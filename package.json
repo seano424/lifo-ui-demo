@@ -6,7 +6,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij > types/supabase.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
