@@ -7,7 +7,12 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij > types/supabase.ts"
+    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij > types/supabase.ts",
+    "supabase": "supabase",
+    "supabase:login": "supabase login",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
@@ -38,6 +43,7 @@
     "eslint-plugin-prettier": "^5.5.0",
     "postcss": "^8",
     "prettier": "^3.5.3",
+    "supabase": "^2.26.9",
     "tailwindcss": "^4.1.10",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5"
