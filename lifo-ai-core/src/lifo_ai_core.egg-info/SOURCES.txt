@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+src/lifo_ai_core/__init__.py
+src/lifo_ai_core.egg-info/PKG-INFO
+src/lifo_ai_core.egg-info/SOURCES.txt
+src/lifo_ai_core.egg-info/dependency_links.txt
+src/lifo_ai_core.egg-info/requires.txt
+src/lifo_ai_core.egg-info/top_level.txt

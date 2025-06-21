@@ -137,6 +137,7 @@ Food surplus management system helping retailers reduce edible inventory loss th
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
+- Tesseract OCR (for lifo-ai-core image processing)
 
 ### Setup
 
@@ -147,19 +148,40 @@ Food surplus management system helping retailers reduce edible inventory loss th
    npm install
    ```
 
-2. **Environment variables**
+2. **Install Tesseract OCR**
+   
+   For the lifo-ai-core image processing functionality, install Tesseract:
+   
+   **Ubuntu/Debian:**
+   ```bash
+   sudo apt update
+   sudo apt install tesseract-ocr
+   ```
+   
+   **macOS:**
+   ```bash
+   brew install tesseract
+   ```
+   
+   **Windows:**
+   Download from [GitHub releases](https://github.com/UB-Mannheim/tesseract/wiki) or use chocolatey:
+   ```bash
+   choco install tesseract
+   ```
+
+3. **Environment variables**
    ```bash
    cp .env.example .env.local
    ```
    
-   Fill in your Supabase credentials:
+   Fill in your Supabase credentials (check Confluence for values):
    ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://jrgmetdsohowtxickqij.supabase.co
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
    ```
 
-3. **Supabase CLI setup**
+4. **Supabase CLI setup**
    ```bash
    # Login to Supabase (one-time setup)
    npm run supabase:login
@@ -168,7 +190,7 @@ Food surplus management system helping retailers reduce edible inventory loss th
    npm run update-types
    ```
 
-4. **Start development**
+5. **Start development**
    ```bash
    npm run dev
    ```
