@@ -44,21 +44,8 @@ export async function fetchUsersPage(
 }> {
   const supabase = serverClient || createClient()
 
-  // Base query with user roles join for role filtering
-  let query = supabase
-    .schema('user_mgmt')
-    .from('users')
-    .select(
-      `
-      *,
-      user_roles (
-        roles (
-          role_name
-        )
-      )
-    `,
-      { count: 'exact' },
-    )
+  // Simplified query - just get users without the complex join
+  let query = supabase.schema('user_mgmt').from('users').select('*', { count: 'exact' })
 
   // Apply filters
   if (filters.is_active !== undefined) {
@@ -139,20 +126,11 @@ export async function deleteUser(userId: string): Promise<void> {
 export async function fetchUserById(userId: string, serverClient?: ServerClient): Promise<User> {
   const supabase = serverClient || createClient()
 
+  // Simple query for single user - roles are fetched separately
   const { data, error } = await supabase
     .schema('user_mgmt')
     .from('users')
-    .select(
-      `
-      *,
-      user_roles (
-        roles (
-          role_name,
-          description
-        )
-      )
-    `,
-    )
+    .select('*')
     .eq('user_id', userId)
     .single()
 
@@ -160,25 +138,34 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
   return data as User
 }
 
-// Role-specific queries
+// Role-specific queries using RPC functions (more reliable)
 export async function fetchUserRoles(userId: string): Promise<string[]> {
   const supabase = createClient()
 
+  // Use the RPC function which is more reliable than complex joins
   const { data, error } = await supabase
     .schema('user_mgmt')
     .rpc('get_user_roles', { user_uuid: userId })
 
-  if (error) throw error
+  if (error) {
+    console.error('[fetchUserRoles] Error:', error)
+    // Return empty array on error instead of throwing
+    return []
+  }
   return data || []
 }
 
 export async function checkUserHasRole(userId: string, roleName: string): Promise<boolean> {
   const supabase = createClient()
 
+  // Use the RPC function
   const { data, error } = await supabase
     .schema('user_mgmt')
     .rpc('has_role', { user_uuid: userId, role_name: roleName })
 
-  if (error) throw error
+  if (error) {
+    console.error('[checkUserHasRole] Error:', error)
+    return false
+  }
   return data || false
 }

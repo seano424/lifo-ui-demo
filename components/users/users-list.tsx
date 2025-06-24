@@ -13,6 +13,7 @@ export function UsersList() {
     useUsers(filters)
   const { activateUser, deactivateUser, isUpdating } = useUserActions()
 
+  if (isLoading) return <div>Loading users...</div>
   if (error) return <div className="text-red-600">Error loading users: {error.message}</div>
 
   return (
