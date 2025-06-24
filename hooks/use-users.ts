@@ -1,5 +1,3 @@
-// hooks/use-users.ts
-
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   fetchUsersPage,
@@ -10,11 +8,12 @@ import {
   updateUser,
   deleteUser,
   type UserFilters,
+  type User,
 } from '@/lib/queries/users'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
-// Main infinite scroll hook for users list
 export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
     queryKey: queryKeys.users.infinite(filters),
@@ -23,7 +22,6 @@ export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
     initialPageParam: 0,
   })
 
-  // Flatten pages into single array
   const data = result.data?.pages.flatMap(page => page.data) ?? []
 
   return {
@@ -39,7 +37,96 @@ export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   }
 }
 
-// Single user query
+export function useCurrentUser() {
+  return useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const supabase = createClient()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        throw new Error('Not authenticated')
+      }
+
+      // Get the user from user_mgmt table
+      const { data: mgmtUser, error: mgmtError } = await supabase
+        .schema('user_mgmt')
+        .from('users')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      if (mgmtError) {
+        throw new Error('User not found in user management')
+      }
+
+      return {
+        auth: user,
+        profile: mgmtUser as User,
+      }
+    },
+    retry: false, // Don't retry auth failures
+  })
+}
+
+export function useCurrentUserRoles() {
+  const { data: currentUser } = useCurrentUser()
+
+  return useQuery({
+    queryKey: ['currentUser', 'roles'],
+    queryFn: () => fetchUserRoles(currentUser!.auth.id),
+    enabled: !!currentUser?.auth.id,
+  })
+}
+
+export function useCurrentUserHasRole(roleName: string) {
+  const { data: currentUser } = useCurrentUser()
+
+  return useQuery({
+    queryKey: ['currentUser', 'hasRole', roleName],
+    queryFn: () => checkUserHasRole(currentUser!.auth.id, roleName),
+    enabled: !!currentUser?.auth.id && !!roleName,
+  })
+}
+
+export function usePermissions() {
+  const { data: currentUser } = useCurrentUser()
+  const { data: isAdmin } = useCurrentUserHasRole('admin')
+  const { data: isManager } = useCurrentUserHasRole('manager')
+  const { data: roles } = useCurrentUserRoles()
+
+  return {
+    userId: currentUser?.auth.id,
+    isAuthenticated: !!currentUser,
+    isAdmin: !!isAdmin,
+    isManager: !!isManager,
+    isViewer: roles?.includes('viewer') ?? false,
+    roles: roles || [],
+
+    // Permission helpers
+    canEditProduct: (productCreatorId?: string) => {
+      if (!currentUser) return false
+      return isAdmin || isManager || productCreatorId === currentUser.auth.id
+    },
+
+    canDeleteProduct: (productCreatorId?: string) => {
+      if (!currentUser) return false
+      return isAdmin || isManager || productCreatorId === currentUser.auth.id
+    },
+
+    canManageUsers: () => {
+      return isAdmin || isManager
+    },
+
+    canCreateProducts: () => {
+      return isAdmin || isManager
+    },
+  }
+}
+
 export function useUser(userId: string) {
   return useQuery({
     queryKey: queryKeys.users.detail(userId),
@@ -48,7 +135,6 @@ export function useUser(userId: string) {
   })
 }
 
-// User roles query
 export function useUserRoles(userId: string) {
   return useQuery({
     queryKey: [...queryKeys.users.detail(userId), 'roles'],
@@ -57,7 +143,6 @@ export function useUserRoles(userId: string) {
   })
 }
 
-// Check if user has specific role
 export function useUserHasRole(userId: string, roleName: string) {
   return useQuery({
     queryKey: [...queryKeys.users.detail(userId), 'hasRole', roleName],
@@ -66,7 +151,6 @@ export function useUserHasRole(userId: string, roleName: string) {
   })
 }
 
-// Convenience hooks for common filters
 export function useActiveUsers() {
   return useUsers({ is_active: true })
 }
@@ -79,17 +163,18 @@ export function useUsersByRole(roleName: string) {
   return useUsers({ role: roleName })
 }
 
-// CRUD Actions with optimistic updates and cache invalidation
 export function useUserActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
     mutationFn: createUser,
-    onSuccess: () => {
+    onSuccess: newUser => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
+      queryClient.setQueryData(queryKeys.users.detail(newUser.user_id), newUser)
       toast.success('User created successfully')
     },
-    onError: () => {
+    onError: error => {
+      console.error('Failed to create user:', error)
       toast.error('Failed to create user')
     },
   })
@@ -97,29 +182,22 @@ export function useUserActions() {
   const updateMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: any }) => updateUser(id, updates),
     onMutate: async ({ id, updates }) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.users.detail(id) })
-
-      // Snapshot previous value
       const previousUser = queryClient.getQueryData(queryKeys.users.detail(id))
 
-      // Optimistically update
-      queryClient.setQueryData(queryKeys.users.detail(id), (old: any) => ({
-        ...old,
-        ...updates,
-      }))
+      queryClient.setQueryData(queryKeys.users.detail(id), (old: User | undefined) =>
+        old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined,
+      )
 
       return { previousUser, id }
     },
     onError: (err, variables, context) => {
-      // Revert on error
       if (context?.previousUser) {
         queryClient.setQueryData(queryKeys.users.detail(context.id), context.previousUser)
       }
       toast.error('Failed to update user')
     },
     onSettled: (data, error, { id }) => {
-      // Always refetch after mutation
       queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(id) })
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
     },

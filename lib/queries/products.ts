@@ -1,4 +1,4 @@
-// lib/queries/products.ts
+// lib/queries/products.ts - Improved version
 
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -22,16 +22,25 @@ export type ProductsPageParam = {
   pageSize: number
 }
 
+// ✅ FIXED: Better error messages and logging
 export async function fetchProducts(serverClient?: ServerClient): Promise<Product[]> {
   const supabase = serverClient || createClient()
   console.log('[fetchProducts] Querying inventory.products with no filters')
 
-  // Use schema.table format
-  const { data, error } = await supabase.schema('inventory').from('products').select('*')
+  try {
+    const { data, error } = await supabase.schema('inventory').from('products').select('*')
 
-  console.log('[fetchProducts] Result:', { data, error })
-  if (error) throw error
-  return data as Product[]
+    if (error) {
+      console.error('[fetchProducts] Supabase error:', error)
+      throw new Error(`Failed to fetch products: ${error.message}`)
+    }
+
+    console.log('[fetchProducts] Success:', { count: data?.length })
+    return data as Product[]
+  } catch (err) {
+    console.error('[fetchProducts] Unexpected error:', err)
+    throw err
+  }
 }
 
 export async function fetchProductsPage(
@@ -45,53 +54,88 @@ export async function fetchProductsPage(
 }> {
   const supabase = serverClient || createClient()
 
-  // Fixed: Remove the await here since supabase is not a Promise
-  let query = supabase.schema('inventory').from('products').select('*', { count: 'exact' })
+  try {
+    let query = supabase.schema('inventory').from('products').select('*', { count: 'exact' })
 
-  // Apply filters
-  if (filters.category) {
-    console.log('[fetchProductsPage] Applying filter:', filters)
-    query = query.eq('category', filters.category)
-  }
+    // Apply filters
+    if (filters.category) {
+      console.log('[fetchProductsPage] Applying category filter:', filters.category)
+      query = query.eq('category', filters.category)
+    }
 
-  if (filters.brand) {
-    query = query.eq('brand', filters.brand)
-  }
+    if (filters.brand) {
+      console.log('[fetchProductsPage] Applying brand filter:', filters.brand)
+      query = query.eq('brand', filters.brand)
+    }
 
-  const rangeFrom = page * pageSize
-  const rangeTo = (page + 1) * pageSize - 1
-  console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
+    const rangeFrom = page * pageSize
+    const rangeTo = (page + 1) * pageSize - 1
+    console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
 
-  const { data, error, count } = await query
-    .order('created_at', { ascending: false })
-    .range(rangeFrom, rangeTo)
+    const { data, error, count } = await query
+      .order('created_at', { ascending: false })
+      .range(rangeFrom, rangeTo)
 
-  console.log('[fetchProductsPage] Supabase response:', { data, error, count })
+    if (error) {
+      console.error('[fetchProductsPage] Supabase error:', error)
+      throw new Error(`Failed to fetch products page: ${error.message}`)
+    }
 
-  if (error) throw error
+    console.log('[fetchProductsPage] Success:', {
+      dataCount: data?.length,
+      totalCount: count,
+      hasNextPage: (count || 0) > (page + 1) * pageSize,
+    })
 
-  return {
-    data: (data as Product[]) || [],
-    count: count || 0,
-    nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined,
+    return {
+      data: (data as Product[]) || [],
+      count: count || 0,
+      nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined,
+    }
+  } catch (err) {
+    console.error('[fetchProductsPage] Unexpected error:', err)
+    throw err
   }
 }
 
-// CRUD mutations for products
+// ✅ CRUD mutations with better error handling and validation
+
 export async function createProduct(
   productData: Database['inventory']['Tables']['products']['Insert'],
 ): Promise<Product> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
-    .schema('inventory')
-    .from('products')
-    .insert(productData)
-    .select()
-    .single()
+  try {
+    console.log('[createProduct] Creating product:', {
+      sku: productData.sku,
+      name: productData.name,
+    })
 
-  if (error) throw error
-  return data as Product
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .insert(productData)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('[createProduct] Supabase error:', error)
+
+      // Handle specific error cases
+      if (error.code === '23505') {
+        // Unique constraint violation
+        throw new Error(`Product with SKU "${productData.sku}" already exists`)
+      }
+
+      throw new Error(`Failed to create product: ${error.message}`)
+    }
+
+    console.log('[createProduct] Success:', { productId: data.product_id })
+    return data as Product
+  } catch (err) {
+    console.error('[createProduct] Unexpected error:', err)
+    throw err
+  }
 }
 
 export async function updateProduct(
@@ -100,28 +144,87 @@ export async function updateProduct(
 ): Promise<Product> {
   const supabase = createClient()
 
-  const { data, error } = await supabase
-    .schema('inventory')
-    .from('products')
-    .update(updates)
-    .eq('product_id', productId)
-    .select()
-    .single()
+  try {
+    console.log('[updateProduct] Updating product:', { productId, updates })
 
-  if (error) throw error
-  return data as Product
+    // Add updated_at timestamp
+    const updateWithTimestamp = {
+      ...updates,
+      updated_at: new Date().toISOString(),
+    }
+
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .update(updateWithTimestamp)
+      .eq('product_id', productId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('[updateProduct] Supabase error:', error)
+
+      // Handle specific error cases
+      if (error.code === 'PGRST116') {
+        // No rows updated
+        throw new Error(`Product with ID "${productId}" not found`)
+      }
+
+      if (error.code === '23505') {
+        // Unique constraint violation
+        throw new Error(`Another product already uses this SKU`)
+      }
+
+      throw new Error(`Failed to update product: ${error.message}`)
+    }
+
+    console.log('[updateProduct] Success:', { productId })
+    return data as Product
+  } catch (err) {
+    console.error('[updateProduct] Unexpected error:', err)
+    throw err
+  }
 }
 
 export async function deleteProduct(productId: string): Promise<void> {
   const supabase = createClient()
 
-  const { error } = await supabase
-    .schema('inventory')
-    .from('products')
-    .delete()
-    .eq('product_id', productId)
+  try {
+    console.log('[deleteProduct] Deleting product:', { productId })
 
-  if (error) throw error
+    // ✅ IMPORTANT: Check for related batches first
+    const { data: relatedBatches, error: batchError } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('batch_id')
+      .eq('product_id', productId)
+      .limit(1)
+
+    if (batchError) {
+      console.error('[deleteProduct] Error checking batches:', batchError)
+      throw new Error(`Failed to check related batches: ${batchError.message}`)
+    }
+
+    if (relatedBatches && relatedBatches.length > 0) {
+      throw new Error('Cannot delete product that has associated batches. Delete batches first.')
+    }
+
+    const { error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .delete()
+      .eq('product_id', productId)
+
+    if (error) {
+      console.error('[deleteProduct] Supabase error:', error)
+      throw new Error(`Failed to delete product: ${error.message}`)
+    }
+
+    console.log('[deleteProduct] Success:', { productId })
+  } catch (err) {
+    console.error('[deleteProduct] Unexpected error:', err)
+    throw err
+  }
 }
 
 export async function fetchProductById(
@@ -130,13 +233,87 @@ export async function fetchProductById(
 ): Promise<Product> {
   const supabase = serverClient || createClient()
 
-  const { data, error } = await supabase
-    .schema('inventory')
-    .from('products')
-    .select('*')
-    .eq('product_id', productId)
-    .single()
+  try {
+    console.log('[fetchProductById] Fetching product:', { productId })
 
-  if (error) throw error
-  return data as Product
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select('*')
+      .eq('product_id', productId)
+      .single()
+
+    if (error) {
+      console.error('[fetchProductById] Supabase error:', error)
+
+      if (error.code === 'PGRST116') {
+        // No rows found
+        throw new Error(`Product with ID "${productId}" not found`)
+      }
+
+      throw new Error(`Failed to fetch product: ${error.message}`)
+    }
+
+    console.log('[fetchProductById] Success:', { productId })
+    return data as Product
+  } catch (err) {
+    console.error('[fetchProductById] Unexpected error:', err)
+    throw err
+  }
+}
+
+// ✅ BONUS: Add a function to fetch product with related batches
+export async function fetchProductWithBatches(
+  productId: string,
+  serverClient?: ServerClient,
+): Promise<Product & { batches: any[] }> {
+  const supabase = serverClient || createClient()
+
+  try {
+    console.log('[fetchProductWithBatches] Fetching product with batches:', { productId })
+
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select(
+        `
+        *,
+        batches (
+          batch_id,
+          batch_number,
+          supplier,
+          manufacture_date,
+          expiry_date,
+          current_quantity,
+          available_quantity,
+          cost_price,
+          selling_price,
+          status,
+          location_code
+        )
+      `,
+      )
+      .eq('product_id', productId)
+      .single()
+
+    if (error) {
+      console.error('[fetchProductWithBatches] Supabase error:', error)
+
+      if (error.code === 'PGRST116') {
+        throw new Error(`Product with ID "${productId}" not found`)
+      }
+
+      throw new Error(`Failed to fetch product with batches: ${error.message}`)
+    }
+
+    console.log('[fetchProductWithBatches] Success:', {
+      productId,
+      batchCount: data.batches?.length || 0,
+    })
+
+    return data as Product & { batches: any[] }
+  } catch (err) {
+    console.error('[fetchProductWithBatches] Unexpected error:', err)
+    throw err
+  }
 }

@@ -1,51 +1,108 @@
-// components/products/product-list.tsx (Client Component)
 'use client'
 
-import { useProducts } from '@/hooks/use-products'
+import { useMemo } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useProducts, useProductActions } from '@/hooks/use-products'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ProductCard } from '@/components/products/product-card'
 
 export function ProductsList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useProducts()
 
-  // No loading state needed - data is pre-hydrated from server!
-  if (error) return <div>Error loading products</div>
+  const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
-  if (isLoading) return <div>Loading products...</div>
+  const uniqueProducts = useMemo(
+    () =>
+      data
+        ? data.filter(
+            (product, index, self) =>
+              self.findIndex(p => p.product_id === product.product_id) === index,
+          )
+        : [],
+    [data],
+  )
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-destructive">Error Loading Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {error instanceof Error ? error.message : 'An unexpected error occurred'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <CardHeader>
+              <div className="h-6 bg-muted rounded w-3/4"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded w-1/2"></div>
+                <div className="h-4 bg-muted rounded w-1/3"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-4">
-      {/* Product Grid */}
+    <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {data?.map(product => (
-          <div key={product.product_id} className="border rounded-lg p-4">
-            <h3 className="font-semibold">{product.name}</h3>
-            <p className="text-sm text-gray-600">{product.category}</p>
-            <p className="text-sm">{product.sku}</p>
-            <div className="mt-2 flex justify-between items-center">
-              <span className="font-bold">${product.base_selling_price}</span>
-              {product.brand && (
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">{product.brand}</span>
-              )}
-            </div>
-          </div>
+        {uniqueProducts.map(product => (
+          <ProductCard
+            key={product.product_id}
+            product={product}
+            onDelete={() => deleteProduct(product.product_id)}
+            onUpdatePrice={newPrice => updateProductPrice(product.product_id, newPrice)}
+            isDeleting={isDeleting}
+            isUpdating={isUpdating}
+          />
         ))}
       </div>
 
-      {/* Load More Button */}
       {hasMore && (
-        <div className="flex justify-center mt-6">
-          <button
+        <div className="flex justify-center">
+          <Button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            variant="outline"
+            size="lg"
           >
             {isFetchingNextPage ? 'Loading more...' : 'Load More Products'}
-          </button>
+          </Button>
         </div>
       )}
 
-      {/* Optional: Show total count */}
       {data && data.length > 0 && (
-        <p className="text-center text-sm text-gray-500 mt-4">Showing {data.length} products</p>
+        <div className="flex justify-center">
+          <Badge variant="secondary" className="text-sm">
+            Showing {uniqueProducts.length} products
+          </Badge>
+        </div>
+      )}
+
+      {data && data.length === 0 && (
+        <div className="flex items-center justify-center p-12">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold">No products found</h3>
+            <p className="text-muted-foreground mt-2">Get started by adding your first product</p>
+          </div>
+        </div>
       )}
     </div>
   )
