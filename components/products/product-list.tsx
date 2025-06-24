@@ -1,3 +1,5 @@
+// components/products/product-list.tsx
+
 'use client'
 
 import { useMemo } from 'react'

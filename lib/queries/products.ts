@@ -1,4 +1,4 @@
-// lib/queries/products.ts - Improved version
+// lib/queries/products.ts
 
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
