@@ -47,7 +47,7 @@ export function ConfirmDetailsStep() {
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">Confirm Store Details</h1>
+        <h1 className="text-2xl font-bold">Review Your Store Details</h1>
         <p className="text-muted-foreground">
           Please review your store information before creating your account
         </p>
