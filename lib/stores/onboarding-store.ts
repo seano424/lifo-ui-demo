@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 export type StoreDetails = {
   name: string
@@ -69,18 +70,23 @@ const initialState: OnboardingData = {
   isConfirmed: false,
 }
 
-export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
-  ...initialState,
-  currentStep: 1,
+export const useOnboardingStore = create<OnboardingStore>()(
+  devtools(
+    (set, get) => ({
+      ...initialState,
+      currentStep: 1,
 
-  setSearchQuery: query => set({ searchQuery: query }),
-  setSelectedStore: store => set({ selectedStore: store, isManualEntry: false }),
-  setManualEntry: isManual => set({ isManualEntry: isManual }),
-  setStoreType: type => set({ storeType: type }),
-  setConfirmedStore: store => set({ confirmedStore: store }),
-  setUserDetails: details => set({ userDetails: details }),
-  setEmailSent: sent => set({ isEmailSent: sent }),
-  setConfirmed: confirmed => set({ isConfirmed: confirmed }),
-  setCurrentStep: step => set({ currentStep: step }),
-  reset: () => set({ ...initialState, currentStep: 1 }),
-}))
+      setSearchQuery: query => set({ searchQuery: query }),
+      setSelectedStore: store => set({ selectedStore: store, isManualEntry: false }),
+      setManualEntry: isManual => set({ isManualEntry: isManual }),
+      setStoreType: type => set({ storeType: type }),
+      setConfirmedStore: store => set({ confirmedStore: store }),
+      setUserDetails: details => set({ userDetails: details }),
+      setEmailSent: sent => set({ isEmailSent: sent }),
+      setConfirmed: confirmed => set({ isConfirmed: confirmed }),
+      setCurrentStep: step => set({ currentStep: step }),
+      reset: () => set({ ...initialState, currentStep: 1 }),
+    }),
+    { name: 'OnboardingStore' }
+  )
+)
