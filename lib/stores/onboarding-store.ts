@@ -13,7 +13,7 @@ export type StoreDetails = {
     lat: number
     lng: number
   }
-  mapboxPlaceId?: string
+  googlePlaceId?: string
 }
 
 export type OnboardingData = {
@@ -87,6 +87,6 @@ export const useOnboardingStore = create<OnboardingStore>()(
       setCurrentStep: step => set({ currentStep: step }),
       reset: () => set({ ...initialState, currentStep: 1 }),
     }),
-    { name: 'OnboardingStore' }
-  )
+    { name: 'OnboardingStore' },
+  ),
 )

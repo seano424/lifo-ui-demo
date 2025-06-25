@@ -17,7 +17,8 @@ export function OnboardingFlow() {
       <div className="mb-8">
         <div className="flex justify-between text-sm">
           {['Store Lookup', 'Store Details', 'Review', 'Account'].map((label, index) => (
-            <div
+            <button
+              onClick={() => setCurrentStep(index + 1)}
               key={label}
               className={`text-center ${
                 index + 1 <= currentStep ? 'text-primary font-medium' : 'text-muted-foreground'
@@ -33,7 +34,7 @@ export function OnboardingFlow() {
                 {index + 1}
               </div>
               {label}
-            </div>
+            </button>
           ))}
         </div>
         <div className="mt-4 bg-muted rounded-full h-2">

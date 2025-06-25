@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { ArrowLeftIcon } from 'lucide-react'
 
 export function OnboardingSignUpForm({
   className,
@@ -23,8 +22,7 @@ export function OnboardingSignUpForm({
   const router = useRouter()
 
   // Get store data from onboarding flow
-  const { confirmedStore, setUserDetails, setEmailSent, currentStep, setCurrentStep } =
-    useOnboardingStore()
+  const { confirmedStore, setUserDetails, setEmailSent, setCurrentStep } = useOnboardingStore()
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -91,6 +89,17 @@ export function OnboardingSignUpForm({
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!confirmedStore) {
+    return (
+      <div className="text-center">
+        <p>No store information found. Please go back and complete the previous steps.</p>
+        <Button onClick={() => setCurrentStep(1)} className="mt-4">
+          Start Over
+        </Button>
+      </div>
+    )
   }
 
   return (

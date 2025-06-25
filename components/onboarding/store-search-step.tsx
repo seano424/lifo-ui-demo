@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 
-// For now, we'll use a simple mock search - replace with Mapbox later
+// For now, we'll use a simple mock search - replace with Google Places API later
 export function StoreSearchStep() {
   const { searchQuery, setSearchQuery, setSelectedStore, setManualEntry, setCurrentStep } =
     useOnboardingStore()
