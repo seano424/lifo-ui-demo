@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+import { CardContent } from '@/components/ui/card'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 
 // For now, we'll use a simple mock search - replace with Google Places API later
@@ -32,6 +32,38 @@ export function StoreSearchStep() {
           },
           {
             id: '2',
+            name: `${searchValue} Centre`,
+            address: '456 Avenue des Champs, 75008 Paris',
+            city: 'Paris',
+            postalCode: '75008',
+            country: 'France',
+          },
+          {
+            id: '3',
+            name: `${searchValue} Centre`,
+            address: '456 Avenue des Champs, 75008 Paris',
+            city: 'Paris',
+            postalCode: '75008',
+            country: 'France',
+          },
+          {
+            id: '4',
+            name: `${searchValue} Centre`,
+            address: '456 Avenue des Champs, 75008 Paris',
+            city: 'Paris',
+            postalCode: '75008',
+            country: 'France',
+          },
+          {
+            id: '5',
+            name: `${searchValue} Centre`,
+            address: '456 Avenue des Champs, 75008 Paris',
+            city: 'Paris',
+            postalCode: '75008',
+            country: 'France',
+          },
+          {
+            id: '6',
             name: `${searchValue} Centre`,
             address: '456 Avenue des Champs, 75008 Paris',
             city: 'Paris',
@@ -72,7 +104,7 @@ export function StoreSearchStep() {
         <p className="text-muted-foreground">Search for your business or add it manually</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 relative">
         <Input
           placeholder="Enter your store name or address..."
           value={searchValue}
@@ -80,21 +112,21 @@ export function StoreSearchStep() {
           className="w-full"
         />
 
-        {isLoading && <div className="text-center text-sm text-muted-foreground">Searching...</div>}
+        {/* {isLoading && <div className="text-center text-sm text-muted-foreground">Searching...</div>} */}
 
         {mockResults.length > 0 && (
-          <div className="space-y-2">
+          <div className="max-h-[300px] overflow-y-auto border shadow-lg divide-y divide-border rounded-lg bg-background">
             {mockResults.map(place => (
-              <Card
+              <button
                 key={place.id}
-                className="cursor-pointer hover:bg-accent transition-colors"
+                className="cursor-pointer hover:bg-accent transition-colors w-full text-left"
                 onClick={() => handlePlaceSelect(place)}
               >
                 <CardContent className="p-4">
                   <div className="font-medium">{place.name}</div>
                   <div className="text-sm text-muted-foreground">{place.address}</div>
                 </CardContent>
-              </Card>
+              </button>
             ))}
           </div>
         )}
@@ -102,19 +134,14 @@ export function StoreSearchStep() {
         {searchValue && mockResults.length === 0 && !isLoading && (
           <div className="text-center space-y-4">
             <p className="text-sm text-muted-foreground">No stores matching your search</p>
-            <Button variant="outline" onClick={handleManualEntry}>
-              Add store details manually
-            </Button>
           </div>
         )}
 
-        {!searchValue && (
-          <div className="text-center">
-            <Button variant="outline" onClick={handleManualEntry}>
-              Add store details manually
-            </Button>
-          </div>
-        )}
+        <div className="text-center">
+          <Button variant="outline" onClick={handleManualEntry}>
+            Add store details manually
+          </Button>
+        </div>
       </div>
     </div>
   )

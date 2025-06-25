@@ -7,6 +7,7 @@ import { ConfirmDetailsStep } from './confirm-details-step'
 import { OnboardingSignUpForm } from './onboarding-signup-form'
 import { Button } from '../ui/button'
 import { ArrowLeftIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export function OnboardingFlow() {
   const { currentStep, setCurrentStep } = useOnboardingStore()
@@ -45,20 +46,18 @@ export function OnboardingFlow() {
         </div>
       </div>
 
-      {currentStep > 1 && (
-        <Button
-          variant="ghost"
-          className="rounded-full border-none h-10 w-10"
-          onClick={() => setCurrentStep(currentStep - 1)}
-          disabled={currentStep === 1}
-        >
-          <ArrowLeftIcon className="w-4 h-4" />
-          {/* Back to {currentStep === 2 ? 'Store' : currentStep === 3 ? 'Store Details' : 'Confirm'} */}
-        </Button>
-      )}
+      <Button
+        variant="ghost"
+        className={cn('rounded-full border-none h-10 w-10 mb-2', currentStep === 1 && '!opacity-0')}
+        onClick={() => setCurrentStep(currentStep - 1)}
+        disabled={currentStep === 1}
+      >
+        <ArrowLeftIcon className="w-4 h-4" />
+        {/* Back to {currentStep === 2 ? 'Store' : currentStep === 3 ? 'Store Details' : 'Confirm'} */}
+      </Button>
 
       {/* Step content */}
-      <div className="min-h-[500px] flex items-center justify-center">
+      <div className="min-h-[500px]">
         {currentStep === 1 && <StoreSearchStep />}
         {currentStep === 2 && <StoreTypeStep />}
         {currentStep === 3 && <ConfirmDetailsStep />}
