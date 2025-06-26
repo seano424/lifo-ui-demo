@@ -14,9 +14,6 @@ export function OnboardingFlow() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-10 flex justify-end">
-        <Button onClick={testOnboardingAPI}>Test Onboarding API</Button>
-      </div>
       {/* Progress indicator */}
       <div className="mb-8">
         <div className="flex justify-between text-sm">
@@ -68,40 +65,4 @@ export function OnboardingFlow() {
       </div>
     </div>
   )
-}
-
-const testOnboardingAPI = async () => {
-  const testData = {
-    userId: 'test-user-id-123',
-    store: {
-      name: 'Test Bakery',
-      address: '123 Test Street',
-      city: 'Paris',
-      postalCode: '75001',
-      country: 'France',
-      phone: '01 23 45 67 89',
-      type: 'bakery',
-      coordinates: { lat: 48.8566, lng: 2.3522 },
-      googlePlaceId: 'test-place-id',
-    },
-    user: {
-      email: 'test@testbakery.fr',
-      fullName: 'Test Manager',
-    },
-  }
-
-  const response = await fetch('/api/onboarding', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(testData),
-  })
-
-  const result = await response.json()
-  console.log('API Response:', result)
-}
-
-export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
 }

@@ -7,28 +7,37 @@ import { CardContent } from '@/components/ui/card'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useDebouncedValue } from '@/hooks/use-debounce-search'
 
+type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results'
+
 export function StoreSearchStep() {
   const { searchQuery, setSearchQuery, setSelectedStore, setManualEntry, setCurrentStep } =
     useOnboardingStore()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
-  const [isLoading, setIsLoading] = useState(false)
   const [mockResults, setMockResults] = useState<any[]>([])
+  const [searchState, setSearchState] = useState<SearchState>('idle')
 
   // Debounce the search value
   const debouncedSearchValue = useDebouncedValue(searchValue, 300)
 
-  // Track if we're waiting for debounce (typing state)
-  const isTyping = searchValue !== debouncedSearchValue
+  // Update search state when user types
+  useEffect(() => {
+    if (searchValue.length <= 2) {
+      setSearchState('idle')
+      setMockResults([])
+    } else if (searchValue !== debouncedSearchValue) {
+      setSearchState('typing')
+    }
+  }, [searchValue, debouncedSearchValue])
 
   // Perform search when debounced value changes
   useEffect(() => {
     if (debouncedSearchValue.length > 2) {
-      setIsLoading(true)
+      setSearchState('searching')
 
       // Mock search (replace with Google Places API later)
       setTimeout(() => {
-        setMockResults([
+        const results = [
           {
             id: '1',
             name: debouncedSearchValue,
@@ -77,12 +86,11 @@ export function StoreSearchStep() {
             postalCode: '75010',
             country: 'France',
           },
-        ])
-        setIsLoading(false)
+        ]
+
+        setMockResults(results)
+        setSearchState(results.length > 0 ? 'results' : 'no-results')
       }, 300)
-    } else {
-      setMockResults([])
-      setIsLoading(false)
     }
   }, [debouncedSearchValue])
 
@@ -105,12 +113,6 @@ export function StoreSearchStep() {
     setCurrentStep(2)
   }
 
-  // Determine what to show based on search state
-  const shouldShowResults = mockResults.length > 0 && !isLoading && !isTyping
-  const shouldShowLoading = (isLoading || isTyping) && searchValue.length > 2
-  const shouldShowNoResults =
-    searchValue.length > 2 && !isLoading && !isTyping && mockResults.length === 0
-
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2">
@@ -127,12 +129,12 @@ export function StoreSearchStep() {
         />
 
         {/* Show loading indicator while typing or searching */}
-        {shouldShowLoading && (
+        {(searchState === 'typing' || searchState === 'searching') && (
           <div className="text-center text-sm text-muted-foreground">Searching...</div>
         )}
 
         {/* Show results */}
-        {shouldShowResults && (
+        {searchState === 'results' && (
           <div className="max-h-[300px] overflow-y-auto border shadow-lg divide-y divide-border rounded-lg bg-background">
             {mockResults.map(place => (
               <button
@@ -149,8 +151,8 @@ export function StoreSearchStep() {
           </div>
         )}
 
-        {/* Show no results message only when search is complete */}
-        {shouldShowNoResults && (
+        {/* Show no results message */}
+        {searchState === 'no-results' && (
           <div className="text-center space-y-4">
             <p className="text-sm text-muted-foreground">No stores matching your search</p>
           </div>

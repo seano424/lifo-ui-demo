@@ -11,6 +11,9 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+// Simple test mode flag - just flip this to true/false
+const TEST_MODE = true
+
 export function OnboardingSignUpForm({
   className,
   ...props
@@ -43,48 +46,62 @@ export function OnboardingSignUpForm({
     }
 
     try {
-      const supabase = createClient()
+      let userId: string
 
-      // 1. Create Supabase Auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: {
-            store_name: confirmedStore.name, // Add to user metadata
-          },
-        },
-      })
+      if (TEST_MODE) {
+        // Test mode: Skip Supabase Auth entirely
+        console.log('🧪 TEST MODE: Skipping Supabase Auth')
+        userId = `test-user-${Date.now()}`
+        console.log('🧪 Generated test user ID:', userId)
+      } else {
+        // Production mode: Use real Supabase Auth
+        console.log('🔐 PRODUCTION MODE: Using Supabase Auth')
+        const supabase = createClient()
 
-      if (authError) throw authError
-
-      if (authData.user) {
-        // 2. Create store and user records via API
-        const response = await fetch('/api/onboarding', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: authData.user.id, // Supabase Auth ID
-            store: confirmedStore,
-            user: {
-              email,
-              fullName: '', // Could add name field to form
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              store_name: confirmedStore.name,
             },
-          }),
+          },
         })
 
-        if (!response.ok) {
-          throw new Error('Failed to create store and user records')
+        if (authError) throw authError
+
+        if (!authData.user) {
+          throw new Error('No user data returned from Supabase')
         }
 
-        // 3. Update onboarding state
-        setUserDetails({ email, password })
-        setEmailSent(true)
-
-        // 4. Redirect to success page
-        router.push('/onboarding/success')
+        userId = authData.user.id
       }
+
+      // Call your API (works for both test and production)
+      const response = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          store: confirmedStore,
+          user: {
+            email,
+            fullName: '',
+          },
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create store and user records')
+      }
+
+      // Update onboarding state
+      setUserDetails({ email, password })
+      setEmailSent(true)
+
+      // Redirect to success page
+      router.push('/onboarding/success')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -105,6 +122,13 @@ export function OnboardingSignUpForm({
 
   return (
     <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
+      {/* Show test mode indicator in development */}
+      {TEST_MODE && process.env.NODE_ENV === 'development' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+          🧪 <strong>Test Mode Active</strong> - Supabase Auth will be bypassed
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Create Your Account</CardTitle>
@@ -155,7 +179,13 @@ export function OnboardingSignUpForm({
               )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading
+                  ? TEST_MODE
+                    ? 'Testing...'
+                    : 'Creating Account...'
+                  : TEST_MODE
+                    ? '🧪 Test Create Account'
+                    : 'Create Account'}
               </Button>
             </div>
           </form>

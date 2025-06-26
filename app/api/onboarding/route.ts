@@ -1,5 +1,3 @@
-// app/api/onboarding/route.ts
-
 import { NextRequest, NextResponse } from 'next/server'
 
 const DEV_MODE = true
