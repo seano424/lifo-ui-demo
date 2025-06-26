@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -12,7 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { storeDetailsSchema, type StoreDetailsForm } from '@/lib/schemas/store-schemas'
 
 const STORE_TYPES = [
   { value: 'supermarket', label: 'Supermarket' },
@@ -23,39 +32,36 @@ const STORE_TYPES = [
   { value: 'restaurant', label: 'Restaurant' },
   { value: 'cafe', label: 'Café' },
   { value: 'other', label: 'Other' },
-]
+] as const
 
 export function StoreTypeStep() {
   const { selectedStore, isManualEntry, setSelectedStore, setCurrentStep } = useOnboardingStore()
 
-  const [formData, setFormData] = useState({
-    name: selectedStore?.name || '',
-    address: selectedStore?.address || '',
-    city: selectedStore?.city || '',
-    postalCode: selectedStore?.postalCode || '',
-    country: selectedStore?.country || 'France',
-    phone: selectedStore?.phone || '',
-    type: selectedStore?.type || '',
+  const form = useForm<StoreDetailsForm>({
+    resolver: zodResolver(storeDetailsSchema),
+    defaultValues: {
+      name: selectedStore?.name || '',
+      address: selectedStore?.address || '',
+      city: selectedStore?.city || '',
+      postalCode: selectedStore?.postalCode || '',
+      country: selectedStore?.country || 'France',
+      phone: selectedStore?.phone || '',
+      type: (selectedStore?.type as StoreDetailsForm['type']) || undefined,
+    },
   })
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleContinue = () => {
-    if (!formData.name || !formData.type || !formData.address) {
-      alert('Please fill in all required fields')
-      return
-    }
-
+  const onSubmit = (data: StoreDetailsForm) => {
     const storeDetails = {
-      name: formData.name,
-      address: formData.address,
-      city: formData.city,
-      postalCode: formData.postalCode,
-      country: formData.country,
-      phone: formData.phone,
-      type: formData.type,
+      name: data.name,
+      address: data.address,
+      city: data.city,
+      postalCode: data.postalCode,
+      country: data.country,
+      phone: data.phone || '',
+      type: data.type,
+      // Preserve any existing coordinates/placeId
+      coordinates: selectedStore?.coordinates,
+      googlePlaceId: selectedStore?.googlePlaceId,
     }
 
     setSelectedStore(storeDetails)
@@ -83,84 +89,116 @@ export function StoreTypeStep() {
         <CardHeader>
           <CardTitle>Store Information</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Store Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={e => handleInputChange('name', e.target.value)}
-              placeholder="Your Store Name"
-              required
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="type">Store Type *</Label>
-            <Select value={formData.type} onValueChange={value => handleInputChange('type', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select store type" />
-              </SelectTrigger>
-              <SelectContent>
-                {STORE_TYPES.map(type => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="address">Address *</Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={e => handleInputChange('address', e.target.value)}
-              placeholder="123 Rue de la Paix"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={e => handleInputChange('city', e.target.value)}
-                placeholder="Paris"
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Store Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your Store Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="postalCode">Postal Code</Label>
-              <Input
-                id="postalCode"
-                value={formData.postalCode}
-                onChange={e => handleInputChange('postalCode', e.target.value)}
-                placeholder="75001"
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Store Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select store type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {STORE_TYPES.map(type => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              value={formData.phone}
-              onChange={e => handleInputChange('phone', e.target.value)}
-              placeholder="01 23 45 67 89"
-            />
-          </div>
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123 Rue de la Paix" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={handleBack} className="w-full">
-              Back
-            </Button>
-            <Button onClick={handleContinue} className="w-full">
-              Continue
-            </Button>
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Paris" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Postal Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="75001" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="01 23 45 67 89" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleBack} className="w-full">
+                  Back
+                </Button>
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Validating...' : 'Continue'}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
