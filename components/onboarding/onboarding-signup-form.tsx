@@ -93,7 +93,7 @@ export function OnboardingSignUpForm({
 
   if (!confirmedStore) {
     return (
-      <div className="text-center">
+      <div className="text-center max-w-md mx-auto">
         <p>No store information found. Please go back and complete the previous steps.</p>
         <Button onClick={() => setCurrentStep(1)} className="mt-4">
           Start Over
@@ -103,7 +103,7 @@ export function OnboardingSignUpForm({
   }
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Create Your Account</CardTitle>

@@ -16,7 +16,7 @@ export function StoreSearchStep() {
   const [mockResults, setMockResults] = useState<any[]>([])
 
   // Debounce the search value
-  const debouncedSearchValue = useDebouncedValue(searchValue, 3000)
+  const debouncedSearchValue = useDebouncedValue(searchValue, 300)
 
   // Track if we're waiting for debounce (typing state)
   const isTyping = searchValue !== debouncedSearchValue
