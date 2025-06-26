@@ -602,4 +602,435 @@ export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
       )}
       
       {/* Background fetching indicator */}
-      {i
+      {isFetching && !isFetchingNextPage && (
+        <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm">
+          Updating...
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+---
+
+## Data Flow Example: Complete User Journey
+
+Let's trace through a complete user interaction to see how all the pieces work together:
+
+### 1. **User Visits Products Page**
+```typescript
+// Server Component runs first
+export default async function ProductsPage() {
+  const { queryClient } = await createPrefetchedQuery()
+  const supabase = await createServerClient()
+  
+  // Prefetch first 20 products server-side
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: queryKeys.products.infinite({}),
+    queryFn: ({ pageParam = 0 }) => fetchProductsPage({ page: 0, pageSize: 20 }, {}, supabase),
+    initialPageParam: 0,
+  })
+  
+  // HTML is sent to browser with data already loaded
+  return <HydrationBoundary><ProductsList /></HydrationBoundary>
+}
+```
+
+### 2. **Client Hydrates with Data**
+```typescript
+// Client component renders immediately with server data
+export function ProductsList() {
+  const { data, fetchNextPage, hasMore } = useProducts()
+  // data contains 20 products immediately - no loading spinner!
+  
+  return (
+    <div>
+      {data.map(product => <ProductCard key={product.id} product={product} />)}
+      {hasMore && <LoadMoreButton onClick={fetchNextPage} />}
+    </div>
+  )
+}
+```
+
+### 3. **User Scrolls and Loads More**
+```typescript
+// User clicks "Load More" - fetches next 20 products
+const { fetchNextPage } = useProducts()
+// fetchNextPage() calls fetchProductsPage({ page: 1, pageSize: 20 })
+// React Query automatically appends new data to existing list
+```
+
+### 4. **User Marks Product as Discounted**
+```typescript
+// User clicks discount button
+const { markAsDiscounted } = useProductActions()
+markAsDiscounted('prod_123', 25)
+
+// This triggers optimistic update:
+// 1. UI updates instantly (product shows as discounted)
+// 2. API call happens in background
+// 3. If error occurs, UI automatically reverts
+// 4. Cache is invalidated to ensure consistency
+```
+
+### 5. **Another User Sees Update Immediately**
+```typescript
+// Other devices see the change via cache invalidation
+// React Query refetches in background when cache is invalidated
+// Fresh data appears without user action
+```
+
+**Result**: Instant UI updates, seamless infinite scroll, automatic error handling, and multi-device consistency!
+
+---
+
+## Common Patterns & Examples
+
+### Filtering Products by Category
+
+```typescript
+// In your component
+const { data: dairyProducts } = useProducts({ category: 'dairy' })
+const { data: expiringProducts } = useExpiringProducts(storeId)
+
+// URLs automatically work with filters
+// /products?category=dairy → filters are applied server-side and client-side
+```
+
+### Batch Operations
+
+```typescript
+// Multiple updates with loading states
+const { updateProduct, isUpdating } = useProductActions()
+
+const markMultipleAsDiscounted = async (productIds: string[]) => {
+  for (const id of productIds) {
+    await updateProduct({ id, updates: { status: 'discounted' } })
+  }
+}
+
+// UI shows loading state automatically
+if (isUpdating) return <LoadingSpinner />
+```
+
+### Real-time Updates (Future)
+
+```typescript
+// When we add real-time subscriptions
+useEffect(() => {
+  const subscription = supabase
+    .channel('products')
+    .on('postgres_changes', 
+       { event: '*', schema: 'inventory', table: 'products' }, 
+       (payload) => {
+         // Invalidate affected queries
+         queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+       }
+    )
+    .subscribe()
+
+  return () => subscription.unsubscribe()
+}, [])
+```
+
+---
+
+## Error Handling Strategies
+
+### Query Error Handling
+
+```typescript
+// In your component
+const { data, error, isError } = useProducts()
+
+if (isError) {
+  return <ErrorMessage error={error} retry={() => refetch()} />
+}
+
+// Error boundaries catch unhandled errors
+export function ProductsErrorBoundary({ children }) {
+  return (
+    <ErrorBoundary 
+      fallback={<div>Something went wrong loading products</div>}
+      onError={(error) => console.error('Products error:', error)}
+    >
+      {children}
+    </ErrorBoundary>
+  )
+}
+```
+
+### Mutation Error Handling
+
+```typescript
+// Automatic error handling in hooks
+const updateMutation = useMutation({
+  mutationFn: updateProduct,
+  onError: (error, variables, context) => {
+    // Automatic rollback
+    if (context?.previousData) {
+      queryClient.setQueryData(context.queryKey, context.previousData)
+    }
+    // User feedback
+    toast.error(`Failed to update product: ${error.message}`)
+    // Error logging
+    console.error('Update failed:', error, variables)
+  }
+})
+```
+
+### Network Error Recovery
+
+```typescript
+// React Query automatically retries failed requests
+// Configure retry logic in query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Don't retry 4xx errors
+        if (error?.status >= 400 && error?.status < 500) return false
+        // Retry network errors up to 3 times
+        return failureCount < 3
+      },
+      staleTime: 30 * 1000, // 30 seconds
+      gcTime: 5 * 60 * 1000, // 5 minutes
+    }
+  }
+})
+```
+
+---
+
+## Performance Optimization
+
+### Cache Management
+
+```typescript
+// Smart cache invalidation
+const updateMutation = useMutation({
+  mutationFn: updateProduct,
+  onSuccess: (updatedProduct, { id }) => {
+    // Update specific item cache
+    queryClient.setQueryData(queryKeys.products.detail(id), updatedProduct)
+    
+    // Invalidate lists that might include this product
+    queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+    
+    // Don't invalidate unrelated caches
+    // queryClient.invalidateQueries({ queryKey: queryKeys.users.all })  ❌
+  }
+})
+```
+
+### Prefetching Strategies
+
+```typescript
+// Prefetch related data on hover
+const { prefetchQuery } = useQueryClient()
+
+const handleProductHover = (productId: string) => {
+  prefetchQuery({
+    queryKey: queryKeys.products.detail(productId),
+    queryFn: () => fetchProductById(productId),
+    staleTime: 60 * 1000, // Cache for 1 minute
+  })
+}
+
+// Prefetch next page before user needs it
+const { fetchNextPage, hasMore } = useProducts()
+
+useEffect(() => {
+  const handleScroll = () => {
+    const scrollPosition = window.scrollY + window.innerHeight
+    const documentHeight = document.documentElement.offsetHeight
+    
+    // Prefetch when user is 80% down the page
+    if (scrollPosition > documentHeight * 0.8 && hasMore) {
+      fetchNextPage()
+    }
+  }
+  
+  window.addEventListener('scroll', handleScroll)
+  return () => window.removeEventListener('scroll', handleScroll)
+}, [fetchNextPage, hasMore])
+```
+
+---
+
+## Testing Patterns
+
+### Testing Query Functions
+
+```typescript
+// lib/queries/__tests__/products.test.ts
+import { fetchProductsPage } from '../products'
+import { createMockSupabase } from '@/lib/test-utils'
+
+describe('fetchProductsPage', () => {
+  it('should fetch products with filters', async () => {
+    const mockSupabase = createMockSupabase({
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      range: jest.fn().mockResolvedValue({
+        data: [{ id: '1', name: 'Test Product' }],
+        count: 1,
+        error: null
+      })
+    })
+
+    const result = await fetchProductsPage(
+      { page: 0, pageSize: 20 }, 
+      { category: 'dairy' }, 
+      mockSupabase
+    )
+
+    expect(result.data).toHaveLength(1)
+    expect(mockSupabase.eq).toHaveBeenCalledWith('category', 'dairy')
+  })
+})
+```
+
+### Testing React Hooks
+
+```typescript
+// hooks/__tests__/use-products.test.ts
+import { renderHook, waitFor } from '@testing-library/react'
+import { useProducts } from '../use-products'
+import { createTestQueryClient } from '@/lib/test-utils'
+
+const wrapper = ({ children }) => (
+  <QueryClientProvider client={createTestQueryClient()}>
+    {children}
+  </QueryClientProvider>
+)
+
+describe('useProducts', () => {
+  it('should fetch and return products', async () => {
+    const { result } = renderHook(() => useProducts(), { wrapper })
+    
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+    
+    expect(result.current.data).toBeDefined()
+  })
+})
+```
+
+---
+
+## Troubleshooting Guide
+
+### Common Issues
+
+**Issue**: "Cannot read property 'pages' of undefined"
+```typescript
+// ❌ Problem: Not handling loading state
+const { data } = useProducts()
+return data.map(product => <ProductCard product={product} />)
+
+// ✅ Solution: Handle loading and empty states
+const { data, isLoading } = useProducts()
+if (isLoading) return <LoadingSpinner />
+return data.map(product => <ProductCard product={product} />)
+```
+
+**Issue**: "Query key mismatch between server and client"
+```typescript
+// ❌ Problem: Different query keys
+// Server: queryKeys.products.list({})
+// Client: queryKeys.products.infinite({})
+
+// ✅ Solution: Use identical keys
+// Both: queryKeys.products.infinite({})
+```
+
+**Issue**: "Stale data after mutations"
+```typescript
+// ❌ Problem: Not invalidating cache
+const updateMutation = useMutation({
+  mutationFn: updateProduct,
+  // onSuccess missing
+})
+
+// ✅ Solution: Invalidate relevant queries
+onSuccess: () => {
+  queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+}
+```
+
+### Debugging Tips
+
+```typescript
+// Enable React Query DevTools in development
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+export function ReactQueryProvider({ children }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      {process.env.NODE_ENV === 'development' && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
+    </QueryClientProvider>
+  )
+}
+```
+
+---
+
+## Migration Guide: Adding Real-time
+
+When we're ready to add real-time subscriptions:
+
+### 1. Update Query Client
+```typescript
+// lib/react-query/subscriptions.ts
+export function setupRealtimeSubscriptions(queryClient: QueryClient) {
+  const supabase = createClient()
+  
+  // Products table changes
+  supabase
+    .channel('products')
+    .on('postgres_changes', 
+       { event: '*', schema: 'inventory', table: 'products' },
+       (payload) => {
+         if (payload.eventType === 'UPDATE') {
+           // Update specific product cache
+           queryClient.setQueryData(
+             queryKeys.products.detail(payload.new.id), 
+             payload.new
+           )
+           // Invalidate product lists
+           queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+         }
+       }
+    )
+    .subscribe()
+}
+```
+
+### 2. Update Provider
+```typescript
+// lib/react-query/provider.tsx
+export function ReactQueryProvider({ children }) {
+  const [queryClient] = useState(() => createQueryClient())
+  
+  useEffect(() => {
+    setupRealtimeSubscriptions(queryClient)
+  }, [queryClient])
+  
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+}
+```
+
+### 3. No Component Changes Needed!
+The existing `useProducts()` hooks automatically benefit from real-time updates through cache invalidation.
+
+---
+
+*This architecture provides a scalable, performant foundation for LIFO's real-time inventory management needs while maintaining excellent developer experience.*
