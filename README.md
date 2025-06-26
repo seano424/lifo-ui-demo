@@ -59,12 +59,11 @@ npm run update-types
 ## 📚 Documentation
 
 ### Start Here
-- 🏗️ **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)** - System overview and architectural decisions
-- 👋 **[Developer Onboarding](docs/DEVELOPER_ONBOARDING.md)** - New team member setup guide
+- 🏗️ **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD)** - System overview and architectural decisions
+- 👋 **[Developer Onboarding](docs/DEVELOPER_ONBOARDING.MD)** - New team member setup guide
 
 ### Implementation Guides
-- 📖 **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.md)** - How to add new features and CRUD operations
-- 🎨 **[Component Standards](docs/COMPONENT_STANDARDS.md)** - UI patterns and conventions _(coming soon)_
+- 📖 **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)** - How to add new features and CRUD operations
 
 ### For Different Audiences
 - **New to the project?** → Developer Onboarding → Technical Architecture
@@ -85,7 +84,7 @@ npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ```
 
 ### Adding a New Feature
-1. **Check patterns** in [Data Fetching Guide](docs/DATA_FETCHING_GUIDE.md)
+1. **Check patterns** in [Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)
 2. **Create raw queries** in `lib/queries/[table].ts`
 3. **Add query keys** to `lib/queries/query-keys.ts`  
 4. **Build React hook** in `hooks/use-[table].ts`
@@ -118,7 +117,7 @@ git push origin feature/what-youre-working-on
 - **Role-based access**: Store admin, manager, employee permissions
 - **Direct client access**: Secure via Supabase RLS policies
 
-See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) for security deep-dive.
+See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD) for security deep-dive.
 
 ## 🤝 Team Onboarding
 
@@ -127,7 +126,7 @@ See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md) for security deep-d
 - [ ] Get `.env.local` values from team lead  
 - [ ] Run `npm run update-types` to generate database types
 - [ ] Start with `npm run dev` and explore the app
-- [ ] Read [Developer Onboarding](docs/DEVELOPER_ONBOARDING.md)
+- [ ] Read [Developer Onboarding](docs/DEVELOPER_ONBOARDING.MD)
 - [ ] Pick up your first small task
 
 ### Getting Help
