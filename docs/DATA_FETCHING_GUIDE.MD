@@ -1,338 +1,605 @@
-# LIFO Data Fetching & CRUD Architecture Guide
+# LIFO Data Fetching & CRUD Implementation Guide
 
-## Overview
+## TL;DR - Adding a New Feature
 
-Our data architecture separates raw data fetching from React-specific logic, enabling server-side prefetching while maintaining clean, reusable patterns. This creates a seamless user experience with instant page loads and efficient infinite scroll.
+Need to add a new table? Follow this 4-step pattern:
 
-## Architecture Principles
-
-### 🎯 **Separation of Concerns**
-- **Raw Queries** (`lib/queries/`) - Pure data fetching functions
-- **React Hooks** (`hooks/`) - React Query integration with mutations
-- **Components** - UI logic only, no direct data fetching
-
-### ⚡ **Server + Client Hydration**
-- **Server Components** prefetch first page
-- **Client Components** seamlessly continue with infinite scroll
-- **Same Query Keys** ensure perfect cache hydration
-
-### 🔄 **Consistent Patterns**
-- Every table follows the same structure
-- Predictable API across all data operations
-- Easy to scale and maintain
-
----
-
-## File Structure
-
-```
-lib/
-├── queries/                    # Raw Supabase queries (server/client agnostic)
-│   ├── query-keys.ts          # Centralized query keys
-│   ├── products.ts            # Product CRUD operations
-│   ├── users.ts               # User CRUD operations
-│   └── batches.ts             # Batch CRUD operations (future)
-├── supabase/                  # Supabase clients
-│   ├── client.ts              # Browser client
-│   └── server.ts              # Server client (async)
-└── react-query/               # React Query setup
-    ├── client.ts              # Query client configuration
-    ├── provider.tsx           # App-level provider
-    └── prefetch.ts            # Server prefetch utilities
-
-hooks/
-├── use-products.ts            # Product hooks + mutations
-├── use-users.ts               # User hooks + mutations
-└── use-batches.ts             # Batch hooks + mutations (future)
-```
-
----
-
-## Implementation Pattern
-
-### 1. Query Keys (`lib/queries/query-keys.ts`)
-
-**Purpose**: Single source of truth for all query keys
-
+### 1. **Raw Query Functions** (`lib/queries/[table].ts`)
 ```typescript
-export const queryKeys = {
-  products: {
-    all: ['products'] as const,
-    infinite: (filters: ProductFilters) => ['products', 'infinite', { filters }] as const,
-    detail: (id: string) => ['products', 'detail', id] as const,
-  },
-  users: {
-    all: ['users'] as const,
-    infinite: (filters: UserFilters) => ['users', 'infinite', { filters }] as const,
-    detail: (id: string) => ['users', 'detail', id] as const,
-  }
-}
-```
-
-**Why**: Ensures server prefetch, client hooks, and cache invalidation use identical keys
-
-### 2. Raw Queries (`lib/queries/[table].ts`)
-
-**Purpose**: Pure data fetching functions (no React dependencies)
-
-```typescript
-// Products example
-export async function fetchProductsPage(
-  { page, pageSize }: ProductsPageParam,
-  filters: ProductFilters = {},
-  serverClient?: ServerClient
-): Promise<{ data: Product[]; count: number; nextPage?: number }> {
+export async function fetchSuppliersPage({ page, pageSize }, filters = {}, serverClient) {
   const supabase = serverClient || createClient()
-  
-  let query = supabase.schema('inventory').from('products').select('*', { count: 'exact' })
+  let query = supabase.schema('inventory').from('suppliers').select('*', { count: 'exact' })
   
   // Apply filters
-  if (filters.category) {
-    query = query.eq('category', filters.category)
-  }
+  if (filters.active_only) query = query.eq('is_active', true)
   
   const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(page * pageSize, (page + 1) * pageSize - 1)
   
   if (error) throw error
-  
-  return {
-    data: data || [],
-    count: count || 0,
-    nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined
+  return { data: data || [], count: count || 0, nextPage: /* pagination logic */ }
+}
+```
+
+### 2. **Query Keys** (`lib/queries/query-keys.ts`)
+```typescript
+export const queryKeys = {
+  suppliers: {
+    all: ['suppliers'] as const,
+    infinite: (filters) => ['suppliers', 'infinite', { filters }] as const,
+    detail: (id) => ['suppliers', 'detail', id] as const,
   }
 }
 ```
 
-**Includes**:
-- ✅ Pagination logic
-- ✅ Filter application  
-- ✅ Server/client compatibility
-- ✅ TypeScript types
-- ✅ CRUD mutations (create, update, delete)
-
-**Why**: 
-- Shared between server prefetching and client hooks
-- Testable without React
-- Clean separation of data access logic
-
-### 3. React Hooks (`hooks/use-[table].ts`)
-
-**Purpose**: React Query integration with complete table management
-
+### 3. **React Hook** (`hooks/use-suppliers.ts`)
 ```typescript
-// Reading data
-export function useProducts(filters: ProductFilters = {}, pageSize = 20) {
+export function useSuppliers(filters = {}, pageSize = 20) {
   const result = useInfiniteQuery({
-    queryKey: queryKeys.products.infinite(filters),
-    queryFn: ({ pageParam = 0 }) => fetchProductsPage({ page: pageParam, pageSize }, filters),
-    getNextPageParam: lastPage => lastPage.nextPage,
+    queryKey: queryKeys.suppliers.infinite(filters),
+    queryFn: ({ pageParam = 0 }) => fetchSuppliersPage({ page: pageParam, pageSize }, filters),
+    getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
   })
 
-  // Flatten pages into single array
   const data = result.data?.pages.flatMap(page => page.data) ?? []
-
-  return {
-    data,
-    count: result.data?.pages[0]?.count ?? 0,
-    isLoading: result.isLoading,
-    hasMore: result.hasNextPage,
-    fetchNextPage: result.fetchNextPage,
-    // ... other result properties
-  }
-}
-
-// Writing data
-export function useProductActions() {
-  const queryClient = useQueryClient()
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, updates }) => updateProduct(id, updates),
-    onMutate: async ({ id, updates }) => {
-      // Optimistic update
-      await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(id) })
-      const previousData = queryClient.getQueryData(queryKeys.products.detail(id))
-      queryClient.setQueryData(queryKeys.products.detail(id), old => ({ ...old, ...updates }))
-      return { previousData, id }
-    },
-    onError: (err, variables, context) => {
-      // Rollback on error
-      queryClient.setQueryData(queryKeys.products.detail(context.id), context.previousData)
-    },
-    onSettled: (data, error, { id }) => {
-      // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.detail(id) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
-    }
-  })
-
-  return {
-    updateProduct: updateMutation.mutate,
-    isUpdating: updateMutation.isPending,
-    // Convenience methods
-    markAsDiscounted: (id, percentage) => updateMutation.mutate({
-      id, 
-      updates: { status: 'discounted', discount_percentage: percentage }
-    })
-  }
+  return { data, fetchNextPage: result.fetchNextPage, hasMore: result.hasNextPage, ...result }
 }
 ```
 
-**Features**:
-- ✅ Infinite scroll by default
-- ✅ Optimistic updates
-- ✅ Automatic cache invalidation
-- ✅ Business logic methods
-- ✅ Loading states
-- ✅ Error handling
-
----
-
-## Data Flow
-
-### 1. Server Component (Prefetch)
+### 4. **Use in Component**
 ```typescript
-// app/products/page.tsx
-export default async function ProductsPage() {
-  const { queryClient } = await createPrefetchedQuery()
-  const serverClient = await createServerClient()
-
-  // Prefetch first page
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: queryKeys.products.infinite({}),
-    queryFn: ({ pageParam = 0 }) => 
-      fetchProductsPage({ page: pageParam, pageSize: 20 }, {}, serverClient),
-    initialPageParam: 0,
-  })
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProductsList />
-    </HydrationBoundary>
-  )
-}
-```
-
-### 2. Client Component (Hydration + Infinite Scroll)
-```typescript
-// app/products/products-list.tsx
-'use client'
-export function ProductsList() {
-  const { data, fetchNextPage, hasMore } = useProducts()
-  // Data is immediately available from server prefetch!
-  
+export function SupplierList() {
+  const { data, fetchNextPage, hasMore } = useSuppliers()
   return (
     <div>
-      {data.map(product => <ProductCard key={product.id} product={product} />)}
+      {data.map(supplier => <SupplierCard key={supplier.id} supplier={supplier} />)}
       {hasMore && <LoadMoreButton onClick={fetchNextPage} />}
     </div>
   )
 }
 ```
 
-### 3. User Actions (Cache Updates)
-```typescript
-// User clicks "Update Product"
-const { updateProduct } = useProductActions()
-updateProduct({ id: 'prod_123', updates: { name: 'New Name' } })
-// → UI updates instantly (optimistic)
-// → Syncs with server in background
-// → Cache invalidation ensures consistency
-```
+**That's it!** Your new feature has infinite scroll, server prefetching, caching, and optimistic updates.
 
 ---
 
-## Usage Examples
+## Architecture Deep Dive
 
-### Basic List with Infinite Scroll
-```typescript
-const { data, fetchNextPage, hasMore } = useProducts()
+### Design Principles
+
+#### 🎯 **Separation of Concerns**
+```
+📁 lib/queries/     → Pure data fetching (no React)
+📁 hooks/           → React Query integration + mutations  
+📁 components/      → UI only (no direct data calls)
 ```
 
-### Filtered Lists
-```typescript
-const { data } = useProducts({ category: 'dairy' })
-const { data } = useUsers({ is_active: true })
+#### ⚡ **Server + Client Hydration**
+```
+Server Component (prefetch) → Client Component (continue) → User Action (update)
+        ↓                            ↓                           ↓
+   First page loaded              Infinite scroll            Optimistic update
 ```
 
-### Single Item
-```typescript
-const { data: product } = useProduct(productId)
-const { data: user } = useUser(userId)
-```
-
-### CRUD Operations
-```typescript
-const { updateProduct, isUpdating } = useProductActions()
-const { createUser, activateUser } = useUserActions()
-```
-
-### Server Prefetching
-```typescript
-await queryClient.prefetchInfiniteQuery({
-  queryKey: queryKeys.products.infinite(filters),
-  queryFn: ({ pageParam }) => fetchProductsPage(params, filters, serverClient)
-})
-```
+#### 🔄 **Consistent API**
+Every table follows identical patterns. Once you learn one, you know them all.
 
 ---
 
-## Key Benefits
+## File Structure & Organization
 
-### ⚡ **Performance**
-- **No loading spinners** - Data renders immediately from server
-- **Efficient pagination** - Only fetch what's needed
-- **Smart caching** - Background updates with stale-while-revalidate
+```
+lib/
+├── queries/                    # Raw Supabase operations
+│   ├── query-keys.ts          # Centralized cache keys
+│   ├── products.ts            # Product CRUD + pagination
+│   ├── users.ts               # User management
+│   ├── batches.ts             # Batch tracking
+│   └── suppliers.ts           # Example new table
+├── supabase/                  
+│   ├── client.ts              # Browser client (anon key)
+│   └── server.ts              # Server client (service key)
+└── react-query/               
+    ├── client.ts              # Query client config
+    ├── provider.tsx           # App wrapper
+    └── prefetch.ts            # Server prefetch utils
 
-### 🔄 **Real-time Feel**
-- **Optimistic updates** - UI responds instantly
-- **Background sync** - Server updates happen seamlessly
-- **Automatic rollback** - Error handling with state recovery
+hooks/
+├── use-products.ts            # Product hooks + actions
+├── use-users.ts               # User hooks + actions
+├── use-batches.ts             # Batch hooks + actions
+└── use-suppliers.ts           # Example new feature
+```
 
-### 📱 **Mobile-Friendly**
-- **Retry logic** - Handles poor network connections
-- **Efficient memory** - Pagination prevents memory bloat
-- **Touch-friendly** - Smooth infinite scroll
+### Why This Structure Works
 
-### 🛠️ **Developer Experience**
-- **Consistent API** - Same patterns across all tables
-- **Type safety** - Full TypeScript integration
-- **Easy testing** - Pure functions are easily testable
-- **Predictable** - Clear separation of concerns
-
-### 🚀 **Scalability**
-- **Server-side rendering** - SEO and performance benefits
-- **Cache management** - Automatic invalidation and updates
-- **Multi-schema** - Works across all Supabase schemas
-
----
-
-## Adding New Tables
-
-To add a new table (e.g., `batches`):
-
-1. **Create query file**: `lib/queries/batches.ts`
-2. **Add query keys**: Update `lib/queries/query-keys.ts`
-3. **Create hook**: `hooks/use-batches.ts`
-4. **Follow patterns**: Use the same structure as products/users
-
-The architecture scales automatically! 🎯
+- **lib/queries/**: Pure functions, easy to test, server/client compatible
+- **hooks/**: React-specific logic, mutations, cache management  
+- **Shared Query Keys**: Server prefetch and client hooks use identical cache keys
+- **Schema Support**: Works across multiple Supabase schemas (`inventory`, `user_mgmt`, `scoring`)
 
 ---
 
-## Schema Support
+## Implementation Patterns
 
-Our architecture works seamlessly across multiple Supabase schemas:
+### 1. Query Keys Pattern
 
-- **`inventory`** - Products, batches, stock management
-- **`user_mgmt`** - Users, roles, permissions
-- **`scoring`** - Analytics, category weights
-- **Future schemas** - Easy to add with same patterns
+**Purpose**: Single source of truth for all cache keys
 
-Each schema is accessed with `supabase.schema('schema_name').from('table')`
+```typescript
+// lib/queries/query-keys.ts
+export const queryKeys = {
+  products: {
+    all: ['products'] as const,
+    lists: () => [...queryKeys.products.all, 'list'] as const,
+    infinite: (filters: ProductFilters) => [...queryKeys.products.lists(), 'infinite', { filters }] as const,
+    detail: (id: string) => [...queryKeys.products.all, 'detail', id] as const,
+  },
+  batches: {
+    all: ['batches'] as const,
+    infinite: (filters: BatchFilters) => ['batches', 'infinite', { filters }] as const,
+    byProduct: (productId: string) => ['batches', 'product', productId] as const,
+    expiring: (days: number) => ['batches', 'expiring', days] as const,
+  }
+} as const
+```
+
+**Critical**: Server prefetch, client hooks, and cache invalidation MUST use identical keys.
+
+### 2. Raw Query Functions Pattern
+
+**Purpose**: Database operations with no React dependencies
+
+```typescript
+// lib/queries/products.ts
+import { createClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/server'
+
+export type ProductFilters = {
+  storeId?: string
+  category?: string
+  expiringOnly?: boolean
+  searchTerm?: string
+}
+
+export type ProductsPageParam = {
+  page: number
+  pageSize: number
+}
+
+// READ: Paginated products with filters
+export async function fetchProductsPage(
+  { page, pageSize }: ProductsPageParam,
+  filters: ProductFilters = {},
+  serverClient?: ReturnType<typeof createServerClient>
+) {
+  const supabase = serverClient || createClient()
+  
+  let query = supabase
+    .schema('inventory')
+    .from('products')
+    .select(`
+      *,
+      batches:inventory.batches(*)
+    `, { count: 'exact' })
+  
+  // Apply filters dynamically
+  if (filters.storeId) {
+    query = query.eq('store_id', filters.storeId)
+  }
+  
+  if (filters.category) {
+    query = query.eq('category', filters.category)
+  }
+  
+  if (filters.expiringOnly) {
+    const threeDaysFromNow = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+    query = query.lt('expiration_date', threeDaysFromNow)
+  }
+  
+  if (filters.searchTerm) {
+    query = query.ilike('name', `%${filters.searchTerm}%`)
+  }
+  
+  // Execute with pagination
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(page * pageSize, (page + 1) * pageSize - 1)
+  
+  if (error) {
+    console.error('Failed to fetch products:', error)
+    throw new Error(`Database error: ${error.message}`)
+  }
+  
+  return { 
+    data: data || [], 
+    count: count || 0, 
+    nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined 
+  }
+}
+
+// CREATE: Add new product
+export async function createProduct(productData: Omit<Product, 'id' | 'created_at' | 'updated_at'>) {
+  const supabase = createClient()
+  
+  const { data, error } = await supabase
+    .schema('inventory')
+    .from('products')
+    .insert(productData)
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Failed to create product:', error)
+    throw new Error(`Failed to create product: ${error.message}`)
+  }
+  
+  return data
+}
+
+// UPDATE: Modify existing product
+export async function updateProduct(id: string, updates: Partial<Product>) {
+  const supabase = createClient()
+  
+  const { data, error } = await supabase
+    .schema('inventory')
+    .from('products')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Failed to update product:', error)
+    throw new Error(`Failed to update product: ${error.message}`)
+  }
+  
+  return data
+}
+
+// DELETE: Remove product
+export async function deleteProduct(id: string) {
+  const supabase = createClient()
+  
+  const { error } = await supabase
+    .schema('inventory')
+    .from('products')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Failed to delete product:', error)
+    throw new Error(`Failed to delete product: ${error.message}`)
+  }
+}
+```
+
+**Key Features**:
+- ✅ **Server/Client Compatible**: Optional `serverClient` parameter
+- ✅ **Type Safe**: Uses generated Supabase types
+- ✅ **Error Handling**: Consistent logging and user-friendly errors
+- ✅ **Flexible Filtering**: Dynamic query building
+- ✅ **Pagination Logic**: Built-in next page calculation
+
+### 3. React Query Hooks Pattern
+
+**Purpose**: React integration with caching, mutations, and optimistic updates
+
+```typescript
+// hooks/use-products.ts
+import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { 
+  fetchProductsPage, 
+  fetchProductById,
+  createProduct, 
+  updateProduct, 
+  deleteProduct,
+  type ProductFilters 
+} from '@/lib/queries/products'
+import { toast } from 'sonner'
+
+// INFINITE SCROLL: Main product list
+export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
+  const result = useInfiniteQuery({
+    queryKey: queryKeys.products.infinite(filters),
+    queryFn: ({ pageParam = 0 }) => 
+      fetchProductsPage({ page: pageParam, pageSize }, filters),
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
+    staleTime: 30 * 1000, // 30 seconds
+  })
+
+  // Flatten pages into single array for easy rendering
+  const data = result.data?.pages.flatMap(page => page.data) ?? []
+
+  return {
+    data,
+    count: result.data?.pages[0]?.count ?? 0,
+    isLoading: result.isLoading,
+    isFetching: result.isFetching,
+    isError: result.isError,
+    error: result.error,
+    hasMore: result.hasNextPage,
+    fetchNextPage: result.fetchNextPage,
+    isFetchingNextPage: result.isFetchingNextPage,
+  }
+}
+
+// SINGLE ITEM: Product details
+export function useProduct(id: string) {
+  return useQuery({
+    queryKey: queryKeys.products.detail(id),
+    queryFn: () => fetchProductById(id),
+    enabled: !!id,
+  })
+}
+
+// CONVENIENCE HOOKS: Common filter combinations
+export function useExpiringProducts(storeId: string, days: number = 3) {
+  return useProducts({ 
+    storeId, 
+    expiringOnly: true 
+  })
+}
+
+export function useStoreProducts(storeId: string, category?: string) {
+  return useProducts({ 
+    storeId, 
+    category 
+  })
+}
+
+// MUTATIONS: Create, update, delete with optimistic updates
+export function useProductActions() {
+  const queryClient = useQueryClient()
+
+  // CREATE: Add new product
+  const createMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: (newProduct) => {
+      // Add to lists cache
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+      // Add to detail cache
+      queryClient.setQueryData(queryKeys.products.detail(newProduct.id), newProduct)
+      toast.success('Product created successfully')
+    },
+    onError: (error) => {
+      console.error('Create product error:', error)
+      toast.error('Failed to create product')
+    },
+  })
+
+  // UPDATE: Modify with optimistic updates
+  const updateMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Product> }) => 
+      updateProduct(id, updates),
+    
+    // OPTIMISTIC UPDATE: Update UI immediately
+    onMutate: async ({ id, updates }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(id) })
+      
+      // Snapshot the previous value
+      const previousProduct = queryClient.getQueryData(queryKeys.products.detail(id))
+      
+      // Optimistically update the cache
+      queryClient.setQueryData(queryKeys.products.detail(id), (old: any) => 
+        old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined
+      )
+      
+      return { previousProduct, id }
+    },
+    
+    // ROLLBACK: Revert on error
+    onError: (error, { id }, context) => {
+      if (context?.previousProduct) {
+        queryClient.setQueryData(queryKeys.products.detail(context.id), context.previousProduct)
+      }
+      console.error('Update product error:', error)
+      toast.error('Failed to update product')
+    },
+    
+    // REFETCH: Ensure consistency
+    onSettled: (data, error, { id }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.detail(id) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+    },
+    
+    onSuccess: () => {
+      toast.success('Product updated successfully')
+    },
+  })
+
+  // DELETE: Remove product
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: (_, deletedId) => {
+      // Remove from all caches
+      queryClient.removeQueries({ queryKey: queryKeys.products.detail(deletedId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+      toast.success('Product deleted successfully')
+    },
+    onError: (error) => {
+      console.error('Delete product error:', error)
+      toast.error('Failed to delete product')
+    },
+  })
+
+  // BUSINESS LOGIC: Convenience methods for common actions
+  const markAsDiscounted = (id: string, discountPercentage: number) =>
+    updateMutation.mutate({
+      id,
+      updates: {
+        status: 'discounted',
+        discount_percentage: discountPercentage,
+        discounted_at: new Date().toISOString(),
+      },
+    })
+
+  const markAsDonated = (id: string, donationDetails: any) =>
+    updateMutation.mutate({
+      id,
+      updates: {
+        status: 'donated',
+        donation_details: donationDetails,
+        donated_at: new Date().toISOString(),
+      },
+    })
+
+  const markAsExpired = (id: string) =>
+    updateMutation.mutate({
+      id,
+      updates: {
+        status: 'expired',
+        expired_at: new Date().toISOString(),
+      },
+    })
+
+  return {
+    // Raw mutations
+    createProduct: createMutation.mutate,
+    updateProduct: updateMutation.mutate,
+    deleteProduct: deleteMutation.mutate,
+    
+    // Business logic
+    markAsDiscounted,
+    markAsDonated,
+    markAsExpired,
+    
+    // Loading states
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+  }
+}
+```
+
+**Key Features**:
+- ✅ **Infinite Scroll**: Built-in pagination
+- ✅ **Optimistic Updates**: Instant UI feedback
+- ✅ **Error Handling**: Automatic rollback on failure
+- ✅ **Business Logic**: Domain-specific convenience methods
+- ✅ **Cache Management**: Smart invalidation strategies
 
 ---
 
-*This architecture provides the foundation for a scalable, performant inventory management system with excellent developer experience and user performance.*
+## Server-Side Prefetching
+
+### Server Component Pattern
+
+```typescript
+// app/(dashboard)/products/page.tsx
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { fetchProductsPage } from '@/lib/queries/products'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { createServerClient } from '@/lib/supabase/server'
+import { ProductsList } from './products-list'
+
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: { category?: string; search?: string }
+}) {
+  const { queryClient } = await createPrefetchedQuery()
+  const supabase = await createServerClient()
+
+  // Build filters from URL params
+  const filters = {
+    category: searchParams.category,
+    searchTerm: searchParams.search,
+  }
+
+  // Prefetch first page with same query key as client
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: queryKeys.products.infinite(filters),
+    queryFn: ({ pageParam = 0 }) => 
+      fetchProductsPage({ page: pageParam, pageSize: 20 }, filters, supabase),
+    initialPageParam: 0,
+  })
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Products</h1>
+          <ProductFilters />
+        </div>
+        
+        <ProductsList filters={filters} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+### Client Component Pattern
+
+```typescript
+// app/(dashboard)/products/products-list.tsx
+'use client'
+
+import { useProducts, useProductActions } from '@/hooks/use-products'
+import { Button } from '@/components/ui/button'
+import { ProductCard } from './product-card'
+import { LoadingSpinner } from '@/components/ui/loading'
+
+export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
+  // Data is immediately available from server prefetch!
+  const { 
+    data, 
+    fetchNextPage, 
+    hasMore, 
+    isLoading, 
+    isFetching, 
+    isFetchingNextPage 
+  } = useProducts(filters)
+  
+  const { markAsDiscounted, markAsDonated, isUpdating } = useProductActions()
+
+  // Handle initial loading state
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Product Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {data.map((product) => (
+          <ProductCard 
+            key={product.id} 
+            product={product}
+            onDiscount={(percentage) => markAsDiscounted(product.id, percentage)}
+            onDonate={(details) => markAsDonated(product.id, details)}
+            isUpdating={isUpdating}
+          />
+        ))}
+      </div>
+      
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center">
+          <Button 
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            variant="outline"
+            size="lg"
+          >
+            {isFetchingNextPage ? (
+              <>
+                <LoadingSpinner className="mr-2 h-4 w-4" />
+                Loading...
+              </>
+            ) : (
+              'Load More Products'
+            )}
+          </Button>
+        </div>
+      )}
+      
+      {/* Background fetching indicator */}
+      {i
