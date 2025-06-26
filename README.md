@@ -60,7 +60,7 @@ npm run update-types
 
 ### Start Here
 - 🏗️ **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD)** - System overview and architectural decisions
-- 👋 **[Developer Onboarding](docs/DEVELOPER_ONBOARDING.MD)** - New team member setup guide
+- 👋 **[Developer Onboarding](docs/DEV_ONBOARDING.MD)** - New team member setup guide
 
 ### Implementation Guides
 - 📖 **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)** - How to add new features and CRUD operations
@@ -126,7 +126,7 @@ See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD) for security deep-d
 - [ ] Get `.env.local` values from team lead  
 - [ ] Run `npm run update-types` to generate database types
 - [ ] Start with `npm run dev` and explore the app
-- [ ] Read [Developer Onboarding](docs/DEVELOPER_ONBOARDING.MD)
+- [ ] Read [Developer Onboarding](docs/DEV_ONBOARDING.MD)
 - [ ] Pick up your first small task
 
 ### Getting Help
