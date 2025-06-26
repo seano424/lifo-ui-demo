@@ -34,7 +34,7 @@ npm run dev
 # Visit http://localhost:3000
 ```
 
-**Stuck?** Check our [Developer Onboarding Guide](docs/DEVELOPER_ONBOARDING.md) or ask in Slack!
+**Stuck?** Check our [Developer Onboarding Guide](docs/DEV_ONBOARDING.MD) or ask in Slack!
 
 ## 🗄️ Database & Environment
 
