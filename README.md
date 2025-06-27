@@ -1,132 +1,154 @@
 # LIFO.AI
 
-Food surplus management system helping retailers reduce edible inventory loss through AI-driven tools.
+Food surplus management system helping retailers reduce edible inventory loss through AI-driven batch-level inventory intelligence.
 
-## 🚀 Getting Started
+## 🎯 What We're Building
+
+LIFO.AI solves the **batch visibility problem** that costs retailers millions in unnecessary waste. Instead of managing inventory with statistical guesswork, we provide precise, batch-level tracking by expiration date.
+
+**Current Focus**: MVP validation with Dutch grocery stores
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
-- npm or yarn
-- Tesseract OCR (for lifo-ai-core image processing)
+- npm (latest version)
 
-### Setup
-
-1. **Clone and install dependencies**
-   ```bash
-   git clone https://github.com/lifo-ai/lifo-app.git
-   cd lifo-app
-   npm install
-   ```
-
-2. **Install Tesseract OCR**
-   
-   For the lifo-ai-core image processing functionality, install Tesseract:
-   
-   **Ubuntu/Debian:**
-   ```bash
-   sudo apt update
-   sudo apt install tesseract-ocr
-   ```
-   
-   **macOS:**
-   ```bash
-   brew install tesseract
-   ```
-   
-   **Windows:**
-   Download from [GitHub releases](https://github.com/UB-Mannheim/tesseract/wiki) or use chocolatey:
-   ```bash
-   choco install tesseract
-   ```
-
-3. **Environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Fill in your Supabase credentials (check Confluence for values):
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your-project-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   ```
-
-4. **Supabase CLI setup**
-   ```bash
-   # Login to Supabase (one-time setup)
-   npm run supabase:login
-   
-   # Generate TypeScript types
-   npm run update-types
-   ```
-
-5. **Start development**
-   ```bash
-   npm run dev
-   ```
-
-## 🗄️ Database & Types
-
-### Updating TypeScript Types
-
-Whenever database schema changes, run:
-```bash
-npm run update-types
-```
-
-This generates fresh TypeScript types in `types/supabase.ts` for full type safety.
-
-### Supabase CLI Commands
+### Get Running in 5 Minutes
 
 ```bash
-# Login (one-time setup per developer)
-npm run supabase:login
+# 1. Clone and install
+git clone https://github.com/lifo-ai/lifo-app.git
+cd lifo-app
+npm install
 
-# Generate types
+# 2. Environment setup
+cp .env.example .env.local
+# Ask team lead for actual values to put in .env.local
+
+# 3. Generate database types
 npm run update-types
 
-# Check project status
-npm run supabase status
-
-# View help
-npm run supabase --help
+# 4. Start development
+npm run dev
+# Visit http://localhost:3000
 ```
 
-## 📝 Development Workflow
+**Stuck?** Check our [Developer Onboarding Guide](docs/DEV_ONBOARDING.MD) or ask in Slack!
 
-1. **Make database changes** in Supabase Dashboard → SQL Editor
-2. **Update types**: `npm run update-types`
-3. **Update your code** with new TypeScript types
-4. **Commit both** schema changes and updated types
+## 🗄️ Database & Environment
 
-## 🔐 Authentication
+### Environment Variables
 
-Using Supabase Auth with:
-- Email/password signup
-- Row Level Security (RLS) for data isolation
-- JWT-based sessions
-- Auto-profile creation on signup
+Get these values from your team lead:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://jrgmetdsohowtxickqij.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=[ask for this]
+SUPABASE_SERVICE_ROLE_KEY=[keep this secret!]
+```
 
-## 📚 Useful Scripts
+### Keeping Types Updated
 
 ```bash
-npm run dev              # Start Next.js development server
+# Generate fresh TypeScript types from database
+npm run update-types
+
+# After any schema changes in Supabase Dashboard
+```
+
+## 📚 Documentation
+
+### Start Here
+- 🏗️ **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD)** - System overview and architectural decisions
+- 👋 **[Developer Onboarding](docs/DEV_ONBOARDING.MD)** - New team member setup guide
+
+### Implementation Guides
+- 📖 **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)** - How to add new features and CRUD operations
+
+### For Different Audiences
+- **New to the project?** → Developer Onboarding → Technical Architecture
+- **Building a feature?** → Data Fetching Guide  
+- **Understanding our architecture?** → Technical Architecture
+- **Business context?** → Technical Architecture (Executive Summary)
+
+## 🛠️ Development Workflow
+
+### Useful Scripts
+```bash
+npm run dev              # Start development server (with Turbopack)
 npm run build            # Build for production
-npm run update-types     # Generate fresh Supabase types
-npm run supabase:login   # Authenticate with Supabase CLI
+npm run lint             # Run ESLint
+npm run format           # Format code with Prettier
+npm run update-types     # Generate Supabase TypeScript types
+npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ```
+
+### Adding a New Feature
+1. **Check patterns** in [Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)
+2. **Create raw queries** in `lib/queries/[table].ts`
+3. **Add query keys** to `lib/queries/query-keys.ts`  
+4. **Build React hook** in `hooks/use-[table].ts`
+5. **Use in components** with the standard patterns
+
+### Git Workflow
+```bash
+git checkout -b feature/what-youre-working-on
+# Make your changes
+git add .
+git commit -m "feat: describe what you did"
+git push origin feature/what-youre-working-on
+# Create PR for review
+```
+
+## 🏗️ Tech Stack
+
+**Frontend**: Next.js 15 + TypeScript + Tailwind CSS v4  
+**Database**: Supabase (PostgreSQL with RLS)  
+**UI Components**: shadcn/ui + Radix primitives  
+**Data Fetching**: React Query (TanStack Query)  
+**Deployment**: Vercel Pro
+
+**Key Principle**: Direct database access with intelligent caching for real-time inventory updates.
+
+## 🔐 Security
+
+- **Row Level Security (RLS)**: All data protection at database level
+- **Multi-schema design**: `inventory`, `user_mgmt`, `scoring` schemas
+- **Role-based access**: Store admin, manager, employee permissions
+- **Direct client access**: Secure via Supabase RLS policies
+
+See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD) for security deep-dive.
 
 ## 🤝 Team Onboarding
 
-New team members should:
-1. Clone repo and run `npm install`
-2. Get `.env.local` values from team lead
-3. Run `npm run supabase:login` to authenticate
-4. Run `npm run update-types` to generate types
-5. Start coding with `npm run dev`
+### New Developer Checklist
+- [ ] Clone repo and run `npm install`
+- [ ] Get `.env.local` values from team lead  
+- [ ] Run `npm run update-types` to generate database types
+- [ ] Start with `npm run dev` and explore the app
+- [ ] Read [Developer Onboarding](docs/DEV_ONBOARDING.MD)
+- [ ] Pick up your first small task
 
-## 📖 Documentation
+### Getting Help
+- **Slack**: `#dev` channel for technical questions
+- **Stuck on setup?** Ask immediately, don't spend more than 15 minutes alone
+- **Architecture questions?** Check Technical Architecture doc first
+- **Code patterns?** Data Fetching Guide has examples
 
-- [Supabase Docs](https://supabase.com/docs)
-- [Next.js Docs](https://nextjs.org/docs)
-- [Project Architecture](./docs/architecture.md) _(to be created )_
+## 📊 Project Status
+
+- **Stage**: MVP development
+- **Database**: 3 schemas with batch-level inventory tracking
+- **Frontend**: Dashboard with product and batch management
+- **Target**: Dutch grocery store validation
+
+## 🔗 Quick Links
+
+- **GitHub**: [lifo-ai/lifo-app](https://github.com/lifo-ai/lifo-app)
+- **Supabase Dashboard**: [Project jrgmetdsohowtxickqij](https://supabase.com/dashboard/project/jrgmetdsohowtxickqij)
+- **Slack**: Team communication
+- **Figma**: Design files _(ask for access)_
+
+---
+
+**Questions?** Check our docs first, then ask in Slack. We're here to help! 🚀
