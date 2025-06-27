@@ -4,15 +4,14 @@ Hey there! We're excited to have you join the team. This guide will help you get
 
 ## First Things First
 
-**Your point person**: [Mentor Name] - they're here to help with anything you need
 **Slack**: Feel free to ask questions in `#dev` or DM anyone on the team
 **No stupid questions**: Seriously, we've all been there
 
 ---
 
 ## What We're Building
-
-LIFO.AI helps grocery stores track their inventory by expiration date (instead of just "we have 50 apples"). This lets them make smarter decisions about discounts and donations, reducing food waste.
+LIFO.AI helps grocery stores track their inventory by expiration date. 
+This lets them make smarter decisions about discounts and donations, reducing food waste.
 
 **Why it matters**: Most stores just guess when to discount products. We give them actual data.
 **Our users**: Dutch grocery store managers who want to waste less food
@@ -48,8 +47,9 @@ npm run dev
 - **VS Code** (recommended) - with Prettier and ESLint extensions
 
 ### Environment Variables
-
-Ask your mentor for these values to put in `.env.local`:
+We do have a confluence doc for env variables right now. 
+If you don't have access to that or you don't see all the variables necessary, just reach out to dev on slack for help
+Ask for these values to put in `.env.local`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://jrgmetdsohowtxickqij.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=[ask for this]
