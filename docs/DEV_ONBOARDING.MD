@@ -96,10 +96,11 @@ git push origin feature/what-youre-working-on
 
 ### Useful Commands
 ```bash
-npm run dev         # Start development server
-npm run lint        # Check code quality
-npm run format      # Auto-format code
-npm run update-types # Sync database types (run this occasionally)
+npm run dev              # Start development server
+npm run lint             # Check code quality
+npm run format           # Auto-format code
+npm run update-types     # Sync database types (run this occasionally)
+npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ```
 
 ---
