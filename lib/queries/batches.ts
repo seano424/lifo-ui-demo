@@ -1,5 +1,3 @@
-// lib/queries/batches.ts
-
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
@@ -41,7 +39,12 @@ export async function fetchBatches(serverClient?: ServerClient): Promise<Batch[]
   console.log('[fetchBatches] Querying inventory.batches with no filters')
 
   try {
-    const { data, error } = await supabase.schema('inventory').from('batches').select('*')
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('*')
+      .order('expiry_date', { ascending: true })
+      .order('batch_id', { ascending: true }) // ✅ STABLE SECONDARY SORT
 
     if (error) {
       console.error('[fetchBatches] Supabase error:', error)
@@ -151,6 +154,7 @@ export async function fetchBatchesPage(
 
     const { data, error, count } = await query
       .order('expiry_date', { ascending: true }) // Show expiring batches first
+      .order('batch_id', { ascending: true }) // ✅ STABLE SECONDARY SORT FOR CONSISTENT PAGINATION
       .range(rangeFrom, rangeTo)
 
     if (error) {
@@ -182,11 +186,21 @@ export async function fetchBatchesForProduct(
   filters: Omit<BatchFilters, 'product_id'> = {},
   serverClient?: ServerClient,
 ): Promise<{
-  data: Batch[]
+  data: BatchWithProduct[]
   count: number
   nextPage: number | undefined
 }> {
-  return fetchBatchesPage({ page, pageSize }, { ...filters, product_id: productId }, serverClient)
+  const result = await fetchBatchesPage(
+    { page, pageSize },
+    { ...filters, product_id: productId },
+    serverClient,
+  )
+
+  // Type assertion to remove the optional products since we know they'll be included
+  return {
+    ...result,
+    data: result.data as BatchWithProduct[],
+  }
 }
 
 // ✅ CRUD OPERATIONS
@@ -408,6 +422,7 @@ export async function fetchExpiringBatches(
       .gt('current_quantity', 0)
       .lte('expiry_date', expiryThreshold.toISOString().split('T')[0])
       .order('expiry_date', { ascending: true })
+      .order('batch_id', { ascending: true }) // ✅ STABLE SORT HERE TOO
 
     if (error) {
       console.error('[fetchExpiringBatches] Supabase error:', error)
@@ -450,6 +465,7 @@ export async function fetchLowStockBatches(
       .gt('current_quantity', 0)
       .lte('current_quantity', thresholdQuantity)
       .order('current_quantity', { ascending: true })
+      .order('batch_id', { ascending: true }) // ✅ STABLE SORT HERE TOO
 
     if (error) {
       console.error('[fetchLowStockBatches] Supabase error:', error)
