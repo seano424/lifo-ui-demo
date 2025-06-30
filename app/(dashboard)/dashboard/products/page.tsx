@@ -7,6 +7,7 @@ import { ProductsList } from '@/components/products/product-list'
 import { Button } from '@/components/ui/button'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { Plus } from 'lucide-react'
+import { ProductSortList } from '@/components/products/product-sort-list'
 
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -38,7 +39,7 @@ export default async function ProductsPage() {
           }
         />
 
-        <ProductsList />
+        <ProductSortList />
       </div>
     </HydrationBoundary>
   )
