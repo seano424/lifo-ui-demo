@@ -4,6 +4,9 @@ import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { fetchProductsPage } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { ProductsList } from '@/components/products/product-list'
+import { Button } from '@/components/ui/button'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { Plus } from 'lucide-react'
 
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -22,11 +25,18 @@ export default async function ProductsPage() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Products</h1>
-
-          {/* Add action buttons here later */}
-        </div>
+        <DashboardInsetHeader
+          title="Products"
+          description="View and manage your products"
+          rightContent={
+            <div className="flex items-center gap-2">
+              <Button variant="secondary">
+                <Plus className="w-4 h-4" />
+                Add Product
+              </Button>
+            </div>
+          }
+        />
 
         <ProductsList />
       </div>
