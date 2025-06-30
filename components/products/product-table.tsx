@@ -81,7 +81,7 @@ export function ProductTable() {
   })
 
   return (
-    <Card>
+    <Card className="w-full overflow-x-auto h-max">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Package className="h-5 w-5" />

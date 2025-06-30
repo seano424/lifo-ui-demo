@@ -23,11 +23,11 @@ export default function DashboardTabs() {
       <TabsContent value="dashboard" className="space-y-4">
         {/* <DashboardCards /> */}
         <div className="grid gap-4 md:grid-cols-2">
-          <ProductTable />
           <div className="space-y-4">
-            <BatchAnalytics />
+            <ProductTable />
             <ActionLog />
           </div>
+          <BatchAnalytics />
         </div>
       </TabsContent>
 
