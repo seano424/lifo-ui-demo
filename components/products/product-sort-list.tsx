@@ -105,25 +105,6 @@ export function ProductSortList({
           setSort({ field, direction: newDirection })
         }}
       />
-
-      {/* Debug Info (Conditional) */}
-      {(showDebugInfo || process.env.NODE_ENV === 'development') && (
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="text-sm">Debug Info</CardTitle>
-          </CardHeader>
-          <CardContent className="text-xs space-y-1">
-            <div>
-              Current Sort: {currentSort.field} ({currentSort.direction})
-            </div>
-            <div>Products Loaded: {data?.length || 0}</div>
-            <div>Total Count: {count}</div>
-            <div>Has More: {hasMore ? 'Yes' : 'No'}</div>
-            <div>Is Loading: {isLoading ? 'Yes' : 'No'}</div>
-            <div>Is Fetching Next: {isFetchingNextPage ? 'Yes' : 'No'}</div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
