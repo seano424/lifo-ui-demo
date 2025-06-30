@@ -22,13 +22,17 @@ export type ProductsPageParam = {
   pageSize: number
 }
 
-// ✅ FIXED: Better error messages and logging
 export async function fetchProducts(serverClient?: ServerClient): Promise<Product[]> {
   const supabase = serverClient || createClient()
   console.log('[fetchProducts] Querying inventory.products with no filters')
 
   try {
-    const { data, error } = await supabase.schema('inventory').from('products').select('*')
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .order('product_id', { ascending: true })
 
     if (error) {
       console.error('[fetchProducts] Supabase error:', error)
@@ -74,6 +78,7 @@ export async function fetchProductsPage(
 
     const { data, error, count } = await query
       .order('created_at', { ascending: false })
+      .order('product_id', { ascending: true })
       .range(rangeFrom, rangeTo)
 
     if (error) {

@@ -1,8 +1,8 @@
-// components/products/product-list.tsx
+// components/products/product-list.tsx - FIXED VERSION with memoization
 
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useProducts, useProductActions } from '@/hooks/use-products'
@@ -10,19 +10,42 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProductCard } from '@/components/products/product-card'
 
 export function ProductsList() {
-  const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useProducts()
+  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } =
+    useProducts()
 
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
-  const uniqueProducts = useMemo(
-    () =>
-      data
-        ? data.filter(
-            (product, index, self) =>
-              self.findIndex(p => p.product_id === product.product_id) === index,
-          )
-        : [],
-    [data],
+  const products = useMemo(() => {
+    if (!data) return []
+
+    // Create a Map to deduplicate by product_id (keeps the first occurrence)
+    const uniqueProductsMap = new Map()
+
+    data.forEach(product => {
+      if (!uniqueProductsMap.has(product.product_id)) {
+        uniqueProductsMap.set(product.product_id, product)
+      }
+    })
+
+    return Array.from(uniqueProductsMap.values())
+  }, [data])
+
+  const handleFetchNextPage = useCallback(() => {
+    fetchNextPage()
+  }, [fetchNextPage])
+
+  const handleDeleteProduct = useCallback(
+    (productId: string) => {
+      deleteProduct(productId)
+    },
+    [deleteProduct],
+  )
+
+  const handleUpdatePrice = useCallback(
+    (productId: string, newPrice: number) => {
+      updateProductPrice(productId, newPrice)
+    },
+    [updateProductPrice],
   )
 
   if (error) {
@@ -65,12 +88,12 @@ export function ProductsList() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {uniqueProducts.map(product => (
+        {products.map(product => (
           <ProductCard
-            key={product.product_id}
+            key={product.product_id} // ✅ This should now be unique
             product={product}
-            onDelete={() => deleteProduct(product.product_id)}
-            onUpdatePrice={newPrice => updateProductPrice(product.product_id, newPrice)}
+            onDelete={() => handleDeleteProduct(product.product_id)}
+            onUpdatePrice={newPrice => handleUpdatePrice(product.product_id, newPrice)}
             isDeleting={isDeleting}
             isUpdating={isUpdating}
           />
@@ -80,7 +103,7 @@ export function ProductsList() {
       {hasMore && (
         <div className="flex justify-center">
           <Button
-            onClick={() => fetchNextPage()}
+            onClick={handleFetchNextPage}
             disabled={isFetchingNextPage}
             variant="outline"
             size="lg"
@@ -90,15 +113,15 @@ export function ProductsList() {
         </div>
       )}
 
-      {data && data.length > 0 && (
+      {products.length > 0 && (
         <div className="flex justify-center">
           <Badge variant="secondary" className="text-sm">
-            Showing {uniqueProducts.length} products
+            Showing {products.length} of {count} products
           </Badge>
         </div>
       )}
 
-      {data && data.length === 0 && (
+      {products.length === 0 && !isLoading && (
         <div className="flex items-center justify-center p-12">
           <div className="text-center">
             <h3 className="text-lg font-semibold">No products found</h3>
