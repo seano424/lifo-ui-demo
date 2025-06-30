@@ -1,12 +1,12 @@
-// app/dashboard/batches/page.tsx
-
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { fetchBatchesPage, fetchExpiringBatches } from '@/lib/queries/batches'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { BatchList } from '@/components/batches/batch-list'
-import { BatchDashboardStats } from '@/components/batches/batch-dashboard-stats'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
 
 export default async function BatchesPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -28,14 +28,17 @@ export default async function BatchesPage() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Inventory Batches</h1>
-        </div>
+        <DashboardInsetHeader
+          title="Batch Analytics"
+          description="View and manage your inventory batches"
+          rightContent={
+            <Button variant="secondary">
+              <Plus className="w-4 h-4" />
+              Add Batch
+            </Button>
+          }
+        />
 
-        {/* Dashboard Stats */}
-        <BatchDashboardStats />
-
-        {/* Main Batch List */}
         <BatchList title="All Batches" />
       </div>
     </HydrationBoundary>
