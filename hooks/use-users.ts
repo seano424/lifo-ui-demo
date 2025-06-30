@@ -1,4 +1,3 @@
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   fetchUsersPage,
   fetchUserById,
@@ -10,9 +9,10 @@ import {
   type UserFilters,
   type User,
 } from '@/lib/queries/users'
+import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
-import { toast } from 'sonner'
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
@@ -68,6 +68,7 @@ export function useCurrentUser() {
         profile: mgmtUser as User,
       }
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes - same as server prefetch
     retry: false, // Don't retry auth failures
   })
 }

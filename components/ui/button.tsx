@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
+import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 
@@ -31,20 +32,82 @@ const buttonVariants = cva(
   },
 )
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-}
+type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>
+type ButtonOnlyProps =
+  | 'disabled'
+  | 'form'
+  | 'formAction'
+  | 'formEncType'
+  | 'formMethod'
+  | 'formNoValidate'
+  | 'formTarget'
+  | 'name'
+  | 'type'
+  | 'value'
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button'
-    return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
-    )
-  },
-)
+type ButtonPropsBase = {
+  asChild?: boolean
+  asLink?: boolean
+  href?: string
+  children?: React.ReactNode
+} & VariantProps<typeof buttonVariants>
+
+export type ButtonProps =
+  | (ButtonPropsBase & React.ButtonHTMLAttributes<HTMLButtonElement> & { asLink?: false })
+  | (ButtonPropsBase & Omit<AnchorProps, ButtonOnlyProps> & { asLink: true; href: string })
+
+const Button = React.forwardRef<
+  HTMLButtonElement & HTMLAnchorElement,
+  ButtonProps
+>((props, ref) => {
+  const {
+    className,
+    variant,
+    size,
+    asChild = false,
+    asLink = false,
+    href,
+    children,
+    ...rest
+  } = props as ButtonProps & { href?: string }
+
+  if (asLink && href) {
+    const isInternal = href.startsWith('/')
+    const anchorProps = rest as AnchorProps
+    if (isInternal) {
+      // Internal: use Next.js Link directly
+      return (
+        <Link
+          href={href}
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          {...anchorProps}
+        >
+          {children}
+        </Link>
+      )
+    } else {
+      // External: use <a>
+      return (
+        <a
+          href={href}
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          {...anchorProps}
+        >
+          {children}
+        </a>
+      )
+    }
+  }
+  const Comp = asChild ? Slot : 'button'
+  const buttonProps = rest as React.ButtonHTMLAttributes<HTMLButtonElement>
+  return (
+    <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...buttonProps}>
+      {children}
+    </Comp>
+  )
+})
 Button.displayName = 'Button'
 
 export { Button, buttonVariants }
