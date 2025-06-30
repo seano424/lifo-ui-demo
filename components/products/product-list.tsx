@@ -3,7 +3,7 @@
 import { useMemo, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { useProducts, useProductActions } from '@/hooks/use-products'
+import { useProductsWithSort, useProductActions } from '@/hooks/use-products'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -19,11 +19,70 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Package, Edit, Trash2, DollarSign } from 'lucide-react'
+import {
+  MoreHorizontal,
+  Package,
+  Edit,
+  Trash2,
+  DollarSign,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from 'lucide-react'
+import type { SortField } from '@/lib/queries/products'
+
+// ✅ Sortable Table Header Component
+interface SortableHeaderProps {
+  field: SortField
+  children: React.ReactNode
+  currentSort: ReturnType<typeof useProductsWithSort>['currentSort']
+  onSort: (field: SortField) => void
+  className?: string
+}
+
+function SortableHeader({ field, children, currentSort, onSort, className }: SortableHeaderProps) {
+  const isCurrentField = currentSort.field === field
+  const direction = isCurrentField ? currentSort.direction : null
+
+  const getSortIcon = () => {
+    if (!isCurrentField) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
+    }
+    return direction === 'asc' ? (
+      <ArrowUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ArrowDown className="ml-2 h-4 w-4" />
+    )
+  }
+
+  return (
+    <TableHead className={className}>
+      <Button
+        variant="ghost"
+        className="h-auto p-0 font-semibold hover:bg-transparent"
+        onClick={() => onSort(field)}
+      >
+        <div className="flex items-center">
+          {children}
+          {getSortIcon()}
+        </div>
+      </Button>
+    </TableHead>
+  )
+}
 
 export function ProductsList() {
-  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } =
-    useProducts()
+  const {
+    data,
+    count,
+    isLoading,
+    error,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+    currentSort,
+    updateSort,
+  } = useProductsWithSort()
 
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
@@ -123,7 +182,12 @@ export function ProductsList() {
             Products Catalog
           </CardTitle>
           <CardDescription>
-            Manage your product catalog and inventory. View product details and take actions.
+            Manage your product catalog and inventory. Click column headers to sort.
+            {currentSort && (
+              <span className="ml-2 text-xs bg-muted px-2 py-1 rounded">
+                Sorted by {currentSort.field} ({currentSort.direction === 'asc' ? '↑' : '↓'})
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -141,12 +205,33 @@ export function ProductsList() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Product Details</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Brand</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead className="text-right">Pricing</TableHead>
-                  <TableHead>Active Batches</TableHead>
+                  <SortableHeader field="name" currentSort={currentSort} onSort={updateSort}>
+                    Product Details
+                  </SortableHeader>
+                  <SortableHeader field="category" currentSort={currentSort} onSort={updateSort}>
+                    Category
+                  </SortableHeader>
+                  <SortableHeader field="brand" currentSort={currentSort} onSort={updateSort}>
+                    Brand
+                  </SortableHeader>
+                  <SortableHeader field="total_stock" currentSort={currentSort} onSort={updateSort}>
+                    Stock
+                  </SortableHeader>
+                  <SortableHeader
+                    field="base_selling_price"
+                    currentSort={currentSort}
+                    onSort={updateSort}
+                    className="text-right"
+                  >
+                    Pricing
+                  </SortableHeader>
+                  <SortableHeader
+                    field="active_batches_count"
+                    currentSort={currentSort}
+                    onSort={updateSort}
+                  >
+                    Active Batches
+                  </SortableHeader>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>

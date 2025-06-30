@@ -1,7 +1,7 @@
-// hooks/use-products.ts - Complete implementation
+// hooks/use-products.ts - Updated with sorting support
 
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner' // Add this dependency: npm install sonner
+import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchProductsPage,
@@ -11,10 +11,14 @@ import {
   deleteProduct,
   type ProductFilters,
   type Product,
+  type ProductSort,
+  type SortField,
+  type SortDirection,
 } from '@/lib/queries/products'
 import type { Database } from '@/types/supabase'
+import { useCallback, useState } from 'react'
 
-// ✅ READING DATA - Infinite scroll products list
+// ✅ READING DATA - Infinite scroll products list with sorting
 export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
     queryKey: queryKeys.products.infinite(filters),
@@ -39,6 +43,43 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
   }
 }
 
+// ✅ NEW: Products hook with built-in sorting state management
+export function useProductsWithSort(initialSort?: ProductSort, pageSize: number = 20) {
+  const [currentSort, setCurrentSort] = useState<ProductSort>(
+    initialSort || { field: 'created_at', direction: 'desc' },
+  )
+
+  const filters: ProductFilters = {
+    sort: currentSort,
+  }
+
+  const result = useProducts(filters, pageSize)
+
+  // Helper function to update sort
+  const updateSort = useCallback((field: SortField) => {
+    setCurrentSort(prev => ({
+      field,
+      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }, [])
+
+  // Helper function to get sort direction for a field
+  const getSortDirection = useCallback(
+    (field: SortField): SortDirection | null => {
+      return currentSort.field === field ? currentSort.direction : null
+    },
+    [currentSort],
+  )
+
+  return {
+    ...result,
+    currentSort,
+    updateSort,
+    getSortDirection,
+    setSort: setCurrentSort,
+  }
+}
+
 // ✅ READING DATA - Single product by ID
 export function useProduct(productId: string) {
   return useQuery({
@@ -48,15 +89,17 @@ export function useProduct(productId: string) {
   })
 }
 
-// ✅ CONVENIENCE HOOKS - Common filter patterns
-export function useExpiringProducts(storeId: string) {
+// ✅ CONVENIENCE HOOKS - Common filter patterns with sorting support
+export function useExpiringProducts(storeId: string, sort?: ProductSort) {
   return useProducts({
+    sort,
     /* add expiring filter when you have it */
   })
 }
 
-export function useStoreProducts(storeId: string) {
+export function useStoreProducts(storeId: string, sort?: ProductSort) {
   return useProducts({
+    sort,
     /* add store filter when you have it */
   })
 }
@@ -201,23 +244,32 @@ export function useProductActions() {
   })
 
   // ✅ CONVENIENCE METHODS - Business logic helpers
-  const updateProductPrice = (productId: string, newPrice: number) =>
-    updateMutation.mutate({
-      productId,
-      updates: { base_selling_price: newPrice },
-    })
+  const updateProductPrice = useCallback(
+    (productId: string, newPrice: number) =>
+      updateMutation.mutate({
+        productId,
+        updates: { base_selling_price: newPrice },
+      }),
+    [updateMutation],
+  )
 
-  const updateProductStock = (productId: string, newStock: number) =>
-    updateMutation.mutate({
-      productId,
-      updates: { total_stock: newStock },
-    })
+  const updateProductStock = useCallback(
+    (productId: string, newStock: number) =>
+      updateMutation.mutate({
+        productId,
+        updates: { total_stock: newStock },
+      }),
+    [updateMutation],
+  )
 
-  const updateProductCategory = (productId: string, category: string) =>
-    updateMutation.mutate({
-      productId,
-      updates: { category },
-    })
+  const updateProductCategory = useCallback(
+    (productId: string, category: string) =>
+      updateMutation.mutate({
+        productId,
+        updates: { category },
+      }),
+    [updateMutation],
+  )
 
   return {
     // Raw mutation functions
@@ -225,7 +277,7 @@ export function useProductActions() {
     updateProduct: updateMutation.mutate,
     deleteProduct: deleteMutation.mutate,
 
-    // Loading states - Fixed: These check if ANY mutation is pending for that specific ID
+    // Loading states
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
