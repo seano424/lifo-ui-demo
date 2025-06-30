@@ -22,7 +22,7 @@ export default function UserButton() {
   }
 
   return (
-    <Button asLink href="/profile" variant="outline" size="sm">
+    <Button asLink href="/dashboard/account" variant="outline" size="sm">
       <UserIcon className="w-4 h-4" />
       {user.profile.full_name || user.auth.email}
     </Button>

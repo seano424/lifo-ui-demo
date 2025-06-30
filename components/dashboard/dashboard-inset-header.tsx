@@ -7,7 +7,7 @@ export default function DashboardInsetHeader({
 }: {
   title: string
   description: string
-  rightContent: React.ReactNode
+  rightContent?: React.ReactNode
 }) {
   return (
     <div className="flex justify-between items-center">
@@ -15,7 +15,7 @@ export default function DashboardInsetHeader({
         <h1 className="text-2xl font-bold">{title}</h1>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
-      {rightContent}
+      {rightContent && rightContent}
     </div>
   )
 }
