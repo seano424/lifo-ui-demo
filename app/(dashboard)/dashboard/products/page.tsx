@@ -1,11 +1,9 @@
-// app/products/page.tsx (Server Component)
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { fetchProductsPage } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { ProductsList } from '@/components/products/product-list'
-import { AuthStatus } from '@/components/debug/auth-status'
 
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -26,7 +24,7 @@ export default async function ProductsPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Products</h1>
-          
+
           {/* Add action buttons here later */}
         </div>
 
