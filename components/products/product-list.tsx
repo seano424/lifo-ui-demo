@@ -1,13 +1,25 @@
-// components/products/product-list.tsx - FIXED VERSION with memoization
-
 'use client'
 
 import { useMemo, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useProducts, useProductActions } from '@/hooks/use-products'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ProductCard } from '@/components/products/product-card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { MoreHorizontal, Package, Edit, Trash2, DollarSign } from 'lucide-react'
 
 export function ProductsList() {
   const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } =
@@ -36,16 +48,23 @@ export function ProductsList() {
 
   const handleDeleteProduct = useCallback(
     (productId: string) => {
-      deleteProduct(productId)
+      if (confirm('Are you sure you want to delete this product?')) {
+        deleteProduct(productId)
+      }
     },
     [deleteProduct],
   )
 
   const handleUpdatePrice = useCallback(
-    (productId: string, newPrice: number) => {
-      updateProductPrice(productId, newPrice)
+    (productId: string) => {
+      const product = products.find(p => p.product_id === productId)
+      const currentPrice = product?.base_selling_price || 0
+      const newPrice = prompt('Enter new price:', currentPrice.toString())
+      if (newPrice && !isNaN(Number(newPrice))) {
+        updateProductPrice(productId, Number(newPrice))
+      }
     },
-    [updateProductPrice],
+    [updateProductPrice, products],
   )
 
   if (error) {
@@ -67,39 +86,176 @@ export function ProductsList() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {[...Array(6)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader>
-              <div className="h-6 bg-muted rounded w-3/4"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="h-4 bg-muted rounded w-1/2"></div>
-                <div className="h-4 bg-muted rounded w-1/3"></div>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Products Catalog
+          </CardTitle>
+          <CardDescription>Manage your product catalog and inventory</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center space-x-4 p-4 border rounded-lg animate-pulse"
+              >
+                <div className="h-4 bg-muted rounded w-1/4"></div>
+                <div className="h-4 bg-muted rounded w-1/6"></div>
+                <div className="h-4 bg-muted rounded w-1/8"></div>
+                <div className="h-4 bg-muted rounded w-1/8"></div>
+                <div className="h-4 bg-muted rounded w-1/12"></div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {products.map(product => (
-          <ProductCard
-            key={product.product_id} // ✅ This should now be unique
-            product={product}
-            onDelete={() => handleDeleteProduct(product.product_id)}
-            onUpdatePrice={newPrice => handleUpdatePrice(product.product_id, newPrice)}
-            isDeleting={isDeleting}
-            isUpdating={isUpdating}
-          />
-        ))}
-      </div>
+      <Card className="w-full overflow-x-auto">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Products Catalog
+          </CardTitle>
+          <CardDescription>
+            Manage your product catalog and inventory. View product details and take actions.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {products.length === 0 ? (
+            <div className="flex items-center justify-center p-12">
+              <div className="text-center">
+                <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold">No products found</h3>
+                <p className="text-muted-foreground mt-2">
+                  Get started by adding your first product
+                </p>
+              </div>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product Details</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Brand</TableHead>
+                  <TableHead>Stock</TableHead>
+                  <TableHead className="text-right">Pricing</TableHead>
+                  <TableHead>Active Batches</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {products.map(product => (
+                  <TableRow key={product.product_id}>
+                    <TableCell className="font-medium">
+                      <div>
+                        <div className="font-semibold">{product.name || 'Unnamed Product'}</div>
+                        <div className="text-sm text-muted-foreground font-mono">
+                          SKU: {product.sku || 'N/A'}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {product.category ? (
+                        <Badge variant="outline" className="capitalize">
+                          {product.category}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Uncategorized</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{product.brand || 'N/A'}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <span className="font-medium">{product.total_stock || 0}</span>
+                        <span className="text-muted-foreground ml-1">
+                          {product.unit_type || 'units'}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div>
+                        <div className="font-bold text-lg">
+                          ${product.base_selling_price?.toFixed(2) || '0.00'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Cost: ${product.base_cost_price?.toFixed(2) || '0.00'}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <span className="font-medium">{product.active_batches_count || 0}</span>
+                        <span className="text-muted-foreground ml-1">
+                          batch{(product.active_batches_count || 0) !== 1 ? 'es' : ''}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            disabled={isDeleting || isUpdating}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleUpdatePrice(product.product_id)}
+                            disabled={isUpdating}
+                          >
+                            <DollarSign className="mr-2 h-4 w-4" />
+                            Update Price
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              // Add view batches functionality
+                              console.log('View batches for product:', product.product_id)
+                            }}
+                          >
+                            <Package className="mr-2 h-4 w-4" />
+                            View Batches
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              // Add edit functionality here
+                              console.log('Edit product:', product.product_id)
+                            }}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Product
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteProduct(product.product_id)}
+                            disabled={isDeleting}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Product
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
+      {/* Load More Section */}
       {hasMore && (
         <div className="flex justify-center">
           <Button
@@ -113,20 +269,12 @@ export function ProductsList() {
         </div>
       )}
 
+      {/* Product Count Badge */}
       {products.length > 0 && (
         <div className="flex justify-center">
           <Badge variant="secondary" className="text-sm">
             Showing {products.length} of {count} products
           </Badge>
-        </div>
-      )}
-
-      {products.length === 0 && !isLoading && (
-        <div className="flex items-center justify-center p-12">
-          <div className="text-center">
-            <h3 className="text-lg font-semibold">No products found</h3>
-            <p className="text-muted-foreground mt-2">Get started by adding your first product</p>
-          </div>
         </div>
       )}
     </div>
