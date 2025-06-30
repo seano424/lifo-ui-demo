@@ -21,6 +21,8 @@ import {
 import { MoreHorizontal, Package } from 'lucide-react'
 import { sampleProducts } from '@/lib/sample-data'
 import type { Product } from '@/types/inventory'
+import { useBatches, useBatchesForProduct } from '@/hooks/use-batches'
+import { BatchFilters } from '@/lib/queries/batches'
 
 const getStatusColor = (status: Product['status']) => {
   switch (status) {
@@ -69,27 +71,12 @@ const getDaysUntilExpiration = (expirationDate: string) => {
 }
 
 export function ProductTable() {
-  const [products, setProducts] = useState(sampleProducts)
+  const [filters, setFilters] = useState<BatchFilters>({})
+  const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useBatches(filters)
 
-  const handleAction = (productId: string, action: 'discount' | 'donate' | 'sold') => {
-    setProducts(prev =>
-      prev.map(product =>
-        product.id === productId
-          ? {
-              ...product,
-              status:
-                action === 'discount' ? 'discounted' : action === 'donate' ? 'donated' : 'sold',
-              discountedPrice:
-                action === 'discount' ? product.price * 0.7 : product.discountedPrice,
-            }
-          : product,
-      ),
-    )
-  }
-
-  const sortedProducts = [...products].sort((a, b) => {
-    const daysA = getDaysUntilExpiration(a.expirationDate)
-    const daysB = getDaysUntilExpiration(b.expirationDate)
+  const sortedProducts = [...data].sort((a, b) => {
+    const daysA = getDaysUntilExpiration(a.expiry_date)
+    const daysB = getDaysUntilExpiration(b.expiry_date)
     return daysA - daysB
   })
 
@@ -120,17 +107,19 @@ export function ProductTable() {
           </TableHeader>
           <TableBody>
             {sortedProducts.map(product => {
-              const daysLeft = getDaysUntilExpiration(product.expirationDate)
+              const daysLeft = getDaysUntilExpiration(product.expiry_date)
               return (
-                <TableRow key={product.id}>
+                <TableRow key={product.batch_id}>
                   <TableCell className="font-medium">
                     <div>
-                      <div>{product.name}</div>
-                      <div className="text-sm text-muted-foreground">{product.category}</div>
+                      <div>{product.products?.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {product.products?.category}
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-sm">{product.batchId}</TableCell>
-                  <TableCell>{new Date(product.expirationDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="font-mono text-sm">{product.batch_id}</TableCell>
+                  <TableCell>{new Date(product.expiry_date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <span
                       className={`font-medium ${
@@ -149,26 +138,24 @@ export function ProductTable() {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium">{product.quantity}</span>
-                    <span className="text-muted-foreground">/{product.originalQuantity}</span>
+                    <span className="font-medium">{product.available_quantity}</span>
+                    <span className="text-muted-foreground">/{product.current_quantity}</span>
                   </TableCell>
                   <TableCell>
-                    <Badge className={getStatusColor(product.status)}>
-                      {getStatusLabel(product.status)}
+                    <Badge className={getStatusColor(product.status as Product['status'])}>
+                      {getStatusLabel(product.status as Product['status'])}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div>
                       <div
-                        className={
-                          product.discountedPrice ? 'line-through text-muted-foreground' : ''
-                        }
+                        className={product.cost_price ? 'line-through text-muted-foreground' : ''}
                       >
-                        ${product.price.toFixed(2)}
+                        ${product.cost_price.toFixed(2)}
                       </div>
-                      {product.discountedPrice && (
+                      {product.selling_price && (
                         <div className="text-blue-600 font-medium">
-                          ${product.discountedPrice.toFixed(2)}
+                          ${product.selling_price.toFixed(2)}
                         </div>
                       )}
                     </div>
@@ -182,15 +169,9 @@ export function ProductTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleAction(product.id, 'discount')}>
-                            Mark as Discounted
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction(product.id, 'donate')}>
-                            Mark as Donated
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleAction(product.id, 'sold')}>
-                            Mark as Sold
-                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {}}>Mark as Discounted</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {}}>Mark as Donated</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {}}>Mark as Sold</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     ) : (

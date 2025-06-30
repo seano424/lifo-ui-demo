@@ -1,8 +1,4 @@
-// hooks/use-batches.ts - Complete implementation
-
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchBatchesPage,
   fetchBatchById,
@@ -17,6 +13,8 @@ import {
   type BatchWithProduct,
 } from '@/lib/queries/batches'
 import type { Database } from '@/types/supabase'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 // ✅ READING DATA - Infinite scroll batches list
 export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
