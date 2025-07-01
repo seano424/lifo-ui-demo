@@ -5,41 +5,44 @@
 Need to add a new table? Follow this 4-step pattern:
 
 ### 1. **Raw Query Functions** (`lib/queries/[table].ts`)
+
 ```typescript
 export async function fetchSuppliersPage({ page, pageSize }, filters = {}, serverClient) {
   const supabase = serverClient || createClient()
   let query = supabase.schema('inventory').from('suppliers').select('*', { count: 'exact' })
-  
+
   // Apply filters
   if (filters.active_only) query = query.eq('is_active', true)
-  
+
   const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(page * pageSize, (page + 1) * pageSize - 1)
-  
+
   if (error) throw error
   return { data: data || [], count: count || 0, nextPage: /* pagination logic */ }
 }
 ```
 
 ### 2. **Query Keys** (`lib/queries/query-keys.ts`)
+
 ```typescript
 export const queryKeys = {
   suppliers: {
     all: ['suppliers'] as const,
-    infinite: (filters) => ['suppliers', 'infinite', { filters }] as const,
-    detail: (id) => ['suppliers', 'detail', id] as const,
-  }
+    infinite: filters => ['suppliers', 'infinite', { filters }] as const,
+    detail: id => ['suppliers', 'detail', id] as const,
+  },
 }
 ```
 
 ### 3. **React Hook** (`hooks/use-suppliers.ts`)
+
 ```typescript
 export function useSuppliers(filters = {}, pageSize = 20) {
   const result = useInfiniteQuery({
     queryKey: queryKeys.suppliers.infinite(filters),
     queryFn: ({ pageParam = 0 }) => fetchSuppliersPage({ page: pageParam, pageSize }, filters),
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+    getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
   })
 
@@ -49,6 +52,7 @@ export function useSuppliers(filters = {}, pageSize = 20) {
 ```
 
 ### 4. **Use in Component**
+
 ```typescript
 export function SupplierList() {
   const { data, fetchNextPage, hasMore } = useSuppliers()
@@ -70,13 +74,15 @@ export function SupplierList() {
 ### Design Principles
 
 #### 🎯 **Separation of Concerns**
+
 ```
 📁 lib/queries/     → Pure data fetching (no React)
-📁 hooks/           → React Query integration + mutations  
+📁 hooks/           → React Query integration + mutations
 📁 components/      → UI only (no direct data calls)
 ```
 
 #### ⚡ **Server + Client Hydration**
+
 ```
 Server Component (prefetch) → Client Component (continue) → User Action (update)
         ↓                            ↓                           ↓
@@ -84,6 +90,7 @@ Server Component (prefetch) → Client Component (continue) → User Action (upd
 ```
 
 #### 🔄 **Consistent API**
+
 Every table follows identical patterns. Once you learn one, you know them all.
 
 ---
@@ -98,10 +105,10 @@ lib/
 │   ├── users.ts               # User management
 │   ├── batches.ts             # Batch tracking
 │   └── suppliers.ts           # Example new table
-├── supabase/                  
+├── supabase/
 │   ├── client.ts              # Browser client (anon key)
 │   └── server.ts              # Server client (service key)
-└── react-query/               
+└── react-query/
     ├── client.ts              # Query client config
     ├── provider.tsx           # App wrapper
     └── prefetch.ts            # Server prefetch utils
@@ -116,7 +123,7 @@ hooks/
 ### Why This Structure Works
 
 - **lib/queries/**: Pure functions, easy to test, server/client compatible
-- **hooks/**: React-specific logic, mutations, cache management  
+- **hooks/**: React-specific logic, mutations, cache management
 - **Shared Query Keys**: Server prefetch and client hooks use identical cache keys
 - **Schema Support**: Works across multiple Supabase schemas (`inventory`, `user_mgmt`, `scoring`)
 
@@ -134,7 +141,8 @@ export const queryKeys = {
   products: {
     all: ['products'] as const,
     lists: () => [...queryKeys.products.all, 'list'] as const,
-    infinite: (filters: ProductFilters) => [...queryKeys.products.lists(), 'infinite', { filters }] as const,
+    infinite: (filters: ProductFilters) =>
+      [...queryKeys.products.lists(), 'infinite', { filters }] as const,
     detail: (id: string) => [...queryKeys.products.all, 'detail', id] as const,
   },
   batches: {
@@ -142,7 +150,7 @@ export const queryKeys = {
     infinite: (filters: BatchFilters) => ['batches', 'infinite', { filters }] as const,
     byProduct: (productId: string) => ['batches', 'product', productId] as const,
     expiring: (days: number) => ['batches', 'expiring', days] as const,
-  }
+  },
 } as const
 ```
 
@@ -173,76 +181,81 @@ export type ProductsPageParam = {
 export async function fetchProductsPage(
   { page, pageSize }: ProductsPageParam,
   filters: ProductFilters = {},
-  serverClient?: ReturnType<typeof createServerClient>
+  serverClient?: ReturnType<typeof createServerClient>,
 ) {
   const supabase = serverClient || createClient()
-  
+
   let query = supabase
     .schema('inventory')
     .from('products')
-    .select(`
+    .select(
+      `
       *,
       batches:inventory.batches(*)
-    `, { count: 'exact' })
-  
+    `,
+      { count: 'exact' },
+    )
+
   // Apply filters dynamically
   if (filters.storeId) {
     query = query.eq('store_id', filters.storeId)
   }
-  
+
   if (filters.category) {
     query = query.eq('category', filters.category)
   }
-  
+
   if (filters.expiringOnly) {
     const threeDaysFromNow = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
     query = query.lt('expiration_date', threeDaysFromNow)
   }
-  
+
   if (filters.searchTerm) {
     query = query.ilike('name', `%${filters.searchTerm}%`)
   }
-  
+
   // Execute with pagination
   const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(page * pageSize, (page + 1) * pageSize - 1)
-  
+
   if (error) {
     console.error('Failed to fetch products:', error)
     throw new Error(`Database error: ${error.message}`)
   }
-  
-  return { 
-    data: data || [], 
-    count: count || 0, 
-    nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined 
+
+  return {
+    data: data || [],
+    count: count || 0,
+    nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined,
   }
 }
 
 // CREATE: Add new product
-export async function createProduct(productData: Omit<Product, 'id' | 'created_at' | 'updated_at'>) {
+export async function createProduct(
+  productData: Omit<Product, 'id' | 'created_at' | 'updated_at'>,
+) {
   const supabase = createClient()
-  
+
   const { data, error } = await supabase
     .schema('inventory')
     .from('products')
     .insert(productData)
     .select()
     .single()
-  
+
   if (error) {
     console.error('Failed to create product:', error)
     throw new Error(`Failed to create product: ${error.message}`)
   }
-  
+
   return data
 }
 
 // UPDATE: Modify existing product
 export async function updateProduct(id: string, updates: Partial<Product>) {
   const supabase = createClient()
-  
+
   const { data, error } = await supabase
     .schema('inventory')
     .from('products')
@@ -250,25 +263,21 @@ export async function updateProduct(id: string, updates: Partial<Product>) {
     .eq('id', id)
     .select()
     .single()
-  
+
   if (error) {
     console.error('Failed to update product:', error)
     throw new Error(`Failed to update product: ${error.message}`)
   }
-  
+
   return data
 }
 
 // DELETE: Remove product
 export async function deleteProduct(id: string) {
   const supabase = createClient()
-  
-  const { error } = await supabase
-    .schema('inventory')
-    .from('products')
-    .delete()
-    .eq('id', id)
-  
+
+  const { error } = await supabase.schema('inventory').from('products').delete().eq('id', id)
+
   if (error) {
     console.error('Failed to delete product:', error)
     throw new Error(`Failed to delete product: ${error.message}`)
@@ -277,6 +286,7 @@ export async function deleteProduct(id: string) {
 ```
 
 **Key Features**:
+
 - ✅ **Server/Client Compatible**: Optional `serverClient` parameter
 - ✅ **Type Safe**: Uses generated Supabase types
 - ✅ **Error Handling**: Consistent logging and user-friendly errors
@@ -291,13 +301,13 @@ export async function deleteProduct(id: string) {
 // hooks/use-products.ts
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { 
-  fetchProductsPage, 
+import {
+  fetchProductsPage,
   fetchProductById,
-  createProduct, 
-  updateProduct, 
+  createProduct,
+  updateProduct,
   deleteProduct,
-  type ProductFilters 
+  type ProductFilters,
 } from '@/lib/queries/products'
 import { toast } from 'sonner'
 
@@ -305,9 +315,8 @@ import { toast } from 'sonner'
 export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
     queryKey: queryKeys.products.infinite(filters),
-    queryFn: ({ pageParam = 0 }) => 
-      fetchProductsPage({ page: pageParam, pageSize }, filters),
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+    queryFn: ({ pageParam = 0 }) => fetchProductsPage({ page: pageParam, pageSize }, filters),
+    getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     staleTime: 30 * 1000, // 30 seconds
   })
@@ -339,16 +348,16 @@ export function useProduct(id: string) {
 
 // CONVENIENCE HOOKS: Common filter combinations
 export function useExpiringProducts(storeId: string, days: number = 3) {
-  return useProducts({ 
-    storeId, 
-    expiringOnly: true 
+  return useProducts({
+    storeId,
+    expiringOnly: true,
   })
 }
 
 export function useStoreProducts(storeId: string, category?: string) {
-  return useProducts({ 
-    storeId, 
-    category 
+  return useProducts({
+    storeId,
+    category,
   })
 }
 
@@ -359,14 +368,14 @@ export function useProductActions() {
   // CREATE: Add new product
   const createMutation = useMutation({
     mutationFn: createProduct,
-    onSuccess: (newProduct) => {
+    onSuccess: newProduct => {
       // Add to lists cache
       queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
       // Add to detail cache
       queryClient.setQueryData(queryKeys.products.detail(newProduct.id), newProduct)
       toast.success('Product created successfully')
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Create product error:', error)
       toast.error('Failed to create product')
     },
@@ -374,25 +383,25 @@ export function useProductActions() {
 
   // UPDATE: Modify with optimistic updates
   const updateMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Product> }) => 
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Product> }) =>
       updateProduct(id, updates),
-    
+
     // OPTIMISTIC UPDATE: Update UI immediately
     onMutate: async ({ id, updates }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(id) })
-      
+
       // Snapshot the previous value
       const previousProduct = queryClient.getQueryData(queryKeys.products.detail(id))
-      
+
       // Optimistically update the cache
-      queryClient.setQueryData(queryKeys.products.detail(id), (old: any) => 
-        old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined
+      queryClient.setQueryData(queryKeys.products.detail(id), (old: any) =>
+        old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined,
       )
-      
+
       return { previousProduct, id }
     },
-    
+
     // ROLLBACK: Revert on error
     onError: (error, { id }, context) => {
       if (context?.previousProduct) {
@@ -401,13 +410,13 @@ export function useProductActions() {
       console.error('Update product error:', error)
       toast.error('Failed to update product')
     },
-    
+
     // REFETCH: Ensure consistency
     onSettled: (data, error, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.detail(id) })
       queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
     },
-    
+
     onSuccess: () => {
       toast.success('Product updated successfully')
     },
@@ -422,7 +431,7 @@ export function useProductActions() {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
       toast.success('Product deleted successfully')
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Delete product error:', error)
       toast.error('Failed to delete product')
     },
@@ -463,12 +472,12 @@ export function useProductActions() {
     createProduct: createMutation.mutate,
     updateProduct: updateMutation.mutate,
     deleteProduct: deleteMutation.mutate,
-    
+
     // Business logic
     markAsDiscounted,
     markAsDonated,
     markAsExpired,
-    
+
     // Loading states
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
@@ -478,6 +487,7 @@ export function useProductActions() {
 ```
 
 **Key Features**:
+
 - ✅ **Infinite Scroll**: Built-in pagination
 - ✅ **Optimistic Updates**: Instant UI feedback
 - ✅ **Error Handling**: Automatic rollback on failure
@@ -516,7 +526,7 @@ export default async function ProductsPage({
   // Prefetch first page with same query key as client
   await queryClient.prefetchInfiniteQuery({
     queryKey: queryKeys.products.infinite(filters),
-    queryFn: ({ pageParam = 0 }) => 
+    queryFn: ({ pageParam = 0 }) =>
       fetchProductsPage({ page: pageParam, pageSize: 20 }, filters, supabase),
     initialPageParam: 0,
   })
@@ -528,7 +538,7 @@ export default async function ProductsPage({
           <h1 className="text-3xl font-bold">Products</h1>
           <ProductFilters />
         </div>
-        
+
         <ProductsList filters={filters} />
       </div>
     </HydrationBoundary>
@@ -549,15 +559,15 @@ import { LoadingSpinner } from '@/components/ui/loading'
 
 export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
   // Data is immediately available from server prefetch!
-  const { 
-    data, 
-    fetchNextPage, 
-    hasMore, 
-    isLoading, 
-    isFetching, 
-    isFetchingNextPage 
+  const {
+    data,
+    fetchNextPage,
+    hasMore,
+    isLoading,
+    isFetching,
+    isFetchingNextPage
   } = useProducts(filters)
-  
+
   const { markAsDiscounted, markAsDonated, isUpdating } = useProductActions()
 
   // Handle initial loading state
@@ -570,8 +580,8 @@ export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
       {/* Product Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {data.map((product) => (
-          <ProductCard 
-            key={product.id} 
+          <ProductCard
+            key={product.id}
             product={product}
             onDiscount={(percentage) => markAsDiscounted(product.id, percentage)}
             onDonate={(details) => markAsDonated(product.id, details)}
@@ -579,11 +589,11 @@ export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
           />
         ))}
       </div>
-      
+
       {/* Load More Button */}
       {hasMore && (
         <div className="flex justify-center">
-          <Button 
+          <Button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
             variant="outline"
@@ -600,7 +610,7 @@ export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
           </Button>
         </div>
       )}
-      
+
       {/* Background fetching indicator */}
       {isFetching && !isFetchingNextPage && (
         <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm">
@@ -619,31 +629,33 @@ export function ProductsList({ filters = {} }: { filters?: ProductFilters }) {
 Let's trace through a complete user interaction to see how all the pieces work together:
 
 ### 1. **User Visits Products Page**
+
 ```typescript
 // Server Component runs first
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()
   const supabase = await createServerClient()
-  
+
   // Prefetch first 20 products server-side
   await queryClient.prefetchInfiniteQuery({
     queryKey: queryKeys.products.infinite({}),
     queryFn: ({ pageParam = 0 }) => fetchProductsPage({ page: 0, pageSize: 20 }, {}, supabase),
     initialPageParam: 0,
   })
-  
+
   // HTML is sent to browser with data already loaded
   return <HydrationBoundary><ProductsList /></HydrationBoundary>
 }
 ```
 
 ### 2. **Client Hydrates with Data**
+
 ```typescript
 // Client component renders immediately with server data
 export function ProductsList() {
   const { data, fetchNextPage, hasMore } = useProducts()
   // data contains 20 products immediately - no loading spinner!
-  
+
   return (
     <div>
       {data.map(product => <ProductCard key={product.id} product={product} />)}
@@ -654,6 +666,7 @@ export function ProductsList() {
 ```
 
 ### 3. **User Scrolls and Loads More**
+
 ```typescript
 // User clicks "Load More" - fetches next 20 products
 const { fetchNextPage } = useProducts()
@@ -662,6 +675,7 @@ const { fetchNextPage } = useProducts()
 ```
 
 ### 4. **User Marks Product as Discounted**
+
 ```typescript
 // User clicks discount button
 const { markAsDiscounted } = useProductActions()
@@ -675,6 +689,7 @@ markAsDiscounted('prod_123', 25)
 ```
 
 ### 5. **Another User Sees Update Immediately**
+
 ```typescript
 // Other devices see the change via cache invalidation
 // React Query refetches in background when cache is invalidated
@@ -721,13 +736,10 @@ if (isUpdating) return <LoadingSpinner />
 useEffect(() => {
   const subscription = supabase
     .channel('products')
-    .on('postgres_changes', 
-       { event: '*', schema: 'inventory', table: 'products' }, 
-       (payload) => {
-         // Invalidate affected queries
-         queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
-       }
-    )
+    .on('postgres_changes', { event: '*', schema: 'inventory', table: 'products' }, payload => {
+      // Invalidate affected queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+    })
     .subscribe()
 
   return () => subscription.unsubscribe()
@@ -751,7 +763,7 @@ if (isError) {
 // Error boundaries catch unhandled errors
 export function ProductsErrorBoundary({ children }) {
   return (
-    <ErrorBoundary 
+    <ErrorBoundary
       fallback={<div>Something went wrong loading products</div>}
       onError={(error) => console.error('Products error:', error)}
     >
@@ -776,7 +788,7 @@ const updateMutation = useMutation({
     toast.error(`Failed to update product: ${error.message}`)
     // Error logging
     console.error('Update failed:', error, variables)
-  }
+  },
 })
 ```
 
@@ -796,8 +808,8 @@ const queryClient = new QueryClient({
       },
       staleTime: 30 * 1000, // 30 seconds
       gcTime: 5 * 60 * 1000, // 5 minutes
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -814,13 +826,13 @@ const updateMutation = useMutation({
   onSuccess: (updatedProduct, { id }) => {
     // Update specific item cache
     queryClient.setQueryData(queryKeys.products.detail(id), updatedProduct)
-    
+
     // Invalidate lists that might include this product
     queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
-    
+
     // Don't invalidate unrelated caches
     // queryClient.invalidateQueries({ queryKey: queryKeys.users.all })  ❌
-  }
+  },
 })
 ```
 
@@ -845,13 +857,13 @@ useEffect(() => {
   const handleScroll = () => {
     const scrollPosition = window.scrollY + window.innerHeight
     const documentHeight = document.documentElement.offsetHeight
-    
+
     // Prefetch when user is 80% down the page
     if (scrollPosition > documentHeight * 0.8 && hasMore) {
       fetchNextPage()
     }
   }
-  
+
   window.addEventListener('scroll', handleScroll)
   return () => window.removeEventListener('scroll', handleScroll)
 }, [fetchNextPage, hasMore])
@@ -878,14 +890,14 @@ describe('fetchProductsPage', () => {
       range: jest.fn().mockResolvedValue({
         data: [{ id: '1', name: 'Test Product' }],
         count: 1,
-        error: null
-      })
+        error: null,
+      }),
     })
 
     const result = await fetchProductsPage(
-      { page: 0, pageSize: 20 }, 
-      { category: 'dairy' }, 
-      mockSupabase
+      { page: 0, pageSize: 20 },
+      { category: 'dairy' },
+      mockSupabase,
     )
 
     expect(result.data).toHaveLength(1)
@@ -911,11 +923,11 @@ const wrapper = ({ children }) => (
 describe('useProducts', () => {
   it('should fetch and return products', async () => {
     const { result } = renderHook(() => useProducts(), { wrapper })
-    
+
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
-    
+
     expect(result.current.data).toBeDefined()
   })
 })
@@ -928,6 +940,7 @@ describe('useProducts', () => {
 ### Common Issues
 
 **Issue**: "Cannot read property 'pages' of undefined"
+
 ```typescript
 // ❌ Problem: Not handling loading state
 const { data } = useProducts()
@@ -940,6 +953,7 @@ return data.map(product => <ProductCard product={product} />)
 ```
 
 **Issue**: "Query key mismatch between server and client"
+
 ```typescript
 // ❌ Problem: Different query keys
 // Server: queryKeys.products.list({})
@@ -950,6 +964,7 @@ return data.map(product => <ProductCard product={product} />)
 ```
 
 **Issue**: "Stale data after mutations"
+
 ```typescript
 // ❌ Problem: Not invalidating cache
 const updateMutation = useMutation({
@@ -988,49 +1003,46 @@ export function ReactQueryProvider({ children }) {
 When we're ready to add real-time subscriptions:
 
 ### 1. Update Query Client
+
 ```typescript
 // lib/react-query/subscriptions.ts
 export function setupRealtimeSubscriptions(queryClient: QueryClient) {
   const supabase = createClient()
-  
+
   // Products table changes
   supabase
     .channel('products')
-    .on('postgres_changes', 
-       { event: '*', schema: 'inventory', table: 'products' },
-       (payload) => {
-         if (payload.eventType === 'UPDATE') {
-           // Update specific product cache
-           queryClient.setQueryData(
-             queryKeys.products.detail(payload.new.id), 
-             payload.new
-           )
-           // Invalidate product lists
-           queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
-         }
-       }
-    )
+    .on('postgres_changes', { event: '*', schema: 'inventory', table: 'products' }, payload => {
+      if (payload.eventType === 'UPDATE') {
+        // Update specific product cache
+        queryClient.setQueryData(queryKeys.products.detail(payload.new.id), payload.new)
+        // Invalidate product lists
+        queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+      }
+    })
     .subscribe()
 }
 ```
 
 ### 2. Update Provider
+
 ```typescript
 // lib/react-query/provider.tsx
 export function ReactQueryProvider({ children }) {
   const [queryClient] = useState(() => createQueryClient())
-  
+
   useEffect(() => {
     setupRealtimeSubscriptions(queryClient)
   }, [queryClient])
-  
+
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 }
 ```
 
 ### 3. No Component Changes Needed!
+
 The existing `useProducts()` hooks automatically benefit from real-time updates through cache invalidation.
 
 ---
 
-*This architecture provides a scalable, performant foundation for LIFO's real-time inventory management needs while maintaining excellent developer experience.*
+_This architecture provides a scalable, performant foundation for LIFO's real-time inventory management needs while maintaining excellent developer experience._

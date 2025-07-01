@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,10 +18,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { MoreHorizontal, Package } from 'lucide-react'
-import { sampleProducts } from '@/lib/sample-data'
+import { useBatches } from '@/hooks/use-batches'
 import type { Product } from '@/types/inventory'
-import { useBatches, useBatchesForProduct } from '@/hooks/use-batches'
-import { BatchFilters } from '@/lib/queries/batches'
 
 const getStatusColor = (status: Product['status']) => {
   switch (status) {
@@ -71,8 +68,7 @@ const getDaysUntilExpiration = (expirationDate: string) => {
 }
 
 export function ProductTable() {
-  const [filters, setFilters] = useState<BatchFilters>({})
-  const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useBatches(filters)
+  const { data } = useBatches()
 
   const sortedProducts = [...data].sort((a, b) => {
     const daysA = getDaysUntilExpiration(a.expiry_date)

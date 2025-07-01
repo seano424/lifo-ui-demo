@@ -325,7 +325,7 @@ export async function fetchProductById(
 export async function fetchProductWithBatches(
   productId: string,
   serverClient?: ServerClient,
-): Promise<Product & { batches: any[] }> {
+): Promise<Product & { batches: unknown[] }> {
   const supabase = serverClient || createClient()
 
   try {
@@ -370,7 +370,7 @@ export async function fetchProductWithBatches(
       batchCount: data.batches?.length || 0,
     })
 
-    return data as Product & { batches: any[] }
+    return data as Product & { batches: unknown[] }
   } catch (err) {
     console.error('[fetchProductWithBatches] Unexpected error:', err)
     throw err

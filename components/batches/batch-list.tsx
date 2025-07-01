@@ -15,7 +15,8 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { type BatchFilters } from '@/lib/queries/batches'
-import { useBatches, useBatchActions, useBatchesForProduct } from '@/hooks/use-batches'
+import { useBatches, useBatchActions } from '@/hooks/use-batches'
+import { useBatchesForProduct } from '@/hooks/use-batches'
 import { BatchCard } from '@/components/batches/batch-card'
 import { Package, Filter, AlertTriangle, Calendar, MapPin, Truck, Search } from 'lucide-react'
 
@@ -40,7 +41,9 @@ export function BatchList({
   const [searchTerm, setSearchTerm] = useState('')
 
   // Use different hooks based on whether we're showing batches for a specific product
-  const batchQuery = productId ? useBatchesForProduct(productId, filters) : useBatches(filters)
+  const batchesForProduct = useBatchesForProduct(productId || '', filters)
+  const batches = useBatches(filters)
+  const batchQuery = productId ? batchesForProduct : batches
 
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = batchQuery
 
@@ -84,7 +87,7 @@ export function BatchList({
     return result
   }, [data, searchTerm, maxItems])
 
-  const updateFilter = (key: keyof BatchFilters, value: any) => {
+  const updateFilter = (key: keyof BatchFilters, value: unknown) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,

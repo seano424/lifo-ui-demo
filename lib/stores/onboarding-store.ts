@@ -72,7 +72,7 @@ const initialState: OnboardingData = {
 
 export const useOnboardingStore = create<OnboardingStore>()(
   devtools(
-    (set, get) => ({
+    set => ({
       ...initialState,
       currentStep: 1,
 

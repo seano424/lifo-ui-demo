@@ -11,7 +11,8 @@ LIFO.AI solves the **batch visibility problem** that costs retailers millions in
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm (latest version)
 
 ### Get Running in 5 Minutes
@@ -41,6 +42,7 @@ npm run dev
 ### Environment Variables
 
 Get these values from your team lead:
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://jrgmetdsohowtxickqij.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=[ask for this]
@@ -59,21 +61,25 @@ npm run update-types
 ## 📚 Documentation
 
 ### Start Here
+
 - 🏗️ **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD)** - System overview and architectural decisions
 - 👋 **[Developer Onboarding](docs/DEV_ONBOARDING.MD)** - New team member setup guide
 
 ### Implementation Guides
+
 - 📖 **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)** - How to add new features and CRUD operations
 
 ### For Different Audiences
+
 - **New to the project?** → Developer Onboarding → Technical Architecture
-- **Building a feature?** → Data Fetching Guide  
+- **Building a feature?** → Data Fetching Guide
 - **Understanding our architecture?** → Technical Architecture
 - **Business context?** → Technical Architecture (Executive Summary)
 
 ## 🛠️ Development Workflow
 
 ### Useful Scripts
+
 ```bash
 npm run dev              # Start development server (with Turbopack)
 npm run build            # Build for production
@@ -84,13 +90,15 @@ npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ```
 
 ### Adding a New Feature
+
 1. **Check patterns** in [Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)
 2. **Create raw queries** in `lib/queries/[table].ts`
-3. **Add query keys** to `lib/queries/query-keys.ts`  
+3. **Add query keys** to `lib/queries/query-keys.ts`
 4. **Build React hook** in `hooks/use-[table].ts`
 5. **Use in components** with the standard patterns
 
 ### Git Workflow
+
 ```bash
 git checkout -b feature/what-youre-working-on
 # Make your changes
@@ -122,14 +130,16 @@ See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD) for security deep-d
 ## 🤝 Team Onboarding
 
 ### New Developer Checklist
+
 - [ ] Clone repo and run `npm install`
-- [ ] Get `.env.local` values from team lead  
+- [ ] Get `.env.local` values from team lead
 - [ ] Run `npm run update-types` to generate database types
 - [ ] Start with `npm run dev` and explore the app
 - [ ] Read [Developer Onboarding](docs/DEV_ONBOARDING.MD)
 - [ ] Pick up your first small task
 
 ### Getting Help
+
 - **Slack**: `#dev` channel for technical questions
 - **Stuck on setup?** Ask immediately, don't spend more than 15 minutes alone
 - **Architecture questions?** Check Technical Architecture doc first

@@ -14,8 +14,9 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
 
   const handleStatusChange = (status: string) => {
     if (status === 'all') {
-      const { is_active, ...rest } = filters
-      onFiltersChange(rest)
+      onFiltersChange(
+        Object.fromEntries(Object.entries(filters).filter(([key]) => key !== 'is_active')),
+      )
     } else {
       onFiltersChange({ ...filters, is_active: status === 'active' })
     }
@@ -25,8 +26,9 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
     if (localEmail.trim()) {
       onFiltersChange({ ...filters, email: localEmail.trim() })
     } else {
-      const { email, ...rest } = filters
-      onFiltersChange(rest)
+      onFiltersChange(
+        Object.fromEntries(Object.entries(filters).filter(([key]) => key !== 'email')),
+      )
     }
   }
 

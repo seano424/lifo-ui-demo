@@ -25,8 +25,9 @@ export const queryKeys = {
   batches: {
     all: ['batches'] as const,
     lists: () => [...queryKeys.batches.all, 'list'] as const,
-    list: (filters: any) => [...queryKeys.batches.lists(), { filters }] as const,
-    infinite: (filters: any) => [...queryKeys.batches.lists(), 'infinite', { filters }] as const,
+    list: (filters: unknown) => [...queryKeys.batches.lists(), { filters }] as const,
+    infinite: (filters: unknown) =>
+      [...queryKeys.batches.lists(), 'infinite', { filters }] as const,
     details: () => [...queryKeys.batches.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.batches.details(), id] as const,
     byProduct: (productId: string) => [...queryKeys.batches.all, 'byProduct', productId] as const,
