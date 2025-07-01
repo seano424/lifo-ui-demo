@@ -40,7 +40,7 @@ export function BatchList({
   const [searchTerm, setSearchTerm] = useState('')
 
   // Use different hooks based on whether we're showing batches for a specific product
-  const batchesForProduct = useBatchesForProduct(productId, filters)
+  const batchesForProduct = useBatchesForProduct(productId ?? '', filters)
   const batches = useBatches(filters)
   const batchQuery = productId ? batchesForProduct : batches
 
