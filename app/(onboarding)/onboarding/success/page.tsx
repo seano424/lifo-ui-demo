@@ -4,7 +4,7 @@ export default function OnboardingSuccessPage() {
       <div className="w-full max-w-sm text-center space-y-4">
         <h1 className="text-2xl font-bold">Check Your Email</h1>
         <p className="text-muted-foreground">
-          We've sent you a confirmation link. Click it to activate your account and access your
+          We&apos;ve sent you a confirmation link. Click it to activate your account and access your
           dashboard.
         </p>
       </div>

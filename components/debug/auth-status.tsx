@@ -4,8 +4,19 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+export interface AuthInfoType {
+  hasSession: boolean
+  hasUser: boolean
+  userId: string | null
+  email: string | null
+  sessionError: string | null
+  userError: string | null
+  queryResult: { data: number | null; error: string | null } | null
+  rawSession: unknown
+}
+
 export function AuthStatus() {
-  const [authInfo, setAuthInfo] = useState<any>(null)
+  const [authInfo, setAuthInfo] = useState<AuthInfoType | null>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -31,7 +42,7 @@ export function AuthStatus() {
           .select('product_id')
           .limit(1)
         queryResult = { data: data?.length || 0, error: error?.message || null }
-      } catch (err) {
+      } catch {
         queryResult = { data: null, error: 'Query failed' }
       }
 

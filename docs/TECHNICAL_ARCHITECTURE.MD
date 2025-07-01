@@ -11,7 +11,7 @@
 ### Key Business Benefits
 
 - **⚡ Speed**: No API route bottlenecks for time-sensitive inventory decisions
-- **🔄 Real-time**: When one employee marks a batch as discounted, all devices see it immediately  
+- **🔄 Real-time**: When one employee marks a batch as discounted, all devices see it immediately
 - **🛡️ Security**: Database-level protection that's more robust than application-layer security
 - **💰 Cost-Effective**: Pay for database usage, not server complexity
 - **📱 Mobile-First**: Optimized for in-store scanning and inventory management
@@ -21,13 +21,15 @@
 **Decision**: We use direct Supabase client access instead of traditional API routes
 
 **Why This Is Secure**:
+
 - ✅ **RLS at Database Level**: All security logic lives in PostgreSQL policies, not fragile application code
 - ✅ **Principle of Least Privilege**: Client uses limited `anon` key; sensitive operations use `service_role` server-side
 - ✅ **Authentication Required**: Every data operation requires a valid user session
 - ✅ **Audit Trail**: All changes are logged at the database level with user context
 
 **Trade-offs Considered**:
-- ❌ **Complex Business Logic**: Advanced validation must use database functions/triggers  
+
+- ❌ **Complex Business Logic**: Advanced validation must use database functions/triggers
 - ✅ **Performance**: Fewer network hops = faster inventory updates
 - ✅ **Real-time**: Direct subscriptions enable live inventory synchronization
 - ✅ **Reliability**: Database-level security is harder to misconfigure than scattered API permissions
@@ -41,7 +43,7 @@
 ```
 📱 Store Employee Device
     ↓ (scan product, update batch)
-🌐 Direct Supabase Connection  
+🌐 Direct Supabase Connection
     ↓ (RLS enforced)
 🗄️  PostgreSQL Database
     ↓ (real-time subscription)
@@ -49,6 +51,7 @@
 ```
 
 **Key Principle**: **Direct Client Access with Intelligent Caching**
+
 - Raw data operations in `lib/queries/` (server/client agnostic)
 - React Query hooks in `hooks/` (caching, optimistic updates)
 - UI components in `components/` (rendering only)
@@ -75,7 +78,7 @@ lifo-app/
 │   └── batches/     # Batch tracking
 ├── lib/             # Core business logic
 │   ├── queries/     # Database operations
-│   ├── supabase/    # Client configuration  
+│   ├── supabase/    # Client configuration
 │   └── react-query/ # Caching setup
 └── hooks/           # Data hooks with mutations
 ```
@@ -90,21 +93,21 @@ lifo-app/
 
 ```sql
 -- Example: Users can only access their store's products
-CREATE POLICY "store_isolation" ON inventory.products 
+CREATE POLICY "store_isolation" ON inventory.products
 FOR ALL USING (
   store_id IN (
-    SELECT store_id FROM user_mgmt.users 
+    SELECT store_id FROM user_mgmt.users
     WHERE id = auth.uid()
   )
 );
 
 -- Example: Only managers can modify discount settings
-CREATE POLICY "manager_discounts" ON inventory.products 
+CREATE POLICY "manager_discounts" ON inventory.products
 FOR UPDATE USING (
   EXISTS (
     SELECT 1 FROM user_mgmt.user_roles ur
     JOIN user_mgmt.roles r ON ur.role_id = r.id
-    WHERE ur.user_id = auth.uid() 
+    WHERE ur.user_id = auth.uid()
     AND r.name IN ('manager', 'admin')
   )
 );
@@ -115,7 +118,7 @@ FOR UPDATE USING (
 ### Multi-User Access Patterns
 
 - **Store Admin**: Full access to store data, user management
-- **Store Manager**: Inventory management, discount decisions  
+- **Store Manager**: Inventory management, discount decisions
 - **Store Employee**: Product scanning, batch updates
 - **System Admin**: Cross-store analytics, system configuration
 
@@ -128,18 +131,21 @@ Each role is enforced through RLS policies, not application-level checks.
 ### Current Architecture (MVP - Scale)
 
 **Direct Client Pattern**:
+
 - Perfect for LIFO's real-time inventory needs
-- Handles 1-50 stores efficiently  
+- Handles 1-50 stores efficiently
 - Costs scale with usage, not infrastructure complexity
 
 ### Migration Strategy (Future Scale)
 
 **Phase 1 (Current)**: Direct client for all operations
+
 - ✅ MVP speed and simplicity
-- ✅ Real-time updates  
+- ✅ Real-time updates
 - ✅ Cost-effective
 
 **Phase 2 (Growth)**: Hybrid approach for complex operations
+
 - Keep direct client for core CRUD
 - Add API routes for:
   - Bulk CSV imports (1000+ products)
@@ -147,7 +153,8 @@ Each role is enforced through RLS policies, not application-level checks.
   - Complex analytics aggregations
   - Compliance reporting
 
-**Phase 3 (Enterprise)**: Server-side optimization  
+**Phase 3 (Enterprise)**: Server-side optimization
+
 - Move high-volume operations to API routes
 - Implement advanced caching strategies
 - Consider self-hosted Postgres for cost optimization
@@ -201,14 +208,17 @@ npm run format           # Prettier code formatting
 ### Scaling Projections
 
 **Phase 1 (1-10 stores)**: $200-300/month
+
 - Supabase Pro upgrade needed
 - Increased bandwidth costs
 
-**Phase 2 (10-50 stores)**: $600-900/month  
+**Phase 2 (10-50 stores)**: $600-900/month
+
 - **Migration trigger**: When Vercel hits $300+/month
 - Consider Railway/Render alternatives
 
 **Phase 3 (50+ stores)**: $400-800/month
+
 - Post-migration costs with optimized infrastructure
 - Enterprise features and compliance
 
@@ -226,11 +236,13 @@ npm run format           # Prettier code formatting
 Ready to build features? These guides provide hands-on implementation details:
 
 ### 📖 Core Implementation
+
 - **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.md)** - How to add new features following our patterns
-- **[Component Standards](docs/COMPONENT_STANDARDS.md)** - UI patterns and conventions  
+- **[Component Standards](docs/COMPONENT_STANDARDS.md)** - UI patterns and conventions
 - **[Developer Onboarding](docs/DEVELOPER_ONBOARDING.md)** - Environment setup and first contributions
 
 ### 🔧 Specialized Guides
+
 - **[Database Schema](docs/DATABASE_SCHEMA.md)** - Table relationships and RLS policies
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Production setup and monitoring
 - **[Security Checklist](docs/SECURITY_CHECKLIST.md)** - Compliance and data protection
@@ -242,16 +254,19 @@ Ready to build features? These guides provide hands-on implementation details:
 ### Planned Technical Improvements
 
 **Short-term (3-6 months)**:
+
 - Real-time subscriptions for live inventory updates
 - Advanced caching for offline mobile usage
 - Bulk import workflows for large inventories
 
 **Medium-term (6-12 months)**:
+
 - POS system integrations via API routes
 - Predictive analytics for waste reduction
 - Multi-store management for retail chains
 
 **Long-term (12+ months)**:
+
 - AI-powered expiration date recognition
 - Advanced compliance reporting
 - Enterprise customer features
@@ -282,7 +297,7 @@ Ready to build features? These guides provide hands-on implementation details:
 ### When We Might Need Architecture Changes
 
 - **Bulk Operations**: If stores want to upload 1000+ products at once
-- **POS Integration**: When connecting to existing store computer systems  
+- **POS Integration**: When connecting to existing store computer systems
 - **Enterprise Features**: Multi-store chains with complex reporting needs
 - **Compliance**: Advanced audit trails for regulatory requirements
 
@@ -290,4 +305,4 @@ The current architecture is designed to scale smoothly through these transitions
 
 ---
 
-*This architecture provides the foundation for LIFO's mission: giving retailers precise, batch-level inventory intelligence that eliminates guesswork in food waste management.*
+_This architecture provides the foundation for LIFO's mission: giving retailers precise, batch-level inventory intelligence that eliminates guesswork in food waste management._

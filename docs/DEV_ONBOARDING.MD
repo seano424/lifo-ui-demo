@@ -10,7 +10,8 @@ Hey there! We're excited to have you join the team. This guide will help you get
 ---
 
 ## What We're Building
-LIFO.AI helps grocery stores track their inventory by expiration date. 
+
+LIFO.AI helps grocery stores track their inventory by expiration date.
 This lets them make smarter decisions about discounts and donations, reducing food waste.
 
 **Why it matters**: Most stores just guess when to discount products. We give them actual data.
@@ -47,9 +48,11 @@ npm run dev
 - **VS Code** (recommended) - with Prettier and ESLint extensions
 
 ### Environment Variables
-We do have a confluence doc for env variables right now. 
+
+We do have a confluence doc for env variables right now.
 If you don't have access to that or you don't see all the variables necessary, just reach out to dev on slack for help
 Ask for these values to put in `.env.local`:
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://jrgmetdsohowtxickqij.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=[ask for this]
@@ -68,6 +71,7 @@ SUPABASE_SERVICE_ROLE_KEY=[ask for this - keep it secret!]
 **Don't worry if you're new to any of these** - the patterns are pretty straightforward once you see a few examples.
 
 ### Project Structure
+
 ```
 app/           # Pages and layouts (Next.js App Router)
 components/    # Reusable UI components
@@ -80,6 +84,7 @@ hooks/         # Custom React hooks
 ## How We Work
 
 ### Git Workflow
+
 ```bash
 # Create a branch for your work
 git checkout -b feature/what-youre-working-on
@@ -95,6 +100,7 @@ git push origin feature/what-youre-working-on
 **Pull Requests**: We review each other's code before merging. It's collaborative, not judgmental!
 
 ### Useful Commands
+
 ```bash
 npm run dev              # Start development server
 npm run lint             # Check code quality
@@ -108,12 +114,14 @@ npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ## Your First Week
 
 ### Day 1-2: Get Oriented
+
 - Get the app running locally
 - Explore the codebase - click around, see what's there
 - Ask questions about anything confusing
 - Maybe make a small change (change some text, adjust a color)
 
 ### Day 3-5: First Contribution
+
 - Pick up a small task (we'll help you find one)
 - Create your first PR
 - Go through the code review process
@@ -134,11 +142,13 @@ npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ## When You're Stuck
 
 ### Good Ways to Ask for Help
+
 - "I'm trying to [do X] but getting [specific error]. I've tried [what you tried]. Any ideas?"
 - "Can someone explain how [specific thing] works?"
 - "Is there a pattern for [specific scenario]?"
 
 ### When to Ask
+
 - **Immediately** if you can't get the app running
 - **After 30 minutes** if you're stuck on something
 - **Anytime** you're unsure about business logic or requirements
@@ -150,6 +160,7 @@ npm run supabase:login   # Authenticate with Supabase CLI (one-time)
 ## Database Basics
 
 We use Supabase (PostgreSQL) with a few key tables:
+
 - **products**: The grocery items (apples, milk, etc.)
 - **inventory_batches**: Specific batches with expiration dates
 - **users**: Store managers and employees
@@ -204,4 +215,4 @@ We're building something that can genuinely reduce food waste and help small bus
 
 ---
 
-*Questions about anything? Just ask in Slack or DM your mentor.*
+_Questions about anything? Just ask in Slack or DM your mentor._

@@ -40,7 +40,9 @@ export function BatchList({
   const [searchTerm, setSearchTerm] = useState('')
 
   // Use different hooks based on whether we're showing batches for a specific product
-  const batchQuery = productId ? useBatchesForProduct(productId, filters) : useBatches(filters)
+  const batchesForProduct = useBatchesForProduct(productId, filters)
+  const batches = useBatches(filters)
+  const batchQuery = productId ? batchesForProduct : batches
 
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = batchQuery
 
@@ -84,7 +86,7 @@ export function BatchList({
     return result
   }, [data, searchTerm, maxItems])
 
-  const updateFilter = (key: keyof BatchFilters, value: any) => {
+  const updateFilter = (key: keyof BatchFilters, value: unknown) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === 'all' ? undefined : value,

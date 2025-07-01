@@ -156,7 +156,7 @@ export function StoreSearchStep() {
         {showNoResults && (
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              No stores found matching "{debouncedSearchValue}"
+              No stores found matching &quot;{debouncedSearchValue}&quot;
             </p>
             <p className="text-xs text-muted-foreground">
               Try a different search term or add your store manually
@@ -174,7 +174,7 @@ export function StoreSearchStep() {
         {/* Help text */}
         <div className="text-center">
           <p className="text-xs text-muted-foreground">
-            Can't find your store? You can add all details manually in the next step.
+            Can&apos;t find your store? You can add all details manually in the next step.
           </p>
         </div>
       </div>

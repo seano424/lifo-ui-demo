@@ -27,9 +27,9 @@ import {
   Lock,
   Truck,
 } from 'lucide-react'
-import type { Batch, BatchWithProduct } from '@/lib/queries/batches'
+import type { BatchWithProduct } from '@/lib/queries/batches'
 import { usePermissions } from '@/hooks/use-users'
-import { formatDistanceToNow, isAfter, isBefore, addDays } from 'date-fns'
+import { formatDistanceToNow, isBefore, addDays } from 'date-fns'
 import { toast } from 'sonner'
 
 interface BatchCardProps {

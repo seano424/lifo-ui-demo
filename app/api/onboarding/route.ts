@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type { StoreDetails } from '@/lib/stores/onboarding-store'
 
 const DEV_MODE = true
+
+// Define a minimal user type for onboarding
+interface OnboardingUser {
+  email: string
+  fullName?: string
+}
 
 export async function POST(request: NextRequest) {
   console.log('=== ONBOARDING API CALLED ===')
@@ -96,7 +103,11 @@ export async function POST(request: NextRequest) {
 }
 
 // ========== PRODUCTION IMPLEMENTATION ==========
-async function handleProductionOnboarding(userId: string, store: any, user: any) {
+async function handleProductionOnboarding(
+  userId: string,
+  store: StoreDetails,
+  user: OnboardingUser,
+) {
   // Import here to avoid issues if not yet installed
   const { createClient } = await import('@/lib/supabase/server')
 
@@ -115,9 +126,12 @@ async function handleProductionOnboarding(userId: string, store: any, user: any)
         phone: store.phone || null,
         store_type: store.type,
         // Handle coordinates if present
-        coordinates: store.coordinates
-          ? `POINT(${store.coordinates.lng} ${store.coordinates.lat})`
-          : null,
+        coordinates:
+          store.coordinates &&
+          typeof store.coordinates.lng === 'number' &&
+          typeof store.coordinates.lat === 'number'
+            ? `POINT(${store.coordinates.lng} ${store.coordinates.lat})`
+            : null,
         google_place_id: store.googlePlaceId || null,
         is_active: true,
       })
@@ -136,8 +150,8 @@ async function handleProductionOnboarding(userId: string, store: any, user: any)
       .from('user_mgmt.users')
       .insert({
         user_id: userId, // Link to Supabase Auth
-        username: user.email.split('@')[0], // Generate username from email
-        email: user.email,
+        username: typeof user.email === 'string' ? user.email.split('@')[0] : '', // Generate username from email
+        email: typeof user.email === 'string' ? user.email : '',
         password_hash: 'managed_by_supabase_auth', // Placeholder since Supabase Auth handles this
         full_name: user.fullName || '',
         store_id: storeData.store_id, // Link to the store we just created
