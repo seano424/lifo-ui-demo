@@ -60,6 +60,7 @@ const data = {
         },
         {
           title: 'Discounts',
+          url: '/dashboard/discounts',
         },
       ],
     },
