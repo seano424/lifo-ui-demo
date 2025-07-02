@@ -130,7 +130,7 @@ const MarketingNav = ({
   },
 }: MarketingNavProps) => {
   return (
-    <section className="py-6 container mx-auto">
+    <section className="py-6 px-10 fixed top-0 left-0 right-0 z-50 h-24 bg-white/90 backdrop-blur-xs flex flex-col justify-center">
       {/* Desktop Menu */}
       <nav className="hidden justify-between lg:flex">
         <div className="flex items-center gap-2">
