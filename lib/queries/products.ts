@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
+import type { Batch } from './batches'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -325,7 +326,7 @@ export async function fetchProductById(
 export async function fetchProductWithBatches(
   productId: string,
   serverClient?: ServerClient,
-): Promise<Product & { batches: unknown[] }> {
+): Promise<Product & { batches: Batch[] }> {
   const supabase = serverClient || createClient()
 
   try {
@@ -370,7 +371,7 @@ export async function fetchProductWithBatches(
       batchCount: data.batches?.length || 0,
     })
 
-    return data as Product & { batches: unknown[] }
+    return data as Product & { batches: Batch[] }
   } catch (err) {
     console.error('[fetchProductWithBatches] Unexpected error:', err)
     throw err

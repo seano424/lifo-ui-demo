@@ -20,13 +20,11 @@ export function createQueryClient() {
         staleTime: 30 * 1000, // 30 seconds
         gcTime: 5 * 60 * 1000, // 5 minutes
         retry: (failureCount, error: unknown) => {
-          if (
-            hasStatus(error) &&
-            error.status >= 400 &&
-            error.status < 500 &&
-            error.status !== 408
-          ) {
-            return false
+          if (typeof error === 'object' && error !== null && 'status' in error) {
+            const status = (error as { status?: number }).status
+            if (status && status >= 400 && status < 500 && status !== 408) {
+              return false
+            }
           }
           return failureCount < 3
         },

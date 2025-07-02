@@ -2,6 +2,7 @@
 
 import type { ProductFilters } from './products'
 import type { UserFilters } from './users'
+import type { BatchFilters } from './batches'
 
 export const queryKeys = {
   products: {
@@ -25,8 +26,8 @@ export const queryKeys = {
   batches: {
     all: ['batches'] as const,
     lists: () => [...queryKeys.batches.all, 'list'] as const,
-    list: (filters: unknown) => [...queryKeys.batches.lists(), { filters }] as const,
-    infinite: (filters: unknown) =>
+    list: (filters: BatchFilters) => [...queryKeys.batches.lists(), { filters }] as const,
+    infinite: (filters: BatchFilters) =>
       [...queryKeys.batches.lists(), 'infinite', { filters }] as const,
     details: () => [...queryKeys.batches.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.batches.details(), id] as const,

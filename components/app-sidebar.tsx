@@ -45,10 +45,28 @@ const data = {
       url: '/dashboard',
       icon: SquareTerminal,
       isActive: true,
+      items: [
+        {
+          title: 'Products',
+          url: '/dashboard/products',
+        },
+        {
+          title: 'Batches',
+          url: '/dashboard/batches',
+        },
+        {
+          title: 'Donations',
+          url: '/dashboard',
+        },
+        {
+          title: 'Discounts',
+          url: '/dashboard/discounts',
+        },
+      ],
     },
     {
-      title: 'Products',
-      url: '/dashboard/products',
+      title: 'Inventory',
+      url: '/dashboard',
       icon: Bot,
     },
     {

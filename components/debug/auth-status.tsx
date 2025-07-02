@@ -4,19 +4,19 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-type AuthInfo = {
+export interface AuthInfoType {
   hasSession: boolean
   hasUser: boolean
   userId: string | null
   email: string | null
   sessionError: string | null
   userError: string | null
-  queryResult: { data: number | null; error: string | null }
+  queryResult: { data: number | null; error: string | null } | null
   rawSession: unknown
 }
 
 export function AuthStatus() {
-  const [authInfo, setAuthInfo] = useState<AuthInfo | null>(null)
+  const [authInfo, setAuthInfo] = useState<AuthInfoType | null>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
