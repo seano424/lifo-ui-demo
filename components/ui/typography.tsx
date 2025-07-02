@@ -36,7 +36,7 @@ export type TypographyProps = {
 } & Omit<React.HTMLAttributes<HTMLElement>, 'color'> &
   VariantProps<typeof typographyVariants>
 
-const Typography = React.forwardRef<any, TypographyProps>(
+const Typography = React.forwardRef<HTMLElement, TypographyProps>(
   ({ className, variant, color, asChild = false, as: CompProp, ...props }, ref) => {
     const Comp = asChild ? Slot : CompProp || 'p'
     return (
