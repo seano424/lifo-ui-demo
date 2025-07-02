@@ -151,10 +151,10 @@ const MarketingNav = ({
       </nav>
 
       {/* Mobile Menu */}
-      <div className="block lg:hidden">
+      <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href={logo.url} className="flex items-center gap-2 relative h-8 aspect-video">
+          <Link href={logo.url} className="flex items-center gap-2 relative h-10 aspect-video">
             <Image fill src={logo.src} className="object-cover" alt={logo.alt} />
           </Link>
           <Sheet>
@@ -167,13 +167,7 @@ const MarketingNav = ({
               <SheetHeader>
                 <SheetTitle>
                   <Link href={logo.url} className="flex items-center gap-2">
-                    <Image
-                      src={logo.src}
-                      className="max-h-8"
-                      alt={logo.alt}
-                      width={32}
-                      height={32}
-                    />
+                    <Image src={logo.src} alt={logo.alt} width={80} height={80} />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
