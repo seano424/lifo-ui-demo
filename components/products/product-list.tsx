@@ -3,6 +3,7 @@
 import { useMemo, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 import { useProductsWithSort, useProductActions } from '@/hooks/use-products'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -134,9 +135,9 @@ export function ProductsList() {
             <CardTitle className="text-destructive">Error Loading Products</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <Typography variant="p" color="muted">
               {error instanceof Error ? error.message : 'An unexpected error occurred'}
-            </p>
+            </Typography>
           </CardContent>
         </Card>
       </div>
@@ -195,10 +196,10 @@ export function ProductsList() {
             <div className="flex items-center justify-center p-12">
               <div className="text-center">
                 <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">No products found</h3>
-                <p className="text-muted-foreground mt-2">
+                <Typography variant="h3">No products found</Typography>
+                <Typography variant="p" color="muted" className="mt-2">
                   Get started by adding your first product
-                </p>
+                </Typography>
               </div>
             </div>
           ) : (

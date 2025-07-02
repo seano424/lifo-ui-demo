@@ -1,7 +1,8 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Typography } from '@/components/ui/typography'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useBatchAlerts, useBatchSummary } from '@/hooks/use-batches'
 import {
   Package,
@@ -123,14 +124,14 @@ export function BatchDashboardStats() {
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5 text-orange-600" />
               <div className="flex-1">
-                <p className="font-medium text-orange-800">
+                <Typography variant="p" color="muted">
                   Action Required: {expiringBatches?.length || 0} batch(es) expiring soon
                   {(lowStockBatches?.length || 0) > 0 &&
                     `, ${lowStockBatches.length} with low stock`}
-                </p>
-                <p className="text-sm text-orange-600">
+                </Typography>
+                <Typography variant="p" color="muted">
                   Review your inventory to prevent waste and stockouts
-                </p>
+                </Typography>
               </div>
               <Badge variant="outline" className="border-orange-300 text-orange-700">
                 {(expiringBatches?.length || 0) + (lowStockBatches?.length || 0)} alerts
@@ -150,7 +151,9 @@ export function BatchDashboardStats() {
               className={`transition-all hover:shadow-md ${getTrendBg(stat.trend, stat.alert)}`}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                <CardTitle>
+                  <Typography variant="h3">{stat.title}</Typography>
+                </CardTitle>
                 <Icon className={`h-4 w-4 ${getTrendColor(stat.trend, stat.alert)}`} />
               </CardHeader>
               <CardContent>
@@ -162,7 +165,9 @@ export function BatchDashboardStats() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">{stat.description}</p>
+                <Typography variant="p" color="muted">
+                  {stat.description}
+                </Typography>
               </CardContent>
             </Card>
           )
@@ -182,10 +187,10 @@ export function BatchDashboardStats() {
             <div className="grid gap-4 md:grid-cols-2">
               {(expiringBatches?.length || 0) > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium flex items-center gap-2">
+                  <Typography variant="h4" className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     Expiring Batches ({expiringBatches?.length})
-                  </h4>
+                  </Typography>
                   <div className="space-y-1">
                     {expiringBatches?.slice(0, 3).map(batch => (
                       <div
@@ -199,9 +204,9 @@ export function BatchDashboardStats() {
                       </div>
                     ))}
                     {(expiringBatches?.length || 0) > 3 && (
-                      <p className="text-xs text-muted-foreground">
+                      <Typography variant="p" color="muted">
                         +{(expiringBatches?.length || 0) - 3} more
-                      </p>
+                      </Typography>
                     )}
                   </div>
                 </div>
@@ -209,10 +214,10 @@ export function BatchDashboardStats() {
 
               {(lowStockBatches?.length || 0) > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium flex items-center gap-2">
+                  <Typography variant="h4" className="flex items-center gap-2">
                     <TrendingDown className="h-4 w-4" />
                     Low Stock Batches ({lowStockBatches?.length})
-                  </h4>
+                  </Typography>
                   <div className="space-y-1">
                     {lowStockBatches?.slice(0, 3).map(batch => (
                       <div
@@ -226,9 +231,9 @@ export function BatchDashboardStats() {
                       </div>
                     ))}
                     {(lowStockBatches?.length || 0) > 3 && (
-                      <p className="text-xs text-muted-foreground">
+                      <Typography variant="p" color="muted">
                         +{(lowStockBatches?.length || 0) - 3} more
-                      </p>
+                      </Typography>
                     )}
                   </div>
                 </div>

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 
 // Simple test mode flag - just flip this to true/false
 const TEST_MODE = true
@@ -160,7 +161,9 @@ export function OnboardingSignUpForm({
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
+                <Typography variant="p" color="muted">
+                  Must be at least 8 characters
+                </Typography>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>

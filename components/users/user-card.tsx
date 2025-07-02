@@ -1,8 +1,8 @@
-// components/users/user-card.tsx
 'use client'
 
 import { useUserRoles } from '@/hooks/use-users'
 import type { User } from '@/lib/queries/users'
+import { Typography } from '@/components/ui/typography'
 
 interface UserCardProps {
   user: User
@@ -46,8 +46,10 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900">{user.full_name || 'No name'}</h3>
-            <p className="text-sm text-gray-600">@{user.username}</p>
+            <Typography variant="h3">{user.full_name || 'No name'}</Typography>
+            <Typography variant="p" color="muted">
+              @{user.username}
+            </Typography>
           </div>
         </div>
 
@@ -88,7 +90,9 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
 
       {/* Roles */}
       <div className="mb-4">
-        <p className="text-xs font-medium text-gray-700 mb-2">ROLES</p>
+        <Typography variant="p" color="muted">
+          ROLES
+        </Typography>
         {rolesLoading ? (
           <div className="text-sm text-gray-500">Loading roles...</div>
         ) : roles.length > 0 ? (
@@ -100,7 +104,9 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
             ))}
           </div>
         ) : (
-          <span className="text-sm text-gray-500">No roles assigned</span>
+          <Typography variant="p" color="muted">
+            No roles assigned
+          </Typography>
         )}
       </div>
 
@@ -134,7 +140,9 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
 
       {/* Footer */}
       <div className="mt-4 pt-4 border-t border-gray-100">
-        <p className="text-xs text-gray-500">Joined {formatDate(user.created_at)}</p>
+        <Typography variant="p" color="muted">
+          Joined {formatDate(user.created_at)}
+        </Typography>
       </div>
     </div>
   )

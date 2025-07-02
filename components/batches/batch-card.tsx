@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -237,10 +238,12 @@ export function BatchCard({
 
             {showProductInfo && batch.products && (
               <div className="mt-1">
-                <p className="text-sm font-medium text-muted-foreground truncate">
+                <Typography variant="p" color="muted">
                   {batch.products.name}
-                </p>
-                <p className="text-xs text-muted-foreground">SKU: {batch.products.sku}</p>
+                </Typography>
+                <Typography variant="p" color="muted">
+                  SKU: {batch.products.sku}
+                </Typography>
               </div>
             )}
 

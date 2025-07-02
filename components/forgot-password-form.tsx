@@ -1,13 +1,14 @@
 'use client'
 
+import Link from 'next/link'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import Link from 'next/link'
-import { useState } from 'react'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -40,22 +41,32 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       {success ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
+            <CardTitle>
+              <Typography variant="h1">Check Your Email</Typography>
+            </CardTitle>
+            <CardDescription>
+              <Typography variant="p" color="muted">
+                Password reset instructions sent
+              </Typography>
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <Typography variant="p" color="muted">
               If you registered using your email and password, you will receive a password reset
               email.
-            </p>
+            </Typography>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+            <CardTitle>
+              <Typography variant="h1">Reset Your Password</Typography>
+            </CardTitle>
             <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your password
+              <Typography variant="p" color="muted">
+                Type in your email and we&apos;ll send you a link to reset your password
+              </Typography>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -72,16 +83,22 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                     onChange={e => setEmail(e.target.value)}
                   />
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
+                {error && (
+                  <Typography variant="p" color="destructive">
+                    {error}
+                  </Typography>
+                )}
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? 'Sending...' : 'Send reset email'}
                 </Button>
               </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{' '}
-                <Link href="/auth/login" className="underline underline-offset-4">
-                  Login
-                </Link>
+              <div className="mt-4 text-center">
+                <Typography variant="p" color="muted">
+                  Already have an account?{' '}
+                  <Link href="/auth/login" className="underline underline-offset-4">
+                    Login
+                  </Link>
+                </Typography>
               </div>
             </form>
           </CardContent>

@@ -508,6 +508,7 @@ import { fetchProductsPage } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createServerClient } from '@/lib/supabase/server'
 import { ProductsList } from './products-list'
+import { Typography } from '@/components/ui/typography'
 
 export default async function ProductsPage({
   searchParams,
@@ -535,7 +536,7 @@ export default async function ProductsPage({
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Products</h1>
+          <Typography variant="h1">Hello World</Typography>
           <ProductFilters />
         </div>
 

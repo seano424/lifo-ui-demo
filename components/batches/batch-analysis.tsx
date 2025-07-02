@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { Typography } from '@/components/ui/typography'
 import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
 import { sampleBatchPerformance } from '@/lib/sample-data'
 
@@ -24,11 +25,11 @@ export function BatchAnalytics() {
             <div key={batch.batchId} className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h4 className="font-medium">{batch.productName}</h4>
-                  <p className="text-sm text-muted-foreground">
+                  <Typography variant="h3">{batch.productName}</Typography>
+                  <Typography variant="p" color="muted">
                     Batch: {batch.batchId} • Expires:{' '}
                     {new Date(batch.expirationDate).toLocaleDateString()}
-                  </p>
+                  </Typography>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge

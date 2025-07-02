@@ -1,5 +1,6 @@
 'use client'
 
+import { Typography } from '@/components/ui/typography'
 import { useMemo, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -103,9 +104,9 @@ export function BatchList({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
+            <Typography variant="p" color="muted">
               {error instanceof Error ? error.message : 'An unexpected error occurred'}
-            </p>
+            </Typography>
           </CardContent>
         </Card>
       </div>
@@ -115,7 +116,7 @@ export function BatchList({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {title && <h2 className="text-2xl font-bold">{title}</h2>}
+        {title && <Typography variant="h2">{title}</Typography>}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -142,10 +143,10 @@ export function BatchList({
       {/* Header */}
       {title && (
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
+          <Typography variant="h2" className="flex items-center gap-2">
             <Package className="h-6 w-6" />
             {title}
-          </h2>
+          </Typography>
           {data && data.length > 0 && (
             <Badge variant="ghost" className="text-sm">
               {filteredData.length} current batch{filteredData.length !== 1 ? 'es' : ''}
@@ -352,19 +353,19 @@ export function BatchList({
         <div className="flex items-center justify-center p-12">
           <div className="text-center">
             <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold">
+            <Typography variant="h3">
               {searchTerm || Object.keys(filters).length > 0
                 ? 'No batches found'
                 : 'No batches yet'}
-            </h3>
-            <p className="text-muted-foreground mt-2">
+            </Typography>
+            <Typography variant="p" color="muted" className="mt-2">
               {emptyMessage ||
                 (searchTerm || Object.keys(filters).length > 0
                   ? 'Try adjusting your search or filters'
                   : productId
                     ? 'This product has no batches yet'
                     : 'Get started by adding your first batch')}
-            </p>
+            </Typography>
             {(searchTerm || Object.keys(filters).length > 0) && (
               <Button
                 variant="outline"

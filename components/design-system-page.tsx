@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 import { Palette, Type, Grid, Layers } from 'lucide-react'
 
 export default function DesignSystemPage() {
@@ -120,14 +121,20 @@ export default function DesignSystemPage() {
         style={{ backgroundColor: showHex ? color.hex : `hsl(var(--${color.cssVar}))` }}
       />
       <div className="space-y-1">
-        <h4 className="font-medium text-sm">{color.name}</h4>
+        <Typography variant="h4">{color.name}</Typography>
         {showHex && (
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground font-mono">{color.value}</p>
-            <p className="text-xs text-muted-foreground font-mono">{color.hex}</p>
+            <Typography variant="p" color="muted" className="font-mono">
+              {color.value}
+            </Typography>
+            <Typography variant="p" color="muted" className="font-mono">
+              {color.hex}
+            </Typography>
           </div>
         )}
-        <p className="text-xs text-muted-foreground">{color.usage}</p>
+        <Typography variant="p" color="muted" className="font-mono">
+          {color.usage}
+        </Typography>
         <Badge variant="outline" className="text-xs font-mono">
           {showHex ? color.cssVar : `--${color.cssVar}`}
         </Badge>
@@ -139,10 +146,10 @@ export default function DesignSystemPage() {
     <div className="min-h-screen bg-background p-6 space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold">LIFO Design System</h1>
-        <p className="text-lg text-muted-foreground">
+        <Typography variant="h1">LIFO Design System</Typography>
+        <Typography variant="p" color="muted">
           Visual design foundation for consistent UI across the LIFO platform
-        </p>
+        </Typography>
       </div>
 
       {/* Navigation */}
@@ -168,10 +175,10 @@ export default function DesignSystemPage() {
       {/* Brand Colors */}
       <section className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold mb-2">Brand Colors</h2>
-          <p className="text-muted-foreground">
+          <Typography variant="h2">Brand Colors</Typography>
+          <Typography variant="p" color="muted">
             Core brand colors that define LIFO&apos;s visual identity
-          </p>
+          </Typography>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -184,10 +191,10 @@ export default function DesignSystemPage() {
       {/* System Colors */}
       <section className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold mb-2">System Colors</h2>
-          <p className="text-muted-foreground">
+          <Typography variant="h2">System Colors</Typography>
+          <Typography variant="p" color="muted">
             Semantic colors that adapt automatically between light and dark modes
-          </p>
+          </Typography>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -199,12 +206,12 @@ export default function DesignSystemPage() {
 
       {/* Footer */}
       <footer className="pt-8 border-t">
-        <p className="text-sm text-muted-foreground">
+        <Typography variant="p" color="muted">
           Design System v1.0 • Last updated: January 2025 •
           <a href="#" className="text-primary hover:underline ml-1">
             View in Figma
           </a>
-        </p>
+        </Typography>
       </footer>
     </div>
   )

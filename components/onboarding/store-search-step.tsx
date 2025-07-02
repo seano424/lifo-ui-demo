@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
+import { Typography } from '@/components/ui/typography'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useDebouncedValue } from '@/hooks/use-debounce-search'
 import { useGooglePlaces } from '@/hooks/use-google-places'
@@ -84,8 +85,10 @@ export function StoreSearchStep() {
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">Find Your Store</h1>
-        <p className="text-muted-foreground">Search for your business or add it manually</p>
+        <Typography variant="h1">Find Your Store</Typography>
+        <Typography variant="p" color="muted">
+          Search for your business or add it manually
+        </Typography>
       </div>
 
       <div className="space-y-4 relative">
@@ -155,12 +158,12 @@ export function StoreSearchStep() {
         {/* No results message */}
         {showNoResults && (
           <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <Typography variant="p" color="muted">
               No stores found matching &quot;{debouncedSearchValue}&quot;
-            </p>
-            <p className="text-xs text-muted-foreground">
+            </Typography>
+            <Typography variant="p" color="muted">
               Try a different search term or add your store manually
-            </p>
+            </Typography>
           </div>
         )}
 
@@ -173,9 +176,9 @@ export function StoreSearchStep() {
 
         {/* Help text */}
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">
+          <Typography variant="p" color="muted">
             Can&apos;t find your store? You can add all details manually in the next step.
-          </p>
+          </Typography>
         </div>
       </div>
     </div>

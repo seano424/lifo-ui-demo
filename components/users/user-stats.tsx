@@ -1,7 +1,7 @@
-// components/users/user-stats.tsx
 'use client'
 
 import { useUsers, useActiveUsers, useInactiveUsers } from '@/hooks/use-users'
+import { Typography } from '@/components/ui/typography'
 
 export function UserStats() {
   const { count: totalUsers } = useUsers({}, 1) // Just get count, minimal page size
@@ -91,9 +91,15 @@ export function UserStats() {
         <div key={stat.name} className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
+              <Typography variant="p" color="muted">
+                {stat.name}
+              </Typography>
+              <Typography variant="p" color="muted">
+                {stat.value}
+              </Typography>
+              <Typography variant="p" color="muted">
+                {stat.description}
+              </Typography>
             </div>
             <div className={`p-3 rounded-lg border ${getColorClasses(stat.color)}`}>
               {stat.icon}
