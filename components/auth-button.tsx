@@ -19,13 +19,16 @@ export async function AuthButton() {
       </Button>
     </div>
   ) : (
-    <div className="flex gap-2">
-      <Button asChild size="sm" variant={'outline'}>
-        <Link href="/auth/login">My Store Login</Link>
-      </Button>
-      <Button asChild size="sm" variant={'default'}>
-        {/* <Link href="/auth/sign-up">Sign Up</Link> */}
-        <Link href="/onboarding/create-account">Business Sign Up</Link>
+    <div className="flex gap-10 items-center uppercase font-mono">
+      <Link
+        className="font-medium text-xs dark:hover:text-brand-secondary hover:text-brand-primary"
+        href="/auth/login"
+      >
+        Login
+      </Link>
+
+      <Button asChild size="sm" variant={'brand'} className="uppercase font-mono">
+        <Link href="/onboarding/create-account">Start trial</Link>
       </Button>
     </div>
   )
