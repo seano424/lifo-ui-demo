@@ -19,6 +19,10 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         brand: 'bg-brand-primary text-white shadow-sm hover:bg-brand-primary/90',
         brandSecondary: 'bg-brand-secondary text-white shadow-sm hover:bg-brand-secondary/90',
+        brandOutline:
+          'border border-brand-primary bg-background shadow-xs hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-brand-secondary',
+        brandSecondaryOutline:
+          'border border-brand-secondary bg-background shadow-xs hover:bg-brand-secondary/10 hover:text-brand-secondary dark:hover:bg-brand-primary/10 dark:hover:text-brand-primary',
       },
       size: {
         default: 'px-4 py-2 text-sm',

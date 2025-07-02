@@ -27,7 +27,7 @@ export async function AuthButton() {
         Login
       </Link>
 
-      <Button asChild size="sm" variant={'brandSecondary'} className="uppercase font-mono">
+      <Button asChild size="sm" variant={'brand'} className="uppercase font-mono">
         <Link href="/onboarding/create-account">Start trial</Link>
       </Button>
     </div>

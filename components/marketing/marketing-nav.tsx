@@ -166,8 +166,11 @@ const MarketingNav = ({
             <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href={logo.url} className="flex items-center gap-2">
-                    <Image src={logo.src} alt={logo.alt} width={80} height={80} />
+                  <Link
+                    href={logo.url}
+                    className="flex items-center gap-2 relative h-10 aspect-video"
+                  >
+                    <Image src={logo.src} alt={logo.alt} fill className="object-cover" />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
@@ -213,7 +216,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-xs uppercase font-mono transition-colors hover:bg-muted hover:text-accent-foreground"
+        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-xs uppercase font-mono transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-brand-secondary"
       >
         {item.title}
       </NavigationMenuLink>
