@@ -1,6 +1,6 @@
+import type { Database } from '@/types/supabase'
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import type { Database } from '@/types/supabase'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -335,5 +335,45 @@ export async function fetchUserWithRoles(
   } catch (err) {
     console.error('[fetchUserWithRoles] Unexpected error:', err)
     throw err
+  }
+}
+
+export async function fetchCurrentUser(
+  serverClient: Awaited<ReturnType<typeof createServerClient>>,
+) {
+  try {
+    console.log('[fetchCurrentUser] Getting server-side user')
+
+    const {
+      data: { user },
+      error: authError,
+    } = await serverClient.auth.getUser()
+
+    if (authError || !user) {
+      console.log('[fetchCurrentUser] No authenticated user')
+      return null
+    }
+
+    // Get the user from user_mgmt table
+    const { data: mgmtUser, error: mgmtError } = await serverClient
+      .schema('user_mgmt')
+      .from('users')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (mgmtError) {
+      console.error('[fetchCurrentUser] User not found in user management:', mgmtError)
+      return null
+    }
+
+    console.log('[fetchCurrentUser] Success:', { userId: user.id })
+    return {
+      auth: user,
+      profile: mgmtUser as User,
+    }
+  } catch (err) {
+    console.error('[fetchCurrentUser] Unexpected error:', err)
+    return null
   }
 }

@@ -1,5 +1,3 @@
-// components/products/product-card.tsx
-
 'use client'
 
 import { useState } from 'react'

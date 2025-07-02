@@ -1,10 +1,11 @@
-// app/products/page.tsx (Server Component)
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { fetchProductsPage } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { ProductsList } from '@/components/products/product-list'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { ProductSortList } from '@/components/products/product-sort-list'
+import { Button } from '@/components/ui/button'
 
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -23,13 +24,18 @@ export default async function ProductsPage() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Products</h1>
+        <DashboardInsetHeader
+          title="Products"
+          description="View and manage your products"
+          rightContent={
+            <div className="flex gap-2">
+              <Button variant="outline">Export Products</Button>
+              <Button>Add Product</Button>
+            </div>
+          }
+        />
 
-          {/* Add action buttons here later */}
-        </div>
-
-        <ProductsList />
+        <ProductSortList />
       </div>
     </HydrationBoundary>
   )

@@ -1,4 +1,4 @@
-// lib/queries/products.ts
+// lib/queries/products.ts - Updated with sorting capabilities
 
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -11,10 +11,28 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 // Type for a product row
 export type Product = Database['inventory']['Tables']['products']['Row']
 
-// Type for a product filter (enhanced with better typing)
+// Enhanced sorting types
+export type SortField =
+  | 'name'
+  | 'category'
+  | 'brand'
+  | 'total_stock'
+  | 'base_selling_price'
+  | 'active_batches_count'
+  | 'created_at'
+
+export type SortDirection = 'asc' | 'desc'
+
+export type ProductSort = {
+  field: SortField
+  direction: SortDirection
+}
+
+// Type for a product filter (enhanced with sorting)
 export type ProductFilters = {
   category?: Database['inventory']['Tables']['products']['Row']['category']
   brand?: string
+  sort?: ProductSort
   // Add more as needed
 }
 
@@ -23,13 +41,40 @@ export type ProductsPageParam = {
   pageSize: number
 }
 
-// ✅ FIXED: Better error messages and logging
+// Helper function to build Supabase order clause
+function buildOrderClause(sort?: ProductSort): { column: string; ascending: boolean } {
+  if (!sort) {
+    return { column: 'created_at', ascending: false } // Default: newest first
+  }
+
+  // Map sort fields to actual database columns
+  const columnMap: Record<SortField, string> = {
+    name: 'name',
+    category: 'category',
+    brand: 'brand',
+    total_stock: 'total_stock',
+    base_selling_price: 'base_selling_price',
+    active_batches_count: 'active_batches_count',
+    created_at: 'created_at',
+  }
+
+  return {
+    column: columnMap[sort.field],
+    ascending: sort.direction === 'asc',
+  }
+}
+
 export async function fetchProducts(serverClient?: ServerClient): Promise<Product[]> {
   const supabase = serverClient || createClient()
   console.log('[fetchProducts] Querying inventory.products with no filters')
 
   try {
-    const { data, error } = await supabase.schema('inventory').from('products').select('*')
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .order('product_id', { ascending: true })
 
     if (error) {
       console.error('[fetchProducts] Supabase error:', error)
@@ -69,13 +114,27 @@ export async function fetchProductsPage(
       query = query.eq('brand', filters.brand)
     }
 
+    // Apply sorting
+    const orderClause = buildOrderClause(filters.sort)
+    console.log('[fetchProductsPage] Applying sort:', {
+      field: filters.sort?.field,
+      direction: filters.sort?.direction,
+      column: orderClause.column,
+      ascending: orderClause.ascending,
+    })
+
+    query = query.order(orderClause.column, { ascending: orderClause.ascending })
+
+    // Add secondary sort for consistency (always sort by product_id as tiebreaker)
+    if (orderClause.column !== 'product_id') {
+      query = query.order('product_id', { ascending: true })
+    }
+
     const rangeFrom = page * pageSize
     const rangeTo = (page + 1) * pageSize - 1
     console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
 
-    const { data, error, count } = await query
-      .order('created_at', { ascending: false })
-      .range(rangeFrom, rangeTo)
+    const { data, error, count } = await query.range(rangeFrom, rangeTo)
 
     if (error) {
       console.error('[fetchProductsPage] Supabase error:', error)
@@ -99,7 +158,7 @@ export async function fetchProductsPage(
   }
 }
 
-// ✅ CRUD mutations with better error handling and validation
+// ✅ CRUD mutations remain the same...
 
 export async function createProduct(
   productData: Database['inventory']['Tables']['products']['Insert'],

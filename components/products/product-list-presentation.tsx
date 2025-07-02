@@ -3,8 +3,8 @@
 import { useMemo, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { useProductsWithSort, useProductActions } from '@/hooks/use-products'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useProductActions } from '@/hooks/use-products'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -29,13 +29,13 @@ import {
   ArrowUp,
   ArrowDown,
 } from 'lucide-react'
-import type { SortField } from '@/lib/queries/products'
+import type { SortField, ProductSort, Product } from '@/lib/queries/products'
 
 // ✅ Sortable Table Header Component
 interface SortableHeaderProps {
   field: SortField
   children: React.ReactNode
-  currentSort: ReturnType<typeof useProductsWithSort>['currentSort']
+  currentSort: ProductSort
   onSort: (field: SortField) => void
   className?: string
 }
@@ -71,19 +71,30 @@ function SortableHeader({ field, children, currentSort, onSort, className }: Sor
   )
 }
 
-export function ProductsList() {
-  const {
-    data,
-    count,
-    isLoading,
-    error,
-    hasMore,
-    fetchNextPage,
-    isFetchingNextPage,
-    currentSort,
-    updateSort,
-  } = useProductsWithSort()
+// ✅ Pure presentation component that receives data as props
+interface ProductsListPresentationProps {
+  data: Product[]
+  count: number
+  isLoading: boolean
+  error: Error | null
+  hasMore: boolean
+  fetchNextPage: () => void
+  isFetchingNextPage: boolean
+  currentSort: ProductSort
+  updateSort: (field: SortField) => void
+}
 
+export function ProductsListPresentation({
+  data,
+  count,
+  isLoading,
+  error,
+  hasMore,
+  fetchNextPage,
+  isFetchingNextPage,
+  currentSort,
+  updateSort,
+}: ProductsListPresentationProps) {
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
   const products = useMemo(() => {
@@ -146,13 +157,6 @@ export function ProductsList() {
   if (isLoading) {
     return (
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Products Catalog
-          </CardTitle>
-          <CardDescription>Manage your product catalog and inventory</CardDescription>
-        </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {[...Array(8)].map((_, i) => (
@@ -176,20 +180,6 @@ export function ProductsList() {
   return (
     <div className="space-y-6">
       <Card className="w-full overflow-x-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Products Catalog
-          </CardTitle>
-          <CardDescription>
-            Manage your product catalog and inventory. Click column headers to sort.
-            {currentSort && (
-              <span className="ml-2 text-xs bg-muted px-2 py-1 rounded">
-                Sorted by {currentSort.field} ({currentSort.direction === 'asc' ? '↑' : '↓'})
-              </span>
-            )}
-          </CardDescription>
-        </CardHeader>
         <CardContent>
           {products.length === 0 ? (
             <div className="flex items-center justify-center p-12">
@@ -305,7 +295,6 @@ export function ProductsList() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              // Add view batches functionality
                               console.log('View batches for product:', product.product_id)
                             }}
                           >
@@ -314,7 +303,6 @@ export function ProductsList() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              // Add edit functionality here
                               console.log('Edit product:', product.product_id)
                             }}
                           >

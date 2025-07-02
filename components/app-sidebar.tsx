@@ -2,16 +2,16 @@
 
 import * as React from 'react'
 import {
-  // Removed: AudioWaveform,
   BookOpen,
   Bot,
-  // Removed: Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
   Settings2,
   SquareTerminal,
+  Users,
+  Calendar,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -41,128 +41,53 @@ const data = {
   ],
   navMain: [
     {
-      title: 'Overview',
+      title: 'Dashboard',
       url: '/dashboard',
       icon: SquareTerminal,
       isActive: true,
-      items: [
-        {
-          title: 'Products',
-          url: '/dashboard/products',
-        },
-        {
-          title: 'Batches',
-          url: '/dashboard/batches',
-        },
-        {
-          title: 'Donations',
-          url: '/dashboard',
-        },
-        {
-          title: 'Discounts',
-          url: '/dashboard/discounts',
-        },
-      ],
+      // items: [
+      //   {
+      //     title: 'Overview',
+      //     url: '/dashboard',
+      //   },
+      //   {
+      //     title: 'Batches',
+      //     url: '/dashboard',
+      //   },
+      //   {
+      //     title: 'Donations',
+      //     url: '/dashboard',
+      //   },
+      //   {
+      //     title: 'Discounts',
+      //     url: '/dashboard',
+      //   },
+      // ],
     },
     {
-      title: 'Inventory',
-      url: '/dashboard',
+      title: 'Products',
+      url: '/dashboard/products',
       icon: Bot,
-      items: [
-        {
-          title: 'All Inventory',
-          url: '/dashboard',
-        },
-        {
-          title: 'Expiring Soon',
-          url: '/dashboard',
-        },
-        {
-          title: 'Expired',
-          url: '/dashboard',
-        },
-        {
-          title: 'Alerts',
-          url: '/dashboard',
-        },
-      ],
-    },
-    {
-      title: 'Actions',
-      url: '/dashboard',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'Add New Product',
-          url: '/dashboard',
-        },
-        {
-          title: 'Add New Batch',
-          url: '/dashboard',
-        },
-        {
-          title: 'Edit Product',
-          url: '/dashboard',
-        },
-        {
-          title: 'Edit Batch',
-          url: '/dashboard',
-        },
-        {
-          title: 'Add Discount',
-          url: '/dashboard',
-        },
-        {
-          title: 'Add Donation',
-          url: '/dashboard',
-        },
-      ],
     },
     {
       title: 'Analytics',
-      url: '/dashboard',
-      icon: Settings2,
-      items: [
-        {
-          title: 'Overview',
-          url: '/dashboard',
-        },
-        {
-          title: 'Reports',
-          url: '/dashboard',
-        },
-      ],
+      url: '/dashboard/batch-analytics',
+      icon: BookOpen,
+    },
+    {
+      title: 'Actions',
+      url: '/dashboard/action-log',
+      icon: Calendar,
+    },
+    {
+      title: 'Users',
+      url: '/dashboard/users',
+      icon: Users,
     },
     {
       title: 'Settings',
-      url: '/dashboard',
+      url: '/dashboard/settings',
       icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '/dashboard',
-        },
-        {
-          title: 'Store Settings',
-          url: '/dashboard',
-        },
-        {
-          title: 'Team',
-          url: '/dashboard',
-        },
-        {
-          title: 'Notifications',
-          url: '/dashboard',
-        },
-        {
-          title: 'Billing',
-          url: '/dashboard',
-        },
-        {
-          title: 'Limits',
-          url: '/dashboard',
-        },
-      ],
     },
   ],
   projects: [

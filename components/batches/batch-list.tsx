@@ -1,5 +1,3 @@
-// components/batches/batch-list.tsx
-
 'use client'
 
 import { useMemo, useState } from 'react'
@@ -15,7 +13,8 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { type BatchFilters } from '@/lib/queries/batches'
-import { useBatches, useBatchActions, useBatchesForProduct } from '@/hooks/use-batches'
+import { useBatches, useBatchActions } from '@/hooks/use-batches'
+import { useBatchesForProduct } from '@/hooks/use-batches'
 import { BatchCard } from '@/components/batches/batch-card'
 import { Package, Filter, AlertTriangle, Calendar, MapPin, Truck, Search } from 'lucide-react'
 
@@ -40,7 +39,7 @@ export function BatchList({
   const [searchTerm, setSearchTerm] = useState('')
 
   // Use different hooks based on whether we're showing batches for a specific product
-  const batchesForProduct = useBatchesForProduct(productId ?? '', filters)
+  const batchesForProduct = useBatchesForProduct(productId || '', filters)
   const batches = useBatches(filters)
   const batchQuery = productId ? batchesForProduct : batches
 
@@ -148,8 +147,8 @@ export function BatchList({
             {title}
           </h2>
           {data && data.length > 0 && (
-            <Badge variant="secondary" className="text-sm">
-              {filteredData.length} batch{filteredData.length !== 1 ? 'es' : ''}
+            <Badge variant="ghost" className="text-sm">
+              {filteredData.length} current batch{filteredData.length !== 1 ? 'es' : ''}
             </Badge>
           )}
         </div>
