@@ -7,15 +7,15 @@ import { cn } from '@/lib/utils'
 const typographyVariants = cva('', {
   variants: {
     variant: {
-      h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl',
-      h2: 'scroll-m-20 text-3xl font-semibold tracking-tight',
-      h3: 'scroll-m-20 text-2xl font-semibold tracking-tight',
-      h4: 'scroll-m-20 text-xl font-semibold tracking-tight',
-      p: 'text-base leading-7',
-      muted: 'text-sm text-muted-foreground',
-      small: 'text-sm font-medium',
-      blockquote: 'mt-6 border-l-2 pl-6 italic',
-      code: 'rounded bg-muted px-1.5 py-1 font-mono text-sm font-semibold',
+      h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl font-heading',
+      h2: 'scroll-m-20 text-3xl font-semibold tracking-tight font-heading',
+      h3: 'scroll-m-20 text-2xl font-semibold tracking-tight font-heading',
+      h4: 'scroll-m-20 text-xl font-semibold tracking-tight font-heading',
+      p: 'text-base leading-7 font-sans',
+      muted: 'text-sm text-muted-foreground font-sans',
+      small: 'text-sm font-medium font-sans',
+      blockquote: 'mt-6 border-l-2 pl-6 italic font-sans',
+      code: 'rounded bg-muted px-1.5 py-1 font-mono text-sm font-semibold font-sans',
     },
     color: {
       default: 'text-foreground',
@@ -30,16 +30,15 @@ const typographyVariants = cva('', {
   },
 })
 
-export interface TypographyProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof typographyVariants> {
+export type TypographyProps = {
   asChild?: boolean
-}
+  as?: React.ElementType
+} & Omit<React.HTMLAttributes<HTMLElement>, 'color'> &
+  VariantProps<typeof typographyVariants>
 
-const Typography = React.forwardRef<HTMLElement, TypographyProps>(
-  ({ className, variant, color, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'p'
-
+const Typography = React.forwardRef<any, TypographyProps>(
+  ({ className, variant, color, asChild = false, as: CompProp, ...props }, ref) => {
+    const Comp = asChild ? Slot : CompProp || 'p'
     return (
       <Comp
         className={cn(typographyVariants({ variant, color, className }))}
@@ -53,21 +52,3 @@ const Typography = React.forwardRef<HTMLElement, TypographyProps>(
 Typography.displayName = 'Typography'
 
 export { Typography, typographyVariants }
-
-
-
-
-// example usage
-import { Typography } from '@/components/ui/typography'
-
-export default function Demo() {
-  return (
-    <div>
-      <Typography variant="h1">This is a Heading 1</Typography>
-      <Typography variant="p" color="muted">
-        This is a muted paragraph.
-      </Typography>
-      <Typography variant="blockquote">“Code is like humor. When you have to explain it, it’s bad.”</Typography>
-    </div>
-  )
-}
