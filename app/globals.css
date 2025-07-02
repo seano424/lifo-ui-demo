@@ -40,6 +40,14 @@
   --color-brand-white: hsl(0 0% 100%);
   --color-brand-primary: hsl(263 82% 45%);
   --color-brand-secondary: hsl(207 87% 54%);
+
+  /* Font families */
+  --font-family-sans:
+    var(--font-montserrat), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --font-family-heading:
+    var(--font-raleway), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 }
 
 @layer base {

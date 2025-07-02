@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
+import { Montserrat, Raleway } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
@@ -15,10 +15,20 @@ export const metadata: Metadata = {
     'LIFO.AI helps retailers reduce food waste through AI-driven inventory management. Scan products, track expiration dates, and optimize discounting and donations to maximize profitability.',
 }
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+// Raleway font for headings
+const raleway = Raleway({
+  variable: '--font-raleway',
   display: 'swap',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+})
+
+// Montserrat font for body text
+const montserrat = Montserrat({
+  variable: '--font-montserrat',
+  display: 'swap',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
 })
 
 export default function RootLayout({
@@ -28,7 +38,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body
+        className={`${montserrat.className} ${raleway.variable} ${montserrat.variable} antialiased`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
