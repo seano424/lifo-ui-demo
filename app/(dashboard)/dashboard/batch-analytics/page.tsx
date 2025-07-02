@@ -32,10 +32,14 @@ export default async function BatchesPage() {
           title="Batch Analytics"
           description="View and manage your inventory batches"
           rightContent={
-            <Button variant="secondary">
-              <Plus className="w-4 h-4" />
-              Add Batch
-            </Button>
+            <div className="flex gap-2">
+              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                Export Batches
+              </button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Add Batch
+              </button>
+            </div>
           }
         />
 

@@ -7,6 +7,7 @@ import { fetchUsersPage } from '@/lib/queries/users'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { UsersList } from '@/components/users/users-list'
 import { UserStats } from '@/components/users/user-stats'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 
 export default async function UsersPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -35,22 +36,20 @@ export default async function UsersPage() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">User Management</h1>
-            <p className="text-gray-600 mt-1">Manage team members and their roles</p>
-          </div>
-          {/* Future: Add user button */}
-          <div className="flex gap-2">
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-              Export Users
-            </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Add User
-            </button>
-          </div>
-        </div>
+        <DashboardInsetHeader
+          title="User Management"
+          description="Manage team members and their roles"
+          rightContent={
+            <div className="flex gap-2">
+              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                Export Users
+              </button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Add User
+              </button>
+            </div>
+          }
+        />
 
         {/* Stats Cards */}
         <UserStats />

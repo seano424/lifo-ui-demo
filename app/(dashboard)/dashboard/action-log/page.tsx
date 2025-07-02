@@ -1,3 +1,5 @@
+import { ActionLog } from '@/components/actions/action-log'
+
 export default function ActionLogPage() {
-  return <div>ActionLogPage</div>
+  return <ActionLog />
 }

@@ -47,8 +47,8 @@ const data = {
       isActive: true,
       // items: [
       //   {
-      //     title: 'Products',
-      //     url: '/dashboard/products',
+      //     title: 'Overview',
+      //     url: '/dashboard',
       //   },
       //   {
       //     title: 'Batches',
@@ -65,17 +65,17 @@ const data = {
       // ],
     },
     {
-      title: 'Inventory',
+      title: 'Products',
       url: '/dashboard/products',
       icon: Bot,
     },
     {
-      title: 'Batch Analytics',
+      title: 'Analytics',
       url: '/dashboard/batch-analytics',
       icon: BookOpen,
     },
     {
-      title: 'Action Log',
+      title: 'Actions',
       url: '/dashboard/action-log',
       icon: Calendar,
     },
