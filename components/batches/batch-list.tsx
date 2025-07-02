@@ -149,8 +149,8 @@ export function BatchList({
             {title}
           </h2>
           {data && data.length > 0 && (
-            <Badge variant="secondary" className="text-sm">
-              {filteredData.length} batch{filteredData.length !== 1 ? 'es' : ''}
+            <Badge variant="ghost" className="text-sm">
+              {filteredData.length} current batch{filteredData.length !== 1 ? 'es' : ''}
             </Badge>
           )}
         </div>

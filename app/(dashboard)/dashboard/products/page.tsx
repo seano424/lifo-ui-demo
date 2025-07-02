@@ -5,6 +5,7 @@ import { fetchProductsPage } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { ProductSortList } from '@/components/products/product-sort-list'
+import { Button } from '@/components/ui/button'
 
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -28,12 +29,8 @@ export default async function ProductsPage() {
           description="View and manage your products"
           rightContent={
             <div className="flex gap-2">
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                Export Products
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Add Product
-              </button>
+              <Button variant="outline">Export Products</Button>
+              <Button>Add Product</Button>
             </div>
           }
         />
