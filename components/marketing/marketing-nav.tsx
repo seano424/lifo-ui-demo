@@ -130,9 +130,9 @@ const MarketingNav = ({
   },
 }: MarketingNavProps) => {
   return (
-    <section className="py-6 px-10 fixed top-0 left-0 right-0 z-50 h-24 bg-white/90 backdrop-blur-xs flex flex-col justify-center">
+    <section className="py-6 fixed top-0 left-0 right-0 z-50 h-24 backdrop-blur-xs flex flex-col justify-center bg-background/80">
       {/* Desktop Menu */}
-      <nav className="hidden justify-between lg:flex">
+      <nav className="hidden justify-between lg:flex container mx-auto">
         <div className="flex items-center gap-2">
           {/* Logo */}
           <Link href={logo.url} className="flex items-center gap-2 relative h-10 aspect-video">
@@ -219,7 +219,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-xs font-medium uppercase font-mono transition-colors hover:bg-muted hover:text-accent-foreground"
+        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-xs uppercase font-mono transition-colors hover:bg-muted hover:text-accent-foreground"
       >
         {item.title}
       </NavigationMenuLink>
