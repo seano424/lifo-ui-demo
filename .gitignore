@@ -44,3 +44,7 @@ next-env.d.ts
 
 .claude
 .cursor
+
+# Test files and images
+test-images/
+public/test-images/
