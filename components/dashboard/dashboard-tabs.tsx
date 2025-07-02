@@ -21,7 +21,13 @@ export default function DashboardTabs() {
       </TabsList>
 
       <TabsContent value="dashboard" className="space-y-4">
-        <ProductTable />
+        <div className="flex flex-wrap gap-4">
+          <ProductTable />
+          <BatchAnalytics />
+          <div className="flex-1">
+            <ActionLog />
+          </div>
+        </div>
       </TabsContent>
 
       <TabsContent value="products" className="space-y-4">

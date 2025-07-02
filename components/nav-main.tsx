@@ -1,8 +1,9 @@
 'use client'
-'use client'
 
-import { ChevronRight, type LucideIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ChevronRight, type LucideIcon } from 'lucide-react'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
@@ -16,8 +17,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
-import Link from 'next/link'
-import { cn } from '@/lib/utils'
 
 export function NavMain({
   items,
@@ -60,9 +59,9 @@ export function NavMain({
                     {item.items.map(subItem => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
+                          <Link href={subItem.url}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

@@ -45,28 +45,28 @@ const data = {
       url: '/dashboard',
       icon: SquareTerminal,
       isActive: true,
-      items: [
-        {
-          title: 'Products',
-          url: '/dashboard/products',
-        },
-        {
-          title: 'Batches',
-          url: '/dashboard/batches',
-        },
-        {
-          title: 'Donations',
-          url: '/dashboard',
-        },
-        {
-          title: 'Discounts',
-          url: '/dashboard/discounts',
-        },
-      ],
+      // items: [
+      //   {
+      //     title: 'Products',
+      //     url: '/dashboard/products',
+      //   },
+      //   {
+      //     title: 'Batches',
+      //     url: '/dashboard',
+      //   },
+      //   {
+      //     title: 'Donations',
+      //     url: '/dashboard',
+      //   },
+      //   {
+      //     title: 'Discounts',
+      //     url: '/dashboard',
+      //   },
+      // ],
     },
     {
       title: 'Inventory',
-      url: '/dashboard',
+      url: '/dashboard/products',
       icon: Bot,
     },
     {
