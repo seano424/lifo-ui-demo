@@ -3,9 +3,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { fetchProductsPage } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { Button } from '@/components/ui/button'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { Plus } from 'lucide-react'
 import { ProductSortList } from '@/components/products/product-sort-list'
 
 export default async function ProductsPage() {

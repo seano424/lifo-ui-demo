@@ -2,16 +2,16 @@
 
 import { QueryClient } from '@tanstack/react-query'
 
-type StatusError = { status: number }
+// type StatusError = { status: number }
 
-function hasStatus(error: unknown): error is StatusError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'status' in error &&
-    typeof (error as { status?: unknown }).status === 'number'
-  )
-}
+// function hasStatus(error: unknown): error is StatusError {
+//   return (
+//     typeof error === 'object' &&
+//     error !== null &&
+//     'status' in error &&
+//     typeof (error as { status?: unknown }).status === 'number'
+//   )
+// }
 
 export function createQueryClient() {
   return new QueryClient({

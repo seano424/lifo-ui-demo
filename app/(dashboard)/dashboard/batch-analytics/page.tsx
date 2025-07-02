@@ -5,8 +5,6 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { BatchList } from '@/components/batches/batch-list'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 
 export default async function BatchesPage() {
   const { queryClient } = await createPrefetchedQuery()

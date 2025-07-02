@@ -255,7 +255,9 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       variant="ghost"
       size="icon"
       className={cn('size-7', className)}
-      onClick={event => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error onClick type is not a union, but event is safe
         onClick?.(event)
         toggleSidebar()
       }}
