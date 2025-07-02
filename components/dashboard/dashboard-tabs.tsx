@@ -21,14 +21,7 @@ export default function DashboardTabs() {
       </TabsList>
 
       <TabsContent value="dashboard" className="space-y-4">
-        {/* <DashboardCards /> */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-4">
-            <ProductTable />
-            <ActionLog />
-          </div>
-          <BatchAnalytics />
-        </div>
+        <ProductTable />
       </TabsContent>
 
       <TabsContent value="products" className="space-y-4">
