@@ -52,6 +52,7 @@ type ButtonPropsBase = {
   asLink?: boolean
   href?: string
   children?: React.ReactNode
+  onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement, MouseEvent>) => void
 } & VariantProps<typeof buttonVariants>
 
 export type ButtonProps =

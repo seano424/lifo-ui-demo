@@ -256,7 +256,6 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       size="icon"
       className={cn('size-7', className)}
       onClick={(event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
-        // @ts-expect-error onClick type is not a union, but event is safe
         onClick?.(event)
         toggleSidebar()
       }}
