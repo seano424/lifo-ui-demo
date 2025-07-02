@@ -1,4 +1,3 @@
-// products-list-presentation.tsx - Pure presentation component
 'use client'
 
 import { useMemo, useCallback } from 'react'

@@ -1,5 +1,3 @@
-// components/batches/batch-card.tsx
-
 'use client'
 
 import { useState } from 'react'
