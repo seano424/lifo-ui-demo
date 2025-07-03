@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Montserrat, Raleway } from 'next/font/google'
+import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
@@ -31,6 +31,13 @@ const montserrat = Montserrat({
   weight: ['400', '500', '600', '700', '800', '900'],
 })
 
+const robotoMono = Roboto_Mono({
+  variable: '--font-roboto-mono',
+  display: 'swap',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,7 +47,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${raleway.variable} ${montserrat.variable}`}
+      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} scroll-smooth`}
     >
       <body className="font-sans antialiased">
         <ThemeProvider
