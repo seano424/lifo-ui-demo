@@ -2,14 +2,17 @@ import { z } from 'zod'
 import { Database } from '@/types/supabase'
 
 // Get the allowed store types from your database schema check constraint
-const STORE_TYPES = [
+type StoreType = Database['business']['Enums']['store_type_enum']
+
+// Manually define the allowed values as a runtime array, type-checked against StoreType
+export const STORE_TYPES = [
   'supermarket',
   'convenience',
   'restaurant',
   'bakery',
   'butcher',
   'organic',
-] as const
+] as const satisfies readonly StoreType[]
 
 // Zod schema for the onboarding form
 export const storeFormSchema = z.object({

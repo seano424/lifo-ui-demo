@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { Database } from '@/types/supabase'
+import { STORE_TYPES } from '@/lib/schemas/store-schemas'
 
 // Database types
 export type Store = Database['business']['Tables']['stores']['Row']
@@ -13,7 +14,7 @@ export type StoreFormData = {
   city: string | null
   postal_code: string | null
   country: string | null
-  store_type: string | null
+  store_type: (typeof STORE_TYPES)[number] | null
   business_name?: string | null
   phone?: string
   // Google Places specific

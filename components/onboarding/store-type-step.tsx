@@ -23,13 +23,12 @@ import {
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { storeFormSchema, STORE_TYPE_LABELS, type StoreFormData } from '@/lib/schemas/store-schemas'
 import { Typography } from '@/components/ui/typography'
+import { STORE_TYPES } from '@/lib/schemas/store-schemas'
 
 // Type guard for store_type
 function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {
   if (typeof value !== 'string') return false
-  return ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'].includes(
-    value,
-  )
+  return STORE_TYPES.includes(value as StoreFormData['store_type'])
 }
 
 export function StoreTypeStep() {
