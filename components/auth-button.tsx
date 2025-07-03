@@ -19,7 +19,7 @@ export async function AuthButton() {
       </Button>
     </div>
   ) : (
-    <div className="flex gap-10 items-center uppercase font-mono">
+    <div className="flex gap-10 items-center uppercase">
       <Link
         className="text-xs dark:hover:text-brand-secondary hover:text-brand-primary"
         href="/auth/login"
@@ -27,7 +27,7 @@ export async function AuthButton() {
         Login
       </Link>
 
-      <Button asChild size="sm" variant={'brand'} className="uppercase font-mono">
+      <Button asChild size="sm" variant={'brand'} className="uppercase">
         <Link href="/onboarding/create-account">Start trial</Link>
       </Button>
     </div>
