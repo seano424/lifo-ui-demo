@@ -30,9 +30,7 @@ import { Typography } from '@/components/ui/typography'
 function isStoreType(value: any): value is StoreFormData['store_type'] {
   return (
     value === undefined ||
-    ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic', 'other'].includes(
-      value,
-    )
+    ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'].includes(value)
   )
 }
 

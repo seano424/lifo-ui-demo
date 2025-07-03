@@ -20,8 +20,6 @@ import { useCurrentUser } from '@/hooks/use-users'
 // Simple test mode flag - just flip this to true/false
 const TEST_MODE = true
 const REAL_USER_TEST = true // New flag
-// Replace this with your actual Supabase user ID
-const YOUR_USER_ID = 'your-actual-user-id-here' // You need to replace this!
 
 export function OnboardingSignUpForm({
   className,
@@ -35,7 +33,6 @@ export function OnboardingSignUpForm({
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { data: currentUser } = useCurrentUser()
-  console.log('🧪 REAL USER TEST MODE: Current user:', currentUser)
 
   // Get store data from onboarding flow
   const {
@@ -51,6 +48,12 @@ export function OnboardingSignUpForm({
     e.preventDefault()
     setIsLoading(true)
     setError(null)
+
+    console.log('🚀 Starting handleSignUp')
+    console.log('🧪 TEST_MODE:', TEST_MODE)
+    console.log('🧪 REAL_USER_TEST:', REAL_USER_TEST)
+    console.log('👤 currentUser:', currentUser)
+    console.log('👤 currentUser?.auth?.id:', currentUser?.auth?.id)
 
     // Validation
     if (password !== confirmPassword) {
@@ -72,35 +75,33 @@ export function OnboardingSignUpForm({
     }
 
     try {
-      let userId: string
+      let userId: string = '' // Initialize with empty string
 
       if (REAL_USER_TEST) {
-        // Real user test mode: Use current user ID or fallback to hardcoded ID
+        console.log('🔄 Entering REAL_USER_TEST mode')
+        // Real user test mode: Use current user ID
         const currentUserId = currentUser?.auth?.id
+        console.log('🔍 currentUserId from auth:', currentUserId)
 
         if (currentUserId) {
-          console.log('🧪 REAL USER TEST MODE: Using current user ID from auth')
+          console.log('✅ Using current user ID from auth')
           userId = currentUserId
-        } else if (YOUR_USER_ID !== 'your-actual-user-id-here') {
-          console.log('🧪 REAL USER TEST MODE: Using hardcoded user ID')
-          userId = YOUR_USER_ID
         } else {
-          setError(
-            'No user ID available. Please either sign in first or set YOUR_USER_ID in the code.',
-          )
+          console.log('❌ No current user ID available')
+          setError('No user ID available. Please sign in to your account first.')
           setIsLoading(false)
           return
         }
 
-        console.log('🧪 REAL USER TEST MODE: Using user ID:', userId)
+        console.log('🎯 Final userId for REAL_USER_TEST:', userId)
       } else if (TEST_MODE) {
+        console.log('🔄 Entering TEST_MODE')
         // Test mode: Skip Supabase Auth entirely
-        console.log('🧪 TEST MODE: Skipping Supabase Auth')
         userId = `test-user-${Date.now()}`
-        console.log('🧪 Generated test user ID:', userId)
+        console.log('🎯 Generated test user ID:', userId)
       } else {
+        console.log('🔄 Entering PRODUCTION MODE')
         // Production mode: Use real Supabase Auth
-        console.log('🔐 PRODUCTION MODE: Using Supabase Auth')
         const supabase = createClient()
 
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -122,12 +123,20 @@ export function OnboardingSignUpForm({
         }
 
         userId = authData.user.id
+        console.log('🎯 Production user ID:', userId)
       }
 
       // Validate we have a userId before proceeding
-      if (!userId) {
+      console.log('🔍 Final validation - userId:', userId)
+      console.log('🔍 userId type:', typeof userId)
+      console.log('🔍 userId length:', userId.length)
+
+      if (!userId || userId.trim() === '') {
+        console.error('❌ No valid user ID available')
         throw new Error('Failed to get user ID')
       }
+
+      console.log('✅ User ID validated successfully:', userId)
 
       // Prepare store data for API call
       const storeData = selectedStoreForm || {
@@ -140,27 +149,36 @@ export function OnboardingSignUpForm({
         business_name: confirmedStoreInsert?.business_name,
       }
 
+      console.log('📦 Prepared store data:', storeData)
+
       // Call your API to create store and user records
+      const apiPayload = {
+        userId,
+        store: storeData,
+        user: {
+          email,
+          fullName,
+        },
+      }
+
+      console.log('🚀 Calling API with payload:', apiPayload)
+
       const response = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          store: storeData,
-          user: {
-            email,
-            fullName,
-          },
-        }),
+        body: JSON.stringify(apiPayload),
       })
+
+      console.log('📡 API response status:', response.status)
 
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('❌ API error:', errorData)
         throw new Error(errorData.error || 'Failed to create store and user records')
       }
 
       const result = await response.json()
-      console.log('Onboarding API result:', result)
+      console.log('✅ Onboarding API result:', result)
 
       // Update onboarding state
       setUserDetails({ email, password, fullName })
@@ -173,7 +191,7 @@ export function OnboardingSignUpForm({
         router.push('/onboarding/success')
       }
     } catch (error: unknown) {
-      console.error('Signup error:', error)
+      console.error('💥 Signup error:', error)
       setError(error instanceof Error ? error.message : 'An error occurred during signup')
     } finally {
       setIsLoading(false)
@@ -228,6 +246,8 @@ export function OnboardingSignUpForm({
   const storeName =
     selectedStoreForm?.store_name || confirmedStoreInsert?.store_name || 'your store'
 
+  const hasValidUserId = REAL_USER_TEST ? !!currentUser?.auth?.id : true
+
   return (
     <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
       {/* Show test mode indicator in development */}
@@ -238,10 +258,8 @@ export function OnboardingSignUpForm({
             🧪 <strong>Test Mode Active</strong> -
             {REAL_USER_TEST
               ? currentUser?.auth?.id
-                ? ' Using your current user account'
-                : YOUR_USER_ID !== 'your-actual-user-id-here'
-                  ? ' Using hardcoded user ID'
-                  : ' ⚠️ No user ID configured!'
+                ? ` Using your current user account (${currentUser.auth.id.slice(0, 8)}...)`
+                : ' ⚠️ No user ID available - please sign in first!'
               : ' Supabase Auth will be bypassed for testing'}
           </AlertDescription>
         </Alert>
@@ -258,12 +276,12 @@ export function OnboardingSignUpForm({
       )}
 
       {/* Warning if no user ID is available in real user test mode */}
-      {REAL_USER_TEST && !currentUser?.auth?.id && YOUR_USER_ID === 'your-actual-user-id-here' && (
+      {REAL_USER_TEST && !currentUser?.auth?.id && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Configuration needed:</strong> Please either sign in to your account or set
-            YOUR_USER_ID in the component code.
+            <strong>Sign in required:</strong> Please sign in to your account first to test with
+            your real user ID.
           </AlertDescription>
         </Alert>
       )}
@@ -335,16 +353,7 @@ export function OnboardingSignUpForm({
                 </Alert>
               )}
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={
-                  isLoading ||
-                  (REAL_USER_TEST &&
-                    !currentUser?.auth?.id &&
-                    YOUR_USER_ID === 'your-actual-user-id-here')
-                }
-              >
+              <Button type="submit" className="w-full" disabled={isLoading || !hasValidUserId}>
                 {isLoading
                   ? TEST_MODE
                     ? 'Testing Account Creation...'

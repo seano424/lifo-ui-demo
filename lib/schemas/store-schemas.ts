@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { Database } from '@/types/supabase'
 
 // Get the allowed store types from your database schema check constraint
+// FIXED: Removed 'other' as it's not allowed in the database
 const STORE_TYPES = [
   'supermarket',
   'convenience',
@@ -11,7 +12,6 @@ const STORE_TYPES = [
   'bakery',
   'butcher',
   'organic',
-  'other',
 ] as const
 
 // Zod schema for the onboarding form
@@ -59,6 +59,7 @@ export const businessCheckSchema = z.object({
 export type BusinessCheckRequest = z.infer<typeof businessCheckSchema>
 
 // Store type labels for UI display
+// FIXED: Removed 'other' option
 export const STORE_TYPE_LABELS: Record<(typeof STORE_TYPES)[number], string> = {
   supermarket: 'Supermarket',
   convenience: 'Convenience Store',
@@ -66,7 +67,6 @@ export const STORE_TYPE_LABELS: Record<(typeof STORE_TYPES)[number], string> = {
   bakery: 'Bakery',
   butcher: 'Butcher',
   organic: 'Organic Store',
-  other: 'Other',
 }
 
 // Helper function to convert form data to database insert format
