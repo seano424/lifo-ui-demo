@@ -6,8 +6,8 @@ import { convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
 import type { StoreFormData } from '@/lib/stores/onboarding-store'
 
 // Test modes
-const DEV_MODE = true
-const REAL_USER_TEST = true
+const DEV_MODE = process.env.DEV_MODE === 'true'
+const REAL_USER_TEST = process.env.REAL_USER_TEST === 'true'
 
 interface OnboardingRequest {
   userId: string
