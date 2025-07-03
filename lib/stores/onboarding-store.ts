@@ -1,14 +1,24 @@
+// lib/stores/onboarding-store.ts
+
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { Database } from '@/types/supabase'
 
-export type StoreDetails = {
-  name: string
-  address: string
-  city: string
-  postalCode: string
-  country: string
-  phone: string
-  type: string
+// Database types
+export type Store = Database['business']['Tables']['stores']['Row']
+export type StoreInsert = Database['business']['Tables']['stores']['Insert']
+
+// For Google Places API and form data before it becomes a Store record
+export type StoreFormData = {
+  store_name: string
+  address: string | null
+  city: string | null
+  postal_code: string | null
+  country: string | null
+  store_type: string | null
+  business_name?: string | null
+  phone?: string
+  // Google Places specific
   coordinates?: {
     lat: number
     lng: number
@@ -16,22 +26,30 @@ export type StoreDetails = {
   googlePlaceId?: string
 }
 
+export type BusinessCheckResult = {
+  exists: boolean
+  storeData?: Store
+  message?: string
+}
+
 export type OnboardingData = {
   // Step 1: Store lookup
   searchQuery: string
-  selectedStore?: StoreDetails
+  selectedStoreForm?: StoreFormData
   isManualEntry: boolean
 
-  // Step 2: Store type
-  storeType: string
+  // Business checking
+  businessCheckResult?: BusinessCheckResult
+  isCheckingBusiness: boolean
 
-  // Step 3: Confirmed store details
-  confirmedStore?: StoreDetails
+  // Step 3: Confirmed store details (ready for database insert)
+  confirmedStoreInsert?: StoreInsert
 
   // Step 4: User signup
   userDetails: {
     email: string
     password: string
+    fullName?: string
   }
 
   // Step 5: Email confirmation
@@ -42,29 +60,35 @@ export type OnboardingData = {
 export type OnboardingStore = OnboardingData & {
   // Actions
   setSearchQuery: (query: string) => void
-  setSelectedStore: (store: StoreDetails | undefined) => void
+  setSelectedStoreForm: (store: StoreFormData | undefined) => void
   setManualEntry: (isManual: boolean) => void
-  setStoreType: (type: string) => void
-  setConfirmedStore: (store: StoreDetails) => void
-  setUserDetails: (details: { email: string; password: string }) => void
+  setConfirmedStoreInsert: (store: StoreInsert) => void
+  setUserDetails: (details: { email: string; password: string; fullName?: string }) => void
   setEmailSent: (sent: boolean) => void
   setConfirmed: (confirmed: boolean) => void
+  setBusinessCheckResult: (result: BusinessCheckResult) => void
+  setIsCheckingBusiness: (checking: boolean) => void
   reset: () => void
 
   // Current step
   currentStep: number
   setCurrentStep: (step: number) => void
+
+  // Helper methods
+  convertFormDataToInsert: (formData: StoreFormData, storeCode: string) => StoreInsert
 }
 
 const initialState: OnboardingData = {
   searchQuery: '',
-  selectedStore: undefined,
+  selectedStoreForm: undefined,
   isManualEntry: false,
-  storeType: '',
-  confirmedStore: undefined,
+  businessCheckResult: undefined,
+  isCheckingBusiness: false,
+  confirmedStoreInsert: undefined,
   userDetails: {
     email: '',
     password: '',
+    fullName: '',
   },
   isEmailSent: false,
   isConfirmed: false,
@@ -77,16 +101,49 @@ export const useOnboardingStore = create<OnboardingStore>()(
       currentStep: 1,
 
       setSearchQuery: query => set({ searchQuery: query }),
-      setSelectedStore: store => set({ selectedStore: store, isManualEntry: false }),
+      setSelectedStoreForm: store => set({ selectedStoreForm: store, isManualEntry: false }),
       setManualEntry: isManual => set({ isManualEntry: isManual }),
-      setStoreType: type => set({ storeType: type }),
-      setConfirmedStore: store => set({ confirmedStore: store }),
+      setConfirmedStoreInsert: store => set({ confirmedStoreInsert: store }),
       setUserDetails: details => set({ userDetails: details }),
       setEmailSent: sent => set({ isEmailSent: sent }),
       setConfirmed: confirmed => set({ isConfirmed: confirmed }),
+      setBusinessCheckResult: result => set({ businessCheckResult: result }),
+      setIsCheckingBusiness: checking => set({ isCheckingBusiness: checking }),
       setCurrentStep: step => set({ currentStep: step }),
       reset: () => set({ ...initialState, currentStep: 1 }),
+
+      // Helper method to convert form data to database insert format
+      convertFormDataToInsert: (formData: StoreFormData, storeCode: string): StoreInsert => ({
+        store_name: formData.store_name,
+        store_code: storeCode,
+        business_name: formData.business_name || formData.store_name,
+        address: formData.address,
+        city: formData.city,
+        postal_code: formData.postal_code,
+        country: formData.country || 'France',
+        store_type: formData.store_type,
+        timezone: getTimezoneForCountry(formData.country || 'France'),
+        is_active: true,
+        onboarding_completed: false,
+        // owner_id will be set in the API
+      }),
     }),
     { name: 'OnboardingStore' },
   ),
 )
+
+// Helper function to get timezone based on country
+function getTimezoneForCountry(country: string): string {
+  const timezoneMap: Record<string, string> = {
+    France: 'Europe/Paris',
+    Netherlands: 'Europe/Amsterdam',
+    Germany: 'Europe/Berlin',
+    Spain: 'Europe/Madrid',
+    Italy: 'Europe/Rome',
+    Belgium: 'Europe/Brussels',
+    'United Kingdom': 'Europe/London',
+    UK: 'Europe/London',
+  }
+
+  return timezoneMap[country] || 'Europe/Paris' // Default to Paris
+}

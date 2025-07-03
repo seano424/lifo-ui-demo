@@ -1,25 +1,33 @@
+// app/api/onboarding/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
-// import type { StoreDetails } from '@/lib/stores/onboarding-store'
+import { createClient as createServerClient } from '@/lib/supabase/server'
+import { convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
+import type { StoreFormData } from '@/lib/stores/onboarding-store'
 
+// Test modes
 const DEV_MODE = true
+const REAL_USER_TEST = true // New flag for testing with your real account
+const YOUR_USER_ID = 'your-actual-user-id-here' // Replace with your actual user ID
 
-// Define a minimal user type for onboarding
-// interface OnboardingUser {
-//   email: string
-//   fullName?: string
-// }
+interface OnboardingRequest {
+  userId: string
+  store: StoreFormData
+  user: {
+    email: string
+    fullName?: string
+  }
+}
 
 export async function POST(request: NextRequest) {
   console.log('=== ONBOARDING API CALLED ===')
 
   try {
-    const body = await request.json()
-    console.log('Request body received:', body)
-
+    const body: OnboardingRequest = await request.json()
     const { userId, store, user } = body
 
+    // Validate required fields
     if (!userId || !store || !user) {
-      console.error('Missing required fields:', { userId, store: !!store, user: !!user })
       return NextResponse.json(
         { error: 'Missing required fields: userId, store, or user' },
         { status: 400 },
@@ -28,193 +36,295 @@ export async function POST(request: NextRequest) {
 
     console.log('Onboarding request received:', {
       userId,
-      store: store.name,
+      storeName: store.store_name,
       userEmail: user.email,
     })
 
-    if (DEV_MODE) {
-      console.log('=== DEV MODE ACTIVE ===')
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Log the data we would save
-      console.log('DEV MODE: Would create store:', {
-        name: store.name,
-        address: store.address,
-        city: store.city,
-        postal_code: store.postalCode,
-        country: store.country,
-        phone: store.phone,
-        store_type: store.type,
-        coordinates: store.coordinates,
-        googlePlaceId: store.googlePlaceId,
-      })
-
-      console.log('DEV MODE: Would create user record:', {
-        user_id: userId,
-        username: user.email.split('@')[0],
-        email: user.email,
-        full_name: user.fullName || '',
-        is_active: true,
-      })
-
-      console.log('DEV MODE: Would assign admin role to user')
-
-      // Return mock success response
-      const response = {
-        success: true,
-        message: 'DEV MODE: Onboarding completed successfully',
-        data: {
-          store: {
-            store_id: 'mock-store-id-123',
-            name: store.name,
-            type: store.type,
-          },
-          user: {
-            user_id: userId,
-            email: user.email,
-            role: 'admin',
-          },
-        },
-      }
-
-      console.log('DEV MODE: Returning response:', response)
-      return NextResponse.json(response)
+    if (DEV_MODE && !REAL_USER_TEST) {
+      // Pure dev mode - no database changes
+      return handleDevModeOnboarding(userId, store, user)
+    } else if (DEV_MODE && REAL_USER_TEST) {
+      // Real user test mode - create actual stores for your account
+      console.log('🧪 REAL USER TEST MODE: Creating store for existing user')
+      return await handleRealUserTestMode(store, user)
+    } else {
+      // Full production mode
+      return await handleProductionOnboarding(userId, store, user)
     }
-
-    // Production mode
-    console.log('=== PRODUCTION MODE ===')
-    // TODO: Implement production onboarding logic here
-    return NextResponse.json({ error: 'Production onboarding not implemented' }, { status: 501 })
   } catch (error) {
-    console.error('=== ONBOARDING API ERROR ===')
-    console.error('Error details:', error)
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
-
-    return NextResponse.json(
-      {
-        error: 'Failed to complete onboarding',
-        details: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 },
-    )
+    console.error('=== ONBOARDING API ERROR ===', error)
+    return NextResponse.json({ error: 'Failed to complete onboarding' }, { status: 500 })
   }
 }
 
-// ========== PRODUCTION IMPLEMENTATION ==========
-// async function handleProductionOnboarding(
-//   userId: string,
-//   store: StoreDetails,
-//   user: OnboardingUser,
-// ) {
-//   // Import here to avoid issues if not yet installed
-//   const { createClient } = await import('@/lib/supabase/server')
+// New function for testing with your real account
+async function handleRealUserTestMode(
+  store: StoreFormData,
+  user: { email: string; fullName?: string },
+) {
+  const supabase = await createServerClient()
+  const storeCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
 
-//   try {
-//     const supabase = await createClient()
+  try {
+    console.log('🔑 Using real user ID:', YOUR_USER_ID)
 
-//     // 1. Create store record
-//     const { data: storeData, error: storeError } = await supabase
-//       .from('stores')
-//       .insert({
-//         name: store.name,
-//         address: store.address,
-//         city: store.city,
-//         postal_code: store.postalCode,
-//         country: store.country || 'France',
-//         phone: store.phone || null,
-//         store_type: store.type,
-//         // Handle coordinates if present
-//         coordinates:
-//           store.coordinates &&
-//           typeof store.coordinates.lng === 'number' &&
-//           typeof store.coordinates.lat === 'number'
-//             ? `POINT(${store.coordinates.lng} ${store.coordinates.lat})`
-//             : null,
-//         google_place_id: store.googlePlaceId || null,
-//         is_active: true,
-//       })
-//       .select()
-//       .single()
+    // Create store with your real user ID
+    const storeInsert = convertFormDataToStoreInsert(
+      {
+        ...store,
+        store_type: store.store_type as
+          | 'supermarket'
+          | 'convenience'
+          | 'restaurant'
+          | 'bakery'
+          | 'butcher'
+          | 'organic'
+          | 'other',
+      },
+      storeCode,
+      YOUR_USER_ID,
+    )
 
-//     if (storeError) {
-//       console.error('Store creation error:', storeError)
-//       throw new Error(`Failed to create store: ${storeError.message}`)
-//     }
+    const { data: storeData, error: storeError } = await supabase
+      .from('stores')
+      .insert(storeInsert)
+      .select('store_id')
+      .single()
 
-//     console.log('Store created successfully:', storeData.store_id)
+    if (storeError) {
+      console.error('Store creation error:', storeError)
+      throw new Error(`Failed to create store: ${storeError.message}`)
+    }
 
-//     // 2. Create user record in user_mgmt.users
-//     const { data: userData, error: userError } = await supabase
-//       .from('user_mgmt.users')
-//       .insert({
-//         user_id: userId, // Link to Supabase Auth
-//         username: typeof user.email === 'string' ? user.email.split('@')[0] : '', // Generate username from email
-//         email: typeof user.email === 'string' ? user.email : '',
-//         password_hash: 'managed_by_supabase_auth', // Placeholder since Supabase Auth handles this
-//         full_name: user.fullName || '',
-//         store_id: storeData.store_id, // Link to the store we just created
-//         is_active: true,
-//       })
-//       .select()
-//       .single()
+    console.log('✅ Store created successfully:', storeData.store_id)
 
-//     if (userError) {
-//       console.error('User creation error:', userError)
-//       // If user creation fails, we should probably delete the store to maintain consistency
-//       await supabase.from('stores').delete().eq('store_id', storeData.store_id)
-//       throw new Error(`Failed to create user: ${userError.message}`)
-//     }
+    // Create store-user relationship with your real account
+    const { error: storeUserError } = await supabase.from('store_users').insert({
+      store_id: storeData.store_id,
+      user_id: YOUR_USER_ID, // Your real Supabase user ID
+      role_in_store: 'owner',
+      permissions: {
+        can_view_analytics: true,
+        can_apply_discounts: true,
+        can_upload_inventory: true,
+        can_manage_users: true,
+        can_manage_settings: true,
+      },
+      assigned_by: YOUR_USER_ID,
+    })
 
-//     console.log('User created successfully:', userData.user_id)
+    if (storeUserError) {
+      console.error('Store-user relationship error:', storeUserError)
+      throw new Error(`Failed to create store-user relationship: ${storeUserError.message}`)
+    }
 
-//     // 3. Get admin role ID
-//     const { data: adminRole, error: roleError } = await supabase
-//       .from('user_mgmt.roles')
-//       .select('role_id')
-//       .eq('role_name', 'admin')
-//       .single()
+    console.log('✅ Store-user relationship created')
 
-//     if (roleError || !adminRole) {
-//       console.error('Admin role lookup error:', roleError)
-//       throw new Error('Failed to find admin role')
-//     }
+    // Create default store settings
+    const { error: settingsError } = await supabase.from('store_settings').insert({
+      store_id: storeData.store_id,
+    })
 
-//     // 4. Assign admin role to user
-//     const { error: roleAssignError } = await supabase.from('user_mgmt.user_roles').insert({
-//       user_id: userId,
-//       role_id: adminRole.role_id,
-//       assigned_by: userId,
-//     })
+    if (settingsError) {
+      console.warn('Store settings creation failed:', settingsError)
+    }
 
-//     if (roleAssignError) {
-//       console.error('Role assignment error:', roleAssignError)
-//       throw new Error(`Failed to assign admin role: ${roleAssignError.message}`)
-//     }
+    return NextResponse.json({
+      success: true,
+      message: 'Real User Test: Store created successfully for your account!',
+      data: {
+        storeId: storeData.store_id,
+        userId: YOUR_USER_ID,
+        storeCode,
+        testMode: true,
+        realUser: true,
+      },
+    })
+  } catch (error) {
+    console.error('Real user test error:', error)
+    throw error
+  }
+}
 
-//     console.log('Admin role assigned successfully')
+// Keep existing dev mode function
+function handleDevModeOnboarding(
+  userId: string,
+  store: StoreFormData,
+  user: { email: string; fullName?: string },
+) {
+  console.log('=== DEV MODE ACTIVE - NO DATABASE CHANGES ===')
 
-//     // 5. Return success response
-//     return NextResponse.json({
-//       success: true,
-//       message: 'Onboarding completed successfully',
-//       data: {
-//         store: {
-//           store_id: storeData.store_id,
-//           name: storeData.name,
-//           type: storeData.store_type,
-//         },
-//         user: {
-//           user_id: userData.user_id,
-//           email: userData.email,
-//           role: 'admin',
-//         },
-//       },
-//     })
-//   } catch (error) {
-//     console.error('Production onboarding error:', error)
-//     throw error
-//   }
-// }
+  const mockStoreCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
+
+  console.log('DEV MODE: Would create store:', {
+    store_name: store.store_name,
+    store_code: mockStoreCode,
+    // ... rest of store data
+  })
+
+  return NextResponse.json({
+    success: true,
+    message: 'DEV MODE: Onboarding completed successfully (no database changes)',
+    data: {
+      storeId: 'mock-store-id-123',
+      userId: userId,
+      storeCode: mockStoreCode,
+      testMode: true,
+    },
+  })
+}
+
+// Production mode handler
+async function handleProductionOnboarding(
+  userId: string,
+  store: StoreFormData,
+  user: { email: string; fullName?: string },
+) {
+  console.log('=== PRODUCTION MODE ===')
+
+  const supabase = await createServerClient()
+
+  // Generate store code
+  const storeCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
+
+  try {
+    // Convert form data to database insert format
+    const storeInsert = convertFormDataToStoreInsert(
+      {
+        ...store,
+        store_type: store.store_type as
+          | 'supermarket'
+          | 'convenience'
+          | 'restaurant'
+          | 'bakery'
+          | 'butcher'
+          | 'organic',
+      },
+      storeCode,
+      userId,
+    )
+
+    // 1. Create store record in business.stores
+    const { data: storeData, error: storeError } = await supabase
+      .schema('business')
+      .from('stores')
+      .insert(storeInsert)
+      .select('store_id')
+      .single()
+
+    if (storeError) {
+      console.error('Store creation error:', storeError)
+      throw new Error(`Failed to create store: ${storeError.message}`)
+    }
+
+    console.log('Store created successfully:', storeData.store_id)
+
+    // 2. Create user record in user_mgmt.users
+    const { data: userData, error: userError } = await supabase
+      .schema('user_mgmt')
+      .from('users')
+      .insert({
+        username: user.email.split('@')[0],
+        email: user.email,
+        password_hash: 'managed_by_supabase_auth', // Placeholder since Supabase Auth handles this
+        full_name: user.fullName || '',
+        is_active: true,
+      })
+      .select('user_id')
+      .single()
+
+    if (userError) {
+      console.error('User creation error:', userError)
+      // Clean up store if user creation fails
+      await supabase.from('stores').delete().eq('store_id', storeData.store_id)
+      throw new Error(`Failed to create user: ${userError.message}`)
+    }
+
+    console.log('User created successfully:', userData.user_id)
+
+    // 3. Get admin role ID
+    const { data: adminRole, error: roleError } = await supabase
+      .schema('user_mgmt')
+      .from('roles')
+      .select('role_id')
+      .eq('role_name', 'admin')
+      .single()
+
+    if (roleError || !adminRole) {
+      console.error('Admin role lookup error:', roleError)
+      throw new Error('Failed to find admin role')
+    }
+
+    // 4. Assign admin role to user
+    const { error: roleAssignError } = await supabase
+      .schema('user_mgmt')
+      .from('user_roles')
+      .insert({
+        user_id: userData.user_id,
+        role_id: adminRole.role_id,
+        assigned_by: userData.user_id, // Self-assigned during onboarding
+      })
+
+    if (roleAssignError) {
+      console.error('Role assignment error:', roleAssignError)
+      throw new Error(`Failed to assign admin role: ${roleAssignError.message}`)
+    }
+
+    console.log('Admin role assigned successfully')
+
+    // 5. Create store-user relationship
+    const { error: storeUserError } = await supabase
+      .schema('business')
+      .from('store_users')
+      .insert({
+        store_id: storeData.store_id,
+        user_id: userId, // Link to Supabase Auth user
+        role_in_store: 'owner',
+        permissions: {
+          can_view_analytics: true,
+          can_apply_discounts: true,
+          can_upload_inventory: true,
+          can_manage_users: true,
+          can_manage_settings: true,
+        },
+        assigned_by: userId,
+      })
+
+    if (storeUserError) {
+      console.error('Store-user relationship error:', storeUserError)
+      throw new Error(`Failed to create store-user relationship: ${storeUserError.message}`)
+    }
+
+    console.log('Store-user relationship created successfully')
+
+    // 6. Create default store settings
+    const { error: settingsError } = await supabase
+      .schema('business')
+      .from('store_settings')
+      .insert({
+        store_id: storeData.store_id,
+        // Default values will be used from schema
+      })
+
+    if (settingsError) {
+      console.error('Store settings creation error:', settingsError)
+      // Non-critical error - don't fail the whole process
+      console.warn('Store settings creation failed but continuing...')
+    }
+
+    // 7. Return success response
+    return NextResponse.json({
+      success: true,
+      message: 'Onboarding completed successfully',
+      data: {
+        storeId: storeData.store_id,
+        userId: userData.user_id,
+        storeCode,
+        testMode: false,
+      },
+    })
+  } catch (error) {
+    console.error('Production onboarding error:', error)
+    throw error
+  }
+}

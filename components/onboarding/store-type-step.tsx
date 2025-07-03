@@ -1,3 +1,5 @@
+// components/onboarding/store-type-step.tsx
+
 'use client'
 
 import { useForm } from 'react-hook-form'
@@ -21,51 +23,55 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { storeDetailsSchema, type StoreDetailsForm } from '@/lib/schemas/store-schemas'
+import { storeFormSchema, STORE_TYPE_LABELS, type StoreFormData } from '@/lib/schemas/store-schemas'
 import { Typography } from '@/components/ui/typography'
 
-const STORE_TYPES = [
-  { value: 'supermarket', label: 'Supermarket' },
-  { value: 'grocery_store', label: 'Grocery Store' },
-  { value: 'bakery', label: 'Bakery' },
-  { value: 'butcher', label: 'Butcher' },
-  { value: 'delicatessen', label: 'Delicatessen' },
-  { value: 'restaurant', label: 'Restaurant' },
-  { value: 'cafe', label: 'Café' },
-  { value: 'other', label: 'Other' },
-] as const
+// Type guard for store_type
+function isStoreType(value: any): value is StoreFormData['store_type'] {
+  return (
+    value === undefined ||
+    ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic', 'other'].includes(
+      value,
+    )
+  )
+}
 
 export function StoreTypeStep() {
-  const { selectedStore, isManualEntry, setSelectedStore, setCurrentStep } = useOnboardingStore()
+  const { selectedStoreForm, isManualEntry, setSelectedStoreForm, setCurrentStep } =
+    useOnboardingStore()
 
-  const form = useForm<StoreDetailsForm>({
-    resolver: zodResolver(storeDetailsSchema),
+  const form = useForm<StoreFormData>({
+    resolver: zodResolver(storeFormSchema),
     defaultValues: {
-      name: selectedStore?.name || '',
-      address: selectedStore?.address || '',
-      city: selectedStore?.city || '',
-      postalCode: selectedStore?.postalCode || '',
-      country: selectedStore?.country || 'France',
-      phone: selectedStore?.phone || '',
-      type: (selectedStore?.type as StoreDetailsForm['type']) || undefined,
+      store_name: selectedStoreForm?.store_name || '',
+      address: selectedStoreForm?.address || '',
+      city: selectedStoreForm?.city || '',
+      postal_code: selectedStoreForm?.postal_code || '',
+      country: selectedStoreForm?.country || 'France',
+      phone: selectedStoreForm?.phone || '',
+      store_type: isStoreType(selectedStoreForm?.store_type)
+        ? selectedStoreForm?.store_type
+        : undefined,
+      business_name: selectedStoreForm?.business_name || '',
     },
   })
 
-  const onSubmit = (data: StoreDetailsForm) => {
-    const storeDetails = {
-      name: data.name,
+  const onSubmit = (data: StoreFormData) => {
+    const storeFormData: StoreFormData = {
+      store_name: data.store_name,
       address: data.address,
       city: data.city,
-      postalCode: data.postalCode,
-      country: data.country,
+      postal_code: data.postal_code,
+      country: data.country || 'France',
       phone: data.phone || '',
-      type: data.type,
+      store_type: data.store_type,
+      business_name: data.business_name || data.store_name,
       // Preserve any existing coordinates/placeId
-      coordinates: selectedStore?.coordinates,
-      googlePlaceId: selectedStore?.googlePlaceId,
+      coordinates: selectedStoreForm?.coordinates,
+      googlePlaceId: selectedStoreForm?.googlePlaceId,
     }
 
-    setSelectedStore(storeDetails)
+    setSelectedStoreForm(storeFormData)
     setCurrentStep(3)
   }
 
@@ -93,36 +99,47 @@ export function StoreTypeStep() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
+              <FormField<StoreFormData>
                 control={form.control}
-                name="name"
+                name="store_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Store Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your Store Name" {...field} />
+                      <Input
+                        placeholder="Your Store Name"
+                        {...field}
+                        value={
+                          typeof field.value === 'string' || typeof field.value === 'number'
+                            ? field.value
+                            : ''
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
+              <FormField<StoreFormData>
                 control={form.control}
-                name="type"
+                name="store_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Store Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={typeof field.value === 'string' ? field.value : undefined}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select store type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {STORE_TYPES.map(type => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
+                        {Object.entries(STORE_TYPE_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -132,14 +149,44 @@ export function StoreTypeStep() {
                 )}
               />
 
-              <FormField
+              <FormField<StoreFormData>
+                control={form.control}
+                name="business_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Name (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="If different from store name"
+                        {...field}
+                        value={
+                          typeof field.value === 'string' || typeof field.value === 'number'
+                            ? field.value
+                            : ''
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField<StoreFormData>
                 control={form.control}
                 name="address"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="123 Rue de la Paix" {...field} />
+                      <Input
+                        placeholder="123 Rue de la Paix"
+                        {...field}
+                        value={
+                          typeof field.value === 'string' || typeof field.value === 'number'
+                            ? field.value
+                            : ''
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,28 +194,44 @@ export function StoreTypeStep() {
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormField
+                <FormField<StoreFormData>
                   control={form.control}
                   name="city"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>City</FormLabel>
                       <FormControl>
-                        <Input placeholder="Paris" {...field} />
+                        <Input
+                          placeholder="Paris"
+                          {...field}
+                          value={
+                            typeof field.value === 'string' || typeof field.value === 'number'
+                              ? field.value
+                              : ''
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
+                <FormField<StoreFormData>
                   control={form.control}
-                  name="postalCode"
+                  name="postal_code"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Postal Code</FormLabel>
                       <FormControl>
-                        <Input placeholder="75001" {...field} />
+                        <Input
+                          placeholder="75001"
+                          {...field}
+                          value={
+                            typeof field.value === 'string' || typeof field.value === 'number'
+                              ? field.value
+                              : ''
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -176,14 +239,43 @@ export function StoreTypeStep() {
                 />
               </div>
 
-              <FormField
+              <FormField<StoreFormData>
                 control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="France"
+                        {...field}
+                        value={
+                          typeof field.value === 'string' || typeof field.value === 'number'
+                            ? field.value
+                            : ''
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField<StoreFormData>
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="01 23 45 67 89" {...field} />
+                      <Input
+                        placeholder="01 23 45 67 89"
+                        {...field}
+                        value={
+                          typeof field.value === 'string' || typeof field.value === 'number'
+                            ? field.value
+                            : ''
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
