@@ -5,9 +5,8 @@ import { createClient } from '@supabase/supabase-js'
 import { convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
 import type { StoreFormData } from '@/lib/stores/onboarding-store'
 
-// Test modes
-const DEV_MODE = process.env.DEV_MODE === 'true'
-const REAL_USER_TEST = process.env.REAL_USER_TEST === 'true'
+// Single environment variable approach
+const ONBOARDING_MODE = process.env.ONBOARDING_MODE || 'production'
 
 interface OnboardingRequest {
   userId: string
@@ -37,6 +36,7 @@ function createServiceRoleClient() {
 
 export async function POST(request: NextRequest) {
   console.log('=== ONBOARDING API CALLED ===')
+  console.log('🌍 ONBOARDING_MODE:', ONBOARDING_MODE)
 
   try {
     const body: OnboardingRequest = await request.json()
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       storeType: store?.store_type,
     })
 
-    // Validate required fields
+    // Validate required fields (always required)
     if (!userId || !store || !user) {
       console.error('❌ Missing required fields:', {
         userId: !!userId,
@@ -72,18 +72,20 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Validation passed')
 
-    if (DEV_MODE && !REAL_USER_TEST) {
-      // Pure dev mode - no database changes
-      console.log('🔄 Using DEV_MODE (no database changes)')
-      return handleDevModeOnboarding(userId, store, user)
-    } else if (DEV_MODE && REAL_USER_TEST) {
-      // Real user test mode - create actual stores for your account
-      console.log('🔄 Using REAL_USER_TEST mode - creating actual database records')
-      return await handleRealUserTestMode(userId, store, user)
-    } else {
-      // Full production mode
-      console.log('🔄 Using PRODUCTION mode')
-      return await handleProductionOnboarding(userId, store, user)
+    // Simple switch based on mode
+    switch (ONBOARDING_MODE) {
+      case 'mock':
+        console.log('🎭 MOCK MODE: No database changes')
+        return handleMockOnboarding(userId, store, user)
+
+      case 'test':
+        console.log('🧪 TEST MODE: Real database with current user')
+        return await handleTestOnboarding(userId, store, user)
+
+      case 'production':
+      default:
+        console.log('🔐 PRODUCTION MODE: Full signup flow')
+        return await handleProductionOnboarding(userId, store, user)
     }
   } catch (error) {
     console.error('=== ONBOARDING API ERROR ===')
@@ -100,16 +102,48 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Updated function for testing with your real account
-async function handleRealUserTestMode(
+// Mock mode - no dependencies, just returns fake success
+function handleMockOnboarding(
   userId: string,
   store: StoreFormData,
   user: { email: string; fullName?: string },
 ) {
-  console.log('🧪 === REAL USER TEST MODE ===')
-  console.log('🔑 Using dynamic user ID from frontend:', userId)
+  console.log('🎭 === MOCK MODE - NO DATABASE CHANGES ===')
 
-  // Use service role client to bypass RLS (proper approach)
+  const mockStoreCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
+
+  console.log('📋 MOCK: Would create store:', {
+    store_name: store.store_name,
+    store_code: mockStoreCode,
+    store_type: store.store_type,
+    owner_id: userId,
+  })
+
+  const response = {
+    success: true,
+    message: 'MOCK: Onboarding simulated successfully (no database changes)',
+    data: {
+      storeId: 'mock-store-id-123',
+      userId: userId,
+      storeCode: mockStoreCode,
+      mode: 'mock',
+    },
+  }
+
+  console.log('🎭 MOCK response:', response)
+  return NextResponse.json(response)
+}
+
+// Test mode - requires logged in user, creates real database records
+async function handleTestOnboarding(
+  userId: string,
+  store: StoreFormData,
+  user: { email: string; fullName?: string },
+) {
+  console.log('🧪 === TEST MODE - REAL DATABASE ===')
+  console.log('🔑 Using user ID from frontend:', userId)
+
+  // Use service role client to bypass RLS
   const supabase = createServiceRoleClient()
   console.log('🔐 Created service role client (bypasses RLS)')
 
@@ -139,7 +173,7 @@ async function handleRealUserTestMode(
       owner_id: storeInsert.owner_id,
     })
 
-    // Create store record with service role (bypasses RLS)
+    // Create store record
     const { data: storeData, error: storeError } = await supabase
       .schema('business')
       .from('stores')
@@ -205,57 +239,24 @@ async function handleRealUserTestMode(
 
     const successResponse = {
       success: true,
-      message: 'Real User Test: Store created successfully for your account!',
+      message: 'TEST: Store created successfully with your account!',
       data: {
         storeId: storeData.store_id,
         userId: userId,
         storeCode,
-        testMode: true,
-        realUser: true,
+        mode: 'test',
       },
     }
 
-    console.log('🎉 Success response:', successResponse)
+    console.log('🎉 TEST success response:', successResponse)
     return NextResponse.json(successResponse)
   } catch (error) {
-    console.error('💥 Real user test error:', error)
+    console.error('💥 Test mode error:', error)
     throw error
   }
 }
 
-// Keep existing dev mode function
-function handleDevModeOnboarding(
-  userId: string,
-  store: StoreFormData,
-  user: { email: string; fullName?: string },
-) {
-  console.log('🧪 === DEV MODE ACTIVE - NO DATABASE CHANGES ===')
-
-  const mockStoreCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
-
-  console.log('📋 DEV MODE: Would create store:', {
-    store_name: store.store_name,
-    store_code: mockStoreCode,
-    store_type: store.store_type,
-    owner_id: userId,
-  })
-
-  const response = {
-    success: true,
-    message: 'DEV MODE: Onboarding completed successfully (no database changes)',
-    data: {
-      storeId: 'mock-store-id-123',
-      userId: userId,
-      storeCode: mockStoreCode,
-      testMode: true,
-    },
-  }
-
-  console.log('🎉 DEV MODE response:', response)
-  return NextResponse.json(response)
-}
-
-// Production mode handler
+// Production mode - creates new auth user + store
 async function handleProductionOnboarding(
   userId: string,
   store: StoreFormData,
@@ -339,12 +340,12 @@ async function handleProductionOnboarding(
 
     return NextResponse.json({
       success: true,
-      message: 'Onboarding completed successfully',
+      message: 'PRODUCTION: Onboarding completed successfully',
       data: {
         storeId: storeData.store_id,
         userId: userId,
         storeCode,
-        testMode: false,
+        mode: 'production',
       },
     })
   } catch (error) {
