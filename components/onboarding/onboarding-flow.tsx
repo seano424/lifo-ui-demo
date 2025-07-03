@@ -23,7 +23,6 @@ export function OnboardingFlow() {
   ]
 
   const canGoBack = currentStep > 1
-  const currentStepData = steps[currentStep - 1]
 
   return (
     <div className="max-w-2xl mx-auto">

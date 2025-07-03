@@ -21,7 +21,6 @@ export function ConfirmDetailsStep() {
     setCurrentStep,
     setBusinessCheckResult,
     setIsCheckingBusiness,
-    convertFormDataToInsert,
   } = useOnboardingStore()
 
   const { checkBusiness } = useBusinessCheck()
@@ -101,7 +100,7 @@ export function ConfirmDetailsStep() {
       <div className="text-center space-y-2">
         <Typography variant="h1">Review Your Store Details</Typography>
         <Typography variant="p" color="muted">
-          We'll verify this business isn't already registered before creating your account
+          We&#39;ll verify this business isn&#39;t already registered before creating your account
         </Typography>
       </div>
 
@@ -158,7 +157,7 @@ export function ConfirmDetailsStep() {
             {!hasCheckedBusiness && (
               <div className="space-y-3">
                 <Typography variant="p" color="muted">
-                  Before creating your account, we need to verify this business isn't already
+                  Before creating your account, we need to verify this business isn&#39;t already
                   registered.
                 </Typography>
                 <Button
@@ -189,7 +188,7 @@ export function ConfirmDetailsStep() {
                         {businessCheckResult.storeData && (
                           <div className="text-xs bg-destructive/10 p-2 rounded mt-2">
                             <p>
-                              <strong>Existing Store:</strong>{' '}
+                              <strong>Existing Store:</strong>&#39;{' '}
                               {businessCheckResult.storeData.store_name}
                             </p>
                             <p>

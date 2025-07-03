@@ -28,13 +28,13 @@ function SuccessContent() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Typography variant="p" color="muted">
-              We've sent you a confirmation email. Please check your inbox and click the
+              We&#39;ve sent you a confirmation email. Please check your inbox and click the
               verification link to activate your account.
             </Typography>
 
             <div className="bg-muted/50 p-4 rounded-lg">
               <Typography variant="p" className="text-sm">
-                <strong>What's next?</strong>
+                <strong>What&#39;s next?</strong>
               </Typography>
               <ul className="text-sm text-muted-foreground mt-2 space-y-1">
                 <li>1. Check your email for verification link</li>
@@ -65,7 +65,7 @@ function SuccessContent() {
         <Card className="bg-muted/50">
           <CardContent className="pt-4">
             <Typography variant="p" color="muted" className="text-center text-sm">
-              Didn't receive the email? Check your spam folder or{' '}
+              Didn&#39;t receive the email? Check your spam folder or{' '}
               <a
                 href="mailto:support@lifo.ai?subject=Email Verification Issue"
                 className="text-primary hover:underline"

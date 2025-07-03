@@ -17,7 +17,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { CheckCircle, AlertTriangle, Eye, EyeOff } from 'lucide-react'
 import { useCurrentUser } from '@/hooks/use-users'
 
-// Use the same environment variable as the API
 const ONBOARDING_MODE = process.env.NEXT_PUBLIC_ONBOARDING_MODE || 'production'
 
 export function OnboardingSignUpForm({
@@ -384,7 +383,7 @@ export function OnboardingSignUpForm({
               {ONBOARDING_MODE === 'production' && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
                   By creating an account, you agree to our Terms of Service and Privacy Policy.
-                  You'll receive a confirmation email to verify your account.
+                  You&#39;ll receive a confirmation email to verify your account.
                 </Typography>
               )}
 

@@ -76,16 +76,16 @@ export async function POST(request: NextRequest) {
     switch (ONBOARDING_MODE) {
       case 'mock':
         console.log('🎭 MOCK MODE: No database changes')
-        return handleMockOnboarding(userId, store, user)
+        return handleMockOnboarding(userId, store)
 
       case 'test':
         console.log('🧪 TEST MODE: Real database with current user')
-        return await handleTestOnboarding(userId, store, user)
+        return await handleTestOnboarding(userId, store)
 
       case 'production':
       default:
         console.log('🔐 PRODUCTION MODE: Full signup flow')
-        return await handleProductionOnboarding(userId, store, user)
+        return await handleProductionOnboarding(userId, store)
     }
   } catch (error) {
     console.error('=== ONBOARDING API ERROR ===')
@@ -103,11 +103,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Mock mode - no dependencies, just returns fake success
-function handleMockOnboarding(
-  userId: string,
-  store: StoreFormData,
-  user: { email: string; fullName?: string },
-) {
+function handleMockOnboarding(userId: string, store: StoreFormData) {
   console.log('🎭 === MOCK MODE - NO DATABASE CHANGES ===')
 
   const mockStoreCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
@@ -135,11 +131,7 @@ function handleMockOnboarding(
 }
 
 // Test mode - requires logged in user, creates real database records
-async function handleTestOnboarding(
-  userId: string,
-  store: StoreFormData,
-  user: { email: string; fullName?: string },
-) {
+async function handleTestOnboarding(userId: string, store: StoreFormData) {
   console.log('🧪 === TEST MODE - REAL DATABASE ===')
   console.log('🔑 Using user ID from frontend:', userId)
 
@@ -257,11 +249,7 @@ async function handleTestOnboarding(
 }
 
 // Production mode - creates new auth user + store
-async function handleProductionOnboarding(
-  userId: string,
-  store: StoreFormData,
-  user: { email: string; fullName?: string },
-) {
+async function handleProductionOnboarding(userId: string, store: StoreFormData) {
   console.log('🔐 === PRODUCTION MODE ===')
 
   // Use service role client for production too (for onboarding)

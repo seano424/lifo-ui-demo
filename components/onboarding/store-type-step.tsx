@@ -27,10 +27,10 @@ import { storeFormSchema, STORE_TYPE_LABELS, type StoreFormData } from '@/lib/sc
 import { Typography } from '@/components/ui/typography'
 
 // Type guard for store_type
-function isStoreType(value: any): value is StoreFormData['store_type'] {
-  return (
-    value === undefined ||
-    ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'].includes(value)
+function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {
+  if (typeof value !== 'string') return false
+  return ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'].includes(
+    value,
   )
 }
 
@@ -42,13 +42,13 @@ export function StoreTypeStep() {
     resolver: zodResolver(storeFormSchema),
     defaultValues: {
       store_name: selectedStoreForm?.store_name || '',
-      address: selectedStoreForm?.address || '',
-      city: selectedStoreForm?.city || '',
-      postal_code: selectedStoreForm?.postal_code || '',
-      country: selectedStoreForm?.country || 'France',
+      address: selectedStoreForm?.address ?? '',
+      city: selectedStoreForm?.city ?? '',
+      postal_code: selectedStoreForm?.postal_code ?? '',
+      country: selectedStoreForm?.country ?? 'France',
       phone: selectedStoreForm?.phone || '',
       store_type: isStoreType(selectedStoreForm?.store_type)
-        ? selectedStoreForm?.store_type
+        ? (selectedStoreForm?.store_type as StoreFormData['store_type'])
         : undefined,
       business_name: selectedStoreForm?.business_name || '',
     },

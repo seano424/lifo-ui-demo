@@ -4,7 +4,6 @@ import { z } from 'zod'
 import { Database } from '@/types/supabase'
 
 // Get the allowed store types from your database schema check constraint
-// FIXED: Removed 'other' as it's not allowed in the database
 const STORE_TYPES = [
   'supermarket',
   'convenience',
