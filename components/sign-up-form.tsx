@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Typography } from '@/components/ui/typography'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -51,8 +52,14 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardTitle>
+            <Typography variant="h1">Sign up</Typography>
+          </CardTitle>
+          <CardDescription>
+            <Typography variant="p" color="muted">
+              Create a new account
+            </Typography>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
@@ -92,12 +99,16 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                   onChange={e => setRepeatPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && (
+                <Typography variant="p" color="destructive">
+                  {error}
+                </Typography>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Creating an account...' : 'Sign up'}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-4 text-center">
               Already have an account?{' '}
               <Link href="/auth/login" className="underline underline-offset-4">
                 Login

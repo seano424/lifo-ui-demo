@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { Typography } from '@/components/ui/typography'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -42,8 +43,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardTitle>
+            <Typography variant="h1">Login</Typography>
+          </CardTitle>
+          <CardDescription>
+            <Typography variant="p" color="muted">
+              Enter your email below to login to your account
+            </Typography>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
@@ -77,12 +84,16 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                   onChange={e => setPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && (
+                <Typography variant="p" color="destructive">
+                  {error}
+                </Typography>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-4 text-center">
               Don&apos;t have an account?{' '}
               <Link href="/auth/sign-up" className="underline underline-offset-4">
                 Sign up

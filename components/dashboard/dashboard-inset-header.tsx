@@ -1,4 +1,4 @@
-import React from 'react'
+import { Typography } from '@/components/ui/typography'
 
 export default function DashboardInsetHeader({
   title,
@@ -12,8 +12,10 @@ export default function DashboardInsetHeader({
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{title}</h1>
-        <p className="text-gray-600">{description}</p>
+        <Typography variant="h1">{title}</Typography>
+        <Typography variant="p" color="muted">
+          {description}
+        </Typography>
       </div>
       {rightContent && rightContent}
     </div>

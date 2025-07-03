@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 
@@ -36,7 +37,9 @@ export function ConfirmDetailsStep() {
   if (!selectedStore) {
     return (
       <div className="text-center">
-        <p>No store information found. Please go back and complete the previous steps.</p>
+        <Typography variant="p" color="muted">
+          No store information found. Please go back and complete the previous steps.
+        </Typography>
         <Button onClick={() => setCurrentStep(1)} className="mt-4">
           Start Over
         </Button>
@@ -47,10 +50,10 @@ export function ConfirmDetailsStep() {
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">Review Your Store Details</h1>
-        <p className="text-muted-foreground">
+        <Typography variant="h1">Review Your Store Details</Typography>
+        <Typography variant="p" color="muted">
           Please review your store information before creating your account
-        </p>
+        </Typography>
       </div>
 
       <Card>

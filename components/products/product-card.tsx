@@ -14,6 +14,7 @@ import { MoreHorizontal, Edit, Trash2, DollarSign, Lock } from 'lucide-react'
 import type { Product } from '@/lib/queries/products'
 import { usePermissions } from '@/hooks/use-users'
 import { toast } from 'sonner'
+import { Typography } from '@/components/ui/typography'
 
 interface ProductCardProps {
   product: Product
@@ -64,8 +65,14 @@ export function ProductCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg truncate">{product.name}</CardTitle>
-            <p className="text-sm text-muted-foreground truncate">{product.sku}</p>
+            <CardTitle>
+              <Typography variant="h3" className="truncate">
+                {product.name}
+              </Typography>
+            </CardTitle>
+            <Typography variant="p" color="muted" className="truncate">
+              {product.sku}
+            </Typography>
 
             <div className="flex items-center gap-2 mt-1">
               {product.created_by === permissions.userId && (

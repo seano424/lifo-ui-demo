@@ -23,6 +23,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import type { SortField, SortDirection, ProductSort } from '@/lib/queries/products'
+import { Typography } from '@/components/ui/typography'
 
 interface ProductsSortToolbarProps {
   currentSort: ProductSort
@@ -137,7 +138,9 @@ export function ProductsSortToolbar({
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{option.description}</p>
+                    <Typography variant="p" color="muted" className="mt-1">
+                      {option.description}
+                    </Typography>
                   </div>
                 </DropdownMenuItem>
               )

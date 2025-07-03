@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 
 export default function Page() {
   return (
@@ -7,14 +8,20 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Thank you for signing up!</CardTitle>
-              <CardDescription>Check your email to confirm</CardDescription>
+              <CardTitle>
+                <Typography variant="h1">Thank you for signing up!</Typography>
+              </CardTitle>
+              <CardDescription>
+                <Typography variant="p" color="muted">
+                  Check your email to confirm
+                </Typography>
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <Typography variant="p" color="muted">
                 You&apos;ve successfully signed up. Please check your email to confirm your account
                 before signing in.
-              </p>
+              </Typography>
             </CardContent>
           </Card>
         </div>

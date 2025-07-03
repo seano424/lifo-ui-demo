@@ -1,14 +1,17 @@
 import Link from 'next/link'
 import { TutorialStep } from './tutorial-step'
 import { ArrowUpRight } from 'lucide-react'
+import { Typography } from '@/components/ui/typography'
 
 export function SignUpUserSteps() {
   return (
     <ol className="flex flex-col gap-6">
       {process.env.VERCEL_ENV === 'preview' || process.env.VERCEL_ENV === 'production' ? (
         <TutorialStep title="Set up redirect urls">
-          <p>It looks like this App is hosted on Vercel.</p>
-          <p className="mt-4">
+          <Typography variant="p" color="muted">
+            It looks like this App is hosted on Vercel.
+          </Typography>
+          <Typography variant="p" color="muted" className="mt-4">
             This particular deployment is
             <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-medium text-secondary-foreground border">
               &quot;{process.env.VERCEL_ENV}&quot;
@@ -18,8 +21,8 @@ export function SignUpUserSteps() {
               https://{process.env.VERCEL_URL}
             </span>
             .
-          </p>
-          <p className="mt-4">
+          </Typography>
+          <Typography variant="p" color="muted" className="mt-4">
             You will need to{' '}
             <Link
               className="text-primary hover:text-foreground"
@@ -28,7 +31,7 @@ export function SignUpUserSteps() {
               update your Supabase project
             </Link>{' '}
             with redirect URLs based on your Vercel deployment URLs.
-          </p>
+          </Typography>
           <ul className="mt-4">
             <li>
               -{' '}

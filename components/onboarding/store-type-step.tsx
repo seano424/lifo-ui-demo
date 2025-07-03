@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { storeDetailsSchema, type StoreDetailsForm } from '@/lib/schemas/store-schemas'
+import { Typography } from '@/components/ui/typography'
 
 const STORE_TYPES = [
   { value: 'supermarket', label: 'Supermarket' },
@@ -75,14 +76,14 @@ export function StoreTypeStep() {
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">
+        <Typography variant="h1">
           {isManualEntry ? 'Add Store Details' : 'Complete Store Information'}
-        </h1>
-        <p className="text-muted-foreground">
+        </Typography>
+        <Typography variant="p" color="muted">
           {isManualEntry
             ? 'Enter your store information'
             : 'Select your store type and verify details'}
-        </p>
+        </Typography>
       </div>
 
       <Card>

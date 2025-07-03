@@ -1,7 +1,7 @@
-// components/users/users-list.tsx (Client Component)
 'use client'
 
 import { useState } from 'react'
+import { Typography } from '@/components/ui/typography'
 import { useUsers, useUserActions } from '@/hooks/use-users'
 import { UserCard } from '@/components/users/user-card'
 import { UserFilters } from '@/components/users/user-filters'
@@ -23,9 +23,9 @@ export function UsersList() {
 
       {/* Results Header */}
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-600">
+        <Typography variant="p" color="muted">
           {count > 0 ? `Showing ${data.length} of ${count} users` : 'No users found'}
-        </p>
+        </Typography>
 
         {/* View Toggle */}
         <div className="flex rounded-lg border border-gray-200">
@@ -62,12 +62,12 @@ export function UsersList() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No users found</h3>
-          <p className="text-gray-500 mb-4">
+          <Typography variant="h3">No users found</Typography>
+          <Typography variant="p" color="muted" className="mb-4">
             {Object.keys(filters).length > 0
               ? 'Try adjusting your filters to see more results.'
               : 'Get started by adding your first team member.'}
-          </p>
+          </Typography>
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Add First User
           </button>
