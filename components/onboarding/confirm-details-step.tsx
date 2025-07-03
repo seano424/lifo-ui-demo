@@ -1,5 +1,3 @@
-// components/onboarding/confirm-details-step.tsx
-
 'use client'
 
 import { useState } from 'react'

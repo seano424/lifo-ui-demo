@@ -1,5 +1,3 @@
-// components/onboarding/store-type-step.tsx
-
 'use client'
 
 import { useForm } from 'react-hook-form'

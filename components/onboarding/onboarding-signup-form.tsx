@@ -1,5 +1,3 @@
-// components/onboarding/onboarding-signup-form.tsx
-
 'use client'
 
 import { useState } from 'react'

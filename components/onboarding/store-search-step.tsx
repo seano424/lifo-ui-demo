@@ -1,5 +1,3 @@
-// components/onboarding/store-search-step.tsx
-
 'use client'
 
 import { useState, useEffect } from 'react'

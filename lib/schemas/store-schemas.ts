@@ -1,5 +1,3 @@
-// lib/schemas/store-schemas.ts
-
 import { z } from 'zod'
 import { Database } from '@/types/supabase'
 
@@ -58,7 +56,6 @@ export const businessCheckSchema = z.object({
 export type BusinessCheckRequest = z.infer<typeof businessCheckSchema>
 
 // Store type labels for UI display
-// FIXED: Removed 'other' option
 export const STORE_TYPE_LABELS: Record<(typeof STORE_TYPES)[number], string> = {
   supermarket: 'Supermarket',
   convenience: 'Convenience Store',

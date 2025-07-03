@@ -1,5 +1,3 @@
-// lib/stores/onboarding-store.ts
-
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { Database } from '@/types/supabase'
