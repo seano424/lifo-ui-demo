@@ -114,6 +114,8 @@ npm run dev
 cd lifo-ai-core && source venv/bin/activate && cd ..
 ```
 
+**Note**: The `venv/` directory is not included in git (as it should be). Each developer needs to create their own virtual environment locally.
+
 ## 🚦 Getting Started
 
 ### Development Server
