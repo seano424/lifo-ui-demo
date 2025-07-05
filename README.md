@@ -1,164 +1,319 @@
-# LIFO.AI
+# LIFO.AI - Intelligent Food Waste Management Platform
 
-Food surplus management system helping retailers reduce edible inventory loss through AI-driven batch-level inventory intelligence.
+**Transform inventory management from reactive to predictive, reducing food waste through AI-driven insights.**
 
-## 🎯 What We're Building
+## 🎯 Mission
 
-LIFO.AI solves the **batch visibility problem** that costs retailers millions in unnecessary waste. Instead of managing inventory with statistical guesswork, we provide precise, batch-level tracking by expiration date.
+LIFO.AI helps retailers minimize food waste by providing intelligent scoring, demand prediction, and automated recommendations for inventory optimization. Our ML-enhanced platform reduces waste while maximizing profitability.
 
-**Current Focus**: MVP validation with Dutch grocery stores
+## 🚀 Complete Data Platform Implementation
 
-## 🚀 Quick Start
+This repository contains the implementation of LIFO.AI's data platform
 
-### Prerequisites
+- **Database Schema**: Complete PostgreSQL schema with time series support
+- **Core Scoring Engine**: Algorithmic scoring based on expiry, velocity, and margin
+- **ETL Pipeline**: CSV processing with comprehensive validation
+- **API Infrastructure**: Next.js API routes for all core functionality
 
-- Node.js 18+
-- npm (latest version)
+- **Data Collection**: Automated hourly inventory snapshots
+- **Pattern Analysis**: Demand trend detection and seasonality analysis
+- **External Factors**: Weather and holiday impact integration
+- **Advanced Analytics**: Category insights and performance metrics
 
-### Get Running in 5 Minutes
+- **Feature Engineering**: 50+ features from inventory, sales, and external data
+- **ML Models**: Random Forest and Gradient Boosting for demand prediction
+- **Enhanced Scoring**: ML-augmented recommendations with confidence levels
+- **Discount Optimization**: AI-driven pricing recommendations
+
+## 🏗️ Architecture Overview
+
+```
+lifo-app/
+├── app/                      # Next.js 15 Frontend
+├── lifo-ai-core/            # Python Business Logic
+│   ├── database/            # Data models and connections
+│   ├── scoring/             # Scoring algorithms (base + ML)
+│   ├── etl/                # CSV processing pipeline
+│   ├── timeseries/         # Data collection and analysis
+│   ├── ml/                 # Machine learning pipeline
+│   └── api/                # Business logic APIs
+├── app/api/                # Next.js API routes
+├── supabase/migrations/    # Database migrations
+└── components/             # React UI components
+```
+
+## 🛠️ Technology Stack
+
+**Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
+**Backend**: Python, Supabase PostgreSQL, TimescaleDB
+**ML/AI**: scikit-learn, pandas, numpy, scipy
+**Infrastructure**: Supabase (Auth, Database, Real-time), Vercel (Hosting)
+
+## 📦 Installation & Setup
+
+### 1. Prerequisites
 
 ```bash
-# 1. Clone and install
+Node.js 18+
+Python 3.12+
+Supabase account
+```
+
+### 2. Clone and Install
+
+```bash
 git clone https://github.com/lifo-ai/lifo-app.git
 cd lifo-app
 npm install
 
-# 2. Environment setup
-cp .env.example .env.local
-# Ask team lead for actual values to put in .env.local
-
-# 3. Generate database types
-npm run update-types
-
-# 4. Start development
-npm run dev
-# Visit http://localhost:3000
+# Set up Python environment
+cd lifo-ai-core
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+pip install -e .  # Install the package in development mode
+cd ..
 ```
 
-**Stuck?** Check our [Developer Onboarding Guide](docs/DEV_ONBOARDING.MD) or ask in Slack!
-
-## 🗄️ Database & Environment
-
-### Environment Variables
-
-Get these values from your team lead:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://jrgmetdsohowtxickqij.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=[ask for this]
-SUPABASE_SERVICE_ROLE_KEY=[keep this secret!]
-```
-
-### Keeping Types Updated
+### 3. Environment Configuration
 
 ```bash
-# Generate fresh TypeScript types from database
-npm run update-types
+cp .env.example .env.local
+```
 
-# After any schema changes in Supabase Dashboard
+Fill in your Supabase credentials:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+### 4. Database Setup
+
+```bash
+# Authenticate with Supabase CLI
+npx supabase login
+
+# Generate TypeScript types (includes all schemas)
+npm run update-types
+```
+
+### 5. Python Integration
+
+The Python CSV processor is fully integrated with the Next.js application:
+
+```bash
+# Test Python integration
+npm run dev
+# Upload CSV files via the web interface or API endpoints
+```
+
+**Important**: The Python environment must be activated for CSV processing to work:
+```bash
+cd lifo-ai-core && source venv/bin/activate && cd ..
+```
+
+## 🚦 Getting Started
+
+### Development Server
+
+```bash
+npm run dev
+```
+
+### Current State & Next Steps
+
+✅ **Completed**:
+- Python CSV processor fully integrated with Next.js
+- All API endpoints working and properly configured
+- Database operations and TypeScript types generated
+
+⚠️ **Known Issues**:
+- Store creation UI component needs frontend developer review
+- Users need to create stores via API for now
+
+🔧 **Next Steps**:
+1. Frontend developer to fix store creation dialog rendering issues
+2. Implement proper store selector UI component
+
+### Key Operations
+
+**CSV Upload & Processing**:
+
+```bash
+# Upload via UI at /protected or API
+curl -X POST /api/inventory/upload -F "file=@inventory.csv"
+```
+
+**Score Calculation**:
+
+```bash
+# Recalculate all scores
+npm run scoring:recalculate
+
+# Or via API
+curl -X POST /api/scores/recalculate
+```
+
+**ML Model Training**:
+
+```bash
+# Train ML models (requires historical data)
+npm run ml:train
+```
+
+**Time Series Collection**:
+
+```bash
+# Collect hourly snapshots (run via cron)
+npm run timeseries:collect
+```
+
+## 📊 API Endpoints
+
+### Store Management
+- `GET /api/stores` - Get user's stores
+- `POST /api/stores` - Create new store
+
+### Core Inventory Management (🔐 Auth Required)
+
+- `GET /api/inventory` - Paginated inventory with filtering
+- `POST /api/inventory/upload` - CSV file upload and processing
+- `GET /api/alerts` - High-priority inventory alerts
+- `GET /api/csv/sample` - Download CSV template
+
+### Scoring & Analytics (🔐 Auth Required)
+
+- `POST /api/scores/recalculate` - Trigger score recalculation
+- `GET /api/analytics` - Comprehensive analytics and KPIs
+
+### CSV Format
+Expected CSV columns:
+```
+SKU,Product_Name,Category,Quantity,Cost_Price,Selling_Price,Expiry_Date,Batch_Number,Manufacture_Date,Location
+```
+
+### Advanced Features
+
+- ML-enhanced scoring with discount optimization
+- Time series pattern analysis and forecasting
+- External factor integration (weather, holidays)
+- Real-time inventory alerts and recommendations
+
+## 🧠 ML Features
+
+### Demand Prediction Models
+
+- **24h, 48h, 7-day forecasts** with confidence levels
+- **Discount scenario modeling** for optimal pricing
+- **Sellthrough rate prediction** for inventory planning
+
+### Feature Engineering (50+ Features)
+
+- **Product Features**: Category, brand, pricing, margins
+- **Temporal Features**: Seasonality, day-of-week patterns
+- **Sales History**: Velocity trends, transaction patterns
+- **Inventory State**: Expiry urgency, quantity ratios
+- **External Factors**: Weather, holidays, market conditions
+
+### Enhanced Scoring Algorithm
+
+```python
+enhanced_score = (
+    0.4 * base_algorithmic_score +
+    0.35 * ml_prediction_score +
+    0.15 * pattern_analysis_score +
+    0.1 * external_factors_score
+)
+```
+
+## 📈 Business Impact
+
+### Key Metrics Tracked
+
+- **Waste Reduction Rate**: Items saved vs. at-risk items
+- **Revenue Recovery**: Revenue from discounted vs. wasted items
+- **Action Effectiveness**: Success rate of recommendations
+- **Inventory Turnover**: Improved velocity through optimization
+
+### Expected Outcomes
+
+- **30-50% reduction** in food waste
+- **15-25% increase** in margin recovery
+- **Automated decision-making** for 80%+ of inventory
+- **Real-time insights** for proactive management
+
+## 🔧 Development Workflow
+
+### Database Changes
+
+1. **Modify schema** in Supabase Dashboard
+2. **Update types**: `npm run update-types`
+3. **Update models** in `lifo-ai-core/database/models.py`
+4. **Test changes** with sample data
+
+### ML Model Updates
+
+1. **Retrain models** with new data: `npm run ml:train`
+2. **Validate performance** with test datasets
+3. **Deploy updated models** via API
+
+### Monitoring & Maintenance
+
+- **Hourly data collection** via automated snapshots
+- **Daily score recalculation** for all active inventory
+- **Weekly ML model retraining** with fresh data
+
+## 🚀 Deployment
+
+### Production Environment
+
+```bash
+# Build and deploy
+npm run build
+npm run start
+
+# Ensure Python dependencies in production
+pip install -r requirements.txt --production
+```
+
+### Environment Variables (Production)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=production-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=production-anon-key
+SUPABASE_SERVICE_ROLE_KEY=production-service-key
+DB_PASSWORD=production-db-password
+WEATHER_API_KEY=optional-weather-key
+```
+
+### Scheduled Jobs
+
+Set up cron jobs for automated operations:
+
+```bash
+# Hourly data collection
+0 * * * * npm run timeseries:collect
+
+# Daily score recalculation
+0 2 * * * npm run scoring:recalculate
+
+# Weekly ML retraining
+0 3 * * 0 npm run ml:train
 ```
 
 ## 📚 Documentation
 
-### Start Here
+- **API Documentation**: Auto-generated from TypeScript interfaces
+- **Database Schema**: Complete ERD in `supabase/migrations/`
+- **ML Pipeline**: Feature engineering and model documentation
+- **Business Logic**: Comprehensive scoring algorithm documentation
 
-- 🏗️ **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD)** - System overview and architectural decisions
-- 👋 **[Developer Onboarding](docs/DEV_ONBOARDING.MD)** - New team member setup guide
+## 🌟 Team
 
-### Implementation Guides
-
-- 📖 **[Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)** - How to add new features and CRUD operations
-
-### For Different Audiences
-
-- **New to the project?** → Developer Onboarding → Technical Architecture
-- **Building a feature?** → Data Fetching Guide
-- **Understanding our architecture?** → Technical Architecture
-- **Business context?** → Technical Architecture (Executive Summary)
-
-## 🛠️ Development Workflow
-
-### Useful Scripts
-
-```bash
-npm run dev              # Start development server (with Turbopack)
-npm run build            # Build for production
-npm run lint             # Run ESLint
-npm run format           # Format code with Prettier
-npm run update-types     # Generate Supabase TypeScript types
-npm run supabase:login   # Authenticate with Supabase CLI (one-time)
-```
-
-### Adding a New Feature
-
-1. **Check patterns** in [Data Fetching Guide](docs/DATA_FETCHING_GUIDE.MD)
-2. **Create raw queries** in `lib/queries/[table].ts`
-3. **Add query keys** to `lib/queries/query-keys.ts`
-4. **Build React hook** in `hooks/use-[table].ts`
-5. **Use in components** with the standard patterns
-
-### Git Workflow
-
-```bash
-git checkout -b feature/what-youre-working-on
-# Make your changes
-git add .
-git commit -m "feat: describe what you did"
-git push origin feature/what-youre-working-on
-# Create PR for review
-```
-
-## 🏗️ Tech Stack
-
-**Frontend**: Next.js 15 + TypeScript + Tailwind CSS v4  
-**Database**: Supabase (PostgreSQL with RLS)  
-**UI Components**: shadcn/ui + Radix primitives  
-**Data Fetching**: React Query (TanStack Query)  
-**Deployment**: Vercel Pro
-
-**Key Principle**: Direct database access with intelligent caching for real-time inventory updates.
-
-## 🔐 Security
-
-- **Row Level Security (RLS)**: All data protection at database level
-- **Multi-schema design**: `inventory`, `user_mgmt`, `scoring` schemas
-- **Role-based access**: Store admin, manager, employee permissions
-- **Direct client access**: Secure via Supabase RLS policies
-
-See [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD) for security deep-dive.
-
-## 🤝 Team Onboarding
-
-### New Developer Checklist
-
-- [ ] Clone repo and run `npm install`
-- [ ] Get `.env.local` values from team lead
-- [ ] Run `npm run update-types` to generate database types
-- [ ] Start with `npm run dev` and explore the app
-- [ ] Read [Developer Onboarding](docs/DEV_ONBOARDING.MD)
-- [ ] Pick up your first small task
-
-### Getting Help
-
-- **Slack**: `#dev` channel for technical questions
-- **Stuck on setup?** Ask immediately, don't spend more than 15 minutes alone
-- **Architecture questions?** Check Technical Architecture doc first
-- **Code patterns?** Data Fetching Guide has examples
-
-## 📊 Project Status
-
-- **Stage**: MVP development
-- **Database**: 3 schemas with batch-level inventory tracking
-- **Frontend**: Dashboard with product and batch management
-- **Target**: Dutch grocery store validation
-
-## 🔗 Quick Links
-
-- **GitHub**: [lifo-ai/lifo-app](https://github.com/lifo-ai/lifo-app)
-- **Supabase Dashboard**: [Project jrgmetdsohowtxickqij](https://supabase.com/dashboard/project/jrgmetdsohowtxickqij)
-- **Slack**: Team communication
-- **Figma**: Design files _(ask for access)_
+**LIFO.AI** - Transforming food retail through intelligent inventory management.
 
 ---
 
-**Questions?** Check our docs first, then ask in Slack. We're here to help! 🚀
+**Built with ❤️ for a sustainable future** 🌱

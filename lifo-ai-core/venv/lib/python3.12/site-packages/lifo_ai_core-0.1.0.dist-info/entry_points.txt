@@ -1,0 +1,3 @@
+[console_scripts]
+lifo-etl = lifo_ai_core.etl.processor:main
+lifo-scorer = lifo_ai_core.scoring.engine:main
