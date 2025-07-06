@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const { data, count } = await operations.getStoreInventory(storeId, {
       page,
       limit,
-      category,
+      category: category ?? undefined,
       status,
     })
 
@@ -56,7 +56,8 @@ export async function GET(request: NextRequest) {
         (new Date(batch.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
 
-      const urgencyLevel =
+      type UrgencyLevel = 'critical' | 'high' | 'medium' | 'low'
+      const urgencyLevel: UrgencyLevel =
         daysToExpiry <= 0
           ? 'critical'
           : daysToExpiry <= 1
@@ -85,7 +86,9 @@ export async function GET(request: NextRequest) {
     inventory.sort((a, b) => {
       // First by urgency level
       const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3 }
-      const urgencyDiff = urgencyOrder[a.urgency_level] - urgencyOrder[b.urgency_level]
+      const urgencyDiff =
+        urgencyOrder[a.urgency_level as keyof typeof urgencyOrder] -
+        urgencyOrder[b.urgency_level as keyof typeof urgencyOrder]
       if (urgencyDiff !== 0) return urgencyDiff
 
       // Then by days to expiry
@@ -114,7 +117,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to fetch inventory',
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },
     )
@@ -123,7 +126,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/inventory - Update inventory item
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -146,7 +149,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const operations = new InventoryOperations()
+    const operations = new InventoryOperations(supabase)
     const hasAccess = await operations.validateStoreAccess(storeId, user.id, 'staff')
 
     if (!hasAccess) {
@@ -204,7 +207,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to update inventory',
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },
     )

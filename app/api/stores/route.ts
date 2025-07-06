@@ -24,7 +24,7 @@ export async function GET() {
     return NextResponse.json(
       {
         error: 'Failed to fetch stores',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
     )
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     console.error('Error creating store:', error)
 
     // Handle specific database errors
-    if (error.code === '23505') {
+    if (error instanceof Error && error.message.includes('23505')) {
       // Unique violation
       return NextResponse.json(
         {
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to create store',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
     )

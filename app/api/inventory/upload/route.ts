@@ -14,10 +14,25 @@ interface ProcessorResult {
     errors: string[]
     warnings?: string[]
   }
-  data?: unknown[]
+  data?: Record<string, unknown>[]
   processed_count?: number
   errors: string[]
   warnings?: string[]
+}
+
+interface ProcessedRow {
+  [key: string]: string | number
+  SKU: string
+  Product_Name: string
+  Quantity: string | number
+  Expiry_Date: string
+  Cost_Price: string | number
+  Selling_Price: string | number
+  Category: string
+  Unit_Type: string
+  Location: string
+  Batch_Number: string
+  Manufacture_Date: string
 }
 
 // Python CSV processor integration
@@ -77,7 +92,8 @@ class PythonCSVProcessor {
               const result = this.parseProcessorOutput(stdout)
               resolve(result)
             } catch (parseError) {
-              reject(new Error(`Failed to parse processor output: ${parseError.message}`))
+              const message = parseError instanceof Error ? parseError.message : String(parseError)
+              reject(new Error(`Failed to parse processor output: ${message}`))
             }
           } else {
             reject(new Error(`Python processor failed with code ${code}: ${stderr}`))
@@ -94,7 +110,8 @@ class PythonCSVProcessor {
           reject(new Error(`Failed to start Python processor: ${error.message}`))
         })
       } catch (fileError) {
-        reject(new Error(`Failed to create temporary file: ${fileError.message}`))
+        const message = fileError instanceof Error ? fileError.message : String(fileError)
+        reject(new Error(`Failed to create temporary file: ${message}`))
       }
     })
   }
@@ -167,7 +184,7 @@ class PythonCSVProcessor {
 
 // Fallback mock processor for development/testing
 class MockCSVProcessor {
-  validate_csv_structure(content: string) {
+  validate_csv_structure(content: string): ProcessorResult['validation'] {
     try {
       const lines = content.split('\n').filter(line => line.trim())
       if (lines.length < 2) {
@@ -205,22 +222,22 @@ class MockCSVProcessor {
     } catch (error) {
       return {
         valid: false,
-        errors: [`Failed to parse CSV: ${error.message}`],
+        errors: [`Failed to parse CSV: ${error instanceof Error ? error.message : String(error)}`],
         row_count: 0,
       }
     }
   }
 
-  clean_and_normalize_data(content: string) {
+  clean_and_normalize_data(content: string): [ProcessedRow[], string[]] {
     const lines = content.split('\n').filter(line => line.trim())
     const headers = lines[0].split(',').map(h => h.trim())
-    const data = []
-    const errors = []
+    const data: ProcessedRow[] = []
+    const errors: string[] = []
 
     for (let i = 1; i < lines.length; i++) {
       try {
         const values = lines[i].split(',').map(v => v.trim())
-        const row = {}
+        const row: ProcessedRow = {} as ProcessedRow
 
         headers.forEach((header, index) => {
           row[header] = values[index] || ''
@@ -240,9 +257,9 @@ class MockCSVProcessor {
         }
 
         // Validate numbers
-        const quantity = parseFloat(row['Quantity'])
-        const costPrice = parseFloat(row['Cost_Price'])
-        const sellingPrice = parseFloat(row['Selling_Price'])
+        const quantity = parseFloat(String(row['Quantity']))
+        const costPrice = parseFloat(String(row['Cost_Price']))
+        const sellingPrice = parseFloat(String(row['Selling_Price']))
 
         if (isNaN(quantity) || quantity <= 0) {
           errors.push(`Row ${i}: Invalid quantity`)
@@ -260,15 +277,21 @@ class MockCSVProcessor {
         }
 
         // Validate date
-        const expiryDate = new Date(row['Expiry_Date'])
+        const expiryDate = new Date(String(row['Expiry_Date']))
         if (isNaN(expiryDate.getTime())) {
           errors.push(`Row ${i}: Invalid expiry date`)
           continue
         }
 
+        // Convert numeric strings to numbers
+        row['Quantity'] = quantity
+        row['Cost_Price'] = costPrice
+        row['Selling_Price'] = sellingPrice
+
         data.push(row)
       } catch (error) {
-        errors.push(`Row ${i}: ${error.message}`)
+        const message = error instanceof Error ? error.message : String(error)
+        errors.push(`Row ${i}: ${message}`)
       }
     }
 
@@ -324,7 +347,7 @@ export async function POST(request: NextRequest) {
 
     // Validate store access
     const operations = new InventoryOperations(supabase)
-    const hasAccess = await operations.validateStoreAccess(storeId, user.id, 'staff')
+    const hasAccess = await operations.validateStoreAccess(storeId, user.id)
 
     if (!hasAccess) {
       return NextResponse.json(
@@ -337,7 +360,7 @@ export async function POST(request: NextRequest) {
 
     const csvContent = await file.text()
     let validation: ProcessorResult['validation']
-    let cleanedData: unknown[]
+    let cleanedData: ProcessedRow[]
     let processingErrors: string[]
 
     if (usePython) {
@@ -357,7 +380,7 @@ export async function POST(request: NextRequest) {
         }
 
         validation = result.validation
-        cleanedData = result.data || []
+        cleanedData = (result.data || []) as ProcessedRow[]
         processingErrors = result.errors || []
       } catch (pythonError) {
         console.warn('Python processor failed, falling back to JavaScript:', pythonError)
@@ -375,7 +398,9 @@ export async function POST(request: NextRequest) {
           )
         }
 
-        ;[cleanedData, processingErrors] = mockProcessor.clean_and_normalize_data(csvContent)
+        const [data, errors] = mockProcessor.clean_and_normalize_data(csvContent)
+        cleanedData = data
+        processingErrors = errors
       }
     } else {
       // Use JavaScript/mock processor
@@ -392,7 +417,9 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      ;[cleanedData, processingErrors] = mockProcessor.clean_and_normalize_data(csvContent)
+      const [data, errors] = mockProcessor.clean_and_normalize_data(csvContent)
+      cleanedData = data
+      processingErrors = errors
     }
 
     if (cleanedData.length === 0) {
@@ -420,10 +447,11 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('CSV upload error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
       {
         error: 'Upload failed',
-        details: error.message,
+        details: message,
       },
       { status: 500 },
     )

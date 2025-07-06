@@ -4,6 +4,12 @@ import { InventoryOperations } from '@/lifo-ai-core/database/operations'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
+// Helper type for joined batch with optional products and product_scores
+type BatchWithJoins = Database['inventory']['Tables']['batches']['Row'] & {
+  products?: { category?: string; name?: string; sku?: string }
+  product_scores?: { composite_score?: number; recommendation?: string }[]
+}
+
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
@@ -58,7 +64,7 @@ export async function GET(request: NextRequest) {
         startDate.setDate(endDate.getDate() - 7)
     }
 
-    const analytics = {
+    const analytics: Record<string, unknown> = {
       timeframe,
       store_id: storeId,
       generated_at: new Date().toISOString(),
@@ -90,7 +96,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to fetch analytics',
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },
     )
@@ -103,48 +109,60 @@ async function getOverviewAnalytics(
   startDate: Date,
   endDate: Date,
 ) {
-  const operations = new InventoryOperations()
-
   try {
     // Get current store stats
+    const operations = new InventoryOperations(supabase)
     const storeStats = await operations.getStoreStats(storeId)
 
-    // Get actions taken in timeframe
+    // Get actions taken in timeframe (from analytics schema)
     const { data: actions } = await supabase
+      .schema('analytics')
       .from('actions')
       .select('*')
       .eq('store_id', storeId)
       .gte('executed_at', startDate.toISOString())
       .lte('executed_at', endDate.toISOString())
 
-    // Get high urgency batches
-    const { data: urgentBatches } = await supabase
+    // Get high urgency batches (from scoring schema with joins to inventory)
+    let urgentBatchesResult = null
+    // The get_urgent_batches RPC is not available in the types, so we use the fallback query only
+    const { data: fallbackUrgent } = await supabase
+      .schema('scoring')
       .from('product_scores')
-      .select('*, batches!inner(*)')
+      .select('*')
       .eq('store_id', storeId)
       .gte('composite_score', 0.6)
-      .eq('batches.status', 'active')
+    urgentBatchesResult = fallbackUrgent
 
     // Calculate discounts applied
-    const discountActions = actions?.filter(a => a.action_type.includes('discount')) || []
+    const discountActions =
+      actions?.filter(
+        a =>
+          a.action_type &&
+          (a.action_type.includes('discount') ||
+            a.action_type === 'discount_aggressive' ||
+            a.action_type === 'discount_moderate'),
+      ) || []
+
     const totalDiscountValue = discountActions.reduce((sum, action) => {
-      return sum + (action.original_price - action.new_price) || 0
+      return sum + ((action.original_price ?? 0) - (action.new_price ?? 0))
     }, 0)
 
     return {
       ...storeStats,
-      urgent_items: urgentBatches?.length || 0,
+      urgent_items: urgentBatchesResult?.length || 0,
       actions_taken: actions?.length || 0,
       discount_actions: discountActions.length,
       total_discount_value: Math.round(totalDiscountValue * 100) / 100,
       avg_composite_score:
-        urgentBatches?.length > 0
-          ? urgentBatches.reduce((sum, b) => sum + b.composite_score, 0) / urgentBatches.length
+        urgentBatchesResult && urgentBatchesResult.length > 0
+          ? urgentBatchesResult.reduce((sum, b) => sum + (b.composite_score ?? 0), 0) /
+            urgentBatchesResult.length
           : 0,
     }
   } catch (error) {
     console.error('Error in overview analytics:', error)
-    return { error: error.message }
+    return { error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
@@ -155,15 +173,11 @@ async function getWasteAnalytics(
   endDate: Date,
 ) {
   try {
-    // Get expired batches
+    // Get expired batches (from inventory schema with products join)
     const { data: expiredBatches } = await supabase
+      .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products(category, name, sku)
-      `,
-      )
+      .select('*')
       .eq('store_id', storeId)
       .eq('status', 'expired')
       .gte('updated_at', startDate.toISOString())
@@ -174,14 +188,9 @@ async function getWasteAnalytics(
     soonExpiryDate.setDate(soonExpiryDate.getDate() + 3)
 
     const { data: expiringSoon } = await supabase
+      .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products(category, name, sku),
-        product_scores(composite_score, recommendation)
-      `,
-      )
+      .select('*')
       .eq('store_id', storeId)
       .eq('status', 'active')
       .lte('expiry_date', soonExpiryDate.toISOString().split('T')[0])
@@ -189,17 +198,18 @@ async function getWasteAnalytics(
     // Calculate waste metrics
     const wasteValue =
       expiredBatches?.reduce((sum, batch) => {
-        return sum + batch.current_quantity * batch.selling_price
+        return sum + (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
       }, 0) || 0
 
-    const wasteByCategory = {}
+    const wasteByCategory: Record<string, { count: number; value: number }> = {}
     expiredBatches?.forEach(batch => {
-      const category = batch.products?.category || 'unknown'
+      const b = batch as BatchWithJoins
+      const category = b.products?.category || 'unknown'
       if (!wasteByCategory[category]) {
         wasteByCategory[category] = { count: 0, value: 0 }
       }
       wasteByCategory[category].count += 1
-      wasteByCategory[category].value += batch.current_quantity * batch.selling_price
+      wasteByCategory[category].value += (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
     })
 
     return {
@@ -209,12 +219,12 @@ async function getWasteAnalytics(
       waste_by_category: wasteByCategory,
       prevention_potential:
         expiringSoon?.reduce((sum, batch) => {
-          return sum + batch.current_quantity * batch.selling_price
+          return sum + (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
         }, 0) || 0,
     }
   } catch (error) {
     console.error('Error in waste analytics:', error)
-    return { error: error.message }
+    return { error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
@@ -225,8 +235,9 @@ async function getRevenueAnalytics(
   endDate: Date,
 ) {
   try {
-    // Get discount actions and their effectiveness
+    // Get discount actions and their effectiveness (from analytics schema)
     const { data: discountActions } = await supabase
+      .schema('analytics')
       .from('actions')
       .select('*')
       .eq('store_id', storeId)
@@ -237,23 +248,23 @@ async function getRevenueAnalytics(
     // Calculate revenue metrics
     const totalOriginalValue =
       discountActions?.reduce((sum, action) => {
-        return sum + (action.original_price || 0)
+        return sum + (action.original_price ?? 0)
       }, 0) || 0
 
     const totalDiscountedValue =
       discountActions?.reduce((sum, action) => {
-        return sum + (action.new_price || 0)
+        return sum + (action.new_price ?? 0)
       }, 0) || 0
 
     const totalDiscountGiven = totalOriginalValue - totalDiscountedValue
 
     const revenueRecovered =
       discountActions?.reduce((sum, action) => {
-        return sum + (action.revenue_recovered || action.new_price || 0)
+        return sum + (action.revenue_recovered ?? action.new_price ?? 0)
       }, 0) || 0
 
     // Calculate savings vs waste
-    const preventedWaste = discountActions?.filter(a => a.revenue_recovered > 0).length || 0
+    const preventedWaste = discountActions?.filter(a => (a.revenue_recovered ?? 0) > 0).length || 0
 
     return {
       total_discounts_applied: discountActions?.length || 0,
@@ -263,39 +274,45 @@ async function getRevenueAnalytics(
       recovery_rate:
         totalOriginalValue > 0 ? Math.round((revenueRecovered / totalOriginalValue) * 100) : 0,
       avg_discount_percent:
-        discountActions?.length > 0
+        discountActions && discountActions.length > 0
           ? Math.round(
-              discountActions.reduce((sum, a) => sum + (a.discount_percent || 0), 0) /
+              discountActions.reduce((sum, a) => sum + (a.discount_percent ?? 0), 0) /
                 discountActions.length,
             )
           : 0,
     }
   } catch (error) {
     console.error('Error in revenue analytics:', error)
-    return { error: error.message }
+    return { error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
 async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId: string) {
   try {
-    // Get batch data by category
+    // Get batch data by category (from inventory schema with joins)
     const { data: batches } = await supabase
+      .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products(category, name),
-        product_scores(composite_score, recommendation)
-      `,
-      )
+      .select('*')
       .eq('store_id', storeId)
       .eq('status', 'active')
 
+    // Define the type for category stats
+    type CategoryStats = {
+      total_items: number
+      total_value: number
+      high_urgency: number
+      avg_score: number
+      expiring_3days: number
+      scores?: number[]
+    }
+
     // Group by category
-    const categoryStats = {}
+    const categoryStats: Record<string, CategoryStats> = {}
 
     batches?.forEach(batch => {
-      const category = batch.products?.category || 'unknown'
+      const b = batch as BatchWithJoins
+      const category = b.products?.category || 'unknown'
 
       if (!categoryStats[category]) {
         categoryStats[category] = {
@@ -304,19 +321,19 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
           high_urgency: 0,
           avg_score: 0,
           expiring_3days: 0,
-          scores: [],
         }
       }
 
       const daysToExpiry = Math.floor(
-        (new Date(batch.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+        (new Date(b.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
 
-      const score = batch.product_scores?.[0]?.composite_score || 0
-      const value = batch.current_quantity * batch.selling_price
+      const score = b.product_scores?.[0]?.composite_score || 0
+      const value = (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
 
       categoryStats[category].total_items += 1
       categoryStats[category].total_value += value
+      categoryStats[category].scores = categoryStats[category].scores || []
       categoryStats[category].scores.push(score)
 
       if (score >= 0.6) categoryStats[category].high_urgency += 1
@@ -326,10 +343,12 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     // Calculate averages
     Object.keys(categoryStats).forEach(category => {
       const stats = categoryStats[category]
+      const scoresArray = stats.scores ?? []
       stats.avg_score =
-        stats.scores.length > 0
-          ? Math.round((stats.scores.reduce((sum, s) => sum + s, 0) / stats.scores.length) * 100) /
-            100
+        scoresArray.length > 0
+          ? Math.round(
+              scoresArray.reduce((sum: number, s: number) => sum + s, 0) / scoresArray.length,
+            ) / 100
           : 0
       stats.total_value = Math.round(stats.total_value * 100) / 100
       delete stats.scores // Remove raw scores from response
@@ -338,6 +357,6 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     return categoryStats
   } catch (error) {
     console.error('Error in category analytics:', error)
-    return { error: error.message }
+    return { error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }

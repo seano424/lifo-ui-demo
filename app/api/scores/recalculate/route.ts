@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lifo-ai-core/database/operations'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     const operations = new InventoryOperations(supabase)
-    const hasAccess = await operations.validateStoreAccess(storeId, user.id, 'staff')
+    const hasAccess = await operations.validateStoreAccess(storeId, user.id)
 
     if (!hasAccess) {
       return NextResponse.json(
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // For MVP, we'll implement a TypeScript version of the scoring algorithm
     // In production, this would call the Python scoring service
-    const scoringResult = await calculateScoresTypeScript(storeId, batchIds)
+    const scoringResult = await calculateScoresTypeScript(supabase, storeId, batchIds)
 
     return NextResponse.json({
       success: true,
@@ -48,24 +49,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to recalculate scores',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
     )
   }
 }
 
-async function calculateScoresTypeScript(storeId: string, batchIds?: string[]) {
-  const supabase = createClient()
-
+async function calculateScoresTypeScript(
+  supabase: SupabaseClient,
+  storeId: string,
+  batchIds?: string[],
+) {
   try {
-    // Get active batches with product info
     let query = supabase
+      .schema('inventory')
       .from('batches')
       .select(
         `
-        *,
-        products(*)
+        batch_id,
+        expiry_date,
+        current_quantity,
+        selling_price,
+        cost_price,
+        store_id,
+        product_id
       `,
       )
       .eq('store_id', storeId)
@@ -79,11 +87,33 @@ async function calculateScoresTypeScript(storeId: string, batchIds?: string[]) {
 
     if (error) throw error
 
+    // Get products separately to avoid complex joins
+    const productIds = [...new Set(batches?.map(b => b.product_id) || [])]
+    const { data: products, error: productsError } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select('product_id, category, sku, typical_shelf_life_days')
+      .in('product_id', productIds)
+
+    if (productsError) throw productsError
+
+    // Create a map for quick product lookup
+    const productMap = new Map()
+    products?.forEach(product => {
+      productMap.set(product.product_id, product)
+    })
+
     const processed = []
     const errors = []
 
     for (const batch of batches || []) {
       try {
+        const product = productMap.get(batch.product_id)
+        if (!product) {
+          errors.push(`Batch ${batch.batch_id}: Product not found`)
+          continue
+        }
+
         // Calculate days to expiry
         const expiryDate = new Date(batch.expiry_date)
         const daysToExpiry = Math.floor(
@@ -92,24 +122,22 @@ async function calculateScoresTypeScript(storeId: string, batchIds?: string[]) {
 
         // Get category weights
         const { data: categoryWeights } = await supabase
+          .schema('scoring')
           .from('category_weights')
-          .select('*')
-          .eq('category', batch.products.category)
+          .select('spoilage_risk_weight, turnover_speed_weight, value_impact_weight')
+          .eq('category', product.category)
           .single()
 
         const weights = categoryWeights
           ? {
-              expiry: parseFloat(categoryWeights.spoilage_risk_weight),
-              velocity: parseFloat(categoryWeights.turnover_speed_weight),
-              margin: parseFloat(categoryWeights.value_impact_weight),
+              expiry: Number(categoryWeights.spoilage_risk_weight),
+              velocity: Number(categoryWeights.turnover_speed_weight),
+              margin: Number(categoryWeights.value_impact_weight),
             }
           : { expiry: 0.5, velocity: 0.3, margin: 0.2 }
 
         // Calculate individual scores
-        const expiryScore = calculateExpiryScore(
-          daysToExpiry,
-          batch.products.typical_shelf_life_days,
-        )
+        const expiryScore = calculateExpiryScore(daysToExpiry, product.typical_shelf_life_days)
         const velocityScore = calculateVelocityScore(batch.current_quantity, 2.0, daysToExpiry) // Default velocity
         const marginScore = calculateMarginScore(batch.selling_price, batch.cost_price)
 
@@ -122,36 +150,40 @@ async function calculateScoresTypeScript(storeId: string, batchIds?: string[]) {
         const recommendation = generateRecommendation(compositeScore, daysToExpiry)
 
         // Store scores (upsert)
-        const { error: upsertError } = await supabase.from('product_scores').upsert(
-          {
-            batch_id: batch.batch_id,
-            store_id: storeId,
-            expiry_score: Math.round(expiryScore * 100) / 100,
-            velocity_score: Math.round(velocityScore * 100) / 100,
-            margin_score: Math.round(marginScore * 100) / 100,
-            composite_score: Math.round(compositeScore * 100) / 100,
-            recommendation: recommendation.action,
-            confidence_level: 0.8,
-            calculated_at: new Date().toISOString(),
-          },
-          {
-            onConflict: 'batch_id',
-          },
-        )
+        const { error: upsertError } = await supabase
+          .schema('scoring')
+          .from('product_scores')
+          .upsert(
+            {
+              batch_id: batch.batch_id,
+              store_id: storeId,
+              expiry_score: Math.round(expiryScore * 100) / 100,
+              velocity_score: Math.round(velocityScore * 100) / 100,
+              margin_score: Math.round(marginScore * 100) / 100,
+              composite_score: Math.round(compositeScore * 100) / 100,
+              recommendation: recommendation.action,
+              confidence_level: 0.8,
+              calculated_at: new Date().toISOString(),
+            },
+            {
+              onConflict: 'batch_id',
+            },
+          )
 
         if (upsertError) {
           errors.push(`Batch ${batch.batch_id}: ${upsertError.message}`)
         } else {
           processed.push({
             batch_id: batch.batch_id,
-            sku: batch.products.sku,
+            sku: product.sku,
             composite_score: Math.round(compositeScore * 100) / 100,
             recommendation: recommendation.action,
             days_to_expiry: daysToExpiry,
           })
         }
       } catch (error) {
-        errors.push(`Batch ${batch.batch_id}: ${error.message}`)
+        const message = error instanceof Error ? error.message : String(error)
+        errors.push(`Batch ${batch.batch_id}: ${message}`)
       }
     }
 
@@ -168,9 +200,17 @@ async function calculateScoresTypeScript(storeId: string, batchIds?: string[]) {
       },
     }
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
     return {
       processed: 0,
-      errors: [error.message],
+      errors: [message],
+      batch_scores: [],
+      summary: {
+        total_batches: 0,
+        high_urgency: 0,
+        medium_urgency: 0,
+        low_urgency: 0,
+      },
     }
   }
 }

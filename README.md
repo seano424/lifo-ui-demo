@@ -110,6 +110,7 @@ npm run dev
 ```
 
 **Important**: The Python environment must be activated for CSV processing to work:
+
 ```bash
 cd lifo-ai-core && source venv/bin/activate && cd ..
 ```
@@ -127,15 +128,18 @@ npm run dev
 ### Current State & Next Steps
 
 ✅ **Completed**:
+
 - Python CSV processor fully integrated with Next.js
 - All API endpoints working and properly configured
 - Database operations and TypeScript types generated
 
 ⚠️ **Known Issues**:
+
 - Store creation UI component needs frontend developer review
 - Users need to create stores via API for now
 
 🔧 **Next Steps**:
+
 1. Frontend developer to fix store creation dialog rendering issues
 2. Implement proper store selector UI component
 
@@ -175,6 +179,7 @@ npm run timeseries:collect
 ## 📊 API Endpoints
 
 ### Store Management
+
 - `GET /api/stores` - Get user's stores
 - `POST /api/stores` - Create new store
 
@@ -191,7 +196,9 @@ npm run timeseries:collect
 - `GET /api/analytics` - Comprehensive analytics and KPIs
 
 ### CSV Format
+
 Expected CSV columns:
+
 ```
 SKU,Product_Name,Category,Quantity,Cost_Price,Selling_Price,Expiry_Date,Batch_Number,Manufacture_Date,Location
 ```

@@ -63,6 +63,8 @@ export class InventoryOperations {
           ...storeData,
           owner_id: ownerId,
           is_active: true,
+          store_code: storeData.store_code ?? 'DEFAULT_CODE',
+          store_name: storeData.store_name ?? 'Untitled Store',
         })
         .select()
         .single()
@@ -113,6 +115,7 @@ export class InventoryOperations {
         }
 
         const { data: product, error: productError } = await this.supabase
+          .schema('inventory')
           .from('products')
           .upsert(productData, { onConflict: 'sku' })
           .select()
@@ -140,7 +143,10 @@ export class InventoryOperations {
           created_by: userId,
         }
 
-        const { error: batchError } = await this.supabase.from('batches').insert(batchData)
+        const { error: batchError } = await this.supabase
+          .schema('inventory')
+          .from('batches')
+          .insert(batchData)
 
         if (batchError) {
           errors.push(
@@ -151,7 +157,9 @@ export class InventoryOperations {
 
         processed++
       } catch (error) {
-        errors.push(`Row ${csvData.indexOf(row) + 1}: ${error.message}`)
+        errors.push(
+          `Row ${csvData.indexOf(row) + 1}: ${error instanceof Error ? error.message : String(error)}`,
+        )
       }
     }
 
@@ -160,6 +168,7 @@ export class InventoryOperations {
 
   async getStoreInventoryAlerts(storeId: string, threshold: number = 0.6): Promise<any[]> {
     const { data, error } = await this.supabase
+      .schema('inventory')
       .from('batches')
       .select(
         `
@@ -193,6 +202,7 @@ export class InventoryOperations {
     const { page = 1, limit = 50, category, status = 'active' } = options
 
     let query = this.supabase
+      .schema('inventory')
       .from('batches')
       .select(
         `
@@ -223,6 +233,7 @@ export class InventoryOperations {
 
   async updateBatchQuantity(batchId: string, newQuantity: number, userId: string): Promise<void> {
     const { error } = await this.supabase
+      .schema('inventory')
       .from('batches')
       .update({
         current_quantity: newQuantity,
@@ -239,6 +250,7 @@ export class InventoryOperations {
   async applyDiscount(batchId: string, discountPercent: number, userId: string): Promise<void> {
     // Get current batch data
     const { data: batch, error: fetchError } = await this.supabase
+      .schema('inventory')
       .from('batches')
       .select('selling_price, store_id')
       .eq('batch_id', batchId)
@@ -254,6 +266,7 @@ export class InventoryOperations {
 
     // Update batch price
     const { error: updateError } = await this.supabase
+      .schema('inventory')
       .from('batches')
       .update({
         selling_price: newPrice,
@@ -267,15 +280,18 @@ export class InventoryOperations {
     }
 
     // Log action
-    const { error: actionError } = await this.supabase.from('actions').insert({
-      batch_id: batchId,
-      store_id: batch.store_id,
-      action_type: discountPercent >= 30 ? 'discount_aggressive' : 'discount_moderate',
-      original_price: originalPrice,
-      new_price: newPrice,
-      discount_percent: discountPercent,
-      executed_by: userId,
-    })
+    const { error: actionError } = await this.supabase
+      .schema('analytics')
+      .from('actions')
+      .insert({
+        batch_id: batchId,
+        store_id: batch.store_id,
+        action_type: discountPercent >= 30 ? 'discount_aggressive' : 'discount_moderate',
+        original_price: originalPrice,
+        new_price: newPrice,
+        discount_percent: discountPercent,
+        executed_by: userId,
+      })
 
     if (actionError) {
       console.error('Error logging discount action:', actionError)
@@ -314,32 +330,29 @@ export class InventoryOperations {
       { count: totalBatches },
       { count: activeAlerts },
       { data: valueData },
-      { count: expiringItems },
     ] = await Promise.all([
       this.supabase
+        .schema('inventory')
         .from('products')
         .select('*', { count: 'exact', head: true })
         .eq('store_id', storeId),
 
       this.supabase
-        .from('batches')
-        .select('*', { count: 'exact', head: true })
-        .eq('store_id', storeId)
-        .eq('status', 'active'),
-
-      this.supabase
+        .schema('scoring')
         .from('product_scores')
         .select('*', { count: 'exact', head: true })
         .eq('store_id', storeId)
         .gte('composite_score', 0.6),
 
       this.supabase
+        .schema('inventory')
         .from('batches')
         .select('current_quantity, selling_price')
         .eq('store_id', storeId)
         .eq('status', 'active'),
 
       this.supabase
+        .schema('inventory')
         .from('batches')
         .select('*', { count: 'exact', head: true })
         .eq('store_id', storeId)
@@ -358,7 +371,7 @@ export class InventoryOperations {
       totalBatches: totalBatches || 0,
       activeAlerts: activeAlerts || 0,
       totalValue,
-      expiringItems: expiringItems || 0,
+      expiringItems: 0,
     }
   }
 }
