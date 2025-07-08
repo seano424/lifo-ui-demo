@@ -52,7 +52,7 @@ export function useBusinessCheck() {
           message: result.message,
           storeData: result.storeData
             ? {
-                name: result.storeData.name,
+                store_name: result.storeData.store_name,
                 address: result.storeData.address,
                 city: result.storeData.city,
               }

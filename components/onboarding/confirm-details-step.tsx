@@ -54,13 +54,22 @@ export function ConfirmDetailsStep() {
   }
 
   const handleConfirm = () => {
-    if (selectedStoreForm) {
-      // Generate a temporary store code for the insert
+    if (
+      selectedStoreForm &&
+      selectedStoreForm.store_type // Ensure store_type is not null
+    ) {
       const tempStoreCode = `${selectedStoreForm.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
-
-      // Convert form data to store insert format
-      const storeInsert = convertFormDataToStoreInsert(selectedStoreForm, tempStoreCode)
-
+      // Patch: cast store_type to correct type for insert
+      const storeInsert = convertFormDataToStoreInsert(
+        {
+          ...selectedStoreForm,
+          store_type: selectedStoreForm.store_type as Exclude<
+            typeof selectedStoreForm.store_type,
+            null
+          >,
+        },
+        tempStoreCode,
+      )
       setConfirmedStoreInsert(storeInsert)
       setCurrentStep(4)
     }
