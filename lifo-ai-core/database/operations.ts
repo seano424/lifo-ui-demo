@@ -74,8 +74,27 @@ export class InventoryOperations {
         throw error
       }
 
-      // TODO: Add owner to store_users once RLS policies are fixed
-      // For now, we're using owner_id field in stores table
+      // Add owner to store_users table
+      const { error: storeUserError } = await this.supabase
+        .schema('business')
+        .from('store_users')
+        .insert({
+          store_id: data.store_id,
+          user_id: ownerId,
+          role_in_store: 'owner',
+          permissions: {
+            can_upload_inventory: true,
+            can_apply_discounts: true,
+            can_view_analytics: true,
+          },
+          assigned_by: ownerId,
+        })
+
+      if (storeUserError) {
+        console.error('Error adding owner to store_users:', storeUserError)
+        // Continue despite this error - owner_id field in stores table provides fallback
+      }
+
       console.log('Store created successfully:', data.store_id)
 
       return data
