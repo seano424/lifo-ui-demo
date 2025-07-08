@@ -88,6 +88,7 @@ export function ProductSortList({
       <Separator />
 
       {/* Products List - Use presentation component with controlled data */}
+
       <ProductsListPresentation
         data={data}
         count={count}
