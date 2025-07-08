@@ -7,7 +7,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij --schema user_mgmt,scoring,inventory,business,public > types/supabase.ts",
+    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij --schema user_mgmt,timeseries,scoring,inventory,business,analytics,public > types/supabase.ts",
     "supabase": "supabase",
     "supabase:login": "supabase login",
     "supabase:start": "supabase start",

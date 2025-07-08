@@ -1,6 +1,105 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
+  analytics: {
+    Tables: {
+      actions: {
+        Row: {
+          action_id: string
+          action_type: string | null
+          batch_id: string | null
+          discount_percent: number | null
+          effectiveness_score: number | null
+          executed_at: string | null
+          executed_by: string | null
+          new_price: number | null
+          original_price: number | null
+          quantity_sold_24h: number | null
+          quantity_sold_48h: number | null
+          revenue_recovered: number | null
+          store_id: string | null
+        }
+        Insert: {
+          action_id?: string
+          action_type?: string | null
+          batch_id?: string | null
+          discount_percent?: number | null
+          effectiveness_score?: number | null
+          executed_at?: string | null
+          executed_by?: string | null
+          new_price?: number | null
+          original_price?: number | null
+          quantity_sold_24h?: number | null
+          quantity_sold_48h?: number | null
+          revenue_recovered?: number | null
+          store_id?: string | null
+        }
+        Update: {
+          action_id?: string
+          action_type?: string | null
+          batch_id?: string | null
+          discount_percent?: number | null
+          effectiveness_score?: number | null
+          executed_at?: string | null
+          executed_by?: string | null
+          new_price?: number | null
+          original_price?: number | null
+          quantity_sold_24h?: number | null
+          quantity_sold_48h?: number | null
+          revenue_recovered?: number | null
+          store_id?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      daily_inventory_summary: {
+        Row: {
+          avg_days_to_expiry: number | null
+          avg_quantity: number | null
+          max_quantity: number | null
+          min_quantity: number | null
+          sku: string | null
+          snapshot_count: number | null
+          snapshot_date: string | null
+          store_id: string | null
+        }
+        Relationships: []
+      }
+      daily_sales_summary: {
+        Row: {
+          avg_sale_price: number | null
+          sale_date: string | null
+          sku: string | null
+          store_id: string | null
+          total_quantity_sold: number | null
+          total_revenue: number | null
+          transaction_count: number | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   business: {
     Tables: {
       store_settings: {
@@ -42,11 +141,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_settings_store_id_fkey'
-            columns: ['store_id']
+            foreignKeyName: "store_settings_store_id_fkey"
+            columns: ["store_id"]
             isOneToOne: true
-            referencedRelation: 'stores'
-            referencedColumns: ['store_id']
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -80,11 +179,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_users_store_id_fkey'
-            columns: ['store_id']
+            foreignKeyName: "store_users_store_id_fkey"
+            columns: ["store_id"]
             isOneToOne: false
-            referencedRelation: 'stores'
-            referencedColumns: ['store_id']
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -104,7 +203,7 @@ export type Database = {
           store_code: string
           store_id: string
           store_name: string
-          store_type: Database['business']['Enums']['store_type_enum'] | null
+          store_type: Database["business"]["Enums"]["store_type_enum"] | null
           timezone: string | null
           updated_at: string | null
           waste_reduction_target_percent: number | null
@@ -124,7 +223,7 @@ export type Database = {
           store_code: string
           store_id?: string
           store_name: string
-          store_type?: Database['business']['Enums']['store_type_enum'] | null
+          store_type?: Database["business"]["Enums"]["store_type_enum"] | null
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
@@ -144,7 +243,7 @@ export type Database = {
           store_code?: string
           store_id?: string
           store_name?: string
-          store_type?: Database['business']['Enums']['store_type_enum'] | null
+          store_type?: Database["business"]["Enums"]["store_type_enum"] | null
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
@@ -155,7 +254,9 @@ export type Database = {
     Views: {
       store_type_reference: {
         Row: {
-          store_type_value: Database['business']['Enums']['store_type_enum'] | null
+          store_type_value:
+            | Database["business"]["Enums"]["store_type_enum"]
+            | null
         }
         Relationships: []
       }
@@ -163,7 +264,7 @@ export type Database = {
     Functions: {
       get_store_types: {
         Args: Record<PropertyKey, never>
-        Returns: Database['business']['Enums']['store_type_enum'][]
+        Returns: Database["business"]["Enums"]["store_type_enum"][]
       }
       user_has_store_access: {
         Args: { store_uuid: string }
@@ -172,12 +273,12 @@ export type Database = {
     }
     Enums: {
       store_type_enum:
-        | 'supermarket'
-        | 'convenience'
-        | 'restaurant'
-        | 'bakery'
-        | 'butcher'
-        | 'organic'
+        | "supermarket"
+        | "convenience"
+        | "restaurant"
+        | "bakery"
+        | "butcher"
+        | "organic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -251,25 +352,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "low_stock_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -410,25 +511,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "low_stock_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -660,6 +761,148 @@ export type Database = {
       [_ in never]: never
     }
   }
+  timeseries: {
+    Tables: {
+      external_factors: {
+        Row: {
+          day_of_week: number | null
+          factor_id: string
+          hour_of_day: number | null
+          humidity: number | null
+          is_holiday: boolean | null
+          is_rainy: boolean | null
+          local_events: string[] | null
+          recorded_at: string | null
+          store_id: string | null
+          temperature: number | null
+          week_of_year: number | null
+        }
+        Insert: {
+          day_of_week?: number | null
+          factor_id?: string
+          hour_of_day?: number | null
+          humidity?: number | null
+          is_holiday?: boolean | null
+          is_rainy?: boolean | null
+          local_events?: string[] | null
+          recorded_at?: string | null
+          store_id?: string | null
+          temperature?: number | null
+          week_of_year?: number | null
+        }
+        Update: {
+          day_of_week?: number | null
+          factor_id?: string
+          hour_of_day?: number | null
+          humidity?: number | null
+          is_holiday?: boolean | null
+          is_rainy?: boolean | null
+          local_events?: string[] | null
+          recorded_at?: string | null
+          store_id?: string | null
+          temperature?: number | null
+          week_of_year?: number | null
+        }
+        Relationships: []
+      }
+      inventory_snapshots: {
+        Row: {
+          batch_id: string | null
+          day_of_week: number | null
+          days_to_expiry: number | null
+          hour_of_day: number | null
+          is_holiday: boolean | null
+          is_weekend: boolean | null
+          price: number | null
+          quantity: number | null
+          sku: string | null
+          snapshot_id: string
+          snapshot_timestamp: string | null
+          store_id: string | null
+          temperature: number | null
+        }
+        Insert: {
+          batch_id?: string | null
+          day_of_week?: number | null
+          days_to_expiry?: number | null
+          hour_of_day?: number | null
+          is_holiday?: boolean | null
+          is_weekend?: boolean | null
+          price?: number | null
+          quantity?: number | null
+          sku?: string | null
+          snapshot_id?: string
+          snapshot_timestamp?: string | null
+          store_id?: string | null
+          temperature?: number | null
+        }
+        Update: {
+          batch_id?: string | null
+          day_of_week?: number | null
+          days_to_expiry?: number | null
+          hour_of_day?: number | null
+          is_holiday?: boolean | null
+          is_weekend?: boolean | null
+          price?: number | null
+          quantity?: number | null
+          sku?: string | null
+          snapshot_id?: string
+          snapshot_timestamp?: string | null
+          store_id?: string | null
+          temperature?: number | null
+        }
+        Relationships: []
+      }
+      sales_events: {
+        Row: {
+          batch_id: string | null
+          channel: string | null
+          customer_type: string | null
+          event_id: string
+          quantity_sold: number | null
+          sale_price: number | null
+          sale_timestamp: string | null
+          sku: string | null
+          store_id: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          channel?: string | null
+          customer_type?: string | null
+          event_id?: string
+          quantity_sold?: number | null
+          sale_price?: number | null
+          sale_timestamp?: string | null
+          sku?: string | null
+          store_id?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          channel?: string | null
+          customer_type?: string | null
+          event_id?: string
+          quantity_sold?: number | null
+          sale_price?: number | null
+          sale_timestamp?: string | null
+          sku?: string | null
+          store_id?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   user_mgmt: {
     Tables: {
       roles: {
@@ -704,25 +947,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_roles_assigned_by_fkey'
-            columns: ['assigned_by']
+            foreignKeyName: "user_roles_assigned_by_fkey"
+            columns: ["assigned_by"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['user_id']
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: 'user_roles_role_id_fkey'
-            columns: ['role_id']
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: 'roles'
-            referencedColumns: ['role_id']
+            referencedRelation: "roles"
+            referencedColumns: ["role_id"]
           },
           {
-            foreignKeyName: 'user_roles_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['user_id']
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -789,27 +1032,33 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, 'public'>]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    | { schema: keyof Database },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      Database[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -818,21 +1067,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
-    | { schema: keyof Database },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -841,21 +1092,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
-    | { schema: keyof Database },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -863,37 +1116,53 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums'] | { schema: keyof Database },
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
-    | { schema: keyof Database },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
+  analytics: {
+    Enums: {},
+  },
   business: {
     Enums: {
-      store_type_enum: ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'],
+      store_type_enum: [
+        "supermarket",
+        "convenience",
+        "restaurant",
+        "bakery",
+        "butcher",
+        "organic",
+      ],
     },
   },
   inventory: {
@@ -903,6 +1172,9 @@ export const Constants = {
     Enums: {},
   },
   scoring: {
+    Enums: {},
+  },
+  timeseries: {
     Enums: {},
   },
   user_mgmt: {
