@@ -86,8 +86,8 @@ export function BatchListPresentation({
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
           <CardTitle className="text-lg mb-2">No batches found</CardTitle>
           <CardDescription className="text-center max-w-md">
-            You don't have any batches in your inventory yet. Start by adding your first batch to
-            track expiration dates and manage stock levels.
+            You don&apos;t have any batches in your inventory yet. Start by adding your first batch
+            to track expiration dates and manage stock levels.
           </CardDescription>
           <Button className="mt-4">Add First Batch</Button>
         </CardContent>
@@ -98,6 +98,14 @@ export function BatchListPresentation({
   return (
     <div className="space-y-4">
       {/* View mode toggle could go here if needed */}
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
+        >
+          {viewMode === 'table' ? 'View as Cards' : 'View as Table'}
+        </Button>
+      </div>
 
       {viewMode === 'table' ? (
         <BatchTable data={data} currentSort={currentSort} updateSort={updateSort} />

@@ -14,7 +14,7 @@ interface StoreProviderWrapperProps {
  */
 export function StoreProviderWrapper({ children }: StoreProviderWrapperProps) {
   // This hook automatically loads user stores and sets the active store
-  const { userStores, isLoading, error } = useUserStores()
+  const { userStores, error } = useUserStores()
 
   useEffect(() => {
     if (error) {

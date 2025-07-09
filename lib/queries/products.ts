@@ -130,9 +130,6 @@ export async function fetchProductsPage(
 
     if (filters.expiringOnly) {
       // Join with batches to find expiring products
-      console.log('[fetchProductsPage] Applying expiring filter')
-      const expiryThreshold = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-
       // This is a complex query - for now, we'll fetch all and filter in memory
       // In production, you might want to create a view or use a more complex query
     }

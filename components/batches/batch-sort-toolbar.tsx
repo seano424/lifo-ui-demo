@@ -12,13 +12,11 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import {
-  ArrowUpDown,
   ArrowUp,
   ArrowDown,
   Calendar,
   Package,
   DollarSign,
-  MapPin,
   Clock,
   AlertTriangle,
   TrendingUp,
@@ -72,9 +70,6 @@ export function BatchSortToolbar({
       return <ArrowDown className="h-4 w-4" />
     }
   }
-
-  const currentOption = sortOptions.find(option => option.value === currentSort.field)
-  const IconComponent = currentOption?.icon || ArrowUpDown
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
