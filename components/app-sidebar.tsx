@@ -5,7 +5,6 @@ import {
   BookOpen,
   Bot,
   Frame,
-  GalleryVerticalEnd,
   Map,
   PieChart,
   Settings2,
@@ -59,12 +58,12 @@ const data = {
       icon: Bot,
     },
     {
-      title: 'Analytics',
-      url: '/dashboard/batch-analytics',
+      title: 'Batches',
+      url: '/dashboard/batches',
       icon: BookOpen,
     },
     {
-      title: 'Actions',
+      title: 'Action Log',
       url: '/dashboard/action-log',
       icon: Calendar,
     },
