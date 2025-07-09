@@ -3,6 +3,7 @@ import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
+import { StoreProviderWrapper } from '@/components/providers/store-provider-wrapper'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -56,7 +57,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <StoreProviderWrapper>{children}</StoreProviderWrapper>
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>

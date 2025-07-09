@@ -1,8 +1,9 @@
-// hooks/use-products.ts - Updated with sorting support
+// hooks/use-products.ts - Updated to be store-aware
 
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
   fetchProductsPage,
   fetchProductById,
@@ -18,16 +19,25 @@ import {
 import type { Database } from '@/types/supabase'
 import { useCallback, useState } from 'react'
 
-// ✅ READING DATA - Infinite scroll products list with sorting
+// ✅ READING DATA - Store-aware infinite scroll products list with sorting
 export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
+  const activeStoreId = useActiveStoreId()
+
+  // Don't fetch if no active store
   const result = useInfiniteQuery({
-    queryKey: queryKeys.products.infinite(filters),
-    queryFn: ({ pageParam = 0 }) => fetchProductsPage({ page: pageParam, pageSize }, filters),
+    queryKey: queryKeys.products.infinite(activeStoreId || '', filters),
+    queryFn: ({ pageParam = 0 }) =>
+      fetchProductsPage(
+        { page: pageParam, pageSize },
+        { ...filters, storeId: activeStoreId || undefined },
+        undefined,
+      ),
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
+    enabled: !!activeStoreId, // Only fetch when we have a store
   })
 
-  // Flatten pages into single array (just like Supabase UI hook)
+  // Flatten pages into single array (just like before)
   const data = result.data?.pages.flatMap(page => page.data) ?? []
 
   return {
@@ -43,7 +53,7 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
   }
 }
 
-// ✅ NEW: Products hook with built-in sorting state management
+// Products hook with built-in sorting state management (store-aware)
 export function useProductsWithSort(initialSort?: ProductSort, pageSize: number = 20) {
   const [currentSort, setCurrentSort] = useState<ProductSort>(
     initialSort || { field: 'created_at', direction: 'desc' },
@@ -63,7 +73,6 @@ export function useProductsWithSort(initialSort?: ProductSort, pageSize: number 
     }))
   }, [])
 
-  // Helper function to get sort direction for a field
   const getSortDirection = useCallback(
     (field: SortField): SortDirection | null => {
       return currentSort.field === field ? currentSort.direction : null
@@ -80,7 +89,7 @@ export function useProductsWithSort(initialSort?: ProductSort, pageSize: number 
   }
 }
 
-// ✅ READING DATA - Single product by ID
+// READING DATA - Single product by ID (store-aware)
 export function useProduct(productId: string) {
   return useQuery({
     queryKey: queryKeys.products.detail(productId),
@@ -89,31 +98,27 @@ export function useProduct(productId: string) {
   })
 }
 
-// ✅ CONVENIENCE HOOKS - Common filter patterns with sorting support
-export function useExpiringProducts(storeId: string, sort?: ProductSort) {
-  return useProducts({
-    sort,
-    /* add expiring filter when you have it */
-  })
-}
-
-export function useStoreProducts(storeId: string, sort?: ProductSort) {
-  return useProducts({
-    sort,
-    /* add store filter when you have it */
-  })
-}
-
-// ✅ WRITING DATA - Product CRUD actions with proper cache invalidation
+// WRITING DATA - Product CRUD actions with proper cache invalidation (store-aware)
 export function useProductActions() {
   const queryClient = useQueryClient()
+  const activeStoreId = useActiveStoreId()
 
   const createMutation = useMutation({
-    mutationFn: (productData: Database['inventory']['Tables']['products']['Insert']) =>
-      createProduct(productData),
+    mutationFn: (productData: Database['inventory']['Tables']['products']['Insert']) => {
+      // Automatically add store_id to product data
+      const productWithStore = {
+        ...productData,
+        store_id: activeStoreId,
+      }
+      return createProduct(productWithStore)
+    },
     onSuccess: newProduct => {
-      // Invalidate all product lists to show the new product
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+      // Invalidate store-specific product lists
+      if (activeStoreId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
+        })
+      }
 
       // Add the new product to the detail cache
       queryClient.setQueryData(queryKeys.products.detail(newProduct.product_id), newProduct)
@@ -136,40 +141,44 @@ export function useProductActions() {
     }) => updateProduct(productId, updates),
 
     onMutate: async ({ productId, updates }) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(productId) })
 
-      // Snapshot the previous value
+      // Snapshot previous value
       const previousProduct = queryClient.getQueryData(queryKeys.products.detail(productId))
 
-      // Optimistically update to the new value
+      // Optimistically update
       queryClient.setQueryData(queryKeys.products.detail(productId), (old: Product | undefined) =>
         old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined,
       )
 
-      // Also update in infinite query caches
-      queryClient.setQueriesData({ queryKey: queryKeys.products.lists() }, (oldData: any) => {
-        if (!oldData) return oldData
+      // Also update in store-specific infinite query caches
+      if (activeStoreId) {
+        queryClient.setQueriesData(
+          { queryKey: queryKeys.products.byStore(activeStoreId) },
+          (oldData: any) => {
+            if (!oldData) return oldData
 
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: page.data.map((product: Product) =>
-              product.product_id === productId
-                ? { ...product, ...updates, updated_at: new Date().toISOString() }
-                : product,
-            ),
-          })),
-        }
-      })
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                data: page.data.map((product: Product) =>
+                  product.product_id === productId
+                    ? { ...product, ...updates, updated_at: new Date().toISOString() }
+                    : product,
+                ),
+              })),
+            }
+          },
+        )
+      }
 
-      // Return a context object with the snapshotted value
       return { previousProduct, productId }
     },
 
     onError: (err, variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
+      // Revert on error
       if (context?.previousProduct) {
         queryClient.setQueryData(
           queryKeys.products.detail(context.productId),
@@ -181,9 +190,11 @@ export function useProductActions() {
     },
 
     onSettled: (data, error, { productId }) => {
-      // Always refetch after error or success to ensure we have correct data
+      // Always refetch after mutation
       queryClient.invalidateQueries({ queryKey: queryKeys.products.detail(productId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+      if (activeStoreId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.products.byStore(activeStoreId) })
+      }
     },
 
     onSuccess: () => {
@@ -195,28 +206,33 @@ export function useProductActions() {
     mutationFn: (productId: string) => deleteProduct(productId),
 
     onMutate: async productId => {
-      // Cancel any outgoing refetches
+      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(productId) })
 
-      // Snapshot the previous value
+      // Snapshot previous value
       const previousProduct = queryClient.getQueryData(queryKeys.products.detail(productId))
 
       // Optimistically remove from detail cache
       queryClient.removeQueries({ queryKey: queryKeys.products.detail(productId) })
 
-      // Optimistically remove from infinite query caches
-      queryClient.setQueriesData({ queryKey: queryKeys.products.lists() }, (oldData: any) => {
-        if (!oldData) return oldData
+      // Optimistically remove from store-specific infinite query caches
+      if (activeStoreId) {
+        queryClient.setQueriesData(
+          { queryKey: queryKeys.products.byStore(activeStoreId) },
+          (oldData: any) => {
+            if (!oldData) return oldData
 
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: page.data.filter((product: Product) => product.product_id !== productId),
-            count: Math.max(0, page.count - 1),
-          })),
-        }
-      })
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                data: page.data.filter((product: Product) => product.product_id !== productId),
+                count: Math.max(0, page.count - 1),
+              })),
+            }
+          },
+        )
+      }
 
       return { previousProduct, productId }
     },
@@ -235,7 +251,9 @@ export function useProductActions() {
 
     onSettled: () => {
       // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.lists() })
+      if (activeStoreId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.products.byStore(activeStoreId) })
+      }
     },
 
     onSuccess: () => {
@@ -292,4 +310,13 @@ export function useProductActions() {
     updateMutation,
     deleteMutation,
   }
+}
+
+// Convenience hooks for common filters (store-aware)
+export function useExpiringProducts() {
+  return useProducts({ expiringOnly: true })
+}
+
+export function useProductsByCategory(category: string) {
+  return useProducts({ category })
 }

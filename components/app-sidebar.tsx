@@ -24,21 +24,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { useCurrentUser } from '@/hooks/use-users'
 
 // This is sample data.
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  teams: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-  ],
   navMain: [
     {
       title: 'Dashboard',
@@ -110,17 +99,22 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: user, isLoading, isError } = useCurrentUser()
+  if (isLoading) return <div>Loading...</div>
+  if (isError) return <div>Error</div>
+  if (!user) return <div>Not logged in</div>
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
         {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user.profile} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -926,6 +926,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          preferences: Json
+          primary_store_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          preferences?: Json
+          primary_store_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          preferences?: Json
+          primary_store_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_at: string | null
@@ -971,6 +995,7 @@ export type Database = {
       }
       users: {
         Row: {
+          avatar_url: string | null
           created_at: string | null
           email: string
           full_name: string | null
@@ -982,6 +1007,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string | null
           email: string
           full_name?: string | null
@@ -993,6 +1019,7 @@ export type Database = {
           username: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string | null
           email?: string
           full_name?: string | null
