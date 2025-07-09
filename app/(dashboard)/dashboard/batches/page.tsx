@@ -1,16 +1,18 @@
+// app/dashboard/batches/page.tsx - Updated to be store-aware (following products pattern)
+
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { fetchProductsPage } from '@/lib/queries/products'
+import { fetchBatchesPage, fetchExpiringBatches } from '@/lib/queries/batches'
 import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
 import { queryKeys } from '@/lib/queries/query-keys'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { ProductSortList } from '@/components/products/product-sort-list'
+import { BatchSortList } from '@/components/batches/batch-sort-list'
 import { StoreHeaderDisplay } from '@/components/stores/store-header-display'
 import { Button } from '@/components/ui/button'
 import { redirect } from 'next/navigation'
 
-export default async function ProductsPage() {
+export default async function BatchesPage() {
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
 
@@ -39,7 +41,7 @@ export default async function ProductsPage() {
       }),
     ])
 
-    // Get user's stores to determine which store to prefetch products for
+    // Get user's stores to determine which store to prefetch batches for
     const stores = await fetchUserStores(user.id, serverClient)
     const preferences = await fetchUserPreferences(user.id, serverClient)
 
@@ -53,11 +55,11 @@ export default async function ProductsPage() {
     const primaryStore = stores.find(s => s.store.store_id === primaryStoreId)
     const storeToUse = primaryStore ? primaryStore.store : stores[0].store
 
-    // Prefetch the first page of products for the user's primary/first store
+    // Prefetch the first page of batches for the user's primary/first store
     await queryClient.prefetchInfiniteQuery({
-      queryKey: queryKeys.products.infinite(storeToUse.store_id, {}),
+      queryKey: queryKeys.batches.infinite(storeToUse.store_id, {}),
       queryFn: ({ pageParam = 0 }) =>
-        fetchProductsPage(
+        fetchBatchesPage(
           { page: pageParam, pageSize: 20 },
           { storeId: storeToUse.store_id },
           serverClient,
@@ -67,9 +69,15 @@ export default async function ProductsPage() {
       pages: 1, // Only prefetch first page
     })
 
-    console.log('[ProductsPage] Prefetched data for store:', storeToUse.store_name)
+    // Prefetch expiring batches for dashboard stats
+    await queryClient.prefetchQuery({
+      queryKey: [...queryKeys.batches.byStore(storeToUse.store_id), 'expiring', { daysAhead: 7 }],
+      queryFn: () => fetchExpiringBatches(storeToUse.store_id, 7, serverClient),
+    })
+
+    console.log('[BatchesPage] Prefetched data for store:', storeToUse.store_name)
   } catch (error) {
-    console.error('[ProductsPage] Error prefetching data:', error)
+    console.error('[BatchesPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading
   }
 
@@ -80,18 +88,18 @@ export default async function ProductsPage() {
         <StoreHeaderDisplay variant="compact" showAddress={false} />
 
         <DashboardInsetHeader
-          title="Products"
-          description="View and manage your store's product inventory"
+          title="Batch Analytics"
+          description="View and manage your store's inventory batches"
           rightContent={
             <div className="flex gap-2">
-              <Button variant="outline">Export Products</Button>
-              <Button>Add Product</Button>
+              <Button variant="outline">Export Batches</Button>
+              <Button>Add Batch</Button>
             </div>
           }
         />
 
-        {/* Store-aware product list */}
-        <ProductSortList />
+        {/* Store-aware batch list with sorting */}
+        <BatchSortList />
       </div>
     </HydrationBoundary>
   )
