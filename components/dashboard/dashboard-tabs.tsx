@@ -15,7 +15,7 @@ export default function DashboardTabs() {
       <TabsList>
         <TabsTrigger value="dashboard">Overview</TabsTrigger>
         <TabsTrigger value="products">Products</TabsTrigger>
-        <TabsTrigger value="analytics">Batch Analytics</TabsTrigger>
+        <TabsTrigger value="batches">Batches</TabsTrigger>
         <TabsTrigger value="log">Action Log</TabsTrigger>
         <TabsTrigger value="add">Add Product</TabsTrigger>
       </TabsList>
@@ -34,7 +34,7 @@ export default function DashboardTabs() {
         <ProductTable />
       </TabsContent>
 
-      <TabsContent value="analytics" className="space-y-4">
+      <TabsContent value="batches" className="space-y-4">
         <BatchAnalytics />
       </TabsContent>
 

@@ -88,7 +88,7 @@ export default async function BatchesPage() {
         <StoreHeaderDisplay variant="compact" showAddress={false} />
 
         <DashboardInsetHeader
-          title="Batch Analytics"
+          title="Batches"
           description="View and manage your store's inventory batches"
           rightContent={
             <div className="flex gap-2">
