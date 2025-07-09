@@ -12,9 +12,8 @@ export async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
       <LogoutButton />
-      <Button asChild size="lg" variant={'outline'}>
+      <Button asChild size="default" variant={'brand'}>
         <Link href="/dashboard">Go to dashboard</Link>
       </Button>
     </div>
@@ -27,7 +26,7 @@ export async function AuthButton() {
         Login
       </Link>
 
-      <Button asChild size="sm" variant={'brand'} className="uppercase">
+      <Button asChild size="sm" variant={'brandSecondary'} className="uppercase">
         <Link href="/onboarding/create-account">Business Signup</Link>
       </Button>
     </div>

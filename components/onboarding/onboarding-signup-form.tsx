@@ -11,9 +11,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { CheckCircle, AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import { useCurrentUser } from '@/hooks/use-users'
 
-// Simple test mode flag - just flip this to true/false
-const TEST_MODE = true
+const ONBOARDING_MODE = process.env.NEXT_PUBLIC_ONBOARDING_MODE || 'production'
 
 export function OnboardingSignUpForm({
   className,
@@ -22,98 +24,170 @@ export function OnboardingSignUpForm({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { data: currentUser } = useCurrentUser()
 
   // Get store data from onboarding flow
-  const { confirmedStore, setUserDetails, setEmailSent, setCurrentStep } = useOnboardingStore()
+  const {
+    confirmedStoreInsert,
+    selectedStoreForm,
+    businessCheckResult,
+    setUserDetails,
+    setEmailSent,
+    setCurrentStep,
+  } = useOnboardingStore()
+
+  // Determine what's required based on mode
+  const requiresAuth = ONBOARDING_MODE === 'test'
+  const isAuthReady = !requiresAuth || !!currentUser?.auth?.id
+  const showAuthWarning = requiresAuth && !currentUser?.auth?.id
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
 
+    console.log('🚀 Starting handleSignUp')
+    console.log('🌍 ONBOARDING_MODE:', ONBOARDING_MODE)
+    console.log('👤 currentUser:', currentUser)
+
+    // Validation
     if (password !== confirmPassword) {
       setError('Passwords do not match')
       setIsLoading(false)
       return
     }
 
-    if (!confirmedStore) {
+    if (!confirmedStoreInsert && !selectedStoreForm) {
       setError('Store information is missing. Please go back and complete store setup.')
       setIsLoading(false)
       return
     }
 
+    if (businessCheckResult?.exists) {
+      setError('This business is already registered. Please contact support.')
+      setIsLoading(false)
+      return
+    }
+
     try {
-      let userId: string
+      let userId: string = ''
 
-      if (TEST_MODE) {
-        // Test mode: Skip Supabase Auth entirely
-        console.log('🧪 TEST MODE: Skipping Supabase Auth')
-        userId = `test-user-${Date.now()}`
-        console.log('🧪 Generated test user ID:', userId)
-      } else {
-        // Production mode: Use real Supabase Auth
-        console.log('🔐 PRODUCTION MODE: Using Supabase Auth')
-        const supabase = createClient()
+      switch (ONBOARDING_MODE) {
+        case 'mock':
+          // Mock mode: generate fake user ID
+          userId = `mock-user-${Date.now()}`
+          console.log('🎭 Mock mode: Generated user ID:', userId)
+          break
 
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: {
-              store_name: confirmedStore.name,
+        case 'test':
+          // Test mode: use current logged-in user
+          const currentUserId = currentUser?.auth?.id
+          if (!currentUserId) {
+            setError('Test mode requires you to be signed in first.')
+            setIsLoading(false)
+            return
+          }
+          userId = currentUserId
+          console.log('🧪 Test mode: Using current user ID:', userId)
+          break
+
+        case 'production':
+        default:
+          // Production mode: create new auth user
+          console.log('🔐 Production mode: Creating new user')
+          const supabase = createClient()
+
+          const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/dashboard`,
+              data: {
+                store_name: selectedStoreForm?.store_name || 'Unknown Store',
+                full_name: fullName,
+              },
             },
-          },
-        })
+          })
 
-        if (authError) throw authError
+          if (authError) throw authError
+          if (!authData.user) throw new Error('No user data returned from Supabase')
 
-        if (!authData.user) {
-          throw new Error('No user data returned from Supabase')
-        }
-
-        userId = authData.user.id
+          userId = authData.user.id
+          console.log('🔐 Production: Created user ID:', userId)
+          break
       }
 
-      // Call your API (works for both test and production)
+      // Prepare store data for API call
+      const storeData = selectedStoreForm || {
+        store_name: confirmedStoreInsert?.store_name || 'Unknown Store',
+        address: confirmedStoreInsert?.address,
+        city: confirmedStoreInsert?.city,
+        postal_code: confirmedStoreInsert?.postal_code,
+        country: confirmedStoreInsert?.country,
+        store_type: confirmedStoreInsert?.store_type,
+        business_name: confirmedStoreInsert?.business_name,
+      }
+
+      console.log('🚀 Calling API with payload:', {
+        userId,
+        store: storeData,
+        user: { email, fullName },
+      })
+
+      // Call API
       const response = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId,
-          store: confirmedStore,
-          user: {
-            email,
-            fullName: '',
-          },
+          store: storeData,
+          user: { email, fullName },
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create store and user records')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create store and user records')
       }
 
+      const result = await response.json()
+      console.log('✅ Onboarding result:', result)
+
       // Update onboarding state
-      setUserDetails({ email, password })
+      setUserDetails({ email, password, fullName })
       setEmailSent(true)
 
-      // Redirect to success page
-      router.push('/onboarding/success')
+      // Redirect based on mode
+      const redirectPath =
+        ONBOARDING_MODE === 'production'
+          ? '/onboarding/success'
+          : `/onboarding/success?mode=${ONBOARDING_MODE}`
+
+      router.push(redirectPath)
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      console.error('💥 Signup error:', error)
+      setError(error instanceof Error ? error.message : 'An error occurred during signup')
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (!confirmedStore) {
+  // Early returns for missing requirements
+  if (!confirmedStoreInsert && !selectedStoreForm) {
     return (
       <div className="text-center max-w-md mx-auto">
-        <p>No store information found. Please go back and complete the previous steps.</p>
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            No store information found. Please go back and complete the previous steps.
+          </AlertDescription>
+        </Alert>
         <Button onClick={() => setCurrentStep(1)} className="mt-4">
           Start Over
         </Button>
@@ -121,25 +195,99 @@ export function OnboardingSignUpForm({
     )
   }
 
+  if (businessCheckResult?.exists) {
+    return (
+      <div className="text-center max-w-md mx-auto">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <p>
+                <strong>Business Already Registered</strong>
+              </p>
+              <p>
+                This business is already in our system. Please contact support or try a different
+                store.
+              </p>
+            </div>
+          </AlertDescription>
+        </Alert>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
+            Back
+          </Button>
+          <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
+            Try Different Store
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  const storeName =
+    selectedStoreForm?.store_name || confirmedStoreInsert?.store_name || 'your store'
+
   return (
     <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
-      {/* Show test mode indicator in development */}
-      {TEST_MODE && process.env.NODE_ENV === 'development' && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-          🧪 <strong>Test Mode Active</strong> - Supabase Auth will be bypassed
-        </div>
+      {/* Mode indicator for development */}
+      {process.env.NODE_ENV === 'development' && (
+        <Alert>
+          <CheckCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>🧪 {ONBOARDING_MODE.toUpperCase()} MODE</strong>
+            {ONBOARDING_MODE === 'mock' && ' - No database changes, returns fake success'}
+            {ONBOARDING_MODE === 'test' &&
+              currentUser?.auth?.id &&
+              ` - Using your account (${currentUser.auth.id.slice(0, 8)}...)`}
+            {ONBOARDING_MODE === 'production' && ' - Full signup with new user account'}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Business verification status */}
+      {businessCheckResult && !businessCheckResult.exists && (
+        <Alert>
+          <CheckCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Business Verified!</strong> This store is available for registration.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Auth requirement warning */}
+      {showAuthWarning && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Sign in required:</strong> Test mode requires you to be signed in first.
+            <br />
+            <small>Switch to MOCK mode if you want to test without authentication.</small>
+          </AlertDescription>
+        </Alert>
       )}
 
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Create Your Account</CardTitle>
           <CardDescription>
-            Almost done! Create your account to access your {confirmedStore?.name} dashboard.
+            Almost done! Create your account to access your {storeName} dashboard.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Your full name"
+                  required
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                />
+              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -151,45 +299,100 @@ export function OnboardingSignUpForm({
                   onChange={e => setEmail(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-                <Typography variant="p" color="muted">
-                  Must be at least 8 characters
-                </Typography>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                />
-              </div>
-              {error && (
-                <div className="text-sm text-destructive bg-destructive/10 p-3 rounded">
-                  {error}
-                </div>
+
+              {/* Only show password fields in production mode */}
+              {ONBOARDING_MODE === 'production' && (
+                <>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        minLength={8}
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                    <Typography variant="p" color="muted">
+                      Must be at least 8 characters
+                    </Typography>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="confirm-password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </>
               )}
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isLoading || !isAuthReady}>
                 {isLoading
-                  ? TEST_MODE
-                    ? 'Testing...'
-                    : 'Creating Account...'
-                  : TEST_MODE
-                    ? '🧪 Test Create Account'
-                    : 'Create Account'}
+                  ? `${ONBOARDING_MODE === 'production' ? 'Creating Account' : 'Testing'}...`
+                  : `${ONBOARDING_MODE === 'production' ? 'Create Account' : `🧪 Test ${ONBOARDING_MODE.toUpperCase()}`}`}
               </Button>
+
+              {ONBOARDING_MODE === 'production' && (
+                <Typography variant="p" color="muted" className="text-center text-sm">
+                  By creating an account, you agree to our Terms of Service and Privacy Policy.
+                  You&#39;ll receive a confirmation email to verify your account.
+                </Typography>
+              )}
+
+              {ONBOARDING_MODE !== 'production' && (
+                <Typography variant="p" color="muted" className="text-center text-sm">
+                  🧪 {ONBOARDING_MODE} mode:{' '}
+                  {ONBOARDING_MODE === 'mock'
+                    ? 'No real changes will be made'
+                    : 'Real database changes with your account'}
+                </Typography>
+              )}
             </div>
           </form>
         </CardContent>

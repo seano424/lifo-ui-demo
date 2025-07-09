@@ -11,12 +11,18 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useDebouncedValue } from '@/hooks/use-debounce-search'
 import { useGooglePlaces } from '@/hooks/use-google-places'
 import type { PlaceAutocompleteResult } from '@/lib/services/google-places'
+import type { StoreFormData } from '@/lib/stores/onboarding-store'
 
 type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 'error'
 
 export function StoreSearchStep() {
-  const { searchQuery, setSearchQuery, setSelectedStore, setManualEntry, setCurrentStep } =
-    useOnboardingStore()
+  const {
+    searchQuery,
+    setSearchQuery,
+    setSelectedStoreForm, // ✅ Updated method name
+    setManualEntry,
+    setCurrentStep,
+  } = useOnboardingStore()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [localSearchState, setLocalSearchState] = useState<SearchState>('idle')
@@ -65,7 +71,21 @@ export function StoreSearchStep() {
     const storeDetails = await selectPlace(place.place_id)
 
     if (storeDetails) {
-      setSelectedStore(storeDetails)
+      // Convert Google Places data to StoreFormData format
+      const storeFormData: StoreFormData = {
+        store_name: storeDetails.name || place.structured_formatting.main_text,
+        address: storeDetails.address || null,
+        city: storeDetails.city || null,
+        postal_code: storeDetails.postalCode || null,
+        country: storeDetails.country || null,
+        store_type: null, // Will be set in the next step
+        business_name: storeDetails.name || place.structured_formatting.main_text,
+        phone: storeDetails.phone || '',
+        coordinates: storeDetails.coordinates,
+        googlePlaceId: place.place_id,
+      }
+
+      setSelectedStoreForm(storeFormData) // ✅ Using correct method and data format
       setCurrentStep(2)
     }
     // Error handling is done in the hook and displayed via the error state

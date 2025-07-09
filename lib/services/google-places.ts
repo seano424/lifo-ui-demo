@@ -1,5 +1,3 @@
-// lib/services/google-places.ts
-
 export interface PlaceAutocompleteResult {
   place_id: string
   structured_formatting: {
