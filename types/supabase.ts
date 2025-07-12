@@ -1,10 +1,16 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '12.2.3 (519615d)'
+    PostgrestVersion: "12.2.3 (519615d)"
   }
   analytics: {
     Tables: {
@@ -135,11 +141,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_settings_store_id_fkey'
-            columns: ['store_id']
+            foreignKeyName: "store_settings_store_id_fkey"
+            columns: ["store_id"]
             isOneToOne: true
-            referencedRelation: 'stores'
-            referencedColumns: ['store_id']
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -147,8 +153,11 @@ export type Database = {
         Row: {
           assigned_at: string | null
           assigned_by: string | null
+          can_use_pin_auth: boolean | null
           is_active: boolean | null
           permissions: Json | null
+          pin_access_level: string | null
+          pin_permissions: Json | null
           role_in_store: string | null
           store_id: string
           user_id: string
@@ -156,8 +165,11 @@ export type Database = {
         Insert: {
           assigned_at?: string | null
           assigned_by?: string | null
+          can_use_pin_auth?: boolean | null
           is_active?: boolean | null
           permissions?: Json | null
+          pin_access_level?: string | null
+          pin_permissions?: Json | null
           role_in_store?: string | null
           store_id: string
           user_id: string
@@ -165,19 +177,22 @@ export type Database = {
         Update: {
           assigned_at?: string | null
           assigned_by?: string | null
+          can_use_pin_auth?: boolean | null
           is_active?: boolean | null
           permissions?: Json | null
+          pin_access_level?: string | null
+          pin_permissions?: Json | null
           role_in_store?: string | null
           store_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'store_users_store_id_fkey'
-            columns: ['store_id']
+            foreignKeyName: "store_users_store_id_fkey"
+            columns: ["store_id"]
             isOneToOne: false
-            referencedRelation: 'stores'
-            referencedColumns: ['store_id']
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -197,7 +212,7 @@ export type Database = {
           store_code: string
           store_id: string
           store_name: string
-          store_type: Database['business']['Enums']['store_type_enum'] | null
+          store_type: Database["business"]["Enums"]["store_type_enum"] | null
           timezone: string | null
           updated_at: string | null
           waste_reduction_target_percent: number | null
@@ -217,7 +232,7 @@ export type Database = {
           store_code: string
           store_id?: string
           store_name: string
-          store_type?: Database['business']['Enums']['store_type_enum'] | null
+          store_type?: Database["business"]["Enums"]["store_type_enum"] | null
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
@@ -237,7 +252,7 @@ export type Database = {
           store_code?: string
           store_id?: string
           store_name?: string
-          store_type?: Database['business']['Enums']['store_type_enum'] | null
+          store_type?: Database["business"]["Enums"]["store_type_enum"] | null
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
@@ -248,7 +263,9 @@ export type Database = {
     Views: {
       store_type_reference: {
         Row: {
-          store_type_value: Database['business']['Enums']['store_type_enum'] | null
+          store_type_value:
+            | Database["business"]["Enums"]["store_type_enum"]
+            | null
         }
         Relationships: []
       }
@@ -256,7 +273,7 @@ export type Database = {
     Functions: {
       get_store_types: {
         Args: Record<PropertyKey, never>
-        Returns: Database['business']['Enums']['store_type_enum'][]
+        Returns: Database["business"]["Enums"]["store_type_enum"][]
       }
       user_has_store_access: {
         Args: { store_uuid: string }
@@ -265,12 +282,12 @@ export type Database = {
     }
     Enums: {
       store_type_enum:
-        | 'supermarket'
-        | 'convenience'
-        | 'restaurant'
-        | 'bakery'
-        | 'butcher'
-        | 'organic'
+        | "supermarket"
+        | "convenience"
+        | "restaurant"
+        | "bakery"
+        | "butcher"
+        | "organic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -344,25 +361,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "low_stock_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -503,25 +520,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "low_stock_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -649,6 +666,10 @@ export type Database = {
       get_enum_values: {
         Args: { enum_name: string; schema_name?: string }
         Returns: string[]
+      }
+      user_has_pin_access: {
+        Args: { target_store_id: string }
+        Returns: boolean
       }
       user_has_store_access: {
         Args: { target_store_id: string; required_role?: string }
@@ -897,6 +918,81 @@ export type Database = {
   }
   user_mgmt: {
     Tables: {
+      pin_deliveries: {
+        Row: {
+          created_at: string | null
+          delivered_by: string | null
+          delivery_address: string | null
+          delivery_confirmed_at: string | null
+          delivery_id: string
+          delivery_method: string
+          delivery_requested_at: string | null
+          delivery_sent_at: string | null
+          delivery_status: string | null
+          expires_at: string | null
+          max_attempts: number | null
+          pin_format: string | null
+          pin_length: number | null
+          pin_reference: string | null
+          store_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          delivered_by?: string | null
+          delivery_address?: string | null
+          delivery_confirmed_at?: string | null
+          delivery_id?: string
+          delivery_method: string
+          delivery_requested_at?: string | null
+          delivery_sent_at?: string | null
+          delivery_status?: string | null
+          expires_at?: string | null
+          max_attempts?: number | null
+          pin_format?: string | null
+          pin_length?: number | null
+          pin_reference?: string | null
+          store_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          delivered_by?: string | null
+          delivery_address?: string | null
+          delivery_confirmed_at?: string | null
+          delivery_id?: string
+          delivery_method?: string
+          delivery_requested_at?: string | null
+          delivery_sent_at?: string | null
+          delivery_status?: string | null
+          expires_at?: string | null
+          max_attempts?: number | null
+          pin_format?: string | null
+          pin_length?: number | null
+          pin_reference?: string | null
+          store_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pin_deliveries_delivered_by_fkey"
+            columns: ["delivered_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pin_deliveries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       roles: {
         Row: {
           created_at: string | null
@@ -963,25 +1059,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_roles_assigned_by_fkey'
-            columns: ['assigned_by']
+            foreignKeyName: "user_roles_assigned_by_fkey"
+            columns: ["assigned_by"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['user_id']
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: 'user_roles_role_id_fkey'
-            columns: ['role_id']
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: 'roles'
-            referencedColumns: ['role_id']
+            referencedRelation: "roles"
+            referencedColumns: ["role_id"]
           },
           {
-            foreignKeyName: 'user_roles_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['user_id']
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -994,6 +1090,13 @@ export type Database = {
           is_active: boolean | null
           last_login: string | null
           password_hash: string
+          pin_attempts: number | null
+          pin_delivery_method: string | null
+          pin_expires_at: string | null
+          pin_hash: string | null
+          pin_locked_until: string | null
+          pin_set_at: string | null
+          requires_pin: boolean | null
           updated_at: string | null
           user_id: string
           username: string
@@ -1006,6 +1109,13 @@ export type Database = {
           is_active?: boolean | null
           last_login?: string | null
           password_hash: string
+          pin_attempts?: number | null
+          pin_delivery_method?: string | null
+          pin_expires_at?: string | null
+          pin_hash?: string | null
+          pin_locked_until?: string | null
+          pin_set_at?: string | null
+          requires_pin?: boolean | null
           updated_at?: string | null
           user_id?: string
           username: string
@@ -1018,6 +1128,13 @@ export type Database = {
           is_active?: boolean | null
           last_login?: string | null
           password_hash?: string
+          pin_attempts?: number | null
+          pin_delivery_method?: string | null
+          pin_expires_at?: string | null
+          pin_hash?: string | null
+          pin_locked_until?: string | null
+          pin_set_at?: string | null
+          requires_pin?: boolean | null
           updated_at?: string | null
           user_id?: string
           username?: string
@@ -1051,31 +1168,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -1084,23 +1203,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -1109,23 +1228,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -1134,36 +1253,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -1172,7 +1291,14 @@ export const Constants = {
   },
   business: {
     Enums: {
-      store_type_enum: ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'],
+      store_type_enum: [
+        "supermarket",
+        "convenience",
+        "restaurant",
+        "bakery",
+        "butcher",
+        "organic",
+      ],
     },
   },
   inventory: {
