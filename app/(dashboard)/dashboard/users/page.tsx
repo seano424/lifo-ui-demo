@@ -48,10 +48,8 @@ export default async function UsersPage() {
           }
         />
 
-        {/* Stats Cards */}
         <UserStats />
 
-        {/* Users List */}
         <UsersList />
       </div>
     </HydrationBoundary>

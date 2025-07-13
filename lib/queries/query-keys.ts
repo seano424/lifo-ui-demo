@@ -47,7 +47,7 @@ export const queryKeys = {
       [...queryKeys.batches.byStore(storeId), 'byProduct', productId] as const,
   },
 
-  // User queries (unchanged)
+  // Updated user queries to support new auth.users structure
   users: {
     all: ['users'] as const,
     lists: () => [...queryKeys.users.all, 'list'] as const,
@@ -56,5 +56,44 @@ export const queryKeys = {
       [...queryKeys.users.lists(), 'infinite', { filters }] as const,
     details: () => [...queryKeys.users.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.users.details(), id] as const,
+
+    // New queries for PIN authentication system
+    pinRequired: () => [...queryKeys.users.all, 'pinRequired'] as const,
+    pinLocked: () => [...queryKeys.users.all, 'pinLocked'] as const,
+
+    // Role-specific queries
+    roles: (userId: string) => [...queryKeys.users.detail(userId), 'roles'] as const,
+    hasRole: (userId: string, role: string) =>
+      [...queryKeys.users.detail(userId), 'hasRole', role] as const,
+    withRoles: (userId: string) => [...queryKeys.users.detail(userId), 'withRoles'] as const,
+
+    // User management queries
+    byRole: (role: string) => [...queryKeys.users.all, 'byRole', role] as const,
+    active: () => [...queryKeys.users.all, 'active'] as const,
+    inactive: () => [...queryKeys.users.all, 'inactive'] as const,
+  },
+
+  // PIN delivery tracking queries (new with migration)
+  pinDeliveries: {
+    all: ['pinDeliveries'] as const,
+    byUser: (userId: string) => [...queryKeys.pinDeliveries.all, 'byUser', userId] as const,
+    byStore: (storeId: string) => [...queryKeys.pinDeliveries.all, 'byStore', storeId] as const,
+    pending: () => [...queryKeys.pinDeliveries.all, 'pending'] as const,
+    delivered: () => [...queryKeys.pinDeliveries.all, 'delivered'] as const,
+  },
+
+  // Authentication-related queries (enhanced)
+  auth: {
+    currentUser: () => ['currentUser'] as const,
+    currentUserRoles: () => ['currentUser', 'roles'] as const,
+    currentUserPermissions: () => ['currentUser', 'permissions'] as const,
+    session: () => ['auth', 'session'] as const,
   },
 } as const
+
+// Type helpers for query key validation
+export type QueryKey = typeof queryKeys
+export type UserQueryKeys = typeof queryKeys.users
+export type ProductQueryKeys = typeof queryKeys.products
+export type BatchQueryKeys = typeof queryKeys.batches
+export type StoreQueryKeys = typeof queryKeys.stores

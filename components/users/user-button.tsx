@@ -8,6 +8,14 @@ import { UserIcon } from 'lucide-react'
 export default function UserButton() {
   const { data: user, isLoading, isError } = useCurrentUser()
 
+  console.log('UserButton Debug:', {
+    user,
+    full_name: user?.full_name,
+    email: user?.email,
+    username: user?.username,
+    migrated_from_user_mgmt: user?.migrated_from_user_mgmt,
+  })
+
   if (isLoading) {
     return <Skeleton className="h-10 w-24" />
   }
@@ -21,10 +29,13 @@ export default function UserButton() {
     )
   }
 
+  // ✅ CLEAN: Now we can access the user data directly
+  const displayName = user.full_name || user.username || user.email?.split('@')[0] || 'User'
+
   return (
     <Button asLink href="/dashboard/account" variant="outline" size="sm">
       <UserIcon className="w-4 h-4" />
-      {user.profile.full_name || user.auth.email}
+      {displayName}
     </Button>
   )
 }

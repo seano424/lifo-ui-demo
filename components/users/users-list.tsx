@@ -40,10 +40,10 @@ export function UsersList() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {data?.map(user => (
           <UserCard
-            key={user.user_id}
+            key={user.id}
             user={user}
-            onActivate={() => activateUser(user.user_id)}
-            onDeactivate={() => deactivateUser(user.user_id)}
+            onActivate={() => activateUser(user.id)}
+            onDeactivate={() => deactivateUser(user.id)}
             isUpdating={isUpdating}
           />
         ))}
