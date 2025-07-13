@@ -296,16 +296,20 @@ export function useUserActions() {
   const queryClient = useQueryClient()
 
   // Note: Create mutation would need to be handled server-side
-  const createMutation = useMutation<User, Error, {
-    email: string
-    password?: string
-    username?: string
-    full_name?: string
-    is_active?: boolean
-    requires_pin?: boolean
-    pin_delivery_method?: string
-  }>({
-    mutationFn: async (userData) => {
+  const createMutation = useMutation<
+    User,
+    Error,
+    {
+      email: string
+      password?: string
+      username?: string
+      full_name?: string
+      is_active?: boolean
+      requires_pin?: boolean
+      pin_delivery_method?: string
+    }
+  >({
+    mutationFn: async userData => {
       // This would need to be implemented as a server action or API route
       throw new Error('User creation must be handled server-side')
     },

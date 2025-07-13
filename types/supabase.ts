@@ -655,9 +655,96 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_security_warnings: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          warning_type: string
+          item: string
+          status: string
+        }[]
+      }
+      cleanup_backup_table: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_enum_values: {
         Args: { enum_name: string; schema_name?: string }
         Returns: string[]
+      }
+      get_store_users: {
+        Args: { store_id: string }
+        Returns: {
+          user_id: string
+          email: string
+          full_name: string
+          role_in_store: string
+          permissions: Json
+          is_active: boolean
+          can_use_pin_auth: boolean
+          assigned_at: string
+        }[]
+      }
+      get_store_users_paginated: {
+        Args: {
+          store_id: string
+          page_number?: number
+          page_size?: number
+          role_filter?: string
+          pin_auth_filter?: boolean
+        }
+        Returns: {
+          user_id: string
+          email: string
+          full_name: string
+          role_in_store: string
+          permissions: Json
+          is_active: boolean
+          can_use_pin_auth: boolean
+          assigned_at: string
+          total_count: number
+        }[]
+      }
+      get_users_with_metadata: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          created_at: string
+          updated_at: string
+          raw_user_meta_data: Json
+          username: string
+          full_name: string
+          is_active: boolean
+          avatar_url: string
+          last_login: string
+          pin_hash: string
+          pin_set_at: string
+          pin_attempts: number
+          requires_pin: boolean
+          email_verified: boolean
+          phone_verified: boolean
+          pin_expires_at: string
+          pin_locked_until: string
+          pin_delivery_method: string
+          migrated_from_user_mgmt: boolean
+        }[]
+      }
+      security_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_issues: number
+          rls_issues: number
+          function_issues: number
+          compliance_status: string
+        }[]
+      }
+      update_user_email: {
+        Args: { target_user_id: string; new_email: string }
+        Returns: Json
+      }
+      update_user_metadata: {
+        Args: { target_user_id: string; metadata_updates: Json }
+        Returns: Json
       }
       user_has_pin_access: {
         Args: { target_store_id: string }

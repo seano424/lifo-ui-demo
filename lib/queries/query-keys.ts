@@ -2,6 +2,7 @@
 import type { ProductFilters } from './products'
 import type { UserFilters } from './users'
 import type { BatchFilters } from './batches'
+import type { StoreUserFilters } from './store-users'
 
 export const queryKeys = {
   // Store-related queries
@@ -45,6 +46,28 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.batches.details(), id] as const,
     byProduct: (storeId: string, productId: string) =>
       [...queryKeys.batches.byStore(storeId), 'byProduct', productId] as const,
+  },
+
+  // Store users queries (NEW)
+  storeUsers: {
+    all: ['storeUsers'] as const,
+    byStore: (storeId: string) => [...queryKeys.storeUsers.all, 'byStore', storeId] as const,
+    list: (storeId: string, filters: StoreUserFilters) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'list', { filters }] as const,
+    infinite: (storeId: string, filters: StoreUserFilters) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'infinite', { filters }] as const,
+    detail: (storeId: string, userId: string) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'detail', userId] as const,
+
+    // Convenience queries for specific roles
+    owners: (storeId: string) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'role', 'owner'] as const,
+    managers: (storeId: string) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'role', 'manager'] as const,
+    employees: (storeId: string) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'role', 'employee'] as const,
+    pinEnabled: (storeId: string) =>
+      [...queryKeys.storeUsers.byStore(storeId), 'pinEnabled'] as const,
   },
 
   // Updated user queries to support new auth.users structure
@@ -97,3 +120,4 @@ export type UserQueryKeys = typeof queryKeys.users
 export type ProductQueryKeys = typeof queryKeys.products
 export type BatchQueryKeys = typeof queryKeys.batches
 export type StoreQueryKeys = typeof queryKeys.stores
+export type StoreUserQueryKeys = typeof queryKeys.storeUsers
