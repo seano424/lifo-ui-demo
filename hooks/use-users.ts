@@ -12,7 +12,15 @@ import {
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type UseQueryResult,
+} from '@tanstack/react-query'
+
+export type UserRole = 'admin' | 'manager' | 'employee'
 
 export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
@@ -73,17 +81,34 @@ export function useCurrentUser() {
   })
 }
 
-export function useCurrentUserRoles() {
+export function useCurrentUserRoles(): UseQueryResult<UserRole[], Error> {
   const { data: currentUser } = useCurrentUser()
 
   return useQuery({
     queryKey: ['currentUser', 'roles'],
-    queryFn: () => fetchUserRoles(currentUser!.auth.id),
+    queryFn: async (): Promise<UserRole[]> => {
+      const roles = await fetchUserRoles(currentUser!.auth.id)
+
+      // Runtime validation to ensure type safety
+      const validRoles = roles.filter((role): role is UserRole =>
+        ['admin', 'manager', 'employee'].includes(role),
+      )
+
+      // Optional: warn about invalid roles
+      if (validRoles.length !== roles.length) {
+        console.warn(
+          'Invalid roles detected:',
+          roles.filter(r => !validRoles.includes(r as UserRole)),
+        )
+      }
+
+      return validRoles
+    },
     enabled: !!currentUser?.auth.id,
   })
 }
 
-export function useCurrentUserHasRole(roleName: string) {
+export function useCurrentUserHasRole(roleName: UserRole): UseQueryResult<boolean, Error> {
   const { data: currentUser } = useCurrentUser()
 
   return useQuery({
@@ -104,31 +129,49 @@ export function usePermissions() {
     isAuthenticated: !!currentUser,
     isAdmin: !!isAdmin,
     isManager: !!isManager,
-    isViewer: roles?.includes('viewer') ?? false,
-    roles: roles || [],
+    isEmployee: roles?.includes('employee') ?? false,
+    roles: roles || ([] as UserRole[]),
+
+    // Type-safe role checker
+    hasRole: (role: UserRole): boolean => roles?.includes(role) ?? false,
 
     // Permission helpers
-    canEditProduct: (productCreatorId?: string) => {
+    canEditProduct: (productCreatorId?: string): boolean => {
       if (!currentUser) return false
       return isAdmin || isManager || productCreatorId === currentUser.auth.id
     },
 
-    canDeleteProduct: (productCreatorId?: string) => {
+    canDeleteProduct: (productCreatorId?: string): boolean => {
       if (!currentUser) return false
-      return isAdmin || isManager || productCreatorId === currentUser.auth.id
+      return !!isAdmin || !!isManager || productCreatorId === currentUser.auth.id
     },
 
-    canManageUsers: () => {
-      return isAdmin || isManager
+    canManageUsers: (): boolean => {
+      return !!isAdmin || !!isManager
     },
 
-    canCreateProducts: () => {
-      return isAdmin || isManager
+    canCreateProducts: (): boolean => {
+      return !!isAdmin || !!isManager
+    },
+
+    canScanProducts: (): boolean => {
+      // All authenticated users can scan products
+      return !!currentUser
+    },
+
+    canApplyDiscounts: (): boolean => {
+      // Managers and admins can apply discounts, employees might need approval
+      return !!isAdmin || !!isManager
+    },
+
+    canViewAnalytics: (): boolean => {
+      // Only managers and admins can view detailed analytics
+      return !!isAdmin || !!isManager
     },
   }
 }
 
-export function useUser(userId: string) {
+export function useUser(userId: string): UseQueryResult<User, Error> {
   return useQuery({
     queryKey: queryKeys.users.detail(userId),
     queryFn: () => fetchUserById(userId),
@@ -136,15 +179,24 @@ export function useUser(userId: string) {
   })
 }
 
-export function useUserRoles(userId: string) {
+export function useUserRoles(userId: string): UseQueryResult<UserRole[], Error> {
   return useQuery({
     queryKey: [...queryKeys.users.detail(userId), 'roles'],
-    queryFn: () => fetchUserRoles(userId),
+    queryFn: async (): Promise<UserRole[]> => {
+      const roles = await fetchUserRoles(userId)
+
+      // Runtime validation
+      const validRoles = roles.filter((role): role is UserRole =>
+        ['admin', 'manager', 'employee'].includes(role),
+      )
+
+      return validRoles
+    },
     enabled: !!userId,
   })
 }
 
-export function useUserHasRole(userId: string, roleName: string) {
+export function useUserHasRole(userId: string, roleName: UserRole): UseQueryResult<boolean, Error> {
   return useQuery({
     queryKey: [...queryKeys.users.detail(userId), 'hasRole', roleName],
     queryFn: () => checkUserHasRole(userId, roleName),
@@ -160,8 +212,20 @@ export function useInactiveUsers() {
   return useUsers({ is_active: false })
 }
 
-export function useUsersByRole(roleName: string) {
+export function useUsersByRole(roleName: UserRole) {
   return useUsers({ role: roleName })
+}
+
+export function useEmployees() {
+  return useUsersByRole('employee')
+}
+
+export function useManagers() {
+  return useUsersByRole('manager')
+}
+
+export function useAdmins() {
+  return useUsersByRole('admin')
 }
 
 export function useUserActions() {
@@ -237,6 +301,19 @@ export function useUserActions() {
       updates: profileData,
     })
 
+  // Role management helpers
+  const assignRole = (userId: string, role: UserRole) => {
+    // This would need to be implemented in your queries
+    console.log(`Assigning role ${role} to user ${userId}`)
+    // TODO: Implement role assignment logic
+  }
+
+  const removeRole = (userId: string, role: UserRole) => {
+    // This would need to be implemented in your queries
+    console.log(`Removing role ${role} from user ${userId}`)
+    // TODO: Implement role removal logic
+  }
+
   return {
     createUser: createMutation.mutate,
     updateUser: updateMutation.mutate,
@@ -244,6 +321,8 @@ export function useUserActions() {
     activateUser,
     deactivateUser,
     updateUserProfile,
+    assignRole,
+    removeRole,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
