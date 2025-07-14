@@ -1,0 +1,36 @@
+# Use UV for dependency management
+# Install dependencies: uv pip install -e .[dev]
+# Or sync from lock file: uv pip sync requirements.txt
+
+# Core FastAPI dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+asyncpg>=0.29.0
+psycopg2-binary>=2.9.0
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+PyJWT>=2.8.0
+passlib[bcrypt]>=1.7.4
+httpx>=0.25.0
+structlog>=23.2.0
+python-dotenv>=1.0.0
+
+# Rate limiting and caching
+slowapi>=0.1.9
+redis>=5.0.0
+
+# Security and middleware
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Development tools
+black>=23.0.0
+isort>=5.12.0
