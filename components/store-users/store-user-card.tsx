@@ -1,0 +1,295 @@
+'use client'
+
+import { useState } from 'react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  MoreHorizontal,
+  User,
+  Crown,
+  UserCheck,
+  Users,
+  Shield,
+  Pin,
+  UserMinus,
+  Clock,
+  AlertTriangle,
+} from 'lucide-react'
+import { Typography } from '@/components/ui/typography'
+import type { StoreUser } from '@/lib/queries/store-users'
+
+interface StoreUserCardProps {
+  storeUser: StoreUser
+  onChangeRole: (role: 'owner' | 'manager' | 'employee' | 'staff') => void
+  onToggleActive: (isActive: boolean) => void
+  onTogglePinAuth: (enabled: boolean) => void
+  onRemove: () => void
+  isUpdating: boolean
+}
+
+export function StoreUserCard({
+  storeUser,
+  onChangeRole,
+  onToggleActive,
+  onTogglePinAuth,
+  onRemove,
+  isUpdating,
+}: StoreUserCardProps) {
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false)
+
+  // Helper function to get role icon and color
+  const getRoleInfo = (role: string) => {
+    switch (role) {
+      case 'owner':
+        return { icon: Crown, color: 'bg-yellow-100 text-yellow-800', label: 'Owner' }
+      case 'manager':
+        return { icon: UserCheck, color: 'bg-blue-100 text-blue-800', label: 'Manager' }
+      case 'employee':
+        return { icon: User, color: 'bg-green-100 text-green-800', label: 'Employee' }
+      case 'staff':
+        return { icon: Users, color: 'bg-gray-100 text-gray-800', label: 'Staff' }
+      default:
+        return { icon: User, color: 'bg-gray-100 text-gray-800', label: 'Unknown' }
+    }
+  }
+
+  // Helper function to get PIN status
+  const getPinStatus = () => {
+    if (!storeUser.can_use_pin_auth) {
+      return { icon: Pin, color: 'text-gray-400', label: 'PIN Disabled' }
+    }
+
+    if (storeUser.pin_locked_until && new Date() < new Date(storeUser.pin_locked_until)) {
+      return { icon: AlertTriangle, color: 'text-red-500', label: 'PIN Locked' }
+    }
+
+    if (storeUser.requires_pin && !storeUser.username) {
+      return { icon: Clock, color: 'text-orange-500', label: 'PIN Pending' }
+    }
+
+    return { icon: Shield, color: 'text-green-500', label: 'PIN Active' }
+  }
+
+  const roleInfo = getRoleInfo(storeUser.role_in_store)
+  const pinStatus = getPinStatus()
+  const RoleIcon = roleInfo.icon
+  const PinIcon = pinStatus.icon
+
+  // Get user initials for avatar
+  const getInitials = () => {
+    if (storeUser.full_name) {
+      return storeUser.full_name
+        .split(' ')
+        .map(name => name[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    }
+    return storeUser.email.split('@')[0].slice(0, 2).toUpperCase()
+  }
+
+  return (
+    <>
+      <Card className={`relative ${!storeUser.is_active ? 'opacity-60' : ''}`}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage
+                src={storeUser.avatar_url}
+                alt={storeUser.full_name || storeUser.email}
+              />
+              <AvatarFallback>{getInitials()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <Typography variant="h4" className="truncate">
+                {storeUser.full_name || storeUser.email.split('@')[0]}
+              </Typography>
+              <Typography variant="small" color="muted" className="truncate">
+                {storeUser.email}
+              </Typography>
+            </div>
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>User Actions</DropdownMenuLabel>
+
+              {/* Role Changes */}
+              <DropdownMenuItem onClick={() => onChangeRole('employee')}>
+                <User className="mr-2 h-4 w-4" />
+                Make Employee
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onChangeRole('manager')}>
+                <UserCheck className="mr-2 h-4 w-4" />
+                Make Manager
+              </DropdownMenuItem>
+              {storeUser.role_in_store !== 'owner' && (
+                <DropdownMenuItem onClick={() => onChangeRole('owner')}>
+                  <Crown className="mr-2 h-4 w-4" />
+                  Make Owner
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuSeparator />
+
+              {/* PIN Auth Toggle */}
+              <DropdownMenuItem onClick={() => onTogglePinAuth(!storeUser.can_use_pin_auth)}>
+                <Pin className="mr-2 h-4 w-4" />
+                {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
+              </DropdownMenuItem>
+
+              {/* Active Status Toggle */}
+              <DropdownMenuItem onClick={() => onToggleActive(!storeUser.is_active)}>
+                {storeUser.is_active ? (
+                  <>
+                    <UserMinus className="mr-2 h-4 w-4" />
+                    Deactivate User
+                  </>
+                ) : (
+                  <>
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    Reactivate User
+                  </>
+                )}
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Remove from Store */}
+              <DropdownMenuItem
+                onClick={() => setShowRemoveDialog(true)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <UserMinus className="mr-2 h-4 w-4" />
+                Remove from Store
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardHeader>
+
+        <CardContent className="space-y-3">
+          {/* Role Badge */}
+          <div className="flex items-center justify-between">
+            <Badge variant="secondary" className={roleInfo.color}>
+              <RoleIcon className="w-3 h-3 mr-1" />
+              {roleInfo.label}
+            </Badge>
+
+            {/* Status Indicators */}
+            <div className="flex items-center gap-2">
+              {!storeUser.is_active && (
+                <Badge variant="destructive" className="text-xs">
+                  Inactive
+                </Badge>
+              )}
+              {storeUser.can_use_pin_auth && (
+                <div className="flex items-center gap-1" title={pinStatus.label}>
+                  <PinIcon className={`w-3 h-3 ${pinStatus.color}`} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Username (if available) */}
+          {storeUser.username && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="font-medium">Username:</span>
+              <code className="bg-gray-100 px-2 py-1 rounded text-xs">{storeUser.username}</code>
+            </div>
+          )}
+
+          {/* Permissions Summary */}
+          <div className="space-y-2">
+            <Typography variant="small" className="font-medium">
+              Permissions:
+            </Typography>
+            <div className="flex flex-wrap gap-1">
+              {Object.entries(storeUser.permissions).map(([permission, enabled]) => (
+                <Badge
+                  key={permission}
+                  variant={enabled ? 'default' : 'secondary'}
+                  className="text-xs"
+                >
+                  {permission.replace('can_', '').replace('_', ' ')}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Last Login */}
+          {storeUser.last_login && (
+            <Typography variant="small" color="muted">
+              Last login: {new Date(storeUser.last_login).toLocaleDateString()}
+            </Typography>
+          )}
+
+          {/* PIN Attempts Warning */}
+          {storeUser.pin_attempts && storeUser.pin_attempts > 0 && (
+            <div className="flex items-center gap-1 text-orange-600 text-xs">
+              <AlertTriangle className="w-3 h-3" />
+              {storeUser.pin_attempts} failed PIN attempt{storeUser.pin_attempts > 1 ? 's' : ''}
+            </div>
+          )}
+        </CardContent>
+
+        {/* Loading Overlay */}
+        {isUpdating && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+          </div>
+        )}
+      </Card>
+
+      {/* Remove Confirmation Dialog */}
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove User from Store</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {storeUser.full_name || storeUser.email} from this
+              store? This will deactivate their access but won&apos;t delete their account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onRemove()
+                setShowRemoveDialog(false)
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Remove User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}

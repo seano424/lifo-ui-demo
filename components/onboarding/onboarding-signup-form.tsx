@@ -44,8 +44,8 @@ export function OnboardingSignUpForm({
 
   // Determine what's required based on mode
   const requiresAuth = ONBOARDING_MODE === 'test'
-  const isAuthReady = !requiresAuth || !!currentUser?.auth?.id
-  const showAuthWarning = requiresAuth && !currentUser?.auth?.id
+  const isAuthReady = !requiresAuth || !!currentUser?.id
+  const showAuthWarning = requiresAuth && !currentUser?.id
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -87,7 +87,7 @@ export function OnboardingSignUpForm({
 
         case 'test':
           // Test mode: use current logged-in user
-          const currentUserId = currentUser?.auth?.id
+          const currentUserId = currentUser?.id
           if (!currentUserId) {
             setError('Test mode requires you to be signed in first.')
             setIsLoading(false)
@@ -237,8 +237,8 @@ export function OnboardingSignUpForm({
             <strong>🧪 {ONBOARDING_MODE.toUpperCase()} MODE</strong>
             {ONBOARDING_MODE === 'mock' && ' - No database changes, returns fake success'}
             {ONBOARDING_MODE === 'test' &&
-              currentUser?.auth?.id &&
-              ` - Using your account (${currentUser.auth.id.slice(0, 8)}...)`}
+              currentUser?.id &&
+              ` - Using your account (${currentUser.id.slice(0, 8)}...)`}
             {ONBOARDING_MODE === 'production' && ' - Full signup with new user account'}
           </AlertDescription>
         </Alert>
