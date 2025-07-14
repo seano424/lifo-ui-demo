@@ -6,61 +6,79 @@ import { writeFileSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 
-interface ProcessorResult {
-  success: boolean
-  validation: {
-    valid: boolean
-    row_count: number
-    errors: string[]
-    warnings?: string[]
-  }
-  data?: Record<string, unknown>[]
-  processed_count?: number
+interface UnifiedProcessorResult {
+  status: 'success' | 'warning' | 'error'
+  data: ProcessedRow[]
+  processed_count: number
+  warnings: string[]
   errors: string[]
-  warnings?: string[]
+  metadata: {
+    store_id: string
+    processed_at: string
+    processed_by: string
+  }
 }
 
 interface ProcessedRow {
-  [key: string]: string | number
-  SKU: string
-  Product_Name: string
-  Quantity: string | number
-  Expiry_Date: string
-  Cost_Price: string | number
-  Selling_Price: string | number
-  Category: string
-  Unit_Type: string
-  Location: string
-  Batch_Number: string
-  Manufacture_Date: string
+  sku: string
+  product_name: string
+  category: string
+  quantity: number
+  expiry_date: string
+  brand?: string
+  cost_price?: number
+  selling_price?: number
+  manufacture_date?: string
+  location_code: string
+  unit_type: string
+  batch_number: string
+  store_id: string
+  created_by: string
+  status: string
 }
 
-// Python CSV processor integration
-class PythonCSVProcessor {
+// Unified CSV processor integration
+class UnifiedCSVProcessor {
   private pythonPath: string
   private processorPath: string
 
   constructor() {
     // Use the virtual environment Python if available, otherwise system Python
     this.pythonPath = join(process.cwd(), 'lifo-ai-core/venv/bin/python')
-    this.processorPath = join(process.cwd(), 'lifo-ai-core/etl/processor.py')
+    this.processorPath = join(process.cwd(), 'lifo-ai-core/etl/unified_csv_processor.py')
   }
 
-  async processCsv(csvContent: string, validateOnly: boolean = false): Promise<ProcessorResult> {
+  async processCsv(
+    fileContent: Buffer, 
+    storeId: string, 
+    userId: string
+  ): Promise<UnifiedProcessorResult> {
     return new Promise((resolve, reject) => {
       // Create temporary file
       const tempFileName = `csv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.csv`
       const tempFilePath = join(tmpdir(), tempFileName)
 
       try {
-        // Write CSV content to temporary file
-        writeFileSync(tempFilePath, csvContent, 'utf8')
+        // Write file content to temporary file
+        writeFileSync(tempFilePath, fileContent)
 
         // Prepare Python command arguments
-        const args = [this.processorPath, tempFilePath, '--json']
-        if (validateOnly) {
-          args.push('--validate-only')
-        }
+        const args = [
+          '-c',
+          `
+import asyncio
+import sys
+sys.path.insert(0, '${join(process.cwd(), 'lifo-ai-core')}')
+from etl.unified_csv_processor import UnifiedCSVProcessor
+
+async def main():
+    processor = UnifiedCSVProcessor('${storeId}', '${userId}')
+    result = await processor.process_csv_file('${tempFilePath}')
+    print('JSON_RESULT:' + str(result).replace("'", '"'))
+
+asyncio.run(main())
+          `
+        ]
 
         // Spawn Python process
         const pythonProcess = spawn(this.pythonPath, args, {
@@ -88,12 +106,17 @@ class PythonCSVProcessor {
 
           if (code === 0) {
             try {
-              // Parse Python output as JSON (we'll need to modify Python script to output JSON)
-              const result = this.parseProcessorOutput(stdout)
-              resolve(result)
+              // Extract JSON result from Python output
+              const jsonMatch = stdout.match(/JSON_RESULT:(.+)/)
+              if (jsonMatch) {
+                const result = JSON.parse(jsonMatch[1])
+                resolve(result)
+              } else {
+                reject(new Error('No JSON result found in Python output'))
+              }
             } catch (parseError) {
               const message = parseError instanceof Error ? parseError.message : String(parseError)
-              reject(new Error(`Failed to parse processor output: ${message}`))
+              reject(new Error(`Failed to parse processor output: ${message}\nOutput: ${stdout}\nError: ${stderr}`))
             }
           } else {
             reject(new Error(`Python processor failed with code ${code}: ${stderr}`))
@@ -115,187 +138,188 @@ class PythonCSVProcessor {
       }
     })
   }
-
-  private parseProcessorOutput(output: string): ProcessorResult {
-    // Try to parse as JSON first (when --json flag is used)
-    try {
-      const jsonOutput = JSON.parse(output.trim())
-      return jsonOutput
-    } catch {
-      // Fall back to text parsing for backward compatibility
-      if (output.includes('✅ Processing successful')) {
-        // Extract metrics from output
-        const rowCountMatch = output.match(/(\d+) rows/)
-        const processedMatch = output.match(/Processed: (\d+) items/)
-
-        return {
-          success: true,
-          validation: {
-            valid: true,
-            row_count: rowCountMatch ? parseInt(rowCountMatch[1]) : 0,
-            errors: [],
-            warnings: this.extractWarnings(output),
-          },
-          processed_count: processedMatch ? parseInt(processedMatch[1]) : 0,
-          errors: this.extractErrors(output),
-          warnings: this.extractWarnings(output),
-        }
-      } else {
-        return {
-          success: false,
-          validation: {
-            valid: false,
-            errors: this.extractErrors(output),
-            row_count: 0,
-          },
-          data: [],
-          errors: this.extractErrors(output),
-        }
-      }
-    }
-  }
-
-  private extractErrors(output: string): string[] {
-    const errors: string[] = []
-    const lines = output.split('\n')
-
-    lines.forEach(line => {
-      if (line.includes('❌') || line.includes('Error:')) {
-        errors.push(line.replace(/[❌]/g, '').trim())
-      }
-    })
-
-    return errors
-  }
-
-  private extractWarnings(output: string): string[] {
-    const warnings: string[] = []
-    const lines = output.split('\n')
-
-    lines.forEach(line => {
-      if (line.includes('⚠️') || line.includes('Warning:')) {
-        warnings.push(line.replace(/[⚠️]/g, '').trim())
-      }
-    })
-
-    return warnings
-  }
 }
 
-// Fallback mock processor for development/testing
-class MockCSVProcessor {
-  validate_csv_structure(content: string): ProcessorResult['validation'] {
+// Legacy fallback processor (simplified)
+class FallbackCSVProcessor {
+  private storeId: string
+  private userId: string
+
+  constructor(storeId: string, userId: string) {
+    this.storeId = storeId
+    this.userId = userId
+  }
+
+  async processCsv(csvContent: string): Promise<UnifiedProcessorResult> {
     try {
-      const lines = content.split('\n').filter(line => line.trim())
+      const lines = csvContent.split('\n').filter(line => line.trim())
       if (lines.length < 2) {
-        return {
-          valid: false,
-          errors: ['CSV must have at least a header and one data row'],
-          row_count: 0,
-        }
+        throw new Error('CSV must have at least a header and one data row')
       }
 
-      const headers = lines[0].split(',').map(h => h.trim())
-      const requiredColumns = [
-        'SKU',
-        'Product_Name',
-        'Quantity',
-        'Expiry_Date',
-        'Cost_Price',
-        'Selling_Price',
-      ]
-      const missingColumns = requiredColumns.filter(col => !headers.includes(col))
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g, '_'))
+      const data: ProcessedRow[] = []
+      const errors: string[] = []
+      const warnings: string[] = []
 
+      // Column mapping
+      const columnMap: { [key: string]: string } = {
+        'sku': 'sku',
+        'product_name': 'product_name',
+        'productname': 'product_name', 
+        'name': 'product_name',
+        'category': 'category',
+        'quantity': 'quantity',
+        'qty': 'quantity',
+        'expiry_date': 'expiry_date',
+        'expirydate': 'expiry_date',
+        'expiry': 'expiry_date',
+        'cost_price': 'cost_price',
+        'costprice': 'cost_price',
+        'selling_price': 'selling_price',
+        'sellingprice': 'selling_price',
+        'price': 'selling_price',
+        'brand': 'brand',
+        'manufacture_date': 'manufacture_date',
+        'mfg_date': 'manufacture_date',
+        'location': 'location_code',
+        'location_code': 'location_code',
+        'unit_type': 'unit_type',
+        'unit': 'unit_type'
+      }
+
+      // Check required columns
+      const mappedHeaders = headers.map(h => columnMap[h] || h)
+      const requiredColumns = ['sku', 'product_name', 'quantity', 'expiry_date']
+      const missingColumns = requiredColumns.filter(col => !mappedHeaders.includes(col))
+      
       if (missingColumns.length > 0) {
-        return {
-          valid: false,
-          errors: [`Missing required columns: ${missingColumns.join(', ')}`],
-          row_count: lines.length - 1,
+        throw new Error(`Missing required columns: ${missingColumns.join(', ')}`)
+      }
+
+      for (let i = 1; i < lines.length; i++) {
+        try {
+          const values = lines[i].split(',').map(v => v.trim())
+          const rowData: any = {}
+
+          // Map values to normalized columns
+          headers.forEach((header, index) => {
+            const normalizedHeader = columnMap[header] || header
+            rowData[normalizedHeader] = values[index] || ''
+          })
+
+          // Validate and process row
+          const processedRow: ProcessedRow = {
+            sku: this.validateSku(rowData.sku, i),
+            product_name: this.validateProductName(rowData.product_name, i),
+            category: this.normalizeCategory(rowData.category || 'dry_goods'),
+            quantity: this.validateQuantity(rowData.quantity, i),
+            expiry_date: this.validateDate(rowData.expiry_date, i),
+            brand: rowData.brand || 'Unknown',
+            cost_price: this.validatePrice(rowData.cost_price),
+            selling_price: this.validatePrice(rowData.selling_price),
+            manufacture_date: this.validateDate(rowData.manufacture_date) || this.estimateManufactureDate(rowData.expiry_date),
+            location_code: rowData.location_code || 'MAIN',
+            unit_type: rowData.unit_type || 'pcs',
+            batch_number: `${this.storeId.substring(0, 8)}_${rowData.sku}_${Date.now()}_${i.toString().padStart(3, '0')}`,
+            store_id: this.storeId,
+            created_by: this.userId,
+            status: 'active'
+          }
+
+          data.push(processedRow)
+        } catch (rowError) {
+          const message = rowError instanceof Error ? rowError.message : String(rowError)
+          errors.push(`Row ${i}: ${message}`)
         }
       }
 
       return {
-        valid: true,
-        errors: [],
-        row_count: lines.length - 1,
+        status: errors.length > 0 ? 'warning' : 'success',
+        data,
+        processed_count: data.length,
+        warnings,
+        errors,
+        metadata: {
+          store_id: this.storeId,
+          processed_at: new Date().toISOString(),
+          processed_by: this.userId
+        }
       }
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
       return {
-        valid: false,
-        errors: [`Failed to parse CSV: ${error instanceof Error ? error.message : String(error)}`],
-        row_count: 0,
+        status: 'error',
+        data: [],
+        processed_count: 0,
+        warnings: [],
+        errors: [message],
+        metadata: {
+          store_id: this.storeId,
+          processed_at: new Date().toISOString(),
+          processed_by: this.userId
+        }
       }
     }
   }
 
-  clean_and_normalize_data(content: string): [ProcessedRow[], string[]] {
-    const lines = content.split('\n').filter(line => line.trim())
-    const headers = lines[0].split(',').map(h => h.trim())
-    const data: ProcessedRow[] = []
-    const errors: string[] = []
-
-    for (let i = 1; i < lines.length; i++) {
-      try {
-        const values = lines[i].split(',').map(v => v.trim())
-        const row: ProcessedRow = {} as ProcessedRow
-
-        headers.forEach((header, index) => {
-          row[header] = values[index] || ''
-        })
-
-        // Basic validation and defaults
-        row['Category'] = row['Category'] || 'dry_goods'
-        row['Unit_Type'] = row['Unit_Type'] || 'pcs'
-        row['Location'] = row['Location'] || 'MAIN'
-        row['Batch_Number'] = row['Batch_Number'] || `${row['SKU']}-${Date.now()}`
-        row['Manufacture_Date'] = row['Manufacture_Date'] || new Date().toISOString().split('T')[0]
-
-        // Validate required fields
-        if (!row['SKU'] || !row['Product_Name'] || !row['Quantity'] || !row['Expiry_Date']) {
-          errors.push(`Row ${i}: Missing required fields`)
-          continue
-        }
-
-        // Validate numbers
-        const quantity = parseFloat(String(row['Quantity']))
-        const costPrice = parseFloat(String(row['Cost_Price']))
-        const sellingPrice = parseFloat(String(row['Selling_Price']))
-
-        if (isNaN(quantity) || quantity <= 0) {
-          errors.push(`Row ${i}: Invalid quantity`)
-          continue
-        }
-
-        if (isNaN(costPrice) || costPrice <= 0) {
-          errors.push(`Row ${i}: Invalid cost price`)
-          continue
-        }
-
-        if (isNaN(sellingPrice) || sellingPrice <= 0) {
-          errors.push(`Row ${i}: Invalid selling price`)
-          continue
-        }
-
-        // Validate date
-        const expiryDate = new Date(String(row['Expiry_Date']))
-        if (isNaN(expiryDate.getTime())) {
-          errors.push(`Row ${i}: Invalid expiry date`)
-          continue
-        }
-
-        // Convert numeric strings to numbers
-        row['Quantity'] = quantity
-        row['Cost_Price'] = costPrice
-        row['Selling_Price'] = sellingPrice
-
-        data.push(row)
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        errors.push(`Row ${i}: ${message}`)
-      }
+  private validateSku(sku: any, row: number): string {
+    if (!sku || typeof sku !== 'string' || !sku.trim()) {
+      throw new Error('SKU is required')
     }
+    return sku.trim()
+  }
 
-    return [data, errors]
+  private validateProductName(name: any, row: number): string {
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      throw new Error('Product name is required')
+    }
+    return name.trim()
+  }
+
+  private normalizeCategory(category: string): string {
+    const categoryMap: { [key: string]: string } = {
+      'produce': 'fresh_produce',
+      'meat': 'fresh_meat_fish', 
+      'dairy': 'dairy',
+      'bakery': 'bakery_fresh',
+      'frozen': 'frozen',
+      'beverages': 'beverages'
+    }
+    
+    const lowerCategory = category.toLowerCase()
+    return categoryMap[lowerCategory] || 'dry_goods'
+  }
+
+  private validateQuantity(quantity: any, row: number): number {
+    const qty = parseFloat(quantity)
+    if (isNaN(qty) || qty <= 0) {
+      throw new Error('Invalid quantity')
+    }
+    return qty
+  }
+
+  private validateDate(dateStr: any, row?: number): string | undefined {
+    if (!dateStr) return undefined
+    
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) {
+      if (row) throw new Error('Invalid date format')
+      return undefined
+    }
+    return date.toISOString().split('T')[0]
+  }
+
+  private validatePrice(price: any): number | undefined {
+    if (!price) return undefined
+    const priceNum = parseFloat(price)
+    return isNaN(priceNum) ? undefined : priceNum
+  }
+
+  private estimateManufactureDate(expiryDate: string): string {
+    const expiry = new Date(expiryDate)
+    const estimated = new Date(expiry.getTime() - (30 * 24 * 60 * 60 * 1000)) // 30 days before
+    return estimated.toISOString().split('T')[0]
   }
 }
 
@@ -315,7 +339,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
-    const usePython = formData.get('usePython') === 'true' // Optional flag to use Python processor
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
@@ -328,20 +351,16 @@ export async function POST(request: NextRequest) {
     // Validate file type
     if (!file.name.toLowerCase().endsWith('.csv')) {
       return NextResponse.json(
-        {
-          error: 'Invalid file type. Please upload a CSV file.',
-        },
-        { status: 400 },
+        { error: 'Invalid file type. Please upload a CSV file.' },
+        { status: 400 }
       )
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
-        {
-          error: 'File too large. Maximum size is 10MB.',
-        },
-        { status: 400 },
+        { error: 'File too large. Maximum size is 10MB.' },
+        { status: 400 }
       )
     }
 
@@ -351,99 +370,81 @@ export async function POST(request: NextRequest) {
 
     if (!hasAccess) {
       return NextResponse.json(
-        {
-          error: 'No access to this store',
-        },
-        { status: 403 },
+        { error: 'No access to this store' },
+        { status: 403 }
       )
     }
 
-    const csvContent = await file.text()
-    let validation: ProcessorResult['validation']
-    let cleanedData: ProcessedRow[]
-    let processingErrors: string[]
+    // Get file content
+    const fileBuffer = Buffer.from(await file.arrayBuffer())
+    let result: UnifiedProcessorResult
 
-    if (usePython) {
-      try {
-        // Use Python CSV processor
-        const pythonProcessor = new PythonCSVProcessor()
-        const result = await pythonProcessor.processCsv(csvContent, false)
-
-        if (!result.success) {
-          return NextResponse.json(
-            {
-              error: 'Python CSV processing failed',
-              details: result.errors,
-            },
-            { status: 400 },
-          )
-        }
-
-        validation = result.validation
-        cleanedData = (result.data || []) as ProcessedRow[]
-        processingErrors = result.errors || []
-      } catch (pythonError) {
-        console.warn('Python processor failed, falling back to JavaScript:', pythonError)
-        // Fall back to JavaScript processor
-        const mockProcessor = new MockCSVProcessor()
-        validation = mockProcessor.validate_csv_structure(csvContent)
-
-        if (!validation.valid) {
-          return NextResponse.json(
-            {
-              error: 'Invalid CSV format',
-              details: validation.errors,
-            },
-            { status: 400 },
-          )
-        }
-
-        const [data, errors] = mockProcessor.clean_and_normalize_data(csvContent)
-        cleanedData = data
-        processingErrors = errors
-      }
-    } else {
-      // Use JavaScript/mock processor
-      const mockProcessor = new MockCSVProcessor()
-      validation = mockProcessor.validate_csv_structure(csvContent)
-
-      if (!validation.valid) {
-        return NextResponse.json(
-          {
-            error: 'Invalid CSV format',
-            details: validation.errors,
-          },
-          { status: 400 },
-        )
-      }
-
-      const [data, errors] = mockProcessor.clean_and_normalize_data(csvContent)
-      cleanedData = data
-      processingErrors = errors
+    try {
+      // Try unified Python processor first
+      console.log('Attempting to use unified Python processor...')
+      const unifiedProcessor = new UnifiedCSVProcessor()
+      result = await unifiedProcessor.processCsv(fileBuffer, storeId, user.id)
+      console.log('Unified processor succeeded')
+    } catch (pythonError) {
+      console.warn('Unified Python processor failed, falling back to JavaScript:', pythonError)
+      
+      // Fall back to JavaScript processor
+      const csvContent = fileBuffer.toString('utf-8')
+      const fallbackProcessor = new FallbackCSVProcessor(storeId, user.id)
+      result = await fallbackProcessor.processCsv(csvContent)
+      console.log('Fallback processor completed')
     }
 
-    if (cleanedData.length === 0) {
+    if (result.status === 'error') {
+      return NextResponse.json(
+        {
+          error: 'CSV processing failed',
+          details: result.errors,
+        },
+        { status: 400 }
+      )
+    }
+
+    if (result.data.length === 0) {
       return NextResponse.json(
         {
           error: 'No valid data found in CSV',
-          details: processingErrors,
+          details: result.errors,
         },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
+    // Convert to format expected by InventoryOperations
+    const formattedData = result.data.map(item => ({
+      SKU: item.sku,
+      Product_Name: item.product_name,
+      Category: item.category,
+      Quantity: item.quantity,
+      Expiry_Date: item.expiry_date,
+      Brand: item.brand || 'Unknown',
+      Cost_Price: item.cost_price || 0,
+      Selling_Price: item.selling_price || 0,
+      Manufacture_Date: item.manufacture_date || item.expiry_date,
+      Location: item.location_code,
+      Unit_Type: item.unit_type,
+      Batch_Number: item.batch_number
+    }))
+
     // Process inventory using the database operations
-    const result = await operations.processCsvBatch(cleanedData, storeId, user.id)
+    const dbResult = await operations.processCsvBatch(formattedData, storeId, user.id)
 
     return NextResponse.json({
       success: true,
-      processed: result.processed,
-      errors: [...processingErrors, ...result.errors],
-      total_rows: validation.row_count,
-      valid_rows: cleanedData.length,
+      processed: dbResult.processed,
+      errors: [...result.errors, ...dbResult.errors],
+      warnings: result.warnings,
+      total_items: result.data.length,
+      valid_items: result.data.length,
       store_id: storeId,
-      processor_used: usePython ? 'python' : 'javascript',
-      message: `Successfully processed ${result.processed} items`,
+      processor_used: result.errors.length === 0 ? 'unified_python' : 'fallback_javascript',
+      message: `Successfully processed ${dbResult.processed} items`,
+      metadata: result.metadata
     })
   } catch (error) {
     console.error('CSV upload error:', error)
@@ -453,7 +454,7 @@ export async function POST(request: NextRequest) {
         error: 'Upload failed',
         details: message,
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

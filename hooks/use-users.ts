@@ -13,15 +13,7 @@ import {
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
-import {
-  useInfiniteQuery,
-  useQuery,
-  useMutation,
-  useQueryClient,
-  type UseQueryResult,
-} from '@tanstack/react-query'
-
-export type UserRole = 'admin' | 'manager' | 'employee'
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
@@ -100,7 +92,7 @@ export function useCurrentUser() {
   })
 }
 
-export function useCurrentUserRoles(): UseQueryResult<UserRole[], Error> {
+export function useCurrentUserRoles() {
   const { data: currentUser } = useCurrentUser()
 
   return useQuery({
@@ -131,7 +123,7 @@ export function useCurrentUserRoles(): UseQueryResult<UserRole[], Error> {
   })
 }
 
-export function useCurrentUserHasRole(roleName: UserRole): UseQueryResult<boolean, Error> {
+export function useCurrentUserHasRole(roleName: string) {
   const { data: currentUser } = useCurrentUser()
 
   return useQuery({
@@ -158,28 +150,25 @@ export function usePermissions() {
     isAdmin: !!isAdmin,
     isManager: !!isManager,
     isEmployee: roles?.includes('employee') ?? false,
-    roles: roles || ([] as UserRole[]),
-
-    // Type-safe role checker
-    hasRole: (role: UserRole): boolean => roles?.includes(role) ?? false,
+    roles: roles || [],
 
     // Permission helpers
-    canEditProduct: (productCreatorId?: string): boolean => {
+    canEditProduct: (productCreatorId?: string) => {
       if (!currentUser) return false
       return isAdmin || isManager || productCreatorId === currentUser.id
     },
 
-    canDeleteProduct: (productCreatorId?: string): boolean => {
+    canDeleteProduct: (productCreatorId?: string) => {
       if (!currentUser) return false
       return !!isAdmin || !!isManager || productCreatorId === currentUser.id
     },
 
-    canManageUsers: (): boolean => {
-      return !!isAdmin || !!isManager
+    canManageUsers: () => {
+      return isAdmin || isManager
     },
 
-    canCreateProducts: (): boolean => {
-      return !!isAdmin || !!isManager
+    canCreateProducts: () => {
+      return isAdmin || isManager
     },
 
     canScanProducts: (): boolean => {
@@ -225,24 +214,15 @@ export function useUser(userId: string): UseQueryResult<User, Error> {
   })
 }
 
-export function useUserRoles(userId: string): UseQueryResult<UserRole[], Error> {
+export function useUserRoles(userId: string) {
   return useQuery({
     queryKey: [...queryKeys.users.detail(userId), 'roles'],
-    queryFn: async (): Promise<UserRole[]> => {
-      const roles = await fetchUserRoles(userId)
-
-      // Runtime validation
-      const validRoles = roles.filter((role): role is UserRole =>
-        ['admin', 'manager', 'employee'].includes(role),
-      )
-
-      return validRoles
-    },
+    queryFn: () => fetchUserRoles(userId),
     enabled: !!userId,
   })
 }
 
-export function useUserHasRole(userId: string, roleName: UserRole): UseQueryResult<boolean, Error> {
+export function useUserHasRole(userId: string, roleName: string) {
   return useQuery({
     queryKey: [...queryKeys.users.detail(userId), 'hasRole', roleName],
     queryFn: () => checkUserHasRole(userId, roleName),
@@ -258,7 +238,7 @@ export function useInactiveUsers() {
   return useUsers({ is_active: false })
 }
 
-export function useUsersByRole(roleName: UserRole) {
+export function useUsersByRole(roleName: string) {
   return useUsers({ role: roleName })
 }
 
