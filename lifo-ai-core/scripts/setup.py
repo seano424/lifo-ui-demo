@@ -83,12 +83,19 @@ def create_env_file():
                 dst.write(src.read())
             logger.info(".env file created from .env.example")
         else:
-            # Create basic template
+            # Create basic template with secure placeholders
             env_content = """# LIFO AI Core Environment Variables
-DATABASE_URL=postgresql://user:password@localhost:5432/lifo_db
+# SECURITY WARNING: Replace all placeholder values with actual credentials
+# DO NOT commit this file with real credentials
+DATABASE_URL=postgresql://YOUR_USERNAME:YOUR_PASSWORD@YOUR_HOST:5432/YOUR_DATABASE
 LIFO_LOG_LEVEL=INFO
 LIFO_DEBUG=True
 LIFO_ENVIRONMENT=development
+
+# Instructions:
+# 1. Replace YOUR_USERNAME, YOUR_PASSWORD, YOUR_HOST, YOUR_DATABASE with actual values
+# 2. Add this file to .gitignore to prevent credential exposure
+# 3. Use environment variables in production
 """
             with open(env_file, 'w') as f:
                 f.write(env_content)
