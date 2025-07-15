@@ -17,16 +17,19 @@ This guide covers deploying the LIFO AI Platform to Digital Ocean App Platform.
 #### 1. Install doctl CLI
 
 **macOS:**
+
 ```bash
 brew install doctl
 ```
 
 **Linux:**
+
 ```bash
 snap install doctl
 ```
 
 **Windows:**
+
 ```bash
 # Download from https://github.com/digitalocean/doctl/releases
 ```
@@ -66,17 +69,20 @@ envs:
 Set these environment variables in Digital Ocean:
 
 **Global Variables:**
+
 - `SUPABASE_URL`: Your Supabase project URL
 - `SUPABASE_JWT_SECRET`: Your Supabase JWT secret
 - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key
 - `SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
 **Frontend Variables:**
+
 - `NEXT_PUBLIC_API_URL`: Auto-populated by Digital Ocean
 - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
 **API Variables:**
+
 - `ENVIRONMENT`: `production`
 - `DEBUG`: `false`
 - `LOG_LEVEL`: `INFO`
@@ -158,14 +164,17 @@ curl https://your-api-url.ondigitalocean.app/api/v1/debug/cors-info
 #### Common Issues
 
 1. **Build Failures**
+
    - Check build logs: `doctl apps logs YOUR_APP_ID --type=build`
    - Verify dependencies in `requirements.txt` and `package.json`
 
 2. **Runtime Errors**
+
    - Check runtime logs: `doctl apps logs YOUR_APP_ID --type=run`
    - Verify environment variables are set correctly
 
 3. **Database Connection Issues**
+
    - Ensure database is created and accessible
    - Check `DATABASE_URL` environment variable
 
@@ -184,12 +193,14 @@ When `ENVIRONMENT=development`, these endpoints are available:
 ### Environment-Specific Configurations
 
 #### Production
+
 - Docs disabled (`/docs`, `/redoc` return 404)
 - Debug endpoints disabled
 - CORS origins restricted to configured URLs
 - Logging level set to `WARNING`
 
 #### Development
+
 - All endpoints enabled
 - Debug endpoints available
 - CORS origins include localhost
@@ -226,8 +237,8 @@ Adjust scaling in `.do/app.yaml`:
 ```yaml
 services:
   - name: api
-    instance_count: 2  # Scale to 2 instances
-    instance_size_slug: basic-s  # Upgrade to larger instance
+    instance_count: 2 # Scale to 2 instances
+    instance_size_slug: basic-s # Upgrade to larger instance
 ```
 
 ### Cost Optimization
@@ -305,6 +316,7 @@ docker-compose down
 ## Support
 
 For deployment issues:
+
 1. Check Digital Ocean documentation
 2. Review application logs
 3. Test with debug endpoints

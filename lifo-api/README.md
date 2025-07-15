@@ -39,18 +39,21 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-org/lifo-ai-engine.git
    cd lifo-ai-engine
    ```
 
 2. **Set up virtual environment**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\\Scripts\\activate
    ```
 
 3. **Install dependencies**
+
    ```bash
    pip install -e ".[all]"
    # Or for development
@@ -58,12 +61,14 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
    ```
 
 4. **Configure environment**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 5. **Run the application**
+
    ```bash
    make run-dev
    # Or directly with uvicorn
@@ -99,6 +104,7 @@ LOG_LEVEL=INFO
 ### Database Setup
 
 1. **Create database**
+
    ```sql
    CREATE DATABASE lifo_db;
    ```
@@ -112,45 +118,45 @@ LOG_LEVEL=INFO
 
 ### Core Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | API root with service info |
-| `/health` | GET | Health check endpoint |
-| `/api/info` | GET | Detailed API information |
+| Endpoint    | Method | Description                |
+| ----------- | ------ | -------------------------- |
+| `/`         | GET    | API root with service info |
+| `/health`   | GET    | Health check endpoint      |
+| `/api/info` | GET    | Detailed API information   |
 
 ### Scoring Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/scoring/score-batch/{batch_id}` | POST | Score individual batch |
-| `/api/v1/scoring/score-store/{store_id}` | POST | Score all store inventory |
-| `/api/v1/scoring/high-urgency/{store_id}` | GET | Get high urgency items |
-| `/api/v1/scoring/recommendations/{store_id}` | GET | Get AI recommendations |
+| Endpoint                                     | Method | Description               |
+| -------------------------------------------- | ------ | ------------------------- |
+| `/api/v1/scoring/score-batch/{batch_id}`     | POST   | Score individual batch    |
+| `/api/v1/scoring/score-store/{store_id}`     | POST   | Score all store inventory |
+| `/api/v1/scoring/high-urgency/{store_id}`    | GET    | Get high urgency items    |
+| `/api/v1/scoring/recommendations/{store_id}` | GET    | Get AI recommendations    |
 
 ### Inventory Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/inventory/store/{store_id}` | GET | Get store inventory |
-| `/api/v1/inventory/batch/{batch_id}` | GET | Get batch details |
-| `/api/v1/inventory/batch/{batch_id}/discount` | POST | Apply discount |
-| `/api/v1/inventory/bulk-action` | POST | Bulk operations |
+| Endpoint                                      | Method | Description         |
+| --------------------------------------------- | ------ | ------------------- |
+| `/api/v1/inventory/store/{store_id}`          | GET    | Get store inventory |
+| `/api/v1/inventory/batch/{batch_id}`          | GET    | Get batch details   |
+| `/api/v1/inventory/batch/{batch_id}/discount` | POST   | Apply discount      |
+| `/api/v1/inventory/bulk-action`               | POST   | Bulk operations     |
 
 ### Analytics Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/analytics/store/{store_id}` | GET | Store analytics |
-| `/api/v1/analytics/dashboard/{store_id}` | GET | Dashboard data |
-| `/api/v1/analytics/performance/{store_id}` | GET | Performance metrics |
+| Endpoint                                   | Method | Description         |
+| ------------------------------------------ | ------ | ------------------- |
+| `/api/v1/analytics/store/{store_id}`       | GET    | Store analytics     |
+| `/api/v1/analytics/dashboard/{store_id}`   | GET    | Dashboard data      |
+| `/api/v1/analytics/performance/{store_id}` | GET    | Performance metrics |
 
 ### CSV Processing Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/csv/upload/{store_id}` | POST | Upload CSV file |
-| `/api/v1/csv/template/{type}` | GET | Get CSV template |
-| `/api/v1/csv/validate/{store_id}` | POST | Validate CSV data |
+| Endpoint                          | Method | Description       |
+| --------------------------------- | ------ | ----------------- |
+| `/api/v1/csv/upload/{store_id}`   | POST   | Upload CSV file   |
+| `/api/v1/csv/template/{type}`     | GET    | Get CSV template  |
+| `/api/v1/csv/validate/{store_id}` | POST   | Validate CSV data |
 
 ## 🧪 Testing
 
@@ -201,11 +207,13 @@ make pre-commit
 ### Development Workflow
 
 1. **Create feature branch**
+
    ```bash
    git checkout -b feature/your-feature
    ```
 
 2. **Make changes and test**
+
    ```bash
    make dev-check
    ```
@@ -276,6 +284,7 @@ The application exposes metrics for monitoring:
 ### Security Implementations
 
 #### Authentication Security
+
 ```python
 # Constant-time comparison to prevent timing attacks
 import hmac
@@ -287,6 +296,7 @@ self.algorithms = ["HS256"]  # Only allow HS256
 ```
 
 #### Input Validation
+
 ```python
 # UUID validation with sanitization
 def validate_store_id_format(store_id: str) -> str:
@@ -301,11 +311,12 @@ dangerous_patterns = [
 ```
 
 #### File Upload Security
+
 ```python
 # Magic number verification for file content
 dangerous_headers = [
     b'MZ',  # Windows executable
-    b'\x7fELF',  # Linux executable  
+    b'\x7fELF',  # Linux executable
     b'\x89PNG',  # PNG image (not CSV)
 ]
 ```
