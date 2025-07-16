@@ -2,6 +2,7 @@
 Configuration management for LIFO AI Engine
 Handles environment variables and application settings
 """
+from pydantic import Field
 from pydantic_settings import BaseSettings
 from typing import List, Dict, Any, Optional
 import os
@@ -46,6 +47,7 @@ class Settings(BaseSettings):
     # Authentication
     supabase_url: str = ""
     supabase_jwt_secret: str = ""
+    supabase_anon_key: str = ""
     supabase_service_role_key: str = ""
     
     # Logging

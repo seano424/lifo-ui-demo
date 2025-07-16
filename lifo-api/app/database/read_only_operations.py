@@ -338,21 +338,22 @@ class SecureReadOnlyOperations:
             else:
                 store_uuid = store_id
             
-            # Get analytics data from read-only view
+            # Get analytics data directly from batches table
             query = text("""
                 SELECT 
-                    total_batches,
-                    total_quantity,
-                    total_value,
-                    expired_count,
-                    expiring_soon_count,
-                    critical_items,
-                    high_urgency_items,
-                    medium_urgency_items,
-                    low_urgency_items
-                FROM analytics_summary_view
-                WHERE store_id = :store_id
-                AND analysis_date >= :start_date
+                    COUNT(b.batch_id) as total_batches,
+                    COALESCE(SUM(b.current_quantity), 0) as total_quantity,
+                    COALESCE(SUM(b.current_quantity * b.selling_price), 0) as total_value,
+                    COUNT(CASE WHEN b.expiry_date < CURRENT_DATE THEN 1 END) as expired_count,
+                    COUNT(CASE WHEN b.expiry_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as expiring_soon_count,
+                    COUNT(CASE WHEN b.expiry_date <= CURRENT_DATE + INTERVAL '1 day' THEN 1 END) as critical_items,
+                    COUNT(CASE WHEN b.expiry_date BETWEEN CURRENT_DATE + INTERVAL '1 day' AND CURRENT_DATE + INTERVAL '3 days' THEN 1 END) as high_urgency_items,
+                    COUNT(CASE WHEN b.expiry_date BETWEEN CURRENT_DATE + INTERVAL '3 days' AND CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as medium_urgency_items,
+                    COUNT(CASE WHEN b.expiry_date > CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as low_urgency_items
+                FROM inventory.batches b
+                WHERE b.store_id = :store_id
+                AND b.status = 'active'
+                AND b.current_quantity > 0
             """)
             
             params = {

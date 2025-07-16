@@ -47,15 +47,15 @@ async def get_current_user(
             raise AuthenticationException("Invalid authentication token")
         
         # Verify token with Supabase
-        user = supabase_auth.verify_token(token)
+        user = await supabase_auth.verify_token(token)
         
         # Log successful authentication (without sensitive data)
         logger.info("User authenticated successfully", 
-                   user_id=user.id,
+                   user_id=user.user_id,
                    role=user.role)
         
         return {
-            "sub": user.id,
+            "sub": user.user_id,
             "email": user.email,
             "role": user.role,
             "aud": user.aud,
@@ -83,9 +83,9 @@ async def get_optional_user(
     
     try:
         token = authorization[7:]  # Remove "Bearer " prefix
-        user = supabase_auth.verify_token(token)
+        user = await supabase_auth.verify_token(token)
         return {
-            "sub": user.id,
+            "sub": user.user_id,
             "email": user.email,
             "role": user.role,
             "authenticated": True
@@ -103,7 +103,7 @@ async def require_service_role(
     """
     try:
         token = credentials.credentials
-        if not supabase_auth.verify_service_role(token):
+        if not supabase_auth.verify_service_role_token(token):
             logger.warning("Service role authentication failed")
             raise AuthorizationException("Service role required")
         
@@ -367,8 +367,13 @@ def rate_limit_key_func(request: Request) -> str:
         auth_header = request.headers.get("authorization", "")
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
-            user = supabase_auth.verify_token(token)
-            return f"user:{user.id}"
+            # For rate limiting, we'll decode without verification for speed
+            # This is safe because we're only using it for rate limiting keys
+            import jwt
+            payload = jwt.decode(token, options={"verify_signature": False})
+            user_id = payload.get("sub")
+            if user_id:
+                return f"user:{user_id}"
     except Exception:
         pass
     

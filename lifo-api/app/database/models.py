@@ -53,9 +53,9 @@ class User(Base):
 
 
 class Role(Base):
-    """Role definitions - custom role management in auth schema"""
+    """Role definitions - custom role management in user_mgmt schema"""
     __tablename__ = "roles"
-    __table_args__ = {"schema": "auth"}
+    __table_args__ = {"schema": "user_mgmt"}
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(50), unique=True, nullable=False)
@@ -68,11 +68,11 @@ class UserRole(Base):
     """User role assignments"""
     __tablename__ = "user_roles"
     __table_args__ = (
-        {"schema": "auth"},
+        {"schema": "user_mgmt"},
     )
     
     user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"), primary_key=True)
-    role_id = Column(UUID(as_uuid=True), ForeignKey("auth.roles.id"), primary_key=True)
+    role_id = Column(UUID(as_uuid=True), ForeignKey("user_mgmt.roles.id"), primary_key=True)
     assigned_at = Column(DateTime, default=func.now())
     assigned_by = Column(UUID(as_uuid=True))
 

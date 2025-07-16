@@ -102,6 +102,30 @@ class SecurityException(MVPBaseException):
         )
 
 
+class AuthenticationException(MVPBaseException):
+    """Exception for authentication errors"""
+    def __init__(self, message: str = "Authentication required"):
+        super().__init__(
+            message=message,
+            error_code="AUTHENTICATION_ERROR",
+            status_code=401,
+            user_message="Please sign in to continue",
+            retry_allowed=False
+        )
+
+
+class AuthorizationException(MVPBaseException):
+    """Exception for authorization errors"""
+    def __init__(self, message: str = "Access denied"):
+        super().__init__(
+            message=message,
+            error_code="AUTHORIZATION_ERROR",
+            status_code=403,
+            user_message="You don't have permission to access this resource",
+            retry_allowed=False
+        )
+
+
 class RateLimitException(MVPBaseException):
     """Exception for rate limiting"""
     def __init__(self, message: str, retry_after: int = 60):

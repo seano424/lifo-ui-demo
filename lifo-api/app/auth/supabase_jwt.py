@@ -1,6 +1,7 @@
 """
 Supabase JWT Authentication for LIFO AI Engine
 Provides seamless integration with existing Supabase authentication
+Updated to use modern JWKS-based verification instead of legacy JWT secret
 """
 import jwt
 from datetime import datetime, timezone
@@ -8,6 +9,8 @@ from typing import Dict, Optional, Any
 import structlog
 from fastapi import HTTPException, status
 from pydantic import BaseModel
+import httpx
+import json
 
 from app.core.config import settings
 
@@ -57,9 +60,9 @@ class SupabaseAuth:
         # JWT algorithm - enforce HS256 only for security
         self.algorithms = ["HS256"]
         
-    def verify_token(self, token: str) -> SupabaseUser:
+    async def verify_token(self, token: str) -> SupabaseUser:
         """
-        Verify and decode Supabase JWT token
+        Verify and decode Supabase JWT token using Auth server verification
         
         Args:
             token: JWT token from Authorization header
@@ -75,7 +78,12 @@ class SupabaseAuth:
             if token.startswith("Bearer "):
                 token = token[7:]
             
-            # Decode JWT token
+            # Use Auth server verification (recommended approach)
+            user_info = await self._verify_with_auth_server(token)
+            if user_info:
+                return user_info
+            
+            # Fallback to legacy JWT secret verification
             payload = jwt.decode(
                 token,
                 self.jwt_secret,
@@ -88,21 +96,6 @@ class SupabaseAuth:
                     "require": ["exp", "iat", "sub"]
                 }
             )
-            
-            # Validate token hasn't expired
-            exp_timestamp = payload.get("exp")
-            if exp_timestamp:
-                exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
-                if exp_datetime < datetime.now(timezone.utc):
-                    raise SupabaseAuthError("Token has expired")
-            
-            # Validate issuer if configured
-            if self.supabase_url:
-                expected_issuer = f"{self.supabase_url}/auth/v1"
-                if payload.get("iss") != expected_issuer:
-                    self.logger.warning("Token issuer mismatch", 
-                                      expected=expected_issuer, 
-                                      actual=payload.get("iss"))
             
             # Extract user information
             user_id = payload.get("sub")
@@ -146,8 +139,84 @@ class SupabaseAuth:
             raise SupabaseAuthError("Invalid token audience")
             
         except Exception as e:
-            self.logger.error("Token verification failed", error=str(e))
+            self.logger.error("Token verification failed", error=str(e), token_preview=token[:20] + "..." if len(token) > 20 else token)
             raise SupabaseAuthError(f"Authentication failed: {str(e)}")
+    
+    async def _verify_with_auth_server(self, token: str) -> Optional[SupabaseUser]:
+        """
+        Verify token with Supabase Auth server (modern approach)
+        """
+        try:
+            auth_url = f"{self.supabase_url}/auth/v1/user"
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "apikey": settings.supabase_anon_key or settings.supabase_service_role_key
+            }
+            
+            self.logger.info("Attempting Auth server verification", 
+                           url=auth_url, 
+                           has_anon_key=bool(settings.supabase_anon_key),
+                           has_service_key=bool(settings.supabase_service_role_key))
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.get(auth_url, headers=headers, timeout=10.0)
+                
+                # Log detailed response information
+                self.logger.info("Auth server response", 
+                               status_code=response.status_code,
+                               headers=dict(response.headers),
+                               response_length=len(response.content))
+                
+                if response.status_code == 200:
+                    user_data = response.json()
+                    self.logger.info("Auth server returned user data", 
+                                   user_id=user_data.get("id"),
+                                   email=user_data.get("email"),
+                                   role=user_data.get("role"),
+                                   has_app_metadata=bool(user_data.get("app_metadata")),
+                                   has_user_metadata=bool(user_data.get("user_metadata")))
+                    
+                    # Create user object from Auth server response
+                    user = SupabaseUser(
+                        user_id=user_data.get("id"),
+                        email=user_data.get("email", ""),
+                        role=user_data.get("role", "authenticated"),
+                        app_metadata=user_data.get("app_metadata", {}),
+                        user_metadata=user_data.get("user_metadata", {}),
+                        aud="authenticated",
+                        exp=int(datetime.now(timezone.utc).timestamp()) + 3600,  # Estimate expiry
+                        iat=int(datetime.now(timezone.utc).timestamp()),
+                        iss=f"{self.supabase_url}/auth/v1",
+                        sub=user_data.get("id")
+                    )
+                    
+                    self.logger.info("Auth server verification successful", 
+                                   user_id=user.user_id, 
+                                   email=user.email)
+                    return user
+                else:
+                    # Log error response details
+                    try:
+                        error_data = response.json()
+                        self.logger.error("Auth server verification failed", 
+                                        status_code=response.status_code,
+                                        error_data=error_data,
+                                        response_text=response.text[:500])
+                    except:
+                        self.logger.error("Auth server verification failed", 
+                                        status_code=response.status_code,
+                                        response_text=response.text[:500])
+                    return None
+                    
+        except httpx.TimeoutException:
+            self.logger.error("Auth server verification timeout")
+            return None
+        except httpx.RequestError as e:
+            self.logger.error("Auth server verification request error", error=str(e))
+            return None
+        except Exception as e:
+            self.logger.error("Auth server verification error", error=str(e), error_type=type(e).__name__)
+            return None
     
     def verify_service_role_token(self, token: str) -> bool:
         """

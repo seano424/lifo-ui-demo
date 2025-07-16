@@ -384,13 +384,14 @@ class ScoringService:
     async def estimate_daily_sales(self, product_id: str, category: str, 
                                  store_id: str, batch_id: str = None) -> float:
         """
-        Enhanced daily sales estimation with multiple data sources
+        Enhanced daily sales estimation with proper product relationship queries
+        Fixed: Use actual product category relationships instead of SKU string matching
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.models import SalesEvent, InventorySnapshot
+            from app.database.models import SalesEvent, Product, Batch
             
-            # Try to get actual sales data for this batch
+            # Try to get actual sales data for this specific batch
             if batch_id:
                 result = await self.db.execute(
                     select(func.avg(SalesEvent.quantity_sold)).where(
@@ -404,13 +405,32 @@ class ScoringService:
                 if avg_sales and avg_sales > 0:
                     return float(avg_sales)
             
-            # Try to get sales data for similar products
+            # Try to get sales data for similar products in the same category
+            # FIX: Use proper JOIN with Products table instead of SKU string matching
             result = await self.db.execute(
-                select(func.avg(SalesEvent.quantity_sold)).where(
+                select(func.avg(SalesEvent.quantity_sold)).select_from(
+                    SalesEvent.join(Batch).join(Product)
+                ).where(
                     and_(
                         SalesEvent.store_id == store_id,
-                        SalesEvent.sku.like(f"%{category}%"),
+                        Product.category == category,
                         SalesEvent.sale_timestamp >= datetime.utcnow() - timedelta(days=30)
+                    )
+                )
+            )
+            avg_sales = result.scalar()
+            if avg_sales and avg_sales > 0:
+                return float(avg_sales)
+            
+            # If no batch-level data, try product-level sales for same category
+            result = await self.db.execute(
+                select(func.avg(SalesEvent.quantity_sold)).select_from(
+                    SalesEvent.join(Batch).join(Product)
+                ).where(
+                    and_(
+                        SalesEvent.store_id == store_id,
+                        Product.category == category,
+                        SalesEvent.sale_timestamp >= datetime.utcnow() - timedelta(days=90)  # Wider time window
                     )
                 )
             )

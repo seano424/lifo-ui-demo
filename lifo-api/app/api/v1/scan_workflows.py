@@ -26,6 +26,22 @@ router = APIRouter()
 logger = structlog.get_logger()
 
 
+@router.post("/debug-scan/{store_id}")
+async def debug_scan_endpoint(
+    store_id: str,
+    request: Request,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Debug endpoint to test authentication only"""
+    return {
+        "success": True,
+        "message": "Authentication working",
+        "store_id": store_id,
+        "user_id": current_user.get("sub"),
+        "user_email": current_user.get("email")
+    }
+
+
 @router.post("/scan-in/{store_id}", response_model=ScanInResponse)
 @ai_endpoint_rate_limit("30/minute")  # Higher limit for mobile scanning
 async def scan_in_batch(

@@ -56,9 +56,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "form-action 'self'"
             )
         else:
-            # More permissive CSP for development
+            # More permissive CSP for development (allow CDN for Swagger UI)
             response.headers["Content-Security-Policy"] = (
-                "default-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:*; "
+                "default-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* cdn.jsdelivr.net unpkg.com; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* cdn.jsdelivr.net unpkg.com; "
+                "style-src 'self' 'unsafe-inline' localhost:* cdn.jsdelivr.net unpkg.com; "
+                "img-src 'self' data: https: localhost:* cdn.jsdelivr.net unpkg.com fastapi.tiangolo.com; "
+                "font-src 'self' localhost:* cdn.jsdelivr.net unpkg.com; "
                 "connect-src 'self' localhost:* ws: wss:;"
             )
         
