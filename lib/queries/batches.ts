@@ -1,4 +1,4 @@
-// lib/queries/batches.ts - Updated with store filtering (following products pattern)
+// lib/queries/batches.ts - FIXED VERSION with proper PostgREST relationship handling
 
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -83,6 +83,39 @@ function buildBatchOrderClause(sort?: BatchSort): { column: string; ascending: b
   }
 }
 
+// ✅ FIXED: Alternative approach that fetches batches and products separately
+async function fetchBatchesWithProducts(
+  batches: Batch[],
+  supabase: any,
+): Promise<BatchWithProduct[]> {
+  if (batches.length === 0) return []
+
+  // Get unique product IDs
+  const productIds = [...new Set(batches.map(b => b.product_id))]
+
+  // Fetch products separately
+  const { data: products, error: productsError } = await supabase
+    .schema('inventory')
+    .from('products')
+    .select('product_id, name, sku, category, brand, unit_type')
+    .in('product_id', productIds)
+
+  if (productsError) {
+    console.warn('[fetchBatchesWithProducts] Failed to fetch products:', productsError)
+    // Return batches without product data
+    return batches.map(batch => ({ ...batch, products: undefined }))
+  }
+
+  // Combine batches with their products
+  return batches.map(batch => {
+    const product = products?.find(p => p.product_id === batch.product_id)
+    return {
+      ...batch,
+      products: product || undefined,
+    }
+  })
+}
+
 // ✅ STORE-AWARE: Fetch all batches for a specific store
 export async function fetchBatches(
   storeId: string,
@@ -92,23 +125,12 @@ export async function fetchBatches(
   console.log('[fetchBatches] Querying inventory.batches for store:', { storeId })
 
   try {
-    const { data, error } = await supabase
+    // First fetch batches only
+    const { data: batches, error } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products (
-          product_id,
-          name,
-          sku,
-          category,
-          brand,
-          unit_type
-        )
-      `,
-      )
-      .eq('store_id', storeId) // ✅ STORE FILTER
+      .select('*')
+      .eq('store_id', storeId)
       .order('expiry_date', { ascending: true })
       .order('batch_id', { ascending: true })
 
@@ -117,15 +139,18 @@ export async function fetchBatches(
       throw new Error(`Failed to fetch batches: ${error.message}`)
     }
 
-    console.log('[fetchBatches] Success:', { storeId, count: data?.length })
-    return data as BatchWithProduct[]
+    // Then fetch with products
+    const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
+
+    console.log('[fetchBatches] Success:', { storeId, count: batchesWithProducts.length })
+    return batchesWithProducts
   } catch (err) {
     console.error('[fetchBatches] Unexpected error:', err)
     throw err
   }
 }
 
-// ✅ STORE-AWARE: Paginated batches with filters
+// ✅ STORE-AWARE: Paginated batches with filters - FIXED VERSION
 export async function fetchBatchesPage(
   { page, pageSize }: BatchesPageParam,
   filters: BatchFilters = {},
@@ -138,31 +163,19 @@ export async function fetchBatchesPage(
   const supabase = serverClient || createClient()
 
   try {
-    let query = supabase
-      .schema('inventory')
-      .from('batches')
-      .select(
-        `
-        *,
-        products (
-          product_id,
-          name,
-          sku,
-          category,
-          brand,
-          unit_type
-        )
-      `,
-        { count: 'exact' },
-      )
-
     // ✅ MANDATORY STORE FILTER
     if (!filters.storeId) {
       throw new Error('Store ID is required for fetching batches')
     }
 
     console.log('[fetchBatchesPage] Applying store filter:', filters.storeId)
-    query = query.eq('store_id', filters.storeId)
+
+    // Build query for batches only (no nested select)
+    let query = supabase
+      .schema('inventory')
+      .from('batches')
+      .select('*', { count: 'exact' })
+      .eq('store_id', filters.storeId)
 
     // Apply other filters
     if (filters.product_id) {
@@ -236,22 +249,25 @@ export async function fetchBatchesPage(
     const rangeTo = (page + 1) * pageSize - 1
     console.log('[fetchBatchesPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
 
-    const { data, error, count } = await query.range(rangeFrom, rangeTo)
+    const { data: batches, error, count } = await query.range(rangeFrom, rangeTo)
 
     if (error) {
       console.error('[fetchBatchesPage] Supabase error:', error)
       throw new Error(`Failed to fetch batches page: ${error.message}`)
     }
 
+    // Now fetch with products
+    const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
+
     console.log('[fetchBatchesPage] Success:', {
       storeId: filters.storeId,
-      dataCount: data?.length,
+      dataCount: batchesWithProducts.length,
       totalCount: count,
       hasNextPage: (count || 0) > (page + 1) * pageSize,
     })
 
     return {
-      data: (data as BatchWithProduct[]) || [],
+      data: batchesWithProducts,
       count: count || 0,
       nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined,
     }
@@ -285,7 +301,6 @@ export async function fetchBatchesForProduct(
 }
 
 // ✅ CRUD mutations (ensure store_id is set)
-
 export async function createBatch(
   batchData: Database['inventory']['Tables']['batches']['Insert'],
 ): Promise<Batch> {
@@ -400,18 +415,6 @@ export async function deleteBatch(batchId: string): Promise<void> {
   try {
     console.log('[deleteBatch] Deleting batch:', { batchId })
 
-    // TODO: Check for related transactions/sales first if needed
-    // const { data: relatedSales, error: salesError } = await supabase
-    //   .schema('timeseries')
-    //   .from('sales_events')
-    //   .select('sale_id')
-    //   .eq('batch_id', batchId)
-    //   .limit(1)
-
-    // if (relatedSales && relatedSales.length > 0) {
-    //   throw new Error('Cannot delete batch with sales history. Mark as inactive instead.')
-    // }
-
     const { error } = await supabase
       .schema('inventory')
       .from('batches')
@@ -430,6 +433,7 @@ export async function deleteBatch(batchId: string): Promise<void> {
   }
 }
 
+// ✅ FIXED: Single batch fetch with product
 export async function fetchBatchById(
   batchId: string,
   serverClient?: ServerClient,
@@ -439,24 +443,11 @@ export async function fetchBatchById(
   try {
     console.log('[fetchBatchById] Fetching batch:', { batchId })
 
-    const { data, error } = await supabase
+    // Fetch batch first
+    const { data: batch, error } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products (
-          product_id,
-          name,
-          sku,
-          category,
-          brand,
-          unit_type,
-          base_cost_price,
-          base_selling_price
-        )
-      `,
-      )
+      .select('*')
       .eq('batch_id', batchId)
       .single()
 
@@ -471,15 +462,30 @@ export async function fetchBatchById(
       throw new Error(`Failed to fetch batch: ${error.message}`)
     }
 
+    // Fetch product separately
+    const { data: product } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select(
+        'product_id, name, sku, category, brand, unit_type, base_cost_price, base_selling_price',
+      )
+      .eq('product_id', batch.product_id)
+      .single()
+
+    const batchWithProduct: BatchWithProduct = {
+      ...batch,
+      products: product || undefined,
+    }
+
     console.log('[fetchBatchById] Success:', { batchId })
-    return data as BatchWithProduct
+    return batchWithProduct
   } catch (err) {
     console.error('[fetchBatchById] Unexpected error:', err)
     throw err
   }
 }
 
-// ✅ STORE-AWARE: Business logic helpers
+// ✅ STORE-AWARE: Business logic helpers - FIXED
 export async function fetchExpiringBatches(
   storeId: string,
   daysAhead: number = 7,
@@ -497,22 +503,12 @@ export async function fetchExpiringBatches(
       threshold: expiryThreshold,
     })
 
-    const { data, error } = await supabase
+    // Fetch batches first
+    const { data: batches, error } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products (
-          product_id,
-          name,
-          sku,
-          category,
-          brand
-        )
-      `,
-      )
-      .eq('store_id', storeId) // ✅ STORE FILTER
+      .select('*')
+      .eq('store_id', storeId)
       .eq('status', 'active')
       .gt('current_quantity', 0)
       .lte('expiry_date', expiryThreshold.toISOString().split('T')[0])
@@ -524,8 +520,11 @@ export async function fetchExpiringBatches(
       throw new Error(`Failed to fetch expiring batches: ${error.message}`)
     }
 
-    console.log('[fetchExpiringBatches] Success:', { storeId, count: data?.length })
-    return data as BatchWithProduct[]
+    // Add products
+    const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
+
+    console.log('[fetchExpiringBatches] Success:', { storeId, count: batchesWithProducts.length })
+    return batchesWithProducts
   } catch (err) {
     console.error('[fetchExpiringBatches] Unexpected error:', err)
     throw err
@@ -545,22 +544,12 @@ export async function fetchLowStockBatches(
       thresholdQuantity,
     })
 
-    const { data, error } = await supabase
+    // Fetch batches first
+    const { data: batches, error } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(
-        `
-        *,
-        products (
-          product_id,
-          name,
-          sku,
-          category,
-          brand
-        )
-      `,
-      )
-      .eq('store_id', storeId) // ✅ STORE FILTER
+      .select('*')
+      .eq('store_id', storeId)
       .eq('status', 'active')
       .gt('current_quantity', 0)
       .lte('current_quantity', thresholdQuantity)
@@ -572,8 +561,11 @@ export async function fetchLowStockBatches(
       throw new Error(`Failed to fetch low stock batches: ${error.message}`)
     }
 
-    console.log('[fetchLowStockBatches] Success:', { storeId, count: data?.length })
-    return data as BatchWithProduct[]
+    // Add products
+    const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
+
+    console.log('[fetchLowStockBatches] Success:', { storeId, count: batchesWithProducts.length })
+    return batchesWithProducts
   } catch (err) {
     console.error('[fetchLowStockBatches] Unexpected error:', err)
     throw err
