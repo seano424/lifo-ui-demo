@@ -13,32 +13,35 @@ CREATE SCHEMA IF NOT EXISTS user_mgmt;
 
 -- User profiles and extended information
 CREATE TABLE IF NOT EXISTS user_mgmt.users (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
+    avatar_url VARCHAR(255),
     phone VARCHAR(20),
     timezone VARCHAR(50) DEFAULT 'Europe/Paris',
     language VARCHAR(10) DEFAULT 'fr',
     is_active BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Role definitions
 CREATE TABLE IF NOT EXISTS user_mgmt.roles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(50) UNIQUE NOT NULL,
+    role_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    role_name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
-    permissions JSONB DEFAULT '{}',
     created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- User role assignments
 CREATE TABLE IF NOT EXISTS user_mgmt.user_roles (
-    user_id UUID REFERENCES user_mgmt.users(id) ON DELETE CASCADE,
-    role_id UUID REFERENCES user_mgmt.roles(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES user_mgmt.users(user_id) ON DELETE CASCADE,
+    role_id UUID REFERENCES user_mgmt.roles(role_id) ON DELETE CASCADE,
     assigned_at TIMESTAMP DEFAULT NOW(),
-    assigned_by UUID REFERENCES auth.users(id),
+    assigned_by UUID REFERENCES user_mgmt.users(user_id),
     PRIMARY KEY (user_id, role_id)
 );
 
@@ -72,8 +75,8 @@ CREATE TABLE IF NOT EXISTS inventory.products (
     -- Audit
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    created_by UUID REFERENCES auth.users(id),
-    updated_by UUID REFERENCES auth.users(id)
+    created_by UUID REFERENCES user_mgmt.users(user_id),
+    updated_by UUID REFERENCES user_mgmt.users(user_id)
 );
 
 -- Inventory batches - the core of LIFO tracking
@@ -105,8 +108,8 @@ CREATE TABLE IF NOT EXISTS inventory.batches (
     -- Audit
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    created_by UUID REFERENCES auth.users(id),
-    updated_by UUID REFERENCES auth.users(id),
+    created_by UUID REFERENCES user_mgmt.users(user_id),
+    updated_by UUID REFERENCES user_mgmt.users(user_id),
     
     -- Ensure unique batch numbers per store
     UNIQUE(store_id, batch_number)
@@ -187,7 +190,7 @@ CREATE TABLE IF NOT EXISTS business.stores (
     waste_reduction_target_percent DECIMAL(5,2) DEFAULT 25.00,
     
     -- Ownership & Access
-    owner_id UUID REFERENCES auth.users(id),
+    owner_id UUID REFERENCES user_mgmt.users(user_id),
     is_active BOOLEAN DEFAULT TRUE,
     onboarding_completed BOOLEAN DEFAULT FALSE,
     
@@ -199,11 +202,11 @@ CREATE TABLE IF NOT EXISTS business.stores (
 -- Store staff access and permissions
 CREATE TABLE IF NOT EXISTS business.store_users (
     store_id UUID REFERENCES business.stores(store_id) ON DELETE CASCADE,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES user_mgmt.users(user_id) ON DELETE CASCADE,
     role_in_store VARCHAR(50) CHECK (role_in_store IN ('owner', 'manager', 'staff', 'viewer')) DEFAULT 'staff',
     permissions JSONB DEFAULT '{"can_upload_inventory": true, "can_apply_discounts": false, "can_view_analytics": true}',
     assigned_at TIMESTAMP DEFAULT NOW(),
-    assigned_by UUID REFERENCES auth.users(id),
+    assigned_by UUID REFERENCES user_mgmt.users(user_id),
     is_active BOOLEAN DEFAULT TRUE,
     PRIMARY KEY (store_id, user_id)
 );
@@ -237,7 +240,7 @@ CREATE TABLE IF NOT EXISTS analytics.actions (
     new_price DECIMAL(12,4),
     discount_percent DECIMAL(5,2),
     executed_at TIMESTAMP DEFAULT NOW(),
-    executed_by UUID REFERENCES auth.users(id),
+    executed_by UUID REFERENCES user_mgmt.users(user_id),
     
     -- Results tracking (updated later)
     quantity_sold_24h DECIMAL(12,4),
