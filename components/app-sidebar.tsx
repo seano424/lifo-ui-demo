@@ -67,11 +67,11 @@ const data = {
       url: '/dashboard/action-log',
       icon: Calendar,
     },
-    {
-      title: 'Users',
-      url: '/dashboard/users',
-      icon: Users,
-    },
+    // {
+    //   title: 'Users',
+    //   url: '/dashboard/users',
+    //   icon: Users,
+    // },
     {
       title: 'Settings',
       url: '/dashboard/settings',
