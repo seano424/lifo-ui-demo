@@ -1,11 +1,21 @@
 'use client'
 
+import { StoreUserCard } from '@/components/store-users/store-user-card'
 import { useState } from 'react'
 import { Typography } from '@/components/ui/typography'
 import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
-import { StoreUserCard } from '@/components/store-users/store-user-card'
 import { Button } from '@/components/ui/button'
-import { Users } from 'lucide-react'
+import {
+  MoreHorizontal,
+  UserCheck,
+  UserMinus,
+  UserPlus,
+  Users,
+  Crown,
+  Pin,
+  User,
+} from 'lucide-react'
+
 import {
   Dialog,
   DialogContent,
@@ -14,8 +24,24 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-  DialogTrigger,
 } from '@/components/ui/dialog'
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu'
 
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -26,12 +52,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
     useStoreUsers()
 
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false)
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
 
   const {
@@ -79,33 +119,148 @@ export function StoreUsersList() {
 
   return (
     <>
-      <div className="space-y-6 border border-gray-200 rounded-lg p-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="space-y-6 border border-gray-200 rounded-2xl p-4">
+        <div className="flex flex-col">
           <Typography variant="h2">Team Management</Typography>
+          <Typography variant="p" color="muted">
+            Invite new team members to your store and manage their roles and permissions.
+          </Typography>
         </div>
 
         <div className="flex justify-between items-center">
           <Typography variant="p" color="muted">
             {count > 0 ? `Showing ${data.length} of ${count} users` : 'No users found'}
           </Typography>
-
-          <div className="hidden md:flex rounded-lg border border-gray-200">
-            <button
-              className={`px-3 py-1 text-sm ${view === 'grid' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'} rounded-l-lg`}
-              onClick={() => setView('grid')}
-            >
-              Grid
-            </button>
-            <button
-              className={`px-3 py-1 text-sm ${view === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'} rounded-r-lg`}
-              onClick={() => setView('list')}
-            >
-              List
-            </button>
-          </div>
+          <Button
+            variant="brand"
+            onClick={() => setIsAddUserDialogOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <UserPlus className="w-4 h-4" />
+            Invite team member
+          </Button>
         </div>
 
-        {view === 'grid' && (
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-opacity-0">
+              <TableHead>Name</TableHead>
+              <TableHead>Username</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map(storeUser => {
+              return (
+                <TableRow key={storeUser.user_id} className="hover:bg-opacity-0">
+                  <TableCell className="font-medium">
+                    <div>
+                      <div>{storeUser.full_name}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
+                  <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
+                  <TableCell>
+                    <span className="capitalize">{storeUser.role_in_store}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span>{storeUser.is_active ? 'Active' : 'Inactive'}</span>
+                  </TableCell>
+
+                  <TableCell>
+                    {storeUser.is_active ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>User Actions</DropdownMenuLabel>
+
+                          {/* Role Changes */}
+                          <DropdownMenuItem
+                            onClick={() => changeUserRole(storeUser.user_id, 'employee')}
+                          >
+                            <User className="mr-2 h-4 w-4" />
+                            Make Employee
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => changeUserRole(storeUser.user_id, 'manager')}
+                          >
+                            <UserCheck className="mr-2 h-4 w-4" />
+                            Make Manager
+                          </DropdownMenuItem>
+                          {storeUser.role_in_store !== 'owner' && (
+                            <DropdownMenuItem
+                              onClick={() => changeUserRole(storeUser.user_id, 'owner')}
+                            >
+                              <Crown className="mr-2 h-4 w-4" />
+                              Make Owner
+                            </DropdownMenuItem>
+                          )}
+
+                          <DropdownMenuSeparator />
+
+                          {/* PIN Auth Toggle */}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
+                            }
+                          >
+                            <Pin className="mr-2 h-4 w-4" />
+                            {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
+                          </DropdownMenuItem>
+
+                          {/* Active Status Toggle */}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              toggleUserActiveStatus(storeUser.user_id, !storeUser.is_active)
+                            }
+                          >
+                            {storeUser.is_active ? (
+                              <>
+                                <UserMinus className="mr-2 h-4 w-4" />
+                                Deactivate User
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="mr-2 h-4 w-4" />
+                                Reactivate User
+                              </>
+                            )}
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
+                          {/* Remove from Store */}
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUserId(storeUser.user_id)
+                              setShowRemoveDialog(true)
+                            }}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <UserMinus className="mr-2 h-4 w-4" />
+                            Remove from Store
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">No actions</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+
+        {/* {view === 'grid' && (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {data?.map(storeUser => (
               <StoreUserCard
@@ -119,23 +274,7 @@ export function StoreUsersList() {
               />
             ))}
           </div>
-        )}
-
-        {view === 'list' && (
-          <div className="flex flex-col gap-4">
-            {data?.map(storeUser => (
-              <StoreUserCard
-                key={storeUser.user_id}
-                storeUser={storeUser}
-                onChangeRole={role => changeUserRole(storeUser.user_id, role)}
-                onToggleActive={isActive => toggleUserActiveStatus(storeUser.user_id, isActive)}
-                onTogglePinAuth={enabled => enablePinAuth(storeUser.user_id, enabled)}
-                onRemove={() => removeUser(storeUser.user_id)}
-                isUpdating={isUpdating}
-              />
-            ))}
-          </div>
-        )}
+        )} */}
 
         {/* Empty State */}
         {data.length === 0 && !isLoading && (
@@ -174,9 +313,6 @@ export function StoreUsersList() {
 
       <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
         <form>
-          <DialogTrigger asChild>
-            <Button variant="outline">Open Dialog</Button>
-          </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add User</DialogTitle>
@@ -222,6 +358,33 @@ export function StoreUsersList() {
           </DialogContent>
         </form>
       </Dialog>
+
+      {/* Remove Confirmation Dialog */}
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove User from Store</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this user from this store? This will deactivate their
+              access but won&apos;t delete their account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedUserId) {
+                  removeUser(selectedUserId)
+                  setShowRemoveDialog(false)
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Remove User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
