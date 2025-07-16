@@ -49,9 +49,9 @@ class UnifiedCSVProcessor {
   }
 
   async processCsv(
-    fileContent: Buffer, 
-    storeId: string, 
-    userId: string
+    fileContent: Buffer,
+    storeId: string,
+    userId: string,
   ): Promise<UnifiedProcessorResult> {
     return new Promise((resolve, reject) => {
       // Create temporary file
@@ -77,7 +77,7 @@ async def main():
     print('JSON_RESULT:' + str(result).replace("'", '"'))
 
 asyncio.run(main())
-          `
+          `,
         ]
 
         // Spawn Python process
@@ -116,7 +116,11 @@ asyncio.run(main())
               }
             } catch (parseError) {
               const message = parseError instanceof Error ? parseError.message : String(parseError)
-              reject(new Error(`Failed to parse processor output: ${message}\nOutput: ${stdout}\nError: ${stderr}`))
+              reject(
+                new Error(
+                  `Failed to parse processor output: ${message}\nOutput: ${stdout}\nError: ${stderr}`,
+                ),
+              )
             }
           } else {
             reject(new Error(`Python processor failed with code ${code}: ${stderr}`))
@@ -157,42 +161,47 @@ class FallbackCSVProcessor {
         throw new Error('CSV must have at least a header and one data row')
       }
 
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g, '_'))
+      const headers = lines[0].split(',').map(h =>
+        h
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '_'),
+      )
       const data: ProcessedRow[] = []
       const errors: string[] = []
       const warnings: string[] = []
 
       // Column mapping
       const columnMap: { [key: string]: string } = {
-        'sku': 'sku',
-        'product_name': 'product_name',
-        'productname': 'product_name', 
-        'name': 'product_name',
-        'category': 'category',
-        'quantity': 'quantity',
-        'qty': 'quantity',
-        'expiry_date': 'expiry_date',
-        'expirydate': 'expiry_date',
-        'expiry': 'expiry_date',
-        'cost_price': 'cost_price',
-        'costprice': 'cost_price',
-        'selling_price': 'selling_price',
-        'sellingprice': 'selling_price',
-        'price': 'selling_price',
-        'brand': 'brand',
-        'manufacture_date': 'manufacture_date',
-        'mfg_date': 'manufacture_date',
-        'location': 'location_code',
-        'location_code': 'location_code',
-        'unit_type': 'unit_type',
-        'unit': 'unit_type'
+        sku: 'sku',
+        product_name: 'product_name',
+        productname: 'product_name',
+        name: 'product_name',
+        category: 'category',
+        quantity: 'quantity',
+        qty: 'quantity',
+        expiry_date: 'expiry_date',
+        expirydate: 'expiry_date',
+        expiry: 'expiry_date',
+        cost_price: 'cost_price',
+        costprice: 'cost_price',
+        selling_price: 'selling_price',
+        sellingprice: 'selling_price',
+        price: 'selling_price',
+        brand: 'brand',
+        manufacture_date: 'manufacture_date',
+        mfg_date: 'manufacture_date',
+        location: 'location_code',
+        location_code: 'location_code',
+        unit_type: 'unit_type',
+        unit: 'unit_type',
       }
 
       // Check required columns
       const mappedHeaders = headers.map(h => columnMap[h] || h)
       const requiredColumns = ['sku', 'product_name', 'quantity', 'expiry_date']
       const missingColumns = requiredColumns.filter(col => !mappedHeaders.includes(col))
-      
+
       if (missingColumns.length > 0) {
         throw new Error(`Missing required columns: ${missingColumns.join(', ')}`)
       }
@@ -200,7 +209,7 @@ class FallbackCSVProcessor {
       for (let i = 1; i < lines.length; i++) {
         try {
           const values = lines[i].split(',').map(v => v.trim())
-          const rowData: any = {}
+          const rowData: Record<string, string> = {}
 
           // Map values to normalized columns
           headers.forEach((header, index) => {
@@ -210,21 +219,23 @@ class FallbackCSVProcessor {
 
           // Validate and process row
           const processedRow: ProcessedRow = {
-            sku: this.validateSku(rowData.sku, i),
-            product_name: this.validateProductName(rowData.product_name, i),
+            sku: this.validateSku(rowData.sku),
+            product_name: this.validateProductName(rowData.product_name),
             category: this.normalizeCategory(rowData.category || 'dry_goods'),
-            quantity: this.validateQuantity(rowData.quantity, i),
-            expiry_date: this.validateDate(rowData.expiry_date, i),
+            quantity: this.validateQuantity(rowData.quantity),
+            expiry_date: this.validateDate(rowData.expiry_date) || '',
             brand: rowData.brand || 'Unknown',
             cost_price: this.validatePrice(rowData.cost_price),
             selling_price: this.validatePrice(rowData.selling_price),
-            manufacture_date: this.validateDate(rowData.manufacture_date) || this.estimateManufactureDate(rowData.expiry_date),
+            manufacture_date:
+              this.validateDate(rowData.manufacture_date) ||
+              this.estimateManufactureDate(rowData.expiry_date),
             location_code: rowData.location_code || 'MAIN',
             unit_type: rowData.unit_type || 'pcs',
             batch_number: `${this.storeId.substring(0, 8)}_${rowData.sku}_${Date.now()}_${i.toString().padStart(3, '0')}`,
             store_id: this.storeId,
             created_by: this.userId,
-            status: 'active'
+            status: 'active',
           }
 
           data.push(processedRow)
@@ -243,8 +254,8 @@ class FallbackCSVProcessor {
         metadata: {
           store_id: this.storeId,
           processed_at: new Date().toISOString(),
-          processed_by: this.userId
-        }
+          processed_by: this.userId,
+        },
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
@@ -257,20 +268,20 @@ class FallbackCSVProcessor {
         metadata: {
           store_id: this.storeId,
           processed_at: new Date().toISOString(),
-          processed_by: this.userId
-        }
+          processed_by: this.userId,
+        },
       }
     }
   }
 
-  private validateSku(sku: any, row: number): string {
+  private validateSku(sku: string): string {
     if (!sku || typeof sku !== 'string' || !sku.trim()) {
       throw new Error('SKU is required')
     }
     return sku.trim()
   }
 
-  private validateProductName(name: any, row: number): string {
+  private validateProductName(name: string): string {
     if (!name || typeof name !== 'string' || !name.trim()) {
       throw new Error('Product name is required')
     }
@@ -279,19 +290,19 @@ class FallbackCSVProcessor {
 
   private normalizeCategory(category: string): string {
     const categoryMap: { [key: string]: string } = {
-      'produce': 'fresh_produce',
-      'meat': 'fresh_meat_fish', 
-      'dairy': 'dairy',
-      'bakery': 'bakery_fresh',
-      'frozen': 'frozen',
-      'beverages': 'beverages'
+      produce: 'fresh_produce',
+      meat: 'fresh_meat_fish',
+      dairy: 'dairy',
+      bakery: 'bakery_fresh',
+      frozen: 'frozen',
+      beverages: 'beverages',
     }
-    
+
     const lowerCategory = category.toLowerCase()
     return categoryMap[lowerCategory] || 'dry_goods'
   }
 
-  private validateQuantity(quantity: any, row: number): number {
+  private validateQuantity(quantity: string): number {
     const qty = parseFloat(quantity)
     if (isNaN(qty) || qty <= 0) {
       throw new Error('Invalid quantity')
@@ -299,18 +310,17 @@ class FallbackCSVProcessor {
     return qty
   }
 
-  private validateDate(dateStr: any, row?: number): string | undefined {
+  private validateDate(dateStr: string): string | undefined {
     if (!dateStr) return undefined
-    
+
     const date = new Date(dateStr)
     if (isNaN(date.getTime())) {
-      if (row) throw new Error('Invalid date format')
-      return undefined
+      throw new Error('Invalid date format')
     }
     return date.toISOString().split('T')[0]
   }
 
-  private validatePrice(price: any): number | undefined {
+  private validatePrice(price: string): number | undefined {
     if (!price) return undefined
     const priceNum = parseFloat(price)
     return isNaN(priceNum) ? undefined : priceNum
@@ -318,7 +328,7 @@ class FallbackCSVProcessor {
 
   private estimateManufactureDate(expiryDate: string): string {
     const expiry = new Date(expiryDate)
-    const estimated = new Date(expiry.getTime() - (30 * 24 * 60 * 60 * 1000)) // 30 days before
+    const estimated = new Date(expiry.getTime() - 30 * 24 * 60 * 60 * 1000) // 30 days before
     return estimated.toISOString().split('T')[0]
   }
 }
@@ -352,16 +362,13 @@ export async function POST(request: NextRequest) {
     if (!file.name.toLowerCase().endsWith('.csv')) {
       return NextResponse.json(
         { error: 'Invalid file type. Please upload a CSV file.' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 10MB.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 })
     }
 
     // Validate store access
@@ -369,10 +376,7 @@ export async function POST(request: NextRequest) {
     const hasAccess = await operations.validateStoreAccess(storeId, user.id)
 
     if (!hasAccess) {
-      return NextResponse.json(
-        { error: 'No access to this store' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'No access to this store' }, { status: 403 })
     }
 
     // Get file content
@@ -387,7 +391,7 @@ export async function POST(request: NextRequest) {
       console.log('Unified processor succeeded')
     } catch (pythonError) {
       console.warn('Unified Python processor failed, falling back to JavaScript:', pythonError)
-      
+
       // Fall back to JavaScript processor
       const csvContent = fileBuffer.toString('utf-8')
       const fallbackProcessor = new FallbackCSVProcessor(storeId, user.id)
@@ -401,7 +405,7 @@ export async function POST(request: NextRequest) {
           error: 'CSV processing failed',
           details: result.errors,
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -411,7 +415,7 @@ export async function POST(request: NextRequest) {
           error: 'No valid data found in CSV',
           details: result.errors,
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -428,7 +432,7 @@ export async function POST(request: NextRequest) {
       Manufacture_Date: item.manufacture_date || item.expiry_date,
       Location: item.location_code,
       Unit_Type: item.unit_type,
-      Batch_Number: item.batch_number
+      Batch_Number: item.batch_number,
     }))
 
     // Process inventory using the database operations
@@ -444,7 +448,7 @@ export async function POST(request: NextRequest) {
       store_id: storeId,
       processor_used: result.errors.length === 0 ? 'unified_python' : 'fallback_javascript',
       message: `Successfully processed ${dbResult.processed} items`,
-      metadata: result.metadata
+      metadata: result.metadata,
     })
   } catch (error) {
     console.error('CSV upload error:', error)
@@ -454,7 +458,7 @@ export async function POST(request: NextRequest) {
         error: 'Upload failed',
         details: message,
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
