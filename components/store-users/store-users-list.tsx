@@ -6,6 +6,7 @@ import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
 import { type StoreUser } from '@/lib/queries/store-users'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   MoreHorizontal,
   UserCheck,
@@ -65,14 +66,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-import {
-  usePermissions,
-  useCurrentUser,
-  useCurrentUserRoles,
-  useCurrentUserStoreRole,
-  useCanPerform,
-  useUserRole,
-} from '@/hooks/use-users'
+import { usePermissions, useUserRole } from '@/hooks/use-users'
 
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
@@ -91,18 +85,17 @@ export function StoreUsersList() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-          <span>Loading store users...</span>
-        </div>
+      <div className="flex flex-col gap-4 border border-gray-50 rounded-2xl p-4">
+        <Skeleton className="w-full h-10 bg-gray-50" />
+        <Skeleton className="w-full h-10 bg-gray-50" />
+        <Skeleton className="w-full h-10 bg-gray-50" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 border border-red-100 rounded-2xl p-4">
         <div className="text-red-600 mb-4">Error loading store users: {error.message}</div>
         <Button variant="outline" onClick={() => window.location.reload()}>
           Retry
