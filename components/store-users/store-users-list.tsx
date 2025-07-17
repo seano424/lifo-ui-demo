@@ -1,6 +1,5 @@
 'use client'
 
-import { StoreUserCard } from '@/components/store-users/store-user-card'
 import { useState } from 'react'
 import { Typography } from '@/components/ui/typography'
 import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
@@ -52,7 +51,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
 
 import {
   AlertDialog,
@@ -70,7 +68,6 @@ export function StoreUsersList() {
     useStoreUsers()
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
-  const [view, setView] = useState<'grid' | 'list'>('grid')
   const [showRemoveDialog, setShowRemoveDialog] = useState(false)
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
 
@@ -259,22 +256,6 @@ export function StoreUsersList() {
             })}
           </TableBody>
         </Table>
-
-        {/* {view === 'grid' && (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data?.map(storeUser => (
-              <StoreUserCard
-                key={storeUser.user_id}
-                storeUser={storeUser}
-                onChangeRole={role => changeUserRole(storeUser.user_id, role)}
-                onToggleActive={isActive => toggleUserActiveStatus(storeUser.user_id, isActive)}
-                onTogglePinAuth={enabled => enablePinAuth(storeUser.user_id, enabled)}
-                onRemove={() => removeUser(storeUser.user_id)}
-                isUpdating={isUpdating}
-              />
-            ))}
-          </div>
-        )} */}
 
         {/* Empty State */}
         {data.length === 0 && !isLoading && (
