@@ -1,7 +1,6 @@
 // lib/queries/store-users.ts
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import type { SupabaseClient } from '@supabase/supabase-js'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 

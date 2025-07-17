@@ -7,21 +7,25 @@ The LIFO.AI API is a comprehensive FastAPI-based microservice that provides inte
 ## 🔗 Base Information
 
 ### API Base URLs
+
 - **Development**: `http://localhost:8000`
 - **Staging**: `https://staging-api.lifoai.com`
 - **Production**: `https://api.lifoai.com`
 
 ### API Version
+
 Current API version: `v1`
 
 All endpoints are prefixed with `/api/v1/`
 
 ### Content Type
+
 All requests and responses use `application/json` unless otherwise specified.
 
 ## 🔐 Authentication
 
 ### JWT Bearer Token
+
 All API endpoints require authentication using Supabase JWT tokens:
 
 ```bash
@@ -29,6 +33,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### Authentication Levels
+
 - **Anonymous**: No authentication required (public endpoints only)
 - **Authenticated User**: Valid JWT token required
 - **Service Role**: Service role token required for administrative operations
@@ -36,14 +41,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### Getting Authentication Tokens
 
 #### Client-Side (Supabase)
+
 ```javascript
-const { data: { session } } = await supabase.auth.getSession();
-const token = session?.access_token;
+const {
+  data: { session },
+} = await supabase.auth.getSession()
+const token = session?.access_token
 ```
 
 #### Server-Side (Service Role)
+
 ```javascript
-const serviceToken = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const serviceToken = process.env.SUPABASE_SERVICE_ROLE_KEY
 ```
 
 ## 📊 API Endpoints
@@ -51,14 +60,17 @@ const serviceToken = process.env.SUPABASE_SERVICE_ROLE_KEY;
 ### 🏥 Health & System
 
 #### GET / - API Root
+
 Returns basic API information and service status.
 
 **Request:**
+
 ```bash
 curl -X GET "https://api.lifoai.com/"
 ```
 
 **Response:**
+
 ```json
 {
   "service": "LIFO AI Engine",
@@ -76,14 +88,17 @@ curl -X GET "https://api.lifoai.com/"
 ```
 
 #### GET /health - Health Check
+
 Comprehensive health check including database connectivity.
 
 **Request:**
+
 ```bash
 curl -X GET "https://api.lifoai.com/health"
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -103,20 +118,24 @@ curl -X GET "https://api.lifoai.com/health"
 ### 📱 Mobile-Optimized Endpoints
 
 #### GET /api/v1/mobile/mobile-summary/{store_id} - Mobile Dashboard
+
 Fast overview for mobile scanning interface (target <300ms).
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `include_details` (query, optional): Include detailed batch information
 - `limit_urgent` (query, optional): Limit urgent items returned (default: 10)
 
 **Request:**
+
 ```bash
 curl -X GET "https://api.lifoai.com/api/v1/mobile/mobile-summary/123e4567-e89b-12d3-a456-426614174000?include_details=true&limit_urgent=15" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "urgent_batches": [
@@ -129,7 +148,7 @@ curl -X GET "https://api.lifoai.com/api/v1/mobile/mobile-summary/123e4567-e89b-1
       "expires_in_hours": 8,
       "quantity_remaining": 12,
       "recommended_action": "Apply 30% discount immediately",
-      "potential_loss_eur": 14.40
+      "potential_loss_eur": 14.4
     }
   ],
   "expiring_today": [
@@ -150,19 +169,23 @@ curl -X GET "https://api.lifoai.com/api/v1/mobile/mobile-summary/123e4567-e89b-1
 ```
 
 #### POST /api/v1/mobile/batch-quick-score/{batch_id} - Quick Batch Scoring
+
 Real-time scoring for scanned items (target <200ms).
 
 **Parameters:**
+
 - `batch_id` (path, required): Batch UUID
 - `store_id` (query, required): Store UUID
 
 **Request:**
+
 ```bash
 curl -X POST "https://api.lifoai.com/api/v1/mobile/batch-quick-score/456e7890-f12a-34b5-c678-567890123456?store_id=123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "batch_id": "456e7890-f12a-34b5-c678-567890123456",
@@ -177,7 +200,7 @@ curl -X POST "https://api.lifoai.com/api/v1/mobile/batch-quick-score/456e7890-f1
   ],
   "category_risk_factor": 0.8,
   "economic_impact": {
-    "potential_loss_eur": 12.50,
+    "potential_loss_eur": 12.5,
     "profit_at_risk_eur": 8.75
   },
   "processing_time_ms": 145
@@ -187,12 +210,15 @@ curl -X POST "https://api.lifoai.com/api/v1/mobile/batch-quick-score/456e7890-f1
 ### 🔍 Scan Workflow Endpoints
 
 #### POST /api/v1/scan/scan-in/{store_id} - Scan-In Workflow
+
 Register new inventory via mobile scanning (proof of delivery).
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 
 **Request Body:**
+
 ```json
 {
   "product_sku": "APPLE-RED-001",
@@ -201,7 +227,7 @@ Register new inventory via mobile scanning (proof of delivery).
   "category": "fresh_produce",
   "expiry_date": "2024-02-15",
   "quantity": 50,
-  "cost_price": 1.50,
+  "cost_price": 1.5,
   "selling_price": 2.99,
   "manufacture_date": "2024-01-10",
   "location_code": "PRODUCE",
@@ -212,6 +238,7 @@ Register new inventory via mobile scanning (proof of delivery).
 ```
 
 **Request:**
+
 ```bash
 curl -X POST "https://api.lifoai.com/api/v1/scan/scan-in/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer $TOKEN" \
@@ -228,6 +255,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scan/scan-in/123e4567-e89b-12d3-a456
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -246,13 +274,16 @@ curl -X POST "https://api.lifoai.com/api/v1/scan/scan-in/123e4567-e89b-12d3-a456
 ```
 
 #### POST /api/v1/scan/scan-out/{store_id}/{batch_id} - Scan-Out Workflow
+
 Track when inventory is sold, discounted, or disposed.
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `batch_id` (path, required): Batch UUID
 
 **Request Body:**
+
 ```json
 {
   "action": "sold_discounted",
@@ -267,6 +298,7 @@ Track when inventory is sold, discounted, or disposed.
 ```
 
 **Action Types:**
+
 - `sold_full_price` - Regular sale at full price
 - `sold_discounted` - Discounted sale
 - `donated` - Donation to charity
@@ -275,6 +307,7 @@ Track when inventory is sold, discounted, or disposed.
 - `returned_supplier` - Supplier return
 
 **Request:**
+
 ```bash
 curl -X POST "https://api.lifoai.com/api/v1/scan/scan-out/123e4567-e89b-12d3-a456-426614174000/456e7890-f12a-34b5-c678-567890123456" \
   -H "Authorization: Bearer $TOKEN" \
@@ -289,6 +322,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scan/scan-out/123e4567-e89b-12d3-a45
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -298,9 +332,9 @@ curl -X POST "https://api.lifoai.com/api/v1/scan/scan-out/123e4567-e89b-12d3-a45
   "quantity_processed": 10,
   "remaining_quantity": 40,
   "financial_impact": {
-    "revenue_generated": 23.90,
-    "discount_amount": 6.00,
-    "profit_margin": 8.90
+    "revenue_generated": 23.9,
+    "discount_amount": 6.0,
+    "profit_margin": 8.9
   },
   "updated_score": 0.42,
   "effectiveness_score": 0.85,
@@ -311,19 +345,23 @@ curl -X POST "https://api.lifoai.com/api/v1/scan/scan-out/123e4567-e89b-12d3-a45
 ### 📊 Analytics Endpoints
 
 #### GET /api/v1/analytics/store/{store_id} - Store Analytics
+
 Comprehensive analytics for a store with configurable time periods.
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `days` (query, optional): Analysis period in days (default: 30, max: 365)
 
 **Request:**
+
 ```bash
 curl -X GET "https://api.lifoai.com/api/v1/analytics/store/123e4567-e89b-12d3-a456-426614174000?days=30" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "store_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -334,8 +372,8 @@ curl -X GET "https://api.lifoai.com/api/v1/analytics/store/123e4567-e89b-12d3-a4
       "active_batches": 156,
       "expired_count": 12,
       "expiring_soon_count": 23,
-      "total_value_eur": 12450.00,
-      "at_risk_value_eur": 1230.00
+      "total_value_eur": 12450.0,
+      "at_risk_value_eur": 1230.0
     },
     "urgency_distribution": {
       "critical": 8,
@@ -347,21 +385,21 @@ curl -X GET "https://api.lifoai.com/api/v1/analytics/store/123e4567-e89b-12d3-a4
       {
         "category": "fresh_produce",
         "batch_count": 45,
-        "total_value": 2340.00,
+        "total_value": 2340.0,
         "waste_rate": 0.08,
         "average_score": 0.65
       },
       {
         "category": "dairy",
         "batch_count": 32,
-        "total_value": 1890.00,
+        "total_value": 1890.0,
         "waste_rate": 0.05,
         "average_score": 0.45
       }
     ],
     "performance_metrics": {
       "waste_reduction_percent": 23.5,
-      "revenue_recovery_eur": 2340.00,
+      "revenue_recovery_eur": 2340.0,
       "discount_effectiveness": 0.78,
       "staff_response_time_hours": 2.4
     },
@@ -372,7 +410,7 @@ curl -X GET "https://api.lifoai.com/api/v1/analytics/store/123e4567-e89b-12d3-a4
         "action_type": "discount_applied",
         "timestamp": "2024-01-15T09:30:00Z",
         "effectiveness_score": 0.85,
-        "financial_impact": 23.90
+        "financial_impact": 23.9
       }
     ]
   },
@@ -381,15 +419,18 @@ curl -X GET "https://api.lifoai.com/api/v1/analytics/store/123e4567-e89b-12d3-a4
 ```
 
 #### GET /api/v1/analytics/dashboard/{store_id} - Dashboard Data
+
 Quick dashboard overview optimized for frontend displays.
 
 **Request:**
+
 ```bash
 curl -X GET "https://api.lifoai.com/api/v1/analytics/dashboard/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "store_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -397,7 +438,7 @@ curl -X GET "https://api.lifoai.com/api/v1/analytics/dashboard/123e4567-e89b-12d
     "total_batches": 156,
     "expired_count": 3,
     "expiring_soon_count": 12,
-    "total_value_eur": 8450.00
+    "total_value_eur": 8450.0
   },
   "alerts": {
     "expired_items": 3,
@@ -436,13 +477,16 @@ curl -X GET "https://api.lifoai.com/api/v1/analytics/dashboard/123e4567-e89b-12d
 ### 📁 CSV Processing Endpoints
 
 #### POST /api/v1/csv/upload - Upload CSV File
+
 Upload and process CSV inventory file with comprehensive validation.
 
 **Parameters:**
+
 - `store_id` (form, required): Store UUID
 - `file` (form, required): CSV file (max 10MB)
 
 **Request:**
+
 ```bash
 curl -X POST "https://api.lifoai.com/api/v1/csv/upload" \
   -H "Authorization: Bearer $TOKEN" \
@@ -451,6 +495,7 @@ curl -X POST "https://api.lifoai.com/api/v1/csv/upload" \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -486,27 +531,58 @@ curl -X POST "https://api.lifoai.com/api/v1/csv/upload" \
 ```
 
 #### GET /api/v1/csv/template - Download CSV Template
+
 Get CSV template with sample data and formatting guidelines.
 
 **Request:**
+
 ```bash
 curl -X GET "https://api.lifoai.com/api/v1/csv/template" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "content": "sku,product_name,category,quantity,expiry_date,brand,cost_price,selling_price,manufacture_date,location_code,unit_type\\nAPPLE001,Red Apples,fresh_produce,50,2024-07-20,FreshFarms,2.50,3.99,2024-07-13,MAIN,kg\\n...",
     "filename": "inventory_template.csv",
-    "headers": ["sku", "product_name", "category", "quantity", "expiry_date", "brand", "cost_price", "selling_price", "manufacture_date", "location_code", "unit_type"],
+    "headers": [
+      "sku",
+      "product_name",
+      "category",
+      "quantity",
+      "expiry_date",
+      "brand",
+      "cost_price",
+      "selling_price",
+      "manufacture_date",
+      "location_code",
+      "unit_type"
+    ],
     "sample_rows": 3,
     "instructions": {
       "required_columns": ["sku", "product_name", "category", "quantity", "expiry_date"],
-      "optional_columns": ["brand", "cost_price", "selling_price", "manufacture_date", "location_code", "unit_type"],
-      "category_examples": ["fresh_produce", "fresh_meat_fish", "dairy", "bakery_fresh", "frozen", "beverages", "dry_goods", "canned_jarred"],
+      "optional_columns": [
+        "brand",
+        "cost_price",
+        "selling_price",
+        "manufacture_date",
+        "location_code",
+        "unit_type"
+      ],
+      "category_examples": [
+        "fresh_produce",
+        "fresh_meat_fish",
+        "dairy",
+        "bakery_fresh",
+        "frozen",
+        "beverages",
+        "dry_goods",
+        "canned_jarred"
+      ],
       "date_format": "YYYY-MM-DD (e.g., 2024-07-20)",
       "notes": [
         "SKU must be unique within your store",
@@ -522,9 +598,11 @@ curl -X GET "https://api.lifoai.com/api/v1/csv/template" \
 ### 🎯 Scoring Endpoints
 
 #### POST /api/v1/scoring/calculate-score - Calculate Batch Score
+
 Calculate urgency score for a specific batch.
 
 **Request Body:**
+
 ```json
 {
   "store_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -533,6 +611,7 @@ Calculate urgency score for a specific batch.
 ```
 
 **Request:**
+
 ```bash
 curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
   -H "Authorization: Bearer $TOKEN" \
@@ -544,6 +623,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 ```
 
 **Response:**
+
 ```json
 {
   "batch_id": "456e7890-f12a-34b5-c678-567890123456",
@@ -551,7 +631,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
   "urgency_level": "high",
   "factors": {
     "expiry_urgency": 0.85,
-    "category_risk": 0.80,
+    "category_risk": 0.8,
     "economic_impact": 0.65,
     "sales_velocity": 0.45
   },
@@ -572,6 +652,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 ## 📋 Data Models
 
 ### Store Model
+
 ```json
 {
   "store_id": "uuid",
@@ -595,6 +676,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 ```
 
 ### Product Batch Model
+
 ```json
 {
   "batch_id": "uuid",
@@ -621,6 +703,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 ```
 
 ### Analytics Model
+
 ```json
 {
   "store_id": "uuid",
@@ -651,6 +734,7 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 ## ⚠️ Error Handling
 
 ### Error Response Format
+
 ```json
 {
   "success": false,
@@ -665,17 +749,17 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 
 ### HTTP Status Codes
 
-| Code | Description | When Used |
-|------|-------------|-----------|
-| 200 | OK | Successful request |
-| 201 | Created | Resource created successfully |
-| 400 | Bad Request | Invalid request data |
-| 401 | Unauthorized | Authentication required |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not Found | Resource not found |
-| 422 | Unprocessable Entity | Validation errors |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Server error |
+| Code | Description           | When Used                     |
+| ---- | --------------------- | ----------------------------- |
+| 200  | OK                    | Successful request            |
+| 201  | Created               | Resource created successfully |
+| 400  | Bad Request           | Invalid request data          |
+| 401  | Unauthorized          | Authentication required       |
+| 403  | Forbidden             | Insufficient permissions      |
+| 404  | Not Found             | Resource not found            |
+| 422  | Unprocessable Entity  | Validation errors             |
+| 429  | Too Many Requests     | Rate limit exceeded           |
+| 500  | Internal Server Error | Server error                  |
 
 ### Common Error Codes
 
@@ -691,15 +775,16 @@ curl -X POST "https://api.lifoai.com/api/v1/scoring/calculate-score" \
 
 ### Rate Limits by Endpoint Category
 
-| Category | Development | Production | Headers |
-|----------|-------------|------------|---------|
-| Mobile Endpoints | 60/minute | 40/minute | `X-RateLimit-*` |
-| Scan Workflows | 40/minute | 30/minute | `X-RateLimit-*` |
-| CSV Processing | 10/hour | 3/hour | `X-RateLimit-*` |
-| Analytics | 60/minute | 30/minute | `X-RateLimit-*` |
-| Scoring | 40/minute | 20/minute | `X-RateLimit-*` |
+| Category         | Development | Production | Headers         |
+| ---------------- | ----------- | ---------- | --------------- |
+| Mobile Endpoints | 60/minute   | 40/minute  | `X-RateLimit-*` |
+| Scan Workflows   | 40/minute   | 30/minute  | `X-RateLimit-*` |
+| CSV Processing   | 10/hour     | 3/hour     | `X-RateLimit-*` |
+| Analytics        | 60/minute   | 30/minute  | `X-RateLimit-*` |
+| Scoring          | 40/minute   | 20/minute  | `X-RateLimit-*` |
 
 ### Rate Limit Headers
+
 ```bash
 X-RateLimit-Limit: 30
 X-RateLimit-Remaining: 25
@@ -710,17 +795,20 @@ Retry-After: 60
 ## 🛡️ Security
 
 ### Authentication Requirements
+
 - All endpoints require valid JWT token except health endpoints
 - Service role required for administrative operations
 - Store access validated for store-specific operations
 
 ### Input Validation
+
 - All UUID parameters validated for format
 - String inputs sanitized to prevent injection
 - File uploads validated for content and size
 - Rate limiting prevents abuse
 
 ### Security Headers
+
 ```bash
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
@@ -735,37 +823,34 @@ Strict-Transport-Security: max-age=31536000
 ```typescript
 // API client setup
 class LifoApiClient {
-  private baseUrl: string;
-  private token: string;
+  private baseUrl: string
+  private token: string
 
   constructor(baseUrl: string, token: string) {
-    this.baseUrl = baseUrl;
-    this.token = token;
+    this.baseUrl = baseUrl
+    this.token = token
   }
 
-  private async request<T>(
-    endpoint: string, 
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers: {
-        'Authorization': `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
         'Content-Type': 'application/json',
         ...options.headers,
       },
-    });
+    })
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+      throw new Error(`API error: ${response.statusText}`)
     }
 
-    return response.json();
+    return response.json()
   }
 
   // Mobile summary
   async getMobileSummary(storeId: string): Promise<MobileSummaryResponse> {
-    return this.request(`/api/v1/mobile/mobile-summary/${storeId}`);
+    return this.request(`/api/v1/mobile/mobile-summary/${storeId}`)
   }
 
   // Scan in workflow
@@ -773,42 +858,42 @@ class LifoApiClient {
     return this.request(`/api/v1/scan/scan-in/${storeId}`, {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    })
   }
 
   // CSV upload
   async uploadCsv(storeId: string, file: File): Promise<CsvUploadResponse> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('store_id', storeId);
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('store_id', storeId)
 
     return this.request('/api/v1/csv/upload', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
         // Don't set Content-Type for FormData
       },
       body: formData,
-    });
+    })
   }
 }
 
 // Usage example
-const client = new LifoApiClient('https://api.lifoai.com', userToken);
+const client = new LifoApiClient('https://api.lifoai.com', userToken)
 
 // Get mobile dashboard data
-const summary = await client.getMobileSummary(storeId);
-console.log(`Urgent batches: ${summary.urgent_batches.length}`);
+const summary = await client.getMobileSummary(storeId)
+console.log(`Urgent batches: ${summary.urgent_batches.length}`)
 
 // Scan in new product
 const scanResult = await client.scanIn(storeId, {
   product_sku: 'APPLE-001',
   expiry_date: '2024-02-15',
   quantity: 50,
-  cost_price: 1.50,
+  cost_price: 1.5,
   selling_price: 2.99,
-});
-console.log(`New batch created: ${scanResult.batch_id}`);
+})
+console.log(`New batch created: ${scanResult.batch_id}`)
 ```
 
 ### Python Integration
@@ -827,9 +912,9 @@ class LifoApiClient:
         )
 
     async def request(
-        self, 
-        method: str, 
-        endpoint: str, 
+        self,
+        method: str,
+        endpoint: str,
         **kwargs
     ) -> Dict[str, Any]:
         """Make authenticated API request"""
@@ -839,21 +924,21 @@ class LifoApiClient:
         return response.json()
 
     async def get_mobile_summary(
-        self, 
-        store_id: str, 
+        self,
+        store_id: str,
         include_details: bool = True
     ) -> Dict[str, Any]:
         """Get mobile dashboard summary"""
         params = {'include_details': include_details}
         return await self.request(
-            'GET', 
+            'GET',
             f'/api/v1/mobile/mobile-summary/{store_id}',
             params=params
         )
 
     async def scan_in_product(
-        self, 
-        store_id: str, 
+        self,
+        store_id: str,
         product_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Scan in new product batch"""
@@ -864,8 +949,8 @@ class LifoApiClient:
         )
 
     async def calculate_score(
-        self, 
-        store_id: str, 
+        self,
+        store_id: str,
         batch_id: str
     ) -> Dict[str, Any]:
         """Calculate batch urgency score"""
@@ -878,11 +963,11 @@ class LifoApiClient:
 # Usage example
 async def main():
     client = LifoApiClient('https://api.lifoai.com', user_token)
-    
+
     # Get store summary
     summary = await client.get_mobile_summary(store_id)
     print(f"Store health score: {summary['store_health_score']}")
-    
+
     # Scan in new product
     product = {
         'product_sku': 'MILK-001',
@@ -893,10 +978,10 @@ async def main():
         'cost_price': 1.20,
         'selling_price': 1.89
     }
-    
+
     result = await client.scan_in_product(store_id, product)
     print(f"Created batch: {result['batch_id']}")
-    
+
     # Calculate score for the new batch
     score = await client.calculate_score(store_id, result['batch_id'])
     print(f"Initial score: {score['score']} ({score['urgency_level']})")
@@ -908,16 +993,19 @@ asyncio.run(main())
 ## 📞 Support & Resources
 
 ### API Documentation
+
 - **Interactive Docs**: `https://api.lifoai.com/docs`
 - **OpenAPI Spec**: `https://api.lifoai.com/openapi.json`
 - **Postman Collection**: Available on request
 
 ### Support Channels
+
 - **Technical Support**: support@lifoai.com
 - **API Questions**: api-support@lifoai.com
 - **Documentation Issues**: docs@lifoai.com
 
 ### Rate Limits & Quotas
+
 For higher rate limits or custom quotas, contact our enterprise team at enterprise@lifoai.com.
 
 ---
