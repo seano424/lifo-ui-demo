@@ -162,13 +162,13 @@ export default function UserAccountInformation() {
     <Card>
       <CardHeader>
         <div className="flex flex-col">
-          <Typography variant="h2">Team Management</Typography>
+          <Typography variant="h2">Account Information</Typography>
           <Typography variant="p" color="muted">
-            Invite new team members to your store and manage their roles and permissions.
+            Manage your account settings and preferences.
           </Typography>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-4 border-t">
         {/* Profile Information Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -253,7 +253,6 @@ export default function UserAccountInformation() {
                   Email Address
                 </Typography>
                 <Typography variant="p" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
                   {user?.email || 'No email'}
                 </Typography>
               </div>
@@ -265,7 +264,6 @@ export default function UserAccountInformation() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Typography variant="h3" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
               Phone Number
             </Typography>
             {!isEditingPhone && (
@@ -326,7 +324,6 @@ export default function UserAccountInformation() {
           ) : (
             <div>
               <Typography variant="p" className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
                 {user?.phone ? formatPhoneNumber(user.phone) : 'No phone number set'}
               </Typography>
               {!user?.phone && (
@@ -339,10 +336,9 @@ export default function UserAccountInformation() {
         </div>
 
         {/* Language Preference Section */}
-        <div className="space-y-4">
+        <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">
             <Typography variant="h3" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
               Language Preference
             </Typography>
             {!isEditingLanguage && (
@@ -403,10 +399,9 @@ export default function UserAccountInformation() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              <Badge variant="secondary" className="flex items-center gap-1">
+              <span className="flex items-center gap-1">
                 {SUPPORTED_LANGUAGES[user?.language_preference || 'en']}
-              </Badge>
+              </span>
             </div>
           )}
         </div>
@@ -419,27 +414,27 @@ export default function UserAccountInformation() {
               <Typography variant="small" className="font-medium text-muted-foreground">
                 Status:
               </Typography>
-              <Badge variant={user?.is_active ? 'default' : 'secondary'}>
+              <span className="flex items-center gap-1">
                 {user?.is_active ? 'Active' : 'Inactive'}
-              </Badge>
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
               <Typography variant="small" className="font-medium text-muted-foreground">
                 Email Verified:
               </Typography>
-              <Badge variant={user?.email_verified ? 'default' : 'outline'}>
+              <span className="flex items-center gap-1">
                 {user?.email_verified ? 'Verified' : 'Unverified'}
-              </Badge>
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
               <Typography variant="small" className="font-medium text-muted-foreground">
                 Phone Verified:
               </Typography>
-              <Badge variant={user?.phone_verified ? 'default' : 'outline'}>
+              <span className="flex items-center gap-1">
                 {user?.phone_verified ? 'Verified' : 'Unverified'}
-              </Badge>
+              </span>
             </div>
           </div>
         </div>
