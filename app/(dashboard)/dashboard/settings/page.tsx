@@ -10,6 +10,7 @@ import { cookies } from 'next/headers'
 
 import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
 import SettingsHeaderDisplay from '@/components/settings/settings-header-display'
+import SettingsTabs from '@/components/settings/settings-tabs'
 
 export default async function SettingsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -100,7 +101,10 @@ export default async function SettingsPage() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       {/* This component will handle store switching if user has multiple stores */}
       <StoreUsersPrefetch />
-      <SettingsHeaderDisplay />
+      <div className="space-y-6 lg:min-w-3xl lg:mx-auto">
+        <SettingsHeaderDisplay />
+        <SettingsTabs />
+      </div>
     </HydrationBoundary>
   )
 }
