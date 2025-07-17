@@ -68,6 +68,8 @@ import {
 
 import { usePermissions, useUserRole } from '@/hooks/use-users'
 import { Card, CardContent, CardHeader } from '../ui/card'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
@@ -76,13 +78,15 @@ export function StoreUsersList() {
   const [selectedUser, setSelectedUser] = useState<StoreUser | null>(null)
   const [showRemoveDialog, setShowRemoveDialog] = useState(false)
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
+  const [isEditUserRoleDialogOpen, setIsEditUserRoleDialogOpen] = useState(false)
+  const [formRole, setFormRole] = useState<StoreUser['role_in_store']>('employee')
 
-  const { changeUserRole, toggleUserActiveStatus, enablePinAuth, removeUser } =
-    useStoreUserActions()
+  const { changeUserRole, toggleUserActiveStatus, removeUser } = useStoreUserActions()
 
   const { canManageUsers } = usePermissions()
   const { isOwner } = useUserRole()
   const { activeStore } = useStoreState()
+  const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
 
   if (isLoading) {
     return (
@@ -115,6 +119,18 @@ export function StoreUsersList() {
         </Typography>
       </div>
     )
+  }
+
+  const handleEditUserRoleSubmit = (role: StoreUser['role_in_store']) => {
+    if (!selectedUser || !role || role === selectedUser.role_in_store) return
+
+    if (selectedUser.role_in_store === 'owner' && !isMoreThanOneOwner) {
+      toast.error('There must always be at least one owner.')
+      return
+    }
+
+    changeUserRole(selectedUser.user_id, role)
+    setIsEditUserRoleDialogOpen(false)
   }
 
   return (
@@ -189,7 +205,12 @@ export function StoreUsersList() {
 
                             {storeUser.role_in_store !== 'employee' && (
                               <DropdownMenuItem
-                                onClick={() => changeUserRole(storeUser.user_id, 'employee')}
+                                // onClick={() => changeUserRole(storeUser.user_id, 'employee')}
+                                onClick={() => {
+                                  setIsEditUserRoleDialogOpen(true)
+                                  setSelectedUser(storeUser)
+                                  setFormRole('employee')
+                                }}
                               >
                                 <User className="mr-2 h-4 w-4" />
                                 Make Employee
@@ -198,7 +219,12 @@ export function StoreUsersList() {
 
                             {isOwner && storeUser.role_in_store !== 'manager' && (
                               <DropdownMenuItem
-                                onClick={() => changeUserRole(storeUser.user_id, 'manager')}
+                                // onClick={() => changeUserRole(storeUser.user_id, 'manager')}
+                                onClick={() => {
+                                  setIsEditUserRoleDialogOpen(true)
+                                  setSelectedUser(storeUser)
+                                  setFormRole('manager')
+                                }}
                               >
                                 <UserCheck className="mr-2 h-4 w-4" />
                                 Make Manager
@@ -207,17 +233,20 @@ export function StoreUsersList() {
 
                             {isOwner && storeUser.role_in_store !== 'owner' && (
                               <DropdownMenuItem
-                                onClick={() => changeUserRole(storeUser.user_id, 'owner')}
+                                // onClick={() => changeUserRole(storeUser.user_id, 'owner')}
+                                onClick={() => {
+                                  setIsEditUserRoleDialogOpen(true)
+                                  setSelectedUser(storeUser)
+                                  setFormRole('owner')
+                                }}
                               >
                                 <Crown className="mr-2 h-4 w-4" />
                                 Make Owner
                               </DropdownMenuItem>
                             )}
 
-                            <DropdownMenuSeparator />
-
                             {/* PIN Auth Toggle */}
-                            {storeUser.role_in_store === 'employee' && (
+                            {/* {storeUser.role_in_store === 'employee' && (
                               <DropdownMenuItem
                                 onClick={() =>
                                   enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
@@ -226,26 +255,34 @@ export function StoreUsersList() {
                                 <Pin className="mr-2 h-4 w-4" />
                                 {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
                               </DropdownMenuItem>
-                            )}
+                            )} */}
 
                             {/* Active Status Toggle */}
-                            <DropdownMenuItem
-                              onClick={() =>
-                                toggleUserActiveStatus(storeUser.user_id, !storeUser.is_active)
-                              }
-                            >
-                              {storeUser.is_active ? (
-                                <>
-                                  <UserMinus className="mr-2 h-4 w-4" />
-                                  Deactivate User
-                                </>
-                              ) : (
-                                <>
-                                  <UserCheck className="mr-2 h-4 w-4" />
-                                  Reactivate User
-                                </>
-                              )}
-                            </DropdownMenuItem>
+                            {/* Managers can do this for employees */}
+                            {/* Owners can do this for everyone */}
+                            {/* But there must always be at least one owner */}
+                            {canManageUsers && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    toggleUserActiveStatus(storeUser.user_id, !storeUser.is_active)
+                                  }
+                                >
+                                  {storeUser.is_active ? (
+                                    <>
+                                      <UserMinus className="mr-2 h-4 w-4" />
+                                      Deactivate User
+                                    </>
+                                  ) : (
+                                    <>
+                                      <UserCheck className="mr-2 h-4 w-4" />
+                                      Reactivate User
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              </>
+                            )}
 
                             <DropdownMenuSeparator />
 
@@ -307,51 +344,102 @@ export function StoreUsersList() {
       </Card>
 
       <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
-        <form>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add User</DialogTitle>
-              <DialogDescription>Add a new user to the store.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4">
-              <div className="grid gap-3">
-                <Label htmlFor="name-1">Email</Label>
-                <Input id="name-1" name="name" placeholder="Enter email" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="role-1">Role</Label>
-                <Select name="role" defaultValue="employee">
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="employee">Employee</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="status-1">Status</Label>
-                <Select name="status" defaultValue="active">
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add User</DialogTitle>
+            <DialogDescription>Add a new user to the store.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="add-email">Email</Label>
+              <Input id="add-email" name="email" placeholder="Enter email" />
             </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </form>
+            <div className="grid gap-3">
+              <Label htmlFor="add-role">Role</Label>
+              <Select name="role" defaultValue="employee">
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="owner">Owner</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="employee">Employee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="add-status">Status</Label>
+              <Select name="status" defaultValue="active">
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditUserRoleDialogOpen} onOpenChange={setIsEditUserRoleDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit User Role</DialogTitle>
+            <DialogDescription>
+              {!isMoreThanOneOwner && (
+                <>
+                  There must always be at least one owner.
+                  <br />
+                </>
+              )}
+              Edit the role of {selectedUser?.full_name || 'this user'}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="edit-role">Role</Label>
+              <Select
+                name="role"
+                value={formRole}
+                onValueChange={value => setFormRole(value as StoreUser['role_in_store'])}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="owner">Owner</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="employee">Employee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              disabled={!isMoreThanOneOwner && selectedUser?.role_in_store === 'owner'}
+              onClick={() => handleEditUserRoleSubmit(formRole)}
+              className={cn(
+                'bg-blue-600 hover:bg-blue-700',
+                !isMoreThanOneOwner &&
+                  selectedUser?.role_in_store === 'owner' &&
+                  'bg-gray-400 hover:bg-gray-400',
+              )}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
 
       {/* Remove Confirmation Dialog */}
