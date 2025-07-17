@@ -101,8 +101,6 @@ export async function fetchStoreUsers(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchStoreUsers] Fetching users for store:', { storeId })
-
     const { data, error } = await supabase.rpc('get_store_users', {
       input_store_id: storeId,
     })
@@ -114,7 +112,6 @@ export async function fetchStoreUsers(
 
     const storeUsers = (data || []).map(transformStoreUserRow)
 
-    console.log('[fetchStoreUsers] Success:', { storeId, userCount: storeUsers.length })
     return storeUsers
   } catch (err) {
     console.error('[fetchStoreUsers] Unexpected error:', err)
@@ -136,8 +133,6 @@ export async function fetchStoreUsersPage(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchStoreUsersPage] Fetching users page:', { storeId, page, pageSize, filters })
-
     const { data, error } = await supabase.rpc('get_store_users_paginated', {
       input_store_id: storeId,
       page_number: page,
@@ -170,13 +165,6 @@ export async function fetchStoreUsersPage(
 
     const totalCount = data.length > 0 ? Number(data[0]?.total_count || 0) : 0
 
-    console.log('[fetchStoreUsersPage] Success:', {
-      storeId,
-      dataCount: storeUsers.length,
-      totalCount,
-      hasNextPage: totalCount > (page + 1) * pageSize,
-    })
-
     return {
       data: storeUsers,
       count: totalCount,
@@ -197,8 +185,6 @@ export async function fetchStoreUserById(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchStoreUserById] Fetching store user:', { storeId, userId })
-
     const { data, error } = await supabase.rpc('get_store_users', {
       input_store_id: storeId,
     })
@@ -217,7 +203,6 @@ export async function fetchStoreUserById(
 
     const storeUser = transformStoreUserRow(userRow)
 
-    console.log('[fetchStoreUserById] Success:', { storeId, userId })
     return storeUser
   } catch (err) {
     console.error('[fetchStoreUserById] Unexpected error:', err)
@@ -240,8 +225,6 @@ export async function updateStoreUser(
   const supabase = createClient()
 
   try {
-    console.log('[updateStoreUser] Starting update:', { storeId, userId, updates })
-
     // 🔍 Check authentication state
     const {
       data: { session },
@@ -252,14 +235,7 @@ export async function updateStoreUser(
       throw new Error('No authenticated session found')
     }
 
-    console.log('[updateStoreUser] Auth check passed:', {
-      currentUserId: session.user.id,
-      targetUserId: userId,
-    })
-
     // 🎯 METHOD 1: Try direct table update first
-    console.log('[updateStoreUser] Attempting direct table update...')
-
     try {
       const { data, error } = await supabase
         .schema('business')
@@ -279,8 +255,6 @@ export async function updateStoreUser(
         throw error // Will be caught by outer try-catch
       }
 
-      console.log('[updateStoreUser] ✅ Direct update succeeded!')
-
       // Fetch complete user data after successful direct update
       const updatedUser = await fetchStoreUserById(storeId, userId)
       if (!updatedUser) {
@@ -290,12 +264,6 @@ export async function updateStoreUser(
       return updatedUser
     } catch (directError: any) {
       // 🎯 METHOD 2: Fallback to RPC function (now with SECURITY DEFINER)
-      console.log('[updateStoreUser] 🔄 Falling back to RPC method...')
-      console.log('[updateStoreUser] Direct error was:', {
-        message: directError.message,
-        code: directError.code,
-      })
-
       const { data: rpcData, error: rpcError } = await supabase.rpc('update_store_user_safe', {
         input_store_id: storeId,
         input_user_id: userId,
@@ -321,7 +289,6 @@ export async function updateStoreUser(
         throw new Error('No data returned from RPC update')
       }
 
-      console.log('[updateStoreUser] ✅ RPC update succeeded!')
       return transformStoreUserRow(rpcData[0])
     }
   } catch (err: any) {
@@ -338,15 +305,12 @@ export async function updateStoreUser(
 
 // Helper function to test the update functionality
 export async function testStoreUserUpdate(storeId: string, userId: string) {
-  console.log('🧪 Testing store user update functionality...')
-
   try {
     // Test a simple update that should work
     const result = await updateStoreUser(storeId, userId, {
       can_use_pin_auth: true,
     })
 
-    console.log('✅ Test successful:', result)
     return { success: true, result }
   } catch (error: any) {
     console.error('❌ Test failed:', error.message)
@@ -359,8 +323,6 @@ export async function removeUserFromStore(storeId: string, userId: string): Prom
   const supabase = createClient()
 
   try {
-    console.log('[removeUserFromStore] Removing user from store:', { storeId, userId })
-
     // Try direct update first
     const { error } = await supabase
       .schema('business')
@@ -373,8 +335,6 @@ export async function removeUserFromStore(storeId: string, userId: string): Prom
       console.error('[removeUserFromStore] Supabase error:', error)
       throw new Error(`Failed to remove user from store: ${error.message}`)
     }
-
-    console.log('[removeUserFromStore] Success:', { storeId, userId })
   } catch (err) {
     console.error('[removeUserFromStore] Unexpected error:', err)
     throw err
@@ -394,13 +354,6 @@ export async function addUserToStore(
   const supabase = createClient()
 
   try {
-    console.log('[addUserToStore] Adding user to store:', {
-      storeId,
-      userId,
-      roleInStore,
-      permissions,
-    })
-
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -433,7 +386,6 @@ export async function addUserToStore(
       throw new Error('Added user not found')
     }
 
-    console.log('[addUserToStore] Success:', { storeId, userId })
     return newStoreUser
   } catch (err) {
     console.error('[addUserToStore] Unexpected error:', err)

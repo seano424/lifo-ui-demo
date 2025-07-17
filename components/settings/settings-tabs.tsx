@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-import { StoreUsersList } from '../store-users/store-users-list'
+import { StoreUsersList } from '@/components/store-users/store-users-list'
+import UserAccountInformation from '@/components/account/user-account-information'
 
 export default function SettingsTabs() {
   const [activeTab, setActiveTab] = useState('store')
@@ -40,10 +41,7 @@ export default function SettingsTabs() {
       </TabsContent>
 
       <TabsContent value="account" className="space-y-4">
-        <Typography variant="h2">Account</Typography>
-        <Typography variant="p" color="muted">
-          Manage your account settings.
-        </Typography>
+        <UserAccountInformation />
       </TabsContent>
 
       <TabsContent value="team" className="space-y-4">
