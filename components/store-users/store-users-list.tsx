@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Typography } from '@/components/ui/typography'
 import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
+import { type StoreUser } from '@/lib/queries/store-users'
+import { useStoreState } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
 import {
   MoreHorizontal,
@@ -63,22 +65,29 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
+import {
+  usePermissions,
+  useCurrentUser,
+  useCurrentUserRoles,
+  useCurrentUserStoreRole,
+  useCanPerform,
+  useUserRole,
+} from '@/hooks/use-users'
+
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
     useStoreUsers()
 
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [selectedUser, setSelectedUser] = useState<StoreUser | null>(null)
   const [showRemoveDialog, setShowRemoveDialog] = useState(false)
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
 
-  const {
-    changeUserRole,
-    toggleUserActiveStatus,
-    enablePinAuth,
-    removeUser,
-    isUpdating,
-    storeName,
-  } = useStoreUserActions()
+  const { changeUserRole, toggleUserActiveStatus, enablePinAuth, removeUser } =
+    useStoreUserActions()
+
+  const { canManageUsers } = usePermissions()
+  const { isOwner } = useUserRole()
+  const { activeStore } = useStoreState()
 
   if (isLoading) {
     return (
@@ -168,7 +177,7 @@ export function StoreUsersList() {
                   </TableCell>
 
                   <TableCell>
-                    {storeUser.is_active ? (
+                    {canManageUsers && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -180,19 +189,26 @@ export function StoreUsersList() {
                           <DropdownMenuLabel>User Actions</DropdownMenuLabel>
 
                           {/* Role Changes */}
-                          <DropdownMenuItem
-                            onClick={() => changeUserRole(storeUser.user_id, 'employee')}
-                          >
-                            <User className="mr-2 h-4 w-4" />
-                            Make Employee
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => changeUserRole(storeUser.user_id, 'manager')}
-                          >
-                            <UserCheck className="mr-2 h-4 w-4" />
-                            Make Manager
-                          </DropdownMenuItem>
-                          {storeUser.role_in_store !== 'owner' && (
+
+                          {storeUser.role_in_store !== 'employee' && (
+                            <DropdownMenuItem
+                              onClick={() => changeUserRole(storeUser.user_id, 'employee')}
+                            >
+                              <User className="mr-2 h-4 w-4" />
+                              Make Employee
+                            </DropdownMenuItem>
+                          )}
+
+                          {isOwner && storeUser.role_in_store !== 'manager' && (
+                            <DropdownMenuItem
+                              onClick={() => changeUserRole(storeUser.user_id, 'manager')}
+                            >
+                              <UserCheck className="mr-2 h-4 w-4" />
+                              Make Manager
+                            </DropdownMenuItem>
+                          )}
+
+                          {isOwner && storeUser.role_in_store !== 'owner' && (
                             <DropdownMenuItem
                               onClick={() => changeUserRole(storeUser.user_id, 'owner')}
                             >
@@ -204,14 +220,16 @@ export function StoreUsersList() {
                           <DropdownMenuSeparator />
 
                           {/* PIN Auth Toggle */}
-                          <DropdownMenuItem
-                            onClick={() =>
-                              enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
-                            }
-                          >
-                            <Pin className="mr-2 h-4 w-4" />
-                            {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
-                          </DropdownMenuItem>
+                          {storeUser.role_in_store === 'employee' && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
+                              }
+                            >
+                              <Pin className="mr-2 h-4 w-4" />
+                              {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
+                            </DropdownMenuItem>
+                          )}
 
                           {/* Active Status Toggle */}
                           <DropdownMenuItem
@@ -237,7 +255,7 @@ export function StoreUsersList() {
                           {/* Remove from Store */}
                           <DropdownMenuItem
                             onClick={() => {
-                              setSelectedUserId(storeUser.user_id)
+                              setSelectedUser(storeUser)
                               setShowRemoveDialog(true)
                             }}
                             className="text-red-600 focus:text-red-600"
@@ -247,8 +265,6 @@ export function StoreUsersList() {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">No actions</span>
                     )}
                   </TableCell>
                 </TableRow>
@@ -346,22 +362,24 @@ export function StoreUsersList() {
           <AlertDialogHeader>
             <AlertDialogTitle>Remove User from Store</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove this user from this store? This will deactivate their
-              access but won&apos;t delete their account.
+              This will permanently remove {selectedUser?.full_name || 'this user'} from{' '}
+              {activeStore?.business_name || 'this store'}. They will lose all access to this store,
+              lose their current role and permissions, and need to be re-invited if you want them
+              back. Their user account will remain active for other stores.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (selectedUserId) {
-                  removeUser(selectedUserId)
+                if (selectedUser) {
+                  removeUser(selectedUser.user_id)
                   setShowRemoveDialog(false)
                 }
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              Remove User
+              Remove from Store
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,4 +1,4 @@
-// lib/queries/query-keys.ts
+// lib/queries/query-keys.ts - Updated to include store role queries
 import type { ProductFilters } from './products'
 import type { UserFilters } from './users'
 import type { BatchFilters } from './batches'
@@ -48,7 +48,7 @@ export const queryKeys = {
       [...queryKeys.batches.byStore(storeId), 'byProduct', productId] as const,
   },
 
-  // Store users queries (NEW)
+  // Store users queries
   storeUsers: {
     all: ['storeUsers'] as const,
     byStore: (storeId: string) => [...queryKeys.storeUsers.all, 'byStore', storeId] as const,
@@ -105,11 +105,12 @@ export const queryKeys = {
     delivered: () => [...queryKeys.pinDeliveries.all, 'delivered'] as const,
   },
 
-  // Authentication-related queries (enhanced)
+  // Authentication-related queries (enhanced with store role support)
   auth: {
     currentUser: () => ['currentUser'] as const,
     currentUserRoles: () => ['currentUser', 'roles'] as const,
     currentUserPermissions: () => ['currentUser', 'permissions'] as const,
+    currentUserStoreRole: (storeId: string) => ['currentUser', 'storeRole', storeId] as const,
     session: () => ['auth', 'session'] as const,
   },
 } as const
@@ -121,3 +122,4 @@ export type ProductQueryKeys = typeof queryKeys.products
 export type BatchQueryKeys = typeof queryKeys.batches
 export type StoreQueryKeys = typeof queryKeys.stores
 export type StoreUserQueryKeys = typeof queryKeys.storeUsers
+export type AuthQueryKeys = typeof queryKeys.auth

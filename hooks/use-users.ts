@@ -1,3 +1,4 @@
+// hooks/use-users.ts - Fixed version using RPC functions instead of views
 import {
   fetchUsersPage,
   fetchUserById,
@@ -15,9 +16,24 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { UseQueryResult } from '@tanstack/react-query'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
-// UserRole type is not exported from queries, so define it here
-type UserRole = 'admin' | 'manager' | 'employee';
+// Legacy UserRole type (for global roles)
+type UserRole = 'admin' | 'manager' | 'employee'
+
+// New store-specific role types
+export type StoreRole = 'owner' | 'manager' | 'employee' | 'staff'
+
+export interface CurrentUserStoreRole {
+  userId: string
+  storeId: string
+  role: StoreRole
+  permissions: Record<string, boolean>
+  isActive: boolean
+  canUsePinAuth: boolean
+  pinAccessLevel: 'basic' | 'elevated' | 'admin'
+  storeName?: string
+}
 
 export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
@@ -44,7 +60,7 @@ export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
 
 export function useCurrentUser() {
   return useQuery({
-    queryKey: ['currentUser'],
+    queryKey: queryKeys.auth.currentUser(),
     queryFn: async (): Promise<User> => {
       console.log('🔍 useCurrentUser: Starting fetch...')
 
@@ -91,122 +107,356 @@ export function useCurrentUser() {
       console.log('🔍 useCurrentUser: Transformed user:', transformedUser)
       return transformedUser as unknown as User
     },
-    staleTime: 0, // Temporarily set to 0 to force fresh fetch
-    retry: false, // Don't retry auth failures
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   })
 }
 
-export function useCurrentUserRoles() {
-  const { data: currentUser } = useCurrentUser()
+/**
+ * 🆕 FIXED: Get current user's role and permissions using RPC function
+ */
+export function useCurrentUserStoreRole() {
+  const activeStoreId = useActiveStoreId()
 
-  return useQuery({
-    queryKey: ['currentUser', 'roles'],
-    queryFn: async (): Promise<UserRole[]> => {
-      if (!currentUser?.id) {
-        throw new Error('No current user')
+  const result = useQuery({
+    queryKey: queryKeys.auth.currentUserStoreRole(activeStoreId || ''),
+    queryFn: async (): Promise<CurrentUserStoreRole | null> => {
+      console.log('🔍 useCurrentUserStoreRole: Starting fetch...', { activeStoreId })
+
+      if (!activeStoreId) {
+        console.log('🔍 useCurrentUserStoreRole: No active store ID')
+        return null
       }
 
-      const roles = await fetchUserRoles(currentUser.id)
+      const supabase = createClient()
 
-      // Runtime validation to ensure type safety
-      const validRoles = roles.filter((role): role is UserRole =>
-        ['admin', 'manager', 'employee'].includes(role),
+      // Get current user from Supabase auth
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser()
+
+      if (authError || !user) {
+        console.log('🔍 useCurrentUserStoreRole: No authenticated user:', authError)
+        throw new Error('Not authenticated')
+      }
+
+      console.log('🔍 useCurrentUserStoreRole: Auth user found:', user.id)
+
+      // ✅ FIXED: Use RPC function instead of view
+      const { data: storeUserData, error: storeUserError } = await supabase.rpc(
+        'get_user_store_role',
+        {
+          p_user_id: user.id,
+          p_store_id: activeStoreId,
+        },
       )
 
-      // Optional: warn about invalid roles
-      if (validRoles.length !== roles.length) {
-        console.warn(
-          'Invalid roles detected:',
-          roles.filter(r => !validRoles.includes(r as UserRole)),
-        )
+      if (storeUserError) {
+        console.log('🔍 useCurrentUserStoreRole: RPC error:', storeUserError)
+        throw new Error(`Failed to get store role: ${storeUserError.message}`)
       }
 
-      return validRoles
+      if (!storeUserData || storeUserData.length === 0) {
+        console.log('🔍 useCurrentUserStoreRole: No user found in store')
+        return null
+      }
+
+      // RPC returns an array, get the first (and only) result
+      const userData = storeUserData[0]
+      console.log('🔍 useCurrentUserStoreRole: Store user data:', userData)
+
+      const currentUserStoreRole: CurrentUserStoreRole = {
+        userId: user.id,
+        storeId: activeStoreId,
+        role: userData.role_in_store as StoreRole,
+        permissions: userData.permissions || {},
+        isActive: userData.is_active ?? true,
+        canUsePinAuth: userData.can_use_pin_auth ?? false,
+        pinAccessLevel: userData.pin_access_level || 'basic',
+        storeName: userData.store_name, // RPC includes store name
+      }
+
+      console.log('🔍 useCurrentUserStoreRole: Final result:', currentUserStoreRole)
+      return currentUserStoreRole
     },
-    enabled: !!currentUser?.id,
+    enabled: !!activeStoreId,
+    staleTime: 5 * 60 * 1000,
+    retry: (failureCount, error: any) => {
+      if (error?.message?.includes('Not authenticated') || error?.message?.includes('not found')) {
+        return false
+      }
+      return failureCount < 2
+    },
+  })
+
+  return {
+    ...result,
+    // Convenience flags for common permission checks
+    isOwner: result.data?.role === 'owner',
+    isManager: result.data?.role === 'manager',
+    isEmployee: result.data?.role === 'employee' || result.data?.role === 'staff',
+
+    // Store context
+    storeId: activeStoreId,
+    storeName: result.data?.storeName,
+
+    // Permission helpers
+    can: (permission: string): boolean => {
+      return result.data?.permissions?.[permission] === true
+    },
+
+    // Common permission checks
+    canManageUsers: result.data?.permissions?.can_manage_users === true,
+    canViewAnalytics: result.data?.permissions?.can_view_analytics === true,
+    canApplyDiscounts: result.data?.permissions?.can_apply_discounts === true,
+    canScanProducts: result.data?.permissions?.can_scan_products === true,
+    canUploadInventory: result.data?.permissions?.can_upload_inventory === true,
+    canManageSettings: result.data?.permissions?.can_manage_settings === true,
+
+    // PIN authentication flags
+    canUsePinAuth: result.data?.canUsePinAuth === true,
+    pinAccessLevel: result.data?.pinAccessLevel || 'basic',
+
+    // Active status
+    isActiveInStore: result.data?.isActive === true,
+  }
+}
+
+/**
+ * ✅ FIXED: Updated to work with new store-based role system
+ * Maps store roles to legacy global roles for backward compatibility
+ */
+export function useCurrentUserRoles() {
+  const { data: storeRole, isLoading, error } = useCurrentUserStoreRole()
+
+  return useQuery({
+    queryKey: queryKeys.auth.currentUserRoles(),
+    queryFn: async (): Promise<UserRole[]> => {
+      console.log('🔍 useCurrentUserRoles: Store role data:', storeRole)
+
+      if (!storeRole) {
+        console.log('🔍 useCurrentUserRoles: No store role found')
+        return []
+      }
+
+      // Map store roles to the old global role system for compatibility
+      const globalRoles: UserRole[] = []
+
+      if (storeRole.role === 'owner') {
+        globalRoles.push('admin') // Store owners map to admin
+      }
+      if (storeRole.role === 'manager') {
+        globalRoles.push('manager')
+      }
+      if (storeRole.role === 'employee' || storeRole.role === 'staff') {
+        globalRoles.push('employee')
+      }
+
+      console.log('🔍 useCurrentUserRoles: Mapped roles:', {
+        storeRole: storeRole.role,
+        globalRoles,
+        storeId: storeRole.storeId,
+      })
+
+      return globalRoles
+    },
+    enabled: !!storeRole && !isLoading && !error,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
 export function useCurrentUserHasRole(roleName: string) {
-  const { data: currentUser } = useCurrentUser()
+  const { data: roles, isLoading } = useCurrentUserRoles()
 
   return useQuery({
-    queryKey: ['currentUser', 'hasRole', roleName],
-    queryFn: () => {
-      if (!currentUser?.id) {
-        throw new Error('No current user')
-      }
-      return checkUserHasRole(currentUser.id, roleName)
+    queryKey: [...queryKeys.auth.currentUserRoles(), 'hasRole', roleName] as const,
+    queryFn: async (): Promise<boolean> => {
+      if (!roles) return false
+      return roles.includes(roleName as UserRole)
     },
-    enabled: !!currentUser?.id && !!roleName,
+    enabled: !!roles && !!roleName,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
+/**
+ * 🆕 UPDATED: Enhanced permissions hook using new store-based system
+ */
 export function usePermissions() {
-  const { data: currentUser } = useCurrentUser()
-  const { data: isAdmin } = useCurrentUserHasRole('admin')
-  const { data: isManager } = useCurrentUserHasRole('manager')
-  const { data: roles } = useCurrentUserRoles()
+  const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser()
+  const {
+    data: storeRole,
+    isLoading: isLoadingStoreRole,
+    isOwner,
+    isManager,
+    isEmployee,
+    can,
+    canManageUsers,
+    canViewAnalytics,
+    canApplyDiscounts,
+    canScanProducts,
+    canUploadInventory,
+    canManageSettings,
+    canUsePinAuth,
+    pinAccessLevel,
+    isActiveInStore,
+    storeId,
+    storeName,
+  } = useCurrentUserStoreRole()
+
+  // Legacy compatibility - get mapped global roles
+  const { data: globalRoles } = useCurrentUserRoles()
+
+  const isLoading = isLoadingUser || isLoadingStoreRole
 
   return {
-    userId: currentUser?.id,
+    // User info
+    userId: currentUser?.id || null,
+    user: currentUser,
     isAuthenticated: !!currentUser,
-    isAdmin: !!isAdmin,
-    isManager: !!isManager,
-    isEmployee: roles?.includes('employee') ?? false,
-    roles: roles || [],
 
-    // Permission helpers
-    canEditProduct: (productCreatorId?: string) => {
-      if (!currentUser) return false
-      return isAdmin || isManager || productCreatorId === currentUser.id
-    },
+    // Store context
+    storeId,
+    storeName,
 
-    canDeleteProduct: (productCreatorId?: string) => {
-      if (!currentUser) return false
-      return !!isAdmin || !!isManager || productCreatorId === currentUser.id
-    },
+    // Role info (both new and legacy)
+    storeRole: storeRole?.role || null,
+    roles: globalRoles || [], // Legacy compatibility
+    isOwner,
+    isManager,
+    isEmployee,
+    isActiveInStore,
 
-    canManageUsers: () => {
-      return isAdmin || isManager
-    },
+    // Legacy role flags for backward compatibility
+    isAdmin: globalRoles?.includes('admin') ?? false,
 
+    // Permission checking
+    can,
+
+    // Specific permissions (enhanced with store-based checks)
+    canManageUsers: canManageUsers || isOwner,
+    canViewAnalytics: canViewAnalytics || isOwner || isManager,
+    canApplyDiscounts: canApplyDiscounts || isOwner || isManager,
+    canScanProducts: canScanProducts || isOwner || isManager || isEmployee,
+    canUploadInventory: canUploadInventory || isOwner || isManager,
+    canManageSettings: canManageSettings || isOwner,
     canCreateProducts: () => {
-      return isAdmin || isManager
+      return !!currentUser && isActiveInStore && (isOwner || isManager || canUploadInventory)
     },
 
-    canScanProducts: (): boolean => {
-      // All authenticated users can scan products
-      return !!currentUser
+    // PIN authentication
+    canUsePinAuth,
+    pinAccessLevel,
+
+    // Helper functions for common use cases
+    canEditProduct: (productCreatorId?: string): boolean => {
+      if (!currentUser || !isActiveInStore) return false
+      return isOwner || isManager || productCreatorId === currentUser.id
     },
 
-    canApplyDiscounts: (): boolean => {
-      // Managers and admins can apply discounts, employees might need approval
-      return !!isAdmin || !!isManager
+    canDeleteProduct: (productCreatorId?: string): boolean => {
+      if (!currentUser || !isActiveInStore) return false
+      return isOwner || isManager || productCreatorId === currentUser.id
     },
 
-    canViewAnalytics: (): boolean => {
-      // Only managers and admins can view detailed analytics
-      return !!isAdmin || !!isManager
-    },
-
-    // PIN-related permissions (new with migration)
+    // PIN-related permissions (enhanced)
     canSetPin: (): boolean => {
-      return !!currentUser && (currentUser.requires_pin || !!isAdmin)
+      return !!currentUser && (currentUser.requires_pin || isOwner)
     },
 
     canResetPin: (targetUserId?: string): boolean => {
       if (!currentUser) return false
-      // Admins can reset anyone's PIN, users can reset their own
-      return !!isAdmin || targetUserId === currentUser.id
+      return isOwner || targetUserId === currentUser.id
     },
 
     isPinLocked: (): boolean => {
       if (!currentUser?.pin_locked_until) return false
       return new Date() < new Date(currentUser.pin_locked_until)
     },
+
+    // Loading states
+    isLoading,
+    isLoadingUser,
+    isLoadingStoreRole,
+
+    // Debug info (helpful during development)
+    _debug: {
+      userId: currentUser?.id,
+      storeId,
+      storeRole: storeRole?.role,
+      globalRoles,
+      permissions: storeRole?.permissions,
+      isActiveInStore,
+      userMetadata: currentUser
+        ? {
+            username: currentUser.username,
+            full_name: currentUser.full_name,
+            requires_pin: currentUser.requires_pin,
+            is_active: currentUser.is_active,
+          }
+        : null,
+    },
   }
 }
+
+/**
+ * 🆕 NEW: Simple role checking hook
+ */
+export function useUserRole() {
+  const { storeRole, isOwner, isManager, isEmployee, isLoading } = usePermissions()
+
+  return {
+    role: storeRole,
+    isOwner,
+    isManager,
+    isEmployee,
+    isLoading,
+  }
+}
+
+/**
+ * 🆕 NEW: Check if user can perform a specific action
+ */
+export function useCanPerform(action: string) {
+  const { can, isLoading, isAuthenticated, isActiveInStore } = usePermissions()
+
+  return {
+    canPerform: isAuthenticated && isActiveInStore && can(action),
+    isLoading,
+    hasAccess: isAuthenticated && isActiveInStore,
+  }
+}
+
+/**
+ * 🆕 NEW: Authentication guard hook
+ */
+export function useAuthGuard() {
+  const { isAuthenticated, isLoading, userId, storeId, isActiveInStore } = usePermissions()
+
+  return {
+    isAuthenticated,
+    isLoading,
+    hasStoreAccess: isAuthenticated && !!storeId && isActiveInStore,
+    userId,
+    storeId,
+    // Helper for conditional rendering
+    requireAuth: (callback: () => React.ReactNode) => {
+      if (isLoading) return null
+      if (!isAuthenticated) return null
+      return callback()
+    },
+    requireStoreAccess: (callback: () => React.ReactNode) => {
+      if (isLoading) return null
+      if (!isAuthenticated || !storeId || !isActiveInStore) return null
+      return callback()
+    },
+  }
+}
+
+// ================================
+// EXISTING HOOKS (UNCHANGED)
+// ================================
 
 export function useUser(userId: string): UseQueryResult<User, Error> {
   return useQuery({
@@ -258,28 +508,27 @@ export function useAdmins() {
   return useUsersByRole('admin')
 }
 
-// New PIN-related hooks
 export function usePinRequiredUsers() {
   return useUsers({ requires_pin: true })
 }
 
-// ✅ FIXED: This hook needs to use the queries file, not direct database access
 export function usePinLockedUsers() {
   return useQuery({
     queryKey: ['users', 'pinLocked'],
     queryFn: async () => {
-      // Use the filter in your queries file instead of direct DB access
       const { data } = await fetchUsersPage({ page: 0, pageSize: 100 }, { pin_locked: true })
       return data
     },
   })
 }
 
-// Updated useUserActions hook that uses RPC functions instead of admin API
+// ================================
+// USER ACTIONS (UNCHANGED)
+// ================================
+
 export function useUserActions() {
   const queryClient = useQueryClient()
 
-  // Note: Create mutation would need to be handled server-side
   const createMutation = useMutation<
     User,
     Error,
@@ -294,7 +543,6 @@ export function useUserActions() {
     }
   >({
     mutationFn: async userData => {
-      // This would need to be implemented as a server action or API route
       throw new Error('User creation must be handled server-side')
     },
     onSuccess: newUser => {
@@ -310,15 +558,12 @@ export function useUserActions() {
     },
   })
 
-  // Updated mutation that uses RPC functions
   const updateMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
       const supabase = createClient()
 
-      // Separate email from metadata updates
       const { email, ...metadataUpdates } = updates
 
-      // Update email if provided
       if (email) {
         const { data: emailResult, error: emailError } = await supabase.rpc('update_user_email', {
           target_user_id: id,
@@ -330,7 +575,6 @@ export function useUserActions() {
         }
       }
 
-      // Update metadata if provided
       if (Object.keys(metadataUpdates).length > 0) {
         const { data: metadataResult, error: metadataError } = await supabase.rpc(
           'update_user_metadata',
@@ -345,7 +589,6 @@ export function useUserActions() {
         }
       }
 
-      // Fetch updated user data
       const { data: allUsers, error: fetchError } = await supabase.rpc('get_users_with_metadata')
 
       if (fetchError) {
@@ -386,10 +629,8 @@ export function useUserActions() {
     },
   })
 
-  // Delete would also need to be handled server-side
   const deleteMutation = useMutation({
     mutationFn: async (userId: string) => {
-      // This would need to be implemented as a server action or API route
       throw new Error('User deletion must be handled server-side')
     },
     onSuccess: () => {
@@ -401,7 +642,6 @@ export function useUserActions() {
     },
   })
 
-  // Simplified helper methods that use the RPC-based update
   const activateUser = (id: string) =>
     updateMutation.mutate({
       id,
@@ -420,7 +660,6 @@ export function useUserActions() {
       updates: profileData,
     })
 
-  // PIN management methods
   const setPinRequired = (id: string, required: boolean) =>
     updateMutation.mutate({
       id,
@@ -442,16 +681,13 @@ export function useUserActions() {
       updates: { pin_locked_until: lockUntil.toISOString() },
     })
 
-  // Role management helpers (these would need separate RPC functions)
   const assignRole = (userId: string, role: UserRole) => {
     console.log(`Assigning role ${role} to user ${userId}`)
-    // TODO: Implement role assignment RPC function
     toast.info('Role assignment not yet implemented')
   }
 
   const removeRole = (userId: string, role: UserRole) => {
     console.log(`Removing role ${role} from user ${userId}`)
-    // TODO: Implement role removal RPC function
     toast.info('Role removal not yet implemented')
   }
 
