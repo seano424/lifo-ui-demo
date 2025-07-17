@@ -101,7 +101,7 @@ export default async function SettingsPage() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       {/* This component will handle store switching if user has multiple stores */}
       <StoreUsersPrefetch />
-      <div className="space-y-6 lg:min-w-3xl lg:mx-auto">
+      <div className="space-y-6 lg:min-w-5xl lg:mx-auto">
         <SettingsHeaderDisplay />
         <SettingsTabs />
       </div>
