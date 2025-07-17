@@ -225,7 +225,6 @@ export async function fetchStoreUserById(
   }
 }
 
-// HYBRID APPROACH: Try direct table operations first, fallback to RPC
 export async function updateStoreUser(
   storeId: string,
   userId: string,
@@ -241,19 +240,26 @@ export async function updateStoreUser(
   const supabase = createClient()
 
   try {
-    console.log('[updateStoreUser] Updating store user:', { storeId, userId, updates })
+    console.log('[updateStoreUser] Starting update:', { storeId, userId, updates })
 
-    // 🔍 First, check authentication state for debugging
+    // 🔍 Check authentication state
     const {
       data: { session },
       error: sessionError,
     } = await supabase.auth.getSession()
+
     if (!session?.user) {
       throw new Error('No authenticated session found')
     }
-    console.log('[updateStoreUser] Auth check passed:', session.user.id)
 
-    // 🎯 TRY METHOD 1: Direct table update (should work with proper RLS)
+    console.log('[updateStoreUser] Auth check passed:', {
+      currentUserId: session.user.id,
+      targetUserId: userId,
+    })
+
+    // 🎯 METHOD 1: Try direct table update first
+    console.log('[updateStoreUser] Attempting direct table update...')
+
     try {
       const { data, error } = await supabase
         .schema('business')
@@ -265,22 +271,30 @@ export async function updateStoreUser(
         .single()
 
       if (error) {
-        console.warn('[updateStoreUser] Direct update failed:', error.message)
+        console.warn('[updateStoreUser] Direct update failed:', {
+          error: error.message,
+          code: error.code,
+          details: error.details,
+        })
         throw error // Will be caught by outer try-catch
       }
 
-      console.log('[updateStoreUser] Direct update succeeded')
+      console.log('[updateStoreUser] ✅ Direct update succeeded!')
 
-      // Fetch complete user data
+      // Fetch complete user data after successful direct update
       const updatedUser = await fetchStoreUserById(storeId, userId)
       if (!updatedUser) {
-        throw new Error('Updated user not found')
+        throw new Error('Updated user not found after direct update')
       }
 
       return updatedUser
     } catch (directError: any) {
-      // 🎯 METHOD 2: Fallback to RPC function
-      console.log('[updateStoreUser] Falling back to RPC method')
+      // 🎯 METHOD 2: Fallback to RPC function (now with SECURITY DEFINER)
+      console.log('[updateStoreUser] 🔄 Falling back to RPC method...')
+      console.log('[updateStoreUser] Direct error was:', {
+        message: directError.message,
+        code: directError.code,
+      })
 
       const { data: rpcData, error: rpcError } = await supabase.rpc('update_store_user_safe', {
         input_store_id: storeId,
@@ -294,7 +308,12 @@ export async function updateStoreUser(
       })
 
       if (rpcError) {
-        console.error('[updateStoreUser] RPC fallback also failed:', rpcError)
+        console.error('[updateStoreUser] ❌ RPC fallback also failed:', {
+          error: rpcError.message,
+          code: rpcError.code,
+          details: rpcError.details,
+          hint: rpcError.hint,
+        })
         throw new Error(`Failed to update store user: ${rpcError.message}`)
       }
 
@@ -302,12 +321,36 @@ export async function updateStoreUser(
         throw new Error('No data returned from RPC update')
       }
 
-      console.log('[updateStoreUser] RPC update succeeded')
+      console.log('[updateStoreUser] ✅ RPC update succeeded!')
       return transformStoreUserRow(rpcData[0])
     }
-  } catch (err) {
-    console.error('[updateStoreUser] All methods failed:', err)
+  } catch (err: any) {
+    console.error('[updateStoreUser] ❌ All methods failed:', {
+      error: err.message,
+      stack: err.stack,
+      storeId,
+      userId,
+      updates,
+    })
     throw err
+  }
+}
+
+// Helper function to test the update functionality
+export async function testStoreUserUpdate(storeId: string, userId: string) {
+  console.log('🧪 Testing store user update functionality...')
+
+  try {
+    // Test a simple update that should work
+    const result = await updateStoreUser(storeId, userId, {
+      can_use_pin_auth: true,
+    })
+
+    console.log('✅ Test successful:', result)
+    return { success: true, result }
+  } catch (error: any) {
+    console.error('❌ Test failed:', error.message)
+    return { success: false, error: error.message }
   }
 }
 

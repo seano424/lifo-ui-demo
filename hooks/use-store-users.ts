@@ -16,7 +16,7 @@ import {
 
 // ✅ READING DATA - Store-aware infinite scroll users list
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
-  const activeStoreId = useActiveStoreId() // ✅ Same pattern as products
+  const activeStoreId = useActiveStoreId()
 
   const result = useInfiniteQuery({
     queryKey: queryKeys.storeUsers.infinite(activeStoreId || '', filters), // ✅ Centralized keys

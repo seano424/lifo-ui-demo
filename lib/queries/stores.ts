@@ -61,7 +61,6 @@ export async function fetchUserStores(
       `,
       )
       .eq('user_id', userId)
-      .eq('is_active', true)
       .eq('stores.is_active', true)
 
     if (error) {
@@ -118,8 +117,7 @@ export async function fetchUserStoresAlternative(
       `,
       )
       .eq('store_users.user_id', userId)
-      .eq('store_users.is_active', true)
-      .eq('is_active', true)
+      .eq('stores.is_active', true)
 
     if (error) {
       console.error('[fetchUserStoresAlternative] Supabase error:', error)
