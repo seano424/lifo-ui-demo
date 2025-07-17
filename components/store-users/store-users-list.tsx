@@ -394,13 +394,14 @@ export function StoreUsersList() {
           <DialogHeader>
             <DialogTitle>Edit User Role</DialogTitle>
             <DialogDescription>
-              {!isMoreThanOneOwner && (
+              {!isMoreThanOneOwner && selectedUser?.role_in_store === 'owner' && (
                 <>
                   There must always be at least one owner.
                   <br />
                 </>
               )}
-              Edit the role of {selectedUser?.full_name || 'this user'}.
+              {selectedUser?.full_name || 'this user'} currently has the role of:{' '}
+              {selectedUser?.role_in_store}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">

@@ -208,7 +208,7 @@ export default function UserAccountInformation() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input
                     id="email"
@@ -217,7 +217,7 @@ export default function UserAccountInformation() {
                     onChange={e => setEditForm(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Enter your email address"
                   />
-                </div>
+                </div> */}
               </div>
 
               <div className="flex items-center gap-2">
@@ -248,12 +248,21 @@ export default function UserAccountInformation() {
                 <Typography variant="p">{user?.full_name || 'No name'}</Typography>
               </div>
 
-              <div>
+              {/* <div>
                 <Typography variant="small" className="font-medium text-muted-foreground">
                   Email Address
                 </Typography>
                 <Typography variant="p" className="flex items-center gap-2">
                   {user?.email || 'No email'}
+                </Typography>
+              </div> */}
+              <div>
+                <Typography variant="small" className="font-medium text-muted-foreground">
+                  Email Address
+                </Typography>
+                <Typography variant="p">{user?.email || 'No email'}</Typography>
+                <Typography variant="small" className="text-muted-foreground mt-1">
+                  Email cannot be changed. Contact support if needed.
                 </Typography>
               </div>
             </div>

@@ -114,5 +114,5 @@ export type UpdatePhoneResponse = {
 export type UpdateLanguageResponse = {
   success: boolean
   user_id: string
-  language_preference: SupportedLanguage
+  language_preference: string
 }
