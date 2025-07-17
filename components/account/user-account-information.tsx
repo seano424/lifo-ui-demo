@@ -159,293 +159,291 @@ export default function UserAccountInformation() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Account Information
-          </CardTitle>
-          <CardDescription>Manage your account settings and preferences.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Profile Information Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Typography variant="h3" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Profile Information
-              </Typography>
-              {!isEditingProfile && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditingProfile(true)}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </Button>
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col">
+          <Typography variant="h2">Team Management</Typography>
+          <Typography variant="p" color="muted">
+            Invite new team members to your store and manage their roles and permissions.
+          </Typography>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Profile Information Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Typography variant="h3" className="flex items-center gap-2">
+              Profile Information
+            </Typography>
+            {!isEditingProfile && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditingProfile(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Edit
+              </Button>
+            )}
+          </div>
+
+          {isEditingProfile ? (
+            <div className="space-y-4 p-4 border rounded-lg">
+              {profileError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{profileError}</AlertDescription>
+                </Alert>
               )}
-            </div>
 
-            {isEditingProfile ? (
-              <div className="space-y-4 p-4 border rounded-lg">
-                {profileError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{profileError}</AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name</Label>
-                    <Input
-                      id="full_name"
-                      value={editForm.full_name}
-                      onChange={e => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={editForm.email}
-                      onChange={e => setEditForm(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="Enter your email address"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleProfileSubmit}
-                    // disabled={updateUserProfile}
-                    className="flex items-center gap-2"
-                  >
-                    <Check className="h-4 w-4" />
-                    Save Changes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={resetProfileForm}
-                    className="flex items-center gap-2"
-                  >
-                    <X className="h-4 w-4" />
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Typography variant="small" className="font-medium text-muted-foreground">
-                    Full Name
-                  </Typography>
-                  <Typography variant="p">{user?.full_name || 'No name'}</Typography>
-                </div>
-
-                <div>
-                  <Typography variant="small" className="font-medium text-muted-foreground">
-                    Email Address
-                  </Typography>
-                  <Typography variant="p" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    {user?.email || 'No email'}
-                  </Typography>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Phone Number Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Typography variant="h3" className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                Phone Number
-              </Typography>
-              {!isEditingPhone && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditingPhone(true)}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </Button>
-              )}
-            </div>
-
-            {isEditingPhone ? (
-              <div className="space-y-4 p-4 border rounded-lg">
-                {phoneError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{phoneError}</AlertDescription>
-                  </Alert>
-                )}
-
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="full_name">Full Name</Label>
                   <Input
-                    id="phone"
-                    type="tel"
-                    value={phoneForm}
-                    onChange={e => setPhoneForm(e.target.value)}
-                    placeholder="+33 1 23 45 67 89"
+                    id="full_name"
+                    value={editForm.full_name}
+                    onChange={e => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
+                    placeholder="Enter your full name"
                   />
-                  <Typography variant="small" className="text-muted-foreground">
-                    Enter your phone number with country code (optional)
-                  </Typography>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handlePhoneSubmit}
-                    disabled={updatePhone.isPending}
-                    className="flex items-center gap-2"
-                  >
-                    <Check className="h-4 w-4" />
-                    {updatePhone.isPending ? 'Saving...' : 'Save Phone'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={resetPhoneForm}
-                    className="flex items-center gap-2"
-                  >
-                    <X className="h-4 w-4" />
-                    Cancel
-                  </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={editForm.email}
+                    onChange={e => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter your email address"
+                  />
                 </div>
               </div>
-            ) : (
-              <div>
-                <Typography variant="p" className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  {user?.phone ? formatPhoneNumber(user.phone) : 'No phone number set'}
-                </Typography>
-                {!user?.phone && (
-                  <Typography variant="small" className="text-muted-foreground mt-1">
-                    Add a phone number for account security and notifications
-                  </Typography>
-                )}
-              </div>
-            )}
-          </div>
 
-          {/* Language Preference Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Typography variant="h3" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Language Preference
-              </Typography>
-              {!isEditingLanguage && (
+              <div className="flex items-center gap-2">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsEditingLanguage(true)}
+                  onClick={handleProfileSubmit}
+                  // disabled={updateUserProfile}
                   className="flex items-center gap-2"
                 >
-                  <Edit className="h-4 w-4" />
-                  Edit
+                  <Check className="h-4 w-4" />
+                  Save Changes
                 </Button>
-              )}
+                <Button
+                  variant="outline"
+                  onClick={resetProfileForm}
+                  className="flex items-center gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
             </div>
-
-            {isEditingLanguage ? (
-              <div className="space-y-4 p-4 border rounded-lg">
-                <div className="space-y-2">
-                  <Label htmlFor="language">Display Language</Label>
-                  <Select
-                    value={languageForm}
-                    onValueChange={(value: SupportedLanguage) => setLanguageForm(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
-                        <SelectItem key={code} value={code}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Typography variant="small" className="text-muted-foreground">
-                    Choose your preferred language for the interface
-                  </Typography>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleLanguageSubmit}
-                    disabled={updateLanguage.isPending}
-                    className="flex items-center gap-2"
-                  >
-                    <Check className="h-4 w-4" />
-                    {updateLanguage.isPending ? 'Saving...' : 'Save Language'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={resetLanguageForm}
-                    className="flex items-center gap-2"
-                  >
-                    <X className="h-4 w-4" />
-                    Cancel
-                  </Button>
-                </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Typography variant="small" className="font-medium text-muted-foreground">
+                  Full Name
+                </Typography>
+                <Typography variant="p">{user?.full_name || 'No name'}</Typography>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  {SUPPORTED_LANGUAGES[user?.language_preference || 'en']}
-                </Badge>
+
+              <div>
+                <Typography variant="small" className="font-medium text-muted-foreground">
+                  Email Address
+                </Typography>
+                <Typography variant="p" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  {user?.email || 'No email'}
+                </Typography>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Phone Number Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Typography variant="h3" className="flex items-center gap-2">
+              <Phone className="h-4 w-4" />
+              Phone Number
+            </Typography>
+            {!isEditingPhone && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditingPhone(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Edit
+              </Button>
             )}
           </div>
 
-          {/* Account Status Section */}
-          <div className="space-y-4 pt-4 border-t">
-            <Typography variant="h3">Account Status</Typography>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-2">
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  Status:
+          {isEditingPhone ? (
+            <div className="space-y-4 p-4 border rounded-lg">
+              {phoneError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{phoneError}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phoneForm}
+                  onChange={e => setPhoneForm(e.target.value)}
+                  placeholder="+33 1 23 45 67 89"
+                />
+                <Typography variant="small" className="text-muted-foreground">
+                  Enter your phone number with country code (optional)
                 </Typography>
-                <Badge variant={user?.is_active ? 'default' : 'secondary'}>
-                  {user?.is_active ? 'Active' : 'Inactive'}
-                </Badge>
               </div>
 
               <div className="flex items-center gap-2">
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  Email Verified:
-                </Typography>
-                <Badge variant={user?.email_verified ? 'default' : 'outline'}>
-                  {user?.email_verified ? 'Verified' : 'Unverified'}
-                </Badge>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  Phone Verified:
-                </Typography>
-                <Badge variant={user?.phone_verified ? 'default' : 'outline'}>
-                  {user?.phone_verified ? 'Verified' : 'Unverified'}
-                </Badge>
+                <Button
+                  onClick={handlePhoneSubmit}
+                  disabled={updatePhone.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  {updatePhone.isPending ? 'Saving...' : 'Save Phone'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={resetPhoneForm}
+                  className="flex items-center gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
               </div>
             </div>
+          ) : (
+            <div>
+              <Typography variant="p" className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                {user?.phone ? formatPhoneNumber(user.phone) : 'No phone number set'}
+              </Typography>
+              {!user?.phone && (
+                <Typography variant="small" className="text-muted-foreground mt-1">
+                  Add a phone number for account security and notifications
+                </Typography>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Language Preference Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Typography variant="h3" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Language Preference
+            </Typography>
+            {!isEditingLanguage && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditingLanguage(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Edit
+              </Button>
+            )}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+
+          {isEditingLanguage ? (
+            <div className="space-y-4 p-4 border rounded-lg">
+              <div className="space-y-2">
+                <Label htmlFor="language">Display Language</Label>
+                <Select
+                  value={languageForm}
+                  onValueChange={(value: SupportedLanguage) => setLanguageForm(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
+                      <SelectItem key={code} value={code}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Typography variant="small" className="text-muted-foreground">
+                  Choose your preferred language for the interface
+                </Typography>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleLanguageSubmit}
+                  disabled={updateLanguage.isPending}
+                  className="flex items-center gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  {updateLanguage.isPending ? 'Saving...' : 'Save Language'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={resetLanguageForm}
+                  className="flex items-center gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              <Badge variant="secondary" className="flex items-center gap-1">
+                {SUPPORTED_LANGUAGES[user?.language_preference || 'en']}
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        {/* Account Status Section */}
+        <div className="space-y-4 pt-4 border-t">
+          <Typography variant="h3">Account Status</Typography>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-2">
+              <Typography variant="small" className="font-medium text-muted-foreground">
+                Status:
+              </Typography>
+              <Badge variant={user?.is_active ? 'default' : 'secondary'}>
+                {user?.is_active ? 'Active' : 'Inactive'}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Typography variant="small" className="font-medium text-muted-foreground">
+                Email Verified:
+              </Typography>
+              <Badge variant={user?.email_verified ? 'default' : 'outline'}>
+                {user?.email_verified ? 'Verified' : 'Unverified'}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Typography variant="small" className="font-medium text-muted-foreground">
+                Phone Verified:
+              </Typography>
+              <Badge variant={user?.phone_verified ? 'default' : 'outline'}>
+                {user?.phone_verified ? 'Verified' : 'Unverified'}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

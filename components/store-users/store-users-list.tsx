@@ -67,6 +67,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { usePermissions, useUserRole } from '@/hooks/use-users'
+import { Card, CardContent, CardHeader } from '../ui/card'
 
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
@@ -118,188 +119,192 @@ export function StoreUsersList() {
 
   return (
     <>
-      <div className="space-y-6 border border-gray-200 rounded-2xl p-4">
-        <div className="flex flex-col">
-          <Typography variant="h2">Team Management</Typography>
-          <Typography variant="p" color="muted">
-            Invite new team members to your store and manage their roles and permissions.
-          </Typography>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <Typography variant="p" color="muted">
-            {count > 0 ? `Showing ${data.length} of ${count} users` : 'No users found'}
-          </Typography>
-          <Button
-            variant="brand"
-            onClick={() => setIsAddUserDialogOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <UserPlus className="w-4 h-4" />
-            Invite team member
-          </Button>
-        </div>
-
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-opacity-0">
-              <TableHead>Name</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map(storeUser => {
-              return (
-                <TableRow key={storeUser.user_id} className="hover:bg-opacity-0">
-                  <TableCell className="font-medium">
-                    <div>
-                      <div>{storeUser.full_name}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
-                  <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
-                  <TableCell>
-                    <span className="capitalize">{storeUser.role_in_store}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span>{storeUser.is_active ? 'Active' : 'Inactive'}</span>
-                  </TableCell>
-
-                  <TableCell>
-                    {canManageUsers && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>User Actions</DropdownMenuLabel>
-
-                          {/* Role Changes */}
-
-                          {storeUser.role_in_store !== 'employee' && (
-                            <DropdownMenuItem
-                              onClick={() => changeUserRole(storeUser.user_id, 'employee')}
-                            >
-                              <User className="mr-2 h-4 w-4" />
-                              Make Employee
-                            </DropdownMenuItem>
-                          )}
-
-                          {isOwner && storeUser.role_in_store !== 'manager' && (
-                            <DropdownMenuItem
-                              onClick={() => changeUserRole(storeUser.user_id, 'manager')}
-                            >
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Make Manager
-                            </DropdownMenuItem>
-                          )}
-
-                          {isOwner && storeUser.role_in_store !== 'owner' && (
-                            <DropdownMenuItem
-                              onClick={() => changeUserRole(storeUser.user_id, 'owner')}
-                            >
-                              <Crown className="mr-2 h-4 w-4" />
-                              Make Owner
-                            </DropdownMenuItem>
-                          )}
-
-                          <DropdownMenuSeparator />
-
-                          {/* PIN Auth Toggle */}
-                          {storeUser.role_in_store === 'employee' && (
-                            <DropdownMenuItem
-                              onClick={() =>
-                                enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
-                              }
-                            >
-                              <Pin className="mr-2 h-4 w-4" />
-                              {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
-                            </DropdownMenuItem>
-                          )}
-
-                          {/* Active Status Toggle */}
-                          <DropdownMenuItem
-                            onClick={() =>
-                              toggleUserActiveStatus(storeUser.user_id, !storeUser.is_active)
-                            }
-                          >
-                            {storeUser.is_active ? (
-                              <>
-                                <UserMinus className="mr-2 h-4 w-4" />
-                                Deactivate User
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="mr-2 h-4 w-4" />
-                                Reactivate User
-                              </>
-                            )}
-                          </DropdownMenuItem>
-
-                          <DropdownMenuSeparator />
-
-                          {/* Remove from Store */}
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedUser(storeUser)
-                              setShowRemoveDialog(true)
-                            }}
-                            className="text-red-600 focus:text-red-600"
-                          >
-                            <UserMinus className="mr-2 h-4 w-4" />
-                            Remove from Store
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-
-        {/* Empty State */}
-        {data.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 mx-auto mb-4 text-gray-400">
-              <Users className="w-full h-full" />
-            </div>
-            <Typography variant="h3">No users found</Typography>
-            <Typography variant="p" color="muted" className="mb-4">
-              This store doesn't have any users yet.
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col">
+            <Typography variant="h2">Team Management</Typography>
+            <Typography variant="p" color="muted">
+              Invite new team members to your store and manage their roles and permissions.
             </Typography>
           </div>
-        )}
+        </CardHeader>
 
-        {/* Load More Button */}
-        {hasMore && (
-          <div className="flex justify-center mt-8">
+        <CardContent>
+          <div className="flex justify-between items-center">
+            <Typography variant="p" color="muted">
+              {count > 0 ? `Showing ${data.length} of ${count} users` : 'No users found'}
+            </Typography>
             <Button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              variant="outline"
+              variant="brand"
+              onClick={() => setIsAddUserDialogOpen(true)}
               className="flex items-center gap-2"
             >
-              {isFetchingNextPage ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-                  Loading more...
-                </>
-              ) : (
-                'Load More Users'
-              )}
+              <UserPlus className="w-4 h-4" />
+              Invite team member
             </Button>
           </div>
-        )}
-      </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-opacity-0">
+                <TableHead>Name</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.map(storeUser => {
+                return (
+                  <TableRow key={storeUser.user_id} className="hover:bg-opacity-0">
+                    <TableCell className="font-medium">
+                      <div>
+                        <div>{storeUser.full_name}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
+                    <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
+                    <TableCell>
+                      <span className="capitalize">{storeUser.role_in_store}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span>{storeUser.is_active ? 'Active' : 'Inactive'}</span>
+                    </TableCell>
+
+                    <TableCell>
+                      {canManageUsers && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>User Actions</DropdownMenuLabel>
+
+                            {/* Role Changes */}
+
+                            {storeUser.role_in_store !== 'employee' && (
+                              <DropdownMenuItem
+                                onClick={() => changeUserRole(storeUser.user_id, 'employee')}
+                              >
+                                <User className="mr-2 h-4 w-4" />
+                                Make Employee
+                              </DropdownMenuItem>
+                            )}
+
+                            {isOwner && storeUser.role_in_store !== 'manager' && (
+                              <DropdownMenuItem
+                                onClick={() => changeUserRole(storeUser.user_id, 'manager')}
+                              >
+                                <UserCheck className="mr-2 h-4 w-4" />
+                                Make Manager
+                              </DropdownMenuItem>
+                            )}
+
+                            {isOwner && storeUser.role_in_store !== 'owner' && (
+                              <DropdownMenuItem
+                                onClick={() => changeUserRole(storeUser.user_id, 'owner')}
+                              >
+                                <Crown className="mr-2 h-4 w-4" />
+                                Make Owner
+                              </DropdownMenuItem>
+                            )}
+
+                            <DropdownMenuSeparator />
+
+                            {/* PIN Auth Toggle */}
+                            {storeUser.role_in_store === 'employee' && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
+                                }
+                              >
+                                <Pin className="mr-2 h-4 w-4" />
+                                {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
+                              </DropdownMenuItem>
+                            )}
+
+                            {/* Active Status Toggle */}
+                            <DropdownMenuItem
+                              onClick={() =>
+                                toggleUserActiveStatus(storeUser.user_id, !storeUser.is_active)
+                              }
+                            >
+                              {storeUser.is_active ? (
+                                <>
+                                  <UserMinus className="mr-2 h-4 w-4" />
+                                  Deactivate User
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="mr-2 h-4 w-4" />
+                                  Reactivate User
+                                </>
+                              )}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            {/* Remove from Store */}
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedUser(storeUser)
+                                setShowRemoveDialog(true)
+                              }}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              <UserMinus className="mr-2 h-4 w-4" />
+                              Remove from Store
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+
+          {/* Empty State */}
+          {data.length === 0 && !isLoading && (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 mx-auto mb-4 text-gray-400">
+                <Users className="w-full h-full" />
+              </div>
+              <Typography variant="h3">No users found</Typography>
+              <Typography variant="p" color="muted" className="mb-4">
+                This store doesn't have any users yet.
+              </Typography>
+            </div>
+          )}
+
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="flex justify-center mt-8">
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {isFetchingNextPage ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                    Loading more...
+                  </>
+                ) : (
+                  'Load More Users'
+                )}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
         <form>
