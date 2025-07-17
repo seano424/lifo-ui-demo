@@ -1,5 +1,3 @@
-// components/user/UserAccountInformation.tsx - Enhanced with phone & language support
-
 import React, { useState } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
@@ -13,16 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   useCurrentUser,
@@ -36,7 +26,7 @@ import {
   isValidPhoneNumber,
   formatPhoneNumber,
 } from '@/lib/types/user'
-import { Edit, Phone, Globe, User, Mail, Check, X, AlertCircle } from 'lucide-react'
+import { Edit, Check, X, AlertCircle } from 'lucide-react'
 
 export default function UserAccountInformation() {
   const { data: user, isLoading } = useCurrentUser()
