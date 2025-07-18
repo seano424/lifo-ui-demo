@@ -20,11 +20,13 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 export function transformAuthUserToUser(authUser: unknown): User {
   if (typeof authUser === 'object' && authUser !== null) {
     const user = authUser as Record<string, unknown>
-    
+
     // Extract metadata from user_metadata
-    const metadata = (user.user_metadata && typeof user.user_metadata === 'object' 
-      ? user.user_metadata as Record<string, unknown> 
-      : {}) as Record<string, unknown>
+    const metadata = (
+      user.user_metadata && typeof user.user_metadata === 'object'
+        ? (user.user_metadata as Record<string, unknown>)
+        : {}
+    ) as Record<string, unknown>
 
     return {
       id: typeof user.id === 'string' ? user.id : '',
@@ -48,19 +50,25 @@ export function transformAuthUserToUser(authUser: unknown): User {
       pin_set_at: typeof metadata.pin_set_at === 'string' ? metadata.pin_set_at : '',
       pin_attempts: typeof metadata.pin_attempts === 'number' ? metadata.pin_attempts : 0,
       requires_pin: typeof metadata.requires_pin === 'boolean' ? metadata.requires_pin : false,
-      email_verified: typeof metadata.email_verified === 'boolean' ? metadata.email_verified : false,
-      phone_verified: typeof metadata.phone_verified === 'boolean' ? metadata.phone_verified : false,
+      email_verified:
+        typeof metadata.email_verified === 'boolean' ? metadata.email_verified : false,
+      phone_verified:
+        typeof metadata.phone_verified === 'boolean' ? metadata.phone_verified : false,
       pin_expires_at: typeof metadata.pin_expires_at === 'string' ? metadata.pin_expires_at : '',
-      pin_locked_until: typeof metadata.pin_locked_until === 'string' ? metadata.pin_locked_until : '',
+      pin_locked_until:
+        typeof metadata.pin_locked_until === 'string' ? metadata.pin_locked_until : '',
       pin_delivery_method:
         typeof metadata.pin_delivery_method === 'string' ? metadata.pin_delivery_method : '',
       migrated_from_user_mgmt:
-        typeof metadata.migrated_from_user_mgmt === 'boolean' ? metadata.migrated_from_user_mgmt : false,
+        typeof metadata.migrated_from_user_mgmt === 'boolean'
+          ? metadata.migrated_from_user_mgmt
+          : false,
 
       // 🆕 NEW FIELDS:
       phone: typeof user.phone === 'string' ? user.phone : null,
       language_preference:
-        typeof metadata.language_preference === 'string' && isValidLanguage(metadata.language_preference)
+        typeof metadata.language_preference === 'string' &&
+        isValidLanguage(metadata.language_preference)
           ? metadata.language_preference
           : 'en', // Default to English
     }

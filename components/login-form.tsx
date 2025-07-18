@@ -17,11 +17,6 @@ import { toast } from 'sonner'
 // Types for the authentication modes
 type AuthMode = 'admin' | 'employee'
 
-interface PINLoginData {
-  username: string
-  pin: string
-}
-
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [authMode, setAuthMode] = useState<AuthMode>('employee')
   const [isLoading, setIsLoading] = useState(false)
@@ -54,7 +49,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -72,7 +67,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     }
   }
 
-  // PIN login form handler - with enhanced debugging
+  // PIN login form handler - with proper Supabase session
   const handlePINLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     console.log('🚀 Starting PIN login form submission...')
@@ -81,19 +76,52 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
-      console.log('📞 Calling validatePINLogin...')
+      console.log('📞 Calling PIN session API...')
 
-      // Call your custom PIN validation function
-      const result = await validatePINLogin({ username, pin })
+      // Call the PIN session API to validate and create session
+      const response = await fetch('/api/auth/pin-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, pin }),
+      })
 
-      console.log('📬 validatePINLogin returned:', result)
+      const result = await response.json()
+      console.log('📬 PIN session API returned:', result)
 
       if (!result.success) {
         console.log('❌ PIN validation failed:', result.error)
         throw new Error(result.error || 'Invalid credentials')
       }
 
-      console.log('✅ PIN validation succeeded, showing toast...')
+      console.log('✅ PIN validation succeeded!')
+
+      if (result.session) {
+        // Set the session in Supabase client if we have session tokens
+        console.log('Setting session with tokens...')
+        const supabase = createClient()
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: result.session.access_token,
+          refresh_token: result.session.refresh_token,
+        })
+
+        if (sessionError) {
+          console.error('❌ Failed to set session:', sessionError)
+          throw new Error('Failed to create session')
+        }
+
+        console.log('🎉 Session created successfully!')
+      } else {
+        // PIN validation successful but no session tokens yet
+        console.log('📝 PIN validation successful, but session creation needs work')
+        toast.success(`PIN authenticated for ${result.user.username}!`)
+        
+        // For now, show success message and stay on login page
+        // TODO: Implement proper session creation
+        return
+      }
+
       toast.success(`Welcome back, ${result.user.full_name}!`)
 
       console.log('🧭 Attempting to redirect to dashboard...')
@@ -267,90 +295,4 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       </Card>
     </div>
   )
-}
-
-// PIN validation function - with cookie for middleware
-async function validatePINLogin(data: PINLoginData): Promise<{
-  success: boolean
-  user?: any
-  error?: string
-}> {
-  const supabase = createClient()
-
-  try {
-    console.log('🔐 PIN login attempt:', {
-      username: data.username,
-      pin: data.pin.replace(/./g, '*'),
-    })
-
-    // Call your RPC function directly
-    const { data: result, error } = await supabase.rpc('validate_pin_login', {
-      p_username: data.username,
-      p_pin: data.pin,
-    })
-
-    console.log('🔍 RPC Response:', { result, error })
-
-    if (error) {
-      console.error('❌ PIN validation RPC error:', error)
-      return {
-        success: false,
-        error: 'Authentication service error: ' + error.message,
-      }
-    }
-
-    if (!result) {
-      console.error('❌ No result from RPC')
-      return {
-        success: false,
-        error: 'No response from authentication service',
-      }
-    }
-
-    console.log('📋 Full RPC result:', JSON.stringify(result, null, 2))
-
-    if (!result.success) {
-      console.log('❌ PIN validation failed:', result.error)
-      return {
-        success: false,
-        error: result.error || 'Invalid username or PIN',
-      }
-    }
-
-    console.log('✅ PIN validation succeeded!', result.user)
-
-    // Store PIN auth state in sessionStorage
-    const pinAuthData = {
-      userId: result.user.id,
-      email: result.user.email,
-      username: result.user.username,
-      fullName: result.user.full_name,
-      storeId: result.user.store_id,
-      storeName: result.user.store_name,
-      loginMethod: 'pin',
-      authenticatedAt: new Date().toISOString(),
-    }
-
-    console.log('💾 Storing PIN auth data:', pinAuthData)
-
-    sessionStorage.setItem('lifo_pin_auth', JSON.stringify(pinAuthData))
-    sessionStorage.setItem('lifo_auth_method', 'pin')
-
-    // Set a cookie that the middleware can check
-    document.cookie = `lifo_pin_auth=true; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`
-    console.log('🍪 Set PIN auth cookie for middleware')
-
-    console.log('🎉 PIN login successful!')
-
-    return {
-      success: true,
-      user: result.user,
-    }
-  } catch (error: any) {
-    console.error('💥 PIN login error:', error)
-    return {
-      success: false,
-      error: 'Login service unavailable: ' + error.message,
-    }
-  }
 }
