@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
 import UserAccountInformation from '@/components/account/user-account-information'
+import { EmailTestComponent } from '@/components/debug/email-test'
 
 export default function SettingsTabs() {
   const [activeTab, setActiveTab] = useState('store')
@@ -45,6 +46,7 @@ export default function SettingsTabs() {
       </TabsContent>
 
       <TabsContent value="team" className="space-y-4">
+        <EmailTestComponent />
         <StoreUsersList />
       </TabsContent>
     </Tabs>

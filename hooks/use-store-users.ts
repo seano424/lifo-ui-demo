@@ -285,6 +285,13 @@ export function useStoreUserActions() {
       assignedBy,
     })
 
+  const refetch = (storeId: string | null) => {
+    if (!storeId) return
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storeUsers.byStore(storeId),
+    })
+  }
+
   return {
     // Raw mutations
     updateStoreUser: updateMutation.mutate,
@@ -299,7 +306,7 @@ export function useStoreUserActions() {
     updateUserPermissions,
     removeUser,
     addUser,
-
+    refetch,
     // Loading states
     isUpdating: updateMutation.isPending,
     isRemoving: removeMutation.isPending,

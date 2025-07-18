@@ -1,19 +1,50 @@
 import * as React from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
-  ({ className, type, ...props }, ref) => {
+export interface InputProps extends React.ComponentProps<'input'> {
+  showPasswordToggle?: boolean
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, showPasswordToggle, ...props }, ref) => {
+    const [showPassword, setShowPassword] = React.useState(false)
+    const isPassword = type === 'password'
+    const shouldShowToggle = showPasswordToggle && isPassword
+
+    const inputType = isPassword && showPassword ? 'text' : type
+
     return (
-      <input
-        type={type}
-        className={cn(
-          'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-          className,
+      <div className="relative">
+        <input
+          type={inputType}
+          className={cn(
+            'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+            shouldShowToggle && 'pr-10',
+            className,
+          )}
+          ref={ref}
+          {...props}
+        />
+        {shouldShowToggle && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
         )}
-        ref={ref}
-        {...props}
-      />
+      </div>
     )
   },
 )

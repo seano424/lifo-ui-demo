@@ -1,3 +1,5 @@
+// components/store-users/store-users-list.tsx - Updated with PIN management
+
 'use client'
 
 import { useState } from 'react'
@@ -7,6 +9,7 @@ import { type StoreUser } from '@/lib/queries/store-users'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+
 import {
   MoreHorizontal,
   UserCheck,
@@ -14,8 +17,9 @@ import {
   UserPlus,
   Users,
   Crown,
-  Pin,
   User,
+  Key,
+  Lock,
 } from 'lucide-react'
 
 import {
@@ -46,7 +50,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -71,6 +74,10 @@ import { Card, CardContent, CardHeader } from '../ui/card'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
+// Import the new components
+import { AddEmployeeDialog } from './add-employee-dialog'
+import { PINManagementActions } from './pin-management-actions'
+
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
     useStoreUsers()
@@ -81,12 +88,24 @@ export function StoreUsersList() {
   const [isEditUserRoleDialogOpen, setIsEditUserRoleDialogOpen] = useState(false)
   const [formRole, setFormRole] = useState<StoreUser['role_in_store']>('employee')
 
-  const { changeUserRole, toggleUserActiveStatus, removeUser } = useStoreUserActions()
+  const { changeUserRole, toggleUserActiveStatus, removeUser, refetch } = useStoreUserActions()
 
   const { canManageUsers } = usePermissions()
   const { isOwner } = useUserRole()
   const { activeStore } = useStoreState()
   const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
+
+  // Helper function to check if PIN is locked
+  const isPINLocked = (user: StoreUser): boolean => {
+    const lockedUntil = user.pin_locked_until
+    if (!lockedUntil) return false
+    return new Date(lockedUntil) > new Date()
+  }
+
+  // Helper function to check if user has PIN auth
+  const hasPINAuth = (user: StoreUser): boolean => {
+    return user.can_use_pin_auth && !!user.requires_pin
+  }
 
   if (isLoading) {
     return (
@@ -133,6 +152,16 @@ export function StoreUsersList() {
     setIsEditUserRoleDialogOpen(false)
   }
 
+  const handleEmployeeCreated = () => {
+    // Refresh the users list after creating an employee
+    refetch(storeId)
+  }
+
+  const handleUserUpdated = () => {
+    // Refresh the users list after PIN management actions
+    refetch(storeId)
+  }
+
   return (
     <>
       <Card>
@@ -156,7 +185,7 @@ export function StoreUsersList() {
               className="flex items-center gap-2"
             >
               <UserPlus className="w-4 h-4" />
-              Invite team member
+              Add Employee
             </Button>
           </div>
 
@@ -168,6 +197,7 @@ export function StoreUsersList() {
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>PIN Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,10 +213,27 @@ export function StoreUsersList() {
                     <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
                     <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
                     <TableCell>
-                      <span className="capitalize">{storeUser.role_in_store}</span>
+                      <span className="text-sm">{storeUser.role_in_store}</span>
                     </TableCell>
                     <TableCell>
-                      <span>{storeUser.is_active ? 'Active' : 'Inactive'}</span>
+                      <span className="text-sm">{storeUser.is_active ? 'Active' : 'Inactive'}</span>
+                    </TableCell>
+                    <TableCell>
+                      {hasPINAuth(storeUser) ? (
+                        isPINLocked(storeUser) ? (
+                          <span className="text-sm">
+                            <Lock className="w-3 h-3" />
+                            Locked
+                          </span>
+                        ) : (
+                          <span className="text-sm">
+                            <Key className="w-3 h-3" />
+                            PIN Active
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-sm">No PIN</span>
+                      )}
                     </TableCell>
 
                     <TableCell>
@@ -202,10 +249,8 @@ export function StoreUsersList() {
                             <DropdownMenuLabel>User Actions</DropdownMenuLabel>
 
                             {/* Role Changes */}
-
                             {storeUser.role_in_store !== 'employee' && (
                               <DropdownMenuItem
-                                // onClick={() => changeUserRole(storeUser.user_id, 'employee')}
                                 onClick={() => {
                                   setIsEditUserRoleDialogOpen(true)
                                   setSelectedUser(storeUser)
@@ -219,7 +264,6 @@ export function StoreUsersList() {
 
                             {isOwner && storeUser.role_in_store !== 'manager' && (
                               <DropdownMenuItem
-                                // onClick={() => changeUserRole(storeUser.user_id, 'manager')}
                                 onClick={() => {
                                   setIsEditUserRoleDialogOpen(true)
                                   setSelectedUser(storeUser)
@@ -233,7 +277,6 @@ export function StoreUsersList() {
 
                             {isOwner && storeUser.role_in_store !== 'owner' && (
                               <DropdownMenuItem
-                                // onClick={() => changeUserRole(storeUser.user_id, 'owner')}
                                 onClick={() => {
                                   setIsEditUserRoleDialogOpen(true)
                                   setSelectedUser(storeUser)
@@ -245,22 +288,14 @@ export function StoreUsersList() {
                               </DropdownMenuItem>
                             )}
 
-                            {/* PIN Auth Toggle */}
-                            {/* {storeUser.role_in_store === 'employee' && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  enablePinAuth(storeUser.user_id, !storeUser.can_use_pin_auth)
-                                }
-                              >
-                                <Pin className="mr-2 h-4 w-4" />
-                                {storeUser.can_use_pin_auth ? 'Disable PIN' : 'Enable PIN'}
-                              </DropdownMenuItem>
-                            )} */}
+                            {/* PIN Management Actions */}
+
+                            <PINManagementActions
+                              user={storeUser}
+                              onUserUpdated={handleUserUpdated}
+                            />
 
                             {/* Active Status Toggle */}
-                            {/* Managers can do this for employees */}
-                            {/* Owners can do this for everyone */}
-                            {/* But there must always be at least one owner */}
                             {canManageUsers && (
                               <>
                                 <DropdownMenuSeparator />
@@ -343,52 +378,15 @@ export function StoreUsersList() {
         </CardContent>
       </Card>
 
-      <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add User</DialogTitle>
-            <DialogDescription>Add a new user to the store.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="add-email">Email</Label>
-              <Input id="add-email" name="email" placeholder="Enter email" />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="add-role">Role</Label>
-              <Select name="role" defaultValue="employee">
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="owner">Owner</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="employee">Employee</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="add-status">Status</Label>
-              <Select name="status" defaultValue="active">
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button>Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Add Employee Dialog */}
+      <AddEmployeeDialog
+        isOpen={isAddUserDialogOpen}
+        onOpenChange={setIsAddUserDialogOpen}
+        storeId={storeId}
+        onEmployeeCreated={handleEmployeeCreated}
+      />
 
+      {/* Edit User Role Dialog */}
       <Dialog open={isEditUserRoleDialogOpen} onOpenChange={setIsEditUserRoleDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
