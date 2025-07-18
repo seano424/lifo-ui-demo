@@ -161,7 +161,15 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pin">PIN</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">PIN</Label>
+                    <Link
+                      href="/auth/forgot-password"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot PIN?
+                    </Link>
+                  </div>
                   <Input
                     id="pin"
                     type="password"
@@ -188,12 +196,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
-
-                <div className="text-center">
-                  <Button variant="link" size="sm" type="button">
-                    Forgot PIN?
-                  </Button>
-                </div>
               </form>
             </TabsContent>
 

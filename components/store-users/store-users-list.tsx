@@ -221,12 +221,12 @@ export function StoreUsersList() {
                     <TableCell>
                       {hasPINAuth(storeUser) ? (
                         isPINLocked(storeUser) ? (
-                          <span className="text-sm">
+                          <span className="text-sm flex items-center gap-1">
                             <Lock className="w-3 h-3" />
                             Locked
                           </span>
                         ) : (
-                          <span className="text-sm">
+                          <span className="text-sm flex items-center gap-1">
                             <Key className="w-3 h-3" />
                             PIN Active
                           </span>
