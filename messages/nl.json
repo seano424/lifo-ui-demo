@@ -237,5 +237,87 @@
     "profile": "Profiel",
     "help": "Help",
     "support": "Ondersteuning"
+  },
+  "addEmployee": {
+    "title": "Nieuwe medewerker toevoegen",
+    "description": "Maak een nieuw medewerkersaccount aan met PIN-authenticatie. Inloggegevens worden per e-mail verzonden.",
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "username": "Gebruikersnaam",
+      "role": "Rol",
+      "language": "Taal",
+      "firstNamePlaceholder": "Jan",
+      "lastNamePlaceholder": "Jansen",
+      "emailPlaceholder": "test@example.com (gebruik nep e-mail voor testen)",
+      "emailNote": "Gebruik test@example.com voor testen. Echte e-mails ontvangen inloggegevens.",
+      "usernamePlaceholder": "jan.jansen",
+      "usernameNote": "Medewerker gebruikt deze gebruikersnaam om in te loggen",
+      "usernameAvailable": "Gebruikersnaam is beschikbaar",
+      "usernameTaken": "Gebruikersnaam is al bezet",
+      "reset": "Resetten"
+    },
+    "roles": {
+      "employee": "Medewerker",
+      "manager": "Manager"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Gebruikersnaam:",
+      "pin": "PIN:",
+      "pinNote": "Wordt automatisch gegenereerd (4 cijfers)",
+      "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
+    },
+    "buttons": {
+      "cancel": "Annuleren",
+      "create": "Medewerker aanmaken",
+      "creating": "Aanmaken...",
+      "done": "Klaar",
+      "retrySending": "Opnieuw proberen"
+    },
+    "success": {
+      "title": "Medewerker succesvol aangemaakt!",
+      "description": "{name} is toegevoegd aan uw winkel. Bewaar deze inloggegevens en deel ze met de medewerker.",
+      "emailSending": "E-mail versturen...",
+      "emailSent": "Welkomst-e-mail succesvol verzonden naar {email}",
+      "emailPreparing": "E-mail voorbereiden voor {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "E-mailstatus: {error}"
+    },
+    "credentials": {
+      "email": "E-mail",
+      "username": "Gebruikersnaam",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Volgende stappen:",
+      "loginTab": "• De medewerker kan inloggen via het \"Medewerker\" tabblad op de inlogpagina",
+      "useCredentials": "• Gebruik gebruikersnaam: {username} en PIN: {pin}",
+      "resetPin": "• De PIN kan op elk moment worden gereset vanaf de teambeheerpagina",
+      "permissions": "• De medewerker kan producten scannen en basisvoorraad beheren"
+    },
+    "errors": {
+      "fillFields": "Vul alle verplichte velden in",
+      "usernameTaken": "Gebruikersnaam is al bezet. Kies een andere.",
+      "noStore": "Geen winkel geselecteerd",
+      "checkUsername": "Kon beschikbaarheid gebruikersnaam niet controleren",
+      "createFailed": "Kon medewerker niet aanmaken",
+      "copyFailed": "Kon niet kopiëren naar klembord"
+    },
+    "toast": {
+      "created": "Medewerker succesvol aangemaakt via server API!",
+      "emailSent": "Welkomst-e-mail succesvol verzonden!",
+      "emailFailed": "E-mail verzenden mislukt: {error}",
+      "emailError": "Fout bij verzenden e-mail: {error}",
+      "emailSkipped": "Medewerker aangemaakt! E-mail overgeslagen voor testadres.",
+      "copied": "{field} gekopieerd naar klembord"
+    }
   }
 }

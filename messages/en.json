@@ -237,5 +237,87 @@
     "profile": "Profile",
     "help": "Help",
     "support": "Support"
+  },
+  "addEmployee": {
+    "title": "Add New Employee",
+    "description": "Create a new employee account with PIN authentication. Login credentials will be sent by email.",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "username": "Username",
+      "role": "Role",
+      "language": "Language",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "emailPlaceholder": "test@example.com (use fake email for testing)",
+      "emailNote": "Use test@example.com for testing. Real emails will receive login credentials.",
+      "usernamePlaceholder": "john.doe",
+      "usernameNote": "Employee will use this username to log in",
+      "usernameAvailable": "Username is available",
+      "usernameTaken": "Username is already taken",
+      "reset": "Reset"
+    },
+    "roles": {
+      "employee": "Employee",
+      "manager": "Manager"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Username:",
+      "pin": "PIN:",
+      "pinNote": "Will be generated automatically (4 digits)",
+      "loginNote": "The employee can log in using the \"Employee\" tab with their username and PIN"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Employee",
+      "creating": "Creating...",
+      "done": "Done",
+      "retrySending": "Retry sending"
+    },
+    "success": {
+      "title": "Employee Created Successfully!",
+      "description": "{name} has been added to your store. Save these credentials and share them with the employee.",
+      "emailSending": "Sending email...",
+      "emailSent": "Welcome email sent successfully to {email}",
+      "emailPreparing": "Preparing email for {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Email status: {error}"
+    },
+    "credentials": {
+      "email": "Email",
+      "username": "Username",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Next Steps:",
+      "loginTab": "• The employee can log in using the \"Employee\" tab on the login page",
+      "useCredentials": "• Use username: {username} and PIN: {pin}",
+      "resetPin": "• The PIN can be reset at any time from the team management page",
+      "permissions": "• The employee can scan products and manage basic inventory"
+    },
+    "errors": {
+      "fillFields": "Please fill in all required fields",
+      "usernameTaken": "Username is already taken. Please choose a different one.",
+      "noStore": "No store selected",
+      "checkUsername": "Failed to check username availability",
+      "createFailed": "Failed to create employee",
+      "copyFailed": "Failed to copy to clipboard"
+    },
+    "toast": {
+      "created": "Employee created successfully using server API!",
+      "emailSent": "Welcome email sent successfully!",
+      "emailFailed": "Failed to send email: {error}",
+      "emailError": "Error sending email: {error}",
+      "emailSkipped": "Employee created! Email skipped for test address.",
+      "copied": "{field} copied to clipboard"
+    }
   }
 }

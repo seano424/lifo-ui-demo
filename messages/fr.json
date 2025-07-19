@@ -237,5 +237,87 @@
     "profile": "Profil",
     "help": "Aide",
     "support": "Support"
+  },
+  "addEmployee": {
+    "title": "Ajouter un nouvel employé",
+    "description": "Créer un nouveau compte employé avec authentification PIN. Les identifiants de connexion seront envoyés par e-mail.",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse e-mail",
+      "username": "Nom d'utilisateur",
+      "role": "Rôle",
+      "language": "Langue",
+      "firstNamePlaceholder": "Jean",
+      "lastNamePlaceholder": "Dupont",
+      "emailPlaceholder": "test@example.com (utiliser un faux e-mail pour les tests)",
+      "emailNote": "Utilisez test@example.com pour les tests. Les vrais e-mails recevront les identifiants de connexion.",
+      "usernamePlaceholder": "jean.dupont",
+      "usernameNote": "L'employé utilisera ce nom d'utilisateur pour se connecter",
+      "usernameAvailable": "Nom d'utilisateur disponible",
+      "usernameTaken": "Nom d'utilisateur déjà pris",
+      "reset": "Réinitialiser"
+    },
+    "roles": {
+      "employee": "Employé",
+      "manager": "Gestionnaire"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Nom d'utilisateur:",
+      "pin": "PIN:",
+      "pinNote": "Sera généré automatiquement (4 chiffres)",
+      "loginNote": "L'employé peut se connecter en utilisant l'onglet \"Employé\" avec son nom d'utilisateur et son PIN"
+    },
+    "buttons": {
+      "cancel": "Annuler",
+      "create": "Créer un employé",
+      "creating": "Création...",
+      "done": "Terminé",
+      "retrySending": "Réessayer l'envoi"
+    },
+    "success": {
+      "title": "Employé créé avec succès!",
+      "description": "{name} a été ajouté à votre magasin. Sauvegardez ces identifiants et partagez-les avec l'employé.",
+      "emailSending": "Envoi de l'e-mail...",
+      "emailSent": "E-mail de bienvenue envoyé avec succès à {email}",
+      "emailPreparing": "Préparation de l'e-mail pour {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Statut de l'e-mail: {error}"
+    },
+    "credentials": {
+      "email": "E-mail",
+      "username": "Nom d'utilisateur",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Prochaines étapes:",
+      "loginTab": "• L'employé peut se connecter en utilisant l'onglet \"Employé\" sur la page de connexion",
+      "useCredentials": "• Utiliser le nom d'utilisateur: {username} et le PIN: {pin}",
+      "resetPin": "• Le PIN peut être réinitialisé à tout moment depuis la page de gestion d'équipe",
+      "permissions": "• L'employé peut scanner les produits et gérer l'inventaire de base"
+    },
+    "errors": {
+      "fillFields": "Veuillez remplir tous les champs obligatoires",
+      "usernameTaken": "Le nom d'utilisateur est déjà pris. Veuillez en choisir un autre.",
+      "noStore": "Aucun magasin sélectionné",
+      "checkUsername": "Échec de la vérification de la disponibilité du nom d'utilisateur",
+      "createFailed": "Échec de la création de l'employé",
+      "copyFailed": "Échec de la copie dans le presse-papiers"
+    },
+    "toast": {
+      "created": "Employé créé avec succès en utilisant l'API serveur!",
+      "emailSent": "E-mail de bienvenue envoyé avec succès!",
+      "emailFailed": "Échec de l'envoi de l'e-mail: {error}",
+      "emailError": "Erreur lors de l'envoi de l'e-mail: {error}",
+      "emailSkipped": "Employé créé! E-mail ignoré pour l'adresse de test.",
+      "copied": "{field} copié dans le presse-papiers"
+    }
   }
 }

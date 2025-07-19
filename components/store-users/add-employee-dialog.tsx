@@ -3,6 +3,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
@@ -75,6 +76,7 @@ export function AddEmployeeDialog({
   storeId,
   onEmployeeCreated,
 }: AddEmployeeDialogProps) {
+  const t = useTranslations('addEmployee')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingUsername, setIsCheckingUsername] = useState(false)
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
@@ -138,7 +140,7 @@ export function AddEmployeeDialog({
       if (error) {
         console.error('❌ Username availability check error:', error)
         setUsernameAvailable(null)
-        toast.error('Failed to check username availability')
+        toast.error(t('errors.checkUsername'))
         return
       }
 
@@ -149,7 +151,7 @@ export function AddEmployeeDialog({
     } catch (error) {
       console.error('❌ Username availability check failed:', error)
       setUsernameAvailable(null)
-      toast.error('Failed to check username availability')
+      toast.error(t('errors.checkUsername'))
     } finally {
       setIsCheckingUsername(false)
     }
@@ -218,7 +220,7 @@ export function AddEmployeeDialog({
           sending: false,
           messageId: result.messageId,
         })
-        toast.success('Welcome email sent successfully!')
+        toast.success(t('toast.emailSent'))
       } else {
         const errorMessage = getEmailErrorMessage(result.error || 'Unknown error')
         setEmailStatus({
@@ -226,7 +228,7 @@ export function AddEmployeeDialog({
           sending: false,
           error: errorMessage,
         })
-        toast.error(`Failed to send email: ${errorMessage}`)
+        toast.error(t('toast.emailFailed', { error: errorMessage }))
       }
     } catch (error: any) {
       const errorMessage = getEmailErrorMessage(error.message || 'Unknown error')
@@ -235,7 +237,7 @@ export function AddEmployeeDialog({
         sending: false,
         error: errorMessage,
       })
-      toast.error(`Error sending email: ${errorMessage}`)
+      toast.error(t('toast.emailError', { error: errorMessage }))
     }
   }
 
@@ -278,17 +280,17 @@ export function AddEmployeeDialog({
     e.preventDefault()
 
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.username) {
-      toast.error('Please fill in all required fields')
+      toast.error(t('errors.fillFields'))
       return
     }
 
     if (usernameAvailable === false) {
-      toast.error('Username is already taken. Please choose a different one.')
+      toast.error(t('errors.usernameTaken'))
       return
     }
 
     if (!storeId) {
-      toast.error('No store selected')
+      toast.error(t('errors.noStore'))
       return
     }
 
@@ -341,7 +343,7 @@ export function AddEmployeeDialog({
 
       setCreatedCredentials(credentials)
       setStep('credentials')
-      toast.success('Employee created successfully using server API!')
+      toast.success(t('toast.created'))
 
       // Invalidate queries immediately after creation
       invalidateStoreUserQueries()
@@ -359,14 +361,14 @@ export function AddEmployeeDialog({
           sending: false,
           error: 'Skipped sending to test email address',
         })
-        toast.info('Employee created! Email skipped for test address.')
+        toast.info(t('toast.emailSkipped'))
       } else {
         // Send credentials to their real email
         await sendEmployeeWelcomeEmail(credentials)
       }
     } catch (error: any) {
       console.error('❌ Error creating employee:', error)
-      toast.error(error.message || 'Failed to create employee')
+      toast.error(error.message || t('errors.createFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -377,10 +379,10 @@ export function AddEmployeeDialog({
     try {
       await navigator.clipboard.writeText(text)
       setCopiedField(field)
-      toast.success(`${field} copied to clipboard`)
+      toast.success(t('toast.copied', { field }))
       setTimeout(() => setCopiedField(null), 2000)
     } catch (error) {
-      toast.error('Failed to copy to clipboard')
+      toast.error(t('errors.copyFailed'))
     }
   }
 
@@ -414,10 +416,9 @@ export function AddEmployeeDialog({
         {step === 'form' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">Add New Employee</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">{t('title')}</DialogTitle>
               <DialogDescription>
-                Create a new employee account with PIN authentication. Login credentials will be
-                sent by email.
+                {t('description')}
               </DialogDescription>
             </DialogHeader>
 
@@ -425,26 +426,26 @@ export function AddEmployeeDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName" required>
-                    First Name
+                    {t('form.firstName')}
                   </Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                    placeholder="John"
+                    placeholder={t('form.firstNamePlaceholder')}
                     required
                     disabled={isLoading}
                   />
                 </div>
                 <div>
                   <Label htmlFor="lastName" required>
-                    Last Name
+                    {t('form.lastName')}
                   </Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                    placeholder="Doe"
+                    placeholder={t('form.lastNamePlaceholder')}
                     required
                     disabled={isLoading}
                   />
@@ -453,19 +454,19 @@ export function AddEmployeeDialog({
 
               <div>
                 <Label htmlFor="email" required>
-                  Email Address
+                  {t('form.email')}
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="test@example.com (use fake email for testing)"
+                  placeholder={t('form.emailPlaceholder')}
                   required
                   disabled={isLoading}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Use test@example.com for testing. Real emails will receive login credentials.
+                  {t('form.emailNote')}
                 </p>
               </div>
 
@@ -473,7 +474,7 @@ export function AddEmployeeDialog({
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <Label htmlFor="username" required>
-                    Username
+                    {t('form.username')}
                   </Label>
                   {formData.firstName && formData.lastName && (
                     <Button
@@ -484,7 +485,7 @@ export function AddEmployeeDialog({
                       className="text-xs h-6 px-2"
                     >
                       <RotateCcw className="h-3 w-3 mr-1" />
-                      Reset
+                      {t('form.reset')}
                     </Button>
                   )}
                 </div>
@@ -498,7 +499,7 @@ export function AddEmployeeDialog({
                         username: e.target.value.toLowerCase().replace(/[^a-z.]/g, ''),
                       })
                     }
-                    placeholder="john.doe"
+                    placeholder={t('form.usernamePlaceholder')}
                     required
                     disabled={isLoading}
                     className={`pr-10 ${
@@ -521,18 +522,18 @@ export function AddEmployeeDialog({
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {usernameAvailable === false ? (
-                    <span className="text-red-600">Username is already taken</span>
+                    <span className="text-red-600">{t('form.usernameTaken')}</span>
                   ) : usernameAvailable === true ? (
-                    <span className="text-green-600">Username is available</span>
+                    <span className="text-green-600">{t('form.usernameAvailable')}</span>
                   ) : (
-                    'Employee will use this username to log in'
+                    t('form.usernameNote')
                   )}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role">{t('form.role')}</Label>
                   <Select
                     value={formData.role}
                     onValueChange={(value: 'employee' | 'manager') =>
@@ -544,14 +545,14 @@ export function AddEmployeeDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="employee">Employee</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="employee">{t('roles.employee')}</SelectItem>
+                      <SelectItem value="manager">{t('roles.manager')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="language">Language</Label>
+                  <Label htmlFor="language">{t('form.language')}</Label>
                   <Select
                     value={formData.languagePreference}
                     onValueChange={(value: any) =>
@@ -565,7 +566,7 @@ export function AddEmployeeDialog({
                     <SelectContent>
                       {Object.entries(LANGUAGE_OPTIONS).map(([code, name]) => (
                         <SelectItem key={code} value={code}>
-                          {name}
+                          {t(`languages.${code}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -579,14 +580,14 @@ export function AddEmployeeDialog({
                   <AlertDescription>
                     <div className="space-y-1">
                       <div>
-                        <strong>Username:</strong>{' '}
+                        <strong>{t('preview.username')}</strong>{' '}
                         <span className="font-mono">{formData.username}</span>
                       </div>
                       <div>
-                        <strong>PIN:</strong> Will be generated automatically (4 digits)
+                        <strong>{t('preview.pin')}</strong> {t('preview.pinNote')}
                       </div>
                       <div className="text-xs text-muted-foreground mt-2">
-                        The employee can log in using the "Employee" tab with their username and PIN
+                        {t('preview.loginNote')}
                       </div>
                     </div>
                   </AlertDescription>
@@ -600,7 +601,7 @@ export function AddEmployeeDialog({
                   onClick={() => onOpenChange(false)}
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t('buttons.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -610,12 +611,12 @@ export function AddEmployeeDialog({
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Creating...
+                      {t('buttons.creating')}
                     </>
                   ) : (
                     <>
                       <UserPlus className="w-4 h-4" />
-                      Create Employee
+                      {t('buttons.create')}
                     </>
                   )}
                 </Button>
@@ -627,11 +628,10 @@ export function AddEmployeeDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-green-600">
                 <Check className="w-5 h-5" />
-                Employee Created Successfully!
+                {t('success.title')}
               </DialogTitle>
               <DialogDescription>
-                {createdCredentials?.full_name} has been added to your store. Save these credentials
-                and share them with the employee.
+                {t('success.description', { name: createdCredentials?.full_name || '' })}
               </DialogDescription>
             </DialogHeader>
 
@@ -641,17 +641,16 @@ export function AddEmployeeDialog({
                 {emailStatus.sending ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    <AlertDescription>Sending email...</AlertDescription>
+                    <AlertDescription>{t('success.emailSending')}</AlertDescription>
                   </>
                 ) : emailStatus.sent ? (
                   <>
                     <Check className="h-4 w-4" />
                     <AlertDescription>
-                      Welcome email sent successfully to{' '}
-                      <strong>{createdCredentials?.email}</strong>
+                      {t('success.emailSent', { email: createdCredentials?.email || '' })}
                       {emailStatus.messageId && (
                         <div className="text-xs text-muted-foreground mt-1">
-                          ID: {emailStatus.messageId}
+                          {t('success.emailId', { messageId: emailStatus.messageId })}
                         </div>
                       )}
                     </AlertDescription>
@@ -661,7 +660,7 @@ export function AddEmployeeDialog({
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
                       <div className="space-y-2">
-                        <div>Email status: {emailStatus.error}</div>
+                        <div>{t('success.emailStatus', { error: emailStatus.error || '' })}</div>
                         {!emailStatus.error.includes('test') &&
                           !emailStatus.error.includes('Skipped') && (
                             <Button
@@ -671,7 +670,7 @@ export function AddEmployeeDialog({
                               className="flex items-center gap-2"
                             >
                               <RefreshCw className="w-3 h-3" />
-                              Retry sending
+                              {t('buttons.retrySending')}
                             </Button>
                           )}
                       </div>
@@ -681,7 +680,7 @@ export function AddEmployeeDialog({
                   <>
                     <Mail className="h-4 w-4" />
                     <AlertDescription>
-                      Preparing email for <strong>{createdCredentials?.email}</strong>
+                      {t('success.emailPreparing', { email: createdCredentials?.email || '' })}
                     </AlertDescription>
                   </>
                 )}
@@ -690,7 +689,7 @@ export function AddEmployeeDialog({
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">Email</Label>
+                    <Label className="text-sm font-medium">{t('credentials.email')}</Label>
                     <div className="font-mono text-sm">{createdCredentials?.email}</div>
                   </div>
                   <Button
@@ -708,7 +707,7 @@ export function AddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">Username</Label>
+                    <Label className="text-sm font-medium">{t('credentials.username')}</Label>
                     <div className="font-mono text-sm">{createdCredentials?.username}</div>
                   </div>
                   <Button
@@ -726,7 +725,7 @@ export function AddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">PIN</Label>
+                    <Label className="text-sm font-medium">{t('credentials.pin')}</Label>
                     <div className="font-mono text-lg font-bold">{createdCredentials?.pin}</div>
                   </div>
                   <Button
@@ -746,22 +745,24 @@ export function AddEmployeeDialog({
               <Separator />
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">Next Steps:</h4>
+                <h4 className="font-medium text-blue-900 mb-2">{t('nextSteps.title')}</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• The employee can log in using the "Employee" tab on the login page</li>
+                  <li>{t('nextSteps.loginTab')}</li>
                   <li>
-                    • Use username: <strong>{createdCredentials?.username}</strong> and PIN:{' '}
-                    <strong>{createdCredentials?.pin}</strong>
+                    {t('nextSteps.useCredentials', { 
+                      username: createdCredentials?.username || '', 
+                      pin: createdCredentials?.pin || '' 
+                    })}
                   </li>
-                  <li>• The PIN can be reset at any time from the team management page</li>
-                  <li>• The employee can scan products and manage basic inventory</li>
+                  <li>{t('nextSteps.resetPin')}</li>
+                  <li>{t('nextSteps.permissions')}</li>
                 </ul>
               </div>
             </div>
 
             <DialogFooter>
               <Button onClick={handleClose} className="w-full">
-                Done
+                {t('buttons.done')}
               </Button>
             </DialogFooter>
           </>
