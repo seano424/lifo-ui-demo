@@ -29,8 +29,6 @@ export async function fetchUserStores(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchUserStores] Fetching stores for user:', { userId })
-
     const { data, error } = await supabase
       .schema('business')
       .from('store_users')
@@ -61,7 +59,6 @@ export async function fetchUserStores(
       `,
       )
       .eq('user_id', userId)
-      .eq('is_active', true)
       .eq('stores.is_active', true)
 
     if (error) {
@@ -69,22 +66,13 @@ export async function fetchUserStores(
       throw new Error(`Failed to fetch user stores: ${error.message}`)
     }
 
-    // Debug: Let's see what we're actually getting
-    console.log('[fetchUserStores] Raw data:', JSON.stringify(data, null, 2))
-
     const userStores = data.map(item => {
-      // Debug: Log each item to see the structure
-      console.log('[fetchUserStores] Processing item:', JSON.stringify(item, null, 2))
-
       return {
         store: item.stores as unknown as Store,
         role: item.role_in_store as string,
         permissions: item.permissions,
       }
     })
-
-    console.log('[fetchUserStores] Success:', { userId, storeCount: userStores.length })
-    console.log('[fetchUserStores] Final userStores:', JSON.stringify(userStores, null, 2))
 
     return userStores
   } catch (err) {
@@ -101,8 +89,6 @@ export async function fetchUserStoresAlternative(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchUserStoresAlternative] Fetching stores for user:', { userId })
-
     // Direct query with manual join
     const { data, error } = await supabase
       .schema('business')
@@ -118,15 +104,12 @@ export async function fetchUserStoresAlternative(
       `,
       )
       .eq('store_users.user_id', userId)
-      .eq('store_users.is_active', true)
-      .eq('is_active', true)
+      .eq('stores.is_active', true)
 
     if (error) {
       console.error('[fetchUserStoresAlternative] Supabase error:', error)
       throw new Error(`Failed to fetch user stores: ${error.message}`)
     }
-
-    console.log('[fetchUserStoresAlternative] Raw data:', JSON.stringify(data, null, 2))
 
     const userStores = data.map(storeData => ({
       store: {
@@ -153,7 +136,6 @@ export async function fetchUserStoresAlternative(
       permissions: storeData.store_users[0]?.permissions,
     }))
 
-    console.log('[fetchUserStoresAlternative] Success:', { userId, storeCount: userStores.length })
     return userStores
   } catch (err) {
     console.error('[fetchUserStoresAlternative] Unexpected error:', err)
@@ -166,8 +148,6 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchStoreById] Fetching store:', { storeId })
-
     const { data, error } = await supabase
       .schema('business')
       .from('stores')
@@ -180,7 +160,6 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
       throw new Error(`Failed to fetch store: ${error.message}`)
     }
 
-    console.log('[fetchStoreById] Success:', { storeId, store_type: data.store_type })
     return data as Store
   } catch (err) {
     console.error('[fetchStoreById] Unexpected error:', err)
@@ -196,8 +175,6 @@ export async function fetchUserPreferences(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchUserPreferences] Fetching preferences for user:', { userId })
-
     const { data, error } = await supabase
       .schema('user_mgmt')
       .from('user_preferences')
@@ -210,10 +187,6 @@ export async function fetchUserPreferences(
       throw new Error(`Failed to fetch user preferences: ${error.message}`)
     }
 
-    console.log('[fetchUserPreferences] Success:', {
-      userId,
-      hasPrimaryStore: !!data?.primary_store_id,
-    })
     return data as UserPreferences | null
   } catch (err) {
     console.error('[fetchUserPreferences] Unexpected error:', err)
@@ -226,8 +199,6 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
   const supabase = createClient()
 
   try {
-    console.log('[updateUserPrimaryStore] Updating primary store:', { userId, storeId })
-
     const { error } = await supabase.schema('user_mgmt').from('user_preferences').upsert({
       user_id: userId,
       primary_store_id: storeId,

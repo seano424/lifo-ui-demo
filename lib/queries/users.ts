@@ -1,38 +1,32 @@
+// lib/queries/users.ts - Enhanced with phone & language support
+
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import {
+  User,
+  UserUpdate,
+  UserCreate,
+  SupportedLanguage,
+  SUPPORTED_LANGUAGES,
+  isValidLanguage,
+  isValidPhoneNumber,
+  UpdatePhoneResponse,
+  UpdateLanguageResponse,
+} from '@/lib/types/user'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
-// Updated User type to match the new RPC function
-export type User = {
-  id: string
-  email: string
-  created_at: string
-  updated_at: string
-  raw_user_meta_data: Record<string, unknown>
-  // Flattened metadata fields from RPC function
-  username: string
-  full_name: string
-  is_active: boolean
-  avatar_url: string
-  last_login: string
-  pin_hash: string
-  pin_set_at: string
-  pin_attempts: number
-  requires_pin: boolean
-  email_verified: boolean
-  phone_verified: boolean
-  pin_expires_at: string
-  pin_locked_until: string
-  pin_delivery_method: string
-  migrated_from_user_mgmt: boolean
-}
-
-// Updated transform function (simplified since RPC does the work)
+// Updated transform function to handle new fields
 export function transformAuthUserToUser(authUser: unknown): User {
-  // The RPC function now returns flattened data, so minimal transformation needed
   if (typeof authUser === 'object' && authUser !== null) {
     const user = authUser as Record<string, unknown>
+
+    // Extract metadata from user_metadata
+    const metadata = (
+      user.user_metadata && typeof user.user_metadata === 'object'
+        ? (user.user_metadata as Record<string, unknown>)
+        : {}
+    ) as Record<string, unknown>
 
     return {
       id: typeof user.id === 'string' ? user.id : '',
@@ -44,28 +38,39 @@ export function transformAuthUserToUser(authUser: unknown): User {
           : typeof user.created_at === 'string'
             ? user.created_at
             : '',
-      raw_user_meta_data:
-        user.raw_user_meta_data && typeof user.raw_user_meta_data === 'object'
-          ? (user.raw_user_meta_data as Record<string, unknown>)
-          : {},
-      // These are now directly returned by the RPC function
-      username: typeof user.username === 'string' ? user.username : '',
-      full_name: typeof user.full_name === 'string' ? user.full_name : '',
-      is_active: typeof user.is_active === 'boolean' ? user.is_active : true,
-      avatar_url: typeof user.avatar_url === 'string' ? user.avatar_url : '',
-      last_login: typeof user.last_login === 'string' ? user.last_login : '',
-      pin_hash: typeof user.pin_hash === 'string' ? user.pin_hash : '',
-      pin_set_at: typeof user.pin_set_at === 'string' ? user.pin_set_at : '',
-      pin_attempts: typeof user.pin_attempts === 'number' ? user.pin_attempts : 0,
-      requires_pin: typeof user.requires_pin === 'boolean' ? user.requires_pin : false,
-      email_verified: typeof user.email_verified === 'boolean' ? user.email_verified : false,
-      phone_verified: typeof user.phone_verified === 'boolean' ? user.phone_verified : false,
-      pin_expires_at: typeof user.pin_expires_at === 'string' ? user.pin_expires_at : '',
-      pin_locked_until: typeof user.pin_locked_until === 'string' ? user.pin_locked_until : '',
+      raw_user_meta_data: metadata,
+
+      // Extract fields from metadata
+      username: typeof metadata.username === 'string' ? metadata.username : '',
+      full_name: typeof metadata.full_name === 'string' ? metadata.full_name : '',
+      is_active: typeof metadata.is_active === 'boolean' ? metadata.is_active : true,
+      avatar_url: typeof metadata.avatar_url === 'string' ? metadata.avatar_url : '',
+      last_login: typeof metadata.last_login === 'string' ? metadata.last_login : '',
+      pin_hash: typeof metadata.pin_hash === 'string' ? metadata.pin_hash : '',
+      pin_set_at: typeof metadata.pin_set_at === 'string' ? metadata.pin_set_at : '',
+      pin_attempts: typeof metadata.pin_attempts === 'number' ? metadata.pin_attempts : 0,
+      requires_pin: typeof metadata.requires_pin === 'boolean' ? metadata.requires_pin : false,
+      email_verified:
+        typeof metadata.email_verified === 'boolean' ? metadata.email_verified : false,
+      phone_verified:
+        typeof metadata.phone_verified === 'boolean' ? metadata.phone_verified : false,
+      pin_expires_at: typeof metadata.pin_expires_at === 'string' ? metadata.pin_expires_at : '',
+      pin_locked_until:
+        typeof metadata.pin_locked_until === 'string' ? metadata.pin_locked_until : '',
       pin_delivery_method:
-        typeof user.pin_delivery_method === 'string' ? user.pin_delivery_method : '',
+        typeof metadata.pin_delivery_method === 'string' ? metadata.pin_delivery_method : '',
       migrated_from_user_mgmt:
-        typeof user.migrated_from_user_mgmt === 'boolean' ? user.migrated_from_user_mgmt : false,
+        typeof metadata.migrated_from_user_mgmt === 'boolean'
+          ? metadata.migrated_from_user_mgmt
+          : false,
+
+      // 🆕 NEW FIELDS:
+      phone: typeof user.phone === 'string' ? user.phone : null,
+      language_preference:
+        typeof metadata.language_preference === 'string' &&
+        isValidLanguage(metadata.language_preference)
+          ? metadata.language_preference
+          : 'en', // Default to English
     }
   }
 
@@ -91,15 +96,20 @@ export function transformAuthUserToUser(authUser: unknown): User {
     pin_locked_until: '',
     pin_delivery_method: '',
     migrated_from_user_mgmt: false,
+    phone: null,
+    language_preference: 'en',
   }
 }
 
+// Existing filter types (unchanged)
 export type UserFilters = {
   is_active?: boolean
   role?: string
   email?: string
   requires_pin?: boolean
   pin_locked?: boolean
+  language?: SupportedLanguage // 🆕 Filter by language
+  has_phone?: boolean // 🆕 Filter by phone presence
 }
 
 export type UsersPageParam = {
@@ -107,6 +117,7 @@ export type UsersPageParam = {
   pageSize: number
 }
 
+// Existing fetch functions (enhanced but compatible)
 export async function fetchUsers(serverClient?: ServerClient): Promise<User[]> {
   const supabase = serverClient || createClient()
   console.log('[fetchUsers] Querying users via RPC')
@@ -171,7 +182,19 @@ export async function fetchUsersPage(
       )
     }
 
-    // Handle role filtering
+    // 🆕 NEW FILTERS:
+    if (filters.language) {
+      users = users.filter((user: User) => user.language_preference === filters.language)
+    }
+
+    if (filters.has_phone !== undefined) {
+      users = users.filter((user: User) => {
+        const hasPhone = !!(user.phone && user.phone.trim() !== '')
+        return hasPhone === filters.has_phone
+      })
+    }
+
+    // Handle role filtering (unchanged)
     if (filters.role) {
       console.log('[fetchUsersPage] Applying role filter:', filters.role)
 
@@ -217,28 +240,86 @@ export async function fetchUsersPage(
   }
 }
 
-export async function updateUser(
+// 🆕 NEW: Phone update function
+export async function updateUserPhone(
   userId: string,
-  updates: {
-    email?: string
-    username?: string
-    full_name?: string
-    is_active?: boolean
-    requires_pin?: boolean
-    pin_hash?: string
-    pin_attempts?: number
-    pin_locked_until?: string | null
-    pin_set_at?: string
-    last_login?: string
-  },
-): Promise<User> {
+  phone: string | null,
+): Promise<UpdatePhoneResponse> {
+  const supabase = createClient()
+
+  try {
+    console.log('[updateUserPhone] Updating phone for user:', { userId, phone })
+
+    // Validate phone number if provided
+    if (phone && !isValidPhoneNumber(phone)) {
+      throw new Error('Invalid phone number format')
+    }
+
+    const { data, error } = await supabase.rpc('update_user_phone', {
+      target_user_id: userId,
+      new_phone: phone,
+    })
+
+    if (error) {
+      console.error('[updateUserPhone] RPC error:', error)
+      throw new Error(`Failed to update phone: ${error.message}`)
+    }
+
+    console.log('[updateUserPhone] Success:', data)
+    return data as UpdatePhoneResponse
+  } catch (err) {
+    console.error('[updateUserPhone] Unexpected error:', err)
+    throw err
+  }
+}
+
+// 🆕 NEW: Language preference update function
+export async function updateUserLanguagePreference(
+  userId: string,
+  languagePreference: SupportedLanguage,
+): Promise<UpdateLanguageResponse> {
+  const supabase = createClient()
+
+  try {
+    console.log('[updateUserLanguagePreference] Updating language for user:', {
+      userId,
+      languagePreference,
+    })
+
+    // Validate language
+    if (!isValidLanguage(languagePreference)) {
+      throw new Error(
+        `Invalid language preference. Supported languages: ${Object.keys(SUPPORTED_LANGUAGES).join(', ')}`,
+      )
+    }
+
+    const { data, error } = await supabase.rpc('update_user_language_preference', {
+      target_user_id: userId,
+      new_language_preference: languagePreference,
+    })
+
+    if (error) {
+      console.error('[updateUserLanguagePreference] RPC error:', error)
+      throw new Error(`Failed to update language preference: ${error.message}`)
+    }
+
+    console.log('[updateUserLanguagePreference] Success:', data)
+    return data as UpdateLanguageResponse
+  } catch (err) {
+    console.error('[updateUserLanguagePreference] Unexpected error:', err)
+    throw err
+  }
+}
+
+// Enhanced updateUser function (includes phone and language)
+export async function updateUser(userId: string, updates: UserUpdate): Promise<User> {
   const supabase = createClient()
 
   try {
     console.log('[updateUser] Updating user:', { userId, updates })
 
-    // Separate email updates from metadata updates
-    const { email, ...metadataUpdates } = updates
+    // Separate different types of updates
+    const { email, phone, language_preference, ...metadataUpdates } = updates
 
     // Update email if provided using RPC function
     if (email) {
@@ -255,7 +336,17 @@ export async function updateUser(
       console.log('[updateUser] Email updated:', emailResult)
     }
 
-    // Update metadata if provided using RPC function
+    // 🆕 Update phone if provided
+    if (phone !== undefined) {
+      await updateUserPhone(userId, phone)
+    }
+
+    // 🆕 Update language preference if provided
+    if (language_preference) {
+      await updateUserLanguagePreference(userId, language_preference)
+    }
+
+    // Update other metadata if provided using RPC function
     if (Object.keys(metadataUpdates).length > 0) {
       const { data: metadataResult, error: metadataError } = await supabase.rpc(
         'update_user_metadata',
@@ -297,23 +388,17 @@ export async function updateUser(
   }
 }
 
-export async function createUser(userData: {
-  email: string
-  password?: string
-  username?: string
-  full_name?: string
-  is_active?: boolean
-  requires_pin?: boolean
-  pin_delivery_method?: string
-}): Promise<User> {
+// Existing functions (unchanged but compatible with new types)
+export async function createUser(userData: UserCreate): Promise<User> {
   try {
     console.log('[createUser] Creating user:', {
       username: userData.username,
       email: userData.email,
+      phone: userData.phone,
+      language_preference: userData.language_preference,
     })
 
     // For now, we'll need to implement this through a server action
-    // or create an RPC function for user creation
     throw new Error(
       'User creation must be handled server-side. Please implement a server action or RPC function.',
     )
@@ -323,20 +408,10 @@ export async function createUser(userData: {
   }
 }
 
-// Alternative: Create a simpler user update that only handles metadata
+// Enhanced metadata update function
 export async function updateUserMetadata(
   userId: string,
-  metadata: {
-    username?: string
-    full_name?: string
-    is_active?: boolean
-    requires_pin?: boolean
-    pin_hash?: string
-    pin_attempts?: number
-    pin_locked_until?: string | null
-    pin_set_at?: string
-    last_login?: string
-  },
+  metadata: Omit<UserUpdate, 'email' | 'phone' | 'language_preference'>,
 ): Promise<boolean> {
   const supabase = createClient()
 
@@ -359,7 +434,7 @@ export async function updateUserMetadata(
   }
 }
 
-// Alternative: Update only email
+// Update email function (unchanged)
 export async function updateUserEmail(userId: string, email: string): Promise<boolean> {
   const supabase = createClient()
 
@@ -382,6 +457,7 @@ export async function updateUserEmail(userId: string, email: string): Promise<bo
   }
 }
 
+// Existing functions (unchanged)
 export async function deleteUser(userId: string): Promise<void> {
   const supabase = createClient()
 
@@ -426,37 +502,36 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
   try {
     console.log('[fetchUserById] Fetching user:', { userId })
 
-    const { data, error } = await supabase
-      .from('auth.users')
-      .select('id, email, created_at, updated_at, raw_user_meta_data')
-      .eq('id', userId)
-      .single()
+    // Use the RPC function to get user with all metadata
+    const { data, error } = await supabase.rpc('get_users_with_metadata')
 
     if (error) {
-      console.error('[fetchUserById] Supabase error:', error)
+      console.error('[fetchUserById] RPC error:', error)
+      throw new Error(`Failed to fetch users: ${error.message}`)
+    }
 
-      if (error.code === 'PGRST116') {
-        throw new Error(`User with ID "${userId}" not found`)
-      }
+    // Find the specific user
+    const userData = data?.find((user: any) => user.id === userId)
 
-      throw new Error(`Failed to fetch user: ${error.message}`)
+    if (!userData) {
+      throw new Error(`User with ID "${userId}" not found`)
     }
 
     console.log('[fetchUserById] Success:', { userId })
-    return transformAuthUserToUser(data)
+    return transformAuthUserToUser(userData)
   } catch (err) {
     console.error('[fetchUserById] Unexpected error:', err)
     throw err
   }
 }
 
+// Rest of the functions remain unchanged...
 export async function fetchUserRoles(userId: string): Promise<string[]> {
   const supabase = createClient()
 
   try {
     console.log('[fetchUserRoles] Fetching roles for user:', { userId })
 
-    // Query user_mgmt.user_roles joined with roles table
     const { data, error } = await supabase
       .schema('user_mgmt')
       .from('user_roles')
@@ -532,7 +607,7 @@ export async function fetchUserWithRoles(
     })
 
     return {
-      ...transformAuthUserToUser(userResult as unknown as Record<string, unknown>),
+      ...userResult,
       roles,
     }
   } catch (err) {
@@ -560,18 +635,15 @@ export async function fetchCurrentUser(
     // Transform the auth user to our User type
     const transformedUser = transformAuthUserToUser(user)
 
-    console.log('[fetchCurrentUser] Success:', { userId: user.id })
-    return {
-      auth: user,
-      profile: transformedUser,
-    }
+    console.log('[fetchCurrentUser] Success:', { user })
+    return transformedUser
   } catch (err) {
     console.error('[fetchCurrentUser] Unexpected error:', err)
     return null
   }
 }
 
-// PIN-related utility functions
+// PIN-related utility functions (unchanged)
 export async function updateUserPinHash(userId: string, pinHash: string): Promise<void> {
   const supabase = createClient()
 

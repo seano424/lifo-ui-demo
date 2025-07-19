@@ -11,6 +11,12 @@ import {
   SquareTerminal,
   Users,
   Calendar,
+  Box,
+  BarChart,
+  Milestone,
+  Target,
+  Tag,
+  HelpCircle,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -33,49 +39,47 @@ const data = {
       url: '/dashboard',
       icon: SquareTerminal,
       isActive: true,
-      // items: [
-      //   {
-      //     title: 'Overview',
-      //     url: '/dashboard',
-      //   },
-      //   {
-      //     title: 'Batches',
-      //     url: '/dashboard',
-      //   },
-      //   {
-      //     title: 'Donations',
-      //     url: '/dashboard',
-      //   },
-      //   {
-      //     title: 'Discounts',
-      //     url: '/dashboard',
-      //   },
-      // ],
     },
     {
-      title: 'Products',
-      url: '/dashboard/products',
+      title: 'Inbound',
+      url: '/dashboard/inbound',
       icon: Bot,
     },
     {
-      title: 'Batches',
-      url: '/dashboard/batches',
+      title: 'Outbound',
+      url: '/dashboard/outbound',
       icon: BookOpen,
     },
     {
-      title: 'Action Log',
-      url: '/dashboard/action-log',
+      title: 'To-Do',
+      url: '/dashboard/to-do',
       icon: Calendar,
     },
+
     {
-      title: 'Users',
-      url: '/dashboard/users',
-      icon: Users,
+      title: 'Inventory',
+      url: '/dashboard/inventory',
+      icon: Box,
+    },
+    {
+      title: 'Performance',
+      url: '/dashboard/performance',
+      icon: BarChart,
+    },
+    {
+      title: 'Milestones',
+      url: '/dashboard/milestones',
+      icon: Target,
     },
     {
       title: 'Settings',
       url: '/dashboard/settings',
       icon: Settings2,
+    },
+    {
+      title: 'Help Center',
+      url: '/dashboard/help-center',
+      icon: HelpCircle,
     },
   ],
   projects: [

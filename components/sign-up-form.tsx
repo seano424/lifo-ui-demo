@@ -82,6 +82,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 <Input
                   id="password"
                   type="password"
+                  showPasswordToggle
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -94,6 +95,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 <Input
                   id="repeat-password"
                   type="password"
+                  showPasswordToggle
                   required
                   value={repeatPassword}
                   onChange={e => setRepeatPassword(e.target.value)}

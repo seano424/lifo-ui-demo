@@ -120,20 +120,10 @@ export default async function UsersPage() {
       <StoreUsersPrefetch />
 
       <div className="space-y-6">
-        <DashboardInsetHeader
-          title="Team Management"
-          description={`Manage team members for ${primaryStore.store_name}`}
-          rightContent={
-            <div className="flex gap-2">
-              <Button variant="outline">Export Users</Button>
-              <Button>Add User</Button>
-            </div>
-          }
-        />
-
-        <StoreUserStats />
+        <DashboardInsetHeader title="Team Management" />
 
         <StoreUsersList showAddButton={true} />
+        {/* <StoreUserStats /> */}
       </div>
     </HydrationBoundary>
   )

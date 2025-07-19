@@ -8,14 +8,6 @@ import { UserIcon } from 'lucide-react'
 export default function UserButton() {
   const { data: user, isLoading, isError } = useCurrentUser()
 
-  console.log('UserButton Debug:', {
-    user,
-    full_name: user?.full_name,
-    email: user?.email,
-    username: user?.username,
-    migrated_from_user_mgmt: user?.migrated_from_user_mgmt,
-  })
-
   if (isLoading) {
     return <Skeleton className="h-10 w-24" />
   }
