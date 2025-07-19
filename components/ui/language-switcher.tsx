@@ -12,9 +12,9 @@ import { Button } from '@/components/ui/button'
 import { Globe } from 'lucide-react'
 
 const LIFO_LANGUAGES = {
-  fr: { name: 'Français', flag: '🇫🇷' },
-  en: { name: 'English', flag: '🇬🇧' },
-  nl: { name: 'Nederlands', flag: '🇳🇱' },
+  fr: { name: 'Français' },
+  en: { name: 'English' },
+  nl: { name: 'Nederlands' },
 } as const
 
 export function LanguageSwitcher() {
@@ -33,10 +33,9 @@ export function LanguageSwitcher() {
         </div>
       </SelectTrigger>
       <SelectContent>
-        {Object.entries(LIFO_LANGUAGES).map(([code, { name, flag }]) => (
+        {Object.entries(LIFO_LANGUAGES).map(([code, { name }]) => (
           <SelectItem key={code} value={code}>
             <div className="flex items-center gap-2">
-              <span>{flag}</span>
               <span>{name}</span>
             </div>
           </SelectItem>
@@ -52,7 +51,7 @@ export function LanguageButtonGroup() {
 
   return (
     <div className="flex items-center gap-1 rounded-lg border p-1">
-      {Object.entries(LIFO_LANGUAGES).map(([code, { flag }]) => (
+      {Object.entries(LIFO_LANGUAGES).map(([code]) => (
         <Button
           key={code}
           variant={currentLanguage === code ? 'default' : 'ghost'}
@@ -61,7 +60,6 @@ export function LanguageButtonGroup() {
           disabled={isLoading}
           className="h-8 px-3"
         >
-          <span className="mr-1">{flag}</span>
           {code.toUpperCase()}
         </Button>
       ))}
