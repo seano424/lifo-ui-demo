@@ -1,0 +1,16 @@
+sku,product_name,category,brand,quantity,expiry_date,manufacture_date,cost_price,selling_price,location_code,unit_type,supplier
+SNCK-001,Potato Chips Original,snacks,Crispy Co,45,2024-06-30,2024-01-15,1.50,2.99,SHELF-D1,bags,Snack Supplier
+BEVG-002,Cola 500ml,beverages,Fizzy Drinks,60,2024-12-31,2024-01-01,0.80,1.50,SHELF-D2,bottles,Beverage Co
+CNDY-003,Chocolate Bar,confectionery,Sweet Treats,25,2024-08-15,2024-01-20,1.00,2.50,SHELF-D3,bars,Candy Corp
+BKRY-004,Muffin Blueberry,bakery_fresh,Morning Bakery,8,2024-02-16,2024-02-15,1.25,3.50,SHELF-C2,pcs,Morning Bakery
+FRES-005,Strawberries,fresh_produce,Berry Farm,12,2024-02-18,2024-02-16,2.50,4.99,SHELF-A3,punnets,Berry Supplier
+DAIR-006,Cheddar Cheese,dairy,Cheese Co,20,2024-03-01,2024-02-01,3.00,5.50,FRIDGE-B3,blocks,Cheese Factory
+MEAT-007,Ground Beef,fresh_meat_fish,Butcher Shop,8,2024-02-17,2024-02-16,7.00,10.99,MEAT-E2,kg,Local Butcher
+FROZ-008,Frozen Pizza,frozen,Pizza Co,15,2024-09-30,2024-01-10,4.00,7.99,FREEZER-F2,boxes,Pizza Supplier
+HLTH-009,Granola Bars,health_food,Healthy Choice,30,2024-07-15,2024-01-05,2.00,3.99,SHELF-E1,boxes,Health Foods
+SPCE-010,Olive Oil,spices_condiments,Gourmet Co,18,2024-12-31,2024-01-01,5.00,8.99,SHELF-E2,bottles,Oil Supplier
+CERE-011,Breakfast Cereal,cereals,Morning Crunch,22,2024-06-30,2024-01-10,3.50,5.99,SHELF-E3,boxes,Cereal Co
+PAST-012,Spaghetti,pasta_rice,Italian Foods,40,2024-12-31,2024-01-01,1.20,2.49,SHELF-F1,packages,Pasta Supplier
+SAUC-013,Tomato Sauce,sauces,Italian Foods,35,2024-08-31,2024-01-01,0.90,1.99,SHELF-F2,jars,Sauce Co
+VEGG-014,Carrots,fresh_produce,Garden Fresh,50,2024-02-25,2024-02-20,0.80,1.80,SHELF-A4,kg,Vegetable Farm
+BREA-015,Whole Wheat Bread,bakery_fresh,Healthy Bakery,12,2024-02-19,2024-02-18,1.80,3.50,SHELF-C4,loaves,Healthy Bakery

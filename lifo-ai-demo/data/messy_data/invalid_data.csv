@@ -1,0 +1,11 @@
+sku,product_name,category,brand,quantity,expiry_date,manufacture_date,cost_price,selling_price,location_code,unit_type,supplier
+INVD-001,Negative Quantity Product,fresh_produce,Brand A,-10,2024-02-15,2024-02-10,1.00,2.00,SHELF-A1,pcs,Supplier A
+INVD-002,Invalid Date Product,dairy,Brand B,5,2024-13-45,2024-02-15,1.50,2.50,FRIDGE-B1,pcs,Supplier B
+INVD-003,Future Manufacture Product,bakery_fresh,Brand C,8,2024-02-18,2024-12-31,2.00,3.00,SHELF-C1,pcs,Supplier C
+INVD-004,Zero Price Product,frozen,Brand D,12,2024-08-15,2024-01-10,0.00,0.00,FREEZER-F1,pcs,Supplier D
+INVD-005,Negative Price Product,snacks,Brand E,20,2024-06-30,2024-01-15,-1.00,-2.00,SHELF-D1,bags,Supplier E
+INVD-006,Invalid Cost vs Selling,beverages,Brand F,15,2024-12-31,2024-01-01,5.00,2.00,SHELF-E1,bottles,Supplier F
+INVD-007,Text in Numbers,confectionery,Brand G,ABC,2024-08-15,2024-01-20,XYZ,2.50,SHELF-F1,bars,Supplier G
+INVD-008,Empty Fields Product,health_food,,0,,2024-01-05,1.00,,SHELF-G1,boxes,
+INVD-009,Past Expiry Product,spices_condiments,Brand H,25,2023-12-31,2023-11-01,3.00,5.00,SHELF-H1,jars,Supplier H
+INVD-010,Manufacture After Expiry,cereals,Brand I,30,2024-01-15,2024-02-01,2.50,4.00,SHELF-I1,boxes,Supplier I
