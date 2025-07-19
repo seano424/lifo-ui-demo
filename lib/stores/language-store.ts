@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { updateUserLanguagePreference } from '@/lib/queries/users'
 import { createClient } from '@/lib/supabase/client'
-import { SupportedLanguage } from '@/lib/types/user'
 
 export type Language = 'fr' | 'en' | 'nl'
 
@@ -12,7 +11,7 @@ interface LanguageState {
   currentLanguage: Language
   isLoading: boolean
   setLanguage: (language: Language) => Promise<void>
-  initializeLanguage: (userId?: string) => Promise<void>
+  initializeLanguage: () => Promise<void>
   resetLanguage: () => void
 }
 
@@ -48,7 +47,7 @@ export const useLanguageStore = create<LanguageState>()(
         }
       },
 
-      initializeLanguage: async (userId?: string) => {
+      initializeLanguage: async () => {
         set({ isLoading: true })
 
         try {

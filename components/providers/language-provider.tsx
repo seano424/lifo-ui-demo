@@ -13,7 +13,7 @@ export function LanguageProvider({
   const { initializeLanguage } = useLanguageStore()
 
   useEffect(() => {
-    initializeLanguage(userId)
+    initializeLanguage()
   }, [userId, initializeLanguage])
 
   return <>{children}</>
