@@ -1,9 +1,11 @@
-// components/store-users/add-employee-dialog.tsx
+// components/store-users/add-employee-dialog.tsx - FIXED username availability check
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +27,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { UserPlus, Key, Mail, Copy, Check, AlertTriangle, RefreshCw } from 'lucide-react'
+import { UserPlus, Key, Mail, Copy, Check, AlertTriangle, RefreshCw, RotateCcw } from 'lucide-react'
 import { sendWelcomeEmail, getEmailErrorMessage, type EmailSendResult } from '@/lib/email/client'
 
 interface AddEmployeeDialogProps {
@@ -39,6 +41,7 @@ interface CreateEmployeeFormData {
   firstName: string
   lastName: string
   email: string
+  username: string
   role: 'employee' | 'manager'
   languagePreference: 'en' | 'fr' | 'nl' | 'de' | 'es'
 }
@@ -73,11 +76,14 @@ export function AddEmployeeDialog({
   onEmployeeCreated,
 }: AddEmployeeDialogProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false)
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const [step, setStep] = useState<'form' | 'credentials'>('form')
   const [formData, setFormData] = useState<CreateEmployeeFormData>({
     firstName: '',
     lastName: '',
     email: '',
+    username: '',
     role: 'employee',
     languagePreference: 'en',
   })
@@ -88,13 +94,77 @@ export function AddEmployeeDialog({
     sending: false,
   })
 
-  // Generate username preview
-  const generateUsername = (firstName: string, lastName: string): string => {
+  const queryClient = useQueryClient()
+
+  // Generate suggested username (first.last pattern)
+  const generateSuggestedUsername = (firstName: string, lastName: string): string => {
     if (!firstName || !lastName) return ''
     const cleanFirst = firstName.toLowerCase().replace(/[^a-z]/g, '')
     const cleanLast = lastName.toLowerCase().replace(/[^a-z]/g, '')
-    return (cleanFirst.substring(0, 4) + cleanLast.substring(0, 1)).toLowerCase()
+    return `${cleanFirst}.${cleanLast}`
   }
+
+  // Auto-update username when first/last name changes
+  useEffect(() => {
+    if (formData.firstName && formData.lastName) {
+      const suggested = generateSuggestedUsername(formData.firstName, formData.lastName)
+
+      // Only auto-update if username is empty or still matches the old suggestion
+      const currentSuggestion = generateSuggestedUsername(formData.firstName, formData.lastName)
+      if (!formData.username || formData.username === currentSuggestion) {
+        setFormData(prev => ({ ...prev, username: suggested }))
+      }
+    }
+  }, [formData.firstName, formData.lastName])
+
+  // ✅ FIXED: Check username availability using RPC function
+  const checkUsernameAvailability = async (username: string) => {
+    if (!username || username.length < 3) {
+      setUsernameAvailable(null)
+      return
+    }
+
+    setIsCheckingUsername(true)
+    try {
+      const supabase = createClient()
+
+      console.log(`🔍 Checking username availability for: "${username}"`)
+
+      // ✅ Use RPC function instead of direct auth.users query
+      const { data, error } = await supabase.rpc('check_username_availability', {
+        p_username: username,
+      })
+
+      if (error) {
+        console.error('❌ Username availability check error:', error)
+        setUsernameAvailable(null)
+        toast.error('Failed to check username availability')
+        return
+      }
+
+      // data is boolean: true = available, false = taken
+      setUsernameAvailable(data)
+
+      console.log(`✅ Username "${username}" availability:`, data ? 'Available ✅' : 'Taken ❌')
+    } catch (error) {
+      console.error('❌ Username availability check failed:', error)
+      setUsernameAvailable(null)
+      toast.error('Failed to check username availability')
+    } finally {
+      setIsCheckingUsername(false)
+    }
+  }
+
+  // Debounced username check
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formData.username) {
+        checkUsernameAvailability(formData.username)
+      }
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [formData.username])
 
   // Generate secure PIN
   const generateSecurePIN = (): string => {
@@ -176,12 +246,44 @@ export function AddEmployeeDialog({
     }
   }
 
-  // Handle form submission
+  // Reset username to suggestion
+  const resetToSuggestedUsername = () => {
+    const suggested = generateSuggestedUsername(formData.firstName, formData.lastName)
+    setFormData(prev => ({ ...prev, username: suggested }))
+  }
+
+  // Invalidate all store user queries
+  const invalidateStoreUserQueries = () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storeUsers.byStore(storeId),
+    })
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storeUsers.infinite(storeId, {}),
+    })
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storeUsers.employees(storeId),
+    })
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.storeUsers.managers(storeId),
+    })
+
+    console.log('✅ Invalidated store user queries for store:', storeId)
+  }
+
+  // ✅ FIXED: Handle form submission using server-side Admin API
   const handleCreateEmployee = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.username) {
       toast.error('Please fill in all required fields')
+      return
+    }
+
+    if (usernameAvailable === false) {
+      toast.error('Username is already taken. Please choose a different one.')
       return
     }
 
@@ -193,55 +295,77 @@ export function AddEmployeeDialog({
     setIsLoading(true)
 
     try {
-      const supabase = createClient()
-
-      // Generate username and PIN
-      const username = generateUsername(formData.firstName, formData.lastName)
       const pin = generateSecurePIN()
 
-      console.log('Creating employee:', {
-        email: formData.email,
-        username,
+      console.log('🎯 Creating employee via server API:', {
+        username: formData.username,
+        pin: pin,
         storeId,
       })
 
-      // Call RPC function to create employee with PIN
-      const { data: result, error } = await supabase.rpc('create_employee_with_pin', {
-        p_email: formData.email,
-        p_full_name: `${formData.firstName} ${formData.lastName}`,
-        p_username: username,
-        p_pin: pin,
-        p_store_id: storeId,
-        p_role: formData.role,
-        p_language_preference: formData.languagePreference,
+      // Call server-side API that uses Admin API with proper permissions
+      const response = await fetch('/api/employees/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          username: formData.username,
+          role: formData.role,
+          languagePreference: formData.languagePreference,
+          storeId: storeId,
+          pin: pin,
+        }),
       })
 
-      if (error) {
-        console.error('RPC error:', error)
-        throw new Error(error.message || 'Failed to create employee')
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        console.error('❌ Server API error:', result.error)
+        throw new Error(result.error || 'Failed to create employee')
       }
 
-      if (!result?.success) {
-        throw new Error(result?.error || 'Failed to create employee')
-      }
+      console.log('✅ Employee created successfully:', result)
 
       // Store credentials for display and email
       const credentials: CreatedCredentials = {
         username: result.username,
         pin: result.pin,
-        email: result.email,
+        email: result.email, // Contact email for display/notifications
         full_name: `${formData.firstName} ${formData.lastName}`,
         user_id: result.user_id,
       }
 
       setCreatedCredentials(credentials)
       setStep('credentials')
-      toast.success('Employee created successfully!')
+      toast.success('Employee created successfully using server API!')
 
-      // Automatically send welcome email
-      await sendEmployeeWelcomeEmail(credentials)
+      // Invalidate queries immediately after creation
+      invalidateStoreUserQueries()
+      onEmployeeCreated()
+
+      // Check if email looks fake and skip sending if so
+      const isFakeEmail =
+        formData.email.includes('test.com') ||
+        formData.email.includes('fake.com') ||
+        formData.email.includes('example.com')
+
+      if (isFakeEmail) {
+        setEmailStatus({
+          sent: false,
+          sending: false,
+          error: 'Skipped sending to test email address',
+        })
+        toast.info('Employee created! Email skipped for test address.')
+      } else {
+        // Send credentials to their real email
+        await sendEmployeeWelcomeEmail(credentials)
+      }
     } catch (error: any) {
-      console.error('Error creating employee:', error)
+      console.error('❌ Error creating employee:', error)
       toast.error(error.message || 'Failed to create employee')
     } finally {
       setIsLoading(false)
@@ -263,7 +387,7 @@ export function AddEmployeeDialog({
   // Handle dialog close
   const handleClose = () => {
     if (step === 'credentials') {
-      // Employee was created, trigger refresh
+      invalidateStoreUserQueries()
       onEmployeeCreated()
     }
 
@@ -273,12 +397,14 @@ export function AddEmployeeDialog({
       firstName: '',
       lastName: '',
       email: '',
+      username: '',
       role: 'employee',
       languagePreference: 'en',
     })
     setCreatedCredentials(null)
     setCopiedField(null)
     setEmailStatus({ sent: false, sending: false })
+    setUsernameAvailable(null)
     onOpenChange(false)
   }
 
@@ -334,12 +460,73 @@ export function AddEmployeeDialog({
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="john.doe@example.com"
+                  placeholder="test@example.com (use fake email for testing)"
                   required
                   disabled={isLoading}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Login credentials will be sent to this email address
+                  Use test@example.com for testing. Real emails will receive login credentials.
+                </p>
+              </div>
+
+              {/* ✅ FIXED: Username Input with Availability Check using RPC */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="username" required>
+                    Username
+                  </Label>
+                  {formData.firstName && formData.lastName && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetToSuggestedUsername}
+                      className="text-xs h-6 px-2"
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Reset
+                    </Button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        username: e.target.value.toLowerCase().replace(/[^a-z.]/g, ''),
+                      })
+                    }
+                    placeholder="john.doe"
+                    required
+                    disabled={isLoading}
+                    className={`pr-10 ${
+                      usernameAvailable === true
+                        ? 'border-green-500'
+                        : usernameAvailable === false
+                          ? 'border-red-500'
+                          : ''
+                    }`}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {isCheckingUsername ? (
+                      <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin" />
+                    ) : usernameAvailable === true ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : usernameAvailable === false ? (
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
+                    ) : null}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {usernameAvailable === false ? (
+                    <span className="text-red-600">Username is already taken</span>
+                  ) : usernameAvailable === true ? (
+                    <span className="text-green-600">Username is available</span>
+                  ) : (
+                    'Employee will use this username to log in'
+                  )}
                 </p>
               </div>
 
@@ -386,16 +573,14 @@ export function AddEmployeeDialog({
                 </div>
               </div>
 
-              {formData.firstName && formData.lastName && (
+              {formData.username && (
                 <Alert>
                   <Key className="h-4 w-4" />
                   <AlertDescription>
                     <div className="space-y-1">
                       <div>
                         <strong>Username:</strong>{' '}
-                        <span className="font-mono">
-                          {generateUsername(formData.firstName, formData.lastName)}
-                        </span>
+                        <span className="font-mono">{formData.username}</span>
                       </div>
                       <div>
                         <strong>PIN:</strong> Will be generated automatically (4 digits)
@@ -417,7 +602,11 @@ export function AddEmployeeDialog({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading} className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={isLoading || usernameAvailable === false || !formData.username}
+                  className="flex items-center gap-2"
+                >
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -472,16 +661,19 @@ export function AddEmployeeDialog({
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
                       <div className="space-y-2">
-                        <div>Failed to send email: {emailStatus.error}</div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={retryEmailSending}
-                          className="flex items-center gap-2"
-                        >
-                          <RefreshCw className="w-3 h-3" />
-                          Retry sending
-                        </Button>
+                        <div>Email status: {emailStatus.error}</div>
+                        {!emailStatus.error.includes('test') &&
+                          !emailStatus.error.includes('Skipped') && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={retryEmailSending}
+                              className="flex items-center gap-2"
+                            >
+                              <RefreshCw className="w-3 h-3" />
+                              Retry sending
+                            </Button>
+                          )}
                       </div>
                     </AlertDescription>
                   </>
@@ -556,8 +748,11 @@ export function AddEmployeeDialog({
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h4 className="font-medium text-blue-900 mb-2">Next Steps:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• The employee receives their credentials by email automatically</li>
-                  <li>• They can log in using the "Employee" tab on the login page</li>
+                  <li>• The employee can log in using the "Employee" tab on the login page</li>
+                  <li>
+                    • Use username: <strong>{createdCredentials?.username}</strong> and PIN:{' '}
+                    <strong>{createdCredentials?.pin}</strong>
+                  </li>
                   <li>• The PIN can be reset at any time from the team management page</li>
                   <li>• The employee can scan products and manage basic inventory</li>
                 </ul>

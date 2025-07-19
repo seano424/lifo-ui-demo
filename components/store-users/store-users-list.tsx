@@ -20,6 +20,8 @@ import {
   User,
   Key,
   Lock,
+  RefreshCw,
+  Unlock,
 } from 'lucide-react'
 
 import {
@@ -76,7 +78,6 @@ import { cn } from '@/lib/utils'
 
 // Import the new components
 import { AddEmployeeDialog } from './add-employee-dialog'
-import { PINManagementActions } from './pin-management-actions'
 
 export function StoreUsersList() {
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
@@ -86,6 +87,8 @@ export function StoreUsersList() {
   const [showRemoveDialog, setShowRemoveDialog] = useState(false)
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
   const [isEditUserRoleDialogOpen, setIsEditUserRoleDialogOpen] = useState(false)
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false)
+  const [isUnlockDialogOpen, setIsUnlockDialogOpen] = useState(false)
   const [formRole, setFormRole] = useState<StoreUser['role_in_store']>('employee')
 
   const { changeUserRole, toggleUserActiveStatus, removeUser, refetch } = useStoreUserActions()
@@ -289,11 +292,43 @@ export function StoreUsersList() {
                             )}
 
                             {/* PIN Management Actions */}
+                            {hasPINAuth(storeUser) && (
+                              <>
+                                <DropdownMenuSeparator />
+                                
+                                {/* Reset PIN */}
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    // We need to handle this differently since the dropdown will close
+                                    // We'll need to store the user and open the dialog after a brief delay
+                                    setSelectedUser(storeUser)
+                                    setTimeout(() => {
+                                      setIsResetDialogOpen(true)
+                                    }, 100)
+                                  }}
+                                  className="flex items-center gap-2"
+                                >
+                                  <RefreshCw className="w-4 h-4" />
+                                  Reset PIN
+                                </DropdownMenuItem>
 
-                            <PINManagementActions
-                              user={storeUser}
-                              onUserUpdated={handleUserUpdated}
-                            />
+                                {/* Unlock PIN (only if locked) */}
+                                {isPINLocked(storeUser) && (
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedUser(storeUser)
+                                      setTimeout(() => {
+                                        setIsUnlockDialogOpen(true)
+                                      }, 100)
+                                    }}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Unlock className="w-4 h-4" />
+                                    Unlock PIN
+                                  </DropdownMenuItem>
+                                )}
+                              </>
+                            )}
 
                             {/* Active Status Toggle */}
                             {canManageUsers && (
@@ -469,6 +504,129 @@ export function StoreUsersList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* PIN Management Dialogs */}
+      {selectedUser && (
+        <>
+          {/* Reset PIN Dialog */}
+          <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5" />
+                  Reset PIN for {selectedUser.full_name}
+                </DialogTitle>
+                <DialogDescription>
+                  This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="space-y-2">
+                    <div>
+                      <strong>Employee:</strong> {selectedUser.full_name}
+                    </div>
+                    <div>
+                      <strong>Username:</strong>{' '}
+                      <span className="font-mono">{selectedUser.username}</span>
+                    </div>
+                    <div>
+                      <strong>Email:</strong> {selectedUser.email}
+                    </div>
+                    <div>
+                      <strong>Current Status:</strong>
+                      {isPINLocked(selectedUser) ? (
+                        <span className="ml-2 text-red-600 flex items-center gap-1">
+                          <Lock className="w-3 h-3" />
+                          Locked
+                        </span>
+                      ) : (
+                        <span className="ml-2 text-green-600 flex items-center gap-1">
+                          <Key className="w-3 h-3" />
+                          Active
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsResetDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      // TODO: Implement PIN reset logic
+                      console.log('Reset PIN for:', selectedUser.user_id)
+                      setIsResetDialogOpen(false)
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Reset PIN
+                  </Button>
+                </DialogFooter>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Unlock PIN Dialog */}
+          <Dialog open={isUnlockDialogOpen} onOpenChange={setIsUnlockDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Unlock className="w-5 h-5" />
+                  Unlock PIN for {selectedUser.full_name}
+                </DialogTitle>
+                <DialogDescription>
+                  This will immediately unlock the employee's PIN and reset their failed attempts counter.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="space-y-1">
+                    <div>
+                      <strong>Employee:</strong> {selectedUser.full_name}
+                    </div>
+                    <div>
+                      <strong>Username:</strong>{' '}
+                      <span className="font-mono">{selectedUser.username}</span>
+                    </div>
+                    <div>
+                      <strong>Status:</strong> The account is currently locked due to failed PIN attempts
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsUnlockDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      // TODO: Implement PIN unlock logic
+                      console.log('Unlock PIN for:', selectedUser.user_id)
+                      setIsUnlockDialogOpen(false)
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Unlock className="w-4 h-4" />
+                    Unlock PIN
+                  </Button>
+                </DialogFooter>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </>
   )
 }

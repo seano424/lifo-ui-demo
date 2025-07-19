@@ -1,5 +1,12 @@
 // lib/email/client.ts
-import { type EmailCredentials } from './resend'
+
+export interface EmailCredentials {
+  username: string
+  pin: string
+  email: string
+  full_name: string
+  store_name?: string
+}
 
 export interface EmailSendResult {
   success: boolean
@@ -7,27 +14,32 @@ export interface EmailSendResult {
   error?: string
 }
 
-export interface EmailSendOptions {
+export interface WelcomeEmailParams {
   credentials: EmailCredentials
-  storeId?: string
-  deliveryId?: string
+  storeId: string
+}
+
+export interface PinResetEmailParams {
+  credentials: EmailCredentials
+  storeId: string
 }
 
 /**
  * Send welcome email with login credentials to new employee
  */
-export async function sendWelcomeEmail(options: EmailSendOptions): Promise<EmailSendResult> {
+export async function sendWelcomeEmail({
+  credentials,
+  storeId,
+}: WelcomeEmailParams): Promise<EmailSendResult> {
   try {
-    const response = await fetch('/api/email/send', {
+    const response = await fetch('/api/email/send-welcome', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        type: 'welcome',
-        credentials: options.credentials,
-        store_id: options.storeId,
-        delivery_id: options.deliveryId,
+        credentials,
+        storeId,
       }),
     })
 
@@ -36,7 +48,7 @@ export async function sendWelcomeEmail(options: EmailSendOptions): Promise<Email
     if (!response.ok) {
       return {
         success: false,
-        error: result.error || `HTTP ${response.status}: ${response.statusText}`,
+        error: result.error || 'Failed to send email',
       }
     }
 
@@ -45,10 +57,10 @@ export async function sendWelcomeEmail(options: EmailSendOptions): Promise<Email
       messageId: result.messageId,
     }
   } catch (error: any) {
-    console.error('Failed to send welcome email:', error)
+    console.error('Email sending error:', error)
     return {
       success: false,
-      error: error.message || 'Network error while sending email',
+      error: error.message || 'Network error',
     }
   }
 }
@@ -56,18 +68,19 @@ export async function sendWelcomeEmail(options: EmailSendOptions): Promise<Email
 /**
  * Send PIN reset email to employee
  */
-export async function sendPinResetEmail(options: EmailSendOptions): Promise<EmailSendResult> {
+export async function sendPinResetEmail({
+  credentials,
+  storeId,
+}: PinResetEmailParams): Promise<EmailSendResult> {
   try {
-    const response = await fetch('/api/email/send', {
+    const response = await fetch('/api/email/send-pin-reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        type: 'pin_reset',
-        credentials: options.credentials,
-        store_id: options.storeId,
-        delivery_id: options.deliveryId,
+        credentials,
+        storeId,
       }),
     })
 
@@ -76,7 +89,7 @@ export async function sendPinResetEmail(options: EmailSendOptions): Promise<Emai
     if (!response.ok) {
       return {
         success: false,
-        error: result.error || `HTTP ${response.status}: ${response.statusText}`,
+        error: result.error || 'Failed to send email',
       }
     }
 
@@ -85,66 +98,35 @@ export async function sendPinResetEmail(options: EmailSendOptions): Promise<Emai
       messageId: result.messageId,
     }
   } catch (error: any) {
-    console.error('Failed to send PIN reset email:', error)
+    console.error('Email sending error:', error)
     return {
       success: false,
-      error: error.message || 'Network error while sending email',
+      error: error.message || 'Network error',
     }
   }
 }
 
 /**
- * Retry sending an email (useful for failed deliveries)
- */
-export async function retryEmailDelivery(
-  type: 'welcome' | 'pin_reset',
-  options: EmailSendOptions,
-): Promise<EmailSendResult> {
-  if (type === 'welcome') {
-    return sendWelcomeEmail(options)
-  } else {
-    return sendPinResetEmail(options)
-  }
-}
-
-/**
- * Validate email address format
- */
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
-
-/**
- * Get user-friendly error message for email errors
+ * Get user-friendly error message from email error
  */
 export function getEmailErrorMessage(error: string): string {
-  if (error.includes('Authentication required')) {
-    return 'Vous devez être connecté pour envoyer des emails'
+  const errorMap: Record<string, string> = {
+    'Network error': 'Network connection problem. Please check your internet connection.',
+    'Invalid email address': 'The email address is not valid.',
+    'Email delivery failed': 'Email could not be delivered. Please check the email address.',
+    'Rate limit exceeded': 'Too many emails sent. Please wait a few minutes and try again.',
+    'Authentication failed': 'Email service authentication failed. Please contact support.',
+    'Invalid template': 'Email template error. Please contact support.',
+    'Blacklisted email': 'This email address cannot receive emails from our service.',
   }
 
-  if (error.includes('Permission denied')) {
-    return "Vous n'avez pas les permissions pour envoyer des emails pour ce magasin"
+  // Check for specific error patterns
+  for (const [pattern, message] of Object.entries(errorMap)) {
+    if (error.toLowerCase().includes(pattern.toLowerCase())) {
+      return message
+    }
   }
 
-  if (error.includes('Invalid email')) {
-    return "L'adresse email n'est pas valide"
-  }
-
-  if (error.includes('Network error') || error.includes('Failed to fetch')) {
-    return 'Erreur de connexion. Vérifiez votre connexion internet.'
-  }
-
-  if (error.includes('HTTP 429')) {
-    return "Trop de tentatives d'envoi. Réessayez dans quelques minutes."
-  }
-
-  if (error.includes('HTTP 5')) {
-    return 'Erreur du serveur email. Réessayez plus tard.'
-  }
-
-  // Return original error for development, generic message for production
-  return process.env.NODE_ENV === 'development'
-    ? error
-    : "Erreur lors de l'envoi de l'email. Réessayez plus tard."
+  // Default message for unknown errors
+  return 'Email sending failed. Please try again or contact support.'
 }
