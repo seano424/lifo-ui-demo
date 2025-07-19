@@ -51,6 +51,14 @@
       "title": "Langue",
       "description": "Choisissez votre langue préférée pour l'interface",
       "preferred": "Langue préférée"
+    },
+    "tabs": {
+      "store": "Magasin",
+      "notifications": "Notifications",
+      "account": "Compte",
+      "team": "Équipe",
+      "storeDescription": "Gérez les paramètres de votre magasin.",
+      "notificationsDescription": "Gérez vos paramètres de notification."
     }
   }
 }

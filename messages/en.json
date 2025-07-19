@@ -51,6 +51,14 @@
       "title": "Language",
       "description": "Choose your preferred language for the interface",
       "preferred": "Preferred Language"
+    },
+    "tabs": {
+      "store": "Store",
+      "notifications": "Notifications",
+      "account": "Account",
+      "team": "Team",
+      "storeDescription": "Manage your store settings.",
+      "notificationsDescription": "Manage your notification settings."
     }
   }
 }

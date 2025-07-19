@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
@@ -12,6 +13,7 @@ type ValidTab = (typeof VALID_TABS)[number]
 
 export default function SettingsTabs() {
   const searchParams = useSearchParams()
+  const t = useTranslations('settings')
 
   const getInitialTab = (): ValidTab => {
     const tabParam = searchParams.get('tab')
@@ -39,30 +41,30 @@ export default function SettingsTabs() {
     <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
       <TabsList className="grid grid-cols-4 bg-opacity-0">
         <TabsTrigger value="store" variant="secondary">
-          Store
+          {t('tabs.store')}
         </TabsTrigger>
         <TabsTrigger value="notifications" variant="secondary">
-          Notifications
+          {t('tabs.notifications')}
         </TabsTrigger>
         <TabsTrigger value="account" variant="secondary">
-          Account
+          {t('tabs.account')}
         </TabsTrigger>
         <TabsTrigger value="team" variant="secondary">
-          Team
+          {t('tabs.team')}
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="store" className="space-y-4">
-        <Typography variant="h2">Store</Typography>
+        <Typography variant="h2">{t('tabs.store')}</Typography>
         <Typography variant="p" color="muted">
-          Manage your store settings.
+          {t('tabs.storeDescription')}
         </Typography>
       </TabsContent>
 
       <TabsContent value="notifications" className="space-y-4">
-        <Typography variant="h2">Notifications</Typography>
+        <Typography variant="h2">{t('tabs.notifications')}</Typography>
         <Typography variant="p" color="muted">
-          Manage your notification settings.
+          {t('tabs.notificationsDescription')}
         </Typography>
       </TabsContent>
 

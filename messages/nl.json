@@ -51,6 +51,14 @@
       "title": "Taal",
       "description": "Kies uw voorkeurstaal voor de interface",
       "preferred": "Voorkeurstaal"
+    },
+    "tabs": {
+      "store": "Winkel",
+      "notifications": "Meldingen",
+      "account": "Account",
+      "team": "Team",
+      "storeDescription": "Beheer uw winkelinstellingen.",
+      "notificationsDescription": "Beheer uw meldingsinstellingen."
     }
   }
 }
