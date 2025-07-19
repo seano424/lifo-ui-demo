@@ -99,7 +99,7 @@
     "dialogs": {
       "editRole": {
         "title": "Gebruikersrol bewerken",
-        "description": "{{name}} heeft momenteel de rol van: {{role}}",
+        "description": "{name} heeft momenteel de rol van: {role}",
         "roleLabel": "Rol",
         "selectPlaceholder": "Selecteer een rol",
         "cancel": "Annuleren",
@@ -107,12 +107,12 @@
       },
       "removeUser": {
         "title": "Gebruiker uit winkel verwijderen",
-        "description": "Dit zal {{name}} permanent verwijderen uit {{store}}. Ze zullen alle toegang tot deze winkel verliezen, hun huidige rol en machtigingen verliezen, en moeten opnieuw worden uitgenodigd als u ze terug wilt. Hun gebruikersaccount blijft actief voor andere winkels.",
+        "description": "Dit zal {name} permanent verwijderen uit {store}. Ze zullen alle toegang tot deze winkel verliezen, hun huidige rol en machtigingen verliezen, en moeten opnieuw worden uitgenodigd als u ze terug wilt. Hun gebruikersaccount blijft actief voor andere winkels.",
         "cancel": "Annuleren",
         "confirm": "Verwijderen uit winkel"
       },
       "resetPin": {
-        "title": "PIN resetten voor {{name}}",
+        "title": "PIN resetten voor {name}",
         "description": "Dit genereert een nieuwe PIN en stuurt deze naar de medewerker via e-mail. Hun huidige PIN werkt niet meer.",
         "employee": "Medewerker",
         "username": "Gebruikersnaam",
@@ -124,7 +124,7 @@
         "confirm": "PIN resetten"
       },
       "unlockPin": {
-        "title": "PIN ontgrendelen voor {{name}}",
+        "title": "PIN ontgrendelen voor {name}",
         "description": "Dit ontgrendelt onmiddellijk de PIN van de medewerker en reset hun teller voor mislukte pogingen.",
         "employee": "Medewerker",
         "username": "Gebruikersnaam",
@@ -136,7 +136,32 @@
     "roles": {
       "owner": "Eigenaar",
       "manager": "Manager",
-      "employee": "Medewerker"
+      "employee": "Medewerker",
+      "staff": "Personeel",
+      "admin": "Beheerder",
+      "user": "Gebruiker",
+      "unknown": "Onbekend"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Uitgeschakeld",
+        "locked": "PIN Vergrendeld",
+        "pending": "PIN In afwachting",
+        "active": "PIN Actief"
+      },
+      "inactive": "Inactief",
+      "username": "Gebruikersnaam",
+      "permissions": "Machtigingen",
+      "lastLogin": "Laatste aanmelding",
+      "failedAttempts": "{count} mislukte PIN poging{plural}",
+      "enablePin": "PIN inschakelen",
+      "disablePin": "PIN uitschakelen",
+      "removeDialog": {
+        "title": "Gebruiker uit winkel verwijderen",
+        "description": "Weet u zeker dat u {name} uit deze winkel wilt verwijderen? Dit deactiveert hun toegang maar verwijdert hun account niet.",
+        "cancel": "Annuleren",
+        "confirm": "Gebruiker verwijderen"
+      }
     }
   }
 }

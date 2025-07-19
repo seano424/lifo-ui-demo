@@ -99,7 +99,7 @@
     "dialogs": {
       "editRole": {
         "title": "Modifier le rôle utilisateur",
-        "description": "{{name}} a actuellement le rôle de : {{role}}",
+        "description": "{name} a actuellement le rôle de : {role}",
         "roleLabel": "Rôle",
         "selectPlaceholder": "Sélectionner un rôle",
         "cancel": "Annuler",
@@ -107,12 +107,12 @@
       },
       "removeUser": {
         "title": "Retirer l'utilisateur du magasin",
-        "description": "Ceci retirera définitivement {{name}} de {{store}}. Il perdra tout accès à ce magasin, perdra son rôle et ses permissions actuels, et devra être ré-invité si vous voulez qu'il revienne. Son compte utilisateur restera actif pour les autres magasins.",
+        "description": "Ceci retirera définitivement {name} de {store}. Il perdra tout accès à ce magasin, perdra son rôle et ses permissions actuels, et devra être ré-invité si vous voulez qu'il revienne. Son compte utilisateur restera actif pour les autres magasins.",
         "cancel": "Annuler",
         "confirm": "Retirer du magasin"
       },
       "resetPin": {
-        "title": "Réinitialiser PIN pour {{name}}",
+        "title": "Réinitialiser PIN pour {name}",
         "description": "Ceci générera un nouveau PIN et l'enverra à l'employé par e-mail. Son PIN actuel ne fonctionnera plus.",
         "employee": "Employé",
         "username": "Nom d'utilisateur",
@@ -124,7 +124,7 @@
         "confirm": "Réinitialiser PIN"
       },
       "unlockPin": {
-        "title": "Déverrouiller PIN pour {{name}}",
+        "title": "Déverrouiller PIN pour {name}",
         "description": "Ceci déverrouillera immédiatement le PIN de l'employé et réinitialisera son compteur de tentatives échouées.",
         "employee": "Employé",
         "username": "Nom d'utilisateur",
@@ -136,7 +136,32 @@
     "roles": {
       "owner": "Propriétaire",
       "manager": "Gérant",
-      "employee": "Employé"
+      "employee": "Employé",
+      "staff": "Personnel",
+      "admin": "Administrateur",
+      "user": "Utilisateur",
+      "unknown": "Inconnu"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Désactivé",
+        "locked": "PIN Verrouillé",
+        "pending": "PIN En attente",
+        "active": "PIN Actif"
+      },
+      "inactive": "Inactif",
+      "username": "Nom d'utilisateur",
+      "permissions": "Permissions",
+      "lastLogin": "Dernière connexion",
+      "failedAttempts": "{count} tentative{plural} PIN échouée{plural}",
+      "enablePin": "Activer PIN",
+      "disablePin": "Désactiver PIN",
+      "removeDialog": {
+        "title": "Retirer l'utilisateur du magasin",
+        "description": "Êtes-vous sûr de vouloir retirer {name} de ce magasin ? Ceci désactivera son accès mais ne supprimera pas son compte.",
+        "cancel": "Annuler",
+        "confirm": "Retirer l'utilisateur"
+      }
     }
   }
 }

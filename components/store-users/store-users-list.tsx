@@ -98,6 +98,15 @@ export function StoreUsersList() {
   const { activeStore } = useStoreState()
   const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
 
+  // Helper function to safely get translated role
+  const getRoleTranslation = (role: string) => {
+    try {
+      return t(`roles.${role}`)
+    } catch {
+      return role
+    }
+  }
+
   // Helper function to check if PIN is locked
   const isPINLocked = (user: StoreUser): boolean => {
     const lockedUntil = user.pin_locked_until
@@ -216,7 +225,7 @@ export function StoreUsersList() {
                     <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
                     <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
                     <TableCell>
-                      <span className="text-sm">{t(`roles.${storeUser.role_in_store}`)}</span>
+                      <span className="text-sm">{getRoleTranslation(storeUser.role_in_store)}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
@@ -437,7 +446,7 @@ export function StoreUsersList() {
               )}
               {t('dialogs.editRole.description', {
                 name: selectedUser?.full_name || 'this user',
-                role: t(`roles.${selectedUser?.role_in_store}`),
+                role: selectedUser?.role_in_store ? getRoleTranslation(selectedUser.role_in_store) : 'unknown',
               })}
             </DialogDescription>
           </DialogHeader>

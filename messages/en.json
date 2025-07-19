@@ -99,7 +99,7 @@
     "dialogs": {
       "editRole": {
         "title": "Edit User Role",
-        "description": "{{name}} currently has the role of: {{role}}",
+        "description": "{name} currently has the role of: {role}",
         "roleLabel": "Role",
         "selectPlaceholder": "Select a role",
         "cancel": "Cancel",
@@ -107,12 +107,12 @@
       },
       "removeUser": {
         "title": "Remove User from Store",
-        "description": "This will permanently remove {{name}} from {{store}}. They will lose all access to this store, lose their current role and permissions, and need to be re-invited if you want them back. Their user account will remain active for other stores.",
+        "description": "This will permanently remove {name} from {store}. They will lose all access to this store, lose their current role and permissions, and need to be re-invited if you want them back. Their user account will remain active for other stores.",
         "cancel": "Cancel",
         "confirm": "Remove from Store"
       },
       "resetPin": {
-        "title": "Reset PIN for {{name}}",
+        "title": "Reset PIN for {name}",
         "description": "This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.",
         "employee": "Employee",
         "username": "Username",
@@ -124,7 +124,7 @@
         "confirm": "Reset PIN"
       },
       "unlockPin": {
-        "title": "Unlock PIN for {{name}}",
+        "title": "Unlock PIN for {name}",
         "description": "This will immediately unlock the employee's PIN and reset their failed attempts counter.",
         "employee": "Employee",
         "username": "Username",
@@ -136,7 +136,32 @@
     "roles": {
       "owner": "Owner",
       "manager": "Manager",
-      "employee": "Employee"
+      "employee": "Employee",
+      "staff": "Staff",
+      "admin": "Administrator",
+      "user": "User",
+      "unknown": "Unknown"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Disabled",
+        "locked": "PIN Locked",
+        "pending": "PIN Pending",
+        "active": "PIN Active"
+      },
+      "inactive": "Inactive",
+      "username": "Username",
+      "permissions": "Permissions",
+      "lastLogin": "Last login",
+      "failedAttempts": "{count} failed PIN attempt{plural}",
+      "enablePin": "Enable PIN",
+      "disablePin": "Disable PIN",
+      "removeDialog": {
+        "title": "Remove User from Store",
+        "description": "Are you sure you want to remove {name} from this store? This will deactivate their access but won't delete their account.",
+        "cancel": "Cancel",
+        "confirm": "Remove User"
+      }
     }
   }
 }
