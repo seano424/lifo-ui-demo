@@ -4,7 +4,11 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+  className?: string
+}
+
+export function LogoutButton({ className }: LogoutButtonProps) {
   const router = useRouter()
 
   const logout = async () => {
@@ -14,7 +18,7 @@ export function LogoutButton() {
   }
 
   return (
-    <Button variant={'brandSecondary'} size="default" onClick={logout}>
+    <Button variant={'brandSecondary'} size="default" onClick={logout} className={className}>
       Logout
     </Button>
   )

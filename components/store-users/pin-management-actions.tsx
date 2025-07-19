@@ -227,7 +227,8 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               Reset PIN for {user.full_name}
             </DialogTitle>
             <DialogDescription>
-              This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.
+              This will generate a new PIN and send it to the employee by email. Their current PIN
+              will no longer work.
             </DialogDescription>
           </DialogHeader>
 
@@ -241,8 +242,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                       <strong>Employee:</strong> {user.full_name}
                     </div>
                     <div>
-                      <strong>Username:</strong>{' '}
-                      <span className="font-mono">{user.username}</span>
+                      <strong>Username:</strong> <span className="font-mono">{user.username}</span>
                     </div>
                     <div>
                       <strong>Email:</strong> {user.email}
@@ -299,16 +299,13 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                 {emailStatus.sending ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    <AlertDescription>
-                      Sending reset email...
-                    </AlertDescription>
+                    <AlertDescription>Sending reset email...</AlertDescription>
                   </>
                 ) : emailStatus.sent ? (
                   <>
                     <Check className="h-4 w-4" />
                     <AlertDescription>
-                      Reset email sent successfully to{' '}
-                      <strong>{resetResult.email}</strong>
+                      Reset email sent successfully to <strong>{resetResult.email}</strong>
                       {emailStatus.messageId && (
                         <div className="text-xs text-muted-foreground mt-1">
                           ID: {emailStatus.messageId}
@@ -390,7 +387,8 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               Unlock PIN for {user.full_name}
             </DialogTitle>
             <DialogDescription>
-              This will immediately unlock the employee's PIN and reset their failed attempts counter.
+              This will immediately unlock the employee's PIN and reset their failed attempts
+              counter.
             </DialogDescription>
           </DialogHeader>
 
@@ -402,11 +400,11 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                   <strong>Employee:</strong> {user.full_name}
                 </div>
                 <div>
-                  <strong>Username:</strong>{' '}
-                  <span className="font-mono">{user.username}</span>
+                  <strong>Username:</strong> <span className="font-mono">{user.username}</span>
                 </div>
                 <div>
-                  <strong>Status:</strong> The account is currently locked due to failed PIN attempts
+                  <strong>Status:</strong> The account is currently locked due to failed PIN
+                  attempts
                 </div>
               </div>
             </AlertDescription>

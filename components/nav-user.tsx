@@ -1,8 +1,9 @@
 'use client'
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Sparkles } from 'lucide-react'
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Sparkles, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { LogoutButton } from '@/components/logout-button'
+import { LanguageButtonGroup } from '@/components/ui/language-switcher'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -19,7 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { User } from '@/lib/queries/users'
+import { User } from '@/lib/types/user'
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()
@@ -105,8 +106,20 @@ export function NavUser({ user }: { user: User }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogoutButton />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="flex-col items-start p-0 cursor-default hover:!bg-transparent">
+                <div className="flex items-center gap-2 px-2 py-1.5 w-full hover:text-black group-hover:text-black">
+                  <Globe className="h-4 w-4" />
+                  <span className="text-sm">Language</span>
+                </div>
+                <div className="px-2 pb-2">
+                  <LanguageButtonGroup />
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-default hover:!bg-transparent">
+              <LogoutButton className="w-full bg-transparent text-black" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

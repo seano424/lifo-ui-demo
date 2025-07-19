@@ -1,0 +1,56 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Voorraad",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "todo": "Te doen",
+    "performance": "Prestaties",
+    "milestones": "Mijlpalen",
+    "analytics": "Analyses",
+    "settings": "Instellingen",
+    "helpCenter": "Helpcentrum",
+    "logout": "Uitloggen"
+  },
+  "actions": {
+    "add": "Toevoegen",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "scan": "Scannen",
+    "discount": "Korting",
+    "donate": "Doneren"
+  },
+  "forms": {
+    "productName": "Productnaam",
+    "expirationDate": "Vervaldatum",
+    "quantity": "Hoeveelheid",
+    "price": "Prijs",
+    "category": "Categorie",
+    "required": "Vereist"
+  },
+  "status": {
+    "fresh": "Vers",
+    "expiringSoon": "Verloopt Binnenkort",
+    "expired": "Verlopen",
+    "discounted": "Korting",
+    "donated": "Gedoneerd",
+    "sold": "Verkocht"
+  },
+  "validation": {
+    "required": "Dit veld is verplicht",
+    "invalidEmail": "Ongeldig e-mailadres",
+    "passwordTooShort": "Wachtwoord moet minimaal 8 tekens bevatten",
+    "dateMustBeFuture": "Datum moet in de toekomst liggen"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "description": "Beheer uw voorkeuren en accountinstellingen",
+    "language": {
+      "title": "Taal",
+      "description": "Kies uw voorkeurstaal voor de interface",
+      "preferred": "Voorkeurstaal"
+    }
+  }
+}

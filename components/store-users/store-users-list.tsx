@@ -295,7 +295,7 @@ export function StoreUsersList() {
                             {hasPINAuth(storeUser) && (
                               <>
                                 <DropdownMenuSeparator />
-                                
+
                                 {/* Reset PIN */}
                                 <DropdownMenuItem
                                   onClick={() => {
@@ -517,7 +517,8 @@ export function StoreUsersList() {
                   Reset PIN for {selectedUser.full_name}
                 </DialogTitle>
                 <DialogDescription>
-                  This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.
+                  This will generate a new PIN and send it to the employee by email. Their current
+                  PIN will no longer work.
                 </DialogDescription>
               </DialogHeader>
 
@@ -552,10 +553,7 @@ export function StoreUsersList() {
                 </div>
 
                 <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsResetDialogOpen(false)}
-                  >
+                  <Button variant="outline" onClick={() => setIsResetDialogOpen(false)}>
                     Cancel
                   </Button>
                   <Button
@@ -583,7 +581,8 @@ export function StoreUsersList() {
                   Unlock PIN for {selectedUser.full_name}
                 </DialogTitle>
                 <DialogDescription>
-                  This will immediately unlock the employee's PIN and reset their failed attempts counter.
+                  This will immediately unlock the employee's PIN and reset their failed attempts
+                  counter.
                 </DialogDescription>
               </DialogHeader>
 
@@ -598,16 +597,14 @@ export function StoreUsersList() {
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>Status:</strong> The account is currently locked due to failed PIN attempts
+                      <strong>Status:</strong> The account is currently locked due to failed PIN
+                      attempts
                     </div>
                   </div>
                 </div>
 
                 <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsUnlockDialogOpen(false)}
-                  >
+                  <Button variant="outline" onClick={() => setIsUnlockDialogOpen(false)}>
                     Cancel
                   </Button>
                   <Button

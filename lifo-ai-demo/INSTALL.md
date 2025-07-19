@@ -3,6 +3,7 @@
 ## Quick Start
 
 ### 1. Prerequisites
+
 - Python 3.8 or higher
 - pip package manager
 
@@ -34,11 +35,13 @@ jupyter notebook
 ### Common Issues
 
 **1. Dependencies not installed**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 **2. Python version compatibility**
+
 ```bash
 # Check Python version
 python --version
@@ -47,12 +50,14 @@ python --version
 ```
 
 **3. Missing dependencies**
+
 ```bash
 # Install specific packages
 pip install pandas numpy matplotlib seaborn jupyter
 ```
 
 **4. Permission issues**
+
 ```bash
 # Use --user flag if needed
 pip install --user -r requirements.txt
@@ -61,6 +66,7 @@ pip install --user -r requirements.txt
 ### System-Specific Issues
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt-get update
 sudo apt-get install python3-pip python3-dev
@@ -68,6 +74,7 @@ pip3 install -r requirements.txt
 ```
 
 **macOS:**
+
 ```bash
 # Install Homebrew if needed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -76,6 +83,7 @@ pip3 install -r requirements.txt
 ```
 
 **Windows:**
+
 ```bash
 # Use Python installer from python.org
 # Then run:
@@ -91,6 +99,7 @@ python test_installation.py
 ```
 
 Expected output:
+
 ```
 🚀 LIFO.AI Demo Installation Test
 ========================================
@@ -141,6 +150,7 @@ Expected output:
 ## Support
 
 If you encounter issues:
+
 1. Check the troubleshooting section above
 2. Verify Python version compatibility
 3. Ensure all files are in the correct locations

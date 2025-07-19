@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
@@ -27,6 +27,7 @@ import {
   formatPhoneNumber,
 } from '@/lib/types/user'
 import { Edit, Check, X, AlertCircle } from 'lucide-react'
+import { LanguageSwitcher } from '../ui/language-switcher'
 
 export default function UserAccountInformation() {
   const { data: user, isLoading } = useCurrentUser()
@@ -336,73 +337,14 @@ export default function UserAccountInformation() {
 
         {/* Language Preference Section */}
         <div className="space-y-4 pt-4 border-t">
-          <div className="flex items-center justify-between">
-            <Typography variant="h3" className="flex items-center gap-2">
-              Language Preference
-            </Typography>
-            {!isEditingLanguage && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditingLanguage(true)}
-                className="flex items-center gap-2"
-              >
-                <Edit className="h-4 w-4" />
-                Edit
-              </Button>
-            )}
-          </div>
+          <Typography variant="h3" className="flex items-center gap-2">
+            Language Preference
+          </Typography>
 
-          {isEditingLanguage ? (
-            <div className="space-y-4 p-4 border rounded-lg">
-              <div className="space-y-2">
-                <Label htmlFor="language">Display Language</Label>
-                <Select
-                  value={languageForm}
-                  onValueChange={(value: SupportedLanguage) => setLanguageForm(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
-                      <SelectItem key={code} value={code}>
-                        {name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Typography variant="small" className="text-muted-foreground">
-                  Choose your preferred language for the interface
-                </Typography>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={handleLanguageSubmit}
-                  disabled={updateLanguage.isPending}
-                  className="flex items-center gap-2"
-                >
-                  <Check className="h-4 w-4" />
-                  {updateLanguage.isPending ? 'Saving...' : 'Save Language'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={resetLanguageForm}
-                  className="flex items-center gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1">
-                {SUPPORTED_LANGUAGES[user?.language_preference || 'en']}
-              </span>
-            </div>
-          )}
+          <Typography variant="p" className="flex items-center gap-2">
+            Choose your preferred language for the interface
+          </Typography>
+          <LanguageSwitcher />
         </div>
 
         {/* Account Status Section */}

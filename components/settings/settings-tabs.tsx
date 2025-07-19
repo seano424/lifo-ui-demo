@@ -5,6 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
 import UserAccountInformation from '@/components/account/user-account-information'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 // import { EmailTestComponent } from '@/components/debug/email-test'
 
 export default function SettingsTabs() {

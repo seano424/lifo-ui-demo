@@ -121,11 +121,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         // Handle manual session setup
         console.log('🔧 Manual session setup...')
         const supabase = createClient()
-        
+
         // Try to sign in with the user's email (this might work since PIN is validated)
         console.log('Attempting sign in for:', result.authUser.email)
         toast.success(`PIN authenticated! Setting up session for ${result.user.username}...`)
-        
+
         // For now, just show success and redirect to dashboard without session
         // The user might already be logged in from previous sessions
         router.push('/dashboard')
@@ -134,7 +134,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         // PIN validation successful but no session tokens yet
         console.log('📝 PIN validation successful, but session creation needs work')
         toast.success(`PIN authenticated for ${result.user.username}!`)
-        
+
         // For now, show success message and stay on login page
         return
       }

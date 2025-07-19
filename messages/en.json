@@ -1,0 +1,56 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "todo": "To-Do",
+    "performance": "Performance",
+    "milestones": "Milestones",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "helpCenter": "Help Center",
+    "logout": "Logout"
+  },
+  "actions": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "scan": "Scan",
+    "discount": "Discount",
+    "donate": "Donate"
+  },
+  "forms": {
+    "productName": "Product Name",
+    "expirationDate": "Expiration Date",
+    "quantity": "Quantity",
+    "price": "Price",
+    "category": "Category",
+    "required": "Required"
+  },
+  "status": {
+    "fresh": "Fresh",
+    "expiringSoon": "Expiring Soon",
+    "expired": "Expired",
+    "discounted": "Discounted",
+    "donated": "Donated",
+    "sold": "Sold"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "dateMustBeFuture": "Date must be in the future"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your preferences and account settings",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the interface",
+      "preferred": "Preferred Language"
+    }
+  }
+}
