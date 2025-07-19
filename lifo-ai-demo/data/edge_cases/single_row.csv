@@ -1,0 +1,2 @@
+sku,product_name,category,brand,quantity,expiry_date,manufacture_date,cost_price,selling_price,location_code,unit_type,supplier
+SING-001,Single Row Product,fresh_produce,Only Brand,1,2024-02-15,2024-02-10,1.00,2.00,SHELF-A1,pcs,Only Supplier

@@ -1,0 +1,8 @@
+sku,product_name,quantity,expiry_date,cost_price,selling_price
+=cmd|'/c calc'!A1,Malicious Product,10,2024-02-15,1.00,2.00
+@SUM(1+1),Another Bad Product,5,2024-02-16,2.00,3.00
++cmd|'/c calc'!A1,Formula Injection,8,2024-02-17,1.50,2.50
+-2+5+cmd|'/c calc'!A1,Negative Formula,12,2024-02-18,2.00,3.50
+=1+1+cmd|'/c calc'!A1,Calc Formula,15,2024-02-19,1.75,3.00
+SAFE-001,Normal Product,15,2024-02-20,1.50,2.50
+SAFE-002,Another Normal Product,20,2024-02-21,2.00,3.00
