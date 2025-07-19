@@ -22,18 +22,36 @@ export function IntlProvider({
     // Dynamically load messages for the current language
     const loadMessages = async () => {
       try {
-        const newMessages = await import(`../../messages/${currentLanguage}.json`)
+        let newMessages
+        switch (currentLanguage) {
+          case 'en':
+            newMessages = await import(`../../messages/en.json`)
+            break
+          case 'nl':
+            newMessages = await import(`../../messages/nl.json`)
+            break
+          case 'fr':
+          default:
+            newMessages = await import(`../../messages/fr.json`)
+            break
+        }
         setMessages(newMessages.default)
       } catch (error) {
         console.error(`Failed to load messages for ${currentLanguage}:`, error)
         // Fallback to French
-        const fallbackMessages = await import(`../../messages/fr.json`)
-        setMessages(fallbackMessages.default)
+        try {
+          const fallbackMessages = await import(`../../messages/fr.json`)
+          setMessages(fallbackMessages.default)
+        } catch (fallbackError) {
+          console.error('Failed to load fallback messages:', fallbackError)
+          // Use the initial messages as last resort
+          setMessages(initialMessages)
+        }
       }
     }
 
     loadMessages()
-  }, [currentLanguage])
+  }, [currentLanguage, initialMessages])
 
   return (
     <NextIntlClientProvider locale={currentLanguage} messages={messages}>

@@ -40,9 +40,7 @@ export const useLanguageStore = create<LanguageState>()(
           // Update local state
           set({ currentLanguage: language })
 
-          // For now, reload page to apply new language
-          // Can be optimized later with dynamic locale switching
-          window.location.reload()
+          // No need to reload page - our IntlProvider will handle the dynamic switching
         } catch (error) {
           console.error('Failed to update language preference:', error)
         } finally {
