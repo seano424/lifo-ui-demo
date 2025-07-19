@@ -20,7 +20,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
   }
 
   return (
-    <Button variant={'brandSecondary'} size="default" onClick={logout} className={className}>
+    <Button variant={'ghost'} size="default" onClick={logout} className={className}>
       {t('logout')}
     </Button>
   )

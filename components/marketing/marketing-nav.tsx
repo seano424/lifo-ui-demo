@@ -147,7 +147,7 @@ const MarketingNav = ({
           </Link>
           <span className="text-2xl font-heading font-black">{logo.title}</span>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
           </NavigationMenu>

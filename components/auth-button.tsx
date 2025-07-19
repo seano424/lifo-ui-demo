@@ -21,8 +21,8 @@ export function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      <LogoutButton />
-      <Button asChild size="default" variant={'brand'}>
+      <LogoutButton className="text-xs uppercase font-sans font-light" />
+      <Button asChild size="default" variant={'secondary'}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
     </div>
