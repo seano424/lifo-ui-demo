@@ -60,5 +60,83 @@
       "storeDescription": "Gérez les paramètres de votre magasin.",
       "notificationsDescription": "Gérez vos paramètres de notification."
     }
+  },
+  "users": {
+    "title": "Gestion d'équipe",
+    "description": "Invitez de nouveaux membres d'équipe dans votre magasin et gérez leurs rôles et permissions.",
+    "addEmployee": "Ajouter un employé",
+    "showing": "Affichage de {current} sur {total} utilisateurs",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "name": "Nom",
+    "username": "Nom d'utilisateur",
+    "email": "E-mail",
+    "role": "Rôle",
+    "status": "Statut",
+    "pinStatus": "Statut PIN",
+    "actions": "Actions",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "locked": "Verrouillé",
+    "pinActive": "PIN Actif",
+    "noPin": "Aucun PIN",
+    "loadMoreUsers": "Charger plus d'utilisateurs",
+    "loadingMore": "Chargement...",
+    "noUsersMessage": "Ce magasin n'a encore aucun utilisateur.",
+    "errors": {
+      "mustHaveOwner": "Il doit toujours y avoir au moins un propriétaire."
+    },
+    "dropdown": {
+      "userActions": "Actions utilisateur",
+      "makeEmployee": "Nommer employé",
+      "makeManager": "Nommer gérant",
+      "makeOwner": "Nommer propriétaire",
+      "resetPin": "Réinitialiser PIN",
+      "unlockPin": "Déverrouiller PIN",
+      "deactivateUser": "Désactiver utilisateur",
+      "reactivateUser": "Réactiver utilisateur",
+      "removeFromStore": "Retirer du magasin"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Modifier le rôle utilisateur",
+        "description": "{{name}} a actuellement le rôle de : {{role}}",
+        "roleLabel": "Rôle",
+        "selectPlaceholder": "Sélectionner un rôle",
+        "cancel": "Annuler",
+        "save": "Sauvegarder les modifications"
+      },
+      "removeUser": {
+        "title": "Retirer l'utilisateur du magasin",
+        "description": "Ceci retirera définitivement {{name}} de {{store}}. Il perdra tout accès à ce magasin, perdra son rôle et ses permissions actuels, et devra être ré-invité si vous voulez qu'il revienne. Son compte utilisateur restera actif pour les autres magasins.",
+        "cancel": "Annuler",
+        "confirm": "Retirer du magasin"
+      },
+      "resetPin": {
+        "title": "Réinitialiser PIN pour {{name}}",
+        "description": "Ceci générera un nouveau PIN et l'enverra à l'employé par e-mail. Son PIN actuel ne fonctionnera plus.",
+        "employee": "Employé",
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "currentStatus": "Statut actuel",
+        "statusLocked": "Verrouillé",
+        "statusActive": "Actif",
+        "cancel": "Annuler",
+        "confirm": "Réinitialiser PIN"
+      },
+      "unlockPin": {
+        "title": "Déverrouiller PIN pour {{name}}",
+        "description": "Ceci déverrouillera immédiatement le PIN de l'employé et réinitialisera son compteur de tentatives échouées.",
+        "employee": "Employé",
+        "username": "Nom d'utilisateur",
+        "lockedMessage": "Le compte est actuellement verrouillé à cause de tentatives PIN échouées",
+        "cancel": "Annuler",
+        "confirm": "Déverrouiller PIN"
+      }
+    },
+    "roles": {
+      "owner": "Propriétaire",
+      "manager": "Gérant",
+      "employee": "Employé"
+    }
   }
 }

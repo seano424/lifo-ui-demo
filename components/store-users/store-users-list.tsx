@@ -3,6 +3,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
 import { type StoreUser } from '@/lib/queries/store-users'
@@ -80,6 +81,7 @@ import { cn } from '@/lib/utils'
 import { AddEmployeeDialog } from './add-employee-dialog'
 
 export function StoreUsersList() {
+  const t = useTranslations('users')
   const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
     useStoreUsers()
 
@@ -147,7 +149,7 @@ export function StoreUsersList() {
     if (!selectedUser || !role || role === selectedUser.role_in_store) return
 
     if (selectedUser.role_in_store === 'owner' && !isMoreThanOneOwner) {
-      toast.error('There must always be at least one owner.')
+      toast.error(t('errors.mustHaveOwner'))
       return
     }
 
@@ -170,9 +172,9 @@ export function StoreUsersList() {
       <Card>
         <CardHeader>
           <div className="flex flex-col">
-            <Typography variant="h2">Team Management</Typography>
+            <Typography variant="h2">{t('title')}</Typography>
             <Typography variant="p" color="muted">
-              Invite new team members to your store and manage their roles and permissions.
+              {t('description')}
             </Typography>
           </div>
         </CardHeader>
@@ -180,7 +182,7 @@ export function StoreUsersList() {
         <CardContent>
           <div className="flex justify-between items-center">
             <Typography variant="p" color="muted">
-              {count > 0 ? `Showing ${data.length} of ${count} users` : 'No users found'}
+              {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
             </Typography>
             <Button
               variant="brand"
@@ -188,20 +190,20 @@ export function StoreUsersList() {
               className="flex items-center gap-2"
             >
               <UserPlus className="w-4 h-4" />
-              Add Employee
+              {t('addEmployee')}
             </Button>
           </div>
 
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-opacity-0">
-                <TableHead>Name</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>PIN Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t('name')}</TableHead>
+                <TableHead>{t('username')}</TableHead>
+                <TableHead>{t('email')}</TableHead>
+                <TableHead>{t('role')}</TableHead>
+                <TableHead>{t('status')}</TableHead>
+                <TableHead>{t('pinStatus')}</TableHead>
+                <TableHead>{t('actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -216,26 +218,28 @@ export function StoreUsersList() {
                     <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
                     <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
                     <TableCell>
-                      <span className="text-sm">{storeUser.role_in_store}</span>
+                      <span className="text-sm">{t(`roles.${storeUser.role_in_store}`)}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{storeUser.is_active ? 'Active' : 'Inactive'}</span>
+                      <span className="text-sm">
+                        {storeUser.is_active ? t('active') : t('inactive')}
+                      </span>
                     </TableCell>
                     <TableCell>
                       {hasPINAuth(storeUser) ? (
                         isPINLocked(storeUser) ? (
                           <span className="text-sm flex items-center gap-1">
                             <Lock className="w-3 h-3" />
-                            Locked
+                            {t('locked')}
                           </span>
                         ) : (
                           <span className="text-sm flex items-center gap-1">
                             <Key className="w-3 h-3" />
-                            PIN Active
+                            {t('pinActive')}
                           </span>
                         )
                       ) : (
-                        <span className="text-sm">No PIN</span>
+                        <span className="text-sm">{t('noPin')}</span>
                       )}
                     </TableCell>
 
@@ -249,7 +253,7 @@ export function StoreUsersList() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>User Actions</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t('dropdown.userActions')}</DropdownMenuLabel>
 
                             {/* Role Changes */}
                             {storeUser.role_in_store !== 'employee' && (
@@ -261,7 +265,7 @@ export function StoreUsersList() {
                                 }}
                               >
                                 <User className="mr-2 h-4 w-4" />
-                                Make Employee
+                                {t('dropdown.makeEmployee')}
                               </DropdownMenuItem>
                             )}
 
@@ -274,7 +278,7 @@ export function StoreUsersList() {
                                 }}
                               >
                                 <UserCheck className="mr-2 h-4 w-4" />
-                                Make Manager
+                                {t('dropdown.makeManager')}
                               </DropdownMenuItem>
                             )}
 
@@ -287,7 +291,7 @@ export function StoreUsersList() {
                                 }}
                               >
                                 <Crown className="mr-2 h-4 w-4" />
-                                Make Owner
+                                {t('dropdown.makeOwner')}
                               </DropdownMenuItem>
                             )}
 
@@ -309,7 +313,7 @@ export function StoreUsersList() {
                                   className="flex items-center gap-2"
                                 >
                                   <RefreshCw className="w-4 h-4" />
-                                  Reset PIN
+                                  {t('dropdown.resetPin')}
                                 </DropdownMenuItem>
 
                                 {/* Unlock PIN (only if locked) */}
@@ -324,7 +328,7 @@ export function StoreUsersList() {
                                     className="flex items-center gap-2"
                                   >
                                     <Unlock className="w-4 h-4" />
-                                    Unlock PIN
+                                    {t('dropdown.unlockPin')}
                                   </DropdownMenuItem>
                                 )}
                               </>
@@ -342,12 +346,12 @@ export function StoreUsersList() {
                                   {storeUser.is_active ? (
                                     <>
                                       <UserMinus className="mr-2 h-4 w-4" />
-                                      Deactivate User
+                                      {t('dropdown.deactivateUser')}
                                     </>
                                   ) : (
                                     <>
                                       <UserCheck className="mr-2 h-4 w-4" />
-                                      Reactivate User
+                                      {t('dropdown.reactivateUser')}
                                     </>
                                   )}
                                 </DropdownMenuItem>
@@ -365,7 +369,7 @@ export function StoreUsersList() {
                               className="text-red-600 focus:text-red-600"
                             >
                               <UserMinus className="mr-2 h-4 w-4" />
-                              Remove from Store
+                              {t('dropdown.removeFromStore')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -383,9 +387,9 @@ export function StoreUsersList() {
               <div className="w-12 h-12 mx-auto mb-4 text-gray-400">
                 <Users className="w-full h-full" />
               </div>
-              <Typography variant="h3">No users found</Typography>
+              <Typography variant="h3">{t('noUsersFound')}</Typography>
               <Typography variant="p" color="muted" className="mb-4">
-                This store doesn't have any users yet.
+                {t('noUsersMessage')}
               </Typography>
             </div>
           )}
@@ -402,10 +406,10 @@ export function StoreUsersList() {
                 {isFetchingNextPage ? (
                   <>
                     <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-                    Loading more...
+                    {t('loadingMore')}
                   </>
                 ) : (
-                  'Load More Users'
+                  t('loadMoreUsers')
                 )}
               </Button>
             </div>
@@ -425,40 +429,39 @@ export function StoreUsersList() {
       <Dialog open={isEditUserRoleDialogOpen} onOpenChange={setIsEditUserRoleDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit User Role</DialogTitle>
+            <DialogTitle>{t('dialogs.editRole.title')}</DialogTitle>
             <DialogDescription>
               {!isMoreThanOneOwner && selectedUser?.role_in_store === 'owner' && (
                 <>
-                  There must always be at least one owner.
+                  {t('errors.mustHaveOwner')}
                   <br />
                 </>
               )}
-              {selectedUser?.full_name || 'this user'} currently has the role of:{' '}
-              {selectedUser?.role_in_store}
+              {t('dialogs.editRole.description', { name: selectedUser?.full_name || 'this user', role: t(`roles.${selectedUser?.role_in_store}`) })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label htmlFor="edit-role">Role</Label>
+              <Label htmlFor="edit-role">{t('dialogs.editRole.roleLabel')}</Label>
               <Select
                 name="role"
                 value={formRole}
                 onValueChange={value => setFormRole(value as StoreUser['role_in_store'])}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a role" />
+                  <SelectValue placeholder={t('dialogs.editRole.selectPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="owner">Owner</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
-                  <SelectItem value="employee">Employee</SelectItem>
+                  <SelectItem value="owner">{t('roles.owner')}</SelectItem>
+                  <SelectItem value="manager">{t('roles.manager')}</SelectItem>
+                  <SelectItem value="employee">{t('roles.employee')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t('dialogs.editRole.cancel')}</Button>
             </DialogClose>
             <Button
               disabled={!isMoreThanOneOwner && selectedUser?.role_in_store === 'owner'}
@@ -470,7 +473,7 @@ export function StoreUsersList() {
                   'bg-gray-400 hover:bg-gray-400',
               )}
             >
-              Save changes
+              {t('dialogs.editRole.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -480,16 +483,13 @@ export function StoreUsersList() {
       <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove User from Store</AlertDialogTitle>
+            <AlertDialogTitle>{t('dialogs.removeUser.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove {selectedUser?.full_name || 'this user'} from{' '}
-              {activeStore?.business_name || 'this store'}. They will lose all access to this store,
-              lose their current role and permissions, and need to be re-invited if you want them
-              back. Their user account will remain active for other stores.
+              {t('dialogs.removeUser.description', { name: selectedUser?.full_name || 'this user', store: activeStore?.business_name || 'this store' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('dialogs.removeUser.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (selectedUser) {
@@ -499,7 +499,7 @@ export function StoreUsersList() {
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              Remove from Store
+              {t('dialogs.removeUser.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -514,11 +514,10 @@ export function StoreUsersList() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <RefreshCw className="w-5 h-5" />
-                  Reset PIN for {selectedUser.full_name}
+                  {t('dialogs.resetPin.title', { name: selectedUser.full_name })}
                 </DialogTitle>
                 <DialogDescription>
-                  This will generate a new PIN and send it to the employee by email. Their current
-                  PIN will no longer work.
+                  {t('dialogs.resetPin.description')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -526,26 +525,26 @@ export function StoreUsersList() {
                 <div className="p-4 bg-muted rounded-lg">
                   <div className="space-y-2">
                     <div>
-                      <strong>Employee:</strong> {selectedUser.full_name}
+                      <strong>{t('dialogs.resetPin.employee')}:</strong> {selectedUser.full_name}
                     </div>
                     <div>
-                      <strong>Username:</strong>{' '}
+                      <strong>{t('dialogs.resetPin.username')}:</strong>{' '}
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>Email:</strong> {selectedUser.email}
+                      <strong>{t('dialogs.resetPin.email')}:</strong> {selectedUser.email}
                     </div>
                     <div>
-                      <strong>Current Status:</strong>
+                      <strong>{t('dialogs.resetPin.currentStatus')}:</strong>
                       {isPINLocked(selectedUser) ? (
                         <span className="ml-2 text-red-600 flex items-center gap-1">
                           <Lock className="w-3 h-3" />
-                          Locked
+                          {t('dialogs.resetPin.statusLocked')}
                         </span>
                       ) : (
                         <span className="ml-2 text-green-600 flex items-center gap-1">
                           <Key className="w-3 h-3" />
-                          Active
+                          {t('dialogs.resetPin.statusActive')}
                         </span>
                       )}
                     </div>
@@ -554,7 +553,7 @@ export function StoreUsersList() {
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsResetDialogOpen(false)}>
-                    Cancel
+                    {t('dialogs.resetPin.cancel')}
                   </Button>
                   <Button
                     onClick={() => {
@@ -565,7 +564,7 @@ export function StoreUsersList() {
                     className="flex items-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
-                    Reset PIN
+                    {t('dialogs.resetPin.confirm')}
                   </Button>
                 </DialogFooter>
               </div>
@@ -578,11 +577,10 @@ export function StoreUsersList() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Unlock className="w-5 h-5" />
-                  Unlock PIN for {selectedUser.full_name}
+                  {t('dialogs.unlockPin.title', { name: selectedUser.full_name })}
                 </DialogTitle>
                 <DialogDescription>
-                  This will immediately unlock the employee's PIN and reset their failed attempts
-                  counter.
+                  {t('dialogs.unlockPin.description')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -590,22 +588,21 @@ export function StoreUsersList() {
                 <div className="p-4 bg-muted rounded-lg">
                   <div className="space-y-1">
                     <div>
-                      <strong>Employee:</strong> {selectedUser.full_name}
+                      <strong>{t('dialogs.unlockPin.employee')}:</strong> {selectedUser.full_name}
                     </div>
                     <div>
-                      <strong>Username:</strong>{' '}
+                      <strong>{t('dialogs.unlockPin.username')}:</strong>{' '}
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>Status:</strong> The account is currently locked due to failed PIN
-                      attempts
+                      <strong>Status:</strong> {t('dialogs.unlockPin.lockedMessage')}
                     </div>
                   </div>
                 </div>
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsUnlockDialogOpen(false)}>
-                    Cancel
+                    {t('dialogs.unlockPin.cancel')}
                   </Button>
                   <Button
                     onClick={() => {
@@ -616,7 +613,7 @@ export function StoreUsersList() {
                     className="flex items-center gap-2"
                   >
                     <Unlock className="w-4 h-4" />
-                    Unlock PIN
+                    {t('dialogs.unlockPin.confirm')}
                   </Button>
                 </DialogFooter>
               </div>

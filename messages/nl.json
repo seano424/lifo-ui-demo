@@ -60,5 +60,83 @@
       "storeDescription": "Beheer uw winkelinstellingen.",
       "notificationsDescription": "Beheer uw meldingsinstellingen."
     }
+  },
+  "users": {
+    "title": "Teambeheer",
+    "description": "Nodig nieuwe teamleden uit in uw winkel en beheer hun rollen en machtigingen.",
+    "addEmployee": "Medewerker toevoegen",
+    "showing": "{current} van {total} gebruikers weergegeven",
+    "noUsersFound": "Geen gebruikers gevonden",
+    "name": "Naam",
+    "username": "Gebruikersnaam",
+    "email": "E-mail",
+    "role": "Rol",
+    "status": "Status",
+    "pinStatus": "PIN Status",
+    "actions": "Acties",
+    "active": "Actief",
+    "inactive": "Inactief",
+    "locked": "Vergrendeld",
+    "pinActive": "PIN Actief",
+    "noPin": "Geen PIN",
+    "loadMoreUsers": "Meer gebruikers laden",
+    "loadingMore": "Laden...",
+    "noUsersMessage": "Deze winkel heeft nog geen gebruikers.",
+    "errors": {
+      "mustHaveOwner": "Er moet altijd minstens één eigenaar zijn."
+    },
+    "dropdown": {
+      "userActions": "Gebruikersacties",
+      "makeEmployee": "Maak medewerker",
+      "makeManager": "Maak manager",
+      "makeOwner": "Maak eigenaar",
+      "resetPin": "PIN resetten",
+      "unlockPin": "PIN ontgrendelen",
+      "deactivateUser": "Gebruiker deactiveren",
+      "reactivateUser": "Gebruiker reactiveren",
+      "removeFromStore": "Verwijderen uit winkel"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Gebruikersrol bewerken",
+        "description": "{{name}} heeft momenteel de rol van: {{role}}",
+        "roleLabel": "Rol",
+        "selectPlaceholder": "Selecteer een rol",
+        "cancel": "Annuleren",
+        "save": "Wijzigingen opslaan"
+      },
+      "removeUser": {
+        "title": "Gebruiker uit winkel verwijderen",
+        "description": "Dit zal {{name}} permanent verwijderen uit {{store}}. Ze zullen alle toegang tot deze winkel verliezen, hun huidige rol en machtigingen verliezen, en moeten opnieuw worden uitgenodigd als u ze terug wilt. Hun gebruikersaccount blijft actief voor andere winkels.",
+        "cancel": "Annuleren",
+        "confirm": "Verwijderen uit winkel"
+      },
+      "resetPin": {
+        "title": "PIN resetten voor {{name}}",
+        "description": "Dit genereert een nieuwe PIN en stuurt deze naar de medewerker via e-mail. Hun huidige PIN werkt niet meer.",
+        "employee": "Medewerker",
+        "username": "Gebruikersnaam",
+        "email": "E-mail",
+        "currentStatus": "Huidige status",
+        "statusLocked": "Vergrendeld",
+        "statusActive": "Actief",
+        "cancel": "Annuleren",
+        "confirm": "PIN resetten"
+      },
+      "unlockPin": {
+        "title": "PIN ontgrendelen voor {{name}}",
+        "description": "Dit ontgrendelt onmiddellijk de PIN van de medewerker en reset hun teller voor mislukte pogingen.",
+        "employee": "Medewerker",
+        "username": "Gebruikersnaam",
+        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte PIN-pogingen",
+        "cancel": "Annuleren",
+        "confirm": "PIN ontgrendelen"
+      }
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "manager": "Manager",
+      "employee": "Medewerker"
+    }
   }
 }
