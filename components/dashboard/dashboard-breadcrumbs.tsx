@@ -9,22 +9,34 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 export default function DashboardBreadcrumbs() {
+  const t = useTranslations('breadcrumbs')
   const pathname = usePathname()
   const pathSegments = pathname.split('/').filter(Boolean)
   const dashboardIndex = pathSegments.indexOf('dashboard')
   const subSegments = dashboardIndex >= 0 ? pathSegments.slice(dashboardIndex + 1) : []
   const isDashboardPage = subSegments.length === 0
 
+  // Helper function to get translated segment name
+  const getSegmentName = (segment: string): string => {
+    try {
+      return t(segment)
+    } catch {
+      // Fallback to capitalized segment if no translation exists
+      return segment.charAt(0).toUpperCase() + segment.slice(1)
+    }
+  }
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           {isDashboardPage ? (
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            <BreadcrumbPage>{t('dashboard')}</BreadcrumbPage>
           ) : (
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard">{t('dashboard')}</BreadcrumbLink>
           )}
         </BreadcrumbItem>
         {subSegments.length > 0 && <BreadcrumbSeparator />}
@@ -35,11 +47,11 @@ export default function DashboardBreadcrumbs() {
             <BreadcrumbItem key={segment}>
               {isLast ? (
                 <BreadcrumbPage>
-                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                  {getSegmentName(segment)}
                 </BreadcrumbPage>
               ) : (
                 <BreadcrumbLink href={href}>
-                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                  {getSegmentName(segment)}
                 </BreadcrumbLink>
               )}
             </BreadcrumbItem>

@@ -212,5 +212,30 @@
       "updateProfile": "Échec de la mise à jour du profil",
       "updatePhone": "Échec de la mise à jour du numéro de téléphone"
     }
+  },
+  "common": {
+    "more": "Plus"
+  },
+  "breadcrumbs": {
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
+    "analytics": "Analyses",
+    "performance": "Performance",
+    "milestones": "Étapes",
+    "todo": "À faire",
+    "settings": "Paramètres",
+    "users": "Utilisateurs",
+    "teams": "Équipes",
+    "stores": "Magasins",
+    "products": "Produits",
+    "categories": "Catégories",
+    "reports": "Rapports",
+    "notifications": "Notifications",
+    "account": "Compte",
+    "profile": "Profil",
+    "help": "Aide",
+    "support": "Support"
   }
 }

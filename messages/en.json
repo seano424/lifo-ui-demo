@@ -212,5 +212,30 @@
       "updateProfile": "Failed to update profile",
       "updatePhone": "Failed to update phone number"
     }
+  },
+  "common": {
+    "more": "More"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "analytics": "Analytics",
+    "performance": "Performance",
+    "milestones": "Milestones",
+    "todo": "To-Do",
+    "settings": "Settings",
+    "users": "Users",
+    "teams": "Teams",
+    "stores": "Stores",
+    "products": "Products",
+    "categories": "Categories",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "account": "Account",
+    "profile": "Profile",
+    "help": "Help",
+    "support": "Support"
   }
 }

@@ -212,5 +212,30 @@
       "updateProfile": "Kan profiel niet bijwerken",
       "updatePhone": "Kan telefoonnummer niet bijwerken"
     }
+  },
+  "common": {
+    "more": "Meer"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "inventory": "Voorraad",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "analytics": "Analyses",
+    "performance": "Prestaties",
+    "milestones": "Mijlpalen",
+    "todo": "Te doen",
+    "settings": "Instellingen",
+    "users": "Gebruikers",
+    "teams": "Teams",
+    "stores": "Winkels",
+    "products": "Producten",
+    "categories": "Categorieën",
+    "reports": "Rapporten",
+    "notifications": "Meldingen",
+    "account": "Account",
+    "profile": "Profiel",
+    "help": "Help",
+    "support": "Ondersteuning"
   }
 }
