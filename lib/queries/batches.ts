@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -86,7 +87,7 @@ function buildBatchOrderClause(sort?: BatchSort): { column: string; ascending: b
 // ✅ FIXED: Alternative approach that fetches batches and products separately
 async function fetchBatchesWithProducts(
   batches: Batch[],
-  supabase: any,
+  supabase: SupabaseClient<Database>,
 ): Promise<BatchWithProduct[]> {
   if (batches.length === 0) return []
 
@@ -97,7 +98,7 @@ async function fetchBatchesWithProducts(
   const { data: products, error: productsError } = await supabase
     .schema('inventory')
     .from('products')
-    .select('product_id, name, sku, category, brand, unit_type')
+    .select('*') // <-- select all columns
     .in('product_id', productIds)
 
   if (productsError) {

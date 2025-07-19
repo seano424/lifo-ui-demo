@@ -1,34 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+  <head>
     <title>Test Docs</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Testing API Docs</h1>
     <p>Open the browser and go to:</p>
     <ul>
-        <li><a href="http://localhost:8001/docs" target="_blank">http://localhost:8001/docs</a></li>
-        <li><a href="http://localhost:8001/redoc" target="_blank">http://localhost:8001/redoc</a> (Alternative docs)</li>
+      <li><a href="http://localhost:8001/docs" target="_blank">http://localhost:8001/docs</a></li>
+      <li>
+        <a href="http://localhost:8001/redoc" target="_blank">http://localhost:8001/redoc</a>
+        (Alternative docs)
+      </li>
     </ul>
-    
+
     <h2>API Endpoints Test</h2>
     <div id="test-results"></div>
-    
+
     <script>
-        // Test if OpenAPI JSON is accessible
-        fetch('http://localhost:8001/openapi.json')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('test-results').innerHTML = 
-                    '<p>✅ OpenAPI JSON loaded successfully!</p>' +
-                    '<p>API Title: ' + data.info.title + '</p>' +
-                    '<p>Version: ' + data.info.version + '</p>' +
-                    '<p>Total endpoints: ' + Object.keys(data.paths).length + '</p>';
-            })
-            .catch(error => {
-                document.getElementById('test-results').innerHTML = 
-                    '<p>❌ Error loading OpenAPI JSON: ' + error + '</p>';
-            });
+      // Test if OpenAPI JSON is accessible
+      fetch('http://localhost:8001/openapi.json')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('test-results').innerHTML =
+            '<p>✅ OpenAPI JSON loaded successfully!</p>' +
+            '<p>API Title: ' +
+            data.info.title +
+            '</p>' +
+            '<p>Version: ' +
+            data.info.version +
+            '</p>' +
+            '<p>Total endpoints: ' +
+            Object.keys(data.paths).length +
+            '</p>'
+        })
+        .catch(error => {
+          document.getElementById('test-results').innerHTML =
+            '<p>❌ Error loading OpenAPI JSON: ' + error + '</p>'
+        })
     </script>
-</body>
+  </body>
 </html>
