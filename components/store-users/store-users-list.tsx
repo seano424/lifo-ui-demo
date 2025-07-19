@@ -1,5 +1,3 @@
-// components/store-users/store-users-list.tsx - Updated with PIN management
-
 'use client'
 
 import { useState } from 'react'
@@ -437,7 +435,10 @@ export function StoreUsersList() {
                   <br />
                 </>
               )}
-              {t('dialogs.editRole.description', { name: selectedUser?.full_name || 'this user', role: t(`roles.${selectedUser?.role_in_store}`) })}
+              {t('dialogs.editRole.description', {
+                name: selectedUser?.full_name || 'this user',
+                role: t(`roles.${selectedUser?.role_in_store}`),
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
@@ -485,7 +486,10 @@ export function StoreUsersList() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('dialogs.removeUser.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('dialogs.removeUser.description', { name: selectedUser?.full_name || 'this user', store: activeStore?.business_name || 'this store' })}
+              {t('dialogs.removeUser.description', {
+                name: selectedUser?.full_name || 'this user',
+                store: activeStore?.business_name || 'this store',
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -514,11 +518,9 @@ export function StoreUsersList() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <RefreshCw className="w-5 h-5" />
-                  {t('dialogs.resetPin.title', { name: selectedUser.full_name })}
+                  {t('dialogs.resetPin.title', { name: selectedUser.full_name || '' })}
                 </DialogTitle>
-                <DialogDescription>
-                  {t('dialogs.resetPin.description')}
-                </DialogDescription>
+                <DialogDescription>{t('dialogs.resetPin.description')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
@@ -577,11 +579,9 @@ export function StoreUsersList() {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Unlock className="w-5 h-5" />
-                  {t('dialogs.unlockPin.title', { name: selectedUser.full_name })}
+                  {t('dialogs.unlockPin.title', { name: selectedUser.full_name || '' })}
                 </DialogTitle>
-                <DialogDescription>
-                  {t('dialogs.unlockPin.description')}
-                </DialogDescription>
+                <DialogDescription>{t('dialogs.unlockPin.description')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
