@@ -85,7 +85,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
           sending: false,
           messageId: result.messageId,
         })
-        toast.success('Email de réinitialisation PIN envoyé avec succès!')
+        toast.success('PIN reset email sent successfully!')
       } else {
         const errorMessage = getEmailErrorMessage(result.error || 'Unknown error')
         setEmailStatus({
@@ -93,7 +93,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
           sending: false,
           error: errorMessage,
         })
-        toast.error(`Échec de l'envoi de l'email: ${errorMessage}`)
+        toast.error(`Failed to send email: ${errorMessage}`)
       }
     } catch (error: any) {
       const errorMessage = getEmailErrorMessage(error.message || 'Unknown error')
@@ -102,7 +102,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
         sending: false,
         error: errorMessage,
       })
-      toast.error(`Erreur lors de l'envoi: ${errorMessage}`)
+      toast.error(`Error sending email: ${errorMessage}`)
     }
   }
 
@@ -126,7 +126,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
       if (error) throw error
 
       if (!result?.success) {
-        throw new Error(result?.error || 'Échec de la réinitialisation du PIN')
+        throw new Error(result?.error || 'Failed to reset PIN')
       }
 
       const credentials: ResetPINResult = {
@@ -137,14 +137,14 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
       }
 
       setResetResult(credentials)
-      toast.success(`PIN réinitialisé pour ${user.full_name}`)
+      toast.success(`PIN reset for ${user.full_name}`)
       onUserUpdated()
 
       // Automatically send reset email
       await sendResetEmail(credentials)
     } catch (error: any) {
       console.error('Error resetting PIN:', error)
-      toast.error(error.message || 'Échec de la réinitialisation du PIN')
+      toast.error(error.message || 'Failed to reset PIN')
     } finally {
       setIsLoading(false)
     }
@@ -163,15 +163,15 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
       if (error) throw error
 
       if (!result?.success) {
-        throw new Error(result?.error || 'Échec du déverrouillage du PIN')
+        throw new Error(result?.error || 'Failed to unlock PIN')
       }
 
-      toast.success(`PIN déverrouillé pour ${user.full_name}`)
+      toast.success(`PIN unlocked for ${user.full_name}`)
       onUserUpdated()
       setIsUnlockDialogOpen(false)
     } catch (error: any) {
       console.error('Error unlocking PIN:', error)
-      toast.error(error.message || 'Échec du déverrouillage du PIN')
+      toast.error(error.message || 'Failed to unlock PIN')
     } finally {
       setIsLoading(false)
     }
@@ -182,10 +182,10 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
     try {
       await navigator.clipboard.writeText(text)
       setCopiedField(field)
-      toast.success(`${field} copié dans le presse-papier`)
+      toast.success(`${field} copied to clipboard`)
       setTimeout(() => setCopiedField(null), 2000)
     } catch (error) {
-      toast.error('Échec de la copie dans le presse-papier')
+      toast.error('Failed to copy to clipboard')
     }
   }
 
@@ -204,7 +204,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
         className="flex items-center gap-2"
       >
         <RefreshCw className="w-4 h-4" />
-        Réinitialiser le PIN
+        Reset PIN
       </DropdownMenuItem>
 
       {/* Unlock PIN (only if locked) */}
@@ -214,7 +214,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
           className="flex items-center gap-2"
         >
           <Unlock className="w-4 h-4" />
-          Déverrouiller le PIN
+          Unlock PIN
         </DropdownMenuItem>
       )}
 
@@ -224,11 +224,10 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <RefreshCw className="w-5 h-5" />
-              Réinitialiser le PIN pour {user.full_name}
+              Reset PIN for {user.full_name}
             </DialogTitle>
             <DialogDescription>
-              Ceci va générer un nouveau PIN et l'envoyer à l'employé par email. Son PIN actuel ne
-              fonctionnera plus.
+              This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.
             </DialogDescription>
           </DialogHeader>
 
@@ -239,26 +238,26 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                 <AlertDescription>
                   <div className="space-y-2">
                     <div>
-                      <strong>Employé :</strong> {user.full_name}
+                      <strong>Employee:</strong> {user.full_name}
                     </div>
                     <div>
-                      <strong>Nom d'utilisateur :</strong>{' '}
+                      <strong>Username:</strong>{' '}
                       <span className="font-mono">{user.username}</span>
                     </div>
                     <div>
-                      <strong>Email :</strong> {user.email}
+                      <strong>Email:</strong> {user.email}
                     </div>
                     <div>
-                      <strong>Statut actuel :</strong>
+                      <strong>Current Status:</strong>
                       {isPINLocked() ? (
                         <Badge variant="destructive" className="ml-2">
                           <Lock className="w-3 h-3 mr-1" />
-                          Verrouillé
+                          Locked
                         </Badge>
                       ) : (
                         <Badge variant="default" className="ml-2">
                           <Key className="w-3 h-3 mr-1" />
-                          Actif
+                          Active
                         </Badge>
                       )}
                     </div>
@@ -272,7 +271,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                   onClick={() => setIsResetDialogOpen(false)}
                   disabled={isLoading}
                 >
-                  Annuler
+                  Cancel
                 </Button>
                 <Button
                   onClick={handleResetPIN}
@@ -282,12 +281,12 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Réinitialisation...
+                      Resetting...
                     </>
                   ) : (
                     <>
                       <RefreshCw className="w-4 h-4" />
-                      Réinitialiser le PIN
+                      Reset PIN
                     </>
                   )}
                 </Button>
@@ -301,14 +300,14 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
                     <AlertDescription>
-                      Envoi de l'email de réinitialisation en cours...
+                      Sending reset email...
                     </AlertDescription>
                   </>
                 ) : emailStatus.sent ? (
                   <>
                     <Check className="h-4 w-4" />
                     <AlertDescription>
-                      Email de réinitialisation envoyé avec succès à{' '}
+                      Reset email sent successfully to{' '}
                       <strong>{resetResult.email}</strong>
                       {emailStatus.messageId && (
                         <div className="text-xs text-muted-foreground mt-1">
@@ -322,7 +321,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
                       <div className="space-y-2">
-                        <div>Échec de l'envoi de l'email : {emailStatus.error}</div>
+                        <div>Failed to send email: {emailStatus.error}</div>
                         <Button
                           variant="outline"
                           size="sm"
@@ -330,7 +329,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                           className="flex items-center gap-2"
                         >
                           <RefreshCw className="w-3 h-3" />
-                          Réessayer l'envoi
+                          Retry sending
                         </Button>
                       </div>
                     </AlertDescription>
@@ -339,7 +338,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                   <>
                     <Mail className="h-4 w-4" />
                     <AlertDescription>
-                      Email en cours de préparation pour <strong>{resetResult.email}</strong>
+                      Preparing email for <strong>{resetResult.email}</strong>
                     </AlertDescription>
                   </>
                 )}
@@ -348,7 +347,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <div className="text-sm font-medium">Nouveau PIN</div>
+                    <div className="text-sm font-medium">New PIN</div>
                     <div className="font-mono text-lg font-bold">{resetResult.newPin}</div>
                   </div>
                   <Button
@@ -374,7 +373,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
                   }}
                   className="w-full"
                 >
-                  Terminé
+                  Done
                 </Button>
               </DialogFooter>
             </div>
@@ -388,11 +387,10 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Unlock className="w-5 h-5" />
-              Déverrouiller le PIN pour {user.full_name}
+              Unlock PIN for {user.full_name}
             </DialogTitle>
             <DialogDescription>
-              Ceci va immédiatement déverrouiller le PIN de l'employé et remettre à zéro son
-              compteur de tentatives échouées.
+              This will immediately unlock the employee's PIN and reset their failed attempts counter.
             </DialogDescription>
           </DialogHeader>
 
@@ -401,15 +399,14 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
             <AlertDescription>
               <div className="space-y-1">
                 <div>
-                  <strong>Employé :</strong> {user.full_name}
+                  <strong>Employee:</strong> {user.full_name}
                 </div>
                 <div>
-                  <strong>Nom d'utilisateur :</strong>{' '}
+                  <strong>Username:</strong>{' '}
                   <span className="font-mono">{user.username}</span>
                 </div>
                 <div>
-                  <strong>Statut :</strong> Le compte est actuellement verrouillé à cause de
-                  tentatives de PIN échouées
+                  <strong>Status:</strong> The account is currently locked due to failed PIN attempts
                 </div>
               </div>
             </AlertDescription>
@@ -421,7 +418,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               onClick={() => setIsUnlockDialogOpen(false)}
               disabled={isLoading}
             >
-              Annuler
+              Cancel
             </Button>
             <Button
               onClick={handleUnlockPIN}
@@ -431,12 +428,12 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Déverrouillage...
+                  Unlocking...
                 </>
               ) : (
                 <>
                   <Unlock className="w-4 h-4" />
-                  Déverrouiller le PIN
+                  Unlock PIN
                 </>
               )}
             </Button>

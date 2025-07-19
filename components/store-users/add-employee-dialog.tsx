@@ -79,7 +79,7 @@ export function AddEmployeeDialog({
     lastName: '',
     email: '',
     role: 'employee',
-    languagePreference: 'fr',
+    languagePreference: 'en',
   })
   const [createdCredentials, setCreatedCredentials] = useState<CreatedCredentials | null>(null)
   const [copiedField, setCopiedField] = useState<string | null>(null)
@@ -148,7 +148,7 @@ export function AddEmployeeDialog({
           sending: false,
           messageId: result.messageId,
         })
-        toast.success("Email d'accueil envoyé avec succès!")
+        toast.success('Welcome email sent successfully!')
       } else {
         const errorMessage = getEmailErrorMessage(result.error || 'Unknown error')
         setEmailStatus({
@@ -156,7 +156,7 @@ export function AddEmployeeDialog({
           sending: false,
           error: errorMessage,
         })
-        toast.error(`Échec de l'envoi de l'email: ${errorMessage}`)
+        toast.error(`Failed to send email: ${errorMessage}`)
       }
     } catch (error: any) {
       const errorMessage = getEmailErrorMessage(error.message || 'Unknown error')
@@ -165,7 +165,7 @@ export function AddEmployeeDialog({
         sending: false,
         error: errorMessage,
       })
-      toast.error(`Erreur lors de l'envoi: ${errorMessage}`)
+      toast.error(`Error sending email: ${errorMessage}`)
     }
   }
 
@@ -181,12 +181,12 @@ export function AddEmployeeDialog({
     e.preventDefault()
 
     if (!formData.firstName || !formData.lastName || !formData.email) {
-      toast.error('Veuillez remplir tous les champs obligatoires')
+      toast.error('Please fill in all required fields')
       return
     }
 
     if (!storeId) {
-      toast.error('Aucun magasin sélectionné')
+      toast.error('No store selected')
       return
     }
 
@@ -218,11 +218,11 @@ export function AddEmployeeDialog({
 
       if (error) {
         console.error('RPC error:', error)
-        throw new Error(error.message || "Échec de la création de l'employé")
+        throw new Error(error.message || 'Failed to create employee')
       }
 
       if (!result?.success) {
-        throw new Error(result?.error || "Échec de la création de l'employé")
+        throw new Error(result?.error || 'Failed to create employee')
       }
 
       // Store credentials for display and email
@@ -236,13 +236,13 @@ export function AddEmployeeDialog({
 
       setCreatedCredentials(credentials)
       setStep('credentials')
-      toast.success('Employé créé avec succès!')
+      toast.success('Employee created successfully!')
 
       // Automatically send welcome email
       await sendEmployeeWelcomeEmail(credentials)
     } catch (error: any) {
       console.error('Error creating employee:', error)
-      toast.error(error.message || "Échec de la création de l'employé")
+      toast.error(error.message || 'Failed to create employee')
     } finally {
       setIsLoading(false)
     }
@@ -253,10 +253,10 @@ export function AddEmployeeDialog({
     try {
       await navigator.clipboard.writeText(text)
       setCopiedField(field)
-      toast.success(`${field} copié dans le presse-papier`)
+      toast.success(`${field} copied to clipboard`)
       setTimeout(() => setCopiedField(null), 2000)
     } catch (error) {
-      toast.error('Échec de la copie dans le presse-papier')
+      toast.error('Failed to copy to clipboard')
     }
   }
 
@@ -274,7 +274,7 @@ export function AddEmployeeDialog({
       lastName: '',
       email: '',
       role: 'employee',
-      languagePreference: 'fr',
+      languagePreference: 'en',
     })
     setCreatedCredentials(null)
     setCopiedField(null)
@@ -288,12 +288,10 @@ export function AddEmployeeDialog({
         {step === 'form' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                Ajouter un nouvel employé
-              </DialogTitle>
+              <DialogTitle className="flex items-center gap-2">Add New Employee</DialogTitle>
               <DialogDescription>
-                Créer un nouveau compte employé avec authentification PIN. Les identifiants de
-                connexion seront envoyés par email.
+                Create a new employee account with PIN authentication. Login credentials will be
+                sent by email.
               </DialogDescription>
             </DialogHeader>
 
@@ -301,26 +299,26 @@ export function AddEmployeeDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName" required>
-                    Prénom
+                    First Name
                   </Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                    placeholder="Jean"
+                    placeholder="John"
                     required
                     disabled={isLoading}
                   />
                 </div>
                 <div>
                   <Label htmlFor="lastName" required>
-                    Nom de famille
+                    Last Name
                   </Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                    placeholder="Dupont"
+                    placeholder="Doe"
                     required
                     disabled={isLoading}
                   />
@@ -329,25 +327,25 @@ export function AddEmployeeDialog({
 
               <div>
                 <Label htmlFor="email" required>
-                  Adresse email
+                  Email Address
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="jean.dupont@example.com"
+                  placeholder="john.doe@example.com"
                   required
                   disabled={isLoading}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Les identifiants de connexion seront envoyés à cette adresse email
+                  Login credentials will be sent to this email address
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="role">Rôle</Label>
+                  <Label htmlFor="role">Role</Label>
                   <Select
                     value={formData.role}
                     onValueChange={(value: 'employee' | 'manager') =>
@@ -359,14 +357,14 @@ export function AddEmployeeDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="employee">Employé</SelectItem>
+                      <SelectItem value="employee">Employee</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="language">Langue</Label>
+                  <Label htmlFor="language">Language</Label>
                   <Select
                     value={formData.languagePreference}
                     onValueChange={(value: any) =>
@@ -394,17 +392,16 @@ export function AddEmployeeDialog({
                   <AlertDescription>
                     <div className="space-y-1">
                       <div>
-                        <strong>Nom d'utilisateur :</strong>{' '}
+                        <strong>Username:</strong>{' '}
                         <span className="font-mono">
                           {generateUsername(formData.firstName, formData.lastName)}
                         </span>
                       </div>
                       <div>
-                        <strong>PIN :</strong> Sera généré automatiquement (4 chiffres)
+                        <strong>PIN:</strong> Will be generated automatically (4 digits)
                       </div>
                       <div className="text-xs text-muted-foreground mt-2">
-                        L'employé peut se connecter en utilisant l'onglet "Employé" avec son nom
-                        d'utilisateur et son PIN
+                        The employee can log in using the "Employee" tab with their username and PIN
                       </div>
                     </div>
                   </AlertDescription>
@@ -418,18 +415,18 @@ export function AddEmployeeDialog({
                   onClick={() => onOpenChange(false)}
                   disabled={isLoading}
                 >
-                  Annuler
+                  Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading} className="flex items-center gap-2">
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Création...
+                      Creating...
                     </>
                   ) : (
                     <>
                       <UserPlus className="w-4 h-4" />
-                      Créer l'employé
+                      Create Employee
                     </>
                   )}
                 </Button>
@@ -441,11 +438,11 @@ export function AddEmployeeDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-green-600">
                 <Check className="w-5 h-5" />
-                Employé créé avec succès !
+                Employee Created Successfully!
               </DialogTitle>
               <DialogDescription>
-                {createdCredentials?.full_name} a été ajouté à votre magasin. Sauvegardez ces
-                identifiants et partagez-les avec l'employé.
+                {createdCredentials?.full_name} has been added to your store. Save these credentials
+                and share them with the employee.
               </DialogDescription>
             </DialogHeader>
 
@@ -455,13 +452,13 @@ export function AddEmployeeDialog({
                 {emailStatus.sending ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    <AlertDescription>Envoi de l'email en cours...</AlertDescription>
+                    <AlertDescription>Sending email...</AlertDescription>
                   </>
                 ) : emailStatus.sent ? (
                   <>
                     <Check className="h-4 w-4" />
                     <AlertDescription>
-                      Email d'accueil envoyé avec succès à{' '}
+                      Welcome email sent successfully to{' '}
                       <strong>{createdCredentials?.email}</strong>
                       {emailStatus.messageId && (
                         <div className="text-xs text-muted-foreground mt-1">
@@ -475,7 +472,7 @@ export function AddEmployeeDialog({
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
                       <div className="space-y-2">
-                        <div>Échec de l'envoi de l'email : {emailStatus.error}</div>
+                        <div>Failed to send email: {emailStatus.error}</div>
                         <Button
                           variant="outline"
                           size="sm"
@@ -483,7 +480,7 @@ export function AddEmployeeDialog({
                           className="flex items-center gap-2"
                         >
                           <RefreshCw className="w-3 h-3" />
-                          Réessayer l'envoi
+                          Retry sending
                         </Button>
                       </div>
                     </AlertDescription>
@@ -492,8 +489,7 @@ export function AddEmployeeDialog({
                   <>
                     <Mail className="h-4 w-4" />
                     <AlertDescription>
-                      Email en cours de préparation pour{' '}
-                      <strong>{createdCredentials?.email}</strong>
+                      Preparing email for <strong>{createdCredentials?.email}</strong>
                     </AlertDescription>
                   </>
                 )}
@@ -520,7 +516,7 @@ export function AddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">Nom d'utilisateur</Label>
+                    <Label className="text-sm font-medium">Username</Label>
                     <div className="font-mono text-sm">{createdCredentials?.username}</div>
                   </div>
                   <Button
@@ -558,23 +554,19 @@ export function AddEmployeeDialog({
               <Separator />
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">Prochaines étapes :</h4>
+                <h4 className="font-medium text-blue-900 mb-2">Next Steps:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• L'employé reçoit ses identifiants par email automatiquement</li>
-                  <li>
-                    • Il peut se connecter en utilisant l'onglet "Employé" sur la page de connexion
-                  </li>
-                  <li>
-                    • Le PIN peut être réinitialisé à tout moment depuis la page de gestion d'équipe
-                  </li>
-                  <li>• L'employé peut scanner des produits et gérer l'inventaire de base</li>
+                  <li>• The employee receives their credentials by email automatically</li>
+                  <li>• They can log in using the "Employee" tab on the login page</li>
+                  <li>• The PIN can be reset at any time from the team management page</li>
+                  <li>• The employee can scan products and manage basic inventory</li>
                 </ul>
               </div>
             </div>
 
             <DialogFooter>
               <Button onClick={handleClose} className="w-full">
-                Terminé
+                Done
               </Button>
             </DialogFooter>
           </>
