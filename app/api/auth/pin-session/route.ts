@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
       {
         auth: {
           autoRefreshToken: false,
-          persistSession: false
-        }
-      }
+          persistSession: false,
+        },
+      },
     )
 
     // Try multiple email formats for backward compatibility
@@ -35,14 +35,13 @@ export async function POST(request: NextRequest) {
       `${username}@lifo-employee.internal`, // Future employee format
       username.includes('@') ? username : null, // Direct email if provided
       // Special case for testing: map common test usernames to working email
-      (username === 'test.employee2' || username === 'john.smith') ? 'soreilly424@gmail.com' : null,
+      username === 'test.employee2' || username === 'john.smith' ? 'soreilly424@gmail.com' : null,
     ].filter(Boolean)
 
     console.log('🔍 Trying email formats:', possibleEmails)
 
     let signInData: any = null
     let signInError: any = null
-
 
     // Try each email format until one works
     for (const email of possibleEmails) {
@@ -81,13 +80,15 @@ export async function POST(request: NextRequest) {
     console.log('🎉 PIN authentication successful for:', username)
 
     // Get username from metadata, override for test cases
-    let userUsername = signInData.user.user_metadata?.username || 
-                      (signInData.user as any).raw_user_meta_data?.username ||
-                      username
+    let userUsername =
+      signInData.user.user_metadata?.username ||
+      (signInData.user as any).raw_user_meta_data?.username ||
+      username
 
-    let fullName = signInData.user.user_metadata?.full_name || 
-                  (signInData.user as any).raw_user_meta_data?.full_name ||
-                  userUsername
+    let fullName =
+      signInData.user.user_metadata?.full_name ||
+      (signInData.user as any).raw_user_meta_data?.full_name ||
+      userUsername
 
     // Override for john.smith test user
     if (username === 'john.smith') {

@@ -4,6 +4,9 @@ import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
 import { StoreProviderWrapper } from '@/components/providers/store-provider-wrapper'
+import { LanguageProvider } from '@/components/providers/language-provider'
+import { IntlProvider } from '@/components/providers/intl-provider'
+import { getMessages } from 'next-intl/server'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -39,14 +42,16 @@ const robotoMono = Roboto_Mono({
   weight: ['400', '500', '600', '700'],
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const messages = await getMessages()
+
   return (
     <html
-      lang="en"
+      lang="fr"
       suppressHydrationWarning
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} scroll-smooth`}
     >
@@ -58,7 +63,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProvider>
-            <StoreProviderWrapper>{children}</StoreProviderWrapper>
+            <LanguageProvider>
+              <IntlProvider initialMessages={messages}>
+                <StoreProviderWrapper>{children}</StoreProviderWrapper>
+              </IntlProvider>
+            </LanguageProvider>
           </ReactQueryProvider>
         </ThemeProvider>
       </body>

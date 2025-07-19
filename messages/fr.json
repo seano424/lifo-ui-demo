@@ -1,0 +1,352 @@
+{
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
+    "todo": "À faire",
+    "performance": "Performance",
+    "milestones": "Étapes",
+    "analytics": "Analyses",
+    "settings": "Paramètres",
+    "helpCenter": "Centre d'aide",
+    "logout": "Se déconnecter"
+  },
+  "actions": {
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "scan": "Scanner",
+    "discount": "Remise",
+    "donate": "Faire un don"
+  },
+  "forms": {
+    "productName": "Nom du produit",
+    "expirationDate": "Date d'expiration",
+    "quantity": "Quantité",
+    "price": "Prix",
+    "category": "Catégorie",
+    "required": "Requis"
+  },
+  "status": {
+    "fresh": "Frais",
+    "expiringSoon": "Expire bientôt",
+    "expired": "Expiré",
+    "discounted": "En promotion",
+    "donated": "Donné",
+    "sold": "Vendu"
+  },
+  "validation": {
+    "required": "Ce champ est requis",
+    "invalidEmail": "Adresse e-mail invalide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "dateMustBeFuture": "La date doit être dans le futur"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "description": "Gérez vos préférences et paramètres de compte",
+    "language": {
+      "title": "Langue",
+      "description": "Choisissez votre langue préférée pour l'interface",
+      "preferred": "Langue préférée"
+    },
+    "tabs": {
+      "store": "Magasin",
+      "notifications": "Notifications",
+      "account": "Compte",
+      "team": "Équipe",
+      "storeDescription": "Gérez les paramètres de votre magasin.",
+      "notificationsDescription": "Gérez vos paramètres de notification."
+    }
+  },
+  "users": {
+    "title": "Gestion d'équipe",
+    "description": "Invitez de nouveaux membres d'équipe dans votre magasin et gérez leurs rôles et permissions.",
+    "addEmployee": "Ajouter un employé",
+    "showing": "Affichage de {current} sur {total} utilisateurs",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "name": "Nom",
+    "username": "Nom d'utilisateur",
+    "email": "E-mail",
+    "role": "Rôle",
+    "status": "Statut",
+    "pinStatus": "Statut PIN",
+    "actions": "Actions",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "locked": "Verrouillé",
+    "pinActive": "PIN Actif",
+    "noPin": "Aucun PIN",
+    "loadMoreUsers": "Charger plus d'utilisateurs",
+    "loadingMore": "Chargement...",
+    "noUsersMessage": "Ce magasin n'a encore aucun utilisateur.",
+    "errors": {
+      "mustHaveOwner": "Il doit toujours y avoir au moins un propriétaire."
+    },
+    "dropdown": {
+      "userActions": "Actions utilisateur",
+      "makeEmployee": "Nommer employé",
+      "makeManager": "Nommer gérant",
+      "makeOwner": "Nommer propriétaire",
+      "resetPin": "Réinitialiser PIN",
+      "unlockPin": "Déverrouiller PIN",
+      "deactivateUser": "Désactiver utilisateur",
+      "reactivateUser": "Réactiver utilisateur",
+      "removeFromStore": "Retirer du magasin"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Modifier le rôle utilisateur",
+        "description": "{name} a actuellement le rôle de : {role}",
+        "roleLabel": "Rôle",
+        "selectPlaceholder": "Sélectionner un rôle",
+        "cancel": "Annuler",
+        "save": "Sauvegarder les modifications"
+      },
+      "removeUser": {
+        "title": "Retirer l'utilisateur du magasin",
+        "description": "Ceci retirera définitivement {name} de {store}. Il perdra tout accès à ce magasin, perdra son rôle et ses permissions actuels, et devra être ré-invité si vous voulez qu'il revienne. Son compte utilisateur restera actif pour les autres magasins.",
+        "cancel": "Annuler",
+        "confirm": "Retirer du magasin"
+      },
+      "resetPin": {
+        "title": "Réinitialiser PIN pour {name}",
+        "description": "Ceci générera un nouveau PIN et l'enverra à l'employé par e-mail. Son PIN actuel ne fonctionnera plus.",
+        "employee": "Employé",
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "currentStatus": "Statut actuel",
+        "statusLocked": "Verrouillé",
+        "statusActive": "Actif",
+        "cancel": "Annuler",
+        "confirm": "Réinitialiser PIN"
+      },
+      "unlockPin": {
+        "title": "Déverrouiller PIN pour {name}",
+        "description": "Ceci déverrouillera immédiatement le PIN de l'employé et réinitialisera son compteur de tentatives échouées.",
+        "employee": "Employé",
+        "username": "Nom d'utilisateur",
+        "lockedMessage": "Le compte est actuellement verrouillé à cause de tentatives PIN échouées",
+        "cancel": "Annuler",
+        "confirm": "Déverrouiller PIN"
+      }
+    },
+    "roles": {
+      "owner": "Propriétaire",
+      "manager": "Gérant",
+      "employee": "Employé",
+      "staff": "Personnel",
+      "admin": "Administrateur",
+      "user": "Utilisateur",
+      "unknown": "Inconnu"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Désactivé",
+        "locked": "PIN Verrouillé",
+        "pending": "PIN En attente",
+        "active": "PIN Actif"
+      },
+      "inactive": "Inactif",
+      "username": "Nom d'utilisateur",
+      "permissions": "Permissions",
+      "lastLogin": "Dernière connexion",
+      "failedAttempts": "{count} tentative{plural} PIN échouée{plural}",
+      "enablePin": "Activer PIN",
+      "disablePin": "Désactiver PIN",
+      "removeDialog": {
+        "title": "Retirer l'utilisateur du magasin",
+        "description": "Êtes-vous sûr de vouloir retirer {name} de ce magasin ? Ceci désactivera son accès mais ne supprimera pas son compte.",
+        "cancel": "Annuler",
+        "confirm": "Retirer l'utilisateur"
+      }
+    }
+  },
+  "account": {
+    "title": "Informations du compte",
+    "description": "Gérez les paramètres et préférences de votre compte.",
+    "profile": {
+      "title": "Informations de profil",
+      "fullName": "Nom complet",
+      "email": "Adresse e-mail",
+      "fullNamePlaceholder": "Entrez votre nom complet",
+      "emailPlaceholder": "Entrez votre adresse e-mail",
+      "noName": "Aucun nom",
+      "noEmail": "Aucun e-mail",
+      "emailNotice": "L'e-mail ne peut pas être modifié. Contactez le support si nécessaire.",
+      "edit": "Modifier",
+      "save": "Sauvegarder les modifications",
+      "cancel": "Annuler",
+      "saving": "Sauvegarde..."
+    },
+    "phone": {
+      "title": "Numéro de téléphone",
+      "label": "Numéro de téléphone",
+      "placeholder": "+33 1 23 45 67 89",
+      "description": "Entrez votre numéro de téléphone avec l'indicatif pays (optionnel)",
+      "noPhone": "Aucun numéro de téléphone défini",
+      "addNotice": "Ajoutez un numéro de téléphone pour la sécurité du compte et les notifications",
+      "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
+      "edit": "Modifier",
+      "save": "Sauvegarder le téléphone",
+      "cancel": "Annuler",
+      "saving": "Sauvegarde..."
+    },
+    "language": {
+      "title": "Préférence de langue",
+      "description": "Choisissez votre langue préférée pour l'interface"
+    },
+    "status": {
+      "title": "Statut du compte",
+      "accountStatus": "Statut:",
+      "emailVerified": "E-mail vérifié:",
+      "phoneVerified": "Téléphone vérifié:",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "verified": "Vérifié",
+      "unverified": "Non vérifié"
+    },
+    "errors": {
+      "updateProfile": "Échec de la mise à jour du profil",
+      "updatePhone": "Échec de la mise à jour du numéro de téléphone"
+    }
+  },
+  "common": {
+    "more": "Plus"
+  },
+  "breadcrumbs": {
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
+    "analytics": "Analyses",
+    "performance": "Performance",
+    "milestones": "Étapes",
+    "todo": "À faire",
+    "settings": "Paramètres",
+    "users": "Utilisateurs",
+    "teams": "Équipes",
+    "stores": "Magasins",
+    "products": "Produits",
+    "categories": "Catégories",
+    "reports": "Rapports",
+    "notifications": "Notifications",
+    "account": "Compte",
+    "profile": "Profil",
+    "help": "Aide",
+    "support": "Support"
+  },
+  "addEmployee": {
+    "title": "Ajouter un nouvel employé",
+    "description": "Créer un nouveau compte employé avec authentification PIN. Les identifiants de connexion seront envoyés par e-mail.",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse e-mail",
+      "username": "Nom d'utilisateur",
+      "role": "Rôle",
+      "language": "Langue",
+      "firstNamePlaceholder": "Jean",
+      "lastNamePlaceholder": "Dupont",
+      "emailPlaceholder": "test@example.com (utiliser un faux e-mail pour les tests)",
+      "emailNote": "Utilisez test@example.com pour les tests. Les vrais e-mails recevront les identifiants de connexion.",
+      "usernamePlaceholder": "jean.dupont",
+      "usernameNote": "L'employé utilisera ce nom d'utilisateur pour se connecter",
+      "usernameAvailable": "Nom d'utilisateur disponible",
+      "usernameTaken": "Nom d'utilisateur déjà pris",
+      "reset": "Réinitialiser"
+    },
+    "roles": {
+      "employee": "Employé",
+      "manager": "Gestionnaire"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Nom d'utilisateur:",
+      "pin": "PIN:",
+      "pinNote": "Sera généré automatiquement (4 chiffres)",
+      "loginNote": "L'employé peut se connecter en utilisant l'onglet \"Employé\" avec son nom d'utilisateur et son PIN"
+    },
+    "buttons": {
+      "cancel": "Annuler",
+      "create": "Créer un employé",
+      "creating": "Création...",
+      "done": "Terminé",
+      "retrySending": "Réessayer l'envoi"
+    },
+    "success": {
+      "title": "Employé créé avec succès!",
+      "description": "{name} a été ajouté à votre magasin. Sauvegardez ces identifiants et partagez-les avec l'employé.",
+      "emailSending": "Envoi de l'e-mail...",
+      "emailSent": "E-mail de bienvenue envoyé avec succès à {email}",
+      "emailPreparing": "Préparation de l'e-mail pour {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Statut de l'e-mail: {error}"
+    },
+    "credentials": {
+      "email": "E-mail",
+      "username": "Nom d'utilisateur",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Prochaines étapes:",
+      "loginTab": "• L'employé peut se connecter en utilisant l'onglet \"Employé\" sur la page de connexion",
+      "useCredentials": "• Utiliser le nom d'utilisateur: {username} et le PIN: {pin}",
+      "resetPin": "• Le PIN peut être réinitialisé à tout moment depuis la page de gestion d'équipe",
+      "permissions": "• L'employé peut scanner les produits et gérer l'inventaire de base"
+    },
+    "errors": {
+      "fillFields": "Veuillez remplir tous les champs obligatoires",
+      "usernameTaken": "Le nom d'utilisateur est déjà pris. Veuillez en choisir un autre.",
+      "noStore": "Aucun magasin sélectionné",
+      "checkUsername": "Échec de la vérification de la disponibilité du nom d'utilisateur",
+      "createFailed": "Échec de la création de l'employé",
+      "copyFailed": "Échec de la copie dans le presse-papiers"
+    },
+    "toast": {
+      "created": "Employé créé avec succès en utilisant l'API serveur!",
+      "emailSent": "E-mail de bienvenue envoyé avec succès!",
+      "emailFailed": "Échec de l'envoi de l'e-mail: {error}",
+      "emailError": "Erreur lors de l'envoi de l'e-mail: {error}",
+      "emailSkipped": "Employé créé! E-mail ignoré pour l'adresse de test.",
+      "copied": "{field} copié dans le presse-papiers"
+    }
+  },
+  "marketing": {
+    "nav": {
+      "resources": "Ressources",
+      "products": "Produits",
+      "pricing": "Tarifs",
+      "helpCenter": "Centre d'aide",
+      "helpCenterDesc": "Obtenez toutes les réponses dont vous avez besoin ici",
+      "contactUs": "Nous contacter",
+      "contactUsDesc": "Nous sommes là pour vous aider avec toutes vos questions",
+      "status": "Statut",
+      "statusDesc": "Vérifiez l'état actuel de nos services et API",
+      "terms": "Conditions d'utilisation",
+      "termsDesc": "Nos conditions générales d'utilisation de nos services",
+      "blog": "Blog",
+      "blogDesc": "Les dernières actualités, mises à jour et informations du secteur",
+      "company": "Entreprise",
+      "companyDesc": "Notre mission est d'innover et d'autonomiser le monde",
+      "careers": "Carrières",
+      "careersDesc": "Parcourez les offres d'emploi et découvrez notre espace de travail",
+      "support": "Support",
+      "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
+    },
+    "auth": {
+      "login": "Connexion",
+      "signup": "Inscription entreprise",
+      "logout": "Déconnexion",
+      "goToDashboard": "Aller au tableau de bord"
+    }
+  }
+}

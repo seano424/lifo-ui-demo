@@ -1,20 +1,29 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button } from './ui/button'
-import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from './logout-button'
+import { useCurrentUser } from '@/hooks/use-users'
 
-export async function AuthButton() {
-  const supabase = await createClient()
+export function AuthButton() {
+  const t = useTranslations('marketing.auth')
+  const { data: user, isLoading } = useCurrentUser()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-4">
+        <div className="w-20 h-8 bg-gray-200 animate-pulse rounded" />
+        <div className="w-24 h-8 bg-gray-200 animate-pulse rounded" />
+      </div>
+    )
+  }
 
   return user ? (
     <div className="flex items-center gap-4">
-      <LogoutButton />
-      <Button asChild size="default" variant={'brand'}>
-        <Link href="/dashboard">Go to dashboard</Link>
+      <LogoutButton className="text-xs uppercase font-sans font-light" />
+      <Button asChild size="default" variant={'secondary'}>
+        <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
     </div>
   ) : (
@@ -23,11 +32,11 @@ export async function AuthButton() {
         className="text-xs dark:hover:text-brand-secondary hover:text-brand-primary"
         href="/auth/login"
       >
-        Login
+        {t('login')}
       </Link>
 
       <Button asChild size="sm" variant={'brandSecondary'} className="uppercase">
-        <Link href="/onboarding/create-account">Business Signup</Link>
+        <Link href="/onboarding/create-account">{t('signup')}</Link>
       </Button>
     </div>
   )

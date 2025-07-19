@@ -1,0 +1,352 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "todo": "To-Do",
+    "performance": "Performance",
+    "milestones": "Milestones",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "helpCenter": "Help Center",
+    "logout": "Logout"
+  },
+  "actions": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "scan": "Scan",
+    "discount": "Discount",
+    "donate": "Donate"
+  },
+  "forms": {
+    "productName": "Product Name",
+    "expirationDate": "Expiration Date",
+    "quantity": "Quantity",
+    "price": "Price",
+    "category": "Category",
+    "required": "Required"
+  },
+  "status": {
+    "fresh": "Fresh",
+    "expiringSoon": "Expiring Soon",
+    "expired": "Expired",
+    "discounted": "Discounted",
+    "donated": "Donated",
+    "sold": "Sold"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "dateMustBeFuture": "Date must be in the future"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your preferences and account settings",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the interface",
+      "preferred": "Preferred Language"
+    },
+    "tabs": {
+      "store": "Store",
+      "notifications": "Notifications",
+      "account": "Account",
+      "team": "Team",
+      "storeDescription": "Manage your store settings.",
+      "notificationsDescription": "Manage your notification settings."
+    }
+  },
+  "users": {
+    "title": "Team Management",
+    "description": "Invite new team members to your store and manage their roles and permissions.",
+    "addEmployee": "Add Employee",
+    "showing": "Showing {current} of {total} users",
+    "noUsersFound": "No users found",
+    "name": "Name",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "pinStatus": "PIN Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "locked": "Locked",
+    "pinActive": "PIN Active",
+    "noPin": "No PIN",
+    "loadMoreUsers": "Load More Users",
+    "loadingMore": "Loading more...",
+    "noUsersMessage": "This store doesn't have any users yet.",
+    "errors": {
+      "mustHaveOwner": "There must always be at least one owner."
+    },
+    "dropdown": {
+      "userActions": "User Actions",
+      "makeEmployee": "Make Employee",
+      "makeManager": "Make Manager",
+      "makeOwner": "Make Owner",
+      "resetPin": "Reset PIN",
+      "unlockPin": "Unlock PIN",
+      "deactivateUser": "Deactivate User",
+      "reactivateUser": "Reactivate User",
+      "removeFromStore": "Remove from Store"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Edit User Role",
+        "description": "{name} currently has the role of: {role}",
+        "roleLabel": "Role",
+        "selectPlaceholder": "Select a role",
+        "cancel": "Cancel",
+        "save": "Save changes"
+      },
+      "removeUser": {
+        "title": "Remove User from Store",
+        "description": "This will permanently remove {name} from {store}. They will lose all access to this store, lose their current role and permissions, and need to be re-invited if you want them back. Their user account will remain active for other stores.",
+        "cancel": "Cancel",
+        "confirm": "Remove from Store"
+      },
+      "resetPin": {
+        "title": "Reset PIN for {name}",
+        "description": "This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.",
+        "employee": "Employee",
+        "username": "Username",
+        "email": "Email",
+        "currentStatus": "Current Status",
+        "statusLocked": "Locked",
+        "statusActive": "Active",
+        "cancel": "Cancel",
+        "confirm": "Reset PIN"
+      },
+      "unlockPin": {
+        "title": "Unlock PIN for {name}",
+        "description": "This will immediately unlock the employee's PIN and reset their failed attempts counter.",
+        "employee": "Employee",
+        "username": "Username",
+        "lockedMessage": "The account is currently locked due to failed PIN attempts",
+        "cancel": "Cancel",
+        "confirm": "Unlock PIN"
+      }
+    },
+    "roles": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "employee": "Employee",
+      "staff": "Staff",
+      "admin": "Administrator",
+      "user": "User",
+      "unknown": "Unknown"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Disabled",
+        "locked": "PIN Locked",
+        "pending": "PIN Pending",
+        "active": "PIN Active"
+      },
+      "inactive": "Inactive",
+      "username": "Username",
+      "permissions": "Permissions",
+      "lastLogin": "Last login",
+      "failedAttempts": "{count} failed PIN attempt{plural}",
+      "enablePin": "Enable PIN",
+      "disablePin": "Disable PIN",
+      "removeDialog": {
+        "title": "Remove User from Store",
+        "description": "Are you sure you want to remove {name} from this store? This will deactivate their access but won't delete their account.",
+        "cancel": "Cancel",
+        "confirm": "Remove User"
+      }
+    }
+  },
+  "account": {
+    "title": "Account Information",
+    "description": "Manage your account settings and preferences.",
+    "profile": {
+      "title": "Profile Information",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "fullNamePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email address",
+      "noName": "No name",
+      "noEmail": "No email",
+      "emailNotice": "Email cannot be changed. Contact support if needed.",
+      "edit": "Edit",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "phone": {
+      "title": "Phone Number",
+      "label": "Phone Number",
+      "placeholder": "+33 1 23 45 67 89",
+      "description": "Enter your phone number with country code (optional)",
+      "noPhone": "No phone number set",
+      "addNotice": "Add a phone number for account security and notifications",
+      "invalidPhone": "Please enter a valid phone number",
+      "edit": "Edit",
+      "save": "Save Phone",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "language": {
+      "title": "Language Preference",
+      "description": "Choose your preferred language for the interface"
+    },
+    "status": {
+      "title": "Account Status",
+      "accountStatus": "Status:",
+      "emailVerified": "Email Verified:",
+      "phoneVerified": "Phone Verified:",
+      "active": "Active",
+      "inactive": "Inactive",
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
+    "errors": {
+      "updateProfile": "Failed to update profile",
+      "updatePhone": "Failed to update phone number"
+    }
+  },
+  "common": {
+    "more": "More"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "analytics": "Analytics",
+    "performance": "Performance",
+    "milestones": "Milestones",
+    "todo": "To-Do",
+    "settings": "Settings",
+    "users": "Users",
+    "teams": "Teams",
+    "stores": "Stores",
+    "products": "Products",
+    "categories": "Categories",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "account": "Account",
+    "profile": "Profile",
+    "help": "Help",
+    "support": "Support"
+  },
+  "addEmployee": {
+    "title": "Add New Employee",
+    "description": "Create a new employee account with PIN authentication. Login credentials will be sent by email.",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "username": "Username",
+      "role": "Role",
+      "language": "Language",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "emailPlaceholder": "test@example.com (use fake email for testing)",
+      "emailNote": "Use test@example.com for testing. Real emails will receive login credentials.",
+      "usernamePlaceholder": "john.doe",
+      "usernameNote": "Employee will use this username to log in",
+      "usernameAvailable": "Username is available",
+      "usernameTaken": "Username is already taken",
+      "reset": "Reset"
+    },
+    "roles": {
+      "employee": "Employee",
+      "manager": "Manager"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Username:",
+      "pin": "PIN:",
+      "pinNote": "Will be generated automatically (4 digits)",
+      "loginNote": "The employee can log in using the \"Employee\" tab with their username and PIN"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Employee",
+      "creating": "Creating...",
+      "done": "Done",
+      "retrySending": "Retry sending"
+    },
+    "success": {
+      "title": "Employee Created Successfully!",
+      "description": "{name} has been added to your store. Save these credentials and share them with the employee.",
+      "emailSending": "Sending email...",
+      "emailSent": "Welcome email sent successfully to {email}",
+      "emailPreparing": "Preparing email for {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Email status: {error}"
+    },
+    "credentials": {
+      "email": "Email",
+      "username": "Username",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Next Steps:",
+      "loginTab": "• The employee can log in using the \"Employee\" tab on the login page",
+      "useCredentials": "• Use username: {username} and PIN: {pin}",
+      "resetPin": "• The PIN can be reset at any time from the team management page",
+      "permissions": "• The employee can scan products and manage basic inventory"
+    },
+    "errors": {
+      "fillFields": "Please fill in all required fields",
+      "usernameTaken": "Username is already taken. Please choose a different one.",
+      "noStore": "No store selected",
+      "checkUsername": "Failed to check username availability",
+      "createFailed": "Failed to create employee",
+      "copyFailed": "Failed to copy to clipboard"
+    },
+    "toast": {
+      "created": "Employee created successfully using server API!",
+      "emailSent": "Welcome email sent successfully!",
+      "emailFailed": "Failed to send email: {error}",
+      "emailError": "Error sending email: {error}",
+      "emailSkipped": "Employee created! Email skipped for test address.",
+      "copied": "{field} copied to clipboard"
+    }
+  },
+  "marketing": {
+    "nav": {
+      "resources": "Resources",
+      "products": "Products",
+      "pricing": "Pricing",
+      "helpCenter": "Help Center",
+      "helpCenterDesc": "Get all the answers you need right here",
+      "contactUs": "Contact Us",
+      "contactUsDesc": "We are here to help you with any questions you have",
+      "status": "Status",
+      "statusDesc": "Check the current status of our services and APIs",
+      "terms": "Terms of Service",
+      "termsDesc": "Our terms and conditions for using our services",
+      "blog": "Blog",
+      "blogDesc": "The latest industry news, updates, and info",
+      "company": "Company",
+      "companyDesc": "Our mission is to innovate and empower the world",
+      "careers": "Careers",
+      "careersDesc": "Browse job listing and discover our workspace",
+      "support": "Support",
+      "supportDesc": "Get in touch with our support team or visit our community forums"
+    },
+    "auth": {
+      "login": "Login",
+      "signup": "Business Signup",
+      "logout": "Logout",
+      "goToDashboard": "Go to dashboard"
+    }
+  }
+}

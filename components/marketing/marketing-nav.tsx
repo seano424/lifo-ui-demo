@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
 
 import {
@@ -57,78 +60,82 @@ const MarketingNav = ({
     alt: 'logo',
     title: 'LIFO.AI',
   },
-  menu = [
-    {
-      title: 'Resources',
-      url: '#',
-      items: [
-        {
-          title: 'Help Center',
-          description: 'Get all the answers you need right here',
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: 'Contact Us',
-          description: 'We are here to help you with any questions you have',
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: 'Status',
-          description: 'Check the current status of our services and APIs',
-          icon: <Trees className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: 'Terms of Service',
-          description: 'Our terms and conditions for using our services',
-          icon: <Book className="size-5 shrink-0" />,
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Products',
-      url: '#',
-      items: [
-        {
-          title: 'Blog',
-          description: 'The latest industry news, updates, and info',
-          icon: <Book className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: 'Company',
-          description: 'Our mission is to innovate and empower the world',
-          icon: <Trees className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: 'Careers',
-          description: 'Browse job listing and discover our workspace',
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: 'Support',
-          description: 'Get in touch with our support team or visit our community forums',
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-      ],
-    },
-
-    {
-      title: 'Pricing',
-      url: '#',
-    },
-  ],
+  menu,
   auth = {
     login: { title: 'Login', url: '#' },
     signup: { title: 'Sign up', url: '#' },
   },
 }: MarketingNavProps) => {
+  const t = useTranslations('marketing.nav')
+
+  const defaultMenu = [
+    {
+      title: t('resources'),
+      url: '#',
+      items: [
+        {
+          title: t('helpCenter'),
+          description: t('helpCenterDesc'),
+          icon: <Zap className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('contactUs'),
+          description: t('contactUsDesc'),
+          icon: <Sunset className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('status'),
+          description: t('statusDesc'),
+          icon: <Trees className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('terms'),
+          description: t('termsDesc'),
+          icon: <Book className="size-5 shrink-0" />,
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: t('products'),
+      url: '#',
+      items: [
+        {
+          title: t('blog'),
+          description: t('blogDesc'),
+          icon: <Book className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('company'),
+          description: t('companyDesc'),
+          icon: <Trees className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('careers'),
+          description: t('careersDesc'),
+          icon: <Sunset className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('support'),
+          description: t('supportDesc'),
+          icon: <Zap className="size-5 shrink-0" />,
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: t('pricing'),
+      url: '#',
+    },
+  ]
+
+  const menuItems = menu || defaultMenu
   return (
     <section className="py-6 fixed top-0 left-0 right-0 z-50 h-24 backdrop-blur-xs flex flex-col justify-center bg-background/80">
       {/* Desktop Menu */}
@@ -140,12 +147,11 @@ const MarketingNav = ({
           </Link>
           <span className="text-2xl font-heading font-black">{logo.title}</span>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="flex items-center">
-            <NavigationMenu>
-              <NavigationMenuList>{menu.map(item => renderMenuItem(item))}</NavigationMenuList>
-            </NavigationMenu>
-          </div>
+        <div className="flex items-center gap-2">
+          <NavigationMenu>
+            <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
+          </NavigationMenu>
+
           {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
         </div>
       </nav>
@@ -176,7 +182,7 @@ const MarketingNav = ({
               </SheetHeader>
               <div className="flex flex-col gap-6 p-4">
                 <Accordion type="single" collapsible className="flex w-full flex-col gap-4">
-                  {menu.map(item => renderMobileMenuItem(item))}
+                  {menuItems.map(item => renderMobileMenuItem(item))}
                 </Accordion>
 
                 <div className="flex flex-col gap-3">
@@ -201,9 +207,9 @@ const renderMenuItem = (item: MenuItem) => {
     return (
       <NavigationMenuItem key={item.title}>
         <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground">
+        <NavigationMenuContent className="bg-popover text-popover-foreground w-full min-w-80">
           {item.items.map(subItem => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-80">
+            <NavigationMenuLink asChild key={subItem.title}>
               <SubMenuLink item={subItem} />
             </NavigationMenuLink>
           ))}

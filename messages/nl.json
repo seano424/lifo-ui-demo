@@ -1,0 +1,352 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Voorraad",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "todo": "Te doen",
+    "performance": "Prestaties",
+    "milestones": "Mijlpalen",
+    "analytics": "Analyses",
+    "settings": "Instellingen",
+    "helpCenter": "Helpcentrum",
+    "logout": "Uitloggen"
+  },
+  "actions": {
+    "add": "Toevoegen",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "scan": "Scannen",
+    "discount": "Korting",
+    "donate": "Doneren"
+  },
+  "forms": {
+    "productName": "Productnaam",
+    "expirationDate": "Vervaldatum",
+    "quantity": "Hoeveelheid",
+    "price": "Prijs",
+    "category": "Categorie",
+    "required": "Vereist"
+  },
+  "status": {
+    "fresh": "Vers",
+    "expiringSoon": "Verloopt Binnenkort",
+    "expired": "Verlopen",
+    "discounted": "Korting",
+    "donated": "Gedoneerd",
+    "sold": "Verkocht"
+  },
+  "validation": {
+    "required": "Dit veld is verplicht",
+    "invalidEmail": "Ongeldig e-mailadres",
+    "passwordTooShort": "Wachtwoord moet minimaal 8 tekens bevatten",
+    "dateMustBeFuture": "Datum moet in de toekomst liggen"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "description": "Beheer uw voorkeuren en accountinstellingen",
+    "language": {
+      "title": "Taal",
+      "description": "Kies uw voorkeurstaal voor de interface",
+      "preferred": "Voorkeurstaal"
+    },
+    "tabs": {
+      "store": "Winkel",
+      "notifications": "Meldingen",
+      "account": "Account",
+      "team": "Team",
+      "storeDescription": "Beheer uw winkelinstellingen.",
+      "notificationsDescription": "Beheer uw meldingsinstellingen."
+    }
+  },
+  "users": {
+    "title": "Teambeheer",
+    "description": "Nodig nieuwe teamleden uit in uw winkel en beheer hun rollen en machtigingen.",
+    "addEmployee": "Medewerker toevoegen",
+    "showing": "{current} van {total} gebruikers weergegeven",
+    "noUsersFound": "Geen gebruikers gevonden",
+    "name": "Naam",
+    "username": "Gebruikersnaam",
+    "email": "E-mail",
+    "role": "Rol",
+    "status": "Status",
+    "pinStatus": "PIN Status",
+    "actions": "Acties",
+    "active": "Actief",
+    "inactive": "Inactief",
+    "locked": "Vergrendeld",
+    "pinActive": "PIN Actief",
+    "noPin": "Geen PIN",
+    "loadMoreUsers": "Meer gebruikers laden",
+    "loadingMore": "Laden...",
+    "noUsersMessage": "Deze winkel heeft nog geen gebruikers.",
+    "errors": {
+      "mustHaveOwner": "Er moet altijd minstens één eigenaar zijn."
+    },
+    "dropdown": {
+      "userActions": "Gebruikersacties",
+      "makeEmployee": "Maak medewerker",
+      "makeManager": "Maak manager",
+      "makeOwner": "Maak eigenaar",
+      "resetPin": "PIN resetten",
+      "unlockPin": "PIN ontgrendelen",
+      "deactivateUser": "Gebruiker deactiveren",
+      "reactivateUser": "Gebruiker reactiveren",
+      "removeFromStore": "Verwijderen uit winkel"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Gebruikersrol bewerken",
+        "description": "{name} heeft momenteel de rol van: {role}",
+        "roleLabel": "Rol",
+        "selectPlaceholder": "Selecteer een rol",
+        "cancel": "Annuleren",
+        "save": "Wijzigingen opslaan"
+      },
+      "removeUser": {
+        "title": "Gebruiker uit winkel verwijderen",
+        "description": "Dit zal {name} permanent verwijderen uit {store}. Ze zullen alle toegang tot deze winkel verliezen, hun huidige rol en machtigingen verliezen, en moeten opnieuw worden uitgenodigd als u ze terug wilt. Hun gebruikersaccount blijft actief voor andere winkels.",
+        "cancel": "Annuleren",
+        "confirm": "Verwijderen uit winkel"
+      },
+      "resetPin": {
+        "title": "PIN resetten voor {name}",
+        "description": "Dit genereert een nieuwe PIN en stuurt deze naar de medewerker via e-mail. Hun huidige PIN werkt niet meer.",
+        "employee": "Medewerker",
+        "username": "Gebruikersnaam",
+        "email": "E-mail",
+        "currentStatus": "Huidige status",
+        "statusLocked": "Vergrendeld",
+        "statusActive": "Actief",
+        "cancel": "Annuleren",
+        "confirm": "PIN resetten"
+      },
+      "unlockPin": {
+        "title": "PIN ontgrendelen voor {name}",
+        "description": "Dit ontgrendelt onmiddellijk de PIN van de medewerker en reset hun teller voor mislukte pogingen.",
+        "employee": "Medewerker",
+        "username": "Gebruikersnaam",
+        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte PIN-pogingen",
+        "cancel": "Annuleren",
+        "confirm": "PIN ontgrendelen"
+      }
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "manager": "Manager",
+      "employee": "Medewerker",
+      "staff": "Personeel",
+      "admin": "Beheerder",
+      "user": "Gebruiker",
+      "unknown": "Onbekend"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Uitgeschakeld",
+        "locked": "PIN Vergrendeld",
+        "pending": "PIN In afwachting",
+        "active": "PIN Actief"
+      },
+      "inactive": "Inactief",
+      "username": "Gebruikersnaam",
+      "permissions": "Machtigingen",
+      "lastLogin": "Laatste aanmelding",
+      "failedAttempts": "{count} mislukte PIN poging{plural}",
+      "enablePin": "PIN inschakelen",
+      "disablePin": "PIN uitschakelen",
+      "removeDialog": {
+        "title": "Gebruiker uit winkel verwijderen",
+        "description": "Weet u zeker dat u {name} uit deze winkel wilt verwijderen? Dit deactiveert hun toegang maar verwijdert hun account niet.",
+        "cancel": "Annuleren",
+        "confirm": "Gebruiker verwijderen"
+      }
+    }
+  },
+  "account": {
+    "title": "Accountinformatie",
+    "description": "Beheer uw accountinstellingen en voorkeuren.",
+    "profile": {
+      "title": "Profielinformatie",
+      "fullName": "Volledige naam",
+      "email": "E-mailadres",
+      "fullNamePlaceholder": "Voer uw volledige naam in",
+      "emailPlaceholder": "Voer uw e-mailadres in",
+      "noName": "Geen naam",
+      "noEmail": "Geen e-mail",
+      "emailNotice": "E-mail kan niet worden gewijzigd. Neem contact op met ondersteuning indien nodig.",
+      "edit": "Bewerken",
+      "save": "Wijzigingen opslaan",
+      "cancel": "Annuleren",
+      "saving": "Opslaan..."
+    },
+    "phone": {
+      "title": "Telefoonnummer",
+      "label": "Telefoonnummer",
+      "placeholder": "+31 6 12 34 56 78",
+      "description": "Voer uw telefoonnummer in met landcode (optioneel)",
+      "noPhone": "Geen telefoonnummer ingesteld",
+      "addNotice": "Voeg een telefoonnummer toe voor accountbeveiliging en meldingen",
+      "invalidPhone": "Voer een geldig telefoonnummer in",
+      "edit": "Bewerken",
+      "save": "Telefoon opslaan",
+      "cancel": "Annuleren",
+      "saving": "Opslaan..."
+    },
+    "language": {
+      "title": "Taalvoorkeur",
+      "description": "Kies uw voorkeurstaal voor de interface"
+    },
+    "status": {
+      "title": "Accountstatus",
+      "accountStatus": "Status:",
+      "emailVerified": "E-mail geverifieerd:",
+      "phoneVerified": "Telefoon geverifieerd:",
+      "active": "Actief",
+      "inactive": "Inactief",
+      "verified": "Geverifieerd",
+      "unverified": "Niet geverifieerd"
+    },
+    "errors": {
+      "updateProfile": "Kan profiel niet bijwerken",
+      "updatePhone": "Kan telefoonnummer niet bijwerken"
+    }
+  },
+  "common": {
+    "more": "Meer"
+  },
+  "breadcrumbs": {
+    "dashboard": "Dashboard",
+    "inventory": "Voorraad",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "analytics": "Analyses",
+    "performance": "Prestaties",
+    "milestones": "Mijlpalen",
+    "todo": "Te doen",
+    "settings": "Instellingen",
+    "users": "Gebruikers",
+    "teams": "Teams",
+    "stores": "Winkels",
+    "products": "Producten",
+    "categories": "Categorieën",
+    "reports": "Rapporten",
+    "notifications": "Meldingen",
+    "account": "Account",
+    "profile": "Profiel",
+    "help": "Help",
+    "support": "Ondersteuning"
+  },
+  "addEmployee": {
+    "title": "Nieuwe medewerker toevoegen",
+    "description": "Maak een nieuw medewerkersaccount aan met PIN-authenticatie. Inloggegevens worden per e-mail verzonden.",
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "username": "Gebruikersnaam",
+      "role": "Rol",
+      "language": "Taal",
+      "firstNamePlaceholder": "Jan",
+      "lastNamePlaceholder": "Jansen",
+      "emailPlaceholder": "test@example.com (gebruik nep e-mail voor testen)",
+      "emailNote": "Gebruik test@example.com voor testen. Echte e-mails ontvangen inloggegevens.",
+      "usernamePlaceholder": "jan.jansen",
+      "usernameNote": "Medewerker gebruikt deze gebruikersnaam om in te loggen",
+      "usernameAvailable": "Gebruikersnaam is beschikbaar",
+      "usernameTaken": "Gebruikersnaam is al bezet",
+      "reset": "Resetten"
+    },
+    "roles": {
+      "employee": "Medewerker",
+      "manager": "Manager"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Gebruikersnaam:",
+      "pin": "PIN:",
+      "pinNote": "Wordt automatisch gegenereerd (4 cijfers)",
+      "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
+    },
+    "buttons": {
+      "cancel": "Annuleren",
+      "create": "Medewerker aanmaken",
+      "creating": "Aanmaken...",
+      "done": "Klaar",
+      "retrySending": "Opnieuw proberen"
+    },
+    "success": {
+      "title": "Medewerker succesvol aangemaakt!",
+      "description": "{name} is toegevoegd aan uw winkel. Bewaar deze inloggegevens en deel ze met de medewerker.",
+      "emailSending": "E-mail versturen...",
+      "emailSent": "Welkomst-e-mail succesvol verzonden naar {email}",
+      "emailPreparing": "E-mail voorbereiden voor {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "E-mailstatus: {error}"
+    },
+    "credentials": {
+      "email": "E-mail",
+      "username": "Gebruikersnaam",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Volgende stappen:",
+      "loginTab": "• De medewerker kan inloggen via het \"Medewerker\" tabblad op de inlogpagina",
+      "useCredentials": "• Gebruik gebruikersnaam: {username} en PIN: {pin}",
+      "resetPin": "• De PIN kan op elk moment worden gereset vanaf de teambeheerpagina",
+      "permissions": "• De medewerker kan producten scannen en basisvoorraad beheren"
+    },
+    "errors": {
+      "fillFields": "Vul alle verplichte velden in",
+      "usernameTaken": "Gebruikersnaam is al bezet. Kies een andere.",
+      "noStore": "Geen winkel geselecteerd",
+      "checkUsername": "Kon beschikbaarheid gebruikersnaam niet controleren",
+      "createFailed": "Kon medewerker niet aanmaken",
+      "copyFailed": "Kon niet kopiëren naar klembord"
+    },
+    "toast": {
+      "created": "Medewerker succesvol aangemaakt via server API!",
+      "emailSent": "Welkomst-e-mail succesvol verzonden!",
+      "emailFailed": "E-mail verzenden mislukt: {error}",
+      "emailError": "Fout bij verzenden e-mail: {error}",
+      "emailSkipped": "Medewerker aangemaakt! E-mail overgeslagen voor testadres.",
+      "copied": "{field} gekopieerd naar klembord"
+    }
+  },
+  "marketing": {
+    "nav": {
+      "resources": "Bronnen",
+      "products": "Producten",
+      "pricing": "Prijzen",
+      "helpCenter": "Helpcentrum",
+      "helpCenterDesc": "Krijg hier alle antwoorden die je nodig hebt",
+      "contactUs": "Contact",
+      "contactUsDesc": "We zijn er om je te helpen met al je vragen",
+      "status": "Status",
+      "statusDesc": "Controleer de huidige status van onze diensten en API's",
+      "terms": "Servicevoorwaarden",
+      "termsDesc": "Onze algemene voorwaarden voor het gebruik van onze diensten",
+      "blog": "Blog",
+      "blogDesc": "Het laatste nieuws, updates en informatie uit de sector",
+      "company": "Bedrijf",
+      "companyDesc": "Onze missie is innoveren en de wereld versterken",
+      "careers": "Carrières",
+      "careersDesc": "Bekijk vacatures en ontdek onze werkruimte",
+      "support": "Ondersteuning",
+      "supportDesc": "Neem contact op met ons ondersteuningsteam of bezoek onze communityforums"
+    },
+    "auth": {
+      "login": "Inloggen",
+      "signup": "Bedrijfsregistratie",
+      "logout": "Uitloggen",
+      "goToDashboard": "Naar dashboard"
+    }
+  }
+}

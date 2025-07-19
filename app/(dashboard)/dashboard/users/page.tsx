@@ -1,4 +1,5 @@
-import { Button } from '@/components/ui/button'
+// path: /dashboard/users/page.tsx
+
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserStores } from '@/lib/queries/stores'
 import { fetchStoreUsersPage } from '@/lib/queries/store-users'
@@ -122,7 +123,7 @@ export default async function UsersPage() {
       <div className="space-y-6">
         <DashboardInsetHeader title="Team Management" />
 
-        <StoreUsersList showAddButton={true} />
+        <StoreUsersList />
         {/* <StoreUserStats /> */}
       </div>
     </HydrationBoundary>
