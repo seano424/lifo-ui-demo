@@ -38,7 +38,7 @@ export default function SettingsTabs() {
   }
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 max-w-5xl mx-auto">
       <TabsList className="grid grid-cols-4 bg-opacity-0">
         <TabsTrigger value="store" variant="secondary">
           {t('tabs.store')}

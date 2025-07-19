@@ -163,5 +163,54 @@
         "confirm": "Remove User"
       }
     }
+  },
+  "account": {
+    "title": "Account Information",
+    "description": "Manage your account settings and preferences.",
+    "profile": {
+      "title": "Profile Information",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "fullNamePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email address",
+      "noName": "No name",
+      "noEmail": "No email",
+      "emailNotice": "Email cannot be changed. Contact support if needed.",
+      "edit": "Edit",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "phone": {
+      "title": "Phone Number",
+      "label": "Phone Number",
+      "placeholder": "+33 1 23 45 67 89",
+      "description": "Enter your phone number with country code (optional)",
+      "noPhone": "No phone number set",
+      "addNotice": "Add a phone number for account security and notifications",
+      "invalidPhone": "Please enter a valid phone number",
+      "edit": "Edit",
+      "save": "Save Phone",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "language": {
+      "title": "Language Preference",
+      "description": "Choose your preferred language for the interface"
+    },
+    "status": {
+      "title": "Account Status",
+      "accountStatus": "Status:",
+      "emailVerified": "Email Verified:",
+      "phoneVerified": "Phone Verified:",
+      "active": "Active",
+      "inactive": "Inactive",
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
+    "errors": {
+      "updateProfile": "Failed to update profile",
+      "updatePhone": "Failed to update phone number"
+    }
   }
 }

@@ -163,5 +163,54 @@
         "confirm": "Retirer l'utilisateur"
       }
     }
+  },
+  "account": {
+    "title": "Informations du compte",
+    "description": "Gérez les paramètres et préférences de votre compte.",
+    "profile": {
+      "title": "Informations de profil",
+      "fullName": "Nom complet",
+      "email": "Adresse e-mail",
+      "fullNamePlaceholder": "Entrez votre nom complet",
+      "emailPlaceholder": "Entrez votre adresse e-mail",
+      "noName": "Aucun nom",
+      "noEmail": "Aucun e-mail",
+      "emailNotice": "L'e-mail ne peut pas être modifié. Contactez le support si nécessaire.",
+      "edit": "Modifier",
+      "save": "Sauvegarder les modifications",
+      "cancel": "Annuler",
+      "saving": "Sauvegarde..."
+    },
+    "phone": {
+      "title": "Numéro de téléphone",
+      "label": "Numéro de téléphone",
+      "placeholder": "+33 1 23 45 67 89",
+      "description": "Entrez votre numéro de téléphone avec l'indicatif pays (optionnel)",
+      "noPhone": "Aucun numéro de téléphone défini",
+      "addNotice": "Ajoutez un numéro de téléphone pour la sécurité du compte et les notifications",
+      "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
+      "edit": "Modifier",
+      "save": "Sauvegarder le téléphone",
+      "cancel": "Annuler",
+      "saving": "Sauvegarde..."
+    },
+    "language": {
+      "title": "Préférence de langue",
+      "description": "Choisissez votre langue préférée pour l'interface"
+    },
+    "status": {
+      "title": "Statut du compte",
+      "accountStatus": "Statut:",
+      "emailVerified": "E-mail vérifié:",
+      "phoneVerified": "Téléphone vérifié:",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "verified": "Vérifié",
+      "unverified": "Non vérifié"
+    },
+    "errors": {
+      "updateProfile": "Échec de la mise à jour du profil",
+      "updatePhone": "Échec de la mise à jour du numéro de téléphone"
+    }
   }
 }

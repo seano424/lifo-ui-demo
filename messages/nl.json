@@ -163,5 +163,54 @@
         "confirm": "Gebruiker verwijderen"
       }
     }
+  },
+  "account": {
+    "title": "Accountinformatie",
+    "description": "Beheer uw accountinstellingen en voorkeuren.",
+    "profile": {
+      "title": "Profielinformatie",
+      "fullName": "Volledige naam",
+      "email": "E-mailadres",
+      "fullNamePlaceholder": "Voer uw volledige naam in",
+      "emailPlaceholder": "Voer uw e-mailadres in",
+      "noName": "Geen naam",
+      "noEmail": "Geen e-mail",
+      "emailNotice": "E-mail kan niet worden gewijzigd. Neem contact op met ondersteuning indien nodig.",
+      "edit": "Bewerken",
+      "save": "Wijzigingen opslaan",
+      "cancel": "Annuleren",
+      "saving": "Opslaan..."
+    },
+    "phone": {
+      "title": "Telefoonnummer",
+      "label": "Telefoonnummer",
+      "placeholder": "+31 6 12 34 56 78",
+      "description": "Voer uw telefoonnummer in met landcode (optioneel)",
+      "noPhone": "Geen telefoonnummer ingesteld",
+      "addNotice": "Voeg een telefoonnummer toe voor accountbeveiliging en meldingen",
+      "invalidPhone": "Voer een geldig telefoonnummer in",
+      "edit": "Bewerken",
+      "save": "Telefoon opslaan",
+      "cancel": "Annuleren",
+      "saving": "Opslaan..."
+    },
+    "language": {
+      "title": "Taalvoorkeur",
+      "description": "Kies uw voorkeurstaal voor de interface"
+    },
+    "status": {
+      "title": "Accountstatus",
+      "accountStatus": "Status:",
+      "emailVerified": "E-mail geverifieerd:",
+      "phoneVerified": "Telefoon geverifieerd:",
+      "active": "Actief",
+      "inactive": "Inactief",
+      "verified": "Geverifieerd",
+      "unverified": "Niet geverifieerd"
+    },
+    "errors": {
+      "updateProfile": "Kan profiel niet bijwerken",
+      "updatePhone": "Kan telefoonnummer niet bijwerken"
+    }
   }
 }

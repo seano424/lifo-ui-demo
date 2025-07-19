@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,7 @@ import { Edit, Check, X, AlertCircle } from 'lucide-react'
 import { LanguageSwitcher } from '../ui/language-switcher'
 
 export default function UserAccountInformation() {
+  const t = useTranslations('account')
   const { data: user, isLoading } = useCurrentUser()
 
   console.log('user', user)
@@ -76,7 +78,7 @@ export default function UserAccountInformation() {
       })
       setIsEditingProfile(false)
     } catch (error) {
-      setProfileError(error instanceof Error ? error.message : 'Failed to update profile')
+      setProfileError(error instanceof Error ? error.message : t('errors.updateProfile'))
     }
   }
 
@@ -87,7 +89,7 @@ export default function UserAccountInformation() {
 
     // Validate phone number
     if (phoneForm && !isValidPhoneNumber(phoneForm)) {
-      setPhoneError('Please enter a valid phone number')
+      setPhoneError(t('phone.invalidPhone'))
       return
     }
 
@@ -98,7 +100,7 @@ export default function UserAccountInformation() {
       })
       setIsEditingPhone(false)
     } catch (error) {
-      setPhoneError(error instanceof Error ? error.message : 'Failed to update phone number')
+      setPhoneError(error instanceof Error ? error.message : t('errors.updatePhone'))
     }
   }
 
@@ -153,9 +155,9 @@ export default function UserAccountInformation() {
     <Card>
       <CardHeader>
         <div className="flex flex-col">
-          <Typography variant="h2">Account Information</Typography>
+          <Typography variant="h2">{t('title')}</Typography>
           <Typography variant="p" color="muted">
-            Manage your account settings and preferences.
+            {t('description')}
           </Typography>
         </div>
       </CardHeader>
@@ -174,7 +176,7 @@ export default function UserAccountInformation() {
                 className="flex items-center gap-2"
               >
                 <Edit className="h-4 w-4" />
-                Edit
+                {t('profile.edit')}
               </Button>
             )}
           </div>
@@ -226,7 +228,7 @@ export default function UserAccountInformation() {
                   className="flex items-center gap-2"
                 >
                   <X className="h-4 w-4" />
-                  Cancel
+                  {t('profile.cancel')}
                 </Button>
               </div>
             </div>
@@ -234,9 +236,9 @@ export default function UserAccountInformation() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Typography variant="small" className="font-medium text-muted-foreground">
-                  Full Name
+                  {t('profile.fullName')}
                 </Typography>
-                <Typography variant="p">{user?.full_name || 'No name'}</Typography>
+                <Typography variant="p">{user?.full_name || t('profile.noName')}</Typography>
               </div>
 
               {/* <div>
@@ -249,11 +251,11 @@ export default function UserAccountInformation() {
               </div> */}
               <div>
                 <Typography variant="small" className="font-medium text-muted-foreground">
-                  Email Address
+                  {t('profile.email')}
                 </Typography>
-                <Typography variant="p">{user?.email || 'No email'}</Typography>
+                <Typography variant="p">{user?.email || t('profile.noEmail')}</Typography>
                 <Typography variant="small" className="text-muted-foreground mt-1">
-                  Email cannot be changed. Contact support if needed.
+                  {t('profile.emailNotice')}
                 </Typography>
               </div>
             </div>
@@ -264,7 +266,7 @@ export default function UserAccountInformation() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Typography variant="h3" className="flex items-center gap-2">
-              Phone Number
+              {t('phone.title')}
             </Typography>
             {!isEditingPhone && (
               <Button
@@ -274,7 +276,7 @@ export default function UserAccountInformation() {
                 className="flex items-center gap-2"
               >
                 <Edit className="h-4 w-4" />
-                Edit
+                {t('phone.edit')}
               </Button>
             )}
           </div>
@@ -289,16 +291,16 @@ export default function UserAccountInformation() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">{t('phone.label')}</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phoneForm}
                   onChange={e => setPhoneForm(e.target.value)}
-                  placeholder="+33 1 23 45 67 89"
+                  placeholder={t('phone.placeholder')}
                 />
                 <Typography variant="small" className="text-muted-foreground">
-                  Enter your phone number with country code (optional)
+                  {t('phone.description')}
                 </Typography>
               </div>
 
@@ -309,7 +311,7 @@ export default function UserAccountInformation() {
                   className="flex items-center gap-2"
                 >
                   <Check className="h-4 w-4" />
-                  {updatePhone.isPending ? 'Saving...' : 'Save Phone'}
+                  {updatePhone.isPending ? t('phone.saving') : t('phone.save')}
                 </Button>
                 <Button
                   variant="outline"
@@ -317,18 +319,18 @@ export default function UserAccountInformation() {
                   className="flex items-center gap-2"
                 >
                   <X className="h-4 w-4" />
-                  Cancel
+                  {t('phone.cancel')}
                 </Button>
               </div>
             </div>
           ) : (
             <div>
               <Typography variant="p" className="flex items-center gap-2">
-                {user?.phone ? formatPhoneNumber(user.phone) : 'No phone number set'}
+                {user?.phone ? formatPhoneNumber(user.phone) : t('phone.noPhone')}
               </Typography>
               {!user?.phone && (
                 <Typography variant="small" className="text-muted-foreground mt-1">
-                  Add a phone number for account security and notifications
+                  {t('phone.addNotice')}
                 </Typography>
               )}
             </div>
@@ -338,43 +340,43 @@ export default function UserAccountInformation() {
         {/* Language Preference Section */}
         <div className="space-y-4 pt-4 border-t">
           <Typography variant="h3" className="flex items-center gap-2">
-            Language Preference
+            {t('language.title')}
           </Typography>
 
           <Typography variant="p" className="flex items-center gap-2">
-            Choose your preferred language for the interface
+            {t('language.description')}
           </Typography>
           <LanguageSwitcher />
         </div>
 
         {/* Account Status Section */}
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h3">Account Status</Typography>
+          <Typography variant="h3">{t('status.title')}</Typography>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
               <Typography variant="small" className="font-medium text-muted-foreground">
-                Status:
+                {t('status.accountStatus')}
               </Typography>
               <span className="flex items-center gap-1">
-                {user?.is_active ? 'Active' : 'Inactive'}
+                {user?.is_active ? t('status.active') : t('status.inactive')}
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <Typography variant="small" className="font-medium text-muted-foreground">
-                Email Verified:
+                {t('status.emailVerified')}
               </Typography>
               <span className="flex items-center gap-1">
-                {user?.email_verified ? 'Verified' : 'Unverified'}
+                {user?.email_verified ? t('status.verified') : t('status.unverified')}
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <Typography variant="small" className="font-medium text-muted-foreground">
-                Phone Verified:
+                {t('status.phoneVerified')}
               </Typography>
               <span className="flex items-center gap-1">
-                {user?.phone_verified ? 'Verified' : 'Unverified'}
+                {user?.phone_verified ? t('status.verified') : t('status.unverified')}
               </span>
             </div>
           </div>
