@@ -4,6 +4,7 @@ import { Typography } from '@/components/ui/typography'
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { SignUpUserSteps } from '@/components/tutorial/sign-up-user-steps'
 import { ConnectSupabaseSteps } from '@/components/tutorial/connect-supabase-steps'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
             </a>
           </Typography>
           <ThemeSwitcher />
+          <LanguageSwitcher />
         </footer>
       </div>
     </main>

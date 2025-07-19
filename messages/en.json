@@ -319,5 +319,34 @@
       "emailSkipped": "Employee created! Email skipped for test address.",
       "copied": "{field} copied to clipboard"
     }
+  },
+  "marketing": {
+    "nav": {
+      "resources": "Resources",
+      "products": "Products",
+      "pricing": "Pricing",
+      "helpCenter": "Help Center",
+      "helpCenterDesc": "Get all the answers you need right here",
+      "contactUs": "Contact Us",
+      "contactUsDesc": "We are here to help you with any questions you have",
+      "status": "Status",
+      "statusDesc": "Check the current status of our services and APIs",
+      "terms": "Terms of Service",
+      "termsDesc": "Our terms and conditions for using our services",
+      "blog": "Blog",
+      "blogDesc": "The latest industry news, updates, and info",
+      "company": "Company",
+      "companyDesc": "Our mission is to innovate and empower the world",
+      "careers": "Careers",
+      "careersDesc": "Browse job listing and discover our workspace",
+      "support": "Support",
+      "supportDesc": "Get in touch with our support team or visit our community forums"
+    },
+    "auth": {
+      "login": "Login",
+      "signup": "Business Signup",
+      "logout": "Logout",
+      "goToDashboard": "Go to dashboard"
+    }
   }
 }

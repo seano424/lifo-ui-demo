@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 
@@ -9,6 +10,7 @@ interface LogoutButtonProps {
 }
 
 export function LogoutButton({ className }: LogoutButtonProps) {
+  const t = useTranslations('marketing.auth')
   const router = useRouter()
 
   const logout = async () => {
@@ -19,7 +21,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
 
   return (
     <Button variant={'brandSecondary'} size="default" onClick={logout} className={className}>
-      Logout
+      {t('logout')}
     </Button>
   )
 }

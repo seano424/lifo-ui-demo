@@ -319,5 +319,34 @@
       "emailSkipped": "Medewerker aangemaakt! E-mail overgeslagen voor testadres.",
       "copied": "{field} gekopieerd naar klembord"
     }
+  },
+  "marketing": {
+    "nav": {
+      "resources": "Bronnen",
+      "products": "Producten",
+      "pricing": "Prijzen",
+      "helpCenter": "Helpcentrum",
+      "helpCenterDesc": "Krijg hier alle antwoorden die je nodig hebt",
+      "contactUs": "Contact",
+      "contactUsDesc": "We zijn er om je te helpen met al je vragen",
+      "status": "Status",
+      "statusDesc": "Controleer de huidige status van onze diensten en API's",
+      "terms": "Servicevoorwaarden",
+      "termsDesc": "Onze algemene voorwaarden voor het gebruik van onze diensten",
+      "blog": "Blog",
+      "blogDesc": "Het laatste nieuws, updates en informatie uit de sector",
+      "company": "Bedrijf",
+      "companyDesc": "Onze missie is innoveren en de wereld versterken",
+      "careers": "Carrières",
+      "careersDesc": "Bekijk vacatures en ontdek onze werkruimte",
+      "support": "Ondersteuning",
+      "supportDesc": "Neem contact op met ons ondersteuningsteam of bezoek onze communityforums"
+    },
+    "auth": {
+      "login": "Inloggen",
+      "signup": "Bedrijfsregistratie",
+      "logout": "Uitloggen",
+      "goToDashboard": "Naar dashboard"
+    }
   }
 }

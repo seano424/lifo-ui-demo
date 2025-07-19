@@ -319,5 +319,34 @@
       "emailSkipped": "Employé créé! E-mail ignoré pour l'adresse de test.",
       "copied": "{field} copié dans le presse-papiers"
     }
+  },
+  "marketing": {
+    "nav": {
+      "resources": "Ressources",
+      "products": "Produits",
+      "pricing": "Tarifs",
+      "helpCenter": "Centre d'aide",
+      "helpCenterDesc": "Obtenez toutes les réponses dont vous avez besoin ici",
+      "contactUs": "Nous contacter",
+      "contactUsDesc": "Nous sommes là pour vous aider avec toutes vos questions",
+      "status": "Statut",
+      "statusDesc": "Vérifiez l'état actuel de nos services et API",
+      "terms": "Conditions d'utilisation",
+      "termsDesc": "Nos conditions générales d'utilisation de nos services",
+      "blog": "Blog",
+      "blogDesc": "Les dernières actualités, mises à jour et informations du secteur",
+      "company": "Entreprise",
+      "companyDesc": "Notre mission est d'innover et d'autonomiser le monde",
+      "careers": "Carrières",
+      "careersDesc": "Parcourez les offres d'emploi et découvrez notre espace de travail",
+      "support": "Support",
+      "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
+    },
+    "auth": {
+      "login": "Connexion",
+      "signup": "Inscription entreprise",
+      "logout": "Déconnexion",
+      "goToDashboard": "Aller au tableau de bord"
+    }
   }
 }
