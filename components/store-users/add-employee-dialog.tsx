@@ -66,8 +66,6 @@ const LANGUAGE_OPTIONS = {
   fr: 'Français',
   en: 'English',
   nl: 'Nederlands',
-  de: 'Deutsch',
-  es: 'Español',
 } as const
 
 export function AddEmployeeDialog({
@@ -417,9 +415,7 @@ export function AddEmployeeDialog({
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">{t('title')}</DialogTitle>
-              <DialogDescription>
-                {t('description')}
-              </DialogDescription>
+              <DialogDescription>{t('description')}</DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleCreateEmployee} className="space-y-4">
@@ -465,9 +461,7 @@ export function AddEmployeeDialog({
                   required
                   disabled={isLoading}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t('form.emailNote')}
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">{t('form.emailNote')}</p>
               </div>
 
               {/* ✅ FIXED: Username Input with Availability Check using RPC */}
@@ -749,9 +743,9 @@ export function AddEmployeeDialog({
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>{t('nextSteps.loginTab')}</li>
                   <li>
-                    {t('nextSteps.useCredentials', { 
-                      username: createdCredentials?.username || '', 
-                      pin: createdCredentials?.pin || '' 
+                    {t('nextSteps.useCredentials', {
+                      username: createdCredentials?.username || '',
+                      pin: createdCredentials?.pin || '',
                     })}
                   </li>
                   <li>{t('nextSteps.resetPin')}</li>
