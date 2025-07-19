@@ -14,7 +14,7 @@ export default getRequestConfig(async () => {
       console.warn('i18n error:', error.message)
     },
     getMessageFallback({ namespace, key, error }) {
-      const path = [namespace, key].filter((part) => part != null).join('.')
+      const path = [namespace, key].filter(part => part != null).join('.')
       return `${path} (${error.code})`
     },
   }

@@ -46,13 +46,9 @@ export default function DashboardBreadcrumbs() {
           return (
             <BreadcrumbItem key={segment}>
               {isLast ? (
-                <BreadcrumbPage>
-                  {getSegmentName(segment)}
-                </BreadcrumbPage>
+                <BreadcrumbPage>{getSegmentName(segment)}</BreadcrumbPage>
               ) : (
-                <BreadcrumbLink href={href}>
-                  {getSegmentName(segment)}
-                </BreadcrumbLink>
+                <BreadcrumbLink href={href}>{getSegmentName(segment)}</BreadcrumbLink>
               )}
             </BreadcrumbItem>
           )

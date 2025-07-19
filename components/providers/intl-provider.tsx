@@ -54,11 +54,11 @@ export function IntlProvider({
   }, [currentLanguage, initialMessages])
 
   return (
-    <NextIntlClientProvider 
-      locale={currentLanguage} 
+    <NextIntlClientProvider
+      locale={currentLanguage}
       messages={messages}
       timeZone="Europe/Paris"
-      onError={(error) => {
+      onError={error => {
         console.warn('Client i18n error:', error.message)
       }}
     >

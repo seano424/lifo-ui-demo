@@ -446,7 +446,9 @@ export function StoreUsersList() {
               )}
               {t('dialogs.editRole.description', {
                 name: selectedUser?.full_name || 'this user',
-                role: selectedUser?.role_in_store ? getRoleTranslation(selectedUser.role_in_store) : 'unknown',
+                role: selectedUser?.role_in_store
+                  ? getRoleTranslation(selectedUser.role_in_store)
+                  : 'unknown',
               })}
             </DialogDescription>
           </DialogHeader>

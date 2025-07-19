@@ -72,15 +72,35 @@ export function StoreUserCard({
   const getRoleInfo = (role: string) => {
     switch (role) {
       case 'owner':
-        return { icon: Crown, color: 'bg-yellow-100 text-yellow-800', label: getRoleTranslation('owner') }
+        return {
+          icon: Crown,
+          color: 'bg-yellow-100 text-yellow-800',
+          label: getRoleTranslation('owner'),
+        }
       case 'manager':
-        return { icon: UserCheck, color: 'bg-blue-100 text-blue-800', label: getRoleTranslation('manager') }
+        return {
+          icon: UserCheck,
+          color: 'bg-blue-100 text-blue-800',
+          label: getRoleTranslation('manager'),
+        }
       case 'employee':
-        return { icon: User, color: 'bg-green-100 text-green-800', label: getRoleTranslation('employee') }
+        return {
+          icon: User,
+          color: 'bg-green-100 text-green-800',
+          label: getRoleTranslation('employee'),
+        }
       case 'staff':
-        return { icon: Users, color: 'bg-gray-100 text-gray-800', label: getRoleTranslation('staff') }
+        return {
+          icon: Users,
+          color: 'bg-gray-100 text-gray-800',
+          label: getRoleTranslation('staff'),
+        }
       default:
-        return { icon: User, color: 'bg-gray-100 text-gray-800', label: getRoleTranslation('unknown') }
+        return {
+          icon: User,
+          color: 'bg-gray-100 text-gray-800',
+          label: getRoleTranslation('unknown'),
+        }
     }
   }
 
@@ -264,7 +284,10 @@ export function StoreUserCard({
           {storeUser.pin_attempts && storeUser.pin_attempts > 0 && (
             <div className="flex items-center gap-1 text-orange-600 text-xs">
               <AlertTriangle className="w-3 h-3" />
-              {t('card.failedAttempts', { count: storeUser.pin_attempts, plural: storeUser.pin_attempts > 1 ? 's' : '' })}
+              {t('card.failedAttempts', {
+                count: storeUser.pin_attempts,
+                plural: storeUser.pin_attempts > 1 ? 's' : '',
+              })}
             </div>
           )}
         </CardContent>
