@@ -64,6 +64,7 @@ class ScoringResult(BaseModel):
     """
     Result of scoring calculation
     """
+    store_id: str
     batch_id: str
     sku: str
     product_name: str
@@ -149,16 +150,136 @@ class InventoryScorer:
                 return 0.4
                 
         return 0.1  # Low urgency for long shelf life items
+    
+    def _calculate_disposal_urgency(self, days_to_expiry: int, category: str = None) -> float:
+        """
+        Calculate disposal urgency for expired products based on category and days past expiry
+        Returns: 0.0 (can wait) to 1.0 (immediate disposal required)
+        """
+        # Category-specific disposal urgency thresholds
+        category_disposal_profiles = {
+            'fresh_meat_fish': {'immediate': -1, 'urgent': -2, 'moderate': -7},
+            'dairy': {'immediate': -2, 'urgent': -5, 'moderate': -14},
+            'fresh_produce': {'immediate': -3, 'urgent': -7, 'moderate': -14},
+            'bakery_fresh': {'immediate': -2, 'urgent': -5, 'moderate': -10},
+            'deli_prepared': {'immediate': -1, 'urgent': -3, 'moderate': -7},
+            'frozen': {'immediate': -7, 'urgent': -30, 'moderate': -90},
+            'beverages': {'immediate': -30, 'urgent': -90, 'moderate': -180},
+            'dry_goods': {'immediate': -60, 'urgent': -180, 'moderate': -365},
+            'canned_jarred': {'immediate': -90, 'urgent': -365, 'moderate': -730},
+            'spices_condiments': {'immediate': -180, 'urgent': -365, 'moderate': -1095}
+        }
+        
+        # Get category profile or use default
+        profile = category_disposal_profiles.get(category, {
+            'immediate': -7, 'urgent': -30, 'moderate': -90
+        })
+        
+        # Calculate urgency based on how long the product has been expired
+        if days_to_expiry <= profile['immediate']:
+            return 1.0  # Immediate disposal required
+        elif days_to_expiry <= profile['urgent']:
+            return 0.8  # Urgent disposal needed
+        elif days_to_expiry <= profile['moderate']:
+            return 0.6  # Moderate disposal urgency
+        else:
+            return 0.4  # Lower disposal urgency but still expired
+    
+    def _calculate_expired_margin_score(self, margin_percent: float, days_to_expiry: int, category: str = None) -> float:
+        """
+        Calculate margin score for expired products
+        For expired products, margin is much less important - focus is on recovery vs disposal
+        Returns: 0.0 (can still recover some value) to 1.0 (total loss)
+        """
+        # Category-specific recovery potential after expiry
+        category_recovery_potential = {
+            'fresh_meat_fish': 0.0,      # No recovery - safety issue
+            'dairy': 0.1,                # Very limited recovery
+            'fresh_produce': 0.3,        # Some recovery potential
+            'bakery_fresh': 0.4,         # Good recovery potential
+            'deli_prepared': 0.1,        # Limited recovery
+            'frozen': 0.6,               # Good recovery if thawed recently
+            'beverages': 0.7,            # Good recovery potential
+            'dry_goods': 0.8,            # High recovery potential
+            'canned_jarred': 0.9,        # Very high recovery potential
+            'spices_condiments': 0.8     # High recovery potential
+        }
+        
+        base_recovery = category_recovery_potential.get(category, 0.5)
+        
+        # Reduce recovery potential based on how long expired
+        if days_to_expiry <= -30:
+            recovery_factor = base_recovery * 0.1  # Minimal recovery after 30 days
+        elif days_to_expiry <= -14:
+            recovery_factor = base_recovery * 0.3  # Limited recovery after 2 weeks
+        elif days_to_expiry <= -7:
+            recovery_factor = base_recovery * 0.5  # Moderate recovery after 1 week
+        elif days_to_expiry <= -3:
+            recovery_factor = base_recovery * 0.7  # Good recovery within 3 days
+        else:
+            recovery_factor = base_recovery * 0.9  # High recovery within 3 days
+        
+        # Convert recovery potential to margin score (inverse relationship)
+        return 1.0 - recovery_factor
+    
+    def _generate_expired_recommendation(self, days_to_expiry: int, current_margin_percent: float, current_quantity: float = None) -> Dict[str, Any]:
+        """
+        Generate recommendations for expired products based on days past expiry and category
+        """
+        # Determine action based on how long expired
+        if days_to_expiry <= -30:
+            return {
+                'action': 'dispose',
+                'urgency': 'critical',
+                'reason': f'Product expired {abs(days_to_expiry)} days ago - dispose immediately for safety',
+                'discount_percent': 0,
+                'priority': 1
+            }
+        elif days_to_expiry <= -14:
+            return {
+                'action': 'dispose',
+                'urgency': 'critical', 
+                'reason': f'Product expired {abs(days_to_expiry)} days ago - disposal recommended',
+                'discount_percent': 0,
+                'priority': 1
+            }
+        elif days_to_expiry <= -7:
+            return {
+                'action': 'heavy_discount_or_dispose',
+                'urgency': 'critical',
+                'reason': f'Product expired {abs(days_to_expiry)} days ago - heavy discount or dispose',
+                'discount_percent': min(80, max(60, int(current_margin_percent * 0.9))),
+                'priority': 1
+            }
+        elif days_to_expiry <= -3:
+            return {
+                'action': 'discount_aggressive',
+                'urgency': 'critical',
+                'reason': f'Product expired {abs(days_to_expiry)} days ago - aggressive discount needed',
+                'discount_percent': min(70, max(40, int(current_margin_percent * 0.8))),
+                'priority': 1
+            }
+        else:  # -1 to -3 days
+            return {
+                'action': 'discount_immediate',
+                'urgency': 'critical',
+                'reason': f'Product expired {abs(days_to_expiry)} day(s) ago - immediate discount required',
+                'discount_percent': min(60, max(30, int(current_margin_percent * 0.7))),
+                'priority': 1
+            }
         
     def calculate_velocity_score(self, current_quantity: float, 
                                avg_daily_sales: float, 
-                               days_to_expiry: int) -> float:
+                               days_to_expiry: int,
+                               category: str = None) -> float:
         """
         Enhanced velocity score calculation with improved algorithms
-        Returns: 0.0 (selling fast enough) to 1.0 (too slow)
+        For fresh products: Returns 0.0 (selling fast enough) to 1.0 (too slow)
+        For expired products: Returns disposal urgency based on category and days past expiry
         """
         if days_to_expiry <= 0:
-            return 1.0  # Already expired
+            # For expired products, return disposal urgency based on category and days past expiry
+            return self._calculate_disposal_urgency(days_to_expiry, category)
             
         if avg_daily_sales <= 0:
             return 0.8  # No sales data, assume moderate risk
@@ -188,7 +309,8 @@ class InventoryScorer:
             
     def calculate_margin_score(self, cost_price: float, 
                              selling_price: float, 
-                             days_to_expiry: int) -> float:
+                             days_to_expiry: int,
+                             category: str = None) -> float:
         """
         Enhanced margin score with urgency-based adjustments
         Returns: 0.0 (high margin, can afford discounts) to 1.0 (low margin)
@@ -198,7 +320,11 @@ class InventoryScorer:
             
         margin_percent = ((selling_price - cost_price) / selling_price) * 100
         
-        # Adjust margin importance based on urgency
+        # For expired products, margin becomes much less important
+        if days_to_expiry <= 0:
+            return self._calculate_expired_margin_score(margin_percent, days_to_expiry, category)
+        
+        # Adjust margin importance based on urgency for fresh products
         urgency_multiplier = 1.0
         if days_to_expiry <= 1:
             urgency_multiplier = 0.5  # Margin less important when critical
@@ -240,11 +366,14 @@ class InventoryScorer:
             margin_score * weights.get('margin', 0.2)
         )
         
-        # Apply non-linear scaling for more decisive recommendations
+        # Apply non-linear scaling for more decisive recommendations without ceiling effects
         if composite >= 0.8:
-            composite = min(1.0, composite * 1.1)  # Amplify high scores
+            # Use sigmoid-like amplification that doesn't exceed 1.0
+            amplification = 0.8 + (composite - 0.8) * 2.5  # Steeper curve above 0.8
+            composite = min(1.0, amplification)
         elif composite <= 0.2:
-            composite = max(0.0, composite * 0.8)  # Dampen low scores
+            # Dampen very low scores slightly
+            composite = composite * 0.9
         
         return min(1.0, max(0.0, composite))
         
@@ -257,13 +386,7 @@ class InventoryScorer:
         """
         
         if days_to_expiry <= 0:
-            return {
-                'action': 'remove',
-                'urgency': 'critical',
-                'reason': 'Product has expired - remove immediately',
-                'discount_percent': 0,
-                'priority': 1
-            }
+            return self._generate_expired_recommendation(days_to_expiry, current_margin_percent, current_quantity)
             
         # Critical urgency - immediate action required
         if composite_score >= 0.8:
@@ -502,14 +625,16 @@ class ScoringService:
             velocity_score = scorer.calculate_velocity_score(
                 batch_data["current_quantity"],
                 daily_sales,
-                days_to_expiry
+                days_to_expiry,
+                batch_data["category"]
             )
             
             margin_percent = ((batch_data["selling_price"] - batch_data["cost_price"]) / batch_data["selling_price"]) * 100
             margin_score = scorer.calculate_margin_score(
                 batch_data["cost_price"],
                 batch_data["selling_price"],
-                days_to_expiry
+                days_to_expiry,
+                batch_data["category"]
             )
             
             # Calculate composite score
@@ -525,7 +650,7 @@ class ScoringService:
                 composite_score,
                 days_to_expiry,
                 margin_percent,
-                float(batch.current_quantity)
+                float(batch_data['current_quantity'])
             )
             
             # Determine urgency level
@@ -688,7 +813,7 @@ class ScoringService:
             # Insert new score
             score = ProductScore(
                 batch_id=result.batch_id,
-                store_id=result.batch_id,  # Will be set properly in the actual implementation
+                store_id=result.store_id,  
                 expiry_score=Decimal(str(result.expiry_score)),
                 velocity_score=Decimal(str(result.velocity_score)),
                 margin_score=Decimal(str(result.margin_score)),
