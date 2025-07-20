@@ -107,7 +107,7 @@ CREATE TABLE donation.donation_recipients (
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_by VARCHAR(100)
+    created_by UUID REFERENCES auth.users(id)
 );
 
 -- =============================================
@@ -148,7 +148,7 @@ CREATE TABLE donation.eu_regulatory_requirements (
     -- Administrative
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_by VARCHAR(100),
+    created_by UUID REFERENCES auth.users(id),
     
     -- Constraints
     CONSTRAINT eu_reqs_category_check CHECK (regulation_category IN ('food_safety', 'traceability', 'hygiene', 'labeling', 'documentation', 'general')),
@@ -189,7 +189,7 @@ CREATE TABLE donation.organization_compliance_status (
     -- Administrative
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    assessed_by VARCHAR(100),
+    assessed_by UUID REFERENCES auth.users(id),
     
     UNIQUE(recipient_id, requirement_id),
     
@@ -254,9 +254,9 @@ CREATE TABLE donation.donation_records (
     photos_taken JSONB, -- Photo references for documentation
     
     -- User tracking
-    created_by VARCHAR(100), -- User who initiated donation
-    approved_by VARCHAR(100), -- User who approved donation
-    completed_by VARCHAR(100), -- User who completed donation
+    created_by UUID REFERENCES auth.users(id), -- User who initiated donation
+    approved_by UUID REFERENCES auth.users(id), -- User who approved donation
+    completed_by UUID REFERENCES auth.users(id), -- User who completed donation
     
     -- Notes and feedback
     donor_notes TEXT,
@@ -275,7 +275,7 @@ CREATE TABLE donation.donation_compliance_checks (
     -- Check details
     check_timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     check_type VARCHAR(100) NOT NULL, -- "initial", "pre_pickup", "delivery"
-    performed_by VARCHAR(100) NOT NULL,
+    performed_by UUID REFERENCES auth.users(id) NOT NULL,
     
     -- EU regulation compliance
     regulation_178_2002_compliant BOOLEAN, -- General Food Law
@@ -371,8 +371,8 @@ CREATE TABLE donation.donation_alerts (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     acknowledged_at TIMESTAMP WITH TIME ZONE,
     resolved_at TIMESTAMP WITH TIME ZONE,
-    acknowledged_by VARCHAR(100),
-    resolved_by VARCHAR(100),
+    acknowledged_by UUID REFERENCES auth.users(id),
+    resolved_by UUID REFERENCES auth.users(id),
     
     -- Status and actions
     is_active BOOLEAN DEFAULT TRUE,
@@ -519,7 +519,7 @@ CREATE POLICY "Store owners can manage donation recipients" ON donation.donation
         auth.role() = 'authenticated' AND
         EXISTS (
             SELECT 1 FROM business.store_users su
-            WHERE su.user_id = auth.uid()::text
+            WHERE su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager')
         )
     );
@@ -534,7 +534,7 @@ CREATE POLICY "Users can view compliance status" ON donation.organization_compli
         auth.role() = 'authenticated' AND
         EXISTS (
             SELECT 1 FROM business.store_users su
-            WHERE su.user_id = auth.uid()::text
+            WHERE su.user_id = auth.uid()
         )
     );
 
@@ -543,7 +543,7 @@ CREATE POLICY "Store managers can manage compliance status" ON donation.organiza
         auth.role() = 'authenticated' AND
         EXISTS (
             SELECT 1 FROM business.store_users su
-            WHERE su.user_id = auth.uid()::text
+            WHERE su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager')
         )
     );
@@ -555,7 +555,7 @@ CREATE POLICY "Users can view store donation records" ON donation.donation_recor
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_records.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
         )
     );
 
@@ -565,7 +565,7 @@ CREATE POLICY "Store users can manage donation records" ON donation.donation_rec
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_records.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager', 'employee')
         )
     );
@@ -578,7 +578,7 @@ CREATE POLICY "Users can view compliance checks for accessible donations" ON don
             SELECT 1 FROM donation.donation_records dr
             JOIN business.store_users su ON su.store_id = dr.store_id
             WHERE dr.donation_id = donation.donation_compliance_checks.donation_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
         )
     );
 
@@ -589,7 +589,7 @@ CREATE POLICY "Store users can manage compliance checks" ON donation.donation_co
             SELECT 1 FROM donation.donation_records dr
             JOIN business.store_users su ON su.store_id = dr.store_id
             WHERE dr.donation_id = donation.donation_compliance_checks.donation_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager', 'employee')
         )
     );
@@ -601,7 +601,7 @@ CREATE POLICY "Users can view store KPI impacts" ON donation.donation_kpi_impact
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_kpi_impacts.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
         )
     );
 
@@ -611,7 +611,7 @@ CREATE POLICY "Store users can manage KPI impacts" ON donation.donation_kpi_impa
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_kpi_impacts.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager', 'employee')
         )
     );
@@ -623,7 +623,7 @@ CREATE POLICY "Users can view store donation alerts" ON donation.donation_alerts
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_alerts.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
         )
     );
 
@@ -633,7 +633,7 @@ CREATE POLICY "Store users can manage donation alerts" ON donation.donation_aler
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_alerts.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager', 'employee')
         )
     );
@@ -645,7 +645,7 @@ CREATE POLICY "Users can view store donation analytics" ON donation.donation_ana
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_analytics.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
         )
     );
 
@@ -655,7 +655,7 @@ CREATE POLICY "Store owners can manage donation analytics" ON donation.donation_
         EXISTS (
             SELECT 1 FROM business.store_users su
             WHERE su.store_id = donation.donation_analytics.store_id
-            AND su.user_id = auth.uid()::text
+            AND su.user_id = auth.uid()
             AND su.role IN ('owner', 'manager')
         )
     );
