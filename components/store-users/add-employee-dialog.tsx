@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -115,45 +115,48 @@ export function AddEmployeeDialog({
         setFormData(prev => ({ ...prev, username: suggested }))
       }
     }
-  }, [formData.firstName, formData.lastName])
+  }, [formData.firstName, formData.lastName, formData.username])
 
   // ✅ FIXED: Check username availability using RPC function
-  const checkUsernameAvailability = async (username: string) => {
-    if (!username || username.length < 3) {
-      setUsernameAvailable(null)
-      return
-    }
-
-    setIsCheckingUsername(true)
-    try {
-      const supabase = createClient()
-
-      console.log(`🔍 Checking username availability for: "${username}"`)
-
-      // ✅ Use RPC function instead of direct auth.users query
-      const { data, error } = await supabase.rpc('check_username_availability', {
-        p_username: username,
-      })
-
-      if (error) {
-        console.error('❌ Username availability check error:', error)
+  const checkUsernameAvailability = useCallback(
+    async (username: string) => {
+      if (!username || username.length < 3) {
         setUsernameAvailable(null)
-        toast.error(t('errors.checkUsername'))
         return
       }
 
-      // data is boolean: true = available, false = taken
-      setUsernameAvailable(data)
+      setIsCheckingUsername(true)
+      try {
+        const supabase = createClient()
 
-      console.log(`✅ Username "${username}" availability:`, data ? 'Available ✅' : 'Taken ❌')
-    } catch (error) {
-      console.error('❌ Username availability check failed:', error)
-      setUsernameAvailable(null)
-      toast.error(t('errors.checkUsername'))
-    } finally {
-      setIsCheckingUsername(false)
-    }
-  }
+        console.log(`🔍 Checking username availability for: "${username}"`)
+
+        // ✅ Use RPC function instead of direct auth.users query
+        const { data, error } = await supabase.rpc('check_username_availability', {
+          p_username: username,
+        })
+
+        if (error) {
+          console.error('❌ Username availability check error:', error)
+          setUsernameAvailable(null)
+          toast.error(t('errors.checkUsername'))
+          return
+        }
+
+        // data is boolean: true = available, false = taken
+        setUsernameAvailable(data)
+
+        console.log(`✅ Username "${username}" availability:`, data ? 'Available ✅' : 'Taken ❌')
+      } catch (error) {
+        console.error('❌ Username availability check failed:', error)
+        setUsernameAvailable(null)
+        toast.error(t('errors.checkUsername'))
+      } finally {
+        setIsCheckingUsername(false)
+      }
+    },
+    [t],
+  )
 
   // Debounced username check
   useEffect(() => {
@@ -164,7 +167,7 @@ export function AddEmployeeDialog({
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [formData.username])
+  }, [formData.username, checkUsernameAvailability])
 
   // Generate secure PIN
   const generateSecurePIN = (): string => {
@@ -228,8 +231,10 @@ export function AddEmployeeDialog({
         })
         toast.error(t('toast.emailFailed', { error: errorMessage }))
       }
-    } catch (error: any) {
-      const errorMessage = getEmailErrorMessage(error.message || 'Unknown error')
+    } catch (error: unknown) {
+      const errorMessage = getEmailErrorMessage(
+        error instanceof Error ? error.message : 'Unknown error',
+      )
       setEmailStatus({
         sent: false,
         sending: false,
@@ -364,9 +369,9 @@ export function AddEmployeeDialog({
         // Send credentials to their real email
         await sendEmployeeWelcomeEmail(credentials)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Error creating employee:', error)
-      toast.error(error.message || t('errors.createFailed'))
+      toast.error(error instanceof Error ? error.message : t('errors.createFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -379,7 +384,7 @@ export function AddEmployeeDialog({
       setCopiedField(field)
       toast.success(t('toast.copied', { field }))
       setTimeout(() => setCopiedField(null), 2000)
-    } catch (error) {
+    } catch {
       toast.error(t('errors.copyFailed'))
     }
   }
@@ -549,7 +554,7 @@ export function AddEmployeeDialog({
                   <Label htmlFor="language">{t('form.language')}</Label>
                   <Select
                     value={formData.languagePreference}
-                    onValueChange={(value: any) =>
+                    onValueChange={(value: 'en' | 'fr' | 'nl' | 'de' | 'es') =>
                       setFormData({ ...formData, languagePreference: value })
                     }
                     disabled={isLoading}
@@ -558,7 +563,7 @@ export function AddEmployeeDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(LANGUAGE_OPTIONS).map(([code, name]) => (
+                      {Object.entries(LANGUAGE_OPTIONS).map(([code]) => (
                         <SelectItem key={code} value={code}>
                           {t(`languages.${code}`)}
                         </SelectItem>

@@ -88,13 +88,17 @@ export async function POST(request: NextRequest) {
       success: true,
       messageId: data?.id,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Send welcome email error:', error)
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 })
   }
 }
 
-function generateWelcomeEmailHTML(credentials: any, storeName: string): string {
+function generateWelcomeEmailHTML(
+  credentials: { username: string; pin: string; email: string; full_name: string },
+  storeName: string,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -248,7 +252,10 @@ function generateWelcomeEmailHTML(credentials: any, storeName: string): string {
   `
 }
 
-function generateWelcomeEmailText(credentials: any, storeName: string): string {
+function generateWelcomeEmailText(
+  credentials: { username: string; pin: string; email: string; full_name: string },
+  storeName: string,
+): string {
   return `
 Welcome to ${storeName}
 

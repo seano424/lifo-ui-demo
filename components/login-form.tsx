@@ -120,7 +120,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       } else if (result.authUser) {
         // Handle manual session setup
         console.log('🔧 Manual session setup...')
-        const supabase = createClient()
 
         // Try to sign in with the user's email (this might work since PIN is validated)
         console.log('Attempting sign in for:', result.authUser.email)

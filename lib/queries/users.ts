@@ -511,7 +511,7 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
     }
 
     // Find the specific user
-    const userData = data?.find((user: any) => user.id === userId)
+    const userData = data?.find((user: Record<string, unknown>) => user.id === userId)
 
     if (!userData) {
       throw new Error(`User with ID "${userId}" not found`)

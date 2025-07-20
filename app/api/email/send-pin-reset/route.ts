@@ -80,9 +80,10 @@ export async function POST(request: NextRequest) {
       success: true,
       messageId: result.messageId,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Send PIN reset email error:', error)
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 })
   }
 }
 

@@ -2,7 +2,7 @@
 
 import { NextIntlClientProvider } from 'next-intl'
 import { useLanguageStore } from '@/lib/stores/language-store'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface Messages {
   [key: string]: unknown
@@ -17,13 +17,13 @@ export function IntlProvider({
 }) {
   const { currentLanguage } = useLanguageStore()
   const [messages, setMessages] = useState<Messages>(initialMessages)
+  const [isHydrated, setIsHydrated] = useState(false)
 
-  useEffect(() => {
-    // Dynamically load messages for the current language
-    const loadMessages = async () => {
+  const loadMessages = useCallback(
+    async (language: string) => {
       try {
         let newMessages
-        switch (currentLanguage) {
+        switch (language) {
           case 'en':
             newMessages = await import(`../../messages/en.json`)
             break
@@ -37,7 +37,7 @@ export function IntlProvider({
         }
         setMessages(newMessages.default)
       } catch (error) {
-        console.error(`Failed to load messages for ${currentLanguage}:`, error)
+        console.error(`Failed to load messages for ${language}:`, error)
         // Fallback to French
         try {
           const fallbackMessages = await import(`../../messages/fr.json`)
@@ -48,10 +48,37 @@ export function IntlProvider({
           setMessages(initialMessages)
         }
       }
+    },
+    [initialMessages],
+  )
+
+  // Handle hydration mismatch by detecting visitor language preference on client
+  useEffect(() => {
+    if (!isHydrated) {
+      setIsHydrated(true)
+
+      // Check if we need to load visitor language preference
+      const storedLanguage = localStorage.getItem('lifo-language-preference')
+      if (storedLanguage) {
+        const parsed = JSON.parse(storedLanguage)
+        if (parsed.state?.currentLanguage && parsed.state.currentLanguage !== 'fr') {
+          // Load the stored visitor language immediately
+          loadMessages(parsed.state.currentLanguage)
+          return
+        }
+      }
+
+      // Check browser language if no stored preference
+      const browserLang = navigator.language.split('-')[0]
+      if (['en', 'nl'].includes(browserLang) && browserLang !== 'fr') {
+        loadMessages(browserLang)
+        return
+      }
     }
 
-    loadMessages()
-  }, [currentLanguage, initialMessages])
+    // Normal language change handling
+    loadMessages(currentLanguage)
+  }, [currentLanguage, isHydrated, loadMessages])
 
   return (
     <NextIntlClientProvider

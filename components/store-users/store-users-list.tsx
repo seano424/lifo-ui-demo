@@ -169,11 +169,6 @@ export function StoreUsersList() {
     refetch(storeId)
   }
 
-  const handleUserUpdated = () => {
-    // Refresh the users list after PIN management actions
-    refetch(storeId)
-  }
-
   return (
     <>
       <Card>

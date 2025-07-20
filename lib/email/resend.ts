@@ -48,11 +48,11 @@ export async function sendWelcomeEmail(
       success: true,
       messageId: data?.id,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email sending error:', error)
     return {
       success: false,
-      error: error.message || 'Unknown email error',
+      error: error instanceof Error ? error.message : 'Unknown email error',
     }
   }
 }
@@ -84,11 +84,11 @@ export async function sendPinResetEmail(
       success: true,
       messageId: data?.id,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email sending error:', error)
     return {
       success: false,
-      error: error.message || 'Unknown email error',
+      error: error instanceof Error ? error.message : 'Unknown email error',
     }
   }
 }

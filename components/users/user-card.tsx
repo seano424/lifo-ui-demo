@@ -1,7 +1,7 @@
 'use client'
 
 import { useUserRoles } from '@/hooks/use-users'
-import type { User } from '@/lib/queries/users'
+import type { User } from '@/lib/types/user'
 import { Typography } from '@/components/ui/typography'
 
 interface UserCardProps {

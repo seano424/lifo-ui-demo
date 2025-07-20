@@ -35,8 +35,6 @@ function TabsTrigger({
 }: React.ComponentProps<typeof TabsPrimitive.Trigger> & {
   variant?: 'default' | 'secondary'
 }) {
-  const variantClass = variant === 'default' ? 'default' : 'secondary'
-
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"

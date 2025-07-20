@@ -5,28 +5,11 @@ import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import {
-  useCurrentUser,
-  useUpdateLanguagePreference,
-  useUpdatePhone,
-  useUserActions,
-} from '@/hooks/use-users'
-import {
-  SUPPORTED_LANGUAGES,
-  SupportedLanguage,
-  isValidPhoneNumber,
-  formatPhoneNumber,
-} from '@/lib/types/user'
+import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
+import { isValidPhoneNumber, formatPhoneNumber } from '@/lib/types/user'
 import { Edit, Check, X, AlertCircle } from 'lucide-react'
 import { LanguageSwitcher } from '../ui/language-switcher'
 
@@ -35,13 +18,11 @@ export default function UserAccountInformation() {
   const { data: user, isLoading } = useCurrentUser()
 
   console.log('user', user)
-  const updateLanguage = useUpdateLanguagePreference()
   const updatePhone = useUpdatePhone()
   const { updateUserProfile } = useUserActions()
 
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isEditingPhone, setIsEditingPhone] = useState(false)
-  const [isEditingLanguage, setIsEditingLanguage] = useState(false)
 
   // Form states
   const [editForm, setEditForm] = useState({
@@ -49,7 +30,6 @@ export default function UserAccountInformation() {
     email: '',
   })
   const [phoneForm, setPhoneForm] = useState('')
-  const [languageForm, setLanguageForm] = useState<SupportedLanguage>('en')
 
   // Error states
   const [phoneError, setPhoneError] = useState('')
@@ -62,7 +42,6 @@ export default function UserAccountInformation() {
         email: user.email || '',
       })
       setPhoneForm(user.phone || '')
-      setLanguageForm(user.language_preference || 'en')
     }
   }, [user])
 
@@ -104,20 +83,6 @@ export default function UserAccountInformation() {
     }
   }
 
-  const handleLanguageSubmit = async () => {
-    if (!user) return
-
-    try {
-      await updateLanguage.mutateAsync({
-        userId: user.id,
-        language: languageForm,
-      })
-      setIsEditingLanguage(false)
-    } catch (error) {
-      console.error('Failed to update language:', error)
-    }
-  }
-
   const resetProfileForm = () => {
     if (user) {
       setEditForm({
@@ -133,11 +98,6 @@ export default function UserAccountInformation() {
     setPhoneForm(user?.phone || '')
     setPhoneError('')
     setIsEditingPhone(false)
-  }
-
-  const resetLanguageForm = () => {
-    setLanguageForm(user?.language_preference || 'en')
-    setIsEditingLanguage(false)
   }
 
   if (isLoading) {

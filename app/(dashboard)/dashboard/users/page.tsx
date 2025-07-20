@@ -7,7 +7,6 @@ import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
-import { StoreUserStats } from '@/components/store-users/store-user-stats'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
 

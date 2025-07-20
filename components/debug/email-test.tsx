@@ -67,10 +67,10 @@ export function EmailTestComponent() {
       } else {
         toast.error(`Échec de l'envoi: ${data.error}`)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorResult = {
         success: false,
-        error: error.message || 'Erreur réseau',
+        error: error instanceof Error ? error.message : 'Erreur réseau',
       }
       setResult(errorResult)
       toast.error(`Erreur: ${errorResult.error}`)
@@ -86,7 +86,7 @@ export function EmailTestComponent() {
           <Mail className="w-5 h-5" />
           Test Email (Dev)
         </CardTitle>
-        <CardDescription>Testez l'envoi d'emails Resend en développement</CardDescription>
+        <CardDescription>Testez l&apos;envoi d&apos;emails Resend en développement</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -114,7 +114,7 @@ export function EmailTestComponent() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="test-type">Type d'email</Label>
+          <Label htmlFor="test-type">Type d&apos;email</Label>
           <Select
             value={type}
             onValueChange={(value: 'welcome' | 'pin_reset') => setType(value)}
@@ -124,7 +124,7 @@ export function EmailTestComponent() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="welcome">Email d'accueil</SelectItem>
+              <SelectItem value="welcome">Email d&apos;accueil</SelectItem>
               <SelectItem value="pin_reset">Réinitialisation PIN</SelectItem>
             </SelectContent>
           </Select>
