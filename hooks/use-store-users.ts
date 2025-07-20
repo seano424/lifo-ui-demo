@@ -223,7 +223,7 @@ export function useStoreUserActions() {
       if (!activeStoreId) {
         throw new Error('Store ID is required for adding store user')
       }
-      return addUserToStore(activeStoreId, userId, roleInStore, permissions, assignedBy)
+      return addUserToStore(activeStoreId, userId, roleInStore, permissions)
     },
     onSuccess: () => {
       if (activeStoreId) {

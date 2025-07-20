@@ -95,8 +95,10 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
         })
         toast.error(`Failed to send email: ${errorMessage}`)
       }
-    } catch (error: any) {
-      const errorMessage = getEmailErrorMessage(error.message || 'Unknown error')
+    } catch (error: unknown) {
+      const errorMessage = getEmailErrorMessage(
+        error instanceof Error ? error.message : 'Unknown error',
+      )
       setEmailStatus({
         sent: false,
         sending: false,
@@ -142,9 +144,9 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
 
       // Automatically send reset email
       await sendResetEmail(credentials)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error resetting PIN:', error)
-      toast.error(error.message || 'Failed to reset PIN')
+      toast.error(error instanceof Error ? error.message : 'Failed to reset PIN')
     } finally {
       setIsLoading(false)
     }
@@ -169,9 +171,9 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
       toast.success(`PIN unlocked for ${user.full_name}`)
       onUserUpdated()
       setIsUnlockDialogOpen(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error unlocking PIN:', error)
-      toast.error(error.message || 'Failed to unlock PIN')
+      toast.error(error instanceof Error ? error.message : 'Failed to unlock PIN')
     } finally {
       setIsLoading(false)
     }
@@ -184,7 +186,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
       setCopiedField(field)
       toast.success(`${field} copied to clipboard`)
       setTimeout(() => setCopiedField(null), 2000)
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy to clipboard')
     }
   }
@@ -387,7 +389,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               Unlock PIN for {user.full_name}
             </DialogTitle>
             <DialogDescription>
-              This will immediately unlock the employee's PIN and reset their failed attempts
+              This will immediately unlock the employee&apos;s PIN and reset their failed attempts
               counter.
             </DialogDescription>
           </DialogHeader>

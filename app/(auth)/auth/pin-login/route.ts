@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       temp_auth_token: generateTempToken(result.user.id),
       expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PIN login API error:', error)
     return NextResponse.json(
       { success: false, error: 'Login service unavailable' },

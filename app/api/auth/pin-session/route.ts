@@ -40,8 +40,16 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Trying email formats:', possibleEmails)
 
-    let signInData: any = null
-    let signInError: any = null
+    let signInData: {
+      session: { access_token: string; refresh_token: string }
+      user: {
+        id: string
+        email?: string
+        user_metadata?: { username?: string; full_name?: string }
+        raw_user_meta_data?: { username?: string; full_name?: string }
+      }
+    } | null = null
+    let signInError: Error | null = null
 
     // Try each email format until one works
     for (const email of possibleEmails) {
@@ -82,12 +90,14 @@ export async function POST(request: NextRequest) {
     // Get username from metadata, override for test cases
     let userUsername =
       signInData.user.user_metadata?.username ||
-      (signInData.user as any).raw_user_meta_data?.username ||
+      (signInData.user as { raw_user_meta_data?: { username?: string } }).raw_user_meta_data
+        ?.username ||
       username
 
     let fullName =
       signInData.user.user_metadata?.full_name ||
-      (signInData.user as any).raw_user_meta_data?.full_name ||
+      (signInData.user as { raw_user_meta_data?: { full_name?: string } }).raw_user_meta_data
+        ?.full_name ||
       userUsername
 
     // Override for john.smith test user
@@ -101,7 +111,7 @@ export async function POST(request: NextRequest) {
       success: true,
       user: {
         id: signInData.user.id,
-        email: signInData.user.email,
+        email: signInData.user.email || '',
         username: userUsername,
         full_name: fullName,
         role: 'employee',

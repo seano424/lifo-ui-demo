@@ -68,7 +68,22 @@ export const useLanguageStore = create<LanguageState>()(
               set({ currentLanguage: 'fr' })
             }
           } else {
-            // Not logged in - use browser language or default to French
+            // Not logged in - check localStorage first, then browser language
+            const stored = localStorage.getItem('lifo-language-preference')
+            if (stored) {
+              try {
+                const parsed = JSON.parse(stored)
+                const storedLang = parsed.state?.currentLanguage as Language
+                if (storedLang && LIFO_SUPPORTED_LANGUAGES.includes(storedLang)) {
+                  set({ currentLanguage: storedLang })
+                  return
+                }
+              } catch {
+                // Invalid stored data, continue to browser detection
+              }
+            }
+
+            // Use browser language or default to French
             const browserLang = navigator.language.split('-')[0] as Language
             const supportedLanguage = LIFO_SUPPORTED_LANGUAGES.includes(browserLang)
               ? browserLang

@@ -163,7 +163,8 @@ export async function fetchStoreUsersPage(
       )
     }
 
-    const totalCount = data.length > 0 ? Number(data[0]?.total_count || 0) : 0
+    const totalCount =
+      data && data.length > 0 ? Number((data[0] as Record<string, unknown>)?.total_count || 0) : 0
 
     return {
       data: storeUsers,
@@ -228,7 +229,6 @@ export async function updateStoreUser(
     // 🔍 Check authentication state
     const {
       data: { session },
-      error: sessionError,
     } = await supabase.auth.getSession()
 
     if (!session?.user) {
@@ -237,7 +237,7 @@ export async function updateStoreUser(
 
     // 🎯 METHOD 1: Try direct table update first
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .schema('business')
         .from('store_users')
         .update(updates)
@@ -262,7 +262,7 @@ export async function updateStoreUser(
       }
 
       return updatedUser
-    } catch (directError: any) {
+    } catch {
       // 🎯 METHOD 2: Fallback to RPC function (now with SECURITY DEFINER)
       const { data: rpcData, error: rpcError } = await supabase.rpc('update_store_user_safe', {
         input_store_id: storeId,
@@ -291,10 +291,10 @@ export async function updateStoreUser(
 
       return transformStoreUserRow(rpcData[0])
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[updateStoreUser] ❌ All methods failed:', {
-      error: err.message,
-      stack: err.stack,
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
       storeId,
       userId,
       updates,
@@ -312,9 +312,9 @@ export async function testStoreUserUpdate(storeId: string, userId: string) {
     })
 
     return { success: true, result }
-  } catch (error: any) {
-    console.error('❌ Test failed:', error.message)
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    console.error('❌ Test failed:', error instanceof Error ? error.message : String(error))
+    return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -359,7 +359,7 @@ export async function addUserToStore(
     } = await supabase.auth.getUser()
     const assignedBy = user?.id
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .schema('business')
       .from('store_users')
       .upsert({

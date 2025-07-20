@@ -10,13 +10,10 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-  Users,
   Calendar,
   Box,
   BarChart,
-  Milestone,
   Target,
-  Tag,
   HelpCircle,
 } from 'lucide-react'
 

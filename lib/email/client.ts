@@ -56,11 +56,11 @@ export async function sendWelcomeEmail({
       success: true,
       messageId: result.messageId,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email sending error:', error)
     return {
       success: false,
-      error: error.message || 'Network error',
+      error: error instanceof Error ? error.message : 'Network error',
     }
   }
 }
@@ -97,11 +97,11 @@ export async function sendPinResetEmail({
       success: true,
       messageId: result.messageId,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email sending error:', error)
     return {
       success: false,
-      error: error.message || 'Network error',
+      error: error instanceof Error ? error.message : 'Network error',
     }
   }
 }

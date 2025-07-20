@@ -116,14 +116,17 @@ export async function POST(request: NextRequest) {
       messageId: emailResult.messageId,
       message: `${type === 'welcome' ? 'Welcome' : 'PIN reset'} email sent successfully`,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Email API error:', error)
+
+    const errorMessage = error instanceof Error ? error.message : 'Failed to send email'
+    const errorStack = error instanceof Error ? error.stack : undefined
 
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to send email',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? errorStack : undefined,
       },
       { status: 500 },
     )

@@ -70,7 +70,7 @@ export function generateSecurePIN(): string {
     if (attempts > maxAttempts) {
       throw new Error('Unable to generate secure PIN after maximum attempts')
     }
-  } while (BLOCKED_PINS.includes(pin as any) || isSequentialPIN(pin))
+  } while (BLOCKED_PINS.includes(pin as (typeof BLOCKED_PINS)[number]) || isSequentialPIN(pin))
 
   return pin
 }
@@ -171,7 +171,7 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
     console.log('[validatePINLogin] PIN validated, creating session...')
 
     // Sign in the user using their email (since PIN validation succeeded)
-    const { data: authData, error: authError } = await supabase.auth.signInWithOtp({
+    const { error: authError } = await supabase.auth.signInWithOtp({
       email: result.user.email,
       options: {
         shouldCreateUser: false, // User already exists
@@ -217,47 +217,6 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
 }
 
 /**
- * Create a Supabase session for a PIN-authenticated user
- */
-async function createSupabaseSessionFromUser(
-  user: any,
-): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient()
-
-  try {
-    // Generate a magic link for the user (server-side only)
-    // This will need to be done via a secure RPC function
-    const { data, error } = await supabase.rpc('create_session_for_user', {
-      user_id: user.id,
-      login_method: 'pin',
-    })
-
-    if (error) {
-      console.error('[createSupabaseSessionFromUser] Session creation error:', error)
-      return { success: false, error: error.message }
-    }
-
-    // Set the session in the client
-    if (data?.access_token && data?.refresh_token) {
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-      })
-
-      if (sessionError) {
-        console.error('[createSupabaseSessionFromUser] Session set error:', sessionError)
-        return { success: false, error: sessionError.message }
-      }
-    }
-
-    return { success: true }
-  } catch (error) {
-    console.error('[createSupabaseSessionFromUser] Unexpected error:', error)
-    return { success: false, error: 'Session creation failed' }
-  }
-}
-
-/**
  * Reset PIN attempts for a user (admin function)
  */
 export async function resetUserPINAttempts(userId: string): Promise<boolean> {
@@ -292,14 +251,14 @@ export async function updateUserPIN(
 
   try {
     // Validate new PIN strength
-    if (BLOCKED_PINS.includes(newPin as any) || isSequentialPIN(newPin)) {
+    if (BLOCKED_PINS.includes(newPin as (typeof BLOCKED_PINS)[number]) || isSequentialPIN(newPin)) {
       return {
         success: false,
         error: 'PIN is too weak. Please choose a different PIN.',
       }
     }
 
-    const { data, error } = await supabase.rpc('update_user_pin', {
+    const { error } = await supabase.rpc('update_user_pin', {
       target_user_id: userId,
       old_pin: oldPin,
       new_pin: newPin,
