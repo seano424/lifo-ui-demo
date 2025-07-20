@@ -65,7 +65,7 @@ async def init_database():
         # Test the connection
         async with engine.begin() as conn:
             # Import all models to ensure they're registered
-            from app.database import models
+            from app.database import models, donation_models, global_models
             
             # Create tables if they don't exist (for development)
             if settings.debug:

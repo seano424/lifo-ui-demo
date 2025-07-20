@@ -25,12 +25,58 @@ class DonationStatus(Enum):
 
 
 class RecipientType(Enum):
-    """Types of donation recipients under EU regulations"""
-    FOOD_BANK_CERTIFIED = "food_bank_certified"
-    SOUP_KITCHEN_LICENSED = "soup_kitchen_licensed"
-    CHARITY_REGISTERED = "charity_registered"
-    SOCIAL_SERVICE = "social_service"
-    FOOD_RESCUE_ORG = "food_rescue_org"
+    """
+    Types of donation recipients under EU Food Donation Guidelines (2017)
+    Categorized by distribution role and regulatory status
+    """
+    
+    # === Intermediary Organizations (Redistribution) ===
+    FOOD_BANK = "food_bank"                    # Certified food redistribution centers
+    FOOD_RESCUE_ORG = "food_rescue_org"        # Specialized food rescue organizations
+    
+    # === Front-line Organizations (Direct Distribution) ===
+    SOUP_KITCHEN = "soup_kitchen"              # Licensed meal service facilities
+    SOCIAL_SERVICE_AGENCY = "social_service_agency"  # Municipal/government services
+    REGISTERED_CHARITY = "registered_charity"  # NGOs with tax-exempt status
+    
+    # === Community-Level Recipients ===
+    LOCAL_SOLIDARITY_GROUP = "local_solidarity_group"  # Grassroots community groups
+    RELIGIOUS_ORGANIZATION = "religious_organization"   # Churches, mosques, etc.
+    
+    # === Special Cases ===
+    ANIMAL_WELFARE = "animal_welfare"          # For non-human food donations
+    COMPOSTING_FACILITY = "composting_facility" # Environmental waste reduction
+    
+    @classmethod
+    def get_tax_benefit_eligible(cls):
+        """Returns recipient types eligible for tax benefits in France"""
+        return [
+            cls.FOOD_BANK.value,
+            cls.SOUP_KITCHEN.value,
+            cls.REGISTERED_CHARITY.value,
+            cls.SOCIAL_SERVICE_AGENCY.value
+        ]
+    
+    @classmethod
+    def get_intermediary_types(cls):
+        """Returns types that redistribute to other organizations"""
+        return [cls.FOOD_BANK.value, cls.FOOD_RESCUE_ORG.value]
+    
+    @classmethod
+    def get_frontline_types(cls):
+        """Returns types that serve beneficiaries directly"""
+        return [
+            cls.SOUP_KITCHEN.value,
+            cls.SOCIAL_SERVICE_AGENCY.value,
+            cls.REGISTERED_CHARITY.value,
+            cls.LOCAL_SOLIDARITY_GROUP.value,
+            cls.RELIGIOUS_ORGANIZATION.value
+        ]
+    
+    @classmethod
+    def get_environmental_types(cls):
+        """Returns types focused on environmental impact"""
+        return [cls.ANIMAL_WELFARE.value, cls.COMPOSTING_FACILITY.value]
 
 
 class DonationMethod(Enum):
@@ -54,6 +100,7 @@ class DonationRecipient(Base):
     Certified donation recipients with EU compliance validation
     """
     __tablename__ = "donation_recipients"
+    __table_args__ = {"schema": "donation"}
     
     recipient_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     organization_name = Column(String(255), nullable=False)
@@ -106,11 +153,12 @@ class DonationRecord(Base):
     Complete donation tracking with EU compliance documentation
     """
     __tablename__ = "donation_records"
+    __table_args__ = {"schema": "donation"}
     
     donation_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    batch_id = Column(UUID(as_uuid=True), ForeignKey("batches.batch_id"), nullable=False)
-    store_id = Column(UUID(as_uuid=True), ForeignKey("stores.store_id"), nullable=False)
-    recipient_id = Column(UUID(as_uuid=True), ForeignKey("donation_recipients.recipient_id"), nullable=False)
+    batch_id = Column(UUID(as_uuid=True), ForeignKey("inventory.batches.batch_id"), nullable=False)
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    recipient_id = Column(UUID(as_uuid=True), ForeignKey("donation.donation_recipients.recipient_id"), nullable=False)
     
     # Donation details
     quantity_donated = Column(Decimal(10, 3), nullable=False)
@@ -176,9 +224,10 @@ class DonationComplianceCheck(Base):
     Detailed EU compliance validation records for each donation
     """
     __tablename__ = "donation_compliance_checks"
+    __table_args__ = {"schema": "donation"}
     
     check_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    donation_id = Column(UUID(as_uuid=True), ForeignKey("donation_records.donation_id"), nullable=False)
+    donation_id = Column(UUID(as_uuid=True), ForeignKey("donation.donation_records.donation_id"), nullable=False)
     
     # Check details
     check_timestamp = Column(DateTime, default=datetime.utcnow)
@@ -217,10 +266,11 @@ class DonationKPIImpact(Base):
     KPI tracking for donation impact measurement with EU compliance metrics
     """
     __tablename__ = "donation_kpi_impacts"
+    __table_args__ = {"schema": "donation"}
     
     impact_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    donation_id = Column(UUID(as_uuid=True), ForeignKey("donation_records.donation_id"), nullable=False)
-    store_id = Column(UUID(as_uuid=True), ForeignKey("stores.store_id"), nullable=False)
+    donation_id = Column(UUID(as_uuid=True), ForeignKey("donation.donation_records.donation_id"), nullable=False)
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
     
     # Financial impact
     waste_cost_avoided = Column(Decimal(10, 2), nullable=False)
@@ -268,10 +318,11 @@ class DonationAlert(Base):
     Automated alerts for donation opportunities and compliance issues
     """
     __tablename__ = "donation_alerts"
+    __table_args__ = {"schema": "donation"}
     
     alert_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    store_id = Column(UUID(as_uuid=True), ForeignKey("stores.store_id"), nullable=False)
-    batch_id = Column(UUID(as_uuid=True), ForeignKey("batches.batch_id"))
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    batch_id = Column(UUID(as_uuid=True), ForeignKey("inventory.batches.batch_id"))
     
     # Alert details
     alert_type = Column(String(100), nullable=False)  # "donation_opportunity", "compliance_issue", "urgent_action"
@@ -307,9 +358,10 @@ class DonationAnalytics(Base):
     Aggregated analytics for donation program performance
     """
     __tablename__ = "donation_analytics"
+    __table_args__ = {"schema": "donation"}
     
     analytics_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    store_id = Column(UUID(as_uuid=True), ForeignKey("stores.store_id"), nullable=False)
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
     
     # Time period
     period_start = Column(Date, nullable=False)

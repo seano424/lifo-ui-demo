@@ -50,6 +50,14 @@ class Settings(BaseSettings):
     supabase_anon_key: str = ""
     supabase_service_role_key: str = ""
     
+    # JWT Configuration
+    jwt_secret_key: str = Field(
+        default="your-secret-key-change-in-production",
+        description="JWT secret key for token signing and verification"
+    )
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 30
+    
     # Logging
     log_level: str = "INFO"
     log_format: str = "json"  # json or console
