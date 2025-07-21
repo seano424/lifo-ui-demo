@@ -1,0 +1,152 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'lifo-ai-core/**'
+      - 'lifo-api/**'
+      - '.github/workflows/python-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'lifo-ai-core/**'
+      - 'lifo-api/**'
+      - '.github/workflows/python-ci.yml'
+
+jobs:
+  test-core:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lifo-ai-core
+    
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: uv sync --dev
+    
+    - name: Lint with ruff
+      run: uv run ruff check .
+    
+    - name: Check formatting with ruff
+      run: uv run ruff format --check .
+    
+    - name: Type check with mypy
+      run: uv run mypy .
+    
+    - name: Run tests
+      run: uv run pytest --cov=lifo_ai_core --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./lifo-ai-core/coverage.xml
+        flags: core
+
+  test-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lifo-api
+    
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lifo_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: uv sync --dev
+    
+    - name: Lint with ruff
+      run: uv run ruff check .
+    
+    - name: Check formatting with ruff
+      run: uv run ruff format --check .
+    
+    - name: Type check with mypy
+      run: uv run mypy .
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifo_test
+        REDIS_URL: redis://localhost:6379
+        JWT_SECRET: test-secret-key
+      run: uv run pytest --cov=lifo_api --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./lifo-api/coverage.xml
+        flags: api
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Security scan - Core
+      working-directory: ./lifo-ai-core
+      run: |
+        uv sync --dev
+        uv run ruff check --select=S .
+    
+    - name: Security scan - API
+      working-directory: ./lifo-api
+      run: |
+        uv sync --dev
+        uv run ruff check --select=S .

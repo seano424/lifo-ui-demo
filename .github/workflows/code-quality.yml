@@ -1,0 +1,50 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'lifo-ai-core/**'
+      - 'lifo-api/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'lifo-ai-core/**'
+      - 'lifo-api/**'
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python 3.11
+      run: uv python install 3.11
+    
+    - name: Lint Core with ruff
+      working-directory: ./lifo-ai-core
+      run: |
+        uv sync --dev
+        uv run ruff check --output-format=github .
+        uv run ruff format --check .
+    
+    - name: Lint API with ruff
+      working-directory: ./lifo-api
+      run: |
+        uv sync --dev
+        uv run ruff check --output-format=github .
+        uv run ruff format --check .
+    
+    - name: Type check Core
+      working-directory: ./lifo-ai-core
+      run: uv run mypy . --no-error-summary
+    
+    - name: Type check API
+      working-directory: ./lifo-api
+      run: uv run mypy . --no-error-summary

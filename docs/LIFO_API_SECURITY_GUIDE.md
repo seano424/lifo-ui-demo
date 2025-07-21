@@ -4,6 +4,8 @@
 
 This document outlines the comprehensive security measures implemented in the LIFO.AI FastAPI microservice and lifo-ai-core components following a thorough security audit and remediation process.
 
+> 📚 **Development Setup**: This project uses modern Python tooling with uv + ruff. See [PYTHON_DEVELOPMENT.md](../PYTHON_DEVELOPMENT.md) for complete setup instructions.
+
 ## 🚨 Security Audit Summary
 
 ### Critical Vulnerabilities Resolved
@@ -338,16 +340,25 @@ logger.warning(
 
 ### Automated Security Tests
 
+**Modern testing with uv + ruff security checks**
+
 Run security tests regularly:
 
 ```bash
-# Security test suite
-pytest tests/security/ -v
+# Security test suite with uv
+uv run pytest tests/security/ -v
 
 # Specific security test categories
-pytest tests/security/test_auth_edge_cases.py
-pytest tests/security/test_csv_vulnerabilities.py
-pytest tests/security/test_cors_network_vulnerabilities.py
+uv run pytest tests/security/test_auth_edge_cases.py
+uv run pytest tests/security/test_csv_vulnerabilities.py
+uv run pytest tests/security/test_cors_network_vulnerabilities.py
+
+# Run security-focused linting with ruff
+uv run ruff check --select=S .     # Bandit security rules via ruff
+
+# Complete security check workflow
+make test                          # All tests including security
+make quality                       # Code quality + security linting
 ```
 
 ### Manual Security Verification

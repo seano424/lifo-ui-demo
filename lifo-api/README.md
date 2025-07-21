@@ -21,8 +21,13 @@ An AI-powered FastAPI microservice for retail inventory optimization using LIFO 
 - **Authentication**: Supabase JWT
 - **ORM**: SQLAlchemy 2.0 (async)
 - **Validation**: Pydantic 2.0
+- **Package Management**: uv (ultra-fast)
+- **Code Quality**: ruff (extremely fast linter & formatter)
+- **Type Checking**: mypy
 - **Logging**: Structured logging with structlog
 - **Testing**: Pytest with async support
+
+> 📚 **See [PYTHON_DEVELOPMENT.md](../PYTHON_DEVELOPMENT.md) for comprehensive setup guide**
 
 ## 🚀 Quick Start
 
@@ -38,26 +43,32 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
 
 ### Installation
 
-1. **Clone the repository**
+1. **Install uv** (ultra-fast Python package installer)
+
+   ```bash
+   # On macOS/Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   
+   # On Windows  
+   powershell -c "irm https://astral.sh/uv/install.sh | iex"
+   ```
+
+2. **Clone the repository**
 
    ```bash
    git clone https://github.com/your-org/lifo-ai-engine.git
-   cd lifo-ai-engine
+   cd lifo-ai-engine/lifo-api
    ```
 
-2. **Set up virtual environment**
+3. **Quick setup**
 
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
-   ```
-
-3. **Install dependencies**
-
-   ```bash
-   pip install -e ".[all]"
-   # Or for development
-   make install-dev
+   # Automated setup (recommended)
+   ./scripts/dev-setup.sh
+   
+   # Or manual setup
+   uv sync --dev                # Install dependencies (creates .venv automatically)
+   uv run pytest               # Run tests
    ```
 
 4. **Configure environment**
@@ -67,12 +78,12 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
    # Edit .env with your configuration
    ```
 
-5. **Run the application**
+4. **Run the application**
 
    ```bash
-   make run-dev
-   # Or directly with uvicorn
-   uvicorn app.main:app --reload
+   make run
+   # Or directly with uv
+   uv run uvicorn app.main:app --reload
    ```
 
 6. **Access the API**
@@ -165,15 +176,17 @@ LOG_LEVEL=INFO
 ```bash
 # All tests
 make test
+# Or: uv run pytest
 
-# With coverage
+# With coverage  
 make test-cov
+# Or: uv run pytest --cov=lifo_api
 
 # Unit tests only
-make test-unit
+uv run pytest tests/unit/
 
 # Integration tests
-make test-integration
+uv run pytest tests/integration/
 ```
 
 ### Test Structure
@@ -190,18 +203,27 @@ tests/
 
 ### Code Quality
 
+**Modern tooling with uv + ruff (super fast!)**
+
 ```bash
-# Format code
+# Format code with ruff
 make format
+# Or: uv run ruff format .
 
-# Lint code
+# Lint code with ruff  
 make lint
+# Or: uv run ruff check .
 
-# Type checking
-make type-check
+# Auto-fix issues
+make lint-fix
+# Or: uv run ruff check --fix .
 
-# All checks
-make pre-commit
+# Type checking with mypy
+make type-check  
+# Or: uv run mypy .
+
+# All quality checks
+make quality
 ```
 
 ### Development Workflow
@@ -368,15 +390,8 @@ make setup-dev
 make run-dev
 ```
 
-## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-- **Documentation**: [docs.lifoai.com](https://docs.lifoai.com)
-- **Issues**: [GitHub Issues](https://github.com/your-org/lifo-ai-engine/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/lifo-ai-engine/discussions)
 
 ## 🔮 Roadmap
 

@@ -80,10 +80,25 @@ lifo-app/
 │   ├── queries/     # Database operations
 │   ├── supabase/    # Client configuration
 │   └── react-query/ # Caching setup
-└── hooks/           # Data hooks with mutations
+├── hooks/           # Data hooks with mutations
+├── lifo-ai-core/    # Python ETL & scoring engine
+│   ├── pyproject.toml  # Modern Python project config
+│   ├── etl/         # CSV processing & data validation
+│   ├── scoring/     # AI-powered scoring algorithms
+│   └── Makefile     # Development commands
+└── lifo-api/        # FastAPI microservice
+    ├── pyproject.toml  # Modern Python project config
+    ├── app/         # FastAPI application
+    │   ├── api/     # API endpoints
+    │   ├── auth/    # Authentication & security
+    │   └── core/    # Business logic
+    └── Makefile     # Development commands
 ```
 
-**Pattern**: Features are organized by domain (products, batches, users) with clear separation between data logic and UI rendering.
+**Patterns**: 
+- **Frontend**: Features organized by domain with clear data/UI separation
+- **Backend**: Modern Python services with uv + ruff + mypy toolchain
+- **Integration**: Python services provide AI-powered insights to Next.js frontend
 
 ---
 
@@ -179,6 +194,7 @@ Each role is enforced through RLS policies, not application-level checks.
 
 ### Team Scripts & Tools
 
+**Frontend (Next.js)**:
 ```bash
 npm run dev              # Development with Turbopack
 npm run update-types     # Sync TypeScript with database schema
@@ -186,12 +202,41 @@ npm run supabase:start   # Local database for development
 npm run format           # Prettier code formatting
 ```
 
+**Backend Python Services** (lifo-ai-core, lifo-api):
+```bash
+# Modern Python development with uv + ruff
+make dev-setup           # One-time development environment setup
+make quality             # Run all code quality checks (ruff + mypy)
+make test-cov            # Run tests with coverage
+make run                 # Start API development server (lifo-api only)
+
+# Individual commands
+uv run ruff check .      # Ultra-fast linting
+uv run ruff format .     # Ultra-fast code formatting
+uv run mypy .            # Type checking
+uv run pytest           # Run tests
+```
+
+> 📚 **Python Development**: See [PYTHON_DEVELOPMENT.md](../PYTHON_DEVELOPMENT.md) for complete setup guide
+
 ### Code Review Standards
 
-- **Required**: All changes must be reviewed before merging
+**Frontend (TypeScript/Next.js)**:
 - **Type Safety**: No `any` types, full TypeScript coverage
 - **Performance**: Queries must be optimized for mobile usage
 - **Security**: RLS policies reviewed for all schema changes
+
+**Backend (Python)**:
+- **Modern Tooling**: All Python code uses uv + ruff workflow
+- **Code Quality**: Must pass `make quality` checks (ruff linting + mypy)
+- **Type Safety**: All functions require proper type hints
+- **Security**: Security linting with ruff's bandit rules (`--select=S`)
+- **Testing**: New features require comprehensive tests
+
+**Universal Standards**:
+- **Required**: All changes must be reviewed before merging
+- **Documentation**: Update relevant docs when changing architecture
+- **Performance**: Profile performance-critical operations
 
 ---
 
