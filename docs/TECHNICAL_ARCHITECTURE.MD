@@ -81,12 +81,12 @@ lifo-app/
 │   ├── supabase/    # Client configuration
 │   └── react-query/ # Caching setup
 ├── hooks/           # Data hooks with mutations
-├── lifo-ai-core/    # Python ETL & scoring engine
+├── lifo_ai_core/    # Python ETL & scoring engine
 │   ├── pyproject.toml  # Modern Python project config
 │   ├── etl/         # CSV processing & data validation
 │   ├── scoring/     # AI-powered scoring algorithms
 │   └── Makefile     # Development commands
-└── lifo-api/        # FastAPI microservice
+└── lifo_api/        # FastAPI microservice
     ├── pyproject.toml  # Modern Python project config
     ├── app/         # FastAPI application
     │   ├── api/     # API endpoints
@@ -202,13 +202,13 @@ npm run supabase:start   # Local database for development
 npm run format           # Prettier code formatting
 ```
 
-**Backend Python Services** (lifo-ai-core, lifo-api):
+**Backend Python Services** (lifo_ai_core, lifo_api):
 ```bash
 # Modern Python development with uv + ruff
 make dev-setup           # One-time development environment setup
 make quality             # Run all code quality checks (ruff + mypy)
 make test-cov            # Run tests with coverage
-make run                 # Start API development server (lifo-api only)
+make run                 # Start API development server (lifo_api only)
 
 # Individual commands
 uv run ruff check .      # Ultra-fast linting

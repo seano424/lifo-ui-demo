@@ -9,7 +9,7 @@ Main components:
 - config: Configuration management
 - utils: Utilities and helpers
 
-Note: The scoring engine has been moved to lifo-api/app/core/scoring.py
+Note: The scoring engine has been moved to lifo_api/app/core/scoring.py
 """
 
 __version__ = "0.1.0"

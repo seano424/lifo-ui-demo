@@ -3,7 +3,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="lifo-ai-core",
+    name="lifo_ai_core",
     version="0.1.0",
     description="LIFO AI Core - Food waste reduction engine",
     author="LIFO.AI",

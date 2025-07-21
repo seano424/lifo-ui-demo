@@ -31,7 +31,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 ### LIFO AI Core
 
 ```bash
-cd lifo-ai-core
+cd lifo_ai_core
 
 # Setup development environment
 ./scripts/dev-setup.sh
@@ -47,7 +47,7 @@ uv run pytest                   # Run tests
 ### LIFO API
 
 ```bash
-cd lifo-api
+cd lifo_api
 
 # Setup development environment
 ./scripts/dev-setup.sh
@@ -78,7 +78,7 @@ make clean         # Clean up generated files
 ## Project Structure
 
 ```
-lifo-ai-core/
+lifo_ai_core/
 ├── pyproject.toml          # Project configuration & dependencies
 ├── uv.lock                 # Lock file (auto-generated)
 ├── Makefile               # Development commands
@@ -86,7 +86,7 @@ lifo-ai-core/
 │   └── dev-setup.sh       # Development setup script
 └── ...
 
-lifo-api/
+lifo_api/
 ├── pyproject.toml          # Project configuration & dependencies
 ├── uv.lock                 # Lock file (auto-generated)
 ├── Makefile               # Development commands

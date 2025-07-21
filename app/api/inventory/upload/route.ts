@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lifo-ai-core/database/operations'
+import { InventoryOperations } from '@/lifo_ai_core/database/operations'
 import { spawn } from 'child_process'
 import { writeFileSync, unlinkSync } from 'fs'
 import { join } from 'path'
@@ -44,8 +44,8 @@ class UnifiedCSVProcessor {
 
   constructor() {
     // Use the virtual environment Python if available, otherwise system Python
-    this.pythonPath = join(process.cwd(), 'lifo-ai-core/venv/bin/python')
-    this.processorPath = join(process.cwd(), 'lifo-ai-core/etl/unified_csv_processor.py')
+    this.pythonPath = join(process.cwd(), 'lifo_ai_core/venv/bin/python')
+    this.processorPath = join(process.cwd(), 'lifo_ai_core/etl/unified_csv_processor.py')
   }
 
   async processCsv(
@@ -68,7 +68,7 @@ class UnifiedCSVProcessor {
           `
 import asyncio
 import sys
-sys.path.insert(0, '${join(process.cwd(), 'lifo-ai-core')}')
+sys.path.insert(0, '${join(process.cwd(), 'lifo_ai_core')}')
 from etl.unified_csv_processor import UnifiedCSVProcessor
 
 async def main():

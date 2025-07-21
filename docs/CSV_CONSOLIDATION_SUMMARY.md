@@ -8,7 +8,7 @@ Previously, we had **4 different CSV import implementations** with overlapping f
 
 ### **1. Unified CSV Processor**
 
-**Location**: `/lifo-ai-core/etl/unified_csv_processor.py`
+**Location**: `/lifo_ai_core/etl/unified_csv_processor.py`
 
 **Features**:
 
@@ -33,7 +33,7 @@ Previously, we had **4 different CSV import implementations** with overlapping f
 
 ### **3. New FastAPI Endpoint**
 
-**Location**: `/lifo-api/app/api/v1/csv_upload.py`
+**Location**: `/lifo_api/app/api/v1/csv_upload.py`
 
 **Features**:
 
@@ -72,12 +72,12 @@ Standalone → Unified Python Processor (CLI available)
 
 ### **Archived (Moved to .backup)**
 
-- `lifo-api/app/services/csv_processor.py.backup` - Original FastAPI processor
-- `lifo-api/app/services/secure_csv_processor.py.backup` - Security-focused processor
+- `lifo_api/app/services/csv_processor.py.backup` - Original FastAPI processor
+- `lifo_api/app/services/secure_csv_processor.py.backup` - Security-focused processor
 
 ### **Kept for Reference**
 
-- `lifo-ai-core/etl/processor.py` - Original ETL engine (legacy reference)
+- `lifo_ai_core/etl/processor.py` - Original ETL engine (legacy reference)
 
 ## 🔧 **Technical Improvements**
 
@@ -161,7 +161,7 @@ POST /api/v1/csv/validate
 ### **Standalone (CLI)**
 
 ```bash
-cd lifo-ai-core
+cd lifo_ai_core
 python etl/unified_csv_processor.py sample.csv --store-id STORE123 --user-id USER456 --output result.json
 ```
 

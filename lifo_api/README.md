@@ -57,7 +57,7 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
 
    ```bash
    git clone https://github.com/your-org/lifo-ai-engine.git
-   cd lifo-ai-engine/lifo-api
+   cd lifo-ai-engine/lifo_api
    ```
 
 3. **Quick setup**

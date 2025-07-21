@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the comprehensive security measures implemented in the LIFO.AI FastAPI microservice and lifo-ai-core components following a thorough security audit and remediation process.
+This document outlines the comprehensive security measures implemented in the LIFO.AI FastAPI microservice and lifo_ai_core components following a thorough security audit and remediation process.
 
 > 📚 **Development Setup**: This project uses modern Python tooling with uv + ruff. See [PYTHON_DEVELOPMENT.md](../PYTHON_DEVELOPMENT.md) for complete setup instructions.
 

@@ -30,7 +30,7 @@ This repository contains the implementation of LIFO.AI's data platform
 ```
 lifo-app/
 ├── app/                      # Next.js 15 Frontend
-├── lifo-ai-core/            # Python Business Logic
+├── lifo_ai_core/            # Python Business Logic
 │   ├── database/            # Data models and connections
 │   ├── scoring/             # Scoring algorithms (base + ML)
 │   ├── etl/                # CSV processing pipeline
@@ -67,7 +67,7 @@ cd lifo-app
 npm install
 
 # Set up Python environment
-cd lifo-ai-core
+cd lifo_ai_core
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -112,7 +112,7 @@ npm run dev
 **Important**: The Python environment must be activated for CSV processing to work:
 
 ```bash
-cd lifo-ai-core && source venv/bin/activate && cd ..
+cd lifo_ai_core && source venv/bin/activate && cd ..
 ```
 
 **Note**: The `venv/` directory is not included in git (as it should be). Each developer needs to create their own virtual environment locally.
@@ -259,7 +259,7 @@ enhanced_score = (
 
 1. **Modify schema** in Supabase Dashboard
 2. **Update types**: `npm run update-types`
-3. **Update models** in `lifo-ai-core/database/models.py`
+3. **Update models** in `lifo_ai_core/database/models.py`
 4. **Test changes** with sample data
 
 ### ML Model Updates

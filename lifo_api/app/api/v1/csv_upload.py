@@ -14,8 +14,8 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# Add lifo-ai-core to path
-lifo_core_path = Path(__file__).parent.parent.parent.parent / "lifo-ai-core"
+# Add lifo_ai_core to path
+lifo_core_path = Path(__file__).parent.parent.parent.parent / "lifo_ai_core"
 sys.path.insert(0, str(lifo_core_path))
 
 from app.auth.secure_dependencies import get_current_user, validate_store_access

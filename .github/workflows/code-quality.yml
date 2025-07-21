@@ -4,13 +4,13 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'lifo-ai-core/**'
-      - 'lifo-api/**'
+      - 'lifo_ai_core/**'
+      - 'lifo_api/**'
   pull_request:
     branches: [ main, develop ]
     paths:
-      - 'lifo-ai-core/**'
-      - 'lifo-api/**'
+      - 'lifo_ai_core/**'
+      - 'lifo_api/**'
 
 jobs:
   quality-check:
@@ -28,23 +28,23 @@ jobs:
       run: uv python install 3.11
     
     - name: Lint Core with ruff
-      working-directory: ./lifo-ai-core
+      working-directory: ./lifo_ai_core
       run: |
         uv sync --dev
         uv run ruff check --output-format=github .
         uv run ruff format --check .
     
     - name: Lint API with ruff
-      working-directory: ./lifo-api
+      working-directory: ./lifo_api
       run: |
         uv sync --dev
         uv run ruff check --output-format=github .
         uv run ruff format --check .
     
     - name: Type check Core
-      working-directory: ./lifo-ai-core
+      working-directory: ./lifo_ai_core
       run: uv run mypy . --no-error-summary
     
     - name: Type check API
-      working-directory: ./lifo-api
+      working-directory: ./lifo_api
       run: uv run mypy . --no-error-summary

@@ -18,37 +18,37 @@ repos:
       # Run the linter
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-        files: ^(lifo-ai-core|lifo-api)/.*\.py$
+        files: ^(lifo_ai_core|lifo_api)/.*\.py$
       # Run the formatter
       - id: ruff-format
-        files: ^(lifo-ai-core|lifo-api)/.*\.py$
+        files: ^(lifo_ai_core|lifo_api)/.*\.py$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
       - id: mypy
-        files: ^lifo-ai-core/.*\.py$
+        files: ^lifo_ai_core/.*\.py$
         additional_dependencies: [types-all]
         pass_filenames: false
-        args: [lifo-ai-core]
+        args: [lifo_ai_core]
       - id: mypy
-        files: ^lifo-api/.*\.py$
+        files: ^lifo_api/.*\.py$
         additional_dependencies: [types-all]
         pass_filenames: false
-        args: [lifo-api]
+        args: [lifo_api]
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.5
     hooks:
       - id: bandit
         args: [-r, -x, tests/]
-        files: ^(lifo-ai-core|lifo-api)/.*\.py$
+        files: ^(lifo_ai_core|lifo_api)/.*\.py$
 
   - repo: local
     hooks:
       - id: uv-lock-check
         name: Check uv lock files are up to date
-        entry: bash -c 'cd lifo-ai-core && uv lock --check && cd ../lifo-api && uv lock --check'
+        entry: bash -c 'cd lifo_ai_core && uv lock --check && cd ../lifo_api && uv lock --check'
         language: system
-        files: ^(lifo-ai-core|lifo-api)/(pyproject\.toml|uv\.lock)$
+        files: ^(lifo_ai_core|lifo_api)/(pyproject\.toml|uv\.lock)$
         pass_filenames: false

@@ -4,14 +4,14 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'lifo-ai-core/**'
-      - 'lifo-api/**'
+      - 'lifo_ai_core/**'
+      - 'lifo_api/**'
       - '.github/workflows/python-ci.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
-      - 'lifo-ai-core/**'
-      - 'lifo-api/**'
+      - 'lifo_ai_core/**'
+      - 'lifo_api/**'
       - '.github/workflows/python-ci.yml'
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./lifo-ai-core
+        working-directory: ./lifo_ai_core
     
     strategy:
       matrix:
@@ -55,15 +55,15 @@ jobs:
       if: matrix.python-version == '3.11'
       uses: codecov/codecov-action@v4
       with:
-        file: ./lifo-ai-core/coverage.xml
+        file: ./lifo_ai_core/coverage.xml
         flags: core
 
   test-api:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./lifo-api
-    
+        working-directory: ./lifo_api
+
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -126,7 +126,7 @@ jobs:
       if: matrix.python-version == '3.11'
       uses: codecov/codecov-action@v4
       with:
-        file: ./lifo-api/coverage.xml
+        file: ./lifo_api/coverage.xml
         flags: api
 
   security-scan:
@@ -140,13 +140,13 @@ jobs:
         version: "latest"
     
     - name: Security scan - Core
-      working-directory: ./lifo-ai-core
+      working-directory: ./lifo_ai_core
       run: |
         uv sync --dev
         uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
     
     - name: Security scan - API
-      working-directory: ./lifo-api
+      working-directory: ./lifo_api
       run: |
         uv sync --dev
         uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
