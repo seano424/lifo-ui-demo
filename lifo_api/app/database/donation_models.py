@@ -12,7 +12,7 @@ from sqlalchemy import (
     Column,
     Date,
     DateTime,
-    Decimal,
+    DECIMAL,
     Enum as SQLEnum,
     Float,
     ForeignKey,
@@ -192,11 +192,11 @@ class DonationRecord(Base):
     )
 
     # Donation details
-    quantity_donated = Column(Decimal(10, 3), nullable=False)
+    quantity_donated = Column(DECIMAL(10, 3), nullable=False)
     original_value = Column(
-        Decimal(10, 2), nullable=False
+        DECIMAL(10, 2), nullable=False
     )  # Original selling price * quantity
-    estimated_social_value = Column(Decimal(10, 2))  # Estimated social impact value
+    estimated_social_value = Column(DECIMAL(10, 2))  # Estimated social impact value
 
     # Timing
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -228,8 +228,8 @@ class DonationRecord(Base):
     delivery_confirmation = Column(Text)
 
     # Financial impact
-    tax_deduction_value = Column(Decimal(10, 2))  # For donor tax benefits
-    waste_cost_avoided = Column(Decimal(10, 2))  # Disposal cost savings
+    tax_deduction_value = Column(DECIMAL(10, 2))  # For donor tax benefits
+    waste_cost_avoided = Column(DECIMAL(10, 2))  # Disposal cost savings
 
     # Documentation and traceability
     donation_certificate_issued = Column(Boolean, default=False)
@@ -322,10 +322,10 @@ class DonationKPIImpact(Base):
     )
 
     # Financial impact
-    waste_cost_avoided = Column(Decimal(10, 2), nullable=False)
-    revenue_preserved = Column(Decimal(10, 2))  # Value that would have been lost
-    tax_benefit_value = Column(Decimal(10, 2))  # Tax deduction value
-    disposal_cost_saved = Column(Decimal(10, 2))
+    waste_cost_avoided = Column(DECIMAL(10, 2), nullable=False)
+    revenue_preserved = Column(DECIMAL(10, 2))  # Value that would have been lost
+    tax_benefit_value = Column(DECIMAL(10, 2))  # Tax deduction value
+    disposal_cost_saved = Column(DECIMAL(10, 2))
 
     # Environmental impact
     co2_emissions_avoided_kg = Column(Float)  # CO2 equivalent saved
@@ -335,7 +335,7 @@ class DonationKPIImpact(Base):
     # Social impact
     meals_provided_estimate = Column(Integer)  # Estimated meals from donation
     people_served_estimate = Column(Integer)  # Estimated people helped
-    social_value_eur = Column(Decimal(10, 2))  # Estimated social value in EUR
+    social_value_eur = Column(DECIMAL(10, 2))  # Estimated social value in EUR
 
     # EU compliance metrics
     eu_regulation_adherence_score = Column(Float)  # 0.0-1.0
@@ -429,13 +429,13 @@ class DonationAnalytics(Base):
 
     # Volume metrics
     total_donations = Column(Integer, default=0)
-    total_quantity_donated_kg = Column(Decimal(10, 3), default=0)
-    total_value_donated_eur = Column(Decimal(10, 2), default=0)
+    total_quantity_donated_kg = Column(DECIMAL(10, 3), default=0)
+    total_value_donated_eur = Column(DECIMAL(10, 2), default=0)
 
     # Financial impact
-    total_waste_cost_avoided = Column(Decimal(10, 2), default=0)
-    total_tax_benefits = Column(Decimal(10, 2), default=0)
-    total_disposal_savings = Column(Decimal(10, 2), default=0)
+    total_waste_cost_avoided = Column(DECIMAL(10, 2), default=0)
+    total_tax_benefits = Column(DECIMAL(10, 2), default=0)
+    total_disposal_savings = Column(DECIMAL(10, 2), default=0)
 
     # EU compliance metrics
     compliance_rate_percent = Column(
@@ -451,7 +451,7 @@ class DonationAnalytics(Base):
     # Social impact
     estimated_meals_provided = Column(Integer, default=0)
     estimated_people_served = Column(Integer, default=0)
-    total_social_value_eur = Column(Decimal(10, 2), default=0)
+    total_social_value_eur = Column(DECIMAL(10, 2), default=0)
 
     # Efficiency metrics
     average_time_to_donation_hours = Column(Float)

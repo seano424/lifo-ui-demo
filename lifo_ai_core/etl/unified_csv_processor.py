@@ -22,7 +22,8 @@ import chardet
 import magic
 import pandas as pd
 
-from database.operations import InventoryOperations
+# InventoryOperations is imported from lifo_api when needed
+# from database.operations import InventoryOperations
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -162,7 +163,7 @@ class UnifiedCSVProcessor:
     }
 
     def __init__(
-        self, store_id: str, user_id: str, inventory_ops: InventoryOperations = None
+        self, store_id: str, user_id: str, inventory_ops: Optional[Any] = None
     ):
         """
         Initialize processor with store and user context

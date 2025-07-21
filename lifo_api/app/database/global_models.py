@@ -11,7 +11,7 @@ from sqlalchemy import (
     Column,
     Date,
     DateTime,
-    Decimal,
+    DECIMAL,
     Float,
     ForeignKey,
     Integer,
@@ -104,8 +104,8 @@ class StoreProduct(Base):
     )
 
     # Store-specific pricing (replaces product-level pricing)
-    default_cost_price = Column(Decimal(12, 4), nullable=False)
-    default_selling_price = Column(Decimal(12, 4), nullable=False)
+    default_cost_price = Column(DECIMAL(12, 4), nullable=False)
+    default_selling_price = Column(DECIMAL(12, 4), nullable=False)
 
     # Store-specific inventory management
     is_active = Column(Boolean, default=True)
@@ -119,13 +119,13 @@ class StoreProduct(Base):
     storage_location = Column(String(50))  # Default storage location in store
 
     # Pricing history and markup
-    markup_percentage = Column(Decimal(5, 2))  # Store's typical markup for this product
+    markup_percentage = Column(DECIMAL(5, 2))  # Store's typical markup for this product
     last_cost_update = Column(DateTime)  # When cost price was last updated
     price_change_reason = Column(String(100))  # Reason for last price change
 
     # Store performance metrics for this product
     total_sold_units = Column(Integer, default=0)
-    total_revenue = Column(Decimal(12, 4), default=0)
+    total_revenue = Column(DECIMAL(12, 4), default=0)
     last_sale_date = Column(DateTime)
 
     # Audit and tracking
@@ -156,15 +156,15 @@ class ProductCategory(Base):
     typical_shelf_life_range = Column(JSONB)  # {"min_days": 1, "max_days": 7}
 
     # Scoring defaults (links to existing scoring.category_weights)
-    default_spoilage_risk_weight = Column(Decimal(3, 2), default=0.5)
-    default_turnover_speed_weight = Column(Decimal(3, 2), default=0.3)
-    default_value_impact_weight = Column(Decimal(3, 2), default=0.2)
+    default_spoilage_risk_weight = Column(DECIMAL(3, 2), default=0.5)
+    default_turnover_speed_weight = Column(DECIMAL(3, 2), default=0.3)
+    default_value_impact_weight = Column(DECIMAL(3, 2), default=0.2)
 
     # Storage and handling
     requires_refrigeration = Column(Boolean, default=False)
     requires_freezing = Column(Boolean, default=False)
-    typical_storage_temp_min = Column(Decimal(4, 1))
-    typical_storage_temp_max = Column(Decimal(4, 1))
+    typical_storage_temp_min = Column(DECIMAL(4, 1))
+    typical_storage_temp_max = Column(DECIMAL(4, 1))
 
     # Regulatory and compliance
     requires_expiry_date = Column(Boolean, default=True)
@@ -206,7 +206,7 @@ class OCRExtractionLog(Base):
     # OCR session details
     image_url = Column(String(500))
     extracted_text = Column(Text)
-    confidence_score = Column(Decimal(3, 2))  # 0.00 to 1.00
+    confidence_score = Column(DECIMAL(3, 2))  # 0.00 to 1.00
     processing_time_ms = Column(Integer)
 
     # Extracted data
@@ -217,7 +217,7 @@ class OCRExtractionLog(Base):
 
     # Validation results
     barcode_match = Column(Boolean)
-    name_match_score = Column(Decimal(3, 2))
+    name_match_score = Column(DECIMAL(3, 2))
     manual_verification = Column(Boolean)
     verified_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 

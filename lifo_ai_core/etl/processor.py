@@ -2,15 +2,15 @@ import csv
 import io
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from database.operations import InventoryOperations
+# InventoryOperations imported from lifo_api when needed
 
 
 class CSVProcessor:
-    def __init__(self, inventory_ops: InventoryOperations = None):
+    def __init__(self, inventory_ops: Optional[Any] = None):
         self.logger = logging.getLogger(__name__)
         self.inventory_ops = inventory_ops
         self.required_columns = [

@@ -1,25 +1,8 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+# LIFO AI Core - Workspace Dependencies
+# This is part of a monorepo workspace, not a standalone package
 
 [project]
-name = "lifo_ai_core"
-version = "0.1.0"
-description = "LIFO AI Core - Food waste reduction engine"
-authors = [
-    {name = "LIFO.AI", email = "tech@lifo.ai"}
-]
-readme = "README.md"
 requires-python = ">=3.9"
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
 
 dependencies = [
     "pandas>=2.0.0",
@@ -54,83 +37,23 @@ dev = [
     "mypy>=1.5.0",
 ]
 
-[project.scripts]
-lifo-scorer = "lifo_ai_core.scoring.engine:main"
-lifo-etl = "lifo_ai_core.etl.processor:main"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["lifo_ai_core*"]
-
 # Ruff configuration
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 line-length = 88
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E203", "E501"]
+exclude = [".venv", "__pycache__", "*.egg-info"]
 
-[tool.ruff.lint]
-select = [
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings  
-    "F",    # pyflakes
-    "I",    # isort
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "UP",   # pyupgrade
-    "N",    # pep8-naming
-    "S",    # flake8-bandit
-    "T20",  # flake8-print
-    "SIM",  # flake8-simplify
-    "RUF",  # ruff-specific rules
-]
-ignore = [
-    "S101",   # assert-used (allow asserts in tests)
-    "S608",   # hardcoded-sql-expression (we use SQL)
-    "S603",   # subprocess call (needed for setup scripts)
-    "B008",   # function-call-in-default-argument (FastAPI dependencies)
-    "T201",   # print statements (allow in CLI scripts)
-    "E501",   # line too long (let formatter handle this)
-    "N999",   # invalid module name (allow lifo_ai_core package name)
-    "N805",   # first argument should be self (allow cls for validators)
-    "N818",   # exception naming (SecurityViolation is clear)
-    "RUF012", # mutable class attributes (constants are fine)
-    "B904",   # raise from (not always needed for validation errors)
-    "F401",   # unused import (used for testing imports in scripts)
-    "F841",   # unused variable (test variables in scripts)
-    "UP036",  # version block (keep explicit for clarity)
-    "SIM102", # nested if (more readable in this context)
-    "C403",   # list comprehension (original is more readable)
-    "RUF005", # concatenation (more readable than unpacking)
-]
-per-file-ignores = {"tests/**/*" = ["S101", "S106"], "scripts/**/*" = ["T201"]}  # Allow asserts and hardcoded passwords in tests, prints in scripts
-
-[tool.ruff.lint.isort]
-known-first-party = ["lifo_ai_core"]
-force-single-line = false
-combine-as-imports = true
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
+[tool.ruff.isort]
+force-single-line = true
 
 # MyPy configuration
 [tool.mypy]
 python_version = "3.9"
-check_untyped_defs = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-warn_redundant_casts = true
-warn_unused_ignores = true
 warn_return_any = true
-strict_optional = true
-no_implicit_reexport = true
-show_error_codes = true
-exclude = ["build/", "dist/"]
-
-[[tool.mypy.overrides]]
-module = ["sklearn.*", "joblib.*", "magic.*", "chardet.*"]
-ignore_missing_imports = true
+warn_unused_configs = true
+disallow_untyped_defs = true
 
 # Pytest configuration
 [tool.pytest.ini_options]
@@ -138,14 +61,4 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "-v --tb=short --cov=lifo_ai_core --cov-report=term-missing"
-asyncio_mode = "auto"
-
-[dependency-groups]
-dev = [
-    "mypy==1.17.0",
-    "pytest>=8.4.1",
-    "pytest-asyncio>=1.1.0",
-    "pytest-cov>=6.2.1",
-    "ruff>=0.12.4",
-]
+addopts = "-v --tb=short"
