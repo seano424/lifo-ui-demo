@@ -1,6 +1,0 @@
-sku,product_name,category,brand,quantity,expiry_date,manufacture_date,cost_price,selling_price,location_code,unit_type,supplier
-DUPL-001,First Product,fresh_produce,Brand A,10,2024-02-15,2024-02-10,1.00,2.00,SHELF-A1,pcs,Supplier A
-DUPL-001,Duplicate SKU Product,dairy,Brand B,5,2024-02-20,2024-02-15,1.50,2.50,FRIDGE-B1,pcs,Supplier B
-DUPL-002,Second Product,bakery_fresh,Brand C,8,2024-02-18,2024-02-17,2.00,3.00,SHELF-C1,pcs,Supplier C
-DUPL-002,Another Duplicate,frozen,Brand D,12,2024-08-15,2024-01-10,1.75,2.75,FREEZER-F1,pcs,Supplier D
-DUPL-003,Third Product,snacks,Brand E,20,2024-06-30,2024-01-15,0.80,1.50,SHELF-D1,bags,Supplier E

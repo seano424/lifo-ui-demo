@@ -6,17 +6,19 @@ from typing import List, Dict, Optional, Tuple
 import logging
 import re
 from decimal import Decimal, InvalidOperation
+from database.operations import InventoryOperations
 
 class CSVProcessor:
-    def __init__(self):
+    def __init__(self, inventory_ops: InventoryOperations = None):
         self.logger = logging.getLogger(__name__)
+        self.inventory_ops = inventory_ops
         self.required_columns = [
             'SKU', 'Product_Name', 'Quantity', 'Expiry_Date', 
             'Cost_Price', 'Selling_Price'
         ]
         self.optional_columns = [
             'Category', 'Brand', 'Batch_Number', 'Location', 
-            'Manufacture_Date', 'Unit_Type', 'Supplier'
+            'Manufacture_Date', 'Unit_Type', 'Supplier', 'Barcode', 'Supplier_Code'
         ]
         self.category_mapping = {
             'produce': 'fresh_produce',
@@ -398,6 +400,111 @@ class CSVProcessor:
             errors.append(f"Processed {final_count} out of {original_count} rows ({original_count - final_count} removed)")
         
         return df.to_dict('records'), errors
+    
+    async def process_with_global_products(
+        self, 
+        data: List[Dict], 
+        store_id: str, 
+        user_id: str
+    ) -> Tuple[List[Dict], List[str]]:
+        """Process CSV data using global products workflow"""
+        if not self.inventory_ops:
+            return data, ["Global products workflow not available - inventory operations not provided"]
+        
+        enhanced_data = []
+        errors = []
+        
+        for item in data:
+            try:
+                # Find or create global product
+                global_product = None
+                
+                # Try to find by barcode first
+                if item.get('Barcode'):
+                    global_product = await self.inventory_ops.findGlobalProductByBarcode(item['Barcode'])
+                
+                # If not found by barcode, search by name
+                if not global_product and item.get('Product_Name'):
+                    search_results = await self.inventory_ops.searchGlobalProducts(item['Product_Name'], store_id, 1)
+                    if search_results:
+                        global_product = search_results[0]
+                
+                # Create new global product if not found
+                if not global_product:
+                    global_product = await self.inventory_ops.createGlobalProduct({
+                        'name': item['Product_Name'],
+                        'brand': item.get('Brand', 'Unknown'),
+                        'barcode': item.get('Barcode'),
+                        'primary_category': item.get('Category', 'dry_goods'),
+                        'typical_shelf_life_days': self.calculate_shelf_life_days(item.get('Category', 'dry_goods')),
+                        'unit_type': item.get('Unit_Type', 'pcs'),
+                        'created_by': user_id
+                    })
+                
+                # Add product to store catalog if not already there
+                try:
+                    await self.inventory_ops.addProductToStore(
+                        store_id,
+                        global_product['product_id'],
+                        {
+                            'default_cost_price': float(item.get('Cost_Price', 0)),
+                            'default_selling_price': float(item.get('Selling_Price', 0)),
+                            'store_specific_sku': item['SKU'],
+                            'supplier_code': item.get('Supplier_Code')
+                        },
+                        user_id
+                    )
+                except Exception as e:
+                    # Product might already be in store catalog
+                    if 'duplicate' not in str(e).lower():
+                        errors.append(f"Warning: Could not add product {item['SKU']} to store: {e}")
+                
+                # Create batch with global product reference
+                await self.inventory_ops.createBatchWithGlobalProduct({
+                    'global_product_id': global_product['product_id'],
+                    'store_id': store_id,
+                    'batch_number': item.get('Batch_Number', f"{item['SKU']}-{datetime.now().strftime('%Y%m%d')}"),
+                    'expiry_date': item['Expiry_Date'],
+                    'manufacture_date': item.get('Manufacture_Date'),
+                    'initial_quantity': float(item['Quantity']),
+                    'current_quantity': float(item['Quantity']),
+                    'cost_price': float(item.get('Cost_Price', 0)) if item.get('Cost_Price') else None,
+                    'selling_price': float(item.get('Selling_Price', 0)) if item.get('Selling_Price') else None,
+                    'location_code': item.get('Location', 'MAIN'),
+                    'batch_source': 'csv_import',
+                    'barcode_scanned': item.get('Barcode'),
+                    'created_by': user_id
+                })
+                
+                # Add global product info to item for response
+                item['global_product_id'] = global_product['product_id']
+                item['verification_status'] = 'verified'
+                enhanced_data.append(item)
+                
+            except Exception as e:
+                error_msg = f"Failed to process {item.get('SKU', 'unknown SKU')}: {str(e)}"
+                errors.append(error_msg)
+                enhanced_data.append(item)  # Keep original item
+        
+        return enhanced_data, errors
+    
+    def calculate_shelf_life_days(self, category: str) -> int:
+        """Calculate typical shelf life for a category"""
+        shelf_life_map = {
+            'fresh_produce': 7,
+            'fresh_meat_fish': 3,
+            'bakery_fresh': 2,
+            'dairy': 14,
+            'deli_prepared': 3,
+            'frozen': 365,
+            'chilled_packaged': 21,
+            'pantry_staples': 730,
+            'canned_jarred': 1095,
+            'dry_goods': 365,
+            'beverages': 180,
+            'spices_condiments': 1095
+        }
+        return shelf_life_map.get(category.lower(), 30)
     
     def generate_sample_csv(self, num_rows: int = 10) -> str:
         """Generate a sample CSV for user reference"""

@@ -1,6 +1,0 @@
-sku,product_name,quantity,expiry_date,cost_price
-MISS-001,Missing Brand Product,10,2024-02-15,1.50
-MISS-002,Another Missing Product,5,2024-02-20,2.00
-MISS-003,Incomplete Data Product,15,2024-02-25,1.00
-MISS-004,No Selling Price,8,2024-02-18,3.50
-MISS-005,Partial Info Product,12,2024-02-22,2.25

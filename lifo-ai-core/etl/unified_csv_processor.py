@@ -20,6 +20,7 @@ from pathlib import Path
 import asyncio
 import asyncpg
 from enum import Enum
+from database.operations import InventoryOperations
 
 # Security and validation imports
 import magic
@@ -68,6 +69,14 @@ class UnifiedCSVProcessor:
     
     # Required columns
     REQUIRED_COLUMNS = ['sku', 'product_name', 'category', 'quantity', 'expiry_date']
+    
+    # Global product workflow columns
+    GLOBAL_PRODUCT_COLUMNS = {
+        'barcode': None,
+        'brand': 'Unknown',
+        'supplier_code': None,
+        'unit_type': 'pcs'
+    }
     
     # Optional columns with defaults
     OPTIONAL_COLUMNS = {
@@ -128,16 +137,18 @@ class UnifiedCSVProcessor:
         'dry_goods': 365, 'beverages': 180, 'spices_condiments': 1095
     }
 
-    def __init__(self, store_id: str, user_id: str):
+    def __init__(self, store_id: str, user_id: str, inventory_ops: InventoryOperations = None):
         """
         Initialize processor with store and user context
         
         Args:
             store_id: Store ID for multi-tenant processing
             user_id: User ID for audit logging
+            inventory_ops: InventoryOperations instance for global product workflow
         """
         self.store_id = store_id
         self.user_id = user_id
+        self.inventory_ops = inventory_ops
         self.warnings: List[str] = []
         self.errors: List[str] = []
         self.processed_count = 0
@@ -168,6 +179,10 @@ class UnifiedCSVProcessor:
             
             # Generate batch numbers
             processed_data = await self._generate_batch_numbers(processed_data)
+            
+            # Process with global products if inventory operations available
+            if self.inventory_ops:
+                processed_data = await self._process_with_global_products(processed_data)
             
             # Final validation
             await self._final_validation(processed_data)
@@ -333,6 +348,86 @@ class UnifiedCSVProcessor:
         
         return processed_rows
 
+    async def _process_with_global_products(self, processed_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Process data using global products workflow"""
+        if not self.inventory_ops:
+            return processed_data
+            
+        enhanced_data = []
+        
+        for item in processed_data:
+            try:
+                # Find or create global product
+                global_product = None
+                
+                # Try to find by barcode first
+                if item.get('barcode'):
+                    global_product = await self.inventory_ops.findGlobalProductByBarcode(item['barcode'])
+                
+                # If not found by barcode, search by name
+                if not global_product and item.get('product_name'):
+                    search_results = await self.inventory_ops.searchGlobalProducts(item['product_name'], self.store_id, 1)
+                    if search_results:
+                        global_product = search_results[0]
+                
+                # Create new global product if not found
+                if not global_product:
+                    global_product = await self.inventory_ops.createGlobalProduct({
+                        'name': item['product_name'],
+                        'brand': item.get('brand', 'Unknown'),
+                        'barcode': item.get('barcode'),
+                        'primary_category': item['category'],
+                        'typical_shelf_life_days': self.SHELF_LIFE_MAPPING.get(item['category'], 30),
+                        'unit_type': item.get('unit_type', 'pcs'),
+                        'created_by': self.user_id
+                    })
+                
+                # Check if product is in store catalog
+                try:
+                    await self.inventory_ops.addProductToStore(
+                        self.store_id,
+                        global_product['product_id'],
+                        {
+                            'default_cost_price': item.get('cost_price', 0),
+                            'default_selling_price': item.get('selling_price', 0),
+                            'store_specific_sku': item['sku'],
+                            'supplier_code': item.get('supplier_code')
+                        },
+                        self.user_id
+                    )
+                except Exception as e:
+                    # Product might already be in store catalog
+                    if 'duplicate' not in str(e).lower():
+                        self.warnings.append(f"Failed to add product to store: {e}")
+                
+                # Create batch with global product reference
+                await self.inventory_ops.createBatchWithGlobalProduct({
+                    'global_product_id': global_product['product_id'],
+                    'store_id': self.store_id,
+                    'batch_number': item['batch_number'],
+                    'expiry_date': item['expiry_date'],
+                    'manufacture_date': item.get('manufacture_date'),
+                    'initial_quantity': item['quantity'],
+                    'current_quantity': item['quantity'],
+                    'cost_price': item.get('cost_price'),
+                    'selling_price': item.get('selling_price'),
+                    'location_code': item.get('location_code', 'MAIN'),
+                    'batch_source': 'csv_import',
+                    'barcode_scanned': item.get('barcode'),
+                    'created_by': self.user_id
+                })
+                
+                # Add global product info to item
+                item['global_product_id'] = global_product['product_id']
+                item['verification_status'] = 'verified'
+                enhanced_data.append(item)
+                
+            except Exception as e:
+                self.errors.append(f"Global product processing failed for {item.get('sku', 'unknown')}: {e}")
+                enhanced_data.append(item)  # Keep original item
+        
+        return enhanced_data
+
     async def _process_single_row(self, row: pd.Series, row_num: int) -> Optional[Dict[str, Any]]:
         """Process a single CSV row with comprehensive validation"""
         
@@ -354,6 +449,13 @@ class UnifiedCSVProcessor:
                     processed[field] = self._validate_manufacture_date(row[field], processed['expiry_date'], row_num)
                 else:
                     processed[field] = str(row[field]).strip()
+            else:
+                processed[field] = default
+        
+        # Global product workflow fields
+        for field, default in self.GLOBAL_PRODUCT_COLUMNS.items():
+            if field in row and pd.notna(row[field]):
+                processed[field] = str(row[field]).strip()
             else:
                 processed[field] = default
         

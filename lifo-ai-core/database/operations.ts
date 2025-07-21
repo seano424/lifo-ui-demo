@@ -4,6 +4,8 @@ import { SupabaseClient } from '@supabase/supabase-js'
 type Store = Database['business']['Tables']['stores']['Row']
 type Batch = Database['inventory']['Tables']['batches']['Row']
 type Product = Database['inventory']['Tables']['products']['Row']
+type GlobalProduct = Database['global']['Tables']['products']['Row']
+type StoreProduct = Database['business']['Tables']['store_product']['Row']
 
 export class InventoryOperations {
   private supabase: SupabaseClient<Database>
@@ -104,6 +106,236 @@ export class InventoryOperations {
     }
   }
 
+  // =============================================
+  // GLOBAL PRODUCTS OPERATIONS
+  // =============================================
+
+  async findGlobalProductByBarcode(barcode: string): Promise<GlobalProduct | null> {
+    try {
+      const { data, error } = await this.supabase
+        .schema('global')
+        .from('products')
+        .select('*')
+        .eq('barcode', barcode)
+        .eq('is_active', true)
+        .single()
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No rows found
+          return null
+        }
+        console.error('Error finding global product by barcode:', error)
+        throw error
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error in findGlobalProductByBarcode:', error)
+      return null
+    }
+  }
+
+  async searchGlobalProducts(
+    searchTerm: string,
+    storeId?: string,
+    limit: number = 20
+  ): Promise<GlobalProduct[]> {
+    try {
+      let query = this.supabase
+        .schema('global')
+        .from('products')
+        .select(`
+          *,
+          store_products:business.store_product(
+            default_cost_price,
+            default_selling_price,
+            is_active
+          )
+        `)
+        .eq('is_active', true)
+        .or(`name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%,barcode.eq.${searchTerm}`)
+        .limit(limit)
+
+      if (storeId) {
+        query = query.eq('store_products.store_id', storeId)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        console.error('Error searching global products:', error)
+        throw error
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Error in searchGlobalProducts:', error)
+      return []
+    }
+  }
+
+  async createGlobalProduct(productData: {
+    name: string
+    brand?: string
+    barcode?: string
+    primary_category: string
+    typical_shelf_life_days?: number
+    unit_type?: string
+    created_by: string
+  }): Promise<GlobalProduct> {
+    try {
+      const { data, error } = await this.supabase
+        .schema('global')
+        .from('products')
+        .insert({
+          ...productData,
+          verification_status: 'pending',
+          is_active: true,
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating global product:', error)
+        throw error
+      }
+
+      console.log('Global product created successfully:', data.product_id)
+      return data
+    } catch (error) {
+      console.error('Error in createGlobalProduct:', error)
+      throw error
+    }
+  }
+
+  async addProductToStore(
+    storeId: string,
+    productId: string,
+    pricing: {
+      default_cost_price: number
+      default_selling_price: number
+      store_specific_sku?: string
+      supplier_code?: string
+    },
+    userId: string
+  ): Promise<StoreProduct> {
+    try {
+      const { data, error } = await this.supabase
+        .schema('business')
+        .from('store_product')
+        .insert({
+          store_id: storeId,
+          product_id: productId,
+          ...pricing,
+          added_by: userId,
+          updated_by: userId,
+          is_active: true,
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error adding product to store:', error)
+        throw error
+      }
+
+      console.log('Product added to store successfully:', productId)
+      return data
+    } catch (error) {
+      console.error('Error in addProductToStore:', error)
+      throw error
+    }
+  }
+
+  async getStoreProducts(
+    storeId: string,
+    options: {
+      page?: number
+      limit?: number
+      category?: string
+      active_only?: boolean
+    } = {}
+  ): Promise<{ data: any[]; count: number }> {
+    const { page = 1, limit = 50, category, active_only = true } = options
+
+    try {
+      let query = this.supabase
+        .schema('business')
+        .from('store_product')
+        .select(`
+          *,
+          global_product:global.products(*)
+        `, { count: 'exact' })
+        .eq('store_id', storeId)
+
+      if (active_only) {
+        query = query.eq('is_active', true)
+      }
+
+      if (category) {
+        query = query.eq('global_product.primary_category', category)
+      }
+
+      const offset = (page - 1) * limit
+      const { data, error, count } = await query.range(offset, offset + limit - 1)
+
+      if (error) {
+        console.error('Error fetching store products:', error)
+        throw error
+      }
+
+      return { data: data || [], count: count || 0 }
+    } catch (error) {
+      console.error('Error in getStoreProducts:', error)
+      return { data: [], count: 0 }
+    }
+  }
+
+  async createBatchWithGlobalProduct(
+    batchData: {
+      global_product_id: string
+      store_id: string
+      batch_number: string
+      expiry_date: string
+      manufacture_date?: string
+      initial_quantity: number
+      current_quantity: number
+      cost_price?: number
+      selling_price?: number
+      location_code?: string
+      batch_source?: string
+      barcode_scanned?: string
+      created_by: string
+    }
+  ): Promise<Batch> {
+    try {
+      const { data, error } = await this.supabase
+        .schema('inventory')
+        .from('batches')
+        .insert({
+          ...batchData,
+          inherited_from_store_product: !batchData.cost_price || !batchData.selling_price,
+          status: 'active',
+          verification_status: 'verified',
+          received_date: new Date().toISOString().split('T')[0],
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating batch with global product:', error)
+        throw error
+      }
+
+      console.log('Batch created with global product successfully:', data.batch_id)
+      return data
+    } catch (error) {
+      console.error('Error in createBatchWithGlobalProduct:', error)
+      throw error
+    }
+  }
+
   async processCsvBatch(
     csvData: any[],
     storeId: string,
@@ -120,59 +352,74 @@ export class InventoryOperations {
 
     for (const row of csvData) {
       try {
-        // Upsert product
-        const productData = {
-          sku: row.SKU,
-          name: row.Product_Name,
-          category: row.Category || 'dry_goods',
-          store_id: storeId,
-          unit_type: row.Unit_Type || 'pcs',
-          typical_shelf_life_days: this.calculateShelfLife(row.Category),
-          base_cost_price: parseFloat(row.Cost_Price),
-          base_selling_price: parseFloat(row.Selling_Price),
-          created_by: userId,
+        let globalProduct: GlobalProduct | null = null
+        
+        // Try to find global product by barcode first
+        if (row.Barcode) {
+          globalProduct = await this.findGlobalProductByBarcode(row.Barcode)
         }
-
-        const { data: product, error: productError } = await this.supabase
-          .schema('inventory')
-          .from('products')
-          .upsert(productData, { onConflict: 'sku' })
-          .select()
+        
+        // If not found by barcode, search by name
+        if (!globalProduct && row.Product_Name) {
+          const searchResults = await this.searchGlobalProducts(row.Product_Name, storeId, 1)
+          if (searchResults.length > 0) {
+            globalProduct = searchResults[0]
+          }
+        }
+        
+        // If no global product found, create one
+        if (!globalProduct) {
+          globalProduct = await this.createGlobalProduct({
+            name: row.Product_Name,
+            brand: row.Brand,
+            barcode: row.Barcode,
+            primary_category: row.Category || 'dry_goods',
+            typical_shelf_life_days: this.calculateShelfLife(row.Category || 'dry_goods'),
+            unit_type: row.Unit_Type || 'pcs',
+            created_by: userId,
+          })
+        }
+        
+        // Check if product is already in store catalog
+        const { data: existingStoreProduct } = await this.supabase
+          .schema('business')
+          .from('store_product')
+          .select('*')
+          .eq('store_id', storeId)
+          .eq('product_id', globalProduct.product_id)
           .single()
-
-        if (productError) {
-          errors.push(
-            `Row ${csvData.indexOf(row) + 1}: Failed to create product - ${productError.message}`,
+        
+        // Add product to store if not already there
+        if (!existingStoreProduct) {
+          await this.addProductToStore(
+            storeId,
+            globalProduct.product_id,
+            {
+              default_cost_price: parseFloat(row.Cost_Price),
+              default_selling_price: parseFloat(row.Selling_Price),
+              store_specific_sku: row.SKU,
+              supplier_code: row.Supplier_Code,
+            },
+            userId
           )
-          continue
         }
-
-        // Create batch
-        const batchData = {
-          product_id: product.product_id,
+        
+        // Create batch with global product reference
+        await this.createBatchWithGlobalProduct({
+          global_product_id: globalProduct.product_id,
           store_id: storeId,
-          batch_number: row.Batch_Number || `${row.SKU}-${new Date().getTime()}`,
+          batch_number: row.Batch_Number || `${row.SKU || globalProduct.name}-${new Date().getTime()}`,
           expiry_date: row.Expiry_Date,
           manufacture_date: row.Manufacture_Date || new Date().toISOString().split('T')[0],
           initial_quantity: parseFloat(row.Quantity),
           current_quantity: parseFloat(row.Quantity),
-          cost_price: parseFloat(row.Cost_Price),
-          selling_price: parseFloat(row.Selling_Price),
+          cost_price: row.Cost_Price ? parseFloat(row.Cost_Price) : undefined,
+          selling_price: row.Selling_Price ? parseFloat(row.Selling_Price) : undefined,
           location_code: row.Location || 'MAIN',
+          batch_source: 'import',
+          barcode_scanned: row.Barcode,
           created_by: userId,
-        }
-
-        const { error: batchError } = await this.supabase
-          .schema('inventory')
-          .from('batches')
-          .insert(batchData)
-
-        if (batchError) {
-          errors.push(
-            `Row ${csvData.indexOf(row) + 1}: Failed to create batch - ${batchError.message}`,
-          )
-          continue
-        }
+        })
 
         processed++
       } catch (error) {
@@ -188,14 +435,8 @@ export class InventoryOperations {
   async getStoreInventoryAlerts(storeId: string, threshold: number = 0.6): Promise<any[]> {
     const { data, error } = await this.supabase
       .schema('inventory')
-      .from('batches')
-      .select(
-        `
-        *,
-        products(*),
-        product_scores(*)
-      `,
-      )
+      .from('batches_with_products')
+      .select('*')
       .eq('store_id', storeId)
       .eq('status', 'active')
       .gte('product_scores.composite_score', threshold)
@@ -222,21 +463,14 @@ export class InventoryOperations {
 
     let query = this.supabase
       .schema('inventory')
-      .from('batches')
-      .select(
-        `
-        *,
-        products(*),
-        product_scores(*)
-      `,
-        { count: 'exact' },
-      )
+      .from('batches_with_products')
+      .select('*', { count: 'exact' })
       .eq('store_id', storeId)
       .eq('status', status)
       .order('expiry_date', { ascending: true })
 
     if (category) {
-      query = query.eq('products.category', category)
+      query = query.eq('product_category', category)
     }
 
     const offset = (page - 1) * limit
