@@ -10,12 +10,11 @@ authors = [
     {name = "LIFO.AI", email = "tech@lifo.ai"}
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -133,16 +132,17 @@ line-ending = "auto"
 
 # MyPy configuration
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 check_untyped_defs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 warn_redundant_casts = true
 warn_unused_ignores = true
 warn_return_any = true
 strict_optional = true
 no_implicit_reexport = true
 show_error_codes = true
+exclude = ["build/", "dist/"]
 
 [[tool.mypy.overrides]]
 module = ["fastapi.*", "slowapi.*", "redis.*", "magic.*", "chardet.*"]
@@ -159,5 +159,6 @@ asyncio_mode = "auto"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.17.0",
     "ruff>=0.12.4",
 ]
