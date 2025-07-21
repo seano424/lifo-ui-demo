@@ -2,7 +2,9 @@
 LIFO AI Engine FastAPI Application
 Intelligent inventory scoring and waste reduction microservice
 """
+
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env.local file
@@ -13,34 +15,41 @@ load_dotenv(env_path)
 # Environment validation (secure logging)
 if os.getenv("ENVIRONMENT") == "development":
     print("Environment variables loaded:")
-    jwt_secret = os.getenv('SUPABASE_JWT_SECRET', '')
+    jwt_secret = os.getenv("SUPABASE_JWT_SECRET", "")
     if jwt_secret:
         print(f"SUPABASE_JWT_SECRET: ***configured*** (length: {len(jwt_secret)})")
     else:
         print("SUPABASE_JWT_SECRET: ⚠️  NOT CONFIGURED - authentication will fail")
     print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT')}")
 
-import uvicorn
 import logging
 import time
+from contextlib import asynccontextmanager
+
+import structlog
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
-import structlog
-
-from app.core.config import settings
-from app.database.connection import engine, init_database
-from app.utils.logging import setup_logging
-from app.utils.exceptions import setup_exception_handlers
-from app.api.v1.router import router as api_v1_router
-from app.middleware.rate_limiting import (
-    limiter, rate_limit_handler, check_blocked_ip, security_limiter
-)
-from app.middleware.security_headers import SecurityHeadersMiddleware, ProductionSecurityMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+
+from app.api.v1.router import router as api_v1_router
+from app.core.config import settings
+from app.database.connection import engine, init_database
+from app.middleware.rate_limiting import (
+    check_blocked_ip,
+    limiter,
+    rate_limit_handler,
+    security_limiter,
+)
+from app.middleware.security_headers import (
+    ProductionSecurityMiddleware,
+    SecurityHeadersMiddleware,
+)
+from app.utils.exceptions import setup_exception_handlers
+from app.utils.logging import setup_logging
 
 # Setup structured logging
 setup_logging()
@@ -52,7 +61,7 @@ async def lifespan(app: FastAPI):
     """Handle application startup and shutdown"""
     # Startup
     logger.info("Starting LIFO AI Engine", version=settings.api_version)
-    
+
     try:
         # Initialize database connection
         await init_database()
@@ -60,9 +69,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
         raise
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down LIFO AI Engine")
     await engine.dispose()
@@ -95,7 +104,7 @@ app = FastAPI(
     docs_url="/docs" if settings.environment != "production" else None,
     redoc_url="/redoc" if settings.environment != "production" else None,
     openapi_url="/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Security middleware (order matters - most restrictive first)
@@ -122,31 +131,32 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["*"]
+    expose_headers=["*"],
 )
+
 
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
-    
+
     # Log request (sanitize sensitive headers)
     sanitized_headers = dict(request.headers)
     # Remove sensitive headers from logs
-    sensitive_headers = ['authorization', 'cookie', 'x-api-key', 'x-supabase-auth']
+    sensitive_headers = ["authorization", "cookie", "x-api-key", "x-supabase-auth"]
     for header in sensitive_headers:
         if header in sanitized_headers:
             sanitized_headers[header] = "***REDACTED***"
-    
+
     logger.info(
         "Request started",
         method=request.method,
         url=str(request.url),
-        headers=sanitized_headers
+        headers=sanitized_headers,
     )
-    
+
     response = await call_next(request)
-    
+
     # Log response
     process_time = time.time() - start_time
     logger.info(
@@ -154,19 +164,24 @@ async def log_requests(request: Request, call_next):
         method=request.method,
         url=str(request.url),
         status_code=response.status_code,
-        process_time=f"{process_time:.3f}s"
+        process_time=f"{process_time:.3f}s",
     )
-    
+
     return response
+
 
 # Setup exception handlers
 setup_exception_handlers(app)
 
 # Add MVP-specific exception handlers
 from app.utils.mvp_exceptions import (
-    MVPBaseException, ValidationException, MobilePerformanceException,
-    mvp_exception_handler, validation_exception_handler, 
-    performance_exception_handler, general_exception_handler
+    MobilePerformanceException,
+    MVPBaseException,
+    ValidationException,
+    general_exception_handler,
+    mvp_exception_handler,
+    performance_exception_handler,
+    validation_exception_handler,
 )
 
 app.add_exception_handler(MVPBaseException, mvp_exception_handler)
@@ -175,10 +190,8 @@ app.add_exception_handler(MobilePerformanceException, performance_exception_hand
 app.add_exception_handler(Exception, general_exception_handler)
 
 # Include API v1 router
-app.include_router(
-    api_v1_router,
-    prefix=settings.api_v1_prefix
-)
+app.include_router(api_v1_router, prefix=settings.api_v1_prefix)
+
 
 # Root endpoint
 @app.get("/", tags=["Health"])
@@ -195,12 +208,13 @@ async def root():
         "status": "operational",
         "features": [
             "Multi-factor inventory scoring",
-            "Real-time recommendations", 
+            "Real-time recommendations",
             "CSV bulk processing",
             "Store-aware analytics",
-            "Supabase authentication"
-        ]
+            "Supabase authentication",
+        ],
     }
+
 
 # Health check endpoint
 @app.get("/health", tags=["Health"])
@@ -211,26 +225,24 @@ async def health_check():
     try:
         # Test database connection
         from app.database.connection import test_connection
+
         db_healthy = await test_connection()
-        
+
         return {
             "status": "healthy" if db_healthy else "unhealthy",
             "timestamp": time.time(),
             "version": settings.api_version,
             "database": "connected" if db_healthy else "disconnected",
             "environment": settings.environment,
-            "cors_origins": settings.get_cors_origins()
+            "cors_origins": settings.get_cors_origins(),
         }
     except Exception as e:
         logger.error("Health check failed", error=str(e))
         return JSONResponse(
             status_code=503,
-            content={
-                "status": "unhealthy",
-                "timestamp": time.time(),
-                "error": str(e)
-            }
+            content={"status": "unhealthy", "timestamp": time.time(), "error": str(e)},
         )
+
 
 # API info endpoint
 @app.get("/api/info", tags=["Health"])
@@ -247,17 +259,17 @@ async def api_info():
             "scoring": f"{settings.api_v1_prefix}/scoring",
             "csv": f"{settings.api_v1_prefix}/csv",
             "analytics": f"{settings.api_v1_prefix}/analytics",
-            "stores": f"{settings.api_v1_prefix}/stores"
+            "stores": f"{settings.api_v1_prefix}/stores",
         },
         "features": {
             "ai_scoring": True,
             "csv_processing": True,
             "real_time_alerts": True,
             "multi_tenant": True,
-            "async_operations": True
+            "async_operations": True,
         },
         "authentication": "Supabase JWT",
-        "database": "PostgreSQL with AsyncPG"
+        "database": "PostgreSQL with AsyncPG",
     }
 
 
@@ -268,5 +280,5 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,
-        log_level=settings.log_level.lower()
+        log_level=settings.log_level.lower(),
     )

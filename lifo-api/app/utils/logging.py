@@ -2,10 +2,12 @@
 Logging configuration for LIFO AI Engine
 Provides structured logging with proper formatting and levels
 """
-import sys
+
 import logging
-import structlog
+import sys
 from pathlib import Path
+
+import structlog
 
 from app.core.config import settings
 
@@ -20,7 +22,7 @@ def setup_logging():
         stream=sys.stdout,
         level=getattr(logging, settings.log_level.upper()),
     )
-    
+
     # Configure structlog
     structlog.configure(
         processors=[
@@ -46,7 +48,8 @@ def setup_logging():
             # Unicode handling
             structlog.processors.UnicodeDecoder(),
             # JSON formatting for production, key-value for development
-            structlog.processors.JSONRenderer() if settings.environment == "production" 
+            structlog.processors.JSONRenderer()
+            if settings.environment == "production"
             else structlog.dev.ConsoleRenderer(colors=True),
         ],
         context_class=dict,

@@ -2,16 +2,18 @@
 Async PostgreSQL database connection for LIFO AI Engine
 Production-ready connection pool with proper error handling
 """
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.pool import NullPool
-from sqlalchemy import text
-import structlog
+
 import asyncio
 import re
 from typing import AsyncGenerator
 
-from app.core.config import settings, get_database_url
+import structlog
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.pool import NullPool
+
+from app.core.config import get_database_url, settings
 
 logger = structlog.get_logger()
 
@@ -42,7 +44,7 @@ else:
             "server_settings": {
                 "jit": "off",  # Disable JIT for more predictable performance
             },
-        }
+        },
     )
 
 # Create async session factory
@@ -51,7 +53,7 @@ async_session = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,  # Keep objects accessible after commit
     autocommit=False,
-    autoflush=True
+    autoflush=True,
 )
 
 
@@ -61,19 +63,19 @@ async def init_database():
     """
     try:
         logger.info("Initializing database connection...")
-        
+
         # Test the connection
         async with engine.begin() as conn:
             # Import all models to ensure they're registered
-            from app.database import models, donation_models, global_models
-            
+            from app.database import donation_models, global_models, models
+
             # Create tables if they don't exist (for development)
             if settings.debug:
                 await conn.run_sync(Base.metadata.create_all)
                 logger.info("Database tables created/verified")
-        
+
         logger.info("Database initialization completed successfully")
-        
+
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
         raise
@@ -82,7 +84,7 @@ async def init_database():
 async def test_connection() -> bool:
     """
     Test database connection health
-    
+
     Returns:
         bool: True if connection is healthy
     """
@@ -91,14 +93,14 @@ async def test_connection() -> bool:
             # Execute a simple query
             result = await conn.execute(text("SELECT 1"))
             test_result = result.scalar()
-            
+
             if test_result == 1:
                 logger.debug("Database connection test successful")
                 return True
             else:
                 logger.error("Database connection test failed - unexpected result")
                 return False
-                
+
     except Exception as e:
         logger.error("Database connection test failed", error=str(e))
         return False
@@ -107,7 +109,7 @@ async def test_connection() -> bool:
 async def get_database() -> AsyncGenerator[AsyncSession, None]:
     """
     FastAPI dependency to get database session
-    
+
     Yields:
         AsyncSession: Database session for request
     """
@@ -130,7 +132,7 @@ async def get_database_session() -> AsyncSession:
     """
     Get a database session for manual management
     Note: Remember to close the session when done
-    
+
     Returns:
         AsyncSession: Database session
     """
@@ -141,44 +143,51 @@ class DatabaseManager:
     """
     Database manager for advanced operations
     """
-    
+
     def __init__(self):
         self.engine = engine
         self.session_factory = async_session
         self.logger = structlog.get_logger().bind(component="db_manager")
-    
+
     async def execute_safe_query(self, query: str, params: dict = None):
         """
         Execute parameterized SQL query with security validation
-        
+
         Args:
             query: Parameterized SQL query string (must use :param_name format)
             params: Query parameters dictionary
-            
+
         Returns:
             Query result
-            
+
         Raises:
             SecurityError: If query contains potential SQL injection patterns
         """
         # Security validation: ensure query uses parameterized format
-        if params and not all(f":{param}" in query for param in params.keys()):
+        if params and not all(f":{param}" in query for param in params):
             raise ValueError("Query must use parameterized format (:param_name)")
-        
+
         # Block dangerous SQL patterns
         dangerous_patterns = [
-            r'\bDROP\b', r'\bDELETE\b.*\bWHERE\b.*1\b.*=\b.*1',
-            r'\bUNION\b.*\bSELECT\b', r'--', r'/\*', r'\*/', 
-            r'\bEXEC\b', r'\bEXECUTE\b', r'\bxp_cmdshell\b'
+            r"\bDROP\b",
+            r"\bDELETE\b.*\bWHERE\b.*1\b.*=\b.*1",
+            r"\bUNION\b.*\bSELECT\b",
+            r"--",
+            r"/\*",
+            r"\*/",
+            r"\bEXEC\b",
+            r"\bEXECUTE\b",
+            r"\bxp_cmdshell\b",
         ]
-        
+
         query_upper = query.upper()
         for pattern in dangerous_patterns:
             if re.search(pattern, query_upper, re.IGNORECASE):
-                self.logger.warning("Potential SQL injection attempt blocked", 
-                                  query_pattern=pattern)
+                self.logger.warning(
+                    "Potential SQL injection attempt blocked", query_pattern=pattern
+                )
                 raise ValueError("Query contains potentially unsafe SQL patterns")
-        
+
         async with self.session_factory() as session:
             try:
                 result = await session.execute(text(query), params or {})
@@ -186,14 +195,13 @@ class DatabaseManager:
                 return result
             except Exception as e:
                 await session.rollback()
-                self.logger.error("Safe query execution failed", 
-                                error=str(e))
+                self.logger.error("Safe query execution failed", error=str(e))
                 raise
-    
+
     async def bulk_insert(self, model_class, data: list):
         """
         Perform bulk insert operation
-        
+
         Args:
             model_class: SQLAlchemy model class
             data: List of dictionaries with data to insert
@@ -203,25 +211,27 @@ class DatabaseManager:
                 objects = [model_class(**item) for item in data]
                 session.add_all(objects)
                 await session.commit()
-                
-                self.logger.info("Bulk insert completed", 
-                               model=model_class.__name__, 
-                               count=len(data))
-                
+
+                self.logger.info(
+                    "Bulk insert completed", model=model_class.__name__, count=len(data)
+                )
+
                 return objects
-                
+
             except Exception as e:
                 await session.rollback()
-                self.logger.error("Bulk insert failed", 
-                                model=model_class.__name__, 
-                                count=len(data), 
-                                error=str(e))
+                self.logger.error(
+                    "Bulk insert failed",
+                    model=model_class.__name__,
+                    count=len(data),
+                    error=str(e),
+                )
                 raise
-    
+
     async def bulk_update(self, model_class, updates: list):
         """
         Perform bulk update operation
-        
+
         Args:
             model_class: SQLAlchemy model class
             updates: List of dictionaries with id and update data
@@ -229,31 +239,35 @@ class DatabaseManager:
         async with self.session_factory() as session:
             try:
                 for update_data in updates:
-                    obj_id = update_data.pop('id')
+                    obj_id = update_data.pop("id")
                     await session.execute(
                         model_class.__table__.update()
                         .where(model_class.id == obj_id)
                         .values(**update_data)
                     )
-                
+
                 await session.commit()
-                
-                self.logger.info("Bulk update completed", 
-                               model=model_class.__name__, 
-                               count=len(updates))
-                
+
+                self.logger.info(
+                    "Bulk update completed",
+                    model=model_class.__name__,
+                    count=len(updates),
+                )
+
             except Exception as e:
                 await session.rollback()
-                self.logger.error("Bulk update failed", 
-                                model=model_class.__name__, 
-                                count=len(updates), 
-                                error=str(e))
+                self.logger.error(
+                    "Bulk update failed",
+                    model=model_class.__name__,
+                    count=len(updates),
+                    error=str(e),
+                )
                 raise
-    
+
     async def get_connection_info(self) -> dict:
         """
         Get database connection information
-        
+
         Returns:
             dict: Connection information
         """
@@ -262,51 +276,56 @@ class DatabaseManager:
                 # Get PostgreSQL version
                 result = await session.execute(text("SELECT version()"))
                 pg_version = result.scalar()
-                
+
                 # Get current database name
                 result = await session.execute(text("SELECT current_database()"))
                 db_name = result.scalar()
-                
+
                 # Get connection count
                 result = await session.execute(
                     text("SELECT count(*) FROM pg_stat_activity WHERE state = 'active'")
                 )
                 active_connections = result.scalar()
-                
+
                 return {
                     "postgresql_version": pg_version,
                     "database_name": db_name,
                     "active_connections": active_connections,
                     "pool_size": settings.db_pool_size,
-                    "max_overflow": settings.db_max_overflow
+                    "max_overflow": settings.db_max_overflow,
                 }
-                
+
         except Exception as e:
             self.logger.error("Failed to get connection info", error=str(e))
             return {"error": str(e)}
-    
+
     async def health_check(self) -> dict:
         """
         Comprehensive database health check
-        
+
         Returns:
             dict: Health check results
         """
         start_time = asyncio.get_event_loop().time()
-        
+
         try:
             async with self.session_factory() as session:
                 # Test basic connectivity
                 await session.execute(text("SELECT 1"))
-                
+
                 # Test table access
                 from app.database.models import Store
-                result = await session.execute(text("SELECT COUNT(*) FROM business.stores"))
+
+                result = await session.execute(
+                    text("SELECT COUNT(*) FROM business.stores")
+                )
                 store_count = result.scalar()
-                
+
                 end_time = asyncio.get_event_loop().time()
-                response_time = (end_time - start_time) * 1000  # Convert to milliseconds
-                
+                response_time = (
+                    end_time - start_time
+                ) * 1000  # Convert to milliseconds
+
                 return {
                     "status": "healthy",
                     "response_time_ms": round(response_time, 2),
@@ -316,20 +335,20 @@ class DatabaseManager:
                         "checked_in": self.engine.pool.checkedin(),
                         "checked_out": self.engine.pool.checkedout(),
                         "overflow": self.engine.pool.overflow(),
-                        "invalid": self.engine.pool.invalid()
-                    }
+                        "invalid": self.engine.pool.invalid(),
+                    },
                 }
-                
+
         except Exception as e:
             end_time = asyncio.get_event_loop().time()
             response_time = (end_time - start_time) * 1000
-            
+
             self.logger.error("Database health check failed", error=str(e))
-            
+
             return {
                 "status": "unhealthy",
                 "response_time_ms": round(response_time, 2),
-                "error": str(e)
+                "error": str(e),
             }
 
 

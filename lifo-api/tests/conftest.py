@@ -1,17 +1,19 @@
 """
 Pytest configuration and fixtures for LIFO AI Engine tests
 """
-import pytest
+
 import asyncio
 from typing import AsyncGenerator
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.main import app
-from app.database.connection import Base, get_db
 from app.core.config import settings
+from app.database.connection import Base, get_db
+from app.main import app
 
 # Test database URL - use SQLite for testing
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -34,10 +36,10 @@ async def test_engine():
         poolclass=StaticPool,
         connect_args={"check_same_thread": False},
     )
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield engine
     await engine.dispose()
 
@@ -48,7 +50,7 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
     async_session = sessionmaker(
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session() as session:
         yield session
 
@@ -56,25 +58,22 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
 @pytest.fixture
 def client(test_db):
     """Create test client with database override."""
+
     def override_get_db():
         return test_db
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
 def mock_user():
     """Mock user for authentication tests."""
-    return {
-        "sub": "test-user-id",
-        "email": "test@example.com",
-        "role": "authenticated"
-    }
+    return {"sub": "test-user-id", "email": "test@example.com", "role": "authenticated"}
 
 
 @pytest.fixture
@@ -85,7 +84,7 @@ def mock_store():
         "store_name": "Test Store",
         "store_code": "TEST-001",
         "business_name": "Test Business",
-        "is_active": True
+        "is_active": True,
     }
 
 
@@ -101,7 +100,7 @@ def mock_inventory_batch():
         "cost_price": 1.0,
         "selling_price": 2.0,
         "expiry_date": "2024-12-31",
-        "location_code": "TEST-LOC"
+        "location_code": "TEST-LOC",
     }
 
 

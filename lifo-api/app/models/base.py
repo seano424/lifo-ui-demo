@@ -1,21 +1,25 @@
 """
 Base Pydantic models and common schemas for LIFO AI Engine
 """
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List, Dict, Any, Union
-from datetime import datetime, date
+
+from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
+
+from pydantic import BaseModel, Field, validator
 
 
 class TimestampMixin(BaseModel):
     """Mixin for timestamp fields"""
+
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
 
 class ResponseBase(BaseModel):
     """Base response model"""
+
     success: bool = True
     message: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
@@ -23,6 +27,7 @@ class ResponseBase(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Error response model"""
+
     success: bool = False
     error: str
     details: Optional[str] = None
@@ -32,9 +37,10 @@ class ErrorResponse(BaseModel):
 
 class PaginationParams(BaseModel):
     """Pagination parameters"""
+
     page: int = Field(1, ge=1, description="Page number (1-based)")
     limit: int = Field(50, ge=1, le=100, description="Items per page (max 100)")
-    
+
     @property
     def offset(self) -> int:
         return (self.page - 1) * self.limit
@@ -42,49 +48,55 @@ class PaginationParams(BaseModel):
 
 class PaginationResponse(BaseModel):
     """Pagination metadata in responses"""
+
     page: int
     limit: int
     total: int
     pages: int
     has_next: bool
     has_prev: bool
-    
-    @validator('pages', pre=True, always=True)
+
+    @validator("pages", pre=True, always=True)
     def calculate_pages(cls, v, values):
-        total = values.get('total', 0)
-        limit = values.get('limit', 1)
+        total = values.get("total", 0)
+        limit = values.get("limit", 1)
         return max(1, (total + limit - 1) // limit)
-    
-    @validator('has_next', pre=True, always=True)
+
+    @validator("has_next", pre=True, always=True)
     def calculate_has_next(cls, v, values):
-        page = values.get('page', 1)
-        total = values.get('total', 0)
-        limit = values.get('limit', 1)
+        page = values.get("page", 1)
+        total = values.get("total", 0)
+        limit = values.get("limit", 1)
         return page * limit < total
-    
-    @validator('has_prev', pre=True, always=True)
+
+    @validator("has_prev", pre=True, always=True)
     def calculate_has_prev(cls, v, values):
-        page = values.get('page', 1)
+        page = values.get("page", 1)
         return page > 1
 
 
 class SortParams(BaseModel):
     """Sorting parameters"""
+
     sort_field: Optional[str] = "created_at"
     sort_direction: str = Field("asc", pattern="^(asc|desc)$")
 
 
 class FilterParams(BaseModel):
     """Base filtering parameters"""
+
     search: Optional[str] = Field(None, max_length=100, description="Search term")
-    category: Optional[str] = Field(None, max_length=50, description="Filter by category")
+    category: Optional[str] = Field(
+        None, max_length=50, description="Filter by category"
+    )
     status: Optional[str] = Field("active", description="Filter by status")
 
 
 class UrgencyLevel(str, Enum):
     """Urgency levels for inventory items"""
+
     NONE = "none"
-    LOW = "low" 
+    LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
@@ -92,6 +104,7 @@ class UrgencyLevel(str, Enum):
 
 class ActionType(str, Enum):
     """Types of inventory actions"""
+
     MAINTAIN = "maintain"
     MONITOR = "monitor"
     ALERT = "alert"
@@ -103,6 +116,7 @@ class ActionType(str, Enum):
 
 class StoreType(str, Enum):
     """Types of stores"""
+
     SUPERMARKET = "supermarket"
     CONVENIENCE = "convenience"
     RESTAURANT = "restaurant"
@@ -113,6 +127,7 @@ class StoreType(str, Enum):
 
 class UserRole(str, Enum):
     """User roles within a store"""
+
     EMPLOYEE = "employee"
     STAFF = "staff"
     MANAGER = "manager"
@@ -121,6 +136,7 @@ class UserRole(str, Enum):
 
 class BatchStatus(str, Enum):
     """Batch status options"""
+
     ACTIVE = "active"
     SOLD = "sold"
     EXPIRED = "expired"
@@ -130,6 +146,7 @@ class BatchStatus(str, Enum):
 
 class HealthResponse(BaseModel):
     """Health check response"""
+
     status: str
     database_connected: bool
     version: str
@@ -139,6 +156,7 @@ class HealthResponse(BaseModel):
 
 class MetricsResponse(BaseModel):
     """Metrics response for monitoring"""
+
     inventory_count: int
     active_batches: int
     expired_items: int
@@ -162,25 +180,23 @@ def ensure_decimal(value: Union[float, int, str, Decimal]) -> Decimal:
 
 class ConfigurableModel(BaseModel):
     """Base model with common configuration"""
-    
+
     class Config:
         # Enable ORM mode for SQLAlchemy integration
         from_attributes = True
-        
+
         # Use enum values instead of names
         use_enum_values = True
-        
+
         # Validate assignment
         validate_assignment = True
-        
+
         # JSON encoders for special types
         json_encoders = {
             datetime: lambda v: v.isoformat() if v else None,
             date: lambda v: v.isoformat() if v else None,
             Decimal: lambda v: float(v) if v else None,
         }
-        
+
         # Schema extra
-        schema_extra = {
-            "example": {}
-        }
+        schema_extra = {"example": {}}

@@ -3,9 +3,22 @@ Main API router for LIFO AI Engine v1
 Combines all API endpoints into a single router
 Updated for MVP with scan workflows and mobile optimization
 """
+
 from fastapi import APIRouter
 
-from app.api.v1 import scoring, analytics, csv, scan_workflows, mobile_endpoints, mvp_analytics, image_recognition, csv_upload, donations, global_products, donation_queries
+from app.api.v1 import (
+    analytics,
+    csv,
+    csv_upload,
+    donation_queries,
+    donations,
+    global_products,
+    image_recognition,
+    mobile_endpoints,
+    mvp_analytics,
+    scan_workflows,
+    scoring,
+)
 
 # Create the main v1 router
 router = APIRouter()
@@ -20,7 +33,7 @@ router.include_router(
 
 router.include_router(
     analytics.router,
-    prefix="/analytics", 
+    prefix="/analytics",
     tags=["AI Analytics"],
     responses={404: {"description": "Not found"}},
 )
@@ -92,4 +105,3 @@ router.include_router(
     tags=["Image Recognition (Future)"],
     responses={404: {"description": "Not found"}},
 )
-

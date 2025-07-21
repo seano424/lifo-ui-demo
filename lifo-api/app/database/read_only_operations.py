@@ -2,13 +2,15 @@
 Secure read-only database operations for AI features only
 Part of hybrid architecture security remediation
 """
-from typing import List, Dict, Optional, Any
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, text, and_, func
-from datetime import datetime, date, timedelta
-from decimal import Decimal
-import structlog
+
 import uuid
+from datetime import date, datetime, timedelta
+from decimal import Decimal
+from typing import Any, Dict, List, Optional
+
+import structlog
+from sqlalchemy import and_, func, select, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = structlog.get_logger()
 
@@ -18,12 +20,14 @@ class SecureReadOnlyOperations:
     Secure read-only database operations for AI features only
     No CRUD operations - only data retrieval for scoring and analytics
     """
-    
+
     def __init__(self, db: AsyncSession):
         self.db = db
         self.logger = structlog.get_logger().bind(component="read_only_ops")
-    
-    async def get_store_inventory_for_scoring(self, store_id: str) -> List[Dict[str, Any]]:
+
+    async def get_store_inventory_for_scoring(
+        self, store_id: str
+    ) -> List[Dict[str, Any]]:
         """
         Get inventory data for scoring calculations only
         Uses read-only view to prevent SQL injection
@@ -38,7 +42,7 @@ class SecureReadOnlyOperations:
                     return []
             else:
                 store_uuid = store_id
-            
+
             # Use parameterized query with read-only view
             query = text("""
                 SELECT 
@@ -57,37 +61,43 @@ class SecureReadOnlyOperations:
                 AND current_quantity > 0
                 ORDER BY days_to_expiry ASC
             """)
-            
+
             result = await self.db.execute(query, {"store_id": store_uuid})
             rows = result.fetchall()
-            
+
             inventory_data = []
             for row in rows:
-                inventory_data.append({
-                    "batch_id": str(row.batch_id),
-                    "product_id": str(row.product_id),
-                    "sku": row.sku,
-                    "category": row.category,
-                    "current_quantity": float(row.current_quantity),
-                    "expiry_date": row.expiry_date,
-                    "selling_price": float(row.selling_price),
-                    "cost_price": float(row.cost_price),
-                    "days_to_expiry": int(row.days_to_expiry),
-                    "typical_shelf_life_days": int(row.typical_shelf_life_days) if row.typical_shelf_life_days else 30
-                })
-            
-            self.logger.info("Inventory data retrieved for scoring", 
-                           store_id=store_id, 
-                           items_count=len(inventory_data))
-            
+                inventory_data.append(
+                    {
+                        "batch_id": str(row.batch_id),
+                        "product_id": str(row.product_id),
+                        "sku": row.sku,
+                        "category": row.category,
+                        "current_quantity": float(row.current_quantity),
+                        "expiry_date": row.expiry_date,
+                        "selling_price": float(row.selling_price),
+                        "cost_price": float(row.cost_price),
+                        "days_to_expiry": int(row.days_to_expiry),
+                        "typical_shelf_life_days": int(row.typical_shelf_life_days)
+                        if row.typical_shelf_life_days
+                        else 30,
+                    }
+                )
+
+            self.logger.info(
+                "Inventory data retrieved for scoring",
+                store_id=store_id,
+                items_count=len(inventory_data),
+            )
+
             return inventory_data
-            
+
         except Exception as e:
-            self.logger.error("Failed to get inventory for scoring", 
-                            store_id=store_id, 
-                            error=str(e))
+            self.logger.error(
+                "Failed to get inventory for scoring", store_id=store_id, error=str(e)
+            )
             return []
-    
+
     async def get_batch_for_scoring(self, batch_id: str) -> Optional[Dict[str, Any]]:
         """
         Get single batch data for scoring
@@ -103,7 +113,7 @@ class SecureReadOnlyOperations:
                     return None
             else:
                 batch_uuid = batch_id
-            
+
             # Use parameterized query with read-only view
             query = text("""
                 SELECT 
@@ -121,13 +131,13 @@ class SecureReadOnlyOperations:
                 FROM inventory_view_for_scoring 
                 WHERE batch_id = :batch_id
             """)
-            
+
             result = await self.db.execute(query, {"batch_id": batch_uuid})
             row = result.first()
-            
+
             if not row:
                 return None
-            
+
             batch_data = {
                 "batch_id": str(row.batch_id),
                 "product_id": str(row.product_id),
@@ -139,22 +149,24 @@ class SecureReadOnlyOperations:
                 "selling_price": float(row.selling_price),
                 "cost_price": float(row.cost_price),
                 "days_to_expiry": int(row.days_to_expiry),
-                "typical_shelf_life_days": int(row.typical_shelf_life_days) if row.typical_shelf_life_days else 30
+                "typical_shelf_life_days": int(row.typical_shelf_life_days)
+                if row.typical_shelf_life_days
+                else 30,
             }
-            
-            self.logger.info("Batch data retrieved for scoring", 
-                           batch_id=batch_id)
-            
+
+            self.logger.info("Batch data retrieved for scoring", batch_id=batch_id)
+
             return batch_data
-            
+
         except Exception as e:
-            self.logger.error("Failed to get batch for scoring", 
-                            batch_id=batch_id, 
-                            error=str(e))
+            self.logger.error(
+                "Failed to get batch for scoring", batch_id=batch_id, error=str(e)
+            )
             return None
-    
-    async def get_sales_velocity_data(self, store_id: str, product_id: str = None, 
-                                    days: int = 30) -> Dict[str, float]:
+
+    async def get_sales_velocity_data(
+        self, store_id: str, product_id: str = None, days: int = 30
+    ) -> Dict[str, float]:
         """
         Get sales velocity data for scoring calculations
         Uses parameterized query to prevent SQL injection
@@ -169,18 +181,20 @@ class SecureReadOnlyOperations:
                     return {}
             else:
                 store_uuid = store_id
-            
+
             # Build parameterized query
             if product_id:
                 if isinstance(product_id, str):
                     try:
                         product_uuid = uuid.UUID(product_id)
                     except ValueError:
-                        self.logger.error("Invalid product_id format", product_id=product_id)
+                        self.logger.error(
+                            "Invalid product_id format", product_id=product_id
+                        )
                         return {}
                 else:
                     product_uuid = product_id
-                
+
                 query = text("""
                     SELECT 
                         AVG(quantity_sold) as avg_daily_sales,
@@ -190,11 +204,11 @@ class SecureReadOnlyOperations:
                     AND product_id = :product_id
                     AND sale_date >= :start_date
                 """)
-                
+
                 params = {
                     "store_id": store_uuid,
                     "product_id": product_uuid,
-                    "start_date": date.today() - timedelta(days=days)
+                    "start_date": date.today() - timedelta(days=days),
                 }
             else:
                 query = text("""
@@ -205,34 +219,36 @@ class SecureReadOnlyOperations:
                     WHERE store_id = :store_id 
                     AND sale_date >= :start_date
                 """)
-                
+
                 params = {
                     "store_id": store_uuid,
-                    "start_date": date.today() - timedelta(days=days)
+                    "start_date": date.today() - timedelta(days=days),
                 }
-            
+
             result = await self.db.execute(query, params)
             row = result.first()
-            
+
             if row and row.avg_daily_sales:
                 return {
                     "avg_daily_sales": float(row.avg_daily_sales),
-                    "sales_events": int(row.sales_events)
+                    "sales_events": int(row.sales_events),
                 }
-            
+
             # Return fallback data
             return {
                 "avg_daily_sales": 1.0,  # Conservative fallback
-                "sales_events": 0
+                "sales_events": 0,
             }
-            
+
         except Exception as e:
-            self.logger.error("Failed to get sales velocity data", 
-                            store_id=store_id, 
-                            product_id=product_id,
-                            error=str(e))
+            self.logger.error(
+                "Failed to get sales velocity data",
+                store_id=store_id,
+                product_id=product_id,
+                error=str(e),
+            )
             return {"avg_daily_sales": 1.0, "sales_events": 0}
-    
+
     async def get_category_weights(self, category: str) -> Dict[str, float]:
         """
         Get category-specific scoring weights
@@ -248,30 +264,26 @@ class SecureReadOnlyOperations:
                 WHERE category = :category 
                 AND is_active = true
             """)
-            
+
             result = await self.db.execute(query, {"category": category})
             row = result.first()
-            
+
             if row:
                 return {
                     "expiry": float(row.spoilage_risk_weight),
                     "velocity": float(row.turnover_speed_weight),
-                    "margin": float(row.value_impact_weight)
+                    "margin": float(row.value_impact_weight),
                 }
-            
+
             # Return default weights if not found
-            return {
-                "expiry": 0.5,
-                "velocity": 0.3,
-                "margin": 0.2
-            }
-            
-        except Exception as e:
-            self.logger.error("Failed to get category weights", 
-                            category=category, 
-                            error=str(e))
             return {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
-    
+
+        except Exception as e:
+            self.logger.error(
+                "Failed to get category weights", category=category, error=str(e)
+            )
+            return {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
+
     async def store_score_results(self, scores: List[Dict[str, Any]]) -> bool:
         """
         Store scoring results - ONLY operation that writes to database
@@ -280,7 +292,7 @@ class SecureReadOnlyOperations:
         try:
             if not scores:
                 return True
-            
+
             # Prepare batch insert
             insert_query = text("""
                 INSERT INTO scoring.product_scores (
@@ -305,23 +317,22 @@ class SecureReadOnlyOperations:
                     confidence_level = EXCLUDED.confidence_level,
                     calculated_at = EXCLUDED.calculated_at
             """)
-            
+
             # Execute batch insert
             await self.db.execute(insert_query, scores)
             await self.db.commit()
-            
-            self.logger.info("Score results stored", 
-                           scores_count=len(scores))
-            
+
+            self.logger.info("Score results stored", scores_count=len(scores))
+
             return True
-            
+
         except Exception as e:
             await self.db.rollback()
-            self.logger.error("Failed to store score results", 
-                            scores_count=len(scores),
-                            error=str(e))
+            self.logger.error(
+                "Failed to store score results", scores_count=len(scores), error=str(e)
+            )
             return False
-    
+
     async def get_analytics_data(self, store_id: str, days: int = 30) -> Dict[str, Any]:
         """
         Get analytics data for dashboard
@@ -337,7 +348,7 @@ class SecureReadOnlyOperations:
                     return {}
             else:
                 store_uuid = store_id
-            
+
             # Get analytics data directly from batches table
             query = text("""
                 SELECT 
@@ -355,15 +366,15 @@ class SecureReadOnlyOperations:
                 AND b.status = 'active'
                 AND b.current_quantity > 0
             """)
-            
+
             params = {
                 "store_id": store_uuid,
-                "start_date": date.today() - timedelta(days=days)
+                "start_date": date.today() - timedelta(days=days),
             }
-            
+
             result = await self.db.execute(query, params)
             row = result.first()
-            
+
             if row:
                 return {
                     "total_batches": int(row.total_batches),
@@ -375,9 +386,9 @@ class SecureReadOnlyOperations:
                     "high_urgency_items": int(row.high_urgency_items),
                     "medium_urgency_items": int(row.medium_urgency_items),
                     "low_urgency_items": int(row.low_urgency_items),
-                    "generated_at": datetime.utcnow().isoformat()
+                    "generated_at": datetime.utcnow().isoformat(),
                 }
-            
+
             # Return empty analytics if no data
             return {
                 "total_batches": 0,
@@ -389,13 +400,13 @@ class SecureReadOnlyOperations:
                 "high_urgency_items": 0,
                 "medium_urgency_items": 0,
                 "low_urgency_items": 0,
-                "generated_at": datetime.utcnow().isoformat()
+                "generated_at": datetime.utcnow().isoformat(),
             }
-            
+
         except Exception as e:
-            self.logger.error("Failed to get analytics data", 
-                            store_id=store_id, 
-                            error=str(e))
+            self.logger.error(
+                "Failed to get analytics data", store_id=store_id, error=str(e)
+            )
             return {}
 
 

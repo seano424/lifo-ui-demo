@@ -2,14 +2,16 @@
 Rate limiting middleware for AI endpoints
 Part of hybrid architecture security remediation
 """
-from fastapi import Request, HTTPException
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from fastapi.responses import JSONResponse
-import structlog
-from typing import Dict, Any
+
 import time
+from typing import Any, Dict
+
+import structlog
+from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 logger = structlog.get_logger()
 
@@ -18,13 +20,14 @@ limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["100/hour", "20/minute"],  # More restrictive default limits
     storage_uri="memory://",  # In-memory storage for development
-    strategy="moving-window"  # More accurate rate limiting
+    strategy="moving-window",  # More accurate rate limiting
 )
+
 
 # Custom rate limit handler with security logging
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     """Custom rate limit exceeded handler with security logging"""
-    
+
     # Log rate limit violation for security monitoring
     client_ip = get_remote_address(request)
     logger.warning(
@@ -34,51 +37,56 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         method=request.method,
         user_agent=request.headers.get("user-agent", "unknown"),
         limit=exc.detail,
-        retry_after=exc.retry_after
+        retry_after=exc.retry_after,
     )
-    
+
     response = JSONResponse(
         status_code=429,
         content={
             "error": "Rate limit exceeded",
             "message": "Too many requests. Please try again later.",
             "retry_after": exc.retry_after,
-            "endpoint": str(request.url.path)
-        }
+            "endpoint": str(request.url.path),
+        },
     )
-    
+
     # Add rate limit headers
     response.headers["X-RateLimit-Limit"] = str(exc.detail)
     response.headers["X-RateLimit-Remaining"] = "0"
     response.headers["X-RateLimit-Reset"] = str(int(time.time()) + exc.retry_after)
     response.headers["Retry-After"] = str(exc.retry_after)
-    
+
     logger.warning(
         "Rate limit exceeded",
         client_ip=get_remote_address(request),
         endpoint=request.url.path,
         limit=exc.detail,
-        user_agent=request.headers.get("user-agent", "unknown")
+        user_agent=request.headers.get("user-agent", "unknown"),
     )
-    
+
     return response
+
 
 # AI-specific rate limiting decorators
 def ai_endpoint_rate_limit(rate: str = "30/minute"):
     """Rate limit decorator for AI endpoints"""
     return limiter.limit(rate)
 
+
 def csv_processing_rate_limit(rate: str = "5/hour"):
     """Rate limit decorator for CSV processing (resource intensive)"""
     return limiter.limit(rate)
+
 
 def scoring_rate_limit(rate: str = "20/minute"):
     """Rate limit decorator for scoring endpoints"""
     return limiter.limit(rate)
 
+
 def analytics_rate_limit(rate: str = "40/minute"):
     """Rate limit decorator for analytics endpoints"""
     return limiter.limit(rate)
+
 
 # Advanced rate limiting for different user types
 def get_user_rate_limit_key(request: Request) -> str:
@@ -92,15 +100,17 @@ def get_user_rate_limit_key(request: Request) -> str:
             return f"{get_remote_address(request)}:{hash(request.headers.get('user-agent', ''))}"
     except:
         pass
-    
+
     # Fallback to IP address
     return get_remote_address(request)
+
 
 # User-aware limiter
 user_limiter = Limiter(
     key_func=get_user_rate_limit_key,
-    default_limits=["100/minute"]  # Higher limits for authenticated users
+    default_limits=["100/minute"],  # Higher limits for authenticated users
 )
+
 
 # Endpoint-specific rate limiting functions
 def apply_ai_rate_limits():
@@ -109,91 +119,95 @@ def apply_ai_rate_limits():
         "scoring": scoring_rate_limit(),
         "csv_processing": csv_processing_rate_limit(),
         "analytics": analytics_rate_limit(),
-        "general_ai": ai_endpoint_rate_limit()
+        "general_ai": ai_endpoint_rate_limit(),
     }
+
 
 # Security-focused rate limiting
 class SecurityRateLimiter:
     """Advanced rate limiter with security features"""
-    
+
     def __init__(self):
         self.failed_attempts = {}  # Track failed attempts
-        self.blocked_ips = set()   # Temporarily blocked IPs
+        self.blocked_ips = set()  # Temporarily blocked IPs
         self.logger = logger.bind(component="security_rate_limiter")
-    
+
     def is_blocked(self, client_ip: str) -> bool:
         """Check if IP is temporarily blocked"""
         return client_ip in self.blocked_ips
-    
+
     def record_failed_attempt(self, client_ip: str, endpoint: str):
         """Record failed authentication/validation attempt"""
         if client_ip not in self.failed_attempts:
             self.failed_attempts[client_ip] = []
-        
-        self.failed_attempts[client_ip].append({
-            "endpoint": endpoint,
-            "timestamp": time.time()
-        })
-        
+
+        self.failed_attempts[client_ip].append(
+            {"endpoint": endpoint, "timestamp": time.time()}
+        )
+
         # Clean old attempts (older than 1 hour)
         cutoff = time.time() - 3600
         self.failed_attempts[client_ip] = [
-            attempt for attempt in self.failed_attempts[client_ip]
+            attempt
+            for attempt in self.failed_attempts[client_ip]
             if attempt["timestamp"] > cutoff
         ]
-        
+
         # Block IP if too many failed attempts
         if len(self.failed_attempts[client_ip]) >= 10:
             self.blocked_ips.add(client_ip)
             self.logger.warning(
                 "IP temporarily blocked due to repeated failures",
                 client_ip=client_ip,
-                failed_attempts=len(self.failed_attempts[client_ip])
+                failed_attempts=len(self.failed_attempts[client_ip]),
             )
-    
+
     def clear_failed_attempts(self, client_ip: str):
         """Clear failed attempts for successful authentication"""
         if client_ip in self.failed_attempts:
             del self.failed_attempts[client_ip]
-    
+
     def unblock_ip(self, client_ip: str):
         """Unblock IP (for admin use)"""
         self.blocked_ips.discard(client_ip)
         if client_ip in self.failed_attempts:
             del self.failed_attempts[client_ip]
 
+
 # Global security rate limiter instance
 security_limiter = SecurityRateLimiter()
+
 
 # Middleware to check blocked IPs
 async def check_blocked_ip(request: Request, call_next):
     """Middleware to check if IP is blocked"""
     client_ip = get_remote_address(request)
-    
+
     if security_limiter.is_blocked(client_ip):
         logger.warning(
             "Blocked IP attempted access",
             client_ip=client_ip,
-            endpoint=request.url.path
+            endpoint=request.url.path,
         )
         return JSONResponse(
             status_code=403,
             content={
                 "error": "Access forbidden",
-                "message": "IP temporarily blocked due to security violations"
-            }
+                "message": "IP temporarily blocked due to security violations",
+            },
         )
-    
+
     return await call_next(request)
+
 
 # Rate limiting configuration for production
 PRODUCTION_RATE_LIMITS = {
-    "csv_upload": "3/hour",          # CSV uploads are resource intensive
-    "scoring_batch": "15/minute",    # Batch scoring operations
+    "csv_upload": "3/hour",  # CSV uploads are resource intensive
+    "scoring_batch": "15/minute",  # Batch scoring operations
     "analytics_dashboard": "30/minute",  # Dashboard analytics
-    "ai_suggestions": "20/minute",   # AI-powered suggestions
-    "template_download": "10/minute", # Template downloads
-    "file_validation": "10/minute"    # File validation
+    "ai_suggestions": "20/minute",  # AI-powered suggestions
+    "template_download": "10/minute",  # Template downloads
+    "file_validation": "10/minute",  # File validation
 }
 
 # Development rate limits (more permissive)
@@ -203,8 +217,9 @@ DEVELOPMENT_RATE_LIMITS = {
     "analytics_dashboard": "60/minute",
     "ai_suggestions": "40/minute",
     "template_download": "30/minute",
-    "file_validation": "20/minute"
+    "file_validation": "20/minute",
 }
+
 
 def get_rate_limits(environment: str = "production") -> Dict[str, str]:
     """Get rate limits based on environment"""
