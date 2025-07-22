@@ -77,8 +77,8 @@ const COUNTRIES = [
 export default function StoreInformation() {
   const t = useTranslations('settings')
   const { data: storeData, isLoading } = useStoreSettings()
-  const { updateBasicInfo, isUpdating, canEditBasicInfo } = useStoreActions()
-  const { canViewSettings } = useStorePermissions()
+  const { updateBasicInfo, isUpdating } = useStoreActions()
+  const { canViewSettings, canEditAdvancedSettings } = useStorePermissions()
 
   const [isEditing, setIsEditing] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -231,7 +231,7 @@ export default function StoreInformation() {
               Manage your store's basic information and settings
             </Typography>
           </div>
-          {!isEditing && canEditBasicInfo && (
+          {!isEditing && canEditAdvancedSettings && (
             <Button
               variant="outline"
               size="sm"
@@ -257,7 +257,7 @@ export default function StoreInformation() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Store Name */}
               <div className="space-y-2">
-                <Label htmlFor="store_name">Store Name *</Label>
+                <Label htmlFor="store_name">Store Name</Label>
                 {isEditing ? (
                   <Input
                     id="store_name"
@@ -290,7 +290,7 @@ export default function StoreInformation() {
 
               {/* Store Code */}
               <div className="space-y-2">
-                <Label htmlFor="store_code">Store Code *</Label>
+                <Label htmlFor="store_code">Store Code</Label>
                 {isEditing ? (
                   <Input
                     id="store_code"
