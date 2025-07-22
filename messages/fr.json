@@ -59,6 +59,100 @@
       "team": "Équipe",
       "storeDescription": "Gérez les paramètres de votre magasin.",
       "notificationsDescription": "Gérez vos paramètres de notification."
+    },
+    "storeInformation": {
+      "title": "Informations du magasin",
+      "description": "Gérez les informations de base et les paramètres de votre magasin",
+      "editStore": "Modifier le magasin",
+      "permissionError": "Vous n'avez pas la permission de voir les paramètres du magasin.",
+      "sections": {
+        "storeDetails": "Détails du magasin",
+        "addressInformation": "Informations d'adresse",
+        "contactInformation": "Informations de contact",
+        "storeDescription": "Description du magasin",
+        "businessSettings": "Paramètres commerciaux"
+      },
+      "fields": {
+        "storeName": "Nom du magasin",
+        "businessName": "Nom de l'entreprise",
+        "storeCode": "Code du magasin",
+        "storeType": "Type de magasin",
+        "sizeCategory": "Catégorie de taille",
+        "address": "Adresse",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays",
+        "phone": "Numéro de téléphone",
+        "email": "Adresse e-mail",
+        "website": "URL du site web",
+        "description": "Description",
+        "defaultMarkup": "Marge par défaut (%)",
+        "wasteReductionTarget": "Objectif de réduction des déchets (%)"
+      },
+      "placeholders": {
+        "storeName": "Entrez le nom du magasin",
+        "businessName": "Entrez le nom de l'entreprise",
+        "storeCode": "Entrez le code du magasin",
+        "address": "Entrez l'adresse",
+        "city": "Entrez la ville",
+        "postalCode": "Entrez le code postal",
+        "phone": "Entrez le numéro de téléphone",
+        "email": "Entrez l'adresse e-mail",
+        "website": "https://exemple.com",
+        "description": "Décrivez votre magasin..."
+      },
+      "selectPlaceholders": {
+        "storeType": "Sélectionnez le type de magasin",
+        "sizeCategory": "Sélectionnez la catégorie de taille",
+        "country": "Sélectionnez le pays"
+      },
+      "storeTypes": {
+        "supermarket": "Supermarché",
+        "convenience": "Magasin de proximité",
+        "restaurant": "Restaurant",
+        "bakery": "Boulangerie",
+        "butcher": "Boucherie",
+        "organic": "Magasin bio"
+      },
+      "sizeCategories": {
+        "small": "Petit (< 500 m²)",
+        "medium": "Moyen (500-1500 m²)",
+        "large": "Grand (1500-5000 m²)",
+        "hypermarket": "Hypermarché (> 5000 m²)"
+      },
+      "countries": {
+        "France": "France",
+        "Netherlands": "Pays-Bas",
+        "Belgium": "Belgique",
+        "Germany": "Allemagne",
+        "Spain": "Espagne",
+        "Italy": "Italie"
+      },
+      "actions": {
+        "saveChanges": "Enregistrer les modifications",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler",
+        "unsavedChanges": "Vous avez des modifications non enregistrées"
+      },
+      "messages": {
+        "notSet": "Non défini",
+        "noDescription": "Aucune description fournie"
+      },
+      "validation": {
+        "storeNameRequired": "Le nom du magasin est requis",
+        "storeNameTooLong": "Le nom du magasin est trop long",
+        "businessNameTooLong": "Le nom de l'entreprise est trop long",
+        "storeCodeRequired": "Le code du magasin est requis",
+        "storeCodeTooLong": "Le code du magasin est trop long",
+        "addressTooLong": "L'adresse est trop longue",
+        "cityTooLong": "Le nom de la ville est trop long",
+        "postalCodeTooLong": "Le code postal est trop long",
+        "countryTooLong": "Le nom du pays est trop long",
+        "phoneTooLong": "Le numéro de téléphone est trop long",
+        "invalidEmail": "Format d'e-mail invalide",
+        "invalidWebsite": "URL de site web invalide",
+        "descriptionTooLong": "La description est trop longue"
+      }
     }
   },
   "users": {
