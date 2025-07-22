@@ -158,7 +158,7 @@
   "users": {
     "title": "Teambeheer",
     "description": "Nodig nieuwe teamleden uit in uw winkel en beheer hun rollen en machtigingen.",
-    "addEmployee": "Medewerker toevoegen",
+    "addEmployee": "Team lid uitnodigen",
     "showing": "{current} van {total} gebruikers weergegeven",
     "noUsersFound": "Geen gebruikers gevonden",
     "name": "Naam",

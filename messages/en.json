@@ -158,7 +158,7 @@
   "users": {
     "title": "Team Management",
     "description": "Invite new team members to your store and manage their roles and permissions.",
-    "addEmployee": "Add Employee",
+    "addEmployee": "Invite team member",
     "showing": "Showing {current} of {total} users",
     "noUsersFound": "No users found",
     "name": "Name",

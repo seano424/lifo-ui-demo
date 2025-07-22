@@ -182,12 +182,12 @@ export function StoreUsersList() {
         </CardHeader>
 
         <CardContent>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-4">
             <Typography variant="p" color="muted">
               {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
             </Typography>
             <Button
-              variant="brand"
+              variant="secondary"
               onClick={() => setIsAddUserDialogOpen(true)}
               className="flex items-center gap-2"
             >

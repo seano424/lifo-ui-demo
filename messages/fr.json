@@ -158,7 +158,7 @@
   "users": {
     "title": "Gestion d'équipe",
     "description": "Invitez de nouveaux membres d'équipe dans votre magasin et gérez leurs rôles et permissions.",
-    "addEmployee": "Ajouter un employé",
+    "addEmployee": "Inviter un membre d'équipe",
     "showing": "Affichage de {current} sur {total} utilisateurs",
     "noUsersFound": "Aucun utilisateur trouvé",
     "name": "Nom",
