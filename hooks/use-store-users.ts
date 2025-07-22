@@ -1,4 +1,4 @@
-// hooks/use-store-users.ts - Fixed to use centralized query keys
+// hooks/use-store-users.ts
 
 import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'

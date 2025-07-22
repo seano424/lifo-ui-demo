@@ -17,7 +17,6 @@ export default function UserAccountInformation() {
   const t = useTranslations('account')
   const { data: user, isLoading } = useCurrentUser()
 
-  console.log('user', user)
   const updatePhone = useUpdatePhone()
   const { updateUserProfile } = useUserActions()
 
