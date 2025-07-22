@@ -3,8 +3,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 
 type Store = Database['business']['Tables']['stores']['Row']
 type Batch = Database['inventory']['Tables']['batches']['Row']
-type Product = Database['inventory']['Tables']['products']['Row']
-// Updated types for normalized inventory schema
+
 type GlobalProduct = Database['inventory']['Tables']['products']['Row']
 type StoreProduct = Database['inventory']['Tables']['store_products']['Row']
 
@@ -113,7 +112,8 @@ export class InventoryOperations {
 
   async findGlobalProductByBarcode(barcode: string): Promise<GlobalProduct | null> {
     const { data, error } = await this.supabase
-      .from('inventory.products')
+      .schema('inventory')
+      .from('products')
       .select('*')
       .eq('barcode', barcode)
       .single()
@@ -134,32 +134,39 @@ export class InventoryOperations {
     storeId?: string,
     limit: number = 20,
   ): Promise<GlobalProduct[]> {
-    let query = this.supabase
-      .from('inventory.products')
-      .select('*')
-      .or(`name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
-      .limit(limit)
-
     // If storeId provided, only show products available in that store
     if (storeId) {
-      query = this.supabase
-        .from('inventory.products')
+      const { data, error } = await this.supabase
+        .schema('inventory')
+        .from('products')
         .select(
           `
           *,
-          inventory.store_products!inner (
+          store_products!inner (
             store_id,
             is_active
           )
         `,
         )
         .or(`name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
-        .eq('inventory.store_products.store_id', storeId)
-        .eq('inventory.store_products.is_active', true)
+        .eq('store_products.store_id', storeId)
+        .eq('store_products.is_active', true)
         .limit(limit)
+
+      if (error) {
+        throw new Error(`Error searching global products: ${error.message}`)
+      }
+
+      return data || []
     }
 
-    const { data, error } = await query
+    // Default search without store filtering
+    const { data, error } = await this.supabase
+      .schema('inventory')
+      .from('products')
+      .select('*')
+      .or(`name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
+      .limit(limit)
 
     if (error) {
       throw new Error(`Error searching global products: ${error.message}`)
@@ -178,16 +185,19 @@ export class InventoryOperations {
     created_by: string
   }): Promise<GlobalProduct> {
     const { data, error } = await this.supabase
-      .from('inventory.products')
+      .schema('inventory')
+      .from('products')
       .insert({
         name: productData.name,
         brand: productData.brand,
         barcode: productData.barcode,
         category: productData.primary_category,
-        typical_shelf_life_days: productData.typical_shelf_life_days,
+        typical_shelf_life_days: productData.typical_shelf_life_days || 30,
         unit_type: productData.unit_type || 'pcs',
         created_by: productData.created_by,
         sku: `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Generate unique SKU
+        base_cost_price: 0, // Required field - set default
+        base_selling_price: 0, // Required field - set default
       })
       .select()
       .single()
@@ -211,7 +221,8 @@ export class InventoryOperations {
     userId: string,
   ): Promise<StoreProduct> {
     const { data, error } = await this.supabase
-      .from('inventory.store_products')
+      .schema('inventory')
+      .from('store_products')
       .insert({
         store_id: storeId,
         product_id: productId,
@@ -246,11 +257,12 @@ export class InventoryOperations {
     const to = from + limit - 1
 
     let query = this.supabase
-      .from('inventory.store_products')
+      .schema('inventory')
+      .from('store_products')
       .select(
         `
         *,
-        inventory.products (
+        products (
           product_id,
           name,
           brand,
@@ -270,7 +282,7 @@ export class InventoryOperations {
     }
 
     if (category) {
-      query = query.eq('inventory.products.category', category)
+      query = query.eq('products.category', category)
     }
 
     const { data, error, count } = await query
