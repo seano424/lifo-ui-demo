@@ -1,8 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lifo_ai_core/database/operations'
+// TODO: Re-enable when InventoryOperations is ready
+// import { createClient } from '@/lib/supabase/server'
+import { NextRequest } from 'next/server'
+// TODO: Re-enable when InventoryOperations is ready
+// import { NextResponse } from 'next/server'
+// import { InventoryOperations } from '@/lifo-ai-core/database/operations'
 
+// TODO: Re-enable when alerts functionality is ready
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
+  // TODO: Re-enable when InventoryOperations is ready
+  return new Response(JSON.stringify({ message: 'Alerts API temporarily disabled' }), {
+    status: 501,
+    headers: { 'Content-Type': 'application/json' },
+  })
+
+  /*
   const supabase = await createClient()
 
   const {
@@ -169,8 +181,11 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     )
   }
+  */
 }
 
+// TODO: Re-enable when alerts functionality is ready
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function generateActionSuggestions(
   daysToExpiry: number,
   compositeScore: number,
@@ -220,6 +235,8 @@ function generateActionSuggestions(
   return suggestions
 }
 
+// TODO: Re-enable when alerts functionality is ready
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function calculatePriorityScore(
   daysToExpiry: number,
   potentialLoss: number,
