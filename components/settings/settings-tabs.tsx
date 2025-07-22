@@ -13,6 +13,7 @@ import { useStorePermissions } from '@/hooks/use-store-settings'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 const VALID_TABS = ['store', 'notifications', 'account', 'team'] as const
 type ValidTab = (typeof VALID_TABS)[number]
@@ -104,19 +105,27 @@ export default function SettingsTabs() {
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-4">
-          <Typography variant="h2">{t('tabs.notifications')}</Typography>
-          <Typography variant="p" color="muted">
-            {t('tabs.notificationsDescription')}
-          </Typography>
           {/* TODO: Implement notifications settings */}
-          <div className="p-8 text-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
-            <Typography variant="p" color="muted">
-              Notification settings coming soon...
-            </Typography>
-            <Typography variant="small" color="muted" className="mt-2">
-              Configure email alerts, push notifications, and more
-            </Typography>
-          </div>
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col">
+                <Typography variant="h2">{t('tabs.notifications')}</Typography>
+                <Typography variant="p" color="muted">
+                  {t('tabs.notificationsDescription')}
+                </Typography>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-4 border-t">
+              <div className="p-8 text-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+                <Typography variant="p" color="muted">
+                  Notification settings coming soon...
+                </Typography>
+                <Typography variant="small" color="muted" className="mt-2">
+                  Configure email alerts, push notifications, and more
+                </Typography>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="account" className="space-y-4">
