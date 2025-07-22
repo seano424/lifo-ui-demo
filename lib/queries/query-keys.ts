@@ -18,11 +18,11 @@ export const queryKeys = {
     detail: (userId: string) => [...queryKeys.userPreferences.all, userId] as const,
   },
 
-  // Store-aware product queries
+  // Store-aware product queries (now using normalized schema with store_products junction table)
   products: {
     all: ['products'] as const,
     lists: () => [...queryKeys.products.all, 'list'] as const,
-    // Store-specific queries
+    // Store-specific queries - these query through the store_products junction table
     byStore: (storeId: string) => [...queryKeys.products.all, 'byStore', storeId] as const,
     list: (storeId: string, filters: ProductFilters) =>
       [...queryKeys.products.byStore(storeId), 'list', { filters }] as const,

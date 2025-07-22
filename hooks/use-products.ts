@@ -1,4 +1,4 @@
-// hooks/use-products.ts - Updated to be store-aware
+// hooks/use-products.ts
 
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -15,26 +15,39 @@ import {
   type ProductSort,
   type SortField,
   type SortDirection,
+  type CreateProductData,
+  type UpdateProductData,
 } from '@/lib/queries/products'
-import type { Database } from '@/types/supabase'
 import { useCallback, useState } from 'react'
 
-// ✅ READING DATA - Store-aware infinite scroll products list with sorting
+// ✅ FIXED: Store-aware infinite scroll products list with simplified sorting
 export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
 
   // Don't fetch if no active store
   const result = useInfiniteQuery({
     queryKey: queryKeys.products.infinite(activeStoreId || '', filters),
-    queryFn: ({ pageParam = 0 }) =>
-      fetchProductsPage(
+    queryFn: ({ pageParam = 0 }) => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      return fetchProductsPage(
         { page: pageParam, pageSize },
-        { ...filters, storeId: activeStoreId || undefined },
+        { ...filters, storeId: activeStoreId },
         undefined,
-      ),
+      )
+    },
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId, // Only fetch when we have a store
+    retry: (failureCount, error: any) => {
+      // Don't retry on PostgREST ordering errors
+      if (error?.message?.includes('failed to parse order')) {
+        console.error('[useProducts] PostgREST ordering error - not retrying:', error)
+        return false
+      }
+      return failureCount < 3
+    },
   })
 
   // Flatten pages into single array (just like before)
@@ -53,7 +66,7 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
   }
 }
 
-// Products hook with built-in sorting state management (store-aware)
+// ✅ FIXED: Products hook with built-in sorting state management (store-aware)
 export function useProductsWithSort(initialSort?: ProductSort, pageSize: number = 20) {
   const [currentSort, setCurrentSort] = useState<ProductSort>(
     initialSort || { field: 'created_at', direction: 'desc' },
@@ -89,26 +102,36 @@ export function useProductsWithSort(initialSort?: ProductSort, pageSize: number 
   }
 }
 
-// READING DATA - Single product by ID (store-aware)
+// ✅ READING DATA - Single product by ID (store-aware)
 export function useProduct(productId: string) {
+  const activeStoreId = useActiveStoreId()
+
   return useQuery({
     queryKey: queryKeys.products.detail(productId),
-    queryFn: () => fetchProductById(productId),
-    enabled: !!productId, // Only fetch if productId exists
+    queryFn: () => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      return fetchProductById(productId, activeStoreId)
+    },
+    enabled: !!productId && !!activeStoreId, // Only fetch if both exist
   })
 }
 
-// WRITING DATA - Product CRUD actions with proper cache invalidation (store-aware)
+// ✅ WRITING DATA - Product CRUD actions with proper cache invalidation (store-aware)
 export function useProductActions() {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
 
   const createMutation = useMutation({
-    mutationFn: (productData: Database['inventory']['Tables']['products']['Insert']) => {
-      // Automatically add store_id to product data
+    mutationFn: (productData: CreateProductData) => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      // Automatically add storeId to product data
       const productWithStore = {
         ...productData,
-        store_id: activeStoreId,
+        storeId: activeStoreId,
       }
       return createProduct(productWithStore)
     },
@@ -127,18 +150,17 @@ export function useProductActions() {
     },
     onError: error => {
       console.error('Failed to create product:', error)
-      toast.error('Failed to create product')
+      toast.error(`Failed to create product: ${error.message}`)
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({
-      productId,
-      updates,
-    }: {
-      productId: string
-      updates: Database['inventory']['Tables']['products']['Update']
-    }) => updateProduct(productId, updates),
+    mutationFn: ({ productId, updates }: { productId: string; updates: UpdateProductData }) => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      return updateProduct(productId, updates, activeStoreId)
+    },
 
     onMutate: async ({ productId, updates }) => {
       // Cancel outgoing refetches
@@ -156,12 +178,12 @@ export function useProductActions() {
       if (activeStoreId) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.products.byStore(activeStoreId) },
-          (oldData: any) => {
+          (oldData: { pages: { data: Product[]; count: number }[] } | undefined) => {
             if (!oldData) return oldData
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page: any) => ({
+              pages: oldData.pages.map((page: { data: Product[]; count: number }) => ({
                 ...page,
                 data: page.data.map((product: Product) =>
                   product.product_id === productId
@@ -186,7 +208,7 @@ export function useProductActions() {
         )
       }
       console.error('Failed to update product:', err)
-      toast.error('Failed to update product')
+      toast.error(`Failed to update product: ${err.message}`)
     },
 
     onSettled: (data, error, { productId }) => {
@@ -203,7 +225,12 @@ export function useProductActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (productId: string) => deleteProduct(productId),
+    mutationFn: (productId: string) => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      return deleteProduct(productId, activeStoreId)
+    },
 
     onMutate: async productId => {
       // Cancel outgoing refetches
@@ -219,12 +246,12 @@ export function useProductActions() {
       if (activeStoreId) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.products.byStore(activeStoreId) },
-          (oldData: any) => {
+          (oldData: { pages: { data: Product[]; count: number }[] } | undefined) => {
             if (!oldData) return oldData
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page: any) => ({
+              pages: oldData.pages.map((page: { data: Product[]; count: number }) => ({
                 ...page,
                 data: page.data.filter((product: Product) => product.product_id !== productId),
                 count: Math.max(0, page.count - 1),
@@ -246,7 +273,7 @@ export function useProductActions() {
         )
       }
       console.error('Failed to delete product:', err)
-      toast.error('Failed to delete product')
+      toast.error(`Failed to delete product: ${err.message}`)
     },
 
     onSettled: () => {
@@ -266,16 +293,16 @@ export function useProductActions() {
     (productId: string, newPrice: number) =>
       updateMutation.mutate({
         productId,
-        updates: { base_selling_price: newPrice },
+        updates: { selling_price: newPrice }, // Store-specific price
       }),
     [updateMutation],
   )
 
-  const updateProductStock = useCallback(
-    (productId: string, newStock: number) =>
+  const updateProductBasePrice = useCallback(
+    (productId: string, newPrice: number) =>
       updateMutation.mutate({
         productId,
-        updates: { total_stock: newStock },
+        updates: { base_selling_price: newPrice }, // Global base price
       }),
     [updateMutation],
   )
@@ -284,7 +311,16 @@ export function useProductActions() {
     (productId: string, category: string) =>
       updateMutation.mutate({
         productId,
-        updates: { category },
+        updates: { category }, // Global category
+      }),
+    [updateMutation],
+  )
+
+  const toggleProductActive = useCallback(
+    (productId: string, isActive: boolean) =>
+      updateMutation.mutate({
+        productId,
+        updates: { is_active: isActive }, // Store-specific active status
       }),
     [updateMutation],
   )
@@ -302,8 +338,9 @@ export function useProductActions() {
 
     // Convenience methods
     updateProductPrice,
-    updateProductStock,
+    updateProductBasePrice,
     updateProductCategory,
+    toggleProductActive,
 
     // Access to mutation objects for advanced usage
     createMutation,
@@ -312,7 +349,7 @@ export function useProductActions() {
   }
 }
 
-// Convenience hooks for common filters (store-aware)
+// ✅ Convenience hooks for common filters (store-aware)
 export function useExpiringProducts() {
   return useProducts({ expiringOnly: true })
 }

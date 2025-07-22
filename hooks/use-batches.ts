@@ -1,4 +1,4 @@
-// hooks/use-batches.ts - Updated to be store-aware (following products pattern)
+// hooks/use-batches.ts
 
 import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -39,6 +39,18 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId, // Only fetch when we have a store
+    retry: (failureCount, error: any) => {
+      // ✅ FIXED: Don't retry on PostgREST ordering errors
+      if (error?.message?.includes('failed to parse order')) {
+        console.error('[useBatches] PostgREST ordering error - not retrying:', error)
+        return false
+      }
+      // Don't retry on 4xx errors except 408 (timeout)
+      if (error?.status >= 400 && error?.status < 500 && error?.status !== 408) {
+        return false
+      }
+      return failureCount < 3
+    },
   })
 
   // Flatten pages into single array (just like products)
@@ -57,7 +69,7 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   }
 }
 
-// Batches hook with built-in sorting state management (store-aware)
+// ✅ ENHANCED: Batches hook with built-in sorting state management (store-aware)
 export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 20) {
   const [currentSort, setCurrentSort] = useState<BatchSort>(
     initialSort || { field: 'expiry_date', direction: 'asc' },
@@ -93,16 +105,26 @@ export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 2
   }
 }
 
-// READING DATA - Single batch by ID (store-aware)
+// ✅ READING DATA - Single batch by ID (store-aware)
 export function useBatch(batchId: string) {
   return useQuery({
     queryKey: queryKeys.batches.detail(batchId),
     queryFn: () => fetchBatchById(batchId),
     enabled: !!batchId, // Only fetch if batchId exists
+    retry: (failureCount, error: any) => {
+      // ✅ FIXED: Handle PostgREST errors properly
+      if (error?.message?.includes('failed to parse order')) {
+        return false
+      }
+      if (error?.status >= 400 && error?.status < 500 && error?.status !== 408) {
+        return false
+      }
+      return failureCount < 3
+    },
   })
 }
 
-// READING DATA - Batches for a specific product (store-aware)
+// ✅ READING DATA - Batches for a specific product (store-aware)
 export function useBatchesForProduct(
   productId: string,
   filters: Omit<BatchFilters, 'product_id'> = {},
@@ -121,6 +143,16 @@ export function useBatchesForProduct(
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!productId && !!activeStoreId,
+    retry: (failureCount, error: any) => {
+      // ✅ FIXED: Handle PostgREST errors properly
+      if (error?.message?.includes('failed to parse order')) {
+        return false
+      }
+      if (error?.status >= 400 && error?.status < 500 && error?.status !== 408) {
+        return false
+      }
+      return failureCount < 3
+    },
   })
 
   const data = result.data?.pages.flatMap(page => page.data) ?? []
@@ -149,6 +181,16 @@ export function useExpiringBatches(daysAhead: number = 7) {
     // Refetch more frequently for critical data
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
+    retry: (failureCount, error: any) => {
+      // ✅ FIXED: Handle PostgREST errors properly
+      if (error?.message?.includes('failed to parse order')) {
+        return false
+      }
+      if (error?.status >= 400 && error?.status < 500 && error?.status !== 408) {
+        return false
+      }
+      return failureCount < 3
+    },
   })
 }
 
@@ -164,6 +206,16 @@ export function useLowStockBatches(thresholdQuantity: number = 10) {
     queryFn: () => fetchLowStockBatches(activeStoreId!, thresholdQuantity),
     enabled: !!activeStoreId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error: any) => {
+      // ✅ FIXED: Handle PostgREST errors properly
+      if (error?.message?.includes('failed to parse order')) {
+        return false
+      }
+      if (error?.status >= 400 && error?.status < 500 && error?.status !== 408) {
+        return false
+      }
+      return failureCount < 3
+    },
   })
 }
 
@@ -183,14 +235,14 @@ export function useBatchesBySupplier(supplier: string) {
   return useBatches({ supplier, status: 'active' })
 }
 
-// WRITING DATA - Batch CRUD actions with proper cache invalidation (store-aware)
+// ✅ WRITING DATA - Batch CRUD actions with proper cache invalidation (store-aware)
 export function useBatchActions() {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
 
   const createMutation = useMutation({
     mutationFn: (batchData: Database['inventory']['Tables']['batches']['Insert']) => {
-      // Automatically add store_id to batch data
+      // ✅ STORE-AWARE: Automatically add store_id to batch data
       const batchWithStore = {
         ...batchData,
         store_id: activeStoreId,
@@ -220,9 +272,17 @@ export function useBatchActions() {
 
       toast.success('Batch created successfully')
     },
-    onError: error => {
+    onError: (error: any) => {
       console.error('Failed to create batch:', error)
-      toast.error('Failed to create batch')
+
+      // ✅ ENHANCED: Specific error messages for store validation
+      if (error?.message?.includes('not available in this store')) {
+        toast.error('Product is not available in the current store')
+      } else if (error?.message?.includes('already exists')) {
+        toast.error('Batch number already exists')
+      } else {
+        toast.error('Failed to create batch')
+      }
     },
   })
 
@@ -531,8 +591,10 @@ export function useBatchAlerts() {
   }
 }
 
-// Convenience hooks for common filters (store-aware)
+// ✅ CONVENIENCE HOOKS for common filters (store-aware)
 export function useBatchesByCategory(category: string) {
+  // Note: Category filtering would need to be done via product join
+  // For now, this returns all batches (would need backend enhancement)
   return useBatches({
     /* filter by product category if needed */
   })
