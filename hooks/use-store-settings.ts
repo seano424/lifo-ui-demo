@@ -2,9 +2,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { usePermissions } from '@/hooks/use-users'
 import { useCurrentUser } from '@/hooks/use-users'
+import { convertStoreBasicInfoToStore } from '@/lib/utils'
 import {
   fetchStoreSettings,
   updateStoreBasicInfo,
@@ -69,6 +70,7 @@ export function useUpdateStoreBasicInfo() {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
   const { data: currentUser } = useCurrentUser()
+  const { setActiveStore, setUserStores, userStores } = useStoreState()
 
   return useMutation({
     mutationFn: async (updates: Partial<StoreBasicInfo>) => {
@@ -177,8 +179,34 @@ export function useUpdateStoreBasicInfo() {
         }
       }
     },
-    onSuccess: data => {
+    onSuccess: (data) => {
       console.log('✅ Mutation completed successfully:', data)
+      
+      // Update Zustand store to reflect changes in team switcher
+      if (activeStoreId && data) {
+        console.log('🔄 Updating Zustand store with new store data...')
+        
+        // Convert StoreBasicInfo to Store type using utility function
+        const storeData = convertStoreBasicInfoToStore(data)
+        
+        // Update the active store in Zustand
+        setActiveStore(storeData)
+        
+        // Update the store in userStores array
+        const updatedUserStores = userStores.map(userStore => {
+          if (userStore.store.store_id === activeStoreId) {
+            return {
+              ...userStore,
+              store: storeData
+            }
+          }
+          return userStore
+        })
+        setUserStores(updatedUserStores)
+        
+        console.log('✅ Zustand store updated successfully')
+      }
+      
       toast.success('Store information updated successfully')
     },
   })
@@ -251,6 +279,8 @@ export function useUpdateStoreAdvancedSettings() {
       }
     },
     onSuccess: () => {
+      // Note: Advanced settings don't affect the team switcher display
+      // since they're stored separately from basic store info
       toast.success('Store settings updated successfully')
     },
   })
