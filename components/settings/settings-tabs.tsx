@@ -32,15 +32,6 @@ export default function SettingsTabs() {
 
   const [activeTab, setActiveTab] = useState<ValidTab>(getInitialTab)
 
-  console.log('🎯 SettingsTabs - State:', {
-    canViewSettings,
-    permissionsLoading,
-    shouldShowLoading: permissionsLoading || canViewSettings === undefined,
-    shouldShowStoreInfo: !permissionsLoading && canViewSettings === true,
-    shouldShowError: !permissionsLoading && canViewSettings === false,
-    activeTab,
-  })
-
   const handleTabChange = (newTab: string) => {
     if (VALID_TABS.includes(newTab as ValidTab)) {
       const validTab = newTab as ValidTab
@@ -56,86 +47,60 @@ export default function SettingsTabs() {
   // Show loading state while checking permissions
   if (permissionsLoading) {
     return (
-      <div className="space-y-4 max-w-5xl mx-auto">
-        <div className="h-10 bg-gray-100 rounded animate-pulse" />
-        <div className="h-96 bg-gray-50 rounded animate-pulse" />
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="flex gap-2">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <div className="space-y-4">
+          <Skeleton className="h-[600px] w-full" />
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div>
-        <Typography variant="h1">Settings</Typography>
-        <Typography variant="p" color="muted">
-          Manage your store, account, and team settings
-        </Typography>
-      </div>
-
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <TabsList className="grid grid-cols-4 bg-opacity-0">
-          <TabsTrigger value="store" variant="secondary">
+        <TabsList className="grid grid-cols-4 bg-opacity-0" aria-label="Settings navigation">
+          <TabsTrigger value="store" variant="secondary" aria-label="Store settings">
             {t('tabs.store')}
           </TabsTrigger>
-          <TabsTrigger value="notifications" variant="secondary">
+          <TabsTrigger
+            value="notifications"
+            variant="secondary"
+            aria-label="Notification preferences"
+          >
             {t('tabs.notifications')}
           </TabsTrigger>
-          <TabsTrigger value="account" variant="secondary">
+          <TabsTrigger value="account" variant="secondary" aria-label="Account information">
             {t('tabs.account')}
           </TabsTrigger>
-          <TabsTrigger value="team" variant="secondary">
+          <TabsTrigger value="team" variant="secondary" aria-label="Team management">
             {t('tabs.team')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="store" className="space-y-4">
-          {(() => {
-            const shouldShowLoading = permissionsLoading || canViewSettings === undefined
-            const shouldShowStoreInfo = !permissionsLoading && canViewSettings === true
-            const shouldShowError = !permissionsLoading && canViewSettings === false
-
-            console.log('🎨 Store tab rendering decision:', {
-              shouldShowLoading,
-              shouldShowStoreInfo,
-              shouldShowError,
-              permissionsLoading,
-              canViewSettings,
-            })
-
-            if (shouldShowLoading) {
-              console.log('⏳ Rendering loading skeleton')
-              return (
-                <div className="space-y-4">
-                  <Skeleton className="h-8" />
-                  <Skeleton className="h-32" />
-                  <Skeleton className="h-24" />
-                </div>
-              )
-            } else if (shouldShowStoreInfo) {
-              console.log('✅ Rendering StoreInformation component')
-              return <StoreInformation />
-            } else if (shouldShowError) {
-              console.log('❌ Rendering permission error')
-              return (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    You don't have permission to view store settings. Contact your store manager or
-                    owner.
-                  </AlertDescription>
-                </Alert>
-              )
-            } else {
-              console.log('🤔 Unexpected state, defaulting to loading')
-              return (
-                <div className="space-y-4">
-                  <Skeleton className="h-8" />
-                  <Skeleton className="h-32" />
-                  <Skeleton className="h-24" />
-                </div>
-              )
-            }
-          })()}
+          {permissionsLoading || canViewSettings === undefined ? (
+            <div className="space-y-4">
+              <Skeleton className="h-8" />
+              <Skeleton className="h-32" />
+              <Skeleton className="h-24" />
+            </div>
+          ) : canViewSettings ? (
+            <StoreInformation />
+          ) : (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You don't have permission to view store settings. Contact your store manager or
+                owner.
+              </AlertDescription>
+            </Alert>
+          )}
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-4">
@@ -144,9 +109,12 @@ export default function SettingsTabs() {
             {t('tabs.notificationsDescription')}
           </Typography>
           {/* TODO: Implement notifications settings */}
-          <div className="p-8 text-center border-2 border-dashed border-gray-200 rounded-lg">
+          <div className="p-8 text-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
             <Typography variant="p" color="muted">
               Notification settings coming soon...
+            </Typography>
+            <Typography variant="small" color="muted" className="mt-2">
+              Configure email alerts, push notifications, and more
             </Typography>
           </div>
         </TabsContent>
