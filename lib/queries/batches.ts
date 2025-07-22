@@ -1,4 +1,4 @@
-// lib/queries/batches.ts - FIXED VERSION with proper PostgREST relationship handling
+// lib/queries/batches.ts
 
 import { createClient } from '@/lib/supabase/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -58,33 +58,42 @@ export type BatchesPageParam = {
   pageSize: number
 }
 
-// Helper function to build Supabase order clause
-function buildBatchOrderClause(sort?: BatchSort): { column: string; ascending: boolean } {
+// ✅ FIXED: Simple single-column ordering compatible with PostgREST
+function applySingleColumnSort(query: any, sort?: BatchSort): any {
   if (!sort) {
-    return { column: 'expiry_date', ascending: true } // Default: soonest expiry first
+    // Default: soonest expiry first for batch management
+    return query.order('expiry_date', { ascending: true })
   }
 
-  // Map sort fields to actual database columns
-  const columnMap: Record<BatchSortField, string> = {
-    batch_number: 'batch_number',
-    supplier: 'supplier',
-    manufacture_date: 'manufacture_date',
-    expiry_date: 'expiry_date',
-    received_date: 'received_date',
-    current_quantity: 'current_quantity',
-    cost_price: 'cost_price',
-    selling_price: 'selling_price',
-    status: 'status',
-    created_at: 'created_at',
-  }
-
-  return {
-    column: columnMap[sort.field],
-    ascending: sort.direction === 'asc',
+  // ✅ SIMPLE: One order() call only - PostgREST compatible
+  switch (sort.field) {
+    case 'expiry_date':
+      return query.order('expiry_date', { ascending: sort.direction === 'asc' })
+    case 'current_quantity':
+      return query.order('current_quantity', { ascending: sort.direction === 'asc' })
+    case 'cost_price':
+      return query.order('cost_price', { ascending: sort.direction === 'asc' })
+    case 'selling_price':
+      return query.order('selling_price', { ascending: sort.direction === 'asc' })
+    case 'received_date':
+      return query.order('received_date', { ascending: sort.direction === 'asc' })
+    case 'manufacture_date':
+      return query.order('manufacture_date', { ascending: sort.direction === 'asc' })
+    case 'batch_number':
+      return query.order('batch_number', { ascending: sort.direction === 'asc' })
+    case 'supplier':
+      return query.order('supplier', { ascending: sort.direction === 'asc' })
+    case 'status':
+      return query.order('status', { ascending: sort.direction === 'asc' })
+    case 'created_at':
+      return query.order('created_at', { ascending: sort.direction === 'asc' })
+    default:
+      // Fallback to expiry date
+      return query.order('expiry_date', { ascending: true })
   }
 }
 
-// ✅ FIXED: Alternative approach that fetches batches and products separately
+// ✅ FIXED: Separate fetch approach to avoid complex joins that break PostgREST
 async function fetchBatchesWithProducts(
   batches: Batch[],
   supabase: SupabaseClient<Database>,
@@ -94,20 +103,20 @@ async function fetchBatchesWithProducts(
   // Get unique product IDs
   const productIds = [...new Set(batches.map(b => b.product_id))]
 
-  // Fetch products separately
+  // Fetch products separately - simple query
   const { data: products, error: productsError } = await supabase
     .schema('inventory')
     .from('products')
-    .select('*') // <-- select all columns
+    .select('*')
     .in('product_id', productIds)
 
   if (productsError) {
     console.warn('[fetchBatchesWithProducts] Failed to fetch products:', productsError)
-    // Return batches without product data
+    // Return batches without product data instead of failing
     return batches.map(batch => ({ ...batch, products: undefined }))
   }
 
-  // Combine batches with their products
+  // Map products to batches
   return batches.map(batch => {
     const product = products?.find(p => p.product_id === batch.product_id)
     return {
@@ -115,40 +124,6 @@ async function fetchBatchesWithProducts(
       products: product || undefined,
     }
   })
-}
-
-// ✅ STORE-AWARE: Fetch all batches for a specific store
-export async function fetchBatches(
-  storeId: string,
-  serverClient?: ServerClient,
-): Promise<BatchWithProduct[]> {
-  const supabase = serverClient || createClient()
-  console.log('[fetchBatches] Querying inventory.batches for store:', { storeId })
-
-  try {
-    // First fetch batches only
-    const { data: batches, error } = await supabase
-      .schema('inventory')
-      .from('batches')
-      .select('*')
-      .eq('store_id', storeId)
-      .order('expiry_date', { ascending: true })
-      .order('batch_id', { ascending: true })
-
-    if (error) {
-      console.error('[fetchBatches] Supabase error:', error)
-      throw new Error(`Failed to fetch batches: ${error.message}`)
-    }
-
-    // Then fetch with products
-    const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
-
-    console.log('[fetchBatches] Success:', { storeId, count: batchesWithProducts.length })
-    return batchesWithProducts
-  } catch (err) {
-    console.error('[fetchBatches] Unexpected error:', err)
-    throw err
-  }
 }
 
 // ✅ STORE-AWARE: Paginated batches with filters - FIXED VERSION
@@ -171,14 +146,14 @@ export async function fetchBatchesPage(
 
     console.log('[fetchBatchesPage] Applying store filter:', filters.storeId)
 
-    // Build query for batches only (no nested select)
+    // ✅ SIMPLE: Build query for batches only (no nested select to avoid PostgREST issues)
     let query = supabase
       .schema('inventory')
       .from('batches')
       .select('*', { count: 'exact' })
       .eq('store_id', filters.storeId)
 
-    // Apply other filters
+    // Apply filters one by one
     if (filters.product_id) {
       console.log('[fetchBatchesPage] Applying product_id filter:', filters.product_id)
       query = query.eq('product_id', filters.product_id)
@@ -230,22 +205,14 @@ export async function fetchBatchesPage(
       query = query.lte('received_date', filters.received_date_to)
     }
 
-    // Apply sorting
-    const orderClause = buildBatchOrderClause(filters.sort)
+    // ✅ FIXED: Apply single-column sorting compatible with PostgREST
     console.log('[fetchBatchesPage] Applying sort:', {
       field: filters.sort?.field,
       direction: filters.sort?.direction,
-      column: orderClause.column,
-      ascending: orderClause.ascending,
     })
+    query = applySingleColumnSort(query, filters.sort)
 
-    query = query.order(orderClause.column, { ascending: orderClause.ascending })
-
-    // Add secondary sort for consistency (always sort by batch_id as tiebreaker)
-    if (orderClause.column !== 'batch_id') {
-      query = query.order('batch_id', { ascending: true })
-    }
-
+    // Apply pagination
     const rangeFrom = page * pageSize
     const rangeTo = (page + 1) * pageSize - 1
     console.log('[fetchBatchesPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
@@ -257,7 +224,7 @@ export async function fetchBatchesPage(
       throw new Error(`Failed to fetch batches page: ${error.message}`)
     }
 
-    // Now fetch with products
+    // ✅ FIXED: Fetch products separately to avoid complex join issues
     const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
 
     console.log('[fetchBatchesPage] Success:', {
@@ -289,19 +256,10 @@ export async function fetchBatchesForProduct(
   count: number
   nextPage: number | undefined
 }> {
-  const result = await fetchBatchesPage(
-    { page, pageSize },
-    { ...filters, product_id: productId },
-    serverClient,
-  )
-
-  return {
-    ...result,
-    data: result.data as BatchWithProduct[],
-  }
+  return fetchBatchesPage({ page, pageSize }, { ...filters, product_id: productId }, serverClient)
 }
 
-// ✅ CRUD mutations (ensure store_id is set)
+// ✅ CRUD mutations with proper store validation
 export async function createBatch(
   batchData: Database['inventory']['Tables']['batches']['Insert'],
 ): Promise<Batch> {
@@ -319,17 +277,30 @@ export async function createBatch(
       product_id: batchData.product_id,
     })
 
-    // Validate that product exists and belongs to the same store
+    // ✅ VALIDATE: Product exists (products are global, but validate it exists)
     const { data: product, error: productError } = await supabase
       .schema('inventory')
       .from('products')
-      .select('product_id, store_id')
+      .select('product_id')
       .eq('product_id', batchData.product_id)
-      .eq('store_id', batchData.store_id) // ✅ ENSURE PRODUCT BELONGS TO SAME STORE
       .single()
 
     if (productError || !product) {
-      throw new Error(`Product with ID "${batchData.product_id}" not found in this store`)
+      throw new Error(`Product with ID "${batchData.product_id}" not found`)
+    }
+
+    // ✅ VALIDATE: Product is available in this store via store_products junction
+    const { data: storeProduct, error: storeProductError } = await supabase
+      .schema('inventory')
+      .from('store_products')
+      .select('product_id')
+      .eq('store_id', batchData.store_id)
+      .eq('product_id', batchData.product_id)
+      .eq('is_active', true)
+      .single()
+
+    if (storeProductError || !storeProduct) {
+      throw new Error(`Product "${batchData.product_id}" is not available in this store`)
     }
 
     const { data, error } = await supabase
@@ -434,7 +405,7 @@ export async function deleteBatch(batchId: string): Promise<void> {
   }
 }
 
-// ✅ FIXED: Single batch fetch with product
+// ✅ FIXED: Single batch fetch with product (separate queries)
 export async function fetchBatchById(
   batchId: string,
   serverClient?: ServerClient,
@@ -467,9 +438,7 @@ export async function fetchBatchById(
     const { data: product } = await supabase
       .schema('inventory')
       .from('products')
-      .select(
-        'product_id, name, sku, category, brand, unit_type, base_cost_price, base_selling_price',
-      )
+      .select('*')
       .eq('product_id', batch.product_id)
       .single()
 
@@ -486,7 +455,7 @@ export async function fetchBatchById(
   }
 }
 
-// ✅ STORE-AWARE: Business logic helpers - FIXED
+// ✅ STORE-AWARE: Business logic helpers - FIXED with simple ordering
 export async function fetchExpiringBatches(
   storeId: string,
   daysAhead: number = 7,
@@ -504,7 +473,7 @@ export async function fetchExpiringBatches(
       threshold: expiryThreshold,
     })
 
-    // Fetch batches first
+    // ✅ SIMPLE: Fetch batches first with single-column ordering
     const { data: batches, error } = await supabase
       .schema('inventory')
       .from('batches')
@@ -513,15 +482,14 @@ export async function fetchExpiringBatches(
       .eq('status', 'active')
       .gt('current_quantity', 0)
       .lte('expiry_date', expiryThreshold.toISOString().split('T')[0])
-      .order('expiry_date', { ascending: true })
-      .order('batch_id', { ascending: true })
+      .order('expiry_date', { ascending: true }) // ✅ Single column sort only
 
     if (error) {
       console.error('[fetchExpiringBatches] Supabase error:', error)
       throw new Error(`Failed to fetch expiring batches: ${error.message}`)
     }
 
-    // Add products
+    // Add products separately
     const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
 
     console.log('[fetchExpiringBatches] Success:', { storeId, count: batchesWithProducts.length })
@@ -545,7 +513,7 @@ export async function fetchLowStockBatches(
       thresholdQuantity,
     })
 
-    // Fetch batches first
+    // ✅ SIMPLE: Fetch batches first with single-column ordering
     const { data: batches, error } = await supabase
       .schema('inventory')
       .from('batches')
@@ -554,15 +522,14 @@ export async function fetchLowStockBatches(
       .eq('status', 'active')
       .gt('current_quantity', 0)
       .lte('current_quantity', thresholdQuantity)
-      .order('current_quantity', { ascending: true })
-      .order('batch_id', { ascending: true })
+      .order('current_quantity', { ascending: true }) // ✅ Single column sort only
 
     if (error) {
       console.error('[fetchLowStockBatches] Supabase error:', error)
       throw new Error(`Failed to fetch low stock batches: ${error.message}`)
     }
 
-    // Add products
+    // Add products separately
     const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
 
     console.log('[fetchLowStockBatches] Success:', { storeId, count: batchesWithProducts.length })
@@ -573,7 +540,7 @@ export async function fetchLowStockBatches(
   }
 }
 
-// ✅ STORE-AWARE: Fetch batch with related product for specific store
+// ✅ STORE-AWARE: Convenience function
 export async function fetchBatchWithProduct(
   batchId: string,
   serverClient?: ServerClient,
