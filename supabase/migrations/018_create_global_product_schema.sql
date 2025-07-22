@@ -1,426 +1,236 @@
--- Migration: 018_create_global_product_schema.sql
--- Phase 1: Create new global schema foundation for normalized products
--- This migration creates the foundation without breaking existing functionality
+-- Migration: 018_normalize_inventory_products.sql
+-- Normalize inventory.products to remove data duplication
+-- Create store-specific product settings in inventory.store_products
 
 BEGIN;
 
 -- =============================================
--- CREATE GLOBAL SCHEMA
+-- STEP 1: BACKUP EXISTING DATA
 -- =============================================
 
-CREATE SCHEMA IF NOT EXISTS global;
+-- Create temporary backup of current products
+CREATE TEMP TABLE products_backup AS 
+SELECT * FROM inventory.products;
 
--- Enable UUID extension for global schema
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- =============================================
--- GLOBAL PRODUCTS TABLE
--- =============================================
-
-CREATE TABLE global.products (
-    product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+-- Debug: Check for products without store_id
+DO $$
+DECLARE
+    null_store_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO null_store_count 
+    FROM products_backup 
+    WHERE store_id IS NULL;
     
-    -- Identification fields (prepared for OCR/barcode)
-    barcode VARCHAR(20) UNIQUE,              -- EAN13, UPC, Code128, etc.
-    sku VARCHAR(100),                        -- Global SKU (optional)
-    name VARCHAR(255) NOT NULL,
-    brand VARCHAR(100),
-    category VARCHAR(50),
-    
-    -- OCR and Image Recognition fields
-    image_url VARCHAR(500),                  -- Product image for recognition training
-    ocr_keywords TEXT[],                     -- Keywords for OCR matching
-    alternative_names TEXT[],                -- Common name variations
-    
-    -- Product characteristics
-    typical_shelf_life_days INTEGER,
-    unit_type VARCHAR(20) DEFAULT 'pcs',
-    standard_weight_grams INTEGER,           -- For weight-based calculations
-    standard_volume_ml INTEGER,              -- For volume-based calculations
-    
-    -- Categorization (enhanced for AI scoring)
-    primary_category VARCHAR(50),            -- Maps to existing scoring categories
-    sub_category VARCHAR(50),
-    dietary_attributes JSONB DEFAULT '{}',   -- {"vegan": true, "gluten_free": false}
-    
-    -- Metadata for OCR/Barcode functionality
-    manufacturer VARCHAR(100),
-    country_of_origin VARCHAR(50),
-    product_description TEXT,
-    
-    -- Search optimization
-    search_vector tsvector GENERATED ALWAYS AS (
-        to_tsvector('english', 
-            COALESCE(name, '') || ' ' || 
-            COALESCE(brand, '') || ' ' || 
-            COALESCE(manufacturer, '') || ' ' ||
-            array_to_string(COALESCE(alternative_names, ARRAY[]::TEXT[]), ' ')
-        )
-    ) STORED,
-    
-    -- Global product status
-    is_active BOOLEAN DEFAULT TRUE,
-    verification_status VARCHAR(20) DEFAULT 'pending',  -- pending, verified, flagged
-    
-    -- Audit fields
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_by UUID REFERENCES auth.users(id),         -- First user who added this product
-    
-    -- Constraints
-    CONSTRAINT global_products_category_check CHECK (primary_category IN (
-        'fresh_produce', 'fresh_meat_fish', 'dairy', 'bakery_fresh',
-        'deli_prepared', 'frozen', 'chilled_packaged', 'pantry_staples',
-        'canned_jarred', 'dry_goods', 'beverages', 'spices_condiments'
-    )),
-    
-    CONSTRAINT global_products_verification_check CHECK (verification_status IN (
-        'pending', 'verified', 'flagged', 'rejected'
-    )),
-    
-    CONSTRAINT global_products_shelf_life_check CHECK (
-        typical_shelf_life_days IS NULL OR typical_shelf_life_days > 0
-    )
-);
+    IF null_store_count > 0 THEN
+        RAISE NOTICE 'WARNING: Found % products with NULL store_id. These will be skipped in migration.', null_store_count;
+    END IF;
+END $$;
 
 -- =============================================
--- GLOBAL PRODUCTS INDEXES
+-- STEP 2: DROP EXISTING RLS POLICIES THAT DEPEND ON STORE_ID
 -- =============================================
 
--- Performance indexes
-CREATE INDEX idx_global_products_barcode ON global.products(barcode) WHERE barcode IS NOT NULL;
-CREATE INDEX idx_global_products_search ON global.products USING GIN(search_vector);
-CREATE INDEX idx_global_products_category ON global.products(primary_category);
-CREATE INDEX idx_global_products_brand ON global.products(brand) WHERE brand IS NOT NULL;
-CREATE INDEX idx_global_products_active ON global.products(is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_global_products_name ON global.products(name);
-CREATE INDEX idx_global_products_created ON global.products(created_at);
-
--- Composite indexes for common queries
-CREATE INDEX idx_global_products_category_active ON global.products(primary_category, is_active) 
-    WHERE is_active = TRUE;
-CREATE INDEX idx_global_products_brand_category ON global.products(brand, primary_category) 
-    WHERE brand IS NOT NULL;
+-- Drop existing policies that reference store_id column
+DROP POLICY IF EXISTS "Users can view products from their stores" ON inventory.products;
+DROP POLICY IF EXISTS "Users can create products in their stores" ON inventory.products;
+DROP POLICY IF EXISTS "Users can update products in their stores" ON inventory.products;
+DROP POLICY IF EXISTS "Users can delete products in their stores" ON inventory.products;
 
 -- =============================================
--- BUSINESS.STORE_PRODUCT JUNCTION TABLE
+-- STEP 3: NORMALIZE INVENTORY.PRODUCTS
 -- =============================================
 
-CREATE TABLE business.store_product (
-    store_id UUID REFERENCES business.stores(store_id) ON DELETE CASCADE,
-    product_id UUID REFERENCES global.products(product_id) ON DELETE CASCADE,
+-- Drop foreign key constraint first
+ALTER TABLE inventory.products DROP CONSTRAINT IF EXISTS products_store_id_fkey;
+
+-- Remove store_id from products (normalize - no more duplication)
+ALTER TABLE inventory.products DROP COLUMN store_id;
+
+-- Add enhanced fields for LIFO.AI (barcode already exists)
+ALTER TABLE inventory.products 
+ADD COLUMN barcode_type VARCHAR(20), -- EAN13, UPC, Code128, etc.
+ADD COLUMN is_verified BOOLEAN DEFAULT FALSE,
+ADD COLUMN verification_count INTEGER DEFAULT 0,
+ADD COLUMN last_scanned_at TIMESTAMP;
+
+-- =============================================
+-- STEP 4: CREATE STORE_PRODUCTS JUNCTION TABLE
+-- =============================================
+
+CREATE TABLE inventory.store_products (
+    store_id UUID NOT NULL REFERENCES business.stores(store_id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES inventory.products(product_id) ON DELETE CASCADE,
     
     -- Store-specific pricing (replaces product-level pricing)
-    default_cost_price DECIMAL(12,4) NOT NULL,
-    default_selling_price DECIMAL(12,4) NOT NULL,
+    cost_price DECIMAL(12,4),
+    selling_price DECIMAL(12,4),
     
-    -- Store-specific inventory management
+    -- Store-specific settings
     is_active BOOLEAN DEFAULT TRUE,
-    minimum_stock_level INTEGER DEFAULT 0,
-    maximum_stock_level INTEGER,
-    reorder_point INTEGER DEFAULT 5,
     
     -- Store-specific product settings
-    store_specific_sku VARCHAR(100),         -- Store's internal SKU if different
-    supplier_code VARCHAR(50),               -- Store's supplier reference
-    storage_location VARCHAR(50),            -- Default storage location in store
-    
-    -- Pricing history and markup
-    markup_percentage DECIMAL(5,2),          -- Store's typical markup for this product
-    last_cost_update TIMESTAMP WITH TIME ZONE,   -- When cost price was last updated
-    price_change_reason VARCHAR(100),        -- Reason for last price change
-    
-    -- Store performance metrics for this product
-    total_sold_units INTEGER DEFAULT 0,
-    total_revenue DECIMAL(12,4) DEFAULT 0,
-    last_sale_date TIMESTAMP WITH TIME ZONE,
+    store_sku VARCHAR(100), -- Store's internal SKU if different
+    supplier_code VARCHAR(50), -- Store's supplier reference
     
     -- Audit and tracking
     added_by UUID REFERENCES auth.users(id),
     updated_by UUID REFERENCES auth.users(id),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
     
-    PRIMARY KEY (store_id, product_id),
-    
-    -- Constraints
-    CONSTRAINT store_product_cost_price_positive CHECK (default_cost_price > 0),
-    CONSTRAINT store_product_selling_price_positive CHECK (default_selling_price > 0),
-    CONSTRAINT store_product_margin_sensible CHECK (default_selling_price >= default_cost_price),
-    CONSTRAINT store_product_stock_levels_logical CHECK (
-        minimum_stock_level >= 0 AND 
-        (maximum_stock_level IS NULL OR maximum_stock_level >= minimum_stock_level) AND
-        reorder_point >= 0
-    )
+    PRIMARY KEY (store_id, product_id)
 );
 
 -- =============================================
--- STORE_PRODUCT INDEXES
+-- STEP 5: MIGRATE EXISTING DATA
 -- =============================================
 
-CREATE INDEX idx_store_product_store ON business.store_product(store_id);
-CREATE INDEX idx_store_product_product ON business.store_product(product_id);
-CREATE INDEX idx_store_product_active ON business.store_product(store_id, is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_store_product_prices ON business.store_product(store_id, default_cost_price, default_selling_price);
-CREATE INDEX idx_store_product_reorder ON business.store_product(store_id, reorder_point) WHERE is_active = TRUE;
-CREATE INDEX idx_store_product_sku ON business.store_product(store_specific_sku) WHERE store_specific_sku IS NOT NULL;
+-- Step 5a: Create deduplicated products temporary table
+CREATE TEMP TABLE deduplicated_products AS
+SELECT 
+    (array_agg(product_id ORDER BY created_at ASC))[1] as kept_product_id,
+    name,
+    brand,
+    category,
+    unit_type,
+    typical_shelf_life_days,
+    -- Take the most recent values for other fields
+    (array_agg(created_by ORDER BY created_at DESC))[1] as created_by,
+    MIN(created_at) as created_at,
+    MAX(updated_at) as updated_at
+FROM products_backup
+GROUP BY name, brand, category, unit_type, typical_shelf_life_days;
 
--- =============================================
--- PRODUCT CATEGORIES REFERENCE TABLE
--- =============================================
-
-CREATE TABLE global.product_categories (
-    category_code VARCHAR(50) PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL,
-    category_description TEXT,
-    
-    -- OCR Recognition hints
-    common_keywords TEXT[],                  -- Keywords commonly found on packages
-    typical_shelf_life_range JSONB,          -- {"min_days": 1, "max_days": 7}
-    
-    -- Scoring defaults (links to existing scoring.category_weights)
-    default_spoilage_risk_weight DECIMAL(3,2) DEFAULT 0.5,
-    default_turnover_speed_weight DECIMAL(3,2) DEFAULT 0.3,
-    default_value_impact_weight DECIMAL(3,2) DEFAULT 0.2,
-    
-    -- Storage and handling
-    requires_refrigeration BOOLEAN DEFAULT FALSE,
-    requires_freezing BOOLEAN DEFAULT FALSE,
-    typical_storage_temp_min DECIMAL(4,1),
-    typical_storage_temp_max DECIMAL(4,1),
-    
-    -- Regulatory and compliance
-    requires_expiry_date BOOLEAN DEFAULT TRUE,
-    allows_donation BOOLEAN DEFAULT TRUE,
-    high_risk_category BOOLEAN DEFAULT FALSE,
-    
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
-    -- Constraints
-    CONSTRAINT category_weights_sum_check CHECK (
-        default_spoilage_risk_weight + default_turnover_speed_weight + default_value_impact_weight <= 1.0
-    ),
-    CONSTRAINT category_weights_positive CHECK (
-        default_spoilage_risk_weight >= 0 AND 
-        default_turnover_speed_weight >= 0 AND 
-        default_value_impact_weight >= 0
-    )
+-- Step 5b: Create product mapping temporary table
+CREATE TEMP TABLE product_mapping AS
+SELECT 
+    pb.product_id as old_product_id,
+    dp.kept_product_id as new_product_id,
+    pb.store_id,
+    pb.base_cost_price,
+    pb.base_selling_price,
+    pb.created_by as added_by
+FROM products_backup pb
+JOIN deduplicated_products dp ON (
+    pb.name = dp.name AND 
+    pb.brand = dp.brand AND 
+    pb.category = dp.category AND
+    pb.unit_type = dp.unit_type AND
+    pb.typical_shelf_life_days = dp.typical_shelf_life_days
 );
 
--- =============================================
--- INSERT PRODUCT CATEGORIES DATA
--- =============================================
+-- Step 5c: Insert store_products data
+INSERT INTO inventory.store_products (
+    store_id, product_id, cost_price, selling_price, added_by, created_at, updated_at
+)
+SELECT DISTINCT
+    pm.store_id,
+    pm.new_product_id,
+    pm.base_cost_price,
+    pm.base_selling_price,
+    pm.added_by,
+    NOW(),
+    NOW()
+FROM product_mapping pm
+WHERE pm.store_id IS NOT NULL;
 
-INSERT INTO global.product_categories (
-    category_code, category_name, category_description, common_keywords, typical_shelf_life_range,
-    requires_refrigeration, requires_expiry_date, allows_donation, high_risk_category,
-    default_spoilage_risk_weight, default_turnover_speed_weight, default_value_impact_weight
-) VALUES 
-(
-    'fresh_produce', 'Fresh Produce', 
-    'Fresh fruits, vegetables, herbs, and salads requiring careful handling and quick turnover',
-    ARRAY['fresh', 'organic', 'fruit', 'vegetable', 'salad', 'herbs', 'produce'],
-    '{"min_days": 1, "max_days": 14}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.6, 0.3, 0.1
-),
-(
-    'fresh_meat_fish', 'Fresh Meat & Fish',
-    'Fresh meat, poultry, and fish products with high spoilage risk',
-    ARRAY['fresh', 'meat', 'fish', 'poultry', 'beef', 'chicken', 'salmon', 'pork'],
-    '{"min_days": 1, "max_days": 5}',
-    TRUE, TRUE, FALSE, TRUE,
-    0.7, 0.2, 0.1
-),
-(
-    'dairy', 'Dairy Products',
-    'Milk, cheese, yogurt, and other dairy products requiring refrigeration',
-    ARRAY['milk', 'cheese', 'yogurt', 'butter', 'cream', 'dairy'],
-    '{"min_days": 3, "max_days": 21}',
-    TRUE, TRUE, TRUE, FALSE,
-    0.5, 0.3, 0.2
-),
-(
-    'bakery_fresh', 'Fresh Bakery',
-    'Fresh bread, pastries, and baked goods with short shelf life',
-    ARRAY['bread', 'bakery', 'fresh', 'baked', 'croissant', 'pastry', 'baguette'],
-    '{"min_days": 1, "max_days": 7}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.6, 0.3, 0.1
-),
-(
-    'deli_prepared', 'Deli & Prepared Foods',
-    'Ready-to-eat prepared foods and deli items',
-    ARRAY['deli', 'prepared', 'ready', 'sandwich', 'salad'],
-    '{"min_days": 1, "max_days": 3}',
-    TRUE, TRUE, TRUE, TRUE,
-    0.7, 0.2, 0.1
-),
-(
-    'frozen', 'Frozen Products',
-    'Frozen foods with extended shelf life when properly stored',
-    ARRAY['frozen', 'ice', 'gelato', 'ice cream'],
-    '{"min_days": 30, "max_days": 730}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.2, 0.4, 0.4
-),
-(
-    'chilled_packaged', 'Chilled Packaged Foods',
-    'Packaged foods requiring refrigeration but with moderate shelf life',
-    ARRAY['chilled', 'refrigerated', 'packaged'],
-    '{"min_days": 7, "max_days": 30}',
-    TRUE, TRUE, TRUE, FALSE,
-    0.4, 0.3, 0.3
-),
-(
-    'pantry_staples', 'Pantry Staples',
-    'Dry goods, grains, and shelf-stable pantry items',
-    ARRAY['rice', 'pasta', 'flour', 'sugar', 'oil', 'vinegar'],
-    '{"min_days": 180, "max_days": 1095}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.1, 0.3, 0.6
-),
-(
-    'canned_jarred', 'Canned & Jarred',
-    'Canned goods, jars, and preserved foods with long shelf life',
-    ARRAY['canned', 'jar', 'conserve', 'preserve', 'tin'],
-    '{"min_days": 365, "max_days": 1825}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.1, 0.2, 0.7
-),
-(
-    'dry_goods', 'Dry Goods',
-    'Dried foods, nuts, snacks, and shelf-stable items',
-    ARRAY['dried', 'nuts', 'snacks', 'cereal', 'crackers'],
-    '{"min_days": 90, "max_days": 545}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.2, 0.3, 0.5
-),
-(
-    'beverages', 'Beverages',
-    'Drinks, juices, and liquid refreshments',
-    ARRAY['drink', 'juice', 'water', 'soda', 'beverage', 'wine', 'beer'],
-    '{"min_days": 30, "max_days": 730}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.2, 0.4, 0.4
-),
-(
-    'spices_condiments', 'Spices & Condiments',
-    'Spices, seasonings, sauces, and condiments',
-    ARRAY['spice', 'sauce', 'condiment', 'seasoning', 'herb'],
-    '{"min_days": 365, "max_days": 1095}',
-    FALSE, TRUE, TRUE, FALSE,
-    0.1, 0.2, 0.7
-);
+-- Step 5d: Update inventory.products with deduplicated data
+DELETE FROM inventory.products;
+
+INSERT INTO inventory.products (
+    product_id, sku, name, description, category, brand, unit_type,
+    typical_shelf_life_days, base_cost_price, base_selling_price,
+    created_by, created_at, updated_at
+)
+SELECT 
+    dp.kept_product_id,
+    'SKU-' || dp.kept_product_id::text, -- Generate new unique SKUs
+    dp.name,
+    '', -- description
+    dp.category,
+    dp.brand,
+    dp.unit_type,
+    dp.typical_shelf_life_days,
+    -- Use average pricing from all instances of this product
+    AVG(pb.base_cost_price) as base_cost_price,
+    AVG(pb.base_selling_price) as base_selling_price,
+    dp.created_by,
+    dp.created_at,
+    dp.updated_at
+FROM deduplicated_products dp
+JOIN products_backup pb ON (
+    pb.name = dp.name AND 
+    pb.brand = dp.brand AND 
+    pb.category = dp.category AND
+    pb.unit_type = dp.unit_type AND
+    pb.typical_shelf_life_days = dp.typical_shelf_life_days
+)
+GROUP BY dp.kept_product_id, dp.name, dp.category, dp.brand, dp.unit_type, 
+         dp.typical_shelf_life_days, dp.created_by, dp.created_at, dp.updated_at;
 
 -- =============================================
--- BARCODE AND OCR SUPPORT TABLES
+-- STEP 6: UPDATE BATCHES REFERENCES
 -- =============================================
 
--- Barcode format reference
-CREATE TABLE global.barcode_formats (
-    format_code VARCHAR(20) PRIMARY KEY,
-    format_name VARCHAR(50) NOT NULL,
-    format_description TEXT,
-    regex_pattern VARCHAR(100),              -- Validation pattern
-    typical_length INTEGER,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Create batch mapping table using existing product_mapping temp table
+CREATE TEMP TABLE batch_product_mapping AS
+SELECT DISTINCT
+    pm.old_product_id,
+    pm.new_product_id
+FROM product_mapping pm;
 
-INSERT INTO global.barcode_formats VALUES
-('EAN13', 'European Article Number 13', 'Most common barcode format in Europe', '^[0-9]{13}$', 13, TRUE, NOW()),
-('UPC', 'Universal Product Code', 'Common in North America', '^[0-9]{12}$', 12, TRUE, NOW()),
-('EAN8', 'European Article Number 8', 'Short format for small packages', '^[0-9]{8}$', 8, TRUE, NOW()),
-('CODE128', 'Code 128', 'High-density linear barcode', NULL, NULL, TRUE, NOW()),
-('QR', 'QR Code', '2D matrix barcode', NULL, NULL, TRUE, NOW());
-
--- OCR extraction log (for training and improvement)
-CREATE TABLE global.ocr_extraction_log (
-    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    product_id UUID REFERENCES global.products(product_id),
-    
-    -- OCR session details
-    image_url VARCHAR(500),
-    extracted_text TEXT,
-    confidence_score DECIMAL(3,2),           -- 0.00 to 1.00
-    processing_time_ms INTEGER,
-    
-    -- Extracted data
-    detected_barcode VARCHAR(50),
-    detected_expiry_date DATE,
-    detected_product_name VARCHAR(255),
-    detected_brand VARCHAR(100),
-    
-    -- Validation results
-    barcode_match BOOLEAN,
-    name_match_score DECIMAL(3,2),
-    manual_verification BOOLEAN,
-    verified_by UUID REFERENCES auth.users(id),
-    
-    -- Context
-    store_id UUID REFERENCES business.stores(store_id),
-    extracted_by UUID REFERENCES auth.users(id),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
-    -- Constraints
-    CONSTRAINT ocr_confidence_range CHECK (confidence_score >= 0.0 AND confidence_score <= 1.0),
-    CONSTRAINT ocr_match_score_range CHECK (name_match_score IS NULL OR (name_match_score >= 0.0 AND name_match_score <= 1.0))
-);
+-- Update batches to reference new product_ids
+UPDATE inventory.batches 
+SET product_id = bpm.new_product_id
+FROM batch_product_mapping bpm
+WHERE inventory.batches.product_id = bpm.old_product_id;
 
 -- =============================================
--- OCR LOG INDEXES
+-- STEP 7: INDEXES AND CONSTRAINTS
 -- =============================================
 
-CREATE INDEX idx_ocr_log_product ON global.ocr_extraction_log(product_id);
-CREATE INDEX idx_ocr_log_store ON global.ocr_extraction_log(store_id);
-CREATE INDEX idx_ocr_log_confidence ON global.ocr_extraction_log(confidence_score);
-CREATE INDEX idx_ocr_log_created ON global.ocr_extraction_log(created_at);
-CREATE INDEX idx_ocr_log_barcode ON global.ocr_extraction_log(detected_barcode) WHERE detected_barcode IS NOT NULL;
+-- Core lookup indexes
+CREATE INDEX idx_store_products_store ON inventory.store_products(store_id);
+CREATE INDEX idx_store_products_product ON inventory.store_products(product_id);
+CREATE INDEX idx_store_products_active ON inventory.store_products(store_id, is_active) WHERE is_active = TRUE;
+
+-- Barcode lookup
+CREATE INDEX idx_products_barcode ON inventory.products(barcode) WHERE barcode IS NOT NULL;
+CREATE INDEX idx_products_name_search ON inventory.products USING gin(to_tsvector('english', name));
+
+-- Pricing lookup indexes
+CREATE INDEX idx_store_products_pricing ON inventory.store_products(store_id, is_active) 
+    WHERE is_active = TRUE;
 
 -- =============================================
--- AUTOMATIC TIMESTAMPS TRIGGERS
+-- STEP 8: ADD USEFUL CONSTRAINTS
 -- =============================================
 
--- Function to update timestamps
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
+-- Ensure pricing consistency
+ALTER TABLE inventory.store_products
+ADD CONSTRAINT store_products_pricing_check 
+CHECK (cost_price IS NULL OR cost_price > 0),
+ADD CONSTRAINT store_products_selling_price_check 
+CHECK (selling_price IS NULL OR selling_price > 0);
 
--- Apply triggers
-CREATE TRIGGER update_global_products_updated_at
-    BEFORE UPDATE ON global.products
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+-- Note: No stock level constraints needed - LIFO.AI tracks and recommends, doesn't manage inventory
 
-CREATE TRIGGER update_store_product_updated_at
-    BEFORE UPDATE ON business.store_product
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_product_categories_updated_at
-    BEFORE UPDATE ON global.product_categories
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- =============================================
--- COMMENTS FOR DOCUMENTATION
--- =============================================
-
-COMMENT ON SCHEMA global IS 'Global product catalog and shared resources for all stores';
-COMMENT ON TABLE global.products IS 'Centralized product catalog with OCR and barcode support';
-COMMENT ON TABLE business.store_product IS 'Store-specific product pricing and inventory settings';
-COMMENT ON TABLE global.product_categories IS 'Enhanced product categories with OCR hints and scoring defaults';
-COMMENT ON TABLE global.barcode_formats IS 'Supported barcode formats for product identification';
-COMMENT ON TABLE global.ocr_extraction_log IS 'OCR processing history for training and improvement';
-
-COMMENT ON COLUMN global.products.search_vector IS 'Full-text search index for product discovery';
-COMMENT ON COLUMN global.products.verification_status IS 'Product verification status: pending, verified, flagged, rejected';
-COMMENT ON COLUMN global.products.dietary_attributes IS 'JSON object with dietary attributes like vegan, gluten_free, etc.';
+-- Barcode format validation (basic)
+ALTER TABLE inventory.products
+ADD CONSTRAINT products_barcode_format_check
+CHECK (barcode IS NULL OR length(barcode) BETWEEN 8 AND 50);
 
 COMMIT;
+
+-- =============================================
+-- VERIFICATION QUERIES (run manually after migration)
+-- =============================================
+
+-- Check deduplication worked
+-- SELECT name, brand, COUNT(*) FROM inventory.products GROUP BY name, brand HAVING COUNT(*) > 1;
+
+-- Check store_products created correctly  
+-- SELECT COUNT(*) FROM inventory.store_products;
+
+-- Check batches still reference valid products
+-- SELECT COUNT(*) FROM inventory.batches b LEFT JOIN inventory.products p ON b.product_id = p.product_id WHERE p.product_id IS NULL;

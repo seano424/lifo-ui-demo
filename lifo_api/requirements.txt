@@ -1,6 +1,6 @@
-# Use UV for dependency management
-# Install dependencies: uv pip install -e .[dev]
-# Or sync from lock file: uv pip sync requirements.txt
+# LIFO.AI API Dependencies
+# This is part of the unified LIFO.AI application (no longer a package)
+# Install dependencies: uv pip install -r requirements.txt
 
 # Core FastAPI dependencies
 fastapi>=0.104.0

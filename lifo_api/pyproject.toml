@@ -1,127 +1,27 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+# LIFO.AI API - Development Configuration Only
+# This is no longer a standalone package - it's part of the unified LIFO.AI application
+# Dependencies are managed via requirements.txt for single deployment
 
-[project]
-name = "lifo_api"
-version = "0.1.0"
-description = "LIFO AI API - Food waste reduction API service"
-authors = [
-    {name = "LIFO.AI", email = "tech@lifo.ai"}
-]
-readme = "README.md"
-requires-python = ">=3.9"
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-
-dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "pydantic>=2.5.0",
-    "pydantic-settings>=2.1.0",
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.13.0",
-    "asyncpg>=0.29.0",
-    "psycopg2-binary>=2.9.0",
-    "python-multipart>=0.0.6",
-    "python-jose[cryptography]>=3.3.0",
-    "PyJWT>=2.8.0",
-    "passlib[bcrypt]>=1.7.4",
-    "httpx>=0.25.0",
-    "structlog>=23.2.0",
-    "python-dotenv>=1.0.0",
-    "slowapi>=0.1.9",
-    "redis>=5.0.0",
-    "aiofiles>=23.2.1",
-    "python-magic>=0.4.27",
-    "chardet>=5.0.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.5.0",
-]
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["lifo_api*"]
-
-# Ruff configuration
 [tool.ruff]
-target-version = "py38"
-line-length = 88
+line-length = 100
+target-version = "py39"
+extend-include = ["*.py"]
 
 [tool.ruff.lint]
 select = [
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings  
-    "F",    # pyflakes
-    "I",    # isort
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "UP",   # pyupgrade
-    "N",    # pep8-naming
-    "S",    # flake8-bandit
-    "T20",  # flake8-print
-    "SIM",  # flake8-simplify
-    "RUF",  # ruff-specific rules
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
 ]
 ignore = [
-    "S101",   # assert-used (allow asserts in tests)
-    "S608",   # hardcoded-sql-expression (we use SQL)
-    "S603",   # subprocess call (needed for setup scripts)
-    "B008",   # function-call-in-default-argument (FastAPI dependencies)
-    "T201",   # print statements (allow in test/debug scripts)
-    "E501",   # line too long (let formatter handle this)
-    "E402",   # module import not at top (needed for path modification in csv_upload)
-    "E712",   # == True comparisons (SQLAlchemy patterns)
-    "E722",   # bare except (intentional in some error handling)
-    "N805",   # first argument should be self (allow cls for validators)
-    "N802",   # function name should be lowercase (test methods can be descriptive)
-    "N818",   # exception naming (SecurityViolation is clear)
-    "RUF012", # mutable class attributes (constants are fine)
-    "B904",   # raise from (not always needed for validation errors)
-    "B017",   # assert blind exception (expected in security tests)
-    "F401",   # unused import (used for testing imports in scripts)
-    "F821",   # undefined name (dynamic imports and test mocks)
-    "F841",   # unused variable (test variables in scripts)
-    "F541",   # f-string without placeholders (more readable sometimes)
-    "UP036",  # version block (keep explicit for clarity)
-    "SIM102", # nested if (more readable in this context)
-    "SIM103", # return condition directly (more readable as if/else)
-    "SIM105", # contextlib.suppress (try/except more readable)
-    "SIM110", # return any() (loop more readable)
-    "SIM117", # nested with statements (more readable)
-    "SIM118", # key in dict instead of key in dict.keys() (both work)
-    "C401",   # unnecessary generator (more readable as is)
-    "C403",   # list comprehension (original is more readable)
-    "RUF005", # concatenation (more readable than unpacking)
-    "RUF013", # implicit optional (legacy code compatibility)
-    "B007",   # unused loop variable (needed for iteration count)
-    "S104",   # binding to all interfaces (needed for containerization)
-    "S105",   # hardcoded password (test tokens)
-    "S110",   # try-except-pass (expected in tests)
-    "S324",   # hashlib without usedforsecurity (legacy code)
-    "W291",   # trailing whitespace (formatter handles this)
-    "W293",   # blank line contains whitespace (formatter handles this)
+    "E501",  # line too long (handled by line-length)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
 ]
-per-file-ignores = {"tests/**/*" = ["S101", "S106", "T201"], "app/main.py" = ["T201"]}  # Allow asserts, hardcoded passwords, and prints in tests
-
-[tool.ruff.lint.isort]
-known-first-party = ["lifo_api", "app"]
-force-single-line = false
-combine-as-imports = true
 
 [tool.ruff.format]
 quote-style = "double"
@@ -129,38 +29,47 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
 
-# MyPy configuration
 [tool.mypy]
 python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
 check_untyped_defs = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
+disallow_untyped_decorators = true
+no_implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
-warn_return_any = true
-strict_optional = true
-no_implicit_reexport = true
-show_error_codes = true
-exclude = ["build/", "dist/"]
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
 
-[[tool.mypy.overrides]]
-module = ["fastapi.*", "slowapi.*", "redis.*", "magic.*", "chardet.*"]
-ignore_missing_imports = true
-
-# Pytest configuration
 [tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
-addopts = "-v --tb=short --cov=lifo_api --cov-report=term-missing"
-asyncio_mode = "auto"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
 
-[dependency-groups]
-dev = [
-    "mypy>=1.17.0",
-    "pytest>=8.4.1",
-    "pytest-asyncio>=1.1.0",
-    "pytest-cov>=6.2.1",
-    "ruff>=0.12.4",
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
 ]
