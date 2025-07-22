@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     }
 
     const operations = new InventoryOperations(supabase)
-    const hasAccess = await operations.validateStoreAccess(storeId, user.id, 'staff')
+    const hasAccess = await operations.validateStoreAccess(storeId, user.id)
 
     if (!hasAccess) {
       return NextResponse.json(
