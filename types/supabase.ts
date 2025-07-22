@@ -291,11 +291,106 @@ export type Database = {
   }
   inventory: {
     Tables: {
+      batch_actions: {
+        Row: {
+          action_date: string | null
+          action_id: string
+          actual_action: Database['public']['Enums']['action_type']
+          ai_score: number | null
+          batch_id: string
+          created_at: string | null
+          donation_recipient_id: string | null
+          notes: string | null
+          original_value: number | null
+          performed_by: string | null
+          quantity_affected: number | null
+          recommended_action: Database['public']['Enums']['action_type']
+          recovered_value: number | null
+          store_id: string
+        }
+        Insert: {
+          action_date?: string | null
+          action_id?: string
+          actual_action: Database['public']['Enums']['action_type']
+          ai_score?: number | null
+          batch_id: string
+          created_at?: string | null
+          donation_recipient_id?: string | null
+          notes?: string | null
+          original_value?: number | null
+          performed_by?: string | null
+          quantity_affected?: number | null
+          recommended_action: Database['public']['Enums']['action_type']
+          recovered_value?: number | null
+          store_id: string
+        }
+        Update: {
+          action_date?: string | null
+          action_id?: string
+          actual_action?: Database['public']['Enums']['action_type']
+          ai_score?: number | null
+          batch_id?: string
+          created_at?: string | null
+          donation_recipient_id?: string | null
+          notes?: string | null
+          original_value?: number | null
+          performed_by?: string | null
+          quantity_affected?: number | null
+          recommended_action?: Database['public']['Enums']['action_type']
+          recovered_value?: number | null
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'batch_actions_batch_id_fkey'
+            columns: ['batch_id']
+            isOneToOne: false
+            referencedRelation: 'batch_status'
+            referencedColumns: ['batch_id']
+          },
+          {
+            foreignKeyName: 'batch_actions_batch_id_fkey'
+            columns: ['batch_id']
+            isOneToOne: false
+            referencedRelation: 'batches'
+            referencedColumns: ['batch_id']
+          },
+          {
+            foreignKeyName: 'batch_actions_batch_id_fkey'
+            columns: ['batch_id']
+            isOneToOne: false
+            referencedRelation: 'expiring_batches'
+            referencedColumns: ['batch_id']
+          },
+          {
+            foreignKeyName: 'batch_actions_batch_id_fkey'
+            columns: ['batch_id']
+            isOneToOne: false
+            referencedRelation: 'expiring_products'
+            referencedColumns: ['batch_id']
+          },
+          {
+            foreignKeyName: 'batch_actions_batch_id_fkey'
+            columns: ['batch_id']
+            isOneToOne: false
+            referencedRelation: 'my_store_batches'
+            referencedColumns: ['batch_id']
+          },
+          {
+            foreignKeyName: 'batch_actions_donation_recipient_id_fkey'
+            columns: ['donation_recipient_id']
+            isOneToOne: false
+            referencedRelation: 'donation_recipients'
+            referencedColumns: ['recipient_id']
+          },
+        ]
+      }
       batches: {
         Row: {
           available_quantity: number | null
           batch_id: string
           batch_number: string
+          batch_source: string | null
           cost_price: number
           created_at: string | null
           created_by: string | null
@@ -310,16 +405,20 @@ export type Database = {
           product_id: string
           received_date: string | null
           reserved_quantity: number | null
+          scan_confidence: number | null
+          scanned_barcode: string | null
           selling_price: number
           status: string | null
           store_id: string | null
           supplier: string | null
           updated_at: string | null
+          verification_status: string | null
         }
         Insert: {
           available_quantity?: number | null
           batch_id?: string
           batch_number: string
+          batch_source?: string | null
           cost_price: number
           created_at?: string | null
           created_by?: string | null
@@ -334,16 +433,20 @@ export type Database = {
           product_id: string
           received_date?: string | null
           reserved_quantity?: number | null
+          scan_confidence?: number | null
+          scanned_barcode?: string | null
           selling_price: number
           status?: string | null
           store_id?: string | null
           supplier?: string | null
           updated_at?: string | null
+          verification_status?: string | null
         }
         Update: {
           available_quantity?: number | null
           batch_id?: string
           batch_number?: string
+          batch_source?: string | null
           cost_price?: number
           created_at?: string | null
           created_by?: string | null
@@ -358,11 +461,14 @@ export type Database = {
           product_id?: string
           received_date?: string | null
           reserved_quantity?: number | null
+          scan_confidence?: number | null
+          scanned_barcode?: string | null
           selling_price?: number
           status?: string | null
           store_id?: string | null
           supplier?: string | null
           updated_at?: string | null
+          verification_status?: string | null
         }
         Relationships: [
           {
@@ -393,7 +499,62 @@ export type Database = {
             referencedRelation: 'products'
             referencedColumns: ['product_id']
           },
+          {
+            foreignKeyName: 'batches_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products_needing_barcodes'
+            referencedColumns: ['product_id']
+          },
         ]
+      }
+      donation_recipients: {
+        Row: {
+          accepts_pickups: boolean | null
+          certification_notes: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          is_active: boolean | null
+          is_certified: boolean | null
+          max_distance_km: number | null
+          name: string
+          recipient_id: string
+          recipient_type: Database['public']['Enums']['donation_recipient_type']
+          store_id: string
+        }
+        Insert: {
+          accepts_pickups?: boolean | null
+          certification_notes?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          is_active?: boolean | null
+          is_certified?: boolean | null
+          max_distance_km?: number | null
+          name: string
+          recipient_id?: string
+          recipient_type: Database['public']['Enums']['donation_recipient_type']
+          store_id: string
+        }
+        Update: {
+          accepts_pickups?: boolean | null
+          certification_notes?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          is_active?: boolean | null
+          is_certified?: boolean | null
+          max_distance_km?: number | null
+          name?: string
+          recipient_id?: string
+          recipient_type?: Database['public']['Enums']['donation_recipient_type']
+          store_id?: string
+        }
+        Relationships: []
       }
       ocr_processing_batches: {
         Row: {
@@ -484,6 +645,7 @@ export type Database = {
           active_batches_count: number | null
           avg_days_to_expiry: number | null
           barcode: string | null
+          barcode_type: string | null
           base_cost_price: number
           base_selling_price: number
           brand: string | null
@@ -492,21 +654,24 @@ export type Database = {
           created_by: string | null
           description: string | null
           image_url: string | null
+          is_verified: boolean | null
+          last_scanned_at: string | null
           last_verified: string | null
           name: string
           open_food_facts_data: Json | null
           product_id: string
           sku: string
-          store_id: string | null
           total_stock: number | null
           typical_shelf_life_days: number
           unit_type: string
           updated_at: string | null
+          verification_count: number | null
         }
         Insert: {
           active_batches_count?: number | null
           avg_days_to_expiry?: number | null
           barcode?: string | null
+          barcode_type?: string | null
           base_cost_price: number
           base_selling_price: number
           brand?: string | null
@@ -515,21 +680,24 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           image_url?: string | null
+          is_verified?: boolean | null
+          last_scanned_at?: string | null
           last_verified?: string | null
           name: string
           open_food_facts_data?: Json | null
           product_id?: string
           sku: string
-          store_id?: string | null
           total_stock?: number | null
           typical_shelf_life_days: number
           unit_type: string
           updated_at?: string | null
+          verification_count?: number | null
         }
         Update: {
           active_batches_count?: number | null
           avg_days_to_expiry?: number | null
           barcode?: string | null
+          barcode_type?: string | null
           base_cost_price?: number
           base_selling_price?: number
           brand?: string | null
@@ -538,21 +706,107 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           image_url?: string | null
+          is_verified?: boolean | null
+          last_scanned_at?: string | null
           last_verified?: string | null
           name?: string
           open_food_facts_data?: Json | null
           product_id?: string
           sku?: string
-          store_id?: string | null
           total_stock?: number | null
           typical_shelf_life_days?: number
           unit_type?: string
           updated_at?: string | null
+          verification_count?: number | null
         }
         Relationships: []
       }
+      store_products: {
+        Row: {
+          added_by: string | null
+          cost_price: number | null
+          created_at: string | null
+          is_active: boolean | null
+          product_id: string
+          selling_price: number | null
+          store_id: string
+          store_sku: string | null
+          supplier_code: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          added_by?: string | null
+          cost_price?: number | null
+          created_at?: string | null
+          is_active?: boolean | null
+          product_id: string
+          selling_price?: number | null
+          store_id: string
+          store_sku?: string | null
+          supplier_code?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          added_by?: string | null
+          cost_price?: number | null
+          created_at?: string | null
+          is_active?: boolean | null
+          product_id?: string
+          selling_price?: number | null
+          store_id?: string
+          store_sku?: string | null
+          supplier_code?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'expiring_products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'low_stock_products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products_needing_barcodes'
+            referencedColumns: ['product_id']
+          },
+        ]
+      }
     }
     Views: {
+      barcode_scan_summary: {
+        Row: {
+          avg_confidence: number | null
+          batch_count: number | null
+          batch_source: string | null
+          first_scan: string | null
+          last_scan: string | null
+          store_id: string | null
+          unique_barcodes: number | null
+          verification_status: string | null
+        }
+        Relationships: []
+      }
       batch_status: {
         Row: {
           available_quantity: number | null
@@ -648,7 +902,27 @@ export type Database = {
             referencedRelation: 'products'
             referencedColumns: ['product_id']
           },
+          {
+            foreignKeyName: 'batches_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products_needing_barcodes'
+            referencedColumns: ['product_id']
+          },
         ]
+      }
+      donation_impact: {
+        Row: {
+          donation_count: number | null
+          last_donation_date: string | null
+          recipient_name: string | null
+          recipient_type: Database['public']['Enums']['donation_recipient_type'] | null
+          store_id: string | null
+          total_quantity_donated: number | null
+          total_tax_benefit: number | null
+          total_value_donated: number | null
+        }
+        Relationships: []
       }
       expiring_batches: {
         Row: {
@@ -752,9 +1026,173 @@ export type Database = {
         }
         Relationships: []
       }
+      my_store_batches: {
+        Row: {
+          available_quantity: number | null
+          barcode: string | null
+          batch_id: string | null
+          batch_number: string | null
+          batch_source: string | null
+          brand: string | null
+          category: string | null
+          cost_price: number | null
+          created_at: string | null
+          created_by: string | null
+          current_quantity: number | null
+          expiry_date: string | null
+          initial_quantity: number | null
+          location_code: string | null
+          manufacture_date: string | null
+          ocr_confidence: number | null
+          ocr_extracted_date: string | null
+          processing_batch_id: string | null
+          product_id: string | null
+          product_name: string | null
+          received_date: string | null
+          reserved_quantity: number | null
+          scan_confidence: number | null
+          scanned_barcode: string | null
+          selling_price: number | null
+          status: string | null
+          store_cost_price: number | null
+          store_id: string | null
+          store_name: string | null
+          store_selling_price: number | null
+          supplier: string | null
+          updated_at: string | null
+          verification_status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'batches_processing_batch_id_fkey'
+            columns: ['processing_batch_id']
+            isOneToOne: false
+            referencedRelation: 'ocr_processing_batches'
+            referencedColumns: ['batch_id']
+          },
+          {
+            foreignKeyName: 'batches_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'expiring_products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'batches_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'low_stock_products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'batches_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'batches_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products_needing_barcodes'
+            referencedColumns: ['product_id']
+          },
+        ]
+      }
+      my_store_products: {
+        Row: {
+          added_by: string | null
+          barcode: string | null
+          brand: string | null
+          category: string | null
+          cost_price: number | null
+          created_at: string | null
+          is_active: boolean | null
+          name: string | null
+          product_id: string | null
+          selling_price: number | null
+          store_id: string | null
+          store_name: string | null
+          store_sku: string | null
+          supplier_code: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'expiring_products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'low_stock_products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products'
+            referencedColumns: ['product_id']
+          },
+          {
+            foreignKeyName: 'store_products_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'products_needing_barcodes'
+            referencedColumns: ['product_id']
+          },
+        ]
+      }
+      products_needing_barcodes: {
+        Row: {
+          batch_count: number | null
+          brand: string | null
+          category: string | null
+          latest_batch: string | null
+          name: string | null
+          product_id: string | null
+          store_count: number | null
+        }
+        Relationships: []
+      }
+      recommendation_analytics: {
+        Row: {
+          actual_action: Database['public']['Enums']['action_type'] | null
+          avg_ai_score: number | null
+          recommendation_count: number | null
+          recommended_action: Database['public']['Enums']['action_type'] | null
+          recovery_percentage: number | null
+          store_id: string | null
+          total_original_value: number | null
+          total_recovered_value: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_user_stores: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          store_id: string
+          store_name: string
+          role_in_store: string
+        }[]
+      }
+      user_can_access_store: {
+        Args: { store_uuid: string }
+        Returns: boolean
+      }
+      user_can_manage_store: {
+        Args: { store_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
@@ -1047,7 +1485,18 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      action_type: 'discount' | 'donate' | 'dispose' | 'maintain' | 'ignored'
+      donation_recipient_type:
+        | 'food_bank'
+        | 'soup_kitchen'
+        | 'charity'
+        | 'religious_org'
+        | 'community_group'
+        | 'animal_shelter'
+        | 'school'
+        | 'elderly_care'
+        | 'homeless_shelter'
+        | 'other'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1679,7 +2128,21 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      action_type: ['discount', 'donate', 'dispose', 'maintain', 'ignored'],
+      donation_recipient_type: [
+        'food_bank',
+        'soup_kitchen',
+        'charity',
+        'religious_org',
+        'community_group',
+        'animal_shelter',
+        'school',
+        'elderly_care',
+        'homeless_shelter',
+        'other',
+      ],
+    },
   },
   scoring: {
     Enums: {},
