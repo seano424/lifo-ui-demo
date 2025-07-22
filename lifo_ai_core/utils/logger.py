@@ -1,0 +1,152 @@
+"""Logging utilities for LIFO AI Core"""
+
+import json
+import sys
+from datetime import datetime
+from typing import Any, Dict
+
+from loguru import logger
+
+
+class StructuredLogger:
+    """Structured logger for LIFO AI Core"""
+
+    def __init__(self, service_name: str = "lifo_ai_core", log_level: str = "INFO"):
+        self.service_name = service_name
+        self.log_level = log_level
+        self._setup_logger()
+
+    def _setup_logger(self):
+        """Setup loguru with structured logging"""
+        # Remove default logger
+        logger.remove()
+
+        # Add structured JSON logger
+        logger.add(
+            sys.stdout,
+            level=self.log_level,
+            format=self._json_formatter,
+            colorize=False,
+            serialize=False,
+        )
+
+        # Add file logger for errors
+        logger.add(
+            "logs/errors.log",
+            level="ERROR",
+            rotation="1 day",
+            retention="30 days",
+            format=self._json_formatter,
+            serialize=False,
+        )
+
+    def _json_formatter(self, record):
+        """Format log record as JSON"""
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "level": record["level"].name,
+            "service": self.service_name,
+            "message": record["message"],
+            "module": record["name"],
+            "function": record["function"],
+            "line": record["line"],
+        }
+
+        # Add extra fields if present
+        if record.get("extra"):
+            log_entry.update(record["extra"])
+
+        # Add exception info if present
+        if record.get("exception"):
+            log_entry["exception"] = {
+                "type": record["exception"].type.__name__,
+                "value": str(record["exception"].value),
+                "traceback": record["exception"].traceback.format(),
+            }
+
+        return json.dumps(log_entry)
+
+    def info(self, message: str, **kwargs):
+        """Log info message with extra fields"""
+        logger.bind(**kwargs).info(message)
+
+    def error(self, message: str, **kwargs):
+        """Log error message with extra fields"""
+        logger.bind(**kwargs).error(message)
+
+    def warning(self, message: str, **kwargs):
+        """Log warning message with extra fields"""
+        logger.bind(**kwargs).warning(message)
+
+    def debug(self, message: str, **kwargs):
+        """Log debug message with extra fields"""
+        logger.bind(**kwargs).debug(message)
+
+    def exception(self, message: str, **kwargs):
+        """Log exception with traceback"""
+        logger.bind(**kwargs).exception(message)
+
+
+# Global logger instance
+_logger = None
+
+
+def get_logger(
+    service_name: str = "lifo_ai_core", log_level: str = "INFO"
+) -> StructuredLogger:
+    """Get or create logger instance"""
+    global _logger
+    if _logger is None:
+        _logger = StructuredLogger(service_name, log_level)
+    return _logger
+
+
+# Convenience functions
+def log_scoring_event(store_id: str, batch_count: int, processing_time: float):
+    """Log scoring event with structured data"""
+    get_logger().info(
+        "Scoring completed",
+        event_type="scoring_completed",
+        store_id=store_id,
+        batch_count=batch_count,
+        processing_time_seconds=processing_time,
+    )
+
+
+def log_csv_processing(
+    store_id: str, filename: str, row_count: int, success_count: int, error_count: int
+):
+    """Log CSV processing event"""
+    get_logger().info(
+        "CSV processing completed",
+        event_type="csv_processed",
+        store_id=store_id,
+        filename=filename,
+        total_rows=row_count,
+        successful_rows=success_count,
+        error_rows=error_count,
+        success_rate=round((success_count / row_count) * 100, 2)
+        if row_count > 0
+        else 0,
+    )
+
+
+def log_database_operation(
+    operation: str, table: str, affected_rows: int, execution_time: float
+):
+    """Log database operation"""
+    get_logger().info(
+        f"Database {operation} completed",
+        event_type="database_operation",
+        operation=operation,
+        table=table,
+        affected_rows=affected_rows,
+        execution_time_ms=round(execution_time * 1000, 2),
+    )
+
+
+def log_error_with_context(error: Exception, context: Dict[str, Any]):
+    """Log error with additional context"""
+    get_logger().exception(
+        f"Error occurred: {error!s}", error_type=type(error).__name__, **context
+    )

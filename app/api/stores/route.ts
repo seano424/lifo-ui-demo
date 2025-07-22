@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lifo-ai-core/database/operations'
+import { InventoryOperations } from '@/lifo_ai_core/database/operations'
 
 // GET /api/stores - List user's stores
 export async function GET() {

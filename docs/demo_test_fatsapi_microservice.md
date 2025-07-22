@@ -10,11 +10,11 @@ This guide provides comprehensive instructions for testing and demonstrating all
 
 #### 1. Create Environment File
 
-Create a `.env.local` file in the `lifo-api` directory:
+Create a `.env.local` file in the `lifo_api` directory:
 
 ```bash
 # Navigate to the FastAPI directory
-cd lifo-api
+cd lifo_api
 
 # Create .env.local file
 touch .env.local
@@ -667,7 +667,7 @@ curl -X GET "http://localhost:8000/health"
 open "http://localhost:8000/docs"
 
 # Check logs
-tail -f logs/lifo-api.log
+tail -f logs/lifo_api.log
 ```
 
 ## <� Demo Script for Stakeholders
