@@ -77,29 +77,29 @@ export type ProductsPageParam = {
   pageSize: number
 }
 
-// ✅ FIXED: Helper function to build single Supabase order clause
-function buildOrderClause(sort?: ProductSort): { column: string; ascending: boolean } {
-  if (!sort) {
-    return { column: 'created_at', ascending: false } // Default: newest first
-  }
+// Helper function to build single Supabase order clause (currently unused)
+// function buildOrderClause(sort?: ProductSort): { column: string; ascending: boolean } {
+//   if (!sort) {
+//     return { column: 'created_at', ascending: false } // Default: newest first
+//   }
 
-  // For joined table queries, we need to be careful about column references
-  // PostgREST doesn't handle multiple order clauses well across joined tables
-  const columnMap: Record<SortField, string> = {
-    name: 'products(name)',
-    category: 'products(category)',
-    brand: 'products(brand)',
-    total_stock: 'products(total_stock)',
-    base_selling_price: 'products(base_selling_price)',
-    active_batches_count: 'products(active_batches_count)',
-    created_at: 'products(created_at)',
-  }
+//   // For joined table queries, we need to be careful about column references
+//   // PostgREST doesn't handle multiple order clauses well across joined tables
+//   const columnMap: Record<SortField, string> = {
+//     name: 'products(name)',
+//     category: 'products(category)',
+//     brand: 'products(brand)',
+//     total_stock: 'products(total_stock)',
+//     base_selling_price: 'products(base_selling_price)',
+//     active_batches_count: 'products(active_batches_count)',
+//     created_at: 'products(created_at)',
+//   }
 
-  return {
-    column: columnMap[sort.field],
-    ascending: sort.direction === 'asc',
-  }
-}
+//   return {
+//     column: columnMap[sort.field],
+//     ascending: sort.direction === 'asc',
+//   }
+// }
 
 export async function fetchProducts(
   storeId: string,

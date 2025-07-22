@@ -48,8 +48,8 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
    ```bash
    # On macOS/Linux
    curl -LsSf https://astral.sh/uv/install.sh | sh
-   
-   # On Windows  
+
+   # On Windows
    powershell -c "irm https://astral.sh/uv/install.sh | iex"
    ```
 
@@ -65,7 +65,7 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
    ```bash
    # Automated setup (recommended)
    ./scripts/dev-setup.sh
-   
+
    # Or manual setup
    uv sync --dev                # Install dependencies (creates .venv automatically)
    uv run pytest               # Run tests
@@ -78,7 +78,7 @@ For production deployment on Digital Ocean App Platform, see the [Deployment Gui
    # Edit .env with your configuration
    ```
 
-4. **Run the application**
+5. **Run the application**
 
    ```bash
    make run
@@ -178,7 +178,7 @@ LOG_LEVEL=INFO
 make test
 # Or: uv run pytest
 
-# With coverage  
+# With coverage
 make test-cov
 # Or: uv run pytest --cov=lifo_api
 
@@ -210,7 +210,7 @@ tests/
 make format
 # Or: uv run ruff format .
 
-# Lint code with ruff  
+# Lint code with ruff
 make lint
 # Or: uv run ruff check .
 
@@ -219,7 +219,7 @@ make lint-fix
 # Or: uv run ruff check --fix .
 
 # Type checking with mypy
-make type-check  
+make type-check
 # Or: uv run mypy .
 
 # All quality checks
@@ -389,9 +389,6 @@ make setup-dev
 # Run development server
 make run-dev
 ```
-
-
-
 
 ## 🔮 Roadmap
 

@@ -59,7 +59,9 @@ export type BatchesPageParam = {
 }
 
 // ✅ FIXED: Simple single-column ordering compatible with PostgREST
-function applySingleColumnSort(query: any, sort?: BatchSort): any {
+function applySingleColumnSort<
+  T extends { order: (column: string, options?: { ascending: boolean }) => T },
+>(query: T, sort?: BatchSort): T {
   if (!sort) {
     // Default: soonest expiry first for batch management
     return query.order('expiry_date', { ascending: true })

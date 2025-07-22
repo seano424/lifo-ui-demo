@@ -50,7 +50,7 @@ The LIFO AI Core is a Python-based ETL (Extract, Transform, Load) engine designe
    ```bash
    # On macOS/Linux
    curl -LsSf https://astral.sh/uv/install.sh | sh
-   
+
    # On Windows
    powershell -c "irm https://astral.sh/uv/install.sh | iex"
    ```
@@ -59,10 +59,10 @@ The LIFO AI Core is a Python-based ETL (Extract, Transform, Load) engine designe
 
    ```bash
    cd lifo_ai_core
-   
+
    # Automated setup (recommended)
    ./scripts/dev-setup.sh
-   
+
    # Or manual setup
    uv sync --dev                # Install dependencies (creates .venv automatically)
    uv run pytest               # Run tests
@@ -513,7 +513,7 @@ cd lifo_ai_core
 # Or manual setup
 uv sync --dev                    # Install all dependencies (dev + prod)
 uv run ruff check .              # Lint code
-uv run ruff format .             # Format code  
+uv run ruff format .             # Format code
 uv run mypy .                    # Type check
 uv run pytest                   # Run tests
 
@@ -539,7 +539,5 @@ make test-cov                    # Tests with coverage
 make quality                     # Lint, format, and type checks
 make test-cov                   # Tests with coverage
 ```
-
-
 
 **The LIFO AI Core powers intelligent inventory management through advanced data processing and scoring algorithms, enabling retailers to reduce waste and maximize profitability.**

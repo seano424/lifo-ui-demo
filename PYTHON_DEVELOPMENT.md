@@ -105,7 +105,7 @@ Ruff is configured in each `pyproject.toml` file with:
 - **Target Python version**: 3.8+
 - **Selected rules**: Comprehensive set including:
   - pycodestyle (E, W)
-  - pyflakes (F) 
+  - pyflakes (F)
   - isort (I)
   - flake8-bugbear (B)
   - flake8-comprehensions (C4)
@@ -117,6 +117,7 @@ Ruff is configured in each `pyproject.toml` file with:
 ### MyPy Configuration
 
 Type checking is configured with strict settings:
+
 - `check_untyped_defs = true`
 - `disallow_untyped_defs = true`
 - `disallow_incomplete_defs = true`
@@ -131,7 +132,7 @@ Type checking is configured with strict settings:
 # Production dependency
 uv add pandas>=2.0.0
 
-# Development dependency  
+# Development dependency
 uv add --dev pytest>=7.0.0
 
 # Optional dependency group
@@ -208,6 +209,7 @@ uv run pytest -v
 ### Test Configuration
 
 Tests are configured in `pyproject.toml`:
+
 - Test discovery: `tests/` directory
 - Coverage reporting
 - Async test support via pytest-asyncio
@@ -215,9 +217,10 @@ Tests are configured in `pyproject.toml`:
 ## CI/CD
 
 GitHub Actions workflows automatically:
+
 - Run tests on Python 3.9, 3.10, 3.11, 3.12
 - Check code quality with ruff
-- Validate type annotations with mypy  
+- Validate type annotations with mypy
 - Run security scans
 - Generate coverage reports
 
@@ -263,6 +266,7 @@ make help                  # Project commands
 ## Legacy Files
 
 The following files are no longer needed but kept for reference:
+
 - `requirements.txt` (replaced by pyproject.toml)
 - `setup.py` (replaced by pyproject.toml)
 - `.flake8`, `black.toml`, `isort.cfg` (replaced by ruff config in pyproject.toml)
