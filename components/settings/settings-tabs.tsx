@@ -65,21 +65,37 @@ export default function SettingsTabs() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <TabsList className="grid grid-cols-4 bg-opacity-0" aria-label="Settings navigation">
-          <TabsTrigger value="store" variant="secondary" aria-label="Store settings">
+        <TabsList className="flex gap-4 bg-opacity-0" aria-label="Settings navigation">
+          <TabsTrigger
+            className="px-4 py-4"
+            value="store"
+            variant="secondary"
+            aria-label="Store settings"
+          >
             {t('tabs.store')}
           </TabsTrigger>
           <TabsTrigger
+            className="px-4 py-4"
             value="notifications"
             variant="secondary"
             aria-label="Notification preferences"
           >
             {t('tabs.notifications')}
           </TabsTrigger>
-          <TabsTrigger value="account" variant="secondary" aria-label="Account information">
+          <TabsTrigger
+            className="px-4 py-4"
+            value="account"
+            variant="secondary"
+            aria-label="Account information"
+          >
             {t('tabs.account')}
           </TabsTrigger>
-          <TabsTrigger value="team" variant="secondary" aria-label="Team management">
+          <TabsTrigger
+            className="px-4 py-4"
+            value="team"
+            variant="secondary"
+            aria-label="Team management"
+          >
             {t('tabs.team')}
           </TabsTrigger>
         </TabsList>
