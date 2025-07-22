@@ -1,125 +1,164 @@
--- Migration: 021_simple_manual_migration_guide.sql
--- Simple manual migration guide for MVP/testing phase
--- Since we're in testing with sample data, keep it simple!
+-- Migration: 021_post_migration_test_data.sql
+-- Simple test data and verification for normalized inventory schema
+-- Run after migrations 018-020 to populate test data
 
 BEGIN;
 
 -- =============================================
--- SIMPLE MANUAL MIGRATION APPROACH
+-- TEST DATA FOR NORMALIZED SCHEMA
 -- =============================================
 
--- For MVP/testing phase, we'll just provide simple queries 
--- that can be run manually in the Supabase dashboard
+-- Note: These are sample queries for manual testing
+-- Run in Supabase SQL editor after applying migrations 018-020
 
--- Step 1: Create a few sample global products manually
--- Run these in the SQL editor:
+-- =============================================
+-- SAMPLE PRODUCTS (comment out if you have existing data)
+-- =============================================
+
+-- Sample normalized products (no store_id duplication)
+INSERT INTO inventory.products (name, brand, category, unit_type, typical_shelf_life_days, barcode, barcode_type) VALUES
+('Fresh Milk 1L', 'Local Dairy', 'dairy', 'liter', 7, '1234567890123', 'EAN13'),
+('Whole Wheat Bread', 'Bakers Choice', 'bakery_fresh', 'loaf', 3, '2345678901234', 'EAN13'),
+('Organic Bananas', 'Fresh Farm', 'fresh_produce', 'kg', 5, '3456789012345', 'EAN13'),
+('Greek Yogurt 500g', 'Healthy Choice', 'dairy', 'cup', 14, '4567890123456', 'EAN13'),
+('Salmon Fillet', 'Ocean Fresh', 'fresh_meat_fish', 'kg', 2, '5678901234567', 'EAN13')
+ON CONFLICT (barcode) DO NOTHING; -- Skip if barcodes already exist
+
+-- =============================================
+-- SAMPLE STORE-PRODUCT ASSOCIATIONS
+-- =============================================
+
+-- Get your store ID (replace in queries below)
+-- SELECT store_id, store_name FROM business.stores WHERE is_active = true;
+
+-- Example: Add products to store with pricing
+-- Replace 'YOUR-STORE-ID-HERE' with actual store UUID
 
 /*
-INSERT INTO global.products (name, brand, primary_category, barcode, typical_shelf_life_days, unit_type, verification_status) VALUES
-('Fresh Milk', 'Local Dairy', 'dairy', '1234567890123', 7, 'liter', 'verified'),
-('Whole Wheat Bread', 'Baker''s Choice', 'bakery_fresh', '2345678901234', 3, 'loaf', 'verified'),
-('Organic Bananas', 'Fresh Farm', 'fresh_produce', '3456789012345', 5, 'kg', 'verified'),
-('Greek Yogurt', 'Healthy Choice', 'dairy', '4567890123456', 14, 'cup', 'verified'),
-('Salmon Fillet', 'Ocean Fresh', 'fresh_meat_fish', '5678901234567', 2, 'kg', 'verified');
-*/
-
--- Step 2: Add these products to your stores
--- Replace 'your-store-id-here' with actual store ID:
-
-/*
--- Get your store ID first:
-SELECT store_id, store_name FROM business.stores WHERE is_active = true;
-
--- Then add products to store with pricing:
-INSERT INTO business.store_product (store_id, product_id, default_cost_price, default_selling_price, added_by) 
+INSERT INTO inventory.store_products (store_id, product_id, cost_price, selling_price, added_by) 
 SELECT 
-    'your-store-id-here'::UUID as store_id,
-    product_id,
-    5.00 as default_cost_price,   -- Set your cost price
-    7.50 as default_selling_price, -- Set your selling price  
+    'YOUR-STORE-ID-HERE'::UUID as store_id,
+    p.product_id,
+    CASE p.category 
+        WHEN 'dairy' THEN 2.50
+        WHEN 'bakery_fresh' THEN 1.80
+        WHEN 'fresh_produce' THEN 3.00
+        WHEN 'fresh_meat_fish' THEN 12.00
+        ELSE 5.00
+    END as cost_price,
+    CASE p.category 
+        WHEN 'dairy' THEN 3.99
+        WHEN 'bakery_fresh' THEN 2.99
+        WHEN 'fresh_produce' THEN 4.99
+        WHEN 'fresh_meat_fish' THEN 18.99
+        ELSE 7.99
+    END as selling_price,
     auth.uid() as added_by
-FROM global.products 
-WHERE verification_status = 'verified';
-*/
-
--- Step 3: Update existing batches to use global products (optional)
--- This links your existing test batches to the new global products:
-
-/*
--- First, see what batches you have:
-SELECT b.batch_id, b.batch_number, p.name as product_name, p.category 
-FROM inventory.batches b 
-JOIN inventory.products p ON p.product_id = b.product_id;
-
--- Then manually update a few batches to test:
-UPDATE inventory.batches 
-SET global_product_id = (SELECT product_id FROM global.products WHERE name = 'Fresh Milk' LIMIT 1),
-    inherited_from_store_product = true,
-    batch_source = 'manual'
-WHERE batch_id = 'your-batch-id-here';
+FROM inventory.products p
+WHERE p.barcode IS NOT NULL
+ON CONFLICT (store_id, product_id) DO NOTHING;
 */
 
 -- =============================================
--- HELPER QUERIES FOR TESTING
+-- VERIFICATION FUNCTIONS
 -- =============================================
 
--- Check what global products exist:
--- SELECT * FROM global.products;
-
--- Check store-product relationships:
--- SELECT sp.*, gp.name, gp.brand FROM business.store_product sp JOIN global.products gp ON gp.product_id = sp.product_id;
-
--- Check batches with global product info:
--- SELECT * FROM inventory.batches_with_products WHERE uses_global_product = true;
-
--- Test the search function:
--- SELECT * FROM search_global_products_fuzzy('milk', 'your-store-id');
-
--- Test barcode lookup:
--- SELECT * FROM find_product_by_barcode('1234567890123', 'your-store-id');
-
--- =============================================
--- QUICK CLEANUP (if needed)
--- =============================================
-
--- If you want to start fresh during testing:
-/*
--- Clear test data:
-DELETE FROM business.store_product;
-DELETE FROM global.products WHERE verification_status = 'verified';
-
--- Reset batch references:
-UPDATE inventory.batches SET global_product_id = NULL, inherited_from_store_product = false;
-*/
-
--- =============================================
--- COMMENTS
--- =============================================
-
-COMMENT ON SCHEMA global IS 'New global product schema - ready for OCR and barcode features';
-
--- Sample API usage for future frontend integration:
-/*
--- Add product to store via API:
-SELECT add_product_to_store(
-    'store-id'::UUID, 
-    'product-id'::UUID, 
-    5.00, -- cost
-    7.50  -- selling price
-);
-
--- Create new global product:
-SELECT create_global_product(
-    'New Product Name',
-    'Brand Name', 
-    'dairy',
-    '1234567890123',
-    7,
-    'pcs'
-);
-
--- Get store products:
-SELECT * FROM get_store_products('store-id'::UUID, true, 50, 0);
-*/
+-- Function to check migration success
+CREATE OR REPLACE FUNCTION inventory.verify_migration()
+RETURNS TABLE(
+    check_name TEXT,
+    status TEXT,
+    count_result BIGINT,
+    message TEXT
+) AS $$
+BEGIN
+    -- Check 1: Products without store_id
+    RETURN QUERY
+    SELECT 
+        'products_normalized'::TEXT,
+        CASE WHEN NOT EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_schema = 'inventory' 
+            AND table_name = 'products' 
+            AND column_name = 'store_id'
+        ) THEN 'PASS'::TEXT ELSE 'FAIL'::TEXT END,
+        (SELECT COUNT(*) FROM inventory.products)::BIGINT,
+        'Products table should not have store_id column'::TEXT;
+    
+    -- Check 2: Store_products table exists
+    RETURN QUERY
+    SELECT 
+        'store_products_table'::TEXT,
+        CASE WHEN EXISTS (
+            SELECT 1 FROM information_schema.tables
+            WHERE table_schema = 'inventory' 
+            AND table_name = 'store_products'
+        ) THEN 'PASS'::TEXT ELSE 'FAIL'::TEXT END,
+        (SELECT COUNT(*) FROM inventory.store_products)::BIGINT,
+        'Store_products junction table exists'::TEXT;
+    
+    -- Check 3: Barcode columns added
+    RETURN QUERY
+    SELECT 
+        'barcode_support'::TEXT,
+        CASE WHEN EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_schema = 'inventory' 
+            AND table_name = 'products' 
+            AND column_name = 'barcode'
+        ) THEN 'PASS'::TEXT ELSE 'FAIL'::TEXT END,
+        (SELECT COUNT(*) FROM inventory.products WHERE barcode IS NOT NULL)::BIGINT,
+        'Products table has barcode support'::TEXT;
+        
+    -- Check 4: Batch enhancements
+    RETURN QUERY
+    SELECT 
+        'batch_enhancements'::TEXT,
+        CASE WHEN EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_schema = 'inventory' 
+            AND table_name = 'batches' 
+            AND column_name = 'batch_source'
+        ) THEN 'PASS'::TEXT ELSE 'FAIL'::TEXT END,
+        (SELECT COUNT(*) FROM inventory.batches)::BIGINT,
+        'Batches table has barcode workflow columns'::TEXT;
+        
+    -- Check 5: RLS policies active
+    RETURN QUERY
+    SELECT 
+        'rls_policies'::TEXT,
+        CASE WHEN (
+            SELECT COUNT(*) FROM pg_policies 
+            WHERE schemaname = 'inventory' 
+            AND tablename IN ('products', 'store_products', 'batches')
+        ) > 5 THEN 'PASS'::TEXT ELSE 'FAIL'::TEXT END,
+        (SELECT COUNT(*) FROM pg_policies WHERE schemaname = 'inventory')::BIGINT,
+        'RLS policies are configured'::TEXT;
+END;
+$$ LANGUAGE plpgsql;
 
 COMMIT;
+
+-- =============================================
+-- POST-MIGRATION VERIFICATION
+-- =============================================
+
+-- Run this to verify the migration worked correctly:
+-- SELECT * FROM inventory.verify_migration();
+
+-- Quick data overview:
+-- SELECT 'Products' as table_name, COUNT(*) as count FROM inventory.products
+-- UNION ALL
+-- SELECT 'Store Products', COUNT(*) FROM inventory.store_products  
+-- UNION ALL
+-- SELECT 'Batches', COUNT(*) FROM inventory.batches;
+
+-- Check barcode support:
+-- SELECT COUNT(*) as products_with_barcodes FROM inventory.products WHERE barcode IS NOT NULL;
+
+-- View sample normalized data:
+-- SELECT p.name, p.barcode, COUNT(sp.store_id) as store_count 
+-- FROM inventory.products p
+-- LEFT JOIN inventory.store_products sp ON p.product_id = sp.product_id
+-- GROUP BY p.product_id, p.name, p.barcode
+-- ORDER BY store_count DESC;

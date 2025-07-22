@@ -555,7 +555,8 @@ class ScoringService:
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.models import Batch, Product, SalesEvent
+            from app.database.models import Batch, SalesEvent
+            from app.database.inventory_models import Product
 
             # Try to get actual sales data for this specific batch
             if batch_id:
@@ -633,7 +634,7 @@ class ScoringService:
             return 1.0  # Conservative fallback
 
     async def score_batch(
-        self, batch_id: str, category_weights: Dict[str, float] = None
+        self, batch_id: str, category_weights: Dict[str, float] = None, track_recommendation: bool = True
     ) -> Optional[ScoringResult]:
         """Score a single batch with enhanced error handling - SECURE READ-ONLY VERSION"""
         try:
@@ -730,6 +731,13 @@ class ScoringService:
                 * batch_data["selling_price"],
                 margin_percent=margin_percent,
             )
+
+            # Track AI recommendation in database for analytics
+            if track_recommendation:
+                try:
+                    await self._track_recommendation(result, batch_data.get("store_id"))
+                except Exception as e:
+                    self.logger.warning("Failed to track recommendation", error=str(e))
 
             return result
 
@@ -894,6 +902,29 @@ class ScoringService:
                 "Error saving score result", batch_id=result.batch_id, error=str(e)
             )
             raise
+
+    async def _track_recommendation(self, result: ScoringResult, store_id: Optional[str] = None):
+        """Track AI recommendation for analytics"""
+        try:
+            from app.services.action_tracking import ActionTrackingService
+            
+            tracker = ActionTrackingService(self.db)
+            
+            # Map scoring recommendation to database enum
+            db_action = tracker.map_scoring_action_to_enum(result.recommendation)
+            
+            # Create recommendation record
+            await tracker.create_recommendation_record(
+                batch_id=result.batch_id,
+                store_id=store_id or result.store_id,
+                ai_recommendation=db_action,
+                ai_score=result.composite_score,
+                user_id=None,  # System-generated recommendation
+            )
+            
+        except Exception as e:
+            # Don't let tracking errors break the scoring
+            self.logger.warning("Failed to track AI recommendation", error=str(e))
 
 
 # Factory function for easy instantiation
