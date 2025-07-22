@@ -135,7 +135,7 @@ export function useCurrentUserStoreRole() {
     queryKey: queryKeys.auth.currentUserStoreRole(activeStoreId || ''),
     queryFn: async (): Promise<CurrentUserStoreRole | null> => {
       console.log('🔄 useCurrentUserStoreRole - Executing query for storeId:', activeStoreId)
-      
+
       if (!activeStoreId) {
         console.log('❌ useCurrentUserStoreRole - No activeStoreId, returning null')
         return null
@@ -205,11 +205,13 @@ export function useCurrentUserStoreRole() {
     isLoading: result.isLoading,
     isError: result.isError,
     error: result.error?.message,
-    data: result.data ? {
-      role: result.data.role,
-      permissions: result.data.permissions,
-      isActive: result.data.isActive,
-    } : null,
+    data: result.data
+      ? {
+          role: result.data.role,
+          permissions: result.data.permissions,
+          isActive: result.data.isActive,
+        }
+      : null,
   })
 
   return {

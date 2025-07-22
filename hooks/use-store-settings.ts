@@ -41,7 +41,9 @@ export function useStorePermissions() {
   // When loading OR when no activeStoreId is selected, return undefined for permission flags
   // This prevents premature false values when the store context hasn't loaded yet
   if (permissionsLoading || !activeStoreId) {
-    console.log('⏳ useStorePermissions - Still loading or no activeStoreId, returning undefined flags')
+    console.log(
+      '⏳ useStorePermissions - Still loading or no activeStoreId, returning undefined flags',
+    )
     return {
       canEditStore: undefined,
       canEditBasicInfo: undefined,
@@ -209,34 +211,34 @@ export function useUpdateStoreBasicInfo() {
         }
       }
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       console.log('✅ Mutation completed successfully:', data)
-      
+
       // Update Zustand store to reflect changes in team switcher
       if (activeStoreId && data) {
         console.log('🔄 Updating Zustand store with new store data...')
-        
+
         // Convert StoreBasicInfo to Store type using utility function
         const storeData = convertStoreBasicInfoToStore(data)
-        
+
         // Update the active store in Zustand
         setActiveStore(storeData)
-        
+
         // Update the store in userStores array
         const updatedUserStores = userStores.map(userStore => {
           if (userStore.store.store_id === activeStoreId) {
             return {
               ...userStore,
-              store: storeData
+              store: storeData,
             }
           }
           return userStore
         })
         setUserStores(updatedUserStores)
-        
+
         console.log('✅ Zustand store updated successfully')
       }
-      
+
       toast.success('Store information updated successfully')
     },
   })

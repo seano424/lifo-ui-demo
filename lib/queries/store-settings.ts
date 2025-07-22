@@ -221,7 +221,19 @@ export async function updateStoreAdvancedSettings(
 }
 
 // Debug function to test store access
-export async function debugStoreAccess(storeId: string, serverClient?: ServerClient): Promise<any> {
+export async function debugStoreAccess(
+  storeId: string,
+  serverClient?: ServerClient,
+): Promise<
+  | {
+      rpcTest: { data: unknown; error: unknown }
+      roleTest: { data: unknown; error: unknown }
+      updateTest: { data: unknown; error: unknown }
+    }
+  | {
+      error: string
+    }
+> {
   const supabase = serverClient || createClient()
 
   try {

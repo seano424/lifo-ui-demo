@@ -113,7 +113,7 @@ export default function SettingsTabs() {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                You don't have permission to view store settings. Contact your store manager or
+                You don&apos;t have permission to view store settings. Contact your store manager or
                 owner.
               </AlertDescription>
             </Alert>
