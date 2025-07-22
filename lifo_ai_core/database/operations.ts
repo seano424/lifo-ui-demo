@@ -4,12 +4,9 @@ import { SupabaseClient } from '@supabase/supabase-js'
 type Store = Database['business']['Tables']['stores']['Row']
 type Batch = Database['inventory']['Tables']['batches']['Row']
 type Product = Database['inventory']['Tables']['products']['Row']
-// TODO: Re-enable when global schema is ready
-// type GlobalProduct = Database['global']['Tables']['products']['Row']
-type GlobalProduct = any // Temporary stub
-// TODO: Re-enable when store_product table is ready
-// type StoreProduct = Database['business']['Tables']['store_product']['Row']
-type StoreProduct = any // Temporary stub
+// Updated types for normalized inventory schema
+type GlobalProduct = Database['inventory']['Tables']['products']['Row']
+type StoreProduct = Database['inventory']['Tables']['store_products']['Row']
 
 export class InventoryOperations {
   private supabase: SupabaseClient<Database>
@@ -111,13 +108,25 @@ export class InventoryOperations {
   }
 
   // =============================================
-  // GLOBAL PRODUCTS OPERATIONS - TEMPORARILY DISABLED
+  // GLOBAL PRODUCTS OPERATIONS - NORMALIZED SCHEMA
   // =============================================
 
   async findGlobalProductByBarcode(barcode: string): Promise<GlobalProduct | null> {
-    // TODO: Re-enable when global schema is ready
-    console.warn('Global products functionality temporarily disabled')
-    return null
+    const { data, error } = await this.supabase
+      .from('inventory.products')
+      .select('*')
+      .eq('barcode', barcode)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned - product not found
+        return null
+      }
+      throw new Error(`Error finding product by barcode: ${error.message}`)
+    }
+
+    return data
   }
 
   async searchGlobalProducts(
@@ -125,9 +134,38 @@ export class InventoryOperations {
     storeId?: string,
     limit: number = 20,
   ): Promise<GlobalProduct[]> {
-    // TODO: Re-enable when global schema is ready
-    console.warn('Global products functionality temporarily disabled')
-    return []
+    let query = this.supabase
+      .from('inventory.products')
+      .select('*')
+      .or(`name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
+      .limit(limit)
+
+    // If storeId provided, only show products available in that store
+    if (storeId) {
+      query = this.supabase
+        .from('inventory.products')
+        .select(
+          `
+          *,
+          inventory.store_products!inner (
+            store_id,
+            is_active
+          )
+        `,
+        )
+        .or(`name.ilike.%${searchTerm}%,brand.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%`)
+        .eq('inventory.store_products.store_id', storeId)
+        .eq('inventory.store_products.is_active', true)
+        .limit(limit)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      throw new Error(`Error searching global products: ${error.message}`)
+    }
+
+    return data || []
   }
 
   async createGlobalProduct(productData: {
@@ -139,9 +177,26 @@ export class InventoryOperations {
     unit_type?: string
     created_by: string
   }): Promise<GlobalProduct> {
-    // TODO: Re-enable when global schema is ready
-    console.warn('Global products functionality temporarily disabled')
-    throw new Error('Global products functionality temporarily disabled')
+    const { data, error } = await this.supabase
+      .from('inventory.products')
+      .insert({
+        name: productData.name,
+        brand: productData.brand,
+        barcode: productData.barcode,
+        category: productData.primary_category,
+        typical_shelf_life_days: productData.typical_shelf_life_days,
+        unit_type: productData.unit_type || 'pcs',
+        created_by: productData.created_by,
+        sku: `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Generate unique SKU
+      })
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(`Error creating global product: ${error.message}`)
+    }
+
+    return data
   }
 
   async addProductToStore(
@@ -155,9 +210,26 @@ export class InventoryOperations {
     },
     userId: string,
   ): Promise<StoreProduct> {
-    // TODO: Re-enable when global schema is ready
-    console.warn('Global products functionality temporarily disabled')
-    throw new Error('Global products functionality temporarily disabled')
+    const { data, error } = await this.supabase
+      .from('inventory.store_products')
+      .insert({
+        store_id: storeId,
+        product_id: productId,
+        cost_price: pricing.default_cost_price,
+        selling_price: pricing.default_selling_price,
+        store_sku: pricing.store_specific_sku,
+        supplier_code: pricing.supplier_code,
+        added_by: userId,
+        is_active: true,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(`Error adding product to store: ${error.message}`)
+    }
+
+    return data
   }
 
   async getStoreProducts(
@@ -169,9 +241,45 @@ export class InventoryOperations {
       active_only?: boolean
     } = {},
   ): Promise<{ data: any[]; count: number }> {
-    // TODO: Re-enable when global schema is ready
-    console.warn('Global products functionality temporarily disabled')
-    return { data: [], count: 0 }
+    const { page = 1, limit = 50, category, active_only = true } = options
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+
+    let query = this.supabase
+      .from('inventory.store_products')
+      .select(
+        `
+        *,
+        inventory.products (
+          product_id,
+          name,
+          brand,
+          category,
+          barcode,
+          unit_type,
+          typical_shelf_life_days
+        )
+      `,
+        { count: 'exact' },
+      )
+      .eq('store_id', storeId)
+      .range(from, to)
+
+    if (active_only) {
+      query = query.eq('is_active', true)
+    }
+
+    if (category) {
+      query = query.eq('inventory.products.category', category)
+    }
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw new Error(`Error getting store products: ${error.message}`)
+    }
+
+    return { data: data || [], count: count || 0 }
   }
 
   async createBatchWithGlobalProduct(batchData: {

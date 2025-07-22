@@ -27,19 +27,25 @@ This repository contains the implementation of LIFO.AI's data platform
 
 ## 🏗️ Architecture Overview
 
+**Single Unified Deployment** - All components integrated for streamlined development and deployment.
+
 ```
 lifo-app/
-├── app/                      # Next.js 15 Frontend
-├── lifo_ai_core/            # Python Business Logic
-│   ├── database/            # Data models and connections
-│   ├── scoring/             # Scoring algorithms (base + ML)
+├── app/                      # Next.js 15 Frontend & API Routes
+│   ├── api/                 # Next.js API routes
+│   ├── components/          # React UI components
+│   └── lib/                 # Shared utilities
+├── lifo_ai_core/            # Python AI & Data Processing
+│   ├── database/            # Data models and operations
+│   ├── scoring/             # AI scoring algorithms
 │   ├── etl/                # CSV processing pipeline
-│   ├── timeseries/         # Data collection and analysis
-│   ├── ml/                 # Machine learning pipeline
-│   └── api/                # Business logic APIs
-├── app/api/                # Next.js API routes
-├── supabase/migrations/    # Database migrations
-└── components/             # React UI components
+│   └── ml/                 # Machine learning models
+├── lifo_api/                # Python API Backend
+│   ├── app/                # FastAPI application
+│   ├── services/           # Business logic services
+│   └── database/           # Database models & operations
+├── supabase/migrations/    # Database schema & migrations
+└── docs/                   # Documentation
 ```
 
 ## 🛠️ Technology Stack
@@ -64,15 +70,14 @@ Supabase account
 ```bash
 git clone https://github.com/lifo-ai/lifo-app.git
 cd lifo-app
+
+# Install frontend dependencies
 npm install
 
-# Set up Python environment
-cd lifo_ai_core
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-pip install -e .  # Install the package in development mode
-cd ..
+# Set up Python dependencies (using modern uv - recommended)
+curl -LsSf https://astral.sh/uv/install.sh | sh  # Install uv
+cd lifo_api && uv sync && cd ..                  # API dependencies
+cd lifo_ai_core && uv pip install -r requirements.txt && cd ..  # Core dependencies
 ```
 
 ### 3. Environment Configuration
@@ -99,23 +104,19 @@ npx supabase login
 npm run update-types
 ```
 
-### 5. Python Integration
-
-The Python CSV processor is fully integrated with the Next.js application:
+### 5. Run the Application
 
 ```bash
-# Test Python integration
+# Start the unified LIFO.AI application
 npm run dev
-# Upload CSV files via the web interface or API endpoints
+
+# The application integrates:
+# - Next.js frontend (port 3000)
+# - Python API backend and AI core
+# - Supabase database and authentication
 ```
 
-**Important**: The Python environment must be activated for CSV processing to work:
-
-```bash
-cd lifo_ai_core && source venv/bin/activate && cd ..
-```
-
-**Note**: The `venv/` directory is not included in git (as it should be). Each developer needs to create their own virtual environment locally.
+**📚 For detailed Python development setup, see [docs/PYTHON_DEVELOPMENT.md](docs/PYTHON_DEVELOPMENT.md)**
 
 ## 🚦 Getting Started
 
@@ -312,12 +313,25 @@ Set up cron jobs for automated operations:
 0 3 * * 0 npm run ml:train
 ```
 
+## 🚀 Deployment
+
+LIFO.AI uses a **single deployment architecture** for simplified operations:
+
+- **Frontend + API**: Deploy to Vercel with integrated backend
+- **Database**: Supabase managed PostgreSQL with migrations
+- **All-in-one**: No microservice complexity, unified codebase
+
+**📖 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for detailed deployment guide**
+
 ## 📚 Documentation
 
-- **API Documentation**: Auto-generated from TypeScript interfaces
-- **Database Schema**: Complete ERD in `supabase/migrations/`
-- **ML Pipeline**: Feature engineering and model documentation
-- **Business Logic**: Comprehensive scoring algorithm documentation
+Comprehensive documentation is organized in the `docs/` folder:
+
+- **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.MD)**: System overview and design
+- **[Python Development](docs/PYTHON_DEVELOPMENT.md)**: Backend development guide
+- **[API Documentation](docs/API_DOCUMENTATION.md)**: Endpoint reference
+- **[Deployment Guide](docs/DEPLOYMENT.md)**: Production deployment
+- **[Security Guide](docs/LIFO_API_SECURITY_GUIDE.md)**: Security implementation
 
 ## 🌟 Team
 

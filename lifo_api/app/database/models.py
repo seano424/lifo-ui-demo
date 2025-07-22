@@ -204,41 +204,8 @@ class StoreSettings(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
 
-class Product(Base):
-    """Product master data"""
-
-    __tablename__ = "products"
-    __table_args__ = {"schema": "inventory"}
-
-    product_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    sku = Column(String(100), unique=True, nullable=False)
-    name = Column(String(255), nullable=False)
-    description = Column(Text)
-    category = Column(String(100))
-    brand = Column(String(100))
-    unit_type = Column(String(20), default="pcs")
-
-    # Pricing
-    base_cost_price = Column(NUMERIC(12, 4))
-    base_selling_price = Column(NUMERIC(12, 4))
-
-    # Product characteristics
-    typical_shelf_life_days = Column(Integer)
-    storage_temperature_min = Column(NUMERIC(5, 2))
-    storage_temperature_max = Column(NUMERIC(5, 2))
-
-    # Multi-tenant support
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"))
-
-    # Audit
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    created_by = Column(UUID(as_uuid=True))
-    updated_by = Column(UUID(as_uuid=True))
-
-    # Relationships
-    store = relationship("Store", back_populates="products")
-    batches = relationship("Batch", back_populates="product")
+# Product model moved to inventory_models.py to match normalized schema
+# This legacy model conflicted with the new normalized products table
 
 
 class Batch(Base):

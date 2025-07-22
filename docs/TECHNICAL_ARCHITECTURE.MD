@@ -95,7 +95,8 @@ lifo-app/
     └── Makefile     # Development commands
 ```
 
-**Patterns**: 
+**Patterns**:
+
 - **Frontend**: Features organized by domain with clear data/UI separation
 - **Backend**: Modern Python services with uv + ruff + mypy toolchain
 - **Integration**: Python services provide AI-powered insights to Next.js frontend
@@ -195,6 +196,7 @@ Each role is enforced through RLS policies, not application-level checks.
 ### Team Scripts & Tools
 
 **Frontend (Next.js)**:
+
 ```bash
 npm run dev              # Development with Turbopack
 npm run update-types     # Sync TypeScript with database schema
@@ -203,6 +205,7 @@ npm run format           # Prettier code formatting
 ```
 
 **Backend Python Services** (lifo_ai_core, lifo_api):
+
 ```bash
 # Modern Python development with uv + ruff
 make dev-setup           # One-time development environment setup
@@ -222,11 +225,13 @@ uv run pytest           # Run tests
 ### Code Review Standards
 
 **Frontend (TypeScript/Next.js)**:
+
 - **Type Safety**: No `any` types, full TypeScript coverage
 - **Performance**: Queries must be optimized for mobile usage
 - **Security**: RLS policies reviewed for all schema changes
 
 **Backend (Python)**:
+
 - **Modern Tooling**: All Python code uses uv + ruff workflow
 - **Code Quality**: Must pass `make quality` checks (ruff linting + mypy)
 - **Type Safety**: All functions require proper type hints
@@ -234,6 +239,7 @@ uv run pytest           # Run tests
 - **Testing**: New features require comprehensive tests
 
 **Universal Standards**:
+
 - **Required**: All changes must be reviewed before merging
 - **Documentation**: Update relevant docs when changing architecture
 - **Performance**: Profile performance-critical operations

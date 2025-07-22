@@ -2,13 +2,13 @@ name: Python CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
       - '.github/workflows/python-ci.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
@@ -20,43 +20,43 @@ jobs:
     defaults:
       run:
         working-directory: ./lifo_ai_core
-    
+
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-    
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        version: "latest"
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      run: uv python install ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: uv sync --dev
-    
-    - name: Lint with ruff
-      run: uv run ruff check .
-    
-    - name: Check formatting with ruff
-      run: uv run ruff format --check .
-    
-    - name: Type check with mypy
-      run: uv run mypy . --no-error-summary || echo "MyPy check failed, continuing..."
-    
-    - name: Run tests
-      run: uv run pytest --cov=lifo_ai_core --cov-report=xml || echo "No tests found, skipping test execution"
-    
-    - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.11'
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./lifo_ai_core/coverage.xml
-        flags: core
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: 'latest'
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Lint with ruff
+        run: uv run ruff check .
+
+      - name: Check formatting with ruff
+        run: uv run ruff format --check .
+
+      - name: Type check with mypy
+        run: uv run mypy . --no-error-summary || echo "MyPy check failed, continuing..."
+
+      - name: Run tests
+        run: uv run pytest --cov=lifo_ai_core --cov-report=xml || echo "No tests found, skipping test execution"
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./lifo_ai_core/coverage.xml
+          flags: core
 
   test-api:
     runs-on: ubuntu-latest
@@ -66,8 +66,8 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-    
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
     services:
       postgres:
         image: postgres:15
@@ -81,7 +81,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:7
         options: >-
@@ -91,62 +91,62 @@ jobs:
           --health-retries 5
         ports:
           - 6379:6379
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        version: "latest"
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      run: uv python install ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: uv sync --dev
-    
-    - name: Lint with ruff
-      run: uv run ruff check .
-    
-    - name: Check formatting with ruff
-      run: uv run ruff format --check .
-    
-    - name: Type check with mypy
-      run: uv run mypy . --no-error-summary || echo "MyPy check failed, continuing..."
-    
-    - name: Run tests
-      env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifo_test
-        REDIS_URL: redis://localhost:6379
-        JWT_SECRET: test-secret-key
-      run: uv run pytest --cov=lifo_api --cov-report=xml || echo "Tests completed with issues, continuing..."
-    
-    - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.11'
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./lifo_api/coverage.xml
-        flags: api
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: 'latest'
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Lint with ruff
+        run: uv run ruff check .
+
+      - name: Check formatting with ruff
+        run: uv run ruff format --check .
+
+      - name: Type check with mypy
+        run: uv run mypy . --no-error-summary || echo "MyPy check failed, continuing..."
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifo_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret-key
+        run: uv run pytest --cov=lifo_api --cov-report=xml || echo "Tests completed with issues, continuing..."
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./lifo_api/coverage.xml
+          flags: api
 
   security-scan:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        version: "latest"
-    
-    - name: Security scan - Core
-      working-directory: ./lifo_ai_core
-      run: |
-        uv sync --dev
-        uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
-    
-    - name: Security scan - API
-      working-directory: ./lifo_api
-      run: |
-        uv sync --dev
-        uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: 'latest'
+
+      - name: Security scan - Core
+        working-directory: ./lifo_ai_core
+        run: |
+          uv sync --dev
+          uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
+
+      - name: Security scan - API
+        working-directory: ./lifo_api
+        run: |
+          uv sync --dev
+          uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
