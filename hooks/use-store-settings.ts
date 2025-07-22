@@ -20,6 +20,7 @@ import {
 
 // Hook to check store permissions
 export function useStorePermissions() {
+  const activeStoreId = useActiveStoreId()
   const {
     canManageSettings,
     isOwner,
@@ -28,7 +29,33 @@ export function useStorePermissions() {
     isLoading: permissionsLoading,
   } = usePermissions()
 
-  return {
+  console.log('🔍 useStorePermissions - Raw values:', {
+    activeStoreId,
+    canManageSettings,
+    isOwner,
+    isManager,
+    isEmployee,
+    permissionsLoading,
+  })
+
+  // When loading OR when no activeStoreId is selected, return undefined for permission flags
+  // This prevents premature false values when the store context hasn't loaded yet
+  if (permissionsLoading || !activeStoreId) {
+    console.log('⏳ useStorePermissions - Still loading or no activeStoreId, returning undefined flags')
+    return {
+      canEditStore: undefined,
+      canEditBasicInfo: undefined,
+      canEditAdvancedSettings: undefined,
+      canEditAISettings: undefined,
+      canViewSettings: undefined,
+      isOwner: undefined,
+      isManager: undefined,
+      isEmployee: undefined,
+      isLoading: permissionsLoading || !activeStoreId,
+    }
+  }
+
+  const computedPermissions = {
     canEditStore: canManageSettings || isOwner,
     canEditBasicInfo: canManageSettings || isOwner || isManager,
     canEditAdvancedSettings: canManageSettings || isOwner,
@@ -39,6 +66,9 @@ export function useStorePermissions() {
     isEmployee,
     isLoading: permissionsLoading,
   }
+
+  console.log('✅ useStorePermissions - Computed permissions:', computedPermissions)
+  return computedPermissions
 }
 
 // Hook to fetch store settings

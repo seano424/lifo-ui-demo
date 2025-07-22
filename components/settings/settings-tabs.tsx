@@ -12,6 +12,7 @@ import StoreInformation from '@/components/settings/store-information'
 import { useStorePermissions } from '@/hooks/use-store-settings'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const VALID_TABS = ['store', 'notifications', 'account', 'team'] as const
 type ValidTab = (typeof VALID_TABS)[number]
@@ -30,6 +31,15 @@ export default function SettingsTabs() {
   }
 
   const [activeTab, setActiveTab] = useState<ValidTab>(getInitialTab)
+
+  console.log('🎯 SettingsTabs - State:', {
+    canViewSettings,
+    permissionsLoading,
+    shouldShowLoading: permissionsLoading || canViewSettings === undefined,
+    shouldShowStoreInfo: !permissionsLoading && canViewSettings === true,
+    shouldShowError: !permissionsLoading && canViewSettings === false,
+    activeTab,
+  })
 
   const handleTabChange = (newTab: string) => {
     if (VALID_TABS.includes(newTab as ValidTab)) {
@@ -79,17 +89,53 @@ export default function SettingsTabs() {
         </TabsList>
 
         <TabsContent value="store" className="space-y-4">
-          {canViewSettings ? (
-            <StoreInformation />
-          ) : (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                You don't have permission to view store settings. Contact your store manager or
-                owner.
-              </AlertDescription>
-            </Alert>
-          )}
+          {(() => {
+            const shouldShowLoading = permissionsLoading || canViewSettings === undefined
+            const shouldShowStoreInfo = !permissionsLoading && canViewSettings === true
+            const shouldShowError = !permissionsLoading && canViewSettings === false
+
+            console.log('🎨 Store tab rendering decision:', {
+              shouldShowLoading,
+              shouldShowStoreInfo,
+              shouldShowError,
+              permissionsLoading,
+              canViewSettings,
+            })
+
+            if (shouldShowLoading) {
+              console.log('⏳ Rendering loading skeleton')
+              return (
+                <div className="space-y-4">
+                  <Skeleton className="h-8" />
+                  <Skeleton className="h-32" />
+                  <Skeleton className="h-24" />
+                </div>
+              )
+            } else if (shouldShowStoreInfo) {
+              console.log('✅ Rendering StoreInformation component')
+              return <StoreInformation />
+            } else if (shouldShowError) {
+              console.log('❌ Rendering permission error')
+              return (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    You don't have permission to view store settings. Contact your store manager or
+                    owner.
+                  </AlertDescription>
+                </Alert>
+              )
+            } else {
+              console.log('🤔 Unexpected state, defaulting to loading')
+              return (
+                <div className="space-y-4">
+                  <Skeleton className="h-8" />
+                  <Skeleton className="h-32" />
+                  <Skeleton className="h-24" />
+                </div>
+              )
+            }
+          })()}
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-4">
