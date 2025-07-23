@@ -70,12 +70,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-import { usePermissions, useUserRole } from '@/hooks/use-users'
-import { Card, CardContent, CardHeader } from '../ui/card'
-import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-
-// Import the new components
+import { toast } from 'sonner'
+import { usePermissions, useUserRole } from '@/hooks/use-users'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { AddEmployeeDialog } from './add-employee-dialog'
 
 export function StoreUsersList() {

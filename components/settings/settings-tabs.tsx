@@ -18,55 +18,49 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 export default function SettingsTabs() {
-  const t = useTranslations('settings')
-  const { canViewSettings, isLoading: permissionsLoading } = useStorePermissions()
   const pathname = usePathname()
+  const t = useTranslations('settings')
 
   const isStoreSettings = pathname.includes('/store')
   const isNotificationsSettings = pathname.includes('/notifications')
   const isAccountSettings = pathname.includes('/account')
   const isTeamSettings = pathname.includes('/team')
 
-  // Show loading state while checking permissions
-  if (permissionsLoading) {
-    return (
-      <div className="space-y-6 max-w-5xl mx-auto">
-        <div className="flex gap-2">
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-8 w-32" />
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-[600px] w-full" />
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-6 max-w-5xl mx-auto flex gap-4">
+    <div className="max-w-5xl mx-auto flex gap-4">
       <Link
         href="/dashboard/settings/store"
-        className={cn(isStoreSettings && 'border-b-2 border-brand-secondary')}
+        className={cn(
+          isStoreSettings && 'border-b-2 border-brand-secondary',
+          'w-32 pb-2 flex items-center justify-center',
+        )}
       >
         {t('tabs.store')}
       </Link>
       <Link
         href="/dashboard/settings/notifications"
-        className={cn(isNotificationsSettings && 'border-b-2 border-brand-secondary')}
+        className={cn(
+          isNotificationsSettings && 'border-b-2 border-brand-secondary',
+          'w-32 pb-2 flex items-center justify-center',
+        )}
       >
         {t('tabs.notifications')}
       </Link>
       <Link
         href="/dashboard/settings/account"
-        className={cn(isAccountSettings && 'border-b-2 border-brand-secondary')}
+        className={cn(
+          isAccountSettings && 'border-b-2 border-brand-secondary',
+          'w-32 pb-2 flex items-center justify-center',
+        )}
       >
         {t('tabs.account')}
       </Link>
       <Link
         href="/dashboard/settings/team"
-        className={cn(isTeamSettings && 'border-b-2 border-brand-secondary')}
+        className={cn(
+          isTeamSettings && 'border-b-2 border-brand-secondary',
+          'w-32 pb-2 flex items-center justify-center',
+        )}
       >
         {t('tabs.team')}
       </Link>
