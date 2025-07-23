@@ -4,7 +4,15 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const withNextIntl = createNextIntlPlugin('./i18n.ts')
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: '/dashboard/settings',
+        destination: '/dashboard/settings/store',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 export default withNextIntl(nextConfig)

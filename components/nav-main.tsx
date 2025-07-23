@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRight, type LucideIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 import {
@@ -34,6 +35,27 @@ export function NavMain({
 }) {
   const pathname = usePathname()
   const t = useTranslations('navigation')
+
+  // 🚀 FIX: Prevent hydration mismatch by tracking when we're hydrated
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  // 🚀 Helper function to check if path is active (only after hydration)
+  const isPathActive = (itemUrl: string) => {
+    if (!isHydrated) return false // Prevent hydration mismatch
+
+    if (pathname === itemUrl) return true
+
+    // Special handling for settings: treat /settings/store as active for /settings
+    if (itemUrl.includes('/settings')) {
+      return pathname.startsWith(itemUrl)
+    }
+
+    return false
+  }
 
   return (
     <SidebarGroup>
@@ -75,9 +97,7 @@ export function NavMain({
               <SidebarMenuButton
                 className={cn(
                   'hover:bg-muted py-6 px-4 rounded-lg',
-                  pathname === item.url && 'bg-muted hover:!bg-muted',
-                  // match settings pages to item.url
-                  item.url.includes('/settings') && pathname.startsWith(item.url) && 'bg-muted hover:!bg-muted',
+                  isPathActive(item.url) && 'bg-muted hover:!bg-muted',
                 )}
                 asChild
                 tooltip={item.title}
