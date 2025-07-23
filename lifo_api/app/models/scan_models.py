@@ -5,9 +5,8 @@ Mobile-optimized models for scan-in/scan-out workflows
 
 import uuid
 from datetime import date, datetime
-from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -133,7 +132,7 @@ class ProcessScanRequest(BaseModel):
     image_url: Optional[str] = Field(
         None, max_length=500, description="Reference to scanned image"
     )
-    ocr_data: Optional[Dict[str, Any]] = Field(
+    ocr_data: Optional[dict[str, Any]] = Field(
         None, description="Raw OCR extraction data"
     )
 
@@ -144,11 +143,11 @@ class ScanInResponse(BaseModel):
     success: bool
     batch_id: str
     batch_number: str
-    product_info: Dict[str, Any]
+    product_info: dict[str, Any]
     initial_score: Optional[float] = None
     urgency_level: Optional[str] = None
-    recommendations: List[str] = []
-    warnings: List[str] = []
+    recommendations: list[str] = []
+    warnings: list[str] = []
     processing_time_ms: float
 
 
@@ -169,9 +168,9 @@ class ScanOutResponse(BaseModel):
 class MobileBatchSummary(BaseModel):
     """Mobile-optimized batch summary response"""
 
-    urgent_batches: List[Dict[str, Any]] = []
-    expiring_today: List[Dict[str, Any]] = []
-    action_needed: List[Dict[str, Any]] = []
+    urgent_batches: list[dict[str, Any]] = []
+    expiring_today: list[dict[str, Any]] = []
+    action_needed: list[dict[str, Any]] = []
     total_active_batches: int = 0
     store_health_score: float = 0.0
     last_updated: datetime = Field(default_factory=datetime.utcnow)
@@ -209,12 +208,12 @@ class MVPMetrics(BaseModel):
 class BatchInsights(BaseModel):
     """Batch performance insights response"""
 
-    category_performance: Dict[str, Dict[str, float]] = {}
-    expiry_pattern_analysis: Dict[str, Any] = {}
-    waste_hotspots: List[Dict[str, Any]] = []
-    optimization_opportunities: List[Dict[str, Any]] = []
-    inventory_visibility_gaps: List[Dict[str, Any]] = []
-    seasonal_patterns: Dict[str, Any] = {}
+    category_performance: dict[str, dict[str, float]] = {}
+    expiry_pattern_analysis: dict[str, Any] = {}
+    waste_hotspots: list[dict[str, Any]] = []
+    optimization_opportunities: list[dict[str, Any]] = []
+    inventory_visibility_gaps: list[dict[str, Any]] = []
+    seasonal_patterns: dict[str, Any] = {}
 
 
 class RealtimeUpdate(BaseModel):
@@ -223,7 +222,7 @@ class RealtimeUpdate(BaseModel):
     store_id: str
     batch_id: str
     update_type: str  # 'score_change', 'new_batch', 'status_change'
-    data: Dict[str, Any]
+    data: dict[str, Any]
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     priority: str = "normal"  # 'low', 'normal', 'high', 'critical'
 
@@ -290,7 +289,7 @@ class MobileStoreHealth(BaseModel):
     critical_items: int
     expiring_soon: int
     total_value_at_risk: float
-    trends: Dict[str, float]
+    trends: dict[str, float]
     last_action_taken: Optional[str] = None
     next_recommended_action: Optional[str] = None
 
@@ -323,6 +322,6 @@ def sanitize_text_input(value: str) -> str:
 
     for pattern in dangerous_patterns:
         if pattern in value_lower:
-            raise ValueError(f"Invalid content detected in input")
+            raise ValueError("Invalid content detected in input")
 
     return value.strip()

@@ -5,11 +5,10 @@ Security tests for database edge cases and vulnerabilities
 
 import asyncio
 import time
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from sqlalchemy import text
-from sqlalchemy.exc import DatabaseError, IntegrityError, OperationalError
+from sqlalchemy.exc import DatabaseError, OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.connection import DatabaseManager, get_database, test_connection
@@ -42,7 +41,7 @@ class TestDatabaseVulnerabilities:
     async def test_missing_transaction_boundaries(self):
         """🚨 HIGH: Missing transaction boundaries in operations"""
         mock_db = AsyncMock(spec=AsyncSession)
-        inventory_ops = InventoryOperations(mock_db)
+        InventoryOperations(mock_db)
 
         # Mock complex operation that should be atomic
         async def mock_complex_inventory_update():
@@ -70,7 +69,7 @@ class TestDatabaseVulnerabilities:
 
         try:
             # Try to exhaust connection pool
-            for i in range(100):  # More than typical pool size
+            for _i in range(100):  # More than typical pool size
                 conn = get_database()
                 connections.append(conn)
 
@@ -174,10 +173,9 @@ class TestDatabaseVulnerabilities:
     async def test_concurrent_modification_race_condition(self):
         """🚨 HIGH: Race conditions in concurrent modifications"""
         mock_db = AsyncMock(spec=AsyncSession)
-        inventory_ops = InventoryOperations(mock_db)
+        InventoryOperations(mock_db)
 
         # Simulate two users modifying same batch simultaneously
-        batch_id = "test-batch-123"
 
         async def user1_update():
             # User 1 reads batch quantity: 10
@@ -330,7 +328,7 @@ class TestTransactionConsistency:
         async def transaction2(db):
             await asyncio.sleep(0.05)  # Start slightly after transaction1
             # This might read uncommitted data (dirty read)
-            result = await db.execute(
+            await db.execute(
                 "SELECT quantity FROM batches WHERE id = 'batch123'"
             )
             # Could see quantity = 0 even though transaction1 rolled back
@@ -379,7 +377,7 @@ class TestConnectionPoolVulnerabilities:
         connections = []
 
         # Simulate connection leaks
-        for i in range(50):
+        for _i in range(50):
             try:
                 # Get connection but don't properly close
                 conn = get_database()
@@ -470,7 +468,7 @@ class TestConnectionPoolVulnerabilities:
 
 IMMEDIATE ACTIONS REQUIRED:
 1. Implement parameterized queries for all raw SQL
-2. Add transaction boundaries to all complex operations  
+2. Add transaction boundaries to all complex operations
 3. Add connection pool limits and monitoring
 4. Implement optimistic locking for concurrent updates
 5. Add input validation to all database operations

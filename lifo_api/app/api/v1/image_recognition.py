@@ -3,10 +3,8 @@ Image recognition preparation endpoints for future ML integration
 Placeholder endpoints ready for computer vision and OCR integration
 """
 
-import base64
 import uuid
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
@@ -15,7 +13,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.secure_dependencies import get_current_user, validate_store_id_format
 from app.database.connection import get_db
 from app.middleware.rate_limiting import ai_endpoint_rate_limit
-from app.models.scan_models import ProcessScanRequest
 from app.utils.mvp_exceptions import ValidationException
 
 
@@ -83,7 +80,7 @@ async def analyze_product_image(
         0.7, ge=0.1, le=1.0, description="Minimum confidence for results"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analyze product image for expiry date, barcode, or full product information
@@ -176,7 +173,7 @@ async def extract_expiry_date_from_image(
         None, description="Expected date format hint"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Extract expiry date from product image using OCR
@@ -231,11 +228,11 @@ async def detect_barcode_from_image(
     store_id: str,
     request: Request,
     image: UploadFile = File(...),
-    barcode_types: List[str] = Form(
+    barcode_types: list[str] = Form(
         ["EAN13", "UPC", "CODE128"], description="Expected barcode types"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Detect and decode barcode from product image
@@ -287,7 +284,7 @@ async def detect_barcode_from_image(
 @router.get("/ml-models/status")
 @ai_endpoint_rate_limit("30/minute")
 async def get_ml_models_status(
-    request: Request, current_user: Dict[str, Any] = Depends(get_current_user)
+    request: Request, current_user: dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get status of ML models for image recognition
@@ -350,7 +347,7 @@ async def get_ml_models_status(
 
 async def _mock_image_analysis(
     image_data: bytes, analysis_type: str, confidence_threshold: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Mock image analysis results"""
 
     if analysis_type == "expiry_date":
@@ -421,7 +418,7 @@ async def _mock_image_analysis(
 
 async def _mock_expiry_date_extraction(
     image_data: bytes, date_format_hint: Optional[str]
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Mock expiry date extraction results"""
 
     return {
@@ -443,8 +440,8 @@ async def _mock_expiry_date_extraction(
 
 
 async def _mock_barcode_detection(
-    image_data: bytes, barcode_types: List[str]
-) -> Dict[str, Any]:
+    image_data: bytes, barcode_types: list[str]
+) -> dict[str, Any]:
     """Mock barcode detection results"""
 
     return {

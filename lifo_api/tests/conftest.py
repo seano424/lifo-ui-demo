@@ -3,7 +3,7 @@ Pytest configuration and fixtures for LIFO AI Engine tests
 """
 
 import asyncio
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest
 from fastapi.testclient import TestClient

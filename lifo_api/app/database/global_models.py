@@ -7,19 +7,17 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    DECIMAL,
     Boolean,
     Column,
     Date,
     DateTime,
-    DECIMAL,
-    Float,
     ForeignKey,
     Integer,
     String,
     Text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from app.database.models import Base

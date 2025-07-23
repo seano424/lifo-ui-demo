@@ -5,8 +5,8 @@ Provides security-hardened authentication and input validation
 
 import re
 import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from datetime import datetime
+from typing import Any, Optional
 
 import structlog
 from fastapi import Depends, Header, HTTPException, Request
@@ -25,7 +25,7 @@ security = HTTPBearer()
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get current authenticated user from JWT token
 
@@ -75,7 +75,7 @@ async def get_current_user(
 
 async def get_optional_user(
     authorization: Optional[str] = Header(None),
-) -> Optional[Dict[str, Any]]:
+) -> Optional[dict[str, Any]]:
     """
     Get current user if authenticated, None otherwise
     Used for endpoints that work with or without authentication
@@ -98,7 +98,7 @@ async def get_optional_user(
 
 async def require_service_role(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Require service role authentication
     Used for admin/internal endpoints
@@ -323,7 +323,7 @@ def sanitize_string_input(
     return value
 
 
-async def validate_store_access(store_id: str, current_user: Dict[str, Any]) -> bool:
+async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> bool:
     """
     Validate that current user has access to the specified store
 

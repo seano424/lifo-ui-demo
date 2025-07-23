@@ -22,17 +22,15 @@ if os.getenv("ENVIRONMENT") == "development":
         print("SUPABASE_JWT_SECRET: ⚠️  NOT CONFIGURED - authentication will fail")
     print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT')}")
 
-import logging
 import time
 from contextlib import asynccontextmanager
 
 import structlog
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.api.v1.router import router as api_v1_router
@@ -42,7 +40,6 @@ from app.middleware.rate_limiting import (
     check_blocked_ip,
     limiter,
     rate_limit_handler,
-    security_limiter,
 )
 from app.middleware.security_headers import (
     ProductionSecurityMiddleware,
@@ -82,19 +79,19 @@ app = FastAPI(
     title="LIFO AI Engine",
     description="""
     ## Intelligent Inventory Management Microservice
-    
+
     Advanced AI-driven scoring system for food waste reduction and inventory optimization.
-    
+
     ### Key Features:
     - **Multi-factor Scoring**: Expiry, velocity, and margin analysis
     - **Real-time Recommendations**: Automated discount and action suggestions
     - **CSV Processing**: Bulk inventory upload with validation
     - **Store-aware Operations**: Multi-tenant architecture with RLS
     - **Analytics & Alerts**: Comprehensive inventory insights
-    
+
     ### Authentication:
     Uses Supabase JWT tokens for seamless integration with existing frontend.
-    
+
     ### Performance:
     - Async PostgreSQL operations
     - Optimized scoring algorithms

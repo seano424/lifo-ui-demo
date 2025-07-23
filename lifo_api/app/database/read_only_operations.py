@@ -5,11 +5,10 @@ Part of hybrid architecture security remediation
 
 import uuid
 from datetime import date, datetime, timedelta
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
-from sqlalchemy import and_, func, select, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = structlog.get_logger()
@@ -27,7 +26,7 @@ class SecureReadOnlyOperations:
 
     async def get_store_inventory_for_scoring(
         self, store_id: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Get inventory data for scoring calculations only
         Uses read-only view to prevent SQL injection
@@ -45,7 +44,7 @@ class SecureReadOnlyOperations:
 
             # Use parameterized query with read-only view
             query = text("""
-                SELECT 
+                SELECT
                     batch_id,
                     product_id,
                     sku,
@@ -56,7 +55,7 @@ class SecureReadOnlyOperations:
                     cost_price,
                     days_to_expiry,
                     typical_shelf_life_days
-                FROM inventory_view_for_scoring 
+                FROM inventory_view_for_scoring
                 WHERE store_id = :store_id
                 AND current_quantity > 0
                 ORDER BY days_to_expiry ASC
@@ -98,7 +97,7 @@ class SecureReadOnlyOperations:
             )
             return []
 
-    async def get_batch_for_scoring(self, batch_id: str) -> Optional[Dict[str, Any]]:
+    async def get_batch_for_scoring(self, batch_id: str) -> Optional[dict[str, Any]]:
         """
         Get single batch data for scoring
         Uses parameterized query to prevent SQL injection
@@ -116,7 +115,7 @@ class SecureReadOnlyOperations:
 
             # Use parameterized query with read-only view
             query = text("""
-                SELECT 
+                SELECT
                     batch_id,
                     product_id,
                     store_id,
@@ -128,7 +127,7 @@ class SecureReadOnlyOperations:
                     cost_price,
                     days_to_expiry,
                     typical_shelf_life_days
-                FROM inventory_view_for_scoring 
+                FROM inventory_view_for_scoring
                 WHERE batch_id = :batch_id
             """)
 
@@ -166,7 +165,7 @@ class SecureReadOnlyOperations:
 
     async def get_sales_velocity_data(
         self, store_id: str, product_id: str = None, days: int = 30
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get sales velocity data for scoring calculations
         Uses parameterized query to prevent SQL injection
@@ -196,11 +195,11 @@ class SecureReadOnlyOperations:
                     product_uuid = product_id
 
                 query = text("""
-                    SELECT 
+                    SELECT
                         AVG(quantity_sold) as avg_daily_sales,
                         COUNT(*) as sales_events
                     FROM sales_events_view
-                    WHERE store_id = :store_id 
+                    WHERE store_id = :store_id
                     AND product_id = :product_id
                     AND sale_date >= :start_date
                 """)
@@ -212,11 +211,11 @@ class SecureReadOnlyOperations:
                 }
             else:
                 query = text("""
-                    SELECT 
+                    SELECT
                         AVG(quantity_sold) as avg_daily_sales,
                         COUNT(*) as sales_events
                     FROM sales_events_view
-                    WHERE store_id = :store_id 
+                    WHERE store_id = :store_id
                     AND sale_date >= :start_date
                 """)
 
@@ -249,19 +248,19 @@ class SecureReadOnlyOperations:
             )
             return {"avg_daily_sales": 1.0, "sales_events": 0}
 
-    async def get_category_weights(self, category: str) -> Dict[str, float]:
+    async def get_category_weights(self, category: str) -> dict[str, float]:
         """
         Get category-specific scoring weights
         Uses parameterized query to prevent SQL injection
         """
         try:
             query = text("""
-                SELECT 
+                SELECT
                     spoilage_risk_weight,
                     turnover_speed_weight,
                     value_impact_weight
                 FROM category_weights_view
-                WHERE category = :category 
+                WHERE category = :category
                 AND is_active = true
             """)
 
@@ -284,7 +283,7 @@ class SecureReadOnlyOperations:
             )
             return {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
 
-    async def store_score_results(self, scores: List[Dict[str, Any]]) -> bool:
+    async def store_score_results(self, scores: list[dict[str, Any]]) -> bool:
         """
         Store scoring results - ONLY operation that writes to database
         Uses parameterized insert to prevent SQL injection
@@ -333,7 +332,7 @@ class SecureReadOnlyOperations:
             )
             return False
 
-    async def get_analytics_data(self, store_id: str, days: int = 30) -> Dict[str, Any]:
+    async def get_analytics_data(self, store_id: str, days: int = 30) -> dict[str, Any]:
         """
         Get analytics data for dashboard
         Uses parameterized query to prevent SQL injection
@@ -351,7 +350,7 @@ class SecureReadOnlyOperations:
 
             # Get analytics data directly from batches table
             query = text("""
-                SELECT 
+                SELECT
                     COUNT(b.batch_id) as total_batches,
                     COALESCE(SUM(b.current_quantity), 0) as total_quantity,
                     COALESCE(SUM(b.current_quantity * b.selling_price), 0) as total_value,

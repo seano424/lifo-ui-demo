@@ -5,10 +5,10 @@ Custom exceptions and error responses optimized for mobile consumption
 
 import traceback
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
-from fastapi import HTTPException, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
 
 from app.models.scan_models import MobileOptimizedError
@@ -79,7 +79,7 @@ class ValidationException(MVPBaseException):
     """Exception for data validation errors"""
 
     def __init__(
-        self, message: str, field: str = None, validation_errors: List[str] = None
+        self, message: str, field: str = None, validation_errors: list[str] = None
     ):
         self.field = field
         self.validation_errors = validation_errors or []
@@ -245,7 +245,7 @@ def create_standard_error_response(
     message: str,
     error_code: str = "UNKNOWN_ERROR",
     user_message: str = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create standard error response for non-MVP exceptions"""
 
     return {
@@ -375,7 +375,7 @@ class ErrorTracker:
         if len(self.error_history) > self.max_history:
             self.error_history = self.error_history[-self.max_history :]
 
-    def get_error_summary(self, hours: int = 24) -> Dict[str, Any]:
+    def get_error_summary(self, hours: int = 24) -> dict[str, Any]:
         """Get error summary for the last N hours"""
         cutoff = datetime.utcnow() - timedelta(hours=hours)
         recent_errors = [e for e in self.error_history if e["timestamp"] > cutoff]
@@ -415,7 +415,7 @@ async def error_tracking_middleware(request: Request, call_next):
     except MVPBaseException as e:
         error_tracker.record_error(e.error_code, str(request.url.path))
         raise
-    except Exception as e:
+    except Exception:
         error_tracker.record_error("UNEXPECTED_ERROR", str(request.url.path))
         raise
 

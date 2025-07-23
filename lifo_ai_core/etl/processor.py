@@ -2,7 +2,7 @@ import csv
 import io
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -85,7 +85,7 @@ class CSVProcessor:
             "condiments": "spices_condiments",
         }
 
-    def validate_csv_structure(self, csv_content: str) -> Dict:
+    def validate_csv_structure(self, csv_content: str) -> dict:
         """Validate CSV has required columns and basic data quality"""
         try:
             # Try different encodings
@@ -102,9 +102,7 @@ class CSVProcessor:
             if df is None:
                 return {
                     "valid": False,
-                    "errors": [
-                        "Could not decode CSV file. Please ensure it uses UTF-8 encoding."
-                    ],
+                    "errors": ["Could not decode CSV file. Please ensure it uses UTF-8 encoding."],
                     "row_count": 0,
                     "columns": [],
                 }
@@ -152,15 +150,11 @@ class CSVProcessor:
 
                 invalid_quantities = df["Quantity"].isna().sum()
                 if invalid_quantities > 0:
-                    errors.append(
-                        f"{invalid_quantities} rows have invalid quantity values"
-                    )
+                    errors.append(f"{invalid_quantities} rows have invalid quantity values")
 
                 negative_quantities = (df["Quantity"] < 0).sum()
                 if negative_quantities > 0:
-                    errors.append(
-                        f"{negative_quantities} rows have negative quantities"
-                    )
+                    errors.append(f"{negative_quantities} rows have negative quantities")
 
             # Check date format
             if "Expiry_Date" in df.columns:
@@ -177,18 +171,12 @@ class CSVProcessor:
                     # Check for past dates
                     past_dates = (parsed_dates < pd.Timestamp.now()).sum()
                     if past_dates > 0:
-                        warnings.append(
-                            f"{past_dates} items have expiry dates in the past"
-                        )
+                        warnings.append(f"{past_dates} items have expiry dates in the past")
 
                     # Check for unreasonably far future dates
-                    far_future = (
-                        parsed_dates > pd.Timestamp.now() + pd.Timedelta(days=3650)
-                    ).sum()
+                    far_future = (parsed_dates > pd.Timestamp.now() + pd.Timedelta(days=3650)).sum()
                     if far_future > 0:
-                        warnings.append(
-                            f"{far_future} items expire more than 10 years from now"
-                        )
+                        warnings.append(f"{far_future} items expire more than 10 years from now")
 
                 except Exception as e:
                     errors.append(f"Error parsing expiry dates: {e!s}")
@@ -202,23 +190,17 @@ class CSVProcessor:
 
                     invalid_prices = df[col].isna().sum()
                     if invalid_prices > 0:
-                        errors.append(
-                            f"{invalid_prices} rows have invalid {col} values"
-                        )
+                        errors.append(f"{invalid_prices} rows have invalid {col} values")
 
                     zero_negative_prices = (df[col] <= 0).sum()
                     if zero_negative_prices > 0:
-                        errors.append(
-                            f"{zero_negative_prices} rows have zero or negative {col}"
-                        )
+                        errors.append(f"{zero_negative_prices} rows have zero or negative {col}")
 
             # Check selling price vs cost price
             if "Cost_Price" in df.columns and "Selling_Price" in df.columns:
                 df_clean = df.dropna(subset=["Cost_Price", "Selling_Price"])
                 if len(df_clean) > 0:
-                    negative_margin = (
-                        df_clean["Selling_Price"] < df_clean["Cost_Price"]
-                    ).sum()
+                    negative_margin = (df_clean["Selling_Price"] < df_clean["Cost_Price"]).sum()
                     if negative_margin > 0:
                         warnings.append(
                             f"{negative_margin} rows have selling price lower than cost price"
@@ -254,9 +236,7 @@ class CSVProcessor:
             return "dry_goods"
 
         # Clean and normalize
-        clean_category = (
-            str(category).lower().strip().replace(" ", "_").replace("-", "_")
-        )
+        clean_category = str(category).lower().strip().replace(" ", "_").replace("-", "_")
 
         # Direct match
         if clean_category in self.category_mapping:
@@ -270,9 +250,7 @@ class CSVProcessor:
         # Return original if no mapping found
         return clean_category if clean_category else "dry_goods"
 
-    def clean_and_normalize_data(
-        self, csv_content: str
-    ) -> Tuple[List[Dict], List[str]]:
+    def clean_and_normalize_data(self, csv_content: str) -> tuple[list[dict], list[str]]:
         """Clean and normalize CSV data"""
         try:
             df = pd.read_csv(io.StringIO(csv_content))
@@ -333,9 +311,7 @@ class CSVProcessor:
             # Remove rows with invalid expiry dates
             invalid_expiry = df["Expiry_Date"].isna()
             if invalid_expiry.any():
-                errors.append(
-                    f"Removed {invalid_expiry.sum()} rows with invalid expiry dates"
-                )
+                errors.append(f"Removed {invalid_expiry.sum()} rows with invalid expiry dates")
             df = df[~invalid_expiry]
 
             df["Expiry_Date"] = df["Expiry_Date"].dt.strftime("%Y-%m-%d")
@@ -361,17 +337,16 @@ class CSVProcessor:
                 "spices_condiments": 730,
             }
 
-            def estimate_manufacture_date(row):
-                shelf_life = shelf_life_map.get(row["Category"], 30)
+            def estimate_manufacture_date(row: pd.Series) -> str:
+                category = str(row["Category"]) if pd.notna(row["Category"]) else "dry_goods"
+                shelf_life = shelf_life_map.get(category, 30)
                 expiry = pd.to_datetime(row["Expiry_Date"])
                 return (expiry - pd.Timedelta(days=shelf_life)).strftime("%Y-%m-%d")
 
             df["Manufacture_Date"] = df.apply(estimate_manufacture_date, axis=1)
         else:
             try:
-                df["Manufacture_Date"] = pd.to_datetime(
-                    df["Manufacture_Date"], errors="coerce"
-                )
+                df["Manufacture_Date"] = pd.to_datetime(df["Manufacture_Date"], errors="coerce")
                 invalid_manufacture = df["Manufacture_Date"].isna()
                 if invalid_manufacture.any():
                     # Use today's date for invalid manufacture dates
@@ -406,9 +381,7 @@ class CSVProcessor:
             )
 
         # Calculate days to expiry
-        df["Days_To_Expiry"] = (
-            pd.to_datetime(df["Expiry_Date"]) - pd.Timestamp.now()
-        ).dt.days
+        df["Days_To_Expiry"] = (pd.to_datetime(df["Expiry_Date"]) - pd.Timestamp.now()).dt.days
 
         # Convert numeric columns
         numeric_columns = ["Quantity", "Cost_Price", "Selling_Price"]
@@ -423,26 +396,20 @@ class CSVProcessor:
                 # Remove rows with invalid numeric values
                 invalid_numeric = df[col].isna()
                 if invalid_numeric.any():
-                    errors.append(
-                        f"Removed {invalid_numeric.sum()} rows with invalid {col}"
-                    )
+                    errors.append(f"Removed {invalid_numeric.sum()} rows with invalid {col}")
                 df = df[~invalid_numeric]
 
         # Remove invalid rows
         if "Quantity" in df.columns:
             invalid_qty = df["Quantity"] <= 0
             if invalid_qty.any():
-                errors.append(
-                    f"Removed {invalid_qty.sum()} rows with zero or negative quantity"
-                )
+                errors.append(f"Removed {invalid_qty.sum()} rows with zero or negative quantity")
             df = df[~invalid_qty]
 
         if "Cost_Price" in df.columns:
             invalid_cost = df["Cost_Price"] <= 0
             if invalid_cost.any():
-                errors.append(
-                    f"Removed {invalid_cost.sum()} rows with zero or negative cost price"
-                )
+                errors.append(f"Removed {invalid_cost.sum()} rows with zero or negative cost price")
             df = df[~invalid_cost]
 
         if "Selling_Price" in df.columns:
@@ -456,9 +423,7 @@ class CSVProcessor:
         # Filter out items expired more than 30 days ago (probably data entry errors)
         very_expired = df["Days_To_Expiry"] < -30
         if very_expired.any():
-            errors.append(
-                f"Removed {very_expired.sum()} items expired more than 30 days ago"
-            )
+            errors.append(f"Removed {very_expired.sum()} items expired more than 30 days ago")
         df = df[~very_expired]
 
         # Validate business logic - selling price should be >= cost price
@@ -478,8 +443,8 @@ class CSVProcessor:
         return df.to_dict("records"), errors
 
     async def process_with_global_products(
-        self, data: List[Dict], store_id: str, user_id: str
-    ) -> Tuple[List[Dict], List[str]]:
+        self, data: list[dict], store_id: str, user_id: str
+    ) -> tuple[list[dict], list[str]]:
         """Process CSV data using global products workflow"""
         if not self.inventory_ops:
             return data, [
@@ -496,10 +461,8 @@ class CSVProcessor:
 
                 # Try to find by barcode first
                 if item.get("Barcode"):
-                    global_product = (
-                        await self.inventory_ops.findGlobalProductByBarcode(
-                            item["Barcode"]
-                        )
+                    global_product = await self.inventory_ops.findGlobalProductByBarcode(
+                        item["Barcode"]
                     )
 
                 # If not found by barcode, search by name
@@ -533,9 +496,7 @@ class CSVProcessor:
                         global_product["product_id"],
                         {
                             "default_cost_price": float(item.get("Cost_Price", 0)),
-                            "default_selling_price": float(
-                                item.get("Selling_Price", 0)
-                            ),
+                            "default_selling_price": float(item.get("Selling_Price", 0)),
                             "store_specific_sku": item["SKU"],
                             "supplier_code": item.get("Supplier_Code"),
                         },
@@ -544,9 +505,7 @@ class CSVProcessor:
                 except Exception as e:
                     # Product might already be in store catalog
                     if "duplicate" not in str(e).lower():
-                        errors.append(
-                            f"Warning: Could not add product {item['SKU']} to store: {e}"
-                        )
+                        errors.append(f"Warning: Could not add product {item['SKU']} to store: {e}")
 
                 # Create batch with global product reference
                 await self.inventory_ops.createBatchWithGlobalProduct(
@@ -684,12 +643,10 @@ class CSVProcessor:
                     "Category": category,
                     "Brand": data["brand"],
                     "Quantity": 5 + (i % 20),
-                    "Expiry_Date": (
-                        datetime.now() + timedelta(days=data["days_offset"])
-                    ).strftime("%Y-%m-%d"),
-                    "Manufacture_Date": (datetime.now() - timedelta(days=2)).strftime(
+                    "Expiry_Date": (datetime.now() + timedelta(days=data["days_offset"])).strftime(
                         "%Y-%m-%d"
                     ),
+                    "Manufacture_Date": (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d"),
                     "Cost_Price": round(data["cost"], 2),
                     "Selling_Price": round(data["selling"], 2),
                     "Location": f"SHELF-{chr(65 + (i % 5))}{i % 3 + 1}",
@@ -707,9 +664,9 @@ class CSVProcessor:
 
         return output.getvalue()
 
-    def validate_business_rules(self, data: List[Dict]) -> List[str]:
+    def validate_business_rules(self, data: list[dict]) -> list[str]:
         """Validate business rules and return warnings/suggestions"""
-        warnings = []
+        warnings: list[str] = []
 
         if not data:
             return warnings
@@ -718,8 +675,7 @@ class CSVProcessor:
         high_risk_short_expiry = [
             item
             for item in data
-            if item.get("Category")
-            in ["fresh_produce", "fresh_meat_fish", "bakery_fresh"]
+            if item.get("Category") in ["fresh_produce", "fresh_meat_fish", "bakery_fresh"]
             and item.get("Days_To_Expiry", 0) <= 1
         ]
 
@@ -747,7 +703,7 @@ class CSVProcessor:
             )
 
         # Check for duplicate SKUs with different expiry dates
-        sku_groups = {}
+        sku_groups: dict[str, list[str]] = {}
         for item in data:
             sku = item.get("SKU")
             if sku:
@@ -755,9 +711,7 @@ class CSVProcessor:
                     sku_groups[sku] = []
                 sku_groups[sku].append(item.get("Expiry_Date"))
 
-        multi_batch_skus = {
-            sku: dates for sku, dates in sku_groups.items() if len(set(dates)) > 1
-        }
+        multi_batch_skus = {sku: dates for sku, dates in sku_groups.items() if len(set(dates)) > 1}
         if multi_batch_skus:
             warnings.append(
                 f"{len(multi_batch_skus)} SKUs have multiple batches with different expiry dates"
@@ -767,7 +721,7 @@ class CSVProcessor:
 
 
 # Utility function for command-line usage
-def process_csv_file(file_path: str, validate_only: bool = False) -> Dict:
+def process_csv_file(file_path: str, validate_only: bool = False) -> dict:
     """Process a CSV file from command line"""
     processor = CSVProcessor()
 

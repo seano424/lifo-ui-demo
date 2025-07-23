@@ -3,18 +3,17 @@ Secure Scoring API endpoints for AI features only
 Part of hybrid architecture security remediation
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import get_current_user
-from app.core.scoring import ScoringService, create_scoring_service
+from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
 from app.middleware.rate_limiting import ai_endpoint_rate_limit, scoring_rate_limit
-from app.models.base import ResponseBase
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -29,7 +28,7 @@ async def score_store_batch(
         False, description="Force recalculation of all scores"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Calculate AI scoring for store inventory - SECURE READ-ONLY VERSION
@@ -81,7 +80,7 @@ async def get_urgency_alerts(
     ),
     limit: int = Query(50, ge=1, le=100, description="Maximum alerts to return"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get AI urgency alerts for inventory items - READ-ONLY
@@ -177,7 +176,7 @@ async def get_ai_recommendations(
     category: Optional[str] = Query(None, description="Filter by category"),
     limit: int = Query(20, ge=1, le=50, description="Maximum recommendations"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get AI-powered recommendations for inventory management
@@ -308,7 +307,7 @@ async def get_scoring_analytics(
     request: Request,
     days: int = Query(30, ge=1, le=90, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get scoring analytics and insights for a store

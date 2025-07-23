@@ -4,8 +4,8 @@ Focus on key metrics mentioned in MVP goals
 """
 
 import time
-from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -28,7 +28,7 @@ async def get_mvp_metrics(
     request: Request,
     date_range: int = Query(7, ge=1, le=30, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Metrics specifically designed for MVP validation and success measurement
@@ -85,7 +85,7 @@ async def get_batch_insights(
         "standard", description="Analysis depth: quick, standard, deep"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Reveal previously unknown inventory patterns (MVP goal)
@@ -140,7 +140,7 @@ async def get_scan_workflow_stats(
     request: Request,
     days: int = Query(7, ge=1, le=30, description="Analysis period"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analytics specific to scan workflow performance
@@ -205,7 +205,7 @@ async def get_waste_prevention_impact(
     comparison_period: int = Query(30, ge=7, le=90, description="Days to compare"),
     baseline_period: int = Query(30, ge=7, le=90, description="Baseline period days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Calculate waste prevention impact and ROI
@@ -257,7 +257,7 @@ async def get_action_effectiveness(
     action_type: Optional[str] = Query(None, description="Filter by action type"),
     days: int = Query(14, ge=3, le=60, description="Analysis period"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analyze effectiveness of different actions taken
@@ -305,7 +305,7 @@ async def get_action_effectiveness(
 
 
 async def _calculate_mvp_metrics(
-    store_id: str, date_range: int, analytics_data: Dict[str, Any], read_ops
+    store_id: str, date_range: int, analytics_data: dict[str, Any], read_ops
 ) -> MVPMetrics:
     """Calculate MVP validation metrics"""
 
@@ -316,7 +316,7 @@ async def _calculate_mvp_metrics(
     products_added_via_scan = 8  # Would query new products added via scan workflow
 
     # Waste prevention value calculation
-    total_value = analytics_data.get("total_value", 0)
+    analytics_data.get("total_value", 0)
     critical_items = analytics_data.get("critical_items", 0)
     high_urgency_items = analytics_data.get("high_urgency_items", 0)
 
@@ -366,7 +366,7 @@ async def _calculate_mvp_metrics(
 
 
 async def _generate_batch_insights(
-    inventory_data: List[Dict], analysis_depth: str, store_id: str, read_ops
+    inventory_data: list[dict], analysis_depth: str, store_id: str, read_ops
 ) -> BatchInsights:
     """Generate insights from batch data analysis"""
 
@@ -499,7 +499,7 @@ async def _generate_batch_insights(
 
 async def _calculate_scan_workflow_stats(
     store_id: str, days: int, read_ops
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Calculate scan workflow statistics"""
     # In production, these would be calculated from actual scan event logs
     return {
@@ -514,7 +514,7 @@ async def _calculate_scan_workflow_stats(
 
 async def _calculate_waste_prevention_impact(
     store_id: str, comparison_period: int, baseline_period: int, read_ops
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Calculate waste prevention impact and ROI"""
     # In production, this would compare actual data from different periods
     return {
@@ -557,7 +557,7 @@ async def _calculate_waste_prevention_impact(
 
 async def _calculate_action_effectiveness(
     store_id: str, action_type: Optional[str], days: int, read_ops
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Calculate effectiveness of different actions"""
     # In production, this would analyze actual action outcomes
     return {

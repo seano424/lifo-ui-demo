@@ -3,13 +3,11 @@ FastAPI CSV Upload Endpoint - Unified with Python ETL Core
 Uses the consolidated UnifiedCSVProcessor for all CSV operations
 """
 
-import asyncio
-import json
 import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +37,7 @@ class FastAPICSVIntegration:
     @staticmethod
     async def process_csv_upload(
         file_content: bytes, store_id: str, user_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process CSV upload using the unified processor
 
@@ -86,7 +84,7 @@ class FastAPICSVIntegration:
 async def upload_csv(
     file: UploadFile = File(...),
     store_id: str = Form(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -167,7 +165,7 @@ async def upload_csv(
 
 
 @router.get("/template")
-async def get_csv_template(current_user: Dict[str, Any] = Depends(get_current_user)):
+async def get_csv_template(current_user: dict[str, Any] = Depends(get_current_user)):
     """
     Download CSV template with sample data
 
@@ -289,7 +287,7 @@ async def get_csv_template(current_user: Dict[str, Any] = Depends(get_current_us
 async def validate_csv(
     file: UploadFile = File(...),
     store_id: str = Form(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """

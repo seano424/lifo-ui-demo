@@ -3,14 +3,13 @@ Secure CSV processing service for AI features only
 Part of hybrid architecture security remediation
 """
 
-import asyncio
 import csv
 import io
 import re
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import structlog
 from fastapi import HTTPException, UploadFile
@@ -66,7 +65,7 @@ class SecureCSVProcessor:
 
     async def process_csv_for_validation(
         self, file: UploadFile, store_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process CSV for validation only - no database writes
         Returns validated data for frontend to save via Supabase
@@ -269,7 +268,7 @@ class SecureCSVProcessor:
             detail="Unable to decode CSV file. Please ensure it's UTF-8 encoded",
         )
 
-    def _parse_csv_structure_secure(self, csv_content: str) -> Dict[str, Any]:
+    def _parse_csv_structure_secure(self, csv_content: str) -> dict[str, Any]:
         """Parse CSV structure with security checks"""
 
         # Check content length
@@ -377,8 +376,8 @@ class SecureCSVProcessor:
         return sanitized
 
     async def _validate_and_sanitize_csv(
-        self, parsed_data: Dict[str, Any], store_id: str
-    ) -> Dict[str, Any]:
+        self, parsed_data: dict[str, Any], store_id: str
+    ) -> dict[str, Any]:
         """Validate and sanitize CSV data"""
 
         headers = parsed_data["headers"]
@@ -472,8 +471,8 @@ class SecureCSVProcessor:
         }
 
     async def _validate_row_secure(
-        self, row_data: Dict[str, str], row_number: int
-    ) -> Dict[str, Any]:
+        self, row_data: dict[str, str], row_number: int
+    ) -> dict[str, Any]:
         """Validate individual row with security checks"""
         validated_row = {}
 
@@ -481,10 +480,10 @@ class SecureCSVProcessor:
         if "sku" in row_data:
             sku = row_data["sku"].strip().upper()
             if not sku or len(sku) < 2 or len(sku) > 50:
-                raise ValueError(f"Invalid SKU: must be 2-50 characters")
+                raise ValueError("Invalid SKU: must be 2-50 characters")
             if not re.match(r"^[A-Z0-9\-_]+$", sku):
                 raise ValueError(
-                    f"Invalid SKU: only letters, numbers, hyphens, and underscores allowed"
+                    "Invalid SKU: only letters, numbers, hyphens, and underscores allowed"
                 )
             validated_row["sku"] = sku
 
@@ -492,7 +491,7 @@ class SecureCSVProcessor:
         if "product_name" in row_data:
             name = row_data["product_name"].strip()
             if not name or len(name) < 2 or len(name) > 255:
-                raise ValueError(f"Invalid product name: must be 2-255 characters")
+                raise ValueError("Invalid product name: must be 2-255 characters")
             # Remove HTML/XML tags
             name = re.sub(r"<[^>]+>", "", name)
             validated_row["product_name"] = name
@@ -502,7 +501,7 @@ class SecureCSVProcessor:
             try:
                 quantity = float(row_data["quantity"])
                 if quantity < 0 or quantity > 100000:
-                    raise ValueError(f"Invalid quantity: must be 0-100000")
+                    raise ValueError("Invalid quantity: must be 0-100000")
                 validated_row["quantity"] = quantity
             except ValueError:
                 raise ValueError(f"Invalid quantity format: {row_data['quantity']}")
@@ -570,8 +569,8 @@ class SecureCSVProcessor:
         return validated_row
 
     async def _validate_business_rules_secure(
-        self, row_data: Dict[str, Any], store_id: str, row_number: int
-    ) -> Dict[str, List]:
+        self, row_data: dict[str, Any], store_id: str, row_number: int
+    ) -> dict[str, list]:
         """Validate business rules without database queries"""
         errors = []
         warnings = []
@@ -612,8 +611,8 @@ class SecureCSVProcessor:
         return {"errors": errors, "warnings": warnings}
 
     async def _generate_ai_suggestions(
-        self, valid_rows: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, valid_rows: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Generate AI suggestions for validated data"""
 
         if not valid_rows:

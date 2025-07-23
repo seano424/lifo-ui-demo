@@ -5,14 +5,12 @@ Security tests for CSV processing vulnerabilities
 
 import io
 import time
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi import UploadFile
-from fastapi.testclient import TestClient
 
-from app.api.v1.csv import upload_csv
-from app.services.csv_processor import CSVProcessor, CSVValidationError
+from app.services.csv_processor import CSVProcessor
 
 
 class TestCSVUploadVulnerabilities:
@@ -43,7 +41,7 @@ class TestCSVUploadVulnerabilities:
     def test_mime_type_validation_missing(self):
         """🚨 HIGH: No MIME type validation"""
         # File with wrong MIME type
-        executable_file = UploadFile(
+        UploadFile(
             filename="virus.csv",
             file=io.BytesIO(b"MZ\x90\x00"),  # PE executable header
             content_type="application/octet-stream",  # Not text/csv
@@ -66,7 +64,7 @@ class TestCSVUploadVulnerabilities:
 
         for filename in malicious_filenames:
             # No filename sanitization - accepts malicious filenames
-            malicious_file = UploadFile(
+            UploadFile(
                 filename=filename,
                 file=io.BytesIO(b"header1,header2\nvalue1,value2"),
                 content_type="text/csv",
@@ -79,7 +77,7 @@ class TestCSVUploadVulnerabilities:
         # Small compressed file that expands to huge size
         zip_bomb_csv = b"PK\x03\x04" + b"x" * 100  # Fake ZIP header
 
-        large_file = UploadFile(
+        UploadFile(
             filename="bomb.csv",
             file=io.BytesIO(zip_bomb_csv),
             content_type="application/zip",  # Actually compressed
@@ -122,7 +120,7 @@ class TestCSVUploadVulnerabilities:
     def test_temporary_file_cleanup_missing(self):
         """🚨 MEDIUM: No temporary file cleanup"""
         # UploadFile creates temporary files
-        temp_file = UploadFile(
+        UploadFile(
             filename="test.csv",
             file=io.BytesIO(b"header\ndata"),
             content_type="text/csv",
@@ -240,7 +238,7 @@ class TestCSVParsingVulnerabilities:
         # System tries multiple encodings - could be exploited
         # to hide malicious content in encoding confusion
         try:
-            content = csv_processor._decode_csv_content(malicious_bytes)
+            csv_processor._decode_csv_content(malicious_bytes)
             # Different encoding interpretations possible
         except ValueError:
             pass  # Expected for invalid UTF-8
@@ -258,7 +256,7 @@ class TestCSVParsingVulnerabilities:
         # CSV parser might have exponential time complexity
         start_time = time.time()
         try:
-            parsed_data = csv_processor._parse_csv_structure(malicious_csv)
+            csv_processor._parse_csv_structure(malicious_csv)
         except Exception:
             pass
         parse_time = time.time() - start_time
@@ -273,7 +271,7 @@ class TestCSVParsingVulnerabilities:
 
         # Malformed CSV could cause parser to hang or crash
         try:
-            parsed_data = csv_processor._parse_csv_structure(malformed_csv)
+            csv_processor._parse_csv_structure(malformed_csv)
         except Exception:
             pass  # Expected to fail
 
@@ -445,7 +443,7 @@ class TestCSVImportVulnerabilities:
         # First item imported, second fails, third might not be processed
         # No rollback of successful operations
         try:
-            result = await csv_processor._import_inventory_data(mixed_data, "store123")
+            await csv_processor._import_inventory_data(mixed_data, "store123")
             # Database left in inconsistent state
         except Exception:
             pass
@@ -454,7 +452,7 @@ class TestCSVImportVulnerabilities:
     async def test_duplicate_detection_bypass(self):
         """🚨 MEDIUM: Duplicate detection can be bypassed"""
         mock_db = AsyncMock()
-        csv_processor = CSVProcessor(mock_db)
+        CSVProcessor(mock_db)
 
         # Duplicates with subtle differences
         duplicate_data = [
@@ -466,7 +464,7 @@ class TestCSVImportVulnerabilities:
 
         # Business logic might not catch these as duplicates
         # Could create multiple entries for "same" product
-        for data in duplicate_data:
+        for _data in duplicate_data:
             # Each treated as unique due to subtle differences
             pass
 
@@ -474,7 +472,7 @@ class TestCSVImportVulnerabilities:
     async def test_import_without_authorization_recheck(self):
         """🚨 HIGH: Import doesn't recheck authorization"""
         mock_db = AsyncMock()
-        csv_processor = CSVProcessor(mock_db)
+        CSVProcessor(mock_db)
 
         # User uploads CSV (has access)
         # Admin removes user access during processing
@@ -483,9 +481,6 @@ class TestCSVImportVulnerabilities:
         # No authorization recheck during import phase
         # User could import data to store they no longer have access to
 
-        unauthorized_data = [
-            {"sku": "ADMIN-ONLY", "product_name": "Restricted Product"}
-        ]
 
         # Import proceeds even if user access was revoked
         # Should recheck permissions before each database operation

@@ -1,7 +1,7 @@
 """Configuration settings for LIFO AI Core"""
 
 import os
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import validator
 from pydantic_settings import BaseSettings
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     log_path: str = "logs/"
 
     @validator("database_url")
-    def database_url_must_be_set(cls, v, values):
+    def database_url_must_be_set(cls, v: str, values: dict[str, Any]) -> str:
         if not v:
             # Try to get from environment or use supabase_db_url
             v = os.getenv("DATABASE_URL", values.get("supabase_db_url", ""))
@@ -51,7 +51,7 @@ class Settings(BaseSettings):
         return v
 
     @validator("log_level")
-    def log_level_must_be_valid(cls, v):
+    def log_level_must_be_valid(cls, v: str) -> str:
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
             raise ValueError(f"log_level must be one of {valid_levels}")

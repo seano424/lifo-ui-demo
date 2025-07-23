@@ -3,16 +3,12 @@ Comprehensive tests for MVP endpoints
 Tests for scan workflows, mobile optimization, and MVP analytics
 """
 
-import asyncio
-import json
-import uuid
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.scan_models import ScanInRequest, ScanOutAction, ScanOutRequest
 
 client = TestClient(app)
 
@@ -266,7 +262,7 @@ class TestPerformanceRequirements:
 
         for endpoint in endpoints_to_test:
             start_time = time.time()
-            response = client.get(endpoint, headers=auth_headers)
+            client.get(endpoint, headers=auth_headers)
             end_time = time.time()
 
             response_time_ms = (end_time - start_time) * 1000

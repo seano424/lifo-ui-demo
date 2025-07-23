@@ -4,12 +4,11 @@ Part of hybrid architecture security remediation
 """
 
 import time
-from typing import Any, Dict
 
 import structlog
-from fastapi import HTTPException, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
@@ -221,7 +220,7 @@ DEVELOPMENT_RATE_LIMITS = {
 }
 
 
-def get_rate_limits(environment: str = "production") -> Dict[str, str]:
+def get_rate_limits(environment: str = "production") -> dict[str, str]:
     """Get rate limits based on environment"""
     if environment in ["development", "staging"]:
         return DEVELOPMENT_RATE_LIMITS

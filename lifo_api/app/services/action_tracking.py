@@ -6,13 +6,12 @@ Handles tracking of AI recommendations vs actual user actions
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, Dict, Any
+from typing import Any, Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.inventory_models import BatchAction, ActionType, DonationRecipient
-from app.database.models import Batch
+from app.database.inventory_models import ActionType, BatchAction
 
 
 class ActionTrackingService:
@@ -46,7 +45,7 @@ class ActionTrackingService:
         self.db.add(action_record)
         await self.db.commit()
         await self.db.refresh(action_record)
-        
+
         return action_record
 
     async def update_actual_action(
@@ -90,7 +89,7 @@ class ActionTrackingService:
 
         await self.db.commit()
         await self.db.refresh(action_record)
-        
+
         return action_record
 
     async def record_immediate_action(
@@ -129,19 +128,19 @@ class ActionTrackingService:
         self.db.add(action_record)
         await self.db.commit()
         await self.db.refresh(action_record)
-        
+
         return action_record
 
     async def get_recommendation_effectiveness(
-        self, 
-        store_id: str, 
+        self,
+        store_id: str,
         days_back: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get analytics on how well AI recommendations are being followed
         """
-        from sqlalchemy import func, and_
-        
+        from sqlalchemy import and_, func
+
         result = await self.db.execute(
             select(
                 BatchAction.recommended_action,
@@ -159,9 +158,9 @@ class ActionTrackingService:
             )
             .group_by(BatchAction.recommended_action, BatchAction.actual_action)
         )
-        
+
         analytics_data = result.fetchall()
-        
+
         return {
             "store_id": store_id,
             "period_days": days_back,
@@ -191,5 +190,5 @@ class ActionTrackingService:
             "dispose": ActionType.DISPOSE.value,
             "donate": ActionType.DONATE.value,
         }
-        
+
         return action_mapping.get(scoring_action, ActionType.MAINTAIN.value)

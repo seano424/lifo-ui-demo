@@ -3,12 +3,11 @@ Donation KPI Tracking System with EU Compliance Metrics
 Tracks financial, environmental, social, and compliance impact of donations
 """
 
-import logging
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
 import structlog
 from pydantic import BaseModel
@@ -131,12 +130,12 @@ class ComprehensiveKPIReport(BaseModel):
     total_donations: int
     total_quantity_kg: float
     unique_recipients: int
-    category_breakdown: Dict[str, int]
+    category_breakdown: dict[str, int]
 
     # Trends and insights
-    trend_indicators: Dict[str, str]
-    key_insights: List[str]
-    recommendations: List[str]
+    trend_indicators: dict[str, str]
+    key_insights: list[str]
+    recommendations: list[str]
 
     # Metadata
     generated_at: datetime
@@ -210,7 +209,7 @@ class DonationKPITracker:
 
     def calculate_comprehensive_kpis(
         self,
-        donations_data: List[DonationImpactData],
+        donations_data: list[DonationImpactData],
         timeframe: KPITimeframe,
         period_start: date,
         period_end: date,
@@ -244,7 +243,7 @@ class DonationKPITracker:
             # Calculate summary statistics
             total_donations = len(donations_data)
             total_quantity_kg = sum(d.quantity_donated for d in donations_data)
-            unique_recipients = len(set(d.recipient_type for d in donations_data))
+            unique_recipients = len({d.recipient_type for d in donations_data})
 
             # Category breakdown
             category_breakdown = {}
@@ -308,7 +307,7 @@ class DonationKPITracker:
             raise
 
     def _calculate_financial_metrics(
-        self, donations_data: List[DonationImpactData]
+        self, donations_data: list[DonationImpactData]
     ) -> FinancialImpactMetrics:
         """Calculate financial impact metrics"""
         if not donations_data:
@@ -353,7 +352,7 @@ class DonationKPITracker:
         )
 
     def _calculate_environmental_metrics(
-        self, donations_data: List[DonationImpactData]
+        self, donations_data: list[DonationImpactData]
     ) -> EnvironmentalImpactMetrics:
         """Calculate environmental impact metrics"""
         if not donations_data:
@@ -407,7 +406,7 @@ class DonationKPITracker:
         )
 
     def _calculate_social_metrics(
-        self, donations_data: List[DonationImpactData]
+        self, donations_data: list[DonationImpactData]
     ) -> SocialImpactMetrics:
         """Calculate social impact metrics"""
         if not donations_data:
@@ -448,7 +447,7 @@ class DonationKPITracker:
         )  # Normalize against 1000 meals
 
         # Community benefit rating (based on diversity and volume)
-        unique_recipients = len(set(d.recipient_type for d in donations_data))
+        unique_recipients = len({d.recipient_type for d in donations_data})
         community_benefit = min(
             5.0, (unique_recipients * total_meals) / 200
         )  # Scale to 1-5
@@ -464,7 +463,7 @@ class DonationKPITracker:
         )
 
     def _calculate_eu_compliance_metrics(
-        self, donations_data: List[DonationImpactData]
+        self, donations_data: list[DonationImpactData]
     ) -> EUComplianceMetrics:
         """Calculate EU regulatory compliance metrics"""
         if not donations_data:
@@ -531,7 +530,7 @@ class DonationKPITracker:
         )
 
     def _calculate_operational_efficiency_metrics(
-        self, donations_data: List[DonationImpactData]
+        self, donations_data: list[DonationImpactData]
     ) -> OperationalEfficiencyMetrics:
         """Calculate operational efficiency metrics"""
         if not donations_data:
@@ -601,8 +600,8 @@ class DonationKPITracker:
         )
 
     def _analyze_trends(
-        self, donations_data: List[DonationImpactData], timeframe: KPITimeframe
-    ) -> Dict[str, str]:
+        self, donations_data: list[DonationImpactData], timeframe: KPITimeframe
+    ) -> dict[str, str]:
         """Analyze trends in donation data"""
         if len(donations_data) < 2:
             return {"overall": "insufficient_data"}
@@ -659,7 +658,7 @@ class DonationKPITracker:
         compliance: EUComplianceMetrics,
         efficiency: OperationalEfficiencyMetrics,
         total_donations: int,
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate key insights from metrics"""
         insights = []
 
@@ -697,7 +696,7 @@ class DonationKPITracker:
 
     def _generate_recommendations(
         self, compliance: EUComplianceMetrics, efficiency: OperationalEfficiencyMetrics
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate improvement recommendations"""
         recommendations = []
 
@@ -728,7 +727,7 @@ class DonationKPITracker:
 
         return recommendations
 
-    def _assess_data_quality(self, donations_data: List[DonationImpactData]) -> float:
+    def _assess_data_quality(self, donations_data: list[DonationImpactData]) -> float:
         """Assess quality of donation data for KPI calculations"""
         if not donations_data:
             return 1.0

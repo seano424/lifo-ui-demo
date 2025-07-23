@@ -5,10 +5,9 @@ Handles real-time updates and notifications for mobile scanning workflows
 
 import asyncio
 import json
-import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 
@@ -45,10 +44,10 @@ class RealtimeService:
     """
 
     def __init__(self):
-        self.active_subscriptions: Dict[
-            str, List[str]
+        self.active_subscriptions: dict[
+            str, list[str]
         ] = {}  # store_id -> list of user_ids
-        self.update_queue: List[RealtimeUpdate] = []
+        self.update_queue: list[RealtimeUpdate] = []
         self.logger = structlog.get_logger().bind(component="realtime_service")
 
     async def subscribe_to_store(self, store_id: str, user_id: str):
@@ -100,7 +99,7 @@ class RealtimeService:
         await self._send_to_supabase_realtime(update, subscribers)
 
     async def _send_to_supabase_realtime(
-        self, update: RealtimeUpdate, subscribers: List[str]
+        self, update: RealtimeUpdate, subscribers: list[str]
     ):
         """Send update to Supabase real-time (placeholder for actual integration)"""
         try:
@@ -134,7 +133,7 @@ class RealtimeService:
         self,
         store_id: str,
         batch_id: str,
-        score_data: Dict[str, Any],
+        score_data: dict[str, Any],
         priority: str = "normal",
     ):
         """Trigger score change update"""
@@ -154,7 +153,7 @@ class RealtimeService:
         await self.broadcast_update(update)
 
     async def trigger_scan_completion(
-        self, store_id: str, batch_id: str, scan_data: Dict[str, Any], scan_type: str
+        self, store_id: str, batch_id: str, scan_data: dict[str, Any], scan_type: str
     ):
         """Trigger scan completion update"""
         update = RealtimeUpdate(
@@ -173,7 +172,7 @@ class RealtimeService:
         await self.broadcast_update(update)
 
     async def trigger_urgency_alert(
-        self, store_id: str, batch_id: str, alert_data: Dict[str, Any]
+        self, store_id: str, batch_id: str, alert_data: dict[str, Any]
     ):
         """Trigger urgency alert for immediate attention"""
         update = RealtimeUpdate(
@@ -196,7 +195,7 @@ class RealtimeService:
         await self.broadcast_update(update)
 
     async def trigger_batch_status_change(
-        self, store_id: str, batch_id: str, status_change: Dict[str, Any]
+        self, store_id: str, batch_id: str, status_change: dict[str, Any]
     ):
         """Trigger batch status change update"""
         update = RealtimeUpdate(
@@ -217,7 +216,7 @@ class RealtimeService:
         await self.broadcast_update(update)
 
     async def trigger_new_batch_alert(
-        self, store_id: str, batch_id: str, batch_data: Dict[str, Any]
+        self, store_id: str, batch_id: str, batch_data: dict[str, Any]
     ):
         """Trigger new batch creation alert"""
         update = RealtimeUpdate(
@@ -238,7 +237,7 @@ class RealtimeService:
 
         await self.broadcast_update(update)
 
-    def get_active_subscriptions(self) -> Dict[str, int]:
+    def get_active_subscriptions(self) -> dict[str, int]:
         """Get count of active subscriptions per store"""
         return {
             store_id: len(users)
@@ -277,7 +276,7 @@ class RealtimeService:
         )
 
     async def _process_store_updates(
-        self, store_id: str, updates: List[RealtimeUpdate]
+        self, store_id: str, updates: list[RealtimeUpdate]
     ):
         """Process updates for a specific store"""
         try:
@@ -304,13 +303,13 @@ realtime_service = RealtimeService()
 # Helper functions for easy integration
 
 
-async def notify_score_change(store_id: str, batch_id: str, score_data: Dict[str, Any]):
+async def notify_score_change(store_id: str, batch_id: str, score_data: dict[str, Any]):
     """Convenience function to notify score changes"""
     await realtime_service.trigger_score_update(store_id, batch_id, score_data)
 
 
 async def notify_scan_completion(
-    store_id: str, batch_id: str, scan_result: Dict[str, Any], scan_type: str
+    store_id: str, batch_id: str, scan_result: dict[str, Any], scan_type: str
 ):
     """Convenience function to notify scan completion"""
     await realtime_service.trigger_scan_completion(
@@ -319,20 +318,20 @@ async def notify_scan_completion(
 
 
 async def notify_urgency_alert(
-    store_id: str, batch_id: str, alert_info: Dict[str, Any]
+    store_id: str, batch_id: str, alert_info: dict[str, Any]
 ):
     """Convenience function to send urgency alerts"""
     await realtime_service.trigger_urgency_alert(store_id, batch_id, alert_info)
 
 
 async def notify_batch_change(
-    store_id: str, batch_id: str, change_info: Dict[str, Any]
+    store_id: str, batch_id: str, change_info: dict[str, Any]
 ):
     """Convenience function to notify batch changes"""
     await realtime_service.trigger_batch_status_change(store_id, batch_id, change_info)
 
 
-async def notify_new_batch(store_id: str, batch_id: str, batch_info: Dict[str, Any]):
+async def notify_new_batch(store_id: str, batch_id: str, batch_info: dict[str, Any]):
     """Convenience function to notify new batch creation"""
     await realtime_service.trigger_new_batch_alert(store_id, batch_id, batch_info)
 
@@ -354,7 +353,7 @@ class RealtimeHealthMonitor:
             self.error_count += 1
         self.last_message_time = datetime.utcnow()
 
-    def get_health_status(self) -> Dict[str, Any]:
+    def get_health_status(self) -> dict[str, Any]:
         """Get real-time service health status"""
         uptime = datetime.utcnow() - self.start_time
         error_rate = self.error_count / max(self.message_count, 1)
@@ -391,7 +390,7 @@ async def realtime_background_processor():
 
 # Integration with mobile workflows
 async def integrate_realtime_with_scan_workflow(
-    workflow_type: str, store_id: str, batch_id: str, workflow_data: Dict[str, Any]
+    workflow_type: str, store_id: str, batch_id: str, workflow_data: dict[str, Any]
 ):
     """Integrate real-time updates with scan workflows"""
     try:

@@ -3,7 +3,7 @@ Pydantic models for store-related API endpoints
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -32,7 +32,7 @@ class StoreUserRequest(BaseModel):
 
     user_email: str = Field(..., description="User email to add to store")
     role_in_store: UserRole = Field(default=UserRole.STAFF, description="Role in store")
-    permissions: Optional[Dict[str, bool]] = Field(
+    permissions: Optional[dict[str, bool]] = Field(
         default={
             "can_upload_inventory": True,
             "can_apply_discounts": False,
@@ -45,14 +45,14 @@ class StoreUserRequest(BaseModel):
 class StoreSettingsRequest(BaseModel):
     """Request to update store settings"""
 
-    scoring_weights: Optional[Dict[str, float]] = Field(
+    scoring_weights: Optional[dict[str, float]] = Field(
         None, description="Scoring weights configuration"
     )
-    thresholds: Optional[Dict[str, float]] = Field(None, description="Alert thresholds")
-    notifications: Optional[Dict[str, bool]] = Field(
+    thresholds: Optional[dict[str, float]] = Field(None, description="Alert thresholds")
+    notifications: Optional[dict[str, bool]] = Field(
         None, description="Notification settings"
     )
-    business_hours: Optional[Dict[str, Dict[str, str]]] = Field(
+    business_hours: Optional[dict[str, dict[str, str]]] = Field(
         None, description="Business hours"
     )
     currency: Optional[str] = Field(None, max_length=3, description="Store currency")
@@ -98,7 +98,7 @@ class UserStoreAccess(ConfigurableModel):
     city: Optional[str] = None
     country: Optional[str] = None
     user_role: UserRole
-    permissions: Dict[str, bool]
+    permissions: dict[str, bool]
     is_owner: bool = False
     assigned_at: Optional[datetime] = None
 
@@ -132,7 +132,7 @@ class StoreDetailsResponse(ConfigurableModel, TimestampMixin):
 
     # Access information
     user_role: UserRole
-    permissions: Dict[str, bool]
+    permissions: dict[str, bool]
     is_owner: bool = False
 
     class Config:
@@ -171,7 +171,7 @@ class StoreUserResponse(ConfigurableModel):
     user_email: Optional[str] = None
     full_name: Optional[str] = None
     role_in_store: UserRole
-    permissions: Dict[str, bool]
+    permissions: dict[str, bool]
     assigned_at: datetime
     assigned_by: Optional[str] = None
     is_active: bool = True
@@ -181,7 +181,7 @@ class StoreUsersListResponse(ConfigurableModel):
     """List of store users"""
 
     store_id: str
-    users: List[StoreUserResponse]
+    users: list[StoreUserResponse]
     total_users: int
 
     class Config:
@@ -212,10 +212,10 @@ class StoreSettingsResponse(ConfigurableModel):
     """Store configuration settings"""
 
     store_id: str
-    scoring_weights: Dict[str, float]
-    thresholds: Dict[str, float]
-    notifications: Dict[str, bool]
-    business_hours: Dict[str, Dict[str, str]]
+    scoring_weights: dict[str, float]
+    thresholds: dict[str, float]
+    notifications: dict[str, bool]
+    business_hours: dict[str, dict[str, str]]
     currency: str = "EUR"
     timezone: str = "Europe/Paris"
     last_updated: datetime
@@ -251,7 +251,7 @@ class MyStoresResponse(ConfigurableModel):
     """User's accessible stores"""
 
     user_id: str
-    stores: List[UserStoreAccess]
+    stores: list[UserStoreAccess]
     total_stores: int
 
     class Config:
@@ -289,5 +289,5 @@ class StoreAccessValidationResponse(ConfigurableModel):
     required_role: str
     has_access: bool
     current_role: Optional[str] = None
-    permissions: Optional[Dict[str, bool]] = None
+    permissions: Optional[dict[str, bool]] = None
     checked_at: datetime

@@ -5,8 +5,8 @@ Mobile-optimized endpoints for scan-in/scan-out workflows
 
 import time
 import uuid
-from datetime import date, datetime, timedelta
-from typing import Any, Dict, Optional
+from datetime import date, datetime
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -19,12 +19,11 @@ from app.auth.secure_dependencies import (
     validate_store_id_format,
 )
 from app.core.donation_engine import create_donation_decision_engine
-from app.core.scoring import ScoringService, create_scoring_service
+from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
-from app.middleware.rate_limiting import ai_endpoint_rate_limit, scoring_rate_limit
+from app.middleware.rate_limiting import ai_endpoint_rate_limit
 from app.models.scan_models import (
-    MobileOptimizedError,
     ProcessScanRequest,
     ScanInRequest,
     ScanInResponse,
@@ -32,9 +31,7 @@ from app.models.scan_models import (
     ScanOutResponse,
     ScanWorkflowException,
     sanitize_text_input,
-    validate_uuid_format,
 )
-from app.utils.performance import measure_time
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -44,7 +41,7 @@ logger = structlog.get_logger()
 async def debug_scan_endpoint(
     store_id: str,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """Debug endpoint to test authentication only"""
     return {
@@ -63,7 +60,7 @@ async def scan_in_batch(
     request: Request,
     batch_data: ScanInRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Handle proof of delivery scan-in workflow
@@ -123,7 +120,7 @@ async def scan_in_batch(
 
         try:
             # Quick scoring calculation
-            scoring_service = create_scoring_service(db)
+            create_scoring_service(db)
             days_to_expiry = (batch_data.expiry_date - date.today()).days
 
             if days_to_expiry <= 0:
@@ -216,7 +213,7 @@ async def scan_out_batch(
     request: Request,
     scan_out_data: ScanOutRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Track when batches are sold, discounted, donated, or discarded
@@ -275,7 +272,7 @@ async def scan_out_batch(
             revenue_impact = selling_price * scan_out_data.quantity_moved
 
             if scan_out_data.action == "sold_discounted":
-                original_revenue = (
+                (
                     batch_data["selling_price"] * scan_out_data.quantity_moved
                 )
                 waste_prevented = revenue_impact  # Revenue recovered vs total loss
@@ -373,7 +370,7 @@ async def process_scanned_batch(
     request: Request,
     scan_data: ProcessScanRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Process combined barcode + expiry date scan data
@@ -473,7 +470,7 @@ async def process_scanned_batch(
 
 async def _validate_or_prepare_product(
     sku: str, store_id: str, read_ops
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Validate product exists or prepare data for creation"""
     # This would check if product exists in database
     # For MVP, we'll prepare data for frontend to create via Supabase
@@ -525,7 +522,7 @@ def _suggest_category_from_sku(sku: str) -> str:
 
 async def _lookup_product_by_barcode(
     barcode: str, store_id: str, read_ops
-) -> Optional[Dict[str, Any]]:
+) -> Optional[dict[str, Any]]:
     """Look up product by barcode"""
     # This would query the database for existing products with this barcode
     # For MVP implementation, return None to indicate new product needed
@@ -533,7 +530,7 @@ async def _lookup_product_by_barcode(
 
 
 async def _calculate_action_effectiveness(
-    action_data: Dict, batch_data: Dict, scan_out_data: ScanOutRequest
+    action_data: dict, batch_data: dict, scan_out_data: ScanOutRequest
 ) -> float:
     """Calculate effectiveness score for the action taken"""
     base_score = 0.5
@@ -561,7 +558,7 @@ async def _calculate_action_effectiveness(
 
 
 async def _trigger_realtime_update(
-    store_id: str, batch_id: str, update_data: Dict[str, Any]
+    store_id: str, batch_id: str, update_data: dict[str, Any]
 ):
     """Trigger real-time update for frontend"""
     try:
@@ -596,7 +593,7 @@ async def scan_donation_eligibility_check(
     request: Request,
     donation_scan: DonationScanRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Mobile scanning endpoint for donation eligibility check
@@ -714,7 +711,7 @@ async def execute_donation_action(
     request: Request,
     action_data: ScanOutRequest,  # Reuse existing scan-out model
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Execute donation action from mobile scanning interface
@@ -894,7 +891,7 @@ async def get_donation_quick_scan_list(
     ),
     limit: int = Query(20, ge=1, le=50, description="Maximum items to return"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get mobile-optimized list of donation candidates for quick scanning

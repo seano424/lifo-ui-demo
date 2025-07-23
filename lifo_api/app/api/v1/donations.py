@@ -6,8 +6,7 @@ Implements donation workflow with European food safety compliance
 import time
 import uuid
 from datetime import date, datetime, timedelta
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -20,12 +19,7 @@ from app.auth.secure_dependencies import (
     validate_store_id_format,
 )
 from app.core.donation_engine import (
-    DonationDecisionEngine,
     create_donation_decision_engine,
-)
-from app.core.eu_food_safety import (
-    EUFoodSafetyValidator,
-    create_eu_food_safety_validator,
 )
 from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
@@ -72,20 +66,20 @@ class DonationEligibilityResponse(BaseModel):
     opportunity_cost: float
 
     # Requirements
-    safety_requirements: List[str]
-    handling_instructions: List[str]
-    preferred_recipient_types: List[str]
+    safety_requirements: list[str]
+    handling_instructions: list[str]
+    preferred_recipient_types: list[str]
     temperature_requirements: Optional[str]
 
     # Business reasoning
-    decision_factors: List[str]
+    decision_factors: list[str]
     risk_assessment: str
     business_impact: str
     fallback_action: str
 
     # Compliance
-    regulatory_notes: List[str]
-    compliance_violations: List[str]
+    regulatory_notes: list[str]
+    compliance_violations: list[str]
 
     # Metadata
     calculated_at: datetime
@@ -95,7 +89,7 @@ class DonationEligibilityResponse(BaseModel):
 class BulkDonationEligibilityRequest(BaseModel):
     """Request model for bulk donation eligibility check"""
 
-    batch_ids: List[str]
+    batch_ids: list[str]
     current_temperature: Optional[float] = None
     packaging_condition: str = "good"
     max_results: int = 50
@@ -136,7 +130,7 @@ async def check_donation_eligibility(
     request: Request,
     eligibility_params: DonationEligibilityRequest = Depends(),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Check EU-compliant donation eligibility for a specific batch
@@ -249,7 +243,7 @@ async def check_bulk_donation_eligibility(
     request: Request,
     bulk_request: BulkDonationEligibilityRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Check donation eligibility for multiple batches with EU compliance
@@ -389,7 +383,7 @@ async def create_donation_record(
     request: Request,
     donation_request: CreateDonationRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Create a new donation record with EU compliance validation
@@ -441,13 +435,13 @@ async def create_donation_record(
         current_time = datetime.utcnow()
 
         # Calculate financial impacts
-        unit_cost = float(batch_data.get("cost_price", 0))
+        float(batch_data.get("cost_price", 0))
         unit_selling = float(batch_data.get("selling_price", 0))
         original_value = donation_request.quantity_to_donate * unit_selling
         estimated_social_value = original_value * 0.8  # 80% social value multiplier
 
         # Prepare donation record (this would normally be inserted into database)
-        donation_record = {
+        {
             "donation_id": donation_id,
             "batch_id": batch_id,
             "store_id": store_id,
@@ -544,7 +538,7 @@ async def get_available_recipients(
         None, description="Filter by frozen capability"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get available donation recipients for a store with EU compliance validation
@@ -692,7 +686,7 @@ async def get_donation_tracking(
     limit: int = Query(50, ge=1, le=100, description="Maximum results to return"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Track donation records for a store with EU compliance monitoring
@@ -852,7 +846,7 @@ async def update_donation_status(
     request: Request,
     status_update: UpdateDonationStatusRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Update donation status with EU compliance tracking
@@ -872,14 +866,6 @@ async def update_donation_status(
         current_time = datetime.utcnow()
 
         # Validate status transition logic
-        valid_transitions = {
-            "pending_pickup": ["in_transit", "cancelled"],
-            "in_transit": ["delivered", "cancelled"],
-            "delivered": ["completed"],
-            "completed": [],  # Terminal state
-            "cancelled": [],  # Terminal state
-            "rejected": [],  # Terminal state
-        }
 
         # TODO: In full implementation, would fetch current status from database
         # For MVP, assume transition is valid
@@ -920,7 +906,7 @@ async def update_donation_status(
             }
 
         # Prepare update record
-        update_record = {
+        {
             "donation_id": donation_id,
             "previous_status": "pending_pickup",  # TODO: Get from database
             "new_status": status_update.status,
@@ -1005,7 +991,7 @@ async def get_donation_compliance_report(
         False, description="Include compliance violations detail"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Generate EU compliance report for donation activities
@@ -1155,7 +1141,7 @@ async def get_donation_dashboard(
         "monthly", description="Dashboard timeframe: daily, weekly, monthly"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get comprehensive donation management dashboard data
@@ -1424,7 +1410,7 @@ async def get_donation_analytics(
         False, description="Include comparison with previous period"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get detailed donation analytics with comparison and trends

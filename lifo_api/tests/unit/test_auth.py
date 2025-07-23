@@ -23,7 +23,7 @@ async def test_auth_server():
         print("❌ MANUAL_ACCESS_TOKEN is not set in the environment variables.")
         return False
 
-    print(f"Testing Auth server verification...")
+    print("Testing Auth server verification...")
     print(f"Supabase URL: {supabase_url}")
     print(f"Anon key: {supabase_anon_key[:20]}...")
 
@@ -46,7 +46,7 @@ async def test_auth_server():
                 print("✅ Auth server verification successful!")
                 return True
             else:
-                print(f"❌ Auth server verification failed")
+                print("❌ Auth server verification failed")
                 print(f"Response text: {response.text}")
                 return False
 

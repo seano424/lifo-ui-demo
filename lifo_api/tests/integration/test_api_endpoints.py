@@ -2,9 +2,8 @@
 Integration tests for API endpoints
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 

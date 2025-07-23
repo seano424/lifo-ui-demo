@@ -4,14 +4,12 @@ Implements European food safety regulations for donation system
 EU Regulation 178/2002, 852/2004, 853/2004 compliance
 """
 
-import logging
-from datetime import date, datetime, timedelta
-from decimal import Decimal
+from datetime import date, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import structlog
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 logger = structlog.get_logger()
 
@@ -46,12 +44,12 @@ class EUComplianceResult(BaseModel):
 
     eligible_for_donation: bool
     eligibility_status: DonationEligibility
-    safety_requirements: List[str]
-    regulatory_notes: List[str]
+    safety_requirements: list[str]
+    regulatory_notes: list[str]
     donation_window_days: int
     required_recipient_type: Optional[str]
     temperature_requirements: Optional[str]
-    handling_instructions: List[str]
+    handling_instructions: list[str]
     compliance_score: float
     expires_for_donation: Optional[date]
 
@@ -351,7 +349,7 @@ class EUFoodSafetyValidator:
 
     def _check_temperature_compliance(
         self, eu_category: EUFoodCategory, temperature: float
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Check temperature compliance for EU regulations"""
         temp_ranges = {
             EUFoodCategory.FRESH_MEAT_FISH: {"min": -2, "max": 4, "optimal": 2},
@@ -380,7 +378,7 @@ class EUFoodSafetyValidator:
 
         return {"compliant": True, "requirements": requirements}
 
-    def _get_eu_safety_requirements(self, eu_category: EUFoodCategory) -> List[str]:
+    def _get_eu_safety_requirements(self, eu_category: EUFoodCategory) -> list[str]:
         """Get EU-specific safety requirements for category"""
         base_requirements = [
             "HACCP compliance required",
@@ -413,7 +411,7 @@ class EUFoodSafetyValidator:
 
         return base_requirements + category_specific.get(eu_category, [])
 
-    def _get_handling_instructions(self, eu_category: EUFoodCategory) -> List[str]:
+    def _get_handling_instructions(self, eu_category: EUFoodCategory) -> list[str]:
         """Get handling instructions for donation compliance"""
         base_instructions = [
             "Transfer in appropriate food-grade containers",
@@ -467,7 +465,7 @@ class EUFoodSafetyValidator:
             return 0.0
 
         eu_category = self._map_category_to_eu_category(category)
-        safety_config = self.eu_safety_thresholds[eu_category]
+        self.eu_safety_thresholds[eu_category]
 
         # Base score from compliance
         base_score = compliance_result.compliance_score

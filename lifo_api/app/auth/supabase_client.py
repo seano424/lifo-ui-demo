@@ -3,10 +3,8 @@ Supabase client for automated authentication
 Handles token management, refresh, and service role authentication
 """
 
-import asyncio
-import os
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import httpx
 import structlog
@@ -30,7 +28,7 @@ class SupabaseClient:
 
     async def authenticate_with_email_password(
         self, email: str, password: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Authenticate with email and password
         Returns session data including access_token
@@ -72,7 +70,7 @@ class SupabaseClient:
             logger.error("Authentication error", error=str(e))
             return None
 
-    async def refresh_session(self, refresh_token: str) -> Optional[Dict[str, Any]]:
+    async def refresh_session(self, refresh_token: str) -> Optional[dict[str, Any]]:
         """
         Refresh an existing session using refresh token
         """

@@ -3,12 +3,12 @@ Donation Queries API - Read-only operations for EU donation compliance
 Provides endpoints for querying donation records and compliance data
 """
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import and_, desc, func, or_, select
+from sqlalchemy import desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user
@@ -27,7 +27,7 @@ logger = structlog.get_logger()
 router = APIRouter()
 
 
-@router.get("/recipients", response_model=Dict[str, Any])
+@router.get("/recipients", response_model=dict[str, Any])
 async def get_donation_recipients(
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(50, ge=1, le=100, description="Items per page"),
@@ -43,7 +43,7 @@ async def get_donation_recipients(
 
         # Apply filters
         if active_only:
-            query = query.where(DonationRecipient.is_active == True)
+            query = query.where(DonationRecipient.is_active)
 
         if recipient_type:
             query = query.where(DonationRecipient.recipient_type == recipient_type)
@@ -107,7 +107,7 @@ async def get_donation_recipients(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/records", response_model=Dict[str, Any])
+@router.get("/records", response_model=dict[str, Any])
 async def get_donation_records(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),

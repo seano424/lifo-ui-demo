@@ -4,24 +4,25 @@ Supports full donation lifecycle with European food safety compliance
 """
 
 import uuid
-from datetime import date, datetime
+from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import (
+    DECIMAL,
     Boolean,
     Column,
     Date,
     DateTime,
-    DECIMAL,
-    Enum as SQLEnum,
     Float,
     ForeignKey,
     Integer,
     String,
     Text,
 )
+from sqlalchemy import (
+    Enum as SQLEnum,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from app.database.models import Base

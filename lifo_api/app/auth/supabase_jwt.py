@@ -4,9 +4,8 @@ Provides seamless integration with existing Supabase authentication
 Updated to use modern JWKS-based verification instead of legacy JWT secret
 """
 
-import json
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import httpx
 import jwt
@@ -27,8 +26,8 @@ class SupabaseUser(BaseModel):
     user_id: str
     email: str
     role: str = "authenticated"
-    app_metadata: Dict[str, Any] = {}
-    user_metadata: Dict[str, Any] = {}
+    app_metadata: dict[str, Any] = {}
+    user_metadata: dict[str, Any] = {}
     aud: str = "authenticated"
     exp: int
     iat: int
@@ -286,7 +285,7 @@ class SupabaseAuth:
             self.logger.warning("Service role token verification failed", error=str(e))
             return False
 
-    def extract_user_claims(self, token: str) -> Dict[str, Any]:
+    def extract_user_claims(self, token: str) -> dict[str, Any]:
         """
         Extract custom claims from VERIFIED token only
         SECURITY: Only call this after token has been verified with verify_token()

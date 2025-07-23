@@ -3,18 +3,16 @@ Enhanced LIFO AI Scoring Engine
 Port and enhancement of existing scoring engine with FastAPI integration
 """
 
-import logging
-import uuid
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import structlog
 from pydantic import BaseModel, validator
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import get_scoring_weights, settings
+from app.core.config import get_scoring_weights
 
 logger = structlog.get_logger()
 
@@ -240,7 +238,7 @@ class InventoryScorer:
         days_to_expiry: int,
         current_margin_percent: float,
         current_quantity: float = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate recommendations for expired products based on days past expiry and category
         """
@@ -384,7 +382,7 @@ class InventoryScorer:
         expiry_score: float,
         velocity_score: float,
         margin_score: float,
-        category_weights: Optional[Dict[str, float]] = None,
+        category_weights: Optional[dict[str, float]] = None,
     ) -> float:
         """
         Calculate weighted composite score with enhanced logic
@@ -418,7 +416,7 @@ class InventoryScorer:
         days_to_expiry: int,
         current_margin_percent: float,
         current_quantity: float = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate enhanced AI-powered action recommendations
         """
@@ -503,7 +501,7 @@ class ScoringService:
         self.db = db
         self.logger = structlog.get_logger().bind(component="scoring_service")
 
-    async def get_category_weights(self, category: str) -> Dict[str, float]:
+    async def get_category_weights(self, category: str) -> dict[str, float]:
         """Get category-specific weights from database with fallback"""
         try:
             # Import models here to avoid circular imports
@@ -513,7 +511,7 @@ class ScoringService:
                 select(CategoryWeight).where(
                     and_(
                         CategoryWeight.category == category,
-                        CategoryWeight.is_active == True,
+                        CategoryWeight.is_active,
                     )
                 )
             )
@@ -555,8 +553,8 @@ class ScoringService:
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.models import Batch, SalesEvent
             from app.database.inventory_models import Product
+            from app.database.models import Batch, SalesEvent
 
             # Try to get actual sales data for this specific batch
             if batch_id:
@@ -634,7 +632,7 @@ class ScoringService:
             return 1.0  # Conservative fallback
 
     async def score_batch(
-        self, batch_id: str, category_weights: Dict[str, float] = None, track_recommendation: bool = True
+        self, batch_id: str, category_weights: dict[str, float] = None, track_recommendation: bool = True
     ) -> Optional[ScoringResult]:
         """Score a single batch with enhanced error handling - SECURE READ-ONLY VERSION"""
         try:
@@ -760,7 +758,7 @@ class ScoringService:
 
     async def score_store_inventory(
         self, store_id: str, recalculate_all: bool = False
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Score all active batches for a store with enhanced performance - SECURE READ-ONLY VERSION"""
         start_time = datetime.utcnow()
 
@@ -907,12 +905,12 @@ class ScoringService:
         """Track AI recommendation for analytics"""
         try:
             from app.services.action_tracking import ActionTrackingService
-            
+
             tracker = ActionTrackingService(self.db)
-            
+
             # Map scoring recommendation to database enum
             db_action = tracker.map_scoring_action_to_enum(result.recommendation)
-            
+
             # Create recommendation record
             await tracker.create_recommendation_record(
                 batch_id=result.batch_id,
@@ -921,7 +919,7 @@ class ScoringService:
                 ai_score=result.composite_score,
                 user_id=None,  # System-generated recommendation
             )
-            
+
         except Exception as e:
             # Don't let tracking errors break the scoring
             self.logger.warning("Failed to track AI recommendation", error=str(e))

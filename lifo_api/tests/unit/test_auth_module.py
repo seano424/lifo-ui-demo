@@ -4,11 +4,10 @@ Test the proper authentication module
 """
 
 import asyncio
-import os
 
 from dotenv import load_dotenv
 
-from app.auth.supabase_client import authenticate_for_testing, supabase_client
+from app.auth.supabase_client import supabase_client
 
 # Load environment variables
 load_dotenv(".env.local")
@@ -42,9 +41,8 @@ async def test_auth_module():
     # Option 3: Use your manually extracted token for now
     print("\n3. Testing with your current token:")
     # Replace with your actual token
-    current_token = "YOUR_EXTRACTED_TOKEN_HERE"
     print("You can set your extracted token and test with:")
-    print(f"is_valid = await supabase_client.test_authentication(current_token)")
+    print("is_valid = await supabase_client.test_authentication(current_token)")
 
     # Test API client creation
     print("\n4. Testing API client creation:")

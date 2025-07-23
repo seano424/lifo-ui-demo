@@ -4,11 +4,9 @@ Integrates EU food safety compliance with LIFO.AI scoring system
 Provides intelligent donation recommendations based on EU regulations
 """
 
-import logging
 from datetime import date, datetime, timedelta
-from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import structlog
 from pydantic import BaseModel
@@ -66,16 +64,16 @@ class DonationRecommendation(BaseModel):
     donation_window_expires: Optional[datetime]
 
     # Logistics
-    preferred_recipient_types: List[str]
-    handling_requirements: List[str]
-    transport_instructions: List[str]
+    preferred_recipient_types: list[str]
+    handling_requirements: list[str]
+    transport_instructions: list[str]
 
     # Alternative actions
     fallback_action: str
     fallback_reasoning: str
 
     # Reasoning
-    decision_factors: List[str]
+    decision_factors: list[str]
     risk_assessment: str
     business_impact: str
 
@@ -108,7 +106,7 @@ class DonationDecisionEngine:
 
     def evaluate_donation_opportunity(
         self,
-        batch_data: Dict[str, Any],
+        batch_data: dict[str, Any],
         scoring_result: Optional[ScoringResult] = None,
         current_temperature: Optional[float] = None,
         packaging_condition: str = "good",
@@ -247,7 +245,7 @@ class DonationDecisionEngine:
         total_value: float,
         scoring_result: Any,
         current_quantity: float,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze donation vs discount/disposal alternatives"""
 
         factors = []
@@ -403,7 +401,7 @@ class DonationDecisionEngine:
         }
 
     def _calculate_quick_score(
-        self, batch_data: Dict[str, Any], days_to_expiry: int
+        self, batch_data: dict[str, Any], days_to_expiry: int
     ) -> Any:
         """Calculate quick scoring result if not provided"""
 
@@ -438,7 +436,7 @@ class DonationDecisionEngine:
         current_quantity: float,
         margin_percent: float,
         decision: DonationDecision,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Calculate financial impact of donation decision"""
 
         total_cost = cost_price * current_quantity
@@ -488,7 +486,7 @@ class DonationDecisionEngine:
         compliance_result: EUComplianceResult,
         days_to_expiry: int,
         decision: DonationDecision,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Determine timing and priority for donation actions"""
 
         now = datetime.now()
@@ -531,7 +529,7 @@ class DonationDecisionEngine:
         compliance_result: EUComplianceResult,
         category: str,
         current_quantity: float,
-    ) -> Dict[str, List[str]]:
+    ) -> dict[str, list[str]]:
         """Generate logistics requirements for donation"""
 
         recipient_types = []
@@ -575,7 +573,7 @@ class DonationDecisionEngine:
         }
 
     def _create_fallback_recommendation(
-        self, batch_data: Dict[str, Any], error: str
+        self, batch_data: dict[str, Any], error: str
     ) -> DonationRecommendation:
         """Create safe fallback recommendation when evaluation fails"""
         from app.core.eu_food_safety import DonationEligibility, EUComplianceResult

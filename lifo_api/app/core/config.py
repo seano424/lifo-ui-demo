@@ -3,8 +3,7 @@ Configuration management for LIFO AI Engine
 Handles environment variables and application settings
 """
 
-import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -24,10 +23,10 @@ class Settings(BaseSettings):
     # Server Configuration
     host: str = "0.0.0.0"
     port: int = 8000
-    allowed_hosts: List[str] = ["*"]
+    allowed_hosts: list[str] = ["*"]
 
     # CORS Configuration
-    cors_origins: List[str] = [
+    cors_origins: list[str] = [
         "http://localhost:3000",  # Next.js development
         "http://localhost:3001",  # Alternative dev port
         "https://*.ondigitalocean.app",  # Digital Ocean App Platform
@@ -65,14 +64,14 @@ class Settings(BaseSettings):
     log_format: str = "json"  # json or console
 
     # Scoring Configuration
-    default_scoring_weights: Dict[str, float] = {
+    default_scoring_weights: dict[str, float] = {
         "expiry": 0.5,
         "velocity": 0.3,
         "margin": 0.2,
     }
 
     # Category-specific weights
-    category_weights: Dict[str, Dict[str, float]] = {
+    category_weights: dict[str, dict[str, float]] = {
         "fresh_produce": {"expiry": 0.6, "velocity": 0.25, "margin": 0.15},
         "dairy": {"expiry": 0.45, "velocity": 0.35, "margin": 0.2},
         "bakery_fresh": {"expiry": 0.55, "velocity": 0.25, "margin": 0.2},
@@ -99,10 +98,10 @@ class Settings(BaseSettings):
 
     # Security
     enable_api_key_auth: bool = False
-    api_keys: List[str] = []
+    api_keys: list[str] = []
     rate_limit_per_minute: int = 100
 
-    def get_cors_origins(self) -> List[str]:
+    def get_cors_origins(self) -> list[str]:
         """Get CORS origins based on environment - SECURE VERSION"""
         if self.environment == "production":
             origins = []
@@ -141,7 +140,7 @@ class Settings(BaseSettings):
         # Development only - use default origins
         return self.cors_origins
 
-    def get_allowed_hosts(self) -> List[str]:
+    def get_allowed_hosts(self) -> list[str]:
         """Get allowed hosts based on environment - SECURE VERSION"""
         if self.environment == "production":
             hosts = []
@@ -199,7 +198,7 @@ def get_database_url() -> str:
     return url
 
 
-def get_supabase_config() -> Dict[str, Any]:
+def get_supabase_config() -> dict[str, Any]:
     """
     Get Supabase configuration for authentication
     """
@@ -210,7 +209,7 @@ def get_supabase_config() -> Dict[str, Any]:
     }
 
 
-def get_scoring_weights(category: Optional[str] = None) -> Dict[str, float]:
+def get_scoring_weights(category: Optional[str] = None) -> dict[str, float]:
     """
     Get scoring weights for a specific category or default weights
     """

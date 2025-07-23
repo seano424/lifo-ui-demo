@@ -3,7 +3,7 @@ Global Products API - Read-only operations for global product catalog
 Provides endpoints for querying the global products schema
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -15,8 +15,6 @@ from app.database.connection import get_database
 from app.database.global_models import (
     BarcodeFormat,
     GlobalProduct,
-    OCRExtractionLog,
-    ProductCategory,
     StoreProduct,
 )
 
@@ -25,7 +23,7 @@ logger = structlog.get_logger()
 router = APIRouter()
 
 
-@router.get("/products", response_model=Dict[str, Any])
+@router.get("/products", response_model=dict[str, Any])
 async def get_global_products(
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(50, ge=1, le=100, description="Items per page"),
@@ -39,7 +37,7 @@ async def get_global_products(
 ):
     """Get global products with pagination and filtering"""
     try:
-        query = select(GlobalProduct).where(GlobalProduct.is_active == True)
+        query = select(GlobalProduct).where(GlobalProduct.is_active)
 
         # Apply filters
         if verified_only:
@@ -115,7 +113,7 @@ async def get_global_product(
     try:
         query = select(GlobalProduct).where(
             and_(
-                GlobalProduct.product_id == product_id, GlobalProduct.is_active == True
+                GlobalProduct.product_id == product_id, GlobalProduct.is_active
             )
         )
 
@@ -163,7 +161,7 @@ async def search_by_barcode(
     """Search for a global product by barcode"""
     try:
         query = select(GlobalProduct).where(
-            and_(GlobalProduct.barcode == barcode, GlobalProduct.is_active == True)
+            and_(GlobalProduct.barcode == barcode, GlobalProduct.is_active)
         )
 
         result = await db.execute(query)
@@ -214,7 +212,7 @@ async def get_store_products(
 
         if active_only:
             query = query.where(
-                and_(StoreProduct.is_active == True, GlobalProduct.is_active == True)
+                and_(StoreProduct.is_active, GlobalProduct.is_active)
             )
 
         if category:
@@ -284,7 +282,7 @@ async def get_product_categories(
                 GlobalProduct.primary_category,
                 func.count(GlobalProduct.product_id).label("count"),
             )
-            .where(GlobalProduct.is_active == True)
+            .where(GlobalProduct.is_active)
             .group_by(GlobalProduct.primary_category)
             .order_by(GlobalProduct.primary_category)
         )
@@ -311,7 +309,7 @@ async def get_barcode_formats(
 ):
     """Get supported barcode formats"""
     try:
-        query = select(BarcodeFormat).where(BarcodeFormat.is_active == True)
+        query = select(BarcodeFormat).where(BarcodeFormat.is_active)
         result = await db.execute(query)
         formats = result.scalars().all()
 

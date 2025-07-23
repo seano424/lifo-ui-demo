@@ -4,7 +4,7 @@ Pydantic models for inventory-related API endpoints
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -12,7 +12,6 @@ from app.models.base import (
     BatchStatus,
     ConfigurableModel,
     FilterParams,
-    PaginationParams,
     PaginationResponse,
     SortParams,
     TimestampMixin,
@@ -95,11 +94,11 @@ class DiscountRequest(BaseModel):
 class BulkActionRequest(BaseModel):
     """Request for bulk actions on multiple batches"""
 
-    batch_ids: List[str] = Field(
+    batch_ids: list[str] = Field(
         ..., min_items=1, max_items=100, description="List of batch IDs"
     )
     action_type: str = Field(..., description="Type of action to perform")
-    parameters: Optional[Dict[str, Any]] = Field(
+    parameters: Optional[dict[str, Any]] = Field(
         None, description="Action-specific parameters"
     )
 
@@ -258,10 +257,10 @@ class InventoryItemResponse(ConfigurableModel):
 class InventoryListResponse(ConfigurableModel):
     """Paginated inventory list response"""
 
-    items: List[InventoryItemResponse]
+    items: list[InventoryItemResponse]
     pagination: PaginationResponse
-    summary: Dict[str, Any]
-    filters_applied: Dict[str, Any]
+    summary: dict[str, Any]
+    filters_applied: dict[str, Any]
 
     class Config:
         schema_extra = {
@@ -326,7 +325,7 @@ class InventorySummaryResponse(ConfigurableModel):
     expiring_this_week: int
 
     # Category breakdown
-    categories: List[Dict[str, Any]]
+    categories: list[dict[str, Any]]
 
     # Recent activity
     recent_actions_count: int
@@ -344,7 +343,7 @@ class ActionResult(ConfigurableModel):
     action_type: str
     success: bool
     message: str
-    details: Optional[Dict[str, Any]] = None
+    details: Optional[dict[str, Any]] = None
     executed_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -354,6 +353,6 @@ class BulkActionResponse(ConfigurableModel):
     total_requested: int
     successful: int
     failed: int
-    results: List[ActionResult]
-    summary: Dict[str, Any]
+    results: list[ActionResult]
+    summary: dict[str, Any]
     executed_at: datetime = Field(default_factory=datetime.utcnow)

@@ -3,10 +3,9 @@ Security tests for remaining vulnerabilities: API Performance, Data Validation, 
 ⚠️ FINAL CRITICAL VULNERABILITIES SUMMARY ⚠️
 """
 
-import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -23,14 +22,14 @@ class TestAPIPerformanceVulnerabilities:
         client = TestClient(app)
 
         # Rapid fire requests
-        start_time = time.time()
+        time.time()
         responses = []
 
-        for i in range(50):  # 50 rapid requests
+        for _i in range(50):  # 50 rapid requests
             response = client.get("/health")
             responses.append(response.status_code)
 
-        end_time = time.time()
+        time.time()
 
         # All should succeed - no rate limiting
         success_count = sum(1 for code in responses if code == 200)
@@ -82,7 +81,7 @@ class TestAPIPerformanceVulnerabilities:
         client = TestClient(app)
 
         # Request with parameters that could cause memory issues
-        response = client.get(
+        client.get(
             "/api/v1/inventory/store/test-store",
             params={
                 "limit": 999999,  # Very large limit
@@ -138,7 +137,7 @@ class TestDataValidationVulnerabilities:
             "page": "infinity",
         }
 
-        response = client.get(
+        client.get(
             "/api/v1/inventory/store/test-store", params=malicious_params
         )
 
@@ -157,7 +156,7 @@ class TestDataValidationVulnerabilities:
         ]
 
         for payload in malformed_payloads:
-            response = client.post(
+            client.post(
                 "/api/v1/csv/upload/test-store",
                 data=payload,
                 headers={"Content-Type": "application/json"},
@@ -179,7 +178,7 @@ class TestDataValidationVulnerabilities:
         response = client.get("/health", headers=malicious_headers)
 
         # Check if injection succeeded
-        for header_name, header_value in response.headers.items():
+        for header_name, _header_value in response.headers.items():
             if "X-Injected" in header_name or "Set-Cookie" in header_name:
                 pytest.fail(f"Header injection succeeded: {header_name}")
 
@@ -220,7 +219,7 @@ class TestDeploymentConfigurationVulnerabilities:
 
             # Should not expose sensitive configuration
             sensitive_keys = ["database_url", "jwt_secret", "api_key"]
-            for key in sensitive_keys:
+            for _key in sensitive_keys:
                 if any(
                     sensitive in str(config_data).lower()
                     for sensitive in sensitive_keys
@@ -365,7 +364,7 @@ CRITICAL SECURITY VULNERABILITIES IDENTIFIED ACROSS ALL COMPONENTS:
 
 🔴 CRITICAL (Immediate Action Required):
 1. Authentication bypass via JWT algorithm confusion
-2. SQL injection in database raw queries  
+2. SQL injection in database raw queries
 3. CSV formula injection attacks
 4. Missing rate limiting allowing DoS
 5. No transaction boundaries causing data corruption
@@ -397,7 +396,7 @@ SECURITY SCORE: 2/10 (CRITICAL - IMMEDIATE REMEDIATION REQUIRED)
 
 BUSINESS IMPACT:
 - Complete data breach possible
-- Service disruption attacks viable  
+- Service disruption attacks viable
 - Financial loss through manipulation
 - Regulatory compliance violations
 - Customer data exposure

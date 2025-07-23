@@ -5,7 +5,7 @@ Production-ready connection pool with proper error handling
 
 import asyncio
 import re
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import structlog
 from sqlalchemy import text
@@ -67,7 +67,6 @@ async def init_database():
         # Test the connection
         async with engine.begin() as conn:
             # Import all models to ensure they're registered
-            from app.database import donation_models, global_models, models
 
             # Create tables if they don't exist (for development)
             if settings.debug:
@@ -314,7 +313,6 @@ class DatabaseManager:
                 await session.execute(text("SELECT 1"))
 
                 # Test table access
-                from app.database.models import Store
 
                 result = await session.execute(
                     text("SELECT COUNT(*) FROM business.stores")

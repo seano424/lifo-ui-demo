@@ -4,16 +4,13 @@ Security tests for scoring algorithm edge cases and vulnerabilities
 """
 
 import math
-from decimal import Decimal, InvalidOperation
-from unittest.mock import MagicMock, patch
+from decimal import Decimal
 
 import pytest
 
 from app.core.scoring import (
     InventoryScorer,
     ScoringInput,
-    ScoringResult,
-    ScoringService,
     ScoringWeights,
 )
 
@@ -368,7 +365,7 @@ class TestScoringInputValidationVulnerabilities:
         }
 
         try:
-            confused_input = ScoringInput(**type_confusion_inputs)
+            ScoringInput(**type_confusion_inputs)
             # Should reject type mismatches
             pytest.fail("Type confusion attack succeeded")
         except Exception:
@@ -378,11 +375,6 @@ class TestScoringInputValidationVulnerabilities:
         """🚨 LOW: Unicode normalization allows duplicate/similar inputs"""
 
         # Different unicode representations of similar strings
-        unicode_variants = [
-            "café",  # Normal
-            "cafe\u0301",  # 'e' + combining acute accent
-            "caf\u00e9",  # Precomposed é
-        ]
 
         # These might be treated as different but look identical
         # Could bypass duplicate detection or validation

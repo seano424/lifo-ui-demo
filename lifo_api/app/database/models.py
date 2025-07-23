@@ -5,7 +5,6 @@ Updated to use auth.users schema from Supabase authentication
 """
 
 import uuid
-from datetime import datetime
 
 # Import forward references for global models
 from typing import TYPE_CHECKING
@@ -18,7 +17,6 @@ from sqlalchemy import (
     Column,
     Date,
     DateTime,
-    Float,
     ForeignKey,
     Integer,
     String,
@@ -32,7 +30,7 @@ from sqlalchemy.sql import func
 from app.database.connection import Base
 
 if TYPE_CHECKING:
-    from app.database.global_models import GlobalProduct, StoreProduct
+    pass
 
 
 class User(Base):

@@ -5,7 +5,7 @@ Base Pydantic models and common schemas for LIFO AI Engine
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import BaseModel, Field, validator
 

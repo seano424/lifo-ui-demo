@@ -4,7 +4,7 @@ Part of hybrid architecture security remediation
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
@@ -26,7 +26,7 @@ async def validate_csv_secure(
     store_id: str,
     request: Request,
     file: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Securely validate CSV data for AI processing only
@@ -71,7 +71,7 @@ async def validate_csv_secure(
 @router.get("/template")
 @ai_endpoint_rate_limit("10/minute")  # Template downloads
 async def get_secure_csv_template(
-    request: Request, current_user: Dict[str, Any] = Depends(get_current_user)
+    request: Request, current_user: dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get secure CSV template for inventory data
@@ -122,7 +122,7 @@ async def analyze_csv_with_ai(
     store_id: str,
     request: Request,
     file: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analyze CSV data with AI suggestions

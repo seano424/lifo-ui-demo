@@ -3,8 +3,8 @@ Analytics API endpoints for LIFO AI Engine
 Provides analytics, reporting, and performance metrics
 """
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -13,11 +13,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.secure_dependencies import (
     get_current_user,
     validate_store_access,
-    validate_store_id_format,
 )
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
-from app.models.base import ResponseBase
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -28,7 +26,7 @@ async def get_store_analytics(
     store_id: str,
     days: int = Query(30, ge=1, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get comprehensive analytics for a store
@@ -73,7 +71,7 @@ async def get_store_analytics(
 async def get_dashboard_data(
     store_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get dashboard data for a store (7-day snapshot)
@@ -130,7 +128,7 @@ async def get_performance_metrics(
     store_id: str,
     days: int = Query(30, ge=7, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get performance metrics for waste reduction and revenue optimization
@@ -210,7 +208,7 @@ async def get_trend_analysis(
     ),
     days: int = Query(90, ge=30, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get trend analysis for specific metrics
@@ -224,7 +222,7 @@ async def get_trend_analysis(
 
         # Get analytics data
         read_ops = get_read_only_operations(db)
-        analytics_data = await read_ops.get_store_analytics(store_id, days)
+        await read_ops.get_store_analytics(store_id, days)
 
         # Build trend data (placeholder - would need time series data)
         trend_data = {
@@ -273,7 +271,7 @@ async def get_export_data(
     days: int = Query(30, ge=1, le=365, description="Data period in days"),
     format: str = Query("json", description="Export format (json, csv)"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Export analytics data in various formats

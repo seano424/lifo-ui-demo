@@ -3,15 +3,12 @@ Security tests for CORS and network vulnerabilities
 ⚠️ CRITICAL CORS AND NETWORK VULNERABILITIES DETECTED ⚠️
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-import requests
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.testclient import TestClient
 
-from app.core.config import Settings, settings
+from app.core.config import settings
 from app.main import app
 
 
@@ -22,7 +19,7 @@ class TestCORSVulnerabilities:
         """🚨 CRITICAL: Wildcard subdomain allows malicious subdomains"""
         # Test Digital Ocean wildcard pattern
         with patch.object(settings, "cors_origins", ["https://*.ondigitalocean.app"]):
-            cors_origins = settings.get_cors_origins()
+            settings.get_cors_origins()
 
             # Malicious subdomains that would be allowed
             malicious_subdomains = [
@@ -174,7 +171,7 @@ class TestNetworkSecurityVulnerabilities:
 
         # Rapid-fire requests to test rate limiting
         responses = []
-        for i in range(100):  # 100 requests
+        for _i in range(100):  # 100 requests
             response = client.get("/health")
             responses.append(response.status_code)
 
@@ -192,7 +189,7 @@ class TestNetworkSecurityVulnerabilities:
         # Large payload attack
         large_payload = {"data": "x" * 1000000}  # 1MB payload
 
-        response = client.post(
+        client.post(
             "/api/v1/csv/upload/test-store",
             json=large_payload,  # Large JSON payload
         )
@@ -237,7 +234,7 @@ class TestNetworkSecurityVulnerabilities:
             "X-Forwarded-Port": "443",
         }
 
-        response = client.get("/health", headers=spoofed_headers)
+        client.get("/health", headers=spoofed_headers)
 
         # System might trust these headers for logging/analytics
         # Could lead to IP spoofing and bypassing security
@@ -388,7 +385,7 @@ class TestAPISecurityHeaders:
         client = TestClient(app)
 
         # Send JSON with wrong content type
-        response = client.post(
+        client.post(
             "/api/v1/csv/upload/test-store",
             headers={"Content-Type": "text/plain"},
             data='{"malicious": "data"}',
