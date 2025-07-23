@@ -2,6 +2,8 @@
 
 import { cn } from '@/lib/utils'
 import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import Link from 'next/link'
 
 type LogoVariant = 'vertical' | 'horizontal' | 'icon'
 type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
@@ -54,7 +56,7 @@ export function Logo({
   }
 
   const logoElement = (
-    <img
+    <Image
       src={getLogoPath()}
       alt="LIFO"
       className={cn(
@@ -62,14 +64,16 @@ export function Logo({
         'w-auto transition-opacity duration-200 hover:opacity-80',
         className,
       )}
+      width={100}
+      height={100}
     />
   )
 
   if (href) {
     return (
-      <a href={href} className="inline-block">
+      <Link href={href} className="inline-block">
         {logoElement}
-      </a>
+      </Link>
     )
   }
 
@@ -77,16 +81,24 @@ export function Logo({
 }
 
 // Specific logo components for common use cases
-export function NavbarLogo({ className }: { className?: string }) {
-  return <Logo variant="vertical" size="md" className={className} />
+export function NavbarLogo({
+  className,
+  size = 'md',
+  variant = 'vertical',
+}: {
+  className?: string
+  size?: LogoSize
+  variant?: LogoVariant
+}) {
+  return <Logo variant={variant} size={size} className={className} />
 }
 
-export function AppIcon({ className }: { className?: string }) {
-  return <Logo variant="icon" size="sm" className={className} />
+export function AppIcon({ className, size = 'sm' }: { className?: string; size?: LogoSize }) {
+  return <Logo variant="icon" size={size} className={className} />
 }
 
-export function HeroLogo({ className }: { className?: string }) {
-  return <Logo variant="vertical" size="xl" className={className} />
+export function HeroLogo({ className, size = 'xl' }: { className?: string; size?: LogoSize }) {
+  return <Logo variant="vertical" size={size} className={className} />
 }
 
 // For loading states or when you need a placeholder

@@ -1,5 +1,6 @@
 {
   "navigation": {
+    "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
     "inbound": "Inkomend",

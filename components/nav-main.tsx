@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRight, type LucideIcon } from 'lucide-react'
-
+import { useTranslations } from 'next-intl'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 import {
@@ -33,10 +33,11 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
+  const t = useTranslations('navigation')
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel className="uppercase">{t('dashboard-title')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map(item =>
           item.items && item.items.length > 0 ? (

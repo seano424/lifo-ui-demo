@@ -28,6 +28,8 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import { useCurrentUser } from '@/hooks/use-users'
+import { NavbarLogo } from './ui/logo'
+import { cn } from '@/lib/utils'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
@@ -115,11 +117,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
+        <div className={cn('flex items-center justify-center')}>
+          <NavbarLogo size="lg" />
+        </div>
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navigationData.navMain} />
-        {/* <NavProjects projects={navigationData.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
