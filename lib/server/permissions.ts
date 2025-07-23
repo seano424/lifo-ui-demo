@@ -184,7 +184,7 @@ export async function getUserAccessibleStores(
 > {
   try {
     // Get stores via store_users table
-    const { data: storeUsers, error: storeUsersError } = await serverClient
+    const { data: storeUsers } = await serverClient
       .schema('business')
       .from('store_users')
       .select(
@@ -202,8 +202,7 @@ export async function getUserAccessibleStores(
       .eq('is_active', true)
       .eq('stores.is_active', true)
 
-    // Get stores where user is owner
-    const { data: ownedStores, error: ownedStoresError } = await serverClient
+    const { data: ownedStores } = await serverClient
       .schema('business')
       .from('stores')
       .select('store_id, store_name')
@@ -217,7 +216,6 @@ export async function getUserAccessibleStores(
       permissions: UserStorePermissions
     }> = []
 
-    // Process store_users relationships
     if (storeUsers) {
       for (const storeUser of storeUsers) {
         const permissionsResult = await checkUserStorePermissions(
@@ -229,7 +227,8 @@ export async function getUserAccessibleStores(
         if (permissionsResult.hasAccess && permissionsResult.permissions) {
           accessibleStores.push({
             storeId: storeUser.store_id,
-            storeName: (storeUser.stores as any).store_name,
+            storeName: (storeUser.stores as { store_name: string; is_active: boolean }[])[0]
+              .store_name,
             role: storeUser.role_in_store,
             permissions: permissionsResult.permissions,
           })
@@ -237,10 +236,8 @@ export async function getUserAccessibleStores(
       }
     }
 
-    // Process owned stores (in case they're not in store_users table)
     if (ownedStores) {
       for (const store of ownedStores) {
-        // Check if already added via store_users
         const alreadyAdded = accessibleStores.some(s => s.storeId === store.store_id)
 
         if (!alreadyAdded) {
@@ -270,9 +267,9 @@ export async function getUserAccessibleStores(
 }
 
 /**
- * Middleware-like function to check access and return common page props
+ * Middleware-like function to check access and return common page props.
  */
-export async function withStoreAccess<T = {}>(
+export async function withStoreAccess<T = object>(
   userId: string,
   storeId: string,
   requiredPermission: keyof Omit<UserStorePermissions, 'storeId' | 'userId' | 'role'>,

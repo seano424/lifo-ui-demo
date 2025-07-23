@@ -33,30 +33,21 @@ import { StoreUsersList } from '@/components/store-users/store-users-list'
 
 interface TeamManagementProps {
   serverPermissions?: UserStorePermissions
-  storeId: string
   storeName: string
 }
 
-export default function TeamManagement({
-  serverPermissions,
-  storeId,
-  storeName,
-}: TeamManagementProps) {
+export default function TeamManagement({ serverPermissions, storeName }: TeamManagementProps) {
   const t = useTranslations('team')
   const [activeTab, setActiveTab] = useState('overview')
 
-  // 🚀 Use hybrid permissions hook with server permissions as fallback
   const permissions = useStorePermissions({ serverPermissions })
 
-  // Fetch team data with different filters
   const { data: allUsers, count: totalCount, isLoading } = useStoreUsers()
-  const { data: activeUsers, count: activeCount } = useActiveStoreUsers()
+  const { count: activeCount } = useActiveStoreUsers()
   const { data: owners, count: ownerCount } = useStoreOwners()
   const { data: managers, count: managerCount } = useStoreManagers()
   const { data: employees, count: employeeCount } = useStoreEmployees()
 
-  // Calculate team statistics
-  const inactiveCount = totalCount - activeCount
   const pinEnabledCount = allUsers.filter(user => user.can_use_pin_auth && user.requires_pin).length
   const recentlyAddedCount = allUsers.filter(user => {
     const addedDate = new Date(user.assigned_at || user.created_at)
@@ -89,7 +80,6 @@ export default function TeamManagement({
     )
   }
 
-  // Permission check
   if (!permissions.canManageTeam) {
     return (
       <Card>
@@ -97,7 +87,7 @@ export default function TeamManagement({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              You don't have permission to manage team members. Contact your store{' '}
+              You don&apos;t have permission to manage team members. Contact your store{' '}
               {permissions.isEmployee ? 'manager or owner' : 'owner'} for access.
             </AlertDescription>
           </Alert>
@@ -108,7 +98,6 @@ export default function TeamManagement({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -122,7 +111,6 @@ export default function TeamManagement({
               </Typography>
             </div>
             <div className="flex items-center gap-2">
-              {/* Permission indicator */}
               <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs">
                 <Shield className="h-3 w-3" />
                 {permissions.isOwner ? 'Owner' : permissions.isManager ? 'Manager' : 'Employee'}
@@ -132,7 +120,6 @@ export default function TeamManagement({
         </CardHeader>
       </Card>
 
-      {/* Team Overview Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
@@ -153,9 +140,7 @@ export default function TeamManagement({
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
-          {/* Team Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4">
@@ -222,7 +207,6 @@ export default function TeamManagement({
             </Card>
           </div>
 
-          {/* Role Distribution */}
           <Card>
             <CardHeader>
               <Typography variant="h3">{t('overview.roleDistribution')}</Typography>
@@ -283,7 +267,6 @@ export default function TeamManagement({
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
           <Card>
             <CardHeader>
               <Typography variant="h3">{t('overview.quickActions')}</Typography>
@@ -330,15 +313,12 @@ export default function TeamManagement({
           </Card>
         </TabsContent>
 
-        {/* Members Tab - Full Team List */}
         <TabsContent value="members" className="space-y-6">
           <StoreUsersList />
         </TabsContent>
 
-        {/* Roles Tab - Role-based Management */}
         <TabsContent value="roles" className="space-y-6">
           <div className="grid gap-6">
-            {/* Owners Section */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -379,7 +359,6 @@ export default function TeamManagement({
               </CardContent>
             </Card>
 
-            {/* Managers Section */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -422,7 +401,6 @@ export default function TeamManagement({
               </CardContent>
             </Card>
 
-            {/* Employees Section */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -472,7 +450,6 @@ export default function TeamManagement({
           </div>
         </TabsContent>
 
-        {/* Activity Tab - Recent Activity */}
         <TabsContent value="activity" className="space-y-6">
           <Card>
             <CardHeader>
@@ -483,7 +460,6 @@ export default function TeamManagement({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* This would show recent team activities */}
                 <div className="text-center py-12">
                   <Activity className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <Typography variant="h3">{t('activity.comingSoon')}</Typography>
@@ -497,7 +473,6 @@ export default function TeamManagement({
         </TabsContent>
       </Tabs>
 
-      {/* Debug Info (Development only) */}
       {process.env.NODE_ENV === 'development' && serverPermissions && (
         <Card>
           <CardContent className="p-4">

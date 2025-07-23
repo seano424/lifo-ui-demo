@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
 import { NavbarLogo } from '@/components/ui/logo'
@@ -55,12 +54,6 @@ interface MarketingNavProps {
 }
 
 const MarketingNav = ({
-  logo = {
-    url: '/',
-    src: '/logo.png',
-    alt: 'logo',
-    title: 'LIFO.AI',
-  },
   menu,
   auth = {
     login: { title: 'Login', url: '#' },
@@ -139,7 +132,6 @@ const MarketingNav = ({
   const menuItems = menu || defaultMenu
   return (
     <section className="py-6 fixed top-0 left-0 right-0 z-50 h-24 backdrop-blur-xs flex flex-col justify-center bg-background/80">
-      {/* Desktop Menu */}
       <nav className="hidden justify-between lg:flex container mx-auto">
         <NavbarLogo />
 
@@ -152,10 +144,8 @@ const MarketingNav = ({
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <NavbarLogo />
           <Sheet>
             <SheetTrigger asChild>

@@ -15,7 +15,6 @@ export default async function StoreSettingsPage() {
     const { queryClient } = await createPrefetchedQuery()
     const serverClient = await createServerClient()
 
-    // Get the current user
     const {
       data: { user },
     } = await serverClient.auth.getUser()
@@ -31,7 +30,6 @@ export default async function StoreSettingsPage() {
       )
     }
 
-    // Get user's accessible stores to determine active store
     const userStores = await fetchUserStores(user.id, serverClient)
 
     if (userStores.length === 0) {
@@ -40,14 +38,13 @@ export default async function StoreSettingsPage() {
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              You don't have access to any stores yet. Contact your administrator.
+              You don&apos;t have access to any stores yet. Contact your administrator.
             </AlertDescription>
           </Alert>
         </div>
       )
     }
 
-    // Determine active store - SAME LOGIC AS CLIENT
     const cookieStore = await cookies()
     const lastActiveStoreId = cookieStore.get('activeStoreId')?.value
 
@@ -68,8 +65,8 @@ export default async function StoreSettingsPage() {
       const errorMessages = {
         unauthorized: 'Authentication error. Please try logging in again.',
         forbidden:
-          "You don't have permission to view store settings. Contact your store manager or owner.",
-        'not-found': "Store not found or you don't have access to it.",
+          'You don&apos;t have permission to view store settings. Contact your store manager or owner.',
+        'not-found': 'Store not found or you don&apos;t have access to it.',
       }
 
       return (
@@ -82,27 +79,22 @@ export default async function StoreSettingsPage() {
       )
     }
 
-    // 🚀 CRITICAL FIX: Prefetch with exact same query key pattern as client
     try {
       await queryClient.prefetchQuery({
         queryKey: queryKeys.stores.detail(targetStore.store_id),
         queryFn: () => fetchStoreSettings(targetStore.store_id, serverClient),
         staleTime: 5 * 60 * 1000, // 5 minutes
       })
-
-      console.log('✅ Store settings prefetched successfully for store:', targetStore.store_id)
     } catch (prefetchError) {
       console.error('⚠️ Failed to prefetch store settings:', prefetchError)
-      // Don't fail the page - the component will handle the error state
     }
 
     return (
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="max-w-5xl mx-auto space-y-6">
-          {/* 🚀 CRITICAL: Pass the determined storeId to prevent activeStoreId mismatch */}
           <StoreInformation
             serverPermissions={accessResult.permissions}
-            storeId={targetStore.store_id} // ← This ensures immediate storeId availability
+            storeId={targetStore.store_id}
           />
         </div>
       </HydrationBoundary>

@@ -14,7 +14,6 @@ export default async function TeamSettingsPage() {
   const serverClient = await createServerClient()
 
   try {
-    // Get the current user
     const {
       data: { user },
       error: authError,
@@ -35,7 +34,6 @@ export default async function TeamSettingsPage() {
       )
     }
 
-    // Get user's accessible stores to determine active store
     const userStores = await fetchUserStores(user.id, serverClient)
 
     if (userStores.length === 0) {
@@ -53,7 +51,6 @@ export default async function TeamSettingsPage() {
       )
     }
 
-    // Determine active store from cookies - SAME LOGIC AS CLIENT
     const cookieStore = await cookies()
     const lastActiveStoreId = cookieStore.get('activeStoreId')?.value
 
@@ -62,7 +59,6 @@ export default async function TeamSettingsPage() {
       targetStore = userStores[0].store
     }
 
-    // Check team management permissions
     const accessResult = await withStoreAccess(
       user.id,
       targetStore.store_id,
@@ -96,11 +92,9 @@ export default async function TeamSettingsPage() {
       )
     }
 
-    // 🚀 CRITICAL: Prefetch with exact same query keys that client will use
     try {
       console.log('🚀 Prefetching store users for store:', targetStore.store_id)
 
-      // Prefetch first page of store users - EXACT SAME QUERY KEY AS CLIENT
       await queryClient.prefetchInfiniteQuery({
         queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, {}),
         queryFn: () =>
@@ -108,7 +102,6 @@ export default async function TeamSettingsPage() {
         initialPageParam: 0,
       })
 
-      // Prefetch active users specifically
       await queryClient.prefetchInfiniteQuery({
         queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, { is_active: true }),
         queryFn: () =>
@@ -121,7 +114,6 @@ export default async function TeamSettingsPage() {
         initialPageParam: 0,
       })
 
-      // Prefetch users by role for role management
       const roles = ['owner', 'manager', 'employee'] as const
       await Promise.all(
         roles.map(role =>
@@ -142,13 +134,11 @@ export default async function TeamSettingsPage() {
       console.log('✅ Store users prefetched successfully for store:', targetStore.store_id)
     } catch (error) {
       console.error('⚠️ Failed to prefetch team data:', error)
-      // Don't fail the page, just show error in component
     }
 
     return (
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="max-w-5xl mx-auto space-y-6">
-          {/* 🚀 CRITICAL: Pass the determined storeId to prevent context dependency */}
           <StoreUsersList
             storeId={targetStore.store_id}
             serverPermissions={accessResult.permissions}

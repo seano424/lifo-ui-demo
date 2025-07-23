@@ -647,7 +647,6 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
         </>
       )}
 
-      {/* Debug Info (Development only) */}
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <Typography variant="small" className="font-medium text-yellow-800 mb-2">

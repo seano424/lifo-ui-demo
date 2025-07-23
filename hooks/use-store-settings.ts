@@ -44,7 +44,8 @@ export function useStorePermissions({
         serverPermissions.canEditBasicInfo ||
         serverPermissions.isOwner ||
         serverPermissions.isManager,
-      canEditAdvancedSettings: serverPermissions.canEditAdvancedSettings || serverPermissions.isOwner,
+      canEditAdvancedSettings:
+        serverPermissions.canEditAdvancedSettings || serverPermissions.isOwner,
       canEditAISettings: serverPermissions.isOwner,
       canViewSettings:
         serverPermissions.canViewSettings ||

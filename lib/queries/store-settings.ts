@@ -337,18 +337,20 @@ export async function testTableAccess(
 
   // Method 1: Try RPC function
   try {
-    const { data, error } = await supabase.rpc('get_store_settings', {
+    const { error } = await supabase.rpc('get_store_settings', {
       store_id_param: storeId,
     })
 
     if (!error) {
       return { success: true, method: 'RPC function' }
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error('❌ Method 1 (RPC function) exception:', error)
+  }
 
   // Method 2: Try business schema access
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .schema('business')
       .from('stores')
       .select('store_id, store_name')

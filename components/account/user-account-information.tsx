@@ -13,11 +13,10 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
-import { isValidPhoneNumber, formatPhoneNumber, type SupportedLanguage } from '@/lib/types/user'
+import { isValidPhoneNumber, formatPhoneNumber } from '@/lib/types/user'
 import { Edit, Check, X, AlertCircle, User, Phone, Globe, Shield, Clock } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
-// Validation schema for profile updates
 const createProfileSchema = (t: (key: string) => string) =>
   z.object({
     full_name: z
@@ -41,15 +40,12 @@ export default function UserAccountInformation() {
   const updatePhone = useUpdatePhone()
   const { updateUserProfile } = useUserActions()
 
-  // Edit states
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [isEditingPhone, setIsEditingPhone] = useState(false)
 
-  // Form states
   const [phoneForm, setPhoneForm] = useState('')
   const [phoneError, setPhoneError] = useState('')
 
-  // Profile form with validation
   const profileSchema = createProfileSchema(t)
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -59,7 +55,6 @@ export default function UserAccountInformation() {
     },
   })
 
-  // Update forms when user data loads
   useEffect(() => {
     if (user) {
       profileForm.reset({
@@ -81,7 +76,6 @@ export default function UserAccountInformation() {
       setIsEditingProfile(false)
     } catch (error) {
       console.error('Profile update error:', error)
-      // Error is handled by the hook with toast notifications
     }
   }
 
@@ -90,7 +84,6 @@ export default function UserAccountInformation() {
 
     setPhoneError('')
 
-    // Validate phone number
     if (phoneForm && !isValidPhoneNumber(phoneForm)) {
       setPhoneError(t('phone.invalidPhone'))
       return
@@ -180,7 +173,6 @@ export default function UserAccountInformation() {
       </CardHeader>
 
       <CardContent className="space-y-6 pt-4 border-t">
-        {/* Profile Information Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Typography variant="h3" className="flex items-center gap-2">
@@ -204,7 +196,6 @@ export default function UserAccountInformation() {
             <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)} className="space-y-4">
               <div className="space-y-4 p-4 border rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Full Name */}
                   <div className="space-y-2">
                     <Label htmlFor="full_name">{t('profile.fullName')}</Label>
                     <Input
@@ -219,7 +210,6 @@ export default function UserAccountInformation() {
                     )}
                   </div>
 
-                  {/* Username */}
                   <div className="space-y-2">
                     <Label htmlFor="username">{t('profile.username')}</Label>
                     <Input
@@ -290,7 +280,6 @@ export default function UserAccountInformation() {
           )}
         </div>
 
-        {/* Phone Number Section */}
         <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">
             <Typography variant="h3" className="flex items-center gap-2">
@@ -369,7 +358,6 @@ export default function UserAccountInformation() {
           )}
         </div>
 
-        {/* Language Preference Section */}
         <div className="space-y-4 pt-4 border-t">
           <Typography variant="h3" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
@@ -387,7 +375,6 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        {/* Account Status Section */}
         <div className="space-y-4 pt-4 border-t">
           <Typography variant="h3" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
@@ -439,7 +426,6 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        {/* Account Activity Section */}
         <div className="space-y-4 pt-4 border-t">
           <Typography variant="h3" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
@@ -469,7 +455,6 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        {/* Security Notice */}
         <div className="pt-4 border-t">
           <Alert>
             <Shield className="h-4 w-4" />
