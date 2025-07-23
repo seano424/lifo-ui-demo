@@ -2,12 +2,12 @@ name: Code Quality
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
   pull_request:
-    branches: [main, develop]
+    branches: [main]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
