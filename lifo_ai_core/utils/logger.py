@@ -127,7 +127,9 @@ def log_csv_processing(
     )
 
 
-def log_database_operation(operation: str, table: str, affected_rows: int, execution_time: float) -> None:
+def log_database_operation(
+    operation: str, table: str, affected_rows: int, execution_time: float
+) -> None:
     """Log database operation"""
     get_logger().info(
         f"Database {operation} completed",

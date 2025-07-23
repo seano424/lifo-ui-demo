@@ -243,7 +243,9 @@ class UnifiedCSVProcessor:
             logger.error(f"Unexpected error during CSV processing: {e}")
             return self._error_result(f"Processing failed: {e}")
 
-    async def _validate_file_security(self, file_path: str, file_content: Optional[bytes] = None) -> None:
+    async def _validate_file_security(
+        self, file_path: str, file_content: Optional[bytes] = None
+    ) -> None:
         """Comprehensive security validation"""
 
         if file_content:

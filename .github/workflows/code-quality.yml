@@ -72,6 +72,7 @@ jobs:
         working-directory: ./lifo_ai_core
         run: |
           uv pip install -r requirements.txt
+          ruff check --select I --fix .
           ruff check --output-format=github .
           ruff format --check .
           mypy . --no-error-summary
