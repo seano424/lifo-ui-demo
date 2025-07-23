@@ -8,13 +8,13 @@ import {
   Frame,
   Map,
   PieChart,
-  Settings2,
   SquareTerminal,
   Calendar,
   Box,
   BarChart,
   Target,
   HelpCircle,
+  SettingsIcon,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -76,29 +76,12 @@ function useNavigationData() {
         {
           title: t('settings'),
           url: '/dashboard/settings',
-          icon: Settings2,
+          icon: SettingsIcon,
         },
         {
           title: t('helpCenter'),
           url: '/dashboard/help-center',
           icon: HelpCircle,
-        },
-      ],
-      projects: [
-        {
-          name: 'Design Engineering',
-          url: '/dashboard',
-          icon: Frame,
-        },
-        {
-          name: 'Sales & Marketing',
-          url: '/dashboard',
-          icon: PieChart,
-        },
-        {
-          name: 'Travel',
-          url: '/dashboard',
-          icon: Map,
         },
       ],
     }),
