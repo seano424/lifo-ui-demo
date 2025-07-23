@@ -460,130 +460,58 @@ export function useAuthGuard() {
   }
 }
 
-// 🆕 NEW: Language preference hooks
-export function useUpdateLanguagePreference() {
-  const queryClient = useQueryClient()
+// ======================================
+// Enhanced User Hooks
+// ======================================
 
-  return useMutation<
-    UpdateLanguageResponse,
-    Error,
-    { userId: string; language: SupportedLanguage }
-  >({
-    mutationFn: async ({ userId, language }) => {
-      return await updateUserLanguagePreference(userId, language)
-    },
-    onSuccess: (data, variables) => {
-      // Invalidate user queries to refetch updated data
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(variables.userId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
-
-      toast.success(`Language updated to ${SUPPORTED_LANGUAGES[variables.language]}`)
-    },
-    onError: error => {
-      console.error('Failed to update language preference:', error)
-      toast.error(`Failed to update language: ${error.message}`)
-    },
-  })
-}
-
-// 🆕 NEW: Phone update hooks
+// Enhanced phone update hook
 export function useUpdatePhone() {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdatePhoneResponse, Error, { userId: string; phone: string | null }>({
-    mutationFn: async ({ userId, phone }) => {
-      return await updateUserPhone(userId, phone)
-    },
-    onSuccess: (data, variables) => {
+  return useMutation({
+    mutationFn: ({ userId, phone }: { userId: string; phone: string | null }) =>
+      updateUserPhone(userId, phone),
+    onSuccess: (data: UpdatePhoneResponse, { phone }) => {
       // Invalidate user queries to refetch updated data
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(variables.userId) })
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
-
-      toast.success(variables.phone ? 'Phone number updated' : 'Phone number removed')
+      queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      
+      if (phone) {
+        toast.success('Phone number updated successfully')
+      } else {
+        toast.success('Phone number removed successfully')
+      }
     },
-    onError: error => {
-      console.error('Failed to update phone:', error)
-      toast.error(`Failed to update phone: ${error.message}`)
+    onError: (error) => {
+      console.error('Phone update error:', error)
+      toast.error('Failed to update phone number')
     },
   })
 }
 
-// 🆕 NEW: Convenience hooks for filtering users
-export function useUsersByLanguage(language: SupportedLanguage) {
-  return useUsers({ language })
-}
+// Enhanced language update hook
+export function useUpdateLanguagePreference() {
+  const queryClient = useQueryClient()
 
-export function useUsersWithPhone() {
-  return useUsers({ has_phone: true })
-}
-
-export function useUsersWithoutPhone() {
-  return useUsers({ has_phone: false })
-}
-
-// Existing hooks (unchanged)
-export function useUser(userId: string): UseQueryResult<User, Error> {
-  return useQuery({
-    queryKey: queryKeys.users.detail(userId),
-    queryFn: async (): Promise<User> => {
-      return await fetchUserById(userId)
+  return useMutation({
+    mutationFn: ({ userId, language }: { userId: string; language: SupportedLanguage }) =>
+      updateUserLanguagePreference(userId, language),
+    onSuccess: (data: UpdateLanguageResponse, { language }) => {
+      // Invalidate user queries to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      
+      toast.success(`Language preference updated to ${language.toUpperCase()}`)
+      
+      // Trigger app language change (if using next-intl)
+      if (typeof window !== 'undefined') {
+        // This would trigger a language change in your app
+        window.location.reload()
+      }
     },
-    enabled: !!userId,
-  })
-}
-
-export function useUserRoles(userId: string) {
-  return useQuery({
-    queryKey: [...queryKeys.users.detail(userId), 'roles'],
-    queryFn: () => fetchUserRoles(userId),
-    enabled: !!userId,
-  })
-}
-
-export function useUserHasRole(userId: string, roleName: string) {
-  return useQuery({
-    queryKey: [...queryKeys.users.detail(userId), 'hasRole', roleName],
-    queryFn: () => checkUserHasRole(userId, roleName),
-    enabled: !!userId && !!roleName,
-  })
-}
-
-export function useActiveUsers() {
-  return useUsers({ is_active: true })
-}
-
-export function useInactiveUsers() {
-  return useUsers({ is_active: false })
-}
-
-export function useUsersByRole(roleName: string) {
-  return useUsers({ role: roleName })
-}
-
-export function useEmployees() {
-  return useUsersByRole('employee')
-}
-
-export function useManagers() {
-  return useUsersByRole('manager')
-}
-
-export function useAdmins() {
-  return useUsersByRole('admin')
-}
-
-export function usePinRequiredUsers() {
-  return useUsers({ requires_pin: true })
-}
-
-export function usePinLockedUsers() {
-  return useQuery({
-    queryKey: ['users', 'pinLocked'],
-    queryFn: async () => {
-      const { data } = await fetchUsersPage({ page: 0, pageSize: 100 }, { pin_locked: true })
-      return data
+    onError: (error) => {
+      console.error('Language update error:', error)
+      toast.error('Failed to update language preference')
     },
   })
 }
@@ -670,6 +598,7 @@ export function useUserActions() {
     id: string,
     profileData: {
       full_name?: string
+      username?: string
       email?: string
       phone?: string | null // 🆕
       language_preference?: SupportedLanguage // 🆕
@@ -742,4 +671,82 @@ export function useUserActions() {
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
   }
+}
+
+// Convenience hooks for filtering users
+export function useUsersByLanguage(language: SupportedLanguage) {
+  return useUsers({ language })
+}
+
+export function useUsersWithPhone() {
+  return useUsers({ has_phone: true })
+}
+
+export function useUsersWithoutPhone() {
+  return useUsers({ has_phone: false })
+}
+
+// Existing hooks (unchanged)
+export function useUser(userId: string): UseQueryResult<User, Error> {
+  return useQuery({
+    queryKey: queryKeys.users.detail(userId),
+    queryFn: async (): Promise<User> => {
+      return await fetchUserById(userId)
+    },
+    enabled: !!userId,
+  })
+}
+
+export function useUserRoles(userId: string) {
+  return useQuery({
+    queryKey: [...queryKeys.users.detail(userId), 'roles'],
+    queryFn: () => fetchUserRoles(userId),
+    enabled: !!userId,
+  })
+}
+
+export function useUserHasRole(userId: string, roleName: string) {
+  return useQuery({
+    queryKey: [...queryKeys.users.detail(userId), 'hasRole', roleName],
+    queryFn: () => checkUserHasRole(userId, roleName),
+    enabled: !!userId && !!roleName,
+  })
+}
+
+export function useActiveUsers() {
+  return useUsers({ is_active: true })
+}
+
+export function useInactiveUsers() {
+  return useUsers({ is_active: false })
+}
+
+export function useUsersByRole(roleName: string) {
+  return useUsers({ role: roleName })
+}
+
+export function useEmployees() {
+  return useUsersByRole('employee')
+}
+
+export function useManagers() {
+  return useUsersByRole('manager')
+}
+
+export function useAdmins() {
+  return useUsersByRole('admin')
+}
+
+export function usePinRequiredUsers() {
+  return useUsers({ requires_pin: true })
+}
+
+export function usePinLockedUsers() {
+  return useQuery({
+    queryKey: ['users', 'pinLocked'],
+    queryFn: async () => {
+      const { data } = await fetchUsersPage({ page: 0, pageSize: 100 }, { pin_locked: true })
+      return data
+    },
+  })
 }

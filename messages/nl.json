@@ -49,6 +49,7 @@
     "title": "Instellingen",
     "description": "Beheer uw voorkeuren en accountinstellingen",
     "language": {
+      "currentLanguage": "Huidige taal",
       "title": "Taal",
       "description": "Kies uw voorkeurstaal voor de interface",
       "preferred": "Voorkeurstaal"
@@ -306,6 +307,14 @@
     "errors": {
       "updateProfile": "Kan profiel niet bijwerken",
       "updatePhone": "Kan telefoonnummer niet bijwerken"
+    },
+    "activity": {
+      "memberSince": "Lid sinds {date}",
+      "lastLogin": "Laatste login: {date}",
+      "failedAttempts": "{count} mislukte PIN poging{plural}"
+    },
+    "security": {
+      "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
     }
   },
   "common": {
