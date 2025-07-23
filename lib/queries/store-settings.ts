@@ -237,17 +237,12 @@ export async function debugStoreAccess(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('🔍 Debug: Testing RPC store access...')
-
     // Test 1: Check RPC function access
     const { data: rpcData, error: rpcError } = await supabase.rpc('get_store_settings', {
       store_id_param: storeId,
     })
 
-    console.log('RPC result:', { rpcData, rpcError })
-
     // Test 2: Check user's role in the store via business schema
-    console.log('🔍 Debug: Testing user store role...')
     const { data: roleData, error: roleError } = await supabase
       .schema('business')
       .from('store_users')
@@ -256,16 +251,11 @@ export async function debugStoreAccess(
       .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
       .single()
 
-    console.log('Role result:', { roleData, roleError })
-
     // Test 3: Try a minimal RPC update
-    console.log('🔍 Debug: Testing RPC update...')
     const { data: updateData, error: updateError } = await supabase.rpc('update_store_settings', {
       store_id_param: storeId,
       // Only update the timestamp to test permissions
     })
-
-    console.log('RPC Update result:', { updateData, updateError })
 
     return {
       rpcTest: { data: rpcData, error: rpcError },
@@ -273,7 +263,6 @@ export async function debugStoreAccess(
       updateTest: { data: updateData, error: updateError },
     }
   } catch (error) {
-    console.error('Debug error:', error)
     return { error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
@@ -348,23 +337,17 @@ export async function testTableAccess(
 
   // Method 1: Try RPC function
   try {
-    console.log('🧪 Testing method 1: RPC function')
     const { data, error } = await supabase.rpc('get_store_settings', {
       store_id_param: storeId,
     })
 
     if (!error) {
-      console.log('✅ Method 1 (RPC) successful:', data)
       return { success: true, method: 'RPC function' }
     }
-    console.log('❌ Method 1 (RPC) failed:', error)
-  } catch (error) {
-    console.log('❌ Method 1 (RPC) exception:', error)
-  }
+  } catch (error) {}
 
   // Method 2: Try business schema access
   try {
-    console.log('🧪 Testing method 2: business.stores')
     const { data, error } = await supabase
       .schema('business')
       .from('stores')
@@ -373,12 +356,10 @@ export async function testTableAccess(
       .single()
 
     if (!error) {
-      console.log('✅ Method 2 (business schema) successful:', data)
       return { success: true, method: 'business schema' }
     }
-    console.log('❌ Method 2 (business schema) failed:', error)
   } catch (error) {
-    console.log('❌ Method 2 (business schema) exception:', error)
+    console.error('❌ Method 2 (business schema) exception:', error)
   }
 
   return {

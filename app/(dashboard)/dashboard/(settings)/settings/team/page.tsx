@@ -1,4 +1,3 @@
-// app/(dashboard)/dashboard/(settings)/settings/team/page.tsx
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
@@ -54,7 +53,7 @@ export default async function TeamSettingsPage() {
       )
     }
 
-    // Determine active store from cookies
+    // Determine active store from cookies - SAME LOGIC AS CLIENT
     const cookieStore = await cookies()
     const lastActiveStoreId = cookieStore.get('activeStoreId')?.value
 
@@ -63,17 +62,15 @@ export default async function TeamSettingsPage() {
       targetStore = userStores[0].store
     }
 
-    // 🚀 Check team management permissions using server utility
+    // Check team management permissions
     const accessResult = await withStoreAccess(
       user.id,
       targetStore.store_id,
-      'canManageTeam', // Required permission for team management
+      'canManageTeam',
       serverClient,
     )
 
-    // Handle different access scenarios
     if (!accessResult.hasAccess) {
-      // Determine user's role for better error messaging
       const userRole = userStores.find(us => us.store.store_id === targetStore.store_id)?.role
 
       if (accessResult.errorType === 'forbidden') {
@@ -99,12 +96,15 @@ export default async function TeamSettingsPage() {
       )
     }
 
-    // User has team management access - prefetch team data
+    // 🚀 CRITICAL: Prefetch with exact same query keys that client will use
     try {
-      // Prefetch first page of store users
+      console.log('🚀 Prefetching store users for store:', targetStore.store_id)
+
+      // Prefetch first page of store users - EXACT SAME QUERY KEY AS CLIENT
       await queryClient.prefetchInfiniteQuery({
         queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, {}),
-        queryFn: () => fetchStoreUsersPage(targetStore.store_id, { page: 0, pageSize: 20 }, {}),
+        queryFn: () =>
+          fetchStoreUsersPage(targetStore.store_id, { page: 0, pageSize: 20 }, {}, serverClient),
         initialPageParam: 0,
       })
 
@@ -112,7 +112,12 @@ export default async function TeamSettingsPage() {
       await queryClient.prefetchInfiniteQuery({
         queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, { is_active: true }),
         queryFn: () =>
-          fetchStoreUsersPage(targetStore.store_id, { page: 0, pageSize: 20 }, { is_active: true }),
+          fetchStoreUsersPage(
+            targetStore.store_id,
+            { page: 0, pageSize: 20 },
+            { is_active: true },
+            serverClient,
+          ),
         initialPageParam: 0,
       })
 
@@ -127,21 +132,27 @@ export default async function TeamSettingsPage() {
                 targetStore.store_id,
                 { page: 0, pageSize: 10 },
                 { role_in_store: role },
+                serverClient,
               ),
             initialPageParam: 0,
           }),
         ),
       )
+
+      console.log('✅ Store users prefetched successfully for store:', targetStore.store_id)
     } catch (error) {
-      console.error('Failed to prefetch team data:', error)
+      console.error('⚠️ Failed to prefetch team data:', error)
       // Don't fail the page, just show error in component
     }
 
     return (
       <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="max-w-5xl mx-auto space-y-6">
-          {/* Pass server-computed permissions to client component */}
-          <StoreUsersList />
+          {/* 🚀 CRITICAL: Pass the determined storeId to prevent context dependency */}
+          <StoreUsersList
+            storeId={targetStore.store_id}
+            serverPermissions={accessResult.permissions}
+          />
         </div>
       </HydrationBoundary>
     )
@@ -160,10 +171,4 @@ export default async function TeamSettingsPage() {
       />
     )
   }
-}
-
-// Export metadata for SEO
-export const metadata = {
-  title: 'Team Management | LIFO',
-  description: 'Manage store team members, roles, and permissions.',
 }

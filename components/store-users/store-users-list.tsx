@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
 import { type StoreUser } from '@/lib/queries/store-users'
-import { useStoreState } from '@/lib/stores/store-context'
+import { useStoreState, useActiveStoreId } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -74,13 +74,26 @@ import { usePermissions, useUserRole } from '@/hooks/use-users'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import type { UserStorePermissions } from '@/lib/server/permissions'
 
 // Import the new components
 import { AddEmployeeDialog } from './add-employee-dialog'
 
-export function StoreUsersList() {
+// 🚀 NEW: Interface for component props
+interface StoreUsersListProps {
+  storeId?: string // Server-provided store ID
+  serverPermissions?: UserStorePermissions // Server-computed permissions
+}
+
+export function StoreUsersList({ storeId: propStoreId, serverPermissions }: StoreUsersListProps) {
   const t = useTranslations('users')
-  const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count, storeId } =
+
+  // 🚀 CRITICAL FIX: Use prop storeId if available, fallback to context
+  const contextStoreId = useActiveStoreId()
+  const effectiveStoreId = propStoreId || contextStoreId
+
+  // 🚀 CRITICAL: The hook handles store ID internally via context
+  const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count } =
     useStoreUsers()
 
   const [selectedUser, setSelectedUser] = useState<StoreUser | null>(null)
@@ -93,10 +106,23 @@ export function StoreUsersList() {
 
   const { changeUserRole, toggleUserActiveStatus, removeUser, refetch } = useStoreUserActions()
 
-  const { canManageUsers } = usePermissions()
+  // 🚀 Use server permissions if available, fallback to client permissions
+  const clientPermissions = usePermissions()
   const { isOwner } = useUserRole()
   const { activeStore } = useStoreState()
+
+  const canManageUsers = serverPermissions?.canManageTeam ?? clientPermissions.canManageUsers
   const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
+
+  // 🚀 DEBUG: Show which storeId is being used
+  console.log('🔍 StoreUsersList storeId resolution:', {
+    propStoreId,
+    contextStoreId,
+    effectiveStoreId,
+    hasData: !!data?.length,
+    isLoading,
+    serverPermissions: !!serverPermissions,
+  })
 
   // Helper function to safely get translated role
   const getRoleTranslation = (role: string) => {
@@ -119,6 +145,7 @@ export function StoreUsersList() {
     return user.can_use_pin_auth && !!user.requires_pin
   }
 
+  // 🚀 IMPROVED: Show loading when data is loading
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 border border-gray-50 rounded-2xl p-4">
@@ -140,18 +167,6 @@ export function StoreUsersList() {
     )
   }
 
-  if (!storeId) {
-    return (
-      <div className="text-center py-12">
-        <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-        <Typography variant="h3">No Store Selected</Typography>
-        <Typography variant="p" color="muted">
-          Please select a store to view its users.
-        </Typography>
-      </div>
-    )
-  }
-
   const handleEditUserRoleSubmit = (role: StoreUser['role_in_store']) => {
     if (!selectedUser || !role || role === selectedUser.role_in_store) return
 
@@ -166,7 +181,9 @@ export function StoreUsersList() {
 
   const handleEmployeeCreated = () => {
     // Refresh the users list after creating an employee
-    refetch(storeId)
+    if (effectiveStoreId) {
+      refetch(effectiveStoreId)
+    }
   }
 
   return (
@@ -186,14 +203,16 @@ export function StoreUsersList() {
             <Typography variant="p" color="muted">
               {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
             </Typography>
-            <Button
-              variant="secondary"
-              onClick={() => setIsAddUserDialogOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <UserPlus className="w-4 h-4" />
-              {t('addEmployee')}
-            </Button>
+            {canManageUsers && (
+              <Button
+                variant="secondary"
+                onClick={() => setIsAddUserDialogOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <UserPlus className="w-4 h-4" />
+                {t('addEmployee')}
+              </Button>
+            )}
           </div>
 
           <Table>
@@ -305,8 +324,6 @@ export function StoreUsersList() {
                                 {/* Reset PIN */}
                                 <DropdownMenuItem
                                   onClick={() => {
-                                    // We need to handle this differently since the dropdown will close
-                                    // We'll need to store the user and open the dialog after a brief delay
                                     setSelectedUser(storeUser)
                                     setTimeout(() => {
                                       setIsResetDialogOpen(true)
@@ -420,12 +437,14 @@ export function StoreUsersList() {
       </Card>
 
       {/* Add Employee Dialog */}
-      <AddEmployeeDialog
-        isOpen={isAddUserDialogOpen}
-        onOpenChange={setIsAddUserDialogOpen}
-        storeId={storeId}
-        onEmployeeCreated={handleEmployeeCreated}
-      />
+      {effectiveStoreId && (
+        <AddEmployeeDialog
+          isOpen={isAddUserDialogOpen}
+          onOpenChange={setIsAddUserDialogOpen}
+          storeId={effectiveStoreId}
+          onEmployeeCreated={handleEmployeeCreated}
+        />
+      )}
 
       {/* Edit User Role Dialog */}
       <Dialog open={isEditUserRoleDialogOpen} onOpenChange={setIsEditUserRoleDialogOpen}>
@@ -626,6 +645,31 @@ export function StoreUsersList() {
             </DialogContent>
           </Dialog>
         </>
+      )}
+
+      {/* Debug Info (Development only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <Typography variant="small" className="font-medium text-yellow-800 mb-2">
+            Debug: Store Users List
+          </Typography>
+          <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
+            {JSON.stringify(
+              {
+                propStoreId,
+                contextStoreId,
+                effectiveStoreId,
+                hasData: !!data?.length,
+                dataLength: data?.length || 0,
+                isLoading,
+                serverPermissions: !!serverPermissions,
+                canManageUsers,
+              },
+              null,
+              2,
+            )}
+          </pre>
+        </div>
       )}
     </>
   )
