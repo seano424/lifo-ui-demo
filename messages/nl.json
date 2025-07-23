@@ -59,12 +59,106 @@
       "team": "Team",
       "storeDescription": "Beheer uw winkelinstellingen.",
       "notificationsDescription": "Beheer uw meldingsinstellingen."
+    },
+    "storeInformation": {
+      "title": "Winkelinformatie",
+      "description": "Beheer de basisinformatie en instellingen van uw winkel",
+      "editStore": "Winkel bewerken",
+      "permissionError": "U heeft geen toestemming om winkelinstellingen te bekijken.",
+      "sections": {
+        "storeDetails": "Winkeldetails",
+        "addressInformation": "Adresinformatie",
+        "contactInformation": "Contactinformatie",
+        "storeDescription": "Winkelbeschrijving",
+        "businessSettings": "Bedrijfsinstellingen"
+      },
+      "fields": {
+        "storeName": "Winkelnaam",
+        "businessName": "Bedrijfsnaam",
+        "storeCode": "Winkelcode",
+        "storeType": "Winkeltype",
+        "sizeCategory": "Grootte categorie",
+        "address": "Adres",
+        "city": "Stad",
+        "postalCode": "Postcode",
+        "country": "Land",
+        "phone": "Telefoonnummer",
+        "email": "E-mailadres",
+        "website": "Website URL",
+        "description": "Beschrijving",
+        "defaultMarkup": "Standaard marge (%)",
+        "wasteReductionTarget": "Doel voor afvalvermindering (%)"
+      },
+      "placeholders": {
+        "storeName": "Voer winkelnaam in",
+        "businessName": "Voer bedrijfsnaam in",
+        "storeCode": "Voer winkelcode in",
+        "address": "Voer adres in",
+        "city": "Voer stad in",
+        "postalCode": "Voer postcode in",
+        "phone": "Voer telefoonnummer in",
+        "email": "Voer e-mailadres in",
+        "website": "https://voorbeeld.com",
+        "description": "Beschrijf uw winkel..."
+      },
+      "selectPlaceholders": {
+        "storeType": "Selecteer winkeltype",
+        "sizeCategory": "Selecteer grootte categorie",
+        "country": "Selecteer land"
+      },
+      "storeTypes": {
+        "supermarket": "Supermarkt",
+        "convenience": "Buurtwinkel",
+        "restaurant": "Restaurant",
+        "bakery": "Bakkerij",
+        "butcher": "Slagerij",
+        "organic": "Biologische winkel"
+      },
+      "sizeCategories": {
+        "small": "Klein (< 500 m²)",
+        "medium": "Middel (500-1500 m²)",
+        "large": "Groot (1500-5000 m²)",
+        "hypermarket": "Hypermarkt (> 5000 m²)"
+      },
+      "countries": {
+        "France": "Frankrijk",
+        "Netherlands": "Nederland",
+        "Belgium": "België",
+        "Germany": "Duitsland",
+        "Spain": "Spanje",
+        "Italy": "Italië"
+      },
+      "actions": {
+        "saveChanges": "Wijzigingen opslaan",
+        "saving": "Opslaan...",
+        "cancel": "Annuleren",
+        "unsavedChanges": "U heeft niet-opgeslagen wijzigingen"
+      },
+      "messages": {
+        "notSet": "Niet ingesteld",
+        "noDescription": "Geen beschrijving opgegeven"
+      },
+      "validation": {
+        "storeNameRequired": "Winkelnaam is verplicht",
+        "storeNameTooLong": "Winkelnaam is te lang",
+        "businessNameTooLong": "Bedrijfsnaam is te lang",
+        "storeCodeRequired": "Winkelcode is verplicht",
+        "storeCodeTooLong": "Winkelcode is te lang",
+        "addressTooLong": "Adres is te lang",
+        "cityTooLong": "Stadsnaam is te lang",
+        "postalCodeTooLong": "Postcode is te lang",
+        "countryTooLong": "Landnaam is te lang",
+        "phoneTooLong": "Telefoonnummer is te lang",
+        "invalidEmail": "Ongeldig e-mailformaat",
+        "invalidWebsite": "Ongeldige website URL",
+        "descriptionTooLong": "Beschrijving is te lang"
+      }
     }
   },
   "users": {
     "title": "Teambeheer",
     "description": "Nodig nieuwe teamleden uit in uw winkel en beheer hun rollen en machtigingen.",
-    "addEmployee": "Medewerker toevoegen",
+    "addEmployee": "Team lid uitnodigen",
     "showing": "{current} van {total} gebruikers weergegeven",
     "noUsersFound": "Geen gebruikers gevonden",
     "name": "Naam",

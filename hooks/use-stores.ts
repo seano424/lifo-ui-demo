@@ -87,6 +87,13 @@ export function useUserStores() {
     userStores: userStores, // Return the UserStore[] from Zustand
     isLoading: userStoresResult.isLoading || userPreferencesResult.isLoading,
     error: userStoresResult.error || userPreferencesResult.error,
+    // Add a function to manually refresh Zustand from React Query
+    refreshFromQuery: () => {
+      if (userStoresResult.data) {
+        setUserStores(userStoresResult.data)
+        console.log('[useUserStores] Manually refreshed Zustand from React Query')
+      }
+    },
   }
 }
 

@@ -6,9 +6,9 @@ import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 export default function SettingsHeaderDisplay() {
   const { activeStore, isLoadingStores, isChangingStore } = useStoreState()
 
-  if (isLoadingStores || isChangingStore || !activeStore?.business_name) {
+  if (isLoadingStores || isChangingStore || !activeStore?.store_name) {
     return <DashboardInsetHeader title="Loading..." isLoading={true} />
   }
 
-  return <DashboardInsetHeader title={`${activeStore?.business_name} Settings`} />
+  return <DashboardInsetHeader title={`${activeStore?.store_name} Settings`} />
 }

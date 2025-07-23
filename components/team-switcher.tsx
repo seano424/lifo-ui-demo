@@ -116,11 +116,6 @@ export function TeamSwitcher() {
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <MapPin className="size-3" />
                   <span className="truncate">{activeStore.city}</span>
-                  {activeStore.store_type && (
-                    <Badge variant="secondary" className="ml-1 text-xs">
-                      {activeStore.store_type}
-                    </Badge>
-                  )}
                 </div>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />

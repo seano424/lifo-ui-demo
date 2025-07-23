@@ -98,8 +98,11 @@ export type Database = {
     Tables: {
       store_settings: {
         Row: {
+          backup_preferences: Json | null
           critical_threshold: number | null
           currency: string | null
+          display_preferences: Json | null
+          notification_preferences: Json | null
           opening_hours: Json | null
           peak_hours: Json | null
           scoring_weights: Json | null
@@ -110,8 +113,11 @@ export type Database = {
           weather_location_lon: number | null
         }
         Insert: {
+          backup_preferences?: Json | null
           critical_threshold?: number | null
           currency?: string | null
+          display_preferences?: Json | null
+          notification_preferences?: Json | null
           opening_hours?: Json | null
           peak_hours?: Json | null
           scoring_weights?: Json | null
@@ -122,8 +128,11 @@ export type Database = {
           weather_location_lon?: number | null
         }
         Update: {
+          backup_preferences?: Json | null
           critical_threshold?: number | null
           currency?: string | null
+          display_preferences?: Json | null
+          notification_preferences?: Json | null
           opening_hours?: Json | null
           peak_hours?: Json | null
           scoring_weights?: Json | null
@@ -196,11 +205,18 @@ export type Database = {
           business_name: string | null
           city: string | null
           country: string | null
+          cover_image_url: string | null
           created_at: string | null
           default_markup_percent: number | null
+          description: string | null
+          email: string | null
           is_active: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
           onboarding_completed: boolean | null
           owner_id: string | null
+          phone: string | null
           postal_code: string | null
           size_category: string | null
           store_code: string
@@ -210,17 +226,25 @@ export type Database = {
           timezone: string | null
           updated_at: string | null
           waste_reduction_target_percent: number | null
+          website_url: string | null
         }
         Insert: {
           address?: string | null
           business_name?: string | null
           city?: string | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
           default_markup_percent?: number | null
+          description?: string | null
+          email?: string | null
           is_active?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
           onboarding_completed?: boolean | null
           owner_id?: string | null
+          phone?: string | null
           postal_code?: string | null
           size_category?: string | null
           store_code: string
@@ -230,17 +254,25 @@ export type Database = {
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
+          website_url?: string | null
         }
         Update: {
           address?: string | null
           business_name?: string | null
           city?: string | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string | null
           default_markup_percent?: number | null
+          description?: string | null
+          email?: string | null
           is_active?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
           onboarding_completed?: boolean | null
           owner_id?: string | null
+          phone?: string | null
           postal_code?: string | null
           size_category?: string | null
           store_code?: string
@@ -250,6 +282,7 @@ export type Database = {
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
+          website_url?: string | null
         }
         Relationships: []
       }

@@ -59,12 +59,106 @@
       "team": "Team",
       "storeDescription": "Manage your store settings.",
       "notificationsDescription": "Manage your notification settings."
+    },
+    "storeInformation": {
+      "title": "Store Information",
+      "description": "Manage your store's basic information and settings",
+      "editStore": "Edit Store",
+      "permissionError": "You don't have permission to view store settings.",
+      "sections": {
+        "storeDetails": "Store Details",
+        "addressInformation": "Address Information",
+        "contactInformation": "Contact Information",
+        "storeDescription": "Store Description",
+        "businessSettings": "Business Settings"
+      },
+      "fields": {
+        "storeName": "Store Name",
+        "businessName": "Business Name",
+        "storeCode": "Store Code",
+        "storeType": "Store Type",
+        "sizeCategory": "Size Category",
+        "address": "Street Address",
+        "city": "City",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "phone": "Phone Number",
+        "email": "Email Address",
+        "website": "Website URL",
+        "description": "Description",
+        "defaultMarkup": "Default Markup (%)",
+        "wasteReductionTarget": "Waste Reduction Target (%)"
+      },
+      "placeholders": {
+        "storeName": "Enter store name",
+        "businessName": "Enter business name",
+        "storeCode": "Enter store code",
+        "address": "Enter street address",
+        "city": "Enter city",
+        "postalCode": "Enter postal code",
+        "phone": "Enter phone number",
+        "email": "Enter email address",
+        "website": "https://example.com",
+        "description": "Describe your store..."
+      },
+      "selectPlaceholders": {
+        "storeType": "Select store type",
+        "sizeCategory": "Select size category",
+        "country": "Select country"
+      },
+      "storeTypes": {
+        "supermarket": "Supermarket",
+        "convenience": "Convenience Store",
+        "restaurant": "Restaurant",
+        "bakery": "Bakery",
+        "butcher": "Butcher Shop",
+        "organic": "Organic Store"
+      },
+      "sizeCategories": {
+        "small": "Small (< 500 sqm)",
+        "medium": "Medium (500-1500 sqm)",
+        "large": "Large (1500-5000 sqm)",
+        "hypermarket": "Hypermarket (> 5000 sqm)"
+      },
+      "countries": {
+        "France": "France",
+        "Netherlands": "Netherlands",
+        "Belgium": "Belgium",
+        "Germany": "Germany",
+        "Spain": "Spain",
+        "Italy": "Italy"
+      },
+      "actions": {
+        "saveChanges": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "unsavedChanges": "You have unsaved changes"
+      },
+      "messages": {
+        "notSet": "Not set",
+        "noDescription": "No description provided"
+      },
+      "validation": {
+        "storeNameRequired": "Store name is required",
+        "storeNameTooLong": "Store name too long",
+        "businessNameTooLong": "Business name too long",
+        "storeCodeRequired": "Store code is required",
+        "storeCodeTooLong": "Store code too long",
+        "addressTooLong": "Address too long",
+        "cityTooLong": "City name too long",
+        "postalCodeTooLong": "Postal code too long",
+        "countryTooLong": "Country name too long",
+        "phoneTooLong": "Phone number too long",
+        "invalidEmail": "Invalid email format",
+        "invalidWebsite": "Invalid website URL",
+        "descriptionTooLong": "Description too long"
+      }
     }
   },
   "users": {
     "title": "Team Management",
     "description": "Invite new team members to your store and manage their roles and permissions.",
-    "addEmployee": "Add Employee",
+    "addEmployee": "Invite team member",
     "showing": "Showing {current} of {total} users",
     "noUsersFound": "No users found",
     "name": "Name",

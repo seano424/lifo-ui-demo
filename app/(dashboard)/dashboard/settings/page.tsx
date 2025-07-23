@@ -50,12 +50,6 @@ export default async function SettingsPage() {
     targetStore = userStores[0].store // Fallback to first store
   }
 
-  console.log('[UsersPage] Prefetching for store:', {
-    targetStoreId: targetStore.store_id,
-    storeName: targetStore.store_name,
-    wasFromCookie: !!lastActiveStoreId,
-  })
-
   // ✅ Prefetch store users for the target store using centralized query keys
   await queryClient.prefetchInfiniteQuery({
     queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, {}), // ✅ Centralized keys
