@@ -5,9 +5,6 @@ import { useTranslations } from 'next-intl'
 import {
   BookOpen,
   Bot,
-  Frame,
-  Map,
-  PieChart,
   SquareTerminal,
   Calendar,
   Box,

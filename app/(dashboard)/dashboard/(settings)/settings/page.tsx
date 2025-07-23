@@ -1,5 +1,3 @@
-// app/settings/users/page.tsx
-
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserStores } from '@/lib/queries/stores'
 import { fetchStoreUsersPage } from '@/lib/queries/store-users'
@@ -94,8 +92,6 @@ export default async function SettingsPage() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       {/* This component will handle store switching if user has multiple stores */}
       <StoreUsersPrefetch />
-
-      <SettingsTabs />
     </HydrationBoundary>
   )
 }

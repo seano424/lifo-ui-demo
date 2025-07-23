@@ -76,6 +76,8 @@ export function NavMain({
                 className={cn(
                   'hover:bg-muted py-6 px-4 rounded-lg',
                   pathname === item.url && 'bg-muted hover:!bg-muted',
+                  // match settings pages to item.url
+                  item.url.includes('/settings') && pathname.startsWith(item.url) && 'bg-muted hover:!bg-muted',
                 )}
                 asChild
                 tooltip={item.title}
