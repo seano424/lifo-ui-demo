@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
+import { NavbarLogo } from '@/components/ui/logo'
 
 import {
   Accordion,
@@ -140,13 +141,8 @@ const MarketingNav = ({
     <section className="py-6 fixed top-0 left-0 right-0 z-50 h-24 backdrop-blur-xs flex flex-col justify-center bg-background/80">
       {/* Desktop Menu */}
       <nav className="hidden justify-between lg:flex container mx-auto">
-        <div className="flex items-center gap-2">
-          {/* Logo */}
-          <Link href={logo.url} className="flex items-center gap-2 relative h-10 aspect-video">
-            <Image fill src={logo.src} className="object-cover" alt={logo.alt} />
-          </Link>
-          <span className="text-2xl font-heading font-black">{logo.title}</span>
-        </div>
+        <NavbarLogo />
+
         <div className="flex items-center gap-2">
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
@@ -160,9 +156,7 @@ const MarketingNav = ({
       <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href={logo.url} className="flex items-center gap-2 relative h-10 aspect-video">
-            <Image fill src={logo.src} className="object-cover" alt={logo.alt} />
-          </Link>
+          <NavbarLogo />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -172,12 +166,7 @@ const MarketingNav = ({
             <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>
-                  <Link
-                    href={logo.url}
-                    className="flex items-center gap-2 relative h-10 aspect-video"
-                  >
-                    <Image src={logo.src} alt={logo.alt} fill className="object-cover" />
-                  </Link>
+                  <NavbarLogo />
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 p-4">
