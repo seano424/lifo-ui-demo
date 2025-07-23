@@ -45,28 +45,28 @@ export default function SettingsTabs() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto flex gap-4">
       <Link
         href="/dashboard/settings/store"
-        className={cn(isStoreSettings && 'border-b-2 border-brand-primary')}
+        className={cn(isStoreSettings && 'border-b-2 border-brand-secondary')}
       >
         {t('tabs.store')}
       </Link>
       <Link
         href="/dashboard/settings/notifications"
-        className={cn(isNotificationsSettings && 'border-b-2 border-brand-primary')}
+        className={cn(isNotificationsSettings && 'border-b-2 border-brand-secondary')}
       >
         {t('tabs.notifications')}
       </Link>
       <Link
         href="/dashboard/settings/account"
-        className={cn(isAccountSettings && 'border-b-2 border-brand-primary')}
+        className={cn(isAccountSettings && 'border-b-2 border-brand-secondary')}
       >
         {t('tabs.account')}
       </Link>
       <Link
         href="/dashboard/settings/team"
-        className={cn(isTeamSettings && 'border-b-2 border-brand-primary')}
+        className={cn(isTeamSettings && 'border-b-2 border-brand-secondary')}
       >
         {t('tabs.team')}
       </Link>

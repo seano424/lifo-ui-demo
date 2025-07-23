@@ -21,8 +21,27 @@ import {
 } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
-import { Edit, Check, X, AlertCircle, Store, MapPin, Phone, Globe, Building } from 'lucide-react'
+import { useStoreSettings, useStoreActions } from '@/hooks/use-store-settings'
+import { useStorePermissions } from '@/hooks/use-store-permissions' // Updated hook
+import {
+  Edit,
+  Check,
+  X,
+  AlertCircle,
+  Store,
+  MapPin,
+  Phone,
+  Globe,
+  Building,
+  Shield,
+} from 'lucide-react'
+import type { UserStorePermissions } from '@/lib/server/permissions'
+
+// Interface for server permissions prop
+interface StoreInformationProps {
+  serverPermissions?: UserStorePermissions // Server-computed permissions
+  storeId?: string // Optional store ID override
+}
 
 // Type for translation function
 type TranslationFunction = (key: string) => string
@@ -117,11 +136,13 @@ const createCountries = (t: TranslationFunction) =>
     { value: 'Italy', label: t('storeInformation.countries.Italy') },
   ] as const
 
-export default function StoreInformation() {
+export default function StoreInformation({ serverPermissions, storeId }: StoreInformationProps) {
   const t = useTranslations('settings')
-  const { data: storeData, isLoading } = useStoreSettings()
+  const { data: storeData, isLoading, error } = useStoreSettings()
   const { updateBasicInfo, isUpdating } = useStoreActions()
-  const { canViewSettings, canEditAdvancedSettings } = useStorePermissions()
+
+  // 🚀 Use hybrid permissions hook with server permissions as fallback
+  const permissions = useStorePermissions({ serverPermissions })
 
   const [isEditing, setIsEditing] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -225,21 +246,8 @@ export default function StoreInformation() {
     setHasUnsavedChanges(false)
   }
 
-  // Permission check
-  if (!canViewSettings) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{t('storeInformation.permissionError')}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  // Loading state
+  // 🚀 NO MORE PERMISSION LOADING STATE - server permissions provide immediate values
+  // Only show loading for data fetching, not permissions
   if (isLoading) {
     return (
       <Card>
@@ -266,6 +274,53 @@ export default function StoreInformation() {
     )
   }
 
+  // Show error if data fetch failed
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>Failed to load store settings: {error.message}</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Show error if no store data
+  if (!storeData) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Store data not found. Please try refreshing the page.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Permission check - no loading state needed since server permissions provide immediate values
+  if (!permissions.canViewSettings) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              You don't have permission to view store settings. Contact your store{' '}
+              {permissions.isEmployee ? 'manager or owner' : 'owner'}.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -279,17 +334,26 @@ export default function StoreInformation() {
               {t('storeInformation.description')}
             </Typography>
           </div>
-          {!isEditing && canEditAdvancedSettings && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              {t('storeInformation.editStore')}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Permission indicator */}
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs">
+              <Shield className="h-3 w-3" />
+              {permissions.isOwner ? 'Owner' : permissions.isManager ? 'Manager' : 'Employee'}
+            </div>
+
+            {/* Edit button - only show if user can edit */}
+            {!isEditing && permissions.canEditBasicInfo && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                {t('storeInformation.editStore')}
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 
@@ -323,20 +387,6 @@ export default function StoreInformation() {
                   </Typography>
                 )}
               </div>
-
-              {/* Business Name */}
-              {/* <div className="space-y-2">
-                <Label htmlFor="business_name">{t('storeInformation.fields.businessName')}</Label>
-                {isEditing ? (
-                  <Input
-                    id="business_name"
-                    {...form.register('business_name')}
-                    placeholder={t('storeInformation.placeholders.businessName')}
-                  />
-                ) : (
-                  <Typography variant="p">{storeData?.business_name || t('storeInformation.messages.notSet')}</Typography>
-                )}
-              </div> */}
 
               {/* Store Code */}
               <div className="space-y-2">
@@ -627,61 +677,76 @@ export default function StoreInformation() {
             </div>
           </div>
 
-          {/* Business Settings */}
-          <div className="space-y-4">
-            <Typography variant="h3">{t('storeInformation.sections.businessSettings')}</Typography>
+          {/* Business Settings - Only show if user can edit advanced settings */}
+          {permissions.canEditAdvancedSettings && (
+            <div className="space-y-4">
+              <Typography variant="h3">
+                {t('storeInformation.sections.businessSettings')}
+              </Typography>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Default Markup */}
-              <div className="space-y-2">
-                <Label htmlFor="default_markup_percent">
-                  {t('storeInformation.fields.defaultMarkup')}
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="default_markup_percent"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    {...form.register('default_markup_percent', { valueAsNumber: true })}
-                  />
-                ) : (
-                  <Typography variant="p">
-                    {storeData?.default_markup_percent
-                      ? `${storeData.default_markup_percent}%`
-                      : t('storeInformation.messages.notSet')}
-                  </Typography>
-                )}
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Default Markup */}
+                <div className="space-y-2">
+                  <Label htmlFor="default_markup_percent">
+                    {t('storeInformation.fields.defaultMarkup')}
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      id="default_markup_percent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      {...form.register('default_markup_percent', { valueAsNumber: true })}
+                    />
+                  ) : (
+                    <Typography variant="p">
+                      {storeData?.default_markup_percent
+                        ? `${storeData.default_markup_percent}%`
+                        : t('storeInformation.messages.notSet')}
+                    </Typography>
+                  )}
+                </div>
 
-              {/* Waste Reduction Target */}
-              <div className="space-y-2">
-                <Label htmlFor="waste_reduction_target_percent">
-                  {t('storeInformation.fields.wasteReductionTarget')}
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="waste_reduction_target_percent"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    {...form.register('waste_reduction_target_percent', { valueAsNumber: true })}
-                  />
-                ) : (
-                  <Typography variant="p">
-                    {storeData?.waste_reduction_target_percent
-                      ? `${storeData.waste_reduction_target_percent}%`
-                      : t('storeInformation.messages.notSet')}
-                  </Typography>
-                )}
+                {/* Waste Reduction Target */}
+                <div className="space-y-2">
+                  <Label htmlFor="waste_reduction_target_percent">
+                    {t('storeInformation.fields.wasteReductionTarget')}
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      id="waste_reduction_target_percent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      {...form.register('waste_reduction_target_percent', { valueAsNumber: true })}
+                    />
+                  ) : (
+                    <Typography variant="p">
+                      {storeData?.waste_reduction_target_percent
+                        ? `${storeData.waste_reduction_target_percent}%`
+                        : t('storeInformation.messages.notSet')}
+                    </Typography>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Read-only message for users without edit permissions */}
+          {!permissions.canEditBasicInfo && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You have read-only access to store information. Contact your store{' '}
+                {permissions.isEmployee ? 'manager or owner' : 'owner'} to make changes.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Action Buttons */}
-          {isEditing && (
+          {isEditing && permissions.canEditBasicInfo && (
             <div className="flex items-center gap-2 pt-4 border-t">
               <Button
                 type="submit"
@@ -711,6 +776,18 @@ export default function StoreInformation() {
             </div>
           )}
         </form>
+
+        {/* Debug Info (Development only) */}
+        {process.env.NODE_ENV === 'development' && serverPermissions && (
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <Typography variant="small" className="font-medium text-yellow-800 mb-2">
+              Debug: Server Permissions
+            </Typography>
+            <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
+              {JSON.stringify(serverPermissions, null, 2)}
+            </pre>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

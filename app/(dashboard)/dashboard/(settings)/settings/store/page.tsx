@@ -1,16 +1,17 @@
 // app/(dashboard)/dashboard/(settings)/settings/store/page.tsx
-
-import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchUserStores } from '@/lib/queries/stores'
-import { fetchStoreUsersPage } from '@/lib/queries/store-users'
-import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchStoreSettings } from '@/lib/queries/store-settings'
+import { fetchUserStores } from '@/lib/queries/stores'
+import { withStoreAccess } from '@/lib/server/permissions'
+import StoreInformation from '@/components/settings/store-information'
 
-import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
-
-export default async function SettingsPage() {
+export default async function StoreSettingsPage() {
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
 
@@ -22,12 +23,12 @@ export default async function SettingsPage() {
   if (!user) {
     return (
       <div className="text-center py-12">
-        <p>Please log in to view users.</p>
+        <p>Please log in to view store settings.</p>
       </div>
     )
   }
 
-  // Fetch user stores
+  // Get user's accessible stores to determine active store
   const userStores = await fetchUserStores(user.id, serverClient)
 
   if (userStores.length === 0) {
@@ -39,60 +40,68 @@ export default async function SettingsPage() {
     )
   }
 
-  // ✅ IMPROVED: Try to get last active store from cookie, fallback to first store
+  // Determine active store
   const cookieStore = await cookies()
   const lastActiveStoreId = cookieStore.get('activeStoreId')?.value
 
   let targetStore = userStores.find(us => us.store.store_id === lastActiveStoreId)?.store
   if (!targetStore) {
-    targetStore = userStores[0].store // Fallback to first store
+    targetStore = userStores[0].store
   }
 
-  // ✅ Prefetch store users for the target store using centralized query keys
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, {}), // ✅ Centralized keys
-    queryFn: ({ pageParam = 0 }) =>
-      fetchStoreUsersPage(
-        targetStore.store_id,
-        { page: pageParam, pageSize: 20 },
-        {},
-        serverClient,
-      ),
-    initialPageParam: 0,
-    getNextPageParam: lastPage => lastPage.nextPage,
-    pages: 1,
-  })
-
-  // ✅ Prefetch active users and role-based queries using centralized keys
-  const filterVariants = [
-    { is_active: true },
-    { role_in_store: 'owner' as const },
-    { role_in_store: 'manager' as const },
-    { role_in_store: 'employee' as const },
-  ]
-
-  await Promise.all(
-    filterVariants.map(filters =>
-      queryClient.prefetchInfiniteQuery({
-        queryKey: queryKeys.storeUsers.infinite(targetStore.store_id, filters), // ✅ Centralized keys
-        queryFn: ({ pageParam = 0 }) =>
-          fetchStoreUsersPage(
-            targetStore.store_id,
-            { page: pageParam, pageSize: 20 },
-            filters,
-            serverClient,
-          ),
-        initialPageParam: 0,
-        getNextPageParam: lastPage => lastPage.nextPage,
-        pages: 1,
-      }),
-    ),
+  // 🚀 Use the utility to check permissions and handle all error cases
+  const accessResult = await withStoreAccess(
+    user.id,
+    targetStore.store_id,
+    'canViewSettings', // Required permission
+    serverClient,
   )
+
+  // Handle different access scenarios
+  if (!accessResult.hasAccess) {
+    const errorMessages = {
+      unauthorized: 'Authentication error. Please try logging in again.',
+      forbidden:
+        "You don't have permission to view store settings. Contact your store manager or owner.",
+      'not-found': "Store not found or you don't have access to it.",
+    }
+
+    return (
+      <div className="max-w-5xl mx-auto space-y-6">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errorMessages[accessResult.errorType]}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  // User has access - prefetch store settings data
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.stores.detail(targetStore.store_id),
+      queryFn: () => fetchStoreSettings(targetStore.store_id, serverClient),
+    })
+  } catch (error) {
+    console.error('Failed to prefetch store settings:', error)
+    // Don't fail the page, just show error in component
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      {/* This component will handle store switching if user has multiple stores */}
-      <StoreUsersPrefetch />
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Pass server-computed permissions to client component */}
+        <StoreInformation
+          serverPermissions={accessResult.permissions}
+          storeId={targetStore.store_id}
+        />
+      </div>
     </HydrationBoundary>
   )
+}
+
+// Export the page metadata for better SEO
+export const metadata = {
+  title: 'Store Settings | LIFO',
+  description: 'Manage your store information, contact details, and business settings.',
 }
