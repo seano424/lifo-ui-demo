@@ -1,4 +1,4 @@
-// app/settings/users/page.tsx - Updated with better store selection
+// app/(dashboard)/dashboard/(settings)/settings/store/page.tsx
 
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserStores } from '@/lib/queries/stores'
@@ -9,8 +9,6 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 
 import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
-import SettingsHeaderDisplay from '@/components/settings/settings-header-display'
-import SettingsTabs from '@/components/settings/settings-tabs'
 
 export default async function SettingsPage() {
   const { queryClient } = await createPrefetchedQuery()
@@ -95,10 +93,6 @@ export default async function SettingsPage() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       {/* This component will handle store switching if user has multiple stores */}
       <StoreUsersPrefetch />
-      <div className="space-y-6 lg:min-w-5xl lg:mx-auto">
-        <SettingsHeaderDisplay />
-        <SettingsTabs />
-      </div>
     </HydrationBoundary>
   )
 }
