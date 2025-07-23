@@ -1,10 +1,9 @@
-// hooks/use-store-settings.ts - FIXED VERSION with better error handling
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
-import { usePermissions } from '@/hooks/use-users'
-import { useCurrentUser } from '@/hooks/use-users'
+import { usePermissions, useCurrentUser } from '@/hooks/use-users'
+
 import { convertStoreBasicInfoToStore } from '@/lib/utils'
 import {
   fetchStoreSettings,
@@ -17,10 +16,18 @@ import {
   type StoreAdvancedSettings,
   type StoreSettingsData,
 } from '@/lib/queries/store-settings'
+import type { UserStorePermissions } from '@/lib/server/permissions'
 
-// Hook to check store permissions
-export function useStorePermissions() {
-  const activeStoreId = useActiveStoreId()
+export function useStorePermissions({
+  serverPermissions,
+  storeId,
+}: {
+  serverPermissions?: UserStorePermissions
+  storeId?: string
+} = {}) {
+  const contextStoreId = useActiveStoreId()
+  const effectiveStoreId = storeId || contextStoreId
+
   const {
     canManageSettings,
     isOwner,
@@ -29,21 +36,33 @@ export function useStorePermissions() {
     isLoading: permissionsLoading,
   } = usePermissions()
 
-  console.log('🔍 useStorePermissions - Raw values:', {
-    activeStoreId,
-    canManageSettings,
-    isOwner,
-    isManager,
-    isEmployee,
-    permissionsLoading,
-  })
+  if (serverPermissions && effectiveStoreId) {
+    console.log('🚀 Using server permissions for store:', effectiveStoreId)
+    return {
+      canEditStore: serverPermissions.canEditAdvancedSettings || serverPermissions.isOwner,
+      canEditBasicInfo:
+        serverPermissions.canEditBasicInfo ||
+        serverPermissions.isOwner ||
+        serverPermissions.isManager,
+      canEditAdvancedSettings: serverPermissions.canEditAdvancedSettings || serverPermissions.isOwner,
+      canEditAISettings: serverPermissions.isOwner,
+      canViewSettings:
+        serverPermissions.canViewSettings ||
+        serverPermissions.isOwner ||
+        serverPermissions.isManager,
+      isOwner: serverPermissions.isOwner,
+      isManager: serverPermissions.isManager,
+      isEmployee: serverPermissions.isEmployee,
+      isLoading: false,
+    }
+  }
 
-  // When loading OR when no activeStoreId is selected, return undefined for permission flags
-  // This prevents premature false values when the store context hasn't loaded yet
-  if (permissionsLoading || !activeStoreId) {
-    console.log(
-      '⏳ useStorePermissions - Still loading or no activeStoreId, returning undefined flags',
-    )
+  // Fall back to client permissions when server permissions not available
+  if (permissionsLoading || !effectiveStoreId) {
+    console.log('⏱️ Using client permissions (loading or no storeId):', {
+      permissionsLoading,
+      effectiveStoreId,
+    })
     return {
       canEditStore: undefined,
       canEditBasicInfo: undefined,
@@ -53,15 +72,16 @@ export function useStorePermissions() {
       isOwner: undefined,
       isManager: undefined,
       isEmployee: undefined,
-      isLoading: permissionsLoading || !activeStoreId,
+      isLoading: permissionsLoading || !effectiveStoreId,
     }
   }
 
+  console.log('🔄 Using computed client permissions for store:', effectiveStoreId)
   const computedPermissions = {
     canEditStore: canManageSettings || isOwner,
     canEditBasicInfo: canManageSettings || isOwner || isManager,
     canEditAdvancedSettings: canManageSettings || isOwner,
-    canEditAISettings: isOwner, // Only owners can modify AI settings
+    canEditAISettings: isOwner,
     canViewSettings: canManageSettings || isOwner || isManager,
     isOwner,
     isManager,
@@ -69,26 +89,34 @@ export function useStorePermissions() {
     isLoading: permissionsLoading,
   }
 
-  console.log('✅ useStorePermissions - Computed permissions:', computedPermissions)
   return computedPermissions
 }
 
-// Hook to fetch store settings
-export function useStoreSettings() {
-  const activeStoreId = useActiveStoreId()
+// 🚀 UPDATED: Hook to fetch store settings with optional storeId parameter
+export function useStoreSettings(storeId?: string) {
+  const contextStoreId = useActiveStoreId()
+  const effectiveStoreId = storeId || contextStoreId
+
+  console.log('🔍 useStoreSettings called with:', {
+    propStoreId: storeId,
+    contextStoreId,
+    effectiveStoreId,
+  })
 
   return useQuery({
-    queryKey: queryKeys.stores.detail(activeStoreId || ''),
+    queryKey: queryKeys.stores.detail(effectiveStoreId || ''),
     queryFn: () => {
-      if (!activeStoreId) {
-        throw new Error('No active store selected')
+      if (!effectiveStoreId) {
+        throw new Error('No store ID available')
       }
-      return fetchStoreSettings(activeStoreId)
+      console.log('📡 Fetching store settings for:', effectiveStoreId)
+      return fetchStoreSettings(effectiveStoreId)
     },
-    enabled: !!activeStoreId,
+    enabled: !!effectiveStoreId, // Only run query when we have a storeId
     staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: false, // 🚀 CRITICAL: Prevent refetch if we have cached data
+    refetchOnWindowFocus: false,
     retry: (failureCount, error: any) => {
-      // Don't retry permission errors
       if (error?.message?.includes('permission denied') || error?.message?.includes('403')) {
         return false
       }

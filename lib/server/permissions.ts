@@ -35,8 +35,6 @@ export async function checkUserStorePermissions(
   serverClient: ServerClient,
 ): Promise<StoreAccessResult> {
   try {
-    console.log('🔍 Checking permissions for user:', { userId, storeId })
-
     // First check if user has direct store_users relationship
     const { data: storeUser, error: storeUserError } = await serverClient
       .schema('business')
@@ -49,8 +47,6 @@ export async function checkUserStorePermissions(
 
     // If no direct relationship, check if user is the store owner
     if (storeUserError || !storeUser) {
-      console.log('👤 Checking store ownership...')
-
       const { data: store, error: storeError } = await serverClient
         .schema('business')
         .from('stores')
@@ -68,7 +64,6 @@ export async function checkUserStorePermissions(
       }
 
       if (store.owner_id !== userId) {
-        console.log('❌ User has no access to store')
         return {
           hasAccess: false,
           permissions: null,
@@ -77,7 +72,6 @@ export async function checkUserStorePermissions(
       }
 
       // User is the owner
-      console.log('👑 User is store owner')
       return {
         hasAccess: true,
         permissions: {

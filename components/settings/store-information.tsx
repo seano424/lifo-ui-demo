@@ -1,4 +1,3 @@
-// components/settings/store-information.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -21,8 +20,8 @@ import {
 } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useStoreSettings, useStoreActions } from '@/hooks/use-store-settings'
-import { useStorePermissions } from '@/hooks/use-store-permissions' // Updated hook
+import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
   Edit,
   Check,
@@ -40,7 +39,7 @@ import type { UserStorePermissions } from '@/lib/server/permissions'
 // Interface for server permissions prop
 interface StoreInformationProps {
   serverPermissions?: UserStorePermissions // Server-computed permissions
-  storeId?: string // Optional store ID override
+  storeId?: string // 🚀 NEW: Optional store ID override from server
 }
 
 // Type for translation function
@@ -136,13 +135,25 @@ const createCountries = (t: TranslationFunction) =>
     { value: 'Italy', label: t('storeInformation.countries.Italy') },
   ] as const
 
-export default function StoreInformation({ serverPermissions, storeId }: StoreInformationProps) {
+export default function StoreInformation({
+  serverPermissions,
+  storeId: propStoreId,
+}: StoreInformationProps) {
   const t = useTranslations('settings')
-  const { data: storeData, isLoading, error } = useStoreSettings()
+
+  // 🚀 CRITICAL FIX: Use prop storeId if available, fallback to context
+  const contextStoreId = useActiveStoreId()
+  const effectiveStoreId = propStoreId || contextStoreId
+
+  // 🚀 CRITICAL: Pass the effective storeId directly to the hooks
+  const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId)
   const { updateBasicInfo, isUpdating } = useStoreActions()
 
   // 🚀 Use hybrid permissions hook with server permissions as fallback
-  const permissions = useStorePermissions({ serverPermissions })
+  const permissions = useStorePermissions({
+    serverPermissions,
+    storeId: effectiveStoreId,
+  })
 
   const [isEditing, setIsEditing] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -151,6 +162,16 @@ export default function StoreInformation({ serverPermissions, storeId }: StoreIn
   const STORE_TYPES = createStoreTypes(t)
   const SIZE_CATEGORIES = createSizeCategories(t)
   const COUNTRIES = createCountries(t)
+
+  // 🚀 DEBUG: Show which storeId is being used
+  console.log('🔍 StoreInformation storeId resolution:', {
+    propStoreId,
+    contextStoreId,
+    effectiveStoreId,
+    hasStoreData: !!storeData,
+    isLoading,
+    permissionsLoading: permissions.isLoading,
+  })
 
   const form = useForm<StoreInfoFormData>({
     resolver: zodResolver(storeInfoSchema),
@@ -246,9 +267,8 @@ export default function StoreInformation({ serverPermissions, storeId }: StoreIn
     setHasUnsavedChanges(false)
   }
 
-  // 🚀 NO MORE PERMISSION LOADING STATE - server permissions provide immediate values
-  // Only show loading for data fetching, not permissions
-  if (isLoading) {
+  // 🚀 IMPROVED: Only show loading when we don't have an effective storeId OR data is loading
+  if (!effectiveStoreId || isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -288,7 +308,7 @@ export default function StoreInformation({ serverPermissions, storeId }: StoreIn
     )
   }
 
-  // Show error if no store data
+  // 🚀 FIXED: Check for actual storeData, not negated storeData
   if (!storeData) {
     return (
       <Card>
@@ -305,7 +325,7 @@ export default function StoreInformation({ serverPermissions, storeId }: StoreIn
   }
 
   // Permission check - no loading state needed since server permissions provide immediate values
-  if (!permissions.canViewSettings) {
+  if (!permissions.canViewSettings && !permissions.isLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -735,7 +755,7 @@ export default function StoreInformation({ serverPermissions, storeId }: StoreIn
           )}
 
           {/* Read-only message for users without edit permissions */}
-          {!permissions.canEditBasicInfo && (
+          {!permissions.canEditBasicInfo && !permissions.isLoading && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
@@ -778,13 +798,25 @@ export default function StoreInformation({ serverPermissions, storeId }: StoreIn
         </form>
 
         {/* Debug Info (Development only) */}
-        {process.env.NODE_ENV === 'development' && serverPermissions && (
+        {process.env.NODE_ENV === 'development' && (
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <Typography variant="small" className="font-medium text-yellow-800 mb-2">
-              Debug: Server Permissions
+              Debug: Store Information
             </Typography>
             <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
-              {JSON.stringify(serverPermissions, null, 2)}
+              {JSON.stringify(
+                {
+                  propStoreId,
+                  contextStoreId,
+                  effectiveStoreId,
+                  hasStoreData: !!storeData,
+                  isLoading,
+                  serverPermissions: !!serverPermissions,
+                  permissionsLoading: permissions.isLoading,
+                },
+                null,
+                2,
+              )}
             </pre>
           </div>
         )}

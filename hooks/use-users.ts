@@ -129,15 +129,10 @@ export function useCurrentUser() {
 export function useCurrentUserStoreRole() {
   const activeStoreId = useActiveStoreId()
 
-  console.log('🏪 useCurrentUserStoreRole - Starting with activeStoreId:', activeStoreId)
-
   const result = useQuery({
     queryKey: queryKeys.auth.currentUserStoreRole(activeStoreId || ''),
     queryFn: async (): Promise<CurrentUserStoreRole | null> => {
-      console.log('🔄 useCurrentUserStoreRole - Executing query for storeId:', activeStoreId)
-
       if (!activeStoreId) {
-        console.log('❌ useCurrentUserStoreRole - No activeStoreId, returning null')
         return null
       }
 
@@ -149,11 +144,8 @@ export function useCurrentUserStoreRole() {
       } = await supabase.auth.getUser()
 
       if (authError || !user) {
-        console.log('❌ useCurrentUserStoreRole - Auth error or no user:', authError)
         throw new Error('Not authenticated')
       }
-
-      console.log('✅ useCurrentUserStoreRole - User authenticated:', user.id)
 
       const { data: storeUserData, error: storeUserError } = await supabase.rpc(
         'get_user_store_role',
@@ -164,14 +156,10 @@ export function useCurrentUserStoreRole() {
       )
 
       if (storeUserError) {
-        console.log('❌ useCurrentUserStoreRole - Store role error:', storeUserError)
         throw new Error(`Failed to get store role: ${storeUserError.message}`)
       }
 
-      console.log('📊 useCurrentUserStoreRole - Raw store user data:', storeUserData)
-
       if (!storeUserData || storeUserData.length === 0) {
-        console.log('⚠️ useCurrentUserStoreRole - No store user data found')
         return null
       }
 
@@ -188,7 +176,6 @@ export function useCurrentUserStoreRole() {
         storeName: userData.store_name,
       }
 
-      console.log('✅ useCurrentUserStoreRole - Computed store role:', currentUserStoreRole)
       return currentUserStoreRole
     },
     enabled: !!activeStoreId,
@@ -199,19 +186,6 @@ export function useCurrentUserStoreRole() {
       }
       return failureCount < 2
     },
-  })
-
-  console.log('📈 useCurrentUserStoreRole - Query result:', {
-    isLoading: result.isLoading,
-    isError: result.isError,
-    error: result.error?.message,
-    data: result.data
-      ? {
-          role: result.data.role,
-          permissions: result.data.permissions,
-          isActive: result.data.isActive,
-        }
-      : null,
   })
 
   return {
@@ -304,20 +278,6 @@ export function usePermissions() {
 
   const { data: globalRoles } = useCurrentUserRoles()
   const isLoading = isLoadingUser || isLoadingStoreRole
-
-  console.log('🔐 usePermissions - Debug info:', {
-    isLoadingUser,
-    isLoadingStoreRole,
-    isLoading,
-    currentUser: currentUser ? { id: currentUser.id, email: currentUser.email } : null,
-    storeRole: storeRole ? { role: storeRole.role, permissions: storeRole.permissions } : null,
-    computedFlags: {
-      isOwner,
-      isManager,
-      isEmployee,
-      canManageSettings,
-    },
-  })
 
   return {
     // User info
@@ -475,14 +435,14 @@ export function useUpdatePhone() {
       // Invalidate user queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      
+
       if (phone) {
         toast.success('Phone number updated successfully')
       } else {
         toast.success('Phone number removed successfully')
       }
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Phone update error:', error)
       toast.error('Failed to update phone number')
     },
@@ -500,16 +460,16 @@ export function useUpdateLanguagePreference() {
       // Invalidate user queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      
+
       toast.success(`Language preference updated to ${language.toUpperCase()}`)
-      
+
       // Trigger app language change (if using next-intl)
       if (typeof window !== 'undefined') {
         // This would trigger a language change in your app
         window.location.reload()
       }
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Language update error:', error)
       toast.error('Failed to update language preference')
     },
