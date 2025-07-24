@@ -18,7 +18,7 @@ from app.auth.secure_dependencies import (
     validate_batch_id_format,
     validate_store_id_format,
 )
-from app.core.donation_engine import create_donation_decision_engine
+from app.api.v1.compat_donation_wrapper import create_simplified_donation_engine_compat
 from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
@@ -611,8 +611,8 @@ async def scan_donation_eligibility_check(
             )
 
         # Create donation decision engine and evaluate
-        donation_engine = create_donation_decision_engine()
-        recommendation = donation_engine.evaluate_donation_opportunity(
+        donation_engine = create_simplified_donation_engine_compat()
+        recommendation = donation_engine.evaluate_action_recommendation(
             batch_data=batch_data,
             current_temperature=donation_scan.temperature_check,
             packaging_condition=donation_scan.packaging_condition,
@@ -737,8 +737,8 @@ async def execute_donation_action(
             )
 
         # Re-validate donation eligibility
-        donation_engine = create_donation_decision_engine()
-        recommendation = donation_engine.evaluate_donation_opportunity(batch_data=batch_data)
+        donation_engine = create_simplified_donation_engine_compat()
+        recommendation = donation_engine.evaluate_action_recommendation(batch_data=batch_data)
 
         if not recommendation.eu_compliant:
             raise ScanWorkflowException(
@@ -894,14 +894,14 @@ async def get_donation_quick_scan_list(
             }
 
         # Create donation decision engine
-        donation_engine = create_donation_decision_engine()
+        donation_engine = create_simplified_donation_engine_compat()
 
         # Evaluate each batch for donation
         donation_candidates = []
 
         for batch in inventory_data:
             try:
-                recommendation = donation_engine.evaluate_donation_opportunity(batch_data=batch)
+                recommendation = donation_engine.evaluate_action_recommendation(batch_data=batch)
 
                 if recommendation.eu_compliant:
                     priority_value = recommendation.priority.value

@@ -293,7 +293,7 @@ docker-compose down
 ### Services
 
 - **Frontend**: http://localhost:3000
-- **API**: http://localhost:8000
+- **API**: http://localhost:8001
 - **Database**: localhost:5432
 - **Redis**: localhost:6379
 
