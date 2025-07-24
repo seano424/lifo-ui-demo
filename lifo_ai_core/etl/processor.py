@@ -1,5 +1,6 @@
 # lifo_ai_core/etl/processor.py
 
+import csv
 import io
 import logging
 from datetime import datetime, timedelta
