@@ -635,7 +635,6 @@ export async function fetchCurrentUser(
     // Transform the auth user to our User type
     const transformedUser = transformAuthUserToUser(user)
 
-    console.log('[fetchCurrentUser] Success:', { user })
     return transformedUser
   } catch (err) {
     console.error('[fetchCurrentUser] Unexpected error:', err)

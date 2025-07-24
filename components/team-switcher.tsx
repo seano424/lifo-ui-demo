@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronsUpDown, MapPin, Settings, ShoppingCart } from 'lucide-react'
+import { ChevronsUpDown, MapPin, Settings } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -22,38 +22,18 @@ import { Badge } from '@/components/ui/badge'
 import { useUserStores, useStoreActions } from '@/hooks/use-stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import type { Store } from '@/lib/queries/stores'
-
-// Type definitions for store types
-type StoreType = 'supermarket' | 'convenience' | 'restaurant' | 'bakery' | 'butcher' | 'organic'
-
-// Map store types to icons and colors
-const storeConfig: Record<StoreType, { icon: typeof ShoppingCart; color: string }> & {
-  [key: string]: { icon: typeof ShoppingCart; color: string }
-} = {
-  supermarket: { icon: ShoppingCart, color: 'bg-blue-500' },
-  convenience: { icon: ShoppingCart, color: 'bg-green-500' },
-  restaurant: { icon: ShoppingCart, color: 'bg-orange-500' },
-  bakery: { icon: ShoppingCart, color: 'bg-yellow-500' },
-  butcher: { icon: ShoppingCart, color: 'bg-red-500' },
-  organic: { icon: ShoppingCart, color: 'bg-emerald-500' },
-} as const
-
-function StoreIcon({ storeType, className }: { storeType?: string | null; className?: string }) {
-  const config = storeConfig[storeType as StoreType] || storeConfig.supermarket
-  const IconComponent = config.icon
-  return <IconComponent className={className} />
-}
-
-function StoreTypeColor({ storeType }: { storeType?: string | null }) {
-  const config = storeConfig[storeType as StoreType] || storeConfig.supermarket
-  return config.color
-}
+import { cn } from '@/lib/utils'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
   const { userStores, isLoading } = useUserStores()
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
+
+  const firstTwoStoreInitials = userStores
+    .map(store => store.store.store_name.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('')
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {
@@ -65,9 +45,16 @@ export function TeamSwitcher() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" disabled>
+          <SidebarMenuButton
+            size="lg"
+            disabled
+            className={cn(
+              'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 py-8 px-4 rounded-lg border',
+              'group-data-[state=collapsed]:border-none',
+            )}
+          >
             <div className="flex aspect-square size-8 animate-pulse items-center justify-center rounded-lg bg-muted">
-              <ShoppingCart className="size-4" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <div className="h-4 w-24 animate-pulse rounded bg-muted"></div>
@@ -83,9 +70,16 @@ export function TeamSwitcher() {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" disabled>
+          <SidebarMenuButton
+            size="lg"
+            disabled
+            className={cn(
+              'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 py-8 px-4 rounded-lg border',
+              'group-data-[state=collapsed]:border-none',
+            )}
+          >
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted">
-              <ShoppingCart className="size-4 text-muted-foreground" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="text-muted-foreground">No stores available</span>
@@ -103,20 +97,24 @@ export function TeamSwitcher() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className={cn(
+                'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 py-8 px-4 rounded-lg border',
+                'group-data-[state=collapsed]:border-none',
+              )}
               disabled={isChangingStore}
             >
-              <div
-                className={`flex aspect-square size-8 items-center justify-center rounded-lg text-white ${StoreTypeColor({ storeType: activeStore.store_type })}`}
-              >
-                <StoreIcon storeType={activeStore.store_type} className="size-4" />
+              <div className={`flex aspect-square size-8 items-center justify-center rounded-lg`}>
+                <div
+                  className={cn(
+                    'flex aspect-square size-10 items-center justify-center rounded-full bg-brand-dark text-brand-white font-black',
+                    'group-data-[state=collapsed]:bg-transparent group-data-[state=collapsed]:text-brand-secondary group-data-[state=collapsed]:border-none',
+                  )}
+                >
+                  {firstTwoStoreInitials}
+                </div>
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeStore.store_name}</span>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="size-3" />
-                  <span className="truncate">{activeStore.city}</span>
-                </div>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -142,11 +140,6 @@ export function TeamSwitcher() {
                   className="gap-2 p-2"
                   disabled={isChangingStore}
                 >
-                  <div
-                    className={`flex size-6 items-center justify-center rounded-md text-white ${StoreTypeColor({ storeType: store.store_type })}`}
-                  >
-                    <StoreIcon storeType={store.store_type} className="size-3.5 shrink-0" />
-                  </div>
                   <div className="flex flex-1 flex-col gap-0.5">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{store.store_name}</span>

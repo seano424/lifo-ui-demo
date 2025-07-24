@@ -1,5 +1,6 @@
 {
   "navigation": {
+    "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
     "inbound": "Inbound",
@@ -289,6 +290,7 @@
       "saving": "Saving..."
     },
     "language": {
+      "currentLanguage": "Current Language",
       "title": "Language Preference",
       "description": "Choose your preferred language for the interface"
     },
@@ -305,6 +307,14 @@
     "errors": {
       "updateProfile": "Failed to update profile",
       "updatePhone": "Failed to update phone number"
+    },
+    "activity": {
+      "memberSince": "Member since {date}",
+      "lastLogin": "Last login: {date}",
+      "failedAttempts": "{count} failed PIN attempt{plural}"
+    },
+    "security": {
+      "notice": "This is your personal account. You can change your password in the login page."
     }
   },
   "common": {

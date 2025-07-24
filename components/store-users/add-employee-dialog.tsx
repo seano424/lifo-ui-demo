@@ -1,5 +1,3 @@
-// components/store-users/add-employee-dialog.tsx - FIXED username availability check
-
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'

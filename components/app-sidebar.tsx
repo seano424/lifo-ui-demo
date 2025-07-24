@@ -5,16 +5,13 @@ import { useTranslations } from 'next-intl'
 import {
   BookOpen,
   Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
   SquareTerminal,
   Calendar,
   Box,
   BarChart,
   Target,
   HelpCircle,
+  SettingsIcon,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -28,6 +25,8 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import { useCurrentUser } from '@/hooks/use-users'
+import { NavbarLogo } from './ui/logo'
+import { cn } from '@/lib/utils'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
@@ -74,29 +73,12 @@ function useNavigationData() {
         {
           title: t('settings'),
           url: '/dashboard/settings',
-          icon: Settings2,
+          icon: SettingsIcon,
         },
         {
           title: t('helpCenter'),
           url: '/dashboard/help-center',
           icon: HelpCircle,
-        },
-      ],
-      projects: [
-        {
-          name: 'Design Engineering',
-          url: '/dashboard',
-          icon: Frame,
-        },
-        {
-          name: 'Sales & Marketing',
-          url: '/dashboard',
-          icon: PieChart,
-        },
-        {
-          name: 'Travel',
-          url: '/dashboard',
-          icon: Map,
         },
       ],
     }),
@@ -115,11 +97,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
+        <div className={cn('flex items-center justify-center')}>
+          <NavbarLogo size="lg" />
+        </div>
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navigationData.navMain} />
-        {/* <NavProjects projects={navigationData.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

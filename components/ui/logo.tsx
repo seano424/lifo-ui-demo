@@ -1,0 +1,107 @@
+'use client'
+
+import { cn } from '@/lib/utils'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import Link from 'next/link'
+
+type LogoVariant = 'vertical' | 'horizontal' | 'icon'
+type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
+
+interface LogoProps {
+  variant?: LogoVariant
+  size?: LogoSize
+  className?: string
+  darkMode?: boolean // Force dark/light mode
+  href?: string // Make it clickable
+}
+
+const sizeMap = {
+  sm: 'h-8',
+  md: 'h-12',
+  lg: 'h-16',
+  xl: 'h-24',
+}
+
+export function Logo({
+  variant = 'vertical',
+  size = 'md',
+  className,
+  darkMode,
+  href = '/',
+}: LogoProps) {
+  const { theme } = useTheme()
+
+  // Determine which logo to show based on theme
+  const isDark = darkMode ?? theme === 'dark'
+  // public/logos/lifo-logo-icon.svg
+  // public/logos/lifo-logo-horizontal-dark.svg
+  // public/logos/lifo-logo-horizontal-light.svg
+  // public/logos/lifo-logo-vertical-dark.svg
+  // public/logos/lifo-logo-vertical-light.svg
+
+  const getLogoPath = () => {
+    switch (variant) {
+      case 'icon':
+        return '/logos/lifo-logo-icon.svg'
+      case 'vertical':
+        return isDark ? '/logos/lifo-logo-vertical-dark.svg' : '/logos/lifo-logo-vertical-light.svg'
+      case 'horizontal':
+        return isDark
+          ? '/logos/lifo-logo-horizontal-dark.svg'
+          : '/logos/lifo-logo-horizontal-light.svg'
+      default:
+        return '/logos/lifo-logo.svg'
+    }
+  }
+
+  const logoElement = (
+    <Image
+      src={getLogoPath()}
+      alt="LIFO"
+      className={cn(
+        sizeMap[size],
+        'w-auto transition-opacity duration-200 hover:opacity-80',
+        className,
+      )}
+      width={100}
+      height={100}
+    />
+  )
+
+  if (href) {
+    return (
+      <Link href={href} className="inline-block">
+        {logoElement}
+      </Link>
+    )
+  }
+
+  return logoElement
+}
+
+// Specific logo components for common use cases
+export function NavbarLogo({
+  className,
+  size = 'md',
+  variant = 'vertical',
+}: {
+  className?: string
+  size?: LogoSize
+  variant?: LogoVariant
+}) {
+  return <Logo variant={variant} size={size} className={className} />
+}
+
+export function AppIcon({ className, size = 'sm' }: { className?: string; size?: LogoSize }) {
+  return <Logo variant="icon" size={size} className={className} />
+}
+
+export function HeroLogo({ className, size = 'xl' }: { className?: string; size?: LogoSize }) {
+  return <Logo variant="vertical" size={size} className={className} />
+}
+
+// For loading states or when you need a placeholder
+export function LogoSkeleton({ size = 'md' }: { size?: LogoSize }) {
+  return <div className={cn(sizeMap[size], 'w-32 bg-muted animate-pulse rounded')} />
+}

@@ -1,4 +1,3 @@
-// components/settings/store-information.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -22,7 +21,26 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
-import { Edit, Check, X, AlertCircle, Store, MapPin, Phone, Globe, Building } from 'lucide-react'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import {
+  Edit,
+  Check,
+  X,
+  AlertCircle,
+  Store,
+  MapPin,
+  Phone,
+  Globe,
+  Building,
+  Shield,
+} from 'lucide-react'
+import type { UserStorePermissions } from '@/lib/server/permissions'
+
+// Interface for server permissions prop
+interface StoreInformationProps {
+  serverPermissions?: UserStorePermissions // Server-computed permissions
+  storeId?: string // 🚀 NEW: Optional store ID override from server
+}
 
 // Type for translation function
 type TranslationFunction = (key: string) => string
@@ -117,11 +135,25 @@ const createCountries = (t: TranslationFunction) =>
     { value: 'Italy', label: t('storeInformation.countries.Italy') },
   ] as const
 
-export default function StoreInformation() {
+export default function StoreInformation({
+  serverPermissions,
+  storeId: propStoreId,
+}: StoreInformationProps) {
   const t = useTranslations('settings')
-  const { data: storeData, isLoading } = useStoreSettings()
+
+  // 🚀 CRITICAL FIX: Use prop storeId if available, fallback to context
+  const contextStoreId = useActiveStoreId()
+  const effectiveStoreId = propStoreId || contextStoreId
+
+  // 🚀 CRITICAL: Pass the effective storeId directly to the hooks
+  const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId || undefined)
   const { updateBasicInfo, isUpdating } = useStoreActions()
-  const { canViewSettings, canEditAdvancedSettings } = useStorePermissions()
+
+  // 🚀 Use hybrid permissions hook with server permissions as fallback
+  const permissions = useStorePermissions({
+    serverPermissions,
+    storeId: effectiveStoreId || undefined,
+  })
 
   const [isEditing, setIsEditing] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -130,6 +162,16 @@ export default function StoreInformation() {
   const STORE_TYPES = createStoreTypes(t)
   const SIZE_CATEGORIES = createSizeCategories(t)
   const COUNTRIES = createCountries(t)
+
+  // 🚀 DEBUG: Show which storeId is being used
+  console.log('🔍 StoreInformation storeId resolution:', {
+    propStoreId,
+    contextStoreId,
+    effectiveStoreId,
+    hasStoreData: !!storeData,
+    isLoading,
+    permissionsLoading: permissions.isLoading,
+  })
 
   const form = useForm<StoreInfoFormData>({
     resolver: zodResolver(storeInfoSchema),
@@ -225,22 +267,8 @@ export default function StoreInformation() {
     setHasUnsavedChanges(false)
   }
 
-  // Permission check
-  if (!canViewSettings) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{t('storeInformation.permissionError')}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  // Loading state
-  if (isLoading) {
+  // 🚀 IMPROVED: Only show loading when we don't have an effective storeId OR data is loading
+  if (!effectiveStoreId || isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -266,6 +294,52 @@ export default function StoreInformation() {
     )
   }
 
+  // Show error if data fetch failed
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>Failed to load store settings: {error.message}</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // 🚀 FIXED: Check for actual storeData, not negated storeData
+  if (!storeData) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Store data not found. Please try refreshing the page.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!permissions.canViewSettings && !permissions.isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              You don&apos;t have permission to view store settings. Contact your store{' '}
+              {permissions.isEmployee ? 'manager or owner' : 'owner'}.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -279,23 +353,29 @@ export default function StoreInformation() {
               {t('storeInformation.description')}
             </Typography>
           </div>
-          {!isEditing && canEditAdvancedSettings && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              {t('storeInformation.editStore')}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs">
+              <Shield className="h-3 w-3" />
+              {permissions.isOwner ? 'Owner' : permissions.isManager ? 'Manager' : 'Employee'}
+            </div>
+
+            {!isEditing && permissions.canEditBasicInfo && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                {t('storeInformation.editStore')}
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6 pt-4 border-t">
         <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
-          {/* Store Details Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Building className="h-4 w-4" />
@@ -303,7 +383,6 @@ export default function StoreInformation() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Store Name */}
               <div className="space-y-2">
                 <Label htmlFor="store_name">{t('storeInformation.fields.storeName')}</Label>
                 {isEditing ? (
@@ -324,21 +403,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Business Name */}
-              {/* <div className="space-y-2">
-                <Label htmlFor="business_name">{t('storeInformation.fields.businessName')}</Label>
-                {isEditing ? (
-                  <Input
-                    id="business_name"
-                    {...form.register('business_name')}
-                    placeholder={t('storeInformation.placeholders.businessName')}
-                  />
-                ) : (
-                  <Typography variant="p">{storeData?.business_name || t('storeInformation.messages.notSet')}</Typography>
-                )}
-              </div> */}
-
-              {/* Store Code */}
               <div className="space-y-2">
                 <Label htmlFor="store_code">{t('storeInformation.fields.storeCode')}</Label>
                 {isEditing ? (
@@ -360,7 +424,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Store Type */}
               <div className="space-y-2">
                 <Label htmlFor="store_type">{t('storeInformation.fields.storeType')}</Label>
                 {isEditing ? (
@@ -393,7 +456,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Size Category */}
               <div className="space-y-2">
                 <Label htmlFor="size_category">{t('storeInformation.fields.sizeCategory')}</Label>
                 {isEditing ? (
@@ -428,7 +490,6 @@ export default function StoreInformation() {
             </div>
           </div>
 
-          {/* Address Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
@@ -438,7 +499,6 @@ export default function StoreInformation() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Street Address */}
               <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="address">{t('storeInformation.fields.address')}</Label>
                 {isEditing ? (
@@ -454,7 +514,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* City */}
               <div className="space-y-2">
                 <Label htmlFor="city">{t('storeInformation.fields.city')}</Label>
                 {isEditing ? (
@@ -470,7 +529,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Postal Code */}
               <div className="space-y-2">
                 <Label htmlFor="postal_code">{t('storeInformation.fields.postalCode')}</Label>
                 {isEditing ? (
@@ -486,7 +544,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Country */}
               <div className="space-y-2">
                 <Label htmlFor="country">{t('storeInformation.fields.country')}</Label>
                 {isEditing ? (
@@ -518,7 +575,6 @@ export default function StoreInformation() {
             </div>
           </div>
 
-          {/* Contact Information */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
@@ -528,7 +584,6 @@ export default function StoreInformation() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Phone */}
               <div className="space-y-2">
                 <Label htmlFor="phone">{t('storeInformation.fields.phone')}</Label>
                 {isEditing ? (
@@ -544,7 +599,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">{t('storeInformation.fields.email')}</Label>
                 {isEditing ? (
@@ -566,7 +620,6 @@ export default function StoreInformation() {
                 )}
               </div>
 
-              {/* Website */}
               <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="website_url">{t('storeInformation.fields.website')}</Label>
                 {isEditing ? (
@@ -601,7 +654,6 @@ export default function StoreInformation() {
             </div>
           </div>
 
-          {/* Description */}
           <div className="space-y-4">
             <Typography variant="h3">{t('storeInformation.sections.storeDescription')}</Typography>
 
@@ -627,61 +679,71 @@ export default function StoreInformation() {
             </div>
           </div>
 
-          {/* Business Settings */}
-          <div className="space-y-4">
-            <Typography variant="h3">{t('storeInformation.sections.businessSettings')}</Typography>
+          {permissions.canEditAdvancedSettings && (
+            <div className="space-y-4">
+              <Typography variant="h3">
+                {t('storeInformation.sections.businessSettings')}
+              </Typography>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Default Markup */}
-              <div className="space-y-2">
-                <Label htmlFor="default_markup_percent">
-                  {t('storeInformation.fields.defaultMarkup')}
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="default_markup_percent"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    {...form.register('default_markup_percent', { valueAsNumber: true })}
-                  />
-                ) : (
-                  <Typography variant="p">
-                    {storeData?.default_markup_percent
-                      ? `${storeData.default_markup_percent}%`
-                      : t('storeInformation.messages.notSet')}
-                  </Typography>
-                )}
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="default_markup_percent">
+                    {t('storeInformation.fields.defaultMarkup')}
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      id="default_markup_percent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      {...form.register('default_markup_percent', { valueAsNumber: true })}
+                    />
+                  ) : (
+                    <Typography variant="p">
+                      {storeData?.default_markup_percent
+                        ? `${storeData.default_markup_percent}%`
+                        : t('storeInformation.messages.notSet')}
+                    </Typography>
+                  )}
+                </div>
 
-              {/* Waste Reduction Target */}
-              <div className="space-y-2">
-                <Label htmlFor="waste_reduction_target_percent">
-                  {t('storeInformation.fields.wasteReductionTarget')}
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="waste_reduction_target_percent"
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    {...form.register('waste_reduction_target_percent', { valueAsNumber: true })}
-                  />
-                ) : (
-                  <Typography variant="p">
-                    {storeData?.waste_reduction_target_percent
-                      ? `${storeData.waste_reduction_target_percent}%`
-                      : t('storeInformation.messages.notSet')}
-                  </Typography>
-                )}
+                <div className="space-y-2">
+                  <Label htmlFor="waste_reduction_target_percent">
+                    {t('storeInformation.fields.wasteReductionTarget')}
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      id="waste_reduction_target_percent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      {...form.register('waste_reduction_target_percent', { valueAsNumber: true })}
+                    />
+                  ) : (
+                    <Typography variant="p">
+                      {storeData?.waste_reduction_target_percent
+                        ? `${storeData.waste_reduction_target_percent}%`
+                        : t('storeInformation.messages.notSet')}
+                    </Typography>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Action Buttons */}
-          {isEditing && (
+          {!permissions.canEditBasicInfo && !permissions.isLoading && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You have read-only access to store information. Contact your store{' '}
+                {permissions.isEmployee ? 'manager or owner' : 'owner'} to make changes.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {isEditing && permissions.canEditBasicInfo && (
             <div className="flex items-center gap-2 pt-4 border-t">
               <Button
                 type="submit"
@@ -711,6 +773,29 @@ export default function StoreInformation() {
             </div>
           )}
         </form>
+
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <Typography variant="small" className="font-medium text-yellow-800 mb-2">
+              Debug: Store Information
+            </Typography>
+            <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
+              {JSON.stringify(
+                {
+                  propStoreId,
+                  contextStoreId,
+                  effectiveStoreId,
+                  hasStoreData: !!storeData,
+                  isLoading,
+                  serverPermissions: !!serverPermissions,
+                  permissionsLoading: permissions.isLoading,
+                },
+                null,
+                2,
+              )}
+            </pre>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
