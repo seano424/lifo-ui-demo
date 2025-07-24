@@ -109,7 +109,9 @@ async def init_database():
             # Your database already has the correct schema from migrations
             if settings.debug:
                 # await conn.run_sync(Base.metadata.create_all)  # Disabled - use migrations
-                logger.info("Database connection verified (table creation skipped - using Supabase migrations)")
+                logger.info(
+                    "Database connection verified (table creation skipped - using Supabase migrations)"
+                )
 
         logger.info("Database initialization completed successfully")
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Database } from '@/types/supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
 
@@ -251,7 +252,7 @@ export class InventoryOperations {
       category?: string
       active_only?: boolean
     } = {},
-  ): Promise<{ data: any[]; count: number }> {
+  ): Promise<{ data: StoreProduct[]; count: number }> {
     const { page = 1, limit = 50, category, active_only = true } = options
     const from = (page - 1) * limit
     const to = from + limit - 1
@@ -315,7 +316,7 @@ export class InventoryOperations {
   }
 
   async processCsvBatch(
-    csvData: any[],
+    csvData: unknown[],
     storeId: string,
     userId: string,
   ): Promise<{ processed: number; errors: string[] }> {
@@ -324,7 +325,7 @@ export class InventoryOperations {
     return { processed: 0, errors: ['CSV processing functionality temporarily disabled'] }
   }
 
-  async getStoreInventoryAlerts(storeId: string, threshold: number = 0.6): Promise<any[]> {
+  async getStoreInventoryAlerts(storeId: string, threshold: number = 0.6): Promise<unknown[]> {
     // TODO: Re-enable when scoring system is ready
     console.warn('Inventory alerts functionality temporarily disabled')
     return []
@@ -338,7 +339,7 @@ export class InventoryOperations {
       category?: string
       status?: string
     } = {},
-  ): Promise<{ data: any[]; count: number }> {
+  ): Promise<{ data: Batch[]; count: number }> {
     // TODO: Re-enable when inventory system is ready
     console.warn('Inventory functionality temporarily disabled')
     return { data: [], count: 0 }

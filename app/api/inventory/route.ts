@@ -1,6 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import type { Batch } from '@/lib/queries/batches'
+
+// Extended type for batch with product scores
+type BatchWithScores = Batch & {
+  product_scores?: Array<{
+    composite_score: number
+    recommendation: string
+  }>
+}
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -51,7 +60,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate additional metrics for each item
-    const inventory = data.map(batch => {
+    const inventory = data.map((batch: BatchWithScores) => {
       const daysToExpiry = Math.floor(
         (new Date(batch.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )

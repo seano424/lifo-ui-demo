@@ -218,7 +218,9 @@ class Batch(Base):
     batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     # Product reference (normalized products in inventory schema)
-    product_id = Column(UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False)
+    product_id = Column(
+        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
+    )
 
     batch_number = Column(String(100), nullable=False)
 

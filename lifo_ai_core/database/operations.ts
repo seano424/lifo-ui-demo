@@ -316,7 +316,10 @@ export const createInventoryOperations = (supabase: SupabaseClient<Database>) =>
     return { processed: 0, errors: ['CSV processing functionality temporarily disabled'] }
   }
 
-  const getStoreInventoryAlerts = async (storeId: string, threshold: number = 0.6): Promise<any[]> => {
+  const getStoreInventoryAlerts = async (
+    storeId: string,
+    threshold: number = 0.6,
+  ): Promise<any[]> => {
     // TODO: Re-enable when scoring system is ready
     console.warn('Inventory alerts functionality temporarily disabled')
     return []
@@ -336,13 +339,21 @@ export const createInventoryOperations = (supabase: SupabaseClient<Database>) =>
     return { data: [], count: 0 }
   }
 
-  const updateBatchQuantity = async (batchId: string, newQuantity: number, userId: string): Promise<void> => {
+  const updateBatchQuantity = async (
+    batchId: string,
+    newQuantity: number,
+    userId: string,
+  ): Promise<void> => {
     // TODO: Re-enable when inventory system is ready
     console.warn('Inventory functionality temporarily disabled')
     throw new Error('Inventory functionality temporarily disabled')
   }
 
-  const applyDiscount = async (batchId: string, discountPercent: number, userId: string): Promise<void> => {
+  const applyDiscount = async (
+    batchId: string,
+    discountPercent: number,
+    userId: string,
+  ): Promise<void> => {
     // TODO: Re-enable when inventory system is ready
     console.warn('Inventory functionality temporarily disabled')
     throw new Error('Inventory functionality temporarily disabled')
@@ -367,7 +378,9 @@ export const createInventoryOperations = (supabase: SupabaseClient<Database>) =>
     return shelfLifeMap[category] || 30
   }
 
-  const getStoreStats = async (storeId: string): Promise<{
+  const getStoreStats = async (
+    storeId: string,
+  ): Promise<{
     totalProducts: number
     totalBatches: number
     activeAlerts: number
@@ -713,10 +726,7 @@ export class InventoryOperations {
     return { processed: 0, errors: ['CSV processing functionality temporarily disabled'] }
   }
 
-  getStoreInventoryAlerts = async (
-    storeId: string,
-    threshold: number = 0.6,
-  ): Promise<any[]> => {
+  getStoreInventoryAlerts = async (storeId: string, threshold: number = 0.6): Promise<any[]> => {
     // TODO: Re-enable when scoring system is ready
     console.warn('Inventory alerts functionality temporarily disabled')
     return []
@@ -794,4 +804,4 @@ export class InventoryOperations {
       expiringItems: 0,
     }
   }
-} 
+}

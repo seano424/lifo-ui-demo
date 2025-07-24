@@ -28,7 +28,9 @@ router = APIRouter()
 @router.get("/recipients")
 async def get_donation_recipients(
     store_id: Optional[str] = Query(None, description="Filter by store ID"),
-    recipient_type: Optional[DonationRecipientType] = Query(None, description="Filter by recipient type"),
+    recipient_type: Optional[DonationRecipientType] = Query(
+        None, description="Filter by recipient type"
+    ),
     is_active: bool = Query(True, description="Filter by active status"),
     db: AsyncSession = Depends(get_database),
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -64,7 +66,9 @@ async def get_donation_recipients(
                     "accepts_pickups": recipient.accepts_pickups,
                     "max_distance_km": recipient.max_distance_km,
                     "store_id": str(recipient.store_id),
-                    "created_at": recipient.created_at.isoformat() if recipient.created_at else None,
+                    "created_at": recipient.created_at.isoformat()
+                    if recipient.created_at
+                    else None,
                 }
                 for recipient in recipients
             ],
@@ -114,11 +118,19 @@ async def get_batch_actions(
                     "actual_action": action.actual_action.value,
                     "ai_score": float(action.ai_score) if action.ai_score else None,
                     "action_date": action.action_date.isoformat() if action.action_date else None,
-                    "quantity_affected": float(action.quantity_affected) if action.quantity_affected else None,
+                    "quantity_affected": float(action.quantity_affected)
+                    if action.quantity_affected
+                    else None,
                     "notes": action.notes,
-                    "original_value": float(action.original_value) if action.original_value else None,
-                    "recovered_value": float(action.recovered_value) if action.recovered_value else None,
-                    "donation_recipient_id": str(action.donation_recipient_id) if action.donation_recipient_id else None,
+                    "original_value": float(action.original_value)
+                    if action.original_value
+                    else None,
+                    "recovered_value": float(action.recovered_value)
+                    if action.recovered_value
+                    else None,
+                    "donation_recipient_id": str(action.donation_recipient_id)
+                    if action.donation_recipient_id
+                    else None,
                 }
                 for action in actions
             ],
@@ -159,13 +171,11 @@ async def get_donation_analytics_summary(
         donation_actions = [a for a in actions if a.actual_action == ActionType.DONATE]
 
         total_donated_value = sum(
-            float(action.original_value) for action in donation_actions
-            if action.original_value
+            float(action.original_value) for action in donation_actions if action.original_value
         )
 
         total_recovered_value = sum(
-            float(action.recovered_value) for action in donation_actions
-            if action.recovered_value
+            float(action.recovered_value) for action in donation_actions if action.recovered_value
         )
 
         # Action type breakdown
@@ -175,10 +185,9 @@ async def get_donation_analytics_summary(
             action_breakdown[action_type.value] = count
 
         # Recommendation vs actual analysis
-        followed_recommendations = len([
-            a for a in actions
-            if a.recommended_action == a.actual_action
-        ])
+        followed_recommendations = len(
+            [a for a in actions if a.recommended_action == a.actual_action]
+        )
 
         recommendation_accuracy = (
             (followed_recommendations / total_actions * 100) if total_actions > 0 else 0
@@ -198,7 +207,7 @@ async def get_donation_analytics_summary(
                 "items_donated": len(donation_actions),
                 "estimated_tax_benefit": total_recovered_value,
                 "waste_prevented_value": total_donated_value,
-            }
+            },
         }
 
     except Exception as e:
@@ -218,5 +227,5 @@ async def get_donation_kpis():
     """Legacy endpoint - returns basic metrics"""
     return {
         "message": "KPI tracking simplified - use /analytics/summary instead",
-        "redirect": "/api/v1/donation-queries/analytics/summary"
+        "redirect": "/api/v1/donation-queries/analytics/summary",
     }

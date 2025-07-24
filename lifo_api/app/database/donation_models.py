@@ -28,6 +28,7 @@ from app.database.models import Base
 
 class ActionType(Enum):
     """Types of actions that can be taken on inventory batches"""
+
     DISCOUNT = "discount"
     DONATE = "donate"
     DISPOSE = "dispose"
@@ -37,6 +38,7 @@ class ActionType(Enum):
 
 class DonationRecipientType(Enum):
     """Simplified donation recipient types for MVP"""
+
     FOOD_BANK = "food_bank"
     SOUP_KITCHEN = "soup_kitchen"
     CHARITY = "charity"
@@ -54,11 +56,16 @@ class BatchAction(Base):
     Track what users did with AI recommendations
     Simplified action tracking for LIFO.AI recommendations
     """
+
     __tablename__ = "batch_actions"
     __table_args__ = {"schema": "inventory"}
 
     action_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    batch_id = Column(UUID(as_uuid=True), ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"), nullable=False)
+    batch_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"),
+        nullable=False,
+    )
     store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     # What was recommended vs what was done
@@ -73,14 +80,18 @@ class BatchAction(Base):
 
     # Financial tracking (for ROI calculations)
     original_value = Column(DECIMAL(10, 2))  # Value before action
-    recovered_value = Column(DECIMAL(10, 2))  # Value after action (discount price, tax benefit, etc.)
+    recovered_value = Column(
+        DECIMAL(10, 2)
+    )  # Value after action (discount price, tax benefit, etc.)
 
     # User tracking
     performed_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Link to donation recipient (when applicable)
-    donation_recipient_id = Column(UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id"))
+    donation_recipient_id = Column(
+        UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
+    )
 
     # Relationships
     donation_recipient = relationship("DonationRecipient", back_populates="batch_actions")
@@ -91,6 +102,7 @@ class DonationRecipient(Base):
     Lightweight recipient tracking for MVP
     Simple donation recipients (just enough for compliance)
     """
+
     __tablename__ = "donation_recipients"
     __table_args__ = {"schema": "inventory"}
 

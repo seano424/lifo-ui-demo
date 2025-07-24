@@ -35,8 +35,10 @@ try:
 except ImportError:
     # Fallback logger
     import logging
+
     def get_logger(name: str = __name__):
         return logging.getLogger(name)
+
     StructuredLogger = None
 
 __all__ = [
