@@ -10,6 +10,9 @@ import { fetchUserStores } from '@/lib/queries/stores'
 import { withStoreAccess } from '@/lib/server/permissions'
 import StoreInformation from '@/components/settings/store-information'
 
+// Force dynamic rendering since this page uses cookies
+export const dynamic = 'force-dynamic'
+
 export default async function StoreSettingsPage() {
   try {
     const { queryClient } = await createPrefetchedQuery()
