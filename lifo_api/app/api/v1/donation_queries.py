@@ -5,19 +5,19 @@ Based on simplified schema from migration 017
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import desc, func, select
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import get_current_user
 from app.database.connection import get_database
 from app.database.donation_models import (
+    ActionType,
     BatchAction,
     DonationRecipient,
-    ActionType,
     DonationRecipientType,
 )
 
@@ -31,7 +31,7 @@ async def get_donation_recipients(
     recipient_type: Optional[DonationRecipientType] = Query(None, description="Filter by recipient type"),
     is_active: bool = Query(True, description="Filter by active status"),
     db: AsyncSession = Depends(get_database),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get donation recipients for a store
@@ -39,18 +39,18 @@ async def get_donation_recipients(
     """
     try:
         query = select(DonationRecipient).where(DonationRecipient.is_active == is_active)
-        
+
         if store_id:
             query = query.where(DonationRecipient.store_id == store_id)
-        
+
         if recipient_type:
             query = query.where(DonationRecipient.recipient_type == recipient_type)
-        
+
         query = query.order_by(DonationRecipient.name)
-        
+
         result = await db.execute(query)
         recipients = result.scalars().all()
-        
+
         return {
             "recipients": [
                 {
@@ -70,7 +70,7 @@ async def get_donation_recipients(
             ],
             "total_count": len(recipients),
         }
-        
+
     except Exception as e:
         logger.error("Failed to get donation recipients", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve donation recipients")
@@ -83,27 +83,27 @@ async def get_batch_actions(
     days: int = Query(30, description="Number of days to look back"),
     limit: int = Query(100, description="Maximum number of results"),
     db: AsyncSession = Depends(get_database),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get batch actions (what users did with AI recommendations)
     """
     try:
         cutoff_date = datetime.utcnow() - timedelta(days=days)
-        
+
         query = select(BatchAction).where(BatchAction.action_date >= cutoff_date)
-        
+
         if store_id:
             query = query.where(BatchAction.store_id == store_id)
-        
+
         if action_type:
             query = query.where(BatchAction.actual_action == action_type)
-        
+
         query = query.order_by(desc(BatchAction.action_date)).limit(limit)
-        
+
         result = await db.execute(query)
         actions = result.scalars().all()
-        
+
         return {
             "actions": [
                 {
@@ -125,7 +125,7 @@ async def get_batch_actions(
             "total_count": len(actions),
             "period_days": days,
         }
-        
+
     except Exception as e:
         logger.error("Failed to get batch actions", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve batch actions")
@@ -136,7 +136,7 @@ async def get_donation_analytics_summary(
     store_id: Optional[str] = Query(None, description="Filter by store ID"),
     days: int = Query(30, description="Number of days to analyze"),
     db: AsyncSession = Depends(get_database),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get donation analytics summary
@@ -144,46 +144,46 @@ async def get_donation_analytics_summary(
     """
     try:
         cutoff_date = datetime.utcnow() - timedelta(days=days)
-        
+
         # Base query
         query = select(BatchAction).where(BatchAction.action_date >= cutoff_date)
-        
+
         if store_id:
             query = query.where(BatchAction.store_id == store_id)
-        
+
         result = await db.execute(query)
         actions = result.scalars().all()
-        
+
         # Calculate summary statistics
         total_actions = len(actions)
         donation_actions = [a for a in actions if a.actual_action == ActionType.DONATE]
-        
+
         total_donated_value = sum(
-            float(action.original_value) for action in donation_actions 
+            float(action.original_value) for action in donation_actions
             if action.original_value
         )
-        
+
         total_recovered_value = sum(
-            float(action.recovered_value) for action in donation_actions 
+            float(action.recovered_value) for action in donation_actions
             if action.recovered_value
         )
-        
+
         # Action type breakdown
         action_breakdown = {}
         for action_type in ActionType:
             count = len([a for a in actions if a.actual_action == action_type])
             action_breakdown[action_type.value] = count
-        
+
         # Recommendation vs actual analysis
         followed_recommendations = len([
-            a for a in actions 
+            a for a in actions
             if a.recommended_action == a.actual_action
         ])
-        
+
         recommendation_accuracy = (
             (followed_recommendations / total_actions * 100) if total_actions > 0 else 0
         )
-        
+
         return {
             "summary": {
                 "period_days": days,
@@ -200,7 +200,7 @@ async def get_donation_analytics_summary(
                 "waste_prevented_value": total_donated_value,
             }
         }
-        
+
     except Exception as e:
         logger.error("Failed to get donation analytics", error=str(e))
         raise HTTPException(status_code=500, detail="Failed to retrieve donation analytics")

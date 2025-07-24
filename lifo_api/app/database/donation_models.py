@@ -60,25 +60,25 @@ class BatchAction(Base):
     action_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     batch_id = Column(UUID(as_uuid=True), ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"), nullable=False)
     store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
-    
+
     # What was recommended vs what was done
     recommended_action = Column(SQLEnum(ActionType), nullable=False)
     actual_action = Column(SQLEnum(ActionType), nullable=False)
     ai_score = Column(DECIMAL(3, 2))  # The AI score that triggered the recommendation (0.00-1.00)
-    
+
     # Simple tracking details
     action_date = Column(DateTime, default=datetime.utcnow)
     quantity_affected = Column(DECIMAL(12, 4))
     notes = Column(Text)  # Simple notes from user (e.g., "donated to local food bank")
-    
+
     # Financial tracking (for ROI calculations)
     original_value = Column(DECIMAL(10, 2))  # Value before action
     recovered_value = Column(DECIMAL(10, 2))  # Value after action (discount price, tax benefit, etc.)
-    
+
     # User tracking
     performed_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Link to donation recipient (when applicable)
     donation_recipient_id = Column(UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id"))
 
@@ -99,18 +99,18 @@ class DonationRecipient(Base):
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
     recipient_type = Column(SQLEnum(DonationRecipientType), nullable=False)
-    
+
     # Minimal compliance fields
     is_certified = Column(Boolean, default=False)
     certification_notes = Column(Text)
-    
+
     # Simple operational info
     accepts_pickups = Column(Boolean, default=True)
     max_distance_km = Column(Integer, default=10)
-    
+
     # Store association
     store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
-    
+
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))

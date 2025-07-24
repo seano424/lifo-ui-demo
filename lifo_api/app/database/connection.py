@@ -102,7 +102,7 @@ async def init_database():
         logger.info("Initializing database connection...")
 
         # Test the connection
-        async with engine().begin() as conn:
+        async with engine().begin():
             # Import all models to ensure they're registered
 
             # Skip table creation in development - use Supabase migrations instead
