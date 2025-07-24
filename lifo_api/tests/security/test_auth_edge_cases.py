@@ -4,15 +4,13 @@ Security tests for authentication edge cases and vulnerabilities
 """
 
 import time
-from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, patch
 
 import jwt
 import pytest
 from fastapi import HTTPException
-from fastapi.testclient import TestClient
 
-from app.auth.dependencies import get_current_user, validate_store_access
+from app.auth.dependencies import validate_store_access
 from app.auth.supabase_jwt import SupabaseAuth, SupabaseAuthError
 
 
@@ -65,9 +63,7 @@ class TestAuthenticationVulnerabilities:
         }
 
         # encode without proper signing
-        malicious_token = jwt.encode(
-            malicious_payload, "wrong-secret", algorithm="HS256"
-        )
+        malicious_token = jwt.encode(malicious_payload, "wrong-secret", algorithm="HS256")
 
         # extract_user_claims doesn't verify signature - VULNERABILITY
         claims = supabase_auth.extract_user_claims(malicious_token)
@@ -84,12 +80,10 @@ class TestAuthenticationVulnerabilities:
 
         # Test 2: Service role JWT with wrong signature
         service_payload = {"role": "service_role", "exp": int(time.time()) + 3600}
-        fake_service_token = jwt.encode(
-            service_payload, "wrong-secret", algorithm="HS256"
-        )
+        fake_service_token = jwt.encode(service_payload, "wrong-secret", algorithm="HS256")
 
         # This might pass due to verification bypass in service role path
-        result = supabase_auth.verify_service_role_token(fake_service_token)
+        supabase_auth.verify_service_role_token(fake_service_token)
         # Should be False but implementation is vulnerable
 
     def test_token_reuse_attack(self, supabase_auth):
@@ -185,7 +179,7 @@ class TestAuthenticationVulnerabilities:
 
         # First validation passes
         result1 = await validate_store_access("store123", mock_user, mock_db, "manager")
-        assert result1 == True
+        assert result1
 
         # Between calls, user could be deactivated or role changed
         # But there's no transaction boundary to prevent this race condition
@@ -273,7 +267,7 @@ class TestAuthenticationVulnerabilities:
 
         # System should reject oversized tokens but doesn't
         with pytest.raises(Exception):  # Should implement size limits
-            user = supabase_auth.verify_token(large_token)
+            supabase_auth.verify_token(large_token)
 
     def test_information_disclosure_in_logs(self, supabase_auth):
         """🚨 MEDIUM: Sensitive information in logs"""
@@ -320,10 +314,8 @@ class TestAuthorizationBypass:
         admin_user.role = "admin"
 
         # Admin bypasses specific permission check
-        has_permission = supabase_auth.check_user_permissions(
-            admin_user, "dangerous_permission"
-        )
-        assert has_permission == True  # Admin bypasses everything!
+        has_permission = supabase_auth.check_user_permissions(admin_user, "dangerous_permission")
+        assert has_permission  # Admin bypasses everything!
 
         # This could allow privilege escalation if admin role is compromised
 
@@ -347,7 +339,7 @@ class TestCORSVulnerabilities:
 
         # Test subdomain bypass
         with patch.object(settings, "frontend_url", "https://app.example.com"):
-            cors_origins = settings.get_cors_origins()
+            settings.get_cors_origins()
             # Should not allow arbitrary subdomains
             malicious_origins = [
                 "https://evil.app.example.com",
@@ -355,7 +347,7 @@ class TestCORSVulnerabilities:
                 "https://app-example.com",
             ]
 
-            for origin in malicious_origins:
+            for _origin in malicious_origins:
                 # Current implementation might allow these
                 pass
 
@@ -368,7 +360,7 @@ class TestCORSVulnerabilities:
    - Multiple algorithms supported without proper validation
    - 'none' algorithm might be accepted
 
-2. Unsafe Claims Extraction (CRITICAL) 
+2. Unsafe Claims Extraction (CRITICAL)
    - extract_user_claims() doesn't verify signature
    - Allows extraction of admin claims from invalid tokens
 
@@ -391,7 +383,7 @@ class TestCORSVulnerabilities:
 7. Issuer Validation Bypass (MEDIUM)
    - Wrong issuer only generates warning, doesn't reject token
 
-8. Hardcoded Role Hierarchy (MEDIUM) 
+8. Hardcoded Role Hierarchy (MEDIUM)
    - New roles not recognized, potential bypass
 
 9. No Rate Limiting (MEDIUM)

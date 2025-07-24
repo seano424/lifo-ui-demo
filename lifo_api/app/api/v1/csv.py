@@ -4,7 +4,7 @@ Part of hybrid architecture security remediation
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
@@ -26,7 +26,7 @@ async def validate_csv_secure(
     store_id: str,
     request: Request,
     file: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Securely validate CSV data for AI processing only
@@ -65,13 +65,13 @@ async def validate_csv_secure(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="CSV validation failed")
+        raise HTTPException(status_code=500, detail="CSV validation failed") from None
 
 
 @router.get("/template")
 @ai_endpoint_rate_limit("10/minute")  # Template downloads
 async def get_secure_csv_template(
-    request: Request, current_user: Dict[str, Any] = Depends(get_current_user)
+    request: Request, current_user: dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get secure CSV template for inventory data
@@ -113,7 +113,7 @@ async def get_secure_csv_template(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Template generation failed")
+        raise HTTPException(status_code=500, detail="Template generation failed") from None
 
 
 @router.post("/analyze/{store_id}")
@@ -122,7 +122,7 @@ async def analyze_csv_with_ai(
     store_id: str,
     request: Request,
     file: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analyze CSV data with AI suggestions
@@ -191,4 +191,4 @@ async def analyze_csv_with_ai(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="AI analysis failed")
+        raise HTTPException(status_code=500, detail="AI analysis failed") from None

@@ -4,9 +4,8 @@ Provides seamless integration with existing Supabase authentication
 Updated to use modern JWKS-based verification instead of legacy JWT secret
 """
 
-import json
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import httpx
 import jwt
@@ -27,8 +26,8 @@ class SupabaseUser(BaseModel):
     user_id: str
     email: str
     role: str = "authenticated"
-    app_metadata: Dict[str, Any] = {}
-    user_metadata: Dict[str, Any] = {}
+    app_metadata: dict[str, Any] = {}
+    user_metadata: dict[str, Any] = {}
     aud: str = "authenticated"
     exp: int
     iat: int
@@ -124,9 +123,7 @@ class SupabaseAuth:
                 sub=user_id,
             )
 
-            self.logger.info(
-                "Token verified successfully", user_id=user_id, email=email
-            )
+            self.logger.info("Token verified successfully", user_id=user_id, email=email)
 
             return user
 
@@ -146,9 +143,10 @@ class SupabaseAuth:
             self.logger.error(
                 "Token verification failed",
                 error=str(e),
-                token_preview=token[:20] + "..." if len(token) > 20 else token,
+                # Never log token data for security
             )
-            raise SupabaseAuthError(f"Authentication failed: {e!s}")
+            # Don't expose internal error details to client
+            raise SupabaseAuthError("Authentication failed")
 
     async def _verify_with_auth_server(self, token: str) -> Optional[SupabaseUser]:
         """
@@ -158,8 +156,7 @@ class SupabaseAuth:
             auth_url = f"{self.supabase_url}/auth/v1/user"
             headers = {
                 "Authorization": f"Bearer {token}",
-                "apikey": settings.supabase_anon_key
-                or settings.supabase_service_role_key,
+                "apikey": settings.supabase_anon_key or settings.supabase_service_role_key,
             }
 
             self.logger.info(
@@ -199,8 +196,7 @@ class SupabaseAuth:
                         app_metadata=user_data.get("app_metadata", {}),
                         user_metadata=user_data.get("user_metadata", {}),
                         aud="authenticated",
-                        exp=int(datetime.now(timezone.utc).timestamp())
-                        + 3600,  # Estimate expiry
+                        exp=int(datetime.now(timezone.utc).timestamp()) + 3600,  # Estimate expiry
                         iat=int(datetime.now(timezone.utc).timestamp()),
                         iss=f"{self.supabase_url}/auth/v1",
                         sub=user_data.get("id"),
@@ -222,7 +218,7 @@ class SupabaseAuth:
                             error_data=error_data,
                             response_text=response.text[:500],
                         )
-                    except:
+                    except Exception:
                         self.logger.error(
                             "Auth server verification failed",
                             status_code=response.status_code,
@@ -286,7 +282,7 @@ class SupabaseAuth:
             self.logger.warning("Service role token verification failed", error=str(e))
             return False
 
-    def extract_user_claims(self, token: str) -> Dict[str, Any]:
+    def extract_user_claims(self, token: str) -> dict[str, Any]:
         """
         Extract custom claims from VERIFIED token only
         SECURITY: Only call this after token has been verified with verify_token()
@@ -337,9 +333,7 @@ class SupabaseAuth:
         # Fallback to main role field
         return user.role
 
-    def check_user_permissions(
-        self, user: SupabaseUser, required_permission: str
-    ) -> bool:
+    def check_user_permissions(self, user: SupabaseUser, required_permission: str) -> bool:
         """
         Check if user has required permission
 
@@ -375,5 +369,13 @@ class SupabaseAuth:
             return False
 
 
-# Global authentication instance
-supabase_auth = SupabaseAuth()
+# Global authentication instance (lazy initialization)
+_supabase_auth: Optional[SupabaseAuth] = None
+
+
+def get_supabase_auth() -> SupabaseAuth:
+    """Get or create the global SupabaseAuth instance"""
+    global _supabase_auth
+    if _supabase_auth is None:
+        _supabase_auth = SupabaseAuth()
+    return _supabase_auth

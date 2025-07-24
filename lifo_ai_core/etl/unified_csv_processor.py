@@ -9,16 +9,15 @@ Combines the best features from:
 """
 
 import asyncio
+import io
 import json
 import logging
 import re
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import chardet
-
-# Security and validation imports
 import magic
 import pandas as pd
 
@@ -162,9 +161,7 @@ class UnifiedCSVProcessor:
         "spices_condiments": 1095,
     }
 
-    def __init__(
-        self, store_id: str, user_id: str, inventory_ops: Optional[Any] = None
-    ):
+    def __init__(self, store_id: str, user_id: str, inventory_ops: Optional[Any] = None):
         """
         Initialize processor with store and user context
 
@@ -176,13 +173,13 @@ class UnifiedCSVProcessor:
         self.store_id = store_id
         self.user_id = user_id
         self.inventory_ops = inventory_ops
-        self.warnings: List[str] = []
-        self.errors: List[str] = []
+        self.warnings: list[str] = []
+        self.errors: list[str] = []
         self.processed_count = 0
 
     async def process_csv_file(
         self, file_path: str, file_content: Optional[bytes] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Main entry point for CSV processing
 
@@ -211,9 +208,7 @@ class UnifiedCSVProcessor:
 
             # Process with global products if inventory operations available
             if self.inventory_ops:
-                processed_data = await self._process_with_global_products(
-                    processed_data
-                )
+                processed_data = await self._process_with_global_products(processed_data)
 
             # Final validation
             await self._final_validation(processed_data)
@@ -250,7 +245,7 @@ class UnifiedCSVProcessor:
 
     async def _validate_file_security(
         self, file_path: str, file_content: Optional[bytes] = None
-    ):
+    ) -> None:
         """Comprehensive security validation"""
 
         if file_content:
@@ -270,9 +265,7 @@ class UnifiedCSVProcessor:
             # Encoding detection and validation
             encoding_result = chardet.detect(file_content)
             if encoding_result["confidence"] < 0.7:
-                raise SecurityViolation(
-                    "File encoding is uncertain or potentially malicious"
-                )
+                raise SecurityViolation("File encoding is uncertain or potentially malicious")
 
         # Filename validation
         if file_path:
@@ -284,15 +277,13 @@ class UnifiedCSVProcessor:
             if not file_path.lower().endswith(".csv"):
                 raise SecurityViolation("Only CSV files are allowed")
 
-    async def _load_csv(
-        self, file_path: str, file_content: Optional[bytes] = None
-    ) -> pd.DataFrame:
+    async def _load_csv(self, file_path: str, file_content: Optional[bytes] = None) -> pd.DataFrame:
         """Load CSV with security checks"""
 
         try:
             if file_content:
                 # Load from bytes
-                df = pd.read_csv(pd.io.common.BytesIO(file_content), encoding="utf-8")
+                df = pd.read_csv(io.BytesIO(file_content), encoding="utf-8")
             else:
                 # Load from file path
                 df = pd.read_csv(file_path, encoding="utf-8")
@@ -312,26 +303,27 @@ class UnifiedCSVProcessor:
             for col in df.columns:
                 for idx, value in df[col].items():
                     if pd.notna(value) and isinstance(value, str):
+                        row_num = int(idx) + 1
                         if len(value) > self.MAX_CELL_LENGTH:
                             raise SecurityViolation(
-                                f"Cell content exceeds maximum length at row {idx + 1}, column '{col}'"
+                                f"Cell content exceeds maximum length at row {row_num}, column '{col}'"
                             )
 
                         # Check for dangerous patterns
                         for pattern in self.FORMULA_PATTERNS:
                             if re.search(pattern, value, re.IGNORECASE):
                                 raise SecurityViolation(
-                                    f"Potentially dangerous content detected at row {idx + 1}, column '{col}': {pattern}"
+                                    f"Potentially dangerous content detected at row {row_num}, column '{col}': {pattern}"
                                 )
 
             return df
 
-        except pd.errors.EmptyDataError:
-            raise ValidationError("CSV file is empty")
+        except pd.errors.EmptyDataError as e:
+            raise ValidationError("CSV file is empty") from e
         except pd.errors.ParserError as e:
-            raise ValidationError(f"CSV parsing failed: {e}")
-        except UnicodeDecodeError:
-            raise ValidationError("File encoding is not valid UTF-8")
+            raise ValidationError(f"CSV parsing failed: {e}") from e
+        except UnicodeDecodeError as e:
+            raise ValidationError("File encoding is not valid UTF-8") from e
 
     async def _validate_csv_structure(self, df: pd.DataFrame):
         """Validate CSV structure and required columns"""
@@ -347,9 +339,7 @@ class UnifiedCSVProcessor:
         # Check for completely empty rows
         empty_rows = df.isnull().all(axis=1).sum()
         if empty_rows > 0:
-            self.warnings.append(
-                f"Found {empty_rows} completely empty rows, they will be skipped"
-            )
+            self.warnings.append(f"Found {empty_rows} completely empty rows, they will be skipped")
 
     def _normalize_column_name(self, col_name: str) -> str:
         """Normalize column names to lowercase with underscores"""
@@ -376,7 +366,7 @@ class UnifiedCSVProcessor:
 
         return mappings.get(normalized, normalized)
 
-    async def _process_data(self, df: pd.DataFrame) -> List[Dict[str, Any]]:
+    async def _process_data(self, df: pd.DataFrame) -> list[dict[str, Any]]:
         """Process and validate each row of data"""
 
         processed_rows = []
@@ -387,13 +377,15 @@ class UnifiedCSVProcessor:
                 if row.isnull().all():
                     continue
 
-                processed_row = await self._process_single_row(row, idx + 1)
+                row_num = int(idx) + 1
+                processed_row = await self._process_single_row(row, row_num)
                 if processed_row:
                     processed_rows.append(processed_row)
                     self.processed_count += 1
 
             except Exception as e:
-                self.errors.append(f"Row {idx + 1}: {e}")
+                row_num = int(idx) + 1
+                self.errors.append(f"Row {row_num}: {e}")
                 continue
 
         if not processed_rows:
@@ -402,8 +394,8 @@ class UnifiedCSVProcessor:
         return processed_rows
 
     async def _process_with_global_products(
-        self, processed_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, processed_data: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Process data using global products workflow"""
         if not self.inventory_ops:
             return processed_data
@@ -417,10 +409,8 @@ class UnifiedCSVProcessor:
 
                 # Try to find by barcode first
                 if item.get("barcode"):
-                    global_product = (
-                        await self.inventory_ops.findGlobalProductByBarcode(
-                            item["barcode"]
-                        )
+                    global_product = await self.inventory_ops.findGlobalProductByBarcode(
+                        item["barcode"]
                     )
 
                 # If not found by barcode, search by name
@@ -497,33 +487,31 @@ class UnifiedCSVProcessor:
 
         return enhanced_data
 
-    async def _process_single_row(
-        self, row: pd.Series, row_num: int
-    ) -> Optional[Dict[str, Any]]:
+    async def _process_single_row(self, row: pd.Series, row_num: int) -> Optional[dict[str, Any]]:
         """Process a single CSV row with comprehensive validation"""
 
         processed = {}
 
         # Required fields
         processed["sku"] = self._validate_sku(row.get("sku"), row_num)
-        processed["product_name"] = self._validate_product_name(
-            row.get("product_name"), row_num
-        )
+        processed["product_name"] = self._validate_product_name(row.get("product_name"), row_num)
         processed["category"] = self._normalize_category(row.get("category"), row_num)
         processed["quantity"] = self._validate_quantity(row.get("quantity"), row_num)
-        processed["expiry_date"] = self._validate_expiry_date(
-            row.get("expiry_date"), row_num
-        )
+        processed["expiry_date"] = self._validate_expiry_date(row.get("expiry_date"), row_num)
 
         # Optional fields with defaults
         for field, default in self.OPTIONAL_COLUMNS.items():
             if field in row and pd.notna(row[field]):
                 if field in ["cost_price", "selling_price"]:
-                    processed[field] = self._validate_price(row[field], field, row_num)
+                    price_val = self._validate_price(row[field], field, row_num)
+                    if price_val is not None:
+                        processed[field] = price_val
                 elif field == "manufacture_date":
-                    processed[field] = self._validate_manufacture_date(
+                    mfg_date = self._validate_manufacture_date(
                         row[field], processed["expiry_date"], row_num
                     )
+                    if mfg_date is not None:
+                        processed[field] = mfg_date
                 else:
                     processed[field] = str(row[field]).strip()
             else:
@@ -586,9 +574,7 @@ class UnifiedCSVProcessor:
     def _normalize_category(self, category: Any, row_num: int) -> str:
         """Normalize and validate category"""
         if pd.isna(category):
-            self.warnings.append(
-                f"Row {row_num}: No category provided, using 'dry_goods'"
-            )
+            self.warnings.append(f"Row {row_num}: No category provided, using 'dry_goods'")
             return "dry_goods"
 
         category_str = str(category).lower().strip()
@@ -599,9 +585,7 @@ class UnifiedCSVProcessor:
                 return value
 
         # If no mapping found, return as-is but warn
-        self.warnings.append(
-            f"Row {row_num}: Unknown category '{category}', kept as provided"
-        )
+        self.warnings.append(f"Row {row_num}: Unknown category '{category}', kept as provided")
         return category_str
 
     def _validate_quantity(self, quantity: Any, row_num: int) -> float:
@@ -616,8 +600,8 @@ class UnifiedCSVProcessor:
             if qty > 1000000:
                 raise ValidationError("Quantity seems unreasonably large")
             return qty
-        except (ValueError, TypeError):
-            raise ValidationError(f"Invalid quantity format: {quantity}")
+        except (ValueError, TypeError) as e:
+            raise ValidationError(f"Invalid quantity format: {quantity}") from e
 
     def _validate_expiry_date(self, expiry: Any, row_num: int) -> str:
         """Validate and normalize expiry date"""
@@ -638,9 +622,7 @@ class UnifiedCSVProcessor:
                 if parsed_date < today - timedelta(days=30):
                     self.warnings.append(f"Row {row_num}: Expiry date is in the past")
                 elif parsed_date > today + timedelta(days=3650):  # 10 years
-                    self.warnings.append(
-                        f"Row {row_num}: Expiry date is very far in future"
-                    )
+                    self.warnings.append(f"Row {row_num}: Expiry date is very far in future")
 
                 return parsed_date.isoformat()
 
@@ -649,31 +631,25 @@ class UnifiedCSVProcessor:
 
         raise ValidationError(f"Invalid date format: {expiry}")
 
-    def _validate_price(
-        self, price: Any, field_name: str, row_num: int
-    ) -> Optional[float]:
+    def _validate_price(self, price: Any, field_name: str, row_num: int) -> Optional[float]:
         """Validate price fields"""
         if pd.isna(price) or price == "":
             return None
 
         try:
             # Handle currency symbols
-            price_str = (
-                str(price).replace("$", "").replace("€", "").replace(",", "").strip()
-            )
+            price_str = str(price).replace("$", "").replace("€", "").replace(",", "").strip()
             price_val = float(price_str)
 
             if price_val < 0:
                 raise ValidationError(f"{field_name} cannot be negative")
             if price_val > 10000:
-                self.warnings.append(
-                    f"Row {row_num}: {field_name} seems very high: {price_val}"
-                )
+                self.warnings.append(f"Row {row_num}: {field_name} seems very high: {price_val}")
 
             return price_val
 
-        except (ValueError, TypeError):
-            raise ValidationError(f"Invalid {field_name} format: {price}")
+        except (ValueError, TypeError) as e:
+            raise ValidationError(f"Invalid {field_name} format: {price}") from e
 
     def _validate_manufacture_date(
         self, mfg_date: Any, expiry_date: str, row_num: int
@@ -693,18 +669,14 @@ class UnifiedCSVProcessor:
 
                 # Validate manufacture date is before expiry
                 if mfg_parsed >= expiry_parsed:
-                    self.warnings.append(
-                        f"Row {row_num}: Manufacture date is after expiry date"
-                    )
+                    self.warnings.append(f"Row {row_num}: Manufacture date is after expiry date")
 
                 return mfg_parsed.isoformat()
 
             except ValueError:
                 continue
 
-        self.warnings.append(
-            f"Row {row_num}: Invalid manufacture date format, will estimate"
-        )
+        self.warnings.append(f"Row {row_num}: Invalid manufacture date format, will estimate")
         return None
 
     def _estimate_manufacture_date(self, expiry_date: str, category: str) -> str:
@@ -716,28 +688,26 @@ class UnifiedCSVProcessor:
         return estimated_mfg.isoformat()
 
     async def _generate_batch_numbers(
-        self, processed_data: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, processed_data: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Generate unique batch numbers for each item"""
 
         for idx, item in enumerate(processed_data):
             # Generate batch number: STORE_SKU_YYYYMMDD_SEQUENCE
             date_str = datetime.now().strftime("%Y%m%d")
-            sequence = f"{idx + 1:03d}"
+            sequence = f"{int(idx) + 1:03d}"
 
-            batch_number = (
-                f"{self.store_id[:8]}_{item['sku'][:10]}_{date_str}_{sequence}"
-            )
+            batch_number = f"{self.store_id[:8]}_{item['sku'][:10]}_{date_str}_{sequence}"
             item["batch_number"] = batch_number
 
         return processed_data
 
-    async def _final_validation(self, processed_data: List[Dict[str, Any]]):
+    async def _final_validation(self, processed_data: list[dict[str, Any]]):
         """Final validation checks on processed data"""
 
         # Check for duplicate SKUs
         skus = [item["sku"] for item in processed_data]
-        duplicate_skus = set([sku for sku in skus if skus.count(sku) > 1])
+        duplicate_skus = {sku for sku in skus if skus.count(sku) > 1}
 
         if duplicate_skus:
             self.warnings.append(f"Duplicate SKUs found: {duplicate_skus}")
@@ -747,11 +717,9 @@ class UnifiedCSVProcessor:
             # Check margin if both prices provided
             if item.get("cost_price") and item.get("selling_price"):
                 if item["cost_price"] > item["selling_price"]:
-                    self.warnings.append(
-                        f"SKU {item['sku']}: Cost price higher than selling price"
-                    )
+                    self.warnings.append(f"SKU {item['sku']}: Cost price higher than selling price")
 
-    def _error_result(self, error_message: str) -> Dict[str, Any]:
+    def _error_result(self, error_message: str) -> dict[str, Any]:
         """Create error result"""
         return {
             "status": ProcessingResult.ERROR.value,

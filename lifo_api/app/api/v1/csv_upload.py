@@ -3,30 +3,32 @@ FastAPI CSV Upload Endpoint - Unified with Python ETL Core
 Uses the consolidated UnifiedCSVProcessor for all CSV operations
 """
 
-import asyncio
-import json
 import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.auth.secure_dependencies import get_current_user, validate_store_access
+from app.database.connection import get_db
 
 # Add lifo_ai_core to path
 lifo_core_path = Path(__file__).parent.parent.parent.parent / "lifo_ai_core"
 sys.path.insert(0, str(lifo_core_path))
 
-from app.auth.secure_dependencies import get_current_user, validate_store_access
-from app.database.connection import get_db
-
 # Import the unified processor
 try:
-    from etl.unified_csv_processor import ProcessingResult, UnifiedCSVProcessor
+    from etl.unified_csv_processor import UnifiedCSVProcessor
 except ImportError as e:
-    print(f"Warning: Could not import UnifiedCSVProcessor: {e}")
-    UnifiedCSVProcessor = None
+    # Fallback to using the secure CSV processor already in the API
+    try:
+        from app.services.secure_csv_processor import SecureCSVProcessor as UnifiedCSVProcessor
+    except ImportError:
+        print(f"Warning: Could not import CSV processor: {e}")
+        UnifiedCSVProcessor = None
 
 router = APIRouter()
 
@@ -39,7 +41,7 @@ class FastAPICSVIntegration:
     @staticmethod
     async def process_csv_upload(
         file_content: bytes, store_id: str, user_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process CSV upload using the unified processor
 
@@ -52,18 +54,14 @@ class FastAPICSVIntegration:
             Processing result with data, warnings, and errors
         """
         if not UnifiedCSVProcessor:
-            raise HTTPException(
-                status_code=500, detail="Unified CSV processor not available"
-            )
+            raise HTTPException(status_code=500, detail="Unified CSV processor not available")
 
         try:
             # Create processor instance
             processor = UnifiedCSVProcessor(store_id, user_id)
 
             # Create temporary file for processing
-            with tempfile.NamedTemporaryFile(
-                mode="wb", suffix=".csv", delete=False
-            ) as temp_file:
+            with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as temp_file:
                 temp_file.write(file_content)
                 temp_file_path = temp_file.name
 
@@ -79,14 +77,14 @@ class FastAPICSVIntegration:
                     pass
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"CSV processing failed: {e!s}")
+            raise HTTPException(status_code=400, detail=f"CSV processing failed: {e!s}") from None
 
 
 @router.post("/upload")
 async def upload_csv(
     file: UploadFile = File(...),
     store_id: str = Form(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -114,15 +112,11 @@ async def upload_csv(
 
         # Validate file size (max 10MB)
         if len(file_content) > 10 * 1024 * 1024:
-            raise HTTPException(
-                status_code=400, detail="File too large. Maximum size is 10MB."
-            )
+            raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
 
         # Process CSV using unified processor
         integration = FastAPICSVIntegration()
-        result = await integration.process_csv_upload(
-            file_content, store_id, current_user["sub"]
-        )
+        result = await integration.process_csv_upload(file_content, store_id, current_user["sub"])
 
         # Check processing result status
         if result["status"] == "error":
@@ -163,11 +157,11 @@ async def upload_csv(
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error during CSV processing: {e!s}",
-        )
+        ) from None
 
 
 @router.get("/template")
-async def get_csv_template(current_user: Dict[str, Any] = Depends(get_current_user)):
+async def get_csv_template(current_user: dict[str, Any] = Depends(get_current_user)):
     """
     Download CSV template with sample data
 
@@ -289,7 +283,7 @@ async def get_csv_template(current_user: Dict[str, Any] = Depends(get_current_us
 async def validate_csv(
     file: UploadFile = File(...),
     store_id: str = Form(...),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -314,15 +308,11 @@ async def validate_csv(
 
         # Validate file size
         if len(file_content) > 10 * 1024 * 1024:
-            raise HTTPException(
-                status_code=400, detail="File too large. Maximum size is 10MB."
-            )
+            raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
 
         # Process CSV in validation-only mode
         integration = FastAPICSVIntegration()
-        result = await integration.process_csv_upload(
-            file_content, store_id, current_user["sub"]
-        )
+        result = await integration.process_csv_upload(file_content, store_id, current_user["sub"])
 
         # Return validation results
         return {
@@ -346,4 +336,4 @@ async def validate_csv(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Validation failed: {e!s}")
+        raise HTTPException(status_code=500, detail=f"Validation failed: {e!s}") from None

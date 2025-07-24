@@ -4,16 +4,13 @@ Security tests for scoring algorithm edge cases and vulnerabilities
 """
 
 import math
-from decimal import Decimal, InvalidOperation
-from unittest.mock import MagicMock, patch
+from decimal import Decimal
 
 import pytest
 
 from app.core.scoring import (
     InventoryScorer,
     ScoringInput,
-    ScoringResult,
-    ScoringService,
     ScoringWeights,
 )
 
@@ -36,12 +33,8 @@ class TestScoringMathematicalVulnerabilities:
             try:
                 score = scorer.calculate_velocity_score(quantity, sales, days)
                 # System should handle division by zero gracefully
-                assert not math.isinf(score), (
-                    f"Infinite score from {quantity}/{sales}/{days}"
-                )
-                assert not math.isnan(score), (
-                    f"NaN score from {quantity}/{sales}/{days}"
-                )
+                assert not math.isinf(score), f"Infinite score from {quantity}/{sales}/{days}"
+                assert not math.isnan(score), f"NaN score from {quantity}/{sales}/{days}"
             except ZeroDivisionError:
                 pytest.fail(f"Division by zero not handled: {quantity}/{sales}/{days}")
 
@@ -69,23 +62,15 @@ class TestScoringMathematicalVulnerabilities:
                 margin_score = scorer.calculate_margin_score(cost, selling, days)
 
                 # Scores should be finite and in valid range
-                assert math.isfinite(velocity_score), (
-                    f"Non-finite velocity score: {velocity_score}"
-                )
-                assert math.isfinite(margin_score), (
-                    f"Non-finite margin score: {margin_score}"
-                )
+                assert math.isfinite(velocity_score), f"Non-finite velocity score: {velocity_score}"
+                assert math.isfinite(margin_score), f"Non-finite margin score: {margin_score}"
                 assert 0.0 <= velocity_score <= 1.0, (
                     f"Velocity score out of range: {velocity_score}"
                 )
-                assert 0.0 <= margin_score <= 1.0, (
-                    f"Margin score out of range: {margin_score}"
-                )
+                assert 0.0 <= margin_score <= 1.0, f"Margin score out of range: {margin_score}"
 
             except Exception as e:
-                pytest.fail(
-                    f"Exception with extreme values {quantity}/{sales}/{days}: {e}"
-                )
+                pytest.fail(f"Exception with extreme values {quantity}/{sales}/{days}: {e}")
 
     def test_floating_point_precision_issues(self):
         """🚨 MEDIUM: Floating point precision causes incorrect calculations"""
@@ -108,17 +93,13 @@ class TestScoringMathematicalVulnerabilities:
             assert velocity_score >= 0.0, (
                 f"Negative velocity score due to precision: {velocity_score}"
             )
-            assert margin_score >= 0.0, (
-                f"Negative margin score due to precision: {margin_score}"
-            )
+            assert margin_score >= 0.0, f"Negative margin score due to precision: {margin_score}"
 
     def test_weight_sum_validation_bypass(self):
         """🚨 HIGH: Weight validation can be bypassed"""
 
         # Test 1: Weights that sum to more than 1.0
-        malicious_weights_1 = ScoringWeights(
-            expiry=0.5, velocity=0.5, margin=0.5
-        )  # Sum = 1.5
+        malicious_weights_1 = ScoringWeights(expiry=0.5, velocity=0.5, margin=0.5)  # Sum = 1.5
 
         # Validation should fail but might not be called
         try:
@@ -139,18 +120,14 @@ class TestScoringMathematicalVulnerabilities:
         # If scorer accepts any object with weight attributes
         try:
             scorer = InventoryScorer()
-            scorer.weights = (
-                malicious_weights_2  # Direct assignment bypasses validation
-            )
+            scorer.weights = malicious_weights_2  # Direct assignment bypasses validation
 
             # Calculations would use invalid weights
             composite = scorer.calculate_composite_score(0.5, 0.5, 0.5)
 
             # Should detect invalid weights
             if composite > 1.0:
-                pytest.fail(
-                    f"Invalid weights produced composite score > 1.0: {composite}"
-                )
+                pytest.fail(f"Invalid weights produced composite score > 1.0: {composite}")
 
         except Exception:
             pass  # Expected if validation works
@@ -159,15 +136,11 @@ class TestScoringMathematicalVulnerabilities:
         """🚨 HIGH: Negative weights can manipulate scores"""
         # Malicious weights with negative values
         try:
-            malicious_weights = ScoringWeights(
-                expiry=-0.5, velocity=0.8, margin=0.7
-            )  # Sum = 1.0
+            malicious_weights = ScoringWeights(expiry=-0.5, velocity=0.8, margin=0.7)  # Sum = 1.0
             scorer = InventoryScorer(weights=malicious_weights)
 
             # Negative weight would invert scoring logic
-            composite = scorer.calculate_composite_score(
-                1.0, 1.0, 1.0
-            )  # High urgency inputs
+            composite = scorer.calculate_composite_score(1.0, 1.0, 1.0)  # High urgency inputs
 
             # With negative expiry weight, high expiry score would reduce composite score
             # This could hide urgent items from attention
@@ -207,9 +180,7 @@ class TestScoringBusinessLogicVulnerabilities:
             if discount > 100:
                 pytest.fail(f"Discount > 100%: {discount} for margin {cost}/{selling}")
             if discount < 0:
-                pytest.fail(
-                    f"Negative discount: {discount} for margin {cost}/{selling}"
-                )
+                pytest.fail(f"Negative discount: {discount} for margin {cost}/{selling}")
 
     def test_composite_score_amplification_vulnerability(self):
         """🚨 MEDIUM: Composite score amplification can be exploited"""
@@ -221,18 +192,14 @@ class TestScoringBusinessLogicVulnerabilities:
         edge_scores = [0.79, 0.80, 0.81, 0.90, 0.95]
 
         for base_score in edge_scores:
-            composite = scorer.calculate_composite_score(
-                base_score, base_score, base_score
-            )
+            composite = scorer.calculate_composite_score(base_score, base_score, base_score)
 
             # Check for unexpected amplification
             if base_score >= 0.8:
                 # Should be amplified but not exceed 1.0
                 expected_amplified = min(1.0, base_score * 1.1)
                 if abs(composite - expected_amplified) > 0.01:
-                    pytest.fail(
-                        f"Unexpected amplification: {base_score} -> {composite}"
-                    )
+                    pytest.fail(f"Unexpected amplification: {base_score} -> {composite}")
 
     def test_category_weight_injection(self):
         """🚨 HIGH: Category weights can be injected/manipulated"""
@@ -254,9 +221,7 @@ class TestScoringBusinessLogicVulnerabilities:
 
         # Should reject malicious weights or produce reasonable result
         if composite > 1.0 or composite < 0.0:
-            pytest.fail(
-                f"Malicious category weights produced invalid score: {composite}"
-            )
+            pytest.fail(f"Malicious category weights produced invalid score: {composite}")
 
     def test_urgency_level_manipulation(self):
         """🚨 MEDIUM: Urgency levels can be manipulated through edge inputs"""
@@ -276,13 +241,9 @@ class TestScoringBusinessLogicVulnerabilities:
             expiry_score = scorer.calculate_expiry_score(days, shelf_life)
 
             if should_be_urgent and expiry_score < 0.7:
-                pytest.fail(
-                    f"Failed to detect urgency: {days}/{shelf_life} -> {expiry_score}"
-                )
+                pytest.fail(f"Failed to detect urgency: {days}/{shelf_life} -> {expiry_score}")
             elif not should_be_urgent and expiry_score > 0.8:
-                pytest.fail(
-                    f"False urgency detected: {days}/{shelf_life} -> {expiry_score}"
-                )
+                pytest.fail(f"False urgency detected: {days}/{shelf_life} -> {expiry_score}")
 
     def test_margin_calculation_bypass(self):
         """🚨 HIGH: Margin calculation can be bypassed with edge cases"""
@@ -304,12 +265,8 @@ class TestScoringBusinessLogicVulnerabilities:
                 margin_score = scorer.calculate_margin_score(cost, selling, days)
 
                 # Should handle edge cases gracefully
-                assert 0.0 <= margin_score <= 1.0, (
-                    f"Invalid margin score: {margin_score}"
-                )
-                assert math.isfinite(margin_score), (
-                    f"Non-finite margin score: {margin_score}"
-                )
+                assert 0.0 <= margin_score <= 1.0, f"Invalid margin score: {margin_score}"
+                assert math.isfinite(margin_score), f"Non-finite margin score: {margin_score}"
 
             except Exception as e:
                 # Should not crash on edge cases
@@ -368,7 +325,7 @@ class TestScoringInputValidationVulnerabilities:
         }
 
         try:
-            confused_input = ScoringInput(**type_confusion_inputs)
+            ScoringInput(**type_confusion_inputs)
             # Should reject type mismatches
             pytest.fail("Type confusion attack succeeded")
         except Exception:
@@ -378,11 +335,6 @@ class TestScoringInputValidationVulnerabilities:
         """🚨 LOW: Unicode normalization allows duplicate/similar inputs"""
 
         # Different unicode representations of similar strings
-        unicode_variants = [
-            "café",  # Normal
-            "cafe\u0301",  # 'e' + combining acute accent
-            "caf\u00e9",  # Precomposed é
-        ]
 
         # These might be treated as different but look identical
         # Could bypass duplicate detection or validation

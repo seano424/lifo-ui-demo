@@ -4,7 +4,7 @@ Part of hybrid architecture security remediation
 """
 
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import jwt
 import structlog
@@ -39,12 +39,10 @@ class SecureJWTAuth:
             raise ValueError("SUPABASE_JWT_SECRET environment variable is required")
 
         self.jwt_secret = settings.supabase_jwt_secret
-        self.algorithm = (
-            "HS256"  # Single algorithm only - prevent algorithm confusion attacks
-        )
+        self.algorithm = "HS256"  # Single algorithm only - prevent algorithm confusion attacks
         self.logger = structlog.get_logger().bind(component="secure_jwt_auth")
 
-    def verify_token_for_ai_features(self, token: str) -> Dict[str, Any]:
+    def verify_token_for_ai_features(self, token: str) -> dict[str, Any]:
         """
         Simplified JWT verification for AI features only
         Returns minimal user information needed for AI operations

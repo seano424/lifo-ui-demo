@@ -3,7 +3,7 @@
 import json
 import sys
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from loguru import logger
 
@@ -16,7 +16,7 @@ class StructuredLogger:
         self.log_level = log_level
         self._setup_logger()
 
-    def _setup_logger(self):
+    def _setup_logger(self) -> None:
         """Setup loguru with structured logging"""
         # Remove default logger
         logger.remove()
@@ -40,7 +40,7 @@ class StructuredLogger:
             serialize=False,
         )
 
-    def _json_formatter(self, record):
+    def _json_formatter(self, record) -> str:
         """Format log record as JSON"""
         log_entry = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
@@ -66,19 +66,19 @@ class StructuredLogger:
 
         return json.dumps(log_entry)
 
-    def info(self, message: str, **kwargs):
+    def info(self, message: str, **kwargs) -> None:
         """Log info message with extra fields"""
         logger.bind(**kwargs).info(message)
 
-    def error(self, message: str, **kwargs):
+    def error(self, message: str, **kwargs) -> None:
         """Log error message with extra fields"""
         logger.bind(**kwargs).error(message)
 
-    def warning(self, message: str, **kwargs):
+    def warning(self, message: str, **kwargs) -> None:
         """Log warning message with extra fields"""
         logger.bind(**kwargs).warning(message)
 
-    def debug(self, message: str, **kwargs):
+    def debug(self, message: str, **kwargs) -> None:
         """Log debug message with extra fields"""
         logger.bind(**kwargs).debug(message)
 
@@ -91,9 +91,7 @@ class StructuredLogger:
 _logger = None
 
 
-def get_logger(
-    service_name: str = "lifo_ai_core", log_level: str = "INFO"
-) -> StructuredLogger:
+def get_logger(service_name: str = "lifo_ai_core", log_level: str = "INFO") -> StructuredLogger:
     """Get or create logger instance"""
     global _logger
     if _logger is None:
@@ -102,7 +100,7 @@ def get_logger(
 
 
 # Convenience functions
-def log_scoring_event(store_id: str, batch_count: int, processing_time: float):
+def log_scoring_event(store_id: str, batch_count: int, processing_time: float) -> None:
     """Log scoring event with structured data"""
     get_logger().info(
         "Scoring completed",
@@ -115,7 +113,7 @@ def log_scoring_event(store_id: str, batch_count: int, processing_time: float):
 
 def log_csv_processing(
     store_id: str, filename: str, row_count: int, success_count: int, error_count: int
-):
+) -> None:
     """Log CSV processing event"""
     get_logger().info(
         "CSV processing completed",
@@ -125,15 +123,13 @@ def log_csv_processing(
         total_rows=row_count,
         successful_rows=success_count,
         error_rows=error_count,
-        success_rate=round((success_count / row_count) * 100, 2)
-        if row_count > 0
-        else 0,
+        success_rate=round((success_count / row_count) * 100, 2) if row_count > 0 else 0,
     )
 
 
 def log_database_operation(
     operation: str, table: str, affected_rows: int, execution_time: float
-):
+) -> None:
     """Log database operation"""
     get_logger().info(
         f"Database {operation} completed",
@@ -145,8 +141,6 @@ def log_database_operation(
     )
 
 
-def log_error_with_context(error: Exception, context: Dict[str, Any]):
+def log_error_with_context(error: Exception, context: dict[str, Any]) -> None:
     """Log error with additional context"""
-    get_logger().exception(
-        f"Error occurred: {error!s}", error_type=type(error).__name__, **context
-    )
+    get_logger().exception(f"Error occurred: {error!s}", error_type=type(error).__name__, **context)

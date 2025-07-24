@@ -3,14 +3,13 @@ Secure CSV processing service for AI features only
 Part of hybrid architecture security remediation
 """
 
-import asyncio
 import csv
 import io
 import re
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import structlog
 from fastapi import HTTPException, UploadFile
@@ -64,9 +63,7 @@ class SecureCSVProcessor:
     def __init__(self):
         self.logger = logger.bind(component="secure_csv_processor")
 
-    async def process_csv_for_validation(
-        self, file: UploadFile, store_id: str
-    ) -> Dict[str, Any]:
+    async def process_csv_for_validation(self, file: UploadFile, store_id: str) -> dict[str, Any]:
         """
         Process CSV for validation only - no database writes
         Returns validated data for frontend to save via Supabase
@@ -87,14 +84,10 @@ class SecureCSVProcessor:
             parsed_data = self._parse_csv_structure_secure(csv_content)
 
             # Validate and sanitize data
-            validation_result = await self._validate_and_sanitize_csv(
-                parsed_data, store_id
-            )
+            validation_result = await self._validate_and_sanitize_csv(parsed_data, store_id)
 
             # Generate AI suggestions for validated data
-            suggestions = await self._generate_ai_suggestions(
-                validation_result["valid_rows"]
-            )
+            suggestions = await self._generate_ai_suggestions(validation_result["valid_rows"])
 
             result = {
                 "upload_id": upload_id,
@@ -197,9 +190,7 @@ class SecureCSVProcessor:
 
             # Check for binary content indicators
             if "\x00" in text_content:
-                raise HTTPException(
-                    status_code=400, detail="File contains binary data, not CSV"
-                )
+                raise HTTPException(status_code=400, detail="File contains binary data, not CSV")
 
             # Check for executable content indicators
             dangerous_headers = [
@@ -255,9 +246,7 @@ class SecureCSVProcessor:
 
                 # Check for binary content
                 if "\x00" in decoded:
-                    raise HTTPException(
-                        status_code=400, detail="File contains binary data"
-                    )
+                    raise HTTPException(status_code=400, detail="File contains binary data")
 
                 return decoded
 
@@ -269,7 +258,7 @@ class SecureCSVProcessor:
             detail="Unable to decode CSV file. Please ensure it's UTF-8 encoded",
         )
 
-    def _parse_csv_structure_secure(self, csv_content: str) -> Dict[str, Any]:
+    def _parse_csv_structure_secure(self, csv_content: str) -> dict[str, Any]:
         """Parse CSV structure with security checks"""
 
         # Check content length
@@ -278,9 +267,7 @@ class SecureCSVProcessor:
 
         # Check for suspicious patterns in raw content
         if self._has_suspicious_content(csv_content):
-            raise HTTPException(
-                status_code=400, detail="CSV contains suspicious content"
-            )
+            raise HTTPException(status_code=400, detail="CSV contains suspicious content")
 
         try:
             # Use CSV reader with security settings
@@ -366,9 +353,7 @@ class SecureCSVProcessor:
                 break
 
         # Remove control characters
-        sanitized = "".join(
-            char for char in sanitized if ord(char) >= 32 or char in "\t\n\r"
-        )
+        sanitized = "".join(char for char in sanitized if ord(char) >= 32 or char in "\t\n\r")
 
         # Limit length
         if len(sanitized) > self.MAX_CELL_LENGTH:
@@ -377,8 +362,8 @@ class SecureCSVProcessor:
         return sanitized
 
     async def _validate_and_sanitize_csv(
-        self, parsed_data: Dict[str, Any], store_id: str
-    ) -> Dict[str, Any]:
+        self, parsed_data: dict[str, Any], store_id: str
+    ) -> dict[str, Any]:
         """Validate and sanitize CSV data"""
 
         headers = parsed_data["headers"]
@@ -456,9 +441,7 @@ class SecureCSVProcessor:
                     valid_rows.append(validated_row)
 
             except Exception as e:
-                errors.append(
-                    {"row": row_number, "error": f"Row validation failed: {e!s}"}
-                )
+                errors.append({"row": row_number, "error": f"Row validation failed: {e!s}"})
 
         return {
             "is_valid": len(errors) == 0,
@@ -472,8 +455,8 @@ class SecureCSVProcessor:
         }
 
     async def _validate_row_secure(
-        self, row_data: Dict[str, str], row_number: int
-    ) -> Dict[str, Any]:
+        self, row_data: dict[str, str], row_number: int
+    ) -> dict[str, Any]:
         """Validate individual row with security checks"""
         validated_row = {}
 
@@ -481,10 +464,10 @@ class SecureCSVProcessor:
         if "sku" in row_data:
             sku = row_data["sku"].strip().upper()
             if not sku or len(sku) < 2 or len(sku) > 50:
-                raise ValueError(f"Invalid SKU: must be 2-50 characters")
+                raise ValueError("Invalid SKU: must be 2-50 characters")
             if not re.match(r"^[A-Z0-9\-_]+$", sku):
                 raise ValueError(
-                    f"Invalid SKU: only letters, numbers, hyphens, and underscores allowed"
+                    "Invalid SKU: only letters, numbers, hyphens, and underscores allowed"
                 )
             validated_row["sku"] = sku
 
@@ -492,7 +475,7 @@ class SecureCSVProcessor:
         if "product_name" in row_data:
             name = row_data["product_name"].strip()
             if not name or len(name) < 2 or len(name) > 255:
-                raise ValueError(f"Invalid product name: must be 2-255 characters")
+                raise ValueError("Invalid product name: must be 2-255 characters")
             # Remove HTML/XML tags
             name = re.sub(r"<[^>]+>", "", name)
             validated_row["product_name"] = name
@@ -502,7 +485,7 @@ class SecureCSVProcessor:
             try:
                 quantity = float(row_data["quantity"])
                 if quantity < 0 or quantity > 100000:
-                    raise ValueError(f"Invalid quantity: must be 0-100000")
+                    raise ValueError("Invalid quantity: must be 0-100000")
                 validated_row["quantity"] = quantity
             except ValueError:
                 raise ValueError(f"Invalid quantity format: {row_data['quantity']}")
@@ -516,16 +499,12 @@ class SecureCSVProcessor:
                         raise ValueError(f"Invalid {price_field}: must be 0-10000")
                     validated_row[price_field] = price
                 except (ValueError, InvalidOperation):
-                    raise ValueError(
-                        f"Invalid {price_field} format: {row_data[price_field]}"
-                    )
+                    raise ValueError(f"Invalid {price_field} format: {row_data[price_field]}")
 
         # Date validation
         if row_data.get("expiry_date"):
             try:
-                expiry_date = datetime.strptime(
-                    row_data["expiry_date"], "%Y-%m-%d"
-                ).date()
+                expiry_date = datetime.strptime(row_data["expiry_date"], "%Y-%m-%d").date()
                 # Check reasonable date range
                 if expiry_date < datetime.now().date() - timedelta(days=30):
                     raise ValueError(f"Expiry date too old: {expiry_date}")
@@ -570,8 +549,8 @@ class SecureCSVProcessor:
         return validated_row
 
     async def _validate_business_rules_secure(
-        self, row_data: Dict[str, Any], store_id: str, row_number: int
-    ) -> Dict[str, List]:
+        self, row_data: dict[str, Any], store_id: str, row_number: int
+    ) -> dict[str, list]:
         """Validate business rules without database queries"""
         errors = []
         warnings = []
@@ -611,9 +590,7 @@ class SecureCSVProcessor:
 
         return {"errors": errors, "warnings": warnings}
 
-    async def _generate_ai_suggestions(
-        self, valid_rows: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def _generate_ai_suggestions(self, valid_rows: list[dict[str, Any]]) -> dict[str, Any]:
         """Generate AI suggestions for validated data"""
 
         if not valid_rows:
@@ -652,11 +629,7 @@ class SecureCSVProcessor:
         margins = []
         for row in valid_rows:
             if "cost_price" in row and "selling_price" in row:
-                margin = (
-                    (row["selling_price"] - row["cost_price"])
-                    / row["selling_price"]
-                    * 100
-                )
+                margin = (row["selling_price"] - row["cost_price"]) / row["selling_price"] * 100
                 margins.append(margin)
 
         if margins:

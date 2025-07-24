@@ -5,9 +5,9 @@ Target: <0.5s response time, minimal data transfer
 """
 
 import time
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from functools import lru_cache
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -18,14 +18,11 @@ from app.auth.secure_dependencies import (
     validate_batch_id_format,
     validate_store_id_format,
 )
-from app.core.scoring import ScoringService, create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
 from app.middleware.rate_limiting import ai_endpoint_rate_limit
 from app.models.scan_models import (
-    MobileBatchItem,
     MobileBatchSummary,
-    MobileOptimizedError,
     MobileStoreHealth,
     QuickBatchScore,
 )
@@ -36,7 +33,7 @@ logger = structlog.get_logger()
 
 # Mobile cache for frequently accessed data
 @lru_cache(maxsize=100)
-def get_cached_category_weights(category: str) -> Dict[str, float]:
+def get_cached_category_weights(category: str) -> dict[str, float]:
     """Cache category weights for faster mobile scoring"""
     # Default weights - in production this would cache from database
     weights_map = {
@@ -55,11 +52,9 @@ async def get_mobile_batch_summary(
     store_id: str,
     request: Request,
     include_details: bool = Query(False, description="Include detailed batch info"),
-    limit_urgent: int = Query(
-        10, ge=1, le=50, description="Max urgent items to return"
-    ),
+    limit_urgent: int = Query(10, ge=1, le=50, description="Max urgent items to return"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Lightweight response optimized for mobile scanning interface
@@ -92,7 +87,7 @@ async def get_mobile_batch_summary(
         action_needed = []
         total_value_at_risk = 0.0
 
-        today = date.today()
+        date.today()
 
         for item in inventory_data:
             days_to_expiry = item["days_to_expiry"]
@@ -131,24 +126,20 @@ async def get_mobile_batch_summary(
                 action_needed.append(mobile_item)
 
         # Limit results for mobile performance
-        urgent_batches = sorted(
-            urgent_batches, key=lambda x: x["urgency_score"], reverse=True
-        )[:limit_urgent]
-        expiring_today = sorted(expiring_today, key=lambda x: x["days_to_expiry"])[
+        urgent_batches = sorted(urgent_batches, key=lambda x: x["urgency_score"], reverse=True)[
             :limit_urgent
         ]
-        action_needed = sorted(
-            action_needed, key=lambda x: x["urgency_score"], reverse=True
-        )[:limit_urgent]
+        expiring_today = sorted(expiring_today, key=lambda x: x["days_to_expiry"])[:limit_urgent]
+        action_needed = sorted(action_needed, key=lambda x: x["urgency_score"], reverse=True)[
+            :limit_urgent
+        ]
 
         # Calculate store health score (simplified for mobile)
         total_items = len(inventory_data)
         urgent_count = len(urgent_batches)
         expiring_count = len(expiring_today)
 
-        health_score = max(
-            0.0, 1.0 - ((urgent_count + expiring_count) / max(total_items, 1)) * 2
-        )
+        health_score = max(0.0, 1.0 - ((urgent_count + expiring_count) / max(total_items, 1)) * 2)
 
         processing_time_ms = (time.time() - start_time) * 1000
 
@@ -193,7 +184,7 @@ async def quick_batch_score(
     store_id: str = Query(..., description="Store ID for context"),
     force_recalculate: bool = Query(False, description="Force score recalculation"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Optimized scoring for real-time mobile scanning
@@ -283,7 +274,7 @@ async def get_mobile_store_health(
     store_id: str,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Mobile-optimized store health overview
@@ -330,22 +321,19 @@ async def get_mobile_store_health(
         # Next recommended action
         next_action = None
         if critical_items > 0:
-            next_action = (
-                f"Review {critical_items} critical items requiring immediate attention"
-            )
+            next_action = f"Review {critical_items} critical items requiring immediate attention"
         elif expiring_soon > 0:
             next_action = f"Monitor {expiring_soon} items expiring soon"
         else:
             next_action = "Continue monitoring - store performing well"
 
-        processing_time_ms = (time.time() - start_time) * 1000
+        (time.time() - start_time) * 1000
 
         return MobileStoreHealth(
             overall_score=round(overall_score, 2),
             critical_items=critical_items,
             expiring_soon=expiring_soon,
-            total_value_at_risk=analytics_data.get("total_value", 0)
-            * 0.1,  # Estimated risk
+            total_value_at_risk=analytics_data.get("total_value", 0) * 0.1,  # Estimated risk
             trends=trends,
             last_action_taken="Recent discount applied",  # Would come from action log
             next_recommended_action=next_action,
@@ -373,7 +361,7 @@ async def get_mobile_batch_list(
     limit: int = Query(20, ge=1, le=100, description="Max items to return"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Mobile-optimized batch list with filtering
@@ -421,9 +409,7 @@ async def get_mobile_batch_list(
                 "urgency_score": round(urgency_score, 2),
                 "urgency_level": urgency_level,
                 "location": item.get("location_code", "MAIN"),
-                "estimated_value": round(
-                    item["current_quantity"] * item["selling_price"], 2
-                ),
+                "estimated_value": round(item["current_quantity"] * item["selling_price"], 2),
             }
 
             filtered_batches.append(mobile_item)

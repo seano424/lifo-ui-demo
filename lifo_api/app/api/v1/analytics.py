@@ -3,8 +3,8 @@ Analytics API endpoints for LIFO AI Engine
 Provides analytics, reporting, and performance metrics
 """
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -13,11 +13,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.secure_dependencies import (
     get_current_user,
     validate_store_access,
-    validate_store_id_format,
 )
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
-from app.models.base import ResponseBase
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -28,7 +26,7 @@ async def get_store_analytics(
     store_id: str,
     days: int = Query(30, ge=1, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get comprehensive analytics for a store
@@ -66,14 +64,14 @@ async def get_store_analytics(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from None
 
 
 @router.get("/dashboard/{store_id}")
 async def get_dashboard_data(
     store_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get dashboard data for a store (7-day snapshot)
@@ -97,9 +95,7 @@ async def get_dashboard_data(
                 "expiring_soon": analytics_data.get("inventory_summary", {}).get(
                     "expiring_soon_count", 0
                 ),
-                "high_urgency": analytics_data.get("urgency_distribution", {}).get(
-                    "high", 0
-                )
+                "high_urgency": analytics_data.get("urgency_distribution", {}).get("high", 0)
                 + analytics_data.get("urgency_distribution", {}).get("critical", 0),
             },
             "top_categories": analytics_data.get("category_breakdown", [])[:5],
@@ -107,9 +103,7 @@ async def get_dashboard_data(
             "last_updated": datetime.utcnow().isoformat(),
         }
 
-        logger.info(
-            "Dashboard data retrieved", store_id=store_id, user_id=current_user["sub"]
-        )
+        logger.info("Dashboard data retrieved", store_id=store_id, user_id=current_user["sub"])
 
         return dashboard_data
 
@@ -122,7 +116,7 @@ async def get_dashboard_data(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from None
 
 
 @router.get("/performance/{store_id}")
@@ -130,16 +124,14 @@ async def get_performance_metrics(
     store_id: str,
     days: int = Query(30, ge=7, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get performance metrics for waste reduction and revenue optimization
     """
     try:
         # Validate store access
-        if not await validate_store_access(
-            store_id, current_user["sub"], "manager", db
-        ):
+        if not await validate_store_access(store_id, current_user["sub"], "manager", db):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get analytics data
@@ -199,32 +191,28 @@ async def get_performance_metrics(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from None
 
 
 @router.get("/trends/{store_id}")
 async def get_trend_analysis(
     store_id: str,
-    metric: str = Query(
-        "waste", description="Metric to analyze (waste, revenue, velocity)"
-    ),
+    metric: str = Query("waste", description="Metric to analyze (waste, revenue, velocity)"),
     days: int = Query(90, ge=30, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get trend analysis for specific metrics
     """
     try:
         # Validate store access
-        if not await validate_store_access(
-            store_id, current_user["sub"], "manager", db
-        ):
+        if not await validate_store_access(store_id, current_user["sub"], "manager", db):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get analytics data
         read_ops = get_read_only_operations(db)
-        analytics_data = await read_ops.get_store_analytics(store_id, days)
+        await read_ops.get_store_analytics(store_id, days)
 
         # Build trend data (placeholder - would need time series data)
         trend_data = {
@@ -261,7 +249,7 @@ async def get_trend_analysis(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from None
 
 
 @router.get("/exports/{store_id}")
@@ -273,16 +261,14 @@ async def get_export_data(
     days: int = Query(30, ge=1, le=365, description="Data period in days"),
     format: str = Query("json", description="Export format (json, csv)"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Export analytics data in various formats
     """
     try:
         # Validate store access
-        if not await validate_store_access(
-            store_id, current_user["sub"], "manager", db
-        ):
+        if not await validate_store_access(store_id, current_user["sub"], "manager", db):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get the requested data
@@ -323,4 +309,4 @@ async def get_export_data(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Internal server error") from None

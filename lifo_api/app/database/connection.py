@@ -5,7 +5,7 @@ Production-ready connection pool with proper error handling
 
 import asyncio
 import re
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import structlog
 from sqlalchemy import text
@@ -20,41 +20,78 @@ logger = structlog.get_logger()
 # Create the base class for models
 Base = declarative_base()
 
-# Create async engine with optimized settings
-if settings.debug:
-    # Development: Use NullPool for simplicity
-    engine = create_async_engine(
-        get_database_url(),
-        echo=settings.debug,
-        future=True,
-        poolclass=NullPool,
-    )
-else:
-    # Production: Use connection pooling
-    engine = create_async_engine(
-        get_database_url(),
-        echo=False,
-        future=True,
-        pool_size=settings.db_pool_size,
-        max_overflow=settings.db_max_overflow,
-        pool_pre_ping=True,
-        pool_recycle=settings.db_pool_recycle,
-        connect_args={
-            "command_timeout": 60,
-            "server_settings": {
-                "jit": "off",  # Disable JIT for more predictable performance
-            },
-        },
-    )
+# Lazy initialization for database engine and session
+_engine = None
+_async_session = None
 
-# Create async session factory
-async_session = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,  # Keep objects accessible after commit
-    autocommit=False,
-    autoflush=True,
-)
+
+def get_engine():
+    """Get or create the global database engine instance"""
+    global _engine
+    if _engine is None:
+        database_url = get_database_url()
+
+        if database_url.startswith("sqlite"):
+            # SQLite (testing): Use NullPool and no pooling parameters
+            _engine = create_async_engine(
+                database_url,
+                echo=settings.debug,
+                future=True,
+                poolclass=NullPool,
+                connect_args={"check_same_thread": False},
+            )
+        elif settings.debug:
+            # PostgreSQL Development: Use NullPool for simplicity
+            _engine = create_async_engine(
+                database_url,
+                echo=settings.debug,
+                future=True,
+                poolclass=NullPool,
+            )
+        else:
+            # PostgreSQL Production: Use connection pooling
+            _engine = create_async_engine(
+                database_url,
+                echo=False,
+                future=True,
+                pool_size=settings.db_pool_size,
+                max_overflow=settings.db_max_overflow,
+                pool_pre_ping=True,
+                pool_recycle=settings.db_pool_recycle,
+                connect_args={
+                    "command_timeout": 60,
+                    "server_settings": {
+                        "jit": "off",  # Disable JIT for more predictable performance
+                    },
+                },
+            )
+    return _engine
+
+
+def get_async_session():
+    """Get or create the global async session factory"""
+    global _async_session
+    if _async_session is None:
+        engine = get_engine()
+        _async_session = async_sessionmaker(
+            engine,
+            class_=AsyncSession,
+            expire_on_commit=False,  # Keep objects accessible after commit
+            autocommit=False,
+            autoflush=True,
+        )
+    return _async_session
+
+
+# For backwards compatibility with existing code
+def engine():
+    """Get the database engine (lazy-initialized)"""
+    return get_engine()
+
+
+def async_session():
+    """Get the async session factory (lazy-initialized)"""
+    return get_async_session()
 
 
 async def init_database():
@@ -65,14 +102,14 @@ async def init_database():
         logger.info("Initializing database connection...")
 
         # Test the connection
-        async with engine.begin() as conn:
+        async with engine().begin():
             # Import all models to ensure they're registered
-            from app.database import donation_models, global_models, models
 
-            # Create tables if they don't exist (for development)
+            # Skip table creation in development - use Supabase migrations instead
+            # Your database already has the correct schema from migrations
             if settings.debug:
-                await conn.run_sync(Base.metadata.create_all)
-                logger.info("Database tables created/verified")
+                # await conn.run_sync(Base.metadata.create_all)  # Disabled - use migrations
+                logger.info("Database connection verified (table creation skipped - using Supabase migrations)")
 
         logger.info("Database initialization completed successfully")
 
@@ -89,7 +126,7 @@ async def test_connection() -> bool:
         bool: True if connection is healthy
     """
     try:
-        async with engine.begin() as conn:
+        async with engine().begin() as conn:
             # Execute a simple query
             result = await conn.execute(text("SELECT 1"))
             test_result = result.scalar()
@@ -113,7 +150,7 @@ async def get_database() -> AsyncGenerator[AsyncSession, None]:
     Yields:
         AsyncSession: Database session for request
     """
-    async with async_session() as session:
+    async with async_session()() as session:
         try:
             yield session
         except Exception as e:
@@ -136,7 +173,7 @@ async def get_database_session() -> AsyncSession:
     Returns:
         AsyncSession: Database session
     """
-    return async_session()
+    return async_session()()
 
 
 class DatabaseManager:
@@ -145,8 +182,8 @@ class DatabaseManager:
     """
 
     def __init__(self):
-        self.engine = engine
-        self.session_factory = async_session
+        self.engine = engine()
+        self.session_factory = async_session()
         self.logger = structlog.get_logger().bind(component="db_manager")
 
     async def execute_safe_query(self, query: str, params: dict = None):
@@ -273,27 +310,40 @@ class DatabaseManager:
         """
         try:
             async with self.session_factory() as session:
-                # Get PostgreSQL version
-                result = await session.execute(text("SELECT version()"))
-                pg_version = result.scalar()
+                database_url = get_database_url()
 
-                # Get current database name
-                result = await session.execute(text("SELECT current_database()"))
-                db_name = result.scalar()
+                if database_url.startswith("sqlite"):
+                    # SQLite connection info
+                    result = await session.execute(text("SELECT sqlite_version()"))
+                    version = result.scalar()
 
-                # Get connection count
-                result = await session.execute(
-                    text("SELECT count(*) FROM pg_stat_activity WHERE state = 'active'")
-                )
-                active_connections = result.scalar()
+                    return {
+                        "sqlite_version": version,
+                        "database_type": "SQLite",
+                        "database_url": "sqlite:///:memory:",
+                    }
+                else:
+                    # PostgreSQL connection info
+                    result = await session.execute(text("SELECT version()"))
+                    pg_version = result.scalar()
 
-                return {
-                    "postgresql_version": pg_version,
-                    "database_name": db_name,
-                    "active_connections": active_connections,
-                    "pool_size": settings.db_pool_size,
-                    "max_overflow": settings.db_max_overflow,
-                }
+                    # Get current database name
+                    result = await session.execute(text("SELECT current_database()"))
+                    db_name = result.scalar()
+
+                    # Get connection count
+                    result = await session.execute(
+                        text("SELECT count(*) FROM pg_stat_activity WHERE state = 'active'")
+                    )
+                    active_connections = result.scalar()
+
+                    return {
+                        "postgresql_version": pg_version,
+                        "database_name": db_name,
+                        "active_connections": active_connections,
+                        "pool_size": settings.db_pool_size,
+                        "max_overflow": settings.db_max_overflow,
+                    }
 
         except Exception as e:
             self.logger.error("Failed to get connection info", error=str(e))
@@ -313,31 +363,39 @@ class DatabaseManager:
                 # Test basic connectivity
                 await session.execute(text("SELECT 1"))
 
-                # Test table access
-                from app.database.models import Store
+                database_url = get_database_url()
 
-                result = await session.execute(
-                    text("SELECT COUNT(*) FROM business.stores")
-                )
-                store_count = result.scalar()
+                if database_url.startswith("sqlite"):
+                    # SQLite health check (simpler)
+                    end_time = asyncio.get_event_loop().time()
+                    response_time = (end_time - start_time) * 1000
 
-                end_time = asyncio.get_event_loop().time()
-                response_time = (
-                    end_time - start_time
-                ) * 1000  # Convert to milliseconds
+                    return {
+                        "status": "healthy",
+                        "response_time_ms": round(response_time, 2),
+                        "database_type": "SQLite",
+                        "connection_pool": "NullPool (no pooling)",
+                    }
+                else:
+                    # PostgreSQL health check
+                    result = await session.execute(text("SELECT COUNT(*) FROM business.stores"))
+                    store_count = result.scalar()
 
-                return {
-                    "status": "healthy",
-                    "response_time_ms": round(response_time, 2),
-                    "store_count": store_count,
-                    "connection_pool": {
-                        "size": self.engine.pool.size(),
-                        "checked_in": self.engine.pool.checkedin(),
-                        "checked_out": self.engine.pool.checkedout(),
-                        "overflow": self.engine.pool.overflow(),
-                        "invalid": self.engine.pool.invalid(),
-                    },
-                }
+                    end_time = asyncio.get_event_loop().time()
+                    response_time = (end_time - start_time) * 1000
+
+                    return {
+                        "status": "healthy",
+                        "response_time_ms": round(response_time, 2),
+                        "store_count": store_count,
+                        "connection_pool": {
+                            "size": self.engine.pool.size(),
+                            "checked_in": self.engine.pool.checkedin(),
+                            "checked_out": self.engine.pool.checkedout(),
+                            "overflow": self.engine.pool.overflow(),
+                            "invalid": self.engine.pool.invalid(),
+                        },
+                    }
 
         except Exception as e:
             end_time = asyncio.get_event_loop().time()
@@ -352,8 +410,16 @@ class DatabaseManager:
             }
 
 
-# Global database manager instance
-db_manager = DatabaseManager()
+# Global database manager instance (lazy initialization)
+_db_manager = None
+
+
+def get_db_manager() -> DatabaseManager:
+    """Get or create the global DatabaseManager instance"""
+    global _db_manager
+    if _db_manager is None:
+        _db_manager = DatabaseManager()
+    return _db_manager
 
 
 async def cleanup_database():
@@ -361,7 +427,7 @@ async def cleanup_database():
     Cleanup database connections on application shutdown
     """
     try:
-        await engine.dispose()
+        await engine().dispose()
         logger.info("Database connections cleaned up")
     except Exception as e:
         logger.error("Error during database cleanup", error=str(e))

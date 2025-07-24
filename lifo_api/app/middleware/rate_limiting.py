@@ -4,12 +4,11 @@ Part of hybrid architecture security remediation
 """
 
 import time
-from typing import Any, Dict
 
 import structlog
-from fastapi import HTTPException, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
@@ -37,7 +36,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         method=request.method,
         user_agent=request.headers.get("user-agent", "unknown"),
         limit=exc.detail,
-        retry_after=exc.retry_after,
+        retry_after=getattr(exc, "retry_after", 60),
     )
 
     response = JSONResponse(
@@ -45,7 +44,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         content={
             "error": "Rate limit exceeded",
             "message": "Too many requests. Please try again later.",
-            "retry_after": exc.retry_after,
+            "retry_after": getattr(exc, "retry_after", 60),
             "endpoint": str(request.url.path),
         },
     )
@@ -53,8 +52,8 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     # Add rate limit headers
     response.headers["X-RateLimit-Limit"] = str(exc.detail)
     response.headers["X-RateLimit-Remaining"] = "0"
-    response.headers["X-RateLimit-Reset"] = str(int(time.time()) + exc.retry_after)
-    response.headers["Retry-After"] = str(exc.retry_after)
+    response.headers["X-RateLimit-Reset"] = str(int(time.time()) + getattr(exc, "retry_after", 60))
+    response.headers["Retry-After"] = str(getattr(exc, "retry_after", 60))
 
     logger.warning(
         "Rate limit exceeded",
@@ -98,7 +97,7 @@ def get_user_rate_limit_key(request: Request) -> str:
             # In production, would decode JWT to get user ID
             # For now, use IP + user agent combination
             return f"{get_remote_address(request)}:{hash(request.headers.get('user-agent', ''))}"
-    except:
+    except Exception:
         pass
 
     # Fallback to IP address
@@ -141,16 +140,12 @@ class SecurityRateLimiter:
         if client_ip not in self.failed_attempts:
             self.failed_attempts[client_ip] = []
 
-        self.failed_attempts[client_ip].append(
-            {"endpoint": endpoint, "timestamp": time.time()}
-        )
+        self.failed_attempts[client_ip].append({"endpoint": endpoint, "timestamp": time.time()})
 
         # Clean old attempts (older than 1 hour)
         cutoff = time.time() - 3600
         self.failed_attempts[client_ip] = [
-            attempt
-            for attempt in self.failed_attempts[client_ip]
-            if attempt["timestamp"] > cutoff
+            attempt for attempt in self.failed_attempts[client_ip] if attempt["timestamp"] > cutoff
         ]
 
         # Block IP if too many failed attempts
@@ -221,7 +216,7 @@ DEVELOPMENT_RATE_LIMITS = {
 }
 
 
-def get_rate_limits(environment: str = "production") -> Dict[str, str]:
+def get_rate_limits(environment: str = "production") -> dict[str, str]:
     """Get rate limits based on environment"""
     if environment in ["development", "staging"]:
         return DEVELOPMENT_RATE_LIMITS

@@ -3,8 +3,7 @@ Pydantic models for analytics-related API endpoints
 """
 
 from datetime import date, datetime
-from decimal import Decimal
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field, validator
 
@@ -17,19 +16,15 @@ class AnalyticsRequest(BaseModel):
 
     days: int = Field(30, ge=1, le=365, description="Analysis period in days")
     include_detailed: bool = Field(False, description="Include detailed breakdown")
-    categories: Optional[List[str]] = Field(None, description="Filter by categories")
+    categories: Optional[list[str]] = Field(None, description="Filter by categories")
 
 
 class TrendAnalysisRequest(BaseModel):
     """Request for trend analysis"""
 
-    metric: str = Field(
-        "waste", description="Metric to analyze (waste, revenue, velocity)"
-    )
+    metric: str = Field("waste", description="Metric to analyze (waste, revenue, velocity)")
     days: int = Field(90, ge=30, le=365, description="Analysis period in days")
-    granularity: str = Field(
-        "daily", description="Data granularity (daily, weekly, monthly)"
-    )
+    granularity: str = Field("daily", description="Data granularity (daily, weekly, monthly)")
 
 
 # Response Models
@@ -104,9 +99,9 @@ class StoreAnalyticsResponse(ConfigurableModel):
     analysis_period: str
     period_days: int
     inventory_summary: InventorySummary
-    category_breakdown: List[CategoryBreakdown]
+    category_breakdown: list[CategoryBreakdown]
     urgency_distribution: UrgencyDistribution
-    recent_actions: List[RecentAction]
+    recent_actions: list[RecentAction]
     generated_at: datetime
 
     class Config:
@@ -161,9 +156,7 @@ class DashboardAlert(ConfigurableModel):
 
     type: str = Field(..., description="Alert type (expired, expiring, high_urgency)")
     count: int = Field(..., description="Number of items")
-    severity: str = Field(
-        ..., description="Alert severity (low, medium, high, critical)"
-    )
+    severity: str = Field(..., description="Alert severity (low, medium, high, critical)")
     message: str = Field(..., description="Alert message")
 
 
@@ -185,9 +178,9 @@ class DashboardResponse(ConfigurableModel):
 
     store_id: str
     summary: DashboardSummary
-    alerts: List[DashboardAlert]
-    top_categories: List[CategoryBreakdown]
-    recent_activity: List[RecentAction]
+    alerts: list[DashboardAlert]
+    top_categories: list[CategoryBreakdown]
+    recent_activity: list[RecentAction]
     last_updated: datetime
 
     class Config:
@@ -268,7 +261,7 @@ class PerformanceResponse(ConfigurableModel):
     store_id: str
     period_days: int
     metrics: PerformanceMetrics
-    trends: Dict[str, Any]
+    trends: dict[str, Any]
     generated_at: datetime
 
     class Config:
@@ -305,10 +298,10 @@ class TrendAnalysisResponse(ConfigurableModel):
     store_id: str
     metric: str
     period_days: int
-    trend_points: List[TrendPoint]
+    trend_points: list[TrendPoint]
     trend_direction: str = Field(..., description="Trend direction: up, down, stable")
     percentage_change: float
-    insights: List[str]
+    insights: list[str]
     generated_at: datetime
 
     class Config:
@@ -350,7 +343,7 @@ class ExportResponse(ConfigurableModel):
 
     store_id: str
     metadata: ExportMetadata
-    data: Union[Dict[str, Any], List[Dict[str, Any]]]
+    data: Union[dict[str, Any], list[dict[str, Any]]]
     download_url: Optional[str] = None
     expires_at: Optional[datetime] = None
 

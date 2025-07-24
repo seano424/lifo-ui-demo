@@ -4,7 +4,7 @@ Pydantic models for inventory-related API endpoints
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -12,7 +12,6 @@ from app.models.base import (
     BatchStatus,
     ConfigurableModel,
     FilterParams,
-    PaginationParams,
     PaginationResponse,
     SortParams,
     TimestampMixin,
@@ -29,18 +28,12 @@ class InventoryFilterParams(FilterParams):
     expiring_days: Optional[int] = Field(
         None, ge=0, le=365, description="Items expiring within N days"
     )
-    min_quantity: Optional[float] = Field(
-        None, ge=0, description="Minimum quantity filter"
-    )
-    max_quantity: Optional[float] = Field(
-        None, ge=0, description="Maximum quantity filter"
-    )
-    location_code: Optional[str] = Field(
-        None, max_length=50, description="Filter by location"
-    )
+    min_quantity: Optional[float] = Field(None, ge=0, description="Minimum quantity filter")
+    max_quantity: Optional[float] = Field(None, ge=0, description="Maximum quantity filter")
+    location_code: Optional[str] = Field(None, max_length=50, description="Filter by location")
 
     @validator("max_quantity")
-    def validate_quantity_range(cls, v, values):
+    def validate_quantity_range(cls, v: Optional[float], values: dict[str, Any]) -> Optional[float]:
         min_qty = values.get("min_quantity")
         if min_qty is not None and v is not None and v < min_qty:
             raise ValueError("max_quantity must be greater than min_quantity")
@@ -61,16 +54,12 @@ class BatchUpdateRequest(BaseModel):
     """Request to update batch information"""
 
     current_quantity: Optional[float] = Field(None, ge=0, description="New quantity")
-    selling_price: Optional[Decimal] = Field(
-        None, gt=0, description="New selling price"
-    )
-    location_code: Optional[str] = Field(
-        None, max_length=50, description="New location"
-    )
+    selling_price: Optional[Decimal] = Field(None, gt=0, description="New selling price")
+    location_code: Optional[str] = Field(None, max_length=50, description="New location")
     status: Optional[BatchStatus] = None
 
     @validator("current_quantity")
-    def validate_quantity(cls, v):
+    def validate_quantity(cls, v: Optional[float]) -> Optional[float]:
         if v is not None and v < 0:
             raise ValueError("Quantity cannot be negative")
         return v
@@ -79,29 +68,19 @@ class BatchUpdateRequest(BaseModel):
 class DiscountRequest(BaseModel):
     """Request to apply discount to batch"""
 
-    discount_percent: float = Field(
-        ..., ge=0, le=90, description="Discount percentage (0-90)"
-    )
-    reason: Optional[str] = Field(
-        None, max_length=255, description="Reason for discount"
-    )
+    discount_percent: float = Field(..., ge=0, le=90, description="Discount percentage (0-90)")
+    reason: Optional[str] = Field(None, max_length=255, description="Reason for discount")
 
     class Config:
-        schema_extra = {
-            "example": {"discount_percent": 25.0, "reason": "Approaching expiry date"}
-        }
+        schema_extra = {"example": {"discount_percent": 25.0, "reason": "Approaching expiry date"}}
 
 
 class BulkActionRequest(BaseModel):
     """Request for bulk actions on multiple batches"""
 
-    batch_ids: List[str] = Field(
-        ..., min_items=1, max_items=100, description="List of batch IDs"
-    )
+    batch_ids: list[str] = Field(..., min_length=1, max_length=100, description="List of batch IDs")
     action_type: str = Field(..., description="Type of action to perform")
-    parameters: Optional[Dict[str, Any]] = Field(
-        None, description="Action-specific parameters"
-    )
+    parameters: Optional[dict[str, Any]] = Field(None, description="Action-specific parameters")
 
     class Config:
         schema_extra = {
@@ -248,9 +227,7 @@ class InventoryItemResponse(ConfigurableModel):
     recommendation: Optional[str] = None
     discount_percent: Optional[int] = None
 
-    @validator(
-        "current_quantity", "selling_price", "total_value", "margin_percent", pre=True
-    )
+    @validator("current_quantity", "selling_price", "total_value", "margin_percent", pre=True)
     def convert_decimal_to_float(cls, v):
         return decimal_to_float(v)
 
@@ -258,10 +235,10 @@ class InventoryItemResponse(ConfigurableModel):
 class InventoryListResponse(ConfigurableModel):
     """Paginated inventory list response"""
 
-    items: List[InventoryItemResponse]
+    items: list[InventoryItemResponse]
     pagination: PaginationResponse
-    summary: Dict[str, Any]
-    filters_applied: Dict[str, Any]
+    summary: dict[str, Any]
+    filters_applied: dict[str, Any]
 
     class Config:
         schema_extra = {
@@ -326,7 +303,7 @@ class InventorySummaryResponse(ConfigurableModel):
     expiring_this_week: int
 
     # Category breakdown
-    categories: List[Dict[str, Any]]
+    categories: list[dict[str, Any]]
 
     # Recent activity
     recent_actions_count: int
@@ -344,7 +321,7 @@ class ActionResult(ConfigurableModel):
     action_type: str
     success: bool
     message: str
-    details: Optional[Dict[str, Any]] = None
+    details: Optional[dict[str, Any]] = None
     executed_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -354,6 +331,6 @@ class BulkActionResponse(ConfigurableModel):
     total_requested: int
     successful: int
     failed: int
-    results: List[ActionResult]
-    summary: Dict[str, Any]
+    results: list[ActionResult]
+    summary: dict[str, Any]
     executed_at: datetime = Field(default_factory=datetime.utcnow)

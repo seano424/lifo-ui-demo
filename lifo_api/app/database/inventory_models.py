@@ -8,17 +8,17 @@ from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import (
+    DECIMAL,
     Boolean,
     Column,
     Date,
     DateTime,
-    DECIMAL,
     ForeignKey,
     Integer,
     String,
     Text,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database.models import Base
@@ -47,10 +47,10 @@ class Product(Base):
     # Barcode support for scanning workflows
     barcode = Column(String(50), unique=True)  # EAN13, UPC, Code128, etc.
     barcode_type = Column(String(20))  # Type of barcode format
-    
+
     # AI scoring support
     typical_shelf_life_days = Column(Integer, nullable=False)  # For expiry urgency calculation
-    
+
     # Barcode verification tracking
     is_verified = Column(Boolean, default=False)
     verification_count = Column(Integer, default=0)
@@ -73,18 +73,12 @@ class StoreProduct(Base):
     Contains pricing needed for AI scoring algorithms
     """
 
-    __tablename__ = "store_products"  
+    __tablename__ = "store_products"
     __table_args__ = {"schema": "inventory"}
 
-    store_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("business.stores.store_id"), 
-        primary_key=True
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
     product_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("inventory.products.product_id"), 
-        primary_key=True
+        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), primary_key=True
     )
 
     # Store-specific pricing (needed for margin calculations in AI scoring)
@@ -109,14 +103,16 @@ class StoreProduct(Base):
 
 class BatchSource(Enum):
     """Sources for batch creation in LIFO.AI workflows"""
+
     MANUAL = "manual"
-    BARCODE = "barcode" 
+    BARCODE = "barcode"
     CSV_IMPORT = "csv_import"
     API = "api"
 
 
 class VerificationStatus(Enum):
     """Verification status for barcode scanning accuracy"""
+
     VERIFIED = "verified"
     PENDING = "pending"
     FLAGGED = "flagged"
@@ -135,44 +131,38 @@ class Batch(Base):
 
     batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     product_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("inventory.products.product_id"), 
-        nullable=False
+        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
     )
-    store_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("business.stores.store_id"), 
-        nullable=False
-    )
-    
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+
     # Core batch information
     batch_number = Column(String(100), nullable=False)
     supplier = Column(String(255))
-    
+
     # Critical dates for LIFO scoring
     manufacture_date = Column(Date, nullable=False)
     expiry_date = Column(Date, nullable=False)  # Core input for expiry_urgency score
     received_date = Column(Date, default=datetime.utcnow().date())
-    
+
     # Quantities for tracking
     initial_quantity = Column(DECIMAL(12, 4), nullable=False)
     current_quantity = Column(DECIMAL(12, 4), nullable=False)
     reserved_quantity = Column(DECIMAL(12, 4), default=0)
-    
+
     # Pricing (can override store defaults)
     cost_price = Column(DECIMAL(12, 4))
     selling_price = Column(DECIMAL(12, 4))
-    
+
     # Storage and status
     location_code = Column(String(50))
     status = Column(String(20), default="active")
-    
+
     # LIFO.AI barcode workflow support
     batch_source = Column(String(50), default="manual")  # BatchSource enum values
     scanned_barcode = Column(String(50))  # Barcode that created this batch
     scan_confidence = Column(DECIMAL(3, 2))  # Confidence score (0.00-1.00)
     verification_status = Column(String(20), default="verified")  # VerificationStatus enum values
-    
+
     # Audit fields
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -186,6 +176,7 @@ class Batch(Base):
 
 class ActionType(Enum):
     """Action types for LIFO.AI recommendations"""
+
     DISCOUNT = "discount"
     DONATE = "donate"
     DISPOSE = "dispose"
@@ -195,6 +186,7 @@ class ActionType(Enum):
 
 class DonationRecipientType(Enum):
     """Types of donation recipients for better UX"""
+
     FOOD_BANK = "food_bank"
     SOUP_KITCHEN = "soup_kitchen"
     CHARITY = "charity"
@@ -218,15 +210,11 @@ class BatchAction(Base):
 
     action_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     batch_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"), 
-        nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"),
+        nullable=False,
     )
-    store_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("business.stores.store_id"), 
-        nullable=False
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     # What was recommended vs what was done
     recommended_action = Column(String(20), nullable=False)  # ActionType enum
@@ -245,8 +233,7 @@ class BatchAction(Base):
     # User and donation tracking
     performed_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     donation_recipient_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("inventory.donation_recipients.recipient_id")
+        UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
     )
 
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -280,11 +267,7 @@ class DonationRecipient(Base):
     max_distance_km = Column(Integer, default=10)
 
     # Store association
-    store_id = Column(
-        UUID(as_uuid=True), 
-        ForeignKey("business.stores.store_id"), 
-        nullable=False
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

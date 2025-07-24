@@ -4,7 +4,7 @@ Handles different authentication methods for different environments
 """
 
 import os
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import structlog
 
@@ -40,10 +40,7 @@ class DeploymentAuthManager:
         logger.info("Using production authentication")
 
         # Option 1: Service role (for server-to-server)
-        if (
-            hasattr(settings, "supabase_service_role_key")
-            and settings.supabase_service_role_key
-        ):
+        if hasattr(settings, "supabase_service_role_key") and settings.supabase_service_role_key:
             return settings.supabase_service_role_key
 
         # Option 2: Machine-to-machine authentication
@@ -71,10 +68,7 @@ class DeploymentAuthManager:
         logger.info("Using development authentication")
 
         # Option 1: Service role (easiest for development)
-        if (
-            hasattr(settings, "supabase_service_role_key")
-            and settings.supabase_service_role_key
-        ):
+        if hasattr(settings, "supabase_service_role_key") and settings.supabase_service_role_key:
             return settings.supabase_service_role_key
 
         # Option 2: Development user credentials
@@ -104,10 +98,7 @@ class DeploymentAuthManager:
         logger.info("Using staging authentication")
 
         # Similar to production but with more logging and flexibility
-        if (
-            hasattr(settings, "supabase_service_role_key")
-            and settings.supabase_service_role_key
-        ):
+        if hasattr(settings, "supabase_service_role_key") and settings.supabase_service_role_key:
             return settings.supabase_service_role_key
 
         # Staging-specific service account
@@ -138,9 +129,7 @@ class DeploymentAuthManager:
             # Use environment-specific token
             token = await self.get_auth_token_for_environment()
             if not token:
-                raise ValueError(
-                    f"No authentication token available for {self.environment}"
-                )
+                raise ValueError(f"No authentication token available for {self.environment}")
 
             # Temporarily set the token and create client
             supabase_client.current_session = {"access_token": token}

@@ -3,15 +3,12 @@ Security tests for CORS and network vulnerabilities
 ⚠️ CRITICAL CORS AND NETWORK VULNERABILITIES DETECTED ⚠️
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-import requests
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.testclient import TestClient
 
-from app.core.config import Settings, settings
+from app.core.config import settings
 from app.main import app
 
 
@@ -22,7 +19,7 @@ class TestCORSVulnerabilities:
         """🚨 CRITICAL: Wildcard subdomain allows malicious subdomains"""
         # Test Digital Ocean wildcard pattern
         with patch.object(settings, "cors_origins", ["https://*.ondigitalocean.app"]):
-            cors_origins = settings.get_cors_origins()
+            settings.get_cors_origins()
 
             # Malicious subdomains that would be allowed
             malicious_subdomains = [
@@ -82,18 +79,14 @@ class TestCORSVulnerabilities:
         """🚨 HIGH: Development origins leaked to production"""
         # Check if development origins are included in production
         with patch.object(settings, "environment", "production"):
-            with patch.object(
-                settings, "frontend_url", "https://prod.ondigitalocean.app"
-            ):
+            with patch.object(settings, "frontend_url", "https://prod.ondigitalocean.app"):
                 cors_origins = settings.get_cors_origins()
 
                 # Development origins should not be in production
                 dev_origins = ["http://localhost:3000", "http://localhost:3001"]
                 for dev_origin in dev_origins:
                     if dev_origin in cors_origins:
-                        pytest.fail(
-                            f"Development origin {dev_origin} allowed in production"
-                        )
+                        pytest.fail(f"Development origin {dev_origin} allowed in production")
 
     def test_cors_preflight_bypass(self):
         """🚨 MEDIUM: CORS preflight request bypass"""
@@ -135,9 +128,7 @@ class TestCORSVulnerabilities:
             # Check if injection succeeded
             for header_name, header_value in response.headers.items():
                 if "Set-Cookie" in header_name or "X-Evil" in header_name:
-                    pytest.fail(
-                        f"Header injection succeeded: {header_name}: {header_value}"
-                    )
+                    pytest.fail(f"Header injection succeeded: {header_name}: {header_value}")
 
     def test_cors_credentials_exposure(self):
         """🚨 HIGH: CORS credentials exposed to wrong origins"""
@@ -156,9 +147,7 @@ class TestCORSVulnerabilities:
         )
 
         # Check if credentials are exposed
-        allow_credentials = response.headers.get(
-            "Access-Control-Allow-Credentials", ""
-        ).lower()
+        allow_credentials = response.headers.get("Access-Control-Allow-Credentials", "").lower()
         allow_origin = response.headers.get("Access-Control-Allow-Origin", "")
 
         if allow_credentials == "true" and wrong_origin in allow_origin:
@@ -174,7 +163,7 @@ class TestNetworkSecurityVulnerabilities:
 
         # Rapid-fire requests to test rate limiting
         responses = []
-        for i in range(100):  # 100 requests
+        for _i in range(100):  # 100 requests
             response = client.get("/health")
             responses.append(response.status_code)
 
@@ -192,7 +181,7 @@ class TestNetworkSecurityVulnerabilities:
         # Large payload attack
         large_payload = {"data": "x" * 1000000}  # 1MB payload
 
-        response = client.post(
+        client.post(
             "/api/v1/csv/upload/test-store",
             json=large_payload,  # Large JSON payload
         )
@@ -220,9 +209,7 @@ class TestNetworkSecurityVulnerabilities:
             # Check if malicious host is reflected in response
             response_text = response.text
             if malicious_host in response_text:
-                pytest.fail(
-                    f"Host header injection: {malicious_host} reflected in response"
-                )
+                pytest.fail(f"Host header injection: {malicious_host} reflected in response")
 
     def test_x_forwarded_headers_trust(self):
         """🚨 MEDIUM: Trusting X-Forwarded headers without validation"""
@@ -237,7 +224,7 @@ class TestNetworkSecurityVulnerabilities:
             "X-Forwarded-Port": "443",
         }
 
-        response = client.get("/health", headers=spoofed_headers)
+        client.get("/health", headers=spoofed_headers)
 
         # System might trust these headers for logging/analytics
         # Could lead to IP spoofing and bypassing security
@@ -388,7 +375,7 @@ class TestAPISecurityHeaders:
         client = TestClient(app)
 
         # Send JSON with wrong content type
-        response = client.post(
+        client.post(
             "/api/v1/csv/upload/test-store",
             headers={"Content-Type": "text/plain"},
             data='{"malicious": "data"}',

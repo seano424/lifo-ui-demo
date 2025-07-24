@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lifo_ai_core/database/operations'
+import { InventoryOperations } from '@/lib/database/operations'
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()

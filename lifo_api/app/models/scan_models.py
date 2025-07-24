@@ -7,7 +7,7 @@ import uuid
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -26,32 +26,22 @@ class ScanOutAction(str, Enum):
 class ScanInRequest(BaseModel):
     """Request model for scan-in workflow (proof of delivery)"""
 
-    product_sku: str = Field(
-        ..., min_length=1, max_length=100, description="Product SKU"
-    )
+    product_sku: str = Field(..., min_length=1, max_length=100, description="Product SKU")
     barcode: Optional[str] = Field(None, max_length=50, description="Product barcode")
     expiry_date: date = Field(..., description="Product expiry date")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity received")
-    location_code: Optional[str] = Field(
-        "MAIN", max_length=50, description="Storage location"
-    )
-    cost_price: Optional[float] = Field(
-        None, ge=0, le=10000, description="Cost price per unit"
-    )
+    location_code: Optional[str] = Field("MAIN", max_length=50, description="Storage location")
+    cost_price: Optional[float] = Field(None, ge=0, le=10000, description="Cost price per unit")
     selling_price: Optional[float] = Field(
         None, ge=0, le=10000, description="Selling price per unit"
     )
-    batch_number: Optional[str] = Field(
-        None, max_length=100, description="Optional batch number"
-    )
+    batch_number: Optional[str] = Field(None, max_length=100, description="Optional batch number")
     manufacture_date: Optional[date] = Field(None, description="Manufacture date")
-    temperature: Optional[float] = Field(
-        None, ge=-50, le=50, description="Storage temperature"
-    )
+    temperature: Optional[float] = Field(None, ge=-50, le=50, description="Storage temperature")
     notes: Optional[str] = Field(None, max_length=500, description="Additional notes")
 
     @validator("expiry_date")
-    def validate_expiry_date(cls, v):
+    def validate_expiry_date(cls, v: date) -> date:
         """Ensure expiry date is reasonable"""
         today = date.today()
         if v < today:
@@ -62,14 +52,14 @@ class ScanInRequest(BaseModel):
         return v
 
     @validator("selling_price", "cost_price")
-    def validate_prices(cls, v):
+    def validate_prices(cls, v: Optional[Decimal]) -> Optional[Decimal]:
         """Validate price fields"""
         if v is not None and v < 0:
             raise ValueError("Prices cannot be negative")
         return v
 
     @validator("product_sku")
-    def validate_sku(cls, v):
+    def validate_sku(cls, v: str) -> str:
         """Validate SKU format"""
         if not v or not v.strip():
             raise ValueError("SKU cannot be empty")
@@ -85,9 +75,7 @@ class ScanOutRequest(BaseModel):
 
     action: ScanOutAction = Field(..., description="Action being taken")
     quantity_moved: int = Field(..., gt=0, description="Quantity being moved/sold")
-    actual_selling_price: Optional[float] = Field(
-        None, ge=0, description="Actual selling price"
-    )
+    actual_selling_price: Optional[float] = Field(None, ge=0, description="Actual selling price")
     discount_percent: Optional[float] = Field(
         None, ge=0, le=100, description="Discount percentage applied"
     )
@@ -95,15 +83,11 @@ class ScanOutRequest(BaseModel):
         None, max_length=50, description="Destination location"
     )
     notes: Optional[str] = Field(None, max_length=500, description="Action notes")
-    customer_type: Optional[str] = Field(
-        "regular", max_length=50, description="Customer type"
-    )
-    channel: Optional[str] = Field(
-        "in_store", max_length=50, description="Sales channel"
-    )
+    customer_type: Optional[str] = Field("regular", max_length=50, description="Customer type")
+    channel: Optional[str] = Field("in_store", max_length=50, description="Sales channel")
 
     @validator("discount_percent")
-    def validate_discount(cls, v, values):
+    def validate_discount(cls, v: Optional[int], values: dict[str, Any]) -> Optional[int]:
         """Validate discount is reasonable"""
         if v is not None:
             if v < 0 or v > 100:
@@ -118,24 +102,16 @@ class ScanOutRequest(BaseModel):
 class ProcessScanRequest(BaseModel):
     """Request model for combined scan processing (future image recognition ready)"""
 
-    barcode: str = Field(
-        ..., min_length=1, max_length=50, description="Product barcode"
-    )
+    barcode: str = Field(..., min_length=1, max_length=50, description="Product barcode")
     expiry_date: date = Field(..., description="Expiry date from scan/OCR")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity scanned")
-    confidence_score: Optional[float] = Field(
-        1.0, ge=0, le=1, description="OCR confidence score"
-    )
+    confidence_score: Optional[float] = Field(1.0, ge=0, le=1, description="OCR confidence score")
     location_code: Optional[str] = Field("MAIN", max_length=50, description="Location")
     scan_timestamp: Optional[datetime] = Field(
         default_factory=datetime.utcnow, description="When scan occurred"
     )
-    image_url: Optional[str] = Field(
-        None, max_length=500, description="Reference to scanned image"
-    )
-    ocr_data: Optional[Dict[str, Any]] = Field(
-        None, description="Raw OCR extraction data"
-    )
+    image_url: Optional[str] = Field(None, max_length=500, description="Reference to scanned image")
+    ocr_data: Optional[dict[str, Any]] = Field(None, description="Raw OCR extraction data")
 
 
 class ScanInResponse(BaseModel):
@@ -144,11 +120,11 @@ class ScanInResponse(BaseModel):
     success: bool
     batch_id: str
     batch_number: str
-    product_info: Dict[str, Any]
+    product_info: dict[str, Any]
     initial_score: Optional[float] = None
     urgency_level: Optional[str] = None
-    recommendations: List[str] = []
-    warnings: List[str] = []
+    recommendations: list[str] = []
+    warnings: list[str] = []
     processing_time_ms: float
 
 
@@ -169,9 +145,9 @@ class ScanOutResponse(BaseModel):
 class MobileBatchSummary(BaseModel):
     """Mobile-optimized batch summary response"""
 
-    urgent_batches: List[Dict[str, Any]] = []
-    expiring_today: List[Dict[str, Any]] = []
-    action_needed: List[Dict[str, Any]] = []
+    urgent_batches: list[dict[str, Any]] = []
+    expiring_today: list[dict[str, Any]] = []
+    action_needed: list[dict[str, Any]] = []
     total_active_batches: int = 0
     store_health_score: float = 0.0
     last_updated: datetime = Field(default_factory=datetime.utcnow)
@@ -209,12 +185,12 @@ class MVPMetrics(BaseModel):
 class BatchInsights(BaseModel):
     """Batch performance insights response"""
 
-    category_performance: Dict[str, Dict[str, float]] = {}
-    expiry_pattern_analysis: Dict[str, Any] = {}
-    waste_hotspots: List[Dict[str, Any]] = []
-    optimization_opportunities: List[Dict[str, Any]] = []
-    inventory_visibility_gaps: List[Dict[str, Any]] = []
-    seasonal_patterns: Dict[str, Any] = {}
+    category_performance: dict[str, dict[str, float]] = {}
+    expiry_pattern_analysis: dict[str, Any] = {}
+    waste_hotspots: list[dict[str, Any]] = []
+    optimization_opportunities: list[dict[str, Any]] = []
+    inventory_visibility_gaps: list[dict[str, Any]] = []
+    seasonal_patterns: dict[str, Any] = {}
 
 
 class RealtimeUpdate(BaseModel):
@@ -223,7 +199,7 @@ class RealtimeUpdate(BaseModel):
     store_id: str
     batch_id: str
     update_type: str  # 'score_change', 'new_batch', 'status_change'
-    data: Dict[str, Any]
+    data: dict[str, Any]
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     priority: str = "normal"  # 'low', 'normal', 'high', 'critical'
 
@@ -231,9 +207,7 @@ class RealtimeUpdate(BaseModel):
 class MVPException(Exception):
     """Base exception for MVP-specific errors"""
 
-    def __init__(
-        self, message: str, error_code: str = "MVP_ERROR", status_code: int = 400
-    ):
+    def __init__(self, message: str, error_code: str = "MVP_ERROR", status_code: int = 400):
         self.message = message
         self.error_code = error_code
         self.status_code = status_code
@@ -290,7 +264,7 @@ class MobileStoreHealth(BaseModel):
     critical_items: int
     expiring_soon: int
     total_value_at_risk: float
-    trends: Dict[str, float]
+    trends: dict[str, float]
     last_action_taken: Optional[str] = None
     next_recommended_action: Optional[str] = None
 
@@ -323,6 +297,6 @@ def sanitize_text_input(value: str) -> str:
 
     for pattern in dangerous_patterns:
         if pattern in value_lower:
-            raise ValueError(f"Invalid content detected in input")
+            raise ValueError("Invalid content detected in input")
 
     return value.strip()

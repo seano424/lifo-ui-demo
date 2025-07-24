@@ -3,10 +3,11 @@ Exception handling utilities for LIFO AI Engine
 Provides custom exception handlers and error responses
 """
 
+import uuid
 from datetime import datetime
 
 import structlog
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -111,9 +112,7 @@ def setup_exception_handlers(app: FastAPI):
         )
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(
-        request: Request, exc: RequestValidationError
-    ):
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
         """Handle request validation errors"""
         logger.error(
             "Validation Error",

@@ -3,7 +3,7 @@ FastAPI authentication dependencies for LIFO AI Engine
 Provides dependency injection for authentication and authorization
 """
 
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import structlog
 from fastapi import Depends, HTTPException, Security, status
@@ -139,7 +139,7 @@ async def validate_store_access(
                 and_(
                     StoreUser.store_id == store_id,
                     StoreUser.user_id == current_user.user_id,
-                    StoreUser.is_active == True,
+                    StoreUser.is_active,
                 )
             )
         )
@@ -258,7 +258,7 @@ async def get_user_stores(
     """
     try:
         # Import here to avoid circular imports
-        from sqlalchemy import select
+        from sqlalchemy import and_, select
 
         from app.database.models import StoreUser
 
@@ -266,7 +266,7 @@ async def get_user_stores(
             select(StoreUser.store_id).where(
                 and_(
                     StoreUser.user_id == current_user.user_id,
-                    StoreUser.is_active == True,
+                    StoreUser.is_active,
                 )
             )
         )
@@ -282,9 +282,7 @@ async def get_user_stores(
         return store_ids
 
     except Exception as e:
-        logger.error(
-            "Failed to get user stores", user_id=current_user.user_id, error=str(e)
-        )
+        logger.error("Failed to get user stores", user_id=current_user.user_id, error=str(e))
         return []
 
 

@@ -5,8 +5,8 @@ Mobile-optimized endpoints for scan-in/scan-out workflows
 
 import time
 import uuid
-from datetime import date, datetime, timedelta
-from typing import Any, Dict, Optional
+from datetime import date, datetime
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -19,12 +19,11 @@ from app.auth.secure_dependencies import (
     validate_store_id_format,
 )
 from app.core.donation_engine import create_donation_decision_engine
-from app.core.scoring import ScoringService, create_scoring_service
+from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
-from app.middleware.rate_limiting import ai_endpoint_rate_limit, scoring_rate_limit
+from app.middleware.rate_limiting import ai_endpoint_rate_limit
 from app.models.scan_models import (
-    MobileOptimizedError,
     ProcessScanRequest,
     ScanInRequest,
     ScanInResponse,
@@ -32,9 +31,7 @@ from app.models.scan_models import (
     ScanOutResponse,
     ScanWorkflowException,
     sanitize_text_input,
-    validate_uuid_format,
 )
-from app.utils.performance import measure_time
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -44,7 +41,7 @@ logger = structlog.get_logger()
 async def debug_scan_endpoint(
     store_id: str,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """Debug endpoint to test authentication only"""
     return {
@@ -63,7 +60,7 @@ async def scan_in_batch(
     request: Request,
     batch_data: ScanInRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Handle proof of delivery scan-in workflow
@@ -123,15 +120,13 @@ async def scan_in_batch(
 
         try:
             # Quick scoring calculation
-            scoring_service = create_scoring_service(db)
+            create_scoring_service(db)
             days_to_expiry = (batch_data.expiry_date - date.today()).days
 
             if days_to_expiry <= 0:
                 initial_score = 1.0
                 urgency_level = "critical"
-                recommendations.append(
-                    "Product already expired - immediate action required"
-                )
+                recommendations.append("Product already expired - immediate action required")
             elif days_to_expiry <= 1:
                 initial_score = 0.95
                 urgency_level = "critical"
@@ -139,9 +134,7 @@ async def scan_in_batch(
             elif days_to_expiry <= 3:
                 initial_score = 0.8
                 urgency_level = "high"
-                recommendations.append(
-                    "Expires soon - monitor closely and prepare discounts"
-                )
+                recommendations.append("Expires soon - monitor closely and prepare discounts")
             elif days_to_expiry <= 7:
                 initial_score = 0.6
                 urgency_level = "medium"
@@ -163,9 +156,7 @@ async def scan_in_batch(
 
         except Exception as e:
             logger.warning("Could not calculate initial score", error=str(e))
-            recommendations.append(
-                "Score calculation pending - will be calculated in background"
-            )
+            recommendations.append("Score calculation pending - will be calculated in background")
 
         processing_time_ms = (time.time() - start_time) * 1000
 
@@ -216,7 +207,7 @@ async def scan_out_batch(
     request: Request,
     scan_out_data: ScanOutRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Track when batches are sold, discounted, donated, or discarded
@@ -269,15 +260,11 @@ async def scan_out_batch(
         waste_prevented = 0.0
 
         if scan_out_data.action in ["sold_full_price", "sold_discounted"]:
-            selling_price = (
-                scan_out_data.actual_selling_price or batch_data["selling_price"]
-            )
+            selling_price = scan_out_data.actual_selling_price or batch_data["selling_price"]
             revenue_impact = selling_price * scan_out_data.quantity_moved
 
             if scan_out_data.action == "sold_discounted":
-                original_revenue = (
-                    batch_data["selling_price"] * scan_out_data.quantity_moved
-                )
+                (batch_data["selling_price"] * scan_out_data.quantity_moved)
                 waste_prevented = revenue_impact  # Revenue recovered vs total loss
 
         elif scan_out_data.action == "donated":
@@ -373,7 +360,7 @@ async def process_scanned_batch(
     request: Request,
     scan_data: ProcessScanRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Process combined barcode + expiry date scan data
@@ -389,9 +376,7 @@ async def process_scanned_batch(
         read_ops = get_read_only_operations(db)
 
         # Look up product by barcode
-        product_info = await _lookup_product_by_barcode(
-            scan_data.barcode, store_id, read_ops
-        )
+        product_info = await _lookup_product_by_barcode(scan_data.barcode, store_id, read_ops)
 
         if not product_info:
             # Prepare for new product creation
@@ -471,9 +456,7 @@ async def process_scanned_batch(
 # Helper functions
 
 
-async def _validate_or_prepare_product(
-    sku: str, store_id: str, read_ops
-) -> Dict[str, Any]:
+async def _validate_or_prepare_product(sku: str, store_id: str, read_ops) -> dict[str, Any]:
     """Validate product exists or prepare data for creation"""
     # This would check if product exists in database
     # For MVP, we'll prepare data for frontend to create via Supabase
@@ -506,10 +489,7 @@ def _suggest_category_from_sku(sku: str) -> str:
     """Suggest category based on SKU patterns"""
     sku_lower = sku.lower()
 
-    if any(
-        word in sku_lower
-        for word in ["apple", "banana", "fruit", "vegetable", "produce"]
-    ):
+    if any(word in sku_lower for word in ["apple", "banana", "fruit", "vegetable", "produce"]):
         return "fresh_produce"
     elif any(word in sku_lower for word in ["bread", "bakery", "pastry"]):
         return "bakery_fresh"
@@ -525,7 +505,7 @@ def _suggest_category_from_sku(sku: str) -> str:
 
 async def _lookup_product_by_barcode(
     barcode: str, store_id: str, read_ops
-) -> Optional[Dict[str, Any]]:
+) -> Optional[dict[str, Any]]:
     """Look up product by barcode"""
     # This would query the database for existing products with this barcode
     # For MVP implementation, return None to indicate new product needed
@@ -533,7 +513,7 @@ async def _lookup_product_by_barcode(
 
 
 async def _calculate_action_effectiveness(
-    action_data: Dict, batch_data: Dict, scan_out_data: ScanOutRequest
+    action_data: dict, batch_data: dict, scan_out_data: ScanOutRequest
 ) -> float:
     """Calculate effectiveness score for the action taken"""
     base_score = 0.5
@@ -560,9 +540,7 @@ async def _calculate_action_effectiveness(
     return min(1.0, max(0.0, base_score))
 
 
-async def _trigger_realtime_update(
-    store_id: str, batch_id: str, update_data: Dict[str, Any]
-):
+async def _trigger_realtime_update(store_id: str, batch_id: str, update_data: dict[str, Any]):
     """Trigger real-time update for frontend"""
     try:
         # In full implementation, this would integrate with Supabase real-time
@@ -596,7 +574,7 @@ async def scan_donation_eligibility_check(
     request: Request,
     donation_scan: DonationScanRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Mobile scanning endpoint for donation eligibility check
@@ -714,7 +692,7 @@ async def execute_donation_action(
     request: Request,
     action_data: ScanOutRequest,  # Reuse existing scan-out model
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Execute donation action from mobile scanning interface
@@ -760,9 +738,7 @@ async def execute_donation_action(
 
         # Re-validate donation eligibility
         donation_engine = create_donation_decision_engine()
-        recommendation = donation_engine.evaluate_donation_opportunity(
-            batch_data=batch_data
-        )
+        recommendation = donation_engine.evaluate_donation_opportunity(batch_data=batch_data)
 
         if not recommendation.eu_compliant:
             raise ScanWorkflowException(
@@ -783,8 +759,7 @@ async def execute_donation_action(
             "batch_id": batch_id,
             "store_id": store_id,
             "quantity_donated": action_data.quantity_moved,
-            "original_value": action_data.quantity_moved
-            * batch_data.get("selling_price", 0),
+            "original_value": action_data.quantity_moved * batch_data.get("selling_price", 0),
             "donation_value": donation_value,
             "estimated_social_value": social_value,
             "estimated_tax_benefit": tax_benefit,
@@ -799,9 +774,7 @@ async def execute_donation_action(
         }
 
         # Calculate remaining quantity and status
-        remaining_quantity = (
-            batch_data.get("current_quantity", 0) - action_data.quantity_moved
-        )
+        remaining_quantity = batch_data.get("current_quantity", 0) - action_data.quantity_moved
         new_batch_status = "donated" if remaining_quantity == 0 else "active"
 
         # Generate mobile success response
@@ -818,18 +791,14 @@ async def execute_donation_action(
                 "donation_value": donation_value,
                 "social_value": social_value,
                 "tax_benefit": tax_benefit,
-                "meals_estimated": int(
-                    action_data.quantity_moved * 4
-                ),  # Rough estimate
+                "meals_estimated": int(action_data.quantity_moved * 4),  # Rough estimate
                 "co2_avoided_kg": action_data.quantity_moved * 2.5,  # Rough estimate
             },
             # Compliance summary
             "compliance_summary": {
                 "eu_compliant": True,
                 "compliance_score": recommendation.compliance_result.compliance_score,
-                "documentation_required": len(
-                    recommendation.compliance_result.safety_requirements
-                )
+                "documentation_required": len(recommendation.compliance_result.safety_requirements)
                 > 0,
             },
             # Next steps for mobile user
@@ -894,7 +863,7 @@ async def get_donation_quick_scan_list(
     ),
     limit: int = Query(20, ge=1, le=50, description="Maximum items to return"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Get mobile-optimized list of donation candidates for quick scanning
@@ -932,9 +901,7 @@ async def get_donation_quick_scan_list(
 
         for batch in inventory_data:
             try:
-                recommendation = donation_engine.evaluate_donation_opportunity(
-                    batch_data=batch
-                )
+                recommendation = donation_engine.evaluate_donation_opportunity(batch_data=batch)
 
                 if recommendation.eu_compliant:
                     priority_value = recommendation.priority.value
@@ -943,13 +910,9 @@ async def get_donation_quick_scan_list(
                     if (
                         (priority_filter == "critical" and priority_value != "critical")
                         or (
-                            priority_filter == "high"
-                            and priority_value not in ["critical", "high"]
+                            priority_filter == "high" and priority_value not in ["critical", "high"]
                         )
-                        or (
-                            priority_filter != "all"
-                            and priority_filter != priority_value
-                        )
+                        or (priority_filter != "all" and priority_filter != priority_value)
                     ):
                         continue
 
@@ -1027,9 +990,7 @@ async def get_donation_quick_scan_list(
                 "temperature_monitoring_needed": any(
                     c["temperature_sensitive"] for c in donation_candidates
                 ),
-                "quick_actions_available": any(
-                    c["quick_action"] for c in donation_candidates
-                ),
+                "quick_actions_available": any(c["quick_action"] for c in donation_candidates),
             },
             "processing_time_ms": processing_time_ms,
         }
@@ -1043,9 +1004,7 @@ async def get_donation_quick_scan_list(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500, detail="Failed to generate donation scan list"
-        )
+        raise HTTPException(status_code=500, detail="Failed to generate donation scan list")
 
 
 # Helper functions for mobile donation workflows
@@ -1054,9 +1013,7 @@ async def get_donation_quick_scan_list(
 def _get_mobile_action_summary(recommendation) -> str:
     """Generate mobile-friendly action summary"""
     if not recommendation.eu_compliant:
-        return (
-            f"Not eligible: {recommendation.compliance_result.eligibility_status.value}"
-        )
+        return f"Not eligible: {recommendation.compliance_result.eligibility_status.value}"
 
     priority = recommendation.priority.value
     decision = recommendation.decision.value
@@ -1080,7 +1037,7 @@ def _get_mobile_action_summary(recommendation) -> str:
         return base_summary
 
 
-def _get_mobile_next_steps(recommendation) -> List[str]:
+def _get_mobile_next_steps(recommendation) -> list[str]:
     """Generate mobile-friendly next steps"""
     if not recommendation.eu_compliant:
         return [
@@ -1114,7 +1071,7 @@ def _get_mobile_next_steps(recommendation) -> List[str]:
         ]
 
 
-def _get_mobile_warnings(recommendation) -> List[str]:
+def _get_mobile_warnings(recommendation) -> list[str]:
     """Generate mobile-friendly warnings"""
     warnings = []
 

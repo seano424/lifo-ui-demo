@@ -4,11 +4,11 @@ Custom exceptions and error responses optimized for mobile consumption
 """
 
 import traceback
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from datetime import datetime, timedelta
+from typing import Any, Optional
 
 import structlog
-from fastapi import HTTPException, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
 
 from app.models.scan_models import MobileOptimizedError
@@ -78,9 +78,7 @@ class MobilePerformanceException(MVPBaseException):
 class ValidationException(MVPBaseException):
     """Exception for data validation errors"""
 
-    def __init__(
-        self, message: str, field: str = None, validation_errors: List[str] = None
-    ):
+    def __init__(self, message: str, field: str = None, validation_errors: list[str] = None):
         self.field = field
         self.validation_errors = validation_errors or []
 
@@ -245,7 +243,7 @@ def create_standard_error_response(
     message: str,
     error_code: str = "UNKNOWN_ERROR",
     user_message: str = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create standard error response for non-MVP exceptions"""
 
     return {
@@ -271,11 +269,7 @@ async def mvp_exception_handler(request: Request, exc: MVPBaseException):
         headers={
             "X-Error-Code": exc.error_code,
             "X-Retry-Allowed": str(exc.retry_allowed).lower(),
-            **(
-                {"Retry-After": str(exc.retry_after_seconds)}
-                if exc.retry_after_seconds
-                else {}
-            ),
+            **({"Retry-After": str(exc.retry_after_seconds)} if exc.retry_after_seconds else {}),
         },
     )
 
@@ -297,9 +291,7 @@ async def validation_exception_handler(request: Request, exc: ValidationExceptio
     )
 
 
-async def performance_exception_handler(
-    request: Request, exc: MobilePerformanceException
-):
+async def performance_exception_handler(request: Request, exc: MobilePerformanceException):
     """Handle performance exceptions with timing information"""
     response_data = create_mobile_error_response(exc, request).dict()
 
@@ -375,7 +367,7 @@ class ErrorTracker:
         if len(self.error_history) > self.max_history:
             self.error_history = self.error_history[-self.max_history :]
 
-    def get_error_summary(self, hours: int = 24) -> Dict[str, Any]:
+    def get_error_summary(self, hours: int = 24) -> dict[str, Any]:
         """Get error summary for the last N hours"""
         cutoff = datetime.utcnow() - timedelta(hours=hours)
         recent_errors = [e for e in self.error_history if e["timestamp"] > cutoff]
@@ -415,7 +407,7 @@ async def error_tracking_middleware(request: Request, call_next):
     except MVPBaseException as e:
         error_tracker.record_error(e.error_code, str(request.url.path))
         raise
-    except Exception as e:
+    except Exception:
         error_tracker.record_error("UNEXPECTED_ERROR", str(request.url.path))
         raise
 
@@ -427,9 +419,7 @@ def raise_if_not_found(item: Any, item_type: str, identifier: str):
         raise ValidationException(
             message=f"{item_type} not found",
             field="id",
-            validation_errors=[
-                f"{item_type} with identifier '{identifier}' does not exist"
-            ],
+            validation_errors=[f"{item_type} with identifier '{identifier}' does not exist"],
         )
 
 

@@ -5,7 +5,6 @@ Provides structured logging with proper formatting and levels
 
 import logging
 import sys
-from pathlib import Path
 
 import structlog
 

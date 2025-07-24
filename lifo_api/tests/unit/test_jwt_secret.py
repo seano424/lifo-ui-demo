@@ -21,7 +21,7 @@ def test_jwt_secret():
         print("❌ MANUAL_ACCESS_TOKEN is not set in the environment variables.")
         return False
 
-    print(f"Testing JWT secret verification...")
+    print("Testing JWT secret verification...")
     print(f"JWT secret: {jwt_secret[:20]}...")
 
     try:

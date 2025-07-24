@@ -3,18 +3,16 @@ Enhanced LIFO AI Scoring Engine
 Port and enhancement of existing scoring engine with FastAPI integration
 """
 
-import logging
-import uuid
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import structlog
 from pydantic import BaseModel, validator
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import get_scoring_weights, settings
+from app.core.config import get_scoring_weights
 
 logger = structlog.get_logger()
 
@@ -99,9 +97,7 @@ class InventoryScorer:
     Calculates urgency scores based on multiple factors
     """
 
-    def __init__(
-        self, weights: Optional[ScoringWeights] = None, category: Optional[str] = None
-    ):
+    def __init__(self, weights: Optional[ScoringWeights] = None, category: Optional[str] = None):
         """
         Initialize scorer with custom weights or category-specific weights
         """
@@ -117,9 +113,7 @@ class InventoryScorer:
 
         self.logger = structlog.get_logger().bind(component="scorer")
 
-    def calculate_expiry_score(
-        self, days_to_expiry: int, shelf_life_days: int
-    ) -> float:
+    def calculate_expiry_score(self, days_to_expiry: int, shelf_life_days: int) -> float:
         """
         Calculate urgency based on expiry date with enhanced logic
         Returns: 0.0 (no urgency) to 1.0 (critical)
@@ -160,9 +154,7 @@ class InventoryScorer:
 
         return 0.1  # Low urgency for long shelf life items
 
-    def _calculate_disposal_urgency(
-        self, days_to_expiry: int, category: str = None
-    ) -> float:
+    def _calculate_disposal_urgency(self, days_to_expiry: int, category: str = None) -> float:
         """
         Calculate disposal urgency for expired products based on category and days past expiry
         Returns: 0.0 (can wait) to 1.0 (immediate disposal required)
@@ -240,7 +232,7 @@ class InventoryScorer:
         days_to_expiry: int,
         current_margin_percent: float,
         current_quantity: float = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate recommendations for expired products based on days past expiry and category
         """
@@ -309,9 +301,7 @@ class InventoryScorer:
         days_to_sell = current_quantity / avg_daily_sales
 
         # Enhanced thresholds based on expiry urgency
-        safety_buffer = max(
-            0.7, 1 - (days_to_expiry / 30)
-        )  # More aggressive for shorter expiry
+        safety_buffer = max(0.7, 1 - (days_to_expiry / 30))  # More aggressive for shorter expiry
 
         # If we can sell all stock before expiry with buffer
         if days_to_sell <= days_to_expiry * safety_buffer:
@@ -348,9 +338,7 @@ class InventoryScorer:
 
         # For expired products, margin becomes much less important
         if days_to_expiry <= 0:
-            return self._calculate_expired_margin_score(
-                margin_percent, days_to_expiry, category
-            )
+            return self._calculate_expired_margin_score(margin_percent, days_to_expiry, category)
 
         # Adjust margin importance based on urgency for fresh products
         urgency_multiplier = 1.0
@@ -367,13 +355,9 @@ class InventoryScorer:
         elif margin_percent >= 40:
             return 0.1 * urgency_multiplier  # High margin - can afford deep discounts
         elif margin_percent >= 25:
-            return (
-                0.3 * urgency_multiplier
-            )  # Good margin - can afford moderate discounts
+            return 0.3 * urgency_multiplier  # Good margin - can afford moderate discounts
         elif margin_percent >= 15:
-            return (
-                0.5 * urgency_multiplier
-            )  # Moderate margin - limited discount options
+            return 0.5 * urgency_multiplier  # Moderate margin - limited discount options
         elif margin_percent >= 10:
             return 0.7 * urgency_multiplier  # Low margin - minimal discount options
         else:
@@ -384,7 +368,7 @@ class InventoryScorer:
         expiry_score: float,
         velocity_score: float,
         margin_score: float,
-        category_weights: Optional[Dict[str, float]] = None,
+        category_weights: Optional[dict[str, float]] = None,
     ) -> float:
         """
         Calculate weighted composite score with enhanced logic
@@ -418,7 +402,7 @@ class InventoryScorer:
         days_to_expiry: int,
         current_margin_percent: float,
         current_quantity: float = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate enhanced AI-powered action recommendations
         """
@@ -503,7 +487,7 @@ class ScoringService:
         self.db = db
         self.logger = structlog.get_logger().bind(component="scoring_service")
 
-    async def get_category_weights(self, category: str) -> Dict[str, float]:
+    async def get_category_weights(self, category: str) -> dict[str, float]:
         """Get category-specific weights from database with fallback"""
         try:
             # Import models here to avoid circular imports
@@ -513,7 +497,7 @@ class ScoringService:
                 select(CategoryWeight).where(
                     and_(
                         CategoryWeight.category == category,
-                        CategoryWeight.is_active == True,
+                        CategoryWeight.is_active,
                     )
                 )
             )
@@ -530,9 +514,7 @@ class ScoringService:
                 return get_scoring_weights(category)
 
         except Exception as e:
-            self.logger.error(
-                "Error getting category weights", category=category, error=str(e)
-            )
+            self.logger.error("Error getting category weights", category=category, error=str(e))
             return get_scoring_weights()  # Fallback to default
 
     async def calculate_days_to_expiry(self, expiry_date: date) -> int:
@@ -555,8 +537,8 @@ class ScoringService:
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.models import Batch, SalesEvent
             from app.database.inventory_models import Product
+            from app.database.models import Batch, SalesEvent
 
             # Try to get actual sales data for this specific batch
             if batch_id:
@@ -564,8 +546,7 @@ class ScoringService:
                     select(func.avg(SalesEvent.quantity_sold)).where(
                         and_(
                             SalesEvent.batch_id == batch_id,
-                            SalesEvent.sale_timestamp
-                            >= datetime.utcnow() - timedelta(days=30),
+                            SalesEvent.sale_timestamp >= datetime.utcnow() - timedelta(days=30),
                         )
                     )
                 )
@@ -582,8 +563,7 @@ class ScoringService:
                     and_(
                         SalesEvent.store_id == store_id,
                         Product.category == category,
-                        SalesEvent.sale_timestamp
-                        >= datetime.utcnow() - timedelta(days=30),
+                        SalesEvent.sale_timestamp >= datetime.utcnow() - timedelta(days=30),
                     )
                 )
             )
@@ -634,7 +614,10 @@ class ScoringService:
             return 1.0  # Conservative fallback
 
     async def score_batch(
-        self, batch_id: str, category_weights: Dict[str, float] = None, track_recommendation: bool = True
+        self,
+        batch_id: str,
+        category_weights: dict[str, float] = None,
+        track_recommendation: bool = True,
     ) -> Optional[ScoringResult]:
         """Score a single batch with enhanced error handling - SECURE READ-ONLY VERSION"""
         try:
@@ -656,9 +639,7 @@ class ScoringService:
 
             # Get category weights (use provided or fetch from DB)
             if not category_weights:
-                category_weights = await read_ops.get_category_weights(
-                    batch_data["category"]
-                )
+                category_weights = await read_ops.get_category_weights(batch_data["category"])
 
             # Create scorer with category-specific weights
             scorer = InventoryScorer(category=batch_data["category"])
@@ -727,8 +708,7 @@ class ScoringService:
                 calculated_at=datetime.utcnow(),
                 days_to_expiry=days_to_expiry,
                 current_quantity=batch_data["current_quantity"],
-                potential_loss=batch_data["current_quantity"]
-                * batch_data["selling_price"],
+                potential_loss=batch_data["current_quantity"] * batch_data["selling_price"],
                 margin_percent=margin_percent,
             )
 
@@ -760,7 +740,7 @@ class ScoringService:
 
     async def score_store_inventory(
         self, store_id: str, recalculate_all: bool = False
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Score all active batches for a store with enhanced performance - SECURE READ-ONLY VERSION"""
         start_time = datetime.utcnow()
 
@@ -775,9 +755,7 @@ class ScoringService:
             inventory_data = await read_ops.get_store_inventory_for_scoring(store_id)
 
             if not inventory_data:
-                self.logger.warning(
-                    "No inventory data found for store", store_id=store_id
-                )
+                self.logger.warning("No inventory data found for store", store_id=store_id)
                 return {
                     "store_id": store_id,
                     "total_items": 0,
@@ -853,9 +831,7 @@ class ScoringService:
 
         except Exception as e:
             await self.db.rollback()
-            self.logger.error(
-                "Error scoring store inventory", store_id=store_id, error=str(e)
-            )
+            self.logger.error("Error scoring store inventory", store_id=store_id, error=str(e))
             return {
                 "store_id": store_id,
                 "total_items": 0,
@@ -873,9 +849,7 @@ class ScoringService:
 
             # Delete existing score for this batch
             await self.db.execute(
-                ProductScore.__table__.delete().where(
-                    ProductScore.batch_id == result.batch_id
-                )
+                ProductScore.__table__.delete().where(ProductScore.batch_id == result.batch_id)
             )
 
             # Insert new score
@@ -898,21 +872,19 @@ class ScoringService:
             self.db.add(score)
 
         except Exception as e:
-            self.logger.error(
-                "Error saving score result", batch_id=result.batch_id, error=str(e)
-            )
+            self.logger.error("Error saving score result", batch_id=result.batch_id, error=str(e))
             raise
 
     async def _track_recommendation(self, result: ScoringResult, store_id: Optional[str] = None):
         """Track AI recommendation for analytics"""
         try:
             from app.services.action_tracking import ActionTrackingService
-            
+
             tracker = ActionTrackingService(self.db)
-            
+
             # Map scoring recommendation to database enum
             db_action = tracker.map_scoring_action_to_enum(result.recommendation)
-            
+
             # Create recommendation record
             await tracker.create_recommendation_record(
                 batch_id=result.batch_id,
@@ -921,7 +893,7 @@ class ScoringService:
                 ai_score=result.composite_score,
                 user_id=None,  # System-generated recommendation
             )
-            
+
         except Exception as e:
             # Don't let tracking errors break the scoring
             self.logger.warning("Failed to track AI recommendation", error=str(e))

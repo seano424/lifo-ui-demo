@@ -6,13 +6,12 @@ Handles tracking of AI recommendations vs actual user actions
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, Dict, Any
+from typing import Any, Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.inventory_models import BatchAction, ActionType, DonationRecipient
-from app.database.models import Batch
+from app.database.inventory_models import ActionType, BatchAction
 
 
 class ActionTrackingService:
@@ -46,7 +45,7 @@ class ActionTrackingService:
         self.db.add(action_record)
         await self.db.commit()
         await self.db.refresh(action_record)
-        
+
         return action_record
 
     async def update_actual_action(
@@ -90,7 +89,7 @@ class ActionTrackingService:
 
         await self.db.commit()
         await self.db.refresh(action_record)
-        
+
         return action_record
 
     async def record_immediate_action(
@@ -123,45 +122,46 @@ class ActionTrackingService:
             original_value=Decimal(str(original_value)) if original_value else None,
             recovered_value=Decimal(str(recovered_value)) if recovered_value else None,
             notes=notes,
-            donation_recipient_id=uuid.UUID(donation_recipient_id) if donation_recipient_id else None,
+            donation_recipient_id=uuid.UUID(donation_recipient_id)
+            if donation_recipient_id
+            else None,
         )
 
         self.db.add(action_record)
         await self.db.commit()
         await self.db.refresh(action_record)
-        
+
         return action_record
 
     async def get_recommendation_effectiveness(
-        self, 
-        store_id: str, 
-        days_back: int = 30
-    ) -> Dict[str, Any]:
+        self, store_id: str, days_back: int = 30
+    ) -> dict[str, Any]:
         """
         Get analytics on how well AI recommendations are being followed
         """
-        from sqlalchemy import func, and_
-        
+        from sqlalchemy import and_, func
+
         result = await self.db.execute(
             select(
                 BatchAction.recommended_action,
                 BatchAction.actual_action,
-                func.count().label('count'),
-                func.avg(BatchAction.ai_score).label('avg_ai_score'),
-                func.sum(BatchAction.original_value).label('total_original_value'),
-                func.sum(BatchAction.recovered_value).label('total_recovered_value'),
+                func.count().label("count"),
+                func.avg(BatchAction.ai_score).label("avg_ai_score"),
+                func.sum(BatchAction.original_value).label("total_original_value"),
+                func.sum(BatchAction.recovered_value).label("total_recovered_value"),
             )
             .where(
                 and_(
                     BatchAction.store_id == uuid.UUID(store_id),
-                    BatchAction.action_date >= datetime.utcnow().replace(day=datetime.utcnow().day - days_back)
+                    BatchAction.action_date
+                    >= datetime.utcnow().replace(day=datetime.utcnow().day - days_back),
                 )
             )
             .group_by(BatchAction.recommended_action, BatchAction.actual_action)
         )
-        
+
         analytics_data = result.fetchall()
-        
+
         return {
             "store_id": store_id,
             "period_days": days_back,
@@ -171,12 +171,16 @@ class ActionTrackingService:
                     "actual_action": row.actual_action,
                     "count": row.count,
                     "avg_ai_score": float(row.avg_ai_score) if row.avg_ai_score else 0,
-                    "total_original_value": float(row.total_original_value) if row.total_original_value else 0,
-                    "total_recovered_value": float(row.total_recovered_value) if row.total_recovered_value else 0,
+                    "total_original_value": float(row.total_original_value)
+                    if row.total_original_value
+                    else 0,
+                    "total_recovered_value": float(row.total_recovered_value)
+                    if row.total_recovered_value
+                    else 0,
                     "follow_rate": 1.0 if row.recommended_action == row.actual_action else 0.0,
                 }
                 for row in analytics_data
-            ]
+            ],
         }
 
     def map_scoring_action_to_enum(self, scoring_action: str) -> str:
@@ -191,5 +195,5 @@ class ActionTrackingService:
             "dispose": ActionType.DISPOSE.value,
             "donate": ActionType.DONATE.value,
         }
-        
+
         return action_mapping.get(scoring_action, ActionType.MAINTAIN.value)

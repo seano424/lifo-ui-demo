@@ -4,8 +4,8 @@ Focus on key metrics mentioned in MVP goals
 """
 
 import time
-from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -28,7 +28,7 @@ async def get_mvp_metrics(
     request: Request,
     date_range: int = Query(7, ge=1, le=30, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Metrics specifically designed for MVP validation and success measurement
@@ -48,9 +48,7 @@ async def get_mvp_metrics(
         analytics_data = await read_ops.get_analytics_data(store_id, date_range)
 
         # Calculate MVP-specific metrics
-        metrics = await _calculate_mvp_metrics(
-            store_id, date_range, analytics_data, read_ops
-        )
+        metrics = await _calculate_mvp_metrics(store_id, date_range, analytics_data, read_ops)
 
         processing_time_ms = (time.time() - start_time) * 1000
 
@@ -81,11 +79,9 @@ async def get_mvp_metrics(
 async def get_batch_insights(
     store_id: str,
     request: Request,
-    analysis_depth: str = Query(
-        "standard", description="Analysis depth: quick, standard, deep"
-    ),
+    analysis_depth: str = Query("standard", description="Analysis depth: quick, standard, deep"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Reveal previously unknown inventory patterns (MVP goal)
@@ -140,7 +136,7 @@ async def get_scan_workflow_stats(
     request: Request,
     days: int = Query(7, ge=1, le=30, description="Analysis period"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analytics specific to scan workflow performance
@@ -192,9 +188,7 @@ async def get_scan_workflow_stats(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500, detail="Scan workflow stats calculation failed"
-        )
+        raise HTTPException(status_code=500, detail="Scan workflow stats calculation failed")
 
 
 @router.get("/waste-prevention-impact/{store_id}")
@@ -205,7 +199,7 @@ async def get_waste_prevention_impact(
     comparison_period: int = Query(30, ge=7, le=90, description="Days to compare"),
     baseline_period: int = Query(30, ge=7, le=90, description="Baseline period days"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Calculate waste prevention impact and ROI
@@ -244,9 +238,7 @@ async def get_waste_prevention_impact(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500, detail="Waste prevention impact calculation failed"
-        )
+        raise HTTPException(status_code=500, detail="Waste prevention impact calculation failed")
 
 
 @router.get("/action-effectiveness/{store_id}")
@@ -257,7 +249,7 @@ async def get_action_effectiveness(
     action_type: Optional[str] = Query(None, description="Filter by action type"),
     days: int = Query(14, ge=3, le=60, description="Analysis period"),
     db: AsyncSession = Depends(get_db),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
     Analyze effectiveness of different actions taken
@@ -296,16 +288,14 @@ async def get_action_effectiveness(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500, detail="Action effectiveness calculation failed"
-        )
+        raise HTTPException(status_code=500, detail="Action effectiveness calculation failed")
 
 
 # Helper functions
 
 
 async def _calculate_mvp_metrics(
-    store_id: str, date_range: int, analytics_data: Dict[str, Any], read_ops
+    store_id: str, date_range: int, analytics_data: dict[str, Any], read_ops
 ) -> MVPMetrics:
     """Calculate MVP validation metrics"""
 
@@ -316,23 +306,19 @@ async def _calculate_mvp_metrics(
     products_added_via_scan = 8  # Would query new products added via scan workflow
 
     # Waste prevention value calculation
-    total_value = analytics_data.get("total_value", 0)
+    analytics_data.get("total_value", 0)
     critical_items = analytics_data.get("critical_items", 0)
     high_urgency_items = analytics_data.get("high_urgency_items", 0)
 
     # Estimate waste prevented through AI recommendations
-    waste_prevented_value_eur = (
-        critical_items + high_urgency_items
-    ) * 25.0  # Avg product value
+    waste_prevented_value_eur = (critical_items + high_urgency_items) * 25.0  # Avg product value
 
     # Donation opportunities (items past sell-by but before use-by)
     donation_opportunities = max(0, critical_items - 2)
 
     # Recommendation metrics
     discount_recommendations_given = critical_items + high_urgency_items
-    discount_recommendations_acted_on = int(
-        discount_recommendations_given * 0.6
-    )  # 60% action rate
+    discount_recommendations_acted_on = int(discount_recommendations_given * 0.6)  # 60% action rate
 
     # Batch visibility improvement (estimated)
     total_batches = analytics_data.get("total_batches", 0)
@@ -347,9 +333,7 @@ async def _calculate_mvp_metrics(
     scan_efficiency_score = 0.75  # Based on scan speed and accuracy
 
     # User adoption rate
-    user_adoption_rate = (
-        0.65  # Percentage of eligible users actively using scan workflows
-    )
+    user_adoption_rate = 0.65  # Percentage of eligible users actively using scan workflows
 
     return MVPMetrics(
         batches_scanned_today=batches_scanned_today,
@@ -366,7 +350,7 @@ async def _calculate_mvp_metrics(
 
 
 async def _generate_batch_insights(
-    inventory_data: List[Dict], analysis_depth: str, store_id: str, read_ops
+    inventory_data: list[dict], analysis_depth: str, store_id: str, read_ops
 ) -> BatchInsights:
     """Generate insights from batch data analysis"""
 
@@ -388,9 +372,7 @@ async def _generate_batch_insights(
             }
 
         category_stats[category]["items"] += 1
-        category_stats[category]["total_value"] += (
-            item["current_quantity"] * item["selling_price"]
-        )
+        category_stats[category]["total_value"] += item["current_quantity"] * item["selling_price"]
         category_stats[category]["avg_days_to_expiry"].append(item["days_to_expiry"])
 
         if item["days_to_expiry"] <= 3:
@@ -399,9 +381,7 @@ async def _generate_batch_insights(
     # Convert to performance metrics
     for category, stats in category_stats.items():
         urgent_ratio = stats["urgent_items"] / max(stats["items"], 1)
-        avg_days = sum(stats["avg_days_to_expiry"]) / max(
-            len(stats["avg_days_to_expiry"]), 1
-        )
+        avg_days = sum(stats["avg_days_to_expiry"]) / max(len(stats["avg_days_to_expiry"]), 1)
 
         category_performance[category] = {
             "urgency_ratio": round(urgent_ratio, 3),
@@ -414,9 +394,7 @@ async def _generate_batch_insights(
     expiry_patterns = {
         "expired_count": len([i for i in inventory_data if i["days_to_expiry"] <= 0]),
         "expiring_today": len([i for i in inventory_data if i["days_to_expiry"] == 0]),
-        "expiring_this_week": len(
-            [i for i in inventory_data if 0 < i["days_to_expiry"] <= 7]
-        ),
+        "expiring_this_week": len([i for i in inventory_data if 0 < i["days_to_expiry"] <= 7]),
         "avg_time_to_expiry": sum(i["days_to_expiry"] for i in inventory_data)
         / len(inventory_data),
     }
@@ -497,9 +475,7 @@ async def _generate_batch_insights(
     )
 
 
-async def _calculate_scan_workflow_stats(
-    store_id: str, days: int, read_ops
-) -> Dict[str, float]:
+async def _calculate_scan_workflow_stats(store_id: str, days: int, read_ops) -> dict[str, float]:
     """Calculate scan workflow statistics"""
     # In production, these would be calculated from actual scan event logs
     return {
@@ -514,7 +490,7 @@ async def _calculate_scan_workflow_stats(
 
 async def _calculate_waste_prevention_impact(
     store_id: str, comparison_period: int, baseline_period: int, read_ops
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Calculate waste prevention impact and ROI"""
     # In production, this would compare actual data from different periods
     return {
@@ -557,7 +533,7 @@ async def _calculate_waste_prevention_impact(
 
 async def _calculate_action_effectiveness(
     store_id: str, action_type: Optional[str], days: int, read_ops
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Calculate effectiveness of different actions"""
     # In production, this would analyze actual action outcomes
     return {

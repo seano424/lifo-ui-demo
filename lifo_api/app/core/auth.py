@@ -3,8 +3,8 @@ Authentication and authorization for LIFO API
 Provides JWT token validation and role-based access control for all schemas
 """
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Optional
 
 import jwt
 import structlog
@@ -47,7 +47,7 @@ class AuthorizationError(HTTPException):
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_database),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Extract and validate JWT token, return user information
     """
@@ -94,7 +94,7 @@ async def get_current_user_with_store_access(
     required_role: str = "staff",
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_database),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get current user and validate store access with required role
     """
@@ -127,7 +127,7 @@ async def validate_store_access(
             and_(
                 Store.store_id == store_id,
                 Store.owner_id == user_id,
-                Store.is_active == True,
+                Store.is_active,
             )
         )
         owner_result = await db.execute(owner_query)
@@ -139,7 +139,7 @@ async def validate_store_access(
             and_(
                 StoreUser.store_id == store_id,
                 StoreUser.user_id == user_id,
-                StoreUser.is_active == True,
+                StoreUser.is_active,
             )
         )
         user_result = await db.execute(user_query)
@@ -180,9 +180,7 @@ async def validate_global_product_access(
         # For write operations, check if user has store management permissions
         if action in ["create", "update", "verify"]:
             # Check if user owns any active stores or has manager role
-            owner_query = select(Store).where(
-                and_(Store.owner_id == user_id, Store.is_active == True)
-            )
+            owner_query = select(Store).where(and_(Store.owner_id == user_id, Store.is_active))
             owner_result = await db.execute(owner_query)
             if owner_result.scalar_one_or_none():
                 return True
@@ -192,7 +190,7 @@ async def validate_global_product_access(
                 and_(
                     StoreUser.user_id == user_id,
                     StoreUser.role_in_store.in_(["manager", "owner"]),
-                    StoreUser.is_active == True,
+                    StoreUser.is_active,
                 )
             )
             manager_result = await db.execute(manager_query)
@@ -232,7 +230,7 @@ async def validate_donation_access(
                     and_(
                         StoreUser.user_id == user_id,
                         StoreUser.role_in_store.in_(["manager", "owner"]),
-                        StoreUser.is_active == True,
+                        StoreUser.is_active,
                     )
                 )
                 manager_result = await db.execute(manager_query)
@@ -256,7 +254,7 @@ async def validate_donation_access(
                     and_(
                         StoreUser.user_id == user_id,
                         StoreUser.role_in_store == "owner",
-                        StoreUser.is_active == True,
+                        StoreUser.is_active,
                     )
                 )
                 admin_result = await db.execute(admin_query)
@@ -278,18 +276,14 @@ async def validate_donation_access(
 class PermissionChecker:
     """Helper class for permission checking in endpoints"""
 
-    def __init__(self, user: Dict[str, Any], db: AsyncSession):
+    def __init__(self, user: dict[str, Any], db: AsyncSession):
         self.user = user
         self.db = db
         self.user_id = user["user_id"]
 
-    async def check_store_access(
-        self, store_id: str, required_role: str = "staff"
-    ) -> bool:
+    async def check_store_access(self, store_id: str, required_role: str = "staff") -> bool:
         """Check store access with role requirement"""
-        return await validate_store_access(
-            store_id, self.user_id, required_role, self.db
-        )
+        return await validate_store_access(store_id, self.user_id, required_role, self.db)
 
     async def check_global_product_access(self, action: str = "read") -> bool:
         """Check global product access"""
@@ -306,9 +300,7 @@ class PermissionChecker:
 
         async def check():
             if not await self.check_store_access(store_id, required_role):
-                raise AuthorizationError(
-                    f"Insufficient permissions for store {store_id}"
-                )
+                raise AuthorizationError(f"Insufficient permissions for store {store_id}")
 
         return check()
 
@@ -317,28 +309,22 @@ class PermissionChecker:
 
         async def check():
             if not await self.check_global_product_access(action):
-                raise AuthorizationError(
-                    f"Insufficient permissions for global product {action}"
-                )
+                raise AuthorizationError(f"Insufficient permissions for global product {action}")
 
         return check()
 
-    def require_donation_access(
-        self, action: str = "read", store_id: Optional[str] = None
-    ):
+    def require_donation_access(self, action: str = "read", store_id: Optional[str] = None):
         """Raise exception if user lacks donation access"""
 
         async def check():
             if not await self.check_donation_access(action, store_id):
-                raise AuthorizationError(
-                    f"Insufficient permissions for donation {action}"
-                )
+                raise AuthorizationError(f"Insufficient permissions for donation {action}")
 
         return check()
 
 
 async def get_permission_checker(
-    user: Dict[str, Any] = Depends(get_current_user),
+    user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_database),
 ) -> PermissionChecker:
     """Get permission checker instance for current user"""
@@ -347,8 +333,8 @@ async def get_permission_checker(
 
 # Convenience dependencies for common permission checks
 async def require_authenticated_user(
-    user: Dict[str, Any] = Depends(get_current_user),
-) -> Dict[str, Any]:
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
     """Simple dependency to require authentication"""
     return user
 
@@ -357,9 +343,9 @@ def require_store_permission(store_id: str, required_role: str = "staff"):
     """Dependency factory for store permission requirements"""
 
     async def permission_check(
-        user: Dict[str, Any] = Depends(get_current_user),
+        user: dict[str, Any] = Depends(get_current_user),
         db: AsyncSession = Depends(get_database),
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         checker = PermissionChecker(user, db)
         await checker.require_store_access(store_id, required_role)
         return user
@@ -371,9 +357,9 @@ def require_global_product_permission(action: str = "read"):
     """Dependency factory for global product permission requirements"""
 
     async def permission_check(
-        user: Dict[str, Any] = Depends(get_current_user),
+        user: dict[str, Any] = Depends(get_current_user),
         db: AsyncSession = Depends(get_database),
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         checker = PermissionChecker(user, db)
         await checker.require_global_product_access(action)
         return user
@@ -385,9 +371,9 @@ def require_donation_permission(action: str = "read", store_id: Optional[str] = 
     """Dependency factory for donation permission requirements"""
 
     async def permission_check(
-        user: Dict[str, Any] = Depends(get_current_user),
+        user: dict[str, Any] = Depends(get_current_user),
         db: AsyncSession = Depends(get_database),
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         checker = PermissionChecker(user, db)
         await checker.require_donation_access(action, store_id)
         return user
