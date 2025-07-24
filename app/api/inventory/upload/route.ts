@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lifo_ai_core/database/operations'
+// Note: CSV processing handled by Python backend (UnifiedCSVProcessor)
+// Simple validation operations handled by TypeScript
+import { InventoryOperations } from '@/lib/database/operations'
 import { spawn } from 'child_process'
 import { writeFileSync, unlinkSync } from 'fs'
 import { join } from 'path'

@@ -5,7 +5,7 @@ Base Pydantic models and common schemas for LIFO AI Engine
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field, validator
 
@@ -57,20 +57,20 @@ class PaginationResponse(BaseModel):
     has_prev: bool
 
     @validator("pages", pre=True, always=True)
-    def calculate_pages(cls, v, values):
+    def calculate_pages(cls, v: int, values: dict[str, Any]) -> int:
         total = values.get("total", 0)
         limit = values.get("limit", 1)
         return max(1, (total + limit - 1) // limit)
 
     @validator("has_next", pre=True, always=True)
-    def calculate_has_next(cls, v, values):
+    def calculate_has_next(cls, v: bool, values: dict[str, Any]) -> bool:
         page = values.get("page", 1)
         total = values.get("total", 0)
         limit = values.get("limit", 1)
         return page * limit < total
 
     @validator("has_prev", pre=True, always=True)
-    def calculate_has_prev(cls, v, values):
+    def calculate_has_prev(cls, v: bool, values: dict[str, Any]) -> bool:
         page = values.get("page", 1)
         return page > 1
 
@@ -86,9 +86,7 @@ class FilterParams(BaseModel):
     """Base filtering parameters"""
 
     search: Optional[str] = Field(None, max_length=100, description="Search term")
-    category: Optional[str] = Field(
-        None, max_length=50, description="Filter by category"
-    )
+    category: Optional[str] = Field(None, max_length=50, description="Filter by category")
     status: Optional[str] = Field("active", description="Filter by status")
 
 
@@ -199,4 +197,4 @@ class ConfigurableModel(BaseModel):
         }
 
         # Schema extra
-        schema_extra = {"example": {}}
+        schema_extra: dict[str, dict[str, Any]] = {"example": {}}

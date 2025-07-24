@@ -122,7 +122,9 @@ class ActionTrackingService:
             original_value=Decimal(str(original_value)) if original_value else None,
             recovered_value=Decimal(str(recovered_value)) if recovered_value else None,
             notes=notes,
-            donation_recipient_id=uuid.UUID(donation_recipient_id) if donation_recipient_id else None,
+            donation_recipient_id=uuid.UUID(donation_recipient_id)
+            if donation_recipient_id
+            else None,
         )
 
         self.db.add(action_record)
@@ -132,9 +134,7 @@ class ActionTrackingService:
         return action_record
 
     async def get_recommendation_effectiveness(
-        self,
-        store_id: str,
-        days_back: int = 30
+        self, store_id: str, days_back: int = 30
     ) -> dict[str, Any]:
         """
         Get analytics on how well AI recommendations are being followed
@@ -145,15 +145,16 @@ class ActionTrackingService:
             select(
                 BatchAction.recommended_action,
                 BatchAction.actual_action,
-                func.count().label('count'),
-                func.avg(BatchAction.ai_score).label('avg_ai_score'),
-                func.sum(BatchAction.original_value).label('total_original_value'),
-                func.sum(BatchAction.recovered_value).label('total_recovered_value'),
+                func.count().label("count"),
+                func.avg(BatchAction.ai_score).label("avg_ai_score"),
+                func.sum(BatchAction.original_value).label("total_original_value"),
+                func.sum(BatchAction.recovered_value).label("total_recovered_value"),
             )
             .where(
                 and_(
                     BatchAction.store_id == uuid.UUID(store_id),
-                    BatchAction.action_date >= datetime.utcnow().replace(day=datetime.utcnow().day - days_back)
+                    BatchAction.action_date
+                    >= datetime.utcnow().replace(day=datetime.utcnow().day - days_back),
                 )
             )
             .group_by(BatchAction.recommended_action, BatchAction.actual_action)
@@ -170,12 +171,16 @@ class ActionTrackingService:
                     "actual_action": row.actual_action,
                     "count": row.count,
                     "avg_ai_score": float(row.avg_ai_score) if row.avg_ai_score else 0,
-                    "total_original_value": float(row.total_original_value) if row.total_original_value else 0,
-                    "total_recovered_value": float(row.total_recovered_value) if row.total_recovered_value else 0,
+                    "total_original_value": float(row.total_original_value)
+                    if row.total_original_value
+                    else 0,
+                    "total_recovered_value": float(row.total_recovered_value)
+                    if row.total_recovered_value
+                    else 0,
                     "follow_rate": 1.0 if row.recommended_action == row.actual_action else 0.0,
                 }
                 for row in analytics_data
-            ]
+            ],
         }
 
     def map_scoring_action_to_enum(self, scoring_action: str) -> str:

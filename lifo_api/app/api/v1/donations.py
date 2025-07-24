@@ -120,9 +120,7 @@ class CreateDonationRequest(BaseModel):
         return v
 
 
-@router.get(
-    "/eligibility/{store_id}/{batch_id}", response_model=DonationEligibilityResponse
-)
+@router.get("/eligibility/{store_id}/{batch_id}", response_model=DonationEligibilityResponse)
 @ai_endpoint_rate_limit("30/minute")
 async def check_donation_eligibility(
     store_id: str,
@@ -153,9 +151,7 @@ async def check_donation_eligibility(
 
         # Verify batch belongs to store
         if batch_data.get("store_id") != store_id:
-            raise HTTPException(
-                status_code=403, detail="Batch does not belong to specified store"
-            )
+            raise HTTPException(status_code=403, detail="Batch does not belong to specified store")
 
         # Get existing scoring result if available
         scoring_service = create_scoring_service(db)
@@ -327,9 +323,7 @@ async def check_bulk_donation_eligibility(
         # Calculate summary statistics
         total_batches = len(results)
         eligible_count = len([r for r in results if r["eligible_for_donation"]])
-        critical_priority = len(
-            [r for r in results if r["donation_priority"] == "critical"]
-        )
+        critical_priority = len([r for r in results if r["donation_priority"] == "critical"])
         total_estimated_value = sum(r["estimated_donation_value"] for r in results)
 
         processing_time_ms = (time.time() - start_time) * 1000
@@ -353,9 +347,7 @@ async def check_bulk_donation_eligibility(
                 "eligible_for_donation": eligible_count,
                 "critical_priority_items": critical_priority,
                 "total_estimated_donation_value": total_estimated_value,
-                "avg_eu_compliance_score": sum(
-                    r["eu_compliance_score"] for r in results
-                )
+                "avg_eu_compliance_score": sum(r["eu_compliance_score"] for r in results)
                 / max(total_batches, 1),
             },
             "errors": errors,
@@ -404,9 +396,7 @@ async def create_donation_record(
             raise HTTPException(status_code=404, detail="Batch not found")
 
         if batch_data.get("store_id") != store_id:
-            raise HTTPException(
-                status_code=403, detail="Batch does not belong to specified store"
-            )
+            raise HTTPException(status_code=403, detail="Batch does not belong to specified store")
 
         # Verify sufficient quantity
         if donation_request.quantity_to_donate > batch_data.get("current_quantity", 0):
@@ -416,9 +406,7 @@ async def create_donation_record(
 
         # Re-validate donation eligibility
         donation_engine = create_donation_decision_engine()
-        recommendation = donation_engine.evaluate_donation_opportunity(
-            batch_data=batch_data
-        )
+        recommendation = donation_engine.evaluate_donation_opportunity(batch_data=batch_data)
 
         if not recommendation.eu_compliant:
             raise HTTPException(
@@ -495,9 +483,7 @@ async def create_donation_record(
             "compliance_summary": {
                 "eu_compliant": True,
                 "compliance_score": recommendation.compliance_result.compliance_score,
-                "required_actions": recommendation.compliance_result.safety_requirements[
-                    :5
-                ],
+                "required_actions": recommendation.compliance_result.safety_requirements[:5],
                 "handling_instructions": recommendation.handling_requirements[:5],
             },
             "next_steps": [
@@ -530,13 +516,9 @@ async def create_donation_record(
 async def get_available_recipients(
     store_id: str,
     request: Request,
-    category: Optional[str] = Query(
-        None, description="Filter by food category capability"
-    ),
+    category: Optional[str] = Query(None, description="Filter by food category capability"),
     max_distance_km: Optional[int] = Query(50, description="Maximum pickup distance"),
-    accepts_frozen: Optional[bool] = Query(
-        None, description="Filter by frozen capability"
-    ),
+    accepts_frozen: Optional[bool] = Query(None, description="Filter by frozen capability"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -602,10 +584,7 @@ async def get_available_recipients(
                 continue
 
             # Frozen capability filter
-            if (
-                accepts_frozen is not None
-                and recipient["accepts_frozen"] != accepts_frozen
-            ):
+            if accepts_frozen is not None and recipient["accepts_frozen"] != accepts_frozen:
                 continue
 
             # Category filter
@@ -714,8 +693,7 @@ async def get_donation_tracking(
                 "status": "delivered",
                 "donation_method": "pickup",
                 "created_at": datetime.utcnow() - timedelta(days=2),
-                "scheduled_pickup_date": datetime.utcnow()
-                - timedelta(days=1, hours=10),
+                "scheduled_pickup_date": datetime.utcnow() - timedelta(days=1, hours=10),
                 "actual_pickup_date": datetime.utcnow() - timedelta(days=1, hours=9),
                 "delivery_date": datetime.utcnow() - timedelta(days=1, hours=7),
                 "compliance_status": "compliant",
@@ -780,9 +758,7 @@ async def get_donation_tracking(
 
         # Calculate summary statistics
         total_value_donated = sum(d["original_value"] for d in filtered_donations)
-        total_social_value = sum(
-            d["estimated_social_value"] for d in filtered_donations
-        )
+        total_social_value = sum(d["estimated_social_value"] for d in filtered_donations)
         total_tax_benefits = sum(d["tax_deduction_value"] for d in filtered_donations)
 
         processing_time_ms = (time.time() - start_time) * 1000
@@ -811,9 +787,7 @@ async def get_donation_tracking(
                 "total_value_donated": total_value_donated,
                 "total_social_value": total_social_value,
                 "total_tax_benefits": total_tax_benefits,
-                "avg_compliance_score": sum(
-                    d["eu_eligibility_score"] for d in filtered_donations
-                )
+                "avg_compliance_score": sum(d["eu_eligibility_score"] for d in filtered_donations)
                 / max(len(filtered_donations), 1),
             },
             "filters_applied": {
@@ -833,9 +807,7 @@ async def get_donation_tracking(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500, detail="Donation tracking retrieval failed"
-        )
+        raise HTTPException(status_code=500, detail="Donation tracking retrieval failed")
 
 
 @router.put("/tracking/{store_id}/{donation_id}")
@@ -877,9 +849,7 @@ async def update_donation_status(
                 {
                     "check_type": "pickup_temperature",
                     "value": status_update.temperature_at_pickup,
-                    "passed": -5
-                    <= status_update.temperature_at_pickup
-                    <= 25,  # General safe range
+                    "passed": -5 <= status_update.temperature_at_pickup <= 25,  # General safe range
                     "timestamp": current_time,
                 }
             )
@@ -943,20 +913,14 @@ async def update_donation_status(
             "updated_at": current_time,
             "compliance_summary": {
                 "checks_performed": len(compliance_updates),
-                "all_checks_passed": all(
-                    check.get("passed", True) for check in compliance_updates
-                ),
+                "all_checks_passed": all(check.get("passed", True) for check in compliance_updates),
                 "eu_compliant": True,  # Based on checks
             },
             "impact_summary": impact_metrics,
             "next_actions": [
-                "Generate donation certificate"
-                if status_update.status == "completed"
-                else None,
+                "Generate donation certificate" if status_update.status == "completed" else None,
                 "Update tax records" if status_update.status == "completed" else None,
-                "Follow up with recipient"
-                if status_update.status == "delivered"
-                else None,
+                "Follow up with recipient" if status_update.status == "delivered" else None,
             ],
             "audit_trail": {
                 "updated_by": current_user["sub"],
@@ -987,9 +951,7 @@ async def get_donation_compliance_report(
     store_id: str,
     request: Request,
     period_days: int = Query(30, ge=1, le=365, description="Reporting period in days"),
-    include_violations: bool = Query(
-        False, description="Include compliance violations detail"
-    ),
+    include_violations: bool = Query(False, description="Include compliance violations detail"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -1079,18 +1041,12 @@ async def get_donation_compliance_report(
         # Generate recommendations
         recommendations = []
         if compliance_report["compliance_summary"]["compliance_rate_percent"] < 100:
-            recommendations.append(
-                "Review temperature monitoring procedures for dairy products"
-            )
+            recommendations.append("Review temperature monitoring procedures for dairy products")
         if (
-            compliance_report["recipient_performance"]["soup_kitchen_st_michael"][
-                "compliance_rate"
-            ]
+            compliance_report["recipient_performance"]["soup_kitchen_st_michael"]["compliance_rate"]
             < 95
         ):
-            recommendations.append(
-                "Provide additional training to Soup Kitchen St. Michael"
-            )
+            recommendations.append("Provide additional training to Soup Kitchen St. Michael")
 
         compliance_report["recommendations"] = recommendations
 
@@ -1101,9 +1057,7 @@ async def get_donation_compliance_report(
             store_id=store_id,
             period_days=period_days,
             total_donations=compliance_report["compliance_summary"]["total_donations"],
-            compliance_rate=compliance_report["compliance_summary"][
-                "compliance_rate_percent"
-            ],
+            compliance_rate=compliance_report["compliance_summary"]["compliance_rate_percent"],
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
@@ -1127,9 +1081,7 @@ async def get_donation_compliance_report(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500, detail="Compliance report generation failed"
-        )
+        raise HTTPException(status_code=500, detail="Compliance report generation failed")
 
 
 @router.get("/dashboard/{store_id}")
@@ -1137,9 +1089,7 @@ async def get_donation_compliance_report(
 async def get_donation_dashboard(
     store_id: str,
     request: Request,
-    timeframe: str = Query(
-        "monthly", description="Dashboard timeframe: daily, weekly, monthly"
-    ),
+    timeframe: str = Query("monthly", description="Dashboard timeframe: daily, weekly, monthly"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -1249,34 +1199,20 @@ async def get_donation_dashboard(
             # Key Performance Indicators
             "kpi_summary": {
                 "total_donations": kpi_report.total_donations,
-                "total_value_donated": float(
-                    kpi_report.financial_impact.total_value_donated
-                ),
-                "net_financial_benefit": float(
-                    kpi_report.financial_impact.net_financial_benefit
-                ),
+                "total_value_donated": float(kpi_report.financial_impact.total_value_donated),
+                "net_financial_benefit": float(kpi_report.financial_impact.net_financial_benefit),
                 "eu_compliance_rate": kpi_report.eu_compliance.overall_compliance_rate,
                 "estimated_meals_provided": kpi_report.social_impact.estimated_meals_provided,
                 "co2_emissions_avoided": kpi_report.environmental_impact.co2_emissions_avoided_kg,
-                "social_value_created": float(
-                    kpi_report.social_impact.social_value_eur
-                ),
+                "social_value_created": float(kpi_report.social_impact.social_value_eur),
             },
             # Visual dashboard widgets
             "widgets": {
                 "financial_impact_chart": {
-                    "tax_benefits": float(
-                        kpi_report.financial_impact.tax_deduction_value
-                    ),
-                    "disposal_savings": float(
-                        kpi_report.financial_impact.disposal_cost_saved
-                    ),
-                    "opportunity_cost": float(
-                        kpi_report.financial_impact.opportunity_cost
-                    ),
-                    "net_benefit": float(
-                        kpi_report.financial_impact.net_financial_benefit
-                    ),
+                    "tax_benefits": float(kpi_report.financial_impact.tax_deduction_value),
+                    "disposal_savings": float(kpi_report.financial_impact.disposal_cost_saved),
+                    "opportunity_cost": float(kpi_report.financial_impact.opportunity_cost),
+                    "net_benefit": float(kpi_report.financial_impact.net_financial_benefit),
                 },
                 "environmental_impact_gauge": {
                     "co2_avoided": kpi_report.environmental_impact.co2_emissions_avoided_kg,
@@ -1311,12 +1247,8 @@ async def get_donation_dashboard(
             "category_performance": kpi_report.category_breakdown,
             # Trends and predictions
             "trends": {
-                "donation_value_trend": kpi_report.trend_indicators.get(
-                    "donation_value", "stable"
-                ),
-                "compliance_trend": kpi_report.trend_indicators.get(
-                    "compliance_score", "stable"
-                ),
+                "donation_value_trend": kpi_report.trend_indicators.get("donation_value", "stable"),
+                "compliance_trend": kpi_report.trend_indicators.get("compliance_score", "stable"),
                 "overall_trend": kpi_report.trend_indicators.get("overall", "stable"),
             },
             # Actionable insights
@@ -1406,9 +1338,7 @@ async def get_donation_analytics(
         description="Analytics type: overview, financial, environmental, social, compliance",
     ),
     period_days: int = Query(30, ge=7, le=365, description="Analysis period in days"),
-    compare_previous: bool = Query(
-        False, description="Include comparison with previous period"
-    ),
+    compare_previous: bool = Query(False, description="Include comparison with previous period"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):

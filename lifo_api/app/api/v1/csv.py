@@ -65,7 +65,7 @@ async def validate_csv_secure(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="CSV validation failed")
+        raise HTTPException(status_code=500, detail="CSV validation failed") from None
 
 
 @router.get("/template")
@@ -113,7 +113,7 @@ async def get_secure_csv_template(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Template generation failed")
+        raise HTTPException(status_code=500, detail="Template generation failed") from None
 
 
 @router.post("/analyze/{store_id}")
@@ -191,4 +191,4 @@ async def analyze_csv_with_ai(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="AI analysis failed")
+        raise HTTPException(status_code=500, detail="AI analysis failed") from None

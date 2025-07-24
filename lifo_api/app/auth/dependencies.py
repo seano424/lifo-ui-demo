@@ -258,7 +258,7 @@ async def get_user_stores(
     """
     try:
         # Import here to avoid circular imports
-        from sqlalchemy import select
+        from sqlalchemy import and_, select
 
         from app.database.models import StoreUser
 
@@ -282,9 +282,7 @@ async def get_user_stores(
         return store_ids
 
     except Exception as e:
-        logger.error(
-            "Failed to get user stores", user_id=current_user.user_id, error=str(e)
-        )
+        logger.error("Failed to get user stores", user_id=current_user.user_id, error=str(e))
         return []
 
 

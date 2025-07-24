@@ -229,18 +229,13 @@ class EUFoodSafetyValidator:
                     eligible = True
                     eligibility_status = DonationEligibility.ELIGIBLE_WITH_CONDITIONS
                     compliance_score *= 0.7
-                    safety_requirements.append(
-                        "Visual inspection required before donation"
-                    )
+                    safety_requirements.append("Visual inspection required before donation")
                     handling_instructions.append(
                         "Inspect product condition thoroughly before donation"
                     )
 
             # Temperature compliance checks
-            if (
-                safety_config["temperature_critical"]
-                and current_temperature is not None
-            ):
+            if safety_config["temperature_critical"] and current_temperature is not None:
                 temp_compliance = self._check_temperature_compliance(
                     eu_category, current_temperature
                 )
@@ -271,15 +266,11 @@ class EUFoodSafetyValidator:
             )
 
             # Calculate expires for donation date
-            expires_for_donation = (
-                today + timedelta(days=donation_window) if eligible else None
-            )
+            expires_for_donation = today + timedelta(days=donation_window) if eligible else None
 
             # Determine recipient type requirements
             recipient_restrictions = safety_config.get("recipient_restrictions", [])
-            required_recipient_type = (
-                recipient_restrictions[0] if recipient_restrictions else None
-            )
+            required_recipient_type = recipient_restrictions[0] if recipient_restrictions else None
 
             # Temperature requirements string
             temp_requirements = (

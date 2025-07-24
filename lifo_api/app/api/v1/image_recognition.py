@@ -96,9 +96,7 @@ async def analyze_product_image(
             raise ValidationException(
                 message="Invalid image format",
                 field="image",
-                validation_errors=[
-                    f"Only {', '.join(allowed_image_types)} are supported"
-                ],
+                validation_errors=[f"Only {', '.join(allowed_image_types)} are supported"],
             )
 
         # Read image data
@@ -169,9 +167,7 @@ async def extract_expiry_date_from_image(
     store_id: str,
     request: Request,
     image: UploadFile = File(...),
-    date_format_hint: Optional[str] = Form(
-        None, description="Expected date format hint"
-    ),
+    date_format_hint: Optional[str] = Form(None, description="Expected date format hint"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -336,9 +332,7 @@ async def get_ml_models_status(
         }
 
     except Exception as e:
-        logger.error(
-            "ML models status check failed", error=str(e), user_id=current_user["sub"]
-        )
+        logger.error("ML models status check failed", error=str(e), user_id=current_user["sub"])
         raise HTTPException(status_code=500, detail="Status check failed")
 
 
@@ -439,9 +433,7 @@ async def _mock_expiry_date_extraction(
     }
 
 
-async def _mock_barcode_detection(
-    image_data: bytes, barcode_types: list[str]
-) -> dict[str, Any]:
+async def _mock_barcode_detection(image_data: bytes, barcode_types: list[str]) -> dict[str, Any]:
     """Mock barcode detection results"""
 
     return {

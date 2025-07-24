@@ -1,451 +1,222 @@
 """
-Donation Queries API - Read-only operations for EU donation compliance
-Provides endpoints for querying donation records and compliance data
+Donation Queries API - Simplified for MVP
+Read-only operations for donation tracking and analytics
+Based on simplified schema from migration 017
 """
 
-from datetime import datetime
-from typing import Any, Optional
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import desc, func, or_, select
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import get_current_user
+from app.auth.secure_dependencies import get_current_user
 from app.database.connection import get_database
 from app.database.donation_models import (
-    DonationAlert,
-    DonationAnalytics,
-    DonationComplianceCheck,
-    DonationKPIImpact,
+    BatchAction,
     DonationRecipient,
-    DonationRecord,
+    ActionType,
+    DonationRecipientType,
 )
 
 logger = structlog.get_logger()
-
 router = APIRouter()
 
 
-@router.get("/recipients", response_model=dict[str, Any])
+@router.get("/recipients")
 async def get_donation_recipients(
-    page: int = Query(1, ge=1, description="Page number"),
-    limit: int = Query(50, ge=1, le=100, description="Items per page"),
-    recipient_type: Optional[str] = Query(None, description="Filter by recipient type"),
-    active_only: bool = Query(True, description="Show only active recipients"),
-    search: Optional[str] = Query(None, description="Search by name or contact"),
+    store_id: Optional[str] = Query(None, description="Filter by store ID"),
+    recipient_type: Optional[DonationRecipientType] = Query(None, description="Filter by recipient type"),
+    is_active: bool = Query(True, description="Filter by active status"),
     db: AsyncSession = Depends(get_database),
-    current_user: dict = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
-    """Get donation recipients with filtering and pagination"""
+    """
+    Get donation recipients for a store
+    Simplified version for MVP
+    """
     try:
-        query = select(DonationRecipient)
-
-        # Apply filters
-        if active_only:
-            query = query.where(DonationRecipient.is_active)
-
+        query = select(DonationRecipient).where(DonationRecipient.is_active == is_active)
+        
+        if store_id:
+            query = query.where(DonationRecipient.store_id == store_id)
+        
         if recipient_type:
             query = query.where(DonationRecipient.recipient_type == recipient_type)
-
-        if search:
-            search_filter = or_(
-                DonationRecipient.organization_name.ilike(f"%{search}%"),
-                DonationRecipient.contact_person.ilike(f"%{search}%"),
-                DonationRecipient.contact_email.ilike(f"%{search}%"),
-            )
-            query = query.where(search_filter)
-
-        # Get total count
-        count_query = select(func.count()).select_from(query.subquery())
-        total_result = await db.execute(count_query)
-        total_count = total_result.scalar()
-
-        # Apply pagination
-        offset = (page - 1) * limit
-        query = query.offset(offset).limit(limit)
-        query = query.order_by(DonationRecipient.organization_name)
-
+        
+        query = query.order_by(DonationRecipient.name)
+        
         result = await db.execute(query)
         recipients = result.scalars().all()
-
-        # Convert to dict format
-        recipients_data = []
-        for recipient in recipients:
-            recipient_dict = {
-                "recipient_id": str(recipient.recipient_id),
-                "organization_name": recipient.organization_name,
-                "recipient_type": recipient.recipient_type,
-                "contact_person": recipient.contact_person,
-                "contact_email": recipient.contact_email,
-                "contact_phone": recipient.contact_phone,
-                "address": recipient.address,
-                "certification_number": recipient.certification_number,
-                "tax_exempt_status": recipient.tax_exempt_status,
-                "is_active": recipient.is_active,
-                "created_at": recipient.created_at.isoformat()
-                if recipient.created_at
-                else None,
-                "last_donation_date": recipient.last_donation_date.isoformat()
-                if recipient.last_donation_date
-                else None,
-            }
-            recipients_data.append(recipient_dict)
-
+        
         return {
-            "recipients": recipients_data,
-            "pagination": {
-                "page": page,
-                "limit": limit,
-                "total": total_count,
-                "pages": (total_count + limit - 1) // limit,
-            },
-        }
-
-    except Exception as e:
-        logger.error("Error fetching donation recipients", error=str(e))
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.get("/records", response_model=dict[str, Any])
-async def get_donation_records(
-    page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=100),
-    store_id: Optional[str] = Query(None, description="Filter by store"),
-    recipient_id: Optional[str] = Query(None, description="Filter by recipient"),
-    status: Optional[str] = Query(None, description="Filter by status"),
-    start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
-    end_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
-    db: AsyncSession = Depends(get_database),
-    current_user: dict = Depends(get_current_user),
-):
-    """Get donation records with comprehensive filtering"""
-    try:
-        # Join with recipients for enriched data
-        query = select(DonationRecord, DonationRecipient).join(
-            DonationRecipient,
-            DonationRecord.recipient_id == DonationRecipient.recipient_id,
-        )
-
-        # Apply filters
-        if store_id:
-            query = query.where(DonationRecord.store_id == store_id)
-
-        if recipient_id:
-            query = query.where(DonationRecord.recipient_id == recipient_id)
-
-        if status:
-            query = query.where(DonationRecord.status == status)
-
-        if start_date:
-            start_dt = datetime.fromisoformat(start_date)
-            query = query.where(DonationRecord.donation_date >= start_dt)
-
-        if end_date:
-            end_dt = datetime.fromisoformat(end_date)
-            query = query.where(DonationRecord.donation_date <= end_dt)
-
-        # Get total count
-        count_query = select(func.count()).select_from(query.subquery())
-        total_result = await db.execute(count_query)
-        total_count = total_result.scalar()
-
-        # Apply pagination
-        offset = (page - 1) * limit
-        query = query.offset(offset).limit(limit)
-        query = query.order_by(desc(DonationRecord.donation_date))
-
-        result = await db.execute(query)
-        records = result.all()
-
-        # Convert to dict format
-        records_data = []
-        for donation_record, recipient in records:
-            record_dict = {
-                "donation_id": str(donation_record.donation_id),
-                "store_id": donation_record.store_id,
-                "recipient": {
+            "recipients": [
+                {
                     "recipient_id": str(recipient.recipient_id),
-                    "organization_name": recipient.organization_name,
-                    "recipient_type": recipient.recipient_type,
-                },
-                "donation_date": donation_record.donation_date.isoformat()
-                if donation_record.donation_date
-                else None,
-                "total_items": donation_record.total_items,
-                "total_weight_kg": float(donation_record.total_weight_kg)
-                if donation_record.total_weight_kg
-                else None,
-                "estimated_value_eur": float(donation_record.estimated_value_eur)
-                if donation_record.estimated_value_eur
-                else None,
-                "status": donation_record.status,
-                "pickup_scheduled": donation_record.pickup_scheduled.isoformat()
-                if donation_record.pickup_scheduled
-                else None,
-                "pickup_completed": donation_record.pickup_completed.isoformat()
-                if donation_record.pickup_completed
-                else None,
-                "compliance_status": donation_record.compliance_status,
-                "created_at": donation_record.created_at.isoformat()
-                if donation_record.created_at
-                else None,
-            }
-            records_data.append(record_dict)
-
-        return {
-            "donation_records": records_data,
-            "pagination": {
-                "page": page,
-                "limit": limit,
-                "total": total_count,
-                "pages": (total_count + limit - 1) // limit,
-            },
+                    "name": recipient.name,
+                    "contact_email": recipient.contact_email,
+                    "contact_phone": recipient.contact_phone,
+                    "recipient_type": recipient.recipient_type.value,
+                    "is_certified": recipient.is_certified,
+                    "certification_notes": recipient.certification_notes,
+                    "accepts_pickups": recipient.accepts_pickups,
+                    "max_distance_km": recipient.max_distance_km,
+                    "store_id": str(recipient.store_id),
+                    "created_at": recipient.created_at.isoformat() if recipient.created_at else None,
+                }
+                for recipient in recipients
+            ],
+            "total_count": len(recipients),
         }
-
+        
     except Exception as e:
-        logger.error("Error fetching donation records", error=str(e))
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error("Failed to get donation recipients", error=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve donation recipients")
 
 
-@router.get("/compliance-checks/{donation_id}")
-async def get_compliance_checks(
-    donation_id: str,
+@router.get("/actions")
+async def get_batch_actions(
+    store_id: Optional[str] = Query(None, description="Filter by store ID"),
+    action_type: Optional[ActionType] = Query(None, description="Filter by action type"),
+    days: int = Query(30, description="Number of days to look back"),
+    limit: int = Query(100, description="Maximum number of results"),
     db: AsyncSession = Depends(get_database),
-    current_user: dict = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
-    """Get compliance checks for a specific donation"""
+    """
+    Get batch actions (what users did with AI recommendations)
+    """
     try:
-        query = (
-            select(DonationComplianceCheck)
-            .where(DonationComplianceCheck.donation_id == donation_id)
-            .order_by(DonationComplianceCheck.check_performed_at.desc())
-        )
-
+        cutoff_date = datetime.utcnow() - timedelta(days=days)
+        
+        query = select(BatchAction).where(BatchAction.action_date >= cutoff_date)
+        
+        if store_id:
+            query = query.where(BatchAction.store_id == store_id)
+        
+        if action_type:
+            query = query.where(BatchAction.actual_action == action_type)
+        
+        query = query.order_by(desc(BatchAction.action_date)).limit(limit)
+        
         result = await db.execute(query)
-        checks = result.scalars().all()
-
-        checks_data = []
-        for check in checks:
-            check_dict = {
-                "check_id": str(check.check_id),
-                "check_type": check.check_type,
-                "check_status": check.check_status,
-                "eu_regulation_reference": check.eu_regulation_reference,
-                "check_details": check.check_details,
-                "check_performed_at": check.check_performed_at.isoformat()
-                if check.check_performed_at
-                else None,
-                "checked_by": check.checked_by,
-                "corrective_actions": check.corrective_actions,
-            }
-            checks_data.append(check_dict)
-
-        return {"compliance_checks": checks_data}
-
+        actions = result.scalars().all()
+        
+        return {
+            "actions": [
+                {
+                    "action_id": str(action.action_id),
+                    "batch_id": str(action.batch_id),
+                    "store_id": str(action.store_id),
+                    "recommended_action": action.recommended_action.value,
+                    "actual_action": action.actual_action.value,
+                    "ai_score": float(action.ai_score) if action.ai_score else None,
+                    "action_date": action.action_date.isoformat() if action.action_date else None,
+                    "quantity_affected": float(action.quantity_affected) if action.quantity_affected else None,
+                    "notes": action.notes,
+                    "original_value": float(action.original_value) if action.original_value else None,
+                    "recovered_value": float(action.recovered_value) if action.recovered_value else None,
+                    "donation_recipient_id": str(action.donation_recipient_id) if action.donation_recipient_id else None,
+                }
+                for action in actions
+            ],
+            "total_count": len(actions),
+            "period_days": days,
+        }
+        
     except Exception as e:
-        logger.error(
-            "Error fetching compliance checks", donation_id=donation_id, error=str(e)
-        )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error("Failed to get batch actions", error=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve batch actions")
 
 
 @router.get("/analytics/summary")
 async def get_donation_analytics_summary(
-    store_id: Optional[str] = Query(None),
-    start_date: Optional[str] = Query(None),
-    end_date: Optional[str] = Query(None),
+    store_id: Optional[str] = Query(None, description="Filter by store ID"),
+    days: int = Query(30, description="Number of days to analyze"),
     db: AsyncSession = Depends(get_database),
-    current_user: dict = Depends(get_current_user),
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ):
-    """Get donation analytics summary"""
+    """
+    Get donation analytics summary
+    Simplified analytics for MVP
+    """
     try:
-        # Base query for analytics
-        query = select(DonationAnalytics)
-
+        cutoff_date = datetime.utcnow() - timedelta(days=days)
+        
+        # Base query
+        query = select(BatchAction).where(BatchAction.action_date >= cutoff_date)
+        
         if store_id:
-            query = query.where(DonationAnalytics.store_id == store_id)
-
-        if start_date:
-            start_dt = datetime.fromisoformat(start_date)
-            query = query.where(DonationAnalytics.reporting_period_start >= start_dt)
-
-        if end_date:
-            end_dt = datetime.fromisoformat(end_date)
-            query = query.where(DonationAnalytics.reporting_period_end <= end_dt)
-
+            query = query.where(BatchAction.store_id == store_id)
+        
         result = await db.execute(query)
-        analytics = result.scalars().all()
-
-        # Aggregate data
-        total_donations = len(analytics)
-        total_items_donated = sum(
-            a.total_items_donated for a in analytics if a.total_items_donated
+        actions = result.scalars().all()
+        
+        # Calculate summary statistics
+        total_actions = len(actions)
+        donation_actions = [a for a in actions if a.actual_action == ActionType.DONATE]
+        
+        total_donated_value = sum(
+            float(action.original_value) for action in donation_actions 
+            if action.original_value
         )
-        total_weight_donated = sum(
-            float(a.total_weight_donated_kg or 0) for a in analytics
+        
+        total_recovered_value = sum(
+            float(action.recovered_value) for action in donation_actions 
+            if action.recovered_value
         )
-        total_value_donated = sum(
-            float(a.total_value_donated_eur or 0) for a in analytics
+        
+        # Action type breakdown
+        action_breakdown = {}
+        for action_type in ActionType:
+            count = len([a for a in actions if a.actual_action == action_type])
+            action_breakdown[action_type.value] = count
+        
+        # Recommendation vs actual analysis
+        followed_recommendations = len([
+            a for a in actions 
+            if a.recommended_action == a.actual_action
+        ])
+        
+        recommendation_accuracy = (
+            (followed_recommendations / total_actions * 100) if total_actions > 0 else 0
         )
-        avg_compliance_score = (
-            sum(float(a.compliance_score or 0) for a in analytics) / len(analytics)
-            if analytics
-            else 0
-        )
-
-        # Recent activity
-        recent_query = (
-            select(DonationRecord).order_by(desc(DonationRecord.donation_date)).limit(5)
-        )
-        if store_id:
-            recent_query = recent_query.where(DonationRecord.store_id == store_id)
-
-        recent_result = await db.execute(recent_query)
-        recent_donations = recent_result.scalars().all()
-
-        recent_data = []
-        for donation in recent_donations:
-            recent_data.append(
-                {
-                    "donation_id": str(donation.donation_id),
-                    "donation_date": donation.donation_date.isoformat()
-                    if donation.donation_date
-                    else None,
-                    "total_items": donation.total_items,
-                    "status": donation.status,
-                    "compliance_status": donation.compliance_status,
-                }
-            )
-
+        
         return {
             "summary": {
-                "total_donations": total_donations,
-                "total_items_donated": total_items_donated,
-                "total_weight_donated_kg": round(total_weight_donated, 2),
-                "total_value_donated_eur": round(total_value_donated, 2),
-                "average_compliance_score": round(avg_compliance_score, 2),
+                "period_days": days,
+                "total_actions": total_actions,
+                "donation_count": len(donation_actions),
+                "total_donated_value": total_donated_value,
+                "total_recovered_value": total_recovered_value,
+                "recommendation_accuracy_percent": round(recommendation_accuracy, 2),
             },
-            "recent_donations": recent_data,
-        }
-
-    except Exception as e:
-        logger.error("Error fetching donation analytics", error=str(e))
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.get("/kpi-impact/{donation_id}")
-async def get_donation_kpi_impact(
-    donation_id: str,
-    db: AsyncSession = Depends(get_database),
-    current_user: dict = Depends(get_current_user),
-):
-    """Get KPI impact data for a specific donation"""
-    try:
-        query = select(DonationKPIImpact).where(
-            DonationKPIImpact.donation_id == donation_id
-        )
-
-        result = await db.execute(query)
-        kpi_impact = result.scalar_one_or_none()
-
-        if not kpi_impact:
-            raise HTTPException(status_code=404, detail="KPI impact data not found")
-
-        return {
-            "kpi_impact_id": str(kpi_impact.kpi_impact_id),
-            "food_waste_reduction_kg": float(kpi_impact.food_waste_reduction_kg)
-            if kpi_impact.food_waste_reduction_kg
-            else None,
-            "co2_emissions_saved_kg": float(kpi_impact.co2_emissions_saved_kg)
-            if kpi_impact.co2_emissions_saved_kg
-            else None,
-            "social_impact_score": float(kpi_impact.social_impact_score)
-            if kpi_impact.social_impact_score
-            else None,
-            "tax_benefit_eur": float(kpi_impact.tax_benefit_eur)
-            if kpi_impact.tax_benefit_eur
-            else None,
-            "calculated_at": kpi_impact.calculated_at.isoformat()
-            if kpi_impact.calculated_at
-            else None,
-        }
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error("Error fetching KPI impact", donation_id=donation_id, error=str(e))
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.get("/alerts")
-async def get_donation_alerts(
-    store_id: Optional[str] = Query(None),
-    severity: Optional[str] = Query(
-        None, description="Filter by severity: low, medium, high"
-    ),
-    resolved: Optional[bool] = Query(None, description="Filter by resolution status"),
-    page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=100),
-    db: AsyncSession = Depends(get_database),
-    current_user: dict = Depends(get_current_user),
-):
-    """Get donation system alerts"""
-    try:
-        query = select(DonationAlert)
-
-        if store_id:
-            query = query.where(DonationAlert.store_id == store_id)
-
-        if severity:
-            query = query.where(DonationAlert.severity == severity)
-
-        if resolved is not None:
-            query = query.where(DonationAlert.is_resolved == resolved)
-
-        # Get total count
-        count_query = select(func.count()).select_from(query.subquery())
-        total_result = await db.execute(count_query)
-        total_count = total_result.scalar()
-
-        # Apply pagination
-        offset = (page - 1) * limit
-        query = query.offset(offset).limit(limit)
-        query = query.order_by(desc(DonationAlert.created_at))
-
-        result = await db.execute(query)
-        alerts = result.scalars().all()
-
-        alerts_data = []
-        for alert in alerts:
-            alert_dict = {
-                "alert_id": str(alert.alert_id),
-                "store_id": alert.store_id,
-                "alert_type": alert.alert_type,
-                "severity": alert.severity,
-                "message": alert.message,
-                "metadata": alert.metadata,
-                "is_resolved": alert.is_resolved,
-                "resolved_at": alert.resolved_at.isoformat()
-                if alert.resolved_at
-                else None,
-                "resolved_by": alert.resolved_by,
-                "created_at": alert.created_at.isoformat()
-                if alert.created_at
-                else None,
+            "action_breakdown": action_breakdown,
+            "donation_impact": {
+                "items_donated": len(donation_actions),
+                "estimated_tax_benefit": total_recovered_value,
+                "waste_prevented_value": total_donated_value,
             }
-            alerts_data.append(alert_dict)
-
-        return {
-            "alerts": alerts_data,
-            "pagination": {
-                "page": page,
-                "limit": limit,
-                "total": total_count,
-                "pages": (total_count + limit - 1) // limit,
-            },
         }
-
+        
     except Exception as e:
-        logger.error("Error fetching donation alerts", error=str(e))
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error("Failed to get donation analytics", error=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve donation analytics")
+
+
+# Legacy endpoint stubs for backwards compatibility
+@router.get("/compliance/alerts")
+async def get_compliance_alerts():
+    """Legacy endpoint - returns empty for simplified system"""
+    return {"alerts": [], "message": "Compliance alerts not implemented in simplified system"}
+
+
+@router.get("/analytics/kpi")
+async def get_donation_kpis():
+    """Legacy endpoint - returns basic metrics"""
+    return {
+        "message": "KPI tracking simplified - use /analytics/summary instead",
+        "redirect": "/api/v1/donation-queries/analytics/summary"
+    }

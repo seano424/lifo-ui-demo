@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lifo_ai_core/database/operations'
+import { InventoryOperations } from '@/lib/database/operations'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
@@ -157,7 +157,7 @@ async function getOverviewAnalytics(
       avg_composite_score:
         urgentBatchesResult && urgentBatchesResult.length > 0
           ? urgentBatchesResult.reduce((sum, b) => sum + (b.composite_score ?? 0), 0) /
-            urgentBatchesResult.length
+          urgentBatchesResult.length
           : 0,
     }
   } catch (error) {
@@ -276,9 +276,9 @@ async function getRevenueAnalytics(
       avg_discount_percent:
         discountActions && discountActions.length > 0
           ? Math.round(
-              discountActions.reduce((sum, a) => sum + (a.discount_percent ?? 0), 0) /
-                discountActions.length,
-            )
+            discountActions.reduce((sum, a) => sum + (a.discount_percent ?? 0), 0) /
+            discountActions.length,
+          )
           : 0,
     }
   } catch (error) {
@@ -347,8 +347,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
       stats.avg_score =
         scoresArray.length > 0
           ? Math.round(
-              scoresArray.reduce((sum: number, s: number) => sum + s, 0) / scoresArray.length,
-            ) / 100
+            scoresArray.reduce((sum: number, s: number) => sum + s, 0) / scoresArray.length,
+          ) / 100
           : 0
       stats.total_value = Math.round(stats.total_value * 100) / 100
       delete stats.scores // Remove raw scores from response

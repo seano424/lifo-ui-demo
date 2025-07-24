@@ -52,9 +52,7 @@ async def get_mobile_batch_summary(
     store_id: str,
     request: Request,
     include_details: bool = Query(False, description="Include detailed batch info"),
-    limit_urgent: int = Query(
-        10, ge=1, le=50, description="Max urgent items to return"
-    ),
+    limit_urgent: int = Query(10, ge=1, le=50, description="Max urgent items to return"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -128,24 +126,20 @@ async def get_mobile_batch_summary(
                 action_needed.append(mobile_item)
 
         # Limit results for mobile performance
-        urgent_batches = sorted(
-            urgent_batches, key=lambda x: x["urgency_score"], reverse=True
-        )[:limit_urgent]
-        expiring_today = sorted(expiring_today, key=lambda x: x["days_to_expiry"])[
+        urgent_batches = sorted(urgent_batches, key=lambda x: x["urgency_score"], reverse=True)[
             :limit_urgent
         ]
-        action_needed = sorted(
-            action_needed, key=lambda x: x["urgency_score"], reverse=True
-        )[:limit_urgent]
+        expiring_today = sorted(expiring_today, key=lambda x: x["days_to_expiry"])[:limit_urgent]
+        action_needed = sorted(action_needed, key=lambda x: x["urgency_score"], reverse=True)[
+            :limit_urgent
+        ]
 
         # Calculate store health score (simplified for mobile)
         total_items = len(inventory_data)
         urgent_count = len(urgent_batches)
         expiring_count = len(expiring_today)
 
-        health_score = max(
-            0.0, 1.0 - ((urgent_count + expiring_count) / max(total_items, 1)) * 2
-        )
+        health_score = max(0.0, 1.0 - ((urgent_count + expiring_count) / max(total_items, 1)) * 2)
 
         processing_time_ms = (time.time() - start_time) * 1000
 
@@ -327,9 +321,7 @@ async def get_mobile_store_health(
         # Next recommended action
         next_action = None
         if critical_items > 0:
-            next_action = (
-                f"Review {critical_items} critical items requiring immediate attention"
-            )
+            next_action = f"Review {critical_items} critical items requiring immediate attention"
         elif expiring_soon > 0:
             next_action = f"Monitor {expiring_soon} items expiring soon"
         else:
@@ -341,8 +333,7 @@ async def get_mobile_store_health(
             overall_score=round(overall_score, 2),
             critical_items=critical_items,
             expiring_soon=expiring_soon,
-            total_value_at_risk=analytics_data.get("total_value", 0)
-            * 0.1,  # Estimated risk
+            total_value_at_risk=analytics_data.get("total_value", 0) * 0.1,  # Estimated risk
             trends=trends,
             last_action_taken="Recent discount applied",  # Would come from action log
             next_recommended_action=next_action,
@@ -418,9 +409,7 @@ async def get_mobile_batch_list(
                 "urgency_score": round(urgency_score, 2),
                 "urgency_level": urgency_level,
                 "location": item.get("location_code", "MAIN"),
-                "estimated_value": round(
-                    item["current_quantity"] * item["selling_price"], 2
-                ),
+                "estimated_value": round(item["current_quantity"] * item["selling_price"], 2),
             }
 
             filtered_batches.append(mobile_item)

@@ -143,9 +143,7 @@ def cached_mobile_response(ttl: int = 300, prefix: str = "mobile"):
             # Execute function and cache result
             result = await func(*args, **kwargs)
             mobile_cache.set(cache_key, result, ttl)
-            logger.debug(
-                "Cache miss - stored result", cache_key=cache_key, prefix=prefix
-            )
+            logger.debug("Cache miss - stored result", cache_key=cache_key, prefix=prefix)
 
             return result
 
@@ -168,10 +166,7 @@ class BatchProcessor:
             return []
 
         # Split into batches
-        batches = [
-            items[i : i + self.batch_size]
-            for i in range(0, len(items), self.batch_size)
-        ]
+        batches = [items[i : i + self.batch_size] for i in range(0, len(items), self.batch_size)]
 
         # Process batches with concurrency limit
         semaphore = asyncio.Semaphore(self.max_concurrent)
@@ -204,9 +199,7 @@ class MobileResponseOptimizer:
     """Optimize responses for mobile consumption"""
 
     @staticmethod
-    def compress_batch_list(
-        batches: list, fields_to_keep: Optional[list] = None
-    ) -> list:
+    def compress_batch_list(batches: list, fields_to_keep: Optional[list] = None) -> list:
         """Compress batch data for mobile transmission"""
         if not fields_to_keep:
             fields_to_keep = [
@@ -229,9 +222,7 @@ class MobileResponseOptimizer:
         return compressed
 
     @staticmethod
-    def paginate_response(
-        data: list, page: int = 1, page_size: int = 20
-    ) -> dict[str, Any]:
+    def paginate_response(data: list, page: int = 1, page_size: int = 20) -> dict[str, Any]:
         """Paginate data for mobile consumption"""
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
@@ -292,13 +283,10 @@ class PerformanceMonitor:
         for operation, stats in self.metrics.items():
             if stats["total_calls"] > 0:
                 summary[operation] = {
-                    "avg_duration_ms": stats["total_duration_ms"]
-                    / stats["total_calls"],
+                    "avg_duration_ms": stats["total_duration_ms"] / stats["total_calls"],
                     "success_rate": stats["success_count"] / stats["total_calls"],
                     "slow_call_rate": stats["slow_calls"] / stats["total_calls"],
-                    "fastest_ms": stats["fastest_ms"]
-                    if stats["fastest_ms"] != float("inf")
-                    else 0,
+                    "fastest_ms": stats["fastest_ms"] if stats["fastest_ms"] != float("inf") else 0,
                     "slowest_ms": stats["slowest_ms"],
                     "total_calls": stats["total_calls"],
                 }
@@ -320,9 +308,7 @@ async def timeout_after(seconds: float):
             try:
                 return await asyncio.wait_for(func(*args, **kwargs), timeout=seconds)
             except asyncio.TimeoutError:
-                logger.warning(
-                    "Operation timeout", function=func.__name__, timeout_seconds=seconds
-                )
+                logger.warning("Operation timeout", function=func.__name__, timeout_seconds=seconds)
                 raise
 
         return wrapper
@@ -358,9 +344,7 @@ def compress_for_mobile(data: Any, compression_level: str = "standard") -> Any:
             }
         elif isinstance(data, list):
             return [
-                compress_for_mobile(item, compression_level)
-                for item in data
-                if item is not None
+                compress_for_mobile(item, compression_level) for item in data if item is not None
             ]
 
     elif compression_level == "standard":
@@ -422,9 +406,7 @@ def mobile_performance_health_check() -> dict[str, Any]:
                 f"{operation} averaging {stats['avg_duration_ms']:.1f}ms (target: <500ms)"
             )
         if stats["success_rate"] < 0.95:
-            issues.append(
-                f"{operation} success rate {stats['success_rate']:.1%} (target: >95%)"
-            )
+            issues.append(f"{operation} success rate {stats['success_rate']:.1%} (target: >95%)")
 
     return {
         "performance_summary": summary,

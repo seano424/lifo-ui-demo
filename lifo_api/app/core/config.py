@@ -173,10 +173,12 @@ class Settings(BaseSettings):
         # Development - use configured hosts
         return self.allowed_hosts
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = {
+        "env_file": ".env.local",
+        "env_file_encoding": "utf-8",
+        "case_sensitive": False,
+        "extra": "ignore",  # Ignore extra environment variables not defined in the model
+    }
 
 
 # Create global settings instance

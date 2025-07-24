@@ -63,9 +63,7 @@ class SecureCSVProcessor:
     def __init__(self):
         self.logger = logger.bind(component="secure_csv_processor")
 
-    async def process_csv_for_validation(
-        self, file: UploadFile, store_id: str
-    ) -> dict[str, Any]:
+    async def process_csv_for_validation(self, file: UploadFile, store_id: str) -> dict[str, Any]:
         """
         Process CSV for validation only - no database writes
         Returns validated data for frontend to save via Supabase
@@ -86,14 +84,10 @@ class SecureCSVProcessor:
             parsed_data = self._parse_csv_structure_secure(csv_content)
 
             # Validate and sanitize data
-            validation_result = await self._validate_and_sanitize_csv(
-                parsed_data, store_id
-            )
+            validation_result = await self._validate_and_sanitize_csv(parsed_data, store_id)
 
             # Generate AI suggestions for validated data
-            suggestions = await self._generate_ai_suggestions(
-                validation_result["valid_rows"]
-            )
+            suggestions = await self._generate_ai_suggestions(validation_result["valid_rows"])
 
             result = {
                 "upload_id": upload_id,
@@ -196,9 +190,7 @@ class SecureCSVProcessor:
 
             # Check for binary content indicators
             if "\x00" in text_content:
-                raise HTTPException(
-                    status_code=400, detail="File contains binary data, not CSV"
-                )
+                raise HTTPException(status_code=400, detail="File contains binary data, not CSV")
 
             # Check for executable content indicators
             dangerous_headers = [
@@ -254,9 +246,7 @@ class SecureCSVProcessor:
 
                 # Check for binary content
                 if "\x00" in decoded:
-                    raise HTTPException(
-                        status_code=400, detail="File contains binary data"
-                    )
+                    raise HTTPException(status_code=400, detail="File contains binary data")
 
                 return decoded
 
@@ -277,9 +267,7 @@ class SecureCSVProcessor:
 
         # Check for suspicious patterns in raw content
         if self._has_suspicious_content(csv_content):
-            raise HTTPException(
-                status_code=400, detail="CSV contains suspicious content"
-            )
+            raise HTTPException(status_code=400, detail="CSV contains suspicious content")
 
         try:
             # Use CSV reader with security settings
@@ -365,9 +353,7 @@ class SecureCSVProcessor:
                 break
 
         # Remove control characters
-        sanitized = "".join(
-            char for char in sanitized if ord(char) >= 32 or char in "\t\n\r"
-        )
+        sanitized = "".join(char for char in sanitized if ord(char) >= 32 or char in "\t\n\r")
 
         # Limit length
         if len(sanitized) > self.MAX_CELL_LENGTH:
@@ -455,9 +441,7 @@ class SecureCSVProcessor:
                     valid_rows.append(validated_row)
 
             except Exception as e:
-                errors.append(
-                    {"row": row_number, "error": f"Row validation failed: {e!s}"}
-                )
+                errors.append({"row": row_number, "error": f"Row validation failed: {e!s}"})
 
         return {
             "is_valid": len(errors) == 0,
@@ -515,16 +499,12 @@ class SecureCSVProcessor:
                         raise ValueError(f"Invalid {price_field}: must be 0-10000")
                     validated_row[price_field] = price
                 except (ValueError, InvalidOperation):
-                    raise ValueError(
-                        f"Invalid {price_field} format: {row_data[price_field]}"
-                    )
+                    raise ValueError(f"Invalid {price_field} format: {row_data[price_field]}")
 
         # Date validation
         if row_data.get("expiry_date"):
             try:
-                expiry_date = datetime.strptime(
-                    row_data["expiry_date"], "%Y-%m-%d"
-                ).date()
+                expiry_date = datetime.strptime(row_data["expiry_date"], "%Y-%m-%d").date()
                 # Check reasonable date range
                 if expiry_date < datetime.now().date() - timedelta(days=30):
                     raise ValueError(f"Expiry date too old: {expiry_date}")
@@ -610,9 +590,7 @@ class SecureCSVProcessor:
 
         return {"errors": errors, "warnings": warnings}
 
-    async def _generate_ai_suggestions(
-        self, valid_rows: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    async def _generate_ai_suggestions(self, valid_rows: list[dict[str, Any]]) -> dict[str, Any]:
         """Generate AI suggestions for validated data"""
 
         if not valid_rows:
@@ -651,11 +629,7 @@ class SecureCSVProcessor:
         margins = []
         for row in valid_rows:
             if "cost_price" in row and "selling_price" in row:
-                margin = (
-                    (row["selling_price"] - row["cost_price"])
-                    / row["selling_price"]
-                    * 100
-                )
+                margin = (row["selling_price"] - row["cost_price"]) / row["selling_price"] * 100
                 margins.append(margin)
 
         if margins:

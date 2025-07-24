@@ -12,8 +12,8 @@ from app.api.v1 import (
     csv_upload,
     donation_queries,
     donations,
-    global_products,
-    image_recognition,
+    # global_products,  # Disabled - global schema not implemented
+    # image_recognition,  # Disabled for now
     mobile_endpoints,
     mvp_analytics,
     scan_workflows,
@@ -82,13 +82,13 @@ router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-# Global products catalog (read-only)
-router.include_router(
-    global_products.router,
-    prefix="/global",
-    tags=["Global Products Catalog"],
-    responses={404: {"description": "Not found"}},
-)
+# Global products catalog (read-only) - Disabled: global schema not implemented
+# router.include_router(
+#     global_products.router,
+#     prefix="/global",
+#     tags=["Global Products Catalog"],
+#     responses={404: {"description": "Not found"}},
+# )
 
 # Donation queries (read-only)
 router.include_router(
@@ -98,10 +98,10 @@ router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-# Future-ready endpoints for image recognition
-router.include_router(
-    image_recognition.router,
-    prefix="/image",
-    tags=["Image Recognition (Future)"],
-    responses={404: {"description": "Not found"}},
-)
+# Future-ready endpoints for image recognition - Disabled for now
+# router.include_router(
+#     image_recognition.router,
+#     prefix="/image",
+#     tags=["Image Recognition (Future)"],
+#     responses={404: {"description": "Not found"}},
+# )

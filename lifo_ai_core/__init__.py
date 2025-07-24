@@ -18,14 +18,38 @@ __author__ = "LIFO.AI Team"
 # Import main classes for easy access
 from .config.settings import Settings, get_settings
 from .etl.processor import CSVProcessor
-from .etl.unified_csv_processor import UnifiedCSVProcessor
-from .utils.logger import StructuredLogger, get_logger
+
+try:
+    from .etl.unified_csv_processor import UnifiedCSVProcessor
+except ImportError:
+    UnifiedCSVProcessor = None
+
+try:
+    from .database.operations import InventoryOperations, create_inventory_operations
+except ImportError:
+    InventoryOperations = None
+    create_inventory_operations = None
+
+try:
+    from .utils.logger import StructuredLogger, get_logger
+except ImportError:
+    # Fallback logger
+    import logging
+    def get_logger(name: str = __name__):
+        return logging.getLogger(name)
+    StructuredLogger = None
 
 __all__ = [
     "CSVProcessor",
     "Settings",
-    "StructuredLogger",
-    "UnifiedCSVProcessor",
     "get_logger",
     "get_settings",
 ]
+
+# Add optional exports if available
+if UnifiedCSVProcessor:
+    __all__.append("UnifiedCSVProcessor")
+if InventoryOperations:
+    __all__.extend(["InventoryOperations", "create_inventory_operations"])
+if StructuredLogger:
+    __all__.append("StructuredLogger")

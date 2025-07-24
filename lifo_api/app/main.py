@@ -4,29 +4,13 @@ Intelligent inventory scoring and waste reduction microservice
 """
 
 import os
-
-from dotenv import load_dotenv
-
-# Load environment variables from .env.local file
-env_path = os.path.join(os.path.dirname(__file__), "../.env.local")
-print(f"Loading environment from: {env_path}")
-load_dotenv(env_path)
-
-# Environment validation (secure logging)
-if os.getenv("ENVIRONMENT") == "development":
-    print("Environment variables loaded:")
-    jwt_secret = os.getenv("SUPABASE_JWT_SECRET", "")
-    if jwt_secret:
-        print(f"SUPABASE_JWT_SECRET: ***configured*** (length: {len(jwt_secret)})")
-    else:
-        print("SUPABASE_JWT_SECRET: ⚠️  NOT CONFIGURED - authentication will fail")
-    print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT')}")
-
 import time
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import structlog
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -47,6 +31,60 @@ from app.middleware.security_headers import (
 )
 from app.utils.exceptions import setup_exception_handlers
 from app.utils.logging import setup_logging
+from app.utils.mvp_exceptions import (
+    MobilePerformanceException,
+    MVPBaseException,
+    ValidationException,
+    general_exception_handler,
+    mvp_exception_handler,
+    performance_exception_handler,
+    validation_exception_handler,
+)
+
+# Load environment variables from .env files (try multiple locations)
+env_paths = [
+    os.path.join(os.path.dirname(__file__), "../.env.local"),
+    os.path.join(os.path.dirname(__file__), "../.env"),
+    ".env.local",
+    ".env",
+]
+
+env_loaded = False
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        print(f"Loading environment from: {env_path}")
+        load_dotenv(env_path)
+        env_loaded = True
+        break
+
+if not env_loaded:
+    print("No .env file found, using system environment variables only")
+
+# Environment validation (secure logging)
+if os.getenv("ENVIRONMENT") == "development":
+    print("Environment variables loaded:")
+    jwt_secret = os.getenv("SUPABASE_JWT_SECRET", "")
+    if jwt_secret:
+        # Only show length, never the actual secret
+        print(f"SUPABASE_JWT_SECRET: ***configured*** (length: {len(jwt_secret)})")
+    else:
+        print("SUPABASE_JWT_SECRET: ⚠️  NOT CONFIGURED - authentication will fail")
+    print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT')}")
+
+    # Additional security checks in development
+    database_url = os.getenv("DATABASE_URL", "")
+    valid_db_prefixes = (
+        "postgresql://",
+        "postgresql+asyncpg://",  # Async PostgreSQL (Supabase)
+        "postgres://",
+        "sqlite://",
+        "sqlite+aiosqlite://",  # Async SQLite
+    )
+    if database_url and not database_url.startswith(valid_db_prefixes):
+        print("⚠️  WARNING: DATABASE_URL format may be incorrect")
+
+    if not os.getenv("SUPABASE_URL"):
+        print("⚠️  WARNING: SUPABASE_URL not configured")
 
 # Setup structured logging
 setup_logging()
@@ -54,7 +92,7 @@ logger = structlog.get_logger()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Handle application startup and shutdown"""
     # Startup
     logger.info("Starting LIFO AI Engine", version=settings.api_version)
@@ -71,7 +109,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("Shutting down LIFO AI Engine")
-    await engine.dispose()
+    await engine().dispose()
 
 
 # Create FastAPI application
@@ -116,7 +154,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 
 # Rate limiting middleware
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)  # type: ignore
 
 # Security blocking middleware
 app.middleware("http")(check_blocked_ip)
@@ -171,19 +209,10 @@ async def log_requests(request: Request, call_next):
 setup_exception_handlers(app)
 
 # Add MVP-specific exception handlers
-from app.utils.mvp_exceptions import (
-    MobilePerformanceException,
-    MVPBaseException,
-    ValidationException,
-    general_exception_handler,
-    mvp_exception_handler,
-    performance_exception_handler,
-    validation_exception_handler,
-)
 
-app.add_exception_handler(MVPBaseException, mvp_exception_handler)
-app.add_exception_handler(ValidationException, validation_exception_handler)
-app.add_exception_handler(MobilePerformanceException, performance_exception_handler)
+app.add_exception_handler(MVPBaseException, mvp_exception_handler)  # type: ignore
+app.add_exception_handler(ValidationException, validation_exception_handler)  # type: ignore
+app.add_exception_handler(MobilePerformanceException, performance_exception_handler)  # type: ignore
 app.add_exception_handler(Exception, general_exception_handler)
 
 # Include API v1 router

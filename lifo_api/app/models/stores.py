@@ -15,9 +15,7 @@ class StoreUpdateRequest(BaseModel):
     """Request to update store information"""
 
     store_name: Optional[str] = Field(None, max_length=255, description="Store name")
-    business_name: Optional[str] = Field(
-        None, max_length=255, description="Business name"
-    )
+    business_name: Optional[str] = Field(None, max_length=255, description="Business name")
     address: Optional[str] = Field(None, description="Store address")
     city: Optional[str] = Field(None, max_length=100, description="City")
     postal_code: Optional[str] = Field(None, max_length=20, description="Postal code")
@@ -49,23 +47,17 @@ class StoreSettingsRequest(BaseModel):
         None, description="Scoring weights configuration"
     )
     thresholds: Optional[dict[str, float]] = Field(None, description="Alert thresholds")
-    notifications: Optional[dict[str, bool]] = Field(
-        None, description="Notification settings"
-    )
-    business_hours: Optional[dict[str, dict[str, str]]] = Field(
-        None, description="Business hours"
-    )
+    notifications: Optional[dict[str, bool]] = Field(None, description="Notification settings")
+    business_hours: Optional[dict[str, dict[str, str]]] = Field(None, description="Business hours")
     currency: Optional[str] = Field(None, max_length=3, description="Store currency")
     timezone: Optional[str] = Field(None, max_length=50, description="Store timezone")
 
     @validator("scoring_weights")
-    def validate_scoring_weights(cls, v):
+    def validate_scoring_weights(cls, v: Optional[dict[str, float]]) -> Optional[dict[str, float]]:
         if v is not None:
             required_keys = {"expiry", "velocity", "margin"}
             if not all(key in v for key in required_keys):
-                raise ValueError(
-                    f"Missing required weights: {required_keys - set(v.keys())}"
-                )
+                raise ValueError(f"Missing required weights: {required_keys - set(v.keys())}")
 
             total = sum(v.values())
             if abs(total - 1.0) > 0.01:

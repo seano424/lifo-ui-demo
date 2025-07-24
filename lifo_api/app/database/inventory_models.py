@@ -76,15 +76,9 @@ class StoreProduct(Base):
     __tablename__ = "store_products"
     __table_args__ = {"schema": "inventory"}
 
-    store_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("business.stores.store_id"),
-        primary_key=True
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
     product_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("inventory.products.product_id"),
-        primary_key=True
+        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), primary_key=True
     )
 
     # Store-specific pricing (needed for margin calculations in AI scoring)
@@ -109,6 +103,7 @@ class StoreProduct(Base):
 
 class BatchSource(Enum):
     """Sources for batch creation in LIFO.AI workflows"""
+
     MANUAL = "manual"
     BARCODE = "barcode"
     CSV_IMPORT = "csv_import"
@@ -117,6 +112,7 @@ class BatchSource(Enum):
 
 class VerificationStatus(Enum):
     """Verification status for barcode scanning accuracy"""
+
     VERIFIED = "verified"
     PENDING = "pending"
     FLAGGED = "flagged"
@@ -135,15 +131,9 @@ class Batch(Base):
 
     batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     product_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("inventory.products.product_id"),
-        nullable=False
+        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
     )
-    store_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("business.stores.store_id"),
-        nullable=False
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     # Core batch information
     batch_number = Column(String(100), nullable=False)
@@ -186,6 +176,7 @@ class Batch(Base):
 
 class ActionType(Enum):
     """Action types for LIFO.AI recommendations"""
+
     DISCOUNT = "discount"
     DONATE = "donate"
     DISPOSE = "dispose"
@@ -195,6 +186,7 @@ class ActionType(Enum):
 
 class DonationRecipientType(Enum):
     """Types of donation recipients for better UX"""
+
     FOOD_BANK = "food_bank"
     SOUP_KITCHEN = "soup_kitchen"
     CHARITY = "charity"
@@ -220,13 +212,9 @@ class BatchAction(Base):
     batch_id = Column(
         UUID(as_uuid=True),
         ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
     )
-    store_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("business.stores.store_id"),
-        nullable=False
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     # What was recommended vs what was done
     recommended_action = Column(String(20), nullable=False)  # ActionType enum
@@ -245,8 +233,7 @@ class BatchAction(Base):
     # User and donation tracking
     performed_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     donation_recipient_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("inventory.donation_recipients.recipient_id")
+        UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
     )
 
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -280,11 +267,7 @@ class DonationRecipient(Base):
     max_distance_km = Column(Integer, default=10)
 
     # Store association
-    store_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("business.stores.store_id"),
-        nullable=False
-    )
+    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

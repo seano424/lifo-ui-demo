@@ -149,9 +149,7 @@ class DonationDecisionEngine:
 
             # Calculate financial metrics
             margin_percent = (
-                ((selling_price - cost_price) / selling_price) * 100
-                if selling_price > 0
-                else 0
+                ((selling_price - cost_price) / selling_price) * 100 if selling_price > 0 else 0
             )
             total_value = current_quantity * selling_price
 
@@ -253,15 +251,10 @@ class DonationDecisionEngine:
 
         # EU compliance is primary factor
         if not compliance_result.eligible_for_donation:
-            if (
-                compliance_result.eligibility_status
-                == DonationEligibility.NOT_ELIGIBLE_EXPIRED
-            ):
+            if compliance_result.eligibility_status == DonationEligibility.NOT_ELIGIBLE_EXPIRED:
                 decision = DonationDecision.DISPOSE
                 fallback_action = "Immediate disposal required"
-                fallback_reasoning = (
-                    "Product violates EU food safety regulations for donation"
-                )
+                fallback_reasoning = "Product violates EU food safety regulations for donation"
                 risk_assessment = "High regulatory risk - disposal mandatory"
                 confidence = 0.9
             else:
@@ -271,9 +264,7 @@ class DonationDecisionEngine:
                 risk_assessment = "Medium risk - discount and sell quickly"
                 confidence = 0.8
 
-            factors.append(
-                f"EU compliance: {compliance_result.eligibility_status.value}"
-            )
+            factors.append(f"EU compliance: {compliance_result.eligibility_status.value}")
         else:
             # Product is EU compliant for donation - analyze business factors
 
@@ -281,18 +272,11 @@ class DonationDecisionEngine:
             if margin_percent < self.donation_thresholds["min_margin_for_donation"]:
                 factors.append(f"Low margin ({margin_percent:.1f}%) favors donation")
                 donation_score = 0.8
-            elif (
-                margin_percent
-                > self.donation_thresholds["max_margin_for_immediate_donation"]
-            ):
-                factors.append(
-                    f"High margin ({margin_percent:.1f}%) suggests discount first"
-                )
+            elif margin_percent > self.donation_thresholds["max_margin_for_immediate_donation"]:
+                factors.append(f"High margin ({margin_percent:.1f}%) suggests discount first")
                 donation_score = 0.3
             else:
-                factors.append(
-                    f"Moderate margin ({margin_percent:.1f}%) allows either option"
-                )
+                factors.append(f"Moderate margin ({margin_percent:.1f}%) allows either option")
                 donation_score = 0.6
 
             # Factor 2: Urgency from days to expiry
@@ -307,9 +291,7 @@ class DonationDecisionEngine:
                 factors.append("Expires within 3 days - action needed soon")
             else:
                 urgency_score = 0.4
-                factors.append(
-                    f"Expires in {days_to_expiry} days - planning time available"
-                )
+                factors.append(f"Expires in {days_to_expiry} days - planning time available")
 
             # Factor 3: Value and quantity considerations
             if total_value < 50:  # Low value items
@@ -339,9 +321,7 @@ class DonationDecisionEngine:
             if weighted_score >= 0.8 or days_to_expiry <= 1:
                 decision = DonationDecision.DONATE_IMMEDIATELY
                 fallback_action = "Apply heavy discount if donation fails"
-                fallback_reasoning = (
-                    "Donation preferred but discount available as backup"
-                )
+                fallback_reasoning = "Donation preferred but discount available as backup"
                 risk_assessment = "Low risk - donation captures social value"
                 confidence = min(0.9, weighted_score + 0.1)
 
@@ -349,9 +329,7 @@ class DonationDecisionEngine:
                 if margin_percent > 30:  # High margin products
                     decision = DonationDecision.DISCOUNT_THEN_DONATE
                     fallback_action = "Discount for 24-48 hours, then donate if unsold"
-                    fallback_reasoning = (
-                        "Try to recover revenue first, then capture social value"
-                    )
+                    fallback_reasoning = "Try to recover revenue first, then capture social value"
                     risk_assessment = "Medium risk - balanced approach"
                     confidence = weighted_score
                 else:
@@ -363,12 +341,8 @@ class DonationDecisionEngine:
 
             elif weighted_score >= 0.4:
                 decision = DonationDecision.DISCOUNT_ONLY
-                fallback_action = (
-                    "Monitor closely and reconsider donation if discount unsuccessful"
-                )
-                fallback_reasoning = (
-                    "Prioritize revenue recovery with donation as future option"
-                )
+                fallback_action = "Monitor closely and reconsider donation if discount unsuccessful"
+                fallback_reasoning = "Prioritize revenue recovery with donation as future option"
                 risk_assessment = "Medium risk - focus on business recovery"
                 confidence = 1.0 - weighted_score
 
@@ -384,11 +358,17 @@ class DonationDecisionEngine:
             DonationDecision.DONATE_IMMEDIATELY,
             DonationDecision.DONATE_SCHEDULED,
         ]:
-            business_impact = f"Tax benefit: ~€{total_value * 0.6:.2f}, Social value creation, Waste cost avoided"
+            business_impact = (
+                f"Tax benefit: ~€{total_value * 0.6:.2f}, Social value creation, Waste cost avoided"
+            )
         elif decision == DonationDecision.DISCOUNT_THEN_DONATE:
-            business_impact = f"Revenue recovery attempt: €{total_value * 0.7:.2f}, then social value if needed"
+            business_impact = (
+                f"Revenue recovery attempt: €{total_value * 0.7:.2f}, then social value if needed"
+            )
         else:
-            business_impact = f"Revenue focus: target €{total_value * 0.8:.2f} recovery through discounting"
+            business_impact = (
+                f"Revenue focus: target €{total_value * 0.8:.2f} recovery through discounting"
+            )
 
         return {
             "decision": decision,
@@ -400,9 +380,7 @@ class DonationDecisionEngine:
             "business_impact": business_impact,
         }
 
-    def _calculate_quick_score(
-        self, batch_data: dict[str, Any], days_to_expiry: int
-    ) -> Any:
+    def _calculate_quick_score(self, batch_data: dict[str, Any], days_to_expiry: int) -> Any:
         """Calculate quick scoring result if not provided"""
 
         class QuickScore:
@@ -456,9 +434,7 @@ class DonationDecisionEngine:
 
         elif decision == DonationDecision.DISCOUNT_THEN_DONATE:
             # Hybrid approach - assume 50% sells at discount, 50% donated
-            discount_revenue = (
-                total_selling_value * 0.5 * 0.7
-            )  # 50% quantity at 70% price
+            discount_revenue = total_selling_value * 0.5 * 0.7  # 50% quantity at 70% price
             donation_portion = total_cost * 0.5
             tax_benefit = donation_portion * 0.6
             waste_cost_avoided = donation_portion * 0.2
@@ -470,9 +446,7 @@ class DonationDecisionEngine:
             donation_value = 0.0
             tax_benefit = 0.0
             waste_cost_avoided = 0.0
-            opportunity_cost = (
-                total_selling_value * 0.3
-            )  # Assume 70% recovery through discounting
+            opportunity_cost = total_selling_value * 0.3  # Assume 70% recovery through discounting
 
         return {
             "donation_value": donation_value,
@@ -504,9 +478,7 @@ class DonationDecisionEngine:
             else:
                 priority = DonationPriority.MEDIUM
                 action_by = now + timedelta(days=2)
-                window_expires = now + timedelta(
-                    days=compliance_result.donation_window_days
-                )
+                window_expires = now + timedelta(days=compliance_result.donation_window_days)
 
         elif decision == DonationDecision.DISCOUNT_THEN_DONATE:
             priority = DonationPriority.HIGH

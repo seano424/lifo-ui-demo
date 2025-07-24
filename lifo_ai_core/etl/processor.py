@@ -6,7 +6,12 @@ from typing import Any, Optional
 
 import pandas as pd
 
-# InventoryOperations imported from lifo_api when needed
+# InventoryOperations can be imported from our own database module
+try:
+    from database.operations import InventoryOperations
+except ImportError:
+    # Fallback if database operations not available
+    InventoryOperations = None
 
 
 class CSVProcessor:

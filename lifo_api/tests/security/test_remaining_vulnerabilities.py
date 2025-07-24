@@ -137,9 +137,7 @@ class TestDataValidationVulnerabilities:
             "page": "infinity",
         }
 
-        client.get(
-            "/api/v1/inventory/store/test-store", params=malicious_params
-        )
+        client.get("/api/v1/inventory/store/test-store", params=malicious_params)
 
         # Should validate and sanitize parameters
 
@@ -220,10 +218,7 @@ class TestDeploymentConfigurationVulnerabilities:
             # Should not expose sensitive configuration
             sensitive_keys = ["database_url", "jwt_secret", "api_key"]
             for _key in sensitive_keys:
-                if any(
-                    sensitive in str(config_data).lower()
-                    for sensitive in sensitive_keys
-                ):
+                if any(sensitive in str(config_data).lower() for sensitive in sensitive_keys):
                     pytest.fail("Sensitive configuration exposed in debug endpoint")
 
     def test_cors_wildcard_in_production(self):
@@ -267,9 +262,7 @@ class TestDeploymentConfigurationVulnerabilities:
             missing_headers = [h for h in required_headers if h not in response.headers]
 
             if missing_headers:
-                pytest.fail(
-                    f"Missing security headers in production: {missing_headers}"
-                )
+                pytest.fail(f"Missing security headers in production: {missing_headers}")
 
     def test_database_connection_string_exposure(self):
         """🚨 HIGH: Database connection details exposed"""
@@ -338,9 +331,7 @@ class TestOverallSecurityPosture:
         ]
 
         # All these availability attacks are possible
-        pytest.fail(
-            f"Multiple availability attack vectors found: {availability_issues}"
-        )
+        pytest.fail(f"Multiple availability attack vectors found: {availability_issues}")
 
     def test_confidentiality_breaches_possible(self):
         """🚨 HIGH: Information confidentiality can be breached"""
@@ -353,9 +344,7 @@ class TestOverallSecurityPosture:
         ]
 
         # All these confidentiality issues exist
-        pytest.fail(
-            f"Multiple confidentiality breach vectors found: {confidentiality_issues}"
-        )
+        pytest.fail(f"Multiple confidentiality breach vectors found: {confidentiality_issues}")
 
 
 # 🚨 FINAL VULNERABILITY SUMMARY 🚨
