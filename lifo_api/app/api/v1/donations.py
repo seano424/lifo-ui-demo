@@ -18,9 +18,7 @@ from app.auth.secure_dependencies import (
     validate_batch_id_format,
     validate_store_id_format,
 )
-from app.core.donation_engine import (
-    create_donation_decision_engine,
-)
+from app.api.v1.compat_donation_wrapper import create_simplified_donation_engine_compat
 from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
@@ -157,13 +155,12 @@ async def check_donation_eligibility(
         scoring_service = create_scoring_service(db)
         scoring_result = await scoring_service.score_batch(batch_id)
 
-        # Create donation decision engine
-        donation_engine = create_donation_decision_engine()
+        # Create donation decision engine with compatibility wrapper
+        donation_engine = create_simplified_donation_engine_compat()
 
         # Evaluate donation opportunity
-        recommendation = donation_engine.evaluate_donation_opportunity(
+        recommendation = donation_engine.evaluate_action_recommendation(
             batch_data=batch_data,
-            scoring_result=scoring_result,
             current_temperature=eligibility_params.current_temperature,
             packaging_condition=eligibility_params.packaging_condition,
         )
@@ -253,8 +250,8 @@ async def check_bulk_donation_eligibility(
         # Get read-only operations
         read_ops = get_read_only_operations(db)
 
-        # Create donation decision engine
-        donation_engine = create_donation_decision_engine()
+        # Create donation decision engine with compatibility wrapper
+        donation_engine = create_simplified_donation_engine_compat()
 
         # Process each batch
         results = []
@@ -276,7 +273,7 @@ async def check_bulk_donation_eligibility(
                     continue
 
                 # Quick evaluation for bulk processing
-                recommendation = donation_engine.evaluate_donation_opportunity(
+                recommendation = donation_engine.evaluate_action_recommendation(
                     batch_data=batch_data,
                     current_temperature=bulk_request.current_temperature,
                     packaging_condition=bulk_request.packaging_condition,
@@ -405,8 +402,8 @@ async def create_donation_record(
             )
 
         # Re-validate donation eligibility
-        donation_engine = create_donation_decision_engine()
-        recommendation = donation_engine.evaluate_donation_opportunity(batch_data=batch_data)
+        donation_engine = create_simplified_donation_engine_compat()
+        recommendation = donation_engine.evaluate_action_recommendation(batch_data=batch_data)
 
         if not recommendation.eu_compliant:
             raise HTTPException(

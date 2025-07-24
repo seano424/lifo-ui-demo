@@ -1,7 +1,7 @@
 """
-Donation Decision Engine
-Integrates EU food safety compliance with LIFO.AI scoring system
-Provides intelligent donation recommendations based on EU regulations
+Simplified Donation Decision Engine
+Integrates with simple action tracking system (migration 017)
+Provides basic donation recommendations based on expiry and scoring
 """
 
 from datetime import date, datetime, timedelta
@@ -11,117 +11,112 @@ from typing import Any, Optional
 import structlog
 from pydantic import BaseModel
 
-from app.core.eu_food_safety import (
-    DonationEligibility,
-    EUComplianceResult,
-    EUFoodSafetyValidator,
-)
-from app.core.scoring import InventoryScorer, ScoringResult
-
 logger = structlog.get_logger()
 
 
-class DonationDecision(Enum):
-    """Decision outcomes for donation vs other actions"""
-
-    DONATE_IMMEDIATELY = "donate_immediately"
-    DONATE_SCHEDULED = "donate_scheduled"
-    DISCOUNT_THEN_DONATE = "discount_then_donate"
-    DISCOUNT_ONLY = "discount_only"
+class ActionType(Enum):
+    """Simple action types matching database schema"""
+    
+    DISCOUNT = "discount"
+    DONATE = "donate" 
     DISPOSE = "dispose"
-    MONITOR = "monitor"
+    MAINTAIN = "maintain"
+    IGNORED = "ignored"
+
+
+class DonationRecipientType(Enum):
+    """Common donation recipient types for better UX"""
+    
+    FOOD_BANK = "food_bank"
+    SOUP_KITCHEN = "soup_kitchen"
+    CHARITY = "charity"
+    RELIGIOUS_ORG = "religious_org"
+    COMMUNITY_GROUP = "community_group"
+    ANIMAL_SHELTER = "animal_shelter"
+    SCHOOL = "school"
+    ELDERLY_CARE = "elderly_care"
+    HOMELESS_SHELTER = "homeless_shelter"
+    OTHER = "other"
 
 
 class DonationPriority(Enum):
     """Priority levels for donation decisions"""
 
-    CRITICAL = "critical"  # Must donate within 24 hours
-    HIGH = "high"  # Should donate within 48 hours
-    MEDIUM = "medium"  # Can donate within 1 week
-    LOW = "low"  # Optional donation
+    CRITICAL = "critical"  # Must act within 24 hours
+    HIGH = "high"  # Should act within 48 hours
+    MEDIUM = "medium"  # Can act within 1 week
+    LOW = "low"  # Optional action
 
 
-class DonationRecommendation(BaseModel):
-    """Complete donation recommendation with EU compliance"""
+class SimpleActionRecommendation(BaseModel):
+    """Simplified action recommendation matching migration 017 schema"""
 
     batch_id: str
-    decision: DonationDecision
+    recommended_action: ActionType
     priority: DonationPriority
-    confidence_score: float  # 0.0-1.0
+    ai_score: float  # 0.0-1.0 score that triggered the recommendation
 
-    # EU compliance
-    eu_compliant: bool
-    compliance_result: EUComplianceResult
-
-    # Financial analysis
-    estimated_donation_value: float
-    estimated_waste_cost_avoided: float
-    estimated_tax_benefit: float
-    opportunity_cost: float  # Cost of donating vs discounting
-
+    # Simple tracking details
+    quantity_affected: float
+    notes: str  # Simple reasoning for the recommendation
+    
+    # Financial tracking (for ROI calculations)
+    original_value: float
+    estimated_recovered_value: float  # Expected value after action
+    
     # Timing
     recommended_action_by: datetime
-    donation_window_expires: Optional[datetime]
-
-    # Logistics
-    preferred_recipient_types: list[str]
-    handling_requirements: list[str]
-    transport_instructions: list[str]
-
-    # Alternative actions
-    fallback_action: str
-    fallback_reasoning: str
-
-    # Reasoning
+    
+    # Donation specifics (when applicable)
+    suggested_recipient_types: list[DonationRecipientType]
+    
+    # Simple reasoning
     decision_factors: list[str]
-    risk_assessment: str
-    business_impact: str
+    urgency_reason: str
 
 
-class DonationDecisionEngine:
+class SimplifiedDonationEngine:
     """
-    Intelligent donation decision engine integrating EU compliance with business logic
+    Simplified donation decision engine matching migration 017 implementation
+    Focuses on basic action recommendations without complex EU compliance
     """
 
     def __init__(self):
-        self.logger = structlog.get_logger().bind(component="donation_engine")
-        self.eu_validator = EUFoodSafetyValidator()
-        self.scorer = InventoryScorer()
+        self.logger = structlog.get_logger().bind(component="simplified_donation_engine")
 
-        # Business configuration for donation decisions
-        self.donation_thresholds = {
-            "min_margin_for_donation": 15.0,  # % - below this, always donate if EU compliant
-            "max_margin_for_immediate_donation": 40.0,  # % - above this, consider discount first
+        # Simplified business configuration
+        self.action_thresholds = {
+            "discount_margin_threshold": 20.0,  # % - above this, try discount before donation
             "min_quantity_for_donation": 1.0,  # Minimum quantity worth donating
-            "max_discount_before_donation": 60.0,  # % - max discount before considering donation
+            "critical_days_threshold": 1,  # Days to expiry for critical action
+            "high_priority_days_threshold": 3,  # Days to expiry for high priority
         }
 
-        # EU compliance integration weights
-        self.decision_weights = {
-            "eu_compliance": 0.4,  # EU compliance is highest priority
-            "business_impact": 0.3,  # Business financial impact
-            "urgency": 0.2,  # Time urgency factor
-            "social_impact": 0.1,  # Social value consideration
+        # Category-specific donation suitability
+        self.donation_suitable_categories = {
+            "fresh_produce", "bakery_fresh", "dry_goods", "canned_jarred", 
+            "beverages", "spices_condiments"
+        }
+        
+        # Categories requiring special handling
+        self.special_handling_categories = {
+            "fresh_meat_fish", "dairy", "deli_prepared", "frozen"
         }
 
-    def evaluate_donation_opportunity(
+    def evaluate_action_recommendation(
         self,
         batch_data: dict[str, Any],
-        scoring_result: Optional[ScoringResult] = None,
-        current_temperature: Optional[float] = None,
-        packaging_condition: str = "good",
-    ) -> DonationRecommendation:
+        ai_score: float,
+    ) -> SimpleActionRecommendation:
         """
-        Evaluate donation opportunity with EU compliance and business logic
+        Evaluate action recommendation based on simplified criteria
 
         Args:
             batch_data: Batch information including expiry, pricing, quantity
-            scoring_result: Existing LIFO scoring result (optional)
-            current_temperature: Current storage temperature
-            packaging_condition: Condition of packaging
+            ai_score: LIFO AI score that triggered the evaluation (0.0-1.0)
 
         Returns:
-            Complete donation recommendation with reasoning
+            Simple action recommendation matching migration 017 schema
         """
         try:
             # Extract key data
@@ -139,455 +134,286 @@ class DonationDecisionEngine:
             # Calculate days to expiry
             days_to_expiry = (expiry_date - date.today()).days
 
-            # Get EU compliance assessment
-            compliance_result = self.eu_validator.validate_donation_eligibility(
-                category=category,
-                expiry_date=expiry_date,
-                current_temperature=current_temperature,
-                packaging_condition=packaging_condition,
-            )
-
             # Calculate financial metrics
             margin_percent = (
                 ((selling_price - cost_price) / selling_price) * 100 if selling_price > 0 else 0
             )
-            total_value = current_quantity * selling_price
+            original_value = current_quantity * selling_price
 
-            # Get or calculate scoring result
-            if not scoring_result:
-                scoring_result = self._calculate_quick_score(batch_data, days_to_expiry)
-
-            # Make donation decision based on multiple factors
-            decision_analysis = self._analyze_donation_vs_alternatives(
-                compliance_result=compliance_result,
-                margin_percent=margin_percent,
+            # Make simple action decision
+            action_analysis = self._determine_simple_action(
+                category=category,
                 days_to_expiry=days_to_expiry,
-                total_value=total_value,
-                scoring_result=scoring_result,
+                margin_percent=margin_percent,
+                ai_score=ai_score,
                 current_quantity=current_quantity,
             )
 
-            # Calculate financial impacts
-            financial_analysis = self._calculate_financial_impact(
-                cost_price=cost_price,
-                selling_price=selling_price,
-                current_quantity=current_quantity,
+            # Calculate estimated recovered value
+            recovered_value = self._calculate_simple_recovery_value(
+                original_value=original_value,
+                action=action_analysis["action"],
                 margin_percent=margin_percent,
-                decision=decision_analysis["decision"],
             )
 
             # Determine timing and priority
-            timing_analysis = self._determine_timing_and_priority(
-                compliance_result=compliance_result,
+            timing_analysis = self._determine_simple_timing(
                 days_to_expiry=days_to_expiry,
-                decision=decision_analysis["decision"],
+                action=action_analysis["action"],
             )
 
-            # Generate logistics requirements
-            logistics = self._generate_logistics_requirements(
-                compliance_result=compliance_result,
-                category=category,
-                current_quantity=current_quantity,
-            )
+            # Get suggested recipient types for donations
+            recipient_types = self._get_suitable_recipients(category)
 
             # Create recommendation
-            recommendation = DonationRecommendation(
+            recommendation = SimpleActionRecommendation(
                 batch_id=batch_data.get("batch_id", "unknown"),
-                decision=decision_analysis["decision"],
+                recommended_action=action_analysis["action"],
                 priority=timing_analysis["priority"],
-                confidence_score=decision_analysis["confidence"],
-                eu_compliant=compliance_result.eligible_for_donation,
-                compliance_result=compliance_result,
-                estimated_donation_value=financial_analysis["donation_value"],
-                estimated_waste_cost_avoided=financial_analysis["waste_cost_avoided"],
-                estimated_tax_benefit=financial_analysis["tax_benefit"],
-                opportunity_cost=financial_analysis["opportunity_cost"],
+                ai_score=ai_score,
+                quantity_affected=current_quantity,
+                notes=action_analysis["reasoning"],
+                original_value=original_value,
+                estimated_recovered_value=recovered_value,
                 recommended_action_by=timing_analysis["action_by"],
-                donation_window_expires=timing_analysis["window_expires"],
-                preferred_recipient_types=logistics["recipient_types"],
-                handling_requirements=logistics["handling"],
-                transport_instructions=logistics["transport"],
-                fallback_action=decision_analysis["fallback_action"],
-                fallback_reasoning=decision_analysis["fallback_reasoning"],
-                decision_factors=decision_analysis["factors"],
-                risk_assessment=decision_analysis["risk_assessment"],
-                business_impact=decision_analysis["business_impact"],
+                suggested_recipient_types=recipient_types,
+                decision_factors=action_analysis["factors"],
+                urgency_reason=timing_analysis["urgency_reason"],
             )
 
             self.logger.info(
-                "Donation opportunity evaluated",
+                "Action recommendation generated",
                 batch_id=batch_data.get("batch_id"),
-                decision=decision_analysis["decision"].value,
-                eu_compliant=compliance_result.eligible_for_donation,
+                action=action_analysis["action"].value,
                 priority=timing_analysis["priority"].value,
-                confidence=decision_analysis["confidence"],
+                ai_score=ai_score,
+                days_to_expiry=days_to_expiry,
             )
 
             return recommendation
 
         except Exception as e:
             self.logger.error(
-                "Donation opportunity evaluation failed",
+                "Action recommendation failed",
                 batch_id=batch_data.get("batch_id"),
                 error=str(e),
             )
 
             # Return safe fallback recommendation
-            return self._create_fallback_recommendation(batch_data, str(e))
+            return self._create_simple_fallback_recommendation(batch_data, str(e))
 
-    def _analyze_donation_vs_alternatives(
+    def _determine_simple_action(
         self,
-        compliance_result: EUComplianceResult,
-        margin_percent: float,
+        category: str,
         days_to_expiry: int,
-        total_value: float,
-        scoring_result: Any,
+        margin_percent: float,
+        ai_score: float,
         current_quantity: float,
     ) -> dict[str, Any]:
-        """Analyze donation vs discount/disposal alternatives"""
+        """Determine simple action based on basic business rules"""
 
         factors = []
-        confidence = 0.5
-
-        # EU compliance is primary factor
-        if not compliance_result.eligible_for_donation:
-            if compliance_result.eligibility_status == DonationEligibility.NOT_ELIGIBLE_EXPIRED:
-                decision = DonationDecision.DISPOSE
-                fallback_action = "Immediate disposal required"
-                fallback_reasoning = "Product violates EU food safety regulations for donation"
-                risk_assessment = "High regulatory risk - disposal mandatory"
-                confidence = 0.9
-            else:
-                decision = DonationDecision.DISCOUNT_ONLY
-                fallback_action = "Apply discount and monitor"
-                fallback_reasoning = "EU compliance issues prevent donation"
-                risk_assessment = "Medium risk - discount and sell quickly"
-                confidence = 0.8
-
-            factors.append(f"EU compliance: {compliance_result.eligibility_status.value}")
-        else:
-            # Product is EU compliant for donation - analyze business factors
-
-            # Factor 1: Margin analysis
-            if margin_percent < self.donation_thresholds["min_margin_for_donation"]:
-                factors.append(f"Low margin ({margin_percent:.1f}%) favors donation")
-                donation_score = 0.8
-            elif margin_percent > self.donation_thresholds["max_margin_for_immediate_donation"]:
-                factors.append(f"High margin ({margin_percent:.1f}%) suggests discount first")
-                donation_score = 0.3
-            else:
-                factors.append(f"Moderate margin ({margin_percent:.1f}%) allows either option")
-                donation_score = 0.6
-
-            # Factor 2: Urgency from days to expiry
-            if days_to_expiry <= 0:
-                urgency_score = 1.0
-                factors.append("Expired - immediate action required")
-            elif days_to_expiry <= 1:
-                urgency_score = 0.9
-                factors.append("Expires tomorrow - urgent action needed")
-            elif days_to_expiry <= 3:
-                urgency_score = 0.7
-                factors.append("Expires within 3 days - action needed soon")
-            else:
-                urgency_score = 0.4
-                factors.append(f"Expires in {days_to_expiry} days - planning time available")
-
-            # Factor 3: Value and quantity considerations
-            if total_value < 50:  # Low value items
-                value_score = 0.8  # Favor donation
-                factors.append("Low value item - donation recommended")
-            elif total_value > 500:  # High value items
-                value_score = 0.3  # Consider discount first
-                factors.append("High value item - consider discount to recover revenue")
-            else:
-                value_score = 0.5
-                factors.append("Moderate value - either option viable")
-
-            # Factor 4: Quantity considerations
-            if current_quantity < self.donation_thresholds["min_quantity_for_donation"]:
-                factors.append("Quantity too small for efficient donation")
-                donation_score *= 0.5
-
-            # Combine factors with weights
-            weighted_score = (
-                donation_score * 0.4  # Business margin factor
-                + urgency_score * 0.3  # Time urgency
-                + value_score * 0.2  # Value consideration
-                + compliance_result.compliance_score * 0.1  # EU compliance quality
-            )
-
-            # Make decision based on weighted score and specific conditions
-            if weighted_score >= 0.8 or days_to_expiry <= 1:
-                decision = DonationDecision.DONATE_IMMEDIATELY
-                fallback_action = "Apply heavy discount if donation fails"
-                fallback_reasoning = "Donation preferred but discount available as backup"
-                risk_assessment = "Low risk - donation captures social value"
-                confidence = min(0.9, weighted_score + 0.1)
-
-            elif weighted_score >= 0.6 or days_to_expiry <= 3:
-                if margin_percent > 30:  # High margin products
-                    decision = DonationDecision.DISCOUNT_THEN_DONATE
-                    fallback_action = "Discount for 24-48 hours, then donate if unsold"
-                    fallback_reasoning = "Try to recover revenue first, then capture social value"
-                    risk_assessment = "Medium risk - balanced approach"
-                    confidence = weighted_score
-                else:
-                    decision = DonationDecision.DONATE_SCHEDULED
-                    fallback_action = "Schedule donation pickup within 48 hours"
-                    fallback_reasoning = "Plan efficient donation logistics"
-                    risk_assessment = "Low risk - planned donation approach"
-                    confidence = weighted_score
-
-            elif weighted_score >= 0.4:
-                decision = DonationDecision.DISCOUNT_ONLY
-                fallback_action = "Monitor closely and reconsider donation if discount unsuccessful"
-                fallback_reasoning = "Prioritize revenue recovery with donation as future option"
-                risk_assessment = "Medium risk - focus on business recovery"
-                confidence = 1.0 - weighted_score
-
-            else:
-                decision = DonationDecision.MONITOR
-                fallback_action = "Continue normal sales and reassess in 24 hours"
-                fallback_reasoning = "Product not urgent for donation yet"
-                risk_assessment = "Low risk - normal inventory management"
-                confidence = 0.7
-
-        # Business impact assessment
-        if decision in [
-            DonationDecision.DONATE_IMMEDIATELY,
-            DonationDecision.DONATE_SCHEDULED,
-        ]:
-            business_impact = (
-                f"Tax benefit: ~€{total_value * 0.6:.2f}, Social value creation, Waste cost avoided"
-            )
-        elif decision == DonationDecision.DISCOUNT_THEN_DONATE:
-            business_impact = (
-                f"Revenue recovery attempt: €{total_value * 0.7:.2f}, then social value if needed"
-            )
-        else:
-            business_impact = (
-                f"Revenue focus: target €{total_value * 0.8:.2f} recovery through discounting"
-            )
-
-        return {
-            "decision": decision,
-            "confidence": confidence,
-            "factors": factors,
-            "fallback_action": fallback_action,
-            "fallback_reasoning": fallback_reasoning,
-            "risk_assessment": risk_assessment,
-            "business_impact": business_impact,
-        }
-
-    def _calculate_quick_score(self, batch_data: dict[str, Any], days_to_expiry: int) -> Any:
-        """Calculate quick scoring result if not provided"""
-
-        class QuickScore:
-            def __init__(self):
-                self.composite_score = 0.5
-                self.urgency_level = "medium"
-
+        
+        # Primary decision logic based on expiry and business factors
         if days_to_expiry <= 0:
-            score = QuickScore()
-            score.composite_score = 1.0
-            score.urgency_level = "critical"
-        elif days_to_expiry <= 1:
-            score = QuickScore()
-            score.composite_score = 0.9
-            score.urgency_level = "critical"
-        elif days_to_expiry <= 3:
-            score = QuickScore()
-            score.composite_score = 0.7
-            score.urgency_level = "high"
+            action = ActionType.DISPOSE
+            reasoning = "Product has expired and must be disposed of"
+            factors.append("Expired product")
+        
+        elif days_to_expiry <= self.action_thresholds["critical_days_threshold"]:
+            # Very urgent - need immediate action
+            if margin_percent > self.action_thresholds["discount_margin_threshold"]:
+                action = ActionType.DISCOUNT
+                reasoning = "High margin product expiring soon - try discount to recover value"
+                factors.append(f"High margin ({margin_percent:.1f}%)")
+            elif category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = "Low margin product expiring soon - donation provides tax benefit and social value"
+                factors.append("Donation suitable category")
+            else:
+                action = ActionType.DISCOUNT
+                reasoning = "Special handling category - try discount before disposal"
+                factors.append("Special handling required")
+            
+            factors.append(f"Expires in {days_to_expiry} days - critical timing")
+        
+        elif days_to_expiry <= self.action_thresholds["high_priority_days_threshold"]:
+            # Moderately urgent
+            if ai_score >= 0.8:
+                # High AI score suggests urgent action needed
+                if margin_percent > self.action_thresholds["discount_margin_threshold"]:
+                    action = ActionType.DISCOUNT
+                    reasoning = "High AI score and good margin - apply discount to move inventory"
+                    factors.append(f"High AI urgency score ({ai_score:.2f})")
+                elif category in self.donation_suitable_categories:
+                    action = ActionType.DONATE
+                    reasoning = "High AI score but low margin - donation recommended"
+                    factors.append("Low margin favors donation")
+                else:
+                    action = ActionType.DISCOUNT
+                    reasoning = "High AI score - discount recommended for special handling category"
+                    factors.append("Special handling category")
+            else:
+                action = ActionType.MAINTAIN
+                reasoning = "Monitor closely but no immediate action needed"
+                factors.append(f"Moderate AI score ({ai_score:.2f})")
+            
+            factors.append(f"Expires in {days_to_expiry} days")
+        
         else:
-            score = QuickScore()
-            score.composite_score = 0.4
-            score.urgency_level = "medium"
+            # Not urgent - based on AI score and business factors
+            if ai_score >= 0.7:
+                action = ActionType.DISCOUNT
+                reasoning = "AI suggests proactive discounting"
+                factors.append(f"Elevated AI score ({ai_score:.2f})")
+            else:
+                action = ActionType.MAINTAIN
+                reasoning = "No immediate action needed - continue normal sales"
+                factors.append("Normal sales conditions")
+            
+            factors.append(f"Expires in {days_to_expiry} days - planning time available")
 
-        return score
-
-    def _calculate_financial_impact(
-        self,
-        cost_price: float,
-        selling_price: float,
-        current_quantity: float,
-        margin_percent: float,
-        decision: DonationDecision,
-    ) -> dict[str, float]:
-        """Calculate financial impact of donation decision"""
-
-        total_cost = cost_price * current_quantity
-        total_selling_value = selling_price * current_quantity
-
-        if decision in [
-            DonationDecision.DONATE_IMMEDIATELY,
-            DonationDecision.DONATE_SCHEDULED,
-        ]:
-            # Full donation scenario
-            donation_value = total_cost  # Cost basis for tax purposes
-            tax_benefit = donation_value * 0.6  # Estimated tax benefit in Germany
-            waste_cost_avoided = total_cost * 0.2  # Estimated disposal cost
-            opportunity_cost = (
-                total_selling_value * 0.8
-            )  # Revenue foregone (assuming 80% discount would sell)
-
-        elif decision == DonationDecision.DISCOUNT_THEN_DONATE:
-            # Hybrid approach - assume 50% sells at discount, 50% donated
-            discount_revenue = total_selling_value * 0.5 * 0.7  # 50% quantity at 70% price
-            donation_portion = total_cost * 0.5
-            tax_benefit = donation_portion * 0.6
-            waste_cost_avoided = donation_portion * 0.2
-            opportunity_cost = total_selling_value - discount_revenue - donation_portion
-            donation_value = donation_portion
-
-        else:
-            # Discount only or monitor
-            donation_value = 0.0
-            tax_benefit = 0.0
-            waste_cost_avoided = 0.0
-            opportunity_cost = total_selling_value * 0.3  # Assume 70% recovery through discounting
+        # Quantity considerations
+        if current_quantity < self.action_thresholds["min_quantity_for_donation"] and action == ActionType.DONATE:
+            action = ActionType.DISCOUNT
+            reasoning = "Quantity too small for efficient donation - discount instead"
+            factors.append("Small quantity")
 
         return {
-            "donation_value": donation_value,
-            "tax_benefit": tax_benefit,
-            "waste_cost_avoided": waste_cost_avoided,
-            "opportunity_cost": opportunity_cost,
+            "action": action,
+            "reasoning": reasoning,
+            "factors": factors,
         }
 
-    def _determine_timing_and_priority(
+    def _calculate_simple_recovery_value(
         self,
-        compliance_result: EUComplianceResult,
+        original_value: float,
+        action: ActionType,
+        margin_percent: float,
+    ) -> float:
+        """Calculate estimated recovered value based on action"""
+        
+        if action == ActionType.DISCOUNT:
+            # Assume discount will recover 60-80% of value depending on margin
+            if margin_percent > 30:
+                return original_value * 0.8  # High margin - can afford bigger discount
+            elif margin_percent > 15:
+                return original_value * 0.7  # Medium margin
+            else:
+                return original_value * 0.6  # Low margin - limited discount ability
+        
+        elif action == ActionType.DONATE:
+            # Tax benefit estimated at 60% of cost basis (German tax law)
+            cost_basis = original_value * (1 - margin_percent / 100)
+            return cost_basis * 0.6
+        
+        elif action == ActionType.DISPOSE:
+            # Disposal costs money
+            return -original_value * 0.1  # Negative value for disposal costs
+        
+        else:  # MAINTAIN or IGNORED
+            # Assume normal sales will eventually recover most value
+            return original_value * 0.9
+
+    def _determine_simple_timing(
+        self,
         days_to_expiry: int,
-        decision: DonationDecision,
+        action: ActionType,
     ) -> dict[str, Any]:
-        """Determine timing and priority for donation actions"""
+        """Determine timing and priority for simple actions"""
 
         now = datetime.now()
 
-        if decision == DonationDecision.DONATE_IMMEDIATELY:
+        if days_to_expiry <= 0:
             priority = DonationPriority.CRITICAL
-            action_by = now + timedelta(hours=4)  # Within 4 hours
-            window_expires = now + timedelta(hours=12)  # Must be done within 12 hours
-
-        elif decision == DonationDecision.DONATE_SCHEDULED:
-            if days_to_expiry <= 2:
+            action_by = now + timedelta(hours=2)  # Immediate action required
+            urgency_reason = "Product has expired - immediate disposal required"
+        
+        elif days_to_expiry <= self.action_thresholds["critical_days_threshold"]:
+            priority = DonationPriority.CRITICAL
+            action_by = now + timedelta(hours=6)  # Within 6 hours
+            urgency_reason = "Product expires within 24 hours - urgent action needed"
+        
+        elif days_to_expiry <= self.action_thresholds["high_priority_days_threshold"]:
+            if action == ActionType.DONATE:
                 priority = DonationPriority.HIGH
-                action_by = now + timedelta(hours=24)
-                window_expires = now + timedelta(hours=48)
+                action_by = now + timedelta(hours=24)  # Within 24 hours
+                urgency_reason = "Good donation opportunity - act within 24 hours"
             else:
-                priority = DonationPriority.MEDIUM
-                action_by = now + timedelta(days=2)
-                window_expires = now + timedelta(days=compliance_result.donation_window_days)
-
-        elif decision == DonationDecision.DISCOUNT_THEN_DONATE:
-            priority = DonationPriority.HIGH
-            action_by = now + timedelta(hours=12)  # Start discount process
-            window_expires = now + timedelta(days=2)  # Complete by this time
-
+                priority = DonationPriority.HIGH
+                action_by = now + timedelta(hours=12)  # Within 12 hours
+                urgency_reason = "Product expires soon - timely action recommended"
+        
         else:
-            priority = DonationPriority.LOW
-            action_by = now + timedelta(days=1)
-            window_expires = None
+            if action == ActionType.DISCOUNT:
+                priority = DonationPriority.MEDIUM
+                action_by = now + timedelta(days=1)
+                urgency_reason = "Proactive discounting recommended"
+            else:
+                priority = DonationPriority.LOW
+                action_by = now + timedelta(days=2)
+                urgency_reason = "Monitor and reassess"
 
         return {
             "priority": priority,
             "action_by": action_by,
-            "window_expires": window_expires,
+            "urgency_reason": urgency_reason,
         }
 
-    def _generate_logistics_requirements(
-        self,
-        compliance_result: EUComplianceResult,
-        category: str,
-        current_quantity: float,
-    ) -> dict[str, list[str]]:
-        """Generate logistics requirements for donation"""
+    def _get_suitable_recipients(self, category: str) -> list[DonationRecipientType]:
+        """Get suitable recipient types for a product category"""
+        
+        # Base recipients suitable for most categories
+        base_recipients = [
+            DonationRecipientType.FOOD_BANK,
+            DonationRecipientType.CHARITY,
+            DonationRecipientType.COMMUNITY_GROUP,
+        ]
+        
+        # Special handling categories have limited recipients
+        if category in self.special_handling_categories:
+            return [DonationRecipientType.FOOD_BANK]  # Only certified food banks
+        
+        # Fresh produce can go to more recipients
+        if category == "fresh_produce":
+            return base_recipients + [
+                DonationRecipientType.SOUP_KITCHEN,
+                DonationRecipientType.ANIMAL_SHELTER,
+                DonationRecipientType.SCHOOL,
+            ]
+        
+        # Bakery items are popular with many recipients
+        if category == "bakery_fresh":
+            return base_recipients + [
+                DonationRecipientType.SOUP_KITCHEN,
+                DonationRecipientType.ELDERLY_CARE,
+                DonationRecipientType.HOMELESS_SHELTER,
+            ]
+        
+        return base_recipients
 
-        recipient_types = []
-        if compliance_result.required_recipient_type:
-            recipient_types.append(compliance_result.required_recipient_type)
-        else:
-            recipient_types = ["food_bank_certified", "charity_registered"]
-
-        handling = compliance_result.handling_instructions.copy()
-        transport = []
-
-        # Add quantity-specific handling
-        if current_quantity > 50:
-            handling.append("Large quantity - arrange appropriate transport capacity")
-            transport.append("Consider commercial vehicle for large quantities")
-
-        # Add category-specific transport instructions
-        if category in ["fresh_meat_fish", "dairy", "deli_prepared"]:
-            transport.extend(
-                [
-                    "Refrigerated transport mandatory",
-                    "Minimize transport time (<2 hours)",
-                    "Temperature monitoring required",
-                ]
-            )
-        elif category == "frozen":
-            transport.extend(
-                [
-                    "Frozen transport with dry ice",
-                    "Continuous temperature monitoring",
-                    "Direct transfer to recipient freezer",
-                ]
-            )
-        else:
-            transport.append("Standard food-grade transport acceptable")
-
-        return {
-            "recipient_types": recipient_types,
-            "handling": handling,
-            "transport": transport,
-        }
-
-    def _create_fallback_recommendation(
+    def _create_simple_fallback_recommendation(
         self, batch_data: dict[str, Any], error: str
-    ) -> DonationRecommendation:
+    ) -> SimpleActionRecommendation:
         """Create safe fallback recommendation when evaluation fails"""
-        from app.core.eu_food_safety import DonationEligibility, EUComplianceResult
-
-        fallback_compliance = EUComplianceResult(
-            eligible_for_donation=False,
-            eligibility_status=DonationEligibility.NOT_ELIGIBLE_REGULATORY,
-            safety_requirements=[],
-            regulatory_notes=[f"Evaluation error: {error}"],
-            donation_window_days=0,
-            required_recipient_type=None,
-            temperature_requirements=None,
-            handling_instructions=[],
-            compliance_score=0.0,
-            expires_for_donation=None,
-        )
-
-        return DonationRecommendation(
+        
+        return SimpleActionRecommendation(
             batch_id=batch_data.get("batch_id", "unknown"),
-            decision=DonationDecision.MONITOR,
+            recommended_action=ActionType.MAINTAIN,
             priority=DonationPriority.LOW,
-            confidence_score=0.0,
-            eu_compliant=False,
-            compliance_result=fallback_compliance,
-            estimated_donation_value=0.0,
-            estimated_waste_cost_avoided=0.0,
-            estimated_tax_benefit=0.0,
-            opportunity_cost=0.0,
+            ai_score=0.0,
+            quantity_affected=float(batch_data.get("current_quantity", 0)),
+            notes=f"Automated evaluation failed: {error}. Manual review required.",
+            original_value=0.0,
+            estimated_recovered_value=0.0,
             recommended_action_by=datetime.now() + timedelta(hours=24),
-            donation_window_expires=None,
-            preferred_recipient_types=[],
-            handling_requirements=[],
-            transport_instructions=[],
-            fallback_action="Manual review required",
-            fallback_reasoning=f"Automated evaluation failed: {error}",
+            suggested_recipient_types=[],
             decision_factors=[f"System error: {error}"],
-            risk_assessment="Unknown - manual evaluation required",
-            business_impact="Cannot determine - review needed",
+            urgency_reason="Manual evaluation required due to system error",
         )
 
 
 # Factory function for easy instantiation
-def create_donation_decision_engine() -> DonationDecisionEngine:
-    """Create donation decision engine instance"""
-    return DonationDecisionEngine()
+def create_simplified_donation_engine() -> SimplifiedDonationEngine:
+    """Create simplified donation decision engine instance"""
+    return SimplifiedDonationEngine()

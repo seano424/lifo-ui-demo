@@ -91,7 +91,7 @@ const token = (await supabase.auth.getSession()).data.session?.access_token
 
 ### API Base URL
 
-- **Local Development**: `http://localhost:8000`
+- **Local Development**: `http://localhost:8001`
 - **Production**: `https://your-domain.com`
 
 ### Authentication Header
@@ -109,7 +109,7 @@ Use this UUID for testing: `123e4567-e89b-12d3-a456-426614174000`
 ### 1. Root Endpoint
 
 ```bash
-curl -X GET "http://localhost:8000/" \
+curl -X GET "http://localhost:8001/" \
   -H "Content-Type: application/json"
 ```
 
@@ -134,14 +134,14 @@ curl -X GET "http://localhost:8000/" \
 ### 2. Health Check
 
 ```bash
-curl -X GET "http://localhost:8000/health" \
+curl -X GET "http://localhost:8001/health" \
   -H "Content-Type: application/json"
 ```
 
 ### 3. API Information
 
 ```bash
-curl -X GET "http://localhost:8000/api/info" \
+curl -X GET "http://localhost:8001/api/info" \
   -H "Content-Type: application/json"
 ```
 
@@ -152,7 +152,7 @@ curl -X GET "http://localhost:8000/api/info" \
 **Purpose**: Register new inventory via mobile scanning
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/scan/scan-in/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/scan/scan-in/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -186,7 +186,7 @@ curl -X POST "http://localhost:8000/api/v1/scan/scan-in/123e4567-e89b-12d3-a456-
 **Purpose**: Track when inventory is sold, discounted, or disposed
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/scan/scan-out/123e4567-e89b-12d3-a456-426614174000/456e7890-f12a-34b5-c678-567890123456" \
+curl -X POST "http://localhost:8001/api/v1/scan/scan-out/123e4567-e89b-12d3-a456-426614174000/456e7890-f12a-34b5-c678-567890123456" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -213,7 +213,7 @@ curl -X POST "http://localhost:8000/api/v1/scan/scan-out/123e4567-e89b-12d3-a456
 **Purpose**: Process barcode + expiry date scan data (future image recognition)
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/scan/process-scan/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/scan/process-scan/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -235,7 +235,7 @@ curl -X POST "http://localhost:8000/api/v1/scan/process-scan/123e4567-e89b-12d3-
 **Purpose**: Fast overview for mobile scanning interface (target <300ms)
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mobile/mobile-summary/123e4567-e89b-12d3-a456-426614174000?include_details=true&limit_urgent=15" \
+curl -X GET "http://localhost:8001/api/v1/mobile/mobile-summary/123e4567-e89b-12d3-a456-426614174000?include_details=true&limit_urgent=15" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -267,7 +267,7 @@ curl -X GET "http://localhost:8000/api/v1/mobile/mobile-summary/123e4567-e89b-12
 **Purpose**: Real-time scoring for scanned items (target <200ms)
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/mobile/batch-quick-score/456e7890-f12a-34b5-c678-567890123456?store_id=123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/mobile/batch-quick-score/456e7890-f12a-34b5-c678-567890123456?store_id=123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -277,7 +277,7 @@ curl -X POST "http://localhost:8000/api/v1/mobile/batch-quick-score/456e7890-f12
 **Purpose**: Overall store inventory health for mobile dashboard
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mobile/store-health/123e4567-e89b-12d3-a456-426614174000" \
+curl -X GET "http://localhost:8001/api/v1/mobile/store-health/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -287,7 +287,7 @@ curl -X GET "http://localhost:8000/api/v1/mobile/store-health/123e4567-e89b-12d3
 **Purpose**: Filtered, paginated batch list optimized for mobile
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mobile/batch-list-mobile/123e4567-e89b-12d3-a456-426614174000?category=fresh_produce&urgency_filter=high&limit=20&offset=0" \
+curl -X GET "http://localhost:8001/api/v1/mobile/batch-list-mobile/123e4567-e89b-12d3-a456-426614174000?category=fresh_produce&urgency_filter=high&limit=20&offset=0" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -305,7 +305,7 @@ curl -X GET "http://localhost:8000/api/v1/mobile/batch-list-mobile/123e4567-e89b
 **Purpose**: Track key metrics for MVP success measurement
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mvp/mvp-metrics/123e4567-e89b-12d3-a456-426614174000?date_range=7" \
+curl -X GET "http://localhost:8001/api/v1/mvp/mvp-metrics/123e4567-e89b-12d3-a456-426614174000?date_range=7" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -332,7 +332,7 @@ curl -X GET "http://localhost:8000/api/v1/mvp/mvp-metrics/123e4567-e89b-12d3-a45
 **Purpose**: Pattern analysis and optimization opportunities
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mvp/batch-insights/123e4567-e89b-12d3-a456-426614174000?analysis_depth=detailed" \
+curl -X GET "http://localhost:8001/api/v1/mvp/batch-insights/123e4567-e89b-12d3-a456-426614174000?analysis_depth=detailed" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -348,7 +348,7 @@ curl -X GET "http://localhost:8000/api/v1/mvp/batch-insights/123e4567-e89b-12d3-
 **Purpose**: Adoption and usage metrics for scan workflows
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mvp/scan-workflow-stats/123e4567-e89b-12d3-a456-426614174000?days=14" \
+curl -X GET "http://localhost:8001/api/v1/mvp/scan-workflow-stats/123e4567-e89b-12d3-a456-426614174000?days=14" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -358,7 +358,7 @@ curl -X GET "http://localhost:8000/api/v1/mvp/scan-workflow-stats/123e4567-e89b-
 **Purpose**: ROI analysis and sustainability impact
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mvp/waste-prevention-impact/123e4567-e89b-12d3-a456-426614174000?comparison_period=30&baseline_period=30" \
+curl -X GET "http://localhost:8001/api/v1/mvp/waste-prevention-impact/123e4567-e89b-12d3-a456-426614174000?comparison_period=30&baseline_period=30" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -368,7 +368,7 @@ curl -X GET "http://localhost:8000/api/v1/mvp/waste-prevention-impact/123e4567-e
 **Purpose**: Measure success rates of different actions
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/mvp/action-effectiveness/123e4567-e89b-12d3-a456-426614174000?days=21" \
+curl -X GET "http://localhost:8001/api/v1/mvp/action-effectiveness/123e4567-e89b-12d3-a456-426614174000?days=21" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -380,7 +380,7 @@ curl -X GET "http://localhost:8000/api/v1/mvp/action-effectiveness/123e4567-e89b
 **Purpose**: Check health of image recognition models
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/image/ml-models/status" \
+curl -X GET "http://localhost:8001/api/v1/image/ml-models/status" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json"
 ```
@@ -390,7 +390,7 @@ curl -X GET "http://localhost:8000/api/v1/image/ml-models/status" \
 **Purpose**: Full image analysis for expiry date, barcode, and product info
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/image/analyze-image/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/image/analyze-image/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "image=@product_image.jpg" \
   -F "analysis_type=full" \
@@ -402,7 +402,7 @@ curl -X POST "http://localhost:8000/api/v1/image/analyze-image/123e4567-e89b-12d
 **Purpose**: OCR-focused expiry date extraction
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/image/extract-expiry-date/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/image/extract-expiry-date/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "image=@expiry_label.jpg" \
   -F "date_format_hint=DD/MM/YYYY"
@@ -413,7 +413,7 @@ curl -X POST "http://localhost:8000/api/v1/image/extract-expiry-date/123e4567-e8
 **Purpose**: Computer vision barcode detection
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/image/detect-barcode/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/image/detect-barcode/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "image=@barcode_image.jpg" \
   -F "barcode_types=EAN13" \
@@ -425,7 +425,7 @@ curl -X POST "http://localhost:8000/api/v1/image/detect-barcode/123e4567-e89b-12
 ### 1. Calculate Batch Score
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/scoring/calculate-score" \
+curl -X POST "http://localhost:8001/api/v1/scoring/calculate-score" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -437,7 +437,7 @@ curl -X POST "http://localhost:8000/api/v1/scoring/calculate-score" \
 ### 2. Bulk Score Calculation
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/scoring/calculate-bulk-scores" \
+curl -X POST "http://localhost:8001/api/v1/scoring/calculate-bulk-scores" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -452,7 +452,7 @@ curl -X POST "http://localhost:8000/api/v1/scoring/calculate-bulk-scores" \
 ### 3. Recommendations
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/scoring/recommendations/123e4567-e89b-12d3-a456-426614174000?limit=10&urgency_level=high" \
+curl -X GET "http://localhost:8001/api/v1/scoring/recommendations/123e4567-e89b-12d3-a456-426614174000?limit=10&urgency_level=high" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -461,21 +461,21 @@ curl -X GET "http://localhost:8000/api/v1/scoring/recommendations/123e4567-e89b-
 ### 1. Store Analytics
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/analytics/store-analytics/123e4567-e89b-12d3-a456-426614174000?days=30" \
+curl -X GET "http://localhost:8001/api/v1/analytics/store-analytics/123e4567-e89b-12d3-a456-426614174000?days=30" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### 2. Waste Analytics
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/analytics/waste-analytics/123e4567-e89b-12d3-a456-426614174000?days=30" \
+curl -X GET "http://localhost:8001/api/v1/analytics/waste-analytics/123e4567-e89b-12d3-a456-426614174000?days=30" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 ### 3. Category Performance
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/analytics/category-performance/123e4567-e89b-12d3-a456-426614174000?category=fresh_produce&days=30" \
+curl -X GET "http://localhost:8001/api/v1/analytics/category-performance/123e4567-e89b-12d3-a456-426614174000?category=fresh_produce&days=30" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -484,7 +484,7 @@ curl -X GET "http://localhost:8000/api/v1/analytics/category-performance/123e456
 ### 1. Upload CSV
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/csv/upload/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/csv/upload/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "file=@inventory_data.csv" \
   -F "source=manual_upload" \
@@ -494,7 +494,7 @@ curl -X POST "http://localhost:8000/api/v1/csv/upload/123e4567-e89b-12d3-a456-42
 ### 2. Process CSV
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/csv/process/123e4567-e89b-12d3-a456-426614174000" \
+curl -X POST "http://localhost:8001/api/v1/csv/process/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -515,7 +515,7 @@ curl -X POST "http://localhost:8000/api/v1/csv/process/123e4567-e89b-12d3-a456-4
 #!/bin/bash
 STORE_ID="123e4567-e89b-12d3-a456-426614174000"
 TOKEN="YOUR_JWT_TOKEN"
-BASE_URL="http://localhost:8000"
+BASE_URL="http://localhost:8001"
 
 # 1. Check store health before scan
 echo "=== Initial Store Health ==="
@@ -574,7 +574,7 @@ curl -X GET "$BASE_URL/api/v1/mvp/mvp-metrics/$STORE_ID" \
 # Test mobile performance requirements
 STORE_ID="123e4567-e89b-12d3-a456-426614174000"
 TOKEN="YOUR_JWT_TOKEN"
-BASE_URL="http://localhost:8000"
+BASE_URL="http://localhost:8001"
 
 echo "Testing mobile performance requirements..."
 
@@ -594,7 +594,7 @@ time curl -X POST "$BASE_URL/api/v1/mobile/batch-quick-score/456e7890-f12a-34b5-
 ```bash
 #!/bin/bash
 # Test error scenarios
-BASE_URL="http://localhost:8000"
+BASE_URL="http://localhost:8001"
 TOKEN="YOUR_JWT_TOKEN"
 
 echo "Testing error handling..."
@@ -661,10 +661,10 @@ curl -X POST "$BASE_URL/api/v1/scan/scan-in/123e4567-e89b-12d3-a456-426614174000
 
 ```bash
 # Check server health
-curl -X GET "http://localhost:8000/health"
+curl -X GET "http://localhost:8001/health"
 
 # View API documentation
-open "http://localhost:8000/docs"
+open "http://localhost:8001/docs"
 
 # Check logs
 tail -f logs/lifo_api.log

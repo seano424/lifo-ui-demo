@@ -8,7 +8,7 @@ The LIFO.AI API is a comprehensive FastAPI-based microservice that provides inte
 
 ### API Base URLs
 
-- **Development**: `http://localhost:8000`
+- **Development**: `http://localhost:8001`
 - **Staging**: `https://staging-api.lifoai.com`
 - **Production**: `https://api.lifoai.com`
 
