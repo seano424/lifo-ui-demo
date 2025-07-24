@@ -2,13 +2,13 @@ name: Code Quality & Tests
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
       - '.github/workflows/code-quality.yml'
   pull_request:
-    branches: [main, develop]
+    branches: [main]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
