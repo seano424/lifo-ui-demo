@@ -83,6 +83,8 @@ export default function BarcodeDemo() {
     // Set barcode in workflow store and trigger lookup
     workflowActions.setBarcodeScanned(barcode, detection)
     setLookupBarcode(barcode)
+    // Switch to workflow tab to show progress
+    setActiveTab('workflow')
   }
 
   const handleError = (error: Error) => {
