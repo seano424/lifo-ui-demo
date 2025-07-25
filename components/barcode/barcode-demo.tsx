@@ -112,13 +112,12 @@ export default function BarcodeDemo() {
     }
   }, [isClient])
 
-  // Test barcodes for easy testing
+  // Test barcodes for easy testing (verified working)
   const testBarcodes = [
-    { barcode: '3017620422003', name: 'Nutella' },
-    { barcode: '5000169021625', name: 'Kit Kat' },
-    { barcode: '8712100846019', name: 'Red Bull' },
-    { barcode: '4006381333634', name: 'Oreo' },
-    { barcode: '3228020000006', name: 'Evian Water' },
+    { barcode: '3017624010701', name: 'Nutella' },
+    { barcode: '737628064502', name: 'Thai Peanut Noodles' },
+    { barcode: '078000113464', name: 'Orange Sunkist' },
+    { barcode: '5060482840209', name: 'Deliciously Ella Oat Bar' },
   ]
 
   const testBarcode = (barcode: string) => {
