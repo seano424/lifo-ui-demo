@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Camera,
+  Info,
   ArrowLeft,
   CheckCircle,
   Keyboard,
@@ -89,6 +90,7 @@ export default function WorkingStreamlinedScanningInterface({
   const [isRescanning, setIsRescanning] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
+  const [showSystemStatus, setShowSystemStatus] = useState(false)
 
   // Form state for batch creation
   const [quantity, setQuantity] = useState(1)
@@ -355,22 +357,23 @@ export default function WorkingStreamlinedScanningInterface({
   }
 
   return (
-    <div className={`bg-white min-h-screen ${className}`}>
+    <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">LIFO Complete Scanning System</h1>
         <p className="text-gray-600">
           Camera scanning + Manual entry + Open Food Facts integration + Workflow management
         </p>
-        {activeStore && (
-          <Badge variant="outline" className="mt-2">
-            Store: {activeStore.store_name}
-          </Badge>
-        )}
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={() => setShowSystemStatus(!showSystemStatus)}>
+            <Info className="w-4 h-4 mr-2" />
+            {showSystemStatus ? 'Hide System Status' : 'Show System Status'}
+          </Button>
+        </div>
       </div>
 
       {/* Browser Support Info */}
-      {browserSupport && (
+      {browserSupport && showSystemStatus && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">System Status</CardTitle>
@@ -590,6 +593,8 @@ export default function WorkingStreamlinedScanningInterface({
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 text-sm">
                   <Package className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium">{scannedProduct?.brand}</span>
+                  <span className="text-gray-500">•</span>
                   <span className="font-medium">{scannedProduct?.productName}</span>
                   <span className="text-gray-500">•</span>
                   <span className="font-mono text-xs">{scannedProduct?.barcode}</span>
@@ -696,15 +701,14 @@ export default function WorkingStreamlinedScanningInterface({
 
             {/* Success with Date Captured */}
             {manualExpiryDate && (
-              <Card className="border-green-200 bg-green-50">
+              <Card className="">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-800">
+                    <Typography variant="h3" className="text-secondary">
                       {expiryInfo?.isManual
                         ? 'Date entered manually'
                         : 'Date captured successfully'}
-                    </span>
+                    </Typography>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
