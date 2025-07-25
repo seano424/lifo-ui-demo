@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Search,
   Package,
@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
-import { useScanningWorkflowStore } from '@/lib/stores/scanning-workflow-store'
+import { useScanningActions, useScanHistory } from '@/lib/stores/scanning-workflow-store'
 
 interface ManualBarcodeEntryProps {
   onProductSelected?: (barcode: string, productData: any) => void
@@ -39,9 +39,9 @@ export default function ManualBarcodeEntry({
     imageUrl: '',
   })
 
-  // Workflow store actions
-  const { setBarcodeScanned, setProductLookupResult, setManualProductEntry, scanHistory } =
-    useScanningWorkflowStore()
+  // 🔥 NEW: Get the new setProductSelected action
+  const { setProductSelected } = useScanningActions()
+  const scanHistory = useScanHistory()
 
   // React Query hooks
   const {
@@ -52,16 +52,10 @@ export default function ManualBarcodeEntry({
 
   const productSearch = useProductSearch()
 
-  // Handle barcode submission
+  // Handle barcode submission - just for lookup, don't update workflow yet
   const handleBarcodeSubmit = async () => {
     if (!barcode || barcode.length < 8) return
-
-    // Set barcode in workflow store
-    setBarcodeScanned(barcode, {
-      format: 'Manual Entry',
-      rawValue: barcode,
-      confidence: 1.0,
-    })
+    // Don't call workflow actions here - just let the lookup happen
   }
 
   // Handle product search
@@ -82,6 +76,8 @@ export default function ManualBarcodeEntry({
       category: productData.categories?.split(',')[0] || productData.category || '',
       imageUrl: productData.image_front_url || productData.image_url || productData.imageUrl || '',
       isManualEntry: true,
+      // Include lookup result if this came from a lookup
+      lookupResult: lookupResult && sourceBarcode === barcode ? lookupResult : undefined,
     }
 
     setSelectedProduct(normalizedProduct)
@@ -103,23 +99,19 @@ export default function ManualBarcodeEntry({
     setSelectedProduct(normalizedProduct)
   }
 
-  // Handle confirming the selected product and moving to next step
+  // 🔥 FIXED: Handle confirming the selected product and moving to next step
   const handleConfirmAndProceed = () => {
     if (!selectedProduct) return
 
-    // Set the product in workflow store
-    setBarcodeScanned(selectedProduct.barcode, {
-      format: 'Manual Entry',
-      rawValue: selectedProduct.barcode,
-      confidence: 1.0,
-    })
-
-    // Set manual product entry data
-    setManualProductEntry({
+    // 🔥 Use the new setProductSelected action that skips the intermediate step
+    setProductSelected({
+      barcode: selectedProduct.barcode,
       productName: selectedProduct.productName,
       brand: selectedProduct.brand,
       category: selectedProduct.category,
       imageUrl: selectedProduct.imageUrl,
+      isManualEntry: true,
+      lookupResult: selectedProduct.lookupResult,
     })
 
     // Call parent callback
@@ -137,21 +129,17 @@ export default function ManualBarcodeEntry({
     onClose?.()
   }
 
-  // Update workflow store when lookup completes
-  useEffect(() => {
-    if (lookupResult && barcode) {
-      setProductLookupResult(lookupResult)
-    }
-  }, [lookupResult, barcode, setProductLookupResult])
-
   // Quick rescan from history
   const handleQuickRescan = (historyItem: any) => {
-    setBarcode(historyItem.barcode)
-    setBarcodeScanned(historyItem.barcode, {
-      format: 'Manual Entry',
-      rawValue: historyItem.barcode,
-      confidence: 1.0,
-    })
+    const normalizedProduct = {
+      barcode: historyItem.barcode,
+      productName: historyItem.productName || 'Unknown Product',
+      brand: historyItem.brand || '',
+      category: historyItem.category || '',
+      imageUrl: historyItem.imageUrl || '',
+      isManualEntry: true,
+    }
+    setSelectedProduct(normalizedProduct)
   }
 
   return (
@@ -464,7 +452,7 @@ export default function ManualBarcodeEntry({
                         variant="ghost"
                         size="sm"
                         className="justify-between h-auto p-2 text-xs"
-                        onClick={() => handleSelectProduct(item)}
+                        onClick={() => handleQuickRescan(item)}
                       >
                         <div className="text-left">
                           <div className="font-mono">{item.barcode}</div>
@@ -484,7 +472,7 @@ export default function ManualBarcodeEntry({
                 <p>• Enter a barcode to look up product information</p>
                 <p>• If not found, you can add the product manually</p>
                 <p>• Use search to find similar products in the database</p>
-                <p>• Select a product to proceed to expiry date entry</p>
+                <p>• Select a product to proceed directly to expiry date entry</p>
               </div>
             </>
           )}

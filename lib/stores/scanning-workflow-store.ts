@@ -1,5 +1,3 @@
-// lib/stores/scanning-workflow-store.ts (FINAL SSR-SAFE VERSION)
-
 // Create stable default values
 const DEFAULT_STEP: ScanningStep = 'barcode'
 const DEFAULT_WORKFLOW_PROGRESS = {
@@ -88,6 +86,15 @@ export interface ScanningWorkflowState {
   // Product step actions
   confirmProduct: () => void
   editProduct: (updates: Partial<ScannedProduct>) => void
+  setProductSelected: (productData: {
+    barcode: string
+    productName: string
+    brand?: string
+    category?: string
+    imageUrl?: string
+    isManualEntry?: boolean
+    lookupResult?: ProductLookupResult
+  }) => void
 
   // OCR step actions
   setExpiryDateProcessing: (isProcessing: boolean) => void
@@ -203,6 +210,22 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
           if (state.scannedProduct) {
             Object.assign(state.scannedProduct, updates)
           }
+        }),
+
+      setProductSelected: productData =>
+        set(state => {
+          state.scannedProduct = {
+            barcode: productData.barcode,
+            productName: productData.productName,
+            brand: productData.brand,
+            category: productData.category,
+            imageUrl: productData.imageUrl,
+            isManualEntry: productData.isManualEntry || false,
+            lookupResult: productData.lookupResult,
+          }
+          // Skip directly to OCR step
+          state.currentStep = 'ocr'
+          state.error = null
         }),
 
       // OCR actions
@@ -403,7 +426,6 @@ export const useWorkflowProgress = () => {
   return progress
 }
 
-// Actions hook (SSR-safe)
 export const useScanningActions = () => {
   const [isClient, setIsClient] = useState(false)
 
@@ -432,6 +454,17 @@ export const useScanningActions = () => {
       imageUrl?: string
     }) => {
       if (isClient) useScanningWorkflowStore.getState().setManualProductEntry(productData)
+    },
+    setProductSelected: (productData: {
+      barcode: string
+      productName: string
+      brand?: string
+      category?: string
+      imageUrl?: string
+      isManualEntry?: boolean
+      lookupResult?: ProductLookupResult
+    }) => {
+      if (isClient) useScanningWorkflowStore.getState().setProductSelected(productData)
     },
     confirmProduct: () => {
       if (isClient) useScanningWorkflowStore.getState().confirmProduct()
