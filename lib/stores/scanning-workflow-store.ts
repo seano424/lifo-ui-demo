@@ -436,6 +436,9 @@ export const useScanningActions = () => {
     confirmProduct: () => {
       if (isClient) useScanningWorkflowStore.getState().confirmProduct()
     },
+    setExpiryDateProcessing: (isProcessing: boolean) => {
+      if (isClient) useScanningWorkflowStore.getState().setExpiryDateProcessing(isProcessing)
+    },
     setExpiryDateResult: (expiryInfo: ExpiryDateInfo) => {
       if (isClient) useScanningWorkflowStore.getState().setExpiryDateResult(expiryInfo)
     },
