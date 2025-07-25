@@ -1,10 +1,9 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, ScanLine, AlertCircle, X, Keyboard, CheckCircle } from 'lucide-react'
+import { Camera, ScanLine, AlertCircle, CheckCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
 
@@ -19,6 +18,7 @@ interface BarcodeScannerProps {
   onError?: (error: Error) => void
   autoStart?: boolean
   className?: string
+  title?: string
 }
 
 export default function BarcodeScanner({
@@ -26,16 +26,15 @@ export default function BarcodeScanner({
   onError,
   autoStart = true,
   className = '',
+  title = 'Scan Product',
 }: BarcodeScannerProps): React.JSX.Element {
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showManualEntry, setShowManualEntry] = useState(false)
-  const [manualBarcode, setManualBarcode] = useState('')
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [detectedBarcode, setDetectedBarcode] = useState<string | null>(null)
   const [scanningHistory, setScanningHistory] = useState<string[]>([])
   const [isMounted, setIsMounted] = useState(false)
-  const [userStoppedCamera, setUserStoppedCamera] = useState(false) // 🔥 Tracks if user manually stopped
+  const [userStoppedCamera, setUserStoppedCamera] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -43,7 +42,6 @@ export default function BarcodeScanner({
   const scanIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const isStartingRef = useRef(false) // Prevent multiple simultaneous camera starts
 
-  // 🔥 REAL barcode detection using your infrastructure
   const {
     detectBarcodes,
     initializeDetector,
@@ -59,7 +57,6 @@ export default function BarcodeScanner({
     }
   }, [])
 
-  // Real barcode detection function (replaces mock)
   const detectBarcode = useCallback(
     async (imageData: ImageData): Promise<BarcodeDetection | null> => {
       try {
@@ -74,7 +71,7 @@ export default function BarcodeScanner({
     [detectBarcodes],
   )
 
-  // Stop camera stream - IMPROVED
+  // Stop camera stream
   const stopCamera = useCallback(() => {
     console.log('Stopping camera...')
 
@@ -107,21 +104,14 @@ export default function BarcodeScanner({
     console.log('Camera stopped successfully')
   }, [])
 
-  // Start camera stream - IMPROVED with better state management
+  // Start camera stream
   const startCamera = useCallback(async () => {
-    // 🔥 FIXED: More comprehensive blocking conditions
-    if (
-      isStartingRef.current ||
-      isScanning ||
-      !isMounted ||
-      userStoppedCamera || // 🔥 KEY FIX: Respect user's intent to stop
-      !isInitialized
-    ) {
+    if (isStartingRef.current || isScanning || !isMounted || userStoppedCamera || !isInitialized) {
       console.log('Camera start blocked:', {
         isStarting: isStartingRef.current,
         isScanning,
         isMounted,
-        userStoppedCamera, // 🔥 Now logged
+        userStoppedCamera,
         isInitialized,
       })
       return
@@ -164,7 +154,6 @@ export default function BarcodeScanner({
         // Wait for video to be ready before marking as scanning
         videoRef.current.onloadedmetadata = () => {
           if (isMounted && !userStoppedCamera) {
-            // 🔥 Double-check user intent
             videoRef.current?.play()
             setIsScanning(true)
             console.log('Camera started successfully')
@@ -180,9 +169,9 @@ export default function BarcodeScanner({
     } finally {
       isStartingRef.current = false
     }
-  }, [onError, isScanning, isMounted, stopCamera, userStoppedCamera, isInitialized]) // 🔥 Added userStoppedCamera to dependencies
+  }, [onError, isScanning, isMounted, stopCamera, userStoppedCamera, isInitialized])
 
-  // Scan for barcodes in video feed using REAL detection
+  // Scan for barcodes in video feed
   const scanForBarcode = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current || !isScanning || !isInitialized || !isMounted) {
       return
@@ -202,7 +191,6 @@ export default function BarcodeScanner({
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
     try {
-      // 🔥 Use REAL barcode detection instead of mock
       const detections = await detectBarcodes(canvas)
 
       if (detections.length > 0 && isMounted) {
@@ -241,23 +229,6 @@ export default function BarcodeScanner({
     [onScan, isMounted],
   )
 
-  // Handle manual barcode entry
-  const handleManualSubmit = useCallback(
-    (e: React.FormEvent | React.KeyboardEvent) => {
-      e.preventDefault()
-      if (manualBarcode.trim() && isMounted) {
-        handleBarcodeDetected(manualBarcode.trim(), {
-          format: 'Manual Entry',
-          rawValue: manualBarcode.trim(),
-          confidence: 1.0,
-        })
-        setManualBarcode('')
-        setShowManualEntry(false)
-      }
-    },
-    [manualBarcode, handleBarcodeDetected, isMounted],
-  )
-
   // Set up scanning interval
   useEffect(() => {
     if (isScanning && isInitialized && isMounted) {
@@ -272,7 +243,7 @@ export default function BarcodeScanner({
     }
   }, [isScanning, isInitialized, scanForBarcode, isMounted])
 
-  // Initialize barcode detector - SINGLE EFFECT
+  // Initialize barcode detector
   useEffect(() => {
     if (!isInitialized && isMounted) {
       console.log('Initializing barcode detector...')
@@ -280,7 +251,7 @@ export default function BarcodeScanner({
     }
   }, [isInitialized, initializeDetector, isMounted])
 
-  // 🔥 FIXED: Auto-start camera - Auto-start initially, then respect user stops
+  // Auto-start camera
   useEffect(() => {
     if (
       autoStart &&
@@ -288,8 +259,8 @@ export default function BarcodeScanner({
       isMounted &&
       !isStartingRef.current &&
       !isScanning &&
-      !userStoppedCamera && // 🔥 KEY: Don't auto-start if user manually stopped
-      hasPermission !== false // Don't try if permission was denied
+      !userStoppedCamera &&
+      hasPermission !== false
     ) {
       console.log('Auto-starting camera...')
       startCamera()
@@ -304,17 +275,17 @@ export default function BarcodeScanner({
     hasPermission,
   ])
 
-  // 🔥 FIXED: Handle user manually stopping the camera
+  // Handle user manually stopping the camera
   const handleUserStop = useCallback(() => {
     console.log('User manually stopped camera')
-    setUserStoppedCamera(true) // 🔥 This prevents auto-restart
+    setUserStoppedCamera(true)
     stopCamera()
   }, [stopCamera])
 
-  // 🔥 FIXED: Handle user manually starting the camera
+  // Handle user manually starting the camera
   const handleUserStart = useCallback(() => {
     console.log('User manually started camera')
-    setUserStoppedCamera(false) // 🔥 Clear the stop flag
+    setUserStoppedCamera(false)
     startCamera()
   }, [startCamera])
 
@@ -335,7 +306,7 @@ export default function BarcodeScanner({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ScanLine className="w-5 h-5" />
-            Barcode Scanner
+            {title}
             {isInitialized && (
               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                 Real Detection
@@ -344,7 +315,6 @@ export default function BarcodeScanner({
             {isScanning && (
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Scanning</span>
             )}
-            {/* 🔥 DEBUG: Show user stop status */}
             {userStoppedCamera && (
               <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
                 User Stopped
@@ -378,7 +348,7 @@ export default function BarcodeScanner({
                 <AlertDescription>Camera access is required for barcode scanning.</AlertDescription>
               </Alert>
               <Button
-                onClick={handleUserStart} // 🔥 Use handleUserStart
+                onClick={handleUserStart}
                 className="w-full"
                 disabled={!isInitialized || isStartingRef.current}
               >
@@ -389,7 +359,7 @@ export default function BarcodeScanner({
           )}
 
           {/* Camera View */}
-          {hasPermission && !showManualEntry && (
+          {hasPermission && (
             <div className="relative">
               <video
                 ref={videoRef}
@@ -418,46 +388,11 @@ export default function BarcodeScanner({
             </div>
           )}
 
-          {/* Manual Entry Form */}
-          {showManualEntry && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Enter Barcode Manually</label>
-                <Input
-                  type="text"
-                  value={manualBarcode}
-                  onChange={e => setManualBarcode(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && manualBarcode.trim()) {
-                      handleManualSubmit(e)
-                    }
-                  }}
-                  placeholder="Enter barcode number..."
-                  className="font-mono"
-                  autoFocus
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleManualSubmit}
-                  disabled={!manualBarcode.trim()}
-                  className="flex-1"
-                >
-                  Confirm
-                </Button>
-                <Button variant="outline" onClick={() => setShowManualEntry(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* 🔥 FIXED: Action Buttons - Clear logic for start/stop */}
-          {hasPermission && !showManualEntry && (
+          {hasPermission && (
             <div className="flex gap-2">
               {!isScanning ? (
                 <Button
-                  onClick={handleUserStart} // 🔥 Use handleUserStart
+                  onClick={handleUserStart}
                   className="flex-1"
                   disabled={!isInitialized || isStartingRef.current}
                 >
@@ -465,22 +400,10 @@ export default function BarcodeScanner({
                   {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
                 </Button>
               ) : (
-                <Button
-                  onClick={handleUserStop} // 🔥 Use handleUserStop
-                  variant="outline"
-                  className="flex-1"
-                >
+                <Button onClick={handleUserStop} variant="outline" className="flex-1">
                   Stop Scanning
                 </Button>
               )}
-
-              <Button
-                variant="outline"
-                onClick={() => setShowManualEntry(true)}
-                title="Manual entry"
-              >
-                <Keyboard className="w-4 h-4" />
-              </Button>
             </div>
           )}
 
@@ -513,14 +436,6 @@ export default function BarcodeScanner({
           {hasPermission && isScanning && isInitialized && (
             <div className="text-xs text-gray-500 text-center">
               Point camera at barcode to scan automatically • Real detection active
-            </div>
-          )}
-
-          {/* 🔥 DEBUG INFO - Remove in production */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="text-xs text-gray-400 p-2 bg-gray-50 rounded">
-              Debug: userStopped={userStoppedCamera.toString()}, isScanning={isScanning.toString()},
-              autoStart={autoStart.toString()}
             </div>
           )}
         </CardContent>

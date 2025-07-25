@@ -421,15 +421,12 @@ export default function WorkingStreamlinedScanningInterface({
         {uiStep === 'camera-barcode' && !showManualBarcode && (
           <>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Camera className="w-4 h-4" />
-                <span>Camera starting up...</span>
-              </div>
               <BarcodeScanner
                 onScan={handleScan}
                 onError={handleError}
                 autoStart={true}
                 className="w-full"
+                title="Scan Product"
               />
             </div>
             <div className="flex gap-2">
@@ -652,6 +649,7 @@ export default function WorkingStreamlinedScanningInterface({
                     onError={handleError}
                     autoStart={true}
                     className="w-full"
+                    title="Scan Expiry Date"
                   />
                 </div>
 
