@@ -256,7 +256,7 @@ export default function WorkingStreamlinedScanningInterface({
     // Reset expiry date state to show camera again
     setManualExpiryDate('')
     setShowManualExpiry(false)
-    // Increment camera reset counter to force re-render
+    // Increment camera reset counter to force re-render and restart camera
     setCameraResetCounter(prev => prev + 1)
     console.log('Camera reset counter:', cameraResetCounter + 1)
     // Clear rescanning flag after a short delay
@@ -264,6 +264,22 @@ export default function WorkingStreamlinedScanningInterface({
       setIsRescanning(false)
     }, 500)
   }
+
+  // Force camera restart when switching to camera steps
+  useEffect(() => {
+    if (uiStep === 'camera-barcode' || uiStep === 'camera-expiry') {
+      // Force camera restart by incrementing counter
+      setCameraResetCounter(prev => prev + 1)
+    }
+  }, [uiStep])
+
+  // Ensure camera starts on initial load
+  useEffect(() => {
+    // Start camera immediately when component mounts
+    if (uiStep === 'camera-barcode') {
+      setCameraResetCounter(prev => prev + 1)
+    }
+  }, []) // Empty dependency array - only run once on mount
 
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
@@ -285,12 +301,19 @@ export default function WorkingStreamlinedScanningInterface({
         {/* STEP 1: Camera Barcode Scanning */}
         {uiStep === 'camera-barcode' && !showManualBarcode && (
           <>
-            <BarcodeScanner
-              onScan={handleScan}
-              onError={handleError}
-              autoStart={true}
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Camera className="w-4 h-4" />
+                <span>Camera starting up...</span>
+              </div>
+              <BarcodeScanner
+                key={`barcode-camera-${cameraResetCounter}`}
+                onScan={handleScan}
+                onError={handleError}
+                autoStart={true}
+                className="w-full"
+              />
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"

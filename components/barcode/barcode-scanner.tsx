@@ -207,6 +207,13 @@ export default function BarcodeScanner({
     }
   }, [autoStart, hasPermission, isInitialized, startCamera, stopCamera])
 
+  // Auto-start scanning when permission is granted and autoStart is true
+  useEffect(() => {
+    if (autoStart && hasPermission === true && isInitialized && !isScanning) {
+      startCamera()
+    }
+  }, [autoStart, hasPermission, isInitialized, isScanning, startCamera])
+
   // Show detection error if any
   const displayError = error || detectionError
 
@@ -321,7 +328,7 @@ export default function BarcodeScanner({
           )}
 
           {/* Action Buttons */}
-          {hasPermission && !showManualEntry && (
+          {hasPermission && !showManualEntry && !autoStart && (
             <div className="flex gap-2">
               {!isScanning ? (
                 <Button onClick={startCamera} className="flex-1" disabled={!isInitialized}>
@@ -341,6 +348,15 @@ export default function BarcodeScanner({
               >
                 <Keyboard className="w-4 h-4" />
               </Button> */}
+            </div>
+          )}
+
+          {/* Stop button only when autoStart is true and scanning */}
+          {hasPermission && !showManualEntry && autoStart && isScanning && (
+            <div className="flex gap-2">
+              <Button onClick={stopCamera} variant="outline" className="flex-1">
+                Stop Scanning
+              </Button>
             </div>
           )}
 
