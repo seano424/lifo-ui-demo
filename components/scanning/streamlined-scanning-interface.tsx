@@ -1,18 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import {
-  Camera,
-  ScanLine,
-  CheckCircle,
-  Keyboard,
-  Package,
-  Euro,
-  ArrowRight,
-  Plus,
-  Edit3,
-  AlertCircle,
-} from 'lucide-react'
+import { Camera, CheckCircle, Keyboard, Package, Euro, Edit3, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -265,22 +254,6 @@ export default function WorkingStreamlinedScanningInterface({
     }, 500)
   }
 
-  // Force camera restart when switching to camera steps
-  useEffect(() => {
-    if (uiStep === 'camera-barcode' || uiStep === 'camera-expiry') {
-      // Force camera restart by incrementing counter
-      setCameraResetCounter(prev => prev + 1)
-    }
-  }, [uiStep])
-
-  // Ensure camera starts on initial load
-  useEffect(() => {
-    // Start camera immediately when component mounts
-    if (uiStep === 'camera-barcode') {
-      setCameraResetCounter(prev => prev + 1)
-    }
-  }, []) // Empty dependency array - only run once on mount
-
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
@@ -498,7 +471,9 @@ export default function WorkingStreamlinedScanningInterface({
           <div className="space-y-4">
             {/* Debug Info */}
             <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
-              Debug: uiStep={uiStep}, showManualExpiry={showManualExpiry.toString()}, manualExpiryDate={manualExpiryDate || 'empty'}, cameraResetCounter={cameraResetCounter}
+              Debug: uiStep={uiStep}, showManualExpiry={showManualExpiry.toString()},
+              manualExpiryDate={manualExpiryDate || 'empty'}, cameraResetCounter=
+              {cameraResetCounter}
             </div>
             {/* Product Context */}
             <Card>
@@ -514,7 +489,11 @@ export default function WorkingStreamlinedScanningInterface({
 
             {/* Camera for OCR or Manual Entry */}
             {(() => {
-              console.log('Camera section condition check:', { showManualExpiry, manualExpiryDate, shouldShow: !showManualExpiry && !manualExpiryDate })
+              console.log('Camera section condition check:', {
+                showManualExpiry,
+                manualExpiryDate,
+                shouldShow: !showManualExpiry && !manualExpiryDate,
+              })
               return !showManualExpiry && !manualExpiryDate
             })() && (
               <>
