@@ -301,7 +301,7 @@ export default function BarcodeScanner({
   const displayError = error || detectionError
 
   return (
-    <div className={`barcode-scanner ${className}`}>
+    <div className={`${className}`}>
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

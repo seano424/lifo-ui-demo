@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Camera,
+  ArrowLeft,
   CheckCircle,
   Keyboard,
   Package,
@@ -18,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { UniversalBarcodeDetector } from '@/lib/barcode/barcode-detector'
+import { Typography } from '@/components/ui/typography'
 
 // Import working components from BarcodeDemo
 import BarcodeScanner, { BarcodeDetection } from '@/components/barcode/barcode-scanner'
@@ -27,12 +29,12 @@ import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import {
   useScanningStep,
   useScannedProduct,
-  useWorkflowProgress,
-  useScanHistory,
   useScanningActions,
   useExpiryInfo,
   useScanningError,
   useScanningProcessing,
+  useCanGoBack,
+  usePreviousStepName,
 } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
 import { useProductLookup } from '@/hooks/use-product-lookup'
@@ -65,6 +67,8 @@ export default function WorkingStreamlinedScanningInterface({
   const expiryInfo = useExpiryInfo()
   const workflowError = useScanningError()
   const isWorkflowProcessing = useScanningProcessing()
+  const canGoBack = useCanGoBack()
+  const previousStepName = usePreviousStepName()
   const { activeStore } = useStoreState()
 
   const [browserSupport, setBrowserSupport] = useState<{
@@ -144,13 +148,18 @@ export default function WorkingStreamlinedScanningInterface({
     }
   }, [lookupResult, lookupBarcode, workflowActions])
 
-  // Sync workflow state to UI steps - this is the key integration
+  // Updated workflow sync effect in WorkingStreamlinedScanningInterface
+
   useEffect(() => {
     switch (currentStep) {
       case 'barcode':
         setUIStep('camera-barcode')
         setShowManualBarcode(false)
         setShowManualExpiry(false)
+        setLookupBarcode(null)
+        setQuantity(1)
+        setPrice(0)
+        setManualExpiryDate('')
         break
       case 'product':
         if (scannedProduct?.productName) {
@@ -164,6 +173,15 @@ export default function WorkingStreamlinedScanningInterface({
       case 'ocr':
         setUIStep('camera-expiry')
         setShowManualExpiry(false)
+
+        // 🔥 FIX: Reset expiry date and rescanning flag when entering OCR step
+        // This ensures the camera view shows when going back
+        if (!expiryInfo?.extractedDate || isRescanning) {
+          setManualExpiryDate('')
+        }
+
+        // Reset rescanning flag
+        setIsRescanning(false)
         break
       case 'confirmation':
         // Stay on expiry step but show the confirmation form
@@ -192,7 +210,16 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('batch-success')
         break
     }
-  }, [currentStep, scannedProduct, expiryInfo, manualExpiryDate, quantity, price, onItemAdded])
+  }, [
+    currentStep,
+    scannedProduct,
+    expiryInfo,
+    manualExpiryDate,
+    quantity,
+    price,
+    onItemAdded,
+    isRescanning,
+  ])
 
   // Handle barcode scan
   const handleScan = (barcode: string, detection?: BarcodeDetection) => {
@@ -215,6 +242,38 @@ export default function WorkingStreamlinedScanningInterface({
     // Just close the manual entry and set lookup barcode
     setLookupBarcode(barcode)
     setShowManualBarcode(false)
+  }
+
+  // Enhanced handleGoBack function in WorkingStreamlinedScanningInterface
+
+  // 🔥 ENHANCED: Handle go back button with special logic for OCR step
+  const handleGoBack = () => {
+    // Special handling for confirmation step going back to OCR
+    if (currentStep === 'confirmation') {
+      console.log('Going back to OCR step - resetting expiry state...')
+
+      // Set rescanning flag to prevent workflow sync from setting date
+      setIsRescanning(true)
+
+      // Reset expiry date state to show camera again
+      setManualExpiryDate('')
+      setShowManualExpiry(false)
+
+      // Call workflow go back
+      workflowActions.goBackStep()
+
+      // Clear rescanning flag after a short delay (like handleRescanExpiry)
+      setTimeout(() => {
+        setIsRescanning(false)
+      }, 500)
+    } else {
+      // For all other steps, use normal go back
+      workflowActions.goBackStep()
+
+      // Close any open modals/forms when going back
+      setShowManualBarcode(false)
+      setShowManualExpiry(false)
+    }
   }
 
   // Handle OCR simulation (replace with real OCR later)
@@ -258,21 +317,6 @@ export default function WorkingStreamlinedScanningInterface({
     setManualExpiryDate('')
     setShowManualBarcode(false)
     setShowManualExpiry(false)
-  }
-
-  // Handle rescan expiry date
-  const handleRescanExpiry = () => {
-    console.log('Rescanning expiry date...')
-    // Set rescanning flag to prevent workflow sync from setting date
-    setIsRescanning(true)
-    // Reset expiry date state to show camera again
-    setManualExpiryDate('')
-    setShowManualExpiry(false)
-
-    // Clear rescanning flag after a short delay
-    setTimeout(() => {
-      setIsRescanning(false)
-    }, 500)
   }
 
   // Format price
@@ -523,7 +567,7 @@ export default function WorkingStreamlinedScanningInterface({
                   ))}
 
                 {/* Next Step Button */}
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
                   <Button
                     onClick={workflowActions.confirmProduct}
                     className="w-full"
@@ -713,31 +757,22 @@ export default function WorkingStreamlinedScanningInterface({
                 </Button>
               </div>
             )}
-
-            {/* Re-scan Button - Always available when in expiry step */}
-            {manualExpiryDate && (
-              <div className="flex justify-center">
-                <Button variant="outline" onClick={handleRescanExpiry}>
-                  <Camera className="w-4 h-4 mr-2" />
-                  Re-scan expiry date
-                </Button>
-              </div>
-            )}
           </div>
         )}
 
         {/* STEP 4: Batch Success */}
         {uiStep === 'batch-success' && (
-          <Card className="border-green-200 bg-green-50">
+          <Card className="">
             <CardContent className="p-4 text-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-3" />
-              <h3 className="font-medium text-green-800 mb-2">Product Added Successfully!</h3>
-              <p className="text-sm text-green-700 mb-4">
+              <Typography variant="h3" className="mb-2 text-secondary">
+                Product Added Successfully!
+              </Typography>
+              <Typography variant="p" className="mb-4 text-secondary">
                 {quantity}x {scannedProduct?.productName} • Expires{' '}
                 {manualExpiryDate ? new Date(manualExpiryDate).toLocaleDateString() : 'Unknown'}
-              </p>
+              </Typography>
               <Button
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-secondary hover:bg-secondary/80"
                 onClick={handleScanAnother}
               >
                 Scan Another Product
@@ -755,7 +790,7 @@ export default function WorkingStreamlinedScanningInterface({
                 <Badge variant="secondary">{scannedItems.length}</Badge>
               </div>
 
-              <div className="space-y-2 max-h-32 overflow-y-auto">
+              <div className="space-y-2 max-h-80 overflow-y-auto">
                 {scannedItems.map(item => (
                   <div
                     key={item.id}
@@ -776,6 +811,15 @@ export default function WorkingStreamlinedScanningInterface({
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {canGoBack && (
+          <div className="flex justify-center pt-4">
+            <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              {previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
+            </Button>
+          </div>
         )}
       </div>
     </div>

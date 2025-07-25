@@ -114,6 +114,11 @@ export interface ScanningWorkflowState {
   addToHistory: (product: ScannedProduct) => void
   clearHistory: () => void
   rescanFromHistory: (product: ScannedProduct) => void
+
+  // Navigation actions
+  goBackStep: () => void
+  canGoBack: () => boolean
+  getPreviousStepName: () => string | null
 }
 
 const initialState = {
@@ -320,6 +325,99 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
           state.batchData = null
           state.error = null
         }),
+
+      // Navigation actions
+      goBackStep: () =>
+        set(state => {
+          switch (state.currentStep) {
+            case 'product':
+              // Go back to barcode scanning
+              state.currentStep = 'barcode'
+              // Clear the scanned product but keep it in history
+              if (state.scannedProduct) {
+                const existingIndex = state.scanHistory.findIndex(
+                  (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
+                )
+                if (existingIndex >= 0) {
+                  state.scanHistory[existingIndex] = { ...state.scannedProduct }
+                } else {
+                  state.scanHistory = [
+                    { ...state.scannedProduct },
+                    ...state.scanHistory.slice(0, 9),
+                  ]
+                }
+              }
+              state.scannedProduct = null
+              break
+
+            case 'ocr':
+              // Go back to product confirmation (if we have product data) or barcode scanning
+              if (state.scannedProduct?.productName) {
+                state.currentStep = 'product'
+              } else {
+                state.currentStep = 'barcode'
+                state.scannedProduct = null
+              }
+              // Clear expiry info
+              state.expiryInfo = null
+              break
+
+            case 'confirmation':
+              // 🔥 FIX: Go back to OCR step and clear expiry data to show camera again
+              state.currentStep = 'ocr'
+              // Clear expiry info to reset the OCR step completely
+              state.expiryInfo = null
+              // Keep batch data but clear it to show fresh form
+              state.batchData = null
+              break
+
+            case 'complete':
+              // Go back to confirmation step
+              state.currentStep = 'confirmation'
+              break
+
+            case 'error':
+              // Go back to the last valid step (try to recover)
+              if (state.batchData) {
+                state.currentStep = 'confirmation'
+              } else if (state.expiryInfo) {
+                state.currentStep = 'ocr'
+              } else if (state.scannedProduct) {
+                state.currentStep = 'product'
+              } else {
+                state.currentStep = 'barcode'
+              }
+              state.error = null
+              break
+
+            default:
+              // Already at the first step, can't go back further
+              break
+          }
+        }),
+
+      canGoBack: () => {
+        const state = get()
+        return state.currentStep !== 'barcode'
+      },
+
+      getPreviousStepName: () => {
+        const state = get()
+        switch (state.currentStep) {
+          case 'product':
+            return 'Scan Barcode'
+          case 'ocr':
+            return state.scannedProduct?.productName ? 'Product Details' : 'Scan Barcode'
+          case 'confirmation':
+            return 'Scan Expiry Date'
+          case 'complete':
+            return 'Review Details'
+          case 'error':
+            return 'Previous Step'
+          default:
+            return null
+        }
+      },
     })),
   ),
 )
@@ -487,6 +585,17 @@ export const useScanningActions = () => {
     setError: (error: string | null) => {
       if (isClient) useScanningWorkflowStore.getState().setError(error)
     },
+    goBackStep: () => {
+      if (isClient) useScanningWorkflowStore.getState().goBackStep()
+    },
+    canGoBack: () => {
+      if (isClient) return useScanningWorkflowStore.getState().canGoBack()
+      return false
+    },
+    getPreviousStepName: () => {
+      if (isClient) return useScanningWorkflowStore.getState().getPreviousStepName()
+      return null
+    },
   }
 }
 
@@ -616,4 +725,15 @@ export const usePersistWorkflow = () => {
     loadWorkflow,
     clearPersistedWorkflow,
   }
+}
+
+// 🔥 NEW: Hook to get go back state
+export const useCanGoBack = () => {
+  const selector = useCallback((state: ScanningWorkflowState) => state.canGoBack(), [])
+  return useClientOnlyStore(selector, false)
+}
+
+export const usePreviousStepName = () => {
+  const selector = useCallback((state: ScanningWorkflowState) => state.getPreviousStepName(), [])
+  return useClientOnlyStore(selector, null)
 }
