@@ -38,8 +38,8 @@ export default function BarcodeDemo() {
     formats: string[]
   } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('camera')
   const [isClient, setIsClient] = useState(false)
+  const [activeTab, setActiveTab] = useState('camera')
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
 
   // 🔥 FIXED: SSR-safe selectors and actions
