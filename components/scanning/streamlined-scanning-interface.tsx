@@ -668,13 +668,14 @@ export default function WorkingStreamlinedScanningInterface({
                   </div>
                   <div>
                     <Label htmlFor="price" className="text-xs">
-                      Price per Unit
+                      Price per unit (€)
                     </Label>
                     <div className="relative">
                       <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
                         id="price"
                         type="number"
+                        min="0"
                         step="0.01"
                         value={price}
                         onChange={e => setPrice(parseFloat(e.target.value) || 0)}
@@ -734,10 +735,11 @@ export default function WorkingStreamlinedScanningInterface({
                   </div>
 
                   <div className="mt-3">
-                    <Label className="text-xs">Price per Unit</Label>
+                    <Label className="text-xs">Price per unit (€)</Label>
                     <div className="relative">
                       <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
+                        min="0"
                         type="number"
                         step="0.01"
                         value={price}
@@ -751,11 +753,13 @@ export default function WorkingStreamlinedScanningInterface({
             )}
 
             {/* Add to Inventory Button */}
-            {manualExpiryDate && quantity > 0 && price > 0 && (
+            {manualExpiryDate && (
               <div className="flex gap-2">
                 <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  disabled={quantity <= 0 || price <= 0}
                   onClick={handleAddToInventory}
+                  className="w-full"
+                  variant="secondary"
                 >
                   Add to Inventory • {quantity}x {formatPrice(price)}
                 </Button>
