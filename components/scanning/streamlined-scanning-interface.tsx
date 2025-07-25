@@ -12,6 +12,7 @@ import {
   Edit3,
   AlertCircle,
   ArrowRight,
+  Scan,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -772,29 +773,27 @@ export default function WorkingStreamlinedScanningInterface({
         {uiStep === 'batch-success' && (
           <Card className="">
             <CardContent className="p-4 text-center">
-              <Typography variant="h3" className="mb-2 text-secondary">
+              <Typography variant="h3" className="mb-2">
                 Product Added Successfully!
               </Typography>
-              <Typography variant="p" className="mb-4 text-secondary">
+              <Typography variant="p" className="mb-4">
                 {quantity}x {scannedProduct?.productName} • Expires{' '}
                 {manualExpiryDate ? new Date(manualExpiryDate).toLocaleDateString() : 'Unknown'}
               </Typography>
-              <Button
-                className="w-full bg-secondary hover:bg-secondary/80"
-                onClick={handleScanAnother}
-              >
+              <Button className="w-full" onClick={handleScanAnother}>
+                <Scan className="w-4 h-4" />
                 Scan Another Product
               </Button>
             </CardContent>
           </Card>
         )}
 
-        {/* Recent Scans List */}
+        {/* Recent Scans */}
         {scannedItems.length > 0 && (
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium">Recent Scans</h3>
+                <Typography variant="h3">Total items scanned</Typography>
                 <Badge variant="secondary">{scannedItems.length}</Badge>
               </div>
 
@@ -805,11 +804,16 @@ export default function WorkingStreamlinedScanningInterface({
                     className="flex items-center justify-between p-2 border rounded text-sm"
                   >
                     <div className="flex-1">
-                      <div>{item.productName}</div>
-                      <div className="text-xs text-gray-500">
-                        {item.quantity}x • {formatPrice(item.price)} • Exp:{' '}
+                      <Typography variant="p">
+                        <span className="text-gray-500">Product:</span> {item.productName}
+                      </Typography>
+                      <Typography variant="p">
+                        <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}
+                        x <span className="font-normal text-gray-500">Price:</span>{' '}
+                        {formatPrice(item.price)}{' '}
+                        <span className="font-normal text-gray-500">Expiry:</span>{' '}
                         {new Date(item.expiryDate).toLocaleDateString()}
-                      </div>
+                      </Typography>
                     </div>
                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                       <Edit3 className="w-3 h-3" />
@@ -821,14 +825,27 @@ export default function WorkingStreamlinedScanningInterface({
           </Card>
         )}
 
-        {canGoBack && (
-          <div className="flex justify-center pt-4">
-            <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              {previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
-            </Button>
-          </div>
-        )}
+        {/* Footer */}
+        <div className="flex justify-center gap-4">
+          {canGoBack && (
+            <div className="flex justify-center pt-4">
+              <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                {previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
+              </Button>
+            </div>
+          )}
+
+          {/* Finish and submit button */}
+          {scannedItems.length > 0 && (
+            <div className="flex justify-center pt-4">
+              <Button variant="brandSecondary" className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                Finish and submit {scannedItems.length} item{scannedItems.length > 1 ? 's' : ''}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
