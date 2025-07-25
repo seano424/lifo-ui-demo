@@ -418,7 +418,7 @@ export default function WorkingStreamlinedScanningInterface({
         )}
 
         {/* STEP 1: Camera Barcode Scanning */}
-        {uiStep === 'camera-barcode' && !showManualBarcode && (
+        {uiStep === 'camera-barcode' && (
           <>
             <div className="space-y-2">
               <BarcodeScanner
@@ -429,16 +429,29 @@ export default function WorkingStreamlinedScanningInterface({
                 title="Scan Product"
               />
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowManualBarcode(true)}
-                className="flex-1"
-              >
-                <Keyboard className="w-4 h-4 mr-2" />
-                Manual Entry
-              </Button>
-            </div>
+            {/* Manual Barcode Entry */}
+            {showManualBarcode && (
+              <div className="space-y-4">
+                <ManualBarcodeEntry
+                  onProductFound={handleProductFound}
+                  onManualEntry={handleManualEntry}
+                  onClose={() => setShowManualBarcode(false)}
+                />
+              </div>
+            )}
+
+            {!showManualBarcode && (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowManualBarcode(true)}
+                  className="flex-1"
+                >
+                  <Keyboard className="w-4 h-4 mr-2" />
+                  Manual Entry
+                </Button>
+              </div>
+            )}
 
             <Alert>
               <Camera className="h-4 w-4" />
@@ -448,23 +461,6 @@ export default function WorkingStreamlinedScanningInterface({
               </AlertDescription>
             </Alert>
           </>
-        )}
-
-        {/* Manual Barcode Entry */}
-        {uiStep === 'camera-barcode' && showManualBarcode && (
-          <div className="space-y-4">
-            <ManualBarcodeEntry
-              onProductFound={handleProductFound}
-              onManualEntry={handleManualEntry}
-            />
-            <Button
-              variant="outline"
-              onClick={() => setShowManualBarcode(false)}
-              className="w-full"
-            >
-              Back to Camera
-            </Button>
-          </div>
         )}
 
         {/* STEP 2: Product Success */}

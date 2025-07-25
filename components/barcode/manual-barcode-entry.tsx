@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Search, Package, Scan, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
+import { Search, Package, Scan, Loader2, AlertCircle, CheckCircle, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,12 +18,14 @@ interface ManualBarcodeEntryProps {
   onProductFound?: (barcode: string, lookupResult: any) => void
   onManualEntry?: (productData: any) => void
   className?: string
+  onClose?: () => void
 }
 
 export default function ManualBarcodeEntry({
   onProductFound,
   onManualEntry,
   className = '',
+  onClose,
 }: ManualBarcodeEntryProps) {
   const [barcode, setBarcode] = useState('')
   const [showProductSearch, setShowProductSearch] = useState(false)
@@ -32,6 +34,7 @@ export default function ManualBarcodeEntry({
     brand: '',
     category: '',
     imageUrl: '',
+    barcode: '',
   })
 
   // Workflow store actions
@@ -76,8 +79,8 @@ export default function ManualBarcodeEntry({
     try {
       // Add to cache first
       await addToCache.mutateAsync({
-        barcode,
         ...manualProductData,
+        barcode,
       })
 
       // Set in workflow store
@@ -85,8 +88,8 @@ export default function ManualBarcodeEntry({
 
       // Call parent callback
       onManualEntry?.({
-        barcode,
         ...manualProductData,
+        barcode,
       })
 
       // Reset form
@@ -95,6 +98,7 @@ export default function ManualBarcodeEntry({
         brand: '',
         category: '',
         imageUrl: '',
+        barcode: '',
       })
       setShowProductSearch(false)
     } catch (error) {
@@ -124,10 +128,15 @@ export default function ManualBarcodeEntry({
     <div className={`manual-barcode-entry space-y-4 ${className}`}>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="w-5 h-5" />
-            Manual Product Entry
-          </CardTitle>
+          <div className="flex justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              Manual Product Entry
+            </CardTitle>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
@@ -225,183 +234,170 @@ export default function ManualBarcodeEntry({
           )}
 
           {/* Manual Product Entry (shown when product not found) */}
-          {(lookupResult && !lookupResult.found) || showProductSearch ? (
-            <Card className="border-dashed">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Package className="w-4 h-4" />
-                  Add Product Manually
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 gap-3">
+
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Package className="w-4 h-4" />
+                Add Product Manually
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 gap-3">
+                <div>
+                  <label className="block text-xs font-medium mb-1">Product Name *</label>
+                  <Input
+                    value={manualProductData.productName}
+                    onChange={e =>
+                      setManualProductData(prev => ({
+                        ...prev,
+                        productName: e.target.value,
+                      }))
+                    }
+                    placeholder="e.g., Organic Whole Milk"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1">Barcode *</label>
+                  <Input
+                    value={manualProductData.barcode}
+                    onChange={e =>
+                      setManualProductData(prev => ({
+                        ...prev,
+                        barcode: e.target.value,
+                      }))
+                    }
+                    placeholder="e.g., 078000113464"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-medium mb-1">Product Name *</label>
+                    <label className="block text-xs font-medium mb-1">Brand</label>
                     <Input
-                      value={manualProductData.productName}
+                      value={manualProductData.brand}
                       onChange={e =>
                         setManualProductData(prev => ({
                           ...prev,
-                          productName: e.target.value,
+                          brand: e.target.value,
                         }))
                       }
-                      placeholder="e.g., Organic Whole Milk"
-                      required
+                      placeholder="e.g., Danone"
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs font-medium mb-1">Brand</label>
-                      <Input
-                        value={manualProductData.brand}
-                        onChange={e =>
-                          setManualProductData(prev => ({
-                            ...prev,
-                            brand: e.target.value,
-                          }))
-                        }
-                        placeholder="e.g., Danone"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium mb-1">Category</label>
-                      <Input
-                        value={manualProductData.category}
-                        onChange={e =>
-                          setManualProductData(prev => ({
-                            ...prev,
-                            category: e.target.value,
-                          }))
-                        }
-                        placeholder="e.g., Dairy"
-                      />
-                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium mb-1">Image URL (optional)</label>
+                    <label className="block text-xs font-medium mb-1">Category</label>
                     <Input
-                      value={manualProductData.imageUrl}
+                      value={manualProductData.category}
                       onChange={e =>
                         setManualProductData(prev => ({
                           ...prev,
-                          imageUrl: e.target.value,
+                          category: e.target.value,
                         }))
                       }
-                      placeholder="https://..."
-                      type="url"
+                      placeholder="e.g., Dairy"
                     />
                   </div>
                 </div>
+              </div>
 
-                {/* Product Search Helper */}
-                <div className="border-t pt-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Search Open Food Facts..."
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          handleProductSearch(e.currentTarget.value)
-                        }
-                      }}
-                      className="text-xs"
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        const input = document.querySelector(
-                          'input[placeholder="Search Open Food Facts..."]',
-                        ) as HTMLInputElement
-                        if (input?.value) {
-                          handleProductSearch(input.value)
-                        }
-                      }}
-                      disabled={productSearch.isPending}
-                    >
-                      {productSearch.isPending ? (
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <Search className="w-3 h-3" />
-                      )}
-                    </Button>
-                  </div>
-
-                  {/* Search Results */}
-                  {productSearch.data && productSearch.data.length > 0 && (
-                    <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
-                      {productSearch.data.slice(0, 5).map((product: any) => (
-                        <Button
-                          key={product.code}
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start text-xs h-auto p-2"
-                          onClick={() => {
-                            setManualProductData({
-                              productName: product.product_name || 'Unknown Product',
-                              brand: product.brands || '',
-                              category: '',
-                              imageUrl: product.image_front_small_url || '',
-                            })
-                            setBarcode(product.code)
-                          }}
-                        >
-                          <div className="text-left">
-                            <div className="font-medium">{product.product_name}</div>
-                            {product.brands && (
-                              <div className="text-gray-500">{product.brands}</div>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-2 pt-2">
+              {/* Product Search Helper */}
+              <div className="border-t pt-3">
+                <div className="flex gap-2 w-full">
+                  <Input
+                    placeholder="Search Open Food Facts..."
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        handleProductSearch(e.currentTarget.value)
+                      }
+                    }}
+                    className="text-xs w-full"
+                  />
                   <Button
-                    onClick={handleManualProductSubmit}
-                    disabled={!manualProductData.productName || !barcode || addToCache.isPending}
-                    className="flex-1"
-                  >
-                    {addToCache.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
-                      <Package className="w-4 h-4 mr-2" />
-                    )}
-                    Add Product
-                  </Button>
-                  <Button
+                    size="sm"
                     variant="outline"
                     onClick={() => {
-                      setShowProductSearch(false)
-                      setManualProductData({
-                        productName: '',
-                        brand: '',
-                        category: '',
-                        imageUrl: '',
-                      })
+                      const input = document.querySelector(
+                        'input[placeholder="Search Open Food Facts..."]',
+                      ) as HTMLInputElement
+                      if (input?.value) {
+                        handleProductSearch(input.value)
+                      }
                     }}
+                    disabled={productSearch.isPending}
                   >
-                    Cancel
+                    {productSearch.isPending ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Search className="w-3 h-3" />
+                    )}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            !lookupResult && (
-              <Button
-                variant="outline"
-                onClick={() => setShowProductSearch(true)}
-                className="w-full"
-              >
-                <Package className="w-4 h-4 mr-2" />
-                Or Add Product Manually
-              </Button>
-            )
-          )}
+
+                {/* Search Results */}
+                {productSearch.data && productSearch.data.length > 0 && (
+                  <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
+                    {productSearch.data.slice(0, 5).map((product: any) => (
+                      <Button
+                        key={product.code}
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-xs h-auto p-2"
+                        onClick={() => {
+                          setManualProductData({
+                            productName: product.product_name || 'Unknown Product',
+                            brand: product.brands || '',
+                            category: '',
+                            imageUrl: product.image_front_small_url || '',
+                            barcode: product.code,
+                          })
+                          setBarcode(product.code)
+                        }}
+                      >
+                        <div className="text-left">
+                          <div className="font-medium">{product.product_name}</div>
+                          {product.brands && <div className="text-gray-500">{product.brands}</div>}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  onClick={handleManualProductSubmit}
+                  disabled={!manualProductData.productName || !barcode || addToCache.isPending}
+                  className="flex-1"
+                >
+                  {addToCache.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <Package className="w-4 h-4 mr-2" />
+                  )}
+                  Add Product
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowProductSearch(false)
+                    setManualProductData({
+                      productName: '',
+                      brand: '',
+                      category: '',
+                      imageUrl: '',
+                      barcode: '',
+                    })
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Quick Rescan from History */}
           {scanHistory.length > 0 && (
