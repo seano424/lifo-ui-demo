@@ -28,6 +28,7 @@ import {
 } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
 import { UniversalBarcodeDetector } from '@/lib/barcode/barcode-detector'
+import { useProductLookup } from '@/hooks/use-product-lookup'
 
 // Demo Implementation with Complete Workflow - FINAL SSR-SAFE VERSION
 export default function BarcodeDemo() {
@@ -39,6 +40,7 @@ export default function BarcodeDemo() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('camera')
   const [isClient, setIsClient] = useState(false)
+  const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
 
   // 🔥 FIXED: SSR-safe selectors and actions
   const currentStep = useScanningStep()
@@ -49,6 +51,13 @@ export default function BarcodeDemo() {
 
   // 🔥 FIXED: Use SSR-safe actions hook instead of direct store access
   const workflowActions = useScanningActions()
+
+  // Product lookup hook
+  const {
+    data: lookupResult,
+    isLoading: isLookingUp,
+    error: lookupError,
+  } = useProductLookup(lookupBarcode, !!lookupBarcode && isClient)
 
   // Set isClient flag for SSR safety
   useEffect(() => {
@@ -62,10 +71,18 @@ export default function BarcodeDemo() {
     }
   }, [activeStore, workflowActions, isClient])
 
+  // Update workflow store when lookup completes
+  useEffect(() => {
+    if (lookupResult && lookupBarcode && isClient) {
+      workflowActions.setProductLookupResult(lookupResult)
+    }
+  }, [lookupResult, lookupBarcode, workflowActions, isClient])
+
   const handleScan = (barcode: string, detection?: BarcodeDetection) => {
     console.log('Barcode scanned:', barcode, detection)
-    // This will trigger the product lookup workflow
+    // Set barcode in workflow store and trigger lookup
     workflowActions.setBarcodeScanned(barcode, detection)
+    setLookupBarcode(barcode)
   }
 
   const handleError = (error: Error) => {
@@ -126,6 +143,7 @@ export default function BarcodeDemo() {
       rawValue: barcode,
       confidence: 1.0,
     })
+    setLookupBarcode(barcode)
     setActiveTab('workflow')
   }
 
@@ -347,9 +365,16 @@ export default function BarcodeDemo() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium">Product Scanned</h4>
-                          <Badge variant="secondary">
-                            {scannedProduct.detection?.format || 'Manual Entry'}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            {isLookingUp && (
+                              <Badge variant="outline" className="animate-pulse">
+                                Looking up...
+                              </Badge>
+                            )}
+                            <Badge variant="secondary">
+                              {scannedProduct.detection?.format || 'Manual Entry'}
+                            </Badge>
+                          </div>
                         </div>
                         <div className="text-sm space-y-1">
                           <div>
@@ -374,26 +399,44 @@ export default function BarcodeDemo() {
                             </div>
                           )}
                         </div>
-                        {scannedProduct.lookupResult?.found ? (
-                          <Alert>
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <AlertDescription>
-                              Product found! Ready to proceed to expiry date scanning.
-                            </AlertDescription>
-                          </Alert>
-                        ) : (
+
+                        {/* Lookup Error */}
+                        {lookupError && (
                           <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
-                              Product not found in database. You may need to add it manually.
+                              Lookup failed: {lookupError.message}
                             </AlertDescription>
                           </Alert>
                         )}
 
+                        {/* Lookup Result */}
+                        {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
+                          scannedProduct.lookupResult.found ? (
+                            <Alert>
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <AlertDescription>
+                                Product found! Ready to proceed to expiry date scanning.
+                              </AlertDescription>
+                            </Alert>
+                          ) : (
+                            <Alert variant="destructive">
+                              <AlertCircle className="h-4 w-4" />
+                              <AlertDescription>
+                                Product not found in database. You may need to add it manually.
+                              </AlertDescription>
+                            </Alert>
+                          )
+                        )}
+
                         {/* Next Step Button */}
                         <div className="pt-2">
-                          <Button onClick={workflowActions.confirmProduct} className="w-full">
-                            Proceed to Expiry Date Scanning
+                          <Button 
+                            onClick={workflowActions.confirmProduct} 
+                            className="w-full"
+                            disabled={isLookingUp}
+                          >
+                            {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
                           </Button>
                         </div>
                       </div>
