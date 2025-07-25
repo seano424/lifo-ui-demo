@@ -278,9 +278,8 @@ export default function WorkingStreamlinedScanningInterface({
     // Reset expiry date state to show camera again
     setManualExpiryDate('')
     setShowManualExpiry(false)
-    // Increment camera reset counter to force re-render and restart camera
-    setCameraResetCounter(prev => prev + 1)
-    console.log('Camera reset counter:', cameraResetCounter + 1)
+    // No need for camera reset counter - let the component handle its own state
+
     // Clear rescanning flag after a short delay
     setTimeout(() => {
       setIsRescanning(false)
@@ -427,7 +426,6 @@ export default function WorkingStreamlinedScanningInterface({
                 <span>Camera starting up...</span>
               </div>
               <BarcodeScanner
-                key={`barcode-camera-${cameraResetCounter}`}
                 onScan={handleScan}
                 onError={handleError}
                 autoStart={true}
@@ -650,7 +648,6 @@ export default function WorkingStreamlinedScanningInterface({
                     <span>Point camera at expiry date</span>
                   </div>
                   <BarcodeScanner
-                    key={`expiry-camera-${cameraResetCounter}`}
                     onScan={() => {}} // Don't auto-trigger OCR - let user click button
                     onError={handleError}
                     autoStart={true}
