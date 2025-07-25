@@ -1,7 +1,16 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Camera, CheckCircle, Keyboard, Package, Euro, Edit3, AlertCircle } from 'lucide-react'
+import {
+  Camera,
+  CheckCircle,
+  Keyboard,
+  Package,
+  Euro,
+  Edit3,
+  AlertCircle,
+  ArrowRight,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -73,7 +82,6 @@ export default function WorkingStreamlinedScanningInterface({
   const [showManualExpiry, setShowManualExpiry] = useState(false)
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
-  const [cameraResetCounter, setCameraResetCounter] = useState(0)
   const [isRescanning, setIsRescanning] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
@@ -83,10 +91,16 @@ export default function WorkingStreamlinedScanningInterface({
   const [price, setPrice] = useState(0)
   const [manualExpiryDate, setManualExpiryDate] = useState('')
 
-  // Debug: Track when manualExpiryDate changes
+  // Product lookup hook - exactly like BarcodeDemo
+  const {
+    data: lookupResult,
+    isLoading: isLookingUp,
+    error: lookupError,
+  } = useProductLookup(lookupBarcode, !!lookupBarcode)
+
   useEffect(() => {
-    console.log('manualExpiryDate changed to:', manualExpiryDate)
-  }, [manualExpiryDate])
+    setIsClient(true)
+  }, [])
 
   // Check browser support on component mount
   useEffect(() => {
@@ -115,22 +129,6 @@ export default function WorkingStreamlinedScanningInterface({
       checkSupport()
     }
   }, [isClient])
-
-  // Debug: Track expiryInfo changes
-  useEffect(() => {
-    console.log('expiryInfo changed:', expiryInfo)
-  }, [expiryInfo])
-
-  // Product lookup hook - exactly like BarcodeDemo
-  const {
-    data: lookupResult,
-    isLoading: isLookingUp,
-    error: lookupError,
-  } = useProductLookup(lookupBarcode, !!lookupBarcode)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   // Initialize store ID when active store changes
   useEffect(() => {
@@ -210,21 +208,13 @@ export default function WorkingStreamlinedScanningInterface({
     workflowActions.setError(error.message)
   }
 
-  // Handle manual product found
-  const handleProductFound = (barcode: string, lookupResult: any) => {
-    console.log('Product found:', barcode, lookupResult)
-    // This will trigger the workflow state change
-  }
-
-  // Handle manual product entry
-  const handleManualEntry = (productData: any) => {
-    console.log('Manual product added:', productData)
-    workflowActions.setManualProductEntry({
-      productName: productData.productName || productData.name,
-      brand: productData.brand,
-      category: productData.category,
-      imageUrl: productData.imageUrl,
-    })
+  // Handle manual product selection from ManualBarcodeEntry
+  const handleManualProductSelected = (barcode: string, productData: any) => {
+    console.log('Manual product selected:', barcode, productData)
+    // The ManualBarcodeEntry component already handles setting the workflow state
+    // Just close the manual entry and set lookup barcode
+    setLookupBarcode(barcode)
+    setShowManualBarcode(false)
   }
 
   // Handle OCR simulation (replace with real OCR later)
@@ -278,7 +268,6 @@ export default function WorkingStreamlinedScanningInterface({
     // Reset expiry date state to show camera again
     setManualExpiryDate('')
     setShowManualExpiry(false)
-    // No need for camera reset counter - let the component handle its own state
 
     // Clear rescanning flag after a short delay
     setTimeout(() => {
@@ -429,12 +418,12 @@ export default function WorkingStreamlinedScanningInterface({
                 title="Scan Product"
               />
             </div>
+
             {/* Manual Barcode Entry */}
             {showManualBarcode && (
               <div className="space-y-4">
                 <ManualBarcodeEntry
-                  onProductFound={handleProductFound}
-                  onManualEntry={handleManualEntry}
+                  onProductSelected={handleManualProductSelected}
                   onClose={() => setShowManualBarcode(false)}
                 />
               </div>
@@ -465,62 +454,6 @@ export default function WorkingStreamlinedScanningInterface({
 
         {/* STEP 2: Product Success */}
         {uiStep === 'product-success' && scannedProduct && (
-          // <Card className="border-green-200 bg-green-50">
-          //   <CardContent className="p-4">
-          //     <div className="flex items-start gap-3">
-          //       <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-          //       <div className="flex-1">
-          //         <h3 className="font-medium text-green-800">Product Scanned</h3>
-          //         <div className="text-sm text-green-700 mt-1">
-          //           <div className="font-medium">{scannedProduct.productName}</div>
-          //           {scannedProduct.brand && <div>{scannedProduct.brand}</div>}
-          //           <div className="font-mono text-xs text-green-600 mt-1">
-          //             {scannedProduct.barcode}
-          //           </div>
-          //         </div>
-
-          //         {/* Lookup status */}
-          //         {isLookingUp && (
-          //           <Badge variant="outline" className="animate-pulse mt-2">
-          //             Looking up...
-          //           </Badge>
-          //         )}
-
-          //         {lookupResult && (
-          //           <div className="mt-2">
-          //             {lookupResult.found ? (
-          //               <Alert className="bg-green-100 border-green-300">
-          //                 <CheckCircle className="h-4 w-4 text-green-600" />
-          //                 <AlertDescription className="text-green-800">
-          //                   Product found! Ready to proceed to expiry date scanning.
-          //                 </AlertDescription>
-          //               </Alert>
-          //             ) : (
-          //               <Alert variant="destructive">
-          //                 <AlertCircle className="h-4 w-4" />
-          //                 <AlertDescription>
-          //                   Product not found in database. You may need to add it manually.
-          //                 </AlertDescription>
-          //               </Alert>
-          //             )}
-          //           </div>
-          //         )}
-          //       </div>
-          //     </div>
-
-          //     {/* Continue Button */}
-          //     <div className="mt-4">
-          //       <Button
-          //         onClick={handleProceedToExpiry}
-          //         className="w-full bg-purple-600 hover:bg-purple-700"
-          //         disabled={isLookingUp}
-          //       >
-          //         {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
-          //         <ArrowRight className="w-4 h-4 ml-2" />
-          //       </Button>
-          //     </div>
-          //   </CardContent>
-          // </Card>
           <Card className="border-green-200">
             <CardContent className="pt-4">
               <div className="space-y-2">
@@ -597,6 +530,7 @@ export default function WorkingStreamlinedScanningInterface({
                     disabled={isLookingUp}
                   >
                     {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
               </div>
@@ -607,12 +541,6 @@ export default function WorkingStreamlinedScanningInterface({
         {/* STEP 3: Camera Expiry Scanning */}
         {uiStep === 'camera-expiry' && (
           <div className="space-y-4">
-            {/* Debug Info */}
-            <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
-              Debug: uiStep={uiStep}, showManualExpiry={showManualExpiry.toString()},
-              manualExpiryDate={manualExpiryDate || 'empty'}, cameraResetCounter=
-              {cameraResetCounter}
-            </div>
             {/* Product Context */}
             <Card>
               <CardContent className="p-3">
@@ -626,14 +554,7 @@ export default function WorkingStreamlinedScanningInterface({
             </Card>
 
             {/* Camera for OCR or Manual Entry */}
-            {(() => {
-              console.log('Camera section condition check:', {
-                showManualExpiry,
-                manualExpiryDate,
-                shouldShow: !showManualExpiry && !manualExpiryDate,
-              })
-              return !showManualExpiry && !manualExpiryDate
-            })() && (
+            {!showManualExpiry && !manualExpiryDate && (
               <>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
