@@ -141,7 +141,7 @@ export default function WorkingStreamlinedScanningInterface({
           const newItem: ScannedItem = {
             id: Date.now().toString(),
             barcode: scannedProduct.barcode,
-            productName: scannedProduct.productName,
+            productName: scannedProduct.productName || 'Unknown Product',
             brand: scannedProduct.brand,
             expiryDate: manualExpiryDate,
             quantity,
@@ -238,26 +238,7 @@ export default function WorkingStreamlinedScanningInterface({
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
   return (
-    <div className={`max-w-md mx-auto bg-white min-h-screen ${className}`}>
-      {/* Header */}
-      <div className="bg-purple-600 text-white p-4">
-        <h1 className="text-lg font-semibold">
-          {uiStep === 'camera-barcode' && 'SCAN PRODUCT ENTRY'}
-          {uiStep === 'product-success' && 'SCAN PRODUCT ENTRY'}
-          {uiStep === 'camera-expiry' && 'CAPTURE IMAGE - OCR STEP'}
-          {uiStep === 'batch-success' && 'SCAN PRODUCT ENTRY'}
-        </h1>
-        <div className="flex items-center gap-2 text-sm opacity-90 mt-1">
-          <span className="flex items-center gap-1">
-            <ScanLine className="w-3 h-3" />
-            {uiStep === 'camera-barcode' ? 'Barcode Scanner' : 'OCR Processing'}
-          </span>
-          <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
-            Real Detection
-          </Badge>
-        </div>
-      </div>
-
+    <div className={`bg-white min-h-screen ${className}`}>
       {/* Main Content */}
       <div className="p-4 space-y-4">
         {/* Error Display */}
@@ -279,7 +260,6 @@ export default function WorkingStreamlinedScanningInterface({
               autoStart={true}
               className="w-full"
             />
-
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -290,6 +270,14 @@ export default function WorkingStreamlinedScanningInterface({
                 Manual Entry
               </Button>
             </div>
+
+            <Alert>
+              <Camera className="h-4 w-4" />
+              <AlertDescription>
+                Point your camera at any product barcode. The scanner will automatically detect
+                supported formats and look up product information from Open Food Facts.
+              </AlertDescription>
+            </Alert>
           </>
         )}
 
@@ -572,10 +560,10 @@ export default function WorkingStreamlinedScanningInterface({
                 {scannedItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                    className="flex items-center justify-between p-2 border rounded text-sm"
                   >
                     <div className="flex-1">
-                      <div className="font-medium">{item.productName}</div>
+                      <div>{item.productName}</div>
                       <div className="text-xs text-gray-500">
                         {item.quantity}x • {formatPrice(item.price)} • Exp:{' '}
                         {new Date(item.expiryDate).toLocaleDateString()}
@@ -584,33 +572,6 @@ export default function WorkingStreamlinedScanningInterface({
                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                       <Edit3 className="w-3 h-3" />
                     </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Scan History from Workflow Store */}
-        {scanHistory.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-medium mb-3">Scan History</h3>
-              <div className="space-y-2">
-                {scanHistory.slice(0, 3).map((item, index) => (
-                  <div
-                    key={`${item.barcode}-${index}`}
-                    className="flex items-center justify-between p-2 border rounded text-sm"
-                  >
-                    <div className="space-y-1">
-                      <div className="font-mono text-xs">{item.barcode}</div>
-                      <div className="text-xs text-gray-500">
-                        {item.productName || 'Unknown Product'} • {item.brand || 'No brand'}
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {item.lookupResult?.source || 'manual'}
-                    </Badge>
                   </div>
                 ))}
               </div>

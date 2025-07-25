@@ -540,7 +540,7 @@ export default function BarcodeDemo() {
       </Tabs>
 
       {/* Implementation Status */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="text-lg">Implementation Status</CardTitle>
         </CardHeader>
@@ -603,7 +603,7 @@ export default function BarcodeDemo() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   )
 }

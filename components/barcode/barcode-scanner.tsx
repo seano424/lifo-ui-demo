@@ -212,7 +212,7 @@ export default function BarcodeScanner({
 
   return (
     <div className={`barcode-scanner ${className}`}>
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ScanLine className="w-5 h-5" />
@@ -261,7 +261,7 @@ export default function BarcodeScanner({
             <div className="relative">
               <video
                 ref={videoRef}
-                className="w-full h-48 bg-black rounded-lg object-cover"
+                className="w-full aspect-video bg-black rounded-lg object-cover"
                 playsInline
                 muted
               />
@@ -334,13 +334,13 @@ export default function BarcodeScanner({
                 </Button>
               )}
 
-              <Button
+              {/* <Button
                 variant="outline"
                 onClick={() => setShowManualEntry(true)}
                 title="Manual entry"
               >
                 <Keyboard className="w-4 h-4" />
-              </Button>
+              </Button> */}
             </div>
           )}
 
