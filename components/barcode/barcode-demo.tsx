@@ -334,19 +334,35 @@ export default function BarcodeDemo() {
                     1. Barcode Scan
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <Badge variant={currentStep === 'product' ? 'default' : 'secondary'}>
+                  <Badge
+                    className="cursor-pointer"
+                    onClick={() => setActiveTab('product')}
+                    variant={currentStep === 'product' ? 'default' : 'secondary'}
+                  >
                     2. Product Lookup
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <Badge variant={currentStep === 'ocr' ? 'default' : 'secondary'}>
+                  <Badge
+                    className="cursor-pointer"
+                    onClick={() => setActiveTab('ocr')}
+                    variant={currentStep === 'ocr' ? 'default' : 'secondary'}
+                  >
                     3. Expiry Date
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <Badge variant={currentStep === 'confirmation' ? 'default' : 'secondary'}>
+                  <Badge
+                    className="cursor-pointer"
+                    onClick={() => setActiveTab('confirmation')}
+                    variant={currentStep === 'confirmation' ? 'default' : 'secondary'}
+                  >
                     4. Confirmation
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <Badge variant={currentStep === 'complete' ? 'default' : 'secondary'}>
+                  <Badge
+                    className="cursor-pointer"
+                    onClick={() => setActiveTab('complete')}
+                    variant={currentStep === 'complete' ? 'default' : 'secondary'}
+                  >
                     5. Complete
                   </Badge>
                 </div>
@@ -413,8 +429,10 @@ export default function BarcodeDemo() {
                         )}
 
                         {/* Lookup Result */}
-                        {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
-                          scannedProduct.lookupResult.found ? (
+                        {!isLookingUp &&
+                          !lookupError &&
+                          scannedProduct.lookupResult &&
+                          (scannedProduct.lookupResult.found ? (
                             <Alert>
                               <CheckCircle className="h-4 w-4 text-green-600" />
                               <AlertDescription>
@@ -428,17 +446,18 @@ export default function BarcodeDemo() {
                                 Product not found in database. You may need to add it manually.
                               </AlertDescription>
                             </Alert>
-                          )
-                        )}
+                          ))}
 
                         {/* Next Step Button */}
                         <div className="pt-2">
-                          <Button 
-                            onClick={workflowActions.confirmProduct} 
+                          <Button
+                            onClick={workflowActions.confirmProduct}
                             className="w-full"
                             disabled={isLookingUp}
                           >
-                            {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
+                            {isLookingUp
+                              ? 'Looking up product...'
+                              : 'Proceed to Expiry Date Scanning'}
                           </Button>
                         </div>
                       </div>

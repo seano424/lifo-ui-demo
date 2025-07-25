@@ -80,11 +80,23 @@ export default function WorkingStreamlinedScanningInterface({
   const [showManualExpiry, setShowManualExpiry] = useState(false)
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
+  const [cameraResetCounter, setCameraResetCounter] = useState(0)
+  const [isRescanning, setIsRescanning] = useState(false)
 
   // Form state for batch creation
   const [quantity, setQuantity] = useState(1)
   const [price, setPrice] = useState(0)
   const [manualExpiryDate, setManualExpiryDate] = useState('')
+
+  // Debug: Track when manualExpiryDate changes
+  useEffect(() => {
+    console.log('manualExpiryDate changed to:', manualExpiryDate)
+  }, [manualExpiryDate])
+
+  // Debug: Track expiryInfo changes
+  useEffect(() => {
+    console.log('expiryInfo changed:', expiryInfo)
+  }, [expiryInfo])
 
   // Product lookup hook - exactly like BarcodeDemo
   const {
@@ -131,7 +143,8 @@ export default function WorkingStreamlinedScanningInterface({
       case 'confirmation':
         // Stay on expiry step but show the confirmation form
         setUIStep('camera-expiry')
-        if (expiryInfo?.extractedDate) {
+        if (expiryInfo?.extractedDate && !isRescanning) {
+          console.log('Workflow sync: setting date from expiryInfo:', expiryInfo.extractedDate)
           setManualExpiryDate(expiryInfo.extractedDate)
         }
         break
@@ -194,6 +207,7 @@ export default function WorkingStreamlinedScanningInterface({
 
   // Handle OCR simulation (replace with real OCR later)
   const handleOCRCapture = () => {
+    console.log('handleOCRCapture called - setting date to 2025-02-15')
     // Simulate OCR processing
     const mockDate = '2025-02-15'
     workflowActions.setExpiryDateResult({
@@ -232,6 +246,23 @@ export default function WorkingStreamlinedScanningInterface({
     setManualExpiryDate('')
     setShowManualBarcode(false)
     setShowManualExpiry(false)
+  }
+
+  // Handle rescan expiry date
+  const handleRescanExpiry = () => {
+    console.log('Rescanning expiry date...')
+    // Set rescanning flag to prevent workflow sync from setting date
+    setIsRescanning(true)
+    // Reset expiry date state to show camera again
+    setManualExpiryDate('')
+    setShowManualExpiry(false)
+    // Increment camera reset counter to force re-render
+    setCameraResetCounter(prev => prev + 1)
+    console.log('Camera reset counter:', cameraResetCounter + 1)
+    // Clear rescanning flag after a short delay
+    setTimeout(() => {
+      setIsRescanning(false)
+    }, 500)
   }
 
   // Format price
@@ -300,59 +331,140 @@ export default function WorkingStreamlinedScanningInterface({
 
         {/* STEP 2: Product Success */}
         {uiStep === 'product-success' && scannedProduct && (
-          <Card className="border-green-200 bg-green-50">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-medium text-green-800">Product Scanned</h3>
-                  <div className="text-sm text-green-700 mt-1">
-                    <div className="font-medium">{scannedProduct.productName}</div>
-                    {scannedProduct.brand && <div>{scannedProduct.brand}</div>}
-                    <div className="font-mono text-xs text-green-600 mt-1">
-                      {scannedProduct.barcode}
-                    </div>
-                  </div>
+          // <Card className="border-green-200 bg-green-50">
+          //   <CardContent className="p-4">
+          //     <div className="flex items-start gap-3">
+          //       <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+          //       <div className="flex-1">
+          //         <h3 className="font-medium text-green-800">Product Scanned</h3>
+          //         <div className="text-sm text-green-700 mt-1">
+          //           <div className="font-medium">{scannedProduct.productName}</div>
+          //           {scannedProduct.brand && <div>{scannedProduct.brand}</div>}
+          //           <div className="font-mono text-xs text-green-600 mt-1">
+          //             {scannedProduct.barcode}
+          //           </div>
+          //         </div>
 
-                  {/* Lookup status */}
-                  {isLookingUp && (
-                    <Badge variant="outline" className="animate-pulse mt-2">
-                      Looking up...
+          //         {/* Lookup status */}
+          //         {isLookingUp && (
+          //           <Badge variant="outline" className="animate-pulse mt-2">
+          //             Looking up...
+          //           </Badge>
+          //         )}
+
+          //         {lookupResult && (
+          //           <div className="mt-2">
+          //             {lookupResult.found ? (
+          //               <Alert className="bg-green-100 border-green-300">
+          //                 <CheckCircle className="h-4 w-4 text-green-600" />
+          //                 <AlertDescription className="text-green-800">
+          //                   Product found! Ready to proceed to expiry date scanning.
+          //                 </AlertDescription>
+          //               </Alert>
+          //             ) : (
+          //               <Alert variant="destructive">
+          //                 <AlertCircle className="h-4 w-4" />
+          //                 <AlertDescription>
+          //                   Product not found in database. You may need to add it manually.
+          //                 </AlertDescription>
+          //               </Alert>
+          //             )}
+          //           </div>
+          //         )}
+          //       </div>
+          //     </div>
+
+          //     {/* Continue Button */}
+          //     <div className="mt-4">
+          //       <Button
+          //         onClick={handleProceedToExpiry}
+          //         className="w-full bg-purple-600 hover:bg-purple-700"
+          //         disabled={isLookingUp}
+          //       >
+          //         {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
+          //         <ArrowRight className="w-4 h-4 ml-2" />
+          //       </Button>
+          //     </div>
+          //   </CardContent>
+          // </Card>
+          <Card className="border-green-200">
+            <CardContent className="pt-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Product Scanned</h4>
+                  <div className="flex items-center gap-2">
+                    {isLookingUp && (
+                      <Badge variant="outline" className="animate-pulse">
+                        Looking up...
+                      </Badge>
+                    )}
+                    <Badge variant="secondary">
+                      {scannedProduct.detection?.format || 'Manual Entry'}
                     </Badge>
+                  </div>
+                </div>
+                <div className="text-sm space-y-1">
+                  <div>
+                    <strong>Barcode:</strong> <code>{scannedProduct.barcode}</code>
+                  </div>
+                  {scannedProduct.productName && (
+                    <div>
+                      <strong>Name:</strong> {scannedProduct.productName}
+                    </div>
                   )}
-
-                  {lookupResult && (
-                    <div className="mt-2">
-                      {lookupResult.found ? (
-                        <Alert className="bg-green-100 border-green-300">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <AlertDescription className="text-green-800">
-                            Product found! Ready to proceed to expiry date scanning.
-                          </AlertDescription>
-                        </Alert>
-                      ) : (
-                        <Alert variant="destructive">
-                          <AlertCircle className="h-4 w-4" />
-                          <AlertDescription>
-                            Product not found in database. You may need to add it manually.
-                          </AlertDescription>
-                        </Alert>
-                      )}
+                  {scannedProduct.brand && (
+                    <div>
+                      <strong>Brand:</strong> {scannedProduct.brand}
+                    </div>
+                  )}
+                  {scannedProduct.lookupResult && (
+                    <div>
+                      <strong>Source:</strong>{' '}
+                      {scannedProduct.lookupResult.source === 'cache'
+                        ? 'Local Cache'
+                        : 'Open Food Facts'}
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Continue Button */}
-              <div className="mt-4">
-                <Button
-                  onClick={handleProceedToExpiry}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  disabled={isLookingUp}
-                >
-                  {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                {/* Lookup Error */}
+                {lookupError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Lookup Result */}
+                {!isLookingUp &&
+                  !lookupError &&
+                  scannedProduct.lookupResult &&
+                  (scannedProduct.lookupResult.found ? (
+                    <Alert>
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <AlertDescription>
+                        Product found! Ready to proceed to expiry date scanning.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Product not found in database. You may need to add it manually.
+                      </AlertDescription>
+                    </Alert>
+                  ))}
+
+                {/* Next Step Button */}
+                <div className="pt-2">
+                  <Button
+                    onClick={workflowActions.confirmProduct}
+                    className="w-full"
+                    disabled={isLookingUp}
+                  >
+                    {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -361,6 +473,10 @@ export default function WorkingStreamlinedScanningInterface({
         {/* STEP 3: Camera Expiry Scanning */}
         {uiStep === 'camera-expiry' && (
           <div className="space-y-4">
+            {/* Debug Info */}
+            <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
+              Debug: uiStep={uiStep}, showManualExpiry={showManualExpiry.toString()}, manualExpiryDate={manualExpiryDate || 'empty'}, cameraResetCounter={cameraResetCounter}
+            </div>
             {/* Product Context */}
             <Card>
               <CardContent className="p-3">
@@ -374,14 +490,24 @@ export default function WorkingStreamlinedScanningInterface({
             </Card>
 
             {/* Camera for OCR or Manual Entry */}
-            {!showManualExpiry && !manualExpiryDate && (
+            {(() => {
+              console.log('Camera section condition check:', { showManualExpiry, manualExpiryDate, shouldShow: !showManualExpiry && !manualExpiryDate })
+              return !showManualExpiry && !manualExpiryDate
+            })() && (
               <>
-                <BarcodeScanner
-                  onScan={() => handleOCRCapture()} // Mock OCR trigger
-                  onError={handleError}
-                  autoStart={true}
-                  className="w-full"
-                />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Camera className="w-4 h-4" />
+                    <span>Point camera at expiry date</span>
+                  </div>
+                  <BarcodeScanner
+                    key={`expiry-camera-${cameraResetCounter}`}
+                    onScan={() => {}} // Don't auto-trigger OCR - let user click button
+                    onError={handleError}
+                    autoStart={true}
+                    className="w-full"
+                  />
+                </div>
 
                 <div className="flex gap-2">
                   <Button
@@ -390,7 +516,7 @@ export default function WorkingStreamlinedScanningInterface({
                     disabled={isWorkflowProcessing}
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    {isWorkflowProcessing ? 'Processing...' : 'Scan Expiry Date'}
+                    {isWorkflowProcessing ? 'Processing...' : 'Capture Expiry Date'}
                   </Button>
 
                   <Button variant="outline" onClick={() => setShowManualExpiry(true)}>
@@ -517,12 +643,24 @@ export default function WorkingStreamlinedScanningInterface({
 
             {/* Add to Inventory Button */}
             {manualExpiryDate && quantity > 0 && price > 0 && (
-              <Button
-                className="w-full bg-purple-600 hover:bg-purple-700"
-                onClick={handleAddToInventory}
-              >
-                Add to Inventory • {quantity}x {formatPrice(price)}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  onClick={handleAddToInventory}
+                >
+                  Add to Inventory • {quantity}x {formatPrice(price)}
+                </Button>
+              </div>
+            )}
+
+            {/* Re-scan Button - Always available when in expiry step */}
+            {manualExpiryDate && (
+              <div className="flex justify-center">
+                <Button variant="outline" onClick={handleRescanExpiry}>
+                  <Camera className="w-4 h-4 mr-2" />
+                  Re-scan expiry date
+                </Button>
+              </div>
             )}
           </div>
         )}
