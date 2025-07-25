@@ -7,11 +7,12 @@ import os
 import time
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any
 
 import structlog
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
@@ -172,7 +173,7 @@ app.add_middleware(
 
 # Request logging middleware
 @app.middleware("http")
-async def log_requests(request: Request, call_next):
+async def log_requests(request: Request, call_next) -> Response:
     start_time = time.time()
 
     # Log request (sanitize sensitive headers)
@@ -221,7 +222,7 @@ app.include_router(api_v1_router, prefix=settings.api_v1_prefix)
 
 # Root endpoint
 @app.get("/", tags=["Health"])
-async def root():
+async def root() -> dict[str, str]:
     """
     API root endpoint with service information
     """
@@ -244,7 +245,7 @@ async def root():
 
 # Health check endpoint
 @app.get("/health", tags=["Health"])
-async def health_check():
+async def health_check() -> dict[str, Any]:
     """
     Health check endpoint with detailed service status
     """
@@ -272,7 +273,7 @@ async def health_check():
 
 # API info endpoint
 @app.get("/api/info", tags=["Health"])
-async def api_info():
+async def api_info() -> dict[str, Any]:
     """
     Detailed API information and capabilities
     """

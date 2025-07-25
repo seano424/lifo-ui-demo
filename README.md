@@ -10,20 +10,20 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 
 This repository contains the implementation of LIFO.AI's data platform
 
-- **Database Schema**: Complete PostgreSQL schema with time series support
-- **Core Scoring Engine**: Algorithmic scoring based on expiry, velocity, and margin
-- **ETL Pipeline**: CSV processing with comprehensive validation
-- **API Infrastructure**: Next.js API routes for all core functionality
+- **Database Schema**: Complete PostgreSQL schema with multi-tenant support
+- **Inventory Management**: Batch-level tracking with LIFO methodology  
+- **ETL Pipeline**: Secure CSV processing with comprehensive validation
+- **API Infrastructure**: Next.js API routes + FastAPI backend
 
-- **Data Collection**: Automated hourly inventory snapshots
-- **Pattern Analysis**: Demand trend detection and seasonality analysis
-- **External Factors**: Weather and holiday impact integration
-- **Advanced Analytics**: Category insights and performance metrics
+- **Multi-tenant Architecture**: Store-based access control with RLS
+- **Authentication System**: Supabase Auth + PIN-based employee access
+- **Real-time Dashboard**: Live inventory monitoring and analytics
+- **Donation Workflows**: Coordinated food rescue management
 
-- **Feature Engineering**: 50+ features from inventory, sales, and external data
-- **ML Models**: Random Forest and Gradient Boosting for demand prediction
-- **Enhanced Scoring**: ML-augmented recommendations with confidence levels
-- **Discount Optimization**: AI-driven pricing recommendations
+- **Data Processing**: Advanced CSV validation and category normalization
+- **Business Intelligence**: Comprehensive analytics and KPI tracking
+- **Employee Management**: Role-based permissions and PIN authentication
+- **Audit System**: Complete action tracking and compliance logging
 
 ## 🏗️ Architecture Overview
 
@@ -32,28 +32,53 @@ This repository contains the implementation of LIFO.AI's data platform
 ```
 lifo-app/
 ├── app/                      # Next.js 15 Frontend & API Routes
+│   ├── (auth)/              # Authentication routes
+│   ├── (dashboard)/         # Main dashboard application
+│   ├── (marketing)/         # Marketing pages
+│   ├── (onboarding)/        # User onboarding flow
 │   ├── api/                 # Next.js API routes
-│   ├── components/          # React UI components
-│   └── lib/                 # Shared utilities
-├── lifo_ai_core/            # Python AI & Data Processing
-│   ├── database/            # Data models and operations
-│   ├── scoring/             # AI scoring algorithms
-│   ├── etl/                # CSV processing pipeline
-│   └── ml/                 # Machine learning models
-├── lifo_api/                # Python API Backend
-│   ├── app/                # FastAPI application
-│   ├── services/           # Business logic services
-│   └── database/           # Database models & operations
-├── supabase/migrations/    # Database schema & migrations
-└── docs/                   # Documentation
+│   ├── protected/           # Protected pages
+│   └── globals.css          # Global styles
+├── components/               # React UI Components
+│   ├── auth/                # Authentication components
+│   ├── dashboard/           # Dashboard-specific components
+│   ├── products/            # Product management UI
+│   ├── batches/             # Batch management UI
+│   ├── settings/            # Settings pages
+│   └── ui/                  # Reusable UI components (shadcn/ui)
+├── lib/                     # Shared Frontend Utilities
+│   ├── supabase/            # Supabase client configuration
+│   ├── queries/             # React Query hooks
+│   ├── services/            # External service integrations
+│   └── utils.ts             # General utilities
+├── lifo_ai_core/            # Python Data Processing Core
+│   ├── etl/                 # CSV processing pipeline
+│   ├── config/              # Configuration management
+│   └── utils/               # Core utilities
+├── lifo_api/                # FastAPI Backend Application
+│   ├── app/                 # FastAPI application structure
+│   │   ├── api/v1/          # API version 1 endpoints
+│   │   ├── auth/            # Authentication logic
+│   │   ├── core/            # Core business logic
+│   │   ├── database/        # Database models & operations
+│   │   ├── models/          # Pydantic models
+│   │   └── services/        # Business services
+│   └── tests/               # Comprehensive test suite
+├── hooks/                   # React custom hooks
+├── messages/                # i18n translation files
+├── supabase/migrations/     # Database schema & migrations
+└── docs/                    # Documentation
 ```
 
 ## 🛠️ Technology Stack
 
 **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
-**Backend**: Python, Supabase PostgreSQL, TimescaleDB
-**ML/AI**: scikit-learn, pandas, numpy, scipy
+**Backend**: FastAPI (Python), Supabase PostgreSQL
+**Data Processing**: pandas, numpy, pydantic, asyncpg
 **Infrastructure**: Supabase (Auth, Database, Real-time), Vercel (Hosting)
+**State Management**: Zustand, React Query (TanStack Query)
+**Internationalization**: next-intl (French, English, Dutch)
+**Testing**: pytest, FastAPI TestClient
 
 ## 📦 Installation & Setup
 
@@ -149,32 +174,37 @@ npm run dev
 **CSV Upload & Processing**:
 
 ```bash
-# Upload via UI at /protected or API
+# Upload via UI at /dashboard or API
 curl -X POST /api/inventory/upload -F "file=@inventory.csv"
 ```
 
-**Score Calculation**:
+**Analytics & Reporting**:
 
 ```bash
-# Recalculate all scores
-npm run scoring:recalculate
+# Get comprehensive analytics via API
+curl -X GET /api/analytics
 
-# Or via API
-curl -X POST /api/scores/recalculate
+# Business validation checks
+curl -X POST /api/business/check
 ```
 
-**ML Model Training**:
+**Employee Management**:
 
 ```bash
-# Train ML models (requires historical data)
-npm run ml:train
+# Create store employee
+curl -X POST /api/employees/create \
+  -H "Content-Type: application/json" \
+  -d '{"email": "employee@store.com", "role": "employee"}'
 ```
 
-**Time Series Collection**:
+**Development & Testing**:
 
 ```bash
-# Collect hourly snapshots (run via cron)
-npm run timeseries:collect
+# Run backend tests
+cd lifo_api && pytest
+
+# Run frontend development server
+npm run dev
 ```
 
 ## 📊 API Endpoints
@@ -191,10 +221,24 @@ npm run timeseries:collect
 - `GET /api/alerts` - High-priority inventory alerts
 - `GET /api/csv/sample` - Download CSV template
 
-### Scoring & Analytics (🔐 Auth Required)
+### Analytics & Business Intelligence (🔐 Auth Required)
 
-- `POST /api/scores/recalculate` - Trigger score recalculation
 - `GET /api/analytics` - Comprehensive analytics and KPIs
+- `POST /api/business/check` - Business validation and checks
+
+### Authentication & User Management
+
+- `POST /api/auth/pin-session` - PIN-based authentication for store employees
+- `POST /api/employees/create` - Create new store employee
+- `POST /api/email/send-pin-reset` - Send PIN reset email
+- `POST /api/email/send-welcome` - Send welcome email
+
+### FastAPI Backend Endpoints (`/api/v1/`)
+
+- `POST /api/v1/analytics` - Advanced analytics processing
+- `POST /api/v1/csv-upload` - Secure CSV processing
+- `GET /api/v1/donations` - Donation workflow management
+- `POST /api/v1/mobile-endpoints` - Mobile app integration
 
 ### CSV Format
 
@@ -206,53 +250,52 @@ SKU,Product_Name,Category,Quantity,Cost_Price,Selling_Price,Expiry_Date,Batch_Nu
 
 ### Advanced Features
 
-- ML-enhanced scoring with discount optimization
-- Time series pattern analysis and forecasting
-- External factor integration (weather, holidays)
-- Real-time inventory alerts and recommendations
+- Multi-tenant store management with role-based access
+- PIN-based authentication for store employees
+- Real-time inventory tracking and batch management
+- Comprehensive CSV validation and processing
+- Donation workflow management and tracking
+- Multi-language support (English, French, Dutch)
 
-## 🧠 ML Features
+## 🔍 Core Features
 
-### Demand Prediction Models
+### Inventory Management
 
-- **24h, 48h, 7-day forecasts** with confidence levels
-- **Discount scenario modeling** for optimal pricing
-- **Sellthrough rate prediction** for inventory planning
+- **Batch-level tracking** with LIFO methodology
+- **Product categorization** with global product catalog
+- **Expiry date monitoring** and alert system
+- **Multi-store inventory** with tenant isolation
 
-### Feature Engineering (50+ Features)
+### Data Processing Pipeline
 
-- **Product Features**: Category, brand, pricing, margins
-- **Temporal Features**: Seasonality, day-of-week patterns
-- **Sales History**: Velocity trends, transaction patterns
-- **Inventory State**: Expiry urgency, quantity ratios
-- **External Factors**: Weather, holidays, market conditions
+- **Secure CSV upload** with comprehensive validation
+- **Business rule enforcement** for inventory consistency
+- **Category normalization** with standardized taxonomies
+- **Batch processing** with error handling and rollback
 
-### Enhanced Scoring Algorithm
+### Authentication & Security
 
-```python
-enhanced_score = (
-    0.4 * base_algorithmic_score +
-    0.35 * ml_prediction_score +
-    0.15 * pattern_analysis_score +
-    0.1 * external_factors_score
-)
-```
+- **Supabase Auth integration** with JWT validation
+- **Row Level Security (RLS)** for multi-tenant data isolation
+- **PIN-based employee access** for store operations
+- **Comprehensive middleware** for CORS, rate limiting, and security headers
 
 ## 📈 Business Impact
 
 ### Key Metrics Tracked
 
-- **Waste Reduction Rate**: Items saved vs. at-risk items
-- **Revenue Recovery**: Revenue from discounted vs. wasted items
-- **Action Effectiveness**: Success rate of recommendations
-- **Inventory Turnover**: Improved velocity through optimization
+- **Inventory Efficiency**: Real-time batch tracking and expiry monitoring
+- **Operational Insights**: Store performance and product movement analytics
+- **Donation Tracking**: Coordinated food rescue and waste reduction efforts
+- **Employee Productivity**: Streamlined workflows with PIN-based access
 
-### Expected Outcomes
+### Current Capabilities
 
-- **30-50% reduction** in food waste
-- **15-25% increase** in margin recovery
-- **Automated decision-making** for 80%+ of inventory
-- **Real-time insights** for proactive management
+- **Multi-store management** with unified inventory tracking
+- **Automated CSV processing** for inventory updates
+- **Real-time dashboard** for inventory insights
+- **Donation coordination** for food rescue initiatives
+- **Comprehensive audit trails** for compliance and analysis
 
 ## 🔧 Development Workflow
 
@@ -263,17 +306,23 @@ enhanced_score = (
 3. **Update models** in `lifo_ai_core/database/models.py`
 4. **Test changes** with sample data
 
-### ML Model Updates
+### Backend Development
 
-1. **Retrain models** with new data: `npm run ml:train`
-2. **Validate performance** with test datasets
-3. **Deploy updated models** via API
+1. **Update FastAPI models** in `lifo_api/app/models/`
+2. **Test API endpoints** with `pytest`
+3. **Validate authentication** and authorization logic
 
-### Monitoring & Maintenance
+### Database Management
 
-- **Hourly data collection** via automated snapshots
-- **Daily score recalculation** for all active inventory
-- **Weekly ML model retraining** with fresh data
+- **Monitor migrations** in `supabase/migrations/`
+- **Track RLS policies** for multi-tenant security
+- **Backup critical data** before major changes
+
+### Testing & Quality Assurance
+
+- **Run comprehensive test suite** with security validation
+- **Test CSV processing** with various data formats
+- **Validate multi-tenant isolation** and permissions
 
 ## 🚀 Deployment
 
@@ -298,19 +347,19 @@ DB_PASSWORD=production-db-password
 WEATHER_API_KEY=optional-weather-key
 ```
 
-### Scheduled Jobs
+### Database Maintenance
 
-Set up cron jobs for automated operations:
+Set up regular maintenance tasks:
 
 ```bash
-# Hourly data collection
-0 * * * * npm run timeseries:collect
+# Database backup (recommended daily)
+pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql
 
-# Daily score recalculation
-0 2 * * * npm run scoring:recalculate
+# Log rotation for FastAPI
+logrotate /var/log/lifo_api.log
 
-# Weekly ML retraining
-0 3 * * 0 npm run ml:train
+# Monitor application health
+curl -f http://localhost:3000/api/health || alert-system
 ```
 
 ## 🚀 Deployment

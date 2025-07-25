@@ -13,12 +13,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.v1.compat_donation_wrapper import create_simplified_donation_engine_compat
 from app.auth.secure_dependencies import (
     get_current_user,
     validate_batch_id_format,
     validate_store_id_format,
 )
-from app.api.v1.compat_donation_wrapper import create_simplified_donation_engine_compat
 from app.core.scoring import create_scoring_service
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
@@ -153,7 +153,7 @@ async def check_donation_eligibility(
 
         # Get existing scoring result if available
         scoring_service = create_scoring_service(db)
-        scoring_result = await scoring_service.score_batch(batch_id)
+        await scoring_service.score_batch(batch_id)
 
         # Create donation decision engine with compatibility wrapper
         donation_engine = create_simplified_donation_engine_compat()
