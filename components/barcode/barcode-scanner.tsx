@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, ScanLine, AlertCircle, CheckCircle } from 'lucide-react'
+import { Camera, ScanLine, AlertCircle, CheckCircle, StopCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -400,7 +400,8 @@ export default function BarcodeScanner({
                   {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
                 </Button>
               ) : (
-                <Button onClick={handleUserStop} variant="outline" className="flex-1">
+                <Button onClick={handleUserStop} variant="ghost" className="flex-1">
+                  <StopCircle className="w-4 h-4 mr-2" />
                   Stop Scanning
                 </Button>
               )}
