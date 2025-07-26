@@ -16,9 +16,9 @@ logger = structlog.get_logger()
 
 class ActionType(Enum):
     """Simple action types matching database schema"""
-    
+
     DISCOUNT = "discount"
-    DONATE = "donate" 
+    DONATE = "donate"
     DISPOSE = "dispose"
     MAINTAIN = "maintain"
     IGNORED = "ignored"
@@ -26,7 +26,7 @@ class ActionType(Enum):
 
 class DonationRecipientType(Enum):
     """Common donation recipient types for better UX"""
-    
+
     FOOD_BANK = "food_bank"
     SOUP_KITCHEN = "soup_kitchen"
     CHARITY = "charity"
@@ -59,17 +59,17 @@ class SimpleActionRecommendation(BaseModel):
     # Simple tracking details
     quantity_affected: float
     notes: str  # Simple reasoning for the recommendation
-    
+
     # Financial tracking (for ROI calculations)
     original_value: float
     estimated_recovered_value: float  # Expected value after action
-    
+
     # Timing
     recommended_action_by: datetime
-    
+
     # Donation specifics (when applicable)
     suggested_recipient_types: list[DonationRecipientType]
-    
+
     # Simple reasoning
     decision_factors: list[str]
     urgency_reason: str
@@ -94,14 +94,16 @@ class SimplifiedDonationEngine:
 
         # Category-specific donation suitability
         self.donation_suitable_categories = {
-            "fresh_produce", "bakery_fresh", "dry_goods", "canned_jarred", 
-            "beverages", "spices_condiments"
+            "fresh_produce",
+            "bakery_fresh",
+            "dry_goods",
+            "canned_jarred",
+            "beverages",
+            "spices_condiments",
         }
-        
+
         # Categories requiring special handling
-        self.special_handling_categories = {
-            "fresh_meat_fish", "dairy", "deli_prepared", "frozen"
-        }
+        self.special_handling_categories = {"fresh_meat_fish", "dairy", "deli_prepared", "frozen"}
 
     def evaluate_action_recommendation(
         self,
@@ -213,13 +215,13 @@ class SimplifiedDonationEngine:
         """Determine simple action based on basic business rules"""
 
         factors = []
-        
+
         # Primary decision logic based on expiry and business factors
         if days_to_expiry <= 0:
             action = ActionType.DISPOSE
             reasoning = "Product has expired and must be disposed of"
             factors.append("Expired product")
-        
+
         elif days_to_expiry <= self.action_thresholds["critical_days_threshold"]:
             # Very urgent - need immediate action
             if margin_percent > self.action_thresholds["discount_margin_threshold"]:
@@ -234,9 +236,9 @@ class SimplifiedDonationEngine:
                 action = ActionType.DISCOUNT
                 reasoning = "Special handling category - try discount before disposal"
                 factors.append("Special handling required")
-            
+
             factors.append(f"Expires in {days_to_expiry} days - critical timing")
-        
+
         elif days_to_expiry <= self.action_thresholds["high_priority_days_threshold"]:
             # Moderately urgent
             if ai_score >= 0.8:
@@ -257,9 +259,9 @@ class SimplifiedDonationEngine:
                 action = ActionType.MAINTAIN
                 reasoning = "Monitor closely but no immediate action needed"
                 factors.append(f"Moderate AI score ({ai_score:.2f})")
-            
+
             factors.append(f"Expires in {days_to_expiry} days")
-        
+
         else:
             # Not urgent - based on AI score and business factors
             if ai_score >= 0.7:
@@ -270,11 +272,14 @@ class SimplifiedDonationEngine:
                 action = ActionType.MAINTAIN
                 reasoning = "No immediate action needed - continue normal sales"
                 factors.append("Normal sales conditions")
-            
+
             factors.append(f"Expires in {days_to_expiry} days - planning time available")
 
         # Quantity considerations
-        if current_quantity < self.action_thresholds["min_quantity_for_donation"] and action == ActionType.DONATE:
+        if (
+            current_quantity < self.action_thresholds["min_quantity_for_donation"]
+            and action == ActionType.DONATE
+        ):
             action = ActionType.DISCOUNT
             reasoning = "Quantity too small for efficient donation - discount instead"
             factors.append("Small quantity")
@@ -292,7 +297,7 @@ class SimplifiedDonationEngine:
         margin_percent: float,
     ) -> float:
         """Calculate estimated recovered value based on action"""
-        
+
         if action == ActionType.DISCOUNT:
             # Assume discount will recover 60-80% of value depending on margin
             if margin_percent > 30:
@@ -301,16 +306,16 @@ class SimplifiedDonationEngine:
                 return original_value * 0.7  # Medium margin
             else:
                 return original_value * 0.6  # Low margin - limited discount ability
-        
+
         elif action == ActionType.DONATE:
             # Tax benefit estimated at 60% of cost basis (German tax law)
             cost_basis = original_value * (1 - margin_percent / 100)
             return cost_basis * 0.6
-        
+
         elif action == ActionType.DISPOSE:
             # Disposal costs money
             return -original_value * 0.1  # Negative value for disposal costs
-        
+
         else:  # MAINTAIN or IGNORED
             # Assume normal sales will eventually recover most value
             return original_value * 0.9
@@ -328,12 +333,12 @@ class SimplifiedDonationEngine:
             priority = DonationPriority.CRITICAL
             action_by = now + timedelta(hours=2)  # Immediate action required
             urgency_reason = "Product has expired - immediate disposal required"
-        
+
         elif days_to_expiry <= self.action_thresholds["critical_days_threshold"]:
             priority = DonationPriority.CRITICAL
             action_by = now + timedelta(hours=6)  # Within 6 hours
             urgency_reason = "Product expires within 24 hours - urgent action needed"
-        
+
         elif days_to_expiry <= self.action_thresholds["high_priority_days_threshold"]:
             if action == ActionType.DONATE:
                 priority = DonationPriority.HIGH
@@ -343,7 +348,7 @@ class SimplifiedDonationEngine:
                 priority = DonationPriority.HIGH
                 action_by = now + timedelta(hours=12)  # Within 12 hours
                 urgency_reason = "Product expires soon - timely action recommended"
-        
+
         else:
             if action == ActionType.DISCOUNT:
                 priority = DonationPriority.MEDIUM
@@ -362,18 +367,18 @@ class SimplifiedDonationEngine:
 
     def _get_suitable_recipients(self, category: str) -> list[DonationRecipientType]:
         """Get suitable recipient types for a product category"""
-        
+
         # Base recipients suitable for most categories
         base_recipients = [
             DonationRecipientType.FOOD_BANK,
             DonationRecipientType.CHARITY,
             DonationRecipientType.COMMUNITY_GROUP,
         ]
-        
+
         # Special handling categories have limited recipients
         if category in self.special_handling_categories:
             return [DonationRecipientType.FOOD_BANK]  # Only certified food banks
-        
+
         # Fresh produce can go to more recipients
         if category == "fresh_produce":
             return base_recipients + [
@@ -381,7 +386,7 @@ class SimplifiedDonationEngine:
                 DonationRecipientType.ANIMAL_SHELTER,
                 DonationRecipientType.SCHOOL,
             ]
-        
+
         # Bakery items are popular with many recipients
         if category == "bakery_fresh":
             return base_recipients + [
@@ -389,14 +394,14 @@ class SimplifiedDonationEngine:
                 DonationRecipientType.ELDERLY_CARE,
                 DonationRecipientType.HOMELESS_SHELTER,
             ]
-        
+
         return base_recipients
 
     def _create_simple_fallback_recommendation(
         self, batch_data: dict[str, Any], error: str
     ) -> SimpleActionRecommendation:
         """Create safe fallback recommendation when evaluation fails"""
-        
+
         return SimpleActionRecommendation(
             batch_id=batch_data.get("batch_id", "unknown"),
             recommended_action=ActionType.MAINTAIN,
