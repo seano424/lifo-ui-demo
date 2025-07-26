@@ -595,6 +595,249 @@ curl -X GET "https://api.lifoai.com/api/v1/csv/template" \
 }
 ```
 
+### 🔍 Google Vision OCR Endpoints
+
+The LIFO.AI backend provides advanced Google Vision API integration for complex image processing tasks that frontend cannot handle natively.
+
+#### POST /api/v1/vision/analyze-image/{store_id} - Advanced Image Analysis
+
+Comprehensive image analysis with Google Vision API for complex scenarios requiring bounding boxes and detailed detection.
+
+**Parameters:**
+
+- `store_id` (path, required): Store UUID
+- `image` (form, required): Image file (JPEG, PNG, WebP, max 10MB)
+- `analysis_type` (form, optional): "expiry_date", "barcode", "full" (default: "full")
+- `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.7)
+
+**Request:**
+
+```bash
+curl -X POST "https://api.lifoai.com/api/v1/vision/analyze-image/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "image=@product_image.jpg" \
+  -F "analysis_type=full" \
+  -F "confidence_threshold=0.7"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "image_id": "uuid-generated-id",
+  "analysis_type": "full",
+  "confidence_threshold": 0.7,
+  "analysis_results": {
+    "detections": [
+      {
+        "type": "barcode_ean13",
+        "value": "1234567890123",
+        "confidence": 0.95,
+        "bounding_box": {"x": 50, "y": 200, "width": 150, "height": 40}
+      },
+      {
+        "type": "expiry_date",
+        "value": "2024-03-25",
+        "confidence": 0.89,
+        "original_text": "25/03/24",
+        "bounding_box": {"x": 120, "y": 340, "width": 80, "height": 20}
+      },
+      {
+        "type": "product_name",
+        "value": "Organic Bananas",
+        "confidence": 0.87,
+        "bounding_box": {"x": 30, "y": 50, "width": 200, "height": 30}
+      }
+    ],
+    "analysis_metadata": {
+      "processing_confidence": 0.90,
+      "data_sources": ["google_vision"],
+      "requires_user_confirmation": false
+    }
+  },
+  "processing_info": {
+    "model_version": "google_vision_v3.4",
+    "processing_time_ms": 2145,
+    "image_size_bytes": 1024768,
+    "confidence_score": 0.90
+  },
+  "next_steps": [
+    "Review detected information for accuracy",
+    "Proceed with scan-in workflow if confident",
+    "Manual entry if confidence is low"
+  ]
+}
+```
+
+#### GET /api/v1/vision/ml-models/status - ML Models Health Check
+
+Check the health and status of machine learning models for monitoring and debugging.
+
+**Request:**
+
+```bash
+curl -X GET "https://api.lifoai.com/api/v1/vision/ml-models/status" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "overall_status": "ready",
+  "models": {
+    "expiry_date_ocr": {
+      "status": "ready",
+      "version": "v1.2.3",
+      "accuracy": 0.92,
+      "last_updated": "2024-01-10T14:30:00Z",
+      "supported_formats": ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"]
+    },
+    "barcode_detector": {
+      "status": "ready",
+      "version": "v2.1.0",
+      "accuracy": 0.96,
+      "last_updated": "2024-01-08T09:15:00Z",
+      "supported_types": ["EAN13", "UPC", "CODE128", "QR"]
+    }
+  },
+  "performance_summary": {
+    "average_processing_time_ms": 340,
+    "daily_analysis_count": 1247,
+    "overall_accuracy": 0.91
+  },
+  "maintenance_window": "2024-01-20T02:00:00Z to 2024-01-20T04:00:00Z"
+}
+```
+
+### 📸 OCR Product Scanning Endpoints
+
+Specialized OCR endpoints focused on specific use cases for optimal performance.
+
+#### POST /api/v1/ocr/scan/ocr-expiry/{store_id} - OCR Expiry Date Extraction
+
+Extract expiry dates from product images using Google Vision OCR when frontend cannot handle the complexity.
+
+**Parameters:**
+
+- `store_id` (path, required): Store UUID
+- `image` (form, required): Image file (JPEG, PNG, WebP, max 10MB)
+- `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.65)
+- `max_processing_time_ms` (form, optional): 1000-10000 (default: 4000)
+
+**Request:**
+
+```bash
+curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/ocr-expiry/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "image=@expiry_date_image.jpg" \
+  -F "confidence_threshold=0.65"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "scan_type": "expiry_date_extraction",
+  "expiry_date": "2024-03-15",
+  "confidence_threshold": 0.65,
+  "processing_type": "google_vision_ocr"
+}
+```
+
+#### POST /api/v1/ocr/scan/full-ocr/{store_id} - Complete OCR Analysis
+
+Comprehensive OCR analysis with barcode detection, text extraction, and expiry date parsing for complex scenarios.
+
+**Parameters:**
+
+- `store_id` (path, required): Store UUID
+- `image` (form, required): Image file (JPEG, PNG, WebP, max 15MB)
+- `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.7)
+- `max_processing_time_ms` (form, optional): 1000-10000 (default: 5000)
+
+**Request:**
+
+```bash
+curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "image=@complex_product.jpg" \
+  -F "confidence_threshold=0.7"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "scan_type": "full_ocr_analysis",
+  "barcode": "1234567890123",
+  "suggested_name": "Organic Milk 1L",
+  "expiry_date": "2024-03-20",
+  "raw_text_blocks": ["Organic Milk", "1L", "Use by 20/03/24", "1234567890123"],
+  "confidence_scores": {
+    "overall": 0.85,
+    "barcode": 0.95,
+    "expiry": 0.78
+  },
+  "processing_info": {
+    "processing_time_ms": 2340,
+    "data_sources": ["google_vision"],
+    "requires_user_confirmation": false,
+    "image_dimensions": {"width": 1024, "height": 768}
+  },
+  "vision_details": {
+    "detected_barcodes": 1,
+    "detected_text_blocks": 8,
+    "expiry_candidates": 2
+  }
+}
+```
+
+#### POST /api/v1/ocr/scan/text-extraction/{store_id} - Text Extraction for Manual Entry
+
+Extract all text from product images to assist with manual product entry when barcode detection fails.
+
+**Parameters:**
+
+- `store_id` (path, required): Store UUID
+- `image` (form, required): Image file (JPEG, PNG, WebP, max 8MB)
+- `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.6)
+
+**Request:**
+
+```bash
+curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/text-extraction/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "image=@manual_entry_help.jpg" \
+  -F "confidence_threshold=0.6"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "scan_type": "text_extraction",
+  "text_blocks": [
+    "Premium Pasta Sauce",
+    "Marinara",
+    "500g",
+    "Ingredients: Tomatoes, Basil, Garlic",
+    "Made in Italy"
+  ],
+  "suggested_name": "Premium Pasta Sauce",
+  "confidence_threshold": 0.6,
+  "processing_info": {
+    "processing_time_ms": 1580,
+    "total_text_blocks": 12,
+    "high_confidence_blocks": 5
+  }
+}
+```
+
 ### 🎯 Scoring Endpoints
 
 #### POST /api/v1/scoring/calculate-score - Calculate Batch Score

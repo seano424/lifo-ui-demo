@@ -146,41 +146,80 @@ FormData {
 }
 ```
 
-### 4. Product Enrichment (Database Storage)
-**Endpoint:** `POST /api/v1/product-enrichment/enrich/{store_id}`
-**Purpose:** Store OpenFoodFacts data provided by frontend
-**When to Use:** After frontend successfully fetches product data
+### 4. Advanced Vision Analysis
+**Endpoint:** `POST /api/v1/vision/analyze-image/{store_id}`
+**Purpose:** Advanced image analysis with Google Vision API
+**When to Use:** When comprehensive image analysis is needed with bounding boxes
 
 **Request:**
 ```typescript
-{
-  barcode: string
-  confidence_score: number
-  product_data: {
-    product_name?: string
-    product_name_en?: string
-    brands?: string
-    categories?: string
-    image_url?: string
-    // ... other OpenFoodFacts fields
-  }
+FormData {
+  image: File // Image file (JPEG, PNG, WebP, max 10MB)
+  analysis_type?: string // "expiry_date", "barcode", "full", default "full"
+  confidence_threshold?: number // 0.1-1.0, default 0.7
 }
 ```
 
 **Response:**
 ```typescript
 {
-  product_id: string
-  was_created: boolean
-  was_updated: boolean
-  cache_hit: boolean
+  success: boolean
+  image_id: string
+  analysis_type: string
+  analysis_results: {
+    detections: Array<{
+      type: string // "expiry_date", "barcode_ean13", "product_name"
+      value: string
+      confidence: number
+      bounding_box?: { x: number, y: number, width: number, height: number }
+      original_text?: string // For expiry dates
+    }>
+    analysis_metadata: {
+      processing_confidence: number
+      data_sources: string[]
+      requires_user_confirmation: boolean
+    }
+  }
+  processing_info: {
+    model_version: string
+    processing_time_ms: number
+    image_size_bytes: number
+    confidence_score: number
+  }
+  next_steps: string[]
 }
 ```
 
-### 5. Scan Session Management
-**Endpoint:** `POST /api/v1/scan-sessions/create/{store_id}`
-**Purpose:** Track scanning sessions for analytics
-**When to Use:** Start of scanning workflow for tracking
+### 5. ML Models Status Check
+**Endpoint:** `GET /api/v1/vision/ml-models/status`
+**Purpose:** Check health and status of ML models
+**When to Use:** For system monitoring and debugging
+
+**Response:**
+```typescript
+{
+  overall_status: "ready" | "training" | "error"
+  models: {
+    expiry_date_ocr: {
+      status: string
+      version: string
+      accuracy: number
+      last_updated: string
+    }
+    barcode_detector: {
+      status: string
+      version: string
+      accuracy: number
+      supported_types: string[]
+    }
+  }
+  performance_summary: {
+    average_processing_time_ms: number
+    daily_analysis_count: number
+    overall_accuracy: number
+  }
+}
+```
 
 ## 🔄 Recommended Frontend Workflow
 
