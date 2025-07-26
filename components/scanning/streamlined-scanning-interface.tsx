@@ -214,12 +214,7 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-barcode')
         break
     }
-  }, [
-    currentStep,
-    scannedProduct,
-    expiryInfo,
-    isRescanning,
-  ])
+  }, [currentStep, scannedProduct, expiryInfo, isRescanning])
 
   // Handle barcode scan
   const handleScan = (barcode: string, detection?: BarcodeDetection) => {
@@ -721,7 +716,7 @@ export default function WorkingStreamlinedScanningInterface({
                         type="number"
                         value={quantity}
                         onChange={e => setQuantity(parseInt(e.target.value) || 1)}
-                        min="1"
+                        min="0"
                       />
                     </div>
                   </div>
@@ -785,7 +780,7 @@ export default function WorkingStreamlinedScanningInterface({
                         type="number"
                         value={quantity}
                         onChange={e => setQuantity(parseInt(e.target.value) || 1)}
-                        min="1"
+                        min="0"
                         className="text-sm"
                       />
                     </div>
@@ -958,7 +953,7 @@ export default function WorkingStreamlinedScanningInterface({
                     <Input
                       id="edit-quantity"
                       type="number"
-                      min="1"
+                      min="0"
                       value={editForm.quantity}
                       onChange={e =>
                         setEditForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
