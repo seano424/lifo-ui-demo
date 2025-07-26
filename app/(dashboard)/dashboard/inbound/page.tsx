@@ -4,7 +4,7 @@ import StreamlinedScanningInterface from '@/components/scanning/streamlined-scan
 
 export default function InboundPage() {
   return (
-    <div>
+    <div className="max-w-screen-sm mx-auto">
       {/* <BarcodeScannerDemo /> */}
       <StreamlinedScanningInterface />
     </div>
