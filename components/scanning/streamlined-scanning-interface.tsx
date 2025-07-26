@@ -40,6 +40,14 @@ import {
 } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
 import { useProductLookup } from '@/hooks/use-product-lookup'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog'
 
 // Types for our streamlined workflow
 interface ScannedItem {
@@ -91,6 +99,7 @@ export default function WorkingStreamlinedScanningInterface({
   const [isRescanning, setIsRescanning] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
+  const [isEditingItem, setIsEditingItem] = useState(false)
   const [showSystemStatus, setShowSystemStatus] = useState(false)
 
   // Form state for batch creation
@@ -355,6 +364,11 @@ export default function WorkingStreamlinedScanningInterface({
         </div>
       </div>
     )
+  }
+
+  const handleEditItem = (item: ScannedItem) => {
+    console.log('Editing item:', item)
+    setIsEditingItem(true)
   }
 
   return (
@@ -815,8 +829,14 @@ export default function WorkingStreamlinedScanningInterface({
                         {new Date(item.expiryDate).toLocaleDateString()}
                       </Typography>
                     </div>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      <Edit3 className="w-3 h-3" />
+
+                    <Button
+                      onClick={() => handleEditItem(item)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                    >
+                      <Edit3 className="w-4 h-4" />
                     </Button>
                   </div>
                 ))}
@@ -847,6 +867,24 @@ export default function WorkingStreamlinedScanningInterface({
           )}
         </div>
       </div>
+
+      {isEditingItem && (
+        <Dialog open={isEditingItem} onOpenChange={setIsEditingItem}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Item</DialogTitle>
+            </DialogHeader>
+          </DialogContent>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditingItem(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+          <DialogClose asChild>
+            <Button variant="brandSecondary">Save</Button>
+          </DialogClose>
+        </Dialog>
+      )}
     </div>
   )
 }

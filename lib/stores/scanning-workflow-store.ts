@@ -7,7 +7,7 @@ const DEFAULT_WORKFLOW_PROGRESS = {
   isComplete: false,
   hasError: false,
 }
-
+import { devtools } from 'zustand/middleware'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
@@ -133,292 +133,295 @@ const initialState = {
 }
 
 export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
-  subscribeWithSelector(
-    immer((set, get) => ({
-      ...initialState,
+  devtools(
+    subscribeWithSelector(
+      immer((set, get) => ({
+        ...initialState,
 
-      // Store management
-      setStoreId: (storeId: string) =>
-        set(state => {
-          state.storeId = storeId
-        }),
+        // Store management
+        setStoreId: (storeId: string) =>
+          set(state => {
+            state.storeId = storeId
+          }),
 
-      setCurrentStep: (step: ScanningStep) =>
-        set(state => {
-          state.currentStep = step
-          state.error = null // Clear errors when moving to new step
-        }),
+        setCurrentStep: (step: ScanningStep) =>
+          set(state => {
+            state.currentStep = step
+            state.error = null // Clear errors when moving to new step
+          }),
 
-      // Barcode scanning actions
-      setBarcodeScanned: (barcode: string, detection?: BarcodeDetection) =>
-        set(state => {
-          state.scannedProduct = {
-            barcode,
-            detection,
-            isManualEntry: !detection || detection.format === 'Manual Entry',
-          }
-          state.currentStep = 'product'
-          state.error = null
-        }),
-
-      setProductLookupResult: (result: ProductLookupResult) =>
-        set(state => {
-          if (state.scannedProduct) {
-            state.scannedProduct.lookupResult = result
-
-            // Auto-fill from lookup result if found
-            if (result.found && result.product) {
-              state.scannedProduct.productName =
-                result.product.product_name || result.product.product_name_en || 'Unknown Product'
-              state.scannedProduct.brand = result.product.brands || undefined
-              state.scannedProduct.category = result.product.categories?.split(',')[0] || undefined
-              state.scannedProduct.imageUrl =
-                result.product.image_front_url || result.product.image_url || undefined
+        // Barcode scanning actions
+        setBarcodeScanned: (barcode: string, detection?: BarcodeDetection) =>
+          set(state => {
+            state.scannedProduct = {
+              barcode,
+              detection,
+              isManualEntry: !detection || detection.format === 'Manual Entry',
             }
-          }
-        }),
+            state.currentStep = 'product'
+            state.error = null
+          }),
 
-      setManualProductEntry: productData =>
-        set(state => {
-          if (state.scannedProduct) {
-            state.scannedProduct.productName = productData.productName
-            state.scannedProduct.brand = productData.brand
-            state.scannedProduct.category = productData.category
-            state.scannedProduct.imageUrl = productData.imageUrl
-            state.scannedProduct.isManualEntry = true
-          }
-        }),
+        setProductLookupResult: (result: ProductLookupResult) =>
+          set(state => {
+            if (state.scannedProduct) {
+              state.scannedProduct.lookupResult = result
 
-      // Product confirmation actions
-      confirmProduct: () =>
-        set(state => {
-          if (state.scannedProduct) {
+              // Auto-fill from lookup result if found
+              if (result.found && result.product) {
+                state.scannedProduct.productName =
+                  result.product.product_name || result.product.product_name_en || 'Unknown Product'
+                state.scannedProduct.brand = result.product.brands || undefined
+                state.scannedProduct.category =
+                  result.product.categories?.split(',')[0] || undefined
+                state.scannedProduct.imageUrl =
+                  result.product.image_front_url || result.product.image_url || undefined
+              }
+            }
+          }),
+
+        setManualProductEntry: productData =>
+          set(state => {
+            if (state.scannedProduct) {
+              state.scannedProduct.productName = productData.productName
+              state.scannedProduct.brand = productData.brand
+              state.scannedProduct.category = productData.category
+              state.scannedProduct.imageUrl = productData.imageUrl
+              state.scannedProduct.isManualEntry = true
+            }
+          }),
+
+        // Product confirmation actions
+        confirmProduct: () =>
+          set(state => {
+            if (state.scannedProduct) {
+              state.currentStep = 'ocr'
+
+              // Add to history for quick rescanning
+              const existingIndex = state.scanHistory.findIndex(
+                (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
+              )
+
+              if (existingIndex >= 0) {
+                // Update existing entry
+                state.scanHistory[existingIndex] = { ...state.scannedProduct }
+              } else {
+                // Add new entry (keep last 10)
+                state.scanHistory = [{ ...state.scannedProduct }, ...state.scanHistory.slice(0, 9)]
+              }
+            }
+          }),
+
+        editProduct: updates =>
+          set(state => {
+            if (state.scannedProduct) {
+              Object.assign(state.scannedProduct, updates)
+            }
+          }),
+
+        setProductSelected: productData =>
+          set(state => {
+            state.scannedProduct = {
+              barcode: productData.barcode,
+              productName: productData.productName,
+              brand: productData.brand,
+              category: productData.category,
+              imageUrl: productData.imageUrl,
+              isManualEntry: productData.isManualEntry || false,
+              lookupResult: productData.lookupResult,
+            }
+            // Skip directly to OCR step
             state.currentStep = 'ocr'
+            state.error = null
+          }),
 
-            // Add to history for quick rescanning
+        // OCR actions
+        setExpiryDateProcessing: (isProcessing: boolean) =>
+          set(state => {
+            state.isProcessing = isProcessing
+          }),
+
+        setExpiryDateResult: (expiryInfo: ExpiryDateInfo) =>
+          set(state => {
+            state.expiryInfo = expiryInfo
+            state.isProcessing = false
+            state.currentStep = 'confirmation'
+          }),
+
+        setManualExpiryDate: (date: string) =>
+          set(state => {
+            state.expiryInfo = {
+              extractedDate: date,
+              isManual: true,
+              confidence: 1.0,
+            }
+            state.currentStep = 'confirmation'
+          }),
+
+        // Batch data actions
+        setBatchData: (batchData: BatchData) =>
+          set(state => {
+            state.batchData = batchData
+          }),
+
+        updateBatchData: (updates: Partial<BatchData>) =>
+          set(state => {
+            if (state.batchData) {
+              Object.assign(state.batchData, updates)
+            } else {
+              state.batchData = { quantity: 1, ...updates }
+            }
+          }),
+
+        // Workflow control
+        completeWorkflow: () =>
+          set(state => {
+            state.currentStep = 'complete'
+            state.isProcessing = false
+            state.error = null
+          }),
+
+        resetWorkflow: () =>
+          set(state => {
+            state.currentStep = 'barcode'
+            state.scannedProduct = null
+            state.expiryInfo = null
+            state.batchData = null
+            state.isProcessing = false
+            state.error = null
+          }),
+
+        setError: (error: string | null) =>
+          set(state => {
+            state.error = error
+            state.isProcessing = false
+            if (error) {
+              state.currentStep = 'error'
+            }
+          }),
+
+        // History management
+        addToHistory: (product: ScannedProduct) =>
+          set(state => {
             const existingIndex = state.scanHistory.findIndex(
-              (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
+              (item: ScannedProduct) => item.barcode === product.barcode,
             )
 
             if (existingIndex >= 0) {
-              // Update existing entry
-              state.scanHistory[existingIndex] = { ...state.scannedProduct }
+              state.scanHistory[existingIndex] = product
             } else {
-              // Add new entry (keep last 10)
-              state.scanHistory = [{ ...state.scannedProduct }, ...state.scanHistory.slice(0, 9)]
+              state.scanHistory = [product, ...state.scanHistory.slice(0, 9)]
             }
-          }
-        }),
+          }),
 
-      editProduct: updates =>
-        set(state => {
-          if (state.scannedProduct) {
-            Object.assign(state.scannedProduct, updates)
-          }
-        }),
+        clearHistory: () =>
+          set(state => {
+            state.scanHistory = []
+          }),
 
-      setProductSelected: productData =>
-        set(state => {
-          state.scannedProduct = {
-            barcode: productData.barcode,
-            productName: productData.productName,
-            brand: productData.brand,
-            category: productData.category,
-            imageUrl: productData.imageUrl,
-            isManualEntry: productData.isManualEntry || false,
-            lookupResult: productData.lookupResult,
-          }
-          // Skip directly to OCR step
-          state.currentStep = 'ocr'
-          state.error = null
-        }),
+        rescanFromHistory: (product: ScannedProduct) =>
+          set(state => {
+            state.scannedProduct = { ...product }
+            state.currentStep = 'product'
+            state.expiryInfo = null
+            state.batchData = null
+            state.error = null
+          }),
 
-      // OCR actions
-      setExpiryDateProcessing: (isProcessing: boolean) =>
-        set(state => {
-          state.isProcessing = isProcessing
-        }),
+        // Navigation actions
+        goBackStep: () =>
+          set(state => {
+            switch (state.currentStep) {
+              case 'product':
+                // Go back to barcode scanning
+                state.currentStep = 'barcode'
+                // Clear the scanned product but keep it in history
+                if (state.scannedProduct) {
+                  const existingIndex = state.scanHistory.findIndex(
+                    (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
+                  )
+                  if (existingIndex >= 0) {
+                    state.scanHistory[existingIndex] = { ...state.scannedProduct }
+                  } else {
+                    state.scanHistory = [
+                      { ...state.scannedProduct },
+                      ...state.scanHistory.slice(0, 9),
+                    ]
+                  }
+                }
+                state.scannedProduct = null
+                break
 
-      setExpiryDateResult: (expiryInfo: ExpiryDateInfo) =>
-        set(state => {
-          state.expiryInfo = expiryInfo
-          state.isProcessing = false
-          state.currentStep = 'confirmation'
-        }),
+              case 'ocr':
+                // Go back to product confirmation (if we have product data) or barcode scanning
+                if (state.scannedProduct?.productName) {
+                  state.currentStep = 'product'
+                } else {
+                  state.currentStep = 'barcode'
+                  state.scannedProduct = null
+                }
+                // Clear expiry info
+                state.expiryInfo = null
+                break
 
-      setManualExpiryDate: (date: string) =>
-        set(state => {
-          state.expiryInfo = {
-            extractedDate: date,
-            isManual: true,
-            confidence: 1.0,
-          }
-          state.currentStep = 'confirmation'
-        }),
+              case 'confirmation':
+                // 🔥 FIX: Go back to OCR step and clear expiry data to show camera again
+                state.currentStep = 'ocr'
+                // Clear expiry info to reset the OCR step completely
+                state.expiryInfo = null
+                // Keep batch data but clear it to show fresh form
+                state.batchData = null
+                break
 
-      // Batch data actions
-      setBatchData: (batchData: BatchData) =>
-        set(state => {
-          state.batchData = batchData
-        }),
+              case 'complete':
+                // Go back to confirmation step
+                state.currentStep = 'confirmation'
+                break
 
-      updateBatchData: (updates: Partial<BatchData>) =>
-        set(state => {
-          if (state.batchData) {
-            Object.assign(state.batchData, updates)
-          } else {
-            state.batchData = { quantity: 1, ...updates }
-          }
-        }),
+              case 'error':
+                // Go back to the last valid step (try to recover)
+                if (state.batchData) {
+                  state.currentStep = 'confirmation'
+                } else if (state.expiryInfo) {
+                  state.currentStep = 'ocr'
+                } else if (state.scannedProduct) {
+                  state.currentStep = 'product'
+                } else {
+                  state.currentStep = 'barcode'
+                }
+                state.error = null
+                break
 
-      // Workflow control
-      completeWorkflow: () =>
-        set(state => {
-          state.currentStep = 'complete'
-          state.isProcessing = false
-          state.error = null
-        }),
+              default:
+                // Already at the first step, can't go back further
+                break
+            }
+          }),
 
-      resetWorkflow: () =>
-        set(state => {
-          state.currentStep = 'barcode'
-          state.scannedProduct = null
-          state.expiryInfo = null
-          state.batchData = null
-          state.isProcessing = false
-          state.error = null
-        }),
+        canGoBack: () => {
+          const state = get()
+          return state.currentStep !== 'barcode'
+        },
 
-      setError: (error: string | null) =>
-        set(state => {
-          state.error = error
-          state.isProcessing = false
-          if (error) {
-            state.currentStep = 'error'
-          }
-        }),
-
-      // History management
-      addToHistory: (product: ScannedProduct) =>
-        set(state => {
-          const existingIndex = state.scanHistory.findIndex(
-            (item: ScannedProduct) => item.barcode === product.barcode,
-          )
-
-          if (existingIndex >= 0) {
-            state.scanHistory[existingIndex] = product
-          } else {
-            state.scanHistory = [product, ...state.scanHistory.slice(0, 9)]
-          }
-        }),
-
-      clearHistory: () =>
-        set(state => {
-          state.scanHistory = []
-        }),
-
-      rescanFromHistory: (product: ScannedProduct) =>
-        set(state => {
-          state.scannedProduct = { ...product }
-          state.currentStep = 'product'
-          state.expiryInfo = null
-          state.batchData = null
-          state.error = null
-        }),
-
-      // Navigation actions
-      goBackStep: () =>
-        set(state => {
+        getPreviousStepName: () => {
+          const state = get()
           switch (state.currentStep) {
             case 'product':
-              // Go back to barcode scanning
-              state.currentStep = 'barcode'
-              // Clear the scanned product but keep it in history
-              if (state.scannedProduct) {
-                const existingIndex = state.scanHistory.findIndex(
-                  (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
-                )
-                if (existingIndex >= 0) {
-                  state.scanHistory[existingIndex] = { ...state.scannedProduct }
-                } else {
-                  state.scanHistory = [
-                    { ...state.scannedProduct },
-                    ...state.scanHistory.slice(0, 9),
-                  ]
-                }
-              }
-              state.scannedProduct = null
-              break
-
+              return 'Scan Barcode'
             case 'ocr':
-              // Go back to product confirmation (if we have product data) or barcode scanning
-              if (state.scannedProduct?.productName) {
-                state.currentStep = 'product'
-              } else {
-                state.currentStep = 'barcode'
-                state.scannedProduct = null
-              }
-              // Clear expiry info
-              state.expiryInfo = null
-              break
-
+              return state.scannedProduct?.productName ? 'Product Details' : 'Scan Barcode'
             case 'confirmation':
-              // 🔥 FIX: Go back to OCR step and clear expiry data to show camera again
-              state.currentStep = 'ocr'
-              // Clear expiry info to reset the OCR step completely
-              state.expiryInfo = null
-              // Keep batch data but clear it to show fresh form
-              state.batchData = null
-              break
-
+              return 'Scan Expiry Date'
             case 'complete':
-              // Go back to confirmation step
-              state.currentStep = 'confirmation'
-              break
-
+              return 'Review Details'
             case 'error':
-              // Go back to the last valid step (try to recover)
-              if (state.batchData) {
-                state.currentStep = 'confirmation'
-              } else if (state.expiryInfo) {
-                state.currentStep = 'ocr'
-              } else if (state.scannedProduct) {
-                state.currentStep = 'product'
-              } else {
-                state.currentStep = 'barcode'
-              }
-              state.error = null
-              break
-
+              return 'Previous Step'
             default:
-              // Already at the first step, can't go back further
-              break
+              return null
           }
-        }),
-
-      canGoBack: () => {
-        const state = get()
-        return state.currentStep !== 'barcode'
-      },
-
-      getPreviousStepName: () => {
-        const state = get()
-        switch (state.currentStep) {
-          case 'product':
-            return 'Scan Barcode'
-          case 'ocr':
-            return state.scannedProduct?.productName ? 'Product Details' : 'Scan Barcode'
-          case 'confirmation':
-            return 'Scan Expiry Date'
-          case 'complete':
-            return 'Review Details'
-          case 'error':
-            return 'Previous Step'
-          default:
-            return null
-        }
-      },
-    })),
+        },
+      })),
+    ),
   ),
 )
 
