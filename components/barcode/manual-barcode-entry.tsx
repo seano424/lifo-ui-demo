@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
 import { useScanningActions, useScanHistory } from '@/lib/stores/scanning-workflow-store'
+import { Typography } from '../ui/typography'
 
 interface ManualBarcodeEntryProps {
   onProductSelected?: (barcode: string, productData: any) => void
@@ -160,13 +161,12 @@ export default function ManualBarcodeEntry({
         <CardContent className="space-y-4">
           {/* Show selected product if any */}
           {selectedProduct && (
-            <Card className="border-green-200 bg-green-50">
+            <Card>
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                   <div className="flex-1">
-                    <h3 className="font-medium text-green-800">Product Selected</h3>
-                    <div className="text-sm text-green-700 mt-1 space-y-1">
+                    <Typography variant="h3">Product Selected</Typography>
+                    <div className="text-sm mt-1 space-y-1">
                       <div>
                         <strong>Name:</strong> {selectedProduct.productName}
                       </div>
@@ -256,15 +256,9 @@ export default function ManualBarcodeEntry({
               {lookupResult && (
                 <div className="space-y-3">
                   {lookupResult.found ? (
-                    <Card className="border-blue-200 bg-blue-50">
+                    <Card>
                       <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800">Product Found!</span>
-                          <Badge variant="secondary" className="ml-auto">
-                            {lookupResult.source === 'cache' ? 'Cached' : 'Live API'}
-                          </Badge>
-                        </div>
+                        <Typography variant="h3">Product Found!</Typography>
 
                         {lookupResult.product && (
                           <div className="text-sm space-y-2">

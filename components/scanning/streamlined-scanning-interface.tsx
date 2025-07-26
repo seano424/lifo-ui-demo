@@ -673,9 +673,8 @@ export default function WorkingStreamlinedScanningInterface({
 
         {/* Success notification shown inline while staying on barcode scanning */}
         {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
-          <Alert className="bg-green-50 border-green-200">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
+          <Alert className="font-mono flex items-center justify-center border-none">
+            <AlertDescription>
               Added {scannedItems[0].productName} to your list! Scan the next product.
             </AlertDescription>
           </Alert>
@@ -683,45 +682,45 @@ export default function WorkingStreamlinedScanningInterface({
 
         {/* Recent Scans */}
         {scannedItems.length > 0 && (
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <Typography variant="h3">Total items scanned</Typography>
-                <Badge variant="secondary">{scannedItems.length}</Badge>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <Typography variant="h3">Total items scanned</Typography>
+              <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
+                {scannedItems.length > 99 ? '99+' : scannedItems.length}
               </div>
+            </div>
 
-              <div className="space-y-2 max-h-80 overflow-y-auto">
-                {scannedItems.map(item => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-2 border rounded text-sm"
-                  >
-                    <div className="flex-1">
-                      <Typography variant="p">
-                        <span className="text-gray-500">Product:</span> {item.productName}
-                      </Typography>
-                      <Typography variant="p">
-                        <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}
-                        x <span className="font-normal text-gray-500">Price:</span>{' '}
-                        {formatPrice(item.price)}{' '}
-                        <span className="font-normal text-gray-500">Expiry:</span>{' '}
-                        {new Date(item.expiryDate).toLocaleDateString()}
-                      </Typography>
-                    </div>
-
-                    <Button
-                      onClick={() => handleEditItem(item)}
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </Button>
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {scannedItems.map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-2 border rounded text-sm"
+                >
+                  <div className="flex-1">
+                    <Typography variant="p">
+                      <span className="text-gray-500">Product:</span> {item.productName}
+                    </Typography>
+                    <Typography variant="p">
+                      <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}x{' '}
+                      <span className="font-normal text-gray-500">Price:</span>{' '}
+                      {formatPrice(item.price)}{' '}
+                      <span className="font-normal text-gray-500">Expiry:</span>{' '}
+                      {new Date(item.expiryDate).toLocaleDateString()}
+                    </Typography>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+
+                  <Button
+                    onClick={() => handleEditItem(item)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Footer */}
