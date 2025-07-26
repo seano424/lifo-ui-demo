@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, ScanLine, AlertCircle, CheckCircle, StopCircle } from 'lucide-react'
+import { Camera, AlertCircle, CheckCircle, StopCircle, Scan } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
+import { Badge } from '../ui/badge'
+import { Typography } from '../ui/typography'
+import { cn } from '@/lib/utils'
 
 export interface BarcodeDetection {
   format: string
@@ -19,6 +21,8 @@ interface BarcodeScannerProps {
   autoStart?: boolean
   className?: string
   title?: string
+  subtitle?: string
+  isBarcodeScanner?: boolean
 }
 
 export default function BarcodeScanner({
@@ -27,6 +31,8 @@ export default function BarcodeScanner({
   autoStart = true,
   className = '',
   title = 'Scan Product',
+  subtitle = 'Scan a barcode to add a product to your inventory',
+  isBarcodeScanner = false,
 }: BarcodeScannerProps): React.JSX.Element {
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,20 +62,6 @@ export default function BarcodeScanner({
       setIsMounted(false)
     }
   }, [])
-
-  const detectBarcode = useCallback(
-    async (imageData: ImageData): Promise<BarcodeDetection | null> => {
-      try {
-        // Use your real barcode detection infrastructure
-        const detections = await detectBarcodes(canvasRef.current!)
-        return detections.length > 0 ? detections[0] : null
-      } catch (error) {
-        console.error('Barcode detection failed:', error)
-        return null
-      }
-    },
-    [detectBarcodes],
-  )
 
   // Stop camera stream
   const stopCamera = useCallback(() => {
@@ -301,146 +293,139 @@ export default function BarcodeScanner({
   const displayError = error || detectionError
 
   return (
-    <div className={`${className}`}>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ScanLine className="w-5 h-5" />
-            {title}
-            {isInitialized && (
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                Real Detection
-              </span>
-            )}
-            {isScanning && (
-              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Scanning</span>
-            )}
-            {userStoppedCamera && (
-              <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                User Stopped
-              </span>
-            )}
-          </CardTitle>
-        </CardHeader>
+    <div className={cn('w-full flex flex-col gap-4', className)}>
+      <div className="flex items-center justify-center gap-2 flex-col">
+        <div className="flex items-center gap-2">
+          <Scan className="w-5 h-5" />
+          <Typography variant="h3">{title}</Typography>
+        </div>
+        <Typography variant="p">{subtitle}</Typography>
+      </div>
 
-        <CardContent className="space-y-4">
-          {/* Error Display */}
-          {displayError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{displayError}</AlertDescription>
-            </Alert>
-          )}
+      <div className="space-y-4">
+        {/* Error Display */}
+        {displayError && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{displayError}</AlertDescription>
+          </Alert>
+        )}
 
-          {/* Initialization Status */}
-          {!isInitialized && !detectionError && (
+        {/* Initialization Status */}
+        {!isInitialized && !detectionError && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>Initializing barcode detection...</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Camera Permission Request */}
+        {hasPermission === false && (
+          <div className="text-center space-y-4">
             <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>Initializing barcode detection...</AlertDescription>
+              <Camera className="h-4 w-4" />
+              <AlertDescription>Camera access is required for barcode scanning.</AlertDescription>
             </Alert>
-          )}
+            <Button
+              onClick={handleUserStart}
+              className="w-full"
+              disabled={!isInitialized || isStartingRef.current}
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              {isStartingRef.current ? 'Starting...' : 'Enable Camera'}
+            </Button>
+          </div>
+        )}
 
-          {/* Camera Permission Request */}
-          {hasPermission === false && (
-            <div className="text-center space-y-4">
-              <Alert>
-                <Camera className="h-4 w-4" />
-                <AlertDescription>Camera access is required for barcode scanning.</AlertDescription>
-              </Alert>
+        {/* Camera View */}
+        {hasPermission && (
+          <div className="relative">
+            <video
+              ref={videoRef}
+              className="w-full aspect-video border border-black rounded-3xl object-cover"
+              playsInline
+              muted
+            />
+
+            {!isScanning && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <Typography variant="p">Start scanning to see your camera</Typography>
+              </div>
+            )}
+
+            {/* Scanning overlay */}
+            {isScanning && isInitialized && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="border-2 border-green-400 w-64 h-32 rounded-lg relative">
+                  <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
+                  {detectedBarcode && (
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm">
+                      <CheckCircle className="w-3 h-3 inline mr-1" />
+                      Detected: {detectedBarcode}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Hidden canvas for barcode detection */}
+            <canvas ref={canvasRef} className="hidden" />
+          </div>
+        )}
+
+        {hasPermission && (
+          <div className="flex gap-2">
+            {!isScanning ? (
               <Button
                 onClick={handleUserStart}
-                className="w-full"
+                className="flex-1"
+                variant="brandSecondary"
                 disabled={!isInitialized || isStartingRef.current}
               >
                 <Camera className="w-4 h-4 mr-2" />
-                {isStartingRef.current ? 'Starting...' : 'Enable Camera'}
+                {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
               </Button>
-            </div>
-          )}
+            ) : (
+              <Button onClick={handleUserStop} variant="destructive" className="flex-1">
+                <StopCircle className="w-4 h-4 mr-2" />
+                Stop Scanning
+              </Button>
+            )}
+          </div>
+        )}
 
-          {/* Camera View */}
-          {hasPermission && (
-            <div className="relative">
-              <video
-                ref={videoRef}
-                className="w-full aspect-video bg-black rounded-lg object-cover"
-                playsInline
-                muted
-              />
-
-              {/* Scanning overlay */}
-              {isScanning && isInitialized && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-2 border-green-400 w-64 h-32 rounded-lg relative">
-                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
-                    {detectedBarcode && (
-                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm">
-                        <CheckCircle className="w-3 h-3 inline mr-1" />
-                        Detected: {detectedBarcode}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Hidden canvas for barcode detection */}
-              <canvas ref={canvasRef} className="hidden" />
-            </div>
-          )}
-
-          {hasPermission && (
-            <div className="flex gap-2">
-              {!isScanning ? (
-                <Button
-                  onClick={handleUserStart}
-                  className="flex-1"
-                  disabled={!isInitialized || isStartingRef.current}
+        {/* Scanning History */}
+        {scanningHistory.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-600">Recent Scans</h4>
+            <div className="space-y-1">
+              {scanningHistory.map((barcode, index) => (
+                <div
+                  key={`${barcode}-${index}`}
+                  className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
                 >
-                  <Camera className="w-4 h-4 mr-2" />
-                  {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
-                </Button>
-              ) : (
-                <Button onClick={handleUserStop} variant="ghost" className="flex-1">
-                  <StopCircle className="w-4 h-4 mr-2" />
-                  Stop Scanning
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Scanning History */}
-          {scanningHistory.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-gray-600">Recent Scans</h4>
-              <div className="space-y-1">
-                {scanningHistory.map((barcode, index) => (
-                  <div
-                    key={`${barcode}-${index}`}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                  <span className="font-mono">{barcode}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleBarcodeDetected(barcode)}
+                    className="h-6 px-2 text-xs"
                   >
-                    <span className="font-mono">{barcode}</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleBarcodeDetected(barcode)}
-                      className="h-6 px-2 text-xs"
-                    >
-                      Re-scan
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                    Re-scan
+                  </Button>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Instructions */}
-          {hasPermission && isScanning && isInitialized && (
-            <div className="text-xs text-gray-500 text-center">
-              Point camera at barcode to scan automatically • Real detection active
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        {/* Instructions */}
+        {hasPermission && isScanning && isInitialized && isBarcodeScanner && (
+          <div className="text-xs text-gray-500 text-center">
+            Point camera at barcode to scan automatically • Real detection active
+          </div>
+        )}
+      </div>
     </div>
   )
 }

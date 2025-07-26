@@ -3,29 +3,27 @@
 import React, { useState, useEffect } from 'react'
 import {
   Camera,
-  Info,
   ArrowLeft,
   CheckCircle,
-  Keyboard,
-  Package,
   Euro,
   Edit3,
   AlertCircle,
   ArrowRight,
-  Scan,
+  Keyboard,
+  Package,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { UniversalBarcodeDetector } from '@/lib/barcode/barcode-detector'
 import { Typography } from '@/components/ui/typography'
+import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 
 // Import working components from BarcodeDemo
 import BarcodeScanner, { BarcodeDetection } from '@/components/barcode/barcode-scanner'
-import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 
 // Import working store integration
 import {
@@ -46,7 +44,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog'
 
 // Types for our streamlined workflow
@@ -81,12 +78,6 @@ export default function WorkingStreamlinedScanningInterface({
   const previousStepName = usePreviousStepName()
   const { activeStore } = useStoreState()
 
-  const [browserSupport, setBrowserSupport] = useState<{
-    native: boolean
-    polyfill: boolean
-    formats: string[]
-  } | null>(null)
-
   // Store actions
   const workflowActions = useScanningActions()
 
@@ -96,8 +87,7 @@ export default function WorkingStreamlinedScanningInterface({
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
   const [isRescanning, setIsRescanning] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isClient, setIsClient] = useState(false)
+
   const [isEditingItem, setIsEditingItem] = useState(false)
   const [editingItem, setEditingItem] = useState<ScannedItem | null>(null)
   const [editForm, setEditForm] = useState({
@@ -106,8 +96,6 @@ export default function WorkingStreamlinedScanningInterface({
     price: 0,
   })
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
-  const [hasManuallyEditedDate, setHasManuallyEditedDate] = useState(false)
-  const [showSystemStatus, setShowSystemStatus] = useState(false)
 
   // Form state for batch creation
   const [quantity, setQuantity] = useState(1)
@@ -121,39 +109,6 @@ export default function WorkingStreamlinedScanningInterface({
     error: lookupError,
   } = useProductLookup(lookupBarcode, !!lookupBarcode)
 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // Check browser support on component mount
-  useEffect(() => {
-    async function checkSupport() {
-      setIsLoading(true)
-
-      const native = typeof window !== 'undefined' && 'BarcodeDetector' in window
-      let polyfill = false
-      let formats: string[] = []
-
-      try {
-        if (typeof window !== 'undefined') {
-          const supportedFormats = await UniversalBarcodeDetector.getSupportedFormats()
-          formats = supportedFormats
-          polyfill = true
-        }
-      } catch (error) {
-        console.error('Polyfill check failed:', error)
-      }
-
-      setBrowserSupport({ native, polyfill, formats })
-      setIsLoading(false)
-    }
-
-    if (isClient) {
-      checkSupport()
-    }
-  }, [isClient])
-
-  // Initialize store ID when active store changes
   useEffect(() => {
     if (activeStore) {
       workflowActions.setStoreId(activeStore.store_id)
@@ -314,7 +269,6 @@ export default function WorkingStreamlinedScanningInterface({
       setPrice(0)
       setManualExpiryDate('')
       setShowManualBarcode(false)
-      setHasManuallyEditedDate(false)
     }
 
     // Set batch data and complete workflow
@@ -351,36 +305,6 @@ export default function WorkingStreamlinedScanningInterface({
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
-  // Test barcodes for easy testing (verified working)
-  const testBarcodes = [
-    { barcode: '3017624010701', name: 'Nutella' },
-    { barcode: '737628064502', name: 'Thai Peanut Noodles' },
-    { barcode: '078000113464', name: 'Orange Sunkist' },
-    { barcode: '5060482840209', name: 'Deliciously Ella Oat Bar' },
-  ]
-
-  const testBarcode = (barcode: string) => {
-    workflowActions.setBarcodeScanned(barcode, {
-      format: 'Test Entry',
-      rawValue: barcode,
-      confidence: 1.0,
-    })
-    setLookupBarcode(barcode)
-  }
-
-  if (!isClient || isLoading) {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2 text-gray-600">
-            {!isClient ? 'Loading client...' : 'Initializing scanning system...'}
-          </p>
-        </div>
-      </div>
-    )
-  }
-
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)
     setEditingItem(item)
@@ -416,92 +340,7 @@ export default function WorkingStreamlinedScanningInterface({
 
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">LIFO Complete Scanning System</h1>
-        <p className="text-gray-600">
-          Camera scanning + Manual entry + Open Food Facts integration + Workflow management
-        </p>
-        <div className="flex justify-center">
-          <Button variant="outline" onClick={() => setShowSystemStatus(!showSystemStatus)}>
-            <Info className="w-4 h-4 mr-2" />
-            {showSystemStatus ? 'Hide System Status' : 'Show System Status'}
-          </Button>
-        </div>
-      </div>
-
-      {/* Browser Support Info */}
-      {browserSupport && showSystemStatus && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">System Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  {browserSupport.native ? (
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-yellow-500" />
-                  )}
-                  <span>
-                    Barcode Detection: {browserSupport.native ? 'Native API' : 'Polyfill'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span>Open Food Facts: Connected</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span>Supabase Cache: Ready</span>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <strong>Supported Formats:</strong>
-                <div className="flex flex-wrap gap-1">
-                  {browserSupport.formats.slice(0, 6).map(format => (
-                    <span
-                      key={format}
-                      className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs"
-                    >
-                      {format.toUpperCase()}
-                    </span>
-                  ))}
-                  {browserSupport.formats.length > 6 && (
-                    <span className="px-1 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                      +{browserSupport.formats.length - 6} more
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <strong>Quick Test:</strong>
-                <div className="space-y-1">
-                  {testBarcodes.slice(0, 3).map(item => (
-                    <Button
-                      key={item.barcode}
-                      size="sm"
-                      variant="outline"
-                      onClick={() => testBarcode(item.barcode)}
-                      className="text-xs h-7 w-full justify-start"
-                    >
-                      {item.name}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Main Content */}
       <div className="p-4 space-y-4">
-        {/* Error Display */}
         {(workflowError || lookupError) && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -664,16 +503,14 @@ export default function WorkingStreamlinedScanningInterface({
             {!manualExpiryDate && (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Camera className="w-4 h-4" />
-                    <span>Point camera at expiry date</span>
-                  </div>
                   <BarcodeScanner
                     onScan={() => {}} // Don't auto-trigger OCR - let user click button
                     onError={handleError}
                     autoStart={true}
                     className="w-full"
                     title="Scan Expiry Date"
+                    subtitle="Point camera at expiry date"
+                    isBarcodeScanner={false}
                   />
                 </div>
 
