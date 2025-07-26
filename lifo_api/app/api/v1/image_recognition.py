@@ -1,6 +1,6 @@
 """
-Image recognition preparation endpoints for future ML integration
-Placeholder endpoints ready for computer vision and OCR integration
+Image recognition endpoints with Google Vision API for OCR and complex processing
+Focused on advanced image analysis that frontend cannot handle
 """
 
 import uuid
@@ -218,63 +218,8 @@ async def extract_expiry_date_from_image(
         raise HTTPException(status_code=500, detail="Expiry date extraction failed")
 
 
-@router.post("/detect-barcode/{store_id}")
-@ai_endpoint_rate_limit("20/minute")
-async def detect_barcode_from_image(
-    store_id: str,
-    request: Request,
-    image: UploadFile = File(...),
-    barcode_types: list[str] = Form(
-        ["EAN13", "UPC", "CODE128"], description="Expected barcode types"
-    ),
-    db: AsyncSession = Depends(get_db),
-    current_user: dict[str, Any] = Depends(get_current_user),
-):
-    """
-    Detect and decode barcode from product image
-    Future: Will use computer vision models for barcode detection
-    Currently: Returns mock barcode detection for MVP development
-    """
-    try:
-        store_id = validate_store_id_format(store_id)
-
-        # Validate image
-        if not image.content_type.startswith("image/"):
-            raise ValidationException(message="File must be an image", field="image")
-
-        image_data = await image.read()
-
-        # Mock barcode detection
-        barcode_results = await _mock_barcode_detection(image_data, barcode_types)
-
-        logger.info(
-            "Barcode detection completed",
-            store_id=store_id,
-            barcodes_found=len(barcode_results.get("barcodes", [])),
-            user_id=current_user["sub"],
-        )
-
-        return {
-            "success": True,
-            "detection_results": barcode_results,
-            "supported_types": barcode_types,
-            "recommendations": [
-                "Verify barcode matches product",
-                "Use detected barcode for product lookup",
-                "Manual entry if detection confidence is low",
-            ],
-        }
-
-    except ValidationException:
-        raise
-    except Exception as e:
-        logger.error(
-            "Barcode detection failed",
-            store_id=store_id,
-            error=str(e),
-            user_id=current_user["sub"],
-        )
-        raise HTTPException(status_code=500, detail="Barcode detection failed")
+# Barcode detection endpoint removed - frontend handles this natively
+# Frontend uses browser's barcode detection APIs for real-time scanning
 
 
 @router.get("/ml-models/status")

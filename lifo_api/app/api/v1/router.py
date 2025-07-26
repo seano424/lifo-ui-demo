@@ -1,7 +1,8 @@
 """
 Main API router for LIFO AI Engine v1
-Combines all API endpoints into a single router
-Updated for MVP with scan workflows and mobile optimization
+Optimized architecture with clear frontend-backend separation:
+- Frontend: Handles barcode scanning and OpenFoodFacts API calls  
+- Backend: Provides complex Google Vision OCR and AI processing
 """
 
 from fastapi import APIRouter
@@ -13,9 +14,10 @@ from app.api.v1 import (
     donation_queries,
     donations,
     # global_products,  # Disabled - global schema not implemented
-    # image_recognition,  # Disabled for now
+    image_recognition,  # Re-enabled with optimized architecture
     mobile_endpoints,
     mvp_analytics,
+    product_scanning,  # New OCR-focused endpoints
     scan_workflows,
     scoring,
 )
@@ -98,10 +100,18 @@ router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-# Future-ready endpoints for image recognition - Disabled for now
-# router.include_router(
-#     image_recognition.router,
-#     prefix="/image",
-#     tags=["Image Recognition (Future)"],
-#     responses={404: {"description": "Not found"}},
-# )
+# Google Vision API for complex OCR and image analysis
+router.include_router(
+    image_recognition.router,
+    prefix="/vision",
+    tags=["Google Vision OCR"],
+    responses={404: {"description": "Not found"}},
+)
+
+# OCR-focused product scanning (complex image processing only)
+router.include_router(
+    product_scanning.router,
+    prefix="/ocr",
+    tags=["OCR Product Scanning"],
+    responses={404: {"description": "Not found"}},
+)
