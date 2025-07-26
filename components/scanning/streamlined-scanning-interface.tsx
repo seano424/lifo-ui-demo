@@ -93,13 +93,20 @@ export default function WorkingStreamlinedScanningInterface({
   // Local UI state for streamlined flow
   const [uiStep, setUIStep] = useState<UIStep>('camera-barcode')
   const [showManualBarcode, setShowManualBarcode] = useState(false)
-  const [showManualExpiry, setShowManualExpiry] = useState(false)
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
   const [isRescanning, setIsRescanning] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isClient, setIsClient] = useState(false)
   const [isEditingItem, setIsEditingItem] = useState(false)
+  const [editingItem, setEditingItem] = useState<ScannedItem | null>(null)
+  const [editForm, setEditForm] = useState({
+    expiryDate: '',
+    quantity: 1,
+    price: 0,
+  })
+  const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
+  const [hasManuallyEditedDate, setHasManuallyEditedDate] = useState(false)
   const [showSystemStatus, setShowSystemStatus] = useState(false)
 
   // Form state for batch creation
@@ -167,7 +174,6 @@ export default function WorkingStreamlinedScanningInterface({
       case 'barcode':
         setUIStep('camera-barcode')
         setShowManualBarcode(false)
-        setShowManualExpiry(false)
         setLookupBarcode(null)
         setQuantity(1)
         setPrice(0)
@@ -184,7 +190,6 @@ export default function WorkingStreamlinedScanningInterface({
         break
       case 'ocr':
         setUIStep('camera-expiry')
-        setShowManualExpiry(false)
 
         // 🔥 FIX: Reset expiry date and rescanning flag when entering OCR step
         // This ensures the camera view shows when going back
@@ -204,32 +209,15 @@ export default function WorkingStreamlinedScanningInterface({
         }
         break
       case 'complete':
-        // Add to scanned items list
-        if (scannedProduct && manualExpiryDate) {
-          const newItem: ScannedItem = {
-            id: Date.now().toString(),
-            barcode: scannedProduct.barcode,
-            productName: scannedProduct.productName || 'Unknown Product',
-            brand: scannedProduct.brand,
-            expiryDate: manualExpiryDate,
-            quantity,
-            price,
-            timestamp: new Date(),
-          }
-          setScannedItems(prev => [newItem, ...prev])
-          onItemAdded?.(newItem)
-        }
-        setUIStep('batch-success')
+        // The item creation logic has been moved to handleAddToInventory
+        // Just reset to barcode scanning step
+        setUIStep('camera-barcode')
         break
     }
   }, [
     currentStep,
     scannedProduct,
     expiryInfo,
-    manualExpiryDate,
-    quantity,
-    price,
-    onItemAdded,
     isRescanning,
   ])
 
@@ -248,7 +236,7 @@ export default function WorkingStreamlinedScanningInterface({
   }
 
   // Handle manual product selection from ManualBarcodeEntry
-  const handleManualProductSelected = (barcode: string, productData: any) => {
+  const handleManualProductSelected = (barcode: string, productData: unknown) => {
     console.log('Manual product selected:', barcode, productData)
     // The ManualBarcodeEntry component already handles setting the workflow state
     // Just close the manual entry and set lookup barcode
@@ -269,7 +257,6 @@ export default function WorkingStreamlinedScanningInterface({
 
       // Reset expiry date state to show camera again
       setManualExpiryDate('')
-      setShowManualExpiry(false)
 
       // Call workflow go back
       workflowActions.goBackStep()
@@ -284,7 +271,6 @@ export default function WorkingStreamlinedScanningInterface({
 
       // Close any open modals/forms when going back
       setShowManualBarcode(false)
-      setShowManualExpiry(false)
     }
   }
 
@@ -311,6 +297,32 @@ export default function WorkingStreamlinedScanningInterface({
 
   // Handle add to inventory
   const handleAddToInventory = () => {
+    // Add to scanned items list first
+    if (scannedProduct && manualExpiryDate) {
+      const newItem: ScannedItem = {
+        id: Date.now().toString(),
+        barcode: scannedProduct.barcode,
+        productName: scannedProduct.productName || 'Unknown Product',
+        brand: scannedProduct.brand,
+        expiryDate: manualExpiryDate,
+        quantity,
+        price,
+        timestamp: new Date(),
+      }
+      setScannedItems(prev => [newItem, ...prev])
+      onItemAdded?.(newItem)
+
+      // Reset workflow for next item
+      workflowActions.resetWorkflow()
+      setLookupBarcode(null)
+      setQuantity(1)
+      setPrice(0)
+      setManualExpiryDate('')
+      setShowManualBarcode(false)
+      setHasManuallyEditedDate(false)
+    }
+
+    // Set batch data and complete workflow
     workflowActions.setBatchData({
       quantity,
       costPrice: price,
@@ -319,16 +331,26 @@ export default function WorkingStreamlinedScanningInterface({
     workflowActions.completeWorkflow()
   }
 
-  // Handle scan another product
-  const handleScanAnother = () => {
-    // Reset everything for new scan
+  // Handle final submission of all scanned items
+  const handleFinalSubmission = () => {
+    setShowSubmissionDialog(true)
+  }
+
+  const handleConfirmSubmission = () => {
+    console.log('Submitting', scannedItems.length, 'items:', scannedItems)
+
+    // TODO: Implement actual Supabase submission
+    // This is where you'd call your API to save to inventory
+
+    // For now, show success and clear items
+    alert(`Successfully submitted ${scannedItems.length} items to inventory!`)
+
+    // Clear the batch and close dialog
+    setScannedItems([])
+    setShowSubmissionDialog(false)
+
+    // Optional: Reset to beginning
     workflowActions.resetWorkflow()
-    setLookupBarcode(null)
-    setQuantity(1)
-    setPrice(0)
-    setManualExpiryDate('')
-    setShowManualBarcode(false)
-    setShowManualExpiry(false)
   }
 
   // Format price
@@ -351,8 +373,6 @@ export default function WorkingStreamlinedScanningInterface({
     setLookupBarcode(barcode)
   }
 
-  const devMode = process.env.NODE_ENV === 'development'
-
   if (!isClient || isLoading) {
     return (
       <div className="p-6 max-w-4xl mx-auto">
@@ -368,7 +388,35 @@ export default function WorkingStreamlinedScanningInterface({
 
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)
+    setEditingItem(item)
+    setEditForm({
+      expiryDate: item.expiryDate,
+      quantity: item.quantity,
+      price: item.price,
+    })
     setIsEditingItem(true)
+  }
+
+  const handleSaveEdit = () => {
+    if (!editingItem) return
+
+    const updatedItem: ScannedItem = {
+      ...editingItem,
+      expiryDate: editForm.expiryDate,
+      quantity: editForm.quantity,
+      price: editForm.price,
+    }
+
+    setScannedItems(prev => prev.map(item => (item.id === editingItem.id ? updatedItem : item)))
+
+    setIsEditingItem(false)
+    setEditingItem(null)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditingItem(false)
+    setEditingItem(null)
+    setEditForm({ expiryDate: '', quantity: 1, price: 0 })
   }
 
   return (
@@ -617,9 +665,9 @@ export default function WorkingStreamlinedScanningInterface({
               </CardContent>
             </Card>
 
-            {/* Camera for OCR or Manual Entry */}
-            {!showManualExpiry && !manualExpiryDate && (
-              <>
+            {/* Camera OCR Section - Always visible */}
+            {!manualExpiryDate && (
+              <div className="space-y-3">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Camera className="w-4 h-4" />
@@ -643,19 +691,15 @@ export default function WorkingStreamlinedScanningInterface({
                     <Camera className="w-4 h-4 mr-2" />
                     {isWorkflowProcessing ? 'Processing...' : 'Capture Expiry Date'}
                   </Button>
-
-                  <Button variant="outline" onClick={() => setShowManualExpiry(true)}>
-                    <Keyboard className="w-4 h-4" />
-                  </Button>
                 </div>
-              </>
+              </div>
             )}
 
-            {/* Manual Expiry Entry */}
-            {showManualExpiry && !manualExpiryDate && (
+            {/* Manual Entry Section - Always visible alongside camera */}
+            {!manualExpiryDate && (
               <Card>
                 <CardContent className="p-4 space-y-3">
-                  <Label className="font-medium">Manual Date Entry</Label>
+                  <Label className="font-medium">Or enter manually</Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label htmlFor="expiry" className="text-xs">
@@ -707,20 +751,18 @@ export default function WorkingStreamlinedScanningInterface({
                     >
                       Confirm Date
                     </Button>
-                    <Button variant="outline" onClick={() => setShowManualExpiry(false)}>
-                      Back
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Success with Date Captured */}
+            {/* Success with Date Captured - Editable */}
             {manualExpiryDate && (
-              <Card className="">
+              <Card className="border-green-200">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Typography variant="h3" className="text-secondary">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <Typography variant="h3" className="text-green-800">
                       {expiryInfo?.isManual
                         ? 'Date entered manually'
                         : 'Date captured successfully'}
@@ -729,7 +771,7 @@ export default function WorkingStreamlinedScanningInterface({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs">Expiry Date</Label>
+                      <Label className="text-xs">Expiry Date (editable)</Label>
                       <Input
                         type="date"
                         value={manualExpiryDate}
@@ -763,6 +805,19 @@ export default function WorkingStreamlinedScanningInterface({
                       />
                     </div>
                   </div>
+
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setManualExpiryDate('')
+                        workflowActions.setError(null)
+                      }}
+                      className="flex-1"
+                    >
+                      Clear & Rescan
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -783,23 +838,14 @@ export default function WorkingStreamlinedScanningInterface({
           </div>
         )}
 
-        {/* STEP 4: Batch Success */}
-        {uiStep === 'batch-success' && (
-          <Card className="">
-            <CardContent className="p-4 text-center">
-              <Typography variant="h3" className="mb-2">
-                Product Added Successfully!
-              </Typography>
-              <Typography variant="p" className="mb-4">
-                {quantity}x {scannedProduct?.productName} • Expires{' '}
-                {manualExpiryDate ? new Date(manualExpiryDate).toLocaleDateString() : 'Unknown'}
-              </Typography>
-              <Button className="w-full" onClick={handleScanAnother}>
-                <Scan className="w-4 h-4" />
-                Scan Another Product
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Success notification shown inline while staying on barcode scanning */}
+        {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
+          <Alert className="bg-green-50 border-green-200">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              Added {scannedItems[0].productName} to your list! Scan the next product.
+            </AlertDescription>
+          </Alert>
         )}
 
         {/* Recent Scans */}
@@ -859,7 +905,11 @@ export default function WorkingStreamlinedScanningInterface({
           {/* Finish and submit button */}
           {scannedItems.length > 0 && (
             <div className="flex justify-center pt-4">
-              <Button variant="brandSecondary" className="flex items-center gap-2">
+              <Button
+                variant="brandSecondary"
+                className="flex items-center gap-2"
+                onClick={handleFinalSubmission}
+              >
                 <CheckCircle className="w-4 h-4" />
                 Finish and submit {scannedItems.length} item{scannedItems.length > 1 ? 's' : ''}
               </Button>
@@ -868,21 +918,164 @@ export default function WorkingStreamlinedScanningInterface({
         </div>
       </div>
 
-      {isEditingItem && (
+      {isEditingItem && editingItem && (
         <Dialog open={isEditingItem} onOpenChange={setIsEditingItem}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
             </DialogHeader>
+
+            <div className="space-y-4">
+              {/* Product Info */}
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="text-sm font-medium">{editingItem.productName}</div>
+                {editingItem.brand && (
+                  <div className="text-xs text-gray-600">{editingItem.brand}</div>
+                )}
+                <div className="text-xs text-gray-500 font-mono">{editingItem.barcode}</div>
+              </div>
+
+              {/* Edit Form */}
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="edit-expiry" className="text-sm font-medium">
+                    Expiry Date
+                  </Label>
+                  <Input
+                    id="edit-expiry"
+                    type="date"
+                    value={editForm.expiryDate}
+                    onChange={e => setEditForm(prev => ({ ...prev, expiryDate: e.target.value }))}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="edit-quantity" className="text-sm font-medium">
+                      Quantity
+                    </Label>
+                    <Input
+                      id="edit-quantity"
+                      type="number"
+                      min="1"
+                      value={editForm.quantity}
+                      onChange={e =>
+                        setEditForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-price" className="text-sm font-medium">
+                      Price (€)
+                    </Label>
+                    <div className="relative mt-1">
+                      <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="edit-price"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={editForm.price}
+                        onChange={e =>
+                          setEditForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))
+                        }
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="mt-6">
+              <Button variant="outline" onClick={handleCancelEdit}>
+                Cancel
+              </Button>
+              <Button
+                variant="brandSecondary"
+                onClick={handleSaveEdit}
+                disabled={!editForm.expiryDate || editForm.quantity <= 0 || editForm.price <= 0}
+              >
+                Save Changes
+              </Button>
+            </DialogFooter>
           </DialogContent>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditingItem(false)}>
-              Cancel
-            </Button>
-          </DialogFooter>
-          <DialogClose asChild>
-            <Button variant="brandSecondary">Save</Button>
-          </DialogClose>
+        </Dialog>
+      )}
+
+      {/* Submission Confirmation Dialog */}
+      {showSubmissionDialog && (
+        <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Confirm Submission</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="text-sm text-gray-600">
+                You are about to submit {scannedItems.length} item
+                {scannedItems.length > 1 ? 's' : ''} to inventory:
+              </div>
+
+              {/* Summary List */}
+              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
+                {scannedItems.map(item => {
+                  const totalValue = item.quantity * item.price
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex justify-between items-start p-2 bg-white rounded border text-sm"
+                    >
+                      <div className="flex-1">
+                        <div className="font-medium">{item.productName}</div>
+                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
+                        <div className="text-xs text-gray-500">
+                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium">
+                          {item.quantity}x {formatPrice(item.price)}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          Total: {formatPrice(totalValue)}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Total Summary */}
+              <div className="border-t pt-3">
+                <div className="flex justify-between items-center font-medium">
+                  <span>Total Items:</span>
+                  <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                </div>
+                <div className="flex justify-between items-center font-medium">
+                  <span>Total Value:</span>
+                  <span>
+                    {formatPrice(
+                      scannedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="mt-6">
+              <Button variant="outline" onClick={() => setShowSubmissionDialog(false)}>
+                Cancel
+              </Button>
+              <Button variant="brandSecondary" onClick={handleConfirmSubmission}>
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Submit to Inventory
+              </Button>
+            </DialogFooter>
+          </DialogContent>
         </Dialog>
       )}
     </div>

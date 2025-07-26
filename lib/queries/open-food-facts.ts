@@ -106,12 +106,12 @@ export function transformOpenFoodFactsProduct(
   barcode: string,
   offProduct: OpenFoodFactsProduct,
 ): ProductLookupResult {
-  console.log(`[OpenFoodFacts] Transform for ${barcode}:`, { 
-    status: offProduct.status, 
+  console.log(`[OpenFoodFacts] Transform for ${barcode}:`, {
+    status: offProduct.status,
     hasProduct: !!offProduct.product,
-    productName: offProduct.product?.product_name 
+    productName: offProduct.product?.product_name,
   })
-  
+
   if (offProduct.status !== 1 || !offProduct.product) {
     console.log(`[OpenFoodFacts] Product not found for ${barcode} - status: ${offProduct.status}`)
     return {
