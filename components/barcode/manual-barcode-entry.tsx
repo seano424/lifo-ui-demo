@@ -1,24 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import {
-  Search,
-  Package,
-  Scan,
-  Loader2,
-  AlertCircle,
-  CheckCircle,
-  X,
-  ArrowRight,
-} from 'lucide-react'
+import { Search, Package, Loader2, AlertCircle, X, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
-import { useScanningActions, useScanHistory } from '@/lib/stores/scanning-workflow-store'
-import { Typography } from '../ui/typography'
+import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
+import { Typography } from '@/components/ui/typography'
 
 interface ManualBarcodeEntryProps {
   onProductSelected?: (barcode: string, productData: any) => void
@@ -42,7 +32,6 @@ export default function ManualBarcodeEntry({
 
   // 🔥 NEW: Get the new setProductSelected action
   const { setProductSelected } = useScanningActions()
-  const scanHistory = useScanHistory()
 
   // React Query hooks
   const {

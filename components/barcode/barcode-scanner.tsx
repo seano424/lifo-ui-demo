@@ -5,8 +5,7 @@ import { Camera, AlertCircle, CheckCircle, StopCircle, Scan } from 'lucide-react
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
-import { Badge } from '../ui/badge'
-import { Typography } from '../ui/typography'
+import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 
 export interface BarcodeDetection {
