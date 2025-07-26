@@ -1,28 +1,49 @@
 // lib/barcode/barcode-detector.ts
 import { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 
-// Polyfill for browsers without native support
-let BarcodeDetectorPolyfill: any = null
+// Define a more flexible type that matches the actual library
+type BarcodeFormat = string
 
-async function loadBarcodeDetectorPolyfill() {
+// Define proper types for the barcode detector
+interface BarcodeDetectorConstructor {
+  new (options: { formats: BarcodeFormat[] }): BarcodeDetector
+  getSupportedFormats(): Promise<readonly BarcodeFormat[]>
+}
+
+interface BarcodeDetector {
+  detect(imageSource: ImageData | HTMLCanvasElement | HTMLVideoElement): Promise<BarcodeResult[]>
+}
+
+interface BarcodeResult {
+  format: BarcodeFormat
+  rawValue: string
+  confidence?: number
+}
+
+// Polyfill for browsers without native support
+let BarcodeDetectorPolyfill: BarcodeDetectorConstructor | null = null
+
+async function loadBarcodeDetectorPolyfill(): Promise<BarcodeDetectorConstructor> {
   if (!BarcodeDetectorPolyfill) {
-    const module = await import('barcode-detector')
-    BarcodeDetectorPolyfill = module.BarcodeDetector
+    const barcodeModule = await import('barcode-detector')
+    BarcodeDetectorPolyfill = barcodeModule.BarcodeDetector as BarcodeDetectorConstructor
   }
-  return BarcodeDetectorPolyfill
+  return BarcodeDetectorPolyfill!
 }
 
 export class UniversalBarcodeDetector {
-  private detector: any = null
+  private detector: BarcodeDetector | null = null
   private isNative: boolean = false
 
-  constructor(private formats: string[] = ['ean_13', 'ean_8', 'code_128', 'code_39']) {}
+  constructor(private formats: BarcodeFormat[] = ['ean_13', 'ean_8', 'code_128', 'code_39']) {}
 
   async initialize(): Promise<void> {
     try {
       // Try native BarcodeDetector API first (Chrome/Edge)
       if ('BarcodeDetector' in globalThis) {
-        this.detector = new (globalThis as any).BarcodeDetector({
+        this.detector = new (
+          globalThis as unknown as { BarcodeDetector: BarcodeDetectorConstructor }
+        ).BarcodeDetector({
           formats: this.formats,
         })
         this.isNative = true
@@ -50,9 +71,9 @@ export class UniversalBarcodeDetector {
     }
 
     try {
-      const barcodes = await this.detector.detect(imageSource)
+      const barcodes = await this.detector!.detect(imageSource)
 
-      return barcodes.map((barcode: any) => ({
+      return barcodes.map((barcode: BarcodeResult) => ({
         format: barcode.format,
         rawValue: barcode.rawValue,
         confidence: this.isNative ? 0.95 : 0.85, // Native API typically more accurate
@@ -66,10 +87,14 @@ export class UniversalBarcodeDetector {
   static async getSupportedFormats(): Promise<string[]> {
     try {
       if ('BarcodeDetector' in globalThis) {
-        return await (globalThis as any).BarcodeDetector.getSupportedFormats()
+        const formats = await (
+          globalThis as unknown as { BarcodeDetector: BarcodeDetectorConstructor }
+        ).BarcodeDetector.getSupportedFormats()
+        return Array.from(formats)
       } else {
         const BarcodeDetectorClass = await loadBarcodeDetectorPolyfill()
-        return await BarcodeDetectorClass.getSupportedFormats()
+        const formats = await BarcodeDetectorClass.getSupportedFormats()
+        return Array.from(formats)
       }
     } catch (error) {
       console.error('Failed to get supported formats:', error)
