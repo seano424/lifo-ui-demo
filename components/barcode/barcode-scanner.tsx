@@ -191,7 +191,18 @@ export default function BarcodeScanner({
         // Auto-confirm after brief display
         setTimeout(() => {
           if (isMounted) {
-            handleBarcodeDetected(detection.rawValue, detection)
+            // Call handleBarcodeDetected directly with current values
+            const barcode = detection.rawValue
+            setScanningHistory(prev => [barcode, ...prev.slice(0, 4)])
+            setDetectedBarcode(null)
+            onScan(barcode, detection)
+
+            // Continue scanning after brief pause
+            setTimeout(() => {
+              if (isMounted) {
+                setDetectedBarcode(null)
+              }
+            }, 500)
           }
         }, 1000)
       }
@@ -199,7 +210,7 @@ export default function BarcodeScanner({
       console.error('Barcode detection failed:', error)
       // Don't spam errors, just continue scanning
     }
-  }, [isScanning, isInitialized, detectBarcodes, isMounted])
+  }, [isScanning, isInitialized, detectBarcodes, isMounted, onScan])
 
   // Handle successful barcode detection
   const handleBarcodeDetected = useCallback(
