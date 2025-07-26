@@ -1,4 +1,4 @@
-// lib/queries/query-keys.ts - Updated to include store role queries
+// lib/queries/query-keys.ts - Updated to include product lookup queries
 import type { ProductFilters } from './products'
 import type { UserFilters } from './users'
 import type { BatchFilters } from './batches'
@@ -30,6 +30,16 @@ export const queryKeys = {
       [...queryKeys.products.byStore(storeId), 'infinite', { filters }] as const,
     details: () => [...queryKeys.products.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.products.details(), id] as const,
+  },
+
+  // Product lookup and recognition queries
+  productLookup: {
+    all: ['productLookup'] as const,
+    byBarcode: (barcode: string) => [...queryKeys.productLookup.all, barcode] as const,
+    search: (query: string) => [...queryKeys.productLookup.all, 'search', query] as const,
+    cache: () => [...queryKeys.productLookup.all, 'cache'] as const,
+    verification: (barcode: string) =>
+      [...queryKeys.productLookup.all, 'verification', barcode] as const,
   },
 
   // Store-aware batch queries
@@ -113,13 +123,23 @@ export const queryKeys = {
     currentUserStoreRole: (storeId: string) => ['currentUser', 'storeRole', storeId] as const,
     session: () => ['auth', 'session'] as const,
   },
+
+  // Scanning workflow queries (for caching OCR results, etc.)
+  scanning: {
+    all: ['scanning'] as const,
+    ocr: () => [...queryKeys.scanning.all, 'ocr'] as const,
+    ocrResult: (imageHash: string) => [...queryKeys.scanning.ocr(), imageHash] as const,
+    batchCreation: () => [...queryKeys.scanning.all, 'batchCreation'] as const,
+  },
 } as const
 
 // Type helpers for query key validation
 export type QueryKey = typeof queryKeys
 export type UserQueryKeys = typeof queryKeys.users
 export type ProductQueryKeys = typeof queryKeys.products
+export type ProductLookupQueryKeys = typeof queryKeys.productLookup
 export type BatchQueryKeys = typeof queryKeys.batches
 export type StoreQueryKeys = typeof queryKeys.stores
 export type StoreUserQueryKeys = typeof queryKeys.storeUsers
 export type AuthQueryKeys = typeof queryKeys.auth
+export type ScanningQueryKeys = typeof queryKeys.scanning
