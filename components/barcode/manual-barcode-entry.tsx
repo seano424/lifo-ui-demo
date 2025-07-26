@@ -9,9 +9,20 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 import { Typography } from '@/components/ui/typography'
+import type { ProductLookupResult, OpenFoodFactsSearchResult } from '@/lib/queries/open-food-facts'
+
+interface ProductData {
+  barcode: string
+  productName: string
+  brand: string
+  category: string
+  imageUrl: string
+  isManualEntry: boolean
+  lookupResult?: unknown
+}
 
 interface ManualBarcodeEntryProps {
-  onProductSelected?: (barcode: string, productData: any) => void
+  onProductSelected?: (barcode: string, productData: ProductData) => void
   onClose?: () => void
   className?: string
 }
@@ -22,7 +33,7 @@ export default function ManualBarcodeEntry({
   className = '',
 }: ManualBarcodeEntryProps) {
   const [barcode, setBarcode] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState<any>(null)
+  const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null)
   const [manualProductData, setManualProductData] = useState({
     productName: '',
     brand: '',
@@ -55,19 +66,27 @@ export default function ManualBarcodeEntry({
   }
 
   // Handle selecting a product (either from lookup or search results)
-  const handleSelectProduct = (productData: any, sourceBarcode?: string) => {
+  const handleSelectProduct = (productData: Record<string, unknown>, sourceBarcode?: string) => {
     const finalBarcode = sourceBarcode || barcode
 
     // Create normalized product data
-    const normalizedProduct = {
+    const normalizedProduct: ProductData = {
       barcode: finalBarcode,
-      productName: productData.product_name || productData.productName || 'Unknown Product',
-      brand: productData.brands || productData.brand || '',
-      category: productData.categories?.split(',')[0] || productData.category || '',
-      imageUrl: productData.image_front_url || productData.image_url || productData.imageUrl || '',
+      productName: (productData.product_name ||
+        productData.productName ||
+        'Unknown Product') as string,
+      brand: (productData.brands || productData.brand || '') as string,
+      category: (productData.categories?.toString().split(',')[0] ||
+        productData.category ||
+        '') as string,
+      imageUrl: (productData.image_front_url ||
+        productData.image_url ||
+        productData.imageUrl ||
+        '') as string,
       isManualEntry: true,
       // Include lookup result if this came from a lookup
-      lookupResult: lookupResult && sourceBarcode === barcode ? lookupResult : undefined,
+      lookupResult:
+        lookupResult && sourceBarcode === barcode ? (lookupResult as unknown) : undefined,
     }
 
     setSelectedProduct(normalizedProduct)
@@ -101,7 +120,7 @@ export default function ManualBarcodeEntry({
       category: selectedProduct.category,
       imageUrl: selectedProduct.imageUrl,
       isManualEntry: true,
-      lookupResult: selectedProduct.lookupResult,
+      lookupResult: selectedProduct.lookupResult as ProductLookupResult | undefined,
     })
 
     // Call parent callback
@@ -117,19 +136,6 @@ export default function ManualBarcodeEntry({
       imageUrl: '',
     })
     onClose?.()
-  }
-
-  // Quick rescan from history
-  const handleQuickRescan = (historyItem: any) => {
-    const normalizedProduct = {
-      barcode: historyItem.barcode,
-      productName: historyItem.productName || 'Unknown Product',
-      brand: historyItem.brand || '',
-      category: historyItem.category || '',
-      imageUrl: historyItem.imageUrl || '',
-      isManualEntry: true,
-    }
-    setSelectedProduct(normalizedProduct)
   }
 
   return (
@@ -271,8 +277,11 @@ export default function ManualBarcodeEntry({
                         )}
 
                         <Button
-                          onClick={() => handleSelectProduct(lookupResult.product)}
+                          onClick={() =>
+                            lookupResult.product && handleSelectProduct(lookupResult.product)
+                          }
                           className="w-full mt-3"
+                          disabled={!lookupResult.product}
                         >
                           Select This Product
                         </Button>
@@ -391,22 +400,31 @@ export default function ManualBarcodeEntry({
 
                       {productSearch.data && productSearch.data.length > 0 && (
                         <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
-                          {productSearch.data.slice(0, 5).map((product: any) => (
-                            <Button
-                              key={product.code}
-                              variant="ghost"
-                              size="sm"
-                              className="w-full justify-start text-xs h-auto p-2"
-                              onClick={() => handleSelectProduct(product, product.code)}
-                            >
-                              <div className="text-left">
-                                <div className="font-medium">{product.product_name}</div>
-                                {product.brands && (
-                                  <div className="text-gray-500">{product.brands}</div>
-                                )}
-                              </div>
-                            </Button>
-                          ))}
+                          {productSearch.data
+                            .slice(0, 5)
+                            .map((product: OpenFoodFactsSearchResult) => (
+                              <Button
+                                key={product.code}
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-xs h-auto p-2"
+                                onClick={() =>
+                                  handleSelectProduct(
+                                    product as unknown as Record<string, unknown>,
+                                    product.code,
+                                  )
+                                }
+                              >
+                                <div className="text-left">
+                                  <div className="font-medium">
+                                    {product.product_name || 'Unknown Product'}
+                                  </div>
+                                  {product.brands && (
+                                    <div className="text-gray-500">{product.brands}</div>
+                                  )}
+                                </div>
+                              </Button>
+                            ))}
                         </div>
                       )}
                     </div>

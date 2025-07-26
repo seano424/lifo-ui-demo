@@ -1,4 +1,14 @@
 // lib/queries/open-food-facts.ts
+
+// Type for search results from Open Food Facts
+export interface OpenFoodFactsSearchResult {
+  code: string
+  product_name?: string
+  brands?: string
+  image_front_small_url?: string
+  quantity?: string
+}
+
 export interface OpenFoodFactsProduct {
   code: string
   status: number
@@ -80,7 +90,7 @@ class OpenFoodFactsClient {
   }
 
   // Search products by name (for manual entry fallback)
-  async searchProducts(query: string, limit: number = 20): Promise<OpenFoodFactsProduct[]> {
+  async searchProducts(query: string, limit: number = 20): Promise<OpenFoodFactsSearchResult[]> {
     try {
       const response = await fetch(
         `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=${limit}&fields=code,product_name,brands,image_front_small_url,quantity`,
