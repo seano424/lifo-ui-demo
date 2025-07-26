@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { UniversalBarcodeDetector } from '@/lib/barcode/barcode-detector'
+
 import { Typography } from '@/components/ui/typography'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 
@@ -186,7 +186,7 @@ export default function WorkingStreamlinedScanningInterface({
   }
 
   // Handle manual product selection from ManualBarcodeEntry
-  const handleManualProductSelected = (barcode: string, productData: unknown) => {
+  const handleManualProductSelected = (barcode: string) => {
     // The ManualBarcodeEntry component already handles setting the workflow state
     // Just close the manual entry and set lookup barcode
     setLookupBarcode(barcode)
