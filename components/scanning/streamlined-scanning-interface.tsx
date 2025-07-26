@@ -187,7 +187,6 @@ export default function WorkingStreamlinedScanningInterface({
 
   // Handle manual product selection from ManualBarcodeEntry
   const handleManualProductSelected = (barcode: string, productData: unknown) => {
-    console.log('Manual product selected:', barcode, productData)
     // The ManualBarcodeEntry component already handles setting the workflow state
     // Just close the manual entry and set lookup barcode
     setLookupBarcode(barcode)
@@ -386,13 +385,15 @@ export default function WorkingStreamlinedScanningInterface({
               </div>
             )}
 
-            <Alert>
-              <Camera className="h-4 w-4" />
-              <AlertDescription>
-                Point your camera at any product barcode. The scanner will automatically detect
-                supported formats and look up product information from Open Food Facts.
-              </AlertDescription>
-            </Alert>
+            {currentStep === 'barcode' && (
+              <Alert>
+                <Camera className="h-4 w-4" />
+                <AlertDescription>
+                  Point your camera at any product barcode. The scanner will automatically detect
+                  supported formats and look up product information from Open Food Facts.
+                </AlertDescription>
+              </Alert>
+            )}
           </>
         )}
 
