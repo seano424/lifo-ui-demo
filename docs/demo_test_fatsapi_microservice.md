@@ -373,7 +373,7 @@ curl -X GET "http://localhost:8001/api/v1/mvp/action-effectiveness/123e4567-e89b
   -H "Content-Type: application/json"
 ```
 
-## =� Image Recognition Endpoints (Future-Ready)
+## =� Image Recognition Endpoints (EU-Optimized)
 
 ### 1. ML Models Status
 
@@ -417,6 +417,7 @@ curl -X POST "http://localhost:8001/api/v1/image/detect-barcode/123e4567-e89b-12
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -F "image=@barcode_image.jpg" \
   -F "barcode_types=EAN13" \
+  -F "barcode_types=EAN8" \
   -F "barcode_types=UPC"
 ```
 

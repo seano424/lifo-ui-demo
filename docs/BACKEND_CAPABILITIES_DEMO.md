@@ -5,7 +5,7 @@ This comprehensive demo showcases all the optimized backend capabilities for the
 ## 🎯 Architecture Overview
 
 **Frontend**: Native barcode scanning + OpenFoodFacts API calls + React Query caching
-**Backend**: Google Vision OCR + Complex image processing + Database operations
+**Backend**: EU-optimized Google Vision OCR + European food label processing + Database operations
 
 ## 📋 Demo Scenarios
 
@@ -34,11 +34,13 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_123" \
 }
 ```
 
-#### Demo Images for Testing
-- `expiry_date_clear.jpg` - Clear date format (DD/MM/YYYY)
-- `expiry_date_faded.jpg` - Faded or low-contrast text
-- `expiry_date_multiple.jpg` - Multiple dates on package
-- `expiry_date_non_english.jpg` - Non-English date formats
+#### Demo Images for Testing (European Focus)
+- `expiry_date_clear_ddmmyyyy.jpg` - Clear European date format (DD/MM/YYYY)
+- `expiry_date_french.jpg` - French expiry date ("À consommer avant le 15/03/2024")
+- `expiry_date_german.jpg` - German expiry date ("Mindestens haltbar bis 15.03.2024")
+- `expiry_date_dutch.jpg` - Dutch expiry date ("Ten minste houdbaar tot 15-03-2024")
+- `expiry_date_faded_eu.jpg` - Faded text on European packaging
+- `expiry_date_ean13.jpg` - Product with EAN-13 barcode + date
 
 ---
 
@@ -61,14 +63,14 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
 {
   "success": true,
   "scan_type": "full_ocr_analysis",
-  "barcode": "1234567890123",
+  "barcode": "8712345678901",
   "suggested_name": "Organic Milk 1L",
   "expiry_date": "2024-03-20",
   "raw_text_blocks": [
     "Organic Milk",
     "1L",
     "Use by 20/03/24",
-    "1234567890123",
+    "8712345678901",
     "Keep refrigerated"
   ],
   "confidence_scores": {
@@ -90,11 +92,13 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
 }
 ```
 
-#### Demo Images for Testing
-- `complex_product_full.jpg` - Product with barcode, name, expiry, and nutrition info
-- `complex_product_rotated.jpg` - Rotated product image
-- `complex_product_multiple_barcodes.jpg` - Product with multiple barcodes
-- `complex_product_damaged_label.jpg` - Damaged or torn product label
+#### Demo Images for Testing (European Products)
+- `complex_product_eu_milk.jpg` - European milk carton with EAN-13, multilingual text
+- `complex_product_french_cheese.jpg` - French cheese with French expiry date
+- `complex_product_german_bread.jpg` - German bread with German date format
+- `complex_product_dutch_yogurt.jpg` - Dutch yogurt with multiple languages
+- `complex_product_rotated_eu.jpg` - Rotated European product image
+- `complex_product_damaged_eu_label.jpg` - Damaged European product label
 
 ---
 
@@ -174,7 +178,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
       },
       {
         "type": "barcode_ean13",
-        "value": "1234567890123",
+        "value": "8712345678901",
         "confidence": 0.95,
         "bounding_box": {"x": 50, "y": 200, "width": 150, "height": 40}
       },
@@ -203,6 +207,40 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
     "Manual entry if confidence is low"
   ]
 }
+```
+
+---
+
+## 🇪🇺 European Market Optimizations
+
+### Regional Configuration
+All backend endpoints are optimized for European markets:
+
+- **Google Vision Endpoint**: `eu-vision.googleapis.com` for GDPR compliance
+- **Target Markets**: France, Germany, Netherlands 
+- **Date Format Priority**: DD/MM/YYYY (European standard)
+- **Barcode Standards**: EAN-13 (13 digits), EAN-8 (8 digits)
+
+### Multilingual Support
+The OCR system supports:
+- **English**: "Best before", "Use by", "Exp"
+- **French**: "À consommer avant", "DLC", "DLUO"
+- **German**: "Mindestens haltbar bis", "MHD", "Verbrauchen bis"
+- **Dutch**: "Ten minste houdbaar tot", "THT", "Te gebruiken tot"
+
+### European Test Examples
+```bash
+# Test French product
+curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_fr" \
+  -F "image=@test_images/french_yogurt.jpg"
+
+# Test German product  
+curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_de" \
+  -F "image=@test_images/german_bread.jpg"
+
+# Test Dutch product
+curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_nl" \
+  -F "image=@test_images/dutch_cheese.jpg"
 ```
 
 ---

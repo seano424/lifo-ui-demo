@@ -75,10 +75,11 @@ lifo-app/
 **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
 **Backend**: FastAPI (Python), Supabase PostgreSQL
 **Data Processing**: pandas, numpy, pydantic, asyncpg
+**Product Scanning**: Google Vision API, OpenFoodFacts API, PIL/Pillow
 **Infrastructure**: Supabase (Auth, Database, Real-time), Vercel (Hosting)
 **State Management**: Zustand, React Query (TanStack Query)
 **Internationalization**: next-intl (French, English, Dutch)
-**Testing**: pytest, FastAPI TestClient
+**Testing**: pytest, FastAPI TestClient, 124+ comprehensive tests
 
 ## 📦 Installation & Setup
 
@@ -240,6 +241,13 @@ npm run dev
 - `GET /api/v1/donations` - Donation workflow management
 - `POST /api/v1/mobile-endpoints` - Mobile app integration
 
+### Product Scanning Endpoints (`/api/v1/`) ✅ NEW
+
+- `POST /api/v1/product-scanning/scan/{store_id}` - Complete product scanning with AI
+- `POST /api/v1/scan-sessions/create/{store_id}` - Scan session management
+- `POST /api/v1/product-enrichment/enrich/{store_id}` - Product data enrichment
+- `POST /api/v1/batch-creation/create-from-scan/{store_id}` - Inventory batch creation
+
 ### CSV Format
 
 Expected CSV columns:
@@ -253,6 +261,9 @@ SKU,Product_Name,Category,Quantity,Cost_Price,Selling_Price,Expiry_Date,Batch_Nu
 - Multi-tenant store management with role-based access
 - PIN-based authentication for store employees
 - Real-time inventory tracking and batch management
+- **AI-Powered Product Scanning** with Google Vision API ✅ NEW
+- **Automated Product Enrichment** with OpenFoodFacts integration ✅ NEW
+- **Smart Barcode Recognition** and expiry date extraction ✅ NEW
 - Comprehensive CSV validation and processing
 - Donation workflow management and tracking
 - Multi-language support (English, French, Dutch)
@@ -320,9 +331,27 @@ SKU,Product_Name,Category,Quantity,Cost_Price,Selling_Price,Expiry_Date,Batch_Nu
 
 ### Testing & Quality Assurance
 
-- **Run comprehensive test suite** with security validation
+- **Run comprehensive test suite** with 124+ tests across all layers
+- **Product Scanning Tests**: Unit, integration, API, and E2E validation
+- **Performance Benchmarks**: Latency, throughput, and stress testing
+- **Security Testing**: Authentication, rate limiting, input sanitization
 - **Test CSV processing** with various data formats
 - **Validate multi-tenant isolation** and permissions
+
+#### Running Product Scanning Tests
+
+```bash
+cd lifo_api
+
+# Run all product scanning tests
+python -m pytest tests/ -v
+
+# Run specific test categories
+python -m pytest tests/unit/ -v                    # Unit tests (46 tests)
+python -m pytest tests/integration/ -v             # Integration tests (25 tests)
+python -m pytest tests/api/ -v                     # API tests (35 tests)
+python -m pytest tests/e2e/ -v                     # E2E tests (18 tests)
+```
 
 ## 🚀 Deployment
 
@@ -381,6 +410,13 @@ Comprehensive documentation is organized in the `docs/` folder:
 - **[API Documentation](docs/API_DOCUMENTATION.md)**: Endpoint reference
 - **[Deployment Guide](docs/DEPLOYMENT.md)**: Production deployment
 - **[Security Guide](docs/LIFO_API_SECURITY_GUIDE.md)**: Security implementation
+
+### Product Scanning Documentation ✅ NEW
+
+- **[Product Scanning Demo Setup](docs/PRODUCT_SCANNING_DEMO_SETUP.md)**: Complete setup and testing guide
+- **[Frontend Scanning API Spec](docs/FRONTEND_SCANNING_API_SPEC.md)**: API specifications for frontend
+- **[Product Scanning Test Guide](docs/PRODUCT_SCANNING_TEST_GUIDE.md)**: Comprehensive testing documentation
+- **[Product Scanning Implementation Plan](docs/PRODUCT_SCANNING_OCR_PLAN.md)**: Implementation status and roadmap
 
 ## 🌟 Team
 

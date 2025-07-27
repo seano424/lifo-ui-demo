@@ -42,12 +42,26 @@ BACKEND_CORS_ORIGINS=["http://localhost:3000"]
 ```
 
 ### 3. Database Setup
-```bash
-# Run migrations
-alembic upgrade head
 
-# Verify database connection
-python -c "from app.database.connection import get_db; print('Database connected')"
+**Prerequisites:** This guide assumes you have a Supabase project already set up with the LIFO.AI schema.
+
+Update your `.env` file with your Supabase connection details:
+```bash
+# Supabase Database 
+DATABASE_URL=postgresql+asyncpg://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres
+
+# Supabase Auth
+SUPABASE_URL=https://[YOUR-PROJECT].supabase.co
+SUPABASE_JWT_SECRET=your-jwt-secret
+```
+
+Verify database connection:
+```bash
+python -c "
+import asyncio
+from app.database.connection import get_db
+print('✅ Database connected successfully')
+"
 ```
 
 ### 4. Start the Server
