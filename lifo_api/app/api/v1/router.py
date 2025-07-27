@@ -1,7 +1,7 @@
 """
 Main API router for LIFO AI Engine v1
 Optimized architecture with clear frontend-backend separation:
-- Frontend: Handles barcode scanning and OpenFoodFacts API calls  
+- Frontend: Handles barcode scanning and OpenFoodFacts API calls
 - Backend: Provides complex Google Vision OCR and AI processing
 """
 
@@ -9,15 +9,15 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     analytics,
+    batch_creation,
     csv,
     csv_upload,
     donation_queries,
     donations,
-    # global_products,  # Disabled - global schema not implemented
-    image_recognition,  # Re-enabled with optimized architecture
+    image_recognition,
     mobile_endpoints,
     mvp_analytics,
-    product_scanning,  # New OCR-focused endpoints
+    product_scanning,
     scan_workflows,
     scoring,
 )
@@ -76,21 +76,13 @@ router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-# EU-compliant donation system
+# Simplified donation system
 router.include_router(
     donations.router,
     prefix="/donations",
-    tags=["EU Donation System"],
+    tags=["Donation System"],
     responses={404: {"description": "Not found"}},
 )
-
-# Global products catalog (read-only) - Disabled: global schema not implemented
-# router.include_router(
-#     global_products.router,
-#     prefix="/global",
-#     tags=["Global Products Catalog"],
-#     responses={404: {"description": "Not found"}},
-# )
 
 # Donation queries (read-only)
 router.include_router(
@@ -115,3 +107,14 @@ router.include_router(
     tags=["OCR Product Scanning"],
     responses={404: {"description": "Not found"}},
 )
+
+# Batch creation from scan data
+router.include_router(
+    batch_creation.router,
+    prefix="/batches",
+    tags=["Batch Creation from Scans"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Note: Frontend handles product lookup via OpenFoodFacts API directly
+# Backend focuses on AI processing (OCR, scoring, analytics)

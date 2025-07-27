@@ -8,7 +8,7 @@ from decimal import Decimal
 from typing import Any, Optional
 
 import structlog
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,15 +22,9 @@ class ScoringWeights(BaseModel):
     Scoring weights configuration
     """
 
-    expiry: float = 0.5
-    velocity: float = 0.3
-    margin: float = 0.2
-
-    @validator("expiry", "velocity", "margin")
-    def weights_must_be_positive(cls, v):
-        if v < 0 or v > 1:
-            raise ValueError("Weights must be between 0 and 1")
-        return v
+    expiry: float = Field(default=0.5, ge=0.0, le=1.0, description="Weight for expiry factor (0-1)")
+    velocity: float = Field(default=0.3, ge=0.0, le=1.0, description="Weight for velocity factor (0-1)")
+    margin: float = Field(default=0.2, ge=0.0, le=1.0, description="Weight for margin factor (0-1)")
 
     def validate_sum(self):
         """Ensure weights sum to 1.0"""

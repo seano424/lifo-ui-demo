@@ -210,7 +210,8 @@ class ProductScanningService:
         # Sort by confidence and return the best one
         best_expiry = max(vision_result.expiry_dates, key=lambda e: e.confidence)
         
-        if best_expiry.confidence >= 0.65 and best_expiry.date:
+        # Lowered confidence threshold from 0.65 to 0.5 for better detection
+        if best_expiry.confidence >= 0.5 and best_expiry.date:
             return best_expiry.date
         
         return None

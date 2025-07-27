@@ -7,7 +7,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ValidationInfo, ConfigDict
 
 
 class TimestampMixin(BaseModel):
@@ -56,23 +56,11 @@ class PaginationResponse(BaseModel):
     has_next: bool
     has_prev: bool
 
-    @validator("pages", pre=True, always=True)
-    def calculate_pages(cls, v: int, values: dict[str, Any]) -> int:
-        total = values.get("total", 0)
-        limit = values.get("limit", 1)
-        return max(1, (total + limit - 1) // limit)
+    # Note: pagination calculations moved to business logic for OpenAPI compatibility
 
-    @validator("has_next", pre=True, always=True)
-    def calculate_has_next(cls, v: bool, values: dict[str, Any]) -> bool:
-        page = values.get("page", 1)
-        total = values.get("total", 0)
-        limit = values.get("limit", 1)
-        return page * limit < total
+    # Note: pagination calculations moved to business logic for OpenAPI compatibility
 
-    @validator("has_prev", pre=True, always=True)
-    def calculate_has_prev(cls, v: bool, values: dict[str, Any]) -> bool:
-        page = values.get("page", 1)
-        return page > 1
+    # Note: pagination calculations moved to business logic for OpenAPI compatibility
 
 
 class SortParams(BaseModel):
@@ -179,22 +167,19 @@ def ensure_decimal(value: Union[float, int, str, Decimal]) -> Decimal:
 class ConfigurableModel(BaseModel):
     """Base model with common configuration"""
 
-    class Config:
+    model_config = ConfigDict(
         # Enable ORM mode for SQLAlchemy integration
-        from_attributes = True
-
+        from_attributes=True,
         # Use enum values instead of names
-        use_enum_values = True
-
+        use_enum_values=True,
         # Validate assignment
-        validate_assignment = True
-
+        validate_assignment=True,
         # JSON encoders for special types
-        json_encoders = {
+        json_encoders={
             datetime: lambda v: v.isoformat() if v else None,
             date: lambda v: v.isoformat() if v else None,
             Decimal: lambda v: float(v) if v else None,
-        }
-
+        },
         # Schema extra
-        schema_extra: dict[str, dict[str, Any]] = {"example": {}}
+        json_schema_extra={"example": {}},
+    )

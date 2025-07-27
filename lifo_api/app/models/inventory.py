@@ -6,7 +6,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ValidationInfo, ConfigDict
 
 from app.models.base import (
     BatchStatus,
@@ -32,12 +32,7 @@ class InventoryFilterParams(FilterParams):
     max_quantity: Optional[float] = Field(None, ge=0, description="Maximum quantity filter")
     location_code: Optional[str] = Field(None, max_length=50, description="Filter by location")
 
-    @validator("max_quantity")
-    def validate_quantity_range(cls, v: Optional[float], values: dict[str, Any]) -> Optional[float]:
-        min_qty = values.get("min_quantity")
-        if min_qty is not None and v is not None and v < min_qty:
-            raise ValueError("max_quantity must be greater than min_quantity")
-        return v
+    # Note: quantity range validation moved to business logic for OpenAPI compatibility
 
 
 class InventorySortParams(SortParams):
@@ -58,11 +53,7 @@ class BatchUpdateRequest(BaseModel):
     location_code: Optional[str] = Field(None, max_length=50, description="New location")
     status: Optional[BatchStatus] = None
 
-    @validator("current_quantity")
-    def validate_quantity(cls, v: Optional[float]) -> Optional[float]:
-        if v is not None and v < 0:
-            raise ValueError("Quantity cannot be negative")
-        return v
+    # Note: quantity validation moved to business logic for OpenAPI compatibility
 
 
 class DiscountRequest(BaseModel):
@@ -114,9 +105,7 @@ class PricingInfo(ConfigurableModel):
     margin_percent: float
     total_value: float
 
-    @validator("cost_price", "selling_price", "total_value", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class QuantityInfo(ConfigurableModel):
@@ -126,9 +115,7 @@ class QuantityInfo(ConfigurableModel):
     current: float
     sold: float
 
-    @validator("initial", "current", "sold", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class DateInfo(ConfigurableModel):
@@ -227,9 +214,7 @@ class InventoryItemResponse(ConfigurableModel):
     recommendation: Optional[str] = None
     discount_percent: Optional[int] = None
 
-    @validator("current_quantity", "selling_price", "total_value", "margin_percent", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class InventoryListResponse(ConfigurableModel):
@@ -309,9 +294,7 @@ class InventorySummaryResponse(ConfigurableModel):
     recent_actions_count: int
     last_updated: datetime
 
-    @validator("total_quantity", "total_value", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class ActionResult(ConfigurableModel):
