@@ -14,6 +14,7 @@ from app.api.v1 import (
     csv_upload,
     donation_queries,
     donations,
+    health,
     image_recognition,
     mobile_endpoints,
     mvp_analytics,
@@ -24,6 +25,14 @@ from app.api.v1 import (
 
 # Create the main v1 router
 router = APIRouter()
+
+# Health check endpoints (no authentication required)
+router.include_router(
+    health.router,
+    prefix="/health",
+    tags=["Health Checks"],
+    responses={503: {"description": "Service unavailable"}},
+)
 
 # Include AI feature routers only (CRUD operations removed)
 router.include_router(

@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import get_current_user, validate_store_id_format
 from app.database.connection import get_db
+from app.database.supabase_service import get_supabase_service
 from app.middleware.rate_limiting import ai_endpoint_rate_limit
 from app.services.product_scanning_service import (
     ProductScanningService,
@@ -151,6 +152,40 @@ async def full_ocr_analysis(
         
         # Get dual dates with metadata
         dual_dates = scanning_service.get_last_dual_dates()
+        
+        # Save OCR result to database using Supabase service
+        try:
+            supabase_service = get_supabase_service()
+            
+            ocr_data = {
+                'image_data': None,  # Don't store raw image data
+                'confidence_score': scan_result.confidence_score,
+                'raw_text_blocks': scan_result.raw_text_blocks,
+                'barcode': scan_result.primary_barcode,
+                'suggested_name': scan_result.suggested_name,
+                'expiry_date': dual_dates.get('expiry_date').isoformat() if dual_dates.get('expiry_date') else None,
+                'manufacture_date': dual_dates.get('manufacture_date').isoformat() if dual_dates.get('manufacture_date') else None,
+                'processing_time_ms': scan_result.processing_time_ms
+            }
+            
+            # Use user token for RLS compliance
+            user_token = current_user["token"]
+            saved_result = await supabase_service.save_ocr_result(user_token, store_id, ocr_data)
+            
+            logger.info(
+                "OCR result saved to database",
+                ocr_batch_id=saved_result.get('id'),
+                store_id=store_id
+            )
+            
+        except Exception as save_error:
+            # Log error but don't fail the OCR operation
+            logger.error(
+                "Failed to save OCR result to database",
+                error=str(save_error),
+                store_id=store_id,
+                user_id=current_user["sub"]
+            )
         
         logger.info(
             "Full OCR analysis completed",

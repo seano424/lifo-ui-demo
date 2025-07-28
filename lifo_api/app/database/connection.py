@@ -47,6 +47,9 @@ def get_engine():
                 echo=settings.debug,
                 future=True,
                 poolclass=NullPool,
+                connect_args={
+                    "ssl": "require",  # Required for Supabase
+                },
             )
         else:
             # PostgreSQL Production: Use connection pooling
@@ -60,6 +63,7 @@ def get_engine():
                 pool_recycle=settings.db_pool_recycle,
                 connect_args={
                     "command_timeout": 60,
+                    "ssl": "require",  # Required for Supabase
                     "server_settings": {
                         "jit": "off",  # Disable JIT for more predictable performance
                     },
