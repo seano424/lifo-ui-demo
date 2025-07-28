@@ -5,8 +5,13 @@ import { useTranslations } from 'next-intl'
 import { Button } from './ui/button'
 import { LogoutButton } from './logout-button'
 import { useCurrentUser } from '@/hooks/use-users'
+import { cn } from '@/lib/utils'
 
-export function AuthButton() {
+type AuthButtonProps = {
+  isMobile?: boolean
+}
+
+export function AuthButton({ isMobile }: AuthButtonProps) {
   const t = useTranslations('marketing.auth')
   const { data: user, isLoading } = useCurrentUser()
 
@@ -20,24 +25,40 @@ export function AuthButton() {
   }
 
   return user ? (
-    <div className="flex items-center gap-4">
-      <LogoutButton className="text-xs uppercase font-sans font-light" />
-      <Button asChild size="default" variant={'secondary'}>
+    <div
+      className={cn('flex items-center gap-4', isMobile && 'flex-col-reverse gap-2 items-start')}
+    >
+      <LogoutButton variant="default" className={cn(isMobile && 'w-full')} />
+      <Button asChild size="default" variant={'secondary'} className={cn(isMobile && 'w-full')}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
     </div>
   ) : (
-    <div className="flex gap-10 items-center uppercase">
-      <Link
-        className="text-xs dark:hover:text-brand-secondary hover:text-brand-primary"
-        href="/auth/login"
+    <>
+      {/* Desktop */}
+      <div className={cn('flex gap-4 items-center uppercase', isMobile && 'hidden')}>
+        <Button asChild size="sm" variant={'brandSecondary'} className="uppercase">
+          <Link href="/onboarding/create-account">{t('signup')}</Link>
+        </Button>
+        <Button asChild size="sm" variant={'default'} className="uppercase">
+          <Link href="/auth/login">{t('login')}</Link>
+        </Button>
+      </div>
+      {/* Mobile */}
+      <div
+        className={cn(
+          'flex flex-col gap-2',
+          isMobile && 'flex-col-reverse gap-2 items-start',
+          !isMobile && 'hidden',
+        )}
       >
-        {t('login')}
-      </Link>
-
-      <Button asChild size="sm" variant={'brandSecondary'} className="uppercase">
-        <Link href="/onboarding/create-account">{t('signup')}</Link>
-      </Button>
-    </div>
+        <Button asChild variant={'default'} className="uppercase w-full">
+          <Link href="/auth/login">{t('login')}</Link>
+        </Button>
+        <Button asChild variant={'brandSecondary'} className="uppercase w-full">
+          <Link href="/onboarding/create-account">{t('signup')}</Link>
+        </Button>
+      </div>
+    </>
   )
 }

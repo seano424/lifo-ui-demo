@@ -159,18 +159,13 @@ const MarketingNav = ({
                   <NavbarLogo />
                 </SheetTitle>
               </SheetHeader>
-              <div className="flex flex-col gap-6 p-4">
+              <div className="flex flex-col h-full gap-10 p-4">
                 <Accordion type="single" collapsible className="flex w-full flex-col gap-4">
                   {menuItems.map(item => renderMobileMenuItem(item))}
                 </Accordion>
 
                 <div className="flex flex-col gap-3">
-                  <Button asChild variant="default">
-                    <Link href={auth.login.url}>{auth.login.title}</Link>
-                  </Button>
-                  <Button asChild variant="secondary">
-                    <Link href={auth.signup.url}>{auth.signup.title}</Link>
-                  </Button>
+                  <AuthButton isMobile />
                 </div>
               </div>
             </SheetContent>

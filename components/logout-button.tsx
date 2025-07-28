@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation'
 
 interface LogoutButtonProps {
   className?: string
+  variant?: 'default' | 'secondary' | 'ghost' | 'brandSecondary' | 'destructive'
 }
 
-export function LogoutButton({ className }: LogoutButtonProps) {
+export function LogoutButton({ className, variant = 'default' }: LogoutButtonProps) {
   const t = useTranslations('marketing.auth')
   const router = useRouter()
 
@@ -20,7 +21,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
   }
 
   return (
-    <Button variant={'ghost'} size="default" onClick={logout} className={className}>
+    <Button variant={variant} size="default" onClick={logout} className={className}>
       {t('logout')}
     </Button>
   )
