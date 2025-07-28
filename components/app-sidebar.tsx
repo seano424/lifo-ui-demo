@@ -46,8 +46,8 @@ function useNavigationData() {
           icon: Bot,
         },
         {
-          title: t('outbound'),
-          url: '/dashboard/outbound',
+          title: t('output'),
+          url: '/dashboard/output',
           icon: BookOpen,
         },
         {
