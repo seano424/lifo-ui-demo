@@ -31,7 +31,7 @@ import {
   useScannedProduct,
   useScanningActions,
   useExpiryInfo,
-  useScanningError,
+  // useScanningError,
   useScanningProcessing,
   useCanGoBack,
   usePreviousStepName,
@@ -72,7 +72,6 @@ export default function WorkingStreamlinedScanningInterface({
   const currentStep = useScanningStep()
   const scannedProduct = useScannedProduct()
   const expiryInfo = useExpiryInfo()
-  const workflowError = useScanningError()
   const isWorkflowProcessing = useScanningProcessing()
   const canGoBack = useCanGoBack()
   const previousStepName = usePreviousStepName()
@@ -340,15 +339,6 @@ export default function WorkingStreamlinedScanningInterface({
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="p-4 space-y-4">
-        {(workflowError || lookupError) && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {workflowError || lookupError?.message || 'An error occurred'}
-            </AlertDescription>
-          </Alert>
-        )}
-
         {/* STEP 1: Camera Barcode Scanning */}
         {uiStep === 'camera-barcode' && (
           <>

@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
 import { NavbarLogo } from '@/components/ui/logo'
@@ -41,25 +40,9 @@ interface MarketingNavProps {
     title: string
   }
   menu?: MenuItem[]
-  auth?: {
-    login: {
-      title: string
-      url: string
-    }
-    signup: {
-      title: string
-      url: string
-    }
-  }
 }
 
-const MarketingNav = ({
-  menu,
-  auth = {
-    login: { title: 'Login', url: '#' },
-    signup: { title: 'Sign up', url: '#' },
-  },
-}: MarketingNavProps) => {
+const MarketingNav = ({ menu }: MarketingNavProps) => {
   const t = useTranslations('marketing.nav')
 
   const defaultMenu = [
@@ -159,18 +142,13 @@ const MarketingNav = ({
                   <NavbarLogo />
                 </SheetTitle>
               </SheetHeader>
-              <div className="flex flex-col gap-6 p-4">
+              <div className="flex flex-col h-full gap-10 p-4">
                 <Accordion type="single" collapsible className="flex w-full flex-col gap-4">
                   {menuItems.map(item => renderMobileMenuItem(item))}
                 </Accordion>
 
                 <div className="flex flex-col gap-3">
-                  <Button asChild variant="default">
-                    <Link href={auth.login.url}>{auth.login.title}</Link>
-                  </Button>
-                  <Button asChild variant="secondary">
-                    <Link href={auth.signup.url}>{auth.signup.title}</Link>
-                  </Button>
+                  <AuthButton isMobile />
                 </div>
               </div>
             </SheetContent>
