@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
 import { NavbarLogo } from '@/components/ui/logo'
@@ -41,25 +40,9 @@ interface MarketingNavProps {
     title: string
   }
   menu?: MenuItem[]
-  auth?: {
-    login: {
-      title: string
-      url: string
-    }
-    signup: {
-      title: string
-      url: string
-    }
-  }
 }
 
-const MarketingNav = ({
-  menu,
-  auth = {
-    login: { title: 'Login', url: '#' },
-    signup: { title: 'Sign up', url: '#' },
-  },
-}: MarketingNavProps) => {
+const MarketingNav = ({ menu }: MarketingNavProps) => {
   const t = useTranslations('marketing.nav')
 
   const defaultMenu = [

@@ -31,7 +31,7 @@ import {
   useScannedProduct,
   useScanningActions,
   useExpiryInfo,
-  useScanningError,
+  // useScanningError,
   useScanningProcessing,
   useCanGoBack,
   usePreviousStepName,
@@ -72,7 +72,6 @@ export default function WorkingStreamlinedScanningInterface({
   const currentStep = useScanningStep()
   const scannedProduct = useScannedProduct()
   const expiryInfo = useExpiryInfo()
-  const workflowError = useScanningError()
   const isWorkflowProcessing = useScanningProcessing()
   const canGoBack = useCanGoBack()
   const previousStepName = usePreviousStepName()
