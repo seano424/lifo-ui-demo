@@ -41,8 +41,8 @@ function useNavigationData() {
           isActive: true,
         },
         {
-          title: t('inbound'),
-          url: '/dashboard/inbound',
+          title: t('input'),
+          url: '/dashboard/input',
           icon: Bot,
         },
         {

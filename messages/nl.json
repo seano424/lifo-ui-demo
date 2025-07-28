@@ -3,7 +3,7 @@
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "inbound": "Inkomend",
+    "input": "Inkomend",
     "outbound": "Uitgaand",
     "todo": "Te doen",
     "performance": "Prestaties",
@@ -323,7 +323,7 @@
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "inbound": "Inkomend",
+    "input": "Inkomend",
     "outbound": "Uitgaand",
     "analytics": "Analyses",
     "performance": "Prestaties",

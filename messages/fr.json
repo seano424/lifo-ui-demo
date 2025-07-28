@@ -3,7 +3,7 @@
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "inbound": "Entrées",
+    "input": "Entrées",
     "outbound": "Sorties",
     "todo": "À faire",
     "performance": "Performance",
@@ -323,7 +323,7 @@
   "breadcrumbs": {
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "inbound": "Entrées",
+    "input": "Entrées",
     "outbound": "Sorties",
     "analytics": "Analyses",
     "performance": "Performance",

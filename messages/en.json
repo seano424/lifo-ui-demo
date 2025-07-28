@@ -3,7 +3,7 @@
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "inbound": "Inbound",
+    "input": "Input",
     "outbound": "Outbound",
     "todo": "To-Do",
     "performance": "Performance",
@@ -323,7 +323,7 @@
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "inbound": "Inbound",
+    "input": "Input",
     "outbound": "Outbound",
     "analytics": "Analytics",
     "performance": "Performance",

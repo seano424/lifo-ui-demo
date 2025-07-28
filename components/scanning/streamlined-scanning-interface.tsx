@@ -340,15 +340,6 @@ export default function WorkingStreamlinedScanningInterface({
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="p-4 space-y-4">
-        {(workflowError || lookupError) && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {workflowError || lookupError?.message || 'An error occurred'}
-            </AlertDescription>
-          </Alert>
-        )}
-
         {/* STEP 1: Camera Barcode Scanning */}
         {uiStep === 'camera-barcode' && (
           <>
