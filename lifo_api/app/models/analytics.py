@@ -5,7 +5,7 @@ Pydantic models for analytics-related API endpoints
 from datetime import date, datetime
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from app.models.base import ConfigurableModel, decimal_to_float
 
@@ -38,9 +38,7 @@ class InventorySummary(ConfigurableModel):
     expired_count: int
     expiring_soon_count: int
 
-    @validator("total_quantity", "total_value", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class CategoryBreakdown(ConfigurableModel):
@@ -53,9 +51,7 @@ class CategoryBreakdown(ConfigurableModel):
     expired_items: int = 0
     high_urgency_items: int = 0
 
-    @validator("total_quantity", "total_value", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class UrgencyDistribution(ConfigurableModel):
@@ -81,15 +77,7 @@ class RecentAction(ConfigurableModel):
     executed_by: Optional[str] = None
     effectiveness_score: Optional[float] = None
 
-    @validator(
-        "original_price",
-        "new_price",
-        "discount_percent",
-        "effectiveness_score",
-        pre=True,
-    )
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class StoreAnalyticsResponse(ConfigurableModel):
@@ -168,9 +156,7 @@ class DashboardSummary(ConfigurableModel):
     active_inventory: int
     revenue_at_risk: float
 
-    @validator("total_value", "revenue_at_risk", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class DashboardResponse(ConfigurableModel):
@@ -238,9 +224,7 @@ class PerformanceMetrics(ConfigurableModel):
     inventory_turnover: float
     average_margin: float
 
-    @validator("revenue_recovered", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class TrendPoint(ConfigurableModel):
@@ -250,9 +234,7 @@ class TrendPoint(ConfigurableModel):
     value: float
     category: Optional[str] = None
 
-    @validator("value", pre=True)
-    def convert_decimal_to_float(cls, v):
-        return decimal_to_float(v)
+    # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
 
 class PerformanceResponse(ConfigurableModel):

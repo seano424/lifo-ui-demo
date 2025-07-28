@@ -25,7 +25,6 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # API endpoints: Allow exception chaining suppression for security
-"app/api/v1/global_products.py" = ["B904"]
 "app/api/v1/image_recognition.py" = ["B904"]
 "app/api/v1/mobile_endpoints.py" = ["B904"]
 "app/api/v1/mvp_analytics.py" = ["B904"]

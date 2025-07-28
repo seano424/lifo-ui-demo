@@ -120,25 +120,29 @@ app = FastAPI(
     ## Intelligent Inventory Management Microservice
 
     Advanced AI-driven scoring system for food waste reduction and inventory optimization.
+    ### Architecture:
+    - **Frontend**: Handles product lookup via OpenFoodFacts API directly
+    - **Backend**: Focuses on AI processing (OCR, scoring, analytics)
 
     ### Key Features:
+    - **Google Vision OCR**: Complex image processing and text extraction
     - **Multi-factor Scoring**: Expiry, velocity, and margin analysis
     - **Real-time Recommendations**: Automated discount and action suggestions
     - **CSV Processing**: Bulk inventory upload with validation
-    - **Store-aware Operations**: Multi-tenant architecture with RLS
     - **Analytics & Alerts**: Comprehensive inventory insights
+    - **Donation System**: Basic EU-compliant donation eligibility
 
     ### Authentication:
     Uses Supabase JWT tokens for seamless integration with existing frontend.
 
     ### Performance:
     - Async PostgreSQL operations
-    - Optimized scoring algorithms
+    - Optimized AI algorithms
     - Production-ready with proper error handling
     """,
     version=settings.api_version,
-    docs_url="/docs" if settings.environment != "production" else None,
-    redoc_url="/redoc" if settings.environment != "production" else None,
+    docs_url="/docs",
+    redoc_url="/redoc",
     openapi_url="/openapi.json",
     lifespan=lifespan,
 )
@@ -173,7 +177,7 @@ app.add_middleware(
 
 # Request logging middleware
 @app.middleware("http")
-async def log_requests(request: Request, call_next) -> Response:
+async def log_requests(request: Request, call_next: Any) -> Response:
     start_time = time.time()
 
     # Log request (sanitize sensitive headers)
@@ -191,7 +195,7 @@ async def log_requests(request: Request, call_next) -> Response:
         headers=sanitized_headers,
     )
 
-    response = await call_next(request)
+    response: Response = await call_next(request)
 
     # Log response
     process_time = time.time() - start_time
@@ -222,7 +226,7 @@ app.include_router(api_v1_router, prefix=settings.api_v1_prefix)
 
 # Root endpoint
 @app.get("/", tags=["Health"])
-async def root() -> dict[str, str]:
+async def root() -> dict[str, Any]:
     """
     API root endpoint with service information
     """
@@ -234,18 +238,19 @@ async def root() -> dict[str, str]:
         "health": "/health",
         "status": "operational",
         "features": [
+            "Google Vision OCR processing",
             "Multi-factor inventory scoring",
             "Real-time recommendations",
             "CSV bulk processing",
-            "Store-aware analytics",
-            "Supabase authentication",
+            "Donation eligibility checking",
+            "Mobile-optimized endpoints",
         ],
     }
 
 
 # Health check endpoint
-@app.get("/health", tags=["Health"])
-async def health_check() -> dict[str, Any]:
+@app.get("/health", tags=["Health"], response_model=None)
+async def health_check():
     """
     Health check endpoint with detailed service status
     """
@@ -282,18 +287,24 @@ async def api_info() -> dict[str, Any]:
         "version": settings.api_version,
         "description": "AI-powered inventory management microservice",
         "endpoints": {
-            "inventory": f"{settings.api_v1_prefix}/inventory",
             "scoring": f"{settings.api_v1_prefix}/scoring",
+            "vision_ocr": f"{settings.api_v1_prefix}/vision",
             "csv": f"{settings.api_v1_prefix}/csv",
             "analytics": f"{settings.api_v1_prefix}/analytics",
-            "stores": f"{settings.api_v1_prefix}/stores",
+            "donations": f"{settings.api_v1_prefix}/donations",
+            "mobile": f"{settings.api_v1_prefix}/mobile",
         },
         "features": {
+            "google_vision_ocr": True,
             "ai_scoring": True,
             "csv_processing": True,
-            "real_time_alerts": True,
-            "multi_tenant": True,
+            "donation_eligibility": True,
+            "mobile_optimization": True,
             "async_operations": True,
+        },
+        "architecture": {
+            "frontend_handles": "Product lookup via OpenFoodFacts",
+            "backend_focuses": "AI processing, OCR, scoring, analytics",
         },
         "authentication": "Supabase JWT",
         "database": "PostgreSQL with AsyncPG",

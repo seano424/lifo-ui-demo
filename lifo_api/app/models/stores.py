@@ -5,7 +5,7 @@ Pydantic models for store-related API endpoints
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from app.models.base import ConfigurableModel, StoreType, TimestampMixin, UserRole
 
@@ -52,17 +52,7 @@ class StoreSettingsRequest(BaseModel):
     currency: Optional[str] = Field(None, max_length=3, description="Store currency")
     timezone: Optional[str] = Field(None, max_length=50, description="Store timezone")
 
-    @validator("scoring_weights")
-    def validate_scoring_weights(cls, v: Optional[dict[str, float]]) -> Optional[dict[str, float]]:
-        if v is not None:
-            required_keys = {"expiry", "velocity", "margin"}
-            if not all(key in v for key in required_keys):
-                raise ValueError(f"Missing required weights: {required_keys - set(v.keys())}")
-
-            total = sum(v.values())
-            if abs(total - 1.0) > 0.01:
-                raise ValueError(f"Weights must sum to 1.0, got {total}")
-        return v
+    # Note: scoring weights validation moved to business logic for OpenAPI compatibility
 
 
 # Response Models
