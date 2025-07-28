@@ -5,6 +5,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## ✅ Backend Core Infrastructure
 
 ### Database & Migrations
+
 - [ ] All Alembic migrations applied successfully
 - [ ] Database connection pooling configured (recommended: 20-40 connections)
 - [ ] Row-Level Security (RLS) policies validated for all tables
@@ -13,6 +14,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Database performance monitoring enabled
 
 ### API Server Configuration
+
 - [ ] FastAPI production server configured (Gunicorn + Uvicorn workers)
 - [ ] Worker process count optimized for server resources
 - [ ] Request timeout limits configured (30-60 seconds for OCR endpoints)
@@ -21,6 +23,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Health check endpoints responsive (`/health`, `/api/v1/vision/ml-models/status`)
 
 ### Environment & Security
+
 - [ ] All environment variables set in production environment
 - [ ] Secrets properly managed (no hardcoded credentials)
 - [ ] JWT secret keys using cryptographically secure values
@@ -32,6 +35,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 🔍 Google Vision OCR Integration
 
 ### API Configuration
+
 - [ ] Google Cloud Project ID configured correctly
 - [ ] Google Vision API enabled and quotas verified
 - [ ] Service account credentials properly configured
@@ -40,7 +44,9 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Cost monitoring for Vision API calls enabled
 
 ### Vision Endpoints Testing
+
 - [ ] `/api/v1/vision/analyze-image/{store_id}` - Comprehensive image analysis
+
   - [ ] Barcode detection accuracy validated (>95%)
   - [ ] Expiry date extraction accuracy validated (>85%)
   - [ ] Product name detection tested
@@ -54,7 +60,9 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
   - [ ] Maintenance window notifications configured
 
 ### OCR Endpoints Testing
+
 - [ ] `/api/v1/ocr/scan/ocr-expiry/{store_id}` - Dual date extraction
+
   - [ ] European date format detection (DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY)
   - [ ] Multilingual context recognition (EN/FR/DE/NL keywords)
   - [ ] Dual date extraction (expiry + manufacture when available)
@@ -65,6 +73,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
   - [ ] Error handling for unreadable text
 
 - [ ] `/api/v1/ocr/scan/full-ocr/{store_id}` - Complete dual analysis
+
   - [ ] Multi-element detection (barcode + dual dates + text)
   - [ ] European multilingual keyword mapping validation
   - [ ] Context preservation throughout extraction pipeline
@@ -80,6 +89,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
   - [ ] Performance target met (<3 seconds)
 
 ### Image Processing
+
 - [ ] Image validation (JPEG, PNG, WebP support)
 - [ ] File size limits enforced (8MB-15MB depending on endpoint)
 - [ ] Image preprocessing and optimization
@@ -90,6 +100,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## ⚡ Performance & Scalability
 
 ### Response Time Targets
+
 - [ ] OCR expiry extraction: <4 seconds (95th percentile)
 - [ ] Full OCR analysis: <5 seconds (95th percentile)
 - [ ] Text extraction: <3 seconds (95th percentile)
@@ -97,6 +108,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Health checks: <500ms
 
 ### Throughput & Concurrency
+
 - [ ] Concurrent request handling tested (20+ simultaneous users)
 - [ ] Rate limiting per endpoint validated:
   - [ ] OCR expiry: 12 requests/minute
@@ -107,6 +119,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] No memory leaks detected during sustained testing
 
 ### Resource Management
+
 - [ ] CPU usage monitoring configured
 - [ ] Memory usage alerts set up
 - [ ] Disk space monitoring for temporary files
@@ -117,6 +130,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 🔐 Security & Compliance
 
 ### Authentication & Authorization
+
 - [ ] JWT token validation working correctly
 - [ ] Store ID validation and authorization
 - [ ] User permissions properly enforced
@@ -124,6 +138,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Token expiration handling implemented
 
 ### Data Protection
+
 - [ ] Uploaded images not permanently stored
 - [ ] Temporary file cleanup implemented
 - [ ] No sensitive data in logs
@@ -132,6 +147,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] API audit logging enabled
 
 ### Input Validation
+
 - [ ] Malicious file upload prevention
 - [ ] Image content validation (magic number checking)
 - [ ] XSS prevention in text responses
@@ -141,6 +157,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 📊 Monitoring & Observability
 
 ### Application Monitoring
+
 - [ ] Structured logging configured (JSON format)
 - [ ] Log aggregation system set up
 - [ ] Error tracking and alerting configured
@@ -149,6 +166,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Database query performance monitoring
 
 ### Business Metrics
+
 - [ ] OCR accuracy tracking by endpoint
 - [ ] **Dual Date Extraction Accuracy**: >85% for expiry, >75% for manufacture
 - [ ] **European Language Support**: Keyword recognition accuracy >90% per language
@@ -161,6 +179,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] User success rate metrics
 
 ### Alerting
+
 - [ ] High error rate alerts (>5%)
 - [ ] Slow response time alerts (>10 seconds)
 - [ ] High memory usage alerts (>80%)
@@ -171,6 +190,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 🔄 Operational Procedures
 
 ### Deployment
+
 - [ ] Blue-green deployment strategy implemented
 - [ ] Database migration rollback procedures tested
 - [ ] Environment variable validation in CI/CD
@@ -179,6 +199,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Rollback procedures documented and tested
 
 ### Backup & Recovery
+
 - [ ] Database backup procedures automated
 - [ ] Configuration backup procedures
 - [ ] Service account key backup and rotation
@@ -187,6 +208,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Recovery point objectives (RPO) defined
 
 ### Maintenance
+
 - [ ] Google Vision API model updates procedure
 - [ ] Dependency update and security patching process
 - [ ] Database maintenance windows scheduled
@@ -197,6 +219,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 🧪 Testing & Quality Assurance
 
 ### Automated Testing
+
 - [ ] Unit tests passing (>90% coverage)
 - [ ] Integration tests for all OCR endpoints
 - [ ] Performance regression testing automated
@@ -205,6 +228,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Chaos engineering tests for failure scenarios
 
 ### Manual Testing
+
 - [ ] End-to-end workflow testing completed
 - [ ] Cross-browser compatibility for uploaded images
 - [ ] Mobile device image upload testing
@@ -220,6 +244,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
   - [ ] Multilingual keyword accuracy across target languages
 
 ### Load Testing Results
+
 - [ ] Sustained load testing: 5+ requests/second for 1 hour
 - [ ] Spike testing: 50+ concurrent requests handled gracefully
 - [ ] Memory stability: <100MB growth over 1000 operations
@@ -229,6 +254,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 📋 Documentation & Training
 
 ### Technical Documentation
+
 - [ ] API documentation complete and accurate
 - [ ] Architecture diagrams updated
 - [ ] Deployment guides current
@@ -237,6 +263,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Security guidelines documented
 
 ### Operational Documentation
+
 - [ ] Runbooks for common issues
 - [ ] Escalation procedures defined
 - [ ] Monitoring dashboard setup guide
@@ -245,6 +272,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Capacity planning guidelines
 
 ### Team Readiness
+
 - [ ] Development team trained on new OCR functionality
 - [ ] Operations team familiar with monitoring and alerting
 - [ ] Support team trained on troubleshooting OCR issues
@@ -254,6 +282,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 🌐 Frontend Integration
 
 ### API Compatibility
+
 - [ ] Frontend successfully integrates with optimized backend
 - [ ] Native barcode scanning working without backend dependency
 - [ ] OpenFoodFacts integration handled entirely by frontend
@@ -262,6 +291,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Loading states and progress indicators for OCR operations
 
 ### Performance Optimization
+
 - [ ] Frontend caches OCR results appropriately
 - [ ] Image compression before upload implemented
 - [ ] Fallback workflows for OCR failures defined
@@ -271,6 +301,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 💰 Cost Management
 
 ### Google Vision API Costs
+
 - [ ] Monthly budget limits set
 - [ ] Cost per request calculated and monitored
 - [ ] Usage optimization strategies implemented
@@ -278,6 +309,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Cost alerting configured
 
 ### Infrastructure Costs
+
 - [ ] Server resource utilization optimized
 - [ ] Database storage costs managed
 - [ ] Bandwidth usage monitored
@@ -287,6 +319,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## ✅ Final Production Deployment Checklist
 
 ### Pre-Deployment
+
 - [ ] All above items completed and verified
 - [ ] Staging environment mirrors production exactly
 - [ ] Performance benchmarks validated in staging
@@ -295,6 +328,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Rollback plan tested and documented
 
 ### Deployment Day
+
 - [ ] Maintenance window communicated to stakeholders
 - [ ] Monitoring dashboards active
 - [ ] Support team on standby
@@ -304,6 +338,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Smoke tests completed successfully
 
 ### Post-Deployment
+
 - [ ] Production monitoring shows normal metrics
 - [ ] Error rates within acceptable limits
 - [ ] Performance targets being met
@@ -316,7 +351,7 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 ## 📞 Emergency Contacts
 
 - **Tech Lead**: [Contact Info]
-- **DevOps Lead**: [Contact Info]  
+- **DevOps Lead**: [Contact Info]
 - **Google Cloud Support**: [Support Plan Details]
 - **Database Administrator**: [Contact Info]
 - **Product Owner**: [Contact Info]
@@ -333,4 +368,4 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 
 **Production Readiness Status**: ⚠️ **IN PROGRESS**
 
-*This checklist should be completed and all items verified before deploying the optimized LIFO.AI backend with Google Vision OCR capabilities to production.*
+_This checklist should be completed and all items verified before deploying the optimized LIFO.AI backend with Google Vision OCR capabilities to production._

@@ -52,12 +52,14 @@ const token = session?.access_token
 #### Testing & Development
 
 **Option 1: From Frontend (Production)**
-1. Log into the LIFO frontend application 
+
+1. Log into the LIFO frontend application
 2. Open browser Dev Tools (F12)
 3. Navigate to Application → Local Storage → `supabase.auth.token`
 4. Copy the `access_token` value
 
 **Option 2: Generate Test Token (Development)**
+
 ```bash
 # Navigate to the API directory
 cd lifo_api
@@ -71,12 +73,15 @@ export JWT_TOKEN='your_generated_token_here'
 
 **Option 3: Use Existing Test Token Files**
 The system automatically looks for token files in this order:
+
 - `test_jwt_manager.txt`
-- `fresh_jwt_test_manager.txt` 
+- `fresh_jwt_test_manager.txt`
 - `test_jwt_owner.txt`
 
 #### Using the Token
+
 Include the token in the Authorization header:
+
 ```bash
 curl -X POST \
   -H "Authorization: Bearer $JWT_TOKEN" \
@@ -669,24 +674,24 @@ curl -X POST "https://api.lifoai.com/api/v1/vision/analyze-image/123e4567-e89b-1
         "type": "barcode_ean13",
         "value": "1234567890123",
         "confidence": 0.95,
-        "bounding_box": {"x": 50, "y": 200, "width": 150, "height": 40}
+        "bounding_box": { "x": 50, "y": 200, "width": 150, "height": 40 }
       },
       {
         "type": "expiry_date",
         "value": "2024-03-25",
         "confidence": 0.89,
         "original_text": "25/03/24",
-        "bounding_box": {"x": 120, "y": 340, "width": 80, "height": 20}
+        "bounding_box": { "x": 120, "y": 340, "width": 80, "height": 20 }
       },
       {
         "type": "product_name",
         "value": "Organic Bananas",
         "confidence": 0.87,
-        "bounding_box": {"x": 30, "y": 50, "width": 200, "height": 30}
+        "bounding_box": { "x": 30, "y": 50, "width": 200, "height": 30 }
       }
     ],
     "analysis_metadata": {
-      "processing_confidence": 0.90,
+      "processing_confidence": 0.9,
       "data_sources": ["google_vision"],
       "requires_user_confirmation": false
     }
@@ -695,7 +700,7 @@ curl -X POST "https://api.lifoai.com/api/v1/vision/analyze-image/123e4567-e89b-1
     "model_version": "google_vision_v3.4",
     "processing_time_ms": 2145,
     "image_size_bytes": 1024768,
-    "confidence_score": 0.90
+    "confidence_score": 0.9
   },
   "next_steps": [
     "Review detected information for accuracy",
@@ -827,7 +832,7 @@ curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3
     "processing_time_ms": 2340,
     "data_sources": ["google_vision"],
     "requires_user_confirmation": false,
-    "image_dimensions": {"width": 1024, "height": 768}
+    "image_dimensions": { "width": 1024, "height": 768 }
   },
   "vision_details": {
     "detected_barcodes": 1,
@@ -850,7 +855,7 @@ curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3
     "manufacture_metadata": {
       "context": "manufacture_definitive",
       "confidence": 1.0,
-      "language": "en", 
+      "language": "en",
       "raw_context": "PRO: 15/02/24",
       "source": "expiry_detection"
     }

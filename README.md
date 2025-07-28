@@ -11,7 +11,7 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 This repository contains the implementation of LIFO.AI's data platform
 
 - **Database Schema**: Complete PostgreSQL schema with multi-tenant support
-- **Inventory Management**: Batch-level tracking with LIFO methodology  
+- **Inventory Management**: Batch-level tracking with LIFO methodology
 - **ETL Pipeline**: Secure CSV processing with comprehensive validation
 - **API Infrastructure**: Next.js API routes + FastAPI backend
 

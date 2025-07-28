@@ -5,12 +5,14 @@ This guide provides step-by-step instructions for setting up and testing all bac
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Python 3.9+
 - Google Cloud Vision API credentials
 - PostgreSQL database
 - Test images for scanning
 
 ### 1. Environment Setup
+
 ```bash
 # Clone and navigate to the project
 cd lifo-app/lifo_api
@@ -23,7 +25,9 @@ cp .env.example .env
 ```
 
 ### 2. Configure Environment Variables
+
 Edit `.env` file:
+
 ```bash
 # Database
 DATABASE_URL=postgresql+asyncpg://user:pass@localhost/lifo_db
@@ -46,8 +50,9 @@ BACKEND_CORS_ORIGINS=["http://localhost:3000"]
 **Prerequisites:** This guide assumes you have a Supabase project already set up with the LIFO.AI schema.
 
 Update your `.env` file with your Supabase connection details:
+
 ```bash
-# Supabase Database 
+# Supabase Database
 DATABASE_URL=postgresql+asyncpg://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT].supabase.co:5432/postgres
 
 # Supabase Auth
@@ -56,6 +61,7 @@ SUPABASE_JWT_SECRET=your-jwt-secret
 ```
 
 Verify database connection:
+
 ```bash
 python -c "
 import asyncio
@@ -65,15 +71,17 @@ print('✅ Database connected successfully')
 ```
 
 ### 4. Start the Server
+
 ```bash
 # Development mode
 uvicorn app.main:app --reload --port 8000
 
-# Production mode  
+# Production mode
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### 5. Verify Setup
+
 ```bash
 # Health check
 curl http://localhost:8000/health
@@ -87,12 +95,14 @@ open http://localhost:8000/docs
 ### Test Data Preparation
 
 Create test image directory:
+
 ```bash
 mkdir -p test_data/images
 cd test_data/images
 ```
 
 Download sample images or use your own:
+
 ```bash
 # Example test images (create these or download samples)
 # - clear_expiry_date.jpg (product with visible expiry date)
@@ -105,11 +115,12 @@ Download sample images or use your own:
 ### Authentication Setup
 
 Get your authentication token:
+
 ```bash
 # If using JWT authentication
 export AUTH_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
 
-# If using API key authentication  
+# If using API key authentication
 export API_KEY="your-api-key"
 ```
 
@@ -118,6 +129,7 @@ export API_KEY="your-api-key"
 ### 1. OCR Expiry Date Extraction
 
 #### Test Case 1: Clear Expiry Date
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
   -H "Authorization: Bearer $AUTH_TOKEN" \
@@ -128,6 +140,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
 ```
 
 **Expected Output:**
+
 ```json
 {
   "success": true,
@@ -139,6 +152,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
 ```
 
 #### Test Case 2: Low Quality Image
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
   -H "Authorization: Bearer $AUTH_TOKEN" \
@@ -149,6 +163,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
 ### 2. Full OCR Analysis
 
 #### Test Case 1: Complete Product Analysis
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
   -H "Authorization: Bearer $AUTH_TOKEN" \
@@ -158,6 +173,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
 ```
 
 **Expected Output:**
+
 ```json
 {
   "success": true,
@@ -182,6 +198,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
 ### 3. Text Extraction
 
 #### Test Case 1: Manual Entry Assistance
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/test_store" \
   -H "Authorization: Bearer $AUTH_TOKEN" \
@@ -190,6 +207,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/test_store" 
 ```
 
 **Expected Output:**
+
 ```json
 {
   "success": true,
@@ -208,6 +226,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/test_store" 
 ### 4. Advanced Vision Analysis
 
 #### Test Case 1: Complete Image Analysis
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/test_store" \
   -H "Authorization: Bearer $AUTH_TOKEN" \
@@ -217,6 +236,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/test_store" \
 ```
 
 **Expected Output:**
+
 ```json
 {
   "success": true,
@@ -228,7 +248,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/test_store" \
         "type": "barcode_ean13",
         "value": "1234567890123",
         "confidence": 0.95,
-        "bounding_box": {"x": 50, "y": 200, "width": 150, "height": 40}
+        "bounding_box": { "x": 50, "y": 200, "width": 150, "height": 40 }
       },
       {
         "type": "expiry_date",
@@ -249,6 +269,7 @@ curl -X GET "http://localhost:8000/api/v1/vision/ml-models/status" \
 ```
 
 **Expected Output:**
+
 ```json
 {
   "overall_status": "ready",
@@ -260,7 +281,7 @@ curl -X GET "http://localhost:8000/api/v1/vision/ml-models/status" \
     },
     "barcode_detector": {
       "status": "ready",
-      "version": "v2.1.0", 
+      "version": "v2.1.0",
       "accuracy": 0.96
     }
   }
@@ -272,6 +293,7 @@ curl -X GET "http://localhost:8000/api/v1/vision/ml-models/status" \
 ### Performance Testing
 
 #### Load Testing with Multiple Requests
+
 ```bash
 # Test concurrent requests
 for i in {1..5}; do
@@ -283,6 +305,7 @@ wait
 ```
 
 #### Timeout Testing
+
 ```bash
 # Test with very short timeout
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
@@ -294,6 +317,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
 ### Error Handling Testing
 
 #### Invalid Image Format
+
 ```bash
 # Test with non-image file
 echo "not an image" > test_invalid.txt
@@ -303,6 +327,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
 ```
 
 #### File Size Limit Testing
+
 ```bash
 # Test with oversized image (create a large dummy file)
 dd if=/dev/zero of=large_image.jpg bs=1M count=20  # 20MB file
@@ -312,6 +337,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
 ```
 
 #### Invalid Store ID
+
 ```bash
 # Test with invalid store ID format
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/invalid@store#id" \
@@ -324,6 +350,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/invalid@store#id"
 ### Automated Testing Script
 
 Create `test_performance.py`:
+
 ```python
 import requests
 import time
@@ -332,7 +359,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 def test_endpoint_performance(endpoint, image_path, num_requests=10):
     """Test endpoint performance with multiple requests"""
-    
+
     def make_request():
         start_time = time.time()
         with open(image_path, 'rb') as img:
@@ -343,14 +370,14 @@ def test_endpoint_performance(endpoint, image_path, num_requests=10):
             )
         end_time = time.time()
         return end_time - start_time, response.status_code
-    
+
     # Execute concurrent requests
     with ThreadPoolExecutor(max_workers=5) as executor:
         results = list(executor.map(lambda _: make_request(), range(num_requests)))
-    
+
     response_times = [r[0] for r in results]
     status_codes = [r[1] for r in results]
-    
+
     print(f"Endpoint: {endpoint}")
     print(f"Average response time: {statistics.mean(response_times):.2f}s")
     print(f"Min response time: {min(response_times):.2f}s")
@@ -367,7 +394,7 @@ test_endpoint_performance(
 )
 
 test_endpoint_performance(
-    "/api/v1/ocr/scan/full-ocr/test_store", 
+    "/api/v1/ocr/scan/full-ocr/test_store",
     "test_data/images/complex_product.jpg"
 )
 
@@ -378,6 +405,7 @@ test_endpoint_performance(
 ```
 
 Run the performance test:
+
 ```bash
 python test_performance.py
 ```
@@ -387,6 +415,7 @@ python test_performance.py
 ### Common Issues
 
 #### Google Vision API Errors
+
 ```bash
 # Check credentials
 echo $GOOGLE_APPLICATION_CREDENTIALS
@@ -401,6 +430,7 @@ print('Vision API connected successfully')
 ```
 
 #### Database Connection Issues
+
 ```bash
 # Test database connection
 python -c "
@@ -411,6 +441,7 @@ print('Database connection successful')
 ```
 
 #### Memory Issues with Large Images
+
 ```bash
 # Monitor memory usage during processing
 top -p $(pgrep -f uvicorn)
@@ -422,13 +453,16 @@ htop
 ### Logging and Debugging
 
 #### Enable Debug Logging
+
 Add to `.env`:
+
 ```bash
 LOG_LEVEL=DEBUG
 SQLALCHEMY_ECHO=true
 ```
 
 #### View Application Logs
+
 ```bash
 # Tail logs in real-time
 tail -f app.log
@@ -443,6 +477,7 @@ grep "ocr-expiry" app.log
 ### Health Monitoring
 
 #### Create Health Check Script
+
 ```bash
 #!/bin/bash
 # health_check.sh
@@ -453,7 +488,7 @@ echo "=== LIFO Backend Health Check ==="
 echo "1. API Health:"
 curl -s http://localhost:8000/health || echo "❌ API Down"
 
-# Database Health  
+# Database Health
 echo "2. Database Health:"
 python -c "
 import asyncio
@@ -470,6 +505,7 @@ echo "=== Health Check Complete ==="
 ```
 
 Make executable and run:
+
 ```bash
 chmod +x health_check.sh
 ./health_check.sh
