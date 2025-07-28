@@ -49,6 +49,41 @@ const {
 const token = session?.access_token
 ```
 
+#### Testing & Development
+
+**Option 1: From Frontend (Production)**
+1. Log into the LIFO frontend application 
+2. Open browser Dev Tools (F12)
+3. Navigate to Application → Local Storage → `supabase.auth.token`
+4. Copy the `access_token` value
+
+**Option 2: Generate Test Token (Development)**
+```bash
+# Navigate to the API directory
+cd lifo_api
+
+# Generate test JWT tokens for development
+python generate_test_jwt.py
+
+# This will create test tokens and show usage examples
+export JWT_TOKEN='your_generated_token_here'
+```
+
+**Option 3: Use Existing Test Token Files**
+The system automatically looks for token files in this order:
+- `test_jwt_manager.txt`
+- `fresh_jwt_test_manager.txt` 
+- `test_jwt_owner.txt`
+
+#### Using the Token
+Include the token in the Authorization header:
+```bash
+curl -X POST \
+  -H "Authorization: Bearer $JWT_TOKEN" \
+  -F "image=@your_image.jpg" \
+  "http://localhost:8001/api/v1/ocr/scan/full-ocr/your_store_id"
+```
+
 #### Server-Side (Service Role)
 
 ```javascript
@@ -742,8 +777,13 @@ curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/ocr-expiry/123e4567-e89b-12
   "success": true,
   "scan_type": "expiry_date_extraction",
   "expiry_date": "2024-03-15",
+  "manufacture_date": "2024-01-20",
   "confidence_threshold": 0.65,
-  "processing_type": "google_vision_ocr"
+  "processing_type": "google_vision_ocr",
+  "date_extraction_metadata": {
+    "extraction_strategy": "dual_context_based",
+    "total_dates_detected": 2
+  }
 }
 ```
 
@@ -776,7 +816,8 @@ curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3
   "barcode": "1234567890123",
   "suggested_name": "Organic Milk 1L",
   "expiry_date": "2024-03-20",
-  "raw_text_blocks": ["Organic Milk", "1L", "Use by 20/03/24", "1234567890123"],
+  "manufacture_date": "2024-02-15",
+  "raw_text_blocks": ["Organic Milk", "1L", "Use by 20/03/24", "PRO: 15/02/24", "1234567890123"],
   "confidence_scores": {
     "overall": 0.85,
     "barcode": 0.95,
@@ -790,8 +831,29 @@ curl -X POST "https://api.lifoai.com/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3
   },
   "vision_details": {
     "detected_barcodes": 1,
-    "detected_text_blocks": 8,
+    "detected_text_blocks": 5,
     "expiry_candidates": 2
+  },
+  "date_extraction_metadata": {
+    "total_dates_detected": 2,
+    "expiry_candidates": 1,
+    "manufacture_candidates": 1,
+    "unknown_candidates": 0,
+    "extraction_strategy": "dual_context_based",
+    "expiry_metadata": {
+      "context": "expiry_quality",
+      "confidence": 0.95,
+      "language": "en",
+      "raw_context": "Use by 20/03/24",
+      "source": "expiry_detection"
+    },
+    "manufacture_metadata": {
+      "context": "manufacture_definitive",
+      "confidence": 1.0,
+      "language": "en", 
+      "raw_context": "PRO: 15/02/24",
+      "source": "expiry_detection"
+    }
   }
 }
 ```

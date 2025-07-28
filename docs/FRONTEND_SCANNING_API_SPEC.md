@@ -13,8 +13,10 @@ This document provides the API specifications for the optimized frontend-backend
 - **Scanning Workflow**: Complete state management via Zustand store
 
 ### Backend Responsibilities (Complex AI Processing)
-- **Google Vision OCR**: Advanced text extraction and expiry date parsing
-- **Complex Image Analysis**: Multi-format date recognition and confidence scoring
+- **Google Vision OCR**: Advanced text extraction and dual date parsing (expiry + manufacture)
+- **European Multilingual Support**: Context recognition in EN/FR/DE/NL languages
+- **Complex Image Analysis**: Multi-format date recognition with context-aware classification
+- **Partial Date Inference**: Handle incomplete dates like "SEP 30" with current year inference
 - **Session Analytics**: Scan tracking and performance monitoring
 - **Product Enrichment**: Database storage of frontend-provided OpenFoodFacts data
 
@@ -69,9 +71,15 @@ FormData {
 {
   success: boolean
   scan_type: "expiry_date_extraction"
-  expiry_date?: string // ISO date string
+  expiry_date?: string           // Primary expiry date (ISO format)
+  manufacture_date?: string      // Production/manufacture date (ISO format, if detected)
   confidence_threshold: number
   processing_type: "google_vision_ocr"
+  // Optional metadata for advanced scenarios
+  date_extraction_metadata?: {
+    extraction_strategy: "dual_context_based" | "temporal_inference"
+    total_dates_detected: number
+  }
 }
 ```
 
@@ -96,7 +104,9 @@ FormData {
   scan_type: "full_ocr_analysis"
   barcode?: string
   suggested_name?: string
-  expiry_date?: string
+  // Dual date extraction - both dates available
+  expiry_date?: string           // Primary expiry date (ISO format)
+  manufacture_date?: string      // Production/manufacture date (ISO format)
   raw_text_blocks: string[]
   confidence_scores: {
     overall: number
@@ -113,6 +123,28 @@ FormData {
     detected_barcodes: number
     detected_text_blocks: number
     expiry_candidates: number
+  }
+  // Enhanced metadata for dual date extraction
+  date_extraction_metadata: {
+    total_dates_detected: number
+    expiry_candidates: number
+    manufacture_candidates: number
+    unknown_candidates: number
+    extraction_strategy: "dual_context_based" | "temporal_inference"
+    expiry_metadata: {
+      context: string           // "expiry_definitive" | "expiry_quality" | etc.
+      confidence: number        // 0.0-1.0
+      language: string          // "en" | "fr" | "de" | "nl" | "unknown"
+      raw_context: string       // Original OCR text with context
+      source: string           // "expiry_detection" | "text_fragment_parsing"
+    }
+    manufacture_metadata: {
+      context: string           // "manufacture_definitive" | "inferred_from_earlier_date" 
+      confidence: number        // 0.0-1.0
+      language: string          // "en" | "fr" | "de" | "nl" | "unknown"
+      raw_context: string       // Original OCR text with context
+      source: string           // "expiry_detection" | "text_fragment_parsing"
+    }
   }
 }
 ```
@@ -240,10 +272,23 @@ const handleBarcodeDetected = async (barcode: string) => {
       product_data: productData.product
     })
     
-    // 4. Continue with expiry date if needed
+    // 4. Continue with dual date extraction if needed
     if (!productData.product.expiry_date) {
-      // Use backend OCR for expiry extraction
-      const expiryResult = await extractExpiryDateOCR(storeId, imageFile)
+      // Use backend OCR for dual date extraction
+      const ocrResult = await extractFullOCR(storeId, imageFile)
+      
+      // Handle both dates if extracted
+      if (ocrResult.expiry_date) {
+        productData.expiry_date = ocrResult.expiry_date
+      }
+      if (ocrResult.manufacture_date) {
+        productData.manufacture_date = ocrResult.manufacture_date
+      }
+      
+      // Show extraction metadata for user confidence
+      if (ocrResult.date_extraction_metadata.extraction_strategy === "dual_context_based") {
+        showHighConfidenceIndicator()
+      }
     }
   }
 }

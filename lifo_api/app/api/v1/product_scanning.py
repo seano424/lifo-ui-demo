@@ -149,11 +149,15 @@ async def full_ocr_analysis(
         # Perform complete OCR analysis
         scan_result = await scanning_service.scan_product_image(image_data, workflow)
         
+        # Get dual dates with metadata
+        dual_dates = scanning_service.get_last_dual_dates()
+        
         logger.info(
             "Full OCR analysis completed",
             store_id=store_id,
             barcode=scan_result.primary_barcode,
             has_expiry=scan_result.suggested_expiry_date is not None,
+            has_manufacture=dual_dates.get('manufacture_date') is not None,
             confidence=scan_result.confidence_score,
             processing_time_ms=scan_result.processing_time_ms,
             user_id=current_user["sub"],
@@ -164,7 +168,9 @@ async def full_ocr_analysis(
             "scan_type": "full_ocr_analysis",
             "barcode": scan_result.primary_barcode,
             "suggested_name": scan_result.suggested_name,
-            "expiry_date": scan_result.suggested_expiry_date.isoformat() if scan_result.suggested_expiry_date else None,
+            # Dual date extraction - both expiry and manufacture dates
+            "expiry_date": dual_dates.get('expiry_date').isoformat() if dual_dates.get('expiry_date') else None,
+            "manufacture_date": dual_dates.get('manufacture_date').isoformat() if dual_dates.get('manufacture_date') else None,
             "raw_text_blocks": scan_result.raw_text_blocks,
             "confidence_scores": {
                 "overall": scan_result.confidence_score,
@@ -181,7 +187,9 @@ async def full_ocr_analysis(
                 "detected_barcodes": len(scan_result.vision_result.barcodes),
                 "detected_text_blocks": len(scan_result.vision_result.raw_text),
                 "expiry_candidates": len(scan_result.vision_result.expiry_dates),
-            }
+            },
+            # Enhanced metadata for dual date extraction
+            "date_extraction_metadata": dual_dates.get('metadata', {})
         }
         
     except ValidationException:

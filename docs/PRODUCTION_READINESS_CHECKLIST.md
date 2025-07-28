@@ -54,14 +54,22 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
   - [ ] Maintenance window notifications configured
 
 ### OCR Endpoints Testing
-- [ ] `/api/v1/ocr/scan/ocr-expiry/{store_id}` - Expiry date extraction
-  - [ ] Date format detection (DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD)
+- [ ] `/api/v1/ocr/scan/ocr-expiry/{store_id}` - Dual date extraction
+  - [ ] European date format detection (DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY)
+  - [ ] Multilingual context recognition (EN/FR/DE/NL keywords)
+  - [ ] Dual date extraction (expiry + manufacture when available)
+  - [ ] Partial date inference with current year (e.g., "SEP 30" → current year)
+  - [ ] Context-based priority classification (EXP vs PRO vs USE BY)
   - [ ] Confidence scoring accuracy validated
   - [ ] Performance target met (<4 seconds)
   - [ ] Error handling for unreadable text
 
-- [ ] `/api/v1/ocr/scan/full-ocr/{store_id}` - Complete analysis
-  - [ ] Multi-element detection (barcode + expiry + text)
+- [ ] `/api/v1/ocr/scan/full-ocr/{store_id}` - Complete dual analysis
+  - [ ] Multi-element detection (barcode + dual dates + text)
+  - [ ] European multilingual keyword mapping validation
+  - [ ] Context preservation throughout extraction pipeline
+  - [ ] Both manufacture_date and expiry_date population when detected
+  - [ ] Metadata accuracy for extraction strategy and confidence
   - [ ] Data source integration validated
   - [ ] Confidence threshold logic tested
   - [ ] Performance target met (<5 seconds)
@@ -142,6 +150,10 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 
 ### Business Metrics
 - [ ] OCR accuracy tracking by endpoint
+- [ ] **Dual Date Extraction Accuracy**: >85% for expiry, >75% for manufacture
+- [ ] **European Language Support**: Keyword recognition accuracy >90% per language
+- [ ] **Context Classification Performance**: Expiry vs manufacture distinction >92%
+- [ ] **Partial Date Inference Success**: Current year inference accuracy >95%
 - [ ] Confidence score distribution monitoring
 - [ ] Processing time percentiles tracked
 - [ ] API usage patterns analyzed
@@ -199,6 +211,13 @@ This checklist ensures the LIFO.AI backend with optimized scanning capabilities 
 - [ ] Edge case testing (corrupted images, extreme sizes)
 - [ ] Accessibility testing for error responses
 - [ ] User acceptance testing completed
+- [ ] **Dual Date Extraction Testing**:
+  - [ ] European retail product samples (French, German, Dutch labels)
+  - [ ] Complex products with multiple dates (manufacture + expiry)
+  - [ ] Partial date scenarios ("SEP 30", "NOV 15")
+  - [ ] Context confusion tests (PRO vs EXP in same image)
+  - [ ] Edge cases: date selection logic validation
+  - [ ] Multilingual keyword accuracy across target languages
 
 ### Load Testing Results
 - [ ] Sustained load testing: 5+ requests/second for 1 hour
