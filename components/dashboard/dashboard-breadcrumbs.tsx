@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/breadcrumb'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import React from 'react'
 
 export default function DashboardBreadcrumbs() {
   const t = useTranslations('breadcrumbs')
@@ -39,18 +40,20 @@ export default function DashboardBreadcrumbs() {
             <BreadcrumbLink href="/dashboard">{t('dashboard')}</BreadcrumbLink>
           )}
         </BreadcrumbItem>
-        {subSegments.length > 0 && <BreadcrumbSeparator />}
         {subSegments.map((segment, index) => {
           const href = `/dashboard/${subSegments.slice(0, index + 1).join('/')}`
           const isLast = index === subSegments.length - 1
           return (
-            <BreadcrumbItem key={segment}>
-              {isLast ? (
-                <BreadcrumbPage>{getSegmentName(segment)}</BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink href={href}>{getSegmentName(segment)}</BreadcrumbLink>
-              )}
-            </BreadcrumbItem>
+            <React.Fragment key={segment}>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage>{getSegmentName(segment)}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink href={href}>{getSegmentName(segment)}</BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </React.Fragment>
           )
         })}
       </BreadcrumbList>

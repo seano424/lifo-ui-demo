@@ -1,18 +1,12 @@
-import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { HydrationBoundary } from '@tanstack/react-query'
 import SettingsHeaderDisplay from '@/components/settings/settings-header-display'
 import SettingsTabs from '@/components/settings/settings-tabs'
 
-export default async function SettingsLayout({ children }: { children: React.ReactNode }) {
-  const { dehydratedState } = await createPrefetchedQuery()
-
+export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <HydrationBoundary state={dehydratedState}>
-      <div className="space-y-6 lg:mx-auto">
-        <SettingsHeaderDisplay />
-        <SettingsTabs />
-        {children}
-      </div>
-    </HydrationBoundary>
+    <div className="space-y-6 lg:mx-auto">
+      <SettingsHeaderDisplay />
+      <SettingsTabs />
+      {children}
+    </div>
   )
 }
