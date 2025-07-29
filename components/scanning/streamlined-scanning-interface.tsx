@@ -728,7 +728,7 @@ export default function WorkingStreamlinedScanningInterface({
           {scannedItems.length > 0 && (
             <div className="flex justify-center pt-4">
               <Button
-                variant="brandSecondary"
+                variant="secondary"
                 className="flex items-center gap-2"
                 onClick={handleFinalSubmission}
               >
@@ -817,7 +817,7 @@ export default function WorkingStreamlinedScanningInterface({
                 Cancel
               </Button>
               <Button
-                variant="brandSecondary"
+                variant="secondary"
                 onClick={handleSaveEdit}
                 disabled={!editForm.expiryDate || editForm.quantity <= 0 || editForm.price <= 0}
               >
@@ -892,7 +892,7 @@ export default function WorkingStreamlinedScanningInterface({
               <Button variant="outline" onClick={() => setShowSubmissionDialog(false)}>
                 Cancel
               </Button>
-              <Button variant="brandSecondary" onClick={handleConfirmSubmission}>
+              <Button variant="secondary" onClick={handleConfirmSubmission}>
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Submit to Inventory
               </Button>

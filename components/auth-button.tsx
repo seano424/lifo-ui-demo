@@ -28,8 +28,8 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <div
       className={cn('flex items-center gap-4', isMobile && 'flex-col-reverse gap-2 items-start')}
     >
-      <LogoutButton variant="default" className={cn(isMobile && 'w-full')} />
-      <Button asChild size="default" variant={'secondary'} className={cn(isMobile && 'w-full')}>
+      <LogoutButton variant="subtleSecondary" className={cn(isMobile && 'w-full')} />
+      <Button asChild size="default" variant={'default'} className={cn(isMobile && 'w-full')}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
     </div>
@@ -37,7 +37,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <>
       {/* Desktop */}
       <div className={cn('flex gap-4 items-center uppercase', isMobile && 'hidden')}>
-        <Button asChild size="sm" variant={'brandSecondary'} className="uppercase">
+        <Button asChild size="sm" variant={'secondary'} className="uppercase">
           <Link href="/onboarding/create-account">{t('signup')}</Link>
         </Button>
         <Button asChild size="sm" variant={'default'} className="uppercase">
@@ -55,7 +55,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
         <Button asChild variant={'default'} className="uppercase w-full">
           <Link href="/auth/login">{t('login')}</Link>
         </Button>
-        <Button asChild variant={'brandSecondary'} className="uppercase w-full">
+        <Button asChild variant={'secondary'} className="uppercase w-full">
           <Link href="/onboarding/create-account">{t('signup')}</Link>
         </Button>
       </div>
