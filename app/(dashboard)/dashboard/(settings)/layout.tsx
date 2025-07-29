@@ -8,7 +8,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <div className="space-y-6 lg:min-w-5xl lg:mx-auto">
+      <div className="space-y-6 lg:mx-auto">
         <SettingsHeaderDisplay />
         <SettingsTabs />
         {children}

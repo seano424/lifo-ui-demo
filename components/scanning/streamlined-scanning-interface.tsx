@@ -44,7 +44,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
+
+// Import OCR hooks and utilities
+import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
+import { captureImageFromVideo } from '@/lib/api/ocr-client'
 
 // Types for our streamlined workflow
 interface ScannedItem {
@@ -80,12 +85,16 @@ export default function WorkingStreamlinedScanningInterface({
   // Store actions
   const workflowActions = useScanningActions()
 
+  // OCR processing hook
+  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+
   // Local UI state for streamlined flow
   const [uiStep, setUIStep] = useState<UIStep>('camera-barcode')
   const [showManualBarcode, setShowManualBarcode] = useState(false)
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
   const [isRescanning, setIsRescanning] = useState(false)
+  const [ocrError, setOcrError] = useState<string | null>(null)
 
   const [isEditingItem, setIsEditingItem] = useState(false)
   const [editingItem, setEditingItem] = useState<ScannedItem | null>(null)
@@ -159,7 +168,8 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-expiry')
         if (expiryInfo?.extractedDate && !isRescanning) {
           console.log('Workflow sync: setting date from expiryInfo:', expiryInfo.extractedDate)
-          setManualExpiryDate(expiryInfo.extractedDate)
+          const formattedDate = formatDateForInput(expiryInfo.extractedDate)
+          setManualExpiryDate(formattedDate)
         }
         break
       case 'complete':
@@ -222,18 +232,72 @@ export default function WorkingStreamlinedScanningInterface({
     }
   }
 
-  // Handle OCR simulation (replace with real OCR later)
-  const handleOCRCapture = () => {
-    console.log('handleOCRCapture called - setting date to 2025-02-15')
-    // Simulate OCR processing
-    const mockDate = '2025-02-15'
-    workflowActions.setExpiryDateResult({
-      extractedDate: mockDate,
-      confidence: 0.95,
-      isManual: false,
-      processingTime: 2000,
-    })
-    setManualExpiryDate(mockDate)
+  // Handle real OCR capture from camera
+  const handleOCRCapture = async () => {
+    if (!activeStore?.store_id) {
+      workflowActions.setError('No active store selected')
+      return
+    }
+
+    // Clear any previous errors
+    setOcrError(null)
+    workflowActions.setExpiryDateProcessing(true)
+
+    try {
+      // Find the video element from the BarcodeScanner component
+      const videoElement = document.querySelector('video') as HTMLVideoElement
+
+      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+        throw new Error('Camera not ready. Please ensure camera is active and showing video.')
+      }
+
+      console.log('Capturing image from video for OCR processing...')
+
+      // Capture image from video element
+      const imageBlob = await captureImageFromVideo(videoElement)
+
+      console.log(`Captured image: ${imageBlob.size} bytes, type: ${imageBlob.type}`)
+
+      // Process with OCR API
+      const result = await processExpiryDate(imageBlob, activeStore.store_id, {
+        confidenceThreshold: 0.65,
+        maxProcessingTimeMs: 5000,
+      })
+
+      if (result.success && result.expiryDateInfo) {
+        console.log('OCR processing successful:', result.expiryDateInfo)
+
+        // Update workflow store with OCR result
+        workflowActions.setExpiryDateResult(result.expiryDateInfo)
+
+        // Update local state for UI with properly formatted date
+        if (result.expiryDateInfo.extractedDate) {
+          const formattedDate = formatDateForInput(result.expiryDateInfo.extractedDate)
+          setManualExpiryDate(formattedDate)
+        }
+
+        setOcrError(null)
+      } else if (result.fallbackToManual) {
+        console.log('OCR failed, falling back to manual entry:', result.error)
+
+        setOcrError(result.error?.message || 'OCR processing failed')
+        workflowActions.setExpiryDateProcessing(false)
+
+        // Keep camera active for manual entry
+        // Don't automatically show manual date picker - let user decide
+      } else {
+        // Processing failed but might be retryable
+        setOcrError(result.error?.message || 'OCR processing failed')
+        workflowActions.setExpiryDateProcessing(false)
+      }
+    } catch (error) {
+      console.error('OCR capture failed:', error)
+
+      const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
+      setOcrError(errorMessage)
+      workflowActions.setError(errorMessage)
+      workflowActions.setExpiryDateProcessing(false)
+    }
   }
 
   // Handle manual expiry date confirmation
@@ -302,6 +366,13 @@ export default function WorkingStreamlinedScanningInterface({
 
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+
+  // Convert ISO datetime to date input format (YYYY-MM-DD)
+  const formatDateForInput = (isoDate: string): string => {
+    if (!isoDate) return ''
+    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
+    return isoDate.split('T')[0]
+  }
 
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)
@@ -505,15 +576,56 @@ export default function WorkingStreamlinedScanningInterface({
                   />
                 </div>
 
+                {/* OCR Status and Error Display */}
+                {ocrError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      OCR Error: {ocrError}
+                      {isBackendHealthy === false && (
+                        <span className="block mt-1 text-xs">
+                          FastAPI backend is not available. Please use manual entry.
+                        </span>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Backend Health Warning */}
+                {isBackendHealthy === false && !ocrError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      OCR service is currently unavailable. Please use manual date entry.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <div className="flex gap-2">
                   <Button
                     onClick={handleOCRCapture}
                     className="flex-1 bg-purple-600 hover:bg-purple-700"
-                    disabled={isWorkflowProcessing}
+                    disabled={isWorkflowProcessing || isOCRProcessing || isBackendHealthy === false}
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    {isWorkflowProcessing ? 'Processing...' : 'Capture Expiry Date'}
+                    {isOCRProcessing
+                      ? 'Processing OCR...'
+                      : isWorkflowProcessing
+                        ? 'Processing...'
+                        : 'Capture Expiry Date'}
                   </Button>
+                  {ocrError && (
+                    <Button
+                      onClick={() => {
+                        setOcrError(null)
+                        workflowActions.setError(null)
+                      }}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Clear Error
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
@@ -522,7 +634,11 @@ export default function WorkingStreamlinedScanningInterface({
             {!manualExpiryDate && (
               <Card>
                 <CardContent className="p-4 space-y-3">
-                  <Label className="font-medium">Or enter manually</Label>
+                  <Label className="font-medium">
+                    {ocrError || isBackendHealthy === false
+                      ? '📝 Manual Entry (OCR unavailable)'
+                      : 'Or enter manually'}
+                  </Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label htmlFor="expiry" className="text-xs">
@@ -745,6 +861,9 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
+              <DialogDescription>
+                Modify the expiry date, quantity, and price for this scanned item.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
@@ -834,6 +953,9 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Submission</DialogTitle>
+              <DialogDescription>
+                Review the items below before submitting them to your inventory.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">

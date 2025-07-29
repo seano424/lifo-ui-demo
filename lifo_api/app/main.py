@@ -99,12 +99,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting LIFO AI Engine", version=settings.api_version)
 
     try:
-        # Initialize database connection
-        await init_database()
-        logger.info("Database initialized successfully")
+        # Test Supabase connection (our primary database service)
+        from app.database.supabase_service import get_supabase_service
+        supabase_service = get_supabase_service()
+        connection_ok = await supabase_service.test_connection()
+        
+        if connection_ok:
+            logger.info("Supabase database connection established successfully")
+        else:
+            logger.warning("Supabase connection test failed, but continuing with startup")
+            
+        # Try SQLAlchemy connection (optional for complex queries)
+        try:
+            await init_database()
+            logger.info("SQLAlchemy database connection also established")
+        except Exception as sql_error:
+            logger.warning("SQLAlchemy connection failed, using Supabase only", error=str(sql_error))
+            
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
-        raise
+        # Don't raise - allow server to start with Supabase-only mode
 
     yield
 

@@ -152,6 +152,7 @@ async def full_ocr_analysis(
         # Get dual dates with metadata
         dual_dates = scanning_service.get_last_dual_dates()
         
+        
         logger.info(
             "Full OCR analysis completed",
             store_id=store_id,
