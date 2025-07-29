@@ -4,9 +4,26 @@
  */
 
 import { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
+import { createClient } from '@/lib/supabase/client'
 
 // Environment variables
 const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+
+/**
+ * Get authentication headers for FastAPI requests
+ */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient()
+  const { data: { session }, error } = await supabase.auth.getSession()
+  
+  if (error || !session?.access_token) {
+    throw new Error('Not authenticated - please log in')
+  }
+  
+  return {
+    'Authorization': `Bearer ${session.access_token}`
+  }
+}
 
 export interface OCRUploadResponse {
   success: boolean
@@ -94,13 +111,17 @@ export async function extractExpiryDate(
       formData.append('max_processing_time_ms', options.maxProcessingTimeMs.toString())
     }
 
+    // Get auth headers
+    const authHeaders = await getAuthHeaders()
+    
     // Make API call
     const response = await fetch(
-      `${FASTAPI_URL}/api/v1/product-scanning/scan/ocr-expiry/${storeId}`,
+      `${FASTAPI_URL}/api/v1/ocr/scan/ocr-expiry/${storeId}`,
       {
         method: 'POST',
         body: formData,
         headers: {
+          ...authHeaders,
           // Don't set Content-Type - let browser set it with boundary for FormData
         },
       },
@@ -184,12 +205,18 @@ export async function performFullOCRAnalysis(
       formData.append('max_processing_time_ms', options.maxProcessingTimeMs.toString())
     }
 
+    // Get auth headers
+    const authHeaders = await getAuthHeaders()
+    
     // Make API call
     const response = await fetch(
-      `${FASTAPI_URL}/api/v1/product-scanning/scan/full-ocr/${storeId}`,
+      `${FASTAPI_URL}/api/v1/ocr/scan/full-ocr/${storeId}`,
       {
         method: 'POST',
         body: formData,
+        headers: {
+          ...authHeaders,
+        },
       },
     )
 
@@ -263,11 +290,17 @@ export async function extractTextOnly(
     formData.append('image', imageBlob, 'text-extraction.jpg')
     formData.append('confidence_threshold', confidenceThreshold.toString())
 
+    // Get auth headers
+    const authHeaders = await getAuthHeaders()
+    
     const response = await fetch(
-      `${FASTAPI_URL}/api/v1/product-scanning/scan/text-extraction/${storeId}`,
+      `${FASTAPI_URL}/api/v1/ocr/scan/text-extraction/${storeId}`,
       {
         method: 'POST',
         body: formData,
+        headers: {
+          ...authHeaders,
+        },
       },
     )
 
