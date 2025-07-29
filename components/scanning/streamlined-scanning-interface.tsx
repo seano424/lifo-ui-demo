@@ -44,6 +44,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
 
 // Import OCR hooks and utilities
@@ -860,6 +861,9 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
+              <DialogDescription>
+                Modify the expiry date, quantity, and price for this scanned item.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
@@ -949,6 +953,9 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Submission</DialogTitle>
+              <DialogDescription>
+                Review the items below before submitting them to your inventory.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
