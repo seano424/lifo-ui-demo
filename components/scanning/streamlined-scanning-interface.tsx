@@ -167,7 +167,8 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-expiry')
         if (expiryInfo?.extractedDate && !isRescanning) {
           console.log('Workflow sync: setting date from expiryInfo:', expiryInfo.extractedDate)
-          setManualExpiryDate(expiryInfo.extractedDate)
+          const formattedDate = formatDateForInput(expiryInfo.extractedDate)
+          setManualExpiryDate(formattedDate)
         }
         break
       case 'complete':
@@ -268,9 +269,10 @@ export default function WorkingStreamlinedScanningInterface({
         // Update workflow store with OCR result
         workflowActions.setExpiryDateResult(result.expiryDateInfo)
 
-        // Update local state for UI
+        // Update local state for UI with properly formatted date
         if (result.expiryDateInfo.extractedDate) {
-          setManualExpiryDate(result.expiryDateInfo.extractedDate)
+          const formattedDate = formatDateForInput(result.expiryDateInfo.extractedDate)
+          setManualExpiryDate(formattedDate)
         }
 
         setOcrError(null)
@@ -363,6 +365,13 @@ export default function WorkingStreamlinedScanningInterface({
 
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+
+  // Convert ISO datetime to date input format (YYYY-MM-DD)
+  const formatDateForInput = (isoDate: string): string => {
+    if (!isoDate) return ''
+    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
+    return isoDate.split('T')[0]
+  }
 
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)
