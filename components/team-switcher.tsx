@@ -23,6 +23,7 @@ import { useUserStores, useStoreActions } from '@/hooks/use-stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import type { Store } from '@/lib/queries/stores'
 import { cn } from '@/lib/utils'
+import { Typography } from './ui/typography'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
@@ -98,7 +99,7 @@ export function TeamSwitcher() {
             <SidebarMenuButton
               size="lg"
               className={cn(
-                'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 py-8 px-4 rounded-lg border',
+                'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center rounded-lg',
                 'group-data-[state=collapsed]:border-none',
               )}
               disabled={isChangingStore}
@@ -106,16 +107,14 @@ export function TeamSwitcher() {
               <div className={`flex aspect-square size-8 items-center justify-center rounded-lg`}>
                 <div
                   className={cn(
-                    'flex aspect-square size-10 items-center justify-center rounded-full bg-brand-dark text-brand-white font-black',
-                    'group-data-[state=collapsed]:bg-transparent group-data-[state=collapsed]:text-brand-secondary group-data-[state=collapsed]:border-none',
+                    'flex aspect-square size-8 items-center justify-center rounded-full bg-brand-dark text-brand-white font-black',
+                    'group-data-[state=collapsed]:rounded-full',
                   )}
                 >
-                  {firstTwoStoreInitials}
+                  {activeStore.store_name.charAt(0).toUpperCase()}
                 </div>
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeStore.store_name}</span>
-              </div>
+              <Typography className="truncate font-medium">{activeStore.store_name}</Typography>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
