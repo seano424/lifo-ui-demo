@@ -1,12 +1,18 @@
+import ComingSoon from '@/components/ui/coming-soon'
+import { Typography } from '@/components/ui/typography'
+
 export default function NotificationsPage() {
   return (
-    <div className="border-2 border-red-500">
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold">Coming Soon</h1>
-        <p className="text-sm text-gray-500">
-          We're working on adding notifications to your dashboard.
-        </p>
-      </div>
-    </div>
+    <ComingSoon
+      title="Coming Soon: Notifications"
+      description="We're working on adding notifications to your dashboard."
+    >
+      <Typography variant="p" className="text-muted-foreground">
+        Please check back soon.
+      </Typography>
+      <Typography variant="h4" className="text-muted-foreground">
+        👀
+      </Typography>
+    </ComingSoon>
   )
 }
