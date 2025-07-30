@@ -20,7 +20,7 @@ export default function SettingsTabs() {
         href="/dashboard/settings/store"
         className={cn(
           isStoreSettings && 'border-b-2 border-brand-secondary',
-          'w-32 pb-2 flex items-center justify-center',
+          'flex-1 pb-2 flex items-center justify-center text-center',
         )}
       >
         {t('tabs.store')}
@@ -29,7 +29,7 @@ export default function SettingsTabs() {
         href="/dashboard/settings/notifications"
         className={cn(
           isNotificationsSettings && 'border-b-2 border-brand-secondary',
-          'w-32 pb-2 flex items-center justify-center',
+          'flex-1 pb-2 flex items-center justify-center text-center',
         )}
       >
         {t('tabs.notifications')}
@@ -38,7 +38,7 @@ export default function SettingsTabs() {
         href="/dashboard/settings/account"
         className={cn(
           isAccountSettings && 'border-b-2 border-brand-secondary',
-          'w-32 pb-2 flex items-center justify-center',
+          'flex-1 pb-2 flex items-center justify-center text-center',
         )}
       >
         {t('tabs.account')}
@@ -47,7 +47,7 @@ export default function SettingsTabs() {
         href="/dashboard/settings/team"
         className={cn(
           isTeamSettings && 'border-b-2 border-brand-secondary',
-          'w-32 pb-2 flex items-center justify-center',
+          'flex-1 pb-2 flex items-center justify-center text-center',
         )}
       >
         {t('tabs.team')}

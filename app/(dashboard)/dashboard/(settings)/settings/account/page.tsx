@@ -2,7 +2,7 @@ import UserAccountInformation from '@/components/account/user-account-informatio
 
 export default function AccountSettingsPage() {
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="space-y-6">
       <UserAccountInformation />
     </div>
   )
