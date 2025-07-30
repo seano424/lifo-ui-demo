@@ -1,47 +1,35 @@
-import { NextLogo } from './next-logo'
-import { SupabaseLogo } from './supabase-logo'
+import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 
 export function Hero() {
   return (
-    <div className="flex flex-col gap-16 items-center">
-      <div className="flex gap-8 justify-center items-center">
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          rel="noreferrer"
+    <div className="flex flex-col gap-16 items-center py-12">
+      {/* Main heading */}
+      <div className="text-center max-w-3xl mx-auto">
+        <Typography
+          variant="h1"
+          className="mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary"
         >
-          <SupabaseLogo />
-        </a>
-        <span className="border-l rotate-45 h-6" />
-        <a href="https://nextjs.org/" target="_blank" rel="noreferrer">
-          <NextLogo />
-        </a>
+          Optimisez votre inventaire avec LIFO
+        </Typography>
+
+        <Typography variant="h2" className="mb-8 text-muted-foreground">
+          La solution intelligente pour gérer vos stocks et maximiser votre rentabilité
+        </Typography>
+
+        {/* CTA buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <Button size="lg" className="px-8">
+            Commencer gratuitement
+          </Button>
+          <Button size="lg" variant="outline" className="px-8">
+            Voir la démo
+          </Button>
+        </div>
       </div>
-      <Typography variant="h1" className="sr-only">
-        Supabase and Next.js Starter Template
-      </Typography>
-      <Typography variant="h1" className="mx-auto max-w-xl text-center">
-        The fastest way to build apps with{' '}
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Supabase
-        </a>{' '}
-        and{' '}
-        <a
-          href="https://nextjs.org/"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Next.js
-        </a>
-      </Typography>
-      <div className="w-full p-px bg-linear-to-r from-transparent via-foreground/10 to-transparent my-8" />
+
+      {/* Decorative divider */}
+      <div className="w-full p-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
     </div>
   )
 }
