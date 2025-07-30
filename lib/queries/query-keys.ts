@@ -131,6 +131,14 @@ export const queryKeys = {
     ocrResult: (imageHash: string) => [...queryKeys.scanning.ocr(), imageHash] as const,
     batchCreation: () => [...queryKeys.scanning.all, 'batchCreation'] as const,
   },
+
+  // Inventory submission workflow queries
+  inventorySubmission: {
+    all: ['inventorySubmission'] as const,
+    single: () => [...queryKeys.inventorySubmission.all, 'single'] as const,
+    batch: () => [...queryKeys.inventorySubmission.all, 'batch'] as const,
+    history: (storeId: string) => [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
+  },
 } as const
 
 // Type helpers for query key validation
@@ -143,3 +151,4 @@ export type StoreQueryKeys = typeof queryKeys.stores
 export type StoreUserQueryKeys = typeof queryKeys.storeUsers
 export type AuthQueryKeys = typeof queryKeys.auth
 export type ScanningQueryKeys = typeof queryKeys.scanning
+export type InventorySubmissionQueryKeys = typeof queryKeys.inventorySubmission
