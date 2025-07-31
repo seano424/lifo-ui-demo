@@ -320,9 +320,160 @@ export class InventoryOperations {
     storeId: string,
     userId: string,
   ): Promise<{ processed: number; errors: string[] }> {
-    // TODO: Re-enable when global schema is ready
-    console.warn('CSV processing functionality temporarily disabled')
-    return { processed: 0, errors: ['CSV processing functionality temporarily disabled'] }
+    const errors: string[] = []
+    let processed = 0
+
+    console.log('[processCsvBatch] Processing', csvData.length, 'items for store', storeId)
+
+    for (const item of csvData) {
+      try {
+        const csvItem = item as {
+          SKU: string
+          Product_Name: string
+          Category: string
+          Quantity: number
+          Expiry_Date: string
+          Brand: string
+          Cost_Price: number
+          Selling_Price: number
+          Manufacture_Date: string
+          Location: string
+          Unit_Type: string
+          Batch_Number: string
+        }
+
+        // Create/find product first (search by SKU if available, otherwise by name+brand)
+        let existingProduct = null
+        let productError = null
+
+        if (csvItem.SKU) {
+          const result = await this.supabase
+            .schema('inventory')
+            .from('products')
+            .select('product_id')
+            .eq('sku', csvItem.SKU)
+            .single()
+          existingProduct = result.data
+          productError = result.error
+        }
+
+        // If no SKU match, try name+brand
+        if (!existingProduct && !productError) {
+          const result = await this.supabase
+            .schema('inventory')
+            .from('products')
+            .select('product_id')
+            .eq('name', csvItem.Product_Name)
+            .eq('brand', csvItem.Brand)
+            .single()
+          existingProduct = result.data
+          productError = result.error
+        }
+
+        let productId: string
+
+        if (existingProduct) {
+          productId = existingProduct.product_id
+        } else {
+          // Create new global product
+          const { data: newProduct, error: createProductError } = await this.supabase
+            .schema('inventory')
+            .from('products')
+            .insert({
+              sku: csvItem.SKU || `AUTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              name: csvItem.Product_Name,
+              brand: csvItem.Brand,
+              category: csvItem.Category,
+              unit_type: csvItem.Unit_Type || 'units',
+              typical_shelf_life_days: this.calculateShelfLifeFromCategory(csvItem.Category),
+              base_cost_price: csvItem.Cost_Price || 0,
+              base_selling_price: csvItem.Selling_Price || 0,
+              created_by: userId,
+            })
+            .select('product_id')
+            .single()
+
+          if (createProductError || !newProduct) {
+            errors.push(`Failed to create product "${csvItem.Product_Name}": ${createProductError?.message}`)
+            continue
+          }
+          productId = newProduct.product_id
+        }
+
+        // Ensure product is available in store
+        const { error: storeProductError } = await this.supabase
+          .schema('inventory')
+          .from('store_products')
+          .upsert({
+            store_id: storeId,
+            product_id: productId,
+            selling_price: csvItem.Selling_Price,
+            cost_price: csvItem.Cost_Price,
+            is_active: true,
+            added_by: userId,
+          })
+
+        if (storeProductError) {
+          errors.push(`Failed to link product to store: ${storeProductError.message}`)
+          continue
+        }
+
+        // Create batch
+        const { data: batch, error: batchError } = await this.supabase
+          .schema('inventory')
+          .from('batches')
+          .insert({
+            store_id: storeId,
+            product_id: productId,
+            batch_number: csvItem.Batch_Number || `CSV-${Date.now()}-${processed}`,
+            initial_quantity: csvItem.Quantity,
+            current_quantity: csvItem.Quantity,
+            cost_price: csvItem.Cost_Price,
+            selling_price: csvItem.Selling_Price,
+            manufacture_date: csvItem.Manufacture_Date || null,
+            expiry_date: csvItem.Expiry_Date,
+            location_code: csvItem.Location || 'MAIN',
+            batch_source: 'csv_import',
+            status: 'active',
+            created_by: userId,
+          })
+          .select()
+          .single()
+
+        if (batchError) {
+          errors.push(`Failed to create batch for "${csvItem.Product_Name}": ${batchError.message}`)
+          continue
+        }
+
+        processed++
+        console.log('[processCsvBatch] Successfully created batch:', batch.batch_id)
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        errors.push(`Unexpected error processing item: ${errorMessage}`)
+        console.error('[processCsvBatch] Unexpected error:', error)
+      }
+    }
+
+    console.log('[processCsvBatch] Completed:', { processed, errors: errors.length })
+    return { processed, errors }
+  }
+
+  private calculateShelfLifeFromCategory(category?: string): number {
+    const categoryLifeMap: Record<string, number> = {
+      fresh_produce: 7,
+      dairy: 14,
+      bakery: 3,
+      meat: 5,
+      fish: 3,
+      frozen: 90,
+      packaged: 365,
+      beverages: 180,
+      snacks: 180,
+      other: 30,
+    }
+
+    return categoryLifeMap[category?.toLowerCase() || 'other'] || 30
   }
 
   async getStoreInventoryAlerts(storeId: string, threshold: number = 0.6): Promise<unknown[]> {
