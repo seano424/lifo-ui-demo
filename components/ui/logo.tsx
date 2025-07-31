@@ -64,6 +64,7 @@ export function Logo({
         'w-auto transition-opacity duration-200 hover:opacity-80',
         className,
       )}
+      priority
       width={100}
       height={100}
     />

@@ -23,6 +23,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { hasEnvVars } from '@/lib/utils'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
+import Link from 'next/link'
 
 interface MenuItem {
   title: string
@@ -204,15 +205,15 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
+    <Link key={item.title} href={item.url} className="text-md font-semibold">
       {item.title}
-    </a>
+    </Link>
   )
 }
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
-    <a
+    <Link
       className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
       href={item.url}
     >
@@ -223,7 +224,7 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
           <p className="text-sm leading-snug text-muted-foreground">{item.description}</p>
         )}
       </div>
-    </a>
+    </Link>
   )
 }
 

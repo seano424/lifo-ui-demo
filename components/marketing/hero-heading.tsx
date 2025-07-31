@@ -10,7 +10,7 @@ export function HeroHeading() {
           alt="LIFO AI Logo"
           width={64}
           height={64}
-          className="h-12 w-auto md:h-16"
+          className="h-12 w-12 md:h-16 md:w-16"
           priority
         />
         <Typography
