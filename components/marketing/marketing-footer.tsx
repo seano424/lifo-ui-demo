@@ -1,7 +1,6 @@
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Typography } from '@/components/ui/typography'
-import { Linkedin } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -15,14 +14,16 @@ export function MarketingFooter() {
           {/* Logo and Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Image
-                src="/logos/lifo-logo-icon.svg"
-                alt="LIFO.AI Logo"
-                width={32}
-                height={32}
-                className="h-8 w-8"
-                priority
-              />
+              <div className="relative w-8 h-8">
+                <Image
+                  src="/logos/lifo-logo-icon.svg"
+                  alt="LIFO.AI Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                  sizes="32px"
+                />
+              </div>
               <Typography
                 variant="h4"
                 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
@@ -90,7 +91,21 @@ export function MarketingFooter() {
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
                 >
-                  <Linkedin size={20} />
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                    <rect width="4" height="12" x="2" y="9"/>
+                    <circle cx="4" cy="4" r="2"/>
+                  </svg>
                 </a>
                 <div className="flex items-center gap-2">
                   <ThemeSwitcher />
