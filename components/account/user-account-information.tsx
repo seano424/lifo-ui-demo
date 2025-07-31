@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { isValidPhoneNumber, formatPhoneNumber } from '@/lib/types/user'
-import { Edit, Check, X, AlertCircle, User, Phone, Globe, Shield, Clock } from 'lucide-react'
+import { Edit, Check, X, AlertCircle, Shield } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
 const createProfileSchema = (t: (key: string) => string) =>

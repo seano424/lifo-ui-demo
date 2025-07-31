@@ -22,18 +22,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import {
-  Edit,
-  Check,
-  X,
-  AlertCircle,
-  Store,
-  MapPin,
-  Phone,
-  Globe,
-  Building,
-  Shield,
-} from 'lucide-react'
+import { Edit, Check, X, AlertCircle, Globe } from 'lucide-react'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 
 // Interface for server permissions prop

@@ -36,8 +36,6 @@ export async function prefetchCurrentUser() {
 }
 
 export async function prefetchDashboardData() {
-  console.time('dashboard-data-prefetch')
-  
   const queryClient = createQueryClient()
   const supabase = await createServerClient()
 
@@ -49,7 +47,6 @@ export async function prefetchDashboardData() {
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      console.timeEnd('dashboard-data-prefetch')
       throw new Error('Authentication required')
     }
 
@@ -69,7 +66,7 @@ export async function prefetchDashboardData() {
 
     // Fetch and prefetch user stores
     const userStores = await fetchUserStores(user.id, supabase)
-    
+
     await queryClient.prefetchQuery({
       queryKey: queryKeys.stores.userStores(user.id),
       queryFn: () => userStores,
@@ -93,8 +90,6 @@ export async function prefetchDashboardData() {
       })
     }
 
-    console.timeEnd('dashboard-data-prefetch')
-
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),
@@ -104,8 +99,7 @@ export async function prefetchDashboardData() {
     }
   } catch (error) {
     console.error('Failed to prefetch dashboard data:', error)
-    console.timeEnd('dashboard-data-prefetch')
-    
+
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),

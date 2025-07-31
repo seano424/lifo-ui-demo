@@ -14,14 +14,17 @@ const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:800
  */
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const supabase = createClient()
-  const { data: { session }, error } = await supabase.auth.getSession()
-  
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession()
+
   if (error || !session?.access_token) {
     throw new Error('Not authenticated - please log in')
   }
-  
+
   return {
-    'Authorization': `Bearer ${session.access_token}`
+    Authorization: `Bearer ${session.access_token}`,
   }
 }
 
@@ -113,19 +116,16 @@ export async function extractExpiryDate(
 
     // Get auth headers
     const authHeaders = await getAuthHeaders()
-    
+
     // Make API call
-    const response = await fetch(
-      `${FASTAPI_URL}/api/v1/ocr/scan/ocr-expiry/${storeId}`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...authHeaders,
-          // Don't set Content-Type - let browser set it with boundary for FormData
-        },
+    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/ocr-expiry/${storeId}`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...authHeaders,
+        // Don't set Content-Type - let browser set it with boundary for FormData
       },
-    )
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -207,18 +207,15 @@ export async function performFullOCRAnalysis(
 
     // Get auth headers
     const authHeaders = await getAuthHeaders()
-    
+
     // Make API call
-    const response = await fetch(
-      `${FASTAPI_URL}/api/v1/ocr/scan/full-ocr/${storeId}`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...authHeaders,
-        },
+    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/full-ocr/${storeId}`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...authHeaders,
       },
-    )
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -292,17 +289,14 @@ export async function extractTextOnly(
 
     // Get auth headers
     const authHeaders = await getAuthHeaders()
-    
-    const response = await fetch(
-      `${FASTAPI_URL}/api/v1/ocr/scan/text-extraction/${storeId}`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...authHeaders,
-        },
+
+    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/text-extraction/${storeId}`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...authHeaders,
       },
-    )
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
