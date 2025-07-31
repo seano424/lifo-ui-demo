@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
 import { CSVUploadForm } from '@/components/csv-upload'
 import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Scan, Upload } from 'lucide-react'
 import { useStoreState } from '@/lib/stores/store-context'

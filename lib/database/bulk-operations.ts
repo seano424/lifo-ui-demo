@@ -26,7 +26,7 @@ export class BulkInventoryOperations {
   async processCsvBulk(
     csvData: CsvItem[],
     storeId: string,
-    userId: string
+    userId: string,
   ): Promise<BulkProcessResult> {
     const errors: string[] = []
     const warnings: string[] = []
@@ -56,12 +56,11 @@ export class BulkInventoryOperations {
 
       // STEP 3: Bulk process in single transaction using stored procedure
       console.time('bulk-database-operations')
-      const { data: result, error: procError } = await this.supabase
-        .rpc('bulk_csv_import', {
-          p_store_id: storeId,
-          p_user_id: userId,
-          p_csv_data: JSON.stringify(newItems)
-        })
+      const { data: result, error: procError } = await this.supabase.rpc('bulk_csv_import', {
+        p_store_id: storeId,
+        p_user_id: userId,
+        p_csv_data: JSON.stringify(newItems),
+      })
 
       console.timeEnd('bulk-database-operations')
 
@@ -78,7 +77,6 @@ export class BulkInventoryOperations {
       if (result.warnings) {
         warnings.push(...result.warnings)
       }
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       errors.push(`Bulk processing failed: ${message}`)
@@ -90,7 +88,7 @@ export class BulkInventoryOperations {
 
   private async bulkDetectDuplicates(
     csvData: CsvItem[],
-    storeId: string
+    storeId: string,
   ): Promise<Map<string, boolean>> {
     const duplicateMap = new Map<string, boolean>()
 
@@ -106,12 +104,14 @@ export class BulkInventoryOperations {
       // Single query to detect all duplicates using joins
       const { data: existingBatches, error } = await this.supabase
         .from('batches')
-        .select(`
+        .select(
+          `
           expiry_date,
           store_products!inner(
             product:products!inner(sku)
           )
-        `)
+        `,
+        )
         .eq('store_id', storeId)
         .eq('status', 'active')
         .in('store_products.products.sku', skus)
@@ -130,7 +130,6 @@ export class BulkInventoryOperations {
           duplicateMap.set(key, true)
         }
       })
-
     } catch (error) {
       console.error('Error in bulk duplicate detection:', error)
       // Return empty map to allow processing to continue
@@ -159,22 +158,22 @@ export class BulkInventoryOperations {
   // Utility method for testing performance
   async benchmarkProcessing(csvData: CsvItem[], storeId: string, userId: string) {
     const startTime = Date.now()
-    
+
     console.time('total-processing-time')
     const result = await this.processCsvBulk(csvData, storeId, userId)
     console.timeEnd('total-processing-time')
-    
+
     const totalTime = Date.now() - startTime
     const itemsPerSecond = Math.round((result.processed / totalTime) * 1000)
-    
+
     return {
       ...result,
       performance: {
         total_time_ms: totalTime,
         items_per_second: itemsPerSecond,
         items_processed: result.processed,
-        items_skipped: result.skipped
-      }
+        items_skipped: result.skipped,
+      },
     }
   }
 }

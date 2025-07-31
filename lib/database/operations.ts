@@ -432,7 +432,9 @@ export class InventoryOperations {
           .limit(1)
 
         if (!duplicateCheckError && existingBatches && existingBatches.length > 0) {
-          console.log(`[processCsvBatch] Skipping duplicate batch for ${csvItem.SKU} with expiry ${csvItem.Expiry_Date}`)
+          console.log(
+            `[processCsvBatch] Skipping duplicate batch for ${csvItem.SKU} with expiry ${csvItem.Expiry_Date}`,
+          )
           // Skip this item - it's a duplicate batch
           continue
         }

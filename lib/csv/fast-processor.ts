@@ -29,7 +29,7 @@ export class FastCSVProcessor {
    */
   static parseCSV(csvContent: string): ProcessingResult {
     const startTime = Date.now()
-    
+
     try {
       const lines = csvContent.trim().split('\n')
       if (lines.length < 2) {
@@ -49,16 +49,15 @@ export class FastCSVProcessor {
       // Process all data rows in parallel batches for better performance
       console.time('row-processing')
       const dataLines = lines.slice(1)
-      
+
       for (let i = 0; i < dataLines.length; i++) {
         try {
           const values = this.parseCSVLine(dataLines[i])
           const item = this.mapRowToItem(values, headerMap, headers, i + 2) // +2 for 1-based + header
-          
+
           // Basic validation
           this.validateItem(item)
           items.push(item)
-          
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error)
           errors.push(`Row ${i + 2}: ${message}`)
@@ -69,7 +68,9 @@ export class FastCSVProcessor {
       // Performance logging
       const totalTime = Date.now() - startTime
       const rowsPerSecond = Math.round((dataLines.length / totalTime) * 1000)
-      console.log(`FastCSVProcessor: Processed ${dataLines.length} rows in ${totalTime}ms (${rowsPerSecond} rows/sec)`)
+      console.log(
+        `FastCSVProcessor: Processed ${dataLines.length} rows in ${totalTime}ms (${rowsPerSecond} rows/sec)`,
+      )
 
       if (errors.length > 0 && items.length === 0) {
         throw new Error(`All rows failed validation. First error: ${errors[0]}`)
@@ -80,9 +81,8 @@ export class FastCSVProcessor {
         errors,
         warnings,
         total_rows: dataLines.length,
-        valid_rows: items.length
+        valid_rows: items.length,
       }
-
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       return {
@@ -90,7 +90,7 @@ export class FastCSVProcessor {
         errors: [message],
         warnings: [],
         total_rows: 0,
-        valid_rows: 0
+        valid_rows: 0,
       }
     }
   }
@@ -100,50 +100,123 @@ export class FastCSVProcessor {
    */
   private static createIntelligentHeaderMap(headers: string[]): Map<string, number> {
     const map = new Map<string, number>()
-    
+
     // Comprehensive mapping patterns for common CSV variations
     const fieldPatterns = {
       sku: [
-        'sku', 'product_code', 'productcode', 'code', 'item_code', 'itemcode',
-        'product_sku', 'barcode', 'upc', 'product_id', 'id'
+        'sku',
+        'product_code',
+        'productcode',
+        'code',
+        'item_code',
+        'itemcode',
+        'product_sku',
+        'barcode',
+        'upc',
+        'product_id',
+        'id',
       ],
       product_name: [
-        'product_name', 'productname', 'name', 'product', 'item_name', 
-        'itemname', 'description', 'product_description', 'title'
+        'product_name',
+        'productname',
+        'name',
+        'product',
+        'item_name',
+        'itemname',
+        'description',
+        'product_description',
+        'title',
       ],
       category: [
-        'category', 'cat', 'type', 'product_type', 'producttype', 
-        'classification', 'group', 'product_group'
+        'category',
+        'cat',
+        'type',
+        'product_type',
+        'producttype',
+        'classification',
+        'group',
+        'product_group',
       ],
       quantity: [
-        'quantity', 'qty', 'amount', 'count', 'stock', 'inventory',
-        'units', 'pieces', 'items'
+        'quantity',
+        'qty',
+        'amount',
+        'count',
+        'stock',
+        'inventory',
+        'units',
+        'pieces',
+        'items',
       ],
       expiry_date: [
-        'expiry_date', 'expirydate', 'expiry', 'exp_date', 'expdate',
-        'expiration_date', 'expirationdate', 'use_by', 'useby',
-        'best_before', 'bestbefore', 'expires', 'expire_date'
+        'expiry_date',
+        'expirydate',
+        'expiry',
+        'exp_date',
+        'expdate',
+        'expiration_date',
+        'expirationdate',
+        'use_by',
+        'useby',
+        'best_before',
+        'bestbefore',
+        'expires',
+        'expire_date',
       ],
       brand: [
-        'brand', 'manufacturer', 'make', 'company', 'vendor',
-        'supplier', 'brand_name', 'brandname'
+        'brand',
+        'manufacturer',
+        'make',
+        'company',
+        'vendor',
+        'supplier',
+        'brand_name',
+        'brandname',
       ],
       cost_price: [
-        'cost_price', 'costprice', 'cost', 'purchase_price', 'purchaseprice',
-        'wholesale_price', 'wholesaleprice', 'buy_price', 'buyprice'
+        'cost_price',
+        'costprice',
+        'cost',
+        'purchase_price',
+        'purchaseprice',
+        'wholesale_price',
+        'wholesaleprice',
+        'buy_price',
+        'buyprice',
       ],
       selling_price: [
-        'selling_price', 'sellingprice', 'price', 'retail_price', 'retailprice',
-        'sale_price', 'saleprice', 'unit_price', 'unitprice', 'mrp'
+        'selling_price',
+        'sellingprice',
+        'price',
+        'retail_price',
+        'retailprice',
+        'sale_price',
+        'saleprice',
+        'unit_price',
+        'unitprice',
+        'mrp',
       ],
       location: [
-        'location', 'location_code', 'locationcode', 'shelf', 'area',
-        'zone', 'warehouse', 'bin', 'position'
+        'location',
+        'location_code',
+        'locationcode',
+        'shelf',
+        'area',
+        'zone',
+        'warehouse',
+        'bin',
+        'position',
       ],
       unit_type: [
-        'unit_type', 'unittype', 'unit', 'uom', 'measure', 'measurement',
-        'unit_of_measure', 'units'
-      ]
+        'unit_type',
+        'unittype',
+        'unit',
+        'uom',
+        'measure',
+        'measurement',
+        'unit_of_measure',
+        'units',
+      ],
     }
 
     // Find best match for each field using fuzzy matching
@@ -153,7 +226,7 @@ export class FastCSVProcessor {
 
       for (let i = 0; i < headers.length; i++) {
         const header = this.normalizeHeader(headers[i])
-        
+
         // Exact match gets highest score
         if (patterns.includes(header)) {
           map.set(field, i)
@@ -203,10 +276,10 @@ export class FastCSVProcessor {
     let current = ''
     let inQuotes = false
     let i = 0
-    
+
     while (i < line.length) {
       const char = line[i]
-      
+
       if (char === '"') {
         if (inQuotes && line[i + 1] === '"') {
           // Escaped quote
@@ -227,7 +300,7 @@ export class FastCSVProcessor {
         i++
       }
     }
-    
+
     // Add final field
     result.push(current.trim())
     return result
@@ -237,10 +310,10 @@ export class FastCSVProcessor {
    * Map CSV row to structured item using intelligent field mapping
    */
   private static mapRowToItem(
-    values: string[], 
-    headerMap: Map<string, number>, 
+    values: string[],
+    headerMap: Map<string, number>,
     headers: string[],
-    rowNumber: number
+    rowNumber: number,
   ): CsvItem {
     const getValue = (field: string, defaultValue: any = undefined) => {
       const index = headerMap.get(field)
@@ -261,7 +334,7 @@ export class FastCSVProcessor {
       Cost_Price: this.parseNumber(getValue('cost_price', '0')),
       Selling_Price: this.parseNumber(getValue('selling_price', '0')),
       Location: getValue('location', 'MAIN'),
-      Unit_Type: getValue('unit_type', 'units')
+      Unit_Type: getValue('unit_type', 'units'),
     }
   }
 
@@ -274,7 +347,7 @@ export class FastCSVProcessor {
       .slice(0, 2)
       .map(word => word.substring(0, 3).toUpperCase())
       .join('')
-    
+
     const timestamp = Date.now().toString().slice(-6)
     return `${prefix}-${timestamp}-${rowNumber.toString().padStart(3, '0')}`
   }
@@ -284,25 +357,25 @@ export class FastCSVProcessor {
    */
   private static normalizeCategory(category: string): string {
     const categoryMap: { [key: string]: string } = {
-      'produce': 'fresh_produce',
-      'fresh': 'fresh_produce',
-      'vegetables': 'fresh_produce',
-      'fruits': 'fresh_produce',
-      'meat': 'fresh_meat_fish',
-      'fish': 'fresh_meat_fish',
-      'seafood': 'fresh_meat_fish',
-      'dairy': 'dairy',
-      'milk': 'dairy',
-      'cheese': 'dairy',
-      'bakery': 'bakery_fresh',
-      'bread': 'bakery_fresh',
-      'frozen': 'frozen',
-      'beverages': 'beverages',
-      'drinks': 'beverages',
-      'snacks': 'snacks',
-      'packaged': 'dry_goods',
-      'canned': 'dry_goods',
-      'dry': 'dry_goods'
+      produce: 'fresh_produce',
+      fresh: 'fresh_produce',
+      vegetables: 'fresh_produce',
+      fruits: 'fresh_produce',
+      meat: 'fresh_meat_fish',
+      fish: 'fresh_meat_fish',
+      seafood: 'fresh_meat_fish',
+      dairy: 'dairy',
+      milk: 'dairy',
+      cheese: 'dairy',
+      bakery: 'bakery_fresh',
+      bread: 'bakery_fresh',
+      frozen: 'frozen',
+      beverages: 'beverages',
+      drinks: 'beverages',
+      snacks: 'snacks',
+      packaged: 'dry_goods',
+      canned: 'dry_goods',
+      dry: 'dry_goods',
     }
 
     const normalized = category.toLowerCase().trim()
@@ -314,14 +387,14 @@ export class FastCSVProcessor {
    */
   private static parseNumber(value: string | undefined): number {
     if (!value) return 0
-    
+
     const cleaned = value.replace(/[^0-9.-]/g, '')
     const parsed = parseFloat(cleaned)
-    
+
     if (isNaN(parsed)) {
       throw new Error(`Invalid number: ${value}`)
     }
-    
+
     return parsed
   }
 
@@ -350,15 +423,15 @@ export class FastCSVProcessor {
     if (!item.SKU) {
       throw new Error('SKU is required')
     }
-    
+
     if (!item.Product_Name || item.Product_Name === 'Unknown Product') {
       throw new Error('Product name is required')
     }
-    
+
     if (isNaN(item.Quantity) || item.Quantity <= 0) {
       throw new Error('Valid quantity is required')
     }
-    
+
     if (!item.Expiry_Date) {
       throw new Error('Valid expiry date is required')
     }

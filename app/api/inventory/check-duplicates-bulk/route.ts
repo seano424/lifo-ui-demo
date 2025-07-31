@@ -28,7 +28,10 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
   // Get authenticated user
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         duplicates: [],
         duplicateCount: 0,
-        newItemsCount: 0
+        newItemsCount: 0,
       })
     }
 
@@ -56,7 +59,8 @@ export async function POST(request: NextRequest) {
     // Single query to detect all duplicates using joins
     const { data: existingBatches, error } = await supabase
       .from('batches')
-      .select(`
+      .select(
+        `
         batch_id,
         batch_number,
         current_quantity,
@@ -66,7 +70,8 @@ export async function POST(request: NextRequest) {
             sku
           )
         )
-      `)
+      `,
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .in('store_products.products.sku', skus)
@@ -79,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Process results into lookup map for fast duplicate detection
     const duplicateMap = new Map<string, any[]>()
-    
+
     existingBatches?.forEach((batch: any) => {
       const sku = batch.store_products?.product?.sku
       if (sku) {
@@ -90,7 +95,7 @@ export async function POST(request: NextRequest) {
         duplicateMap.get(key)!.push({
           batch_id: batch.batch_id,
           batch_number: batch.batch_number,
-          current_quantity: batch.current_quantity
+          current_quantity: batch.current_quantity,
         })
       }
     })
@@ -100,12 +105,12 @@ export async function POST(request: NextRequest) {
       .map(item => {
         const key = `${item.sku}:${item.expiryDate}`
         const existingBatches = duplicateMap.get(key) || []
-        
+
         if (existingBatches.length > 0) {
           return {
             sku: item.sku,
             expiryDate: item.expiryDate,
-            existingBatches
+            existingBatches,
           }
         }
         return null
@@ -115,11 +120,10 @@ export async function POST(request: NextRequest) {
     const response: BulkDuplicateResponse = {
       duplicates,
       duplicateCount: duplicates.length,
-      newItemsCount: items.length - duplicates.length
+      newItemsCount: items.length - duplicates.length,
     }
 
     return NextResponse.json(response)
-
   } catch (error) {
     console.error('Bulk duplicate detection error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

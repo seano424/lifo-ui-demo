@@ -80,58 +80,100 @@ export function useFastCsvUpload() {
   // Ultra-fast upload mutation
   const uploadMutation = useMutation({
     mutationFn: async ({ file, storeId }: { file: File; storeId: string }) => {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('storeId', storeId)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('storeId', storeId)
 
-      const response = await fetch('/api/inventory/upload-fast-skip', {
-        method: 'POST',
-        body: formData
-      })
+        const response = await fetch('/api/inventory/upload-fast-skip', {
+          method: 'POST',
+          body: formData
+        })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Upload failed')
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: `Server error: ${response.status}` }))
+          throw new Error(errorData.error || `Upload failed with status ${response.status}`)
+        }
+
+        const result = await response.json()
+        
+        // Validate the response structure
+        if (!result || typeof result !== 'object') {
+          throw new Error('Invalid response from server')
+        }
+
+        return result as FastUploadResult
+      } catch (error) {
+        // Re-throw with better error context
+        if (error instanceof Error) {
+          throw new Error(`Upload failed: ${error.message}`)
+        }
+        throw new Error('Upload failed: Unknown error occurred')
       }
-
-      return response.json() as Promise<FastUploadResult>
     },
     onSuccess: (data) => {
-      // Invalidate inventory queries
-      queryClient.invalidateQueries({ queryKey: ['inventory'] })
-      queryClient.invalidateQueries({ queryKey: ['batches'] })
-      queryClient.invalidateQueries({ queryKey: ['store-analytics'] })
+      try {
+        // Invalidate inventory queries
+        queryClient.invalidateQueries({ queryKey: ['inventory'] })
+        queryClient.invalidateQueries({ queryKey: ['batches'] })
+        queryClient.invalidateQueries({ queryKey: ['store-analytics'] })
 
-      // Show detailed success message
-      const skippedMessage = data.skipped > 0 
-        ? `\n${data.skipped} duplicates skipped` 
-        : ''
-      
-      const speedMessage = `\n⚡ ${data.performance_metrics.items_per_second} items/second`
+        // Safely extract data with fallbacks
+        const processed = data?.processed || 0
+        const skipped = data?.skipped || 0
+        const processingTime = data?.processing_time_ms || 0
+        const itemsPerSecond = data?.performance_metrics?.items_per_second || 0
 
-      toast.success(
-        `Upload Complete! 🚀\n${data.processed} items processed in ${data.processing_time_ms}ms${skippedMessage}${speedMessage}`,
-        { duration: 5000 }
-      )
+        // Show detailed success message with safe data
+        const skippedMessage = skipped > 0 ? `\n${skipped} duplicates skipped` : ''
+        const speedMessage = itemsPerSecond > 0 ? `\n⚡ ${itemsPerSecond} items/second` : ''
 
-      // Log performance details for debugging
-      console.log('🚀 Upload Performance Metrics:', {
-        'Total Time': `${data.processing_time_ms}ms`,
-        'Items/Second': data.performance_metrics.items_per_second,
-        'Duplicate Detection': `${data.performance_metrics.duplicate_detection_ms}ms`,
-        'Database Operations': `${data.performance_metrics.database_operations_ms}ms`,
-        'Items Processed': data.processed,
-        'Items Skipped': data.skipped,
-        'Duplicates': data.duplicates_skipped
-      })
+        toast.success(
+          `Upload Complete! 🚀\n${processed} items processed in ${processingTime}ms${skippedMessage}${speedMessage}`,
+          { duration: 5000 }
+        )
 
-      // Reset preview
-      setCsvPreview([])
-      setIsPreviewReady(false)
+        // Log performance details for debugging (safely)
+        console.log('🚀 Upload Performance Metrics:', {
+          'Total Time': `${processingTime}ms`,
+          'Items/Second': itemsPerSecond,
+          'Duplicate Detection': `${data?.performance_metrics?.duplicate_detection_ms || 0}ms`,
+          'Database Operations': `${data?.performance_metrics?.database_operations_ms || 0}ms`,
+          'Items Processed': processed,
+          'Items Skipped': skipped,
+          'Duplicates': data?.duplicates_skipped || []
+        })
+
+        // Reset preview after successful upload
+        setCsvPreview([])
+        setIsPreviewReady(false)
+      } catch (error) {
+        console.error('Error in upload success handler:', error)
+        // Still show a basic success message even if metrics fail
+        toast.success('Upload completed successfully! Check the results below.', { duration: 3000 })
+      }
     },
     onError: (error) => {
       console.error('Fast upload error:', error)
-      toast.error(`Upload failed: ${error.message}`)
+      
+      // Extract a user-friendly error message
+      let userMessage = 'Upload failed due to an unexpected error'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Unauthorized')) {
+          userMessage = 'You are not authorized to upload to this store'
+        } else if (error.message.includes('Invalid file type')) {
+          userMessage = 'Please upload a valid CSV file'
+        } else if (error.message.includes('No valid data')) {
+          userMessage = 'The CSV file contains no valid data'
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          userMessage = 'Network error - please check your connection and try again'
+        } else {
+          userMessage = error.message.replace(/^Upload failed: /, '')
+        }
+      }
+      
+      toast.error(`Upload Failed: ${userMessage}`, { duration: 8000 })
     }
   })
 

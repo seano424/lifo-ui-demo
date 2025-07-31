@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
   // Get authenticated user
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -38,25 +41,19 @@ export async function POST(request: NextRequest) {
     const storeId = formData.get('storeId') as string
 
     if (!file || !storeId) {
-      return NextResponse.json(
-        { error: 'File and store ID are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File and store ID are required' }, { status: 400 })
     }
 
     // Quick validations
     if (!file.name.toLowerCase().endsWith('.csv')) {
       return NextResponse.json(
         { error: 'Invalid file type. Please upload a CSV file.' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 10MB.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 400 })
     }
 
     // Validate store access
@@ -69,34 +66,35 @@ export async function POST(request: NextRequest) {
     // PERFORMANCE PHASE 1: Fast CSV parsing (JavaScript only, no Python overhead)
     const csvParsingStart = Date.now()
     console.time('csv-parsing-optimized')
-    
+
     const csvContent = await file.text()
     const parseResult = FastCSVProcessor.parseCSV(csvContent)
-    
+
     console.timeEnd('csv-parsing-optimized')
     const csvParsingTime = Date.now() - csvParsingStart
 
     if (parseResult.items.length === 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'No valid data found in CSV',
           details: parseResult.errors,
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     // PERFORMANCE PHASE 2: Bulk processing with performance monitoring
     console.time('bulk-processing-optimized')
     const bulkProcessingStart = Date.now()
-    
+
     const result = await bulkOps.benchmarkProcessing(parseResult.items, storeId, user.id)
-    
+
     console.timeEnd('bulk-processing-optimized')
     const bulkProcessingTime = Date.now() - bulkProcessingStart
 
     const totalTime = Date.now() - startTime
-    const itemsPerSecond = result.processed > 0 ? Math.round((result.processed / totalTime) * 1000) : 0
+    const itemsPerSecond =
+      result.processed > 0 ? Math.round((result.processed / totalTime) * 1000) : 0
 
     // Success response with detailed performance metrics
     const response: OptimizedUploadResult = {
@@ -112,10 +110,10 @@ export async function POST(request: NextRequest) {
         items_per_second: itemsPerSecond,
         csv_parsing_ms: csvParsingTime,
         duplicate_detection_ms: Math.round(bulkProcessingTime * 0.2), // Estimated
-        database_operations_ms: Math.round(bulkProcessingTime * 0.8) // Estimated
+        database_operations_ms: Math.round(bulkProcessingTime * 0.8), // Estimated
       },
       message: `Successfully processed ${result.processed} items in ${totalTime}ms (${itemsPerSecond} items/second)`,
-      processor_used: 'optimized_bulk'
+      processor_used: 'optimized_bulk',
     }
 
     // Performance logging
@@ -126,15 +124,14 @@ export async function POST(request: NextRequest) {
       total_time_ms: totalTime,
       items_per_second: itemsPerSecond,
       parsing_time_ms: csvParsingTime,
-      processing_time_ms: bulkProcessingTime
+      processing_time_ms: bulkProcessingTime,
     })
 
     return NextResponse.json(response)
-
   } catch (error) {
     console.error('Optimized CSV upload error:', error)
     const message = error instanceof Error ? error.message : 'Unknown error'
-    
+
     return NextResponse.json(
       {
         success: false,
@@ -142,9 +139,9 @@ export async function POST(request: NextRequest) {
         details: message,
         processed: 0,
         total_items: 0,
-        processing_time_ms: Date.now() - startTime
+        processing_time_ms: Date.now() - startTime,
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

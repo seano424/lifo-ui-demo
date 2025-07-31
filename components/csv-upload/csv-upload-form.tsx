@@ -96,7 +96,6 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
       h => h.toLowerCase().includes('expiry') || h.toLowerCase().includes('expiration'),
     )
 
-
     for (const [rowIndex, row] of rows.entries()) {
       const sku = row[skuIndex]?.trim()
       const productName = row[nameIndex]?.trim()
@@ -140,7 +139,11 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
             })
           }
         } else {
-          console.error(`Duplicate check API failed for ${sku}:`, response.status, await response.text())
+          console.error(
+            `Duplicate check API failed for ${sku}:`,
+            response.status,
+            await response.text(),
+          )
         }
       } catch (error) {
         console.error(`Failed to check duplicates for ${sku}:`, error)
@@ -173,9 +176,9 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
               line, // Show first 20 rows for preview
             ) => line.split(',').map(cell => cell.trim().replace(/"/g, '')),
           )
-          const allRows = lines.slice(1).map(
-            line => line.split(',').map(cell => cell.trim().replace(/"/g, '')),
-          )
+          const allRows = lines
+            .slice(1)
+            .map(line => line.split(',').map(cell => cell.trim().replace(/"/g, '')))
 
           // Check compatibility
           const missingColumns = REQUIRED_COLUMNS.filter(
@@ -282,7 +285,7 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
     try {
       setUploadProgress(25)
       toast.info('Starting upload...', { duration: 2000 })
-      
+
       const result = await uploadMutation.mutateAsync({
         file: selectedFile,
         storeId,
@@ -296,7 +299,9 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
           toast.success(`Successfully uploaded ${result.processed} items!`, { duration: 5000 })
           setShowSuccessModal(true)
         } else {
-          toast.warning('Upload completed but no items were processed. Check for errors below.', { duration: 7000 })
+          toast.warning('Upload completed but no items were processed. Check for errors below.', {
+            duration: 7000,
+          })
         }
       } else {
         toast.error('Upload failed. Please check the errors below.', { duration: 7000 })
@@ -339,7 +344,6 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
     const file = e.dataTransfer.files[0]
     if (file) handleFileSelect(file)
   }
-
 
   return (
     <div className="space-y-6">
@@ -578,7 +582,8 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
                     <div className="bg-orange-100 p-3 rounded border">
                       <p className="font-medium text-orange-800 text-sm">✅ What will happen:</p>
                       <p className="text-sm text-orange-700 mt-1">
-                        Duplicate batches will be skipped. New items will be added. You can update existing inventory in your dashboard.
+                        Duplicate batches will be skipped. New items will be added. You can update
+                        existing inventory in your dashboard.
                       </p>
                     </div>
                   </div>
@@ -615,9 +620,7 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
       </Card>
 
       {/* Upload Results - Show for all completed uploads */}
-      {uploadResult && (
-        <UploadResults result={uploadResult} />
-      )}
+      {uploadResult && <UploadResults result={uploadResult} />}
 
       {/* Success Modal */}
       {uploadResult && (
@@ -628,7 +631,6 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
           storeId={storeId}
         />
       )}
-
     </div>
   )
 }
