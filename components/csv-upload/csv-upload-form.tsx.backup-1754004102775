@@ -79,7 +79,7 @@ export function CSVUploadForm({ storeId, onUploadComplete }: CSVUploadFormProps)
   const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const uploadMutation = useFastCsvUpload()
+  const uploadMutation = useCSVUpload()
   const uploadResult = uploadMutation.data
 
   const detectDuplicateBatches = async (

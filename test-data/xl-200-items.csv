@@ -1,0 +1,201 @@
+SKU,Product_Name,Category,Quantity,Expiry_Date,Brand,Cost_Price,Selling_Price,Location,Unit_Type
+FRE-ORG-001,Organic Bananas ,fresh_produce,23,2025-11-15,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-001,Whole Milk ,dairy,34,2026-01-19,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-001,Sourdough Bread ,bakery_fresh,47,2026-01-08,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-001,Ground Beef ,fresh_meat_fish,36,2026-01-06,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-001,Frozen Pizza ,frozen,40,2025-12-10,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-001,Orange Juice ,beverages,35,2026-01-25,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-001,Potato Chips ,snacks,27,2025-12-31,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-001,Canned Tomatoes ,dry_goods,21,2025-09-14,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-001,Greek Yogurt ,dairy,14,2025-12-10,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-001,Baby Spinach ,fresh_produce,56,2025-12-28,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-002,Organic Bananas (Var 2),fresh_produce,14,2025-12-30,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-002,Whole Milk (Var 2),dairy,30,2025-11-28,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-002,Sourdough Bread (Var 2),bakery_fresh,54,2026-01-08,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-002,Ground Beef (Var 2),fresh_meat_fish,19,2025-09-01,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-002,Frozen Pizza (Var 2),frozen,58,2025-10-30,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-002,Orange Juice (Var 2),beverages,26,2026-01-17,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-002,Potato Chips (Var 2),snacks,57,2025-11-07,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-002,Canned Tomatoes (Var 2),dry_goods,42,2025-10-24,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-002,Greek Yogurt (Var 2),dairy,42,2025-12-06,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-002,Baby Spinach (Var 2),fresh_produce,33,2026-01-16,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-003,Organic Bananas (Var 3),fresh_produce,49,2026-01-22,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-003,Whole Milk (Var 3),dairy,12,2025-09-25,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-003,Sourdough Bread (Var 3),bakery_fresh,42,2025-09-23,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-003,Ground Beef (Var 3),fresh_meat_fish,45,2025-11-14,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-003,Frozen Pizza (Var 3),frozen,44,2025-11-29,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-003,Orange Juice (Var 3),beverages,17,2025-09-21,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-003,Potato Chips (Var 3),snacks,23,2025-09-05,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-003,Canned Tomatoes (Var 3),dry_goods,27,2025-08-10,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-003,Greek Yogurt (Var 3),dairy,11,2025-11-25,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-003,Baby Spinach (Var 3),fresh_produce,43,2025-11-20,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-004,Organic Bananas (Var 4),fresh_produce,54,2025-10-05,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-004,Whole Milk (Var 4),dairy,27,2025-10-25,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-004,Sourdough Bread (Var 4),bakery_fresh,37,2025-08-09,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-004,Ground Beef (Var 4),fresh_meat_fish,21,2025-12-28,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-004,Frozen Pizza (Var 4),frozen,56,2026-01-13,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-004,Orange Juice (Var 4),beverages,16,2025-09-21,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-004,Potato Chips (Var 4),snacks,30,2025-10-09,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-004,Canned Tomatoes (Var 4),dry_goods,57,2025-11-25,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-004,Greek Yogurt (Var 4),dairy,23,2025-09-16,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-004,Baby Spinach (Var 4),fresh_produce,20,2025-08-19,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-005,Organic Bananas (Var 5),fresh_produce,37,2025-08-12,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-005,Whole Milk (Var 5),dairy,47,2025-11-18,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-005,Sourdough Bread (Var 5),bakery_fresh,16,2026-01-23,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-005,Ground Beef (Var 5),fresh_meat_fish,50,2025-11-02,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-005,Frozen Pizza (Var 5),frozen,43,2025-09-15,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-005,Orange Juice (Var 5),beverages,53,2025-10-21,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-005,Potato Chips (Var 5),snacks,43,2025-11-04,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-005,Canned Tomatoes (Var 5),dry_goods,14,2026-01-22,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-005,Greek Yogurt (Var 5),dairy,14,2025-12-08,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-005,Baby Spinach (Var 5),fresh_produce,43,2025-10-09,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-006,Organic Bananas (Var 6),fresh_produce,38,2025-10-31,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-006,Whole Milk (Var 6),dairy,50,2025-09-04,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-006,Sourdough Bread (Var 6),bakery_fresh,58,2025-08-27,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-006,Ground Beef (Var 6),fresh_meat_fish,47,2026-01-18,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-006,Frozen Pizza (Var 6),frozen,37,2026-01-15,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-006,Orange Juice (Var 6),beverages,22,2025-10-24,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-006,Potato Chips (Var 6),snacks,39,2025-09-17,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-006,Canned Tomatoes (Var 6),dry_goods,43,2025-09-19,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-006,Greek Yogurt (Var 6),dairy,24,2025-12-09,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-006,Baby Spinach (Var 6),fresh_produce,37,2025-09-21,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-007,Organic Bananas (Var 7),fresh_produce,26,2025-08-18,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-007,Whole Milk (Var 7),dairy,27,2025-10-26,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-007,Sourdough Bread (Var 7),bakery_fresh,57,2025-09-10,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-007,Ground Beef (Var 7),fresh_meat_fish,26,2026-01-01,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-007,Frozen Pizza (Var 7),frozen,43,2025-09-27,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-007,Orange Juice (Var 7),beverages,33,2025-08-30,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-007,Potato Chips (Var 7),snacks,47,2025-08-28,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-007,Canned Tomatoes (Var 7),dry_goods,13,2025-11-10,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-007,Greek Yogurt (Var 7),dairy,38,2025-09-17,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-007,Baby Spinach (Var 7),fresh_produce,42,2025-11-14,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-008,Organic Bananas (Var 8),fresh_produce,43,2025-11-07,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-008,Whole Milk (Var 8),dairy,29,2025-12-25,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-008,Sourdough Bread (Var 8),bakery_fresh,30,2025-11-05,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-008,Ground Beef (Var 8),fresh_meat_fish,43,2025-12-24,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-008,Frozen Pizza (Var 8),frozen,53,2025-12-05,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-008,Orange Juice (Var 8),beverages,33,2025-10-16,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-008,Potato Chips (Var 8),snacks,14,2025-12-26,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-008,Canned Tomatoes (Var 8),dry_goods,20,2025-09-02,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-008,Greek Yogurt (Var 8),dairy,12,2025-09-06,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-008,Baby Spinach (Var 8),fresh_produce,13,2025-08-29,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-009,Organic Bananas (Var 9),fresh_produce,29,2026-01-17,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-009,Whole Milk (Var 9),dairy,13,2026-01-12,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-009,Sourdough Bread (Var 9),bakery_fresh,46,2025-12-31,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-009,Ground Beef (Var 9),fresh_meat_fish,30,2026-01-05,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-009,Frozen Pizza (Var 9),frozen,10,2026-01-17,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-009,Orange Juice (Var 9),beverages,41,2026-01-18,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-009,Potato Chips (Var 9),snacks,59,2025-09-13,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-009,Canned Tomatoes (Var 9),dry_goods,10,2025-09-30,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-009,Greek Yogurt (Var 9),dairy,33,2025-08-28,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-009,Baby Spinach (Var 9),fresh_produce,45,2025-09-03,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-010,Organic Bananas (Var 10),fresh_produce,41,2026-01-03,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-010,Whole Milk (Var 10),dairy,27,2025-11-12,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-010,Sourdough Bread (Var 10),bakery_fresh,23,2026-01-09,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-010,Ground Beef (Var 10),fresh_meat_fish,54,2025-09-27,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-010,Frozen Pizza (Var 10),frozen,49,2025-11-05,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-010,Orange Juice (Var 10),beverages,59,2025-12-29,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-010,Potato Chips (Var 10),snacks,20,2025-09-03,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-010,Canned Tomatoes (Var 10),dry_goods,13,2026-01-10,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-010,Greek Yogurt (Var 10),dairy,56,2026-01-18,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-010,Baby Spinach (Var 10),fresh_produce,47,2025-10-09,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-011,Organic Bananas (Var 11),fresh_produce,19,2025-11-02,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-011,Whole Milk (Var 11),dairy,54,2025-10-12,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-011,Sourdough Bread (Var 11),bakery_fresh,16,2025-12-31,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-011,Ground Beef (Var 11),fresh_meat_fish,35,2025-08-21,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-011,Frozen Pizza (Var 11),frozen,12,2026-01-01,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-011,Orange Juice (Var 11),beverages,27,2025-09-14,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-011,Potato Chips (Var 11),snacks,57,2025-12-19,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-011,Canned Tomatoes (Var 11),dry_goods,49,2025-09-28,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-011,Greek Yogurt (Var 11),dairy,36,2025-12-21,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-011,Baby Spinach (Var 11),fresh_produce,30,2026-01-09,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-012,Organic Bananas (Var 12),fresh_produce,41,2025-11-06,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-012,Whole Milk (Var 12),dairy,42,2025-11-30,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-012,Sourdough Bread (Var 12),bakery_fresh,51,2025-10-02,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-012,Ground Beef (Var 12),fresh_meat_fish,16,2025-10-13,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-012,Frozen Pizza (Var 12),frozen,49,2025-09-01,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-012,Orange Juice (Var 12),beverages,55,2025-12-16,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-012,Potato Chips (Var 12),snacks,21,2025-08-20,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-012,Canned Tomatoes (Var 12),dry_goods,23,2026-01-23,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-012,Greek Yogurt (Var 12),dairy,18,2025-10-13,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-012,Baby Spinach (Var 12),fresh_produce,57,2025-12-19,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-013,Organic Bananas (Var 13),fresh_produce,37,2025-08-10,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-013,Whole Milk (Var 13),dairy,23,2025-12-21,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-013,Sourdough Bread (Var 13),bakery_fresh,20,2025-12-10,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-013,Ground Beef (Var 13),fresh_meat_fish,45,2025-10-08,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-013,Frozen Pizza (Var 13),frozen,35,2025-11-12,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-013,Orange Juice (Var 13),beverages,19,2025-12-15,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-013,Potato Chips (Var 13),snacks,14,2025-11-17,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-013,Canned Tomatoes (Var 13),dry_goods,34,2025-10-15,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-013,Greek Yogurt (Var 13),dairy,59,2025-09-08,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-013,Baby Spinach (Var 13),fresh_produce,34,2025-12-08,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-014,Organic Bananas (Var 14),fresh_produce,46,2026-01-23,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-014,Whole Milk (Var 14),dairy,37,2025-10-27,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-014,Sourdough Bread (Var 14),bakery_fresh,25,2025-10-23,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-014,Ground Beef (Var 14),fresh_meat_fish,14,2026-01-16,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-014,Frozen Pizza (Var 14),frozen,45,2025-10-03,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-014,Orange Juice (Var 14),beverages,43,2025-11-16,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-014,Potato Chips (Var 14),snacks,46,2025-10-16,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-014,Canned Tomatoes (Var 14),dry_goods,21,2025-11-25,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-014,Greek Yogurt (Var 14),dairy,50,2025-12-21,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-014,Baby Spinach (Var 14),fresh_produce,14,2025-08-16,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-015,Organic Bananas (Var 15),fresh_produce,41,2025-10-10,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-015,Whole Milk (Var 15),dairy,32,2025-11-26,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-015,Sourdough Bread (Var 15),bakery_fresh,17,2025-08-22,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-015,Ground Beef (Var 15),fresh_meat_fish,10,2025-12-05,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-015,Frozen Pizza (Var 15),frozen,39,2025-12-06,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-015,Orange Juice (Var 15),beverages,53,2025-11-26,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-015,Potato Chips (Var 15),snacks,57,2025-08-21,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-015,Canned Tomatoes (Var 15),dry_goods,36,2026-01-25,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-015,Greek Yogurt (Var 15),dairy,56,2025-12-15,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-015,Baby Spinach (Var 15),fresh_produce,41,2025-09-21,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-016,Organic Bananas (Var 16),fresh_produce,59,2025-09-10,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-016,Whole Milk (Var 16),dairy,45,2025-08-10,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-016,Sourdough Bread (Var 16),bakery_fresh,15,2025-11-21,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-016,Ground Beef (Var 16),fresh_meat_fish,37,2026-01-01,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-016,Frozen Pizza (Var 16),frozen,35,2026-01-25,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-016,Orange Juice (Var 16),beverages,40,2025-08-21,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-016,Potato Chips (Var 16),snacks,55,2025-08-15,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-016,Canned Tomatoes (Var 16),dry_goods,15,2025-09-08,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-016,Greek Yogurt (Var 16),dairy,49,2026-01-06,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-016,Baby Spinach (Var 16),fresh_produce,44,2025-10-26,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-017,Organic Bananas (Var 17),fresh_produce,20,2025-10-06,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-017,Whole Milk (Var 17),dairy,11,2025-12-09,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-017,Sourdough Bread (Var 17),bakery_fresh,48,2025-09-01,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-017,Ground Beef (Var 17),fresh_meat_fish,40,2025-10-17,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-017,Frozen Pizza (Var 17),frozen,16,2025-10-16,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-017,Orange Juice (Var 17),beverages,57,2025-09-15,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-017,Potato Chips (Var 17),snacks,26,2025-09-12,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-017,Canned Tomatoes (Var 17),dry_goods,29,2025-12-12,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-017,Greek Yogurt (Var 17),dairy,44,2025-10-31,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-017,Baby Spinach (Var 17),fresh_produce,13,2025-10-23,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-018,Organic Bananas (Var 18),fresh_produce,45,2025-11-13,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-018,Whole Milk (Var 18),dairy,51,2025-11-04,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-018,Sourdough Bread (Var 18),bakery_fresh,28,2025-11-01,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-018,Ground Beef (Var 18),fresh_meat_fish,43,2025-08-08,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-018,Frozen Pizza (Var 18),frozen,25,2025-10-13,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-018,Orange Juice (Var 18),beverages,59,2025-12-10,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-018,Potato Chips (Var 18),snacks,24,2025-10-13,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-018,Canned Tomatoes (Var 18),dry_goods,24,2026-01-12,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-018,Greek Yogurt (Var 18),dairy,46,2025-08-13,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-018,Baby Spinach (Var 18),fresh_produce,38,2025-11-25,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-019,Organic Bananas (Var 19),fresh_produce,33,2025-09-06,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-019,Whole Milk (Var 19),dairy,37,2025-10-30,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-019,Sourdough Bread (Var 19),bakery_fresh,24,2025-12-20,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-019,Ground Beef (Var 19),fresh_meat_fish,16,2025-12-09,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-019,Frozen Pizza (Var 19),frozen,20,2025-08-28,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-019,Orange Juice (Var 19),beverages,30,2025-08-15,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-019,Potato Chips (Var 19),snacks,14,2026-01-24,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-019,Canned Tomatoes (Var 19),dry_goods,53,2025-08-17,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-019,Greek Yogurt (Var 19),dairy,23,2025-12-16,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-019,Baby Spinach (Var 19),fresh_produce,14,2025-10-07,GreenLeaf,3.25,4.99,MAIN,units
+FRE-ORG-020,Organic Bananas (Var 20),fresh_produce,50,2025-08-31,FreshCorp,2.50,3.99,MAIN,units
+DAI-WHO-020,Whole Milk (Var 20),dairy,53,2025-09-28,DairyBest,3.20,4.49,MAIN,units
+BAK-SOU-020,Sourdough Bread (Var 20),bakery_fresh,58,2025-09-25,BakeFresh,2.80,4.99,MAIN,units
+MEA-GRO-020,Ground Beef (Var 20),fresh_meat_fish,47,2025-09-30,MeatCo,8.99,12.99,MAIN,units
+QUI-FRO-020,Frozen Pizza (Var 20),frozen,56,2025-11-08,QuickMeal,4.50,7.99,MAIN,units
+CIT-ORA-020,Orange Juice (Var 20),beverages,52,2025-09-20,CitrusFresh,3.99,5.99,MAIN,units
+CRU-POT-020,Potato Chips (Var 20),snacks,12,2025-11-05,CrunchTime,2.25,3.99,MAIN,units
+PAN-CAN-020,Canned Tomatoes (Var 20),dry_goods,58,2025-10-11,Pantry Plus,1.99,2.99,MAIN,units
+HEA-GRE-020,Greek Yogurt (Var 20),dairy,30,2026-01-21,HealthyChoice,4.50,6.99,MAIN,units
+GRE-BAB-020,Baby Spinach (Var 20),fresh_produce,28,2025-09-17,GreenLeaf,3.25,4.99,MAIN,units

@@ -28,7 +28,7 @@ interface ProcessedItem {
   error_message?: string
 }
 
-export function useFastCsvUpload() {
+export function useCSVUpload() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -44,7 +44,7 @@ export function useFastCsvUpload() {
       formData.append('storeId', storeId)
 
       // Use Next.js API route with dual processor fallback
-      const response = await fetch('/api/inventory/upload-fast-skip', {
+      const response = await fetch('/api/inventory/upload', {
         method: 'POST',
         body: formData,
       })
