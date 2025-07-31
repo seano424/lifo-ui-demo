@@ -452,5 +452,13 @@
       "logout": "Uitloggen",
       "goToDashboard": "Naar dashboard"
     }
+  },
+  "errors": {
+    "pageNotFoundTitle": "Pagina niet gevonden",
+    "pageNotFoundDescription": "De pagina die u zoekt bestaat niet of is verplaatst.",
+    "backToHome": "Terug naar startpagina",
+    "goBack": "Ga terug",
+    "needHelp": "Hulp nodig?",
+    "contactSupport": "Neem contact op met ons ondersteuningsteam"
   }
 }

@@ -82,7 +82,7 @@ export function MarketingFooter() {
                   contact@lifo-app.com
                 </Typography>
               </a>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-8">
                 <a
                   href="https://linkedin.com/company/lifo-ai"
                   target="_blank"
