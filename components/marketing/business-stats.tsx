@@ -54,6 +54,7 @@ export function BusinessStats() {
       <div className="max-w-7xl mx-auto relative z-10">
         <Typography
           variant="h2"
+          as={'h2'}
           className="text-center mb-16 pb-4 text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
         >
           Maximize Your Profits, Minimize Your Losses

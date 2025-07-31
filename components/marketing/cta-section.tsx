@@ -15,7 +15,7 @@ function CtaFeature({ icon, title, description }: CtaFeatureProps) {
         {icon}
       </div>
       <div>
-        <Typography variant="h4" className="font-medium text-blue-800 mb-1">
+        <Typography variant="h4" className="font-bold text-blue-800 mb-1">
           {title}
         </Typography>
         <Typography variant="p" className="text-blue-700/80">
@@ -28,14 +28,14 @@ function CtaFeature({ icon, title, description }: CtaFeatureProps) {
 
 export function CtaSection() {
   return (
-    <section className="w-full px-4 my-10 relative overflow-hidden">
+    <section className="w-full px-4 my-8 relative overflow-hidden">
       {/* Background decorative elements */}
 
       <div className="max-w-7xl mx-auto relative z-10">
         <Typography
           as={'h2'}
           variant="h2"
-          className="text-center mb-16 pb-4 text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
+          className="text-center mb-16 pb-4 text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
         >
           Switch to LIFO today
         </Typography>

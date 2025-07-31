@@ -35,6 +35,7 @@ export function FeaturesSummary() {
       <div className="max-w-5xl mx-auto">
         <Typography
           variant="h2"
+          as={'h2'}
           className="text-center mb-16 pb-4 text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
         >
           Revolutionize Your Stock Control

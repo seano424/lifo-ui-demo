@@ -8,9 +8,9 @@ export function HeroHeading() {
         <Image
           src="/logos/lifo-logo-icon.svg"
           alt="LIFO AI Logo"
-          width={50}
-          height={50}
-          className="h-16 md:h-16 w-auto"
+          width={64}
+          height={64}
+          className="h-16 w-auto"
         />
         <Typography
           as="h1"
@@ -19,7 +19,7 @@ export function HeroHeading() {
           LIFO.AI
         </Typography>
       </div>
-      <Typography as="h2" className="text-5xl md:text-6xl text-foreground/80">
+      <Typography as="h1" className="text-5xl md:text-6xl text-foreground/80">
         The Future of Inventory Management is Here.
       </Typography>
     </div>
