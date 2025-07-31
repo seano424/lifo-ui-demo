@@ -24,7 +24,7 @@ function Stat({ value, label, description, subtext }: StatProps) {
 
           {/* Value with large display */}
           <div className="mb-2 flex justify-center">
-            <span className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+            <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
               {value}
             </span>
           </div>
