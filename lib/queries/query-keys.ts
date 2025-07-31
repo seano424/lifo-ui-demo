@@ -137,7 +137,8 @@ export const queryKeys = {
     all: ['inventorySubmission'] as const,
     single: () => [...queryKeys.inventorySubmission.all, 'single'] as const,
     batch: () => [...queryKeys.inventorySubmission.all, 'batch'] as const,
-    history: (storeId: string) => [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
+    history: (storeId: string) =>
+      [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
   },
 } as const
 

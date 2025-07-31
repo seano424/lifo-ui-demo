@@ -11,7 +11,7 @@ import { useStoreState } from '@/lib/stores/store-context'
 
 export default function InputPage() {
   const { activeStore: currentStore } = useStoreState()
-  
+
   return (
     <div className="max-w-screen-lg mx-auto space-y-6">
       <Tabs defaultValue="scan" className="w-full">
@@ -25,28 +25,29 @@ export default function InputPage() {
             CSV Bulk Import
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="scan" className="mt-6">
           <div className="max-w-screen-sm mx-auto">
             <StreamlinedScanningInterface />
           </div>
         </TabsContent>
-        
+
         <TabsContent value="csv" className="mt-6">
           <div className="max-w-4xl mx-auto">
             <Card className="p-6 mb-6">
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-bold">Bulk Inventory Import</h2>
                 <p className="text-muted-foreground">
-                  Import hundreds of products at once using CSV files. Perfect for initial setup or large inventory updates.
+                  Import hundreds of products at once using CSV files. Perfect for initial setup or
+                  large inventory updates.
                 </p>
               </div>
             </Card>
-            
+
             {currentStore ? (
-              <CSVUploadForm 
+              <CSVUploadForm
                 storeId={currentStore.store_id}
-                onUploadComplete={(result) => {
+                onUploadComplete={result => {
                   console.log('Upload completed:', result)
                 }}
               />

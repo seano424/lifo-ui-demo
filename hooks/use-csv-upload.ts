@@ -30,30 +30,30 @@ interface ProcessedItem {
 
 export function useCSVUpload() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
-    mutationFn: async ({ 
-      file, 
-      storeId 
-    }: { 
+    mutationFn: async ({
+      file,
+      storeId,
+    }: {
       file: File
-      storeId: string 
+      storeId: string
     }): Promise<CSVUploadResponse> => {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('storeId', storeId)
-      
+
       // Use Next.js API route with dual processor fallback
       const response = await fetch('/api/inventory/upload', {
         method: 'POST',
         body: formData,
       })
-      
+
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || `Upload failed: ${response.statusText}`)
       }
-      
+
       return response.json()
     },
     onSuccess: (data, { storeId }) => {
@@ -62,26 +62,24 @@ export function useCSVUpload() {
       queryClient.invalidateQueries({ queryKey: ['store-inventory', storeId] })
       queryClient.invalidateQueries({ queryKey: ['expiring-batches', storeId] })
       queryClient.invalidateQueries({ queryKey: ['batches', storeId] })
-      
+
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
-      
+
       // Success notification
-      const processorUsed = data.processor_used === 'unified_python' ? 'Advanced Python' : 'JavaScript Fallback'
-      toast.success(
-        `Successfully imported ${data.processed} of ${data.total_items} products`,
-        {
-          description: `Processed with ${processorUsed} processor`,
-          duration: 5000
-        }
-      )
+      const processorUsed =
+        data.processor_used === 'unified_python' ? 'Advanced Python' : 'JavaScript Fallback'
+      toast.success(`Successfully imported ${data.processed} of ${data.total_items} products`, {
+        description: `Processed with ${processorUsed} processor`,
+        duration: 5000,
+      })
     },
     onError: (error: Error) => {
       toast.error(`Upload failed: ${error.message}`, {
         description: 'Please check your CSV format and try again',
-        duration: 5000
+        duration: 5000,
       })
-    }
+    },
   })
 }
 
@@ -93,7 +91,7 @@ export function useDownloadSampleCSV() {
       if (!response.ok) {
         throw new Error('Failed to download sample CSV')
       }
-      
+
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -109,6 +107,6 @@ export function useDownloadSampleCSV() {
     },
     onError: () => {
       toast.error('Failed to download sample CSV')
-    }
+    },
   })
 }

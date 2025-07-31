@@ -394,7 +394,9 @@ export class InventoryOperations {
             .single()
 
           if (createProductError || !newProduct) {
-            errors.push(`Failed to create product "${csvItem.Product_Name}": ${createProductError?.message}`)
+            errors.push(
+              `Failed to create product "${csvItem.Product_Name}": ${createProductError?.message}`,
+            )
             continue
           }
           productId = newProduct.product_id
@@ -418,7 +420,24 @@ export class InventoryOperations {
           continue
         }
 
-        // Create batch
+        // Check for existing batches with same SKU and expiry date (simple duplicate detection)
+        const { data: existingBatches, error: duplicateCheckError } = await this.supabase
+          .schema('inventory')
+          .from('batches')
+          .select('batch_id')
+          .eq('store_id', storeId)
+          .eq('product_id', productId)
+          .eq('expiry_date', csvItem.Expiry_Date)
+          .eq('status', 'active')
+          .limit(1)
+
+        if (!duplicateCheckError && existingBatches && existingBatches.length > 0) {
+          console.log(`[processCsvBatch] Skipping duplicate batch for ${csvItem.SKU} with expiry ${csvItem.Expiry_Date}`)
+          // Skip this item - it's a duplicate batch
+          continue
+        }
+
+        // Create batch (either no duplicate or ADD_ANYWAY action)
         const { data: batch, error: batchError } = await this.supabase
           .schema('inventory')
           .from('batches')
@@ -447,7 +466,6 @@ export class InventoryOperations {
 
         processed++
         console.log('[processCsvBatch] Successfully created batch:', batch.batch_id)
-
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
         errors.push(`Unexpected error processing item: ${errorMessage}`)

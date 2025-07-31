@@ -438,7 +438,11 @@ export async function POST(request: NextRequest) {
     }))
 
     // Process inventory using the database operations
-    const dbResult = await operations.processCsvBatch(formattedData, storeId, user.id)
+    const dbResult = await operations.processCsvBatch(
+      formattedData,
+      storeId,
+      user.id,
+    )
 
     return NextResponse.json({
       success: true,
