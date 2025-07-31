@@ -50,7 +50,7 @@ function Stat({ value, label, description, subtext }: StatProps) {
 
 export function BusinessStats() {
   return (
-    <section className="w-full py-16 md:py-24 px-4 my-16 relative overflow-hidden">
+    <section className="w-full py-8 px-4 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         <Typography
           variant="h2"

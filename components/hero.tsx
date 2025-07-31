@@ -1,7 +1,6 @@
 import { HeroBadge } from '@/components/marketing/hero-badge'
 import { HeroButtons } from '@/components/marketing/hero-buttons'
 import { HeroDescription } from '@/components/marketing/hero-description'
-import { HeroDivider } from '@/components/marketing/hero-divider'
 import { HeroHeading } from '@/components/marketing/hero-heading'
 
 export function Hero() {
@@ -14,7 +13,6 @@ export function Hero() {
         <HeroButtons />
         <HeroBadge />
       </div>
-      <HeroDivider />
     </div>
   )
 }

@@ -1,11 +1,11 @@
 'use client'
 
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
-import { Button } from './ui/button'
-import { LogoutButton } from './logout-button'
 import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
+import { LogoutButton } from './logout-button'
+import { Button } from './ui/button'
 
 type AuthButtonProps = {
   isMobile?: boolean
@@ -28,10 +28,10 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <div
       className={cn('flex items-center gap-4', isMobile && 'flex-col-reverse gap-2 items-start')}
     >
-      <LogoutButton variant="default" className={cn(isMobile && 'w-full')} />
       <Button asChild size="default" variant={'secondary'} className={cn(isMobile && 'w-full')}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
+      <LogoutButton variant="default" className={cn(isMobile && 'w-full')} />
     </div>
   ) : (
     <>
