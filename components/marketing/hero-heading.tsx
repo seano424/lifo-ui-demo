@@ -3,7 +3,7 @@ import { Typography } from '../ui/typography'
 
 export function HeroHeading() {
   return (
-    <div className="text-6xl md:text-5xl font-bold mb-6 leading-tight">
+    <header className="text-6xl md:text-5xl font-bold mb-6 leading-tight">
       <div className="flex items-center justify-center gap-4 mb-2">
         <Image
           src="/logos/lifo-logo-icon.svg"
@@ -11,6 +11,7 @@ export function HeroHeading() {
           width={64}
           height={64}
           className="h-12 w-auto md:h-16"
+          priority
         />
         <Typography
           as="h1"
@@ -19,9 +20,9 @@ export function HeroHeading() {
           LIFO.AI
         </Typography>
       </div>
-      <Typography as="h1" className="text-4xl md:text-6xl text-foreground/80">
+      <Typography as="h2" className="text-4xl md:text-6xl text-foreground/80">
         The Future of Inventory Management is Here.
       </Typography>
-    </div>
+    </header>
   )
 }

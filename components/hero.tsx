@@ -5,7 +5,7 @@ import { HeroHeading } from '@/components/marketing/hero-heading'
 
 export function Hero() {
   return (
-    <div className="flex flex-col gap-4 items-center py-6 px-4 ">
+    <section aria-labelledby="hero-heading" className="flex flex-col gap-4 items-center py-6 px-4">
       {/* Main content */}
       <div className="text-center max-w-4xl mx-auto">
         <HeroHeading />
@@ -13,6 +13,6 @@ export function Hero() {
         <HeroButtons />
         <HeroBadge />
       </div>
-    </div>
+    </section>
   )
 }
