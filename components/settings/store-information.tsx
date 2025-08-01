@@ -157,16 +157,6 @@ export default function StoreInformation({
   const SIZE_CATEGORIES = createSizeCategories(t)
   const COUNTRIES = createCountries(t)
 
-  // 🚀 DEBUG: Show which storeId is being used
-  console.log('🔍 StoreInformation storeId resolution:', {
-    propStoreId,
-    contextStoreId,
-    effectiveStoreId,
-    hasStoreData: !!storeData,
-    isLoading,
-    permissionsLoading: permissions.isLoading,
-  })
-
   const form = useForm<StoreInfoFormData>({
     resolver: zodResolver(storeInfoSchema),
     defaultValues: {

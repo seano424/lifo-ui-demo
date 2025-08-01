@@ -37,7 +37,6 @@ export function useStorePermissions({
   } = usePermissions()
 
   if (serverPermissions && effectiveStoreId) {
-    console.log('🚀 Using server permissions for store:', effectiveStoreId)
     return {
       canEditStore: serverPermissions.canEditAdvancedSettings || serverPermissions.isOwner,
       canEditBasicInfo:
@@ -60,10 +59,6 @@ export function useStorePermissions({
 
   // Fall back to client permissions when server permissions not available
   if (permissionsLoading || !effectiveStoreId) {
-    console.log('⏱️ Using client permissions (loading or no storeId):', {
-      permissionsLoading,
-      effectiveStoreId,
-    })
     return {
       canEditStore: undefined,
       canEditBasicInfo: undefined,
@@ -77,7 +72,6 @@ export function useStorePermissions({
     }
   }
 
-  console.log('🔄 Using computed client permissions for store:', effectiveStoreId)
   const computedPermissions = {
     canEditStore: canManageSettings || isOwner,
     canEditBasicInfo: canManageSettings || isOwner || isManager,
@@ -98,19 +92,13 @@ export function useStoreSettings(storeId?: string) {
   const contextStoreId = useActiveStoreId()
   const effectiveStoreId = storeId || contextStoreId
 
-  console.log('🔍 useStoreSettings called with:', {
-    propStoreId: storeId,
-    contextStoreId,
-    effectiveStoreId,
-  })
-
   return useQuery({
     queryKey: queryKeys.stores.detail(effectiveStoreId || ''),
     queryFn: () => {
       if (!effectiveStoreId) {
         throw new Error('No store ID available')
       }
-      console.log('📡 Fetching store settings for:', effectiveStoreId)
+
       return fetchStoreSettings(effectiveStoreId)
     },
     enabled: !!effectiveStoreId, // Only run query when we have a storeId
@@ -139,21 +127,9 @@ export function useUpdateStoreBasicInfo() {
         throw new Error('No active store selected')
       }
 
-      console.log('🚀 Starting store update mutation for store:', activeStoreId)
-      console.log('📝 Update data:', updates)
-
-      // Debug: Check store access before attempting update
-      try {
-        const debugResult = await debugStoreAccess(activeStoreId)
-        console.log('🔍 Store access debug result:', debugResult)
-      } catch (debugError) {
-        console.warn('⚠️ Debug check failed:', debugError)
-      }
-
       // Attempt the update
       try {
         const result = await updateStoreBasicInfo(activeStoreId, updates)
-        console.log('✅ Store update successful:', result)
         return result
       } catch (updateError) {
         console.error('❌ Store update failed:', updateError)
@@ -178,8 +154,6 @@ export function useUpdateStoreBasicInfo() {
     onMutate: async updates => {
       if (!activeStoreId) return
 
-      console.log('🔄 Starting optimistic update...')
-
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
         queryKey: queryKeys.stores.detail(activeStoreId),
@@ -197,7 +171,6 @@ export function useUpdateStoreBasicInfo() {
         },
       )
 
-      console.log('✅ Optimistic update applied')
       return { previousStore, activeStoreId }
     },
     onError: (err, variables, context) => {
@@ -205,7 +178,6 @@ export function useUpdateStoreBasicInfo() {
 
       // Revert on error
       if (context?.previousStore && context?.activeStoreId) {
-        console.log('🔄 Reverting optimistic update...')
         queryClient.setQueryData(
           queryKeys.stores.detail(context.activeStoreId),
           context.previousStore,
@@ -227,7 +199,6 @@ export function useUpdateStoreBasicInfo() {
     },
     onSettled: () => {
       if (activeStoreId) {
-        console.log('🔄 Invalidating queries after mutation...')
         // Always refetch after mutation
         queryClient.invalidateQueries({
           queryKey: queryKeys.stores.detail(activeStoreId),
@@ -241,12 +212,8 @@ export function useUpdateStoreBasicInfo() {
       }
     },
     onSuccess: data => {
-      console.log('✅ Mutation completed successfully:', data)
-
       // Update Zustand store to reflect changes in team switcher
       if (activeStoreId && data) {
-        console.log('🔄 Updating Zustand store with new store data...')
-
         // Convert StoreBasicInfo to Store type using utility function
         const storeData = convertStoreBasicInfoToStore(data)
 
@@ -264,8 +231,6 @@ export function useUpdateStoreBasicInfo() {
           return userStore
         })
         setUserStores(updatedUserStores)
-
-        console.log('✅ Zustand store updated successfully')
       }
 
       toast.success('Store information updated successfully')
@@ -362,21 +327,16 @@ export function useStoreActions() {
     }
 
     try {
-      console.log('🚀 Starting combined store update:', updates)
-
       // Update basic info if provided and user has permission
       if (updates.basicInfo && canEditBasicInfo) {
-        console.log('📝 Updating basic info...')
         await updateBasicInfo.mutateAsync(updates.basicInfo)
       }
 
       // Update settings if provided and user has permission
       if (updates.settings && canEditAdvancedSettings) {
-        console.log('⚙️ Updating advanced settings...')
         await updateAdvancedSettings.mutateAsync(updates.settings)
       }
 
-      console.log('✅ Combined store update completed successfully')
       toast.success('Store information updated successfully')
     } catch (error) {
       console.error('❌ Combined store update failed:', error)
@@ -454,12 +414,6 @@ export function useStoreImageUpload() {
         throw new Error('No active store selected')
       }
 
-      console.log('📸 Starting image upload:', {
-        fileName: file.name,
-        type,
-        storeId: activeStoreId,
-      })
-
       // TODO: Implement actual image upload
       // For now, return a placeholder URL
       const fakeUrl = `https://placeholder.com/store-${type}-${activeStoreId}-${Date.now()}`
@@ -467,13 +421,10 @@ export function useStoreImageUpload() {
       // Simulate upload delay
       await new Promise(resolve => setTimeout(resolve, 2000))
 
-      console.log('✅ Image upload completed:', fakeUrl)
       return fakeUrl
     },
     onSuccess: (imageUrl, { type }) => {
       if (activeStoreId) {
-        console.log('🔄 Updating store with new image URL:', { type, imageUrl })
-
         // Update the store with the new image URL
         const updateField = type === 'logo' ? 'logo_url' : 'cover_image_url'
 

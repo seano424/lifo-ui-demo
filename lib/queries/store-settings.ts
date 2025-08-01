@@ -78,8 +78,6 @@ export async function fetchStoreSettings(
 ): Promise<StoreSettingsData> {
   const supabase = serverClient || createClient()
 
-  console.log('📖 Fetching store settings via RPC for store:', storeId)
-
   try {
     // Use the RPC function to get store data
     const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
@@ -90,8 +88,6 @@ export async function fetchStoreSettings(
       console.error('❌ Store fetch error:', storeError)
       throw new Error(`Failed to fetch store: ${storeError.message}`)
     }
-
-    console.log('✅ Store data fetched successfully:', storeData)
 
     // Still fetch store settings from business.store_settings if needed
     const { data: settingsData, error: settingsError } = await supabase
@@ -124,8 +120,6 @@ export async function updateStoreBasicInfo(
 ): Promise<StoreBasicInfo> {
   const supabase = serverClient || createClient()
 
-  console.log('🔄 Updating store via RPC:', storeId, 'with data:', updates)
-
   try {
     // Use the RPC function to update store data
     const { data, error } = await supabase.rpc('update_store_settings', {
@@ -152,7 +146,6 @@ export async function updateStoreBasicInfo(
       throw new Error(`Failed to update store: ${error.message}`)
     }
 
-    console.log('✅ Store updated successfully via RPC:', data)
     return data
   } catch (error) {
     console.error('❌ updateStoreBasicInfo error:', error)
@@ -167,8 +160,6 @@ export async function updateStoreAdvancedSettings(
   serverClient?: ServerClient,
 ): Promise<StoreAdvancedSettings> {
   const supabase = serverClient || createClient()
-
-  console.log('🔄 Updating store advanced settings:', storeId, 'with data:', updates)
 
   try {
     // First check if settings record exists
@@ -212,7 +203,6 @@ export async function updateStoreAdvancedSettings(
       result = data
     }
 
-    console.log('✅ Store advanced settings updated successfully:', result)
     return result
   } catch (error) {
     console.error('❌ updateStoreAdvancedSettings error:', error)

@@ -144,7 +144,6 @@ export function useStoreActions() {
       }
 
       toast.success(`Switched to ${newStore.store_name}`)
-      console.log('[switchStore] Successfully switched to:', newStore.store_name)
     } catch (error) {
       console.error('[switchStore] Error switching stores:', error)
       toast.error('Failed to switch stores')
