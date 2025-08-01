@@ -303,10 +303,6 @@ export default function StoreInformation({
     )
   }
 
-  console.log('permissions: ', permissions)
-  console.log('userData: ', userData)
-  console.log('userRoles: ', userRoles)
-
   // If no store data is found we need to ask the user to create a store
   if (!storeData) {
     return (
@@ -330,22 +326,6 @@ export default function StoreInformation({
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (!permissions.canViewSettings && !permissions.isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              You don&apos;t have permission to view store settings. Contact your store{' '}
-              {permissions.isEmployee ? 'manager or owner' : 'owner'}.
-            </AlertDescription>
-          </Alert>
         </CardContent>
       </Card>
     )
@@ -776,7 +756,7 @@ export default function StoreInformation({
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <Typography variant="small" className="font-medium text-yellow-800 mb-2">
-              Debug: Store Information
+              Debug: Store Information: Only visible in development mode
             </Typography>
             <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
               {JSON.stringify(
