@@ -41,13 +41,13 @@ export function useCSVUpload() {
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
     console.log('📄 [USE-CSV-UPLOAD] Starting CSV preview parsing...')
     const startTime = performance.now()
-    
+
     const text = await file.text()
     console.log(`📄 [USE-CSV-UPLOAD] File content loaded: ${text.length} characters`)
-    
+
     const lines = text.trim().split('\n')
     console.log(`📄 [USE-CSV-UPLOAD] CSV lines detected: ${lines.length}`)
-    
+
     if (lines.length < 2) {
       console.warn('⚠️ [USE-CSV-UPLOAD] CSV file has no data rows')
       return []
@@ -55,7 +55,7 @@ export function useCSVUpload() {
 
     const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
     console.log('📋 [USE-CSV-UPLOAD] CSV headers detected:', headers)
-    
+
     const preview: CsvPreviewItem[] = []
 
     const skuIndex = headers.findIndex(h => h.toLowerCase().includes('sku'))
@@ -69,7 +69,7 @@ export function useCSVUpload() {
       name: nameIndex >= 0 ? headers[nameIndex] : 'NOT_FOUND',
       category: categoryIndex >= 0 ? headers[categoryIndex] : 'NOT_FOUND',
       quantity: qtyIndex >= 0 ? headers[qtyIndex] : 'NOT_FOUND',
-      expiry: expiryIndex >= 0 ? headers[expiryIndex] : 'NOT_FOUND'
+      expiry: expiryIndex >= 0 ? headers[expiryIndex] : 'NOT_FOUND',
     })
 
     const previewLimit = Math.min(11, lines.length)
@@ -84,16 +84,18 @@ export function useCSVUpload() {
         Quantity: parseInt(values[qtyIndex] || '1') || 1,
         Expiry_Date: values[expiryIndex] || '',
       }
-      
+
       preview.push(previewItem)
-      
+
       if (i <= 3) {
         console.log(`📦 [USE-CSV-UPLOAD] Sample row ${i}:`, previewItem)
       }
     }
 
     const endTime = performance.now()
-    console.log(`✅ [USE-CSV-UPLOAD] Preview parsing completed in ${Math.round(endTime - startTime)}ms`)
+    console.log(
+      `✅ [USE-CSV-UPLOAD] Preview parsing completed in ${Math.round(endTime - startTime)}ms`,
+    )
     console.log(`📊 [USE-CSV-UPLOAD] Preview ready: ${preview.length} items`)
 
     setCsvPreview(preview)
@@ -111,17 +113,19 @@ export function useCSVUpload() {
     }): Promise<CSVUploadResponse> => {
       console.log('🚀 [USE-CSV-UPLOAD] Mutation started - preparing form data')
       const mutationStartTime = performance.now()
-      
+
       const formData = new FormData()
       formData.append('file', file)
       formData.append('storeId', storeId)
 
-      console.log('📤 [USE-CSV-UPLOAD] Form data prepared, making API call to /api/inventory/upload')
+      console.log(
+        '📤 [USE-CSV-UPLOAD] Form data prepared, making API call to /api/inventory/upload',
+      )
       console.log('🎯 [USE-CSV-UPLOAD] Upload parameters:', {
         fileName: file.name,
         fileSize: file.size,
         storeId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Use the main optimized upload route
@@ -131,8 +135,10 @@ export function useCSVUpload() {
         body: formData,
       })
       const fetchEndTime = performance.now()
-      
-      console.log(`📡 [USE-CSV-UPLOAD] API response received in ${Math.round(fetchEndTime - fetchStartTime)}ms`)
+
+      console.log(
+        `📡 [USE-CSV-UPLOAD] API response received in ${Math.round(fetchEndTime - fetchStartTime)}ms`,
+      )
       console.log('📊 [USE-CSV-UPLOAD] Response status:', response.status, response.statusText)
 
       if (!response.ok) {
@@ -144,10 +150,12 @@ export function useCSVUpload() {
 
       const result = await response.json()
       const mutationEndTime = performance.now()
-      
-      console.log(`✅ [USE-CSV-UPLOAD] Upload mutation completed in ${Math.round(mutationEndTime - mutationStartTime)}ms`)
+
+      console.log(
+        `✅ [USE-CSV-UPLOAD] Upload mutation completed in ${Math.round(mutationEndTime - mutationStartTime)}ms`,
+      )
       console.log('🎉 [USE-CSV-UPLOAD] Raw API response:', result)
-      
+
       return result
     },
     onSuccess: (data, { storeId }) => {
@@ -158,7 +166,7 @@ export function useCSVUpload() {
         processing_time_ms: data.processing_time_ms,
         performance_metrics: data.performance_metrics,
         duplicates_skipped_count: data.duplicates_skipped?.length || 0,
-        errors_count: data.errors?.length || 0
+        errors_count: data.errors?.length || 0,
       })
 
       // Invalidate inventory queries to refresh dashboard
@@ -176,16 +184,16 @@ export function useCSVUpload() {
       const metrics = data.performance_metrics || {}
       const speed = metrics.items_per_second || 0
       const totalTime = data.processing_time_ms || 0
-      
+
       console.log('⚡ [USE-CSV-UPLOAD] Performance metrics analysis:', {
         items_per_second: speed,
         total_time_ms: totalTime,
         duplicate_detection_ms: metrics.duplicate_detection_ms,
         product_resolution_ms: metrics.product_resolution_ms,
         batch_insertion_ms: metrics.batch_insertion_ms,
-        store_products_linked: metrics.store_products_linked
+        store_products_linked: metrics.store_products_linked,
       })
-      
+
       // Create performance breakdown
       const performanceDetails = []
       if (metrics.duplicate_detection_ms) {
@@ -197,10 +205,9 @@ export function useCSVUpload() {
       if (metrics.batch_insertion_ms) {
         performanceDetails.push(`Batches: ${metrics.batch_insertion_ms}ms`)
       }
-      
-      const performanceSummary = performanceDetails.length > 0 
-        ? ` (${performanceDetails.join(', ')})`
-        : ''
+
+      const performanceSummary =
+        performanceDetails.length > 0 ? ` (${performanceDetails.join(', ')})` : ''
 
       console.log('🎊 [USE-CSV-UPLOAD] Showing success toast with performance summary')
       toast.success(`🚀 Successfully imported ${data.processed} of ${data.total_items} products`, {
@@ -217,9 +224,9 @@ export function useCSVUpload() {
         message: error.message,
         name: error.name,
         stack: error.stack,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
-      
+
       toast.error(`Upload failed: ${error.message}`, {
         description: 'Please check your CSV format and try again',
         duration: 5000,

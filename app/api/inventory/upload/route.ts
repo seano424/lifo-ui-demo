@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     console.log('✅ [UPLOAD-API] User authenticated successfully:', {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     })
 
     console.log('📋 [UPLOAD-API] Parsing form data...')
@@ -48,17 +48,20 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
 
-    console.log('📁 [UPLOAD-API] File and store info received:', { 
-      fileName: file?.name, 
+    console.log('📁 [UPLOAD-API] File and store info received:', {
+      fileName: file?.name,
       fileSize: file?.size,
       fileType: file?.type,
       storeId,
       hasFile: !!file,
-      hasStoreId: !!storeId
+      hasStoreId: !!storeId,
     })
 
     if (!file || !storeId) {
-      console.error('❌ [UPLOAD-API] Missing required parameters:', { hasFile: !!file, hasStoreId: !!storeId })
+      console.error('❌ [UPLOAD-API] Missing required parameters:', {
+        hasFile: !!file,
+        hasStoreId: !!storeId,
+      })
       return NextResponse.json({ error: 'File and store ID required' }, { status: 400 })
     }
 
@@ -82,13 +85,17 @@ export async function POST(request: NextRequest) {
     const csvReadStartTime = Date.now()
     const csvContent = await file.text()
     const csvReadEndTime = Date.now()
-    console.log(`✅ [UPLOAD-API] CSV content read in ${csvReadEndTime - csvReadStartTime}ms, length: ${csvContent.length} characters`)
+    console.log(
+      `✅ [UPLOAD-API] CSV content read in ${csvReadEndTime - csvReadStartTime}ms, length: ${csvContent.length} characters`,
+    )
 
     console.log('🔍 [UPLOAD-API] Parsing CSV content...')
     const csvParseStartTime = Date.now()
     const csvData = fastParseCSV(csvContent)
     const csvParseEndTime = Date.now()
-    console.log(`✅ [UPLOAD-API] CSV parsed in ${csvParseEndTime - csvParseStartTime}ms, items found: ${csvData.length}`)
+    console.log(
+      `✅ [UPLOAD-API] CSV parsed in ${csvParseEndTime - csvParseStartTime}ms, items found: ${csvData.length}`,
+    )
 
     if (csvData.length === 0) {
       console.error('❌ [UPLOAD-API] No valid data found in CSV file')
@@ -106,26 +113,30 @@ export async function POST(request: NextRequest) {
     const operationsCreateStartTime = Date.now()
     const operations = new InventoryOperations(supabase)
     const operationsCreateEndTime = Date.now()
-    console.log(`✅ [UPLOAD-API] InventoryOperations created in ${operationsCreateEndTime - operationsCreateStartTime}ms`)
+    console.log(
+      `✅ [UPLOAD-API] InventoryOperations created in ${operationsCreateEndTime - operationsCreateStartTime}ms`,
+    )
 
     console.log('⚙️ [UPLOAD-API] === STARTING BULK CSV PROCESSING ===')
     console.log('🎯 [UPLOAD-API] Processing parameters:', {
       itemCount: csvData.length,
       storeId,
       userId: user.id,
-      bulkOptimizationEnabled: true
+      bulkOptimizationEnabled: true,
     })
-    
+
     const processingStartTime = Date.now()
     const result = await operations.processCsvBatch(csvData, storeId, user.id)
     const processingEndTime = Date.now()
-    
-    console.log(`⚡ [UPLOAD-API] BULK PROCESSING COMPLETED in ${processingEndTime - processingStartTime}ms`)
+
+    console.log(
+      `⚡ [UPLOAD-API] BULK PROCESSING COMPLETED in ${processingEndTime - processingStartTime}ms`,
+    )
     console.log('📊 [UPLOAD-API] Processing results summary:', {
       processed: result.processed,
       errors_count: result.errors?.length || 0,
       duplicates_skipped_count: result.duplicates_skipped?.length || 0,
-      performance_metrics: result.performance_metrics
+      performance_metrics: result.performance_metrics,
     })
 
     const totalTime = Date.now() - apiStartTime
@@ -142,7 +153,9 @@ export async function POST(request: NextRequest) {
       processing_time_ms: totalTime,
       duplicates_skipped: result.duplicates_skipped || [],
       performance_metrics: {
-        items_per_second: result.performance_metrics?.items_per_second || Math.round((result.processed / totalTime) * 1000),
+        items_per_second:
+          result.performance_metrics?.items_per_second ||
+          Math.round((result.processed / totalTime) * 1000),
         duplicate_detection_ms: result.performance_metrics?.duplicate_detection_ms || 0,
         product_resolution_ms: result.performance_metrics?.product_resolution_ms || 0,
         batch_insertion_ms: result.performance_metrics?.batch_insertion_ms || 0,
@@ -160,9 +173,9 @@ export async function POST(request: NextRequest) {
       items_per_second: response.performance_metrics.items_per_second,
       duplicate_detection_ms: response.performance_metrics.duplicate_detection_ms,
       batch_insertion_ms: response.performance_metrics.batch_insertion_ms,
-      success_rate: `${Math.round((result.processed / csvData.length) * 100)}%`
+      success_rate: `${Math.round((result.processed / csvData.length) * 100)}%`,
     })
-    
+
     console.log('📤 [UPLOAD-API] Sending success response to client')
     return NextResponse.json(response)
   } catch (error) {
@@ -173,7 +186,7 @@ export async function POST(request: NextRequest) {
       message: error instanceof Error ? error.message : 'Unknown error',
       name: error instanceof Error ? error.name : 'Unknown',
       stack: error instanceof Error ? error.stack : 'No stack trace',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     const message = error instanceof Error ? error.message : 'Unknown error'
@@ -181,7 +194,7 @@ export async function POST(request: NextRequest) {
       error: 'Upload failed',
       details: message,
       processing_time_ms: errorTime,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     console.log('📤 [UPLOAD-API] Sending error response to client:', errorResponse)

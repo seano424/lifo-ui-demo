@@ -67,16 +67,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Transform the data to match our interface
-    const batches: ExistingBatch[] = (existingBatches || []).map((batch: any) => ({
-      batch_id: batch.batch_id,
-      batch_number: batch.batch_number,
-      current_quantity: parseFloat(batch.current_quantity),
-      expiry_date: batch.expiry_date,
-      product: {
-        sku: product.sku,
-        name: product.name,
-      },
-    }))
+    const batches: ExistingBatch[] = (existingBatches || []).map(
+      (batch: {
+        batch_id: string
+        batch_number: string
+        current_quantity: string | number
+        expiry_date: string
+      }) => ({
+        batch_id: batch.batch_id,
+        batch_number: batch.batch_number,
+        current_quantity: parseFloat(batch.current_quantity.toString()),
+        expiry_date: batch.expiry_date,
+        product: {
+          sku: product.sku,
+          name: product.name,
+        },
+      }),
+    )
 
     return NextResponse.json(batches)
   } catch (error) {

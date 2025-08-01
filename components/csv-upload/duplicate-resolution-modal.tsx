@@ -66,17 +66,6 @@ export function DuplicateResolutionModal({
     }
   }
 
-  const getActionIcon = (action: DuplicateAction) => {
-    switch (action) {
-      case 'MERGE':
-        return <Package className="w-4 h-4" />
-      case 'ADD_ANYWAY':
-        return <Plus className="w-4 h-4" />
-      case 'SKIP':
-        return <X className="w-4 h-4" />
-    }
-  }
-
   const totalMerged = localDuplicates.filter(d => d.action === 'MERGE').length
   const totalSeparate = localDuplicates.filter(d => d.action === 'ADD_ANYWAY').length
   const totalSkipped = localDuplicates.filter(d => d.action === 'SKIP').length
@@ -201,7 +190,7 @@ export function DuplicateResolutionModal({
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Don't import this item. Keep existing inventory unchanged.
+                        Don&apos;t import this item. Keep existing inventory unchanged.
                       </p>
                     </Label>
                   </div>

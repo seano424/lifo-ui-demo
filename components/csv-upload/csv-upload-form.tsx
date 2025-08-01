@@ -57,7 +57,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       name: file.name,
       size: file.size,
       type: file.type,
-      lastModified: new Date(file.lastModified).toISOString()
+      lastModified: new Date(file.lastModified).toISOString(),
     })
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -74,7 +74,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       const startTime = performance.now()
       await previewCsvFile(file)
       const endTime = performance.now()
-      console.log(`✅ [CSV-UPLOAD-FORM] File preview completed in ${Math.round(endTime - startTime)}ms`)
+      console.log(
+        `✅ [CSV-UPLOAD-FORM] File preview completed in ${Math.round(endTime - startTime)}ms`,
+      )
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
       toast.error('Failed to analyze CSV file')
@@ -83,7 +85,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
   const handleUpload = () => {
     console.log('🚀 [CSV-UPLOAD-FORM] Upload initiated')
-    
+
     if (!selectedFile) {
       console.warn('❌ [CSV-UPLOAD-FORM] No file selected')
       toast.error('Please select a file first')
@@ -101,7 +103,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       fileSize: selectedFile.size,
       storeId,
       expectedItems: csvPreview.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     console.log('⚡ [CSV-UPLOAD-FORM] Calling mutation with BULK OPTIMIZATION ENABLED')
@@ -256,7 +258,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <CheckCircle className="h-6 w-6 text-green-600" />
               <h3 className="font-semibold text-green-800 text-lg">Upload Complete! 🎉</h3>
             </div>
-            
+
             {/* Debug: Log detailed results */}
             {(() => {
               console.log('🎉 [CSV-UPLOAD-FORM] Upload results received:', {
@@ -267,7 +269,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 processing_time_ms: uploadResult.processing_time_ms,
                 performance_metrics: uploadResult.performance_metrics,
                 duplicates_count: uploadResult.duplicates_skipped?.length || 0,
-                errors_count: uploadResult.errors?.length || 0
+                errors_count: uploadResult.errors?.length || 0,
               })
               return null
             })()}
@@ -368,7 +370,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   )}
                 </div>
                 <div className="mt-2 text-xs text-gray-500 text-center">
-                  ⚡ Bulk operations reduced processing time by {Math.max(0, Math.round((1 - (uploadResult.processing_time_ms || 0) / (uploadResult.total_items * 50)) * 100))}% compared to individual processing
+                  ⚡ Bulk operations reduced processing time by{' '}
+                  {Math.max(
+                    0,
+                    Math.round(
+                      (1 -
+                        (uploadResult.processing_time_ms || 0) / (uploadResult.total_items * 50)) *
+                        100,
+                    ),
+                  )}
+                  % compared to individual processing
                 </div>
               </div>
             )}

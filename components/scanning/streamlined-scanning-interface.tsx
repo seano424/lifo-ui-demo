@@ -95,7 +95,7 @@ export default function WorkingStreamlinedScanningInterface({
   const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
 
   // Inventory submission hooks
-  const { submitBatch, isSubmittingBatch, batchResult } = useInventoryActions()
+  const { submitBatch, isSubmittingBatch } = useInventoryActions()
   const { convertMultipleScannedItems } = useScannedItemConverter()
 
   // Local UI state for streamlined flow

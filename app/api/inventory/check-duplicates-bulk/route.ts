@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       const { data: duplicateResults, error } = await supabase.rpc('check_bulk_duplicates', {
         p_barcodes: barcodes,
         p_expiry_dates: expiryDates,
-        p_store_id: storeId
+        p_store_id: storeId,
       })
 
       if (error) {
@@ -72,17 +72,27 @@ export async function POST(request: NextRequest) {
 
       // Process RPC results
       const duplicates = duplicateResults || []
-      
+
       const response: BulkDuplicateResponse = {
-        duplicates: duplicates.map((dup: any) => ({
-          sku: dup.sku,
-          expiryDate: dup.expiry_date,
-          existingBatches: [{
-            batch_id: dup.batch_id,
-            batch_number: dup.batch_number,
-            current_quantity: dup.current_quantity,
-          }]
-        })),
+        duplicates: duplicates.map(
+          (dup: {
+            sku: string
+            expiry_date: string
+            batch_id: string
+            batch_number: string
+            current_quantity: number
+          }) => ({
+            sku: dup.sku,
+            expiryDate: dup.expiry_date,
+            existingBatches: [
+              {
+                batch_id: dup.batch_id,
+                batch_number: dup.batch_number,
+                current_quantity: dup.current_quantity,
+              },
+            ],
+          }),
+        ),
         duplicateCount: duplicates.length,
         newItemsCount: items.length - duplicates.length,
       }
@@ -97,7 +107,7 @@ export async function POST(request: NextRequest) {
     // Fallback function using original query method
     async function performFallbackDuplicateCheck() {
       console.log('Using fallback duplicate detection method...')
-      
+
       // Single query to detect all duplicates using joins
       const { data: existingBatches, error } = await supabase
         .from('batches')
@@ -125,22 +135,41 @@ export async function POST(request: NextRequest) {
       }
 
       // Process results into lookup map for fast duplicate detection
-      const duplicateMap = new Map<string, any[]>()
+      const duplicateMap = new Map<
+        string,
+        Array<{
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+        }>
+      >()
 
-      existingBatches?.forEach((batch: any) => {
-        const sku = batch.store_products?.product?.sku
-        if (sku) {
-          const key = `${sku}:${batch.expiry_date}`
-          if (!duplicateMap.has(key)) {
-            duplicateMap.set(key, [])
+      existingBatches?.forEach(
+        (batch: {
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+          expiry_date: string
+          store_products?: {
+            product?: {
+              sku: string
+            }
           }
-          duplicateMap.get(key)!.push({
-            batch_id: batch.batch_id,
-            batch_number: batch.batch_number,
-            current_quantity: batch.current_quantity,
-          })
-        }
-      })
+        }) => {
+          const sku = batch.store_products?.product?.sku
+          if (sku) {
+            const key = `${sku}:${batch.expiry_date}`
+            if (!duplicateMap.has(key)) {
+              duplicateMap.set(key, [])
+            }
+            duplicateMap.get(key)!.push({
+              batch_id: batch.batch_id,
+              batch_number: batch.batch_number,
+              current_quantity: batch.current_quantity,
+            })
+          }
+        },
+      )
 
       // Build response by checking each CSV item against the duplicate map
       const duplicates = items
@@ -157,7 +186,7 @@ export async function POST(request: NextRequest) {
           }
           return null
         })
-        .filter(Boolean) as any[]
+        .filter((item): item is NonNullable<typeof item> => item !== null)
 
       const response: BulkDuplicateResponse = {
         duplicates,
