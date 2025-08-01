@@ -50,7 +50,7 @@ export function useUserStores() {
 
   const userPreferencesResult = useQuery({
     queryKey: queryKeys.userPreferences.detail(currentUser?.id || ''),
-    queryFn: () => fetchUserPreferences(currentUser!.id),
+    queryFn: () => fetchUserPreferences(),
     enabled: !!currentUser?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
