@@ -14,7 +14,7 @@ export function AddStoreSuccess({ storeName }: AddStoreSuccessProps) {
   const router = useRouter()
 
   const handleGoToSettings = () => {
-    router.push('/settings/store')
+    router.push('/dashboard/settings/store')
   }
 
   const handleGoToDashboard = () => {
