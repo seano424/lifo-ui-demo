@@ -154,7 +154,8 @@
         "invalidEmail": "Ongeldig e-mailformaat",
         "invalidWebsite": "Ongeldige website URL",
         "descriptionTooLong": "Beschrijving is te lang"
-      }
+      },
+      "addStore": "Winkel toevoegen"
     }
   },
   "users": {
@@ -354,7 +355,8 @@
     "account": "Account",
     "profile": "Profiel",
     "help": "Help",
-    "support": "Ondersteuning"
+    "support": "Ondersteuning",
+    "addStore": "Winkel toevoegen"
   },
   "addEmployee": {
     "title": "Nieuwe medewerker toevoegen",
