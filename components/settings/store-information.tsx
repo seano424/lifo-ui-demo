@@ -24,6 +24,7 @@ import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Edit, Check, X, AlertCircle, Globe } from 'lucide-react'
 import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useCurrentUser, useCurrentUserRoles } from '@/hooks/use-users'
 
 // Interface for server permissions prop
 interface StoreInformationProps {
@@ -137,6 +138,8 @@ export default function StoreInformation({
   // 🚀 CRITICAL: Pass the effective storeId directly to the hooks
   const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId || undefined)
   const { updateBasicInfo, isUpdating } = useStoreActions()
+  const { data: userData } = useCurrentUser()
+  const { data: userRoles } = useCurrentUserRoles()
 
   // 🚀 Use hybrid permissions hook with server permissions as fallback
   const permissions = useStorePermissions({
@@ -256,8 +259,8 @@ export default function StoreInformation({
     setHasUnsavedChanges(false)
   }
 
-  // 🚀 IMPROVED: Only show loading when we don't have an effective storeId OR data is loading
-  if (!effectiveStoreId || isLoading) {
+  // Only show loading when we don't have an effective storeId OR data is loading
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -297,17 +300,24 @@ export default function StoreInformation({
     )
   }
 
-  // 🚀 FIXED: Check for actual storeData, not negated storeData
+  console.log('permissions: ', permissions)
+  console.log('userData: ', userData)
+  console.log('userRoles: ', userRoles)
+
+  // If no store data is found we need to ask the user to create a store
   if (!storeData) {
     return (
       <Card>
         <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Store data not found. Please try refreshing the page.
-            </AlertDescription>
-          </Alert>
+          {userData?.requires_pin && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Store data not found. Please contact your administrator to create a store.
+              </AlertDescription>
+            </Alert>
+          )}
+          {!userData?.requires_pin && <div>add in your store</div>}
         </CardContent>
       </Card>
     )

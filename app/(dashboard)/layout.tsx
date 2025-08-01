@@ -8,10 +8,10 @@ import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 import { SettingsError } from '@/components/settings/settings-error-boundary'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const result = await prefetchDashboardData()
+  const dashboardData = await prefetchDashboardData()
 
   // Handle authentication errors at the dashboard level
-  if (result.error) {
+  if (dashboardData.error) {
     return (
       <SettingsError
         errorType="unauthorized"
@@ -26,24 +26,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     )
   }
 
-  // Handle no store access
-  if (result.userStores && result.userStores.length === 0) {
-    return (
-      <SettingsError
-        errorType="not-found"
-        title="No Store Access"
-        message="You don't have access to any stores yet. Contact your administrator."
-        showRefreshButton={false}
-        customAction={{
-          label: 'Contact Support',
-          href: '/support',
-        }}
-      />
-    )
-  }
-
   return (
-    <HydrationBoundary state={result.dehydratedState}>
+    <HydrationBoundary state={dashboardData.dehydratedState}>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
