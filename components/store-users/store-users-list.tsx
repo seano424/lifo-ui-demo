@@ -78,6 +78,7 @@ import type { UserStorePermissions } from '@/lib/server/permissions'
 
 // Import the new components
 import { AddEmployeeDialog } from './add-employee-dialog'
+import { EnhancedAddEmployeeDialog } from './enhanced-add-employee-dialog'
 
 // 🚀 NEW: Interface for component props
 interface StoreUsersListProps {
@@ -436,7 +437,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
       {/* Add Employee Dialog */}
       {effectiveStoreId && (
-        <AddEmployeeDialog
+        <EnhancedAddEmployeeDialog
           isOpen={isAddUserDialogOpen}
           onOpenChange={setIsAddUserDialogOpen}
           storeId={effectiveStoreId}

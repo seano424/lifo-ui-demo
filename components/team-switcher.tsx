@@ -25,6 +25,7 @@ import type { Store } from '@/lib/queries/stores'
 import { cn } from '@/lib/utils'
 import { Typography } from './ui/typography'
 
+
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
   const { userStores, isLoading } = useUserStores()
