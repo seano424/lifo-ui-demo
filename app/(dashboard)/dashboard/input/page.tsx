@@ -1,11 +1,11 @@
 'use client'
 
-import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
-import { CSVUploadForm } from '@/components/csv-upload'
 import { Card } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Scan, Upload } from 'lucide-react'
 import { useStoreState } from '@/lib/stores/store-context'
+import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
 
 export default function InputPage() {
   const { activeStore: currentStore } = useStoreState()
@@ -36,7 +36,7 @@ export default function InputPage() {
               <CSVUploadForm
                 storeId={currentStore.store_id}
                 onUploadComplete={result => {
-                  console.log('Ultra-fast upload completed:', result)
+                  console.log('Upload completed:', result)
                 }}
               />
             ) : (

@@ -315,15 +315,366 @@ export class InventoryOperations {
     throw new Error('Global products functionality temporarily disabled')
   }
 
+  // BULK OPERATIONS FOR PERFORMANCE
+  
+  // Test if bulk RPC functions are available
+  async testBulkFunctionAvailability(): Promise<{ available: string[], missing: string[] }> {
+    console.log('🔍 [DB-OPS] Testing bulk RPC function availability...')
+    
+    const available: string[] = []
+    const missing: string[] = []
+    
+    // Test check_bulk_duplicates
+    try {
+      await this.supabase.rpc('check_bulk_duplicates', {
+        p_barcodes: [],
+        p_expiry_dates: [],
+        p_store_id: 'test'
+      })
+      available.push('check_bulk_duplicates')
+      console.log('✅ [DB-OPS] check_bulk_duplicates function is available')
+    } catch (error: any) {
+      missing.push('check_bulk_duplicates')
+      console.error('❌ [DB-OPS] check_bulk_duplicates function missing:', error.message)
+    }
+    
+    // Test bulk_insert_csv_batches_with_store_link
+    try {
+      await this.supabase.rpc('bulk_insert_csv_batches_with_store_link', {
+        p_store_id: 'test',
+        p_created_by: 'test',
+        p_data: []
+      })
+      available.push('bulk_insert_csv_batches_with_store_link')
+      console.log('✅ [DB-OPS] bulk_insert_csv_batches_with_store_link function is available')
+    } catch (error: any) {
+      missing.push('bulk_insert_csv_batches_with_store_link')
+      console.error('❌ [DB-OPS] bulk_insert_csv_batches_with_store_link function missing:', error.message)
+    }
+    
+    return { available, missing }
+  }
+
+  async checkBulkDuplicates(
+    barcodes: string[],
+    expiryDates: string[],
+    storeId: string
+  ): Promise<any[]> {
+    console.log('🔍 [DB-OPS] === BULK DUPLICATE CHECK STARTED ===')
+    console.log(`🔍 [DB-OPS] Checking ${barcodes.length} items for duplicates in store: ${storeId}`)
+    
+    const duplicateCheckStart = performance.now()
+    
+    console.log('📊 [DB-OPS] Sample parameters:', {
+      first_3_barcodes: barcodes.slice(0, 3),
+      first_3_expiry_dates: expiryDates.slice(0, 3),
+      store_id: storeId,
+      total_items: barcodes.length
+    })
+    
+    // Fixed parameter order: barcodes, expiry_dates, store_id
+    console.log('📞 [DB-OPS] Calling Supabase RPC: check_bulk_duplicates')
+    const { data, error } = await this.supabase.rpc('check_bulk_duplicates', {
+      p_barcodes: barcodes,
+      p_expiry_dates: expiryDates,
+      p_store_id: storeId  // Move store_id to last parameter
+    })
+    
+    const duplicateCheckEnd = performance.now()
+    const duplicateCheckTime = duplicateCheckEnd - duplicateCheckStart
+    
+    if (error) {
+      console.error('❌ [DB-OPS] Bulk duplicate check RPC failed:', error)
+      console.error('❌ [DB-OPS] RPC Error Details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
+      throw new Error(`Bulk duplicate check failed: ${error.message}`)
+    }
+    
+    const duplicateCount = data?.length || 0
+    console.log(`✅ [DB-OPS] Bulk duplicate check completed in ${Math.round(duplicateCheckTime)}ms`)
+    console.log(`📊 [DB-OPS] Found ${duplicateCount} duplicate items`)
+    
+    if (duplicateCount > 0 && duplicateCount <= 5) {
+      console.log('🔍 [DB-OPS] Sample duplicates found:', data.slice(0, 3))
+    }
+    
+    return data || []
+  }
+
+  // ADD this new method to handle store product linking
+  async ensureProductInStore(
+    storeId: string,
+    productId: string,
+    costPrice?: number,
+    sellingPrice?: number,
+    storeSku?: string
+  ): Promise<void> {
+    const { error } = await this.supabase.rpc('add_product_to_store_safely', {
+      p_store_id: storeId,
+      p_product_id: productId,
+      p_cost_price: costPrice,
+      p_selling_price: sellingPrice,
+      p_store_sku: storeSku
+    })
+    
+    if (error) {
+      throw new Error(`Failed to link product to store: ${error.message}`)
+    }
+  }
+
+  async resolveBulkProductsSimple(
+    skus: string[],
+    barcodes: string[],
+    names: string[]
+  ): Promise<any> {
+    const { data, error } = await this.supabase.rpc('resolve_bulk_products_simple', {
+      skus,
+      barcodes,
+      names
+    })
+    
+    if (error) {
+      throw new Error(`Bulk product resolution failed: ${error.message}`)
+    }
+    
+    return data
+  }
+
+  // ENHANCED bulk insert method with complete product lifecycle:
+  async insertBatchesBulk(
+    storeId: string,
+    userId: string,
+    batchData: any[]
+  ): Promise<any> {
+    console.log('💾 [DB-OPS] === ENHANCED BULK BATCH INSERT STARTED ===')
+    console.log(`💾 [DB-OPS] Inserting ${batchData.length} batches for store: ${storeId}`)
+    
+    const insertStartTime = performance.now()
+    
+    console.log('📦 [DB-OPS] Sample batch data (first 2 items):')
+    batchData.slice(0, 2).forEach((item, index) => {
+      console.log(`   Batch ${index + 1}:`, {
+        sku: item.sku,
+        product_name: item.product_name,
+        quantity: item.quantity,
+        expiry_date: item.expiry_date,
+        cost_price: item.cost_price
+      })
+    })
+    
+    console.log('📞 [DB-OPS] Calling enhanced RPC: bulk_insert_csv_batches_with_store_link')
+    console.log('🔐 [DB-OPS] This function handles: product creation + store linking + batch insertion')
+    
+    // Use the enhanced function that handles complete product lifecycle
+    const { data, error } = await this.supabase.rpc('bulk_insert_csv_batches_with_store_link', {
+      p_store_id: storeId,
+      p_created_by: userId,
+      p_data: batchData
+    })
+    
+    const insertEndTime = performance.now()
+    const insertTime = insertEndTime - insertStartTime
+    
+    if (error) {
+      console.error('❌ [DB-OPS] Enhanced bulk insert RPC failed:', error)
+      console.error('❌ [DB-OPS] RPC Error Details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
+      throw new Error(`Enhanced bulk insert failed: ${error.message}`)
+    }
+    
+    const result = data?.[0] || data
+    console.log(`✅ [DB-OPS] Enhanced bulk insert completed in ${Math.round(insertTime)}ms`)
+    console.log('📊 [DB-OPS] Enhanced insert results:', {
+      inserted_count: result?.inserted_count || 0,
+      products_created: result?.products_created || 0,
+      store_products_linked: result?.store_products_linked || 0,
+      batch_ids_count: result?.batch_ids?.length || 0,
+      database_processing_time_ms: result?.processing_time_ms || 0
+    })
+    
+    return result // Returns { inserted_count, batch_ids, processing_time_ms, store_products_linked, products_created }
+  }
+
   async processCsvBatch(
     csvData: unknown[],
     storeId: string,
     userId: string,
-  ): Promise<{ processed: number; errors: string[] }> {
+  ): Promise<{ processed: number; errors: string[]; duplicates_skipped: any[]; performance_metrics?: any }> {
+    const processingStartTime = Date.now()
+    console.log('🚀 [DB-OPS] ========= BULK CSV PROCESSING STARTED =========')
+    console.log(`🚀 [DB-OPS] Processing ${csvData.length} items for store: ${storeId}, user: ${userId}`)
+    console.log('🚀 [DB-OPS] Bulk optimization: ENABLED')
+
+    try {
+      // Test function availability first
+      console.log('🔍 [DB-OPS] Step 0: Testing bulk function availability...')
+      const functionTest = await this.testBulkFunctionAvailability()
+      
+      if (functionTest.missing.length > 0) {
+        console.error('🚫 [DB-OPS] Missing required bulk functions:', functionTest.missing)
+        console.log('🔄 [DB-OPS] Falling back to individual processing due to missing functions')
+        return this.processCsvBatchIndividual(csvData, storeId, userId)
+      } else {
+        console.log('✅ [DB-OPS] All bulk functions are available:', functionTest.available)
+      }
+      // Prepare CSV items
+      console.log('📋 [DB-OPS] Step 1: Preparing CSV items for processing...')
+      const prepStartTime = performance.now()
+      
+      const csvItems = csvData.map(item => {
+        const csvItem = item as {
+          SKU: string
+          Product_Name: string
+          Category: string
+          Quantity: number
+          Expiry_Date: string
+          Brand: string
+          Cost_Price: number
+          Selling_Price: number
+          Manufacture_Date: string
+          Location: string
+          Unit_Type: string
+          Batch_Number: string
+        }
+        return csvItem
+      })
+      
+      const prepEndTime = performance.now()
+      console.log(`✅ [DB-OPS] CSV items prepared in ${Math.round(prepEndTime - prepStartTime)}ms`)
+
+      // Step 1: Bulk duplicate check (FIXED parameter order)
+      console.log('🔍 [DB-OPS] Step 2: Starting bulk duplicate detection...')
+      const duplicateCheckStart = Date.now()
+      
+      const duplicateResults = await this.checkBulkDuplicates(
+        csvItems.map(item => item.SKU || ''), // barcodes first
+        csvItems.map(item => item.Expiry_Date), // expiry_dates second
+        storeId // store_id last
+      )
+      const duplicateCheckTime = Date.now() - duplicateCheckStart
+
+      // Step 2: Filter non-duplicates
+      console.log('🔄 [DB-OPS] Step 3: Filtering non-duplicate items...')
+      const filterStartTime = performance.now()
+      
+      const nonDuplicates = csvItems.filter((_, index) => {
+        const dupResult = duplicateResults[index]
+        return !dupResult?.is_duplicate
+      })
+      
+      const filterEndTime = performance.now()
+      console.log(`✅ [DB-OPS] Filtering completed in ${Math.round(filterEndTime - filterStartTime)}ms`)
+      console.log(`📊 [DB-OPS] Items breakdown: ${csvItems.length} total, ${nonDuplicates.length} non-duplicates, ${csvItems.length - nonDuplicates.length} duplicates`)
+
+      // Step 3: Prepare batch data for bulk insert
+      console.log('📦 [DB-OPS] Step 4: Preparing batch data for bulk insert...')
+      const batchPrepStart = performance.now()
+      
+      const batchData = nonDuplicates.map((csvItem, index) => ({
+        sku: csvItem.SKU || `AUTO-${Date.now()}-${index}`,
+        product_name: csvItem.Product_Name,
+        brand: csvItem.Brand,
+        category: csvItem.Category,
+        quantity: csvItem.Quantity,
+        expiry_date: csvItem.Expiry_Date,
+        cost_price: csvItem.Cost_Price || 0,
+        selling_price: csvItem.Selling_Price || 0,
+        manufacture_date: csvItem.Manufacture_Date || null,
+        location: csvItem.Location || 'MAIN',
+        unit_type: csvItem.Unit_Type || 'units',
+        batch_number: csvItem.Batch_Number || `CSV-${Date.now()}-${index}`,
+        typical_shelf_life_days: this.calculateShelfLifeFromCategory(csvItem.Category)
+      }))
+      
+      const batchPrepEnd = performance.now()
+      console.log(`✅ [DB-OPS] Batch data prepared in ${Math.round(batchPrepEnd - batchPrepStart)}ms`)
+
+      // Step 4: Bulk insert (handles store product linking automatically)
+      console.log('💾 [DB-OPS] Step 5: Starting bulk batch insertion...')
+      const batchInsertStart = Date.now()
+      
+      let insertResult = null
+      if (batchData.length > 0) {
+        insertResult = await this.insertBatchesBulk(storeId, userId, batchData)
+      } else {
+        console.log('⚠️ [DB-OPS] No items to insert (all were duplicates)')
+      }
+      
+      const batchInsertTime = Date.now() - batchInsertStart
+      const totalTime = Date.now() - processingStartTime
+      
+      console.log('🎉 [DB-OPS] ========= BULK CSV PROCESSING COMPLETED =========')
+      console.log(`⚡ [DB-OPS] Total processing time: ${totalTime}ms`)
+      console.log('📊 [DB-OPS] Final processing summary:', {
+        total_items: csvData.length,
+        processed: insertResult?.inserted_count || 0,
+        duplicates_skipped: csvData.length - nonDuplicates.length,
+        success_rate: `${Math.round(((insertResult?.inserted_count || 0) / csvData.length) * 100)}%`,
+        items_per_second: Math.round(((insertResult?.inserted_count || 0) / totalTime) * 1000),
+        store_products_linked: insertResult?.store_products_linked || 0
+      })
+      
+      return {
+        processed: insertResult?.inserted_count || 0,
+        errors: insertResult?.errors || [],
+        duplicates_skipped: duplicateResults.filter((d: any) => d?.is_duplicate) || [],
+        performance_metrics: {
+          items_per_second: Math.round(((insertResult?.inserted_count || 0) / totalTime) * 1000),
+          duplicate_detection_ms: duplicateCheckTime,
+          product_resolution_ms: 0, // Handled within bulk insert
+          batch_insertion_ms: batchInsertTime,
+          total_time_ms: totalTime,
+          store_products_linked: insertResult?.store_products_linked || 0,
+          products_created: insertResult?.products_created || 0, // NEW!
+          database_processing_time_ms: insertResult?.processing_time_ms || 0 // NEW!
+        }
+      }
+    } catch (error) {
+      const errorTime = Date.now() - processingStartTime
+      console.error('💥 [DB-OPS] ========= BULK PROCESSING FAILED =========')
+      console.error(`💥 [DB-OPS] Error occurred after ${errorTime}ms`)
+      console.error('💥 [DB-OPS] Error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        name: error instanceof Error ? error.name : 'Unknown',
+        stack: error instanceof Error ? error.stack : 'No stack',
+        timestamp: new Date().toISOString()
+      })
+      
+      // Check if it's an RPC function error
+      if (error instanceof Error && error.message.includes('could not find function')) {
+        console.error('🚫 [DB-OPS] RPC FUNCTION NOT FOUND - Database functions may not be deployed')
+        console.error('🚫 [DB-OPS] Expected functions: check_bulk_duplicates, bulk_insert_csv_batches_with_store_link')
+      } else if (error instanceof Error && error.message.includes('permission denied')) {
+        console.error('🔒 [DB-OPS] PERMISSION DENIED - RLS policies may be blocking access')
+      }
+      
+      // Fallback to individual processing if bulk operations fail
+      console.log('🔄 [DB-OPS] Attempting fallback to individual processing...')
+      console.log('⚠️ [DB-OPS] Note: Individual processing will be slower but should work')
+      return this.processCsvBatchIndividual(csvData, storeId, userId)
+    }
+  }
+
+  // Keep original method as fallback
+  private async processCsvBatchIndividual(
+    csvData: unknown[],
+    storeId: string,
+    userId: string,
+  ): Promise<{ processed: number; errors: string[]; duplicates_skipped: any[] }> {
     const errors: string[] = []
     let processed = 0
 
-    console.log('[processCsvBatch] Processing', csvData.length, 'items for store', storeId)
+    console.log('🔄 [DB-OPS] ========= INDIVIDUAL PROCESSING STARTED =========')
+    console.log(`🔄 [DB-OPS] Processing ${csvData.length} items individually for store: ${storeId}`)
+    console.log('⚠️ [DB-OPS] Note: This is slower than bulk processing but more compatible')
 
     for (const item of csvData) {
       try {
@@ -433,7 +784,7 @@ export class InventoryOperations {
 
         if (!duplicateCheckError && existingBatches && existingBatches.length > 0) {
           console.log(
-            `[processCsvBatch] Skipping duplicate batch for ${csvItem.SKU} with expiry ${csvItem.Expiry_Date}`,
+            `[processCsvBatchIndividual] Skipping duplicate batch for ${csvItem.SKU} with expiry ${csvItem.Expiry_Date}`,
           )
           // Skip this item - it's a duplicate batch
           continue
@@ -467,16 +818,16 @@ export class InventoryOperations {
         }
 
         processed++
-        console.log('[processCsvBatch] Successfully created batch:', batch.batch_id)
+        console.log('[processCsvBatchIndividual] Successfully created batch:', batch.batch_id)
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
         errors.push(`Unexpected error processing item: ${errorMessage}`)
-        console.error('[processCsvBatch] Unexpected error:', error)
+        console.error('[processCsvBatchIndividual] Unexpected error:', error)
       }
     }
 
-    console.log('[processCsvBatch] Completed:', { processed, errors: errors.length })
-    return { processed, errors }
+    console.log('[processCsvBatchIndividual] Completed:', { processed, errors: errors.length })
+    return { processed, errors, duplicates_skipped: [] }
   }
 
   private calculateShelfLifeFromCategory(category?: string): number {

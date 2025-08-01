@@ -51,79 +51,122 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // OPTIMIZATION: Single query to find ALL duplicates at once
-    // Build arrays of SKUs and expiry dates for efficient lookup
+    // Use database RPC function for bulk duplicate detection
     const skus = items.map(item => item.sku)
     const expiryDates = items.map(item => item.expiryDate)
+    const barcodes = items.map(() => '') // Not using barcodes in current schema
 
-    // Single query to detect all duplicates using joins
-    const { data: existingBatches, error } = await supabase
-      .from('batches')
-      .select(
-        `
-        batch_id,
-        batch_number,
-        current_quantity,
-        expiry_date,
-        store_products!inner(
-          product:products!inner(
-            sku
-          )
-        )
-      `,
-      )
-      .eq('store_id', storeId)
-      .eq('status', 'active')
-      .in('store_products.products.sku', skus)
-      .in('expiry_date', expiryDates)
-
-    if (error) {
-      console.error('Bulk duplicate detection error:', error)
-      return NextResponse.json({ error: 'Duplicate detection failed' }, { status: 500 })
-    }
-
-    // Process results into lookup map for fast duplicate detection
-    const duplicateMap = new Map<string, any[]>()
-
-    existingBatches?.forEach((batch: any) => {
-      const sku = batch.store_products?.product?.sku
-      if (sku) {
-        const key = `${sku}:${batch.expiry_date}`
-        if (!duplicateMap.has(key)) {
-          duplicateMap.set(key, [])
-        }
-        duplicateMap.get(key)!.push({
-          batch_id: batch.batch_id,
-          batch_number: batch.batch_number,
-          current_quantity: batch.current_quantity,
-        })
-      }
-    })
-
-    // Build response by checking each CSV item against the duplicate map
-    const duplicates = items
-      .map(item => {
-        const key = `${item.sku}:${item.expiryDate}`
-        const existingBatches = duplicateMap.get(key) || []
-
-        if (existingBatches.length > 0) {
-          return {
-            sku: item.sku,
-            expiryDate: item.expiryDate,
-            existingBatches,
-          }
-        }
-        return null
+    try {
+      // Call the database RPC function for bulk duplicate checking (FIXED parameter order)
+      const { data: duplicateResults, error } = await supabase.rpc('check_bulk_duplicates', {
+        p_barcodes: barcodes,
+        p_expiry_dates: expiryDates,
+        p_store_id: storeId
       })
-      .filter(Boolean) as any[]
 
-    const response: BulkDuplicateResponse = {
-      duplicates,
-      duplicateCount: duplicates.length,
-      newItemsCount: items.length - duplicates.length,
+      if (error) {
+        console.error('RPC bulk duplicate detection error:', error)
+        // Fallback to original query method
+        return performFallbackDuplicateCheck()
+      }
+
+      // Process RPC results
+      const duplicates = duplicateResults || []
+      
+      const response: BulkDuplicateResponse = {
+        duplicates: duplicates.map((dup: any) => ({
+          sku: dup.sku,
+          expiryDate: dup.expiry_date,
+          existingBatches: [{
+            batch_id: dup.batch_id,
+            batch_number: dup.batch_number,
+            current_quantity: dup.current_quantity,
+          }]
+        })),
+        duplicateCount: duplicates.length,
+        newItemsCount: items.length - duplicates.length,
+      }
+
+      return NextResponse.json(response)
+    } catch (rpcError) {
+      console.error('RPC call failed:', rpcError)
+      // Fallback to original query method
+      return performFallbackDuplicateCheck()
     }
 
-    return NextResponse.json(response)
+    // Fallback function using original query method
+    async function performFallbackDuplicateCheck() {
+      console.log('Using fallback duplicate detection method...')
+      
+      // Single query to detect all duplicates using joins
+      const { data: existingBatches, error } = await supabase
+        .from('batches')
+        .select(
+          `
+          batch_id,
+          batch_number,
+          current_quantity,
+          expiry_date,
+          store_products!inner(
+            product:products!inner(
+              sku
+            )
+          )
+        `,
+        )
+        .eq('store_id', storeId)
+        .eq('status', 'active')
+        .in('store_products.products.sku', skus)
+        .in('expiry_date', expiryDates)
+
+      if (error) {
+        console.error('Fallback duplicate detection error:', error)
+        return NextResponse.json({ error: 'Duplicate detection failed' }, { status: 500 })
+      }
+
+      // Process results into lookup map for fast duplicate detection
+      const duplicateMap = new Map<string, any[]>()
+
+      existingBatches?.forEach((batch: any) => {
+        const sku = batch.store_products?.product?.sku
+        if (sku) {
+          const key = `${sku}:${batch.expiry_date}`
+          if (!duplicateMap.has(key)) {
+            duplicateMap.set(key, [])
+          }
+          duplicateMap.get(key)!.push({
+            batch_id: batch.batch_id,
+            batch_number: batch.batch_number,
+            current_quantity: batch.current_quantity,
+          })
+        }
+      })
+
+      // Build response by checking each CSV item against the duplicate map
+      const duplicates = items
+        .map(item => {
+          const key = `${item.sku}:${item.expiryDate}`
+          const existingBatches = duplicateMap.get(key) || []
+
+          if (existingBatches.length > 0) {
+            return {
+              sku: item.sku,
+              expiryDate: item.expiryDate,
+              existingBatches,
+            }
+          }
+          return null
+        })
+        .filter(Boolean) as any[]
+
+      const response: BulkDuplicateResponse = {
+        duplicates,
+        duplicateCount: duplicates.length,
+        newItemsCount: items.length - duplicates.length,
+      }
+
+      return NextResponse.json(response)
+    }
   } catch (error) {
     console.error('Bulk duplicate detection error:', error)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
