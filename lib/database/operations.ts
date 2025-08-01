@@ -60,21 +60,19 @@ export class InventoryOperations {
   async createStore(storeData: Partial<Store>, ownerId: string): Promise<Store> {
     try {
       // Use the database function to create the store
-      const { data, error } = await this.supabase
-        .schema('business')
-        .rpc('create_store_for_user', {
-          p_store_name: storeData.store_name ?? 'Untitled Store',
-          p_store_code: storeData.store_code ?? 'DEFAULT_CODE',
-          p_store_type: storeData.store_type || null,
-          p_address: storeData.address || null,
-          p_city: storeData.city || null,
-          p_postal_code: storeData.postal_code || null,
-          p_country: storeData.country || 'France',
-          p_business_name: storeData.business_name || null,
-          p_phone: storeData.phone || null,
-          p_size_category: storeData.size_category || null,
-          p_timezone: storeData.timezone || 'Europe/Paris'
-        })
+      const { data, error } = await this.supabase.schema('business').rpc('create_store_for_user', {
+        p_store_name: storeData.store_name ?? 'Untitled Store',
+        p_store_code: storeData.store_code ?? 'DEFAULT_CODE',
+        p_store_type: storeData.store_type || null,
+        p_address: storeData.address || null,
+        p_city: storeData.city || null,
+        p_postal_code: storeData.postal_code || null,
+        p_country: storeData.country || 'France',
+        p_business_name: storeData.business_name || null,
+        p_phone: storeData.phone || null,
+        p_size_category: storeData.size_category || null,
+        p_timezone: storeData.timezone || 'Europe/Paris',
+      })
 
       if (error) {
         console.error('Error creating store:', error)

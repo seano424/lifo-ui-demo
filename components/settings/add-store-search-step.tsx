@@ -16,13 +16,8 @@ import type { StoreFormData } from '@/lib/stores/add-store-store'
 type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 'error'
 
 export function AddStoreSearchStep() {
-  const {
-    searchQuery,
-    setSearchQuery,
-    setSelectedStoreForm,
-    setManualEntry,
-    setCurrentStep,
-  } = useAddStoreStore()
+  const { searchQuery, setSearchQuery, setSelectedStoreForm, setManualEntry, setCurrentStep } =
+    useAddStoreStore()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [localSearchState, setLocalSearchState] = useState<SearchState>('idle')

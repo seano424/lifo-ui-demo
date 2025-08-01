@@ -26,7 +26,7 @@ import {
 
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { UserStorePermissions } from '@/lib/server/permissions'
-import { useCurrentUser, useCurrentUserRoles } from '@/hooks/use-users'
+import { useCurrentUser } from '@/hooks/use-users'
 import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
 
 // Interface for server permissions prop
@@ -142,7 +142,6 @@ export default function StoreInformation({
   const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId || undefined)
   const { updateBasicInfo, isUpdating } = useStoreActions()
   const { data: userData } = useCurrentUser()
-  const { data: userRoles } = useCurrentUserRoles()
 
   // 🚀 Use hybrid permissions hook with server permissions as fallback
   const permissions = useStorePermissions({

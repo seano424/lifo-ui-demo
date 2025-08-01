@@ -25,17 +25,11 @@ import type { Store } from '@/lib/queries/stores'
 import { cn } from '@/lib/utils'
 import { Typography } from './ui/typography'
 
-
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
   const { userStores, isLoading } = useUserStores()
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
-
-  const firstTwoStoreInitials = userStores
-    .map(store => store.store.store_name.charAt(0).toUpperCase())
-    .slice(0, 2)
-    .join('')
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {

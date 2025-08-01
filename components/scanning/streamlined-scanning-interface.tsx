@@ -95,7 +95,7 @@ export default function WorkingStreamlinedScanningInterface({
   const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
 
   // Inventory submission hooks
-  const { submitBatch, isSubmittingBatch, batchResult } = useInventoryActions()
+  const { submitBatch, isSubmittingBatch } = useInventoryActions()
   const { convertMultipleScannedItems } = useScannedItemConverter()
 
   // Local UI state for streamlined flow
@@ -378,28 +378,28 @@ export default function WorkingStreamlinedScanningInterface({
         expiryDate: item.expiryDate,
         quantity: item.quantity,
         price: item.price,
-      }))
+      })),
     )
 
     // Submit the batch to inventory using the React Query hook
     submitBatch(productsToSubmit, {
-      onSuccess: (result) => {
+      onSuccess: result => {
         console.log('Batch submission completed:', result)
-        
+
         // Store the result for the success dialog
         setSubmissionResult({
           successCount: result.successCount,
-          totalCount: productsToSubmit.length
+          totalCount: productsToSubmit.length,
         })
-        
+
         // Clear the batch and close submission dialog
         setScannedItems([])
         setShowSubmissionDialog(false)
-        
+
         // Show success dialog
         setShowSuccessDialog(true)
       },
-      onError: (error) => {
+      onError: error => {
         console.error('Batch submission failed:', error)
         // Dialog stays open so user can retry or cancel
       },
@@ -913,10 +913,9 @@ export default function WorkingStreamlinedScanningInterface({
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
               <DialogDescription>
-                {showAdvancedEdit 
+                {showAdvancedEdit
                   ? 'Edit all product details including name, brand, barcode, and inventory information.'
-                  : 'Quick edit expiry date, quantity, and price. Click "Edit Details" for more options.'
-                }
+                  : 'Quick edit expiry date, quantity, and price. Click "Edit Details" for more options.'}
               </DialogDescription>
             </DialogHeader>
 
@@ -933,7 +932,7 @@ export default function WorkingStreamlinedScanningInterface({
               ) : (
                 <div className="space-y-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="text-sm font-medium text-blue-800 mb-2">Product Details</div>
-                  
+
                   <div>
                     <Label htmlFor="edit-product-name" className="text-sm font-medium">
                       Product Name
@@ -942,7 +941,9 @@ export default function WorkingStreamlinedScanningInterface({
                       id="edit-product-name"
                       type="text"
                       value={editForm.productName}
-                      onChange={e => setEditForm(prev => ({ ...prev, productName: e.target.value }))}
+                      onChange={e =>
+                        setEditForm(prev => ({ ...prev, productName: e.target.value }))
+                      }
                       className="mt-1"
                       placeholder="Enter product name"
                     />
@@ -1067,8 +1068,8 @@ export default function WorkingStreamlinedScanningInterface({
                 variant="secondary"
                 onClick={handleSaveEdit}
                 disabled={
-                  !editForm.expiryDate || 
-                  editForm.quantity <= 0 || 
+                  !editForm.expiryDate ||
+                  editForm.quantity <= 0 ||
                   editForm.price <= 0 ||
                   !editForm.productName.trim() ||
                   !editForm.barcode.trim()
@@ -1145,15 +1146,15 @@ export default function WorkingStreamlinedScanningInterface({
             </div>
 
             <DialogFooter className="mt-6">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowSubmissionDialog(false)}
                 disabled={isSubmittingBatch}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 onClick={handleConfirmSubmission}
                 disabled={isSubmittingBatch}
               >
@@ -1175,14 +1176,12 @@ export default function WorkingStreamlinedScanningInterface({
                 Inventory Updated Successfully!
               </DialogTitle>
               <DialogDescription>
-                {submissionResult.successCount === submissionResult.totalCount ? (
-                  `Successfully added ${submissionResult.successCount} item${submissionResult.successCount > 1 ? 's' : ''} to your inventory.`
-                ) : (
-                  `Added ${submissionResult.successCount} of ${submissionResult.totalCount} items to inventory.`
-                )}
+                {submissionResult.successCount === submissionResult.totalCount
+                  ? `Successfully added ${submissionResult.successCount} item${submissionResult.successCount > 1 ? 's' : ''} to your inventory.`
+                  : `Added ${submissionResult.successCount} of ${submissionResult.totalCount} items to inventory.`}
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="flex flex-col gap-3 mt-4">
               <Button
                 onClick={() => {
@@ -1195,7 +1194,7 @@ export default function WorkingStreamlinedScanningInterface({
                 <RefreshCcw className="w-4 h-4 mr-2" />
                 Keep Scanning
               </Button>
-              
+
               <Button
                 variant="outline"
                 onClick={() => {

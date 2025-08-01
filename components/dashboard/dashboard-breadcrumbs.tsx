@@ -24,12 +24,15 @@ export default function DashboardBreadcrumbs() {
   const getSegmentName = (segment: string): string => {
     // Convert kebab-case to camelCase for translation keys
     const translationKey = segment.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
-    
+
     try {
       return t(translationKey)
     } catch {
       // Fallback to capitalized segment if no translation exists
-      return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-([a-z])/g, (_, letter) => ' ' + letter.toUpperCase())
+      return (
+        segment.charAt(0).toUpperCase() +
+        segment.slice(1).replace(/-([a-z])/g, (_, letter) => ' ' + letter.toUpperCase())
+      )
     }
   }
 

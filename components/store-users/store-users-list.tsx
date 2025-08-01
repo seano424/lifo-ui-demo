@@ -77,7 +77,7 @@ import { cn } from '@/lib/utils'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 
 // Import the new components
-import { AddEmployeeDialog } from './add-employee-dialog'
+
 import { EnhancedAddEmployeeDialog } from './enhanced-add-employee-dialog'
 
 // 🚀 NEW: Interface for component props

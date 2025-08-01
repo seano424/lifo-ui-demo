@@ -43,8 +43,6 @@ export interface InventorySubmissionResult {
 export async function submitScannedProductToInventory(
   productData: ScannedProductData,
 ): Promise<InventorySubmissionResult> {
-  const supabase = createClient()
-
   try {
     console.log('[submitScannedProductToInventory] Starting submission:', {
       barcode: productData.barcode,

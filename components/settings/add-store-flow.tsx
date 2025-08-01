@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { ArrowLeftIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,13 +9,11 @@ import { useAddStoreStore, type StoreFormData } from '@/lib/stores/add-store-sto
 import { AddStoreSearchStep } from '@/components/settings/add-store-search-step'
 import { AddStoreDetailsStep } from '@/components/settings/add-store-details-step'
 import { AddStoreSuccess } from '@/components/settings/add-store-success'
-import { convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
 
 export function AddStoreFlow() {
-  const { 
-    currentStep, 
-    setCurrentStep, 
-    convertFormDataToInsert,
+  const {
+    currentStep,
+    setCurrentStep,
     isCreating,
     setIsCreating,
     isComplete,
@@ -24,7 +21,6 @@ export function AddStoreFlow() {
     error,
     setError,
     selectedStoreForm,
-    reset
   } = useAddStoreStore()
 
   // Define step labels and determine if a step should be accessible
@@ -48,7 +44,7 @@ export function AddStoreFlow() {
     try {
       // Generate a temporary store code
       const tempStoreCode = `${storeData.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
-      
+
       // Prepare data for API (matching the expected format)
       const storeCreateData = {
         store_name: storeData.store_name,
@@ -77,23 +73,15 @@ export function AddStoreFlow() {
         throw new Error(errorData.error || 'Failed to create store')
       }
 
-      const newStore = await response.json()
-      
       // Mark as complete and move to success step
       setIsComplete(true)
       setCurrentStep(3)
-      
     } catch (error) {
       console.error('Error creating store:', error)
       setError(error instanceof Error ? error.message : 'Failed to create store. Please try again.')
     } finally {
       setIsCreating(false)
     }
-  }
-
-  // Reset the flow when component unmounts or user navigates away
-  const handleReset = () => {
-    reset()
   }
 
   return (
@@ -169,10 +157,7 @@ export function AddStoreFlow() {
       <div className="min-h-[500px]">
         {currentStep === 1 && <AddStoreSearchStep />}
         {currentStep === 2 && (
-          <AddStoreDetailsStep 
-            onSubmit={handleCreateStore} 
-            isSubmitting={isCreating}
-          />
+          <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
         )}
         {currentStep === 3 && isComplete && selectedStoreForm && (
           <AddStoreSuccess storeName={selectedStoreForm.store_name} />

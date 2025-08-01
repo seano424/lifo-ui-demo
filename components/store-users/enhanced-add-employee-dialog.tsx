@@ -154,7 +154,7 @@ export function EnhancedAddEmployeeDialog({
     // Also invalidate all user store queries to handle any edge cases
     queryClient.invalidateQueries({
       queryKey: queryKeys.stores.all,
-      predicate: (query) => query.queryKey.includes('userStores'),
+      predicate: query => query.queryKey.includes('userStores'),
     })
     console.log('✅ Invalidated all user stores queries')
 
@@ -239,7 +239,7 @@ export function EnhancedAddEmployeeDialog({
         setFormData(prev => ({ ...prev, username: suggested }))
       }
     }
-  }, [formData.firstName, formData.lastName, flowType])
+  }, [formData.firstName, formData.lastName, flowType, existingUser?.user_id, formData.username])
 
   // Check username availability (only for new users)
   const checkUsernameAvailability = useCallback(
@@ -585,7 +585,7 @@ export function EnhancedAddEmployeeDialog({
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  We'll check if this user already exists
+                  We&apos;ll check if this user already exists
                 </p>
               </div>
 
@@ -764,7 +764,7 @@ export function EnhancedAddEmployeeDialog({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.entries(LANGUAGE_OPTIONS).map(([code, name]) => (
+                        {Object.entries(LANGUAGE_OPTIONS).map(([code]) => (
                           <SelectItem key={code} value={code}>
                             {t(`languages.${code}`)}
                           </SelectItem>
@@ -993,7 +993,7 @@ export function EnhancedAddEmployeeDialog({
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• User receives an email notification about the invitation</li>
                   <li>• They can login with their existing LIFO credentials</li>
-                  <li>• They'll see your store in their store selection menu</li>
+                  <li>• They&apos;ll see your store in their store selection menu</li>
                   <li>• You can manage their permissions from the team page</li>
                 </ul>
               </div>
