@@ -5,7 +5,6 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import {
   User,
   UserUpdate,
-  UserCreate,
   SupportedLanguage,
   SUPPORTED_LANGUAGES,
   isValidLanguage,
@@ -302,7 +301,7 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
 
     // Update email if provided using RPC function
     if (email) {
-      const { data: emailResult, error: emailError } = await supabase.rpc('update_user_email', {
+      const { error: emailError } = await supabase.rpc('update_user_email', {
         target_user_id: userId,
         new_email: email,
       })
@@ -325,13 +324,10 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
 
     // Update other metadata if provided using RPC function
     if (Object.keys(metadataUpdates).length > 0) {
-      const { data: metadataResult, error: metadataError } = await supabase.rpc(
-        'update_user_metadata',
-        {
-          target_user_id: userId,
-          metadata_updates: metadataUpdates,
-        },
-      )
+      const { error: metadataError } = await supabase.rpc('update_user_metadata', {
+        target_user_id: userId,
+        metadata_updates: metadataUpdates,
+      })
 
       if (metadataError) {
         console.error('[updateUser] Metadata update error:', metadataError)
@@ -363,7 +359,7 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
 }
 
 // Existing functions (unchanged but compatible with new types)
-export async function createUser(userData: UserCreate): Promise<User> {
+export async function createUser(): Promise<User> {
   try {
     // For now, we'll need to implement this through a server action
     throw new Error(
@@ -383,7 +379,7 @@ export async function updateUserMetadata(
   const supabase = createClient()
 
   try {
-    const { data, error } = await supabase.rpc('update_user_metadata', {
+    const { error } = await supabase.rpc('update_user_metadata', {
       target_user_id: userId,
       metadata_updates: metadata,
     })
@@ -405,7 +401,7 @@ export async function updateUserEmail(userId: string, email: string): Promise<bo
   const supabase = createClient()
 
   try {
-    const { data, error } = await supabase.rpc('update_user_email', {
+    const { error } = await supabase.rpc('update_user_email', {
       target_user_id: userId,
       new_email: email,
     })
