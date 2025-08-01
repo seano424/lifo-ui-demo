@@ -5,6 +5,7 @@
 ### Option 1: Replace Existing Component (Recommended)
 
 **Old Code:**
+
 ```typescript
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
 
@@ -14,6 +15,7 @@ function MyPage() {
 ```
 
 **New Code:**
+
 ```typescript
 import { UltraFastCSVUploadForm } from '@/components/csv-upload/csv-upload-form-ultra-fast'
 
@@ -25,6 +27,7 @@ function MyPage() {
 ### Option 2: Use New Hook Directly
 
 **Old Code:**
+
 ```typescript
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 
@@ -35,6 +38,7 @@ function MyComponent() {
 ```
 
 **New Code:**
+
 ```typescript
 import { useFastCsvUpload } from '@/hooks/use-fast-csv-upload'
 
@@ -47,36 +51,41 @@ function MyComponent() {
 ### Option 3: New API Endpoint
 
 **Old Endpoint:**
+
 ```typescript
 const response = await fetch('/api/inventory/upload', {
   method: 'POST',
-  body: formData
+  body: formData,
 })
 ```
 
 **New Endpoint:**
-```typescript  
+
+```typescript
 const response = await fetch('/api/inventory/upload-fast-skip', {
   method: 'POST',
-  body: formData
+  body: formData,
 })
 ```
 
 ## Key Benefits After Migration
 
 ### ✅ **Eliminated Complexity**
+
 - ❌ No more duplicate resolution modals
-- ❌ No more complex user decisions  
+- ❌ No more complex user decisions
 - ❌ No more N+1 database queries
 - ❌ No more Python subprocess overhead
 
 ### ✅ **Added Performance**
+
 - ⚡ **90%+ faster processing**
 - 🚀 **Single database call** handles everything
 - 📊 **Real-time performance metrics**
 - 🎯 **Automatic duplicate skipping**
 
 ### ✅ **Simplified UX**
+
 - 📁 **Drag & drop** or click to upload
 - 👀 **Simple preview** (first 10 rows)
 - 🔄 **One-click upload** with auto-duplicate handling
@@ -84,13 +93,13 @@ const response = await fetch('/api/inventory/upload-fast-skip', {
 
 ## Performance Comparison
 
-| Metric | Old System | Ultra-Fast System | Improvement |
-|--------|------------|-------------------|-------------|
-| 10 items | 30+ seconds | < 2 seconds | **93% faster** |
-| 100 items | 60+ seconds | < 10 seconds | **83% faster** |
-| 1000 items | 300+ seconds | < 60 seconds | **80% faster** |
-| Database queries | 600+ queries | ~5 queries | **99% reduction** |
-| User decisions | Complex modal | Zero decisions | **100% simpler** |
+| Metric           | Old System    | Ultra-Fast System | Improvement       |
+| ---------------- | ------------- | ----------------- | ----------------- |
+| 10 items         | 30+ seconds   | < 2 seconds       | **93% faster**    |
+| 100 items        | 60+ seconds   | < 10 seconds      | **83% faster**    |
+| 1000 items       | 300+ seconds  | < 60 seconds      | **80% faster**    |
+| Database queries | 600+ queries  | ~5 queries        | **99% reduction** |
+| User decisions   | Complex modal | Zero decisions    | **100% simpler**  |
 
 ## Testing Your Migration
 

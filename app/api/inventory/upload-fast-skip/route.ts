@@ -5,7 +5,7 @@ import { InventoryOperations } from '@/lib/database/operations'
 export async function POST(request: NextRequest) {
   console.log('🚀 Upload API called')
   const startTime = Date.now()
-  
+
   try {
     const supabase = await createClient()
     console.log('✅ Supabase client created')
@@ -15,25 +15,25 @@ export async function POST(request: NextRequest) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    
+
     if (authError) {
       console.error('❌ Auth error:', authError)
       return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
     }
-    
+
     if (!user) {
       console.error('❌ No user found')
       return NextResponse.json({ error: 'No user authenticated' }, { status: 401 })
     }
-    
+
     console.log('✅ User authenticated:', user.id)
 
     const formData = await request.formData()
     console.log('✅ Form data parsed')
-    
+
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
-    
+
     console.log('📁 File info:', { name: file?.name, size: file?.size, storeId })
 
     if (!file || !storeId) {
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     console.log('📄 Reading CSV content...')
     const csvContent = await file.text()
     console.log('✅ CSV content read, length:', csvContent.length)
-    
+
     const csvData = fastParseCSV(csvContent)
     console.log('✅ CSV parsed, items found:', csvData.length)
 
@@ -94,20 +94,19 @@ export async function POST(request: NextRequest) {
         database_operations_ms: totalTime,
       },
     }
-    
+
     console.log('📤 Sending response:', response)
     return NextResponse.json(response)
-    
   } catch (error) {
     console.error('💥 Upload error caught:', error)
     console.error('💥 Error stack:', error instanceof Error ? error.stack : 'No stack trace')
-    
+
     const message = error instanceof Error ? error.message : 'Unknown error'
     const errorResponse = {
       error: 'Upload failed',
       details: message,
     }
-    
+
     console.log('📤 Sending error response:', errorResponse)
     return NextResponse.json(errorResponse, { status: 500 })
   }

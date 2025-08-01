@@ -74,25 +74,25 @@ export function CSVSuccessModal({ open, onOpenChange, result, storeId }: CSVSucc
           <div className="rounded-lg bg-gray-50 p-4 space-y-3">
             <h4 className="font-medium text-sm text-gray-900">Import Summary</h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
-              {breakdown.new_products > 0 && (
+              {breakdown.new_products && breakdown.new_products > 0 && (
                 <div className="flex items-center gap-2">
                   <Package className="h-4 w-4 text-blue-500" />
                   <span>{breakdown.new_products} new products</span>
                 </div>
               )}
-              {breakdown.updated_products > 0 && (
+              {breakdown.updated_products && breakdown.updated_products > 0 && (
                 <div className="flex items-center gap-2">
                   <RefreshCw className="h-4 w-4 text-orange-500" />
                   <span>{breakdown.updated_products} updated products</span>
                 </div>
               )}
-              {breakdown.new_batches > 0 && (
+              {breakdown.new_batches && breakdown.new_batches > 0 && (
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500" />
                   <span>{breakdown.new_batches} inventory batches</span>
                 </div>
               )}
-              {breakdown.unchanged > 0 && (
+              {breakdown.unchanged && breakdown.unchanged > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="h-4 w-4 text-gray-400">•</span>
                   <span>{breakdown.unchanged} unchanged</span>

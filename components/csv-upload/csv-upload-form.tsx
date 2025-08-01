@@ -18,7 +18,7 @@ import {
   Info,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useCSVUpload, useDownloadSampleCSV } from '@/hooks/use-csv-upload'
+import { useFastCsvUpload, useDownloadSampleCSV } from '@/hooks/use-csv-upload'
 import { toast } from 'sonner'
 import { CSVSuccessModal } from './csv-success-modal'
 

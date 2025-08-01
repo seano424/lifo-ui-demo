@@ -280,19 +280,29 @@ export function UltraFastCSVUploadForm({ storeId }: CSVUploadFormProps) {
                   View Skipped Duplicates ({uploadResult.duplicates_skipped.length})
                 </summary>
                 <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
-                  {uploadResult.duplicates_skipped.map((dup: { sku: string; product_name: string; expiry_date: string; reason: string }, index: number) => (
-                    <div
-                      key={index}
-                      className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
-                    >
-                      <div className="font-semibold">
-                        {dup.sku} - {dup.product_name}
+                  {uploadResult.duplicates_skipped.map(
+                    (
+                      dup: {
+                        sku: string
+                        product_name: string
+                        expiry_date: string
+                        reason: string
+                      },
+                      index: number,
+                    ) => (
+                      <div
+                        key={index}
+                        className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
+                      >
+                        <div className="font-semibold">
+                          {dup.sku} - {dup.product_name}
+                        </div>
+                        <div className="text-gray-600">
+                          Expiry: {dup.expiry_date} • {dup.reason}
+                        </div>
                       </div>
-                      <div className="text-gray-600">
-                        Expiry: {dup.expiry_date} • {dup.reason}
-                      </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </details>
             )}
