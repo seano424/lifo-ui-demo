@@ -148,7 +148,6 @@ export function EnhancedAddEmployeeDialog({
       queryClient.invalidateQueries({
         queryKey: queryKeys.stores.userStores(existingUser.user_id),
       })
-      console.log('✅ Invalidated user stores for invited user:', existingUser.user_id)
     }
 
     // Also invalidate all user store queries to handle any edge cases
@@ -156,9 +155,6 @@ export function EnhancedAddEmployeeDialog({
       queryKey: queryKeys.stores.all,
       predicate: query => query.queryKey.includes('userStores'),
     })
-    console.log('✅ Invalidated all user stores queries')
-
-    console.log('✅ Invalidated store user queries for store:', storeId)
   }
 
   // Check if user exists by email
@@ -185,7 +181,6 @@ export function EnhancedAddEmployeeDialog({
       }
 
       if (data.exists) {
-        console.log('✅ Found existing user:', data)
         setExistingUser(data)
         setFlowType('invite_existing')
 
@@ -199,7 +194,6 @@ export function EnhancedAddEmployeeDialog({
           }))
         }
       } else {
-        console.log('ℹ️ No existing user found for:', email)
         setExistingUser(null)
         setFlowType('create_new')
       }

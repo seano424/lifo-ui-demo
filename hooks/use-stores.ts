@@ -72,7 +72,6 @@ export function useUserStores() {
 
       // Set the active store (just the store part, not the UserStore wrapper)
       setActiveStore(userStoreToSelect.store)
-      console.log('[useUserStores] Auto-selected store:', userStoreToSelect.store.store_name)
     }
   }, [
     userStoresResult.data,
@@ -91,7 +90,6 @@ export function useUserStores() {
     refreshFromQuery: () => {
       if (userStoresResult.data) {
         setUserStores(userStoresResult.data)
-        console.log('[useUserStores] Manually refreshed Zustand from React Query')
       }
     },
   }
