@@ -1,37 +1,72 @@
+import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 interface CSVUploadResponse {
   success: boolean
   processed: number
-  total_items: number
-  valid_items: number
+  skipped: number
   errors: string[]
-  warnings: string[]
-  store_id: string
-  processor_used: 'unified_python' | 'fallback_javascript'
-  message: string
-  metadata: {
-    store_id: string
-    processed_at: string
-    processed_by: string
+  total_items: number
+  processing_time_ms: number
+  duplicates_skipped: Array<{
+    sku: string
+    product_name: string
+    expiry_date: string
+    reason: string
+  }>
+  performance_metrics: {
+    items_per_second: number
+    duplicate_detection_ms: number
+    database_operations_ms: number
   }
 }
 
-interface ProcessedItem {
-  row_number: number
-  sku: string
-  product_name: string
-  status: 'success' | 'error' | 'warning'
-  batch_id?: string
-  product_id?: string
-  error_message?: string
+interface CsvPreviewItem {
+  SKU: string
+  Product_Name: string
+  Category: string
+  Quantity: number
+  Expiry_Date: string
 }
 
-export function useFastCsvUpload() {
+export function useCSVUpload() {
+  const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
+  const [isPreviewReady, setIsPreviewReady] = useState(false)
   const queryClient = useQueryClient()
 
-  return useMutation({
+  // Simple CSV preview (first 10 rows)
+  const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
+    const text = await file.text()
+    const lines = text.trim().split('\n')
+    if (lines.length < 2) return []
+
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+    const preview: CsvPreviewItem[] = []
+
+    const skuIndex = headers.findIndex(h => h.toLowerCase().includes('sku'))
+    const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'))
+    const categoryIndex = headers.findIndex(h => h.toLowerCase().includes('category'))
+    const qtyIndex = headers.findIndex(h => h.toLowerCase().includes('quantity'))
+    const expiryIndex = headers.findIndex(h => h.toLowerCase().includes('expiry'))
+
+    for (let i = 1; i < Math.min(11, lines.length); i++) {
+      const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+      preview.push({
+        SKU: values[skuIndex] || `AUTO-${i}`,
+        Product_Name: values[nameIndex] || 'Unknown Product',
+        Category: values[categoryIndex] || 'dry_goods',
+        Quantity: parseInt(values[qtyIndex] || '1') || 1,
+        Expiry_Date: values[expiryIndex] || '',
+      })
+    }
+
+    setCsvPreview(preview)
+    setIsPreviewReady(true)
+    return preview
+  }
+
+  const mutation = useMutation({
     mutationFn: async ({
       file,
       storeId,
@@ -43,8 +78,8 @@ export function useFastCsvUpload() {
       formData.append('file', file)
       formData.append('storeId', storeId)
 
-      // Use Next.js API route with dual processor fallback
-      const response = await fetch('/api/inventory/upload-fast-skip', {
+      // Use the main optimized upload route
+      const response = await fetch('/api/inventory/upload', {
         method: 'POST',
         body: formData,
       })
@@ -66,11 +101,13 @@ export function useFastCsvUpload() {
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
 
-      // Success notification
-      const processorUsed =
-        data.processor_used === 'unified_python' ? 'Advanced Python' : 'JavaScript Fallback'
+      // Success notification with performance metrics
+      const speed = data.performance_metrics?.items_per_second || 0
       toast.success(`Successfully imported ${data.processed} of ${data.total_items} products`, {
-        description: `Processed with ${processorUsed} processor`,
+        description:
+          data.skipped > 0
+            ? `${data.skipped} duplicates skipped • ${speed} items/sec`
+            : `Processed in ${data.processing_time_ms}ms • ${speed} items/sec`,
         duration: 5000,
       })
     },
@@ -81,7 +118,21 @@ export function useFastCsvUpload() {
       })
     },
   })
+
+  return {
+    ...mutation,
+    previewCsvFile,
+    csvPreview,
+    isPreviewReady,
+    resetPreview: () => {
+      setCsvPreview([])
+      setIsPreviewReady(false)
+    },
+  }
 }
+
+// Compatibility export for existing code
+export const useFastCsvUpload = useCSVUpload
 
 // Sample CSV download hook
 export function useDownloadSampleCSV() {
