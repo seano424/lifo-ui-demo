@@ -63,9 +63,7 @@ export default async function RootLayout({
         >
           <ReactQueryProvider>
             <LanguageProvider>
-              <IntlProvider initialMessages={messages}>
-                {children}
-              </IntlProvider>
+              <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
         </ThemeProvider>
