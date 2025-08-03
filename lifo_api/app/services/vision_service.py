@@ -545,6 +545,14 @@ class GoogleVisionService:
     
     def _is_barcode_pattern(self, text: str) -> bool:
         """Check if text matches common barcode patterns"""
+        # First, exclude obvious date patterns to prevent false positives
+        if re.match(r'^\d{4}[/\-\.]\d{2}[/\-\.]\d{2}$', text):  # YYYY/MM/DD, YYYY-MM-DD, etc.
+            return False
+        if re.match(r'^\d{2}[/\-\.]\d{2}[/\-\.]\d{4}$', text):  # DD/MM/YYYY, MM/DD/YYYY, etc.
+            return False
+        if re.match(r'^\d{2}[/\-\.]\d{2}[/\-\.]\d{2}$', text):   # DD/MM/YY, MM/DD/YY, etc.
+            return False
+            
         # EAN-13: 13 digits
         if re.match(r'^\d{13}$', text):
             return True
@@ -554,8 +562,10 @@ class GoogleVisionService:
         # EAN-8: 8 digits
         if re.match(r'^\d{8}$', text):
             return True
-        # Code 128: alphanumeric
-        if re.match(r'^[A-Z0-9\-\s]{6,}$', text) and len(text) >= 6:
+        # Code 128: alphanumeric patterns (common in retail)
+        if (re.match(r'^[A-Z0-9\-]{6,}$', text) and 
+            len(text) >= 6 and 
+            len(text) <= 20):  # Reasonable barcode length
             return True
         return False
     
