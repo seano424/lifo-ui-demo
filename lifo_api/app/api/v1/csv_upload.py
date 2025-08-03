@@ -15,13 +15,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.secure_dependencies import get_current_user, validate_store_access
 from app.database.connection import get_db
 
-# Add lifo_ai_core to path
-lifo_core_path = Path(__file__).parent.parent.parent.parent / "lifo_ai_core"
-sys.path.insert(0, str(lifo_core_path))
-
-# Import the unified processor
+# Import the unified processor (now properly installed)
 try:
-    from etl.unified_csv_processor import UnifiedCSVProcessor
+    from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
 except ImportError as e:
     # Fallback to using the secure CSV processor already in the API
     try:

@@ -10,10 +10,14 @@ import pandas as pd
 
 # InventoryOperations can be imported from our own database module
 try:
-    from database.operations import InventoryOperations
+    from ..database.operations import InventoryOperations
 except ImportError:
-    # Fallback if database operations not available
-    InventoryOperations = None
+    try:
+        # Fallback for when running as script
+        from lifo_ai_core.database.operations import InventoryOperations
+    except ImportError:
+        # Fallback if database operations not available
+        InventoryOperations = None
 
 
 class CSVProcessor:
