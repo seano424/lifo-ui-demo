@@ -58,11 +58,19 @@ class StructuredLogger:
 
         # Add exception info if present
         if record.get("exception"):
-            log_entry["exception"] = {
-                "type": record["exception"].type.__name__,
-                "value": str(record["exception"].value),
-                "traceback": record["exception"].traceback.format(),
-            }
+            try:
+                exc_info = record["exception"]
+                log_entry["exception"] = {
+                    "type": getattr(exc_info.type, '__name__', str(exc_info.type)) if hasattr(exc_info, 'type') else 'Unknown',
+                    "value": str(exc_info.value) if hasattr(exc_info, 'value') else str(exc_info),
+                    "traceback": exc_info.traceback.format() if hasattr(exc_info, 'traceback') and hasattr(exc_info.traceback, 'format') else 'No traceback available',
+                }
+            except AttributeError as e:
+                log_entry["exception"] = {
+                    "type": "ExceptionParsingError",
+                    "value": f"Failed to parse exception: {e}",
+                    "traceback": "Unable to extract traceback"
+                }
 
         return json.dumps(log_entry)
 
