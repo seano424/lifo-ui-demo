@@ -36,10 +36,20 @@ class SupabaseService:
         return self._admin_client
         
     def get_user_client(self, user_token: str) -> Client:
-        """Get client with user context"""
+        """Get client with user context for RLS-compliant operations"""
         client = create_client(self.url, self.anon_key)
-        # Set the user session
-        client.auth.set_session(user_token)
+        
+        # Method 1: Use set_session with access token only (recommended)
+        # For server-side authentication where you only have JWT access token
+        try:
+            # Create a minimal session object with just the access token
+            # The refresh_token can be None for server-side JWT-only scenarios
+            client.auth.set_session(access_token=user_token, refresh_token=None)
+        except Exception as e:
+            logger.warning("Failed to set session with token", error=str(e))
+            # Fallback: manually update client headers (Method 2)
+            client.options.headers["Authorization"] = f"Bearer {user_token}"
+            
         return client
         
     async def test_connection(self) -> bool:
