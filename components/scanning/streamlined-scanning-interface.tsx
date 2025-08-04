@@ -162,6 +162,7 @@ export default function WorkingStreamlinedScanningInterface({
         setManualExpiryDate('')
         break
       case 'product':
+        // Show product success briefly, but this step will auto-advance to OCR
         if (scannedProduct?.productName) {
           setUIStep('product-success')
           // Set default price if available
@@ -468,450 +469,459 @@ export default function WorkingStreamlinedScanningInterface({
 
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
-      <div className="p-4 space-y-4">
-        {/* STEP 1: Camera Barcode Scanning */}
-        {uiStep === 'camera-barcode' && (
-          <>
-            <div className="space-y-2">
-              <BarcodeScanner
-                onScan={handleScan}
-                onError={handleError}
-                autoStart={true}
-                className="w-full"
-                title="Scan Product"
-              />
-            </div>
-
-            {/* Manual Barcode Entry */}
-            {showManualBarcode && (
-              <div className="space-y-4">
-                <ManualBarcodeEntry
-                  onProductSelected={handleManualProductSelected}
-                  onClose={() => setShowManualBarcode(false)}
+      {/* Consistent width container for all scanning steps */}
+      <div className="w-full">
+        <div className="p-4 space-y-4">
+          {/* STEP 1: Camera Barcode Scanning */}
+          {uiStep === 'camera-barcode' && (
+            <>
+              <div className="space-y-2">
+                <BarcodeScanner
+                  onScan={handleScan}
+                  onError={handleError}
+                  autoStart={true}
+                  className="w-full max-w-xl mx-auto"
+                  title="Scan Product"
                 />
               </div>
-            )}
 
-            {!showManualBarcode && (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowManualBarcode(true)}
-                  className="flex-1"
-                >
-                  <Keyboard className="w-4 h-4 mr-2" />
-                  Manual Entry
-                </Button>
-              </div>
-            )}
-
-            {currentStep === 'barcode' && (
-              <Alert>
-                <Camera className="h-4 w-4" />
-                <AlertDescription>
-                  Point your camera at any product barcode. The scanner will automatically detect
-                  supported formats and look up product information from Open Food Facts.
-                </AlertDescription>
-              </Alert>
-            )}
-          </>
-        )}
-
-        {/* STEP 2: Product Success */}
-        {uiStep === 'product-success' && scannedProduct && (
-          <Card className="border-green-200">
-            <CardContent className="pt-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium">Product Scanned</h4>
-                  <div className="flex items-center gap-2">
-                    {isLookingUp && (
-                      <Badge variant="outline" className="animate-pulse">
-                        Looking up...
-                      </Badge>
-                    )}
-                    <Badge variant="secondary">
-                      {scannedProduct.detection?.format || 'Manual Entry'}
-                    </Badge>
-                  </div>
+              {/* Manual Barcode Entry */}
+              {showManualBarcode && (
+                <div className="space-y-4">
+                  <ManualBarcodeEntry
+                    onProductSelected={handleManualProductSelected}
+                    onClose={() => setShowManualBarcode(false)}
+                  />
                 </div>
-                <div className="text-sm space-y-1">
-                  <div>
-                    <strong>Barcode:</strong> <code>{scannedProduct.barcode}</code>
-                  </div>
-                  {scannedProduct.productName && (
-                    <div>
-                      <strong>Name:</strong> {scannedProduct.productName}
-                    </div>
-                  )}
-                  {scannedProduct.brand && (
-                    <div>
-                      <strong>Brand:</strong> {scannedProduct.brand}
-                    </div>
-                  )}
-                  {scannedProduct.lookupResult && (
-                    <div>
-                      <strong>Source:</strong>{' '}
-                      {scannedProduct.lookupResult.source === 'cache'
-                        ? 'Local Cache'
-                        : 'Open Food Facts'}
-                    </div>
-                  )}
-                </div>
+              )}
 
-                {/* Lookup Error */}
-                {lookupError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Lookup Result */}
-                {!isLookingUp &&
-                  !lookupError &&
-                  scannedProduct.lookupResult &&
-                  (scannedProduct.lookupResult.found ? (
-                    <Alert>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertDescription>
-                        Product found! Ready to proceed to expiry date scanning.
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Product not found in database. You may need to add it manually.
-                      </AlertDescription>
-                    </Alert>
-                  ))}
-
-                {/* Next Step Button */}
-                <div className="pt-2 space-y-2">
+              {!showManualBarcode && (
+                <div className="flex gap-2">
                   <Button
-                    onClick={workflowActions.confirmProduct}
-                    className="w-full"
-                    disabled={isLookingUp}
+                    variant="outline"
+                    onClick={() => setShowManualBarcode(true)}
+                    className="flex-1"
                   >
-                    {isLookingUp ? 'Looking up product...' : 'Proceed to Expiry Date Scanning'}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <Keyboard className="w-4 h-4 mr-2" />
+                    Manual Entry
                   </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              )}
 
-        {/* STEP 3: Camera Expiry Scanning */}
-        {uiStep === 'camera-expiry' && (
-          <div className="space-y-4">
-            {/* Product Context */}
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <Package className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium">{scannedProduct?.brand}</span>
-                  <span className="text-gray-500">•</span>
-                  <span className="font-medium">{scannedProduct?.productName}</span>
-                  <span className="text-gray-500">•</span>
-                  <span className="font-mono text-xs">{scannedProduct?.barcode}</span>
+              {currentStep === 'barcode' && (
+                <Alert>
+                  <Camera className="h-4 w-4" />
+                  <AlertDescription>
+                    Point your camera at any product barcode. The scanner will automatically detect
+                    supported formats and look up product information from Open Food Facts.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </>
+          )}
+
+          {/* STEP 2: Product Success */}
+          {uiStep === 'product-success' && scannedProduct && (
+            <Card className="border-green-200">
+              <CardContent className="pt-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Product Scanned</h4>
+                    <div className="flex items-center gap-2">
+                      {isLookingUp && (
+                        <Badge variant="outline" className="animate-pulse">
+                          Looking up...
+                        </Badge>
+                      )}
+                      <Badge variant="secondary">
+                        {scannedProduct.detection?.format || 'Manual Entry'}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="text-sm space-y-1">
+                    <div>
+                      <strong>Barcode:</strong> <code>{scannedProduct.barcode}</code>
+                    </div>
+                    {scannedProduct.productName && (
+                      <div>
+                        <strong>Name:</strong> {scannedProduct.productName}
+                      </div>
+                    )}
+                    {scannedProduct.brand && (
+                      <div>
+                        <strong>Brand:</strong> {scannedProduct.brand}
+                      </div>
+                    )}
+                    {scannedProduct.lookupResult && (
+                      <div>
+                        <strong>Source:</strong>{' '}
+                        {scannedProduct.lookupResult.source === 'cache'
+                          ? 'Local Cache'
+                          : 'Open Food Facts'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lookup Error */}
+                  {lookupError && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Lookup Result */}
+                  {!isLookingUp &&
+                    !lookupError &&
+                    scannedProduct.lookupResult &&
+                    (scannedProduct.lookupResult.found ? (
+                      <Alert>
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <AlertDescription>
+                          Product found! Ready to proceed to expiry date scanning.
+                        </AlertDescription>
+                      </Alert>
+                    ) : (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          Product not found in database. You may need to add it manually.
+                        </AlertDescription>
+                      </Alert>
+                    ))}
+
+                  {/* Auto-advancing message */}
+                  {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
+                    <div className="pt-2">
+                      <Alert>
+                        <ArrowRight className="h-4 w-4 text-blue-600" />
+                        <AlertDescription>
+                          Automatically proceeding to expiry date scanning...
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
+          )}
 
-            {/* Camera OCR Section - Always visible */}
-            {!manualExpiryDate && (
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  <BarcodeScanner
-                    onScan={() => {}} // Don't auto-trigger OCR - let user click button
-                    onError={handleError}
-                    autoStart={true}
-                    className="w-full"
-                    title="Scan Expiry Date"
-                    subtitle="Point camera at expiry date"
-                    isBarcodeScanner={false}
-                  />
-                </div>
-
-                {/* OCR Status and Error Display */}
-                {ocrError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      OCR Error: {ocrError}
-                      {isBackendHealthy === false && (
-                        <span className="block mt-1 text-xs">
-                          FastAPI backend is not available. Please use manual entry.
-                        </span>
-                      )}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Backend Health Warning */}
-                {isBackendHealthy === false && !ocrError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      OCR service is currently unavailable. Please use manual date entry.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleOCRCapture}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700"
-                    disabled={isWorkflowProcessing || isOCRProcessing || isBackendHealthy === false}
-                  >
-                    <Camera className="w-4 h-4 mr-2" />
-                    {isOCRProcessing
-                      ? 'Processing OCR...'
-                      : isWorkflowProcessing
-                        ? 'Processing...'
-                        : 'Capture Expiry Date'}
-                  </Button>
-                  {ocrError && (
-                    <Button
-                      onClick={() => {
-                        setOcrError(null)
-                        workflowActions.setError(null)
-                      }}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Clear Error
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Manual Entry Section - Always visible alongside camera */}
-            {!manualExpiryDate && (
+          {/* STEP 3: Camera Expiry Scanning */}
+          {uiStep === 'camera-expiry' && (
+            <div className="space-y-4">
+              {/* Product Context */}
               <Card>
-                <CardContent className="p-4 space-y-3">
-                  <Label className="font-medium">
-                    {ocrError || isBackendHealthy === false
-                      ? '📝 Manual Entry (OCR unavailable)'
-                      : 'Or enter manually'}
-                  </Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="expiry" className="text-xs">
-                        Expiry Date
-                      </Label>
-                      <Input
-                        id="expiry"
-                        type="date"
-                        value={manualExpiryDate}
-                        onChange={e => setManualExpiryDate(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="quantity" className="text-xs">
-                        Quantity
-                      </Label>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        value={quantity}
-                        onChange={e => setQuantity(parseInt(e.target.value) || 1)}
-                        min="0"
-                      />
-                    </div>
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Package className="w-4 h-4 text-gray-500" />
+                    <span className="font-medium">{scannedProduct?.brand}</span>
+                    <span className="text-gray-500">•</span>
+                    <span className="font-medium">{scannedProduct?.productName}</span>
+                    <span className="text-gray-500">•</span>
+                    <span className="font-mono text-xs">{scannedProduct?.barcode}</span>
                   </div>
-                  <div>
-                    <Label htmlFor="price" className="text-xs">
-                      Price per unit (€)
-                    </Label>
-                    <div className="relative">
-                      <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="price"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={price}
-                        onChange={e => setPrice(parseFloat(e.target.value) || 0)}
-                        className="pl-10"
-                      />
-                    </div>
+                </CardContent>
+              </Card>
+
+              {/* Camera OCR Section - Always visible */}
+              {!manualExpiryDate && (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <BarcodeScanner
+                      onScan={() => {}} // Don't auto-trigger OCR - let user click button
+                      onError={handleError}
+                      autoStart={true}
+                      className="w-full max-w-xl mx-auto"
+                      title="Scan Expiry Date"
+                      subtitle="Point camera at expiry date"
+                      isBarcodeScanner={false}
+                    />
                   </div>
+
+                  {/* OCR Status and Error Display */}
+                  {ocrError && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        OCR Error: {ocrError}
+                        {isBackendHealthy === false && (
+                          <span className="block mt-1 text-xs">
+                            FastAPI backend is not available. Please use manual entry.
+                          </span>
+                        )}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Backend Health Warning */}
+                  {isBackendHealthy === false && !ocrError && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        OCR service is currently unavailable. Please use manual date entry.
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
                   <div className="flex gap-2">
                     <Button
-                      onClick={handleManualExpiryConfirm}
+                      onClick={handleOCRCapture}
                       className="flex-1 bg-purple-600 hover:bg-purple-700"
-                      disabled={!manualExpiryDate}
+                      disabled={
+                        isWorkflowProcessing || isOCRProcessing || isBackendHealthy === false
+                      }
                     >
-                      Confirm Date
+                      <Camera className="w-4 h-4 mr-2" />
+                      {isOCRProcessing
+                        ? 'Processing OCR...'
+                        : isWorkflowProcessing
+                          ? 'Processing...'
+                          : 'Capture Expiry Date'}
                     </Button>
+                    {ocrError && (
+                      <Button
+                        onClick={() => {
+                          setOcrError(null)
+                          workflowActions.setError(null)
+                        }}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Clear Error
+                      </Button>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              )}
 
-            {/* Success with Date Captured - Editable */}
-            {manualExpiryDate && (
-              <Card className="border-green-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <Typography variant="h3" className="text-green-800">
-                      {expiryInfo?.isManual
-                        ? 'Date entered manually'
-                        : 'Date captured successfully'}
-                    </Typography>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs">Expiry Date (editable)</Label>
-                      <Input
-                        type="date"
-                        value={manualExpiryDate}
-                        onChange={e => setManualExpiryDate(e.target.value)}
-                        className="text-sm"
-                      />
+              {/* Manual Entry Section - Always visible alongside camera */}
+              {!manualExpiryDate && (
+                <Card>
+                  <CardContent className="p-4 space-y-3">
+                    <Label className="font-medium">
+                      {ocrError || isBackendHealthy === false
+                        ? '📝 Manual Entry (OCR unavailable)'
+                        : 'Or enter manually'}
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label htmlFor="expiry" className="text-xs">
+                          Expiry Date
+                        </Label>
+                        <Input
+                          id="expiry"
+                          type="date"
+                          value={manualExpiryDate}
+                          onChange={e => setManualExpiryDate(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="quantity" className="text-xs">
+                          Quantity
+                        </Label>
+                        <Input
+                          id="quantity"
+                          type="number"
+                          value={quantity}
+                          onChange={e => setQuantity(parseInt(e.target.value) || 1)}
+                          min="0"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <Label className="text-xs">Quantity</Label>
-                      <Input
-                        type="number"
-                        value={quantity}
-                        onChange={e => setQuantity(parseInt(e.target.value) || 1)}
-                        min="0"
-                        className="text-sm"
-                      />
+                      <Label htmlFor="price" className="text-xs">
+                        Price per unit (€)
+                      </Label>
+                      <div className="relative">
+                        <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Input
+                          id="price"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={price}
+                          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
+                          className="pl-10"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-3">
-                    <Label className="text-xs">Price per unit (€)</Label>
-                    <div className="relative">
-                      <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <Input
-                        min="0"
-                        type="number"
-                        step="0.01"
-                        value={price}
-                        onChange={e => setPrice(parseFloat(e.target.value) || 0)}
-                        className="pl-10 text-sm"
-                      />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleManualExpiryConfirm}
+                        className="flex-1 bg-purple-600 hover:bg-purple-700"
+                        disabled={!manualExpiryDate}
+                      >
+                        Confirm Date
+                      </Button>
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              )}
 
-                  <div className="mt-3 flex gap-2">
+              {/* Success with Date Captured - Editable */}
+              {manualExpiryDate && (
+                <Card className="border-green-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <Typography variant="h3" className="text-green-800">
+                        {expiryInfo?.isManual
+                          ? 'Date entered manually'
+                          : 'Date captured successfully'}
+                      </Typography>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs">Expiry Date (editable)</Label>
+                        <Input
+                          type="date"
+                          value={manualExpiryDate}
+                          onChange={e => setManualExpiryDate(e.target.value)}
+                          className="text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Quantity</Label>
+                        <Input
+                          type="number"
+                          value={quantity}
+                          onChange={e => setQuantity(parseInt(e.target.value) || 1)}
+                          min="0"
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <Label className="text-xs">Price per unit (€)</Label>
+                      <div className="relative">
+                        <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Input
+                          min="0"
+                          type="number"
+                          step="0.01"
+                          value={price}
+                          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
+                          className="pl-10 text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setManualExpiryDate('')
+                          workflowActions.setError(null)
+                        }}
+                        className="flex-1"
+                      >
+                        Clear & Rescan
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Add to Inventory Button */}
+              {manualExpiryDate && (
+                <div className="flex gap-2">
+                  <Button
+                    disabled={quantity <= 0 || price <= 0}
+                    onClick={handleAddToInventory}
+                    className="w-full"
+                    variant="secondary"
+                  >
+                    Add to Inventory • {quantity}x {formatPrice(price)}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Success notification shown inline while staying on barcode scanning */}
+          {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
+            <Alert className="font-mono flex items-center justify-center border-none">
+              <AlertDescription>
+                Added {scannedItems[0].productName} to your list! Scan the next product.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Recent Scans */}
+          {scannedItems.length > 0 && (
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <Typography variant="h3">Total items scanned</Typography>
+                <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
+                  {scannedItems.length > 99 ? '99+' : scannedItems.length}
+                </div>
+              </div>
+
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {scannedItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-2 border rounded text-sm"
+                  >
+                    <div className="flex-1">
+                      <Typography variant="p">
+                        <span className="text-gray-500">Product:</span> {item.productName}
+                      </Typography>
+                      <Typography variant="p">
+                        <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}
+                        x <span className="font-normal text-gray-500">Price:</span>{' '}
+                        {formatPrice(item.price)}{' '}
+                        <span className="font-normal text-gray-500">Expiry:</span>{' '}
+                        {new Date(item.expiryDate).toLocaleDateString()}
+                      </Typography>
+                    </div>
+
                     <Button
-                      variant="outline"
-                      onClick={() => {
-                        setManualExpiryDate('')
-                        workflowActions.setError(null)
-                      }}
-                      className="flex-1"
+                      onClick={() => handleEditItem(item)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
                     >
-                      Clear & Rescan
+                      <Edit3 className="w-4 h-4" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="flex justify-center gap-4">
+            {canGoBack && (
+              <div className="flex justify-center pt-4">
+                <Button
+                  variant="outline"
+                  onClick={handleGoBack}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  {previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
+                </Button>
+              </div>
             )}
 
-            {/* Add to Inventory Button */}
-            {manualExpiryDate && (
-              <div className="flex gap-2">
+            {/* Finish and submit button */}
+            {scannedItems.length > 0 && (
+              <div className="flex justify-center pt-4">
                 <Button
-                  disabled={quantity <= 0 || price <= 0}
-                  onClick={handleAddToInventory}
-                  className="w-full"
                   variant="secondary"
+                  className="flex items-center gap-2"
+                  onClick={handleFinalSubmission}
                 >
-                  Add to Inventory • {quantity}x {formatPrice(price)}
+                  <CheckCircle className="w-4 h-4" />
+                  Finish and submit {scannedItems.length} item{scannedItems.length > 1 ? 's' : ''}
                 </Button>
               </div>
             )}
           </div>
-        )}
-
-        {/* Success notification shown inline while staying on barcode scanning */}
-        {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
-          <Alert className="font-mono flex items-center justify-center border-none">
-            <AlertDescription>
-              Added {scannedItems[0].productName} to your list! Scan the next product.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Recent Scans */}
-        {scannedItems.length > 0 && (
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <Typography variant="h3">Total items scanned</Typography>
-              <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
-                {scannedItems.length > 99 ? '99+' : scannedItems.length}
-              </div>
-            </div>
-
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-              {scannedItems.map(item => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between p-2 border rounded text-sm"
-                >
-                  <div className="flex-1">
-                    <Typography variant="p">
-                      <span className="text-gray-500">Product:</span> {item.productName}
-                    </Typography>
-                    <Typography variant="p">
-                      <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}x{' '}
-                      <span className="font-normal text-gray-500">Price:</span>{' '}
-                      {formatPrice(item.price)}{' '}
-                      <span className="font-normal text-gray-500">Expiry:</span>{' '}
-                      {new Date(item.expiryDate).toLocaleDateString()}
-                    </Typography>
-                  </div>
-
-                  <Button
-                    onClick={() => handleEditItem(item)}
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="flex justify-center gap-4">
-          {canGoBack && (
-            <div className="flex justify-center pt-4">
-              <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                {previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
-              </Button>
-            </div>
-          )}
-
-          {/* Finish and submit button */}
-          {scannedItems.length > 0 && (
-            <div className="flex justify-center pt-4">
-              <Button
-                variant="secondary"
-                className="flex items-center gap-2"
-                onClick={handleFinalSubmission}
-              >
-                <CheckCircle className="w-4 h-4" />
-                Finish and submit {scannedItems.length} item{scannedItems.length > 1 ? 's' : ''}
-              </Button>
-            </div>
-          )}
         </div>
       </div>
 

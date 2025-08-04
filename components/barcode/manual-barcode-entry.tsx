@@ -188,13 +188,19 @@ export default function ManualBarcodeEntry({
                     onClick={handleConfirmAndProceed}
                     className="flex-1 bg-green-600 hover:bg-green-700"
                   >
-                    Proceed to Expiry Date
+                    Select Product
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                   <Button variant="outline" onClick={() => setSelectedProduct(null)}>
                     Change
                   </Button>
                 </div>
+                <Alert className="mt-3">
+                  <ArrowRight className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-xs">
+                    Will automatically proceed to expiry date scanning after selection
+                  </AlertDescription>
+                </Alert>
               </CardContent>
             </Card>
           )}
@@ -277,9 +283,42 @@ export default function ManualBarcodeEntry({
                         )}
 
                         <Button
-                          onClick={() =>
-                            lookupResult.product && handleSelectProduct(lookupResult.product)
-                          }
+                          onClick={() => {
+                            if (lookupResult.product) {
+                              // Skip the intermediate selection step and go directly to workflow
+                              const productData = {
+                                barcode,
+                                productName: (lookupResult.product.product_name ||
+                                  lookupResult.product.product_name_en ||
+                                  'Unknown Product') as string,
+                                brand: (lookupResult.product.brands || '') as string,
+                                category: (lookupResult.product.categories?.toString().split(',')[0] ||
+                                  '') as string,
+                                imageUrl: (lookupResult.product.image_front_url ||
+                                  lookupResult.product.image_url ||
+                                  '') as string,
+                                isManualEntry: true,
+                                lookupResult: lookupResult as ProductLookupResult | undefined,
+                              }
+
+                              // Use setProductSelected to go directly to OCR step
+                              setProductSelected(productData)
+
+                              // Call parent callback
+                              onProductSelected?.(barcode, productData)
+
+                              // Reset and close
+                              setSelectedProduct(null)
+                              setBarcode('')
+                              setManualProductData({
+                                productName: '',
+                                brand: '',
+                                category: '',
+                                imageUrl: '',
+                              })
+                              onClose?.()
+                            }
+                          }}
                           className="w-full mt-3"
                           disabled={!lookupResult.product}
                         >
@@ -408,12 +447,34 @@ export default function ManualBarcodeEntry({
                                 variant="ghost"
                                 size="sm"
                                 className="w-full justify-start text-xs h-auto p-2"
-                                onClick={() =>
-                                  handleSelectProduct(
-                                    product as unknown as Record<string, unknown>,
-                                    product.code,
-                                  )
-                                }
+                                onClick={() => {
+                                  // Skip intermediate step and go directly to workflow
+                                  const productData = {
+                                    barcode: product.code,
+                                    productName: (product.product_name || 'Unknown Product') as string,
+                                    brand: (product.brands || '') as string,
+                                    category: (product.categories?.toString().split(',')[0] || '') as string,
+                                    imageUrl: (product.image_front_url || product.image_url || '') as string,
+                                    isManualEntry: true,
+                                  }
+
+                                  // Use setProductSelected to go directly to OCR step
+                                  setProductSelected(productData)
+
+                                  // Call parent callback
+                                  onProductSelected?.(product.code, productData)
+
+                                  // Reset and close
+                                  setSelectedProduct(null)
+                                  setBarcode('')
+                                  setManualProductData({
+                                    productName: '',
+                                    brand: '',
+                                    category: '',
+                                    imageUrl: '',
+                                  })
+                                  onClose?.()
+                                }}
                               >
                                 <div className="text-left">
                                   <div className="font-medium">
@@ -430,7 +491,36 @@ export default function ManualBarcodeEntry({
                     </div>
 
                     <Button
-                      onClick={handleSelectManualProduct}
+                      onClick={() => {
+                        if (!manualProductData.productName || !barcode) return
+
+                        // Skip intermediate step and go directly to workflow
+                        const productData = {
+                          barcode,
+                          productName: manualProductData.productName,
+                          brand: manualProductData.brand,
+                          category: manualProductData.category,
+                          imageUrl: manualProductData.imageUrl,
+                          isManualEntry: true,
+                        }
+
+                        // Use setProductSelected to go directly to OCR step
+                        setProductSelected(productData)
+
+                        // Call parent callback
+                        onProductSelected?.(barcode, productData)
+
+                        // Reset and close
+                        setSelectedProduct(null)
+                        setBarcode('')
+                        setManualProductData({
+                          productName: '',
+                          brand: '',
+                          category: '',
+                          imageUrl: '',
+                        })
+                        onClose?.()
+                      }}
                       disabled={!manualProductData.productName || !barcode}
                       className="w-full"
                     >
