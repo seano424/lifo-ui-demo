@@ -1,11 +1,16 @@
+'use client'
+
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Typography } from '@/components/ui/typography'
+import { Linkedin } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 
 export function MarketingFooter() {
   const currentYear = new Date().getFullYear()
+  const t = useTranslations('footer')
 
   return (
     <footer className="w-full bg-gradient-to-b from-background to-background/80 border-t border-foreground/10 py-12 px-4">
@@ -32,40 +37,39 @@ export function MarketingFooter() {
               </Typography>
             </div>
             <Typography variant="p" className="text-sm text-muted-foreground max-w-sm">
-              Helping businesses optimize inventory management with intelligent solutions to reduce
-              waste and maximize profits.
+              {t('description')}
             </Typography>
           </div>
 
           {/* Links */}
           <div className="space-y-4">
             <Typography variant="h4" className="text-base font-bold">
-              Quick Links
+              {t('quickLinks')}
             </Typography>
             <div className="grid grid-cols-1 gap-2">
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                About Us
+                {t('links.aboutUs')}
               </Link>
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Products
+                {t('links.products')}
               </Link>
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Pricing
+                {t('links.pricing')}
               </Link>
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Blog
+                {t('links.blog')}
               </Link>
             </div>
           </div>
@@ -73,7 +77,7 @@ export function MarketingFooter() {
           {/* Contact */}
           <div className="space-y-4">
             <Typography variant="h4" className="text-base font-bold">
-              Contact Us
+              {t('contactUs')}
             </Typography>
             <div className="space-y-2">
               <a
@@ -81,10 +85,10 @@ export function MarketingFooter() {
                 className="hover:text-foreground transition-colors"
               >
                 <Typography variant="p" className="text-sm text-muted-foreground">
-                  contact@lifo-app.com
+                  {t('email')}
                 </Typography>
               </a>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-8">
                 <a
                   href="https://linkedin.com/company/lifo-ai"
                   target="_blank"
@@ -119,20 +123,20 @@ export function MarketingFooter() {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-foreground/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <Typography variant="small" className="text-xs text-muted-foreground">
-            © {currentYear} LIFO.AI. All rights reserved.
+            {t('copyright', { year: currentYear })}
           </Typography>
           <div className="flex items-center gap-6">
             <Link
               href="#"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Privacy Policy
+              {t('legal.privacyPolicy')}
             </Link>
             <Link
               href="#"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Terms of Service
+              {t('legal.termsOfService')}
             </Link>
           </div>
         </div>

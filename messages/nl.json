@@ -466,5 +466,114 @@
       "logout": "Uitloggen",
       "goToDashboard": "Naar dashboard"
     }
+  },
+  "errors": {
+    "pageNotFoundTitle": "Pagina niet gevonden",
+    "pageNotFoundDescription": "De pagina die u zoekt bestaat niet of is verplaatst.",
+    "backToHome": "Terug naar startpagina",
+    "goBack": "Ga terug",
+    "needHelp": "Hulp nodig?",
+    "contactSupport": "Neem contact op met ons ondersteuningsteam"
+  },
+  "landingpage": {
+    "hero": {
+      "title": "De toekomst van voorraadbeheer is hier.",
+      "subtitle": "De slimme oplossing om verspilling te verminderen en uw winst te verhogen",
+      "buttons": {
+        "freeTrial": "Start mijn gratis proefperiode",
+        "explore": "Verken het platform"
+      },
+      "badge": {
+        "text": "Geniet van een gratis proefperiode van 14 dagen"
+      }
+    },
+    "features": {
+      "title": "Revolutioneer uw voorraadcontrole",
+      "expiryTracking": {
+        "title": "Real-time houdbaarheidscontrole",
+        "description": "Mis nooit meer een houdbaarheidsdatum met geautomatiseerde monitoring van uw hele voorraad."
+      },
+      "predictiveAlerts": {
+        "title": "Voorspellende waarschuwingen",
+        "description": "Verminder uw verliezen aanzienlijk dankzij de meldingen die door AI worden gevoed vóór het verstrijken van de producten."
+      },
+      "timeSaving": {
+        "title": "Tijdsbesparing",
+        "description": "Enorme vermindering van de tijd die wordt besteed aan handmatig ontvangstbeheer en dagelijkse voorraden."
+      },
+      "errorFree": {
+        "title": "Foutloze operaties",
+        "description": "Eliminatie van menselijke fouten en administratief papierwerk."
+      },
+      "discoverButton": "Ontdek LIFO",
+      "noCommitment": "Geen verplichtingen!"
+    },
+    "businessStats": {
+      "title": "Maximaliseer uw winst, minimaliseer uw verlies",
+      "revenue": {
+        "label": "Omzetstijging",
+        "description": "Gemiddelde toename in bedrijfsomzet",
+        "subtext": "Automatische kortingssuggesties om producten snel te verplaatsen voordat ze verlopen."
+      },
+      "lossReduction": {
+        "label": "Verliesreductie",
+        "description": "Verminder eenvoudig afval en bespaar geld",
+        "subtext": "Minder verlopen producten terwijl u minder aan voorraadbeheer doet."
+      },
+      "taxCredits": {
+        "label": "Belastingvoordelen",
+        "description": "Vanaf de eerste maand op donaties",
+        "subtext": "Verhoog uw fiscaal aftrekbare donaties door te verbinden met een non-profitorganisatie."
+      }
+    },
+    "cta": {
+      "title": "Stap vandaag nog over op LIFO",
+      "features": {
+        "quickSetup": {
+          "title": "Snelle installatie",
+          "description": "Direct te gebruiken oplossing binnen minuten. Geen complexe configuratie vereist."
+        },
+        "freeTrial": {
+          "title": "30 dagen gratis proefperiode",
+          "description": "Test alle functies zonder verplichtingen. Eenvoudige opzegging op elk moment."
+        },
+        "support": {
+          "title": "Toegewijde ondersteuning",
+          "description": "Ons team van experts begeleidt u bij elke stap van uw reis."
+        },
+        "immediateResults": {
+          "title": "Onmiddellijke resultaten",
+          "description": "Verminder afval en verhoog winst vanaf de eerste week van gebruik."
+        }
+      },
+      "card": {
+        "title": "Klaar om uw voorraadbeheer te transformeren?",
+        "description": "Word lid van LIFO om uw inventaris te optimaliseren en de winst te maximaliseren.",
+        "benefits": {
+          "noCommitment": "Geen verplichtingen",
+          "instantSetup": "Directe installatie",
+          "support": "24/7 Ondersteuning"
+        },
+        "button": "Meld u aan voor de wachtlijst",
+        "noCreditCard": "Geen creditcard vereist"
+      }
+    }
+  },
+  "footer": {
+    "description": "Bedrijven helpen voorraad te optimaliseren met intelligente oplossingen om afval te verminderen en winst te maximaliseren.",
+    "quickLinks": "Snelle Links",
+    "links": {
+      "aboutUs": "Over Ons",
+      "products": "Producten",
+      "pricing": "Prijzen",
+      "blog": "Blog"
+    },
+    "contactUs": "Neem Contact Op",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Alle rechten voorbehouden.",
+    "legal": {
+      "privacyPolicy": "Privacybeleid",
+      "termsOfService": "Servicevoorwaarden"
+    }
   }
 }

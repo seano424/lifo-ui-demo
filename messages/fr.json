@@ -466,5 +466,114 @@
       "logout": "Déconnexion",
       "goToDashboard": "Aller au tableau de bord"
     }
+  },
+  "errors": {
+    "pageNotFoundTitle": "Page non trouvée",
+    "pageNotFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backToHome": "Retour à l'accueil",
+    "goBack": "Retour",
+    "needHelp": "Besoin d'aide ?",
+    "contactSupport": "Contactez notre équipe de support"
+  },
+  "landingpage": {
+    "hero": {
+      "title": "L'avenir de la gestion des stocks est là.",
+      "subtitle": "La solution intelligente pour réduire le gaspillage et augmenter vos bénéfices",
+      "buttons": {
+        "freeTrial": "Démarrer mon essai gratuit",
+        "explore": "Explorer la plateforme"
+      },
+      "badge": {
+        "text": "Profitez d'un essai gratuit de 14 jours"
+      }
+    },
+    "features": {
+      "title": "Révolutionnez votre gestion de stock",
+      "expiryTracking": {
+        "title": "Suivi des dates d'expiration en temps réel",
+        "description": "Ne manquez plus jamais une date d'expiration grâce à la surveillance automatisée de tout votre inventaire."
+      },
+      "predictiveAlerts": {
+        "title": "Alertes prédictives",
+        "description": "Réduisez considérablement vos pertes grâce aux notifications alimentées par l'IA avant l'expiration des produits."
+      },
+      "timeSaving": {
+        "title": "Gain de temps",
+        "description": "Réduction énorme du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
+      },
+      "errorFree": {
+        "title": "Opérations sans erreur",
+        "description": "Élimination des erreurs humaines et des tâches administratives."
+      },
+      "discoverButton": "Découvrir LIFO",
+      "noCommitment": "Sans engagement !"
+    },
+    "businessStats": {
+      "title": "Maximisez vos profits, minimisez vos pertes",
+      "revenue": {
+        "label": "Augmentation des revenus",
+        "description": "Augmentation moyenne des revenus commerciaux",
+        "subtext": "Suggestions automatiques de remises pour écouler rapidement les produits avant leur expiration."
+      },
+      "lossReduction": {
+        "label": "Réduction des pertes",
+        "description": "Réduisez facilement les déchets et économisez de l'argent",
+        "subtext": "Moins de produits périmés tout en réduisant le travail de gestion des stocks."
+      },
+      "taxCredits": {
+        "label": "Crédits d'impôt",
+        "description": "Dès le premier mois sur les dons",
+        "subtext": "Augmentez vos dons déductibles d'impôts en vous connectant avec une organisation à but non lucratif."
+      }
+    },
+    "cta": {
+      "title": "Passez à LIFO aujourd'hui",
+      "features": {
+        "quickSetup": {
+          "title": "Installation rapide",
+          "description": "Solution prête à l'emploi en quelques minutes. Aucune configuration complexe requise."
+        },
+        "freeTrial": {
+          "title": "Essai gratuit de 30 jours",
+          "description": "Testez toutes les fonctionnalités sans engagement. Résiliation facile à tout moment."
+        },
+        "support": {
+          "title": "Support dédié",
+          "description": "Notre équipe d'experts vous guide à chaque étape de votre parcours."
+        },
+        "immediateResults": {
+          "title": "Résultats immédiats",
+          "description": "Réduisez les déchets et augmentez les bénéfices dès la première semaine d'utilisation."
+        }
+      },
+      "card": {
+        "title": "Prêt à transformer votre gestion de stock ?",
+        "description": "Rejoignez LIFO pour optimiser votre inventaire et maximiser vos profits.",
+        "benefits": {
+          "noCommitment": "Sans engagement",
+          "instantSetup": "Installation instantanée",
+          "support": "Support 24/7"
+        },
+        "button": "Rejoindre la liste d'attente",
+        "noCreditCard": "Aucune carte de crédit requise"
+      }
+    }
+  },
+  "footer": {
+    "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
+    "quickLinks": "Liens Rapides",
+    "links": {
+      "aboutUs": "À Propos",
+      "products": "Produits",
+      "pricing": "Tarifs",
+      "blog": "Blog"
+    },
+    "contactUs": "Contactez-Nous",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Tous droits réservés.",
+    "legal": {
+      "privacyPolicy": "Politique de Confidentialité",
+      "termsOfService": "Conditions d'Utilisation"
+    }
   }
 }
