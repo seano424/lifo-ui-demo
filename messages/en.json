@@ -153,7 +153,8 @@
         "invalidEmail": "Invalid email format",
         "invalidWebsite": "Invalid website URL",
         "descriptionTooLong": "Description too long"
-      }
+      },
+      "addStore": "Add Store"
     }
   },
   "users": {
@@ -354,7 +355,8 @@
     "account": "Account",
     "profile": "Profile",
     "help": "Help",
-    "support": "Support"
+    "support": "Support",
+    "addStore": "Add Store"
   },
   "addEmployee": {
     "title": "Add New Employee",

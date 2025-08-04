@@ -25,7 +25,7 @@ export default function UserButton() {
   const displayName = user.full_name || user.username || user.email?.split('@')[0] || 'User'
 
   return (
-    <Button asLink href="/dashboard/account" variant="outline" size="sm">
+    <Button asLink href="/dashboard/settings/account" variant="outline" size="sm">
       <UserIcon className="w-4 h-4" />
       {displayName}
     </Button>

@@ -77,7 +77,8 @@ import { cn } from '@/lib/utils'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 
 // Import the new components
-import { AddEmployeeDialog } from './add-employee-dialog'
+
+import { EnhancedAddEmployeeDialog } from './enhanced-add-employee-dialog'
 
 // 🚀 NEW: Interface for component props
 interface StoreUsersListProps {
@@ -211,8 +212,8 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                 <TableHead>{t('email')}</TableHead>
                 <TableHead>{t('role')}</TableHead>
                 <TableHead>{t('status')}</TableHead>
-                <TableHead>{t('pinStatus')}</TableHead>
-                <TableHead>{t('actions')}</TableHead>
+                {canManageUsers && <TableHead>{t('pinStatus')}</TableHead>}
+                {canManageUsers && <TableHead>{t('actions')}</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -234,26 +235,28 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                         {storeUser.is_active ? t('active') : t('inactive')}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      {hasPINAuth(storeUser) ? (
-                        isPINLocked(storeUser) ? (
-                          <span className="text-sm flex items-center gap-1">
-                            <Lock className="w-3 h-3" />
-                            {t('locked')}
-                          </span>
+                    {canManageUsers && (
+                      <TableCell>
+                        {hasPINAuth(storeUser) ? (
+                          isPINLocked(storeUser) ? (
+                            <span className="text-sm flex items-center gap-1">
+                              <Lock className="w-3 h-3" />
+                              {t('locked')}
+                            </span>
+                          ) : (
+                            <span className="text-sm flex items-center gap-1">
+                              <Key className="w-3 h-3" />
+                              {t('pinActive')}
+                            </span>
+                          )
                         ) : (
-                          <span className="text-sm flex items-center gap-1">
-                            <Key className="w-3 h-3" />
-                            {t('pinActive')}
-                          </span>
-                        )
-                      ) : (
-                        <span className="text-sm">{t('noPin')}</span>
-                      )}
-                    </TableCell>
+                          <span className="text-sm">{t('noPin')}</span>
+                        )}
+                      </TableCell>
+                    )}
 
-                    <TableCell>
-                      {canManageUsers && (
+                    {canManageUsers && (
+                      <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -380,8 +383,8 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      )}
-                    </TableCell>
+                      </TableCell>
+                    )}
                   </TableRow>
                 )
               })}
@@ -426,7 +429,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
       {/* Add Employee Dialog */}
       {effectiveStoreId && (
-        <AddEmployeeDialog
+        <EnhancedAddEmployeeDialog
           isOpen={isAddUserDialogOpen}
           onOpenChange={setIsAddUserDialogOpen}
           storeId={effectiveStoreId}
@@ -638,7 +641,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <Typography variant="small" className="font-medium text-yellow-800 mb-2">
-            Debug: Store Users List
+            Debug: Store Users List: Only visible in development mode
           </Typography>
           <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
             {JSON.stringify(

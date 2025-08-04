@@ -98,6 +98,7 @@ export function useStoreSettings(storeId?: string) {
       if (!effectiveStoreId) {
         throw new Error('No store ID available')
       }
+
       return fetchStoreSettings(effectiveStoreId)
     },
     enabled: !!effectiveStoreId, // Only run query when we have a storeId

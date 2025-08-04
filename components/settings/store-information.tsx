@@ -1,16 +1,21 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { z } from 'zod'
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
+import React, { useState, useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Typography } from '@/components/ui/typography'
+import { Edit, Check, X, AlertCircle, Globe } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
@@ -18,12 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
+
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import { Edit, Check, X, AlertCircle, Globe } from 'lucide-react'
 import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useCurrentUser } from '@/hooks/use-users'
+import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
 
 // Interface for server permissions prop
 interface StoreInformationProps {
@@ -137,6 +141,7 @@ export default function StoreInformation({
   // 🚀 CRITICAL: Pass the effective storeId directly to the hooks
   const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId || undefined)
   const { updateBasicInfo, isUpdating } = useStoreActions()
+  const { data: userData } = useCurrentUser()
 
   // 🚀 Use hybrid permissions hook with server permissions as fallback
   const permissions = useStorePermissions({
@@ -246,8 +251,8 @@ export default function StoreInformation({
     setHasUnsavedChanges(false)
   }
 
-  // 🚀 IMPROVED: Only show loading when we don't have an effective storeId OR data is loading
-  if (!effectiveStoreId || isLoading) {
+  // Only show loading when we don't have an effective storeId OR data is loading
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -287,33 +292,29 @@ export default function StoreInformation({
     )
   }
 
-  // 🚀 FIXED: Check for actual storeData, not negated storeData
+  // If no store data is found we need to ask the user to create a store
   if (!storeData) {
     return (
       <Card>
         <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Store data not found. Please try refreshing the page.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (!permissions.canViewSettings && !permissions.isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              You don&apos;t have permission to view store settings. Contact your store{' '}
-              {permissions.isEmployee ? 'manager or owner' : 'owner'}.
-            </AlertDescription>
-          </Alert>
+          {userData?.requires_pin && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Store data not found. Please contact your administrator to create a store.
+              </AlertDescription>
+            </Alert>
+          )}
+          {!userData?.requires_pin && (
+            <div className="flex flex-col items-center gap-2 justify-center">
+              <Typography variant="p" className="text-center">
+                You don&apos;t have a store yet.
+              </Typography>
+              <Button variant="subtleSecondary">
+                <Link href="/dashboard/settings/add-store">{t('storeInformation.addStore')}</Link>
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -744,7 +745,7 @@ export default function StoreInformation({
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <Typography variant="small" className="font-medium text-yellow-800 mb-2">
-              Debug: Store Information
+              Debug: Store Information: Only visible in development mode
             </Typography>
             <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
               {JSON.stringify(
