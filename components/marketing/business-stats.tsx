@@ -1,4 +1,6 @@
+'use client'
 import { Typography } from '@/components/ui/typography'
+import { useTranslations } from 'next-intl'
 
 interface StatProps {
   value: string
@@ -49,6 +51,8 @@ function Stat({ value, label, description, subtext }: StatProps) {
 }
 
 export function BusinessStats() {
+  const t = useTranslations('landingpage.businessStats')
+
   return (
     <section className="w-full py-8 px-4 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
@@ -57,29 +61,29 @@ export function BusinessStats() {
           as={'h2'}
           className="text-center mb-16 pb-4 text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
         >
-          Maximize Your Profits, Minimize Your Losses
+          {t('title')}
         </Typography>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
           <Stat
-            value="22%"
-            label="Revenue Increase"
-            description="Average increase in business revenue"
-            subtext="Automatic discount suggestions to help move products quickly before they expire."
+            value={t('revenue.value')}
+            label={t('revenue.label')}
+            description={t('revenue.description')}
+            subtext={t('revenue.subtext')}
           />
 
           <Stat
-            value="85%"
-            label="Loss Reduction"
-            description="Easily reduce waste and save money"
-            subtext="Fewer expired products while doing less inventory management work."
+            value={t('lossReduction.value')}
+            label={t('lossReduction.label')}
+            description={t('lossReduction.description')}
+            subtext={t('lossReduction.subtext')}
           />
 
           <Stat
-            value="1500€"
-            label="Tax Credits"
-            description="From the first month on donations"
-            subtext="Increase your tax-deductible donations by connecting with a non-profit organization."
+            value={t('taxCredits.value')}
+            label={t('taxCredits.label')}
+            description={t('taxCredits.description')}
+            subtext={t('taxCredits.subtext')}
           />
         </div>
       </div>
