@@ -2,6 +2,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@plugin 'tailwind-scrollbar';
+
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));

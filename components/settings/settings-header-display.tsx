@@ -1,13 +1,19 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
-import { Skeleton } from '../ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function SettingsHeaderDisplay() {
   const { activeStore, isLoadingStores, isChangingStore } = useStoreState()
+  const pathname = usePathname()
 
-  if (isLoadingStores || isChangingStore || !activeStore?.store_name) {
+  if (pathname.includes('/add-store')) {
+    return null
+  }
+
+  if (isLoadingStores || isChangingStore) {
     return <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-full" />
   }
 

@@ -5,7 +5,6 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import {
   User,
   UserUpdate,
-  UserCreate,
   SupportedLanguage,
   SUPPORTED_LANGUAGES,
   isValidLanguage,
@@ -120,7 +119,6 @@ export type UsersPageParam = {
 // Existing fetch functions (enhanced but compatible)
 export async function fetchUsers(serverClient?: ServerClient): Promise<User[]> {
   const supabase = serverClient || createClient()
-  console.log('[fetchUsers] Querying users via RPC')
 
   try {
     const { data, error } = await supabase.rpc('get_users_with_metadata')
@@ -130,7 +128,6 @@ export async function fetchUsers(serverClient?: ServerClient): Promise<User[]> {
       throw new Error(`Failed to fetch users: ${error.message}`)
     }
 
-    console.log('[fetchUsers] Success:', { count: data?.length })
     return (data || []).map(transformAuthUserToUser)
   } catch (err) {
     console.error('[fetchUsers] Unexpected error:', err)
@@ -150,8 +147,6 @@ export async function fetchUsersPage(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchUsersPage] Fetching users page via RPC:', { page, pageSize, filters })
-
     const { data: allUsers, error } = await supabase.rpc('get_users_with_metadata')
 
     if (error) {
@@ -223,12 +218,6 @@ export async function fetchUsersPage(
     const endIndex = startIndex + pageSize
     const pageUsers = users.slice(startIndex, endIndex)
 
-    console.log('[fetchUsersPage] Success:', {
-      dataCount: pageUsers.length,
-      totalCount,
-      hasNextPage: totalCount > endIndex,
-    })
-
     return {
       data: pageUsers,
       count: totalCount,
@@ -248,8 +237,6 @@ export async function updateUserPhone(
   const supabase = createClient()
 
   try {
-    console.log('[updateUserPhone] Updating phone for user:', { userId, phone })
-
     // Validate phone number if provided
     if (phone && !isValidPhoneNumber(phone)) {
       throw new Error('Invalid phone number format')
@@ -265,7 +252,6 @@ export async function updateUserPhone(
       throw new Error(`Failed to update phone: ${error.message}`)
     }
 
-    console.log('[updateUserPhone] Success:', data)
     return data as UpdatePhoneResponse
   } catch (err) {
     console.error('[updateUserPhone] Unexpected error:', err)
@@ -281,11 +267,6 @@ export async function updateUserLanguagePreference(
   const supabase = createClient()
 
   try {
-    console.log('[updateUserLanguagePreference] Updating language for user:', {
-      userId,
-      languagePreference,
-    })
-
     // Validate language
     if (!isValidLanguage(languagePreference)) {
       throw new Error(
@@ -303,7 +284,6 @@ export async function updateUserLanguagePreference(
       throw new Error(`Failed to update language preference: ${error.message}`)
     }
 
-    console.log('[updateUserLanguagePreference] Success:', data)
     return data as UpdateLanguageResponse
   } catch (err) {
     console.error('[updateUserLanguagePreference] Unexpected error:', err)
@@ -316,14 +296,12 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
   const supabase = createClient()
 
   try {
-    console.log('[updateUser] Updating user:', { userId, updates })
-
     // Separate different types of updates
     const { email, phone, language_preference, ...metadataUpdates } = updates
 
     // Update email if provided using RPC function
     if (email) {
-      const { data: emailResult, error: emailError } = await supabase.rpc('update_user_email', {
+      const { error: emailError } = await supabase.rpc('update_user_email', {
         target_user_id: userId,
         new_email: email,
       })
@@ -332,8 +310,6 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
         console.error('[updateUser] Email update error:', emailError)
         throw new Error(`Failed to update email: ${emailError.message}`)
       }
-
-      console.log('[updateUser] Email updated:', emailResult)
     }
 
     // 🆕 Update phone if provided
@@ -348,20 +324,15 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
 
     // Update other metadata if provided using RPC function
     if (Object.keys(metadataUpdates).length > 0) {
-      const { data: metadataResult, error: metadataError } = await supabase.rpc(
-        'update_user_metadata',
-        {
-          target_user_id: userId,
-          metadata_updates: metadataUpdates,
-        },
-      )
+      const { error: metadataError } = await supabase.rpc('update_user_metadata', {
+        target_user_id: userId,
+        metadata_updates: metadataUpdates,
+      })
 
       if (metadataError) {
         console.error('[updateUser] Metadata update error:', metadataError)
         throw new Error(`Failed to update user metadata: ${metadataError.message}`)
       }
-
-      console.log('[updateUser] Metadata updated:', metadataResult)
     }
 
     // Fetch and return updated user using the RPC function
@@ -380,7 +351,6 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
     }
 
     const transformedUser = transformAuthUserToUser(updatedUser)
-    console.log('[updateUser] Success:', { userId })
     return transformedUser
   } catch (err) {
     console.error('[updateUser] Unexpected error:', err)
@@ -389,15 +359,8 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
 }
 
 // Existing functions (unchanged but compatible with new types)
-export async function createUser(userData: UserCreate): Promise<User> {
+export async function createUser(): Promise<User> {
   try {
-    console.log('[createUser] Creating user:', {
-      username: userData.username,
-      email: userData.email,
-      phone: userData.phone,
-      language_preference: userData.language_preference,
-    })
-
     // For now, we'll need to implement this through a server action
     throw new Error(
       'User creation must be handled server-side. Please implement a server action or RPC function.',
@@ -416,7 +379,7 @@ export async function updateUserMetadata(
   const supabase = createClient()
 
   try {
-    const { data, error } = await supabase.rpc('update_user_metadata', {
+    const { error } = await supabase.rpc('update_user_metadata', {
       target_user_id: userId,
       metadata_updates: metadata,
     })
@@ -426,7 +389,6 @@ export async function updateUserMetadata(
       return false
     }
 
-    console.log('[updateUserMetadata] Success:', data)
     return true
   } catch (err) {
     console.error('[updateUserMetadata] Unexpected error:', err)
@@ -439,7 +401,7 @@ export async function updateUserEmail(userId: string, email: string): Promise<bo
   const supabase = createClient()
 
   try {
-    const { data, error } = await supabase.rpc('update_user_email', {
+    const { error } = await supabase.rpc('update_user_email', {
       target_user_id: userId,
       new_email: email,
     })
@@ -449,7 +411,6 @@ export async function updateUserEmail(userId: string, email: string): Promise<bo
       return false
     }
 
-    console.log('[updateUserEmail] Success:', data)
     return true
   } catch (err) {
     console.error('[updateUserEmail] Unexpected error:', err)
@@ -462,8 +423,6 @@ export async function deleteUser(userId: string): Promise<void> {
   const supabase = createClient()
 
   try {
-    console.log('[deleteUser] Deleting user:', { userId })
-
     // Check for dependencies first
     const { data: userRoles, error: rolesError } = await supabase
       .schema('user_mgmt')
@@ -488,8 +447,6 @@ export async function deleteUser(userId: string): Promise<void> {
       console.error('[deleteUser] Supabase error:', error)
       throw new Error(`Failed to delete user: ${error.message}`)
     }
-
-    console.log('[deleteUser] Success:', { userId })
   } catch (err) {
     console.error('[deleteUser] Unexpected error:', err)
     throw err
@@ -500,8 +457,6 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchUserById] Fetching user:', { userId })
-
     // Use the RPC function to get user with all metadata
     const { data, error } = await supabase.rpc('get_users_with_metadata')
 
@@ -517,7 +472,6 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
       throw new Error(`User with ID "${userId}" not found`)
     }
 
-    console.log('[fetchUserById] Success:', { userId })
     return transformAuthUserToUser(userData)
   } catch (err) {
     console.error('[fetchUserById] Unexpected error:', err)
@@ -530,8 +484,6 @@ export async function fetchUserRoles(userId: string): Promise<string[]> {
   const supabase = createClient()
 
   try {
-    console.log('[fetchUserRoles] Fetching roles for user:', { userId })
-
     const { data, error } = await supabase
       .schema('user_mgmt')
       .from('user_roles')
@@ -552,7 +504,6 @@ export async function fetchUserRoles(userId: string): Promise<string[]> {
           Array.isArray(item.roles) ? item.roles.map(r => r.role_name) : [],
         )
       : []
-    console.log('[fetchUserRoles] Success:', { userId, roles })
     return roles
   } catch (err) {
     console.error('[fetchUserRoles] Unexpected error:', err)
@@ -564,8 +515,6 @@ export async function checkUserHasRole(userId: string, roleName: string): Promis
   const supabase = createClient()
 
   try {
-    console.log('[checkUserHasRole] Checking role:', { userId, roleName })
-
     const { data, error } = await supabase
       .schema('user_mgmt')
       .from('user_roles')
@@ -580,7 +529,6 @@ export async function checkUserHasRole(userId: string, roleName: string): Promis
     }
 
     const hasRole = (data?.length || 0) > 0
-    console.log('[checkUserHasRole] Success:', { userId, roleName, hasRole })
     return hasRole
   } catch (err) {
     console.error('[checkUserHasRole] Unexpected error:', err)
@@ -593,18 +541,11 @@ export async function fetchUserWithRoles(
   serverClient?: ServerClient,
 ): Promise<User & { roles: string[] }> {
   try {
-    console.log('[fetchUserWithRoles] Fetching user with roles:', { userId })
-
     // Get user and roles in parallel
     const [userResult, roles] = await Promise.all([
       fetchUserById(userId, serverClient),
       fetchUserRoles(userId),
     ])
-
-    console.log('[fetchUserWithRoles] Success:', {
-      userId,
-      roleCount: roles.length,
-    })
 
     return {
       ...userResult,
@@ -620,15 +561,12 @@ export async function fetchCurrentUser(
   serverClient: Awaited<ReturnType<typeof createServerClient>>,
 ) {
   try {
-    console.log('[fetchCurrentUser] Getting server-side user')
-
     const {
       data: { user },
       error: authError,
     } = await serverClient.auth.getUser()
 
     if (authError || !user) {
-      console.log('[fetchCurrentUser] No authenticated user')
       return null
     }
 

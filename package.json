@@ -70,6 +70,7 @@
     "postcss": "^8",
     "prettier": "^3.5.3",
     "supabase": "^2.26.9",
+    "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.10",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5"

@@ -154,7 +154,8 @@
         "invalidEmail": "Format d'e-mail invalide",
         "invalidWebsite": "URL de site web invalide",
         "descriptionTooLong": "La description est trop longue"
-      }
+      },
+      "addStore": "Ajouter un magasin"
     }
   },
   "users": {
@@ -354,7 +355,8 @@
     "account": "Compte",
     "profile": "Profil",
     "help": "Aide",
-    "support": "Support"
+    "support": "Support",
+    "addStore": "Ajouter un magasin"
   },
   "addEmployee": {
     "title": "Ajouter un nouvel employé",
