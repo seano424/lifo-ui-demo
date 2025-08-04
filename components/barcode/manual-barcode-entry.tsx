@@ -51,7 +51,6 @@ export default function ManualBarcodeEntry({
 
   const productSearch = useProductSearch()
 
-
   const handleBarcodeSubmit = async () => {
     if (!barcode || barcode.length < 8) return
   }
@@ -222,7 +221,9 @@ export default function ManualBarcodeEntry({
                             {lookupResult.product.categories && (
                               <div>
                                 <strong>Category:</strong>{' '}
-                                {lookupResult.product.categories ? String(lookupResult.product.categories).split(',')[0]?.trim() : 'Unknown'}
+                                {lookupResult.product.categories
+                                  ? String(lookupResult.product.categories).split(',')[0]?.trim()
+                                  : 'Unknown'}
                               </div>
                             )}
                           </div>
@@ -238,7 +239,8 @@ export default function ManualBarcodeEntry({
                                   'Unknown Product') as string,
                                 brand: (lookupResult.product.brands || '') as string,
                                 category: (lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim() || ''
+                                  ? String(lookupResult.product.categories).split(',')[0]?.trim() ||
+                                    ''
                                   : '') as string,
                                 imageUrl: (lookupResult.product.image_front_url ||
                                   lookupResult.product.image_url ||
