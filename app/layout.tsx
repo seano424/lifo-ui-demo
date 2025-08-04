@@ -3,7 +3,6 @@ import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
-import { StoreProviderWrapper } from '@/components/providers/store-provider-wrapper'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { getMessages } from 'next-intl/server'
@@ -64,9 +63,7 @@ export default async function RootLayout({
         >
           <ReactQueryProvider>
             <LanguageProvider>
-              <IntlProvider initialMessages={messages}>
-                <StoreProviderWrapper>{children}</StoreProviderWrapper>
-              </IntlProvider>
+              <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
         </ThemeProvider>

@@ -620,15 +620,12 @@ export async function fetchCurrentUser(
   serverClient: Awaited<ReturnType<typeof createServerClient>>,
 ) {
   try {
-    console.log('[fetchCurrentUser] Getting server-side user')
-
     const {
       data: { user },
       error: authError,
     } = await serverClient.auth.getUser()
 
     if (authError || !user) {
-      console.log('[fetchCurrentUser] No authenticated user')
       return null
     }
 
@@ -636,7 +633,7 @@ export async function fetchCurrentUser(
     const transformedUser = transformAuthUserToUser(user)
 
     return transformedUser
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('[fetchCurrentUser] Unexpected error:', err)
     return null
   }

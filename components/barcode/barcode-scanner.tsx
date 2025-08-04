@@ -64,12 +64,9 @@ export default function BarcodeScanner({
 
   // Stop camera stream
   const stopCamera = useCallback(() => {
-    console.log('Stopping camera...')
-
     // Stop the media stream
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => {
-        console.log('Stopping track:', track.kind, track.readyState)
         track.stop()
       })
       streamRef.current = null
@@ -91,24 +88,14 @@ export default function BarcodeScanner({
     setIsScanning(false)
     setDetectedBarcode(null)
     isStartingRef.current = false
-
-    console.log('Camera stopped successfully')
   }, [])
 
   // Start camera stream
   const startCamera = useCallback(async () => {
     if (isStartingRef.current || isScanning || !isMounted || userStoppedCamera || !isInitialized) {
-      console.log('Camera start blocked:', {
-        isStarting: isStartingRef.current,
-        isScanning,
-        isMounted,
-        userStoppedCamera,
-        isInitialized,
-      })
       return
     }
 
-    console.log('Starting camera...')
     isStartingRef.current = true
 
     try {
@@ -147,13 +134,11 @@ export default function BarcodeScanner({
           if (isMounted && !userStoppedCamera) {
             videoRef.current?.play()
             setIsScanning(true)
-            console.log('Camera started successfully')
           }
         }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to access camera'
-      console.error('Camera start failed:', errorMessage)
       setError(errorMessage)
       setHasPermission(false)
       onError?.(new Error(errorMessage))
@@ -206,8 +191,10 @@ export default function BarcodeScanner({
           }
         }, 1000)
       }
-    } catch (error) {
-      console.error('Barcode detection failed:', error)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Barcode detection error:', error.message)
+      }
       // Don't spam errors, just continue scanning
     }
   }, [isScanning, isInitialized, detectBarcodes, isMounted, onScan])
@@ -248,7 +235,6 @@ export default function BarcodeScanner({
   // Initialize barcode detector
   useEffect(() => {
     if (!isInitialized && isMounted) {
-      console.log('Initializing barcode detector...')
       initializeDetector()
     }
   }, [isInitialized, initializeDetector, isMounted])
@@ -264,7 +250,6 @@ export default function BarcodeScanner({
       !userStoppedCamera &&
       hasPermission !== false
     ) {
-      console.log('Auto-starting camera...')
       startCamera()
     }
   }, [
@@ -279,14 +264,12 @@ export default function BarcodeScanner({
 
   // Handle user manually stopping the camera
   const handleUserStop = useCallback(() => {
-    console.log('User manually stopped camera')
     setUserStoppedCamera(true)
     stopCamera()
   }, [stopCamera])
 
   // Handle user manually starting the camera
   const handleUserStart = useCallback(() => {
-    console.log('User manually started camera')
     setUserStoppedCamera(false)
     startCamera()
   }, [startCamera])
@@ -294,7 +277,6 @@ export default function BarcodeScanner({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      console.log('Component unmounting, cleaning up...')
       stopCamera()
     }
   }, [stopCamera])

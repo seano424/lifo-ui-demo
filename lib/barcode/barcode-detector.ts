@@ -47,7 +47,6 @@ export class UniversalBarcodeDetector {
           formats: this.formats,
         })
         this.isNative = true
-        console.log('Using native BarcodeDetector API')
       } else {
         // Fallback to ZXing WebAssembly polyfill
         const BarcodeDetectorClass = await loadBarcodeDetectorPolyfill()
@@ -55,11 +54,9 @@ export class UniversalBarcodeDetector {
           formats: this.formats,
         })
         this.isNative = false
-        console.log('Using ZXing WebAssembly polyfill')
       }
-    } catch (error) {
-      console.error('Failed to initialize barcode detector:', error)
-      throw new Error('Barcode detection not supported')
+    } catch (error: unknown) {
+      throw new Error('Barcode detection not supported', { cause: error })
     }
   }
 

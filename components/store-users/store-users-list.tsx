@@ -114,16 +114,6 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
   const canManageUsers = serverPermissions?.canManageTeam ?? clientPermissions.canManageUsers
   const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
 
-  // 🚀 DEBUG: Show which storeId is being used
-  console.log('🔍 StoreUsersList storeId resolution:', {
-    propStoreId,
-    contextStoreId,
-    effectiveStoreId,
-    hasData: !!data?.length,
-    isLoading,
-    serverPermissions: !!serverPermissions,
-  })
-
   // Helper function to safely get translated role
   const getRoleTranslation = (role: string) => {
     try {
