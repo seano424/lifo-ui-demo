@@ -11,6 +11,9 @@ import {
   ArrowRight,
   Keyboard,
   Package,
+  ArrowUp,
+  BarChart3,
+  RefreshCcw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,7 +47,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog'
+
+// Import OCR hooks and utilities
+import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
+import { captureImageFromVideo } from '@/lib/api/ocr-client'
+
+// Import inventory submission hook
+import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 
 // Types for our streamlined workflow
 interface ScannedItem {
@@ -80,12 +91,20 @@ export default function WorkingStreamlinedScanningInterface({
   // Store actions
   const workflowActions = useScanningActions()
 
+  // OCR processing hook
+  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+
+  // Inventory submission hooks
+  const { submitBatch, isSubmittingBatch, batchResult } = useInventoryActions()
+  const { convertMultipleScannedItems } = useScannedItemConverter()
+
   // Local UI state for streamlined flow
   const [uiStep, setUIStep] = useState<UIStep>('camera-barcode')
   const [showManualBarcode, setShowManualBarcode] = useState(false)
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
   const [isRescanning, setIsRescanning] = useState(false)
+  const [ocrError, setOcrError] = useState<string | null>(null)
 
   const [isEditingItem, setIsEditingItem] = useState(false)
   const [editingItem, setEditingItem] = useState<ScannedItem | null>(null)
@@ -93,8 +112,17 @@ export default function WorkingStreamlinedScanningInterface({
     expiryDate: '',
     quantity: 1,
     price: 0,
+    productName: '',
+    brand: '',
+    barcode: '',
   })
+  const [showAdvancedEdit, setShowAdvancedEdit] = useState(false)
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [submissionResult, setSubmissionResult] = useState<{
+    successCount: number
+    totalCount: number
+  } | null>(null)
 
   // Form state for batch creation
   const [quantity, setQuantity] = useState(1)
@@ -159,7 +187,8 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-expiry')
         if (expiryInfo?.extractedDate && !isRescanning) {
           console.log('Workflow sync: setting date from expiryInfo:', expiryInfo.extractedDate)
-          setManualExpiryDate(expiryInfo.extractedDate)
+          const formattedDate = formatDateForInput(expiryInfo.extractedDate)
+          setManualExpiryDate(formattedDate)
         }
         break
       case 'complete':
@@ -222,18 +251,72 @@ export default function WorkingStreamlinedScanningInterface({
     }
   }
 
-  // Handle OCR simulation (replace with real OCR later)
-  const handleOCRCapture = () => {
-    console.log('handleOCRCapture called - setting date to 2025-02-15')
-    // Simulate OCR processing
-    const mockDate = '2025-02-15'
-    workflowActions.setExpiryDateResult({
-      extractedDate: mockDate,
-      confidence: 0.95,
-      isManual: false,
-      processingTime: 2000,
-    })
-    setManualExpiryDate(mockDate)
+  // Handle real OCR capture from camera
+  const handleOCRCapture = async () => {
+    if (!activeStore?.store_id) {
+      workflowActions.setError('No active store selected')
+      return
+    }
+
+    // Clear any previous errors
+    setOcrError(null)
+    workflowActions.setExpiryDateProcessing(true)
+
+    try {
+      // Find the video element from the BarcodeScanner component
+      const videoElement = document.querySelector('video') as HTMLVideoElement
+
+      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+        throw new Error('Camera not ready. Please ensure camera is active and showing video.')
+      }
+
+      console.log('Capturing image from video for OCR processing...')
+
+      // Capture image from video element
+      const imageBlob = await captureImageFromVideo(videoElement)
+
+      console.log(`Captured image: ${imageBlob.size} bytes, type: ${imageBlob.type}`)
+
+      // Process with OCR API
+      const result = await processExpiryDate(imageBlob, activeStore.store_id, {
+        confidenceThreshold: 0.65,
+        maxProcessingTimeMs: 5000,
+      })
+
+      if (result.success && result.expiryDateInfo) {
+        console.log('OCR processing successful:', result.expiryDateInfo)
+
+        // Update workflow store with OCR result
+        workflowActions.setExpiryDateResult(result.expiryDateInfo)
+
+        // Update local state for UI with properly formatted date
+        if (result.expiryDateInfo.extractedDate) {
+          const formattedDate = formatDateForInput(result.expiryDateInfo.extractedDate)
+          setManualExpiryDate(formattedDate)
+        }
+
+        setOcrError(null)
+      } else if (result.fallbackToManual) {
+        console.log('OCR failed, falling back to manual entry:', result.error)
+
+        setOcrError(result.error?.message || 'OCR processing failed')
+        workflowActions.setExpiryDateProcessing(false)
+
+        // Keep camera active for manual entry
+        // Don't automatically show manual date picker - let user decide
+      } else {
+        // Processing failed but might be retryable
+        setOcrError(result.error?.message || 'OCR processing failed')
+        workflowActions.setExpiryDateProcessing(false)
+      }
+    } catch (error) {
+      console.error('OCR capture failed:', error)
+
+      const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
+      setOcrError(errorMessage)
+      workflowActions.setError(errorMessage)
+      workflowActions.setExpiryDateProcessing(false)
+    }
   }
 
   // Handle manual expiry date confirmation
@@ -286,22 +369,52 @@ export default function WorkingStreamlinedScanningInterface({
   const handleConfirmSubmission = () => {
     console.log('Submitting', scannedItems.length, 'items:', scannedItems)
 
-    // TODO: Implement actual Supabase submission
-    // This is where you'd call your API to save to inventory
+    // Convert scanned items to the format expected by the inventory submission
+    const productsToSubmit = convertMultipleScannedItems(
+      scannedItems.map(item => ({
+        barcode: item.barcode,
+        productName: item.productName,
+        brand: item.brand,
+        expiryDate: item.expiryDate,
+        quantity: item.quantity,
+        price: item.price,
+      }))
+    )
 
-    // For now, show success and clear items
-    alert(`Successfully submitted ${scannedItems.length} items to inventory!`)
-
-    // Clear the batch and close dialog
-    setScannedItems([])
-    setShowSubmissionDialog(false)
-
-    // Optional: Reset to beginning
-    workflowActions.resetWorkflow()
+    // Submit the batch to inventory using the React Query hook
+    submitBatch(productsToSubmit, {
+      onSuccess: (result) => {
+        console.log('Batch submission completed:', result)
+        
+        // Store the result for the success dialog
+        setSubmissionResult({
+          successCount: result.successCount,
+          totalCount: productsToSubmit.length
+        })
+        
+        // Clear the batch and close submission dialog
+        setScannedItems([])
+        setShowSubmissionDialog(false)
+        
+        // Show success dialog
+        setShowSuccessDialog(true)
+      },
+      onError: (error) => {
+        console.error('Batch submission failed:', error)
+        // Dialog stays open so user can retry or cancel
+      },
+    })
   }
 
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+
+  // Convert ISO datetime to date input format (YYYY-MM-DD)
+  const formatDateForInput = (isoDate: string): string => {
+    if (!isoDate) return ''
+    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
+    return isoDate.split('T')[0]
+  }
 
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)
@@ -310,7 +423,11 @@ export default function WorkingStreamlinedScanningInterface({
       expiryDate: item.expiryDate,
       quantity: item.quantity,
       price: item.price,
+      productName: item.productName,
+      brand: item.brand || '',
+      barcode: item.barcode,
     })
+    setShowAdvancedEdit(false) // Reset to basic view
     setIsEditingItem(true)
   }
 
@@ -322,18 +439,23 @@ export default function WorkingStreamlinedScanningInterface({
       expiryDate: editForm.expiryDate,
       quantity: editForm.quantity,
       price: editForm.price,
+      productName: editForm.productName,
+      brand: editForm.brand || undefined,
+      barcode: editForm.barcode,
     }
 
     setScannedItems(prev => prev.map(item => (item.id === editingItem.id ? updatedItem : item)))
 
     setIsEditingItem(false)
     setEditingItem(null)
+    setShowAdvancedEdit(false)
   }
 
   const handleCancelEdit = () => {
     setIsEditingItem(false)
     setEditingItem(null)
-    setEditForm({ expiryDate: '', quantity: 1, price: 0 })
+    setShowAdvancedEdit(false)
+    setEditForm({ expiryDate: '', quantity: 1, price: 0, productName: '', brand: '', barcode: '' })
   }
 
   return (
@@ -505,15 +627,56 @@ export default function WorkingStreamlinedScanningInterface({
                   />
                 </div>
 
+                {/* OCR Status and Error Display */}
+                {ocrError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      OCR Error: {ocrError}
+                      {isBackendHealthy === false && (
+                        <span className="block mt-1 text-xs">
+                          FastAPI backend is not available. Please use manual entry.
+                        </span>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Backend Health Warning */}
+                {isBackendHealthy === false && !ocrError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      OCR service is currently unavailable. Please use manual date entry.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <div className="flex gap-2">
                   <Button
                     onClick={handleOCRCapture}
                     className="flex-1 bg-purple-600 hover:bg-purple-700"
-                    disabled={isWorkflowProcessing}
+                    disabled={isWorkflowProcessing || isOCRProcessing || isBackendHealthy === false}
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    {isWorkflowProcessing ? 'Processing...' : 'Capture Expiry Date'}
+                    {isOCRProcessing
+                      ? 'Processing OCR...'
+                      : isWorkflowProcessing
+                        ? 'Processing...'
+                        : 'Capture Expiry Date'}
                   </Button>
+                  {ocrError && (
+                    <Button
+                      onClick={() => {
+                        setOcrError(null)
+                        workflowActions.setError(null)
+                      }}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Clear Error
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
@@ -522,7 +685,11 @@ export default function WorkingStreamlinedScanningInterface({
             {!manualExpiryDate && (
               <Card>
                 <CardContent className="p-4 space-y-3">
-                  <Label className="font-medium">Or enter manually</Label>
+                  <Label className="font-medium">
+                    {ocrError || isBackendHealthy === false
+                      ? '📝 Manual Entry (OCR unavailable)'
+                      : 'Or enter manually'}
+                  </Label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label htmlFor="expiry" className="text-xs">
@@ -728,7 +895,7 @@ export default function WorkingStreamlinedScanningInterface({
           {scannedItems.length > 0 && (
             <div className="flex justify-center pt-4">
               <Button
-                variant="brandSecondary"
+                variant="secondary"
                 className="flex items-center gap-2"
                 onClick={handleFinalSubmission}
               >
@@ -745,20 +912,100 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
+              <DialogDescription>
+                {showAdvancedEdit 
+                  ? 'Edit all product details including name, brand, barcode, and inventory information.'
+                  : 'Quick edit expiry date, quantity, and price. Click "Edit Details" for more options.'
+                }
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
-              {/* Product Info */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="text-sm font-medium">{editingItem.productName}</div>
-                {editingItem.brand && (
-                  <div className="text-xs text-gray-600">{editingItem.brand}</div>
-                )}
-                <div className="text-xs text-gray-500 font-mono">{editingItem.barcode}</div>
-              </div>
+              {/* Product Info - Now editable in advanced mode */}
+              {!showAdvancedEdit ? (
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <div className="text-sm font-medium">{editingItem.productName}</div>
+                  {editingItem.brand && (
+                    <div className="text-xs text-gray-600">{editingItem.brand}</div>
+                  )}
+                  <div className="text-xs text-gray-500 font-mono">{editingItem.barcode}</div>
+                </div>
+              ) : (
+                <div className="space-y-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-sm font-medium text-blue-800 mb-2">Product Details</div>
+                  
+                  <div>
+                    <Label htmlFor="edit-product-name" className="text-sm font-medium">
+                      Product Name
+                    </Label>
+                    <Input
+                      id="edit-product-name"
+                      type="text"
+                      value={editForm.productName}
+                      onChange={e => setEditForm(prev => ({ ...prev, productName: e.target.value }))}
+                      className="mt-1"
+                      placeholder="Enter product name"
+                    />
+                  </div>
 
-              {/* Edit Form */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="edit-brand" className="text-sm font-medium">
+                        Brand
+                      </Label>
+                      <Input
+                        id="edit-brand"
+                        type="text"
+                        value={editForm.brand}
+                        onChange={e => setEditForm(prev => ({ ...prev, brand: e.target.value }))}
+                        className="mt-1"
+                        placeholder="Brand name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="edit-barcode" className="text-sm font-medium">
+                        Barcode
+                      </Label>
+                      <Input
+                        id="edit-barcode"
+                        type="text"
+                        value={editForm.barcode}
+                        onChange={e => setEditForm(prev => ({ ...prev, barcode: e.target.value }))}
+                        className="mt-1 font-mono text-sm"
+                        placeholder="Barcode number"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Edit Form - Always visible */}
               <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">
+                    {showAdvancedEdit ? 'Inventory Details' : 'Quick Edit'}
+                  </h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAdvancedEdit(!showAdvancedEdit)}
+                    className="text-xs h-7 px-2"
+                  >
+                    {showAdvancedEdit ? (
+                      <>
+                        <ArrowUp className="w-3 h-3 mr-1" />
+                        Hide Details
+                      </>
+                    ) : (
+                      <>
+                        <Edit3 className="w-3 h-3 mr-1" />
+                        Edit Details
+                      </>
+                    )}
+                  </Button>
+                </div>
+
                 <div>
                   <Label htmlFor="edit-expiry" className="text-sm font-medium">
                     Expiry Date
@@ -817,9 +1064,15 @@ export default function WorkingStreamlinedScanningInterface({
                 Cancel
               </Button>
               <Button
-                variant="brandSecondary"
+                variant="secondary"
                 onClick={handleSaveEdit}
-                disabled={!editForm.expiryDate || editForm.quantity <= 0 || editForm.price <= 0}
+                disabled={
+                  !editForm.expiryDate || 
+                  editForm.quantity <= 0 || 
+                  editForm.price <= 0 ||
+                  !editForm.productName.trim() ||
+                  !editForm.barcode.trim()
+                }
               >
                 Save Changes
               </Button>
@@ -834,6 +1087,9 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Submission</DialogTitle>
+              <DialogDescription>
+                Review the items below before submitting them to your inventory.
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
@@ -889,14 +1145,70 @@ export default function WorkingStreamlinedScanningInterface({
             </div>
 
             <DialogFooter className="mt-6">
-              <Button variant="outline" onClick={() => setShowSubmissionDialog(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowSubmissionDialog(false)}
+                disabled={isSubmittingBatch}
+              >
                 Cancel
               </Button>
-              <Button variant="brandSecondary" onClick={handleConfirmSubmission}>
+              <Button 
+                variant="secondary" 
+                onClick={handleConfirmSubmission}
+                disabled={isSubmittingBatch}
+              >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Submit to Inventory
+                {isSubmittingBatch ? 'Submitting...' : 'Submit to Inventory'}
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Success Dialog */}
+      {showSuccessDialog && submissionResult && (
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                Inventory Updated Successfully!
+              </DialogTitle>
+              <DialogDescription>
+                {submissionResult.successCount === submissionResult.totalCount ? (
+                  `Successfully added ${submissionResult.successCount} item${submissionResult.successCount > 1 ? 's' : ''} to your inventory.`
+                ) : (
+                  `Added ${submissionResult.successCount} of ${submissionResult.totalCount} items to inventory.`
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex flex-col gap-3 mt-4">
+              <Button
+                onClick={() => {
+                  setShowSuccessDialog(false)
+                  // Reset workflow to beginning for more scanning
+                  workflowActions.resetWorkflow()
+                }}
+                className="w-full"
+              >
+                <RefreshCcw className="w-4 h-4 mr-2" />
+                Keep Scanning
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowSuccessDialog(false)
+                  // Navigate to dashboard - you might need to add navigation logic here
+                  window.location.href = '/dashboard'
+                }}
+                className="w-full"
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                View in Dashboard
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       )}

@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { isValidPhoneNumber, formatPhoneNumber } from '@/lib/types/user'
-import { Edit, Check, X, AlertCircle, User, Phone, Globe, Shield, Clock } from 'lucide-react'
+import { Edit, Check, X, AlertCircle, Shield } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
 const createProfileSchema = (t: (key: string) => string) =>
@@ -157,16 +157,12 @@ export default function UserAccountInformation() {
   }
 
   return (
-    <Card>
+    <Card className="shadow-primary-300 border-t-0">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <Typography variant="h2" className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+            <Typography variant="h3" className="font-black">
               {t('title')}
-            </Typography>
-            <Typography variant="p" color="muted">
-              {t('description')}
             </Typography>
           </div>
         </div>
@@ -175,13 +171,12 @@ export default function UserAccountInformation() {
       <CardContent className="space-y-6 pt-4 border-t">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Typography variant="h3" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+            <Typography variant="h4" className="font-black">
               {t('profile.title')}
             </Typography>
             {!isEditingProfile && (
               <Button
-                variant="outline"
+                variant="subtleSecondary"
                 size="sm"
                 onClick={() => setIsEditingProfile(true)}
                 className="flex items-center gap-2"
@@ -282,14 +277,12 @@ export default function UserAccountInformation() {
 
         <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">
-            <Typography variant="h3" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
+            <Typography variant="h4" className="font-black">
               {t('phone.title')}
             </Typography>
             {!isEditingPhone && (
               <Button
-                variant="outline"
-                size="sm"
+                variant="subtleSecondary"
                 onClick={() => setIsEditingPhone(true)}
                 className="flex items-center gap-2"
               >
@@ -359,8 +352,7 @@ export default function UserAccountInformation() {
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h3" className="flex items-center gap-2">
-            <Globe className="h-4 w-4" />
+          <Typography variant="h4" className="font-black">
             {t('language.title')}
           </Typography>
 
@@ -376,8 +368,7 @@ export default function UserAccountInformation() {
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h3" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
+          <Typography variant="h4" className="font-black">
             {t('status.title')}
           </Typography>
 
@@ -427,8 +418,7 @@ export default function UserAccountInformation() {
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h3" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
+          <Typography variant="h4" className="font-black">
             {t('activity.title')}
           </Typography>
 

@@ -35,11 +35,35 @@
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
 
-  /* Your custom brand colors */
+  /* Your existing custom brand colors (preserved) */
   --color-brand-dark: hsl(225 42% 8%);
   --color-brand-white: hsl(0 0% 100%);
   --color-brand-primary: hsl(263 82% 45%);
   --color-brand-secondary: hsl(207 87% 54%);
+
+  /* New Primary Color Palette */
+  --color-primary-50: hsl(263 64% 90%);
+  --color-primary-100: hsl(263 66% 85%);
+  --color-primary-200: hsl(263 68% 80%);
+  --color-primary-300: hsl(263 70% 75%);
+  --color-primary-400: hsl(263 72% 70%);
+  --color-primary-500: hsl(263 74% 65%);
+  --color-primary-600: hsl(263 76% 60%);
+  --color-primary-700: hsl(263 78% 55%);
+  --color-primary-800: hsl(263 80% 50%);
+  --color-primary-900: hsl(263 82% 45%);
+
+  /* New Secondary Color Palette */
+  --color-secondary-50: hsl(207 69% 99%);
+  --color-secondary-100: hsl(207 71% 94%);
+  --color-secondary-200: hsl(207 73% 89%);
+  --color-secondary-300: hsl(207 75% 84%);
+  --color-secondary-400: hsl(207 77% 79%);
+  --color-secondary-500: hsl(207 79% 74%);
+  --color-secondary-600: hsl(207 81% 69%);
+  --color-secondary-700: hsl(207 83% 64%);
+  --color-secondary-800: hsl(207 85% 59%);
+  --color-secondary-900: hsl(207 87% 54%);
 
   /* Font families */
   --font-sans:
@@ -63,11 +87,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 225 42% 8%;
 
-    /* Your brand primary */
+    /* Your brand primary - now using the 900 shade from your palette */
     --primary: 263 82% 45%;
     --primary-foreground: 0 0% 100%;
 
-    /* Your brand secondary */
+    /* Your brand secondary - now using the 900 shade from your palette */
     --secondary: 207 87% 54%;
     --secondary-foreground: 0 0% 100%;
 
@@ -75,8 +99,8 @@
     --muted: 220 14% 96%;
     --muted-foreground: 220 8% 46%;
 
-    /* Accent - lighter version of primary */
-    --accent: 263 82% 96%;
+    /* Accent - using primary-50 for consistency */
+    --accent: 263 64% 90%;
     --accent-foreground: 263 82% 45%;
 
     /* Destructive - red for errors */
@@ -88,9 +112,9 @@
     --input: 220 13% 91%;
     --ring: 263 82% 45%;
 
-    /* Chart colors using your palette */
-    --chart-1: 263 82% 45%; /* Your primary */
-    --chart-2: 207 87% 54%; /* Your secondary */
+    /* Chart colors using your new palettes */
+    --chart-1: 263 82% 45%; /* Primary 900 */
+    --chart-2: 207 87% 54%; /* Secondary 900 */
     --chart-3: 142 71% 45%; /* Complementary green */
     --chart-4: 38 92% 50%; /* Complementary orange */
     --chart-5: 346 87% 43%; /* Complementary pink */
@@ -107,21 +131,21 @@
     --popover: 225 42% 8%;
     --popover-foreground: 0 0% 98%;
 
-    /* Your brand primary - slightly lighter for dark mode */
-    --primary: 263 82% 55%;
+    /* Your brand primary - using primary-700 for better dark mode contrast */
+    --primary: 263 78% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Your brand secondary - slightly lighter for dark mode */
-    --secondary: 207 87% 64%;
+    /* Your brand secondary - using secondary-700 for better dark mode contrast */
+    --secondary: 207 83% 64%;
     --secondary-foreground: 0 0% 100%;
 
     /* Muted areas - lighter than background */
     --muted: 225 42% 15%;
     --muted-foreground: 215 20% 65%;
 
-    /* Accent - darker version of primary background */
+    /* Accent - using primary-900 on dark background */
     --accent: 225 42% 15%;
-    --accent-foreground: 263 82% 55%;
+    --accent-foreground: 263 78% 55%;
 
     /* Destructive - slightly muted red for dark mode */
     --destructive: 0 63% 31%;
@@ -130,11 +154,11 @@
     /* Borders and inputs */
     --border: 225 42% 15%;
     --input: 225 42% 15%;
-    --ring: 263 82% 55%;
+    --ring: 263 78% 55%;
 
-    /* Chart colors - adjusted for dark mode */
-    --chart-1: 263 82% 65%; /* Lighter primary */
-    --chart-2: 207 87% 64%; /* Lighter secondary */
+    /* Chart colors - using lighter shades for dark mode */
+    --chart-1: 263 78% 55%; /* Primary 700 */
+    --chart-2: 207 83% 64%; /* Secondary 700 */
     --chart-3: 142 71% 55%; /* Lighter green */
     --chart-4: 38 92% 60%; /* Lighter orange */
     --chart-5: 346 87% 53%; /* Lighter pink */
@@ -174,12 +198,12 @@
 .dark {
   --sidebar: 225 42% 10%;
   --sidebar-foreground: 0 0% 98%;
-  --sidebar-primary: 263 82% 55%;
+  --sidebar-primary: 263 78% 55%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 225 42% 15%;
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: 225 42% 15%;
-  --sidebar-ring: 263 82% 55%;
+  --sidebar-ring: 263 78% 55%;
 }
 
 @theme inline {

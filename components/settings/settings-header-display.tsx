@@ -1,14 +1,19 @@
 'use client'
 
 import { useStoreState } from '@/lib/stores/store-context'
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { Typography } from '@/components/ui/typography'
+import { Skeleton } from '../ui/skeleton'
 
 export default function SettingsHeaderDisplay() {
   const { activeStore, isLoadingStores, isChangingStore } = useStoreState()
 
   if (isLoadingStores || isChangingStore || !activeStore?.store_name) {
-    return <DashboardInsetHeader title="Loading..." isLoading={true} />
+    return <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-full" />
   }
 
-  return <DashboardInsetHeader title={`${activeStore?.store_name} Settings`} />
+  return (
+    <Typography variant="h2" className="font-black text-center text-primary-500">
+      {activeStore?.store_name} Settings
+    </Typography>
+  )
 }

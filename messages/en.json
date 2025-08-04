@@ -265,16 +265,25 @@
     "profile": {
       "title": "Profile Information",
       "fullName": "Full Name",
+      "username": "Username",
       "email": "Email Address",
       "fullNamePlaceholder": "Enter your full name",
       "emailPlaceholder": "Enter your email address",
       "noName": "No name",
+      "noUsername": "No username",
       "noEmail": "No email",
       "emailNotice": "Email cannot be changed. Contact support if needed.",
       "edit": "Edit",
       "save": "Save Changes",
       "cancel": "Cancel",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "validation": {
+        "nameRequired": "Full name is required",
+        "nameTooLong": "Full name must be less than 100 characters",
+        "usernameRequired": "Username must be at least 2 characters",
+        "usernameTooLong": "Username must be less than 50 characters",
+        "usernameInvalid": "Username can only contain letters, numbers, and underscores"
+      }
     },
     "phone": {
       "title": "Phone Number",
@@ -284,6 +293,7 @@
       "noPhone": "No phone number set",
       "addNotice": "Add a phone number for account security and notifications",
       "invalidPhone": "Please enter a valid phone number",
+      "verified": "Verified",
       "edit": "Edit",
       "save": "Save Phone",
       "cancel": "Cancel",
@@ -309,8 +319,10 @@
       "updatePhone": "Failed to update phone number"
     },
     "activity": {
+      "title": "Account Activity",
       "memberSince": "Member since {date}",
       "lastLogin": "Last login: {date}",
+      "neverLoggedIn": "Never logged in",
       "failedAttempts": "{count} failed PIN attempt{plural}"
     },
     "security": {
@@ -330,6 +342,8 @@
     "milestones": "Milestones",
     "todo": "To-Do",
     "settings": "Settings",
+    "store": "Store",
+    "team": "Team",
     "users": "Users",
     "teams": "Teams",
     "stores": "Stores",

@@ -22,18 +22,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import {
-  Edit,
-  Check,
-  X,
-  AlertCircle,
-  Store,
-  MapPin,
-  Phone,
-  Globe,
-  Building,
-  Shield,
-} from 'lucide-react'
+import { Edit, Check, X, AlertCircle, Globe } from 'lucide-react'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 
 // Interface for server permissions prop
@@ -341,12 +330,11 @@ export default function StoreInformation({
   }
 
   return (
-    <Card>
+    <Card className="shadow-primary-300 border-t-0">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <Typography variant="h2" className="flex items-center gap-2">
-              <Store className="h-5 w-5" />
+            <Typography variant="h3" className="flex font-black items-center gap-2">
               {t('storeInformation.title')}
             </Typography>
             <Typography variant="p" color="muted">
@@ -354,15 +342,9 @@ export default function StoreInformation({
             </Typography>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs">
-              <Shield className="h-3 w-3" />
-              {permissions.isOwner ? 'Owner' : permissions.isManager ? 'Manager' : 'Employee'}
-            </div>
-
             {!isEditing && permissions.canEditBasicInfo && (
               <Button
-                variant="outline"
-                size="sm"
+                variant="subtleSecondary"
                 onClick={() => setIsEditing(true)}
                 className="flex items-center gap-2"
               >
@@ -377,10 +359,9 @@ export default function StoreInformation({
       <CardContent className="space-y-6 pt-4 border-t">
         <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Building className="h-4 w-4" />
-              <Typography variant="h3">{t('storeInformation.sections.storeDetails')}</Typography>
-            </div>
+            <Typography variant="h4" className="font-black">
+              {t('storeInformation.sections.storeDetails')}
+            </Typography>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -491,12 +472,9 @@ export default function StoreInformation({
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <Typography variant="h3">
-                {t('storeInformation.sections.addressInformation')}
-              </Typography>
-            </div>
+            <Typography variant="h4" className="font-black">
+              {t('storeInformation.sections.addressInformation')}
+            </Typography>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2 space-y-2">
@@ -576,12 +554,9 @@ export default function StoreInformation({
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              <Typography variant="h3">
-                {t('storeInformation.sections.contactInformation')}
-              </Typography>
-            </div>
+            <Typography variant="h4" className="font-black">
+              {t('storeInformation.sections.contactInformation')}
+            </Typography>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -655,7 +630,9 @@ export default function StoreInformation({
           </div>
 
           <div className="space-y-4">
-            <Typography variant="h3">{t('storeInformation.sections.storeDescription')}</Typography>
+            <Typography variant="h4" className="font-black">
+              {t('storeInformation.sections.storeDescription')}
+            </Typography>
 
             <div className="space-y-2">
               <Label htmlFor="description">{t('storeInformation.fields.description')}</Label>
@@ -681,7 +658,7 @@ export default function StoreInformation({
 
           {permissions.canEditAdvancedSettings && (
             <div className="space-y-4">
-              <Typography variant="h3">
+              <Typography variant="h4" className="font-black">
                 {t('storeInformation.sections.businessSettings')}
               </Typography>
 

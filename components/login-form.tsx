@@ -176,12 +176,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
         <CardContent>
           <Tabs value={authMode} onValueChange={value => handleModeChange(value as AuthMode)}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="employee" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-2 font-mono">
+              <TabsTrigger value="employee" className="flex items-center gap-2 uppercase">
                 <User className="w-4 h-4" />
                 Employee
               </TabsTrigger>
-              <TabsTrigger value="admin" className="flex items-center gap-2">
+              <TabsTrigger value="admin" className="flex items-center gap-2 uppercase">
                 <Key className="w-4 h-4" />
                 Manager/Owner
               </TabsTrigger>
@@ -189,9 +189,9 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             {/* Employee PIN Login */}
             <TabsContent value="employee" className="space-y-4">
-              <form onSubmit={handlePINLogin} className="space-y-4">
+              <form onSubmit={handlePINLogin} className="space-y-4 font-mono uppercase">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">Username or Email</Label>
                   <Input
                     id="username"
                     type="text"
@@ -245,7 +245,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             {/* Admin Email/Password Login */}
             <TabsContent value="admin" className="space-y-4">
-              <form onSubmit={handleEmailLogin} className="space-y-4">
+              <form onSubmit={handleEmailLogin} className="space-y-4 font-mono uppercase">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input

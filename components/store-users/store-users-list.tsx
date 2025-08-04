@@ -188,21 +188,13 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
   return (
     <>
-      <Card>
+      <Card className="shadow-primary-300 border-t-0">
         <CardHeader>
-          <div className="flex flex-col">
-            <Typography variant="h2">{t('title')}</Typography>
-            <Typography variant="p" color="muted">
-              {t('description')}
+          <div className="flex items-center justify-between">
+            <Typography variant="h3" className="font-black">
+              {t('title')}
             </Typography>
-          </div>
-        </CardHeader>
 
-        <CardContent>
-          <div className="flex justify-between items-center mb-4">
-            <Typography variant="p" color="muted">
-              {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
-            </Typography>
             {canManageUsers && (
               <Button
                 variant="secondary"
@@ -214,6 +206,12 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               </Button>
             )}
           </div>
+        </CardHeader>
+
+        <CardContent>
+          <Typography variant="p" color="muted">
+            {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
+          </Typography>
 
           <Table>
             <TableHeader>

@@ -7,7 +7,20 @@ import { useRouter } from 'next/navigation'
 
 interface LogoutButtonProps {
   className?: string
-  variant?: 'default' | 'secondary' | 'ghost' | 'brandSecondary' | 'destructive'
+  variant?:
+    | 'link'
+    | 'default'
+    | 'secondary'
+    | 'ghost'
+    | 'destructive'
+    | 'outline'
+    | 'subtle'
+    | 'subtleSecondary'
+    | 'brand'
+    | 'brandOutline'
+    | 'brandSecondaryOutline'
+    | null
+    | undefined
 }
 
 export function LogoutButton({ className, variant = 'default' }: LogoutButtonProps) {

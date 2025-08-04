@@ -10,10 +10,12 @@ This comprehensive demo showcases all the optimized backend capabilities for the
 ## 📋 Demo Scenarios
 
 ### Scenario 1: OCR Expiry Date Extraction
+
 **Use Case:** Product has barcode but expiry date is printed on package and needs OCR
 **Endpoint:** `POST /api/v1/ocr/scan/ocr-expiry/{store_id}`
 
 #### Demo Request
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_123" \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -24,6 +26,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_123" \
 ```
 
 #### Expected Response
+
 ```json
 {
   "success": true,
@@ -35,6 +38,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_123" \
 ```
 
 #### Demo Images for Testing (European Focus)
+
 - `expiry_date_clear_ddmmyyyy.jpg` - Clear European date format (DD/MM/YYYY)
 - `expiry_date_french.jpg` - French expiry date ("À consommer avant le 15/03/2024")
 - `expiry_date_german.jpg` - German expiry date ("Mindestens haltbar bis 15.03.2024")
@@ -45,10 +49,12 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_123" \
 ---
 
 ### Scenario 2: Full OCR Analysis
+
 **Use Case:** Complex product image requiring comprehensive analysis
 **Endpoint:** `POST /api/v1/ocr/scan/full-ocr/{store_id}`
 
 #### Demo Request
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -59,6 +65,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
 ```
 
 #### Expected Response
+
 ```json
 {
   "success": true,
@@ -82,7 +89,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
     "processing_time_ms": 2340,
     "data_sources": ["google_vision"],
     "requires_user_confirmation": false,
-    "image_dimensions": {"width": 1024, "height": 768}
+    "image_dimensions": { "width": 1024, "height": 768 }
   },
   "vision_details": {
     "detected_barcodes": 1,
@@ -93,6 +100,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
 ```
 
 #### Demo Images for Testing (European Products)
+
 - `complex_product_eu_milk.jpg` - European milk carton with EAN-13, multilingual text
 - `complex_product_french_cheese.jpg` - French cheese with French expiry date
 - `complex_product_german_bread.jpg` - German bread with German date format
@@ -103,10 +111,12 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_123" \
 ---
 
 ### Scenario 3: Text Extraction for Manual Entry
+
 **Use Case:** Help user with manual product entry by extracting visible text
 **Endpoint:** `POST /api/v1/ocr/scan/text-extraction/{store_id}`
 
 #### Demo Request
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/store_123" \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -116,6 +126,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/store_123" \
 ```
 
 #### Expected Response
+
 ```json
 {
   "success": true,
@@ -138,6 +149,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/store_123" \
 ```
 
 #### Demo Images for Testing
+
 - `manual_entry_clear_text.jpg` - Clear product with readable text
 - `manual_entry_handwritten.jpg` - Product with handwritten labels
 - `manual_entry_foreign_language.jpg` - Non-English product text
@@ -146,10 +158,12 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/store_123" \
 ---
 
 ### Scenario 4: Vision-Based Image Analysis
+
 **Use Case:** Advanced image analysis for quality assessment
 **Endpoint:** `POST /api/v1/vision/analyze-image/{store_id}`
 
 #### Demo Request
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -160,6 +174,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
 ```
 
 #### Expected Response
+
 ```json
 {
   "success": true,
@@ -173,24 +188,24 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
         "type": "expiry_date",
         "value": "2024-03-25",
         "confidence": 0.89,
-        "bounding_box": {"x": 120, "y": 340, "width": 80, "height": 20},
+        "bounding_box": { "x": 120, "y": 340, "width": 80, "height": 20 },
         "original_text": "25/03/24"
       },
       {
         "type": "barcode_ean13",
         "value": "8712345678901",
         "confidence": 0.95,
-        "bounding_box": {"x": 50, "y": 200, "width": 150, "height": 40}
+        "bounding_box": { "x": 50, "y": 200, "width": 150, "height": 40 }
       },
       {
         "type": "product_name",
         "value": "Organic Bananas",
         "confidence": 0.87,
-        "bounding_box": {"x": 30, "y": 50, "width": 200, "height": 30}
+        "bounding_box": { "x": 30, "y": 50, "width": 200, "height": 30 }
       }
     ],
     "analysis_metadata": {
-      "processing_confidence": 0.90,
+      "processing_confidence": 0.9,
       "data_sources": ["google_vision"],
       "requires_user_confirmation": false
     }
@@ -199,7 +214,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
     "model_version": "google_vision_v3.4_openfoodfacts_v2",
     "processing_time_ms": 2145,
     "image_size_bytes": 1024768,
-    "confidence_score": 0.90
+    "confidence_score": 0.9
   },
   "next_steps": [
     "Review detected information for accuracy",
@@ -214,27 +229,31 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_123" \
 ## 🇪🇺 European Market Optimizations
 
 ### Regional Configuration
+
 All backend endpoints are optimized for European markets:
 
 - **Google Vision Endpoint**: `eu-vision.googleapis.com` for GDPR compliance
-- **Target Markets**: France, Germany, Netherlands 
+- **Target Markets**: France, Germany, Netherlands
 - **Date Format Priority**: DD/MM/YYYY (European standard)
 - **Barcode Standards**: EAN-13 (13 digits), EAN-8 (8 digits)
 
 ### Multilingual Support
+
 The OCR system supports:
+
 - **English**: "Best before", "Use by", "Exp"
 - **French**: "À consommer avant", "DLC", "DLUO"
 - **German**: "Mindestens haltbar bis", "MHD", "Verbrauchen bis"
 - **Dutch**: "Ten minste houdbaar tot", "THT", "Te gebruiken tot"
 
 ### European Test Examples
+
 ```bash
 # Test French product
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/store_fr" \
   -F "image=@test_images/french_yogurt.jpg"
 
-# Test German product  
+# Test German product
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/store_de" \
   -F "image=@test_images/german_bread.jpg"
 
@@ -248,6 +267,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/store_nl" \
 ## 🧪 Testing Workflow
 
 ### 1. Set Up Test Environment
+
 ```bash
 # Start the backend server
 uvicorn app.main:app --reload --port 8000
@@ -257,13 +277,16 @@ curl http://localhost:8000/health
 ```
 
 ### 2. Authentication Setup
+
 ```bash
 # Get authentication token
 export AUTH_TOKEN="your-auth-token-here"
 ```
 
 ### 3. Test Image Preparation
+
 Create a test image directory with sample images:
+
 ```bash
 mkdir -p test_images
 # Add your test images to this directory
@@ -272,6 +295,7 @@ mkdir -p test_images
 ### 4. Run Complete Demo Workflow
 
 #### Step 1: OCR Expiry Date Extraction
+
 ```bash
 # Test with clear expiry date
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
@@ -281,6 +305,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/ocr-expiry/test_store" \
 ```
 
 #### Step 2: Full OCR Analysis
+
 ```bash
 # Test comprehensive analysis
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
@@ -290,6 +315,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/test_store" \
 ```
 
 #### Step 3: Text Extraction
+
 ```bash
 # Test manual entry assistance
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/test_store" \
@@ -299,6 +325,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/text-extraction/test_store" 
 ```
 
 #### Step 4: Vision Analysis
+
 ```bash
 # Test advanced image analysis
 curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/test_store" \
@@ -312,17 +339,20 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/test_store" \
 ## 📊 Performance Benchmarks
 
 ### Response Time Targets
+
 - **OCR Expiry Extraction**: < 4 seconds
-- **Full OCR Analysis**: < 5 seconds  
+- **Full OCR Analysis**: < 5 seconds
 - **Text Extraction**: < 3 seconds
 - **Vision Analysis**: < 5 seconds
 
 ### Confidence Score Thresholds
+
 - **High Confidence**: > 0.8 (Auto-accept)
 - **Medium Confidence**: 0.6 - 0.8 (User confirmation)
 - **Low Confidence**: < 0.6 (Manual entry recommended)
 
 ### Image Size Limits
+
 - **OCR Expiry**: 10MB max
 - **Full OCR**: 15MB max
 - **Text Extraction**: 8MB max
@@ -333,6 +363,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/test_store" \
 ## 🔧 Configuration Options
 
 ### Processing Timeouts
+
 ```python
 # Endpoint-specific timeouts
 OCR_EXPIRY_TIMEOUT = 4000  # 4 seconds
@@ -341,6 +372,7 @@ TEXT_EXTRACTION_TIMEOUT = 3000  # 3 seconds
 ```
 
 ### Confidence Thresholds
+
 ```python
 # Default confidence thresholds
 BARCODE_MIN_CONFIDENCE = 0.6
@@ -350,6 +382,7 @@ OVERALL_MIN_CONFIDENCE = 0.7
 ```
 
 ### Rate Limiting
+
 ```python
 # API rate limits per minute
 OCR_EXPIRY_RATE = 12
@@ -365,32 +398,40 @@ VISION_ANALYSIS_RATE = 10
 ### Common Issues and Solutions
 
 #### 1. Low Confidence Scores
+
 **Problem**: OCR returning low confidence scores
 **Solutions**:
+
 - Ensure good lighting in images
 - Check image resolution (min 800x600 recommended)
 - Verify text is clearly visible and not rotated
 - Try adjusting confidence_threshold parameter
 
 #### 2. Timeout Errors
+
 **Problem**: Requests timing out
 **Solutions**:
+
 - Reduce image file size
 - Increase max_processing_time_ms parameter
 - Check Google Vision API status
 - Verify network connectivity
 
 #### 3. Invalid Image Format
+
 **Problem**: Image upload rejected
 **Solutions**:
+
 - Use supported formats: JPEG, PNG, WebP
 - Check file size limits
 - Verify image is not corrupted
 - Test with simple image first
 
 #### 4. Authentication Errors
+
 **Problem**: 401/403 errors
 **Solutions**:
+
 - Verify authentication token is valid
 - Check token has required permissions
 - Ensure store_id format is correct (alphanumeric + hyphens)
@@ -400,17 +441,20 @@ VISION_ANALYSIS_RATE = 10
 ## 📈 Performance Monitoring
 
 ### Key Metrics to Track
+
 - **Processing Time**: Monitor average response times
-- **Confidence Scores**: Track accuracy over time  
+- **Confidence Scores**: Track accuracy over time
 - **Error Rates**: Monitor failed requests
 - **API Usage**: Track endpoint usage patterns
 
 ### Health Check Endpoint
+
 ```bash
 curl http://localhost:8000/api/v1/vision/ml-models/status
 ```
 
 Expected response:
+
 ```json
 {
   "overall_status": "ready",
@@ -421,7 +465,7 @@ Expected response:
       "accuracy": 0.92
     },
     "barcode_detector": {
-      "status": "ready", 
+      "status": "ready",
       "version": "v2.1.0",
       "accuracy": 0.96
     }

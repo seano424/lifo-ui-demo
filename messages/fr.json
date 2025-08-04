@@ -266,16 +266,25 @@
     "profile": {
       "title": "Informations de profil",
       "fullName": "Nom complet",
+      "username": "Nom d'utilisateur",
       "email": "Adresse e-mail",
       "fullNamePlaceholder": "Entrez votre nom complet",
       "emailPlaceholder": "Entrez votre adresse e-mail",
       "noName": "Aucun nom",
+      "noUsername": "Aucun nom d'utilisateur",
       "noEmail": "Aucun e-mail",
       "emailNotice": "L'e-mail ne peut pas être modifié. Contactez le support si nécessaire.",
       "edit": "Modifier",
       "save": "Sauvegarder les modifications",
       "cancel": "Annuler",
-      "saving": "Sauvegarde..."
+      "saving": "Sauvegarde...",
+      "validation": {
+        "nameRequired": "Le nom complet est requis",
+        "nameTooLong": "Le nom complet doit contenir moins de 100 caractères",
+        "usernameRequired": "Le nom d'utilisateur doit contenir au moins 2 caractères",
+        "usernameTooLong": "Le nom d'utilisateur doit contenir moins de 50 caractères",
+        "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas"
+      }
     },
     "phone": {
       "title": "Numéro de téléphone",
@@ -285,6 +294,7 @@
       "noPhone": "Aucun numéro de téléphone défini",
       "addNotice": "Ajoutez un numéro de téléphone pour la sécurité du compte et les notifications",
       "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
+      "verified": "Vérifié",
       "edit": "Modifier",
       "save": "Sauvegarder le téléphone",
       "cancel": "Annuler",
@@ -309,8 +319,10 @@
       "updatePhone": "Échec de la mise à jour du numéro de téléphone"
     },
     "activity": {
+      "title": "Activité du compte",
       "memberSince": "Membre depuis {date}",
       "lastLogin": "Dernière connexion: {date}",
+      "neverLoggedIn": "Jamais connecté",
       "failedAttempts": "{count} tentative{plural} PIN échouée{plural}"
     },
     "security": {
@@ -330,6 +342,8 @@
     "milestones": "Étapes",
     "todo": "À faire",
     "settings": "Paramètres",
+    "store": "Magasin",
+    "team": "Équipe",
     "users": "Utilisateurs",
     "teams": "Équipes",
     "stores": "Magasins",

@@ -389,7 +389,7 @@ export default function BarcodeScanner({
               <Button
                 onClick={handleUserStart}
                 className="flex-1"
-                variant="brandSecondary"
+                variant="secondary"
                 disabled={!isInitialized || isStartingRef.current}
               >
                 <Camera className="w-4 h-4 mr-2" />

@@ -22,7 +22,9 @@ export default function DashboardInsetHeader({
           <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-full" />
         ) : (
           <>
-            <Typography variant="h1">{title}</Typography>
+            <Typography variant="h2" className="font-black">
+              {title}
+            </Typography>
             {description && (
               <Typography variant="p" color="muted">
                 {description}

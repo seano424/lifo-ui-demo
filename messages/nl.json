@@ -266,16 +266,25 @@
     "profile": {
       "title": "Profielinformatie",
       "fullName": "Volledige naam",
+      "username": "Gebruikersnaam",
       "email": "E-mailadres",
       "fullNamePlaceholder": "Voer uw volledige naam in",
       "emailPlaceholder": "Voer uw e-mailadres in",
       "noName": "Geen naam",
+      "noUsername": "Geen gebruikersnaam",
       "noEmail": "Geen e-mail",
       "emailNotice": "E-mail kan niet worden gewijzigd. Neem contact op met ondersteuning indien nodig.",
       "edit": "Bewerken",
       "save": "Wijzigingen opslaan",
       "cancel": "Annuleren",
-      "saving": "Opslaan..."
+      "saving": "Opslaan...",
+      "validation": {
+        "nameRequired": "Volledige naam is verplicht",
+        "nameTooLong": "Volledige naam moet minder dan 100 tekens bevatten",
+        "usernameRequired": "Gebruikersnaam moet minimaal 2 tekens bevatten",
+        "usernameTooLong": "Gebruikersnaam moet minder dan 50 tekens bevatten",
+        "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
+      }
     },
     "phone": {
       "title": "Telefoonnummer",
@@ -285,6 +294,7 @@
       "noPhone": "Geen telefoonnummer ingesteld",
       "addNotice": "Voeg een telefoonnummer toe voor accountbeveiliging en meldingen",
       "invalidPhone": "Voer een geldig telefoonnummer in",
+      "verified": "Geverifieerd",
       "edit": "Bewerken",
       "save": "Telefoon opslaan",
       "cancel": "Annuleren",
@@ -309,8 +319,10 @@
       "updatePhone": "Kan telefoonnummer niet bijwerken"
     },
     "activity": {
+      "title": "Accountactiviteit",
       "memberSince": "Lid sinds {date}",
       "lastLogin": "Laatste login: {date}",
+      "neverLoggedIn": "Nooit ingelogd",
       "failedAttempts": "{count} mislukte PIN poging{plural}"
     },
     "security": {
@@ -330,6 +342,8 @@
     "milestones": "Mijlpalen",
     "todo": "Te doen",
     "settings": "Instellingen",
+    "store": "Winkel",
+    "team": "Team",
     "users": "Gebruikers",
     "teams": "Teams",
     "stores": "Winkels",
