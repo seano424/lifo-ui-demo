@@ -49,13 +49,13 @@ export interface BatchPerformance {
  */
 export const BATCH_SOURCES = {
   MANUAL: 'manual',
-  BARCODE: 'barcode', 
+  BARCODE: 'barcode',
   CSV_IMPORT: 'csv_import',
   API: 'api',
   POS_INTEGRATION: 'pos_integration',
 } as const
 
-export type BatchSource = typeof BATCH_SOURCES[keyof typeof BATCH_SOURCES]
+export type BatchSource = (typeof BATCH_SOURCES)[keyof typeof BATCH_SOURCES]
 
 /**
  * Database constants - batch statuses
@@ -67,16 +67,16 @@ export const BATCH_STATUSES = {
   SOLD_OUT: 'sold_out',
 } as const
 
-export type BatchStatus = typeof BATCH_STATUSES[keyof typeof BATCH_STATUSES]
+export type BatchStatus = (typeof BATCH_STATUSES)[keyof typeof BATCH_STATUSES]
 
 /**
  * Database constants - verification statuses
  */
 export const VERIFICATION_STATUSES = {
   VERIFIED: 'verified',
-  PENDING: 'pending', 
+  PENDING: 'pending',
   FLAGGED: 'flagged',
   REJECTED: 'rejected',
 } as const
 
-export type VerificationStatus = typeof VERIFICATION_STATUSES[keyof typeof VERIFICATION_STATUSES]
+export type VerificationStatus = (typeof VERIFICATION_STATUSES)[keyof typeof VERIFICATION_STATUSES]
