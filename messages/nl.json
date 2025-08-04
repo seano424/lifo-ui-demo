@@ -547,5 +547,22 @@
         "noCreditCard": "Geen creditcard vereist"
       }
     }
+  },
+  "footer": {
+    "description": "Bedrijven helpen voorraad te optimaliseren met intelligente oplossingen om afval te verminderen en winst te maximaliseren.",
+    "quickLinks": "Snelle Links",
+    "links": {
+      "aboutUs": "Over Ons",
+      "products": "Producten",
+      "pricing": "Prijzen",
+      "blog": "Blog"
+    },
+    "contactUs": "Neem Contact Op",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Alle rechten voorbehouden.",
+    "legal": {
+      "privacyPolicy": "Privacybeleid",
+      "termsOfService": "Servicevoorwaarden"
+    }
   }
 }

@@ -547,5 +547,22 @@
         "noCreditCard": "Aucune carte de crédit requise"
       }
     }
+  },
+  "footer": {
+    "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
+    "quickLinks": "Liens Rapides",
+    "links": {
+      "aboutUs": "À Propos",
+      "products": "Produits",
+      "pricing": "Tarifs",
+      "blog": "Blog"
+    },
+    "contactUs": "Contactez-Nous",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Tous droits réservés.",
+    "legal": {
+      "privacyPolicy": "Politique de Confidentialité",
+      "termsOfService": "Conditions d'Utilisation"
+    }
   }
 }
