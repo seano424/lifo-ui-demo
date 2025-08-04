@@ -94,22 +94,14 @@ export function TeamSwitcher() {
             <SidebarMenuButton
               size="lg"
               className={cn(
-                'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center rounded-lg',
+                'data-[state=open]:bg-secondary-100/80 data-[state=open]:text-sidebar-accent-foreground flex items-center rounded-xl bg-secondary-100/80 hover:bg-secondary-100',
                 'group-data-[state=collapsed]:border-none',
               )}
               disabled={isChangingStore}
             >
-              <div className={`flex aspect-square size-8 items-center justify-center rounded-lg`}>
-                <div
-                  className={cn(
-                    'flex aspect-square size-8 items-center justify-center rounded-full bg-brand-dark text-brand-white font-black',
-                    'group-data-[state=collapsed]:rounded-full',
-                  )}
-                >
-                  {activeStore.store_name.charAt(0).toUpperCase()}
-                </div>
-              </div>
-              <Typography className="truncate font-medium">{activeStore.store_name}</Typography>
+              <Typography className="truncate text-sm font-semibold">
+                {activeStore.store_name}
+              </Typography>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

@@ -59,7 +59,6 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="uppercase">{t('dashboard-title')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map(item =>
           item.items && item.items.length > 0 ? (
@@ -96,14 +95,15 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 className={cn(
-                  'hover:bg-muted py-6 px-4 rounded-lg',
-                  isPathActive(item.url) && 'bg-muted hover:!bg-muted',
+                  'hover:bg-secondary-100/80 py-6 px-2 rounded-xl  font-medium',
+                  isPathActive(item.url) &&
+                    'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
                 )}
                 asChild
                 tooltip={item.title}
               >
                 <Link href={item.url} className="flex items-center w-full">
-                  {item.icon && <item.icon />}
+                  {item.icon && <item.icon className="text-secondary-900" />}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
