@@ -107,7 +107,6 @@ export async function fetchStoreSettings(
       settings: settingsData || undefined,
     }
   } catch (error) {
-    console.error('❌ fetchStoreSettings error:', error)
     throw error
   }
 }
@@ -148,7 +147,6 @@ export async function updateStoreBasicInfo(
 
     return data
   } catch (error) {
-    console.error('❌ updateStoreBasicInfo error:', error)
     throw error
   }
 }
@@ -205,7 +203,6 @@ export async function updateStoreAdvancedSettings(
 
     return result
   } catch (error) {
-    console.error('❌ updateStoreAdvancedSettings error:', error)
     throw error
   }
 }
@@ -335,7 +332,7 @@ export async function testTableAccess(
       return { success: true, method: 'RPC function' }
     }
   } catch (error) {
-    console.error('❌ Method 1 (RPC function) exception:', error)
+    console.error('testTableAccess error:', error)
   }
 
   // Method 2: Try business schema access

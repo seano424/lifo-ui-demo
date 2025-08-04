@@ -574,7 +574,7 @@ export async function fetchCurrentUser(
     const transformedUser = transformAuthUserToUser(user)
 
     return transformedUser
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('[fetchCurrentUser] Unexpected error:', err)
     return null
   }

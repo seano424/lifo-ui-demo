@@ -132,8 +132,6 @@ export function useUpdateStoreBasicInfo() {
         const result = await updateStoreBasicInfo(activeStoreId, updates)
         return result
       } catch (updateError) {
-        console.error('❌ Store update failed:', updateError)
-
         // Provide more helpful error messages
         if (updateError instanceof Error && updateError.message.includes('permission denied')) {
           throw new Error(
@@ -174,8 +172,6 @@ export function useUpdateStoreBasicInfo() {
       return { previousStore, activeStoreId }
     },
     onError: (err, variables, context) => {
-      console.error('❌ Mutation error occurred:', err)
-
       // Revert on error
       if (context?.previousStore && context?.activeStoreId) {
         queryClient.setQueryData(
@@ -288,7 +284,6 @@ export function useUpdateStoreAdvancedSettings() {
           context.previousStore,
         )
       }
-      console.error('Settings update error:', err)
       toast.error(`Failed to update settings: ${err.message}`)
     },
     onSettled: () => {
@@ -339,7 +334,6 @@ export function useStoreActions() {
 
       toast.success('Store information updated successfully')
     } catch (error) {
-      console.error('❌ Combined store update failed:', error)
       toast.error(
         `Failed to update store: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
@@ -439,7 +433,6 @@ export function useStoreImageUpload() {
       }
     },
     onError: error => {
-      console.error('❌ Image upload error:', error)
       toast.error(
         `Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
