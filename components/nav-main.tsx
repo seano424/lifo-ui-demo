@@ -4,13 +4,11 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRight, type LucideIcon } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -34,7 +32,6 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
-  const t = useTranslations('navigation')
 
   // 🚀 FIX: Prevent hydration mismatch by tracking when we're hydrated
   const [isHydrated, setIsHydrated] = useState(false)
