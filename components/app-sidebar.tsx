@@ -41,13 +41,13 @@ function useNavigationData() {
           isActive: true,
         },
         {
-          title: t('input'),
-          url: '/dashboard/input',
+          title: t('inbound'),
+          url: '/dashboard/inbound',
           icon: Bot,
         },
         {
-          title: t('output'),
-          url: '/dashboard/output',
+          title: t('outbound'),
+          url: '/dashboard/outbound',
           icon: BookOpen,
         },
         {
