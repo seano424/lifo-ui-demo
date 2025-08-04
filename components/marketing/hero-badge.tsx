@@ -1,19 +1,21 @@
 'use client'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 type AnimatedBadgeProps = {
-  text: string
   icon: React.ReactNode
   borderColor: string
   className?: string
 }
 
 export function HeroBadge({
-  text = 'Enjoy a 14-day free trial',
   icon = <span className="mr-2 text-primary text-lg">✨</span>,
   borderColor = 'via-indigo-100',
   className = 'mt-10',
 }: Partial<AnimatedBadgeProps>) {
+  const t = useTranslations('landingpage.hero.badge')
+  const text = t('text', { fallback: 'Enjoy a 14-day free trial' })
+
   return (
     <>
       <style>

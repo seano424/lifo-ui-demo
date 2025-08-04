@@ -382,28 +382,36 @@ export default function WorkingStreamlinedScanningInterface({
     )
 
     // Submit the batch to inventory using the React Query hook
-    submitBatch(productsToSubmit, {
-      onSuccess: result => {
-        console.log('Batch submission completed:', result)
+    submitBatch(
+      productsToSubmit.map(product => ({
+        ...product,
+        storeId: activeStore?.store_id || '',
+        ocrExtractedDate: new Date().toISOString(),
+        ocrConfidence: 1,
+      })),
+      {
+        onSuccess: result => {
+          console.log('Batch submission completed:', result)
 
-        // Store the result for the success dialog
-        setSubmissionResult({
-          successCount: result.successCount,
-          totalCount: productsToSubmit.length,
-        })
+          // Store the result for the success dialog
+          setSubmissionResult({
+            successCount: result.successCount,
+            totalCount: productsToSubmit.length,
+          })
 
-        // Clear the batch and close submission dialog
-        setScannedItems([])
-        setShowSubmissionDialog(false)
+          // Clear the batch and close submission dialog
+          setScannedItems([])
+          setShowSubmissionDialog(false)
 
-        // Show success dialog
-        setShowSuccessDialog(true)
+          // Show success dialog
+          setShowSuccessDialog(true)
+        },
+        onError: error => {
+          console.error('Batch submission failed:', error)
+          // Dialog stays open so user can retry or cancel
+        },
       },
-      onError: error => {
-        console.error('Batch submission failed:', error)
-        // Dialog stays open so user can retry or cancel
-      },
-    })
+    )
   }
 
   // Format price
