@@ -173,7 +173,7 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                   result.product.product_name || result.product.product_name_en || 'Unknown Product'
                 state.scannedProduct.brand = result.product.brands || undefined
                 state.scannedProduct.category =
-                  result.product.categories?.split(',')[0] || undefined
+                  result.product.categories ? String(result.product.categories).split(',')[0]?.trim() || undefined : undefined
                 state.scannedProduct.imageUrl =
                   result.product.image_front_url || result.product.image_url || undefined
               }

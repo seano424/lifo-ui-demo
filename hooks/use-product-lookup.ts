@@ -47,7 +47,7 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
             product_name:
               result.product.product_name || result.product.product_name_en || 'Unknown Product',
             brand: result.product.brands || null,
-            category: result.product.categories?.split(',')[0] || null,
+            category: result.product.categories ? String(result.product.categories).split(',')[0]?.trim() || null : null,
             image_url: result.product.image_front_url || result.product.image_url || null,
             open_food_facts_data: result.product,
             typical_shelf_life_days: null, // We'll estimate this later

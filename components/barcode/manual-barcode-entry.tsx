@@ -41,10 +41,8 @@ export default function ManualBarcodeEntry({
     imageUrl: '',
   })
 
-  // 🔥 NEW: Get the new setProductSelected action
   const { setProductSelected } = useScanningActions()
 
-  // React Query hooks
   const {
     data: lookupResult,
     isLoading: isLookingUp,
@@ -53,66 +51,19 @@ export default function ManualBarcodeEntry({
 
   const productSearch = useProductSearch()
 
-  // Handle barcode submission - just for lookup, don't update workflow yet
+
   const handleBarcodeSubmit = async () => {
     if (!barcode || barcode.length < 8) return
-    // Don't call workflow actions here - just let the lookup happen
   }
 
-  // Handle product search
   const handleProductSearch = async (query: string) => {
     if (query.length < 3) return
     await productSearch.mutateAsync(query)
   }
 
-  // Handle selecting a product (either from lookup or search results)
-  const handleSelectProduct = (productData: Record<string, unknown>, sourceBarcode?: string) => {
-    const finalBarcode = sourceBarcode || barcode
-
-    // Create normalized product data
-    const normalizedProduct: ProductData = {
-      barcode: finalBarcode,
-      productName: (productData.product_name ||
-        productData.productName ||
-        'Unknown Product') as string,
-      brand: (productData.brands || productData.brand || '') as string,
-      category: (productData.categories?.toString().split(',')[0] ||
-        productData.category ||
-        '') as string,
-      imageUrl: (productData.image_front_url ||
-        productData.image_url ||
-        productData.imageUrl ||
-        '') as string,
-      isManualEntry: true,
-      // Include lookup result if this came from a lookup
-      lookupResult:
-        lookupResult && sourceBarcode === barcode ? (lookupResult as unknown) : undefined,
-    }
-
-    setSelectedProduct(normalizedProduct)
-  }
-
-  // Handle selecting manual product data
-  const handleSelectManualProduct = () => {
-    if (!manualProductData.productName || !barcode) return
-
-    const normalizedProduct = {
-      barcode,
-      productName: manualProductData.productName,
-      brand: manualProductData.brand,
-      category: manualProductData.category,
-      imageUrl: manualProductData.imageUrl,
-      isManualEntry: true,
-    }
-
-    setSelectedProduct(normalizedProduct)
-  }
-
-  // 🔥 FIXED: Handle confirming the selected product and moving to next step
   const handleConfirmAndProceed = () => {
     if (!selectedProduct) return
 
-    // 🔥 Use the new setProductSelected action that skips the intermediate step
     setProductSelected({
       barcode: selectedProduct.barcode,
       productName: selectedProduct.productName,
@@ -123,10 +74,8 @@ export default function ManualBarcodeEntry({
       lookupResult: selectedProduct.lookupResult as ProductLookupResult | undefined,
     })
 
-    // Call parent callback
     onProductSelected?.(selectedProduct.barcode, selectedProduct)
 
-    // Reset and close
     setSelectedProduct(null)
     setBarcode('')
     setManualProductData({
@@ -154,7 +103,6 @@ export default function ManualBarcodeEntry({
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Show selected product if any */}
           {selectedProduct && (
             <Card>
               <CardContent className="p-4">
@@ -238,13 +186,11 @@ export default function ManualBarcodeEntry({
                   </Button>
                 </div>
 
-                {/* Barcode validation feedback */}
                 {barcode && barcode.length < 8 && (
                   <p className="text-xs text-orange-600">Barcode must be at least 8 digits long</p>
                 )}
               </div>
 
-              {/* Lookup Results */}
               {lookupError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -276,7 +222,7 @@ export default function ManualBarcodeEntry({
                             {lookupResult.product.categories && (
                               <div>
                                 <strong>Category:</strong>{' '}
-                                {lookupResult.product.categories.split(',')[0]}
+                                {lookupResult.product.categories ? String(lookupResult.product.categories).split(',')[0]?.trim() : 'Unknown'}
                               </div>
                             )}
                           </div>
@@ -285,15 +231,15 @@ export default function ManualBarcodeEntry({
                         <Button
                           onClick={() => {
                             if (lookupResult.product) {
-                              // Skip the intermediate selection step and go directly to workflow
                               const productData = {
                                 barcode,
                                 productName: (lookupResult.product.product_name ||
                                   lookupResult.product.product_name_en ||
                                   'Unknown Product') as string,
                                 brand: (lookupResult.product.brands || '') as string,
-                                category: (lookupResult.product.categories?.toString().split(',')[0] ||
-                                  '') as string,
+                                category: (lookupResult.product.categories
+                                  ? String(lookupResult.product.categories).split(',')[0]?.trim() || ''
+                                  : '') as string,
                                 imageUrl: (lookupResult.product.image_front_url ||
                                   lookupResult.product.image_url ||
                                   '') as string,
@@ -301,13 +247,10 @@ export default function ManualBarcodeEntry({
                                 lookupResult: lookupResult as ProductLookupResult | undefined,
                               }
 
-                              // Use setProductSelected to go directly to OCR step
                               setProductSelected(productData)
 
-                              // Call parent callback
                               onProductSelected?.(barcode, productData)
 
-                              // Reset and close
                               setSelectedProduct(null)
                               setBarcode('')
                               setManualProductData({
@@ -337,7 +280,6 @@ export default function ManualBarcodeEntry({
                 </div>
               )}
 
-              {/* Manual Product Entry */}
               {!lookupResult?.found && (
                 <div className="border-dashed border-2 p-4 rounded-xl">
                   <div className="pb-3">
@@ -448,23 +390,20 @@ export default function ManualBarcodeEntry({
                                 size="sm"
                                 className="w-full justify-start text-xs h-auto p-2"
                                 onClick={() => {
-                                  // Skip intermediate step and go directly to workflow
                                   const productData = {
                                     barcode: product.code,
-                                    productName: (product.product_name || 'Unknown Product') as string,
+                                    productName: (product.product_name ||
+                                      'Unknown Product') as string,
                                     brand: (product.brands || '') as string,
-                                    category: (product.categories?.toString().split(',')[0] || '') as string,
-                                    imageUrl: (product.image_front_url || product.image_url || '') as string,
+                                    category: '', // categories not available in search results
+                                    imageUrl: (product.image_front_small_url || '') as string,
                                     isManualEntry: true,
                                   }
 
-                                  // Use setProductSelected to go directly to OCR step
                                   setProductSelected(productData)
 
-                                  // Call parent callback
                                   onProductSelected?.(product.code, productData)
 
-                                  // Reset and close
                                   setSelectedProduct(null)
                                   setBarcode('')
                                   setManualProductData({
@@ -494,7 +433,6 @@ export default function ManualBarcodeEntry({
                       onClick={() => {
                         if (!manualProductData.productName || !barcode) return
 
-                        // Skip intermediate step and go directly to workflow
                         const productData = {
                           barcode,
                           productName: manualProductData.productName,
@@ -504,13 +442,10 @@ export default function ManualBarcodeEntry({
                           isManualEntry: true,
                         }
 
-                        // Use setProductSelected to go directly to OCR step
                         setProductSelected(productData)
 
-                        // Call parent callback
                         onProductSelected?.(barcode, productData)
 
-                        // Reset and close
                         setSelectedProduct(null)
                         setBarcode('')
                         setManualProductData({
@@ -530,14 +465,6 @@ export default function ManualBarcodeEntry({
                   </div>
                 </div>
               )}
-
-              {/* Instructions */}
-              {/* <div className="text-xs text-gray-500 space-y-1">
-                <p>• Enter a barcode to look up product information</p>
-                <p>• If not found, you can add the product manually</p>
-                <p>• Use search to find similar products in the database</p>
-                <p>• Select a product to proceed directly to expiry date entry</p>
-              </div> */}
             </>
           )}
         </CardContent>
