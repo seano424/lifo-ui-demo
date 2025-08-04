@@ -481,11 +481,11 @@
       },
       "predictiveAlerts": {
         "title": "Alertes prédictives",
-        "description": "Réduisez vos déchets jusqu'à 30% grâce aux notifications alimentées par l'IA avant l'expiration des produits."
+        "description": "Réduisez considérablement vos pertes grâce aux notifications alimentées par l'IA avant l'expiration des produits."
       },
       "timeSaving": {
         "title": "Gain de temps",
-        "description": "75% de réduction du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
+        "description": "Réduction énorme du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
       },
       "errorFree": {
         "title": "Opérations sans erreur",
@@ -497,19 +497,16 @@
     "businessStats": {
       "title": "Maximisez vos profits, minimisez vos pertes",
       "revenue": {
-        "value": "22%",
         "label": "Augmentation des revenus",
         "description": "Augmentation moyenne des revenus commerciaux",
         "subtext": "Suggestions automatiques de remises pour écouler rapidement les produits avant leur expiration."
       },
       "lossReduction": {
-        "value": "85%",
         "label": "Réduction des pertes",
         "description": "Réduisez facilement les déchets et économisez de l'argent",
         "subtext": "Moins de produits périmés tout en réduisant le travail de gestion des stocks."
       },
       "taxCredits": {
-        "value": "1500€",
         "label": "Crédits d'impôt",
         "description": "Dès le premier mois sur les dons",
         "subtext": "Augmentez vos dons déductibles d'impôts en vous connectant avec une organisation à but non lucratif."
@@ -537,7 +534,7 @@
       },
       "card": {
         "title": "Prêt à transformer votre gestion de stock ?",
-        "description": "Rejoignez plus de 500 entreprises qui font confiance à LIFO pour optimiser leur inventaire et maximiser leurs profits.",
+        "description": "Rejoignez LIFO pour optimiser votre inventaire et maximiser vos profits.",
         "benefits": {
           "noCommitment": "Sans engagement",
           "instantSetup": "Installation instantanée",

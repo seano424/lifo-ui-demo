@@ -481,11 +481,11 @@
       },
       "predictiveAlerts": {
         "title": "Voorspellende waarschuwingen",
-        "description": "Verminder afval met tot 30% met AI-gestuurde meldingen voordat producten verlopen."
+        "description": "Verminder uw verliezen aanzienlijk dankzij de meldingen die door AI worden gevoed vóór het verstrijken van de producten."
       },
       "timeSaving": {
         "title": "Tijdsbesparing",
-        "description": "75% vermindering van tijd besteed aan handmatige bonnetjesverwerking en dagelijkse inventarisaties."
+        "description": "Enorme vermindering van de tijd die wordt besteed aan handmatig ontvangstbeheer en dagelijkse voorraden."
       },
       "errorFree": {
         "title": "Foutloze operaties",
@@ -497,19 +497,16 @@
     "businessStats": {
       "title": "Maximaliseer uw winst, minimaliseer uw verlies",
       "revenue": {
-        "value": "22%",
         "label": "Omzetstijging",
         "description": "Gemiddelde toename in bedrijfsomzet",
         "subtext": "Automatische kortingssuggesties om producten snel te verplaatsen voordat ze verlopen."
       },
       "lossReduction": {
-        "value": "85%",
         "label": "Verliesreductie",
         "description": "Verminder eenvoudig afval en bespaar geld",
         "subtext": "Minder verlopen producten terwijl u minder aan voorraadbeheer doet."
       },
       "taxCredits": {
-        "value": "1500€",
         "label": "Belastingvoordelen",
         "description": "Vanaf de eerste maand op donaties",
         "subtext": "Verhoog uw fiscaal aftrekbare donaties door te verbinden met een non-profitorganisatie."
@@ -537,7 +534,7 @@
       },
       "card": {
         "title": "Klaar om uw voorraadbeheer te transformeren?",
-        "description": "Sluit u aan bij meer dan 500 bedrijven die LIFO vertrouwen om hun voorraad te optimaliseren en winst te maximaliseren.",
+        "description": "Word lid van LIFO om uw inventaris te optimaliseren en de winst te maximaliseren.",
         "benefits": {
           "noCommitment": "Geen verplichtingen",
           "instantSetup": "Directe installatie",

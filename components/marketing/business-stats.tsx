@@ -3,13 +3,12 @@ import { Typography } from '@/components/ui/typography'
 import { useTranslations } from 'next-intl'
 
 interface StatProps {
-  value: string
   label: string
   description: string
   subtext: string
 }
 
-function Stat({ value, label, description, subtext }: StatProps) {
+function Stat({ label, description, subtext }: StatProps) {
   return (
     <div className="flex flex-col rounded-xl bg-gradient-to-b from-white via-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl overflow-hidden transform hover:-translate-y-1 transition-all duration-300 h-full">
       {/* Header with plan name */}
@@ -19,17 +18,10 @@ function Stat({ value, label, description, subtext }: StatProps) {
         <div className="relative z-10">
           <Typography
             variant="h2"
-            className="text-xl text-bold text-center font-medium text-blue-800 mb-1"
+            className="text-4xl font-extrabold bg-clip-text text-center text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6"
           >
             {label}
           </Typography>
-
-          {/* Value with large display */}
-          <div className="mb-2 flex justify-center">
-            <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-              {value}
-            </span>
-          </div>
 
           <Typography
             variant="p"
@@ -66,21 +58,18 @@ export function BusinessStats() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
           <Stat
-            value={t('revenue.value')}
             label={t('revenue.label')}
             description={t('revenue.description')}
             subtext={t('revenue.subtext')}
           />
 
           <Stat
-            value={t('lossReduction.value')}
             label={t('lossReduction.label')}
             description={t('lossReduction.description')}
             subtext={t('lossReduction.subtext')}
           />
 
           <Stat
-            value={t('taxCredits.value')}
             label={t('taxCredits.label')}
             description={t('taxCredits.description')}
             subtext={t('taxCredits.subtext')}
