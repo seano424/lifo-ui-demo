@@ -19,7 +19,7 @@ export default function SettingsHeaderDisplay() {
 
   return (
     <Typography variant="h2" className="font-black text-center text-primary-500">
-      {activeStore?.store_name} Settings
+      Settings
     </Typography>
   )
 }

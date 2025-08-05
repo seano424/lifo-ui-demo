@@ -1,3 +1,3 @@
 export default function BatchesPage() {
-  return <div>BatchesPage</div>
+  return <div>Batches Page</div>
 }
