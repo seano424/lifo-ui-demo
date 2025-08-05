@@ -11,7 +11,9 @@
     "analytics": "Analytics",
     "settings": "Settings",
     "helpCenter": "Help Center",
-    "logout": "Logout"
+    "logout": "Logout",
+    "products": "Products",
+    "batches": "Batches"
   },
   "actions": {
     "add": "Add",
@@ -349,6 +351,7 @@
     "teams": "Teams",
     "stores": "Stores",
     "products": "Products",
+    "batches": "Batches",
     "categories": "Categories",
     "reports": "Reports",
     "notifications": "Notifications",

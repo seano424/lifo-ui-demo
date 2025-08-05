@@ -33,14 +33,14 @@ export function NavMain({
 }) {
   const pathname = usePathname()
 
-  // 🚀 FIX: Prevent hydration mismatch by tracking when we're hydrated
+  // Prevent hydration mismatch by tracking when we're hydrated
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
     setIsHydrated(true)
   }, [])
 
-  // 🚀 Helper function to check if path is active (only after hydration)
+  // Helper function to check if path is active (only after hydration)
   const isPathActive = (itemUrl: string) => {
     if (!isHydrated) return false // Prevent hydration mismatch
 
@@ -48,6 +48,10 @@ export function NavMain({
 
     // Special handling for settings: treat /settings/store as active for /settings
     if (itemUrl.includes('/settings')) {
+      return pathname.startsWith(itemUrl)
+    }
+
+    if (itemUrl.includes('/inventory')) {
       return pathname.startsWith(itemUrl)
     }
 
