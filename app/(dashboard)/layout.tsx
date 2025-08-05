@@ -3,9 +3,10 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
-import UserButton from '@/components/users/user-button'
+
 import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 import { SettingsError } from '@/components/settings/settings-error-boundary'
+import { TeamSwitcher } from '@/components/team-switcher'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const dashboardData = await prefetchDashboardData()
@@ -38,7 +39,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <DashboardBreadcrumbs />
             </div>
 
-            <UserButton />
+            <div className="flex">
+              <TeamSwitcher />
+            </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
         </SidebarInset>

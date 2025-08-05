@@ -336,8 +336,8 @@
   "breadcrumbs": {
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "input": "Entrées",
-    "output": "Sorties",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
     "analytics": "Analyses",
     "performance": "Performance",
     "milestones": "Étapes",

@@ -336,8 +336,8 @@
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "input": "Inkomend",
-    "output": "Uitgaand",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
     "analytics": "Analyses",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
