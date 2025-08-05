@@ -1,10 +1,10 @@
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import DashboardTabs from '@/components/dashboard/dashboard-tabs'
+// import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+// import DashboardTabs from '@/components/dashboard/dashboard-tabs'
 
 export default function Page() {
   return (
     <div className="space-y-6">
-      <DashboardInsetHeader
+      {/* <DashboardInsetHeader
         title="Inventory Dashboard"
         description="Track product batches by expiration date and reduce food waste with data-driven decisions"
         rightContent={
@@ -14,7 +14,7 @@ export default function Page() {
           </div>
         }
       />
-      <DashboardTabs />
+      <DashboardTabs /> */}
     </div>
   )
 }

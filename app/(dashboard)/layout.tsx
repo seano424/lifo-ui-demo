@@ -7,6 +7,9 @@ import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
 import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 import { SettingsError } from '@/components/settings/settings-error-boundary'
 import { TeamSwitcher } from '@/components/team-switcher'
+import { Button } from '@/components/ui/button'
+import { BellIcon } from 'lucide-react'
+import UserButton from '@/components/users/user-button'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const dashboardData = await prefetchDashboardData()
@@ -36,11 +39,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-              <DashboardBreadcrumbs />
+              <div className="hidden md:block">
+                <DashboardBreadcrumbs />
+              </div>
             </div>
 
-            <div className="flex">
+            <div className="flex items-center gap-2">
+              <Button variant="subtle">
+                <BellIcon className="w-4 h-4" />
+                Notifications
+              </Button>
               <TeamSwitcher />
+              <UserButton />
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>

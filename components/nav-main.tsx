@@ -92,7 +92,7 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 className={cn(
-                  'hover:bg-secondary-100/80 py-6 px-2 rounded-xl  font-medium',
+                  'hover:bg-secondary-100/80 p-3 rounded-xl font-medium',
                   isPathActive(item.url) &&
                     'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
                 )}

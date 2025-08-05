@@ -21,13 +21,17 @@ export default function UserButton() {
     )
   }
 
-  // ✅ CLEAN: Now we can access the user data directly
-  const displayName = user.full_name || user.username || user.email?.split('@')[0] || 'User'
+  // const displayName = user.full_name || user.username || user.email?.split('@')[0] || 'User'
 
   return (
-    <Button asLink href="/dashboard/settings/account" variant="outline" size="sm">
+    <Button
+      asLink
+      href="/dashboard/settings/account"
+      variant="outline"
+      size="sm"
+      className="rounded-full border h-8 w-8"
+    >
       <UserIcon className="w-4 h-4" />
-      {displayName}
     </Button>
   )
 }
