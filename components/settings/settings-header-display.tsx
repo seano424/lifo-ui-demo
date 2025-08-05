@@ -6,7 +6,7 @@ import { Typography } from '@/components/ui/typography'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function SettingsHeaderDisplay() {
-  const { activeStore, isLoadingStores, isChangingStore } = useStoreState()
+  const { isLoadingStores, isChangingStore } = useStoreState()
   const pathname = usePathname()
 
   if (pathname.includes('/add-store')) {
