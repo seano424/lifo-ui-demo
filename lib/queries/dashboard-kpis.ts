@@ -42,13 +42,13 @@ export type DashboardKPIs = {
 function getDateRanges() {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  
+
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  
+
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  
+
   return {
     todayStart: today.toISOString(),
     todayEnd: tomorrow.toISOString(),
@@ -72,15 +72,13 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
 
   if (currentError) throw currentError
 
-  const totalValue = currentData?.reduce(
-    (sum, batch) => sum + (batch.current_quantity * batch.selling_price), 
-    0
-  ) ?? 0
+  const totalValue =
+    currentData?.reduce((sum, batch) => sum + batch.current_quantity * batch.selling_price, 0) ?? 0
 
   const batchCount = currentData?.length ?? 0
 
   // Mock yesterday's change for now (can be improved with actual historical data)
-  const change = 120 // Mock +€120 change
+  const change = 0
   const changePercent = totalValue > 0 ? (change / totalValue) * 100 : 0
 
   return {
@@ -107,10 +105,8 @@ export async function fetchSalesKPI(storeId: string): Promise<SalesKPI> {
 
   if (todayError) throw todayError
 
-  const totalRevenue = todayData?.reduce(
-    (sum, sale) => sum + (sale.quantity_sold * sale.sale_price),
-    0
-  ) ?? 0
+  const totalRevenue =
+    todayData?.reduce((sum, sale) => sum + sale.quantity_sold * sale.sale_price, 0) ?? 0
 
   const transactionCount = todayData?.length ?? 0
 
@@ -123,10 +119,8 @@ export async function fetchSalesKPI(storeId: string): Promise<SalesKPI> {
     .gte('sale_timestamp', dates.yesterdayStart)
     .lt('sale_timestamp', dates.yesterdayEnd)
 
-  const yesterdayRevenue = yesterdayData?.reduce(
-    (sum, sale) => sum + (sale.quantity_sold * sale.sale_price),
-    0
-  ) ?? 0
+  const yesterdayRevenue =
+    yesterdayData?.reduce((sum, sale) => sum + sale.quantity_sold * sale.sale_price, 0) ?? 0
 
   const change = totalRevenue - yesterdayRevenue
   const changePercent = yesterdayRevenue > 0 ? (change / yesterdayRevenue) * 100 : 0
@@ -134,8 +128,8 @@ export async function fetchSalesKPI(storeId: string): Promise<SalesKPI> {
   return {
     totalRevenue,
     transactionCount,
-    change: change || 450, // Mock change if no yesterday data
-    changePercent: changePercent || 15,
+    change: change,
+    changePercent: changePercent,
   }
 }
 
@@ -156,13 +150,10 @@ export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
 
   if (todayError) throw todayError
 
-  const totalValue = todayData?.reduce(
-    (sum, action) => sum + (action.original_value || 0),
-    0
-  ) ?? 0
+  const totalValue = todayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
 
   const uniqueRecipients = new Set(
-    todayData?.filter(a => a.donation_recipient_id).map(a => a.donation_recipient_id)
+    todayData?.filter(a => a.donation_recipient_id).map(a => a.donation_recipient_id),
   )
   const recipientCount = uniqueRecipients.size
 
@@ -176,10 +167,8 @@ export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
     .gte('action_date', dates.yesterdayStart)
     .lt('action_date', dates.yesterdayEnd)
 
-  const yesterdayValue = yesterdayData?.reduce(
-    (sum, action) => sum + (action.original_value || 0),
-    0
-  ) ?? 0
+  const yesterdayValue =
+    yesterdayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
 
   const change = totalValue - yesterdayValue
   const changePercent = yesterdayValue > 0 ? (change / yesterdayValue) * 100 : 0
@@ -187,8 +176,8 @@ export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
   return {
     totalValue,
     recipientCount,
-    change: change || 45, // Mock change if no yesterday data
-    changePercent: changePercent || 5,
+    change: change,
+    changePercent: changePercent,
   }
 }
 
@@ -209,10 +198,7 @@ export async function fetchWasteKPI(storeId: string): Promise<WasteKPI> {
 
   if (todayError) throw todayError
 
-  const totalCost = todayData?.reduce(
-    (sum, action) => sum + (action.original_value || 0),
-    0
-  ) ?? 0
+  const totalCost = todayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
 
   const itemCount = todayData?.length ?? 0
 
@@ -226,10 +212,8 @@ export async function fetchWasteKPI(storeId: string): Promise<WasteKPI> {
     .gte('action_date', dates.yesterdayStart)
     .lt('action_date', dates.yesterdayEnd)
 
-  const yesterdayCost = yesterdayData?.reduce(
-    (sum, action) => sum + (action.original_value || 0),
-    0
-  ) ?? 0
+  const yesterdayCost =
+    yesterdayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
 
   const change = totalCost - yesterdayCost
   const changePercent = yesterdayCost > 0 ? (change / yesterdayCost) * 100 : 0
@@ -237,8 +221,8 @@ export async function fetchWasteKPI(storeId: string): Promise<WasteKPI> {
   return {
     totalCost,
     itemCount,
-    change: -change || -20, // Negative because less waste is better, mock if no data
-    changePercent: -changePercent || -6,
+    change: -change,
+    changePercent: -changePercent,
   }
 }
 
