@@ -3,6 +3,8 @@
 import { cn } from '@/lib/utils'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '../ui/typography'
+import Link from 'next/link'
 
 interface KPICardProps {
   icon: string
@@ -16,10 +18,11 @@ interface KPICardProps {
   onClick?: () => void
   className?: string
   isCurrency?: boolean
+  isLink?: boolean
+  link?: string
 }
 
 export function KPICard({
-  icon,
   label,
   value,
   change,
@@ -30,6 +33,8 @@ export function KPICard({
   onClick,
   className,
   isCurrency = true,
+  isLink = false,
+  link,
 }: KPICardProps) {
   const formatValue = (val: number) => {
     if (isCurrency) {
@@ -60,72 +65,104 @@ export function KPICard({
 
   if (isLoading) {
     return (
-      <div className={cn(
-        'bg-white rounded-xl p-6 shadow-sm border border-gray-100',
-        className
-      )}>
-        <div className="flex items-start justify-between">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-          <Skeleton className="h-12 w-12 rounded" />
-        </div>
+      <div
+        className={cn(
+          'bg-white rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center',
+          className,
+        )}
+      >
+        <Skeleton className="h-8 w-full rounded-4xl" />
+        <Skeleton className="h-8 w-2/3 rounded-4xl" />
+        <Skeleton className="h-8 w-3/5 rounded-4xl" />
+        <Skeleton className="h-8 w-1/2 rounded-4xl" />
+        <Skeleton className="h-12 w-1/2 rounded-4xl" />
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className={cn(
-        'bg-white rounded-xl p-6 shadow-sm border border-red-100',
-        className
-      )}>
-        <div className="text-red-600 text-sm">Failed to load data</div>
+      <div
+        className={cn(
+          'bg-white rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center min-h-[200px] justify-center',
+          className,
+        )}
+      >
+        <Typography className="text-secondary-600">Failed to load data</Typography>
       </div>
     )
   }
 
-  return (
-    <div
-      className={cn(
-        'bg-white rounded-xl p-6 shadow-sm border border-gray-100',
-        'transition-all duration-200',
-        onClick && 'cursor-pointer hover:shadow-md hover:border-gray-200',
-        className
-      )}
-      onClick={onClick}
-    >
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-sm text-gray-600 font-medium">{label}</p>
-          
-          <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-gray-900">
-              {formatValue(value)}
-            </span>
-            
-            {change !== 0 && (
-              <div className={cn(
-                'flex items-center gap-1 text-sm font-medium',
-                isPositive ? 'text-green-600' : 'text-red-600'
-              )}>
-                <span>{formatChange(change)}</span>
-                {isPositive ? (
-                  <TrendingUp className="h-4 w-4" />
-                ) : (
-                  <TrendingDown className="h-4 w-4" />
+  const cardContent = (
+    <div className="space-y-2 flex flex-col items-center text-center">
+      <Typography variant="h3" className="font-black">
+        {label}
+      </Typography>
+
+      <div className="flex flex-col gap-3 items-center">
+        <Typography variant="h4" className="">
+          {formatValue(value)}
+        </Typography>
+
+        {change !== 0 && (
+          <div className="flex flex-col gap-3 items-center">
+            <Typography variant="h4" className={cn('flex items-center gap-1 ')}>
+              <span>{formatChange(change)}</span>
+              {isPositive ? (
+                <TrendingUp className="h-4 w-4" />
+              ) : (
+                <TrendingDown className="h-4 w-4" />
+              )}
+            </Typography>
+            {/* {changePercent !== undefined && Math.abs(changePercent) > 0 && (
+              <Typography
+                variant="h4"
+                className={cn(
+                  'flex items-center gap-1 ',
+                  isPositive ? 'text-primary-700' : 'text-secondary-600',
                 )}
-              </div>
-            )}
+              >
+                ({isPositive ? '+' : ''}
+                {changePercent.toFixed(1)}%)
+              </Typography>
+            )} */}
           </div>
-          
-          <p className="text-xs text-gray-500">{subtitle}</p>
-        </div>
-        
-        <div className="text-3xl">{icon}</div>
+        )}
+
+        <Typography variant="h4" className="">
+          {subtitle}
+        </Typography>
+        <Typography
+          variant="h4"
+          className="bg-secondary-50 border border-secondary-100 text-black rounded-full px-4 py-2 group-hover:bg-secondary-100/50 transition-all duration-200 ease-in-out group-hover:border-primary-400"
+          onClick={onClick}
+        >
+          View details
+        </Typography>
       </div>
+    </div>
+  )
+
+  const cardClassName = cn(
+    'bg-white rounded-4xl py-6 shadow-sm shadow-primary-100/10 border-4',
+    'transition-all duration-200',
+    (isLink || onClick) && 'cursor-pointer hover:shadow-md hover:border-primary-400 group',
+    className,
+  )
+
+  // If isLink is true and link is provided, render as Next.js Link
+  if (isLink && link) {
+    return (
+      <Link href={link} className={cardClassName}>
+        {cardContent}
+      </Link>
+    )
+  }
+
+  // Otherwise render as a clickable div
+  return (
+    <div className={cardClassName} onClick={onClick}>
+      {cardContent}
     </div>
   )
 }

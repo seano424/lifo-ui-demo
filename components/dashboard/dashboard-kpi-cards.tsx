@@ -8,23 +8,18 @@ import {
   useWasteKPI,
   mockKPIData,
 } from '@/hooks/use-dashboard-kpis'
-import { useRouter } from 'next/navigation'
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { Typography } from '@/components/ui/typography'
 
 interface DashboardKPICardsProps {
-  onCardClick?: (cardType: 'inventory' | 'sales' | 'donations' | 'waste') => void
   useMockData?: boolean
 }
 
-export function DashboardKPICards({ 
-  onCardClick, 
-  useMockData = false 
-}: DashboardKPICardsProps) {
-  const router = useRouter()
+export function DashboardKPICards({ useMockData = false }: DashboardKPICardsProps) {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
 
@@ -35,76 +30,66 @@ export function DashboardKPICards({
   const wasteQuery = useWasteKPI()
 
   // Use mock data if specified or if queries fail
-  const inventoryData = useMockData ? mockKPIData.inventory : (inventoryQuery.data ?? mockKPIData.inventory)
+  const inventoryData = useMockData
+    ? mockKPIData.inventory
+    : (inventoryQuery.data ?? mockKPIData.inventory)
   const salesData = useMockData ? mockKPIData.sales : (salesQuery.data ?? mockKPIData.sales)
-  const donationData = useMockData ? mockKPIData.donations : (donationQuery.data ?? mockKPIData.donations)
+  const donationData = useMockData
+    ? mockKPIData.donations
+    : (donationQuery.data ?? mockKPIData.donations)
   const wasteData = useMockData ? mockKPIData.waste : (wasteQuery.data ?? mockKPIData.waste)
-
-  const handleCardClick = (type: 'inventory' | 'sales' | 'donations' | 'waste') => {
-    if (onCardClick) {
-      onCardClick(type)
-    } else {
-      // Default navigation
-      switch (type) {
-        case 'inventory':
-          router.push('/dashboard/inventory')
-          break
-        case 'sales':
-          router.push('/dashboard/outbound')
-          break
-        case 'donations':
-          router.push('/dashboard/donations')
-          break
-        case 'waste':
-          router.push('/dashboard/waste')
-          break
-      }
-    }
-  }
 
   const handleRefresh = () => {
     if (activeStoreId) {
+      // Invalidate all individual KPI queries to trigger refetch
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.dashboardKPIs.inventory(activeStoreId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.dashboardKPIs.sales(activeStoreId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.dashboardKPIs.donations(activeStoreId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.dashboardKPIs.waste(activeStoreId),
+      })
+      // Also invalidate the combined query
       queryClient.invalidateQueries({
         queryKey: queryKeys.dashboardKPIs.byStore(activeStoreId),
       })
     }
   }
 
-  const isAnyLoading = !useMockData && (
-    inventoryQuery.isLoading || 
-    salesQuery.isLoading || 
-    donationQuery.isLoading || 
-    wasteQuery.isLoading
-  )
+  const isAnyFetching =
+    !useMockData &&
+    (inventoryQuery.isFetching ||
+      salesQuery.isFetching ||
+      donationQuery.isFetching ||
+      wasteQuery.isFetching)
 
-  const hasAnyError = !useMockData && (
-    inventoryQuery.isError || 
-    salesQuery.isError || 
-    donationQuery.isError || 
-    wasteQuery.isError
-  )
+  const hasAnyError =
+    !useMockData &&
+    (inventoryQuery.isError || salesQuery.isError || donationQuery.isError || wasteQuery.isError)
 
   return (
     <div className="w-full">
-      {/* Purple gradient background section */}
-      <div className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-2xl p-8 shadow-xl">
-        {/* Header with refresh button */}
+      <div className="relative ">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Key Performance Indicators</h2>
-            <p className="text-purple-100 text-sm mt-1">Real-time metrics for your store</p>
-          </div>
-          
+          <Typography className="text-brand-primary font-extrabold" variant="h3">
+            Key Metrics Overview
+          </Typography>
+
           {!useMockData && (
             <Button
-              variant="ghost"
+              variant="outline"
+              className="hover:bg-transparent"
               size="sm"
               onClick={handleRefresh}
-              className="text-white hover:bg-white/10"
-              disabled={isAnyLoading}
+              disabled={isAnyFetching}
             >
-              <RefreshCw className={`h-4 w-4 ${isAnyLoading ? 'animate-spin' : ''}`} />
-              <span className="ml-2">Refresh</span>
+              <RefreshCw className={`h-4 w-4 ${isAnyFetching ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
             </Button>
           )}
         </div>
@@ -113,14 +98,15 @@ export function DashboardKPICards({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             icon="📦"
-            label="Inventory Value"
+            label="Total Inventory Value"
             value={inventoryData.totalValue}
             change={inventoryData.change}
             changePercent={inventoryData.changePercent}
             subtitle={`${inventoryData.batchCount} batches`}
             isLoading={!useMockData && inventoryQuery.isLoading}
             isError={!useMockData && inventoryQuery.isError}
-            onClick={() => handleCardClick('inventory')}
+            isLink={true}
+            link="/dashboard/inventory"
           />
 
           <KPICard
@@ -132,7 +118,8 @@ export function DashboardKPICards({
             subtitle={`${salesData.transactionCount} sales`}
             isLoading={!useMockData && salesQuery.isLoading}
             isError={!useMockData && salesQuery.isError}
-            onClick={() => handleCardClick('sales')}
+            isLink={true}
+            link="/dashboard/outbound"
           />
 
           <KPICard
@@ -144,7 +131,8 @@ export function DashboardKPICards({
             subtitle={`${donationData.recipientCount} recipients`}
             isLoading={!useMockData && donationQuery.isLoading}
             isError={!useMockData && donationQuery.isError}
-            onClick={() => handleCardClick('donations')}
+            isLink={true}
+            link="/dashboard/donations"
           />
 
           <KPICard
@@ -156,7 +144,8 @@ export function DashboardKPICards({
             subtitle={`${wasteData.itemCount} items`}
             isLoading={!useMockData && wasteQuery.isLoading}
             isError={!useMockData && wasteQuery.isError}
-            onClick={() => handleCardClick('waste')}
+            isLink={true}
+            link="/dashboard/waste"
           />
         </div>
 
