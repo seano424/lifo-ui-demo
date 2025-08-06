@@ -10,7 +10,8 @@ interface KPICardProps {
   icon: string
   label: string
   value: number
-  change: number
+  change?: number
+  productCount?: number
   changePercent?: number
   subtitle: string
   isLoading?: boolean
@@ -26,7 +27,7 @@ export function KPICard({
   label,
   value,
   change,
-  changePercent,
+  productCount,
   subtitle,
   isLoading = false,
   isError = false,
@@ -61,7 +62,7 @@ export function KPICard({
     return `${val >= 0 ? '+' : '-'}${Math.abs(val).toLocaleString()}`
   }
 
-  const isPositive = change >= 0
+  const isPositive = change && change >= 0
 
   if (isLoading) {
     return (
@@ -104,10 +105,10 @@ export function KPICard({
           {formatValue(value)}
         </Typography>
 
-        {change !== 0 && (
+        {change && change !== 0 && (
           <div className="flex flex-col gap-3 items-center">
             <Typography variant="h4" className={cn('flex items-center gap-1 ')}>
-              <span>{formatChange(change)}</span>
+              <span>{formatChange(change ?? 0)}</span>
               {isPositive ? (
                 <TrendingUp className="h-4 w-4" />
               ) : (
@@ -127,6 +128,12 @@ export function KPICard({
               </Typography>
             )} */}
           </div>
+        )}
+
+        {productCount && (
+          <Typography variant="h4" className="">
+            {productCount} product{productCount > 1 ? 's' : ''}
+          </Typography>
         )}
 
         <Typography variant="h4" className="">

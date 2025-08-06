@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 export type InventoryKPI = {
   totalValue: number
   batchCount: number
+  productCount: number
   change: number
   changePercent: number
 }
@@ -65,7 +66,7 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
     .from('batches')
-    .select('current_quantity, selling_price')
+    .select('current_quantity, selling_price, product_id')
     .eq('store_id', storeId)
     .eq('status', 'active')
     .gt('current_quantity', 0)
@@ -77,6 +78,10 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
 
   const batchCount = currentData?.length ?? 0
 
+  // Count unique products
+  const uniqueProducts = new Set(currentData?.map(batch => batch.product_id) ?? [])
+  const productCount = uniqueProducts.size
+
   // No historical data available - set to zero
   const change = 0
   const changePercent = 0
@@ -84,6 +89,7 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
   return {
     totalValue,
     batchCount,
+    productCount,
     change,
     changePercent,
   }

@@ -59,7 +59,6 @@ export function DashboardKPICards() {
   const hasAnyError =
     inventoryQuery.isError || salesQuery.isError || donationQuery.isError || wasteQuery.isError
 
-
   return (
     <div className="w-full">
       <div className="relative ">
@@ -86,8 +85,7 @@ export function DashboardKPICards() {
             icon="📦"
             label="Total Inventory Value"
             value={inventoryData?.totalValue ?? 0}
-            change={inventoryData?.change ?? 0}
-            changePercent={inventoryData?.changePercent ?? 0}
+            productCount={inventoryData?.productCount ?? 0}
             subtitle={`${inventoryData?.batchCount ?? 0} batches`}
             isLoading={inventoryQuery.isLoading}
             isError={inventoryQuery.isError}
