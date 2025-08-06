@@ -9,7 +9,6 @@ import {
   fetchDonationKPI,
   fetchWasteKPI,
   fetchDashboardKPIs,
-  type DashboardKPIs,
 } from '@/lib/queries/dashboard-kpis'
 
 // Individual KPI hooks for granular control
@@ -109,39 +108,3 @@ export function useDashboardKPIs() {
   })
 }
 
-// Mock data for development/testing
-export const mockKPIData: DashboardKPIs = {
-  inventory: {
-    totalValue: 12450,
-    batchCount: 142,
-    change: 120,
-    changePercent: 0.97,
-  },
-  sales: {
-    totalRevenue: 3568,
-    transactionCount: 23,
-    change: 450,
-    changePercent: 14.4,
-  },
-  donations: {
-    totalValue: 890,
-    recipientCount: 5,
-    change: 45,
-    changePercent: 5.3,
-  },
-  waste: {
-    totalCost: 340,
-    itemCount: 3,
-    change: -220,
-    changePercent: -39.3,
-  },
-}
-
-// Utility hook to get mock data for development/testing
-export function useMockDashboardKPIs(): { data: DashboardKPIs; isLoading: false; error: null } {
-  return {
-    data: mockKPIData,
-    isLoading: false,
-    error: null,
-  }
-}

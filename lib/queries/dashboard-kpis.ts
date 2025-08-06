@@ -77,9 +77,9 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
 
   const batchCount = currentData?.length ?? 0
 
-  // Mock yesterday's change for now (can be improved with actual historical data)
-  const change = totalValue > 0 ? 120 : 0
-  const changePercent = totalValue > 0 ? (change / totalValue) * 100 : 0
+  // No historical data available - set to zero
+  const change = 0
+  const changePercent = 0
 
   return {
     totalValue,
