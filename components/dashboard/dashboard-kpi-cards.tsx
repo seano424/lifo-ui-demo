@@ -1,18 +1,21 @@
 'use client'
 
-import { KPICard } from './kpi-card'
 import {
   useInventoryKPI,
   useSalesKPI,
   useDonationKPI,
   useWasteKPI,
 } from '@/hooks/use-dashboard-kpis'
-import { RefreshCw } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useQueryClient } from '@tanstack/react-query'
+
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+
+import { RefreshCw } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
+import { KPICard } from '@/components/dashboard/kpi-card'
 
 export function DashboardKPICards() {
   const queryClient = useQueryClient()

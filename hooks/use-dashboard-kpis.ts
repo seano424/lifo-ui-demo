@@ -1,8 +1,3 @@
-// hooks/use-dashboard-kpis.ts
-
-import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
   fetchInventoryKPI,
   fetchSalesKPI,
@@ -10,6 +5,9 @@ import {
   fetchWasteKPI,
   fetchDashboardKPIs,
 } from '@/lib/queries/dashboard-kpis'
+import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 // Individual KPI hooks for granular control
 export function useInventoryKPI() {
@@ -27,7 +25,7 @@ export function useInventoryKPI() {
     refetchInterval: 30000, // Auto-refresh every 30 seconds
     staleTime: 10000, // Consider data stale after 10 seconds
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
@@ -46,7 +44,7 @@ export function useSalesKPI() {
     refetchInterval: 30000,
     staleTime: 10000,
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
@@ -65,7 +63,7 @@ export function useDonationKPI() {
     refetchInterval: 30000,
     staleTime: 10000,
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
@@ -84,7 +82,7 @@ export function useWasteKPI() {
     refetchInterval: 30000,
     staleTime: 10000,
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
@@ -104,7 +102,6 @@ export function useDashboardKPIs() {
     refetchInterval: 30000,
     staleTime: 10000,
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
-

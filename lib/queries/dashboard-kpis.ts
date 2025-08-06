@@ -1,5 +1,3 @@
-// lib/queries/dashboard-kpis.ts
-
 import { createClient } from '@/lib/supabase/client'
 
 // KPI Data Types

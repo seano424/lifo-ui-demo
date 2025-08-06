@@ -1,10 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Typography } from '../ui/typography'
-import Link from 'next/link'
+import { Typography } from '@/components/ui/typography'
 
 interface KPICardProps {
   icon: string
