@@ -12,12 +12,14 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 
 import { RefreshCw } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { KPICard } from '@/components/dashboard/kpi-card'
 
 export function DashboardKPICards() {
+  const t = useTranslations('dashboard.kpis')
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
 
@@ -67,7 +69,7 @@ export function DashboardKPICards() {
       <div className="relative ">
         <div className="flex items-center justify-between mb-6">
           <Typography className="text-brand-primary font-extrabold" variant="h3">
-            Key Metrics Overview
+            {t('title')}
           </Typography>
 
           <Button
@@ -78,7 +80,7 @@ export function DashboardKPICards() {
             disabled={isAnyFetching}
           >
             <RefreshCw className={`h-4 w-4 ${isAnyFetching ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <span>{t('refresh')}</span>
           </Button>
         </div>
 
@@ -86,10 +88,10 @@ export function DashboardKPICards() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             icon="📦"
-            label="Total Inventory Value"
+            label={t('inventory.label')}
             value={inventoryData?.totalValue ?? 0}
             productCount={inventoryData?.productCount ?? 0}
-            subtitle={`${inventoryData?.batchCount ?? 0} batches`}
+            subtitle={`${inventoryData?.batchCount ?? 0} ${t('inventory.subtitle')}`}
             isLoading={inventoryQuery.isLoading}
             isError={inventoryQuery.isError}
             isLink={true}
@@ -98,11 +100,11 @@ export function DashboardKPICards() {
 
           <KPICard
             icon="💰"
-            label="Sales Revenue"
+            label={t('sales.label')}
             value={salesData?.totalRevenue ?? 0}
             change={salesData?.change ?? 0}
             changePercent={salesData?.changePercent ?? 0}
-            subtitle={`${salesData?.transactionCount ?? 0} sales`}
+            subtitle={`${salesData?.transactionCount ?? 0} ${t('sales.subtitle')}`}
             isLoading={salesQuery.isLoading}
             isError={salesQuery.isError}
             isLink={true}
@@ -111,11 +113,11 @@ export function DashboardKPICards() {
 
           <KPICard
             icon="❤️"
-            label="Donations"
+            label={t('donations.label')}
             value={donationData?.totalValue ?? 0}
             change={donationData?.change ?? 0}
             changePercent={donationData?.changePercent ?? 0}
-            subtitle={`${donationData?.recipientCount ?? 0} recipients`}
+            subtitle={`${donationData?.recipientCount ?? 0} ${t('donations.subtitle')}`}
             isLoading={donationQuery.isLoading}
             isError={donationQuery.isError}
             isLink={true}
@@ -124,11 +126,11 @@ export function DashboardKPICards() {
 
           <KPICard
             icon="🗑️"
-            label="Waste Cost"
+            label={t('waste.label')}
             value={wasteData?.totalCost ?? 0}
             change={wasteData?.change ?? 0}
             changePercent={wasteData?.changePercent ?? 0}
-            subtitle={`${wasteData?.itemCount ?? 0} items`}
+            subtitle={`${wasteData?.itemCount ?? 0} ${t('waste.subtitle')}`}
             isLoading={wasteQuery.isLoading}
             isError={wasteQuery.isError}
             isLink={true}
@@ -140,7 +142,7 @@ export function DashboardKPICards() {
         {hasAnyError && (
           <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
             <p className="text-sm text-white">
-              Some metrics could not be loaded. Please try refreshing.
+              {t('errorMessage')}
             </p>
           </div>
         )}

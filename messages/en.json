@@ -15,6 +15,30 @@
     "products": "Products",
     "batches": "Batches"
   },
+  "dashboard": {
+    "kpis": {
+      "title": "Key Metrics Overview",
+      "refresh": "Refresh",
+      "inventory": {
+        "label": "Total Inventory Value",
+        "subtitle": "batches",
+        "productCount": "products"
+      },
+      "sales": {
+        "label": "Sales Revenue",
+        "subtitle": "sales"
+      },
+      "donations": {
+        "label": "Donations",
+        "subtitle": "recipients"
+      },
+      "waste": {
+        "label": "Waste Cost",
+        "subtitle": "items"
+      },
+      "errorMessage": "Some metrics could not be loaded. Please try refreshing."
+    }
+  },
   "actions": {
     "add": "Add",
     "edit": "Edit",

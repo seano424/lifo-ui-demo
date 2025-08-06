@@ -15,6 +15,30 @@
     "products": "Produits",
     "batches": "Lots"
   },
+  "dashboard": {
+    "kpis": {
+      "title": "Aperçu des métriques clés",
+      "refresh": "Actualiser",
+      "inventory": {
+        "label": "Valeur totale du stock",
+        "subtitle": "lots",
+        "productCount": "produits"
+      },
+      "sales": {
+        "label": "Chiffre d'affaires",
+        "subtitle": "ventes"
+      },
+      "donations": {
+        "label": "Dons",
+        "subtitle": "bénéficiaires"
+      },
+      "waste": {
+        "label": "Coût des déchets",
+        "subtitle": "articles"
+      },
+      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
+    }
+  },
   "actions": {
     "add": "Ajouter",
     "edit": "Modifier",
