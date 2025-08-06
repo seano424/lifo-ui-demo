@@ -11,7 +11,17 @@
     "analytics": "Analyses",
     "settings": "Instellingen",
     "helpCenter": "Helpcentrum",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "products": "Producten",
+    "batches": "Batches",
+    "categories": "Categorieën",
+    "reports": "Rapporten",
+    "notifications": "Notificaties",
+    "account": "Account",
+    "profile": "Profiel",
+    "help": "Hulp",
+    "support": "Ondersteuning",
+    "addStore": "Winkel toevoegen"
   },
   "actions": {
     "add": "Toevoegen",

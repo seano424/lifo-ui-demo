@@ -6,7 +6,7 @@ import { Typography } from '@/components/ui/typography'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function SettingsHeaderDisplay() {
-  const { activeStore, isLoadingStores, isChangingStore } = useStoreState()
+  const { isLoadingStores, isChangingStore } = useStoreState()
   const pathname = usePathname()
 
   if (pathname.includes('/add-store')) {
@@ -19,7 +19,7 @@ export default function SettingsHeaderDisplay() {
 
   return (
     <Typography variant="h2" className="font-black text-center text-primary-500">
-      {activeStore?.store_name} Settings
+      Settings
     </Typography>
   )
 }

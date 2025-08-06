@@ -11,7 +11,9 @@
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "products": "Produits",
+    "batches": "Lots"
   },
   "actions": {
     "add": "Ajouter",
@@ -349,6 +351,7 @@
     "teams": "Équipes",
     "stores": "Magasins",
     "products": "Produits",
+    "batches": "Lots",
     "categories": "Catégories",
     "reports": "Rapports",
     "notifications": "Notifications",
