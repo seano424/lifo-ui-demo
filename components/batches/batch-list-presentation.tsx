@@ -162,8 +162,8 @@ const DEFAULT_COLUMN_WIDTHS = {
 function ColumnResizer({ header }: { header: Header<BatchWithProduct, unknown> }) {
   return (
     <div
-      className={`absolute right-0 top-0 h-full w-2 cursor-col-resize bg-transparent hover:bg-blue-500/20 transition-colors z-10 ${
-        header.column.getIsResizing() ? 'bg-blue-500/30' : ''
+      className={`absolute right-0 top-0 h-full w-2 cursor-col-resize bg-transparent  z-10 ${
+        header.column.getIsResizing() ? '' : ''
       }`}
       style={{
         userSelect: 'none' as const,
@@ -177,7 +177,7 @@ function ColumnResizer({ header }: { header: Header<BatchWithProduct, unknown> }
     >
       <div
         className={`w-0.5 h-full ml-auto transition-all ${
-          header.column.getIsResizing() ? 'bg-blue-500' : 'bg-transparent hover:bg-border'
+          header.column.getIsResizing() ? 'bg-brand-secondary' : 'bg-transparent hover:bg-border'
         }`}
       />
     </div>
@@ -301,10 +301,13 @@ function BatchTable({
   }
 
   // Calculate dynamic max width based on content
-  const calculateMaxWidth = (data: BatchWithProduct[], accessor: (item: BatchWithProduct) => string) => {
+  const calculateMaxWidth = (
+    data: BatchWithProduct[],
+    accessor: (item: BatchWithProduct) => string,
+  ) => {
     const maxLength = Math.max(
       ...data.map(item => accessor(item)?.length || 0),
-      10 // Minimum reasonable length
+      10, // Minimum reasonable length
     )
     // Rough calculation: ~8px per character + padding
     return Math.min(Math.max(maxLength * 8 + 40, 100), 400)
@@ -454,7 +457,10 @@ function BatchTable({
       ),
       size: DEFAULT_COLUMN_WIDTHS.expiry_date,
       minSize: 100,
-      maxSize: Math.max(180, calculateMaxWidth(data, item => new Date(item.expiry_date).toLocaleDateString())),
+      maxSize: Math.max(
+        180,
+        calculateMaxWidth(data, item => new Date(item.expiry_date).toLocaleDateString()),
+      ),
       enableResizing: true,
     },
     {
@@ -613,7 +619,10 @@ function BatchTable({
       cell: ({ row }) => getStatusBadge(row.original.status || 'active'),
       size: DEFAULT_COLUMN_WIDTHS.status,
       minSize: 70,
-      maxSize: Math.max(130, calculateMaxWidth(data, item => item.status || 'active')),
+      maxSize: Math.max(
+        130,
+        calculateMaxWidth(data, item => item.status || 'active'),
+      ),
       enableResizing: true,
     },
     {
@@ -689,10 +698,10 @@ function BatchTable({
   return (
     <Card>
       <div className="overflow-x-auto">
-        <Table 
-          style={{ 
+        <Table
+          style={{
             width: table.getCenterTotalSize(),
-            tableLayout: 'fixed' // Force fixed layout to prevent column confusion
+            tableLayout: 'fixed', // Force fixed layout to prevent column confusion
           }}
         >
           <TableHeader>
