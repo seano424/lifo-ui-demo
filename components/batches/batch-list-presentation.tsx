@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,6 +39,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  type ColumnDef,
+  type SortingState,
+  type Header,
+} from '@tanstack/react-table'
 import type { BatchWithProduct, BatchSort, BatchSortField } from '@/lib/queries/batches'
 import { useBatchActions } from '@/hooks/use-batches'
 
@@ -133,6 +142,48 @@ export function BatchListPresentation({
   )
 }
 
+// Column widths storage key
+const COLUMN_WIDTHS_STORAGE_KEY = 'lifo-batch-table-columns'
+
+// Default column widths
+const DEFAULT_COLUMN_WIDTHS = {
+  batch_number: 120,
+  product: 200,
+  supplier: 120,
+  expiry_date: 140,
+  current_quantity: 100,
+  cost_price: 110,
+  selling_price: 110,
+  status: 100,
+  actions: 50,
+}
+
+// Resizer component
+function ColumnResizer({ header }: { header: Header<BatchWithProduct, unknown> }) {
+  return (
+    <div
+      className={`absolute right-0 top-0 h-full w-2 cursor-col-resize bg-transparent hover:bg-blue-500/20 transition-colors z-10 ${
+        header.column.getIsResizing() ? 'bg-blue-500/30' : ''
+      }`}
+      style={{
+        userSelect: 'none' as const,
+        touchAction: 'none' as const,
+      }}
+      onMouseDown={header.getResizeHandler()}
+      onTouchStart={header.getResizeHandler()}
+      onDoubleClick={() => {
+        header.column.resetSize()
+      }}
+    >
+      <div
+        className={`w-0.5 h-full ml-auto transition-all ${
+          header.column.getIsResizing() ? 'bg-blue-500' : 'bg-transparent hover:bg-border'
+        }`}
+      />
+    </div>
+  )
+}
+
 function BatchTable({
   data,
   currentSort,
@@ -147,39 +198,66 @@ function BatchTable({
   const tStatus = useTranslations('batches.status')
   const tExpiry = useTranslations('batches.expiry')
 
-  const getSortIcon = (field: BatchSortField) => {
-    if (currentSort.field !== field) {
-      return <ArrowUpDown className="h-4 w-4" />
+  // Load column widths from localStorage
+  const [columnSizing, setColumnSizing] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(COLUMN_WIDTHS_STORAGE_KEY)
+      if (stored) {
+        try {
+          return JSON.parse(stored)
+        } catch {
+          return DEFAULT_COLUMN_WIDTHS
+        }
+      }
     }
-    return currentSort.direction === 'asc' ? (
-      <ArrowUp className="h-4 w-4" />
-    ) : (
-      <ArrowDown className="h-4 w-4" />
-    )
-  }
+    return DEFAULT_COLUMN_WIDTHS
+  })
 
-  const SortableHeader = ({
-    field,
-    children,
-    className = '',
-  }: {
-    field: BatchSortField
-    children: React.ReactNode
-    className?: string
-  }) => (
-    <TableHead className={className}>
-      <Button
-        variant="ghost"
-        onClick={() => updateSort(field)}
-        className="h-auto p-0 font-semibold hover:bg-transparent"
-      >
-        <div className="flex items-center gap-1">
-          {children}
-          {getSortIcon(field)}
-        </div>
-      </Button>
-    </TableHead>
-  )
+  // Save column widths to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(COLUMN_WIDTHS_STORAGE_KEY, JSON.stringify(columnSizing))
+    }
+  }, [columnSizing])
+
+  // Valid column IDs that exist in our table
+  const validColumnIds = [
+    'batch_number',
+    'product',
+    'supplier',
+    'expiry_date',
+    'current_quantity',
+    'cost_price',
+    'selling_price',
+    'status',
+  ]
+
+  // Convert currentSort to TanStack Table sorting state, only if column exists
+  const [sorting, setSorting] = useState<SortingState>(() => {
+    if (validColumnIds.includes(currentSort.field)) {
+      return [
+        {
+          id: currentSort.field,
+          desc: currentSort.direction === 'desc',
+        },
+      ]
+    }
+    return []
+  })
+
+  // Update sorting when currentSort changes
+  useEffect(() => {
+    if (validColumnIds.includes(currentSort.field)) {
+      setSorting([
+        {
+          id: currentSort.field,
+          desc: currentSort.direction === 'desc',
+        },
+      ])
+    } else {
+      setSorting([])
+    }
+  }, [currentSort])
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -197,7 +275,8 @@ function BatchTable({
       reserved: 'reserved',
     }
     const translationKey = statusMap[status] || 'active'
-    const translatedStatus = tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
+    const translatedStatus =
+      tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
     return (
       <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
         {translatedStatus}
@@ -221,145 +300,440 @@ function BatchTable({
     }
   }
 
+  // Calculate dynamic max width based on content
+  const calculateMaxWidth = (data: BatchWithProduct[], accessor: (item: BatchWithProduct) => string) => {
+    const maxLength = Math.max(
+      ...data.map(item => accessor(item)?.length || 0),
+      10 // Minimum reasonable length
+    )
+    // Rough calculation: ~8px per character + padding
+    return Math.min(Math.max(maxLength * 8 + 40, 100), 400)
+  }
+
+  // Column definitions
+  const columns: ColumnDef<BatchWithProduct>[] = [
+    {
+      id: 'batch_number',
+      accessorKey: 'batch_number',
+      header: () => (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'batch_number' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.batchNumber')}
+              {currentSort.field === 'batch_number' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="font-mono text-sm truncate" title={row.original.batch_number}>
+          {row.original.batch_number}
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.batch_number,
+      minSize: 80,
+      maxSize: calculateMaxWidth(data, item => item.batch_number || ''),
+      enableResizing: true,
+    },
+    {
+      id: 'product',
+      accessorFn: row => row.products?.name || '',
+      header: t('headers.product'),
+      cell: ({ row }) => (
+        <div>
+          <div className="font-medium truncate" title={row.original.products?.name}>
+            {row.original.products?.name}
+          </div>
+          <div
+            className="text-sm text-muted-foreground truncate"
+            title={`${row.original.products?.sku} • ${row.original.products?.category}`}
+          >
+            {row.original.products?.sku} • {row.original.products?.category}
+          </div>
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.product,
+      minSize: 120,
+      maxSize: calculateMaxWidth(data, item => item.products?.name || ''),
+      enableResizing: true,
+    },
+    {
+      id: 'supplier',
+      accessorKey: 'supplier',
+      header: () => (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'supplier' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.supplier')}
+              {currentSort.field === 'supplier' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="truncate" title={row.original.supplier || 'Unknown'}>
+            {row.original.supplier || 'Unknown'}
+          </span>
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.supplier,
+      minSize: 80,
+      maxSize: calculateMaxWidth(data, item => item.supplier || 'Unknown'),
+      enableResizing: true,
+    },
+    {
+      id: 'expiry_date',
+      accessorKey: 'expiry_date',
+      header: () => (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'expiry_date' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.expiryDate')}
+              {currentSort.field === 'expiry_date' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="truncate">
+              {new Date(row.original.expiry_date).toLocaleDateString()}
+            </span>
+          </div>
+          {getExpiryBadge(row.original.expiry_date)}
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.expiry_date,
+      minSize: 100,
+      maxSize: Math.max(180, calculateMaxWidth(data, item => new Date(item.expiry_date).toLocaleDateString())),
+      enableResizing: true,
+    },
+    {
+      id: 'current_quantity',
+      accessorKey: 'current_quantity',
+      header: () => (
+        <div className="flex items-center gap-1 justify-end">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'current_quantity' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.stock')}
+              {currentSort.field === 'current_quantity' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-right">
+          <span
+            className="font-medium truncate"
+            title={Number(row.original.current_quantity).toLocaleString()}
+          >
+            {Number(row.original.current_quantity).toLocaleString()}
+          </span>
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.current_quantity,
+      minSize: 60,
+      maxSize: calculateMaxWidth(data, item => Number(item.current_quantity).toLocaleString()),
+      enableResizing: true,
+    },
+    {
+      id: 'cost_price',
+      accessorKey: 'cost_price',
+      header: () => (
+        <div className="flex items-center gap-1 justify-end">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'cost_price' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.costPrice')}
+              {currentSort.field === 'cost_price' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-1">
+          <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+          <span className="truncate" title={`$${Number(row.original.cost_price).toFixed(2)}`}>
+            {Number(row.original.cost_price).toFixed(2)}
+          </span>
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.cost_price,
+      minSize: 70,
+      maxSize: calculateMaxWidth(data, item => `$${Number(item.cost_price).toFixed(2)}`),
+      enableResizing: true,
+    },
+    {
+      id: 'selling_price',
+      accessorKey: 'selling_price',
+      header: () => (
+        <div className="flex items-center gap-1 justify-end">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'selling_price' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.sellPrice')}
+              {currentSort.field === 'selling_price' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-end gap-1">
+          <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+          <span className="truncate" title={`$${Number(row.original.selling_price).toFixed(2)}`}>
+            {Number(row.original.selling_price).toFixed(2)}
+          </span>
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.selling_price,
+      minSize: 70,
+      maxSize: calculateMaxWidth(data, item => `$${Number(item.selling_price).toFixed(2)}`),
+      enableResizing: true,
+    },
+    {
+      id: 'status',
+      accessorKey: 'status',
+      header: () => (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const field = 'status' as BatchSortField
+              updateSort(field)
+            }}
+            className="h-auto p-0 font-semibold hover:bg-transparent"
+          >
+            <div className="flex items-center gap-1">
+              {t('headers.status')}
+              {currentSort.field === 'status' ? (
+                currentSort.direction === 'asc' ? (
+                  <ArrowUp className="h-4 w-4" />
+                ) : (
+                  <ArrowDown className="h-4 w-4" />
+                )
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </div>
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => getStatusBadge(row.original.status || 'active'),
+      size: DEFAULT_COLUMN_WIDTHS.status,
+      minSize: 70,
+      maxSize: Math.max(130, calculateMaxWidth(data, item => item.status || 'active')),
+      enableResizing: true,
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" disabled={isUpdating}>
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Eye className="mr-2 h-4 w-4" />
+              {t('actions.viewDetails')}
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit className="mr-2 h-4 w-4" />
+              {t('actions.editBatch')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => markBatchAsExpired(row.original.batch_id)}
+              disabled={row.original.status === 'expired'}
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              {t('actions.markAsExpired')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => markBatchAsDamaged(row.original.batch_id)}
+              disabled={row.original.status === 'damaged'}
+            >
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              {t('actions.markAsDamaged')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive">
+              <Trash2 className="mr-2 h-4 w-4" />
+              {t('actions.deleteBatch')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      enableResizing: false,
+      size: DEFAULT_COLUMN_WIDTHS.actions,
+      minSize: 50,
+    },
+  ]
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      columnSizing,
+      sorting,
+    },
+    onColumnSizingChange: setColumnSizing,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    columnResizeMode: 'onChange', // Smooth real-time resizing
+    enableColumnResizing: true,
+    enableSorting: false, // We handle sorting externally
+    defaultColumn: {
+      minSize: 50, // Global minimum size
+      maxSize: 400, // Global maximum size
+    },
+  })
+
   return (
     <Card>
       <div className="overflow-x-auto">
-        <Table>
+        <Table 
+          style={{ 
+            width: table.getCenterTotalSize(),
+            tableLayout: 'fixed' // Force fixed layout to prevent column confusion
+          }}
+        >
           <TableHeader>
-            <TableRow>
-              <SortableHeader field="batch_number" className="w-32 max-w-32">
-                {t('headers.batchNumber')}
-              </SortableHeader>
-              <TableHead className="w-48">{t('headers.product')}</TableHead>
-              <SortableHeader field="supplier" className="w-32">
-                {t('headers.supplier')}
-              </SortableHeader>
-              <SortableHeader field="expiry_date" className="w-36">
-                {t('headers.expiryDate')}
-              </SortableHeader>
-              <SortableHeader field="current_quantity" className="text-right w-24">
-                {t('headers.stock')}
-              </SortableHeader>
-              <SortableHeader field="cost_price" className="text-right w-28">
-                {t('headers.costPrice')}
-              </SortableHeader>
-              <SortableHeader field="selling_price" className="text-right w-28">
-                {t('headers.sellPrice')}
-              </SortableHeader>
-              <SortableHeader field="status" className="w-24">
-                {t('headers.status')}
-              </SortableHeader>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead
+                    key={header.id}
+                    className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
+                    style={{
+                      width: header.getSize(),
+                      minWidth: header.getSize(),
+                      maxWidth: header.getSize(),
+                      position: 'relative',
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.column.getCanResize() && <ColumnResizer header={header} />}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
           </TableHeader>
           <TableBody>
-            {data.map(batch => (
-              <TableRow key={batch.batch_id}>
-                <TableCell className="font-mono text-sm w-32 max-w-32">
-                  <div className="truncate" title={batch.batch_number}>
-                    {batch.batch_number}
-                  </div>
-                </TableCell>
-                <TableCell className="w-48">
-                  <div>
-                    <div className="font-medium truncate" title={batch.products?.name}>
-                      {batch.products?.name}
-                    </div>
-                    <div
-                      className="text-sm text-muted-foreground truncate"
-                      title={`${batch.products?.sku} • ${batch.products?.category}`}
-                    >
-                      {batch.products?.sku} • {batch.products?.category}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="w-32">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    <span className="truncate" title={batch.supplier || 'Unknown'}>
-                      {batch.supplier || 'Unknown'}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="w-36">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      <span className="truncate">
-                        {new Date(batch.expiry_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    {getExpiryBadge(batch.expiry_date)}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right w-24">
-                  <div className="flex flex-col items-end gap-1">
-                    <span
-                      className="font-medium truncate"
-                      title={Number(batch.current_quantity).toLocaleString()}
-                    >
-                      {Number(batch.current_quantity).toLocaleString()}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right w-28">
-                  <div className="flex items-center justify-end gap-1">
-                    <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                    <span className="truncate" title={`$${Number(batch.cost_price).toFixed(2)}`}>
-                      {Number(batch.cost_price).toFixed(2)}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right w-28">
-                  <div className="flex items-center justify-end gap-1">
-                    <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                    <span className="truncate" title={`$${Number(batch.selling_price).toFixed(2)}`}>
-                      {Number(batch.selling_price).toFixed(2)}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="w-24">{getStatusBadge(batch.status || 'active')}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" disabled={isUpdating}>
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        {t('actions.viewDetails')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Edit className="mr-2 h-4 w-4" />
-                        {t('actions.editBatch')}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => markBatchAsExpired(batch.batch_id)}
-                        disabled={batch.status === 'expired'}
-                      >
-                        <AlertTriangle className="mr-2 h-4 w-4" />
-                        {t('actions.markAsExpired')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => markBatchAsDamaged(batch.batch_id)}
-                        disabled={batch.status === 'damaged'}
-                      >
-                        <AlertTriangle className="mr-2 h-4 w-4" />
-                        {t('actions.markAsDamaged')}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {t('actions.deleteBatch')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+            {table.getRowModel().rows.map(row => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <TableCell
+                    key={cell.id}
+                    style={{
+                      width: cell.column.getSize(),
+                      minWidth: cell.column.getSize(),
+                      maxWidth: cell.column.getSize(),
+                    }}
+                    className="border-r border-border/50 last:border-r-0 overflow-hidden"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>
@@ -391,7 +765,8 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
       reserved: 'reserved',
     }
     const translationKey = statusMap[status] || 'active'
-    const translatedStatus = tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
+    const translatedStatus =
+      tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
     return (
       <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
         {translatedStatus}
