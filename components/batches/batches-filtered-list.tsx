@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BatchListPresentation } from '@/components/batches/batch-list-presentation'
 import { BatchSortToolbar } from '@/components/batches/batch-sort-toolbar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+
 import {
   Select,
   SelectContent,
@@ -16,9 +14,8 @@ import {
 } from '@/components/ui/select'
 import { useBatches } from '@/hooks/use-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import { X, Filter, AlertTriangle, Clock } from 'lucide-react'
+
 import type { BatchSort, BatchFilters, BatchSortField } from '@/lib/queries/batches'
-import { cn } from '@/lib/utils'
 
 interface InitialFilters {
   filter?: string
@@ -119,14 +116,14 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
   }
 
   // Clear all filters
-  const clearFilters = () => {
-    const baseFilters: BatchFilters = {
-      storeId: activeStoreId || undefined,
-      sort: { field: 'created_at', direction: 'desc' },
-    }
-    setFilters(baseFilters)
-    router.push('/dashboard/inventory/batches')
-  }
+  // const clearFilters = () => {
+  //   const baseFilters: BatchFilters = {
+  //     storeId: activeStoreId || undefined,
+  //     sort: { field: 'created_at', direction: 'desc' },
+  //   }
+  //   setFilters(baseFilters)
+  //   router.push('/dashboard/inventory/batches')
+  // }
 
   // Handle sort changes
   const handleSortChange = (newSort: BatchSort) => {
@@ -134,7 +131,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
   }
 
   // Check if any filters are active
-  const hasActiveFilters = filters.expiringInDays || filters.status
+  // const hasActiveFilters = filters.expiringInDays || filters.status
 
   return (
     <div className="space-y-6">
@@ -191,15 +188,6 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
           </Select>
         </div>
       </div>
-
-      {/* Special message for expiring items */}
-      {/* {filters.expiringInDays && data.length > 0 && (
-        <div className={cn('font-mono', filters.expiringInDays <= 3 && '')}>
-          <div className={cn('text-xs', filters.expiringInDays <= 3 && '')}>
-            {count} {count === 1 ? 'item' : 'items'} expiring within {filters.expiringInDays} days
-          </div>
-        </div>
-      )} */}
 
       {/* Batches List */}
       <BatchListPresentation

@@ -587,5 +587,45 @@
       "privacyPolicy": "Privacybeleid",
       "termsOfService": "Servicevoorwaarden"
     }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "Batch nr.",
+        "product": "Product",
+        "supplier": "Leverancier",
+        "expiryDate": "Vervaldatum",
+        "stock": "Voorraad",
+        "costPrice": "Kostprijs",
+        "sellPrice": "Verkoopprijs",
+        "status": "Status",
+        "location": "Locatie"
+      },
+      "actions": {
+        "viewDetails": "Details bekijken",
+        "editBatch": "Batch bewerken",
+        "markAsExpired": "Markeren als verlopen",
+        "markAsDamaged": "Markeren als beschadigd",
+        "deleteBatch": "Batch verwijderen"
+      },
+      "emptyState": {
+        "title": "Geen batches gevonden",
+        "description": "Je hebt nog geen batches in je inventaris. Begin met het toevoegen van je eerste batch om vervaldatums bij te houden en voorraadniveaus te beheren.",
+        "addFirstBatch": "Eerste batch toevoegen"
+      },
+      "loadMore": "Meer batches laden ({remaining} resterend)",
+      "loading": "Laden..."
+    },
+    "status": {
+      "active": "Actief",
+      "expired": "Verlopen",
+      "damaged": "Beschadigd",
+      "soldOut": "Uitverkocht",
+      "reserved": "Gereserveerd"
+    },
+    "expiry": {
+      "expired": "Verlopen",
+      "daysLeft": "{days}d over"
+    }
   }
 }

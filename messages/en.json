@@ -332,6 +332,46 @@
       "notice": "This is your personal account. You can change your password in the login page."
     }
   },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "Batch #",
+        "product": "Product",
+        "supplier": "Supplier",
+        "expiryDate": "Expiry Date",
+        "stock": "Stock",
+        "costPrice": "Cost Price",
+        "sellPrice": "Sell Price",
+        "status": "Status",
+        "location": "Location"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "editBatch": "Edit Batch",
+        "markAsExpired": "Mark as Expired",
+        "markAsDamaged": "Mark as Damaged",
+        "deleteBatch": "Delete Batch"
+      },
+      "emptyState": {
+        "title": "No batches found",
+        "description": "You don't have any batches in your inventory yet. Start by adding your first batch to track expiration dates and manage stock levels.",
+        "addFirstBatch": "Add First Batch"
+      },
+      "loadMore": "Load More Batches ({remaining} remaining)",
+      "loading": "Loading more..."
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "damaged": "Damaged",
+      "soldOut": "Sold Out",
+      "reserved": "Reserved"
+    },
+    "expiry": {
+      "expired": "Expired",
+      "daysLeft": "{days}d left"
+    }
+  },
   "common": {
     "more": "More"
   },

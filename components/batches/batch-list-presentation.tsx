@@ -3,6 +3,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -64,7 +65,8 @@ export function BatchListPresentation({
   currentSort,
   updateSort,
 }: BatchListPresentationProps) {
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const [viewMode] = useState<'table' | 'cards'>('table')
+  const t = useTranslations('batches.table')
 
   if (error) {
     return (
@@ -84,12 +86,11 @@ export function BatchListPresentation({
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-lg mb-2">No batches found</CardTitle>
+          <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
           <CardDescription className="text-center max-w-md">
-            You don&apos;t have any batches in your inventory yet. Start by adding your first batch
-            to track expiration dates and manage stock levels.
+            {t('emptyState.description')}
           </CardDescription>
-          <Button className="mt-4">Add First Batch</Button>
+          <Button className="mt-4">{t('emptyState.addFirstBatch')}</Button>
         </CardContent>
       </Card>
     )
@@ -120,10 +121,10 @@ export function BatchListPresentation({
             {isFetchingNextPage ? (
               <>
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                Loading more...
+                {t('loading')}
               </>
             ) : (
-              `Load More Batches (${count - data.length} remaining)`
+              t('loadMore', { remaining: count - data.length })
             )}
           </Button>
         </div>
@@ -142,6 +143,9 @@ function BatchTable({
   updateSort: (field: BatchSortField) => void
 }) {
   const { markBatchAsExpired, markBatchAsDamaged, isUpdating } = useBatchActions()
+  const t = useTranslations('batches.table')
+  const tStatus = useTranslations('batches.status')
+  const tExpiry = useTranslations('batches.expiry')
 
   const getSortIcon = (field: BatchSortField) => {
     if (currentSort.field !== field) {
@@ -185,7 +189,20 @@ function BatchTable({
       sold_out: 'secondary' as const,
       reserved: 'outline' as const,
     }
-    return <Badge variant={variants[status as keyof typeof variants] || 'outline'}>{status}</Badge>
+    const statusMap: { [key: string]: string } = {
+      active: 'active',
+      expired: 'expired',
+      damaged: 'damaged',
+      sold_out: 'soldOut',
+      reserved: 'reserved',
+    }
+    const translationKey = statusMap[status] || 'active'
+    const translatedStatus = tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
+    return (
+      <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
+        {translatedStatus}
+      </Badge>
+    )
   }
 
   const getExpiryBadge = (expiryDate: string) => {
@@ -194,141 +211,169 @@ function BatchTable({
     const daysUntilExpiry = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
     if (daysUntilExpiry < 0) {
-      return <Badge variant="destructive">Expired</Badge>
+      return <Badge variant="destructive">{tExpiry('expired')}</Badge>
     } else if (daysUntilExpiry <= 3) {
-      return <Badge variant="destructive">{daysUntilExpiry}d left</Badge>
+      return <Badge variant="destructive">{tExpiry('daysLeft', { days: daysUntilExpiry })}</Badge>
     } else if (daysUntilExpiry <= 7) {
-      return <Badge variant="secondary">{daysUntilExpiry}d left</Badge>
+      return <Badge variant="secondary">{tExpiry('daysLeft', { days: daysUntilExpiry })}</Badge>
     } else {
-      return <Badge variant="outline">{daysUntilExpiry}d left</Badge>
+      return <Badge variant="outline">{tExpiry('daysLeft', { days: daysUntilExpiry })}</Badge>
     }
   }
 
   return (
     <Card>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <SortableHeader field="batch_number">Batch #</SortableHeader>
-            <TableHead>Product</TableHead>
-            <SortableHeader field="supplier">Supplier</SortableHeader>
-            <SortableHeader field="expiry_date">Expiry Date</SortableHeader>
-            <SortableHeader field="current_quantity" className="text-right">
-              Stock
-            </SortableHeader>
-            <SortableHeader field="cost_price" className="text-right">
-              Cost
-            </SortableHeader>
-            <SortableHeader field="selling_price" className="text-right">
-              Price
-            </SortableHeader>
-            <SortableHeader field="status">Status</SortableHeader>
-            <TableHead className="w-12"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map(batch => (
-            <TableRow key={batch.batch_id}>
-              <TableCell className="font-mono text-sm">{batch.batch_number}</TableCell>
-              <TableCell>
-                <div>
-                  <div className="font-medium">{batch.products?.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {batch.products?.sku} • {batch.products?.category}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-muted-foreground" />
-                  {batch.supplier || 'Unknown'}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {new Date(batch.expiry_date).toLocaleDateString()}
-                  </div>
-                  {getExpiryBadge(batch.expiry_date)}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex flex-col items-end gap-1">
-                  <span className="font-medium">
-                    {Number(batch.current_quantity).toLocaleString()}
-                  </span>
-                  {batch.reserved_quantity && Number(batch.reserved_quantity) > 0 && (
-                    <span className="text-xs text-muted-foreground">
-                      {Number(batch.reserved_quantity)} reserved
-                    </span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <DollarSign className="h-3 w-3 text-muted-foreground" />
-                  {Number(batch.cost_price).toFixed(2)}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <DollarSign className="h-3 w-3 text-muted-foreground" />
-                  {Number(batch.selling_price).toFixed(2)}
-                </div>
-              </TableCell>
-              <TableCell>{getStatusBadge(batch.status || 'active')}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" disabled={isUpdating}>
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Batch
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => markBatchAsExpired(batch.batch_id)}
-                      disabled={batch.status === 'expired'}
-                    >
-                      <AlertTriangle className="mr-2 h-4 w-4" />
-                      Mark as Expired
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => markBatchAsDamaged(batch.batch_id)}
-                      disabled={batch.status === 'damaged'}
-                    >
-                      <AlertTriangle className="mr-2 h-4 w-4" />
-                      Mark as Damaged
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Batch
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <SortableHeader field="batch_number" className="w-32 max-w-32">
+                {t('headers.batchNumber')}
+              </SortableHeader>
+              <TableHead className="w-48">{t('headers.product')}</TableHead>
+              <SortableHeader field="supplier" className="w-32">
+                {t('headers.supplier')}
+              </SortableHeader>
+              <SortableHeader field="expiry_date" className="w-36">
+                {t('headers.expiryDate')}
+              </SortableHeader>
+              <SortableHeader field="current_quantity" className="text-right w-24">
+                {t('headers.stock')}
+              </SortableHeader>
+              <SortableHeader field="cost_price" className="text-right w-28">
+                {t('headers.costPrice')}
+              </SortableHeader>
+              <SortableHeader field="selling_price" className="text-right w-28">
+                {t('headers.sellPrice')}
+              </SortableHeader>
+              <SortableHeader field="status" className="w-24">
+                {t('headers.status')}
+              </SortableHeader>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {data.map(batch => (
+              <TableRow key={batch.batch_id}>
+                <TableCell className="font-mono text-sm w-32 max-w-32">
+                  <div className="truncate" title={batch.batch_number}>
+                    {batch.batch_number}
+                  </div>
+                </TableCell>
+                <TableCell className="w-48">
+                  <div>
+                    <div className="font-medium truncate" title={batch.products?.name}>
+                      {batch.products?.name}
+                    </div>
+                    <div
+                      className="text-sm text-muted-foreground truncate"
+                      title={`${batch.products?.sku} • ${batch.products?.category}`}
+                    >
+                      {batch.products?.sku} • {batch.products?.category}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="w-32">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="truncate" title={batch.supplier || 'Unknown'}>
+                      {batch.supplier || 'Unknown'}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="w-36">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="truncate">
+                        {new Date(batch.expiry_date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {getExpiryBadge(batch.expiry_date)}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right w-24">
+                  <div className="flex flex-col items-end gap-1">
+                    <span
+                      className="font-medium truncate"
+                      title={Number(batch.current_quantity).toLocaleString()}
+                    >
+                      {Number(batch.current_quantity).toLocaleString()}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right w-28">
+                  <div className="flex items-center justify-end gap-1">
+                    <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                    <span className="truncate" title={`$${Number(batch.cost_price).toFixed(2)}`}>
+                      {Number(batch.cost_price).toFixed(2)}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right w-28">
+                  <div className="flex items-center justify-end gap-1">
+                    <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                    <span className="truncate" title={`$${Number(batch.selling_price).toFixed(2)}`}>
+                      {Number(batch.selling_price).toFixed(2)}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="w-24">{getStatusBadge(batch.status || 'active')}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" disabled={isUpdating}>
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" />
+                        {t('actions.viewDetails')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Edit className="mr-2 h-4 w-4" />
+                        {t('actions.editBatch')}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => markBatchAsExpired(batch.batch_id)}
+                        disabled={batch.status === 'expired'}
+                      >
+                        <AlertTriangle className="mr-2 h-4 w-4" />
+                        {t('actions.markAsExpired')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => markBatchAsDamaged(batch.batch_id)}
+                        disabled={batch.status === 'damaged'}
+                      >
+                        <AlertTriangle className="mr-2 h-4 w-4" />
+                        {t('actions.markAsDamaged')}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t('actions.deleteBatch')}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </Card>
   )
 }
 
 function BatchCards({ data }: { data: BatchWithProduct[] }) {
   const { markBatchAsExpired, markBatchAsDamaged, isUpdating } = useBatchActions()
+  const t = useTranslations('batches.table')
+  const tStatus = useTranslations('batches.status')
+  const tExpiry = useTranslations('batches.expiry')
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -338,7 +383,20 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
       sold_out: 'secondary' as const,
       reserved: 'outline' as const,
     }
-    return <Badge variant={variants[status as keyof typeof variants] || 'outline'}>{status}</Badge>
+    const statusMap: { [key: string]: string } = {
+      active: 'active',
+      expired: 'expired',
+      damaged: 'damaged',
+      sold_out: 'soldOut',
+      reserved: 'reserved',
+    }
+    const translationKey = statusMap[status] || 'active'
+    const translatedStatus = tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
+    return (
+      <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
+        {translatedStatus}
+      </Badge>
+    )
   }
 
   const getExpiryBadge = (expiryDate: string) => {
@@ -347,13 +405,13 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
     const daysUntilExpiry = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
     if (daysUntilExpiry < 0) {
-      return <Badge variant="destructive">Expired</Badge>
+      return <Badge variant="destructive">{tExpiry('expired')}</Badge>
     } else if (daysUntilExpiry <= 3) {
-      return <Badge variant="destructive">{daysUntilExpiry}d left</Badge>
+      return <Badge variant="destructive">{tExpiry('daysLeft', { days: daysUntilExpiry })}</Badge>
     } else if (daysUntilExpiry <= 7) {
-      return <Badge variant="secondary">{daysUntilExpiry}d left</Badge>
+      return <Badge variant="secondary">{tExpiry('daysLeft', { days: daysUntilExpiry })}</Badge>
     } else {
-      return <Badge variant="outline">{daysUntilExpiry}d left</Badge>
+      return <Badge variant="outline">{tExpiry('daysLeft', { days: daysUntilExpiry })}</Badge>
     }
   }
 
@@ -376,31 +434,31 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Supplier:</span>
+                <span className="text-muted-foreground">{t('headers.supplier')}:</span>
                 <div className="font-medium">{batch.supplier || 'Unknown'}</div>
               </div>
               <div>
-                <span className="text-muted-foreground">Stock:</span>
+                <span className="text-muted-foreground">{t('headers.stock')}:</span>
                 <div className="font-medium">{Number(batch.current_quantity).toLocaleString()}</div>
               </div>
               <div>
-                <span className="text-muted-foreground">Cost:</span>
+                <span className="text-muted-foreground">{t('headers.costPrice')}:</span>
                 <div className="font-medium">${Number(batch.cost_price).toFixed(2)}</div>
               </div>
               <div>
-                <span className="text-muted-foreground">Price:</span>
+                <span className="text-muted-foreground">{t('headers.sellPrice')}:</span>
                 <div className="font-medium">${Number(batch.selling_price).toFixed(2)}</div>
               </div>
             </div>
 
             <div className="text-sm">
-              <span className="text-muted-foreground">Expires:</span>
+              <span className="text-muted-foreground">{t('headers.expiryDate')}:</span>
               <div className="font-medium">{new Date(batch.expiry_date).toLocaleDateString()}</div>
             </div>
 
             {batch.location_code && (
               <div className="text-sm">
-                <span className="text-muted-foreground">Location:</span>
+                <span className="text-muted-foreground">{t('headers.location')}:</span>
                 <div className="font-medium flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {batch.location_code}
@@ -411,7 +469,7 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
             <div className="flex gap-2 pt-2">
               <Button variant="outline" size="sm" className="flex-1">
                 <Eye className="mr-1 h-3 w-3" />
-                View
+                {t('actions.viewDetails')}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -422,7 +480,7 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
                     <Edit className="mr-2 h-4 w-4" />
-                    Edit Batch
+                    {t('actions.editBatch')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -430,19 +488,19 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
                     disabled={batch.status === 'expired'}
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />
-                    Mark as Expired
+                    {t('actions.markAsExpired')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => markBatchAsDamaged(batch.batch_id)}
                     disabled={batch.status === 'damaged'}
                   >
                     <AlertTriangle className="mr-2 h-4 w-4" />
-                    Mark as Damaged
+                    {t('actions.markAsDamaged')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Batch
+                    {t('actions.deleteBatch')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -455,19 +513,21 @@ function BatchCards({ data }: { data: BatchWithProduct[] }) {
 }
 
 function BatchListSkeleton() {
+  const t = useTranslations('batches.table')
+
   return (
     <Card>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Batch #</TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Supplier</TableHead>
-            <TableHead>Expiry Date</TableHead>
-            <TableHead className="text-right">Stock</TableHead>
-            <TableHead className="text-right">Cost</TableHead>
-            <TableHead className="text-right">Price</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>{t('headers.batchNumber')}</TableHead>
+            <TableHead>{t('headers.product')}</TableHead>
+            <TableHead>{t('headers.supplier')}</TableHead>
+            <TableHead>{t('headers.expiryDate')}</TableHead>
+            <TableHead className="text-right">{t('headers.stock')}</TableHead>
+            <TableHead className="text-right">{t('headers.costPrice')}</TableHead>
+            <TableHead className="text-right">{t('headers.sellPrice')}</TableHead>
+            <TableHead>{t('headers.status')}</TableHead>
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
