@@ -1,16 +1,14 @@
-// app/(dashboard)/dashboard/(inventory)/inventory/batches/page.tsx
-
+import { redirect } from 'next/navigation'
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchBatchesPage, fetchExpiringBatches } from '@/lib/queries/batches'
 import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
-import { queryKeys } from '@/lib/queries/query-keys'
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+
+import BatchesHeader from '@/components/batches/batches-header'
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
-import { Button } from '@/components/ui/button'
-import { Plus, Download } from 'lucide-react'
-import { redirect } from 'next/navigation'
 
 interface InventoryBatchesPageProps {
   searchParams: Promise<{
@@ -69,12 +67,12 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
     // Build filters based on search params
     const filters: any = { storeId: storeToUse.store_id }
-    
+
     // Handle expiring filter
     if (params.filter === 'expiring') {
       filters.expiringInDays = parseInt(params.expiringDays || '7')
     }
-    
+
     // Handle status filter
     if (params.status) {
       filters.status = params.status
@@ -84,7 +82,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     if (params.sort) {
       filters.sort = {
         field: params.sort,
-        direction: params.direction || 'asc'
+        direction: params.direction || 'asc',
       }
     }
 
@@ -92,11 +90,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.batches.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchBatchesPage(
-          { page: pageParam, pageSize: 20 },
-          filters,
-          serverClient,
-        ),
+        fetchBatchesPage({ page: pageParam, pageSize: 20 }, filters, serverClient),
       initialPageParam: 0,
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page
@@ -105,12 +99,22 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     // If showing expiring items, also prefetch expiring batches summary
     if (params.filter === 'expiring') {
       await queryClient.prefetchQuery({
-        queryKey: [...queryKeys.batches.byStore(storeToUse.store_id), 'expiring', { daysAhead: filters.expiringInDays }],
-        queryFn: () => fetchExpiringBatches(storeToUse.store_id, filters.expiringInDays, serverClient),
+        queryKey: [
+          ...queryKeys.batches.byStore(storeToUse.store_id),
+          'expiring',
+          { daysAhead: filters.expiringInDays },
+        ],
+        queryFn: () =>
+          fetchExpiringBatches(storeToUse.store_id, filters.expiringInDays, serverClient),
       })
     }
 
-    console.log('[InventoryBatchesPage] Prefetched data for store:', storeToUse.store_name, 'with filters:', filters)
+    console.log(
+      '[InventoryBatchesPage] Prefetched data for store:',
+      storeToUse.store_name,
+      'with filters:',
+      filters,
+    )
   } catch (error) {
     console.error('[InventoryBatchesPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading
@@ -119,32 +123,17 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
   // Determine the header title and description based on filters
   const isExpiringFilter = params.filter === 'expiring'
   const pageTitle = isExpiringFilter ? 'Expiring Items' : 'Inventory Batches'
-  const pageDescription = isExpiringFilter 
+  const pageDescription = isExpiringFilter
     ? `Items expiring within ${params.expiringDays || '7'} days`
-    : 'View and manage your store\'s inventory batches'
+    : "View and manage your store's inventory batches"
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        <DashboardInsetHeader
-          title={pageTitle}
-          description={pageDescription}
-          rightContent={
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Batch
-              </Button>
-            </div>
-          }
-        />
+        <BatchesHeader title={pageTitle} description={pageDescription} />
 
         {/* Client-side filtered batch list */}
-        <BatchesFilteredList 
+        <BatchesFilteredList
           initialFilters={{
             filter: params.filter,
             expiringDays: params.expiringDays,
