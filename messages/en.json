@@ -354,7 +354,7 @@
       },
       "emptyState": {
         "title": "No batches found",
-        "description": "You don't have any batches in your inventory yet. Start by adding your first batch to track expiration dates and manage stock levels.",
+        "description": "Try adjusting your search or filters. ",
         "addFirstBatch": "Add First Batch"
       },
       "loadMore": "Load More Batches ({remaining} remaining)",
