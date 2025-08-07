@@ -23,6 +23,30 @@
     "support": "Ondersteuning",
     "addStore": "Winkel toevoegen"
   },
+  "dashboard": {
+    "kpis": {
+      "title": "Overzicht belangrijke statistieken",
+      "refresh": "Vernieuwen",
+      "inventory": {
+        "label": "Totale voorraadwaarde",
+        "subtitle": "batches",
+        "productCount": "producten"
+      },
+      "sales": {
+        "label": "Verkoopontvangsten",
+        "subtitle": "verkopen"
+      },
+      "donations": {
+        "label": "Donaties",
+        "subtitle": "ontvangers"
+      },
+      "waste": {
+        "label": "Afvalkosten",
+        "subtitle": "items"
+      },
+      "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen."
+    }
+  },
   "actions": {
     "add": "Toevoegen",
     "edit": "Bewerken",
