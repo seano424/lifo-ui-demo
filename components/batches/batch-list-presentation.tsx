@@ -738,138 +738,159 @@ function BatchTable({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* Filters and Sort controls */}
-
-            {onFiltersChange && (
-              <div className="flex items-center justify-end gap-2">
-                <Select
-                  value={filters?.expiringInDays?.toString() || 'all'}
-                  onValueChange={value =>
-                    onFiltersChange({
-                      ...filters,
-                      expiringInDays: value === 'all' ? undefined : parseInt(value),
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Expiry filter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All items </SelectItem>
-                    <SelectItem value="3">Expiring in 3 days</SelectItem>
-                    <SelectItem value="7">Expiring in 7 days</SelectItem>
-                    <SelectItem value="14">Expiring in 14 days</SelectItem>
-                    <SelectItem value="30">Expiring in 30 days</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={filters?.status || 'all'}
-                  onValueChange={value =>
-                    onFiltersChange({
-                      ...filters,
-                      status: value === 'all' ? undefined : value,
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="damaged">Damaged</SelectItem>
-                    <SelectItem value="sold_out">Sold Out</SelectItem>
-                    <SelectItem value="reserved">Reserved</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
-
-              {/* Sort field selector */}
-              <Select
-                value={currentSort.field}
-                onValueChange={(field: BatchSortField) => updateSort(field)}
-                disabled={isLoading}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <div className="flex items-center gap-2">
-                    {currentSort.field === 'expiry_date' && <AlertTriangle className="h-4 w-4" />}
-                    {currentSort.field === 'batch_number' && <Package className="h-4 w-4" />}
-                    {currentSort.field === 'supplier' && <Package className="h-4 w-4" />}
-                    {currentSort.field === 'current_quantity' && <TrendingUp className="h-4 w-4" />}
-                    {currentSort.field === 'cost_price' && <DollarSign className="h-4 w-4" />}
-                    {currentSort.field === 'selling_price' && <DollarSign className="h-4 w-4" />}
-                    {currentSort.field === 'status' && <Clock className="h-4 w-4" />}
-                    {currentSort.field === 'received_date' && <Calendar className="h-4 w-4" />}
-                    {currentSort.field === 'created_at' && <Calendar className="h-4 w-4" />}
-                    <SelectValue />
+            {isLoading && data.length > 0 ? (
+              // Show skeleton when loading more data
+              <>
+                {onFiltersChange && (
+                  <div className="flex items-center justify-end gap-2">
+                    <Skeleton className="h-10 w-[180px]" />
+                    <Skeleton className="h-10 w-[140px]" />
                   </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="expiry_date">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      Expiry Date
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="batch_number">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      Batch Number
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="supplier">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      Supplier
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="current_quantity">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4" />
-                      Stock Level
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="cost_price">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Cost Price
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="selling_price">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Selling Price
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="status">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      Status
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Sort direction toggle */}
-              <Button
-                variant="outline"
-                onClick={() => updateSort(currentSort.field)}
-                disabled={isLoading}
-                className="px-3 hover:text-accent-foreground hover:bg-transparent"
-              >
-                {currentSort.direction === 'asc' ? (
-                  <ArrowUp className="h-4 w-4" />
-                ) : (
-                  <ArrowDown className="h-4 w-4" />
                 )}
-                <span className="ml-1">{currentSort.direction === 'asc' ? 'ASC' : 'DESC'}</span>
-              </Button>
-            </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-10 w-[180px]" />
+                  <Skeleton className="h-10 w-20" />
+                </div>
+              </>
+            ) : (
+              // Show actual controls when not loading or no data
+              <>
+                {onFiltersChange && (
+                  <div className="flex items-center justify-end gap-2">
+                    <Select
+                      value={filters?.expiringInDays?.toString() || 'all'}
+                      onValueChange={value =>
+                        onFiltersChange({
+                          ...filters,
+                          expiringInDays: value === 'all' ? undefined : parseInt(value),
+                        })
+                      }
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Expiry filter" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All items </SelectItem>
+                        <SelectItem value="3">Expiring in 3 days</SelectItem>
+                        <SelectItem value="7">Expiring in 7 days</SelectItem>
+                        <SelectItem value="14">Expiring in 14 days</SelectItem>
+                        <SelectItem value="30">Expiring in 30 days</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={filters?.status || 'all'}
+                      onValueChange={value =>
+                        onFiltersChange({
+                          ...filters,
+                          status: value === 'all' ? undefined : value,
+                        })
+                      }
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="expired">Expired</SelectItem>
+                        <SelectItem value="damaged">Damaged</SelectItem>
+                        <SelectItem value="sold_out">Sold Out</SelectItem>
+                        <SelectItem value="reserved">Reserved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
+
+                  {/* Sort field selector */}
+                  <Select
+                    value={currentSort.field}
+                    onValueChange={(field: BatchSortField) => updateSort(field)}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <div className="flex items-center gap-2">
+                        {currentSort.field === 'expiry_date' && <AlertTriangle className="h-4 w-4" />}
+                        {currentSort.field === 'batch_number' && <Package className="h-4 w-4" />}
+                        {currentSort.field === 'supplier' && <Package className="h-4 w-4" />}
+                        {currentSort.field === 'current_quantity' && <TrendingUp className="h-4 w-4" />}
+                        {currentSort.field === 'cost_price' && <DollarSign className="h-4 w-4" />}
+                        {currentSort.field === 'selling_price' && <DollarSign className="h-4 w-4" />}
+                        {currentSort.field === 'status' && <Clock className="h-4 w-4" />}
+                        {currentSort.field === 'received_date' && <Calendar className="h-4 w-4" />}
+                        {currentSort.field === 'created_at' && <Calendar className="h-4 w-4" />}
+                        <SelectValue />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="expiry_date">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          Expiry Date
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="batch_number">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          Batch Number
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="supplier">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          Supplier
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="current_quantity">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="h-4 w-4" />
+                          Stock Level
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="cost_price">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          Cost Price
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="selling_price">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          Selling Price
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="status">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Status
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Sort direction toggle */}
+                  <Button
+                    variant="outline"
+                    onClick={() => updateSort(currentSort.field)}
+                    disabled={isLoading}
+                    className="px-3 hover:text-accent-foreground hover:bg-transparent"
+                  >
+                    {currentSort.direction === 'asc' ? (
+                      <ArrowUp className="h-4 w-4" />
+                    ) : (
+                      <ArrowDown className="h-4 w-4" />
+                    )}
+                    <span className="ml-1">{currentSort.direction === 'asc' ? 'ASC' : 'DESC'}</span>
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
