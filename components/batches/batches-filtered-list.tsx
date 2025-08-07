@@ -3,15 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BatchListPresentation } from '@/components/batches/batch-list-presentation'
-import { BatchSortToolbar } from '@/components/batches/batch-sort-toolbar'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { useBatches } from '@/hooks/use-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
@@ -133,63 +125,17 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
   // Check if any filters are active
   // const hasActiveFilters = filters.expiringInDays || filters.status
 
+  // Handle filter changes from the integrated table
+  const handleFiltersChange = (newFilters: { expiringInDays?: number; status?: string }) => {
+    updateFilters({
+      expiringInDays: newFilters.expiringInDays,
+      status: newFilters.status as 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved' | undefined,
+    })
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Filter Controls */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <BatchSortToolbar
-          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          onSortChange={handleSortChange}
-          totalCount={count}
-          isLoading={isLoading}
-        />
-
-        {/* Quick Filters: Expiring Days Filter and Status Filter */}
-        <div className="flex gap-2">
-          <Select
-            value={filters.expiringInDays?.toString() || 'all'}
-            onValueChange={value =>
-              updateFilters({
-                expiringInDays: value === 'all' ? undefined : parseInt(value),
-              })
-            }
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Expiry filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All items</SelectItem>
-              <SelectItem value="3">Expiring in 3 days</SelectItem>
-              <SelectItem value="7">Expiring in 7 days</SelectItem>
-              <SelectItem value="14">Expiring in 14 days</SelectItem>
-              <SelectItem value="30">Expiring in 30 days</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={filters.status || 'all'}
-            onValueChange={value =>
-              updateFilters({
-                status: value === 'all' ? undefined : (value as any),
-              })
-            }
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="expired">Expired</SelectItem>
-              <SelectItem value="damaged">Damaged</SelectItem>
-              <SelectItem value="sold_out">Sold Out</SelectItem>
-              <SelectItem value="reserved">Reserved</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Batches List */}
+    <div>
+      {/* Batches List with Fully Integrated Controls */}
       <BatchListPresentation
         data={data}
         count={count}
@@ -205,6 +151,11 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
             currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
           handleSortChange({ field, direction: newDirection })
         }}
+        filters={{
+          expiringInDays: filters.expiringInDays,
+          status: filters.status,
+        }}
+        onFiltersChange={handleFiltersChange}
       />
     </div>
   )
