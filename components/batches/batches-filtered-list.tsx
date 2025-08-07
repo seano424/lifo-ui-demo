@@ -138,56 +138,6 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
 
   return (
     <div className="space-y-6">
-      {/* Active Filters Display */}
-      {hasActiveFilters && (
-        <Card className="border-orange-200 bg-orange-50/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-orange-600" />
-                <CardTitle className="text-base">Active Filters</CardTitle>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="text-orange-700 hover:bg-orange-100"
-              >
-                Clear All
-                <X className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {filters.expiringInDays && (
-                <Badge variant="secondary" className="gap-1">
-                  <AlertTriangle className="h-3 w-3" />
-                  Expiring within {filters.expiringInDays} days
-                  <button
-                    onClick={() => updateFilters({ expiringInDays: undefined })}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-              {filters.status && (
-                <Badge variant="secondary" className="gap-1">
-                  Status: {filters.status}
-                  <button
-                    onClick={() => updateFilters({ status: undefined })}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Filter Controls */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <BatchSortToolbar
@@ -197,9 +147,8 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
           isLoading={isLoading}
         />
 
-        {/* Quick Filters */}
+        {/* Quick Filters: Expiring Days Filter and Status Filter */}
         <div className="flex gap-2">
-          {/* Expiring Days Filter */}
           <Select
             value={filters.expiringInDays?.toString() || 'all'}
             onValueChange={value =>
@@ -220,7 +169,6 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
             </SelectContent>
           </Select>
 
-          {/* Status Filter */}
           <Select
             value={filters.status || 'all'}
             onValueChange={value =>
@@ -245,36 +193,13 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
       </div>
 
       {/* Special message for expiring items */}
-      {filters.expiringInDays && data.length > 0 && (
-        <Card
-          className={cn(
-            'border-l-4',
-            filters.expiringInDays <= 3
-              ? 'border-l-red-500 bg-red-50/50'
-              : 'border-l-orange-500 bg-orange-50/50',
-          )}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Clock
-                className={cn(
-                  'h-5 w-5',
-                  filters.expiringInDays <= 3 ? 'text-red-600' : 'text-orange-600',
-                )}
-              />
-              <CardDescription
-                className={cn(
-                  'text-sm font-medium',
-                  filters.expiringInDays <= 3 ? 'text-red-900' : 'text-orange-900',
-                )}
-              >
-                {count} {count === 1 ? 'item' : 'items'} expiring within {filters.expiringInDays}{' '}
-                days
-              </CardDescription>
-            </div>
-          </CardHeader>
-        </Card>
-      )}
+      {/* {filters.expiringInDays && data.length > 0 && (
+        <div className={cn('font-mono', filters.expiringInDays <= 3 && '')}>
+          <div className={cn('text-xs', filters.expiringInDays <= 3 && '')}>
+            {count} {count === 1 ? 'item' : 'items'} expiring within {filters.expiringInDays} days
+          </div>
+        </div>
+      )} */}
 
       {/* Batches List */}
       <BatchListPresentation
@@ -296,4 +221,3 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     </div>
   )
 }
-

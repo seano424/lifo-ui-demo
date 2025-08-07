@@ -75,7 +75,7 @@ export function BatchSortToolbar({
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
       {/* Results count */}
       <div className="flex items-center gap-2">
-        <Badge variant="secondary" className="px-3 py-1">
+        <Badge variant="secondary" className="text-sm">
           {isLoading ? 'Loading...' : `${totalCount.toLocaleString()} batches`}
         </Badge>
       </div>
@@ -107,13 +107,12 @@ export function BatchSortToolbar({
         {/* Sort direction toggle */}
         <Button
           variant="outline"
-          size="sm"
           onClick={handleDirectionToggle}
           disabled={isLoading}
-          className="px-3"
+          className="px-3 hover:text-accent-foreground hover:bg-transparent"
         >
           {getSortIcon()}
-          <span className="ml-1 text-xs">{currentSort.direction === 'asc' ? 'ASC' : 'DESC'}</span>
+          <span className="ml-1">{currentSort.direction === 'asc' ? 'ASC' : 'DESC'}</span>
         </Button>
       </div>
     </div>
