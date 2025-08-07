@@ -139,8 +139,10 @@ export function DashboardKPICards() {
             icon="📦"
             label={t('inventory.label')}
             value={inventoryData?.totalValue ?? 0}
-            productCount={inventoryData?.productCount ?? 0}
-            subtitle={`${inventoryData?.batchCount ?? 0} ${t('inventory.subtitle')}`}
+            productCount={
+              showTrends ? inventoryTrendData?.metadata?.productCount : inventoryData?.productCount
+            }
+            subtitle={`${showTrends ? (inventoryTrendData?.metadata?.batchCount ?? 0) : (inventoryData?.batchCount ?? 0)} ${t('inventory.subtitle')}`}
             isLoading={inventoryQuery.isLoading || (showTrends && inventoryTrendsQuery.isLoading)}
             isError={inventoryQuery.isError || (showTrends && inventoryTrendsQuery.isError)}
             isLink={true}
@@ -155,7 +157,7 @@ export function DashboardKPICards() {
             value={salesData?.totalRevenue ?? 0}
             change={salesData?.change ?? 0}
             changePercent={salesData?.changePercent ?? 0}
-            subtitle={`${salesData?.transactionCount ?? 0} ${t('sales.subtitle')}`}
+            subtitle={`${showTrends ? (salesTrendData?.metadata?.transactionCount ?? 0) : (salesData?.transactionCount ?? 0)} ${t('sales.subtitle')}`}
             isLoading={salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)}
             isError={salesQuery.isError || (showTrends && salesTrendsQuery.isError)}
             isLink={true}
@@ -170,7 +172,7 @@ export function DashboardKPICards() {
             value={donationData?.totalValue ?? 0}
             change={donationData?.change ?? 0}
             changePercent={donationData?.changePercent ?? 0}
-            subtitle={`${donationData?.recipientCount ?? 0} ${t('donations.subtitle')}`}
+            subtitle={`${showTrends ? (donationTrendData?.metadata?.recipientCount ?? 0) : (donationData?.recipientCount ?? 0)} ${t('donations.subtitle')}`}
             isLoading={donationQuery.isLoading || (showTrends && donationTrendsQuery.isLoading)}
             isError={donationQuery.isError || (showTrends && donationTrendsQuery.isError)}
             isLink={true}
@@ -185,7 +187,7 @@ export function DashboardKPICards() {
             value={wasteData?.totalCost ?? 0}
             change={wasteData?.change ?? 0}
             changePercent={wasteData?.changePercent ?? 0}
-            subtitle={`${wasteData?.itemCount ?? 0} ${t('waste.subtitle')}`}
+            subtitle={`${showTrends ? (wasteTrendData?.metadata?.itemCount ?? 0) : (wasteData?.itemCount ?? 0)} ${t('waste.subtitle')}`}
             isLoading={wasteQuery.isLoading || (showTrends && wasteTrendsQuery.isLoading)}
             isError={wasteQuery.isError || (showTrends && wasteTrendsQuery.isError)}
             isLink={true}

@@ -17,6 +17,7 @@ export type TimePeriod =
   | 'last_month'
   | 'last_7_days'
   | 'last_30_days'
+  | 'all_time'
 
 export interface TimeRange {
   start: Date
@@ -163,6 +164,23 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         compareLabel: 'Previous 30 Days',
       }
     }
+
+    case 'all_time': {
+      // For all time, we compare current year vs previous year
+      const endOfYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999)
+
+      const compareStartOfYear = new Date(today.getFullYear() - 1, 0, 1)
+      const compareEndOfYear = new Date(today.getFullYear() - 1, 11, 31, 23, 59, 59, 999)
+
+      return {
+        start: new Date('2000-01-01'), // Very early date to capture all data
+        end: endOfYear,
+        compareStart: compareStartOfYear,
+        compareEnd: compareEndOfYear,
+        label: 'All Time',
+        compareLabel: 'Previous Year',
+      }
+    }
   }
 }
 
@@ -173,6 +191,7 @@ const periodOptions: { value: TimePeriod; label: string }[] = [
   { value: 'last_month', label: 'Last Month' },
   { value: 'last_7_days', label: 'Last 7 Days' },
   { value: 'last_30_days', label: 'Last 30 Days' },
+  { value: 'all_time', label: 'All Time' },
 ]
 
 export function TimeSelector({ value, onChange, className }: TimeSelectorProps) {
