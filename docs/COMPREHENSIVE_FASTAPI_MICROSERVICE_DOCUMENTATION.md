@@ -8,10 +8,11 @@
 4. [API Routes Documentation](#4-api-routes-documentation)
 5. [Authentication & Security](#5-authentication--security)
 6. [Database Integration](#6-database-integration)
-7. [Development Guide](#7-development-guide)
-8. [Deployment](#8-deployment)
-9. [Usage Examples](#9-usage-examples)
-10. [Troubleshooting](#10-troubleshooting)
+7. [Error Handling & Monitoring](#7-error-handling--monitoring)
+8. [Development Guide](#8-development-guide)
+9. [Deployment](#9-deployment)
+10. [Usage Examples](#10-usage-examples)
+11. [Troubleshooting](#11-troubleshooting)
 
 ---
 
@@ -31,6 +32,8 @@ The **LIFO AI Engine** is an intelligent inventory management microservice desig
 - **📊 Analytics & Insights**: Comprehensive inventory analytics with performance metrics
 - **🎯 Donation System**: EU-compliant donation eligibility checking and workflow management
 - **🔐 Enterprise Security**: JWT authentication, rate limiting, and comprehensive security headers
+- **🛡️ Error Tracking & Recovery**: Comprehensive error monitoring with automatic recovery mechanisms
+- **📈 Performance Monitoring**: Real-time system health tracking with alerting and metrics collection
 
 ### Architecture Overview
 
@@ -42,22 +45,32 @@ graph TB
     end
     
     subgraph "LIFO AI Engine (FastAPI)"
-        D[Main Application] --> E[API v1 Router]
-        E --> F[OCR & Vision Services]
-        E --> G[Scoring Engine]
-        E --> H[Analytics Engine]
-        E --> I[CSV Processing]
-        E --> J[Mobile Endpoints]
+        D[Main Application] --> E[Error Handling Middleware]
+        E --> F[Security Middleware]
+        F --> G[Performance Monitoring]
+        G --> H[API v1 Router]
+        H --> I[OCR & Vision Services]
+        H --> J[Scoring Engine]
+        H --> K[Analytics Engine]
+        H --> L[CSV Processing]
+        H --> M[Mobile Endpoints]
     end
     
     subgraph "Data Layer"
-        K[Supabase PostgreSQL] --> L[Row Level Security]
-        M[Google Vision API] --> F
-        N[Redis Cache] --> G
+        N[Supabase PostgreSQL] --> O[Row Level Security]
+        P[Google Vision API] --> I
+        Q[Redis Cache] --> J
+    end
+    
+    subgraph "Monitoring & Recovery"
+        R[Error Tracker] --> S[Recovery Manager]
+        T[Metrics Collector] --> U[Alert Manager]
+        E --> R
+        G --> T
     end
     
     A --> D
-    D --> K
+    D --> N
 ```
 
 ### Technology Stack
@@ -69,6 +82,9 @@ graph TB
 - **Image Processing**: Google Cloud Vision API v3.4+
 - **Caching**: Redis for performance optimization
 - **Security**: Comprehensive middleware stack with rate limiting
+- **Error Handling**: Comprehensive error tracking with automatic recovery
+- **Monitoring**: Real-time performance metrics and health monitoring
+- **Logging**: Structured logging with error correlation and analysis
 - **Documentation**: Auto-generated OpenAPI specs with interactive docs
 
 ---
@@ -103,7 +119,7 @@ pip install -r requirements.txt
 Create `.env.local` file:
 
 ```bash
-# Copy example environment file
+# Copy unified environment file from root level
 cp .env.example .env.local
 ```
 
@@ -174,6 +190,8 @@ open http://localhost:8000/docs
 ## 3. Environment Setup & Configuration
 
 ### Environment Variables Documentation
+
+> **Note**: We now use a unified `.env.example` file at the root level instead of separate environment files. This replaces the old dual environment setup with a single, comprehensive configuration file.
 
 #### Core API Settings
 
@@ -1013,7 +1031,294 @@ async def health_check() -> dict:
 
 ---
 
-## 7. Development Guide
+## 7. Error Handling & Monitoring
+
+The LIFO AI Engine implements a comprehensive error handling and monitoring system that provides production-ready error management, automatic recovery, and detailed tracking for system reliability.
+
+### 7.1 Error Handling Architecture
+
+#### Error Categories and Severity Levels
+
+The system categorizes errors into specific types with defined severity levels:
+
+**Error Categories:**
+- **Database**: Connection issues, query failures, integrity violations
+- **Authentication**: JWT validation, user verification failures
+- **Authorization**: Permission denied, resource access errors
+- **Validation**: Request data validation, schema violations
+- **External Service**: API timeouts, third-party service failures
+- **Business Logic**: Domain-specific validation failures
+- **System**: Server errors, resource exhaustion, crashes
+- **Performance**: Timeouts, slow response alerts
+- **Security**: Rate limiting violations, suspicious activity
+
+**Severity Levels:**
+- **Low**: Minor issues, validation errors (logged as info)
+- **Medium**: Service degradation, auth failures (logged as warning)
+- **High**: System errors, external service failures (logged as error)
+- **Critical**: System crashes, data corruption (logged as error with alerts)
+
+#### Error Tracking System
+
+The system automatically tracks all errors with comprehensive metadata:
+
+```python
+# Error events include:
+{
+  "error_id": "abc123def456",           # Unique identifier
+  "error_type": "ValidationError",      # Exception type
+  "category": "validation",             # Error category
+  "severity": "low",                    # Severity level
+  "endpoint": "/api/v1/mobile/scan",    # Affected endpoint
+  "user_id": "user-uuid",               # User context
+  "client_ip": "192.168.1.1",          # Client IP
+  "timestamp": "2024-01-15T10:30:00Z",  # UTC timestamp
+  "context": {                          # Additional metadata
+    "processing_time": 1250,
+    "request_method": "POST",
+    "recovery_attempted": true,
+    "recovery_successful": false
+  }
+}
+```
+
+### 7.2 Automatic Error Recovery
+
+The system implements intelligent error recovery for specific error types:
+
+#### Database Connection Recovery
+
+```python
+@error_handler(
+    category=ErrorCategory.DATABASE,
+    severity=ErrorSeverity.HIGH,
+    recovery_enabled=True
+)
+async def database_operation():
+    # Operation that might fail
+    # System will automatically attempt recovery
+    pass
+```
+
+**Recovery Strategy:**
+1. Test current connection
+2. Reinitialize database connection if needed
+3. Retry operation with exponential backoff
+4. Maximum 3 retry attempts
+
+#### External Service Recovery
+
+- **Timeout Recovery**: Wait and retry with exponential backoff
+- **Rate Limit Recovery**: Implement intelligent backoff based on rate limit headers
+- **Connection Recovery**: Retry with different endpoints if available
+
+### 7.3 Error Monitoring Endpoints
+
+#### Get Error Statistics
+
+```bash
+GET /api/errors/stats
+```
+
+**Response:**
+```json
+{
+  "error_tracking": {
+    "total_errors": 1250,
+    "errors_last_24h": 15,
+    "errors_last_1h": 2,
+    "category_breakdown_24h": {
+      "validation": 8,
+      "database": 4,
+      "external_service": 2,
+      "authentication": 1
+    },
+    "severity_breakdown_24h": {
+      "low": 10,
+      "medium": 4,
+      "high": 1
+    },
+    "top_error_endpoints": [
+      ["/api/v1/mobile/scan", 5],
+      ["/api/v1/vision/analyze-image", 3]
+    ],
+    "recovery_success_rates": {
+      "OperationalError": {
+        "success_rate": 0.85,
+        "attempted": 20,
+        "successful": 17
+      }
+    }
+  },
+  "system_health": {
+    "overall_status": "healthy",
+    "error_rate_last_hour": 2,
+    "monitoring_active": true
+  }
+}
+```
+
+#### Get Endpoint-Specific Analysis
+
+```bash
+GET /api/errors/endpoints/api/v1/mobile/scan
+```
+
+**Response:**
+```json
+{
+  "endpoint_analysis": {
+    "endpoint": "/api/v1/mobile/scan",
+    "total_errors": 25,
+    "errors_last_24h": 3,
+    "error_types": {
+      "ValidationError": 2,
+      "TimeoutError": 1
+    },
+    "severity_breakdown": {
+      "low": 2,
+      "medium": 1
+    },
+    "avg_time_between_errors_seconds": 3600,
+    "most_recent_errors": [
+      {
+        "error_id": "def456ghi789",
+        "error_type": "ValidationError",
+        "timestamp": "2024-01-15T10:25:00Z",
+        "recovery_successful": false
+      }
+    ]
+  }
+}
+```
+
+### 7.4 Error Response Format
+
+All errors follow a standardized response format:
+
+```json
+{
+  "error": true,
+  "error_id": "abc123def456",
+  "code": "VALIDATION_ERROR",
+  "message": "The request data is invalid. Please check your input and try again.",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "debug": {                    // Only in debug mode
+    "error_type": "ValidationError",
+    "error_message": "Field 'store_id' is required",
+    "category": "validation",
+    "severity": "low"
+  }
+}
+```
+
+**Response Headers:**
+```
+X-Error-ID: abc123def456
+X-Error-Category: validation
+X-Error-Timestamp: 1705315800
+Cache-Control: no-store, no-cache, must-revalidate
+```
+
+### 7.5 Performance Monitoring Integration
+
+#### Metrics Collection
+
+The error handling system integrates with performance monitoring:
+
+- **Error Rate Metrics**: Tracked per endpoint and time window
+- **Response Time Impact**: Correlation between errors and performance
+- **Recovery Time Tracking**: Time to recover from failures
+- **Cascade Detection**: Identify cascading failures across endpoints
+
+#### Alert Thresholds
+
+**Automatic Alerts:**
+- Error rate > 10 errors/hour on any endpoint
+- Critical severity errors (immediate alert)
+- Recovery failure rate > 50% for any error type
+- Error cascades detected (5+ errors in 5 minutes)
+
+### 7.6 Development Usage
+
+#### Using the Error Handler Decorator
+
+```python
+from app.utils.error_handling import error_handler, ErrorCategory, ErrorSeverity
+
+@error_handler(
+    category=ErrorCategory.EXTERNAL_SERVICE,
+    severity=ErrorSeverity.MEDIUM,
+    recovery_enabled=True
+)
+async def call_external_api():
+    # Your code here
+    # Errors will be automatically tracked and recovery attempted
+    pass
+```
+
+#### Manual Error Tracking
+
+```python
+from app.utils.error_handling import get_error_tracker, ErrorEvent
+
+error_tracker = get_error_tracker()
+
+# Create and track custom error events
+error_event = ErrorEvent(
+    error=exception,
+    category=ErrorCategory.BUSINESS_LOGIC,
+    severity=ErrorSeverity.MEDIUM,
+    endpoint="/api/v1/custom",
+    context={"custom_data": "value"}
+)
+
+error_tracker.track_error(error_event)
+```
+
+### 7.7 Production Monitoring
+
+#### Health Check Integration
+
+The `/health` endpoint includes error monitoring status:
+
+```json
+{
+  "status": "healthy",
+  "error_monitoring": {
+    "active": true,
+    "errors_last_hour": 2,
+    "recovery_success_rate": 0.85,
+    "system_health": "normal"
+  }
+}
+```
+
+#### Log Integration
+
+Errors are automatically logged with structured data:
+
+```json
+{
+  "timestamp": "2024-01-15T10:30:00Z",
+  "level": "ERROR",
+  "message": "Database connection failed",
+  "error_id": "abc123def456",
+  "category": "database",
+  "severity": "high",
+  "endpoint": "/api/v1/mobile/scan",
+  "recovery_attempted": true,
+  "recovery_successful": false,
+  "context": {
+    "processing_time_ms": 1250,
+    "user_id": "user-uuid"
+  }
+}
+```
+
+---
+
+## 8. Development Guide
 
 ### Project Structure
 

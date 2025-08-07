@@ -30,7 +30,7 @@ git clone https://github.com/lifo-ai/lifo-app.git
 cd lifo-app
 npm install
 
-# 2. Environment setup
+# 2. Environment setup (unified root-level file)
 cp .env.example .env.local
 # Ask someone for the actual API keys to put in .env.local
 
@@ -48,6 +48,8 @@ npm run dev
 - **VS Code** (recommended) - with Prettier and ESLint extensions
 
 ### Environment Variables
+
+> **Note**: We now use a unified `.env.example` file at the root level instead of separate environment files. This simplifies configuration and replaces the old dual environment setup.
 
 We do have a confluence doc for env variables right now.
 If you don't have access to that or you don't see all the variables necessary, just reach out to dev on slack for help

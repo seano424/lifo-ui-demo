@@ -171,7 +171,7 @@ cd ../lifo_ai_core
 source path/bin/activate  # Different activation!
 # Work on core...
 
-# Testing complexity
+# Testing complexity (OLD dual environment approach)
 cd lifo_api && source .venv/bin/activate && pytest
 cd ../lifo_ai_core && source path/bin/activate && pytest
 ```

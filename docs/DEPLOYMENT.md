@@ -66,6 +66,8 @@ envs:
 
 #### 2. Environment Variables
 
+> **Note**: We now use a unified `.env.example` file at the root level instead of separate environment files. This replaces the old dual environment setup.
+
 Set these environment variables in Digital Ocean:
 
 **Global Variables:**
@@ -112,9 +114,9 @@ doctl apps create --spec .do/app.yaml --wait
 doctl apps update YOUR_APP_ID --spec .do/app.yaml --wait
 ```
 
-### Monitoring
+### Monitoring & Error Tracking
 
-#### Check App Status
+#### App Platform Monitoring
 
 ```bash
 # List all apps
@@ -127,18 +129,83 @@ doctl apps get YOUR_APP_ID
 doctl apps get YOUR_APP_ID --format Name,Status,LiveURL
 ```
 
-#### View Logs
+#### Log Monitoring
 
 ```bash
 # View build logs
 doctl apps logs YOUR_APP_ID --type=build --follow
 
-# View runtime logs
+# View runtime logs (includes structured error logs)
 doctl apps logs YOUR_APP_ID --type=run --follow
 
 # View deployment logs
 doctl apps logs YOUR_APP_ID --type=deploy --follow
 ```
+
+#### Comprehensive Error Monitoring
+
+The LIFO AI Engine includes built-in error monitoring endpoints:
+
+```bash
+# System health with error statistics
+curl https://your-api-url.ondigitalocean.app/health
+
+# Comprehensive error statistics
+curl https://your-api-url.ondigitalocean.app/api/errors/stats
+
+# API information with monitoring features
+curl https://your-api-url.ondigitalocean.app/api/info
+```
+
+**Example Error Monitoring Response:**
+```json
+{
+  "error_tracking": {
+    "total_errors": 42,
+    "errors_last_24h": 3,
+    "errors_last_1h": 0,
+    "category_breakdown_24h": {
+      "validation": 2,
+      "database": 1
+    },
+    "recovery_success_rates": {
+      "OperationalError": {
+        "success_rate": 1.0,
+        "attempted": 5,
+        "successful": 5
+      }
+    }
+  },
+  "system_health": {
+    "overall_status": "healthy",
+    "monitoring_active": true
+  }
+}
+```
+
+#### Production Logging Configuration
+
+Ensure these environment variables are set for optimal production monitoring:
+
+```bash
+# Structured logging for better log analysis
+LOG_LEVEL=WARNING
+LOG_FORMAT=json
+
+# Enable comprehensive monitoring
+ENABLE_PERFORMANCE_MONITORING=true
+ENABLE_ALERTING=true
+ENABLE_DETAILED_REQUEST_LOGGING=false  # Reduce log volume in production
+```
+
+#### Error Alert Monitoring
+
+Monitor these key metrics in production:
+- Error rate exceeding 10 errors/hour on any endpoint
+- Critical severity errors (require immediate attention)
+- Recovery failure rate above 50% for any error type
+- Database connection failures
+- External service timeout patterns
 
 ### Testing
 
@@ -274,7 +341,7 @@ doctl apps create-deployment YOUR_APP_ID --force-rebuild
 ### Docker Compose Setup
 
 ```bash
-# Copy environment file
+# Copy unified environment file from root level
 cp .env.example .env
 
 # Edit environment variables
@@ -299,19 +366,44 @@ docker-compose down
 
 ## Production Checklist
 
+### Pre-Deployment
 - [ ] Update repository URLs in `.do/app.yaml`
 - [ ] Set all environment variables
 - [ ] Configure Supabase JWT settings
 - [ ] Test database connectivity
 - [ ] Verify CORS configuration
-- [ ] Run health checks
-- [ ] Monitor application logs
-- [ ] Test API endpoints
-- [ ] Verify frontend functionality
+
+### Deployment & Verification
+- [ ] Deploy application to App Platform
+- [ ] Run comprehensive health checks (`/health`)
+- [ ] Test error monitoring endpoints (`/api/errors/stats`)
+- [ ] Verify API endpoints functionality
+- [ ] Test frontend integration
+- [ ] Validate error tracking is active
+
+### Production Monitoring Setup
+- [x] **Built-in Error Monitoring** - Comprehensive error tracking system active
+- [x] **Performance Monitoring** - Real-time metrics collection enabled
+- [x] **Health Check Endpoints** - Enhanced health monitoring available
+- [x] **Structured Logging** - JSON logs with error correlation
+- [x] **Automatic Recovery** - Database connection recovery implemented
+- [ ] Configure external log aggregation (optional)
+- [ ] Set up custom alerting (optional)
+
+### Post-Deployment
+- [ ] Monitor application logs for errors
+- [ ] Check error statistics via `/api/errors/stats`
+- [ ] Verify automatic recovery mechanisms
 - [ ] Configure custom domains (if needed)
-- [ ] Set up monitoring/alerting
-- [ ] Document environment variables
+- [ ] Document monitoring endpoints
 - [ ] Plan backup strategy
+- [ ] Test disaster recovery procedures
+
+### Monitoring Endpoints to Bookmark
+- `GET /health` - System health with error statistics
+- `GET /api/errors/stats` - Comprehensive error tracking data
+- `GET /api/errors/endpoints/{path}` - Endpoint-specific error analysis
+- `GET /api/info` - API capabilities and monitoring features
 
 ## Support
 

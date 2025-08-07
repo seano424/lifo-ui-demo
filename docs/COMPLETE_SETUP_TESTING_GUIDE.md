@@ -20,11 +20,13 @@ cd lifo-app/lifo_api
 # Install dependencies
 pip install -r requirements.txt
 
-# Set up environment variables
+# Set up environment variables (unified root-level file)
 cp .env.example .env
 ```
 
 ### 2. Configure Environment Variables
+
+> **Note**: We now use a unified `.env.example` file at the root level that replaces the old dual environment setup (separate lifo_api/.env.example files).
 
 Edit `.env` file:
 
@@ -49,7 +51,7 @@ BACKEND_CORS_ORIGINS=["http://localhost:3000"]
 
 **Prerequisites:** This guide assumes you have a Supabase project already set up with the LIFO.AI schema.
 
-Update your `.env` file with your Supabase connection details:
+Update your unified `.env` file (located at the root level) with your Supabase connection details:
 
 ```bash
 # Supabase Database

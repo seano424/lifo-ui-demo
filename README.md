@@ -56,9 +56,9 @@ npm install
 # Set up unified Python environment (new!)
 ./scripts/setup-python-env.sh
 
-# Set up environment
+# Set up unified environment (new!)
 cp .env.example .env.local
-# Add your Supabase credentials to .env.local
+# Add your Supabase and API credentials to .env.local
 
 # Run the application
 npm run dev

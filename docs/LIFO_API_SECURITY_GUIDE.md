@@ -209,6 +209,8 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 #### Development Environment
 
+> **Note**: We now use a unified `.env.example` file at the root level instead of separate environment files. This replaces the old dual environment setup.
+
 ```env
 # .env.local - NEVER COMMIT THIS FILE
 # SECURITY WARNING: Replace all placeholder values with actual credentials
@@ -272,13 +274,19 @@ async def security_headers_middleware(request: Request, call_next):
    - Add `.env` files to `.gitignore`
    - Use placeholder values in `.env.example`
 
-2. **Input Validation**
+2. **Environment Configuration**
+
+   - Use the unified `.env.example` file from the root level
+   - Never commit actual credentials to version control
+   - Use `.env.local` for development environment variables
+
+3. **Input Validation**
 
    - Validate all user inputs at the API boundary
    - Use Pydantic models for request validation
    - Sanitize string inputs to prevent injection
 
-3. **Authentication**
+4. **Authentication**
 
    - Use secure JWT tokens with proper algorithm restrictions
    - Implement constant-time comparison for sensitive operations

@@ -17,16 +17,11 @@ pip install PyJWT[cryptography] requests
 ### Step 2: Load Environment Variables
 
 ```bash
-# Check if you have .env.local files
+# Check if you have the unified .env.local file at root level
 ls -la ../.env.local
-ls -la .env.local
 
-# Load environment variables (choose one):
-# Option A: From root .env.local
+# Load environment variables from unified root-level file:
 export $(grep -v '^#' ../.env.local | xargs)
-
-# Option B: From lifo_api/.env.local
-export $(grep -v '^#' .env.local | xargs)
 
 # Verify environment variables are loaded
 echo "SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:0:20}..."
@@ -60,11 +55,9 @@ curl http://localhost:8001/api/info
 
 ### Step 3: Get Your JWT Secret
 
-Check your `.env.local` file for `SUPABASE_JWT_SECRET`:
+Check the unified `.env.local` file at root level for `SUPABASE_JWT_SECRET`:
 
 ```bash
-grep SUPABASE_JWT_SECRET .env.local
-# OR
 grep SUPABASE_JWT_SECRET ../.env.local
 ```
 
@@ -113,13 +106,12 @@ curl -H "Authorization: Bearer $TOKEN" \
 **Solution**: Your environment variables aren't loaded properly.
 
 ```bash
-# Check if .env.local exists
-ls -la .env.local
-ls -la lifo_api/.env.local
+# Check if unified .env.local exists at root level
+ls -la ../.env.local
 
-# Load manually
-source .env.local  # or source lifo_api/.env.local
-export $(grep -v '^#' .env.local | xargs)
+# Load manually from unified root-level file
+source ../.env.local
+export $(grep -v '^#' ../.env.local | xargs)
 ```
 
 ### Problem: "externally-managed-environment"
