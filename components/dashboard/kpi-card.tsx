@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
+import { TrendIndicator } from './TrendIndicator'
+import { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
 
 interface KPICardProps {
   icon: string
@@ -21,6 +23,8 @@ interface KPICardProps {
   isCurrency?: boolean
   isLink?: boolean
   link?: string
+  trendData?: KPITrendData
+  showTrends?: boolean
 }
 
 export function KPICard({
@@ -36,6 +40,8 @@ export function KPICard({
   isCurrency = true,
   isLink = false,
   link,
+  trendData,
+  showTrends = false,
 }: KPICardProps) {
   const formatValue = (val: number) => {
     if (isCurrency) {
@@ -102,32 +108,37 @@ export function KPICard({
 
       <div className="flex flex-col gap-3 items-center">
         <Typography variant="h4" className="">
-          {formatValue(value)}
+          {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
         </Typography>
 
-        {change && change !== 0 && (
-          <div className="flex flex-col gap-3 items-center">
-            <Typography variant="h4" className={cn('flex items-center gap-1 ')}>
-              <span>{formatChange(change ?? 0)}</span>
-              {isPositive ? (
-                <TrendingUp className="h-4 w-4" />
-              ) : (
-                <TrendingDown className="h-4 w-4" />
-              )}
-            </Typography>
-            {/* {changePercent !== undefined && Math.abs(changePercent) > 0 && (
-              <Typography
-                variant="h4"
-                className={cn(
-                  'flex items-center gap-1 ',
-                  isPositive ? 'text-primary-700' : 'text-secondary-600',
+        {showTrends && trendData ? (
+          <TrendIndicator
+            current={trendData.current}
+            previous={trendData.previous}
+            change={trendData.change}
+            changePercent={trendData.changePercent}
+            trend={trendData.trend}
+            isCurrency={isCurrency}
+            showDetails={false}
+            periodMin={trendData.periodMin}
+            periodMax={trendData.periodMax}
+            minDate={trendData.minDate}
+            maxDate={trendData.maxDate}
+          />
+        ) : (
+          change &&
+          change !== 0 && (
+            <div className="flex flex-col gap-3 items-center">
+              <Typography variant="h4" className={cn('flex items-center gap-1 ')}>
+                <span>{formatChange(change ?? 0)}</span>
+                {isPositive ? (
+                  <TrendingUp className="h-4 w-4" />
+                ) : (
+                  <TrendingDown className="h-4 w-4" />
                 )}
-              >
-                ({isPositive ? '+' : ''}
-                {changePercent.toFixed(1)}%)
               </Typography>
-            )} */}
-          </div>
+            </div>
+          )
         )}
 
         {productCount && (
