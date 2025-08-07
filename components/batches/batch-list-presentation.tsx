@@ -98,14 +98,14 @@ export function BatchListPresentation({
   return (
     <div className="space-y-4">
       {/* View mode toggle could go here if needed */}
-      <div className="flex justify-end">
+      {/* <div className="flex justify-end">
         <Button
           variant="outline"
           onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
         >
           {viewMode === 'table' ? 'View as Cards' : 'View as Table'}
         </Button>
-      </div>
+      </div> */}
 
       {viewMode === 'table' ? (
         <BatchTable data={data} currentSort={currentSort} updateSort={updateSort} />
