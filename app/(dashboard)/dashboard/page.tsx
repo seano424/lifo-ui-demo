@@ -8,17 +8,16 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <DashboardInsetHeader title="Dashboard Overview" />
-      
+
       {/* Urgent Alerts - Shows critical expiry warnings */}
       <UrgentAlerts />
-      
+
       {/* KPI Cards will go here once merged from features/dashboard-kpi-cards-v2 */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Placeholder for KPI cards */}
       </div>
 
       <DashboardKPICards />
-
     </div>
   )
 }

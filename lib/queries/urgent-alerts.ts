@@ -21,7 +21,7 @@ export type UrgentAlertData = {
 // Fetch urgent alerts for a specific store
 export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertData> {
   const supabase = createClient()
-  
+
   // First, get all batches for the store to get their IDs
   const { data: storeBatches, error: batchError } = await supabase
     .schema('inventory')
@@ -42,7 +42,7 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
       criticalCount: 0,
       urgentCount: 0,
       totalCount: 0,
-      items: []
+      items: [],
     }
   }
 
@@ -62,21 +62,24 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
 
   // Cast data to our extended type with proper urgency level enum
   const typedData = (data as ExpiringBatch[]) || []
-  
+
   // Categorize items by urgency level
   const criticalItems = typedData.filter(item => item.urgency_level === 'Critical')
   const urgentItems = typedData.filter(item => item.urgency_level === 'Urgent')
-  
+
   return {
     criticalCount: criticalItems.length,
     urgentCount: urgentItems.length,
     totalCount: typedData.length,
-    items: typedData
+    items: typedData,
   }
 }
 
 // Helper function to generate the alert message
-export function getAlertMessage(criticalCount: number, urgentCount: number): {
+export function getAlertMessage(
+  criticalCount: number,
+  urgentCount: number,
+): {
   message: string
   severity: 'critical' | 'urgent' | 'safe'
 } {
@@ -85,20 +88,20 @@ export function getAlertMessage(criticalCount: number, urgentCount: number): {
     const timeframe = criticalCount === 1 ? 'TOMORROW' : 'IN THE NEXT 3 DAYS'
     return {
       message: `URGENT: ${criticalCount} ${itemWord} EXPIRING ${timeframe}`,
-      severity: 'critical'
+      severity: 'critical',
     }
   }
-  
+
   if (urgentCount > 0) {
     const itemWord = urgentCount === 1 ? 'ITEM' : 'ITEMS'
     return {
       message: `${urgentCount} ${itemWord} EXPIRING THIS WEEK`,
-      severity: 'urgent'
+      severity: 'urgent',
     }
   }
-  
+
   return {
     message: 'ALL ITEMS WITHIN SAFE EXPIRY DATES',
-    severity: 'safe'
+    severity: 'safe',
   }
 }
