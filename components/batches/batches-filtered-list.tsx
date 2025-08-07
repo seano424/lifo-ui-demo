@@ -43,7 +43,12 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     }
 
     if (initialFilters?.status) {
-      baseFilters.status = initialFilters.status as any
+      baseFilters.status = initialFilters.status as
+        | 'active'
+        | 'expired'
+        | 'damaged'
+        | 'sold_out'
+        | 'reserved'
     }
 
     if (initialFilters?.sort) {

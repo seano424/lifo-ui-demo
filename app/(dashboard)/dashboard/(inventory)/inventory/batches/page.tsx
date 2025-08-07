@@ -4,7 +4,12 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchBatchesPage, fetchExpiringBatches } from '@/lib/queries/batches'
+import {
+  fetchBatchesPage,
+  fetchExpiringBatches,
+  type BatchFilters,
+  type BatchSortField,
+} from '@/lib/queries/batches'
 import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
 
 import BatchesHeader from '@/components/batches/batches-header'
@@ -66,7 +71,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     const storeToUse = primaryStore ? primaryStore.store : stores[0].store
 
     // Build filters based on search params
-    const filters: any = { storeId: storeToUse.store_id }
+    const filters: BatchFilters = { storeId: storeToUse.store_id }
 
     // Handle expiring filter
     if (params.filter === 'expiring') {
@@ -75,14 +80,14 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
     // Handle status filter
     if (params.status) {
-      filters.status = params.status
+      filters.status = params.status as 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved'
     }
 
     // Handle sorting
     if (params.sort) {
       filters.sort = {
-        field: params.sort,
-        direction: params.direction || 'asc',
+        field: params.sort as BatchSortField,
+        direction: (params.direction || 'asc') as 'asc' | 'desc',
       }
     }
 

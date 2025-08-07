@@ -320,7 +320,7 @@ export function useBatchActions() {
               ...oldData,
               pages: oldData.pages.map((page: any) => {
                 if (!page || !page.data || !Array.isArray(page.data)) return page
-                
+
                 return {
                   ...page,
                   data: page.data.map((batch: Batch) =>
@@ -393,7 +393,7 @@ export function useBatchActions() {
               ...oldData,
               pages: oldData.pages.map((page: any) => {
                 if (!page || !page.data || !Array.isArray(page.data)) return page
-                
+
                 return {
                   ...page,
                   data: page.data.filter((batch: Batch) => batch.batch_id !== batchId),
