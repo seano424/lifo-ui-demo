@@ -141,6 +141,12 @@ export const queryKeys = {
       [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
   },
 
+  // Urgent alerts queries for dashboard
+  urgentAlerts: {
+    all: ['urgentAlerts'] as const,
+    byStore: (storeId: string) => [...queryKeys.urgentAlerts.all, 'byStore', storeId] as const,
+  },
+
   // Dashboard KPI queries
   dashboardKPIs: {
     all: ['dashboardKPIs'] as const,
