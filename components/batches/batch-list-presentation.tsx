@@ -1,5 +1,3 @@
-// components/batches/batch-list-presentation.tsx - Presentation component for batch list
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -32,6 +30,7 @@ import {
   Trash2,
   Clock,
   TrendingUp,
+  Loader2,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -138,22 +137,6 @@ export function BatchListPresentation({
         ) : (
           <BatchCards data={data} />
         )}
-
-        {/* Load more button */}
-        {hasMore && (
-          <div className="flex justify-center pt-6">
-            <Button variant="outline" onClick={fetchNextPage} disabled={isFetchingNextPage} size="lg">
-              {isFetchingNextPage ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                  {t('loading')}
-                </>
-              ) : (
-                t('loadMore', { remaining: count - data.length })
-              )}
-            </Button>
-          </div>
-        )}
       </>
     )
   }
@@ -164,11 +147,18 @@ export function BatchListPresentation({
       <Card>
         <div className="p-4 border-b">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 md:flex-row sm:items-center sm:justify-between">
               {/* Filters and Sort controls */}
               {onFiltersChange && (
                 <div className="flex items-center justify-end gap-2">
-                  <span className="text-sm text-muted-foreground mr-2">{count} items</span>
+                  {isLoading && (
+                    <Skeleton className="h-6 w-16 flex justify-center items-center">
+                      <Loader2 className="h-2 w-2 text-muted-foreground animate-spin" />
+                    </Skeleton>
+                  )}
+                  {!isLoading && count > 0 && (
+                    <span className="text-sm text-muted-foreground mr-2">{count} items</span>
+                  )}
                   <Select
                     value={filters?.expiringInDays?.toString() || 'all'}
                     onValueChange={value =>
@@ -227,21 +217,15 @@ export function BatchListPresentation({
                 >
                   <SelectTrigger className="w-[180px]">
                     <div className="flex items-center gap-2">
-                      {currentSort.field === 'expiry_date' && (
-                        <AlertTriangle className="h-4 w-4" />
-                      )}
-                      {currentSort.field === 'batch_number' && <Package className="h-4 w-4" />}
-                      {currentSort.field === 'supplier' && <Package className="h-4 w-4" />}
-                      {currentSort.field === 'current_quantity' && (
-                        <TrendingUp className="h-4 w-4" />
-                      )}
-                      {currentSort.field === 'cost_price' && <DollarSign className="h-4 w-4" />}
-                      {currentSort.field === 'selling_price' && (
-                        <DollarSign className="h-4 w-4" />
-                      )}
-                      {currentSort.field === 'status' && <Clock className="h-4 w-4" />}
-                      {currentSort.field === 'received_date' && <Calendar className="h-4 w-4" />}
-                      {currentSort.field === 'created_at' && <Calendar className="h-4 w-4" />}
+                      {currentSort.field === 'expiry_date'}
+                      {currentSort.field === 'batch_number'}
+                      {currentSort.field === 'supplier'}
+                      {currentSort.field === 'current_quantity'}
+                      {currentSort.field === 'cost_price'}
+                      {currentSort.field === 'selling_price'}
+                      {currentSort.field === 'status'}
+                      {currentSort.field === 'received_date'}
+                      {currentSort.field === 'created_at'}
                       <SelectValue />
                     </div>
                   </SelectTrigger>
@@ -309,10 +293,26 @@ export function BatchListPresentation({
             </div>
           </div>
         </div>
+
+        {/* Content area */}
+        {renderContent()}
       </Card>
 
-      {/* Content area */}
-      {renderContent()}
+      {/* Load more button outside the card */}
+      {hasMore && (
+        <div className="flex justify-center pt-6">
+          <Button variant="outline" onClick={fetchNextPage} disabled={isFetchingNextPage} size="lg">
+            {isFetchingNextPage ? (
+              <>
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                {t('loading')}
+              </>
+            ) : (
+              t('loadMore', { remaining: count - data.length })
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -363,10 +363,6 @@ function BatchTable({
   data,
   currentSort,
   updateSort,
-  filters,
-  onFiltersChange,
-  count,
-  isLoading,
 }: {
   data: BatchWithProduct[]
   currentSort: BatchSort
@@ -882,60 +878,57 @@ function BatchTable({
   })
 
   return (
-    <Card>
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <Table
-          style={{
-            width: table.getCenterTotalSize(),
-            tableLayout: 'fixed', // Force fixed layout to prevent column confusion
-          }}
-        >
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <TableHead
-                    key={header.id}
-                    className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
-                    style={{
-                      width: header.getSize(),
-                      minWidth: header.getSize(),
-                      maxWidth: header.getSize(),
-                      position: 'relative',
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                    {header.column.getCanResize() && <ColumnResizer header={header} />}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map(row => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map(cell => (
-                  <TableCell
-                    key={cell.id}
-                    style={{
-                      width: cell.column.getSize(),
-                      minWidth: cell.column.getSize(),
-                      maxWidth: cell.column.getSize(),
-                    }}
-                    className="border-r border-border/50 last:border-r-0 overflow-hidden"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </Card>
+    <div className="overflow-x-auto">
+      <Table
+        style={{
+          width: table.getCenterTotalSize(),
+          tableLayout: 'fixed', // Force fixed layout to prevent column confusion
+        }}
+      >
+        <TableHeader>
+          {table.getHeaderGroups().map(headerGroup => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map(header => (
+                <TableHead
+                  key={header.id}
+                  className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
+                  style={{
+                    width: header.getSize(),
+                    minWidth: header.getSize(),
+                    maxWidth: header.getSize(),
+                    position: 'relative',
+                  }}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.column.getCanResize() && <ColumnResizer header={header} />}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map(row => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map(cell => (
+                <TableCell
+                  key={cell.id}
+                  style={{
+                    width: cell.column.getSize(),
+                    minWidth: cell.column.getSize(),
+                    maxWidth: cell.column.getSize(),
+                  }}
+                  className="border-r border-border/50 last:border-r-0 overflow-hidden"
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   )
 }
 
