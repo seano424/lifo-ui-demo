@@ -140,6 +140,12 @@ export const queryKeys = {
     history: (storeId: string) =>
       [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
   },
+
+  // Urgent alerts queries for dashboard
+  urgentAlerts: {
+    all: ['urgentAlerts'] as const,
+    byStore: (storeId: string) => [...queryKeys.urgentAlerts.all, 'byStore', storeId] as const,
+  },
 } as const
 
 // Type helpers for query key validation
