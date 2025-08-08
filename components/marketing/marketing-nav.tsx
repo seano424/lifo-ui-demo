@@ -53,15 +53,15 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       url: '#',
       items: [
         {
-          title: t('helpCenter'),
-          description: t('helpCenterDesc'),
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
           title: t('contactUs'),
           description: t('contactUsDesc'),
           icon: <Sunset className="size-5 shrink-0" />,
+          url: '/contact',
+        },
+        {
+          title: t('helpCenter'),
+          description: t('helpCenterDesc'),
+          icon: <Zap className="size-5 shrink-0" />,
           url: '#',
         },
         {

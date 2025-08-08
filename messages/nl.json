@@ -3,25 +3,15 @@
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "inbound": "Inkomend",
-    "outbound": "Uitgaand",
+    "input": "Inkomend",
+    "output": "Uitgaand",
     "todo": "Te doen",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
     "analytics": "Analyses",
     "settings": "Instellingen",
     "helpCenter": "Helpcentrum",
-    "logout": "Uitloggen",
-    "products": "Producten",
-    "batches": "Batches",
-    "categories": "Categorieën",
-    "reports": "Rapporten",
-    "notifications": "Notificaties",
-    "account": "Account",
-    "profile": "Profiel",
-    "help": "Hulp",
-    "support": "Ondersteuning",
-    "addStore": "Winkel toevoegen"
+    "logout": "Uitloggen"
   },
   "actions": {
     "add": "Toevoegen",
@@ -346,8 +336,8 @@
   "breadcrumbs": {
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "inbound": "Inkomend",
-    "outbound": "Uitgaand",
+    "input": "Inkomend",
+    "output": "Uitgaand",
     "analytics": "Analyses",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
@@ -568,6 +558,46 @@
         },
         "button": "Meld u aan voor de wachtlijst",
         "noCreditCard": "Geen creditcard vereist"
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contact",
+    "subtitle": "Wij zijn er om u te helpen",
+    "description": "Heeft u een vraag, suggestie of hulp nodig? Ons team staat klaar om u te ondersteunen.",
+    "form": {
+      "title": "Stuur ons een bericht",
+      "description": "Vul het onderstaande formulier in en ons team zal zo snel mogelijk contact met u opnemen.",
+      "name": "Naam",
+      "namePlaceholder": "Uw naam",
+      "email": "E-mail",
+      "emailPlaceholder": "uw@email.com",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Onderwerp van uw bericht",
+      "message": "Bericht",
+      "messagePlaceholder": "Uw bericht...",
+      "submit": "Bericht verzenden",
+      "sending": "Verzenden...",
+      "success": "Uw bericht is succesvol verzonden. We nemen zo snel mogelijk contact met u op.",
+      "error": "Er is een fout opgetreden bij het verzenden van het bericht"
+    },
+    "api": {
+      "allFieldsRequired": "Alle velden zijn verplicht",
+      "emailSendingFailed": "E-mail verzenden mislukt",
+      "internalServerError": "Interne serverfout"
+    },
+    "features": {
+      "support": {
+        "title": "Snelle ondersteuning",
+        "description": "Ons team reageert doorgaans binnen 24 werkuren op al uw vragen."
+      },
+      "expertise": {
+        "title": "Toegewijde expertise",
+        "description": "Specialisten in voorraadbeheer om uw vragen te beantwoorden."
+      },
+      "followup": {
+        "title": "Persoonlijke opvolging",
+        "description": "Elke aanvraag wordt individueel behandeld met persoonlijke opvolging."
       }
     }
   },
