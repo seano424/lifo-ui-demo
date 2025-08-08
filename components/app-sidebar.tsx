@@ -51,8 +51,8 @@ function useNavigationData() {
           icon: BookOpen,
         },
         {
-          title: t('todo'),
-          url: '/dashboard/to-do',
+          title: t('todos'),
+          url: '/dashboard/todos',
           icon: Calendar,
         },
         {
