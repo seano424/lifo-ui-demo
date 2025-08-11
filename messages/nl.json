@@ -305,6 +305,7 @@
       "save": "Wijzigingen opslaan",
       "cancel": "Annuleren",
       "saving": "Opslaan...",
+      "saveChanges": "Wijzigingen opslaan",
       "validation": {
         "nameRequired": "Volledige naam is verplicht",
         "nameTooLong": "Volledige naam moet minder dan 100 tekens bevatten",

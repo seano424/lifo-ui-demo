@@ -305,6 +305,7 @@
       "save": "Sauvegarder les modifications",
       "cancel": "Annuler",
       "saving": "Sauvegarde...",
+      "saveChanges": "Enregistrer les modifications",
       "validation": {
         "nameRequired": "Le nom complet est requis",
         "nameTooLong": "Le nom complet doit contenir moins de 100 caractères",

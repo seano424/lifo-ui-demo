@@ -304,6 +304,7 @@
       "save": "Save Changes",
       "cancel": "Cancel",
       "saving": "Saving...",
+      "saveChanges": "Save Changes",
       "validation": {
         "nameRequired": "Full name is required",
         "nameTooLong": "Full name must be less than 100 characters",
@@ -311,7 +312,7 @@
         "usernameTooLong": "Username must be less than 50 characters",
         "usernameInvalid": "Username can only contain letters, numbers, and underscores"
       },
-      "placeholders": {
+      "placeholders ": {
         "fullName": "Enter your full name",
         "email": "Enter your email address",
         "username": "Enter your username"
