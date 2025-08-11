@@ -1,11 +1,19 @@
 'use client'
 
+import { useState } from 'react'
 import {
   useInventoryKPI,
   useSalesKPI,
   useDonationKPI,
   useWasteKPI,
 } from '@/hooks/use-dashboard-kpis'
+
+import {
+  useInventoryKPITrends,
+  useSalesKPITrends,
+  useDonationKPITrends,
+  useWasteKPITrends,
+} from '@/hooks/use-kpi-trends'
 
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -17,21 +25,35 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { KPICard } from '@/components/dashboard/kpi-card'
+import { TimeSelector, TimePeriod } from '@/components/dashboard/TimeSelector'
+import { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
 
 export function DashboardKPICards() {
   const t = useTranslations('dashboard.kpis')
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod | null>(null)
 
   const inventoryQuery = useInventoryKPI()
   const salesQuery = useSalesKPI()
   const donationQuery = useDonationKPI()
   const wasteQuery = useWasteKPI()
 
+  const inventoryTrendsQuery = useInventoryKPITrends(selectedPeriod || 'this_week')
+  const salesTrendsQuery = useSalesKPITrends(selectedPeriod || 'this_week')
+  const donationTrendsQuery = useDonationKPITrends(selectedPeriod || 'this_week')
+  const wasteTrendsQuery = useWasteKPITrends(selectedPeriod || 'this_week')
+
   const inventoryData = inventoryQuery.data
   const salesData = salesQuery.data
   const donationData = donationQuery.data
   const wasteData = wasteQuery.data
+
+  const showTrends = selectedPeriod !== null
+  const inventoryTrendData = inventoryTrendsQuery.data as KPITrendData | undefined
+  const salesTrendData = salesTrendsQuery.data as KPITrendData | undefined
+  const donationTrendData = donationTrendsQuery.data as KPITrendData | undefined
+  const wasteTrendData = wasteTrendsQuery.data as KPITrendData | undefined
 
   const handleRefresh = () => {
     if (activeStoreId) {
@@ -52,6 +74,13 @@ export function DashboardKPICards() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.dashboardKPIs.byStore(activeStoreId),
       })
+
+      // Invalidate trends queries if showing trends
+      if (selectedPeriod) {
+        queryClient.invalidateQueries({
+          queryKey: ['kpi-trends'],
+        })
+      }
     }
   }
 
@@ -59,10 +88,23 @@ export function DashboardKPICards() {
     inventoryQuery.isFetching ||
     salesQuery.isFetching ||
     donationQuery.isFetching ||
-    wasteQuery.isFetching
+    wasteQuery.isFetching ||
+    (showTrends &&
+      (inventoryTrendsQuery.isFetching ||
+        salesTrendsQuery.isFetching ||
+        donationTrendsQuery.isFetching ||
+        wasteTrendsQuery.isFetching))
 
   const hasAnyError =
-    inventoryQuery.isError || salesQuery.isError || donationQuery.isError || wasteQuery.isError
+    inventoryQuery.isError ||
+    salesQuery.isError ||
+    donationQuery.isError ||
+    wasteQuery.isError ||
+    (showTrends &&
+      (inventoryTrendsQuery.isError ||
+        salesTrendsQuery.isError ||
+        donationTrendsQuery.isError ||
+        wasteTrendsQuery.isError))
 
   return (
     <div className="w-full">
@@ -72,16 +114,23 @@ export function DashboardKPICards() {
             {t('title')}
           </Typography>
 
-          <Button
-            variant="outline"
-            className="hover:bg-transparent"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isAnyFetching}
-          >
-            <RefreshCw className={`h-4 w-4 ${isAnyFetching ? 'animate-spin' : ''}`} />
-            <span>{t('refresh')}</span>
-          </Button>
+          <div className="flex items-center gap-4">
+            <TimeSelector
+              value={selectedPeriod || 'this_week'}
+              onChange={period => setSelectedPeriod(period)}
+            />
+
+            <Button
+              variant="outline"
+              className="hover:bg-transparent"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isAnyFetching}
+            >
+              <RefreshCw className={`h-4 w-4 ${isAnyFetching ? 'animate-spin' : ''}`} />
+              <span>{t('refresh')}</span>
+            </Button>
+          </div>
         </div>
 
         {/* KPI Cards Grid */}
@@ -90,12 +139,16 @@ export function DashboardKPICards() {
             icon="📦"
             label={t('inventory.label')}
             value={inventoryData?.totalValue ?? 0}
-            productCount={inventoryData?.productCount ?? 0}
-            subtitle={`${inventoryData?.batchCount ?? 0} ${t('inventory.subtitle')}`}
-            isLoading={inventoryQuery.isLoading}
-            isError={inventoryQuery.isError}
+            productCount={
+              showTrends ? inventoryTrendData?.metadata?.productCount : inventoryData?.productCount
+            }
+            subtitle={`${showTrends ? (inventoryTrendData?.metadata?.batchCount ?? 0) : (inventoryData?.batchCount ?? 0)} ${t('inventory.subtitle')}`}
+            isLoading={inventoryQuery.isLoading || (showTrends && inventoryTrendsQuery.isLoading)}
+            isError={inventoryQuery.isError || (showTrends && inventoryTrendsQuery.isError)}
             isLink={true}
             link="/dashboard/inventory"
+            showTrends={showTrends}
+            trendData={inventoryTrendData}
           />
 
           <KPICard
@@ -104,11 +157,13 @@ export function DashboardKPICards() {
             value={salesData?.totalRevenue ?? 0}
             change={salesData?.change ?? 0}
             changePercent={salesData?.changePercent ?? 0}
-            subtitle={`${salesData?.transactionCount ?? 0} ${t('sales.subtitle')}`}
-            isLoading={salesQuery.isLoading}
-            isError={salesQuery.isError}
+            subtitle={`${showTrends ? (salesTrendData?.metadata?.transactionCount ?? 0) : (salesData?.transactionCount ?? 0)} ${t('sales.subtitle')}`}
+            isLoading={salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)}
+            isError={salesQuery.isError || (showTrends && salesTrendsQuery.isError)}
             isLink={true}
             link="/dashboard/outbound"
+            showTrends={showTrends}
+            trendData={salesTrendData}
           />
 
           <KPICard
@@ -117,11 +172,13 @@ export function DashboardKPICards() {
             value={donationData?.totalValue ?? 0}
             change={donationData?.change ?? 0}
             changePercent={donationData?.changePercent ?? 0}
-            subtitle={`${donationData?.recipientCount ?? 0} ${t('donations.subtitle')}`}
-            isLoading={donationQuery.isLoading}
-            isError={donationQuery.isError}
+            subtitle={`${showTrends ? (donationTrendData?.metadata?.recipientCount ?? 0) : (donationData?.recipientCount ?? 0)} ${t('donations.subtitle')}`}
+            isLoading={donationQuery.isLoading || (showTrends && donationTrendsQuery.isLoading)}
+            isError={donationQuery.isError || (showTrends && donationTrendsQuery.isError)}
             isLink={true}
             link="/dashboard/donations"
+            showTrends={showTrends}
+            trendData={donationTrendData}
           />
 
           <KPICard
@@ -130,11 +187,13 @@ export function DashboardKPICards() {
             value={wasteData?.totalCost ?? 0}
             change={wasteData?.change ?? 0}
             changePercent={wasteData?.changePercent ?? 0}
-            subtitle={`${wasteData?.itemCount ?? 0} ${t('waste.subtitle')}`}
-            isLoading={wasteQuery.isLoading}
-            isError={wasteQuery.isError}
+            subtitle={`${showTrends ? (wasteTrendData?.metadata?.itemCount ?? 0) : (wasteData?.itemCount ?? 0)} ${t('waste.subtitle')}`}
+            isLoading={wasteQuery.isLoading || (showTrends && wasteTrendsQuery.isLoading)}
+            isError={wasteQuery.isError || (showTrends && wasteTrendsQuery.isError)}
             isLink={true}
             link="/dashboard/waste"
+            showTrends={showTrends}
+            trendData={wasteTrendData}
           />
         </div>
 
