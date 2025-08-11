@@ -1,5 +1,3 @@
-'use client'
-
 import { ContactForm } from '@/components/contact-form'
 import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
