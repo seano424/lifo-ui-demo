@@ -3,15 +3,39 @@
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "input": "Entrées",
-    "output": "Sorties",
-    "todo": "À faire",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
+    "todos": "À faire",
     "performance": "Performance",
     "milestones": "Étapes",
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
     "logout": "Se déconnecter"
+  },
+  "dashboard": {
+    "kpis": {
+      "title": "Aperçu des métriques clés",
+      "refresh": "Actualiser",
+      "inventory": {
+        "label": "Valeur totale du stock",
+        "subtitle": "lots",
+        "productCount": "produits"
+      },
+      "sales": {
+        "label": "Chiffre d'affaires",
+        "subtitle": "ventes"
+      },
+      "donations": {
+        "label": "Dons",
+        "subtitle": "bénéficiaires"
+      },
+      "waste": {
+        "label": "Coût des déchets",
+        "subtitle": "articles"
+      },
+      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
+    }
   },
   "actions": {
     "add": "Ajouter",
@@ -341,7 +365,7 @@
     "analytics": "Analyses",
     "performance": "Performance",
     "milestones": "Étapes",
-    "todo": "À faire",
+    "todos": "À faire",
     "settings": "Paramètres",
     "store": "Magasin",
     "team": "Équipe",

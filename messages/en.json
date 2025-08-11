@@ -3,15 +3,39 @@
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "input": "Input",
-    "output": "Output",
-    "todo": "To-Do",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "todos": "Todos",
     "performance": "Performance",
     "milestones": "Milestones",
     "analytics": "Analytics",
     "settings": "Settings",
     "helpCenter": "Help Center",
     "logout": "Logout"
+  },
+  "dashboard": {
+    "kpis": {
+      "title": "Key Metrics Overview",
+      "refresh": "Refresh",
+      "inventory": {
+        "label": "Total Inventory Value",
+        "subtitle": "batches",
+        "productCount": "products"
+      },
+      "sales": {
+        "label": "Sales Revenue",
+        "subtitle": "sales"
+      },
+      "donations": {
+        "label": "Donations",
+        "subtitle": "recipients"
+      },
+      "waste": {
+        "label": "Waste Cost",
+        "subtitle": "items"
+      },
+      "errorMessage": "Some metrics could not be loaded. Please try refreshing."
+    }
   },
   "actions": {
     "add": "Add",
@@ -341,7 +365,7 @@
     "analytics": "Analytics",
     "performance": "Performance",
     "milestones": "Milestones",
-    "todo": "To-Do",
+    "todos": "Todos",
     "settings": "Settings",
     "store": "Store",
     "team": "Team",

@@ -3,15 +3,39 @@
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "input": "Inkomend",
-    "output": "Uitgaand",
-    "todo": "Te doen",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "todos": "Te doen",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
     "analytics": "Analyses",
     "settings": "Instellingen",
     "helpCenter": "Helpcentrum",
     "logout": "Uitloggen"
+  },
+  "dashboard": {
+    "kpis": {
+      "title": "Overzicht belangrijke statistieken",
+      "refresh": "Vernieuwen",
+      "inventory": {
+        "label": "Totale voorraadwaarde",
+        "subtitle": "batches",
+        "productCount": "producten"
+      },
+      "sales": {
+        "label": "Verkoopontvangsten",
+        "subtitle": "verkopen"
+      },
+      "donations": {
+        "label": "Donaties",
+        "subtitle": "ontvangers"
+      },
+      "waste": {
+        "label": "Afvalkosten",
+        "subtitle": "items"
+      },
+      "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen."
+    }
   },
   "actions": {
     "add": "Toevoegen",
@@ -341,7 +365,7 @@
     "analytics": "Analyses",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
-    "todo": "Te doen",
+    "todos": "Te doen",
     "settings": "Instellingen",
     "store": "Winkel",
     "team": "Team",
