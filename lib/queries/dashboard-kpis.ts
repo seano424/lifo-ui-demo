@@ -93,38 +93,40 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
   }
 }
 
-// Fetch Sales KPI (using inventory.sales_summary view)
+// Fetch Sales KPI (using inventory.batch_actions with discount actions)
 export async function fetchSalesKPI(storeId: string): Promise<SalesKPI> {
   const supabase = createClient()
   const dates = getDateRanges()
 
-  // Today's sales using the sales_summary view
+  // Today's sales using batch_actions with discount actions
   const { data: todayData, error: todayError } = await supabase
     .schema('inventory')
-    .from('sales_summary')
-    .select('quantity_sold, sale_price')
+    .from('batch_actions')
+    .select('recovered_value')
     .eq('store_id', storeId)
-    .gte('sale_timestamp', dates.todayStart)
-    .lt('sale_timestamp', dates.todayEnd)
+    .eq('actual_action', 'discount')
+    .gte('action_date', dates.todayStart)
+    .lt('action_date', dates.todayEnd)
 
   if (todayError) throw todayError
 
   const totalRevenue =
-    todayData?.reduce((sum, sale) => sum + sale.quantity_sold * sale.sale_price, 0) ?? 0
+    todayData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
 
   const transactionCount = todayData?.length ?? 0
 
   // Yesterday's sales for comparison
   const { data: yesterdayData } = await supabase
     .schema('inventory')
-    .from('sales_summary')
-    .select('quantity_sold, sale_price')
+    .from('batch_actions')
+    .select('recovered_value')
     .eq('store_id', storeId)
-    .gte('sale_timestamp', dates.yesterdayStart)
-    .lt('sale_timestamp', dates.yesterdayEnd)
+    .eq('actual_action', 'discount')
+    .gte('action_date', dates.yesterdayStart)
+    .lt('action_date', dates.yesterdayEnd)
 
   const yesterdayRevenue =
-    yesterdayData?.reduce((sum, sale) => sum + sale.quantity_sold * sale.sale_price, 0) ?? 0
+    yesterdayData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
 
   const change = totalRevenue - yesterdayRevenue
   const changePercent = yesterdayRevenue > 0 ? (change / yesterdayRevenue) * 100 : 0

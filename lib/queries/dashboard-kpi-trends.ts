@@ -126,34 +126,35 @@ export async function fetchSalesKPITrends(
 
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
-    .from('sales_summary')
-    .select('quantity_sold, sale_price, sale_timestamp')
+    .from('batch_actions')
+    .select('recovered_value, action_date')
     .eq('store_id', storeId)
-    .gte('sale_timestamp', timeRange.start.toISOString())
-    .lte('sale_timestamp', timeRange.end.toISOString())
+    .eq('actual_action', 'discount')
+    .gte('action_date', timeRange.start.toISOString())
+    .lte('action_date', timeRange.end.toISOString())
 
   if (currentError) throw currentError
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
-    .from('sales_summary')
-    .select('quantity_sold, sale_price')
+    .from('batch_actions')
+    .select('recovered_value')
     .eq('store_id', storeId)
-    .gte('sale_timestamp', timeRange.compareStart.toISOString())
-    .lte('sale_timestamp', timeRange.compareEnd.toISOString())
+    .eq('actual_action', 'discount')
+    .gte('action_date', timeRange.compareStart.toISOString())
+    .lte('action_date', timeRange.compareEnd.toISOString())
 
   if (previousError) throw previousError
 
-  const current =
-    currentData?.reduce((sum, sale) => sum + sale.quantity_sold * sale.sale_price, 0) ?? 0
+  const current = currentData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
   const previous =
-    previousData?.reduce((sum, sale) => sum + sale.quantity_sold * sale.sale_price, 0) ?? 0
+    previousData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
 
   const dailySales =
     currentData?.reduce(
-      (acc, sale) => {
-        const date = new Date(sale.sale_timestamp).toDateString()
-        const value = sale.quantity_sold * sale.sale_price
+      (acc, action) => {
+        const date = new Date(action.action_date).toDateString()
+        const value = action.recovered_value || 0
         acc[date] = (acc[date] || 0) + value
         return acc
       },
