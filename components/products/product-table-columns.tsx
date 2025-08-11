@@ -1,15 +1,6 @@
 'use client'
 
-import {
-  Package,
-  Euro,
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Trash2,
-  Tag,
-  Building2,
-} from 'lucide-react'
+import { Package, Euro, MoreHorizontal, Eye, Edit, Trash2, Tag, Building2 } from 'lucide-react'
 import type { ColumnDef, Header } from '@tanstack/react-table'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
@@ -54,7 +45,6 @@ function ColumnResizer({ header }: ColumnResizerProps) {
   )
 }
 
-
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
     beverages: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -71,7 +61,6 @@ const getCategoryBadgeColor = (category: string) => {
 }
 
 export function createProductTableColumns({
-  data,
   currentSort,
   updateSort,
   updateProductPrice,
@@ -248,19 +237,13 @@ export function createProductTableColumns({
       id: 'created_at',
       accessorKey: 'created_at',
       header: () => (
-        <SortableHeader
-          field="created_at"
-          currentSort={currentSort}
-          updateSort={updateSort}
-        >
+        <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
           Date Added
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground">
-          {row.original.created_at 
-            ? new Date(row.original.created_at).toLocaleDateString()
-            : 'N/A'}
+          {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : 'N/A'}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.created_at || 100,

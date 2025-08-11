@@ -7,17 +7,15 @@ Key Changes Made:
 
 1. Sales KPI Logic (lib/queries/dashboard-kpis.ts:96-139):
 
-
-    - Changed from sales_summary view to batch_actions table
-    - Filter by actual_action = 'discount'
-    - Use recovered_value for revenue calculation
-    - Use action_date for date filtering
+   - Changed from sales_summary view to batch_actions table
+   - Filter by actual_action = 'discount'
+   - Use recovered_value for revenue calculation
+   - Use action_date for date filtering
 
 2. Sales KPI Trends (lib/queries/dashboard-kpi-trends.ts:121-195):
 
-
-    - Updated trend analysis to use same batch_actions approach
-    - Consistent with main KPI logic
+   - Updated trend analysis to use same batch_actions approach
+   - Consistent with main KPI logic
 
 Expected Results with Test Data:
 

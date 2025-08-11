@@ -128,44 +128,44 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
 
   return (
     <Table className="w-full table-fixed">
-        <TableHeader>
-          {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <TableHead
-                  key={header.id}
-                  className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
-                  style={{
-                    width: header.getSize(),
-                    position: 'relative',
-                  }}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                  {header.column.getCanResize() && <ColumnResizer header={header} />}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map(row => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <TableCell
-                  key={cell.id}
-                  style={{
-                    width: cell.column.getSize(),
-                  }}
-                  className="border-r border-border/50 last:border-r-0 overflow-hidden"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
+      <TableHeader>
+        {table.getHeaderGroups().map(headerGroup => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map(header => (
+              <TableHead
+                key={header.id}
+                className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
+                style={{
+                  width: header.getSize(),
+                  position: 'relative',
+                }}
+              >
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+                {header.column.getCanResize() && <ColumnResizer header={header} />}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map(row => (
+          <TableRow key={row.id}>
+            {row.getVisibleCells().map(cell => (
+              <TableCell
+                key={cell.id}
+                style={{
+                  width: cell.column.getSize(),
+                }}
+                className="border-r border-border/50 last:border-r-0 overflow-hidden"
+              >
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
     </Table>
   )
 }
