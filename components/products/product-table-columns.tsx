@@ -2,7 +2,7 @@
 
 import {
   Package,
-  DollarSign,
+  Euro,
   MoreHorizontal,
   Eye,
   Edit,
@@ -54,10 +54,6 @@ function ColumnResizer({ header }: ColumnResizerProps) {
   )
 }
 
-const calculateMaxWidth = (data: Product[], accessor: (item: Product) => string) => {
-  const maxLength = Math.max(...data.map(item => accessor(item)?.length || 0), 10)
-  return Math.min(Math.max(maxLength * 8 + 40, 100), 400)
-}
 
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
@@ -113,9 +109,9 @@ export function createProductTableColumns({
           </div>
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.name || 200,
-      minSize: 120,
-      maxSize: calculateMaxWidth(data, item => item.name || 'Unnamed Product'),
+      size: DEFAULT_COLUMN_WIDTHS.name || 250,
+      minSize: 150,
+      maxSize: 400,
       enableResizing: true,
     },
     {
@@ -141,9 +137,9 @@ export function createProductTableColumns({
           )}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.category || 140,
+      size: DEFAULT_COLUMN_WIDTHS.category || 150,
       minSize: 100,
-      maxSize: calculateMaxWidth(data, item => item.category || 'Uncategorized'),
+      maxSize: 200,
       enableResizing: true,
     },
     {
@@ -162,9 +158,9 @@ export function createProductTableColumns({
           </span>
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.brand || 120,
+      size: DEFAULT_COLUMN_WIDTHS.brand || 150,
       minSize: 80,
-      maxSize: calculateMaxWidth(data, item => item.brand || 'N/A'),
+      maxSize: 200,
       enableResizing: true,
     },
     {
@@ -207,13 +203,13 @@ export function createProductTableColumns({
       cell: ({ row }) => (
         <div className="text-right">
           <div className="flex items-center justify-end gap-1 font-bold">
-            <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-            <span title={`$${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
+            <Euro className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+            <span title={`€${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
               {Number(row.original.base_selling_price || 0).toFixed(2)}
             </span>
           </div>
           <div className="text-xs text-muted-foreground">
-            Cost: ${Number(row.original.base_cost_price || 0).toFixed(2)}
+            Cost: €{Number(row.original.base_cost_price || 0).toFixed(2)}
           </div>
         </div>
       ),
@@ -301,13 +297,13 @@ export function createProductTableColumns({
             <DropdownMenuItem
               onClick={() => {
                 const currentPrice = row.original.base_selling_price || 0
-                const newPrice = prompt('Enter new price:', currentPrice.toString())
+                const newPrice = prompt('Enter new price (€):', currentPrice.toString())
                 if (newPrice && !isNaN(Number(newPrice))) {
                   updateProductPrice(row.original.product_id, Number(newPrice))
                 }
               }}
             >
-              <DollarSign className="mr-2 h-4 w-4" />
+              <Euro className="mr-2 h-4 w-4" />
               Update Price
             </DropdownMenuItem>
             <DropdownMenuSeparator />

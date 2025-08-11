@@ -11,7 +11,7 @@ import { Package } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 import { useProductActions } from '@/hooks/use-products'
-import { useColumnSizing } from '@/hooks/use-column-sizing'
+import { useProductColumnSizing } from '@/hooks/use-product-column-sizing'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 import {
@@ -50,7 +50,7 @@ interface ProductTableProps {
 export function ProductTable({ data, currentSort, updateSort, isLoading }: ProductTableProps) {
   const { updateProductPrice, deleteProduct, isUpdating } = useProductActions()
 
-  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useColumnSizing()
+  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useProductColumnSizing()
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
@@ -103,7 +103,7 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
     enableSorting: false,
     defaultColumn: {
       minSize: 50,
-      maxSize: 400,
+      maxSize: 500,
     },
   })
 
@@ -127,13 +127,7 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table
-        style={{
-          width: table.getCenterTotalSize(),
-          tableLayout: 'fixed',
-        }}
-      >
+    <Table className="w-full table-fixed">
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id}>
@@ -143,8 +137,6 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
                   className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
                   style={{
                     width: header.getSize(),
-                    minWidth: header.getSize(),
-                    maxWidth: header.getSize(),
                     position: 'relative',
                   }}
                 >
@@ -165,8 +157,6 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
                   key={cell.id}
                   style={{
                     width: cell.column.getSize(),
-                    minWidth: cell.column.getSize(),
-                    maxWidth: cell.column.getSize(),
                   }}
                   className="border-r border-border/50 last:border-r-0 overflow-hidden"
                 >
@@ -176,7 +166,6 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
             </TableRow>
           ))}
         </TableBody>
-      </Table>
-    </div>
+    </Table>
   )
 }
