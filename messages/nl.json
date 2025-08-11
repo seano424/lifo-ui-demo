@@ -311,6 +311,11 @@
         "usernameRequired": "Gebruikersnaam moet minimaal 2 tekens bevatten",
         "usernameTooLong": "Gebruikersnaam moet minder dan 50 tekens bevatten",
         "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
+      },
+      "placeholders": {
+        "fullName": "Voer uw volledige naam in",
+        "email": "Voer uw e-mailadres in",
+        "username": "Voer uw gebruikersnaam in"
       }
     },
     "phone": {

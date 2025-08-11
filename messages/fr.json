@@ -11,7 +11,7 @@
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
-    "logout": "Se déconnecter",
+      "logout": "Se déconnecter",
     "batches": "Lots",
     "products": "Produits"
   },
@@ -311,6 +311,11 @@
         "usernameRequired": "Le nom d'utilisateur doit contenir au moins 2 caractères",
         "usernameTooLong": "Le nom d'utilisateur doit contenir moins de 50 caractères",
         "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas"
+      },
+      "placeholders": {
+        "fullName": "Entrez votre nom complet",
+        "email": "Entrez votre adresse e-mail",
+        "username": "Entrez votre nom d'utilisateur"
       }
     },
     "phone": {
