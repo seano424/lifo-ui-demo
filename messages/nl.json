@@ -11,7 +11,9 @@
     "analytics": "Analyses",
     "settings": "Instellingen",
     "helpCenter": "Helpcentrum",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "batches": "Batches",
+    "products": "Producten"
   },
   "dashboard": {
     "kpis": {

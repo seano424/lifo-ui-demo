@@ -11,7 +11,9 @@
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "batches": "Lots",
+    "products": "Produits"
   },
   "dashboard": {
     "kpis": {
