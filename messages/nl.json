@@ -424,7 +424,7 @@
     "preview": {
       "username": "Gebruikersnaam:",
       "pin": "PIN:",
-      "pinNote": "Wordt automatisch gegenereerd (4 cijfers)",
+      "pinNote": "Wordt automatisch gegenereerd (6 cijfers)",
       "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
     },
     "buttons": {

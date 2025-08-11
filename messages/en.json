@@ -464,7 +464,7 @@
     "preview": {
       "username": "Username:",
       "pin": "PIN:",
-      "pinNote": "Will be generated automatically (4 digits)",
+      "pinNote": "Will be generated automatically (6 digits)",
       "loginNote": "The employee can log in using the \"Employee\" tab with their username and PIN"
     },
     "buttons": {

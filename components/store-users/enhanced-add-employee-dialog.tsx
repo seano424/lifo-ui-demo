@@ -281,30 +281,33 @@ export function EnhancedAddEmployeeDialog({
   // Generate secure PIN
   const generateSecurePIN = (): string => {
     const blockedPins = [
-      '0000',
-      '1111',
-      '2222',
-      '3333',
-      '4444',
-      '5555',
-      '6666',
-      '7777',
-      '8888',
-      '9999',
-      '1234',
-      '4321',
-      '2468',
-      '8642',
-      '1357',
-      '9753',
-      '0123',
-      '3210',
-      '5678',
-      '8765',
+      '000000',
+      '111111',
+      '222222',
+      '333333',
+      '444444',
+      '555555',
+      '666666',
+      '777777',
+      '888888',
+      '999999',
+      '123456',
+      '654321',
+      '246810',
+      '135790',
+      '012345',
+      '543210',
+      '567890',
+      '098765',
+      '000001',
+      '111122',
+      '123123',
+      '456456',
+      '789789',
     ]
     let pin: string
     do {
-      pin = Math.floor(1000 + Math.random() * 9000).toString()
+      pin = Math.floor(100000 + Math.random() * 900000).toString()
     } while (blockedPins.includes(pin))
     return pin
   }

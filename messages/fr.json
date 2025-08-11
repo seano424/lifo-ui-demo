@@ -11,7 +11,7 @@
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
-      "logout": "Se déconnecter",
+    "logout": "Se déconnecter",
     "batches": "Lots",
     "products": "Produits"
   },
@@ -424,7 +424,7 @@
     "preview": {
       "username": "Nom d'utilisateur:",
       "pin": "PIN:",
-      "pinNote": "Sera généré automatiquement (4 chiffres)",
+      "pinNote": "Sera généré automatiquement (6 chiffres)",
       "loginNote": "L'employé peut se connecter en utilisant l'onglet \"Employé\" avec son nom d'utilisateur et son PIN"
     },
     "buttons": {

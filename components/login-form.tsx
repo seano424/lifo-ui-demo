@@ -218,11 +218,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                     id="pin"
                     type="password"
                     showPasswordToggle
-                    placeholder="••••"
+                    placeholder="••••••"
                     value={pin}
                     onChange={e => setPin(e.target.value)}
-                    maxLength={4}
-                    pattern="[0-9]{4}"
+                    maxLength={6}
+                    pattern="[0-9]{6}"
                     required
                     autoComplete="current-password"
                     disabled={isLoading}
