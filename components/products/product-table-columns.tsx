@@ -249,6 +249,30 @@ export function createProductTableColumns({
       enableResizing: true,
     },
     {
+      id: 'created_at',
+      accessorKey: 'created_at',
+      header: () => (
+        <SortableHeader
+          field="created_at"
+          currentSort={currentSort}
+          updateSort={updateSort}
+        >
+          Date Added
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <div className="text-sm text-muted-foreground">
+          {row.original.created_at 
+            ? new Date(row.original.created_at).toLocaleDateString()
+            : 'N/A'}
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.created_at || 100,
+      minSize: 80,
+      maxSize: 120,
+      enableResizing: true,
+    },
+    {
       id: 'actions',
       header: '',
       cell: ({ row }) => (

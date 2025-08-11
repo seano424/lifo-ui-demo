@@ -22,6 +22,7 @@ export function ProductListSkeleton() {
               <TableHead className="text-right">Stock</TableHead>
               <TableHead className="text-right">Price</TableHead>
               <TableHead className="text-right">Active Batches</TableHead>
+              <TableHead>Date Added</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -57,6 +58,9 @@ export function ProductListSkeleton() {
                     <Skeleton className="h-4 w-8 ml-auto" />
                     <Skeleton className="h-3 w-12 ml-auto" />
                   </div>
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-8 w-8" />
