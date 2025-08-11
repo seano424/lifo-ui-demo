@@ -641,5 +641,45 @@
       "privacyPolicy": "Politique de Confidentialité",
       "termsOfService": "Conditions d'Utilisation"
     }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "N° de lot",
+        "product": "Produit",
+        "supplier": "Fournisseur",
+        "expiryDate": "Date d'expiration",
+        "stock": "Stock",
+        "costPrice": "Prix de revient",
+        "sellPrice": "Prix de vente",
+        "status": "Statut",
+        "location": "Emplacement"
+      },
+      "actions": {
+        "viewDetails": "Voir les détails",
+        "editBatch": "Modifier le lot",
+        "markAsExpired": "Marquer comme expiré",
+        "markAsDamaged": "Marquer comme endommagé",
+        "deleteBatch": "Supprimer le lot"
+      },
+      "emptyState": {
+        "title": "Aucun lot trouvé",
+        "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock.",
+        "addFirstBatch": "Ajouter le premier lot"
+      },
+      "loadMore": "Charger plus de lots ({remaining} restants)",
+      "loading": "Chargement en cours..."
+    },
+    "status": {
+      "active": "Actif",
+      "expired": "Expiré",
+      "damaged": "Endommagé",
+      "soldOut": "Épuisé",
+      "reserved": "Réservé"
+    },
+    "expiry": {
+      "expired": "Expiré",
+      "daysLeft": "{days}j restants"
+    }
   }
 }
