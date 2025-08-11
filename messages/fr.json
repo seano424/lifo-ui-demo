@@ -11,9 +11,7 @@
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
-    "logout": "Se déconnecter",
-    "products": "Produits",
-    "batches": "Lots"
+    "logout": "Se déconnecter"
   },
   "dashboard": {
     "kpis": {
@@ -362,8 +360,8 @@
   "breadcrumbs": {
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "inbound": "Entrées",
-    "outbound": "Sorties",
+    "input": "Entrées",
+    "output": "Sorties",
     "analytics": "Analyses",
     "performance": "Performance",
     "milestones": "Étapes",
@@ -375,7 +373,6 @@
     "teams": "Équipes",
     "stores": "Magasins",
     "products": "Produits",
-    "batches": "Lots",
     "categories": "Catégories",
     "reports": "Rapports",
     "notifications": "Notifications",
@@ -585,6 +582,46 @@
         },
         "button": "Rejoindre la liste d'attente",
         "noCreditCard": "Aucune carte de crédit requise"
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous aider",
+    "description": "Une question, une suggestion ou besoin d'assistance ? Notre équipe est prête à vous accompagner.",
+    "form": {
+      "title": "Envoyez-nous un message",
+      "description": "Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les plus brefs délais.",
+      "name": "Nom",
+      "namePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Sujet de votre message",
+      "message": "Message",
+      "messagePlaceholder": "Votre message...",
+      "submit": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "success": "Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.",
+      "error": "Une erreur est survenue lors de l'envoi du message"
+    },
+    "api": {
+      "allFieldsRequired": "Tous les champs sont requis",
+      "emailSendingFailed": "Échec de l'envoi de l'email",
+      "internalServerError": "Erreur interne du serveur"
+    },
+    "features": {
+      "support": {
+        "title": "Support réactif",
+        "description": "Notre équipe répond généralement sous 24h ouvrées à toutes vos demandes."
+      },
+      "expertise": {
+        "title": "Expertise dédiée",
+        "description": "Des experts spécialisés dans la gestion d'inventaire pour répondre à vos questions."
+      },
+      "followup": {
+        "title": "Suivi personnalisé",
+        "description": "Chaque demande est traitée individuellement avec un suivi personnalisé."
       }
     }
   },
