@@ -132,7 +132,19 @@ export function transformOpenFoodFactsProduct(
     }
   }
 
-  console.log(`[OpenFoodFacts] Product found for ${barcode}:`, offProduct.product.product_name)
+  const productName = offProduct.product.product_name || offProduct.product.product_name_en
+  
+  if (!productName || productName.trim() === '') {
+    console.log(`[OpenFoodFacts] Product found for ${barcode} but has no meaningful name - treating as not found`)
+    return {
+      barcode,
+      found: false,
+      error: 'Product found but has no meaningful name',
+      source: 'open_food_facts',
+    }
+  }
+
+  console.log(`[OpenFoodFacts] Product found for ${barcode}:`, productName)
   return {
     barcode,
     found: true,
