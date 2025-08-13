@@ -50,25 +50,25 @@ export interface DonationAnalytics {
 export async function fetchDonationRecipients(
   storeId: string,
   recipientType?: string,
-  isActive: boolean = true
+  isActive: boolean = true,
 ): Promise<{ recipients: DonationRecipient[]; total_count: number }> {
   const supabase = createClient()
-  
+
   const params = new URLSearchParams({
     store_id: storeId,
     is_active: isActive.toString(),
   })
-  
+
   if (recipientType) {
     params.append('recipient_type', recipientType)
   }
-  
+
   const response = await fetch(`/api/v1/donation-queries/recipients?${params}`)
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch donation recipients')
   }
-  
+
   return response.json()
 }
 
@@ -77,47 +77,47 @@ export async function fetchDonationActions(
   storeId: string,
   actionType?: string,
   days: number = 30,
-  limit: number = 100
+  limit: number = 100,
 ): Promise<{ actions: DonationAction[]; total_count: number; period_days: number }> {
   const supabase = createClient()
-  
+
   const params = new URLSearchParams({
     store_id: storeId,
     days: days.toString(),
     limit: limit.toString(),
   })
-  
+
   if (actionType) {
     params.append('action_type', actionType)
   }
-  
+
   const response = await fetch(`/api/v1/donation-queries/actions?${params}`)
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch donation actions')
   }
-  
+
   return response.json()
 }
 
 // Fetch donation analytics
 export async function fetchDonationAnalytics(
   storeId: string,
-  days: number = 30
+  days: number = 30,
 ): Promise<DonationAnalytics> {
   const supabase = createClient()
-  
+
   const params = new URLSearchParams({
     store_id: storeId,
     days: days.toString(),
   })
-  
+
   const response = await fetch(`/api/v1/donation-queries/analytics/summary?${params}`)
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch donation analytics')
   }
-  
+
   return response.json()
 }
 
@@ -128,7 +128,7 @@ export async function checkDonationEligibility(
     current_temperature?: number
     packaging_condition?: 'good' | 'damaged' | 'opened'
     force_recalculate?: boolean
-  } = {}
+  } = {},
 ): Promise<{
   batch_id: string
   eligible_for_donation: boolean
@@ -146,11 +146,11 @@ export async function checkDonationEligibility(
     },
     body: JSON.stringify(options),
   })
-  
+
   if (!response.ok) {
     throw new Error('Failed to check donation eligibility')
   }
-  
+
   return response.json()
 }
 
@@ -158,7 +158,7 @@ export async function checkDonationEligibility(
 export async function executeDonationAction(
   batchId: string,
   recipientId: string,
-  notes?: string
+  notes?: string,
 ): Promise<{
   success: boolean
   message: string
@@ -167,7 +167,7 @@ export async function executeDonationAction(
 }> {
   // This would integrate with your existing donation system
   // For now, we'll call the batch actions endpoint from donation_queries.py
-  
+
   const response = await fetch(`/api/v1/donation-queries/actions`, {
     method: 'POST',
     headers: {
@@ -180,10 +180,10 @@ export async function executeDonationAction(
       notes: notes || 'Donation executed via Store Insights dashboard',
     }),
   })
-  
+
   if (!response.ok) {
     throw new Error('Failed to execute donation action')
   }
-  
+
   return response.json()
 }

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { 
-  fetchStoreInsights, 
-  fetchActionableBatches, 
-  fetchAllStoresInsights 
+import {
+  fetchStoreInsights,
+  fetchActionableBatches,
+  fetchAllStoresInsights,
 } from '@/lib/queries/store-insights'
 import { queryKeys } from '@/lib/queries/query-keys'
 
@@ -47,7 +47,7 @@ export function useAllStoresInsights() {
 // Convenience hooks for specific insights
 export function useStoreCriticalBatches(storeId: string) {
   const { data: insights, ...rest } = useStoreInsights(storeId)
-  
+
   return {
     ...rest,
     criticalBatches: insights?.insights.expiring_soon.count || 0,
@@ -63,28 +63,33 @@ export function useStoreCriticalBatches(storeId: string) {
 // Hook for urgent actions needed across all stores
 export function useSystemWideUrgentActions() {
   const { data: allStoresInsights, ...rest } = useAllStoresInsights()
-  
-  const urgentActions = allStoresInsights?.reduce((acc, store) => {
-    const insights = store.insights
-    acc.totalExpiringSoon += insights.expiring_soon.count
-    acc.totalReadyForDiscount += insights.ready_for_discount.count
-    acc.totalPerfectForDonation += insights.perfect_for_donation.count
-    acc.totalHighUrgency += insights.high_urgency.count
-    acc.storesWithActions += (
-      insights.expiring_soon.count + 
-      insights.ready_for_discount.count + 
-      insights.perfect_for_donation.count
-    ) > 0 ? 1 : 0
-    return acc
-  }, {
-    totalExpiringSoon: 0,
-    totalReadyForDiscount: 0,
-    totalPerfectForDonation: 0,
-    totalHighUrgency: 0,
-    storesWithActions: 0,
-    totalStores: allStoresInsights?.length || 0
-  })
-  
+
+  const urgentActions = allStoresInsights?.reduce(
+    (acc, store) => {
+      const insights = store.insights
+      acc.totalExpiringSoon += insights.expiring_soon.count
+      acc.totalReadyForDiscount += insights.ready_for_discount.count
+      acc.totalPerfectForDonation += insights.perfect_for_donation.count
+      acc.totalHighUrgency += insights.high_urgency.count
+      acc.storesWithActions +=
+        insights.expiring_soon.count +
+          insights.ready_for_discount.count +
+          insights.perfect_for_donation.count >
+        0
+          ? 1
+          : 0
+      return acc
+    },
+    {
+      totalExpiringSoon: 0,
+      totalReadyForDiscount: 0,
+      totalPerfectForDonation: 0,
+      totalHighUrgency: 0,
+      storesWithActions: 0,
+      totalStores: allStoresInsights?.length || 0,
+    },
+  )
+
   return {
     ...rest,
     urgentActions,

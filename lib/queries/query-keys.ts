@@ -163,7 +163,8 @@ export const queryKeys = {
   storeInsights: {
     all: ['storeInsights'] as const,
     store: (storeId: string) => [...queryKeys.storeInsights.all, 'store', storeId] as const,
-    actionable: (storeId: string) => [...queryKeys.storeInsights.all, 'actionable', storeId] as const,
+    actionable: (storeId: string) =>
+      [...queryKeys.storeInsights.all, 'actionable', storeId] as const,
     allStores: () => [...queryKeys.storeInsights.all, 'allStores'] as const,
   },
 

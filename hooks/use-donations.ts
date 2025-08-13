@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { 
+import {
   fetchDonationRecipients,
   fetchDonationActions,
   fetchDonationAnalytics,
   checkDonationEligibility,
-  executeDonationAction
+  executeDonationAction,
 } from '@/lib/queries/donations'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { toast } from 'sonner'
@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 export function useDonationRecipients(
   storeId: string,
   recipientType?: string,
-  isActive: boolean = true
+  isActive: boolean = true,
 ) {
   return useQuery({
     queryKey: queryKeys.donations.recipients(storeId),
@@ -29,7 +29,7 @@ export function useDonationActions(
   storeId: string,
   actionType?: string,
   days: number = 30,
-  limit: number = 100
+  limit: number = 100,
 ) {
   return useQuery({
     queryKey: queryKeys.donations.actions(storeId),
@@ -58,7 +58,7 @@ export function useDonationEligibility(
     current_temperature?: number
     packaging_condition?: 'good' | 'damaged' | 'opened'
     force_recalculate?: boolean
-  } = {}
+  } = {},
 ) {
   return useQuery({
     queryKey: ['donationEligibility', batchId, options],
@@ -72,20 +72,20 @@ export function useDonationEligibility(
 // Mutation for executing donation actions
 export function useDonationAction() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
-    mutationFn: ({ 
-      batchId, 
-      recipientId, 
-      notes 
-    }: { 
+    mutationFn: ({
+      batchId,
+      recipientId,
+      notes,
+    }: {
       batchId: string
       recipientId: string
-      notes?: string 
+      notes?: string
     }) => executeDonationAction(batchId, recipientId, notes),
     onSuccess: (data, variables) => {
       toast.success(`Successfully donated batch to recipient`)
-      
+
       // Invalidate relevant queries
       queryClient.invalidateQueries({
         queryKey: queryKeys.storeInsights.all,
@@ -97,7 +97,7 @@ export function useDonationAction() {
         queryKey: queryKeys.batches.all,
       })
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Failed to execute donation: ${error.message}`)
     },
   })
@@ -106,7 +106,7 @@ export function useDonationAction() {
 // Convenience hook for getting active donation recipients for a store
 export function useActiveDonationRecipients(storeId: string) {
   const { data, ...rest } = useDonationRecipients(storeId, undefined, true)
-  
+
   return {
     ...rest,
     recipients: data?.recipients || [],
