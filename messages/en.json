@@ -34,6 +34,17 @@
         "action": "Remove products"
       }
     },
+    "errors": {
+      "noStores": {
+        "title": "No Stores Found",
+        "description": "You need to create a store before you can manage products. Please set up your first store to continue.",
+        "tip": {
+          "title": "Why do I need a store?",
+          "description": "Stores help you organize your inventory and track products efficiently. Each store can have its own inventory, settings, and team members."
+        },
+        "button": "Create Your First Store"
+      }
+    },
     "kpis": {
       "title": "Key Metrics Overview",
       "refresh": "Refresh",
