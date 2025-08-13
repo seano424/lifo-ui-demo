@@ -20,9 +20,9 @@ export default function InventoryHeader() {
           <Typography
             variant="h2"
             className={cn(
-              'text-3xl font-bold tracking-tight transition-colors hover:text-primary-500',
+              'transition-colors hover:text-primary-500 border-b-2 border-transparent pb-1',
               isProducts
-                ? 'text-primary-600 border-b-2 border-primary-500 pb-1'
+                ? 'text-primary-600 border-b-2 border-primary-500'
                 : 'text-muted-foreground',
             )}
           >
@@ -34,10 +34,8 @@ export default function InventoryHeader() {
           <Typography
             variant="h2"
             className={cn(
-              'text-3xl font-bold tracking-tight transition-colors hover:text-primary-500',
-              isBatches
-                ? 'text-primary-600 border-b-2 border-primary-500 pb-1'
-                : 'text-muted-foreground',
+              'transition-colors hover:text-primary-500 border-b-2 border-transparent pb-1',
+              isBatches ? 'text-primary-600 border-primary-500' : 'text-muted-foreground',
             )}
           >
             {t('batches')}
