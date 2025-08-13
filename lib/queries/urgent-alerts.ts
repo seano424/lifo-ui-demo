@@ -81,27 +81,27 @@ export function getAlertMessage(
   urgentCount: number,
 ): {
   message: string
-  severity: 'critical' | 'urgent' | 'safe'
+  severity: 'urgent' | 'safe'
 } {
   if (criticalCount > 0) {
-    const itemWord = criticalCount === 1 ? 'ITEM' : 'ITEMS'
-    const timeframe = criticalCount === 1 ? 'TOMORROW' : 'IN THE NEXT 3 DAYS'
+    const itemWord = criticalCount === 1 ? 'item' : 'items'
+    const timeframe = criticalCount === 1 ? 'tomorrow' : 'in the next 3 days'
     return {
-      message: `URGENT: ${criticalCount} ${itemWord} EXPIRING ${timeframe}`,
-      severity: 'critical',
+      message: `Urgent: ${criticalCount} ${itemWord} expiring ${timeframe}`,
+      severity: 'urgent',
     }
   }
 
   if (urgentCount > 0) {
-    const itemWord = urgentCount === 1 ? 'ITEM' : 'ITEMS'
+    const itemWord = urgentCount === 1 ? 'item' : 'items'
     return {
-      message: `${urgentCount} ${itemWord} EXPIRING THIS WEEK`,
+      message: `${urgentCount} ${itemWord} expiring this week`,
       severity: 'urgent',
     }
   }
 
   return {
-    message: 'ALL ITEMS WITHIN SAFE EXPIRY DATES',
+    message: 'All items within safe expiry dates',
     severity: 'safe',
   }
 }
