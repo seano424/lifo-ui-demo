@@ -366,6 +366,8 @@
     "more": "Plus"
   },
   "breadcrumbs": {
+    "batches": "Lots",
+    "billing": "Facturations",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
     "input": "Entrées",
