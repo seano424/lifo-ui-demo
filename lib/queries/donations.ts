@@ -1,5 +1,3 @@
-import { createClient } from '@/lib/supabase/client'
-
 export interface DonationRecipient {
   recipient_id: string
   name: string
@@ -52,8 +50,6 @@ export async function fetchDonationRecipients(
   recipientType?: string,
   isActive: boolean = true,
 ): Promise<{ recipients: DonationRecipient[]; total_count: number }> {
-  const supabase = createClient()
-
   const params = new URLSearchParams({
     store_id: storeId,
     is_active: isActive.toString(),
@@ -79,8 +75,6 @@ export async function fetchDonationActions(
   days: number = 30,
   limit: number = 100,
 ): Promise<{ actions: DonationAction[]; total_count: number; period_days: number }> {
-  const supabase = createClient()
-
   const params = new URLSearchParams({
     store_id: storeId,
     days: days.toString(),
@@ -105,8 +99,6 @@ export async function fetchDonationAnalytics(
   storeId: string,
   days: number = 30,
 ): Promise<DonationAnalytics> {
-  const supabase = createClient()
-
   const params = new URLSearchParams({
     store_id: storeId,
     days: days.toString(),

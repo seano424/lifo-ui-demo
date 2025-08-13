@@ -116,7 +116,7 @@ export async function fetchAllStoresInsights(
   }
 
   // Get insights for each store
-  const insightsPromises = stores.map((store: any) =>
+  const insightsPromises = stores.map((store: { store_id: string; store_name: string }) =>
     fetchStoreInsights(store.store_id, serverClient),
   )
 
@@ -124,8 +124,7 @@ export async function fetchAllStoresInsights(
 
   return insights
     .filter(
-      (result: any): result is PromiseFulfilledResult<StoreInsights> =>
-        result.status === 'fulfilled',
+      (result): result is PromiseFulfilledResult<StoreInsights> => result.status === 'fulfilled',
     )
-    .map((result: any) => result.value)
+    .map(result => result.value)
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useActionableBatches } from '@/hooks/use-store-insights'
+import type { ActionableBatch } from '@/lib/queries/store-insights'
 import { useActiveDonationRecipients, useDonationAction } from '@/hooks/use-donations'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -35,7 +36,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
   const { recipients } = useActiveDonationRecipients(storeId)
   const donationMutation = useDonationAction()
 
-  const [selectedBatch, setSelectedBatch] = useState<any>(null)
+  const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(null)
   const [selectedRecipient, setSelectedRecipient] = useState<string>('')
   const [donationNotes, setDonationNotes] = useState<string>('')
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -77,7 +78,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
     )
   }
 
-  const handleDonation = (batch: any) => {
+  const handleDonation = (batch: ActionableBatch) => {
     setSelectedBatch(batch)
     setSelectedRecipient('')
     setDonationNotes('')
@@ -96,6 +97,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
       setDialogOpen(false)
     } catch (error) {
       // Error handling is done in the mutation
+      console.error(error)
     }
   }
 
@@ -148,7 +150,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                       <Badge variant="outline" className="text-xs">
                         {batch.category}
                       </Badge>
-                      <Badge variant={getUrgencyColor(batch.urgency_level) as any}>
+                      <Badge variant={getUrgencyColor(batch.urgency_level)}>
                         {batch.urgency_level}
                       </Badge>
                     </div>
