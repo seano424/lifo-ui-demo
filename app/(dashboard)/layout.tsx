@@ -53,7 +53,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <UserButton />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 px-6 py-4 max-w-screen-xl mx-auto">
+          <div className="flex flex-1 flex-col gap-4 px-6 py-4">
             {children}
           </div>
         </SidebarInset>
