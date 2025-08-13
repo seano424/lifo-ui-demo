@@ -158,6 +158,23 @@ export const queryKeys = {
       [...queryKeys.dashboardKPIs.byStore(storeId), 'donations'] as const,
     waste: (storeId: string) => [...queryKeys.dashboardKPIs.byStore(storeId), 'waste'] as const,
   },
+
+  // Store insights queries
+  storeInsights: {
+    all: ['storeInsights'] as const,
+    store: (storeId: string) => [...queryKeys.storeInsights.all, 'store', storeId] as const,
+    actionable: (storeId: string) =>
+      [...queryKeys.storeInsights.all, 'actionable', storeId] as const,
+    allStores: () => [...queryKeys.storeInsights.all, 'allStores'] as const,
+  },
+
+  // Donation queries
+  donations: {
+    all: ['donations'] as const,
+    recipients: (storeId: string) => [...queryKeys.donations.all, 'recipients', storeId] as const,
+    actions: (storeId: string) => [...queryKeys.donations.all, 'actions', storeId] as const,
+    analytics: (storeId: string) => [...queryKeys.donations.all, 'analytics', storeId] as const,
+  },
 } as const
 
 // Type helpers for query key validation
