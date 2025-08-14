@@ -213,16 +213,13 @@ export function useStoreActions() {
         queryKey: ['batches', 'byStore'],
       })
 
-      // Always update primary store in database for persistence across sessions
-      // This ensures the user's selection is remembered even after clearing localStorage
-      console.log('[useStoreActions.switchStore] Updating primary store preference in database')
-      updatePrimaryStoreMutation.mutate({
-        userId: currentUser.id,
-        storeId: newStore.store_id,
-      })
-
-      // Show different message based on whether it's a permanent change
+      // Update primary store in database only if requested
       if (makePrimary) {
+        console.log('[useStoreActions.switchStore] Updating primary store preference in database')
+        updatePrimaryStoreMutation.mutate({
+          userId: currentUser.id,
+          storeId: newStore.store_id,
+        })
         toast.success(`${newStore.store_name} set as primary store`)
       } else {
         toast.success(`Switched to ${newStore.store_name}`)
