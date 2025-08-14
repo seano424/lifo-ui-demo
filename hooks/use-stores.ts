@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/client'
 // Hook to get current auth user
 function useCurrentAuthUser() {
   console.log('[useCurrentAuthUser] Hook called')
-  
+
   return useQuery({
     queryKey: ['currentAuthUser'],
     queryFn: async () => {
@@ -27,7 +27,7 @@ function useCurrentAuthUser() {
       } = await supabase.auth.getUser()
 
       console.log('[useCurrentAuthUser] Auth result - user:', user?.id, 'error:', error)
-      
+
       if (error || !user) {
         throw new Error('Not authenticated')
       }
@@ -44,8 +44,13 @@ export function useUserStores() {
   const { data: currentUser } = useCurrentAuthUser()
   const { setActiveStore, setUserStores, setLoadingStores, activeStore, userStores } =
     useStoreState()
-  
-  console.log('[useUserStores] Hook called - currentUser:', currentUser?.id, 'activeStore:', activeStore?.store_id)
+
+  console.log(
+    '[useUserStores] Hook called - currentUser:',
+    currentUser?.id,
+    'activeStore:',
+    activeStore?.store_id,
+  )
 
   const userStoresResult = useQuery({
     queryKey: queryKeys.stores.userStores(currentUser?.id || ''),
@@ -69,10 +74,19 @@ export function useUserStores() {
 
   // Auto-select store when data loads
   useEffect(() => {
-    console.log('[useUserStores.useEffect] Checking store selection - stores:', userStoresResult.data?.length, 'activeStore:', activeStore?.store_id)
-    
+    console.log(
+      '[useUserStores.useEffect] Checking store selection - stores:',
+      userStoresResult.data?.length,
+      'activeStore:',
+      activeStore?.store_id,
+    )
+
     if (userStoresResult.data && userStoresResult.data.length > 0 && !activeStore) {
-      console.log('[useUserStores.useEffect] Setting up stores - found', userStoresResult.data.length, 'stores')
+      console.log(
+        '[useUserStores.useEffect] Setting up stores - found',
+        userStoresResult.data.length,
+        'stores',
+      )
       setLoadingStores(userStoresResult.isLoading)
 
       // Store the complete UserStore objects (no manual transformation needed!)
@@ -81,13 +95,17 @@ export function useUserStores() {
       // Find primary store from preferences or default to first store
       const primaryStoreId = userPreferencesResult.data?.primary_store_id
       console.log('[useUserStores.useEffect] Primary store from preferences:', primaryStoreId)
-      
+
       const primaryUserStore = userStoresResult.data.find(
         us => us.store.store_id === primaryStoreId,
       )
       const userStoreToSelect = primaryUserStore || userStoresResult.data[0]
 
-      console.log('[useUserStores.useEffect] Setting active store:', userStoreToSelect.store.store_id, userStoreToSelect.store.store_name)
+      console.log(
+        '[useUserStores.useEffect] Setting active store:',
+        userStoreToSelect.store.store_id,
+        userStoreToSelect.store.store_name,
+      )
       // Set the active store (just the store part, not the UserStore wrapper)
       setActiveStore(userStoreToSelect.store)
     }
@@ -118,8 +136,13 @@ export function useStoreActions() {
   const queryClient = useQueryClient()
   const { data: currentUser } = useCurrentAuthUser()
   const { setActiveStore, setChangingStore, activeStore } = useStoreState()
-  
-  console.log('[useStoreActions] Hook called - currentUser:', currentUser?.id, 'activeStore:', activeStore?.store_id)
+
+  console.log(
+    '[useStoreActions] Hook called - currentUser:',
+    currentUser?.id,
+    'activeStore:',
+    activeStore?.store_id,
+  )
 
   const updatePrimaryStoreMutation = useMutation({
     mutationFn: ({ userId, storeId }: { userId: string; storeId: string }) =>
@@ -139,8 +162,15 @@ export function useStoreActions() {
   })
 
   const switchStore = async (newStore: Store, makePrimary: boolean = false) => {
-    console.log('[useStoreActions.switchStore] Switching from', activeStore?.store_id, 'to', newStore.store_id, 'makePrimary:', makePrimary)
-    
+    console.log(
+      '[useStoreActions.switchStore] Switching from',
+      activeStore?.store_id,
+      'to',
+      newStore.store_id,
+      'makePrimary:',
+      makePrimary,
+    )
+
     if (!currentUser || newStore.store_id === activeStore?.store_id) {
       console.log('[useStoreActions.switchStore] Skipping - same store or no user')
       return
@@ -149,7 +179,11 @@ export function useStoreActions() {
     setChangingStore(true)
 
     try {
-      console.log('[useStoreActions.switchStore] Setting new active store:', newStore.store_id, newStore.store_name)
+      console.log(
+        '[useStoreActions.switchStore] Setting new active store:',
+        newStore.store_id,
+        newStore.store_name,
+      )
       // Update active store in state (no manual transformation needed!)
       setActiveStore(newStore)
 
@@ -189,7 +223,7 @@ export function useStoreActions() {
 // Hook to get single store details
 export function useStore(storeId: string | null) {
   console.log('[useStore] Hook called - storeId:', storeId)
-  
+
   return useQuery({
     queryKey: queryKeys.stores.detail(storeId || ''),
     queryFn: () => {
