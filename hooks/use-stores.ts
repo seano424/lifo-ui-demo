@@ -7,10 +7,14 @@ import {
   fetchStoreById,
   fetchUserPreferences,
   updateUserPrimaryStore,
+  selectDefaultStore,
   type Store,
 } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
+import { setActiveStoreCookie } from '@/lib/actions/store-actions'
+
+const ACTIVE_STORE_KEY = 'activeStoreId'
 
 // Hook to get current auth user
 function useCurrentAuthUser() {
@@ -89,25 +93,35 @@ export function useUserStores() {
       )
       setLoadingStores(userStoresResult.isLoading)
 
-      // Store the complete UserStore objects (no manual transformation needed!)
+      // Store the complete UserStore objects
       setUserStores(userStoresResult.data)
 
-      // Find primary store from preferences or default to first store
+      // Get last active store from localStorage
+      const lastActiveStoreId =
+        typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
       const primaryStoreId = userPreferencesResult.data?.primary_store_id
-      console.log('[useUserStores.useEffect] Primary store from preferences:', primaryStoreId)
 
-      const primaryUserStore = userStoresResult.data.find(
-        us => us.store.store_id === primaryStoreId,
-      )
-      const userStoreToSelect = primaryUserStore || userStoresResult.data[0]
+      console.log('[useUserStores.useEffect] Store selection context:', {
+        lastActiveStoreId,
+        primaryStoreId,
+        availableStores: userStoresResult.data.map(us => us.store.store_id),
+      })
 
-      console.log(
-        '[useUserStores.useEffect] Setting active store:',
-        userStoreToSelect.store.store_id,
-        userStoreToSelect.store.store_name,
+      // Use smart selection logic
+      const storeToSelect = selectDefaultStore(
+        userStoresResult.data,
+        primaryStoreId || null,
+        lastActiveStoreId,
       )
-      // Set the active store (just the store part, not the UserStore wrapper)
-      setActiveStore(userStoreToSelect.store)
+
+      if (storeToSelect) {
+        console.log(
+          '[useUserStores.useEffect] Setting active store:',
+          storeToSelect.store_id,
+          storeToSelect.store_name,
+        )
+        setActiveStore(storeToSelect)
+      }
     }
   }, [
     userStoresResult.data,
@@ -184,8 +198,11 @@ export function useStoreActions() {
         newStore.store_id,
         newStore.store_name,
       )
-      // Update active store in state (no manual transformation needed!)
+      // Update active store in state (localStorage persistence happens automatically in setActiveStore)
       setActiveStore(newStore)
+
+      // Also set cookie for server-side persistence
+      await setActiveStoreCookie(newStore.store_id)
 
       // Invalidate all store-specific queries to refetch for new store
       console.log('[useStoreActions.switchStore] Invalidating store-specific queries')
@@ -196,16 +213,20 @@ export function useStoreActions() {
         queryKey: ['batches', 'byStore'],
       })
 
-      // Update primary store if requested
-      if (makePrimary) {
-        console.log('[useStoreActions.switchStore] Updating primary store preference')
-        updatePrimaryStoreMutation.mutate({
-          userId: currentUser.id,
-          storeId: newStore.store_id,
-        })
-      }
+      // Always update primary store in database for persistence across sessions
+      // This ensures the user's selection is remembered even after clearing localStorage
+      console.log('[useStoreActions.switchStore] Updating primary store preference in database')
+      updatePrimaryStoreMutation.mutate({
+        userId: currentUser.id,
+        storeId: newStore.store_id,
+      })
 
-      toast.success(`Switched to ${newStore.store_name}`)
+      // Show different message based on whether it's a permanent change
+      if (makePrimary) {
+        toast.success(`${newStore.store_name} set as primary store`)
+      } else {
+        toast.success(`Switched to ${newStore.store_name}`)
+      }
     } catch (error) {
       console.error('[useStoreActions.switchStore] Error:', error)
       toast.error('Failed to switch stores')
