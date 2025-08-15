@@ -1,8 +1,9 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
+import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { NavbarLogo } from '@/components/ui/logo'
+import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import {
   Accordion,
@@ -23,6 +24,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { hasEnvVars } from '@/lib/utils'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
+import Link from 'next/link'
 
 interface MenuItem {
   title: string
@@ -51,15 +53,15 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       url: '#',
       items: [
         {
-          title: t('helpCenter'),
-          description: t('helpCenterDesc'),
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
           title: t('contactUs'),
           description: t('contactUsDesc'),
           icon: <Sunset className="size-5 shrink-0" />,
+          url: '/contact',
+        },
+        {
+          title: t('helpCenter'),
+          description: t('helpCenterDesc'),
+          icon: <Zap className="size-5 shrink-0" />,
           url: '#',
         },
         {
@@ -123,7 +125,10 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
           </NavigationMenu>
 
-          {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
+          <div className="flex items-center gap-2">
+            <CompactLanguageSwitcher />
+            {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
+          </div>
         </div>
       </nav>
 
@@ -149,6 +154,10 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
 
                 <div className="flex flex-col gap-3">
                   <AuthButton isMobile />
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <span className="text-sm text-muted-foreground">Langue</span>
+                    <CompactLanguageSwitcher />
+                  </div>
                 </div>
               </div>
             </SheetContent>
@@ -204,15 +213,15 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
+    <Link key={item.title} href={item.url} className="text-md font-semibold">
       {item.title}
-    </a>
+    </Link>
   )
 }
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
-    <a
+    <Link
       className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
       href={item.url}
     >
@@ -223,7 +232,7 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
           <p className="text-sm leading-snug text-muted-foreground">{item.description}</p>
         )}
       </div>
-    </a>
+    </Link>
   )
 }
 

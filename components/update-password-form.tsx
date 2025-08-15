@@ -22,6 +22,12 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
     setIsLoading(true)
     setError(null)
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setIsLoading(false)
+      return
+    }
+
     try {
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
@@ -56,8 +62,9 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
                   id="password"
                   type="password"
                   showPasswordToggle
-                  placeholder="New password"
+                  placeholder="New password (min 6 characters)"
                   required
+                  minLength={6}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                 />

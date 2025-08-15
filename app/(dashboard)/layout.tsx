@@ -3,15 +3,19 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
-import UserButton from '@/components/users/user-button'
+
 import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 import { SettingsError } from '@/components/settings/settings-error-boundary'
+import { TeamSwitcher } from '@/components/team-switcher'
+import { Button } from '@/components/ui/button'
+import { BellIcon } from 'lucide-react'
+import UserButton from '@/components/users/user-button'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const result = await prefetchDashboardData()
+  const dashboardData = await prefetchDashboardData()
 
   // Handle authentication errors at the dashboard level
-  if (result.error) {
+  if (dashboardData.error) {
     return (
       <SettingsError
         errorType="unauthorized"
@@ -26,24 +30,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     )
   }
 
-  // Handle no store access
-  if (result.userStores && result.userStores.length === 0) {
-    return (
-      <SettingsError
-        errorType="not-found"
-        title="No Store Access"
-        message="You don't have access to any stores yet. Contact your administrator."
-        showRefreshButton={false}
-        customAction={{
-          label: 'Contact Support',
-          href: '/support',
-        }}
-      />
-    )
-  }
-
   return (
-    <HydrationBoundary state={result.dehydratedState}>
+    <HydrationBoundary state={dashboardData.dehydratedState}>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -51,12 +39,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-              <DashboardBreadcrumbs />
+              <div className="hidden md:block">
+                <DashboardBreadcrumbs />
+              </div>
             </div>
 
-            <UserButton />
+            <div className="flex items-center gap-2">
+              <Button variant="subtle">
+                <BellIcon className="w-4 h-4" />
+                <span className="hidden md:block">Notifications</span>
+              </Button>
+              <TeamSwitcher />
+              <UserButton />
+            </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+          <div className="flex flex-1 flex-col gap-4 px-6 py-4">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </HydrationBoundary>

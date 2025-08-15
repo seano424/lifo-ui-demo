@@ -169,8 +169,8 @@ export function ProductCard({
       <CardFooter className="pt-3 border-t">
         <div className="flex items-center justify-between w-full">
           <div className="text-right">
-            <div className="text-2xl font-bold">${product.base_selling_price}</div>
-            <div className="text-xs text-muted-foreground">Cost: ${product.base_cost_price}</div>
+            <div className="text-2xl font-bold">€{product.base_selling_price}</div>
+            <div className="text-xs text-muted-foreground">Cost: €{product.base_cost_price}</div>
           </div>
 
           <div className="text-xs text-muted-foreground">

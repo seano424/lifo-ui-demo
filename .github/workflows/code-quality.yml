@@ -32,16 +32,6 @@ jobs:
         ports:
           - 5432:5432
 
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
     steps:
       - uses: actions/checkout@v4
 
@@ -50,8 +40,8 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Set up Python 3.11
-        run: uv python install 3.11
+      - name: Set up Python 3.12
+        run: uv python install 3.12
 
       - name: Setup virtual environment
         run: |
@@ -68,34 +58,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
-      - name: Core - Quality Checks & Tests
-        working-directory: ./lifo_ai_core
+      - name: Quality Checks & Tests
+        working-directory: .
         run: |
           uv pip install -r requirements.txt
           ruff check --select I --fix .
           ruff format .
-          ruff check --output-format=github .
           ruff format --check .
-          mypy . --no-error-summary
 
-      - name: API - Quality Checks & Tests
-        working-directory: ./lifo_api
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lifo_test
-          REDIS_URL: redis://localhost:6379
-          JWT_SECRET: test-secret-key
+      - name: Run Tests with Coverage
         run: |
-          set +e  # Don't exit on error for linting checks
-          uv pip install -r requirements.txt
-          ruff check --select I --fix .
-          ruff format .
-          echo "Running ruff code quality checks..."
-          ruff check --output-format=github . || echo "⚠️ Ruff found code quality issues - review and fix when possible"
-          echo "Checking code formatting..."
-          ruff format --check .
-          echo "Running mypy type checking..."
-          mypy . --no-error-summary || echo "⚠️ MyPy found type issues - review and fix when possible"
-          echo "✅ API quality checks completed"
+          python -m pytest --cov=lifo_ai_core --cov=lifo_api --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
 
       - name: Security Scans
         run: |
@@ -104,3 +83,8 @@ jobs:
           cd ../lifo_api
           ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/ || echo "Security scan completed"
           cd ..
+
+      - name: Dependency Security Check
+        uses: pypa/gh-action-pip-audit@v1.0.8
+        with:
+          inputs: requirements.txt

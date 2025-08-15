@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       username.includes('@') ? username : null, // Direct email if provided
       // Special case for testing: map common test usernames to working email
       username === 'test.employee2' || username === 'john.smith' ? 'soreilly424@gmail.com' : null,
+      username === 'testme' ? 'seanpatrickstudios@gmail.com' : null,
     ].filter(Boolean)
 
     console.log('🔍 Trying email formats:', possibleEmails)

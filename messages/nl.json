@@ -3,15 +3,70 @@
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "input": "Inkomend",
-    "output": "Uitgaand",
-    "todo": "Te doen",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "todos": "Te doen",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
     "analytics": "Analyses",
     "settings": "Instellingen",
     "helpCenter": "Helpcentrum",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "batches": "Batches",
+    "products": "Producten"
+  },
+  "dashboard": {
+    "quickActions": {
+      "title": "Snelle Acties",
+      "addProducts": {
+        "title": "Producten Toevoegen",
+        "description": "Voeg nieuwe producten toe aan uw voorraad met behulp van barcode-scanning of handmatige invoer.",
+        "action": "Nieuwe producten toevoegen"
+      },
+      "todoSuggestions": {
+        "title": "Todo Suggesties",
+        "description": "Bekijk en beheer taken die door LIFO.AI zijn voorgesteld om uw voorraad te optimaliseren.",
+        "action": "Bekijk todos"
+      },
+      "removeProducts": {
+        "title": "Producten Verwijderen",
+        "description": "Registreer verkopen, donaties of afval voor artikelen die uw voorraad verlaten.",
+        "action": "Verwijder producten"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "Geen Winkels Gevonden",
+        "description": "U moet een winkel aanmaken voordat u producten kunt beheren. Stel uw eerste winkel in om door te gaan.",
+        "tip": {
+          "title": "Waarom heb ik een winkel nodig?",
+          "description": "Winkels helpen u uw voorraad te organiseren en producten efficiënt te volgen. Elke winkel kan zijn eigen voorraad, instellingen en teamleden hebben."
+        },
+        "button": "Maak uw eerste winkel aan"
+      }
+    },
+    "kpis": {
+      "title": "Overzicht belangrijke statistieken",
+      "refresh": "Vernieuwen",
+      "inventory": {
+        "label": "Totale voorraadwaarde",
+        "subtitle": "batches",
+        "productCount": "producten"
+      },
+      "sales": {
+        "label": "Verkoopontvangsten",
+        "subtitle": "verkopen"
+      },
+      "donations": {
+        "label": "Donaties",
+        "subtitle": "ontvangers"
+      },
+      "waste": {
+        "label": "Afvalkosten",
+        "subtitle": "items"
+      },
+      "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen."
+    }
   },
   "actions": {
     "add": "Toevoegen",
@@ -154,7 +209,8 @@
         "invalidEmail": "Ongeldig e-mailformaat",
         "invalidWebsite": "Ongeldige website URL",
         "descriptionTooLong": "Beschrijving is te lang"
-      }
+      },
+      "addStore": "Winkel toevoegen"
     }
   },
   "users": {
@@ -278,12 +334,18 @@
       "save": "Wijzigingen opslaan",
       "cancel": "Annuleren",
       "saving": "Opslaan...",
+      "saveChanges": "Wijzigingen opslaan",
       "validation": {
         "nameRequired": "Volledige naam is verplicht",
         "nameTooLong": "Volledige naam moet minder dan 100 tekens bevatten",
         "usernameRequired": "Gebruikersnaam moet minimaal 2 tekens bevatten",
         "usernameTooLong": "Gebruikersnaam moet minder dan 50 tekens bevatten",
         "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
+      },
+      "placeholders": {
+        "fullName": "Voer uw volledige naam in",
+        "email": "Voer uw e-mailadres in",
+        "username": "Voer uw gebruikersnaam in"
       }
     },
     "phone": {
@@ -333,6 +395,8 @@
     "more": "Meer"
   },
   "breadcrumbs": {
+    "batches": "Partijen",
+    "billing": "Facturering",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
     "input": "Inkomend",
@@ -340,7 +404,7 @@
     "analytics": "Analyses",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
-    "todo": "Te doen",
+    "todos": "Te doen",
     "settings": "Instellingen",
     "store": "Winkel",
     "team": "Team",
@@ -354,7 +418,8 @@
     "account": "Account",
     "profile": "Profiel",
     "help": "Help",
-    "support": "Ondersteuning"
+    "support": "Ondersteuning",
+    "addStore": "Winkel toevoegen"
   },
   "addEmployee": {
     "title": "Nieuwe medewerker toevoegen",
@@ -390,7 +455,7 @@
     "preview": {
       "username": "Gebruikersnaam:",
       "pin": "PIN:",
-      "pinNote": "Wordt automatisch gegenereerd (4 cijfers)",
+      "pinNote": "Wordt automatisch gegenereerd (6 cijfers)",
       "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
     },
     "buttons": {
@@ -465,6 +530,195 @@
       "signup": "Bedrijfsregistratie",
       "logout": "Uitloggen",
       "goToDashboard": "Naar dashboard"
+    }
+  },
+  "errors": {
+    "pageNotFoundTitle": "Pagina niet gevonden",
+    "pageNotFoundDescription": "De pagina die u zoekt bestaat niet of is verplaatst.",
+    "backToHome": "Terug naar startpagina",
+    "goBack": "Ga terug",
+    "needHelp": "Hulp nodig?",
+    "contactSupport": "Neem contact op met ons ondersteuningsteam"
+  },
+  "landingpage": {
+    "hero": {
+      "title": "De toekomst van voorraadbeheer is hier.",
+      "subtitle": "De slimme oplossing om verspilling te verminderen en uw winst te verhogen",
+      "buttons": {
+        "freeTrial": "Start mijn gratis proefperiode",
+        "explore": "Verken het platform"
+      },
+      "badge": {
+        "text": "Geniet van een gratis proefperiode van 14 dagen"
+      }
+    },
+    "features": {
+      "title": "Revolutioneer uw voorraadcontrole",
+      "expiryTracking": {
+        "title": "Real-time houdbaarheidscontrole",
+        "description": "Mis nooit meer een houdbaarheidsdatum met geautomatiseerde monitoring van uw hele voorraad."
+      },
+      "predictiveAlerts": {
+        "title": "Voorspellende waarschuwingen",
+        "description": "Verminder uw verliezen aanzienlijk dankzij de meldingen die door AI worden gevoed vóór het verstrijken van de producten."
+      },
+      "timeSaving": {
+        "title": "Tijdsbesparing",
+        "description": "Enorme vermindering van de tijd die wordt besteed aan handmatig ontvangstbeheer en dagelijkse voorraden."
+      },
+      "errorFree": {
+        "title": "Foutloze operaties",
+        "description": "Eliminatie van menselijke fouten en administratief papierwerk."
+      },
+      "discoverButton": "Ontdek LIFO",
+      "noCommitment": "Geen verplichtingen!"
+    },
+    "businessStats": {
+      "title": "Maximaliseer uw winst, minimaliseer uw verlies",
+      "revenue": {
+        "label": "Omzetstijging",
+        "description": "Gemiddelde toename in bedrijfsomzet",
+        "subtext": "Automatische kortingssuggesties om producten snel te verplaatsen voordat ze verlopen."
+      },
+      "lossReduction": {
+        "label": "Verliesreductie",
+        "description": "Verminder eenvoudig afval en bespaar geld",
+        "subtext": "Minder verlopen producten terwijl u minder aan voorraadbeheer doet."
+      },
+      "taxCredits": {
+        "label": "Belastingvoordelen",
+        "description": "Vanaf de eerste maand op donaties",
+        "subtext": "Verhoog uw fiscaal aftrekbare donaties door te verbinden met een non-profitorganisatie."
+      }
+    },
+    "cta": {
+      "title": "Stap vandaag nog over op LIFO",
+      "features": {
+        "quickSetup": {
+          "title": "Snelle installatie",
+          "description": "Direct te gebruiken oplossing binnen minuten. Geen complexe configuratie vereist."
+        },
+        "freeTrial": {
+          "title": "30 dagen gratis proefperiode",
+          "description": "Test alle functies zonder verplichtingen. Eenvoudige opzegging op elk moment."
+        },
+        "support": {
+          "title": "Toegewijde ondersteuning",
+          "description": "Ons team van experts begeleidt u bij elke stap van uw reis."
+        },
+        "immediateResults": {
+          "title": "Onmiddellijke resultaten",
+          "description": "Verminder afval en verhoog winst vanaf de eerste week van gebruik."
+        }
+      },
+      "card": {
+        "title": "Klaar om uw voorraadbeheer te transformeren?",
+        "description": "Word lid van LIFO om uw inventaris te optimaliseren en de winst te maximaliseren.",
+        "benefits": {
+          "noCommitment": "Geen verplichtingen",
+          "instantSetup": "Directe installatie",
+          "support": "24/7 Ondersteuning"
+        },
+        "button": "Meld u aan voor de wachtlijst",
+        "noCreditCard": "Geen creditcard vereist"
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contact",
+    "subtitle": "Wij zijn er om u te helpen",
+    "description": "Heeft u een vraag, suggestie of hulp nodig? Ons team staat klaar om u te ondersteunen.",
+    "form": {
+      "title": "Stuur ons een bericht",
+      "description": "Vul het onderstaande formulier in en ons team zal zo snel mogelijk contact met u opnemen.",
+      "name": "Naam",
+      "namePlaceholder": "Uw naam",
+      "email": "E-mail",
+      "emailPlaceholder": "uw@email.com",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Onderwerp van uw bericht",
+      "message": "Bericht",
+      "messagePlaceholder": "Uw bericht...",
+      "submit": "Bericht verzenden",
+      "sending": "Verzenden...",
+      "success": "Uw bericht is succesvol verzonden. We nemen zo snel mogelijk contact met u op.",
+      "error": "Er is een fout opgetreden bij het verzenden van het bericht"
+    },
+    "api": {
+      "allFieldsRequired": "Alle velden zijn verplicht",
+      "emailSendingFailed": "E-mail verzenden mislukt",
+      "internalServerError": "Interne serverfout"
+    },
+    "features": {
+      "support": {
+        "title": "Snelle ondersteuning",
+        "description": "Ons team reageert doorgaans binnen 24 werkuren op al uw vragen."
+      },
+      "expertise": {
+        "title": "Toegewijde expertise",
+        "description": "Specialisten in voorraadbeheer om uw vragen te beantwoorden."
+      },
+      "followup": {
+        "title": "Persoonlijke opvolging",
+        "description": "Elke aanvraag wordt individueel behandeld met persoonlijke opvolging."
+      }
+    }
+  },
+  "footer": {
+    "description": "Bedrijven helpen voorraad te optimaliseren met intelligente oplossingen om afval te verminderen en winst te maximaliseren.",
+    "quickLinks": "Snelle Links",
+    "links": {
+      "aboutUs": "Over Ons",
+      "products": "Producten",
+      "pricing": "Prijzen",
+      "blog": "Blog"
+    },
+    "contactUs": "Neem Contact Op",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Alle rechten voorbehouden.",
+    "legal": {
+      "privacyPolicy": "Privacybeleid",
+      "termsOfService": "Servicevoorwaarden"
+    }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "Batch nr.",
+        "product": "Product",
+        "supplier": "Leverancier",
+        "expiryDate": "Vervaldatum",
+        "stock": "Voorraad",
+        "costPrice": "Kostprijs",
+        "sellPrice": "Verkoopprijs",
+        "status": "Status",
+        "location": "Locatie"
+      },
+      "actions": {
+        "viewDetails": "Details bekijken",
+        "editBatch": "Batch bewerken",
+        "markAsExpired": "Markeren als verlopen",
+        "markAsDamaged": "Markeren als beschadigd",
+        "deleteBatch": "Batch verwijderen"
+      },
+      "emptyState": {
+        "title": "Geen batches gevonden",
+        "description": "Je hebt nog geen batches in je inventaris. Begin met het toevoegen van je eerste batch om vervaldatums bij te houden en voorraadniveaus te beheren.",
+        "addFirstBatch": "Eerste batch toevoegen"
+      },
+      "loadMore": "Meer batches laden ({remaining} resterend)",
+      "loading": "Laden..."
+    },
+    "status": {
+      "active": "Actief",
+      "expired": "Verlopen",
+      "damaged": "Beschadigd",
+      "soldOut": "Uitverkocht",
+      "reserved": "Gereserveerd"
+    },
+    "expiry": {
+      "expired": "Verlopen",
+      "daysLeft": "{days}d over"
     }
   }
 }

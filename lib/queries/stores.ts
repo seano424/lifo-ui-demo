@@ -169,27 +169,35 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
 
 // Fetch user preferences including primary store
 export async function fetchUserPreferences(
-  userId: string,
   serverClient?: ServerClient,
 ): Promise<UserPreferences | null> {
   const supabase = serverClient || createClient()
 
   try {
+    // Don't filter by user_id - let RLS handle it automatically
     const { data, error } = await supabase
       .schema('user_mgmt')
       .from('user_preferences')
       .select('*')
-      .eq('user_id', userId)
-      .single()
+      .maybeSingle() // Use maybeSingle() instead of single()
 
-    if (error && error.code !== 'PGRST116') {
+    if (error) {
       console.error('[fetchUserPreferences] Supabase error:', error)
-      throw new Error(`Failed to fetch user preferences: ${error.message}`)
+      // Handle specific error types
+      if (error.code === 'PGRST116') {
+        return null // No row found - this is OK
+      }
+      throw error
     }
 
-    return data as UserPreferences | null
+    return data
   } catch (err) {
     console.error('[fetchUserPreferences] Unexpected error:', err)
+    // Return null instead of throwing for 406 errors
+    if (err instanceof Error && err.message.includes('406')) {
+      console.warn('Authentication issue, returning null preferences')
+      return null
+    }
     throw err
   }
 }
@@ -215,4 +223,47 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
     console.error('[updateUserPrimaryStore] Unexpected error:', err)
     throw err
   }
+}
+
+// Smart store selection logic
+export function selectDefaultStore(
+  userStores: UserStore[],
+  primaryStoreId: string | null,
+  lastActiveStoreId: string | null,
+): Store | null {
+  if (!userStores || userStores.length === 0) {
+    return null
+  }
+
+  // 1. Try to use last active store if it's still accessible
+  if (lastActiveStoreId) {
+    const lastActiveStore = userStores.find(us => us.store.store_id === lastActiveStoreId)
+    if (lastActiveStore) {
+      return lastActiveStore.store
+    }
+  }
+
+  // 2. Try to use primary store from database if set
+  if (primaryStoreId) {
+    const primaryStore = userStores.find(us => us.store.store_id === primaryStoreId)
+    if (primaryStore) {
+      return primaryStore.store
+    }
+  }
+
+  // 3. Fallback to intelligent defaults
+  // First, try to find a store where user is owner
+  const ownedStore = userStores.find(us => us.role === 'owner')
+  if (ownedStore) {
+    return ownedStore.store
+  }
+
+  // Then try manager role
+  const managedStore = userStores.find(us => us.role === 'manager')
+  if (managedStore) {
+    return managedStore.store
+  }
+
+  // Finally, just use the first store
+  return userStores[0].store
 }

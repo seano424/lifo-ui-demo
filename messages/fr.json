@@ -3,15 +3,70 @@
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "input": "Entrées",
-    "output": "Sorties",
-    "todo": "À faire",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
+    "todos": "À faire",
     "performance": "Performance",
     "milestones": "Étapes",
     "analytics": "Analyses",
     "settings": "Paramètres",
     "helpCenter": "Centre d'aide",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "batches": "Lots",
+    "products": "Produits"
+  },
+  "dashboard": {
+    "quickActions": {
+      "title": "Actions Rapides",
+      "addProducts": {
+        "title": "Ajouter des Produits",
+        "description": "Ajoutez de nouveaux produits à votre inventaire en scannant des codes-barres ou en saisissant manuellement.",
+        "action": "Ajouter des produits"
+      },
+      "todoSuggestions": {
+        "title": "Suggestions de Todo",
+        "description": "Afficher et gérer les tâches suggérées par LIFO.AI pour optimiser votre inventaire.",
+        "action": "Afficher les todos"
+      },
+      "removeProducts": {
+        "title": "Supprimer des Produits",
+        "description": "Enregistrer les ventes, les dons ou les déchets pour les articles quittant votre inventaire.",
+        "action": "Supprimer des produits"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "Aucun Magasin Trouvé",
+        "description": "Vous devez créer un magasin avant de pouvoir gérer des produits. Veuillez configurer votre premier magasin pour continuer.",
+        "tip": {
+          "title": "Pourquoi ai-je besoin d'un magasin?",
+          "description": "Les magasins vous aident à organiser votre inventaire et à suivre les produits de manière efficace. Chaque magasin peut avoir son propre inventaire, ses paramètres et ses membres d'équipe."
+        },
+        "button": "Créer Votre Premier Magasin"
+      }
+    },
+    "kpis": {
+      "title": "Aperçu des métriques clés",
+      "refresh": "Actualiser",
+      "inventory": {
+        "label": "Valeur totale du stock",
+        "subtitle": "lots",
+        "productCount": "produits"
+      },
+      "sales": {
+        "label": "Chiffre d'affaires",
+        "subtitle": "ventes"
+      },
+      "donations": {
+        "label": "Dons",
+        "subtitle": "bénéficiaires"
+      },
+      "waste": {
+        "label": "Coût des déchets",
+        "subtitle": "articles"
+      },
+      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
+    }
   },
   "actions": {
     "add": "Ajouter",
@@ -154,7 +209,8 @@
         "invalidEmail": "Format d'e-mail invalide",
         "invalidWebsite": "URL de site web invalide",
         "descriptionTooLong": "La description est trop longue"
-      }
+      },
+      "addStore": "Ajouter un magasin"
     }
   },
   "users": {
@@ -278,12 +334,18 @@
       "save": "Sauvegarder les modifications",
       "cancel": "Annuler",
       "saving": "Sauvegarde...",
+      "saveChanges": "Enregistrer les modifications",
       "validation": {
         "nameRequired": "Le nom complet est requis",
         "nameTooLong": "Le nom complet doit contenir moins de 100 caractères",
         "usernameRequired": "Le nom d'utilisateur doit contenir au moins 2 caractères",
         "usernameTooLong": "Le nom d'utilisateur doit contenir moins de 50 caractères",
         "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas"
+      },
+      "placeholders": {
+        "fullName": "Entrez votre nom complet",
+        "email": "Entrez votre adresse e-mail",
+        "username": "Entrez votre nom d'utilisateur"
       }
     },
     "phone": {
@@ -333,6 +395,8 @@
     "more": "Plus"
   },
   "breadcrumbs": {
+    "batches": "Lots",
+    "billing": "Facturations",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
     "input": "Entrées",
@@ -340,7 +404,7 @@
     "analytics": "Analyses",
     "performance": "Performance",
     "milestones": "Étapes",
-    "todo": "À faire",
+    "todos": "À faire",
     "settings": "Paramètres",
     "store": "Magasin",
     "team": "Équipe",
@@ -354,7 +418,8 @@
     "account": "Compte",
     "profile": "Profil",
     "help": "Aide",
-    "support": "Support"
+    "support": "Support",
+    "addStore": "Ajouter un magasin"
   },
   "addEmployee": {
     "title": "Ajouter un nouvel employé",
@@ -390,7 +455,7 @@
     "preview": {
       "username": "Nom d'utilisateur:",
       "pin": "PIN:",
-      "pinNote": "Sera généré automatiquement (4 chiffres)",
+      "pinNote": "Sera généré automatiquement (6 chiffres)",
       "loginNote": "L'employé peut se connecter en utilisant l'onglet \"Employé\" avec son nom d'utilisateur et son PIN"
     },
     "buttons": {
@@ -465,6 +530,195 @@
       "signup": "Inscription entreprise",
       "logout": "Déconnexion",
       "goToDashboard": "Aller au tableau de bord"
+    }
+  },
+  "errors": {
+    "pageNotFoundTitle": "Page non trouvée",
+    "pageNotFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backToHome": "Retour à l'accueil",
+    "goBack": "Retour",
+    "needHelp": "Besoin d'aide ?",
+    "contactSupport": "Contactez notre équipe de support"
+  },
+  "landingpage": {
+    "hero": {
+      "title": "L'avenir de la gestion des stocks est là.",
+      "subtitle": "La solution intelligente pour réduire le gaspillage et augmenter vos bénéfices",
+      "buttons": {
+        "freeTrial": "Démarrer mon essai gratuit",
+        "explore": "Explorer la plateforme"
+      },
+      "badge": {
+        "text": "Profitez d'un essai gratuit de 14 jours"
+      }
+    },
+    "features": {
+      "title": "Révolutionnez votre gestion de stock",
+      "expiryTracking": {
+        "title": "Suivi des dates d'expiration en temps réel",
+        "description": "Ne manquez plus jamais une date d'expiration grâce à la surveillance automatisée de tout votre inventaire."
+      },
+      "predictiveAlerts": {
+        "title": "Alertes prédictives",
+        "description": "Réduisez considérablement vos pertes grâce aux notifications alimentées par l'IA avant l'expiration des produits."
+      },
+      "timeSaving": {
+        "title": "Gain de temps",
+        "description": "Réduction énorme du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
+      },
+      "errorFree": {
+        "title": "Opérations sans erreur",
+        "description": "Élimination des erreurs humaines et des tâches administratives."
+      },
+      "discoverButton": "Découvrir LIFO",
+      "noCommitment": "Sans engagement !"
+    },
+    "businessStats": {
+      "title": "Maximisez vos profits, minimisez vos pertes",
+      "revenue": {
+        "label": "Augmentation des revenus",
+        "description": "Augmentation moyenne des revenus commerciaux",
+        "subtext": "Suggestions automatiques de remises pour écouler rapidement les produits avant leur expiration."
+      },
+      "lossReduction": {
+        "label": "Réduction des pertes",
+        "description": "Réduisez facilement les déchets et économisez de l'argent",
+        "subtext": "Moins de produits périmés tout en réduisant le travail de gestion des stocks."
+      },
+      "taxCredits": {
+        "label": "Crédits d'impôt",
+        "description": "Dès le premier mois sur les dons",
+        "subtext": "Augmentez vos dons déductibles d'impôts en vous connectant avec une organisation à but non lucratif."
+      }
+    },
+    "cta": {
+      "title": "Passez à LIFO aujourd'hui",
+      "features": {
+        "quickSetup": {
+          "title": "Installation rapide",
+          "description": "Solution prête à l'emploi en quelques minutes. Aucune configuration complexe requise."
+        },
+        "freeTrial": {
+          "title": "Essai gratuit de 30 jours",
+          "description": "Testez toutes les fonctionnalités sans engagement. Résiliation facile à tout moment."
+        },
+        "support": {
+          "title": "Support dédié",
+          "description": "Notre équipe d'experts vous guide à chaque étape de votre parcours."
+        },
+        "immediateResults": {
+          "title": "Résultats immédiats",
+          "description": "Réduisez les déchets et augmentez les bénéfices dès la première semaine d'utilisation."
+        }
+      },
+      "card": {
+        "title": "Prêt à transformer votre gestion de stock ?",
+        "description": "Rejoignez LIFO pour optimiser votre inventaire et maximiser vos profits.",
+        "benefits": {
+          "noCommitment": "Sans engagement",
+          "instantSetup": "Installation instantanée",
+          "support": "Support 24/7"
+        },
+        "button": "Rejoindre la liste d'attente",
+        "noCreditCard": "Aucune carte de crédit requise"
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous aider",
+    "description": "Une question, une suggestion ou besoin d'assistance ? Notre équipe est prête à vous accompagner.",
+    "form": {
+      "title": "Envoyez-nous un message",
+      "description": "Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les plus brefs délais.",
+      "name": "Nom",
+      "namePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Sujet de votre message",
+      "message": "Message",
+      "messagePlaceholder": "Votre message...",
+      "submit": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "success": "Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.",
+      "error": "Une erreur est survenue lors de l'envoi du message"
+    },
+    "api": {
+      "allFieldsRequired": "Tous les champs sont requis",
+      "emailSendingFailed": "Échec de l'envoi de l'email",
+      "internalServerError": "Erreur interne du serveur"
+    },
+    "features": {
+      "support": {
+        "title": "Support réactif",
+        "description": "Notre équipe répond généralement sous 24h ouvrées à toutes vos demandes."
+      },
+      "expertise": {
+        "title": "Expertise dédiée",
+        "description": "Des experts spécialisés dans la gestion d'inventaire pour répondre à vos questions."
+      },
+      "followup": {
+        "title": "Suivi personnalisé",
+        "description": "Chaque demande est traitée individuellement avec un suivi personnalisé."
+      }
+    }
+  },
+  "footer": {
+    "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
+    "quickLinks": "Liens Rapides",
+    "links": {
+      "aboutUs": "À Propos",
+      "products": "Produits",
+      "pricing": "Tarifs",
+      "blog": "Blog"
+    },
+    "contactUs": "Contactez-Nous",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Tous droits réservés.",
+    "legal": {
+      "privacyPolicy": "Politique de Confidentialité",
+      "termsOfService": "Conditions d'Utilisation"
+    }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "N° de lot",
+        "product": "Produit",
+        "supplier": "Fournisseur",
+        "expiryDate": "Date d'expiration",
+        "stock": "Stock",
+        "costPrice": "Prix de revient",
+        "sellPrice": "Prix de vente",
+        "status": "Statut",
+        "location": "Emplacement"
+      },
+      "actions": {
+        "viewDetails": "Voir les détails",
+        "editBatch": "Modifier le lot",
+        "markAsExpired": "Marquer comme expiré",
+        "markAsDamaged": "Marquer comme endommagé",
+        "deleteBatch": "Supprimer le lot"
+      },
+      "emptyState": {
+        "title": "Aucun lot trouvé",
+        "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock.",
+        "addFirstBatch": "Ajouter le premier lot"
+      },
+      "loadMore": "Charger plus de lots ({remaining} restants)",
+      "loading": "Chargement en cours..."
+    },
+    "status": {
+      "active": "Actif",
+      "expired": "Expiré",
+      "damaged": "Endommagé",
+      "soldOut": "Épuisé",
+      "reserved": "Réservé"
+    },
+    "expiry": {
+      "expired": "Expiré",
+      "daysLeft": "{days}j restants"
     }
   }
 }

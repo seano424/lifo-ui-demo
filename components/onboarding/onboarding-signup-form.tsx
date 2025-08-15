@@ -56,6 +56,12 @@ export function OnboardingSignUpForm({
     console.log('👤 currentUser:', currentUser)
 
     // Validation
+    if (ONBOARDING_MODE === 'production' && password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setIsLoading(false)
+      return
+    }
+
     if (password !== confirmPassword) {
       setError('Passwords do not match')
       setIsLoading(false)
@@ -309,12 +315,12 @@ export function OnboardingSignUpForm({
                       type="password"
                       showPasswordToggle
                       required
-                      minLength={8}
+                      minLength={6}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                     />
                     <Typography variant="p" color="muted">
-                      Must be at least 8 characters
+                      Must be at least 6 characters
                     </Typography>
                   </div>
 

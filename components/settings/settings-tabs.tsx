@@ -13,6 +13,11 @@ export default function SettingsTabs() {
   const isNotificationsSettings = pathname.includes('/notifications')
   const isAccountSettings = pathname.includes('/account')
   const isTeamSettings = pathname.includes('/team')
+  const isAddStoreSettings = pathname.includes('/add-store')
+
+  if (isAddStoreSettings) {
+    return null
+  }
 
   return (
     <div className="max-w-5xl mx-auto flex gap-4">

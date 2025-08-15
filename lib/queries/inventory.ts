@@ -7,6 +7,7 @@
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 import { BATCH_SOURCES } from '@/types/inventory'
+import { Json } from '@/types/supabase'
 
 export interface ScannedProductData {
   barcode: string
@@ -133,7 +134,7 @@ async function upsertGlobalProduct(
           updates.category = productData.category
         }
         if (productData.openFoodFactsData && !existingProduct.open_food_facts_data) {
-          updates.open_food_facts_data = productData.openFoodFactsData
+          updates.open_food_facts_data = productData.openFoodFactsData as Json
         }
 
         // Only update if we have meaningful changes
@@ -175,7 +176,7 @@ async function upsertGlobalProduct(
       typical_shelf_life_days: calculateShelfLifeFromCategory(productData.category),
       base_cost_price: productData.costPrice,
       base_selling_price: productData.sellingPrice,
-      open_food_facts_data: productData.openFoodFactsData || null,
+      open_food_facts_data: (productData.openFoodFactsData as Json) || null,
       created_by: (await supabase.auth.getUser()).data.user?.id || null,
       total_stock: 0, // Will be updated by database triggers
       active_batches_count: 0, // Will be updated by database triggers
@@ -320,7 +321,7 @@ async function createProductBatch(
       product_id: productId,
       store_id: productData.storeId,
       supplier: 'Scanned Entry',
-      manufacture_date: null, // Could be extracted from OCR in the future
+      manufacture_date: new Date().toISOString(), // Could be extracted from OCR in the future
       expiry_date: productData.expiryDate,
       received_date: new Date().toISOString(), // Today
       initial_quantity: productData.quantity,

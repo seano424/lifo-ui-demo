@@ -7,9 +7,8 @@ import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
 
-export default function InputPage() {
+export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
-
   return (
     <div className="max-w-screen-lg mx-auto space-y-6">
       <Tabs defaultValue="scan" className="w-full">
