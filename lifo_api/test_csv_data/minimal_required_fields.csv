@@ -1,0 +1,6 @@
+sku,product_name,category,quantity,expiry_date
+MIN-001,Minimal Product 1,dairy,10,2025-08-30
+MIN-002,Minimal Product 2,fresh_produce,25,2025-08-25
+MIN-003,Minimal Product 3,bakery_fresh,15,2025-08-20
+MIN-004,Minimal Product 4,beverages,50,2025-12-31
+MIN-005,Minimal Product 5,dry_goods,100,2026-06-15

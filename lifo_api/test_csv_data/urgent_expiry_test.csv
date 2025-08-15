@@ -1,0 +1,11 @@
+sku,product_name,category,quantity,expiry_date,brand,cost_price,selling_price,location_code
+URGENT-001,Expired Yogurt,dairy,15,2025-08-10,Dairy Co,1.50,3.99,DAIRY-1
+URGENT-002,Expiring Today Bread,bakery_fresh,8,2025-08-11,Bakery Fresh,2.00,5.99,BAKERY
+URGENT-003,Tomorrow Expiry Milk,dairy,25,2025-08-12,Fresh Dairy,1.20,2.99,DAIRY-1
+URGENT-004,Critical Fish,fresh_meat_fish,6,2025-08-11,Ocean Co,15.00,29.99,FISH-COUNTER
+URGENT-005,High Value Cheese,dairy,12,2025-08-13,Premium Cheese,8.00,18.99,DAIRY-2
+URGENT-006,Expensive Steaks,fresh_meat_fish,4,2025-08-12,Prime Beef,25.00,49.99,MEAT-PREMIUM
+URGENT-007,Large Quantity Salad,fresh_produce,100,2025-08-12,Green Fields,1.00,3.99,PRODUCE-A
+URGENT-008,High Margin Item,general,20,2025-08-13,Luxury Brand,5.00,25.99,MAIN
+URGENT-009,Zero Margin Alert,general,10,2025-08-14,Test Brand,10.00,10.00,MAIN
+URGENT-010,Loss Leader,beverages,50,2025-08-13,Popular Brand,3.00,2.99,BEVERAGES
