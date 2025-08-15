@@ -14,6 +14,7 @@ import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
 
 import BatchesHeader from '@/components/batches/batches-header'
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
+import { NoStoresError } from '@/components/dashboard/no-stores-error'
 
 interface InventoryBatchesPageProps {
   searchParams: Promise<{
@@ -61,8 +62,8 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     const preferences = await fetchUserPreferences(serverClient)
 
     if (stores.length === 0) {
-      // User has no stores - redirect to onboarding or show error
-      redirect('/onboarding')
+      // User has no stores - show error instead of redirecting
+      return <NoStoresError />
     }
 
     // Determine which store to prefetch data for

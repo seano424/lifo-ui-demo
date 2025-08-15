@@ -44,7 +44,7 @@ export interface CurrentUserStoreRole {
 // Enhanced useUsers hook with new filtering options
 export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   console.log('[useUsers] Called with filters:', filters, 'pageSize:', pageSize)
-  
+
   const result = useInfiniteQuery({
     queryKey: queryKeys.users.infinite(filters),
     queryFn: ({ pageParam = 0 }) => {
@@ -56,8 +56,15 @@ export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
   })
 
   const data = result.data?.pages.flatMap(page => page.data) ?? []
-  
-  console.log('[useUsers] Result - data count:', data.length, 'isLoading:', result.isLoading, 'hasMore:', result.hasNextPage)
+
+  console.log(
+    '[useUsers] Result - data count:',
+    data.length,
+    'isLoading:',
+    result.isLoading,
+    'hasMore:',
+    result.hasNextPage,
+  )
 
   return {
     data,
@@ -75,7 +82,7 @@ export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
 // Enhanced useCurrentUser hook
 export function useCurrentUser() {
   console.log('[useCurrentUser] Hook called')
-  
+
   return useQuery({
     queryKey: queryKeys.auth.currentUser(),
     queryFn: async (): Promise<User> => {
@@ -85,7 +92,7 @@ export function useCurrentUser() {
         data: { user },
         error,
       } = await supabase.auth.getUser()
-      
+
       console.log('[useCurrentUser] Supabase response - user:', user?.id, 'error:', error)
 
       if (error || !user) {
@@ -134,7 +141,7 @@ export function useCurrentUser() {
         username: transformedUser.username,
         full_name: transformedUser.full_name,
         language: transformedUser.language_preference,
-        phone: transformedUser.phone
+        phone: transformedUser.phone,
       })
       return transformedUser as User
     },
@@ -168,7 +175,12 @@ export function useCurrentUserStoreRole() {
         throw new Error('Not authenticated')
       }
 
-      console.log('[useCurrentUserStoreRole] Fetching store role for user:', user.id, 'store:', activeStoreId)
+      console.log(
+        '[useCurrentUserStoreRole] Fetching store role for user:',
+        user.id,
+        'store:',
+        activeStoreId,
+      )
       const { data: storeUserData, error: storeUserError } = await supabase.rpc(
         'get_user_store_role',
         {
@@ -176,7 +188,12 @@ export function useCurrentUserStoreRole() {
           p_store_id: activeStoreId,
         },
       )
-      console.log('[useCurrentUserStoreRole] RPC response - data:', storeUserData, 'error:', storeUserError)
+      console.log(
+        '[useCurrentUserStoreRole] RPC response - data:',
+        storeUserData,
+        'error:',
+        storeUserError,
+      )
 
       if (storeUserError) {
         throw new Error(`Failed to get store role: ${storeUserError.message}`)
@@ -205,7 +222,7 @@ export function useCurrentUserStoreRole() {
         storeName: currentUserStoreRole.storeName,
         role: currentUserStoreRole.role,
         isActive: currentUserStoreRole.isActive,
-        permissions: Object.keys(currentUserStoreRole.permissions || {})
+        permissions: Object.keys(currentUserStoreRole.permissions || {}),
       })
       return currentUserStoreRole
     },
@@ -306,8 +323,17 @@ export function usePermissions() {
     storeId,
     storeName,
   } = useCurrentUserStoreRole()
-  
-  console.log('[usePermissions] Hook called - currentUser:', currentUser?.id, 'storeId:', storeId, 'storeName:', storeName, 'role:', storeRole?.role)
+
+  console.log(
+    '[usePermissions] Hook called - currentUser:',
+    currentUser?.id,
+    'storeId:',
+    storeId,
+    'storeName:',
+    storeName,
+    'role:',
+    storeRole?.role,
+  )
 
   const { data: globalRoles } = useCurrentUserRoles()
   const isLoading = isLoadingUser || isLoadingStoreRole

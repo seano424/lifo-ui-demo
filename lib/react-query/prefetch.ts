@@ -1,10 +1,10 @@
 import { dehydrate } from '@tanstack/react-query'
 import { createQueryClient } from './client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
 import { fetchCurrentUser } from '@/lib/queries/users'
-import { fetchUserStores } from '@/lib/queries/stores'
+import { fetchUserStores, fetchUserPreferences, selectDefaultStore } from '@/lib/queries/stores'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 
 export async function createPrefetchedQuery() {
   const queryClient = createQueryClient()
@@ -73,14 +73,25 @@ export async function prefetchDashboardData() {
       staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
     })
 
-    // Get active store from cookies and prefetch it
-    const cookieStore = await cookies()
-    const lastActiveStoreId = cookieStore.get('activeStoreId')?.value
+    // Fetch user preferences
+    const userPreferences = await fetchUserPreferences(supabase)
 
-    let targetStore = userStores.find(us => us.store.store_id === lastActiveStoreId)?.store
-    if (!targetStore && userStores.length > 0) {
-      targetStore = userStores[0].store
-    }
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.userPreferences.detail(user.id),
+      queryFn: () => userPreferences,
+      staleTime: 5 * 60 * 1000,
+    })
+
+    // Get active store from cookies and use smart selection
+    const lastActiveStoreId = await getActiveStoreCookie()
+    const primaryStoreId = userPreferences?.primary_store_id
+
+    // Use smart selection logic
+    const targetStore = selectDefaultStore(
+      userStores,
+      primaryStoreId || null,
+      lastActiveStoreId || null,
+    )
 
     if (targetStore) {
       await queryClient.prefetchQuery({

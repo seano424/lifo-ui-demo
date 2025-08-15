@@ -9,6 +9,7 @@ import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
 
 import ProductsHeader from '@/components/products/products-header'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
+import { NoStoresError } from '@/components/dashboard/no-stores-error'
 
 interface InventoryProductsPageProps {
   searchParams: Promise<{
@@ -54,10 +55,9 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
     const preferences = await fetchUserPreferences(serverClient)
 
     if (stores.length === 0) {
-      // User has no stores - redirect to onboarding or show error
-      redirect('/onboarding')
+      // User has no stores - show error instead of redirecting
+      return <NoStoresError />
     }
-
     // Determine which store to prefetch data for
     const primaryStoreId = preferences?.primary_store_id
     const primaryStore = stores.find(s => s.store.store_id === primaryStoreId)

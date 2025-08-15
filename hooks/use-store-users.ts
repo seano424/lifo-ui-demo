@@ -20,7 +20,14 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
   const result = useInfiniteQuery({
     queryKey: queryKeys.storeUsers.infinite(activeStoreId || '', filters), // ✅ Centralized keys
     queryFn: ({ pageParam = 0 }) => {
-      console.log('[useStoreUsers] Fetching page:', pageParam, 'for store:', activeStoreId, 'with filters:', filters)
+      console.log(
+        '[useStoreUsers] Fetching page:',
+        pageParam,
+        'for store:',
+        activeStoreId,
+        'with filters:',
+        filters,
+      )
       if (!activeStoreId) {
         console.log('[useStoreUsers] Error: No activeStoreId')
         throw new Error('Store ID is required for fetching store users') // ✅ Same validation as products
@@ -34,8 +41,15 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
 
   // Flatten pages into single array
   const data = result.data?.pages.flatMap(page => page.data) ?? []
-  
-  console.log('[useStoreUsers] Result - data count:', data.length, 'isLoading:', result.isLoading, 'storeId:', activeStoreId)
+
+  console.log(
+    '[useStoreUsers] Result - data count:',
+    data.length,
+    'isLoading:',
+    result.isLoading,
+    'storeId:',
+    activeStoreId,
+  )
 
   return {
     data,
@@ -117,7 +131,14 @@ export function useStoreUserActions() {
         pin_permissions?: Record<string, unknown>
       }
     }) => {
-      console.log('[useStoreUserActions.updateMutation] Updating user:', userId, 'in store:', activeStoreId, 'with updates:', updates)
+      console.log(
+        '[useStoreUserActions.updateMutation] Updating user:',
+        userId,
+        'in store:',
+        activeStoreId,
+        'with updates:',
+        updates,
+      )
       if (!activeStoreId) {
         throw new Error('Store ID is required for updating store user') // ✅ Validation
       }
@@ -197,7 +218,12 @@ export function useStoreUserActions() {
   // Remove user from store mutation
   const removeMutation = useMutation({
     mutationFn: (userId: string) => {
-      console.log('[useStoreUserActions.removeMutation] Removing user:', userId, 'from store:', activeStoreId)
+      console.log(
+        '[useStoreUserActions.removeMutation] Removing user:',
+        userId,
+        'from store:',
+        activeStoreId,
+      )
       if (!activeStoreId) {
         throw new Error('Store ID is required for removing store user')
       }
@@ -231,7 +257,14 @@ export function useStoreUserActions() {
       permissions?: Record<string, boolean>
       assignedBy?: string
     }) => {
-      console.log('[useStoreUserActions.addMutation] Adding user:', userId, 'to store:', activeStoreId, 'as:', roleInStore)
+      console.log(
+        '[useStoreUserActions.addMutation] Adding user:',
+        userId,
+        'to store:',
+        activeStoreId,
+        'as:',
+        roleInStore,
+      )
       if (!activeStoreId) {
         throw new Error('Store ID is required for adding store user')
       }
