@@ -30,51 +30,39 @@ export function NoStoresError({
         transition={{ duration: 0.5 }}
         className="w-full max-w-[340px] sm:max-w-md"
       >
-        <Card className="border border-red-200 dark:border-red-900/30 shadow-lg overflow-hidden">
-          <CardHeader className="pb-4 pt-5 sm:pt-6 px-4 sm:px-6 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20">
+        <Card className="border border-destructive/30 shadow-lg overflow-hidden">
+          <CardHeader className="pb-4 pt-5 sm:pt-6 px-4 sm:px-6 bg-destructive/10 dark:bg-destructive/20">
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-2 sm:p-3">
-                <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 dark:text-red-400" />
+              <div className="rounded-full bg-destructive/20 dark:bg-destructive/30 p-2.5 sm:p-3.5">
+                <AlertTriangle className="h-7 w-7 sm:h-8 sm:w-8 text-destructive" />
               </div>
-              <Typography
-                variant="h3"
-                className="text-lg sm:text-xl font-bold text-red-700 dark:text-red-400"
-              >
+              <Typography variant="h3" className="text-lg sm:text-2xl font-bold text-destructive">
                 {t('noStores.title')}
               </Typography>
             </div>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
-            <Typography
-              variant="p"
-              className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4"
-            >
+            <Typography variant="p" className="text-sm sm:text-base text-muted-foreground mb-4">
               {t('noStores.description')}
             </Typography>
-            <div className="bg-amber-50 dark:bg-amber-900/20 p-3 sm:p-4 rounded-lg border border-amber-200 dark:border-amber-800/30 mb-2">
-              <div className="flex items-start gap-3">
-                <Store className="h-20 w-20 text-amber-600 dark:text-amber-400 mt-0.5" />
+            <div className="bg-primary/5 p-3 sm:p-4 rounded-lg border border-primary/25 mb-2">
+              <div className="flex items-start gap-4">
+                <Store className="h-12 w-12 sm:h-20 sm:w-20 text-primary-600" />
                 <div>
-                  <Typography
-                    variant="p"
-                    className="text-xs sm:text-sm font-medium text-amber-800 dark:text-amber-300"
-                  >
+                  <Typography variant="p" className="text-xs sm:text-lg font-bold text-primary-600">
                     {t('noStores.tip.title')}
                   </Typography>
-                  <Typography
-                    variant="p"
-                    className="text-xs sm:text-sm text-amber-700 dark:text-amber-400 mt-1"
-                  >
+                  <Typography variant="p" className="text-xs sm:text-sm text-muted-foreground mt-1">
                     {t('noStores.tip.description')}
                   </Typography>
                 </div>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="bg-gradient-to-r from-red-50/50 to-red-100/50 dark:from-red-950/10 dark:to-red-900/10 p-4 sm:p-6 border-t border-red-100 dark:border-red-900/20">
+          <CardFooter className="bg-destructive/5 dark:bg-destructive/10 p-4 sm:p-6 border-t border-destructive/20 dark:border-destructive/30">
             <Link href={redirectPath} className="w-full">
               <Button
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-1.5 sm:py-2 text-sm sm:text-base"
+                className="w-full bg-gradient-to-r from-primary to-secondary-900 hover:bg-gradient-to-r hover:from-primary/90 hover:to-secondary-900/90 text-primary-foreground font-medium py-1.5 sm:py-2 text-sm sm:text-base shadow-md"
                 size="default"
                 type="button"
               >
