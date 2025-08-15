@@ -269,8 +269,12 @@ class UnifiedCSVProcessor:
 
         # Filename validation
         if file_path:
-            # Check for path traversal
-            if ".." in file_path or "/" in file_path or "\\" in file_path:
+            # Extract just the filename for security validation
+            import os
+            filename = os.path.basename(file_path)
+            
+            # Check for path traversal in the filename only
+            if ".." in filename:
                 raise SecurityViolation("Path traversal detected in filename")
 
             # Check file extension

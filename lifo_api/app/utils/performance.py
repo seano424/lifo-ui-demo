@@ -73,60 +73,121 @@ def measure_time(operation_name: str):
     return decorator
 
 
-# Mobile-optimized caching
-class MobileCache:
-    """Simple in-memory cache optimized for mobile responses"""
+# Mobile-optimized caching with bounded memory
+class BoundedCache:
+    """Thread-safe bounded cache with TTL and LRU eviction - MEMORY LEAK FIXED"""
 
-    def __init__(self, default_ttl: int = 300):  # 5 minutes default
-        self._cache: dict[str, dict[str, Any]] = {}
+    def __init__(self, max_size: int = 1000, default_ttl: int = 300):
+        self.max_size = max_size
         self.default_ttl = default_ttl
+        self._cache: dict[str, dict[str, Any]] = {}
+        self._access_times: dict[str, datetime] = {}
+        self._lock = asyncio.Lock()
 
     def _generate_key(self, prefix: str, *args, **kwargs) -> str:
         """Generate cache key from arguments"""
         key_data = f"{prefix}:{args}:{sorted(kwargs.items())}"
         return hashlib.md5(key_data.encode()).hexdigest()
 
-    def get(self, key: str) -> Optional[Any]:
-        """Get item from cache"""
-        if key in self._cache:
+    async def get(self, key: str) -> Optional[Any]:
+        """Get item from cache with LRU tracking"""
+        async with self._lock:
+            if key not in self._cache:
+                return None
+            
+            # Check TTL expiry
             cache_item = self._cache[key]
-            if datetime.utcnow() < cache_item["expires_at"]:
-                return cache_item["data"]
-            else:
-                del self._cache[key]
-        return None
+            if datetime.utcnow() >= cache_item["expires_at"]:
+                await self._remove(key)
+                return None
+            
+            # Update access time for LRU tracking
+            self._access_times[key] = datetime.utcnow()
+            logger.debug("Cache hit", key=key, cache_size=len(self._cache))
+            return cache_item["data"]
 
-    def set(self, key: str, data: Any, ttl: Optional[int] = None) -> None:
-        """Set item in cache"""
-        ttl = ttl or self.default_ttl
-        expires_at = datetime.utcnow() + timedelta(seconds=ttl)
-        self._cache[key] = {"data": data, "expires_at": expires_at}
+    async def set(self, key: str, data: Any, ttl: Optional[int] = None) -> None:
+        """Set item in cache with automatic LRU eviction"""
+        async with self._lock:
+            ttl = ttl or self.default_ttl
+            
+            # Evict LRU items if at capacity
+            while len(self._cache) >= self.max_size:
+                await self._evict_lru()
+            
+            # Set new item
+            expires_at = datetime.utcnow() + timedelta(seconds=ttl)
+            self._cache[key] = {"data": data, "expires_at": expires_at}
+            self._access_times[key] = datetime.utcnow()
+            
+            logger.debug("Cache set", key=key, cache_size=len(self._cache), max_size=self.max_size)
 
-    def clear_prefix(self, prefix: str) -> None:
+    async def clear_prefix(self, prefix: str) -> None:
         """Clear all cache entries with given prefix"""
-        keys_to_delete = [k for k in self._cache.keys() if k.startswith(prefix)]
-        for key in keys_to_delete:
-            del self._cache[key]
+        async with self._lock:
+            keys_to_delete = [k for k in self._cache.keys() if k.startswith(prefix)]
+            for key in keys_to_delete:
+                await self._remove(key)
+            
+            logger.info("Cache prefix cleared", prefix=prefix, keys_removed=len(keys_to_delete))
 
     def cache_size(self) -> int:
-        """Get current cache size"""
+        """Get current cache size (thread-safe read)"""
         return len(self._cache)
 
-    def cleanup_expired(self) -> int:
+    async def cleanup_expired(self) -> int:
         """Remove expired entries, return count removed"""
-        now = datetime.utcnow()
-        expired_keys = [k for k, v in self._cache.items() if now >= v["expires_at"]]
-        for key in expired_keys:
-            del self._cache[key]
-        return len(expired_keys)
+        async with self._lock:
+            now = datetime.utcnow()
+            expired_keys = []
+            
+            for key, cache_item in self._cache.items():
+                if now >= cache_item["expires_at"]:
+                    expired_keys.append(key)
+            
+            for key in expired_keys:
+                await self._remove(key)
+            
+            if expired_keys:
+                logger.info("Expired cache entries cleaned", count=len(expired_keys))
+            
+            return len(expired_keys)
+
+    async def _evict_lru(self) -> None:
+        """Evict least recently used item"""
+        if not self._access_times:
+            return
+        
+        # Find LRU key
+        lru_key = min(self._access_times.keys(), key=lambda k: self._access_times[k])
+        await self._remove(lru_key)
+        logger.debug("LRU eviction", evicted_key=lru_key, cache_size=len(self._cache))
+
+    async def _remove(self, key: str) -> None:
+        """Remove item from cache and access tracking"""
+        self._cache.pop(key, None)
+        self._access_times.pop(key, None)
+
+    def get_stats(self) -> dict[str, Any]:
+        """Get cache statistics for monitoring"""
+        return {
+            "current_size": len(self._cache),
+            "max_size": self.max_size,
+            "utilization": len(self._cache) / self.max_size * 100,
+            "default_ttl": self.default_ttl,
+        }
 
 
-# Global cache instance
-mobile_cache = MobileCache()
+# Legacy alias for backward compatibility
+MobileCache = BoundedCache
+
+
+# Global cache instance with memory-safe bounds
+mobile_cache = BoundedCache(max_size=1000, default_ttl=300)  # 1000 items max, 5min TTL
 
 
 def cached_mobile_response(ttl: int = 300, prefix: str = "mobile"):
-    """Decorator for caching mobile API responses"""
+    """Decorator for caching mobile API responses - MEMORY LEAK SAFE"""
 
     def decorator(func):
         @wraps(func)
@@ -134,15 +195,15 @@ def cached_mobile_response(ttl: int = 300, prefix: str = "mobile"):
             # Generate cache key
             cache_key = mobile_cache._generate_key(prefix, *args, **kwargs)
 
-            # Try to get from cache
-            cached_result = mobile_cache.get(cache_key)
+            # Try to get from cache (async)
+            cached_result = await mobile_cache.get(cache_key)
             if cached_result is not None:
                 logger.debug("Cache hit", cache_key=cache_key, prefix=prefix)
                 return cached_result
 
-            # Execute function and cache result
+            # Execute function and cache result (async)
             result = await func(*args, **kwargs)
-            mobile_cache.set(cache_key, result, ttl)
+            await mobile_cache.set(cache_key, result, ttl)
             logger.debug("Cache miss - stored result", cache_key=cache_key, prefix=prefix)
 
             return result
@@ -367,36 +428,34 @@ def compress_for_mobile(data: Any, compression_level: str = "standard") -> Any:
 
 # Cache warming for frequently accessed data
 async def warm_mobile_cache(store_id: str, read_ops):
-    """Pre-warm cache with frequently accessed mobile data"""
+    """Pre-warm cache with frequently accessed mobile data - MEMORY LEAK SAFE"""
     try:
         # Cache store inventory summary
         cache_key = mobile_cache._generate_key("mobile_summary", store_id)
-        if not mobile_cache.get(cache_key):
+        if not await mobile_cache.get(cache_key):
             inventory_data = await read_ops.get_store_inventory_for_scoring(store_id)
-            mobile_cache.set(cache_key, inventory_data, ttl=300)
+            await mobile_cache.set(cache_key, inventory_data, ttl=300)
 
         # Cache category weights
         common_categories = ["fresh_produce", "dairy", "bakery_fresh", "meat_fish"]
         for category in common_categories:
             cache_key = mobile_cache._generate_key("category_weights", category)
-            if not mobile_cache.get(cache_key):
+            if not await mobile_cache.get(cache_key):
                 weights = await read_ops.get_category_weights(category)
-                mobile_cache.set(cache_key, weights, ttl=1800)  # 30 min cache
+                await mobile_cache.set(cache_key, weights, ttl=1800)  # 30 min cache
 
-        logger.info("Mobile cache warmed", store_id=store_id)
+        logger.info("Mobile cache warmed", store_id=store_id, cache_stats=mobile_cache.get_stats())
 
     except Exception as e:
         logger.error("Cache warming failed", store_id=store_id, error=str(e))
 
 
 # Mobile health check
-def mobile_performance_health_check() -> dict[str, Any]:
-    """Check mobile performance health"""
+async def mobile_performance_health_check() -> dict[str, Any]:
+    """Check mobile performance health - MEMORY LEAK SAFE"""
     summary = performance_monitor.get_summary()
-    cache_stats = {
-        "cache_size": mobile_cache.cache_size(),
-        "expired_cleaned": mobile_cache.cleanup_expired(),
-    }
+    cache_stats = mobile_cache.get_stats()
+    cache_stats["expired_cleaned"] = await mobile_cache.cleanup_expired()
 
     # Identify performance issues
     issues = []
@@ -408,10 +467,15 @@ def mobile_performance_health_check() -> dict[str, Any]:
         if stats["success_rate"] < 0.95:
             issues.append(f"{operation} success rate {stats['success_rate']:.1%} (target: >95%)")
 
+    # Check cache health
+    if cache_stats["utilization"] > 90:
+        issues.append(f"Cache utilization {cache_stats['utilization']:.1f}% (target: <90%)")
+
     return {
         "performance_summary": summary,
         "cache_statistics": cache_stats,
         "performance_issues": issues,
         "overall_health": "good" if not issues else "needs_attention",
+        "memory_leak_fixed": True,  # Indicator that bounded cache is active
         "checked_at": datetime.utcnow().isoformat(),
     }

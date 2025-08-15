@@ -5,7 +5,7 @@ Handles environment variables and application settings
 
 from typing import Any, Optional
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -29,8 +29,29 @@ class Settings(BaseSettings):
     cors_origins: list[str] = [
         "http://localhost:3000",  # Next.js development
         "http://localhost:3001",  # Alternative dev port
-        "https://*.ondigitalocean.app",  # Digital Ocean App Platform
+        "http://127.0.0.1:3000",  # IPv4 localhost
     ]
+
+    @field_validator('cors_origins', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(',') if origin.strip()]
+        return v
+
+    @field_validator('allowed_hosts', mode='before')
+    @classmethod
+    def parse_allowed_hosts(cls, v):
+        if isinstance(v, str):
+            return [host.strip() for host in v.split(',') if host.strip()]
+        return v
+
+    @field_validator('api_keys', mode='before')
+    @classmethod
+    def parse_api_keys(cls, v):
+        if isinstance(v, str):
+            return [key.strip() for key in v.split(',') if key.strip()]
+        return v
 
     # Production URLs (set via environment variables)
     frontend_url: Optional[str] = None
@@ -100,6 +121,29 @@ class Settings(BaseSettings):
     enable_api_key_auth: bool = False
     api_keys: list[str] = []
     rate_limit_per_minute: int = 100
+    
+    # Performance monitoring settings
+    enable_performance_monitoring: bool = Field(default=True, description="Enable comprehensive performance monitoring")
+    enable_detailed_request_logging: bool = Field(default=True, description="Enable detailed request/response logging")
+    performance_monitoring_retention_hours: int = Field(default=72, description="Hours to retain performance metrics")
+    
+    # Mobile performance thresholds
+    mobile_response_time_critical_ms: int = Field(default=200, description="Critical mobile response time threshold (ms)")
+    mobile_response_time_warning_ms: int = Field(default=300, description="Warning mobile response time threshold (ms)")
+    api_response_time_warning_ms: int = Field(default=500, description="General API response time warning threshold (ms)")
+    api_response_time_critical_ms: int = Field(default=1000, description="General API response time critical threshold (ms)")
+    
+    # Alerting settings
+    enable_alerting: bool = Field(default=True, description="Enable performance alerting")
+    alert_cooldown_minutes: int = Field(default=10, description="Default alert cooldown period (minutes)")
+    alert_escalation_minutes: int = Field(default=30, description="Alert escalation time (minutes)")
+    max_alerts_per_type_per_hour: int = Field(default=10, description="Maximum alerts of same type per hour")
+    
+    # System resource monitoring
+    memory_usage_warning_percent: int = Field(default=80, description="Memory usage warning threshold (%)")
+    memory_usage_critical_percent: int = Field(default=90, description="Memory usage critical threshold (%)")
+    disk_usage_warning_percent: int = Field(default=85, description="Disk usage warning threshold (%)")
+    cpu_usage_warning_percent: int = Field(default=80, description="CPU usage warning threshold (%)")
 
     def get_cors_origins(self) -> list[str]:
         """Get CORS origins based on environment - SECURE VERSION"""
@@ -157,7 +201,7 @@ class Settings(BaseSettings):
                     hosts.append(host)
 
             # Add specific production domains only (no wildcards)
-            # Digital Ocean App Platform specific domain if configured
+            # Production domains must be explicitly configured via FRONTEND_URL and API_URL
 
             return hosts if hosts else ["127.0.0.1"]  # Fallback to localhost only
 
@@ -234,12 +278,49 @@ def is_development() -> bool:
     return settings.environment.lower() in ["development", "dev", "local"]
 
 
+# Performance monitoring configuration helpers
+def get_monitoring_config() -> dict[str, Any]:
+    """
+    Get performance monitoring configuration
+    """
+    return {
+        "enabled": settings.enable_performance_monitoring,
+        "detailed_logging": settings.enable_detailed_request_logging,
+        "retention_hours": settings.performance_monitoring_retention_hours,
+        "mobile_thresholds": {
+            "critical_ms": settings.mobile_response_time_critical_ms,
+            "warning_ms": settings.mobile_response_time_warning_ms
+        },
+        "api_thresholds": {
+            "warning_ms": settings.api_response_time_warning_ms,
+            "critical_ms": settings.api_response_time_critical_ms
+        },
+        "alerting": {
+            "enabled": settings.enable_alerting,
+            "cooldown_minutes": settings.alert_cooldown_minutes,
+            "escalation_minutes": settings.alert_escalation_minutes,
+            "max_per_hour": settings.max_alerts_per_type_per_hour
+        },
+        "system_thresholds": {
+            "memory_warning": settings.memory_usage_warning_percent,
+            "memory_critical": settings.memory_usage_critical_percent,
+            "disk_warning": settings.disk_usage_warning_percent,
+            "cpu_warning": settings.cpu_usage_warning_percent
+        }
+    }
+
+
 # Environment-specific configurations
 if is_production():
     # Production overrides
     settings.debug = False
     settings.log_level = "WARNING"
+    # Keep performance monitoring enabled in production
+    settings.enable_performance_monitoring = True
+    settings.enable_alerting = True
 elif is_development():
     # Development overrides
     settings.debug = True
     settings.log_level = "DEBUG"
+    # Enable full monitoring in development
+    settings.enable_detailed_request_logging = True

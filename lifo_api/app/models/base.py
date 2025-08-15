@@ -10,6 +10,27 @@ from typing import Any, Optional, Union
 from pydantic import BaseModel, Field, field_validator, ValidationInfo, ConfigDict
 
 
+class ConfigurableModel(BaseModel):
+    """Base model with common configuration"""
+
+    model_config = ConfigDict(
+        # Enable ORM mode for SQLAlchemy integration
+        from_attributes=True,
+        # Use enum values instead of names
+        use_enum_values=True,
+        # Validate assignment
+        validate_assignment=True,
+        # JSON encoders for special types
+        json_encoders={
+            datetime: lambda v: v.isoformat() if v else None,
+            date: lambda v: v.isoformat() if v else None,
+            Decimal: lambda v: float(v) if v else None,
+        },
+        # Schema extra
+        json_schema_extra={"example": {}},
+    )
+
+
 class TimestampMixin(BaseModel):
     """Mixin for timestamp fields"""
 
@@ -17,7 +38,7 @@ class TimestampMixin(BaseModel):
     updated_at: Optional[datetime] = None
 
 
-class ResponseBase(BaseModel):
+class ResponseBase(ConfigurableModel):
     """Base response model"""
 
     success: bool = True
@@ -25,7 +46,7 @@ class ResponseBase(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
-class ErrorResponse(BaseModel):
+class ErrorResponse(ConfigurableModel):
     """Error response model"""
 
     success: bool = False
@@ -130,7 +151,7 @@ class BatchStatus(str, Enum):
     RETURNED = "returned"
 
 
-class HealthResponse(BaseModel):
+class HealthResponse(ConfigurableModel):
     """Health check response"""
 
     status: str
@@ -140,7 +161,7 @@ class HealthResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
-class MetricsResponse(BaseModel):
+class MetricsResponse(ConfigurableModel):
     """Metrics response for monitoring"""
 
     inventory_count: int
@@ -162,24 +183,3 @@ def ensure_decimal(value: Union[float, int, str, Decimal]) -> Decimal:
     if isinstance(value, Decimal):
         return value
     return Decimal(str(value))
-
-
-class ConfigurableModel(BaseModel):
-    """Base model with common configuration"""
-
-    model_config = ConfigDict(
-        # Enable ORM mode for SQLAlchemy integration
-        from_attributes=True,
-        # Use enum values instead of names
-        use_enum_values=True,
-        # Validate assignment
-        validate_assignment=True,
-        # JSON encoders for special types
-        json_encoders={
-            datetime: lambda v: v.isoformat() if v else None,
-            date: lambda v: v.isoformat() if v else None,
-            Decimal: lambda v: float(v) if v else None,
-        },
-        # Schema extra
-        json_schema_extra={"example": {}},
-    )

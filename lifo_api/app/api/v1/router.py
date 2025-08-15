@@ -21,6 +21,7 @@ from app.api.v1 import (
     product_scanning,
     scan_workflows,
     scoring,
+    security,
 )
 
 # Create the main v1 router
@@ -122,6 +123,14 @@ router.include_router(
     batch_creation.router,
     prefix="/batches",
     tags=["Batch Creation from Scans"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Security monitoring and management endpoints (authenticated)
+router.include_router(
+    security.router,
+    prefix="/security",
+    tags=["Security Monitoring"],
     responses={404: {"description": "Not found"}},
 )
 

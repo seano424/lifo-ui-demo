@@ -100,7 +100,7 @@ async def get_dashboard_data(
             },
             "top_categories": analytics_data.get("category_breakdown", [])[:5],
             "recent_activity": analytics_data.get("recent_actions", [])[:10],
-            "last_updated": datetime.utcnow().isoformat(),
+            "last_updated": datetime.utcnow(),
         }
 
         logger.info("Dashboard data retrieved", store_id=store_id, user_id=current_user["sub"])
@@ -170,7 +170,7 @@ async def get_performance_metrics(
                 "urgency_distribution": analytics_data.get("urgency_distribution", {}),
                 "category_performance": analytics_data.get("category_breakdown", []),
             },
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.utcnow(),
         }
 
         logger.info(
@@ -227,7 +227,7 @@ async def get_trend_analysis(
                 "Consider implementing more proactive discounting",
                 "Monitor high-value categories more closely",
             ],
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.utcnow(),
         }
 
         logger.info(
@@ -286,7 +286,7 @@ async def get_export_data(
             "export_format": format,
             "period_days": days,
             "data": data,
-            "exported_at": datetime.utcnow().isoformat(),
+            "exported_at": datetime.utcnow(),
             "exported_by": current_user["sub"],
         }
 

@@ -80,13 +80,16 @@ async def extract_expiry_date_ocr(
             user_id=current_user["sub"],
         )
         
-        return {
+        # Create JSON-safe response
+        response_data = {
             "success": True,
             "scan_type": "expiry_date_extraction",
-            "expiry_date": expiry_date.isoformat() if expiry_date else None,
+            "expiry_date": expiry_date.isoformat() if expiry_date is not None else None,
             "confidence_threshold": confidence_threshold,
             "processing_type": "google_vision_ocr"
         }
+        
+        return response_data
         
     except ValidationException:
         raise
@@ -164,14 +167,19 @@ async def full_ocr_analysis(
             user_id=current_user["sub"],
         )
         
-        return {
+        # Safely extract dates
+        expiry_date = dual_dates.get('expiry_date')
+        manufacture_date = dual_dates.get('manufacture_date')
+        
+        # Create JSON-safe response
+        response_data = {
             "success": True,
             "scan_type": "full_ocr_analysis",
             "barcode": scan_result.primary_barcode,
             "suggested_name": scan_result.suggested_name,
             # Dual date extraction - both expiry and manufacture dates
-            "expiry_date": dual_dates.get('expiry_date').isoformat() if dual_dates.get('expiry_date') else None,
-            "manufacture_date": dual_dates.get('manufacture_date').isoformat() if dual_dates.get('manufacture_date') else None,
+            "expiry_date": expiry_date.isoformat() if expiry_date is not None else None,
+            "manufacture_date": manufacture_date.isoformat() if manufacture_date is not None else None,
             "raw_text_blocks": scan_result.raw_text_blocks,
             "confidence_scores": {
                 "overall": scan_result.confidence_score,
@@ -192,6 +200,8 @@ async def full_ocr_analysis(
             # Enhanced metadata for dual date extraction
             "date_extraction_metadata": dual_dates.get('metadata', {})
         }
+        
+        return response_data
         
     except ValidationException:
         raise

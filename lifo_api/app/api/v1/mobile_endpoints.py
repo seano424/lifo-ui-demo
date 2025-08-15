@@ -31,7 +31,10 @@ router = APIRouter()
 logger = structlog.get_logger()
 
 
-# Mobile cache for frequently accessed data
+# Mobile cache for frequently accessed data - PERFORMANCE OPTIMIZED
+from app.utils.performance import mobile_cache, cached_mobile_response, compress_for_mobile, measure_time
+from app.utils.mobile_queries import create_mobile_query_optimizer, mobile_query_monitor
+
 @lru_cache(maxsize=100)
 def get_cached_category_weights(category: str) -> dict[str, float]:
     """Cache category weights for faster mobile scoring"""
@@ -48,6 +51,7 @@ def get_cached_category_weights(category: str) -> dict[str, float]:
 
 @router.get("/mobile-summary/{store_id}", response_model=MobileBatchSummary)
 @ai_endpoint_rate_limit("60/minute")  # High limit for frequent mobile refreshes
+@cached_mobile_response(ttl=180, prefix="mobile_summary")  # 3min cache for mobile
 async def get_mobile_batch_summary(
     store_id: str,
     request: Request,
@@ -65,10 +69,14 @@ async def get_mobile_batch_summary(
 
     try:
         store_id = validate_store_id_format(store_id)
-        read_ops = get_read_only_operations(db)
-
-        # Get inventory data with mobile optimization
-        inventory_data = await read_ops.get_store_inventory_for_scoring(store_id)
+        
+        # MOBILE OPTIMIZATION: Use mobile-optimized queries
+        mobile_optimizer = create_mobile_query_optimizer(db)
+        inventory_data = await mobile_optimizer.get_store_inventory_fast(
+            store_id, 
+            limit=200,  # Mobile performance limit
+            urgency_filter=None
+        )
 
         if not inventory_data:
             return MobileBatchSummary(
@@ -77,17 +85,17 @@ async def get_mobile_batch_summary(
                 action_needed=[],
                 total_active_batches=0,
                 store_health_score=1.0,
-                last_updated=datetime.utcnow(),
                 cache_expires_in=300,
             )
 
-        # Mobile-optimized categorization
+        # Mobile-optimized categorization with performance limits
         urgent_batches = []
         expiring_today = []
         action_needed = []
         total_value_at_risk = 0.0
-
-        date.today()
+        
+        # Mobile data is already optimized and limited
+        today = date.today()
 
         for item in inventory_data:
             days_to_expiry = item["days_to_expiry"]
@@ -142,6 +150,13 @@ async def get_mobile_batch_summary(
         health_score = max(0.0, 1.0 - ((urgent_count + expiring_count) / max(total_items, 1)) * 2)
 
         processing_time_ms = (time.time() - start_time) * 1000
+        
+        # MOBILE PERFORMANCE: Record metrics for optimization
+        mobile_query_monitor.record_query(
+            "mobile_summary", 
+            processing_time_ms, 
+            len(urgent_batches) + len(expiring_today) + len(action_needed)
+        )
 
         logger.info(
             "Mobile summary generated",
@@ -151,18 +166,21 @@ async def get_mobile_batch_summary(
             expiring_today=expiring_count,
             health_score=health_score,
             processing_time_ms=processing_time_ms,
+            mobile_target_met=processing_time_ms <= 300,  # 300ms mobile target
             user_id=current_user["sub"],
         )
 
-        return MobileBatchSummary(
-            urgent_batches=urgent_batches,
-            expiring_today=expiring_today,
-            action_needed=action_needed,
+        # MOBILE OPTIMIZATION: Compress response data
+        mobile_response = MobileBatchSummary(
+            urgent_batches=compress_for_mobile(urgent_batches, "standard"),
+            expiring_today=compress_for_mobile(expiring_today, "standard"),
+            action_needed=compress_for_mobile(action_needed, "standard"),
             total_active_batches=total_items,
             store_health_score=round(health_score, 2),
-            last_updated=datetime.utcnow(),
-            cache_expires_in=300,  # 5 minutes cache
+            cache_expires_in=180,  # 3 minutes cache for mobile
         )
+        
+        return mobile_response
 
     except Exception as e:
         processing_time_ms = (time.time() - start_time) * 1000
@@ -178,6 +196,7 @@ async def get_mobile_batch_summary(
 
 @router.post("/batch-quick-score/{batch_id}", response_model=QuickBatchScore)
 @ai_endpoint_rate_limit("100/minute")  # Very high limit for real-time scanning
+@cached_mobile_response(ttl=60, prefix="quick_score")  # 1min cache for scanning
 async def quick_batch_score(
     batch_id: str,
     request: Request,
@@ -197,10 +216,9 @@ async def quick_batch_score(
         batch_id = validate_batch_id_format(batch_id)
         store_id = validate_store_id_format(store_id)
 
-        read_ops = get_read_only_operations(db)
-
-        # Get batch data
-        batch_data = await read_ops.get_batch_for_scoring(batch_id)
+        # MOBILE OPTIMIZATION: Use ultra-fast batch scoring query
+        mobile_optimizer = create_mobile_query_optimizer(db)
+        batch_data = await mobile_optimizer.get_batch_quick_score_data(batch_id)
         if not batch_data:
             raise HTTPException(status_code=404, detail="Batch not found")
 
@@ -233,6 +251,9 @@ async def quick_batch_score(
         )
 
         processing_time_ms = (time.time() - start_time) * 1000
+        
+        # MOBILE PERFORMANCE: Record metrics for optimization
+        mobile_query_monitor.record_query("quick_score", processing_time_ms, 1)
 
         logger.info(
             "Quick score calculated",
@@ -240,6 +261,7 @@ async def quick_batch_score(
             composite_score=composite_score,
             urgency_level=urgency_level,
             processing_time_ms=processing_time_ms,
+            mobile_target_met=processing_time_ms <= 200,  # 200ms mobile target for scoring
             user_id=current_user["sub"],
         )
 
@@ -270,6 +292,7 @@ async def quick_batch_score(
 
 @router.get("/store-health/{store_id}", response_model=MobileStoreHealth)
 @ai_endpoint_rate_limit("30/minute")
+@cached_mobile_response(ttl=300, prefix="store_health")  # 5min cache for health data
 async def get_mobile_store_health(
     store_id: str,
     request: Request,
@@ -284,10 +307,10 @@ async def get_mobile_store_health(
 
     try:
         store_id = validate_store_id_format(store_id)
-        read_ops = get_read_only_operations(db)
-
-        # Get analytics data
-        analytics_data = await read_ops.get_analytics_data(store_id, days=7)
+        
+        # MOBILE OPTIMIZATION: Use single-query health metrics
+        mobile_optimizer = create_mobile_query_optimizer(db)
+        analytics_data = await mobile_optimizer.get_store_health_metrics(store_id)
 
         if not analytics_data:
             return MobileStoreHealth(
@@ -300,10 +323,10 @@ async def get_mobile_store_health(
                 next_recommended_action=None,
             )
 
-        # Calculate mobile-friendly metrics
+        # Mobile-optimized metrics from single query
         total_items = analytics_data.get("total_batches", 0)
-        critical_items = analytics_data.get("critical_items", 0)
-        expiring_soon = analytics_data.get("expiring_soon_count", 0)
+        critical_items = analytics_data.get("critical_batches", 0)
+        expiring_soon = analytics_data.get("expiring_soon", 0)
 
         # Overall health score
         overall_score = 1.0
@@ -351,6 +374,7 @@ async def get_mobile_store_health(
 
 @router.get("/batch-list-mobile/{store_id}")
 @ai_endpoint_rate_limit("40/minute")
+@cached_mobile_response(ttl=120, prefix="batch_list")  # 2min cache for list data
 async def get_mobile_batch_list(
     store_id: str,
     request: Request,
@@ -384,7 +408,21 @@ async def get_mobile_batch_list(
                 "processing_time_ms": (time.time() - start_time) * 1000,
             }
 
-        # Apply filters
+        # MOBILE OPTIMIZATION: Use optimized query with built-in filtering
+        mobile_optimizer = create_mobile_query_optimizer(db)
+        
+        # Convert urgency_filter to database-level filter
+        db_urgency_filter = None
+        if urgency_filter in ["critical", "high", "medium"]:
+            db_urgency_filter = urgency_filter
+        
+        inventory_data = await mobile_optimizer.get_store_inventory_fast(
+            store_id,
+            limit=min(limit * 3, 300),  # Get extra for client-side filtering
+            urgency_filter=db_urgency_filter
+        )
+        
+        # Apply remaining filters
         filtered_batches = []
 
         for item in inventory_data:
@@ -392,11 +430,11 @@ async def get_mobile_batch_list(
             if category and item["category"] != category:
                 continue
 
-            # Urgency filter
+            # Urgency filter (if not already applied at DB level)
             urgency_score = _calculate_quick_urgency_score(item["days_to_expiry"])
             urgency_level = _get_urgency_level(urgency_score)
 
-            if urgency_filter and urgency_level != urgency_filter:
+            if urgency_filter and urgency_level != urgency_filter and not db_urgency_filter:
                 continue
 
             # Create mobile-optimized item
@@ -423,24 +461,32 @@ async def get_mobile_batch_list(
         has_more = offset + limit < total_count
 
         processing_time_ms = (time.time() - start_time) * 1000
+        
+        # MOBILE PERFORMANCE: Record metrics for optimization
+        mobile_query_monitor.record_query("batch_list", processing_time_ms, len(compressed_batches))
 
         logger.info(
             "Mobile batch list generated",
             store_id=store_id,
             total_count=total_count,
-            returned_count=len(paginated_batches),
+            returned_count=len(compressed_batches),
             category_filter=category,
             urgency_filter=urgency_filter,
             processing_time_ms=processing_time_ms,
+            mobile_target_met=processing_time_ms <= 300,  # 300ms mobile target
             user_id=current_user["sub"],
         )
 
+        # MOBILE OPTIMIZATION: Compress batch list for mobile transmission
+        compressed_batches = compress_for_mobile(paginated_batches, "standard")
+        
         return {
-            "batches": paginated_batches,
+            "batches": compressed_batches,
             "total_count": total_count,
             "has_more": has_more,
             "filters_applied": {"category": category, "urgency": urgency_filter},
             "processing_time_ms": processing_time_ms,
+            "mobile_optimized": True,  # Indicator for mobile clients
         }
 
     except Exception as e:
@@ -453,6 +499,88 @@ async def get_mobile_batch_list(
             user_id=current_user["sub"],
         )
         raise HTTPException(status_code=500, detail="Failed to get batch list")
+
+
+@router.get("/mobile-performance-health")
+@ai_endpoint_rate_limit("10/minute")
+async def get_mobile_performance_health(
+    request: Request,
+    current_user: dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Mobile performance health check and metrics
+    Returns optimization status and performance statistics
+    """
+    try:
+        from app.utils.performance import mobile_performance_health_check
+        
+        # Get comprehensive mobile health report
+        health_report = await mobile_performance_health_check()
+        
+        # Get mobile query performance
+        query_report = mobile_query_monitor.get_performance_report()
+        
+        # Calculate overall mobile health score
+        mobile_health_issues = []
+        
+        # Check query performance
+        for query_name, stats in query_report.items():
+            if not stats.get("meets_mobile_target", True):
+                mobile_health_issues.append(
+                    f"{query_name}: {stats['avg_execution_ms']:.1f}ms (target: <200-300ms)"
+                )
+        
+        # Check cache performance
+        cache_issues = health_report.get("performance_issues", [])
+        mobile_health_issues.extend(cache_issues)
+        
+        overall_status = "excellent" if not mobile_health_issues else (
+            "good" if len(mobile_health_issues) <= 2 else "needs_optimization"
+        )
+        
+        return {
+            "mobile_performance_status": overall_status,
+            "query_performance": query_report,
+            "cache_performance": health_report.get("cache_statistics", {}),
+            "performance_issues": mobile_health_issues,
+            "optimization_recommendations": _get_mobile_optimization_recommendations(query_report),
+            "memory_management": {
+                "bounded_cache_active": health_report.get("memory_leak_fixed", False),
+                "cache_utilization": health_report.get("cache_statistics", {}).get("utilization", 0)
+            },
+            "checked_at": datetime.utcnow(),
+        }
+        
+    except Exception as e:
+        logger.error(
+            "Mobile performance health check failed",
+            error=str(e),
+            user_id=current_user["sub"]
+        )
+        raise HTTPException(status_code=500, detail="Performance health check failed")
+
+
+def _get_mobile_optimization_recommendations(query_report: dict) -> list[str]:
+    """Generate mobile optimization recommendations based on performance data"""
+    recommendations = []
+    
+    for query_name, stats in query_report.items():
+        avg_time = stats.get("avg_execution_ms", 0)
+        slow_rate = stats.get("slow_query_rate", 0)
+        
+        if avg_time > 300:
+            recommendations.append(
+                f"Optimize {query_name}: averaging {avg_time:.1f}ms (add indexes or reduce data)"
+            )
+        elif slow_rate > 0.1:  # >10% slow queries
+            recommendations.append(
+                f"Investigate {query_name}: {slow_rate:.1%} queries exceed mobile targets"
+            )
+    
+    if not recommendations:
+        recommendations.append("Mobile performance is optimal - no recommendations needed")
+    
+    return recommendations
 
 
 # Helper functions for mobile optimization

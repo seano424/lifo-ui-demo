@@ -10,6 +10,7 @@ from enum import Enum
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from .base import ConfigurableModel
 
 
 class ScanOutAction(str, Enum):
@@ -66,7 +67,7 @@ class ScanOutRequest(BaseModel):
     # Note: discount validation moved to business logic for OpenAPI compatibility
 
 
-class ProcessScanRequest(BaseModel):
+class ProcessScanRequest(ConfigurableModel):
     """Request model for combined scan processing (future image recognition ready)"""
 
     barcode: str = Field(..., min_length=1, max_length=50, description="Product barcode")
@@ -74,8 +75,8 @@ class ProcessScanRequest(BaseModel):
     quantity: int = Field(..., gt=0, le=10000, description="Quantity scanned")
     confidence_score: Optional[float] = Field(1.0, ge=0, le=1, description="OCR confidence score")
     location_code: Optional[str] = Field("MAIN", max_length=50, description="Location")
-    scan_timestamp: Optional[datetime] = Field(
-        default_factory=datetime.utcnow, description="When scan occurred"
+    scan_timestamp: Optional[str] = Field(
+        default_factory=lambda: datetime.utcnow().isoformat(), description="When scan occurred"
     )
     image_url: Optional[str] = Field(None, max_length=500, description="Reference to scanned image")
     ocr_data: Optional[dict[str, Any]] = Field(None, description="Raw OCR extraction data")
@@ -109,7 +110,7 @@ class ScanOutResponse(BaseModel):
     processing_time_ms: float
 
 
-class MobileBatchSummary(BaseModel):
+class MobileBatchSummary(ConfigurableModel):
     """Mobile-optimized batch summary response"""
 
     urgent_batches: list[dict[str, Any]] = []
@@ -117,7 +118,7 @@ class MobileBatchSummary(BaseModel):
     action_needed: list[dict[str, Any]] = []
     total_active_batches: int = 0
     store_health_score: float = 0.0
-    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    last_updated: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     cache_expires_in: int = 300  # seconds
 
 
@@ -160,14 +161,14 @@ class BatchInsights(BaseModel):
     seasonal_patterns: dict[str, Any] = {}
 
 
-class RealtimeUpdate(BaseModel):
+class RealtimeUpdate(ConfigurableModel):
     """Real-time update notification model"""
 
     store_id: str
     batch_id: str
     update_type: str  # 'score_change', 'new_batch', 'status_change'
     data: dict[str, Any]
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     priority: str = "normal"  # 'low', 'normal', 'high', 'critical'
 
 
@@ -195,7 +196,7 @@ class ScanWorkflowException(MVPException):
         super().__init__(message, error_code, status_code)
 
 
-class MobileOptimizedError(BaseModel):
+class MobileOptimizedError(ConfigurableModel):
     """Mobile-friendly error response"""
 
     success: bool = False
@@ -204,7 +205,7 @@ class MobileOptimizedError(BaseModel):
     user_message: str  # Simplified message for mobile UI
     retry_allowed: bool = True
     retry_after_seconds: Optional[int] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
 
 
 # Response schemas for mobile optimization

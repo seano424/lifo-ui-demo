@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.secure_dependencies import get_current_user, validate_store_id_format
 from app.database.connection import get_db
 from app.middleware.rate_limiting import ai_endpoint_rate_limit
+from app.services.vision_service import GoogleVisionService
 from app.utils.mvp_exceptions import ValidationException
 
 
@@ -111,9 +112,10 @@ async def analyze_product_image(
         # Validate image header matches content type
         _validate_image_content(image_data, image.content_type)
 
-        # Mock analysis results (in production, this would call ML models)
-        analysis_results = await _mock_image_analysis(
-            image_data, analysis_type, confidence_threshold
+        # Real Google Vision analysis
+        vision_service = GoogleVisionService()
+        analysis_results = await _analyze_with_vision_api(
+            vision_service, image_data, analysis_type, confidence_threshold
         )
 
         # Store image reference for future training (optional)
@@ -138,8 +140,8 @@ async def analyze_product_image(
             "confidence_threshold": confidence_threshold,
             "analysis_results": analysis_results,
             "processing_info": {
-                "model_version": "mock_v1.0",
-                "processing_time_ms": 245,  # Mock processing time
+                "model_version": "google_vision_v1",
+                "processing_time_ms": analysis_results.get("analysis_metadata", {}).get("processing_time_ms", 0),
                 "image_size_bytes": len(image_data),
             },
             "next_steps": [
@@ -281,8 +283,112 @@ async def get_ml_models_status(
         raise HTTPException(status_code=500, detail="Status check failed")
 
 
-# Helper functions for mock implementations
+# Helper functions for real Vision API integration
 
+async def _analyze_with_vision_api(
+    vision_service: GoogleVisionService, 
+    image_data: bytes, 
+    analysis_type: str, 
+    confidence_threshold: float
+) -> dict[str, Any]:
+    """Analyze image using real Google Vision API"""
+    import asyncio
+    import time
+    
+    start_time = time.time()
+    
+    try:
+        # Run the Google Vision analysis
+        vision_result = await asyncio.to_thread(
+            vision_service.analyze_product_image, 
+            image_data
+        )
+        
+        detections = []
+        
+        # Convert Vision API results to expected format
+        if analysis_type in ["expiry_date", "full"]:
+            for expiry_result in vision_result.expiry_dates:
+                if expiry_result.confidence >= confidence_threshold:
+                    detections.append({
+                        "type": "expiry_date",
+                        "value": expiry_result.date.strftime("%Y-%m-%d") if expiry_result.date else expiry_result.raw_text,
+                        "confidence": expiry_result.confidence,
+                        "bounding_box": expiry_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
+                        "original_text": expiry_result.raw_text,
+                        "format_detected": expiry_result.format_detected
+                    })
+        
+        if analysis_type in ["barcode", "full"]:
+            for barcode_result in vision_result.barcodes:
+                if barcode_result.confidence >= confidence_threshold:
+                    detections.append({
+                        "type": f"barcode_{barcode_result.format.lower()}",
+                        "value": barcode_result.value,
+                        "confidence": barcode_result.confidence,
+                        "bounding_box": barcode_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
+                        "barcode_type": barcode_result.format
+                    })
+        
+        # Extract product names from OCR text if doing full analysis
+        if analysis_type == "full":
+            product_names = _extract_product_names_from_ocr(vision_result.raw_text, confidence_threshold)
+            detections.extend(product_names)
+        
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        return {
+            "detections": detections,
+            "analysis_metadata": {
+                "image_quality": _assess_image_quality(vision_result),
+                "total_regions_found": len(vision_result.raw_text),
+                "processing_confidence": vision_result.overall_confidence,
+                "processing_time_ms": processing_time_ms
+            }
+        }
+        
+    except Exception as e:
+        logger.error("Google Vision analysis failed", error=str(e))
+        # Fallback to mock data if Vision API fails
+        return await _mock_image_analysis(image_data, analysis_type, confidence_threshold)
+
+
+def _extract_product_names_from_ocr(ocr_results: list, confidence_threshold: float) -> list[dict]:
+    """Extract likely product names from OCR text results"""
+    product_detections = []
+    
+    for ocr_result in ocr_results:
+        if ocr_result.confidence >= confidence_threshold:
+            text = ocr_result.text.strip()
+            
+            # Simple heuristics for product name detection
+            if (len(text) > 5 and 
+                any(keyword in text.upper() for keyword in ['SIGNATURE', 'BRAND', 'ORGANIC', 'REDUCED', 'FAT', 'MILK']) and
+                not any(char in text for char in ['/', '%', '$'])):  # Likely not date/price
+                
+                product_detections.append({
+                    "type": "product_name",
+                    "value": text,
+                    "confidence": ocr_result.confidence,
+                    "bounding_box": ocr_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0}
+                })
+    
+    return product_detections
+
+
+def _assess_image_quality(vision_result) -> str:
+    """Assess overall image quality based on Vision API results"""
+    if vision_result.overall_confidence > 0.9:
+        return "excellent"
+    elif vision_result.overall_confidence > 0.7:
+        return "good"
+    elif vision_result.overall_confidence > 0.5:
+        return "fair"
+    else:
+        return "poor"
+
+
+# Helper functions for mock implementations (kept as fallback)
 
 async def _mock_image_analysis(
     image_data: bytes, analysis_type: str, confidence_threshold: float

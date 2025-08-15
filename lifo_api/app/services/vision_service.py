@@ -15,10 +15,12 @@ from google.api_core.client_options import ClientOptions
 from pydantic import BaseModel
 from PIL import Image
 
+from app.models.base import ConfigurableModel
+
 logger = structlog.get_logger()
 
 
-class BarcodeResult(BaseModel):
+class BarcodeResult(ConfigurableModel):
     """Barcode detection result from Google Vision"""
     value: str
     format: str  # EAN_13, UPC_A, CODE_128, etc.
@@ -26,14 +28,14 @@ class BarcodeResult(BaseModel):
     bounding_box: Optional[dict[str, int]] = None
 
 
-class OCRResult(BaseModel):
+class OCRResult(ConfigurableModel):
     """OCR text detection result"""
     text: str
     confidence: float
     bounding_box: Optional[dict[str, int]] = None
 
 
-class ExpiryDateResult(BaseModel):
+class ExpiryDateResult(ConfigurableModel):
     """Parsed expiry date from OCR text"""
     date: Optional[datetime] = None
     raw_text: str
@@ -41,7 +43,7 @@ class ExpiryDateResult(BaseModel):
     format_detected: Optional[str] = None  # DD/MM/YYYY, MM/DD/YYYY, etc.
 
 
-class VisionScanResult(BaseModel):
+class VisionScanResult(ConfigurableModel):
     """Complete result from Google Vision API processing"""
     # Raw detection results
     barcodes: list[BarcodeResult] = []
@@ -213,9 +215,10 @@ class GoogleVisionService:
         Optimized for European markets and EAN-13 barcodes
         """
         try:
-            # Configure features for European food labels
+            # Configure features for comprehensive detection
             features = [
                 vision.Feature(type_=vision.Feature.Type.TEXT_DETECTION),
+                vision.Feature(type_=vision.Feature.Type.DOCUMENT_TEXT_DETECTION),
             ]
             
             # Configure image context for European text (multilingual support)
@@ -236,35 +239,11 @@ class GoogleVisionService:
                 lambda: self.client.annotate_image(request)
             )
             
-            # Extract both text and barcodes from single response
-            barcodes = []
-            ocr_results = []
+            # Extract text from response
+            ocr_results = self._extract_ocr_results(response)
             
-            if response.text_annotations:
-                # First annotation contains full text
-                full_text = response.text_annotations[0].description if response.text_annotations else ""
-                
-                # Process individual text annotations
-                for annotation in response.text_annotations[1:]:  # Skip full text annotation
-                    text = annotation.description.strip()
-                    
-                    # Check if text looks like a barcode (EAN-13 common in EU)
-                    if self._is_european_barcode_pattern(text):
-                        barcode = BarcodeResult(
-                            value=text,
-                            format=self._detect_barcode_format(text),
-                            confidence=0.9,  # High confidence for clear barcode patterns
-                            bounding_box=self._extract_bounding_box(annotation.bounding_poly)
-                        )
-                        barcodes.append(barcode)
-                    else:
-                        # Regular OCR text
-                        ocr_result = OCRResult(
-                            text=text,
-                            confidence=0.8,  # Default confidence for text
-                            bounding_box=self._extract_bounding_box(annotation.bounding_poly)
-                        )
-                        ocr_results.append(ocr_result)
+            # Now make a separate call for proper barcode detection
+            barcodes = await self._detect_barcodes_properly(image)
             
             logger.info(
                 "EU-optimized Vision API processing completed",
@@ -278,6 +257,88 @@ class GoogleVisionService:
         except Exception as e:
             logger.error(f"Combined text/barcode detection failed: {e}")
             return [], []
+    
+    def _extract_ocr_results(self, response) -> list[OCRResult]:
+        """Extract OCR results from Vision API response"""
+        ocr_results = []
+        
+        if response.text_annotations:
+            # Process individual text annotations (skip full text at index 0)
+            for annotation in response.text_annotations[1:]:
+                text = annotation.description.strip()
+                if text and not self._is_obvious_barcode_number(text):  # Exclude obvious barcodes from OCR
+                    ocr_result = OCRResult(
+                        text=text,
+                        confidence=0.8,  # Vision API doesn't provide per-word confidence
+                        bounding_box=self._extract_bounding_box(annotation.bounding_poly)
+                    )
+                    ocr_results.append(ocr_result)
+        
+        # Also extract from document text detection if available
+        if hasattr(response, 'full_text_annotation') and response.full_text_annotation:
+            # Process document text for better structured text extraction
+            for page in response.full_text_annotation.pages:
+                for block in page.blocks:
+                    for paragraph in block.paragraphs:
+                        paragraph_text = "".join([symbol.text for word in paragraph.words for symbol in word.symbols])
+                        if paragraph_text.strip() and not self._is_obvious_barcode_number(paragraph_text.strip()):
+                            # Get bounding box from paragraph
+                            ocr_result = OCRResult(
+                                text=paragraph_text.strip(),
+                                confidence=0.8,
+                                bounding_box=self._extract_bounding_box(paragraph.bounding_box)
+                            )
+                            ocr_results.append(ocr_result)
+        
+        return ocr_results
+    
+    async def _detect_barcodes_properly(self, image: vision.Image) -> list[BarcodeResult]:
+        """Use Google Vision's actual barcode detection capabilities"""
+        barcodes = []
+        
+        try:
+            # First attempt: Use Google's built-in barcode detection (if available in your Vision API version)
+            # Note: Some versions of Vision API have barcode detection, others don't
+            
+            # For now, let's use a more sophisticated approach:
+            # 1. Look for numeric patterns that match barcode formats
+            # 2. Validate them using check digits
+            # 3. Use position and context clues
+            
+            barcode_request = vision.AnnotateImageRequest(
+                image=image,
+                features=[
+                    vision.Feature(type_=vision.Feature.Type.TEXT_DETECTION),
+                ]
+            )
+            
+            response = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.client.annotate_image(barcode_request)
+            )
+            
+            if response.text_annotations:
+                # Look for barcode patterns in text
+                all_text_blocks = [ann.description.strip() for ann in response.text_annotations[1:]]
+                
+                # Find potential barcodes
+                potential_barcodes = self._find_barcode_patterns(all_text_blocks, response.text_annotations[1:])
+                
+                for barcode_data in potential_barcodes:
+                    barcode = BarcodeResult(
+                        value=barcode_data['value'],
+                        format=barcode_data['format'],
+                        confidence=barcode_data['confidence'],
+                        bounding_box=barcode_data['bounding_box']
+                    )
+                    barcodes.append(barcode)
+            
+            logger.info(f"Detected {len(barcodes)} barcodes using enhanced detection")
+            return barcodes
+            
+        except Exception as e:
+            logger.error(f"Barcode detection failed: {e}")
+            return []
     
     async def _detect_barcodes(self, image: vision.Image) -> list[BarcodeResult]:
         """Detect barcodes in image using Google Vision API"""
@@ -521,6 +582,197 @@ class GoogleVisionService:
             logger.warning(f"Could not get image dimensions: {e}")
             return {"width": 0, "height": 0}
     
+    def _is_obvious_barcode_number(self, text: str) -> bool:
+        """Quick check if text is obviously a barcode (pure numeric, right length)"""
+        clean_text = re.sub(r'[^\d]', '', text)
+        return len(clean_text) in [8, 12, 13, 14] and clean_text.isdigit()
+    
+    def _find_barcode_patterns(self, text_blocks: list[str], annotations) -> list[dict]:
+        """Find barcode patterns using sophisticated detection"""
+        potential_barcodes = []
+        all_numeric_blocks = []
+        
+        # First pass: collect all numeric blocks and their info
+        for i, text in enumerate(text_blocks):
+            clean_text = re.sub(r'[^\d]', '', text)
+            if clean_text and clean_text.isdigit():
+                all_numeric_blocks.append({
+                    'text': clean_text,
+                    'original': text,
+                    'index': i,
+                    'annotation': annotations[i] if i < len(annotations) else None
+                })
+        
+        # Check individual blocks first (highest priority)
+        for block in all_numeric_blocks:
+            clean_text = block['text']
+            if len(clean_text) in [8, 12, 13, 14]:
+                barcode_info = self._validate_barcode(clean_text, block['original'], block['annotation'])
+                if barcode_info:
+                    barcode_info['source'] = 'single_block'
+                    potential_barcodes.append(barcode_info)
+        
+        # Check for 11-digit numbers that might need a leading zero (common with UPC)
+        for block in all_numeric_blocks:
+            clean_text = block['text']
+            if len(clean_text) == 11:
+                # Try adding leading zero for UPC-A
+                padded = '0' + clean_text
+                barcode_info = self._validate_barcode(padded, block['original'], block['annotation'])
+                if barcode_info:
+                    barcode_info['source'] = 'zero_padded'
+                    barcode_info['confidence'] *= 0.95  # Slightly lower confidence for padding
+                    potential_barcodes.append(barcode_info)
+        
+        # Check for fragmented barcodes only if no good single blocks found
+        if not potential_barcodes or max(b['confidence'] for b in potential_barcodes) < 0.7:
+            potential_barcodes.extend(self._find_fragmented_barcodes(all_numeric_blocks))
+        
+        # Sort by confidence and remove duplicates
+        potential_barcodes.sort(key=lambda x: (x['confidence'], x.get('source', '') == 'single_block'), reverse=True)
+        
+        # Remove duplicates and prefer higher confidence
+        unique_barcodes = []
+        seen_values = set()
+        
+        for barcode in potential_barcodes:
+            if barcode['value'] not in seen_values:
+                unique_barcodes.append(barcode)
+                seen_values.add(barcode['value'])
+                # Only return the best barcode to avoid confusion
+                if barcode['confidence'] >= 0.8:
+                    break
+        
+        return unique_barcodes
+    
+    def _find_fragmented_barcodes(self, numeric_blocks: list[dict]) -> list[dict]:
+        """Find barcodes that are split across multiple OCR blocks"""
+        fragmented_barcodes = []
+        
+        for i, block1 in enumerate(numeric_blocks):
+            if len(block1['text']) >= 4:  # First part must be substantial
+                # Look for adjacent blocks
+                for j in range(i+1, min(i+4, len(numeric_blocks))):
+                    block2 = numeric_blocks[j]
+                    if len(block2['text']) >= 2:  # Second part can be shorter
+                        combined = block1['text'] + block2['text']
+                        if len(combined) in [8, 12, 13, 14]:
+                            barcode_info = self._validate_barcode(
+                                combined, 
+                                f"{block1['original']} {block2['original']}", 
+                                block1['annotation']
+                            )
+                            if barcode_info:
+                                barcode_info['source'] = 'fragmented'
+                                barcode_info['confidence'] *= 0.8  # Lower confidence for fragmented
+                                fragmented_barcodes.append(barcode_info)
+        
+        return fragmented_barcodes
+    
+    def _validate_barcode(self, clean_digits: str, original_text: str, annotation) -> dict | None:
+        """Validate and score barcode candidates"""
+        if not clean_digits or not clean_digits.isdigit():
+            return None
+        
+        confidence = 0.5  # Base confidence
+        barcode_format = "UNKNOWN"
+        
+        # Determine format and validate
+        if len(clean_digits) == 13:
+            if self._validate_ean13(clean_digits):
+                barcode_format = "EAN_13"
+                confidence = 0.9
+            else:
+                confidence = 0.3  # Invalid check digit
+        elif len(clean_digits) == 12:
+            if self._validate_upc_a(clean_digits):
+                barcode_format = "UPC_A"
+                confidence = 0.85
+            else:
+                confidence = 0.3
+        elif len(clean_digits) == 8:
+            if self._validate_ean8(clean_digits):
+                barcode_format = "EAN_8"
+                confidence = 0.8
+            else:
+                confidence = 0.25
+        elif len(clean_digits) == 14:
+            # GTIN-14, often used for packaging
+            barcode_format = "GTIN_14"
+            confidence = 0.7
+        else:
+            return None
+        
+        # Boost confidence for context clues
+        if self._has_barcode_context(original_text):
+            confidence = min(confidence + 0.1, 1.0)
+        
+        # Reduce confidence if it looks like a date
+        if self._looks_like_date_fragment(clean_digits):
+            confidence *= 0.5
+        
+        # Only return if confidence is reasonable
+        if confidence < 0.3:
+            return None
+        
+        return {
+            'value': clean_digits,
+            'format': barcode_format,
+            'confidence': confidence,
+            'bounding_box': self._extract_bounding_box(annotation.bounding_poly) if annotation else None
+        }
+    
+    def _validate_ean13(self, digits: str) -> bool:
+        """Validate EAN-13 barcode using check digit"""
+        if len(digits) != 13:
+            return False
+        
+        try:
+            # EAN-13 check digit calculation
+            odd_sum = sum(int(digits[i]) for i in range(0, 12, 2))
+            even_sum = sum(int(digits[i]) for i in range(1, 12, 2))
+            check_sum = (odd_sum + even_sum * 3) % 10
+            check_digit = (10 - check_sum) % 10
+            return int(digits[12]) == check_digit
+        except (ValueError, IndexError):
+            return False
+    
+    def _validate_upc_a(self, digits: str) -> bool:
+        """Validate UPC-A barcode using check digit"""
+        if len(digits) != 12:
+            return False
+        
+        try:
+            # UPC-A check digit calculation  
+            odd_sum = sum(int(digits[i]) for i in range(0, 11, 2))
+            even_sum = sum(int(digits[i]) for i in range(1, 11, 2))
+            check_sum = (odd_sum * 3 + even_sum) % 10
+            check_digit = (10 - check_sum) % 10
+            return int(digits[11]) == check_digit
+        except (ValueError, IndexError):
+            return False
+    
+    def _validate_ean8(self, digits: str) -> bool:
+        """Validate EAN-8 barcode using check digit"""
+        if len(digits) != 8:
+            return False
+        
+        try:
+            # EAN-8 check digit calculation
+            odd_sum = sum(int(digits[i]) for i in range(0, 7, 2))
+            even_sum = sum(int(digits[i]) for i in range(1, 7, 2))
+            check_sum = (odd_sum * 3 + even_sum) % 10
+            check_digit = (10 - check_sum) % 10
+            return int(digits[7]) == check_digit
+        except (ValueError, IndexError):
+            return False
+    
+    def _has_barcode_context(self, text: str) -> bool:
+        """Check if text has context suggesting it's near a barcode"""
+        context_indicators = ['barcode', 'ean', 'upc', 'gtin', 'code']
+        text_lower = text.lower()
+        return any(indicator in text_lower for indicator in context_indicators)
+
     def _is_european_barcode_pattern(self, text: str) -> bool:
         """
         Detect European barcode patterns, optimized for EAN-13
@@ -552,20 +804,24 @@ class GoogleVisionService:
             return False
         if re.match(r'^\d{2}[/\-\.]\d{2}[/\-\.]\d{2}$', text):   # DD/MM/YY, MM/DD/YY, etc.
             return False
+        # Exclude month-day patterns (like "SEP 30" which gets combined as "2021/02/02")
+        if re.match(r'^\d{4}/\d{2}/\d{2}$', text) and self._looks_like_date_fragment(text):
+            return False
             
-        # EAN-13: 13 digits
+        # EAN-13: 13 digits (most common grocery barcode)
         if re.match(r'^\d{13}$', text):
             return True
-        # UPC-A: 12 digits
+        # UPC-A: 12 digits (common in US/Canada) 
         if re.match(r'^\d{12}$', text):
             return True
-        # EAN-8: 8 digits
+        # EAN-8: 8 digits (shorter European barcode)
         if re.match(r'^\d{8}$', text):
             return True
-        # Code 128: alphanumeric patterns (common in retail)
+        # Code 128: alphanumeric patterns (industrial/shipping)
         if (re.match(r'^[A-Z0-9\-]{6,}$', text) and 
             len(text) >= 6 and 
-            len(text) <= 20):  # Reasonable barcode length
+            len(text) <= 20 and
+            not self._looks_like_text_fragment(text)):  # Avoid product name fragments
             return True
         return False
     
@@ -579,6 +835,27 @@ class GoogleVisionService:
             return 'EAN_8'
         else:
             return 'CODE_128'
+    
+    def _looks_like_date_fragment(self, text: str) -> bool:
+        """Check if a numeric string looks like it could be a date"""
+        # Pattern like YYYY/MM/DD where year is reasonable and month/day are valid ranges
+        if re.match(r'^\d{4}/\d{2}/\d{2}$', text):
+            try:
+                parts = text.split('/')
+                year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
+                # Reasonable year range for food products
+                if 2020 <= year <= 2030 and 1 <= month <= 12 and 1 <= day <= 31:
+                    return True
+            except (ValueError, IndexError):
+                pass
+        return False
+    
+    def _looks_like_text_fragment(self, text: str) -> bool:
+        """Check if text looks like a product name fragment rather than a barcode"""
+        # Common words that indicate product names, not barcodes
+        product_keywords = ['MILK', 'REDUCED', 'FAT', 'KIRKLAND', 'SIGNATURE', 'ORGANIC', 'NATURAL']
+        text_upper = text.upper()
+        return any(keyword in text_upper for keyword in product_keywords)
     
     def _extract_bounding_box(self, bounding_poly) -> Optional[dict[str, int]]:
         """Extract bounding box coordinates from Google Vision bounding poly"""

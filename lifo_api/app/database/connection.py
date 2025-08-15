@@ -52,20 +52,24 @@ def get_engine():
                 },
             )
         else:
-            # PostgreSQL Production: Use connection pooling
+            # PostgreSQL Production: Use mobile-optimized connection pooling
             _engine = create_async_engine(
                 database_url,
                 echo=False,
                 future=True,
-                pool_size=settings.db_pool_size,
-                max_overflow=settings.db_max_overflow,
+                pool_size=min(settings.db_pool_size, 10),  # MOBILE: Smaller pool for mobile workloads
+                max_overflow=min(settings.db_max_overflow, 20),  # MOBILE: Limited overflow
                 pool_pre_ping=True,
-                pool_recycle=settings.db_pool_recycle,
+                pool_recycle=1800,  # MOBILE: 30min recycle for mobile stability
+                pool_timeout=10,  # MOBILE: Fast timeout for mobile responsiveness
                 connect_args={
-                    "command_timeout": 60,
+                    "command_timeout": 30,  # MOBILE: Faster timeout for mobile queries
                     "ssl": "require",  # Required for Supabase
                     "server_settings": {
                         "jit": "off",  # Disable JIT for more predictable performance
+                        "statement_timeout": "25s",  # MOBILE: Hard limit for mobile queries
+                        "lock_timeout": "5s",  # MOBILE: Fast lock timeout
+                        "idle_in_transaction_session_timeout": "10min",  # MOBILE: Cleanup idle sessions
                     },
                 },
             )
@@ -83,6 +87,7 @@ def get_async_session():
             expire_on_commit=False,  # Keep objects accessible after commit
             autocommit=False,
             autoflush=True,
+            # MOBILE OPTIMIZATION: Session configured for mobile performance
         )
     return _async_session
 

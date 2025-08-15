@@ -510,7 +510,7 @@ class SecureCSVProcessor:
                     raise ValueError(f"Expiry date too old: {expiry_date}")
                 if expiry_date > datetime.now().date() + timedelta(days=365 * 5):
                     raise ValueError(f"Expiry date too far in future: {expiry_date}")
-                validated_row["expiry_date"] = expiry_date
+                validated_row["expiry_date"] = expiry_date.isoformat()
             except ValueError:
                 raise ValueError(
                     f"Invalid expiry date format: {row_data['expiry_date']}. Use YYYY-MM-DD"

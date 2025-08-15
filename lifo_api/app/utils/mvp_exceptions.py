@@ -225,7 +225,7 @@ def create_mobile_error_response(
         user_message=exception.user_message,
         retry_allowed=exception.retry_allowed,
         retry_after_seconds=exception.retry_after_seconds,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.utcnow().isoformat(),
     )
 
     # Add debug information in development
@@ -359,7 +359,7 @@ class ErrorTracker:
                 "error_code": error_code,
                 "endpoint": endpoint,
                 "user_id": user_id,
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.utcnow().isoformat(),
             }
         )
 

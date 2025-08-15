@@ -4,18 +4,20 @@ Focused on complex image processing while frontend handles simple product lookup
 """
 
 import asyncio
+import re
 from datetime import datetime, timedelta
 from typing import Any, Optional, Tuple, List
 
 import structlog
 from pydantic import BaseModel
 
+from app.models.base import ConfigurableModel
 from app.services.vision_service import GoogleVisionService, VisionScanResult
 
 logger = structlog.get_logger()
 
 
-class ProductScanResult(BaseModel):
+class ProductScanResult(ConfigurableModel):
     """OCR and barcode scanning result focused on Google Vision processing"""
     
     # Vision processing results
@@ -40,7 +42,7 @@ class ProductScanResult(BaseModel):
     expiry_confidence: float = 0.0
 
 
-class ScanningWorkflow(BaseModel):
+class ScanningWorkflow(ConfigurableModel):
     """Scanning workflow configuration focused on vision processing"""
     
     enable_barcode_detection: bool = True
@@ -327,17 +329,31 @@ class ProductScanningService:
                 'source': best_manufacture_candidate.get('source', 'unknown')
             }
         elif len(unknown_candidates) > 1 and best_expiry:
-            # If we have multiple unknown dates and selected one as expiry,
-            # use the earlier remaining date as manufacture
+            # Only infer manufacture date if we have strong evidence of multiple distinct dates
+            # AND the expiry date was inferred (not definitively identified)
             remaining_unknowns = [c for c in unknown_candidates if c['date'] != best_expiry]
-            if remaining_unknowns:
-                best_manufacture_candidate = min(remaining_unknowns, key=lambda x: x['date'])
-                best_manufacture = best_manufacture_candidate['date']
-                manufacture_metadata = {
-                    'context': 'inferred_from_earlier_date',
-                    'confidence': 0.4,
-                    'source': best_manufacture_candidate.get('source', 'unknown')
-                }
+            
+            # Only infer manufacture date if:
+            # 1. We have multiple remaining unknown dates after selecting expiry
+            # 2. The expiry date confidence is low (meaning it was inferred, not definitive)  
+            # 3. There's a reasonable time gap between dates (not just OCR duplicates)
+            if (remaining_unknowns and 
+                len(remaining_unknowns) >= 2 and 
+                expiry_metadata.get('confidence', 0) < 0.7):
+                
+                # Check if there's a reasonable time gap (at least 6 months)
+                potential_manufacture = min(remaining_unknowns, key=lambda x: x['date'])
+                if best_expiry and potential_manufacture['date']:
+                    time_diff = best_expiry - potential_manufacture['date']
+                    if time_diff.days >= 180:  # At least 6 months difference
+                        best_manufacture = potential_manufacture['date']
+                        manufacture_metadata = {
+                            'context': 'inferred_from_earlier_date',
+                            'confidence': 0.4,
+                            'source': potential_manufacture.get('source', 'unknown')
+                        }
+            
+            # If we have a definitive expiry date (like "BEST BY"), don't infer manufacture
         
         # Create comprehensive metadata
         combined_metadata = {
@@ -749,25 +765,263 @@ class ProductScanningService:
         """Get metadata for the last selected expiry date"""
         return self._last_selected_date_metadata
 
+    def _construct_product_name(self, text_blocks: list[str], raw_ocr: list) -> Optional[str]:
+        """Universal product name construction using intelligent text analysis"""
+        
+        # Filter and score text blocks
+        candidate_blocks = self._filter_and_score_name_blocks(text_blocks)
+        
+        if not candidate_blocks:
+            return None
+        
+        # Try different name construction strategies
+        strategies = [
+            self._strategy_brand_product_descriptor,
+            self._strategy_longest_meaningful_sequence,
+            self._strategy_high_confidence_blocks,
+            self._strategy_alphabetic_blocks
+        ]
+        
+        for strategy in strategies:
+            result = strategy(candidate_blocks)
+            if result and len(result.strip()) >= 3:
+                return self._clean_product_name(result)
+        
+        return None
+    
+    def _filter_and_score_name_blocks(self, text_blocks: list[str]) -> list[dict]:
+        """Filter and score text blocks for product name relevance"""
+        candidates = []
+        
+        for block in text_blocks:
+            if not block or len(block.strip()) < 2:
+                continue
+            
+            block = block.strip()
+            score = self._calculate_name_relevance_score(block)
+            
+            if score > 0:  # Only include blocks with positive relevance
+                candidates.append({
+                    'text': block,
+                    'score': score,
+                    'category': self._classify_text_category(block)
+                })
+        
+        # Sort by relevance score
+        candidates.sort(key=lambda x: x['score'], reverse=True)
+        return candidates
+    
+    def _calculate_name_relevance_score(self, block: str) -> float:
+        """Calculate how likely a text block is part of a product name"""
+        score = 0.0
+        block_upper = block.upper()
+        
+        # Negative indicators (reduce score)
+        if block.isdigit():
+            return -1.0  # Pure numbers are rarely product names
+        
+        if re.match(r'^\d+[/\-.]\d+[/\-.]\d+$', block):
+            return -1.0  # Dates
+        
+        if re.match(r'^\d+[ML]?G?L?OZ?$', block_upper):
+            return -0.5  # Weights/volumes
+        
+        if block_upper in ['EXP', 'PRO', 'MHD', 'BB', 'DLC', 'BEST', 'BY', 'USE']:
+            return -1.0  # Date keywords
+        
+        if len(block) == 1:
+            return -0.5  # Single characters
+        
+        # Positive indicators (increase score)
+        base_score = 0.3  # Base score for any text
+        
+        # Length bonus (optimal length for product names)
+        if 3 <= len(block) <= 12:
+            score += 0.2
+        elif len(block) > 12:
+            score -= 0.1  # Very long blocks are less likely to be product names
+        
+        # Alphabetic content bonus
+        if block.isalpha():
+            score += 0.3
+        elif any(c.isalpha() for c in block):
+            score += 0.1
+        
+        # Mixed case suggests brand names
+        if block.istitle() or (any(c.isupper() for c in block) and any(c.islower() for c in block)):
+            score += 0.2
+        
+        # All caps suggests brand/product names
+        elif block.isupper() and len(block) >= 3:
+            score += 0.15
+        
+        # Common product-related words (generic approach)
+        food_indicators = [
+            # Common food categories
+            'MILK', 'CHEESE', 'BREAD', 'JUICE', 'WATER', 'YOGURT', 'BUTTER', 'CREAM',
+            'SOUP', 'SAUCE', 'OIL', 'PASTA', 'RICE', 'BEANS', 'MEAT', 'FISH', 'CHICKEN',
+            'BEEF', 'PORK', 'HAM', 'BACON', 'EGGS', 'FLOUR', 'SUGAR', 'SALT', 'PEPPER',
+            # Beverages
+            'COFFEE', 'TEA', 'SODA', 'COLA', 'BEER', 'WINE', 'JUICE', 'SMOOTHIE',
+            # Snacks/packaged foods
+            'CHIPS', 'COOKIES', 'CRACKERS', 'NUTS', 'CHOCOLATE', 'CANDY', 'GUM',
+            'CEREAL', 'BARS', 'PIZZA', 'SANDWICH', 'SALAD'
+        ]
+        
+        brand_indicators = [
+            # Major brands (generic approach - not hardcoded to specific stores)
+            'ORGANIC', 'NATURAL', 'PREMIUM', 'SELECT', 'CHOICE', 'FRESH', 'PURE',
+            'CLASSIC', 'ORIGINAL', 'TRADITIONAL', 'ARTISAN', 'GOURMET', 'DELUXE'
+        ]
+        
+        descriptive_indicators = [
+            'REDUCED', 'FAT', 'FREE', 'LOW', 'HIGH', 'EXTRA', 'LIGHT', 'DIET',
+            'WHOLE', 'SKIM', 'SEMI', 'FULL', 'THICK', 'THIN', 'CREAMY', 'SMOOTH',
+            'CRUNCHY', 'SOFT', 'HARD', 'HOT', 'MILD', 'SWEET', 'SOUR', 'SPICY'
+        ]
+        
+        # Check for food/product indicators
+        if any(indicator in block_upper for indicator in food_indicators):
+            score += 0.4
+        
+        if any(indicator in block_upper for indicator in brand_indicators):
+            score += 0.35
+        
+        if any(indicator in block_upper for indicator in descriptive_indicators):
+            score += 0.25
+        
+        # Percentage indicators (common in food)
+        if re.search(r'\d+%', block):
+            score += 0.3
+        
+        return max(0.0, base_score + score)
+    
+    def _classify_text_category(self, block: str) -> str:
+        """Classify text block into category for name construction"""
+        block_upper = block.upper()
+        
+        # Brand indicators
+        brand_words = ['ORGANIC', 'NATURAL', 'PREMIUM', 'SELECT', 'SIGNATURE', 'CHOICE']
+        if any(word in block_upper for word in brand_words):
+            return 'brand'
+        
+        # Product type indicators
+        product_words = ['MILK', 'CHEESE', 'BREAD', 'JUICE', 'WATER', 'YOGURT', 'COFFEE', 'TEA']
+        if any(word in block_upper for word in product_words):
+            return 'product'
+        
+        # Descriptive indicators
+        desc_words = ['REDUCED', 'FAT', 'FREE', 'LOW', 'LIGHT', 'DIET', 'WHOLE']
+        if any(word in block_upper for word in desc_words):
+            return 'descriptor'
+        
+        # Size/quantity indicators
+        if re.search(r'\d+%|\d+[ML]?G?L?', block_upper):
+            return 'size'
+        
+        return 'general'
+    
+    def _strategy_brand_product_descriptor(self, candidates: list[dict]) -> Optional[str]:
+        """Try to construct name with brand + product + descriptors"""
+        brands = [c for c in candidates if c['category'] == 'brand'][:2]
+        products = [c for c in candidates if c['category'] == 'product'][:2] 
+        descriptors = [c for c in candidates if c['category'] == 'descriptor'][:3]
+        
+        parts = []
+        parts.extend([c['text'] for c in brands])
+        parts.extend([c['text'] for c in products])
+        parts.extend([c['text'] for c in descriptors])
+        
+        if len(parts) >= 2:
+            return ' '.join(parts[:6])  # Limit to 6 words
+        return None
+    
+    def _strategy_longest_meaningful_sequence(self, candidates: list[dict]) -> Optional[str]:
+        """Find the longest sequence of high-scoring adjacent blocks"""
+        if len(candidates) < 2:
+            return None
+        
+        # Take top 8 candidates and try to form a meaningful sequence
+        top_candidates = candidates[:8]
+        best_sequence = []
+        current_sequence = []
+        
+        for candidate in top_candidates:
+            if candidate['score'] >= 0.4:  # Only high-confidence blocks
+                current_sequence.append(candidate['text'])
+                if len(current_sequence) > len(best_sequence):
+                    best_sequence = current_sequence[:]
+            else:
+                current_sequence = []
+        
+        if len(best_sequence) >= 2:
+            return ' '.join(best_sequence[:5])  # Max 5 words
+        return None
+    
+    def _strategy_high_confidence_blocks(self, candidates: list[dict]) -> Optional[str]:
+        """Use highest-scoring individual blocks"""
+        high_conf = [c for c in candidates if c['score'] >= 0.5][:4]
+        if len(high_conf) >= 2:
+            return ' '.join([c['text'] for c in high_conf])
+        return None
+    
+    def _strategy_alphabetic_blocks(self, candidates: list[dict]) -> Optional[str]:
+        """Fallback: use any alphabetic blocks with decent scores"""
+        alpha_blocks = [c for c in candidates if c['text'].isalpha() and c['score'] >= 0.3][:3]
+        if len(alpha_blocks) >= 1:
+            return ' '.join([c['text'] for c in alpha_blocks])
+        return None
+    
+    def _clean_product_name(self, name: str) -> str:
+        """Clean and normalize the final product name"""
+        # Remove extra whitespace
+        name = ' '.join(name.split())
+        
+        # Capitalize appropriately
+        words = name.split()
+        cleaned_words = []
+        
+        for word in words:
+            # Keep percentage signs and numbers as-is
+            if re.search(r'\d+%', word) or word.isdigit():
+                cleaned_words.append(word)
+            # Title case for regular words
+            else:
+                cleaned_words.append(word.title())
+        
+        return ' '.join(cleaned_words)
+    
     def get_last_dual_dates(self) -> dict:
         """Get the last extracted dual dates (expiry and manufacture)"""
         return self._last_dual_dates or {'expiry_date': None, 'manufacture_date': None, 'metadata': {}}
 
     def _generate_text_suggestions(self, vision_result: VisionScanResult) -> dict[str, Any]:
-        """Generate product name suggestions from OCR text"""
+        """Generate product name suggestions from OCR text by combining meaningful text blocks"""
         suggestions: dict[str, Any] = {"name": None}
         
         if not vision_result.raw_text:
             return suggestions
         
-        # Extract potential product name from text blocks
-        text_blocks = [ocr.text.strip() for ocr in vision_result.raw_text if ocr.confidence > 0.5]
+        # Filter for high-confidence, meaningful text blocks
+        text_blocks = [
+            ocr.text.strip() for ocr in vision_result.raw_text 
+            if ocr.confidence > 0.5 and len(ocr.text.strip()) > 1
+        ]
         
         if text_blocks:
-            # Use the most confident text block as potential name
-            best_text = max(vision_result.raw_text, key=lambda t: t.confidence)
-            if best_text.confidence > 0.7:
-                suggestions["name"] = best_text.text.strip()
+            # Try to construct product name from meaningful text blocks
+            product_name = self._construct_product_name(text_blocks, vision_result.raw_text)
+            if product_name:
+                suggestions["name"] = product_name
+            else:
+                # Fallback: use the most confident meaningful text block
+                meaningful_blocks = [
+                    ocr for ocr in vision_result.raw_text 
+                    if ocr.confidence > 0.7 and len(ocr.text.strip()) > 2 and not ocr.text.strip().isdigit()
+                ]
+                if meaningful_blocks:
+                    best_text = max(meaningful_blocks, key=lambda t: t.confidence)
+                    suggestions["name"] = best_text.text.strip()
         
         return suggestions
 

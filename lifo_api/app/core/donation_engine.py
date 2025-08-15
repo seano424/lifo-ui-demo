@@ -11,32 +11,9 @@ from typing import Any, Optional
 import structlog
 from pydantic import BaseModel
 
+from app.database.inventory_models import ActionType, DonationRecipientType
+
 logger = structlog.get_logger()
-
-
-class ActionType(Enum):
-    """Simple action types matching database schema"""
-
-    DISCOUNT = "discount"
-    DONATE = "donate"
-    DISPOSE = "dispose"
-    MAINTAIN = "maintain"
-    IGNORED = "ignored"
-
-
-class DonationRecipientType(Enum):
-    """Common donation recipient types for better UX"""
-
-    FOOD_BANK = "food_bank"
-    SOUP_KITCHEN = "soup_kitchen"
-    CHARITY = "charity"
-    RELIGIOUS_ORG = "religious_org"
-    COMMUNITY_GROUP = "community_group"
-    ANIMAL_SHELTER = "animal_shelter"
-    SCHOOL = "school"
-    ELDERLY_CARE = "elderly_care"
-    HOMELESS_SHELTER = "homeless_shelter"
-    OTHER = "other"
 
 
 class DonationPriority(Enum):

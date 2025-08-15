@@ -6,6 +6,26 @@ Test script for LIFO FastAPI Supabase Authentication Setup
 import asyncio
 import sys
 import os
+from dotenv import load_dotenv
+
+# Load environment variables first
+env_paths = [
+    os.path.join(os.path.dirname(__file__), "../.env.local"),  # Root level
+    os.path.join(os.path.dirname(__file__), ".env.local"),     # API level
+    "../.env.local",
+    ".env.local"
+]
+
+env_loaded = False
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        print(f"Loading environment from: {env_path}")
+        load_dotenv(env_path)
+        env_loaded = True
+        break
+
+if not env_loaded:
+    print("⚠️  No .env.local file found, using system environment")
 
 # Add the current directory to Python path
 sys.path.insert(0, os.getcwd())

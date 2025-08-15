@@ -324,6 +324,13 @@ class SecureReadOnlyOperations:
             )
             return False
 
+    async def get_store_analytics(self, store_id: str, days: int = 30) -> dict[str, Any]:
+        """
+        Get store analytics data for API endpoints
+        Uses parameterized query to prevent SQL injection
+        """
+        return await self.get_analytics_data(store_id, days)
+
     async def get_analytics_data(self, store_id: str, days: int = 30) -> dict[str, Any]:
         """
         Get analytics data for dashboard
