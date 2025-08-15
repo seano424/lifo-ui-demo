@@ -1,9 +1,7 @@
-// hooks/use-store-users.ts
-
-import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useActiveStoreId } from '@/lib/stores/store-context' // ✅ Use helper like products
-import { queryKeys } from '@/lib/queries/query-keys' // ✅ Use centralized query keys
+import { queryKeys } from '@/lib/queries/query-keys'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import {
   fetchStoreUsersPage,
   fetchStoreUserById,
@@ -17,11 +15,14 @@ import {
 // ✅ READING DATA - Store-aware infinite scroll users list
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
+  console.log('[useStoreUsers] Hook called - activeStoreId:', activeStoreId, 'filters:', filters)
 
   const result = useInfiniteQuery({
     queryKey: queryKeys.storeUsers.infinite(activeStoreId || '', filters), // ✅ Centralized keys
     queryFn: ({ pageParam = 0 }) => {
+      console.log('[useStoreUsers] Fetching page:', pageParam, 'for store:', activeStoreId, 'with filters:', filters)
       if (!activeStoreId) {
+        console.log('[useStoreUsers] Error: No activeStoreId')
         throw new Error('Store ID is required for fetching store users') // ✅ Same validation as products
       }
       return fetchStoreUsersPage(activeStoreId, { page: pageParam, pageSize }, filters)
@@ -33,6 +34,8 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
 
   // Flatten pages into single array
   const data = result.data?.pages.flatMap(page => page.data) ?? []
+  
+  console.log('[useStoreUsers] Result - data count:', data.length, 'isLoading:', result.isLoading, 'storeId:', activeStoreId)
 
   return {
     data,
@@ -51,11 +54,14 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
 // ✅ READING DATA - Single store user by ID (store-aware)
 export function useStoreUser(userId: string) {
   const activeStoreId = useActiveStoreId()
+  console.log('[useStoreUser] Hook called - activeStoreId:', activeStoreId, 'userId:', userId)
 
   return useQuery({
     queryKey: queryKeys.storeUsers.detail(activeStoreId || '', userId), // ✅ Centralized keys
     queryFn: () => {
+      console.log('[useStoreUser] Fetching user:', userId, 'for store:', activeStoreId)
       if (!activeStoreId) {
+        console.log('[useStoreUser] Error: No activeStoreId')
         throw new Error('Store ID is required for fetching store user')
       }
       return fetchStoreUserById(activeStoreId, userId)
@@ -93,6 +99,7 @@ export function usePinEnabledUsers() {
 export function useStoreUserActions() {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId() // ✅ Same pattern as products
+  console.log('[useStoreUserActions] Hook called - activeStoreId:', activeStoreId)
 
   // Update store user mutation
   const updateMutation = useMutation({
@@ -110,6 +117,7 @@ export function useStoreUserActions() {
         pin_permissions?: Record<string, unknown>
       }
     }) => {
+      console.log('[useStoreUserActions.updateMutation] Updating user:', userId, 'in store:', activeStoreId, 'with updates:', updates)
       if (!activeStoreId) {
         throw new Error('Store ID is required for updating store user') // ✅ Validation
       }
@@ -181,6 +189,7 @@ export function useStoreUserActions() {
     },
 
     onSuccess: () => {
+      console.log('[useStoreUserActions.updateMutation] Update successful')
       toast.success('User updated successfully')
     },
   })
@@ -188,12 +197,14 @@ export function useStoreUserActions() {
   // Remove user from store mutation
   const removeMutation = useMutation({
     mutationFn: (userId: string) => {
+      console.log('[useStoreUserActions.removeMutation] Removing user:', userId, 'from store:', activeStoreId)
       if (!activeStoreId) {
         throw new Error('Store ID is required for removing store user')
       }
       return removeUserFromStore(activeStoreId, userId)
     },
     onSuccess: () => {
+      console.log('[useStoreUserActions.removeMutation] User removed successfully')
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.storeUsers.byStore(activeStoreId), // ✅ Centralized keys
@@ -220,12 +231,14 @@ export function useStoreUserActions() {
       permissions?: Record<string, boolean>
       assignedBy?: string
     }) => {
+      console.log('[useStoreUserActions.addMutation] Adding user:', userId, 'to store:', activeStoreId, 'as:', roleInStore)
       if (!activeStoreId) {
         throw new Error('Store ID is required for adding store user')
       }
       return addUserToStore(activeStoreId, userId, roleInStore, permissions)
     },
     onSuccess: () => {
+      console.log('[useStoreUserActions.addMutation] User added successfully')
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.storeUsers.byStore(activeStoreId), // ✅ Centralized keys

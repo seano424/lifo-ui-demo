@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
 import { AlertTriangle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,11 +8,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useUrgentAlerts } from '@/hooks/use-urgent-alerts'
 import { getAlertMessage } from '@/lib/queries/urgent-alerts'
 import { cn } from '@/lib/utils'
+import { Typography } from '@/components/ui/typography'
 
 export function UrgentAlerts({ className }: { className?: string }) {
   const { data, isLoading, isError, refetch } = useUrgentAlerts()
 
-  // Loading state
   if (isLoading) {
     return (
       <Card className={cn('p-4', className)}>
@@ -28,7 +27,6 @@ export function UrgentAlerts({ className }: { className?: string }) {
     )
   }
 
-  // Error state
   if (isError) {
     return (
       <Card className={cn('border-red-200 bg-red-50 p-4', className)}>
@@ -50,69 +48,27 @@ export function UrgentAlerts({ className }: { className?: string }) {
     )
   }
 
-  // Get alert message and severity
   const { message, severity } = getAlertMessage(data?.criticalCount || 0, data?.urgentCount || 0)
 
-  // Don't show alert if there are no urgent/critical items
-  // if (severity === 'safe') {
-  //   return null
-  // }
-
-  // Determine styling based on severity
-  const severityStyles = {
-    critical: {
-      card: 'border-red-200 bg-red-50',
-      dot: 'bg-red-600',
-      text: 'text-red-900',
-      button: 'bg-blue-600 text-white hover:bg-blue-700',
-    },
-    urgent: {
-      card: 'border-orange-200 bg-orange-50',
-      dot: 'bg-orange-600',
-      text: 'text-orange-900',
-      button: 'bg-blue-600 text-white hover:bg-blue-700',
-    },
-    safe: {
-      card: 'border-green-200 bg-green-50',
-      dot: 'bg-green-600',
-      text: 'text-green-900',
-      button: 'bg-green-600 text-white hover:bg-green-700',
-    },
-  }
-
-  const styles = severityStyles[severity]
-
   return (
-    <Card className={cn('p-4 rounded-2xl', styles.card, className)}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Pulsing dot indicator for critical alerts */}
-          <div className="relative">
-            <div className={cn('h-2 w-2 rounded-full', styles.dot)} />
-            {severity === 'critical' && (
-              <div
-                className={cn('absolute inset-0 h-2 w-2 animate-ping rounded-full', styles.dot)}
-              />
-            )}
-          </div>
-
-          {/* Alert message */}
-          <span className={cn('text-sm font-medium', styles.text)}>{message}</span>
-        </div>
-
-        {/* Action button */}
-        <Link href="/dashboard/inventory/batches?filter=expiring">
-          <Button size="sm" className={cn('gap-2', styles.button)}>
-            VIEW EXPIRING ITEMS
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
+    <div className="flex flex-col gap-4 sm:flex-row text-center sm:text-left items-center justify-between border border-primary-500/10 shadow-xs rounded p-4 bg-primary-50/5">
+      <div className="flex flex-col gap-2">
+        <Typography variant="h4" className="font-bold capitalize">
+          {severity} Alerts
+        </Typography>
+        <Typography variant="p">🚨 {message}</Typography>
       </div>
-    </Card>
+
+      <Link href="/dashboard/inventory/batches?filter=expiring">
+        <Button variant="subtleSecondary" className="gap-2">
+          View expiring items
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </Link>
+    </div>
   )
 }
 
-// Skeleton loader component for use in dashboard loading states
 export function UrgentAlertsSkeleton({ className }: { className?: string }) {
   return (
     <Card className={cn('p-4', className)}>

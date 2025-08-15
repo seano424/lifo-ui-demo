@@ -2,14 +2,13 @@
 
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { TrendingUp, TrendingDown } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { TrendIndicator } from './TrendIndicator'
 import { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
-
+import { Button } from '../ui/button'
+import { Euro, Trash2, GiftIcon, LucideIcon, ZapIcon } from 'lucide-react'
 interface KPICardProps {
-  icon: string
+  icon: 'euro' | 'sales' | 'donation' | 'waste'
   label: string
   value: number
   change?: number
@@ -27,10 +26,17 @@ interface KPICardProps {
   showTrends?: boolean
 }
 
+const iconMap: Record<string, LucideIcon> = {
+  euro: Euro,
+  sales: ZapIcon,
+  donation: GiftIcon,
+  waste: Trash2,
+}
+
 export function KPICard({
+  icon,
   label,
   value,
-  change,
   productCount,
   subtitle,
   isLoading = false,
@@ -55,21 +61,6 @@ export function KPICard({
     return val.toLocaleString()
   }
 
-  const formatChange = (val: number) => {
-    if (isCurrency) {
-      const formatted = new Intl.NumberFormat('en-EU', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(Math.abs(val))
-      return `${val >= 0 ? '+' : '-'}${formatted}`
-    }
-    return `${val >= 0 ? '+' : '-'}${Math.abs(val).toLocaleString()}`
-  }
-
-  const isPositive = change && change >= 0
-
   if (isLoading) {
     return (
       <div
@@ -82,7 +73,6 @@ export function KPICard({
         <Skeleton className="h-8 w-2/3 rounded-4xl" />
         <Skeleton className="h-8 w-3/5 rounded-4xl" />
         <Skeleton className="h-8 w-1/2 rounded-4xl" />
-        <Skeleton className="h-12 w-1/2 rounded-4xl" />
       </div>
     )
   }
@@ -102,69 +92,41 @@ export function KPICard({
 
   const cardContent = (
     <div className="space-y-2 flex flex-col items-center text-center">
-      <Typography variant="h3" className="font-black">
+      <Typography variant="h4" className="font-bold flex items-center gap-2">
+        {iconMap[icon as keyof typeof iconMap] &&
+          (() => {
+            const IconComponent = iconMap[icon as keyof typeof iconMap]
+            return IconComponent ? (
+              <IconComponent className="w-6 h-6 bg-primary-50/30 rounded-full p-1" />
+            ) : null
+          })()}
+
         {label}
       </Typography>
 
       <div className="flex flex-col gap-3 items-center">
-        <Typography variant="h4" className="">
+        <Typography variant="h3" className="font-bold">
           {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
         </Typography>
 
-        {showTrends && trendData ? (
-          <TrendIndicator
-            current={trendData.current}
-            previous={trendData.previous}
-            change={trendData.change}
-            changePercent={trendData.changePercent}
-            trend={trendData.trend}
-            isCurrency={isCurrency}
-            showDetails={false}
-            periodMin={trendData.periodMin}
-            periodMax={trendData.periodMax}
-            minDate={trendData.minDate}
-            maxDate={trendData.maxDate}
-          />
-        ) : (
-          change &&
-          change !== 0 && (
-            <div className="flex flex-col gap-3 items-center">
-              <Typography variant="h4" className={cn('flex items-center gap-1 ')}>
-                <span>{formatChange(change ?? 0)}</span>
-                {isPositive ? (
-                  <TrendingUp className="h-4 w-4" />
-                ) : (
-                  <TrendingDown className="h-4 w-4" />
-                )}
-              </Typography>
-            </div>
-          )
-        )}
+        <div className="flex items-center gap-2 mb-2">
+          <Typography variant="p">{subtitle}</Typography>
+          {productCount && (
+            <Typography variant="p" className="">
+              {productCount} product{productCount > 1 ? 's' : ''}
+            </Typography>
+          )}
+        </div>
 
-        {productCount && (
-          <Typography variant="h4" className="">
-            {productCount} product{productCount > 1 ? 's' : ''}
-          </Typography>
-        )}
-
-        <Typography variant="h4" className="">
-          {subtitle}
-        </Typography>
-        <Typography
-          variant="h4"
-          className="bg-secondary-50 border border-secondary-100 text-black rounded-full px-4 py-2 group-hover:bg-secondary-100/50 transition-all duration-200 ease-in-out group-hover:border-primary-400"
-          onClick={onClick}
-        >
-          View details
-        </Typography>
+        <Button variant="subtleSecondary">View details</Button>
       </div>
     </div>
   )
 
   const cardClassName = cn(
-    'bg-white rounded-4xl py-6 shadow-sm shadow-primary-100/10 border-4',
+    'bg-white rounded py-6 border',
     'transition-all duration-200',
-    (isLink || onClick) && 'cursor-pointer hover:shadow-md hover:border-primary-400 group',
+    (isLink || onClick) && 'cursor-pointer hover:shadow-md hover:border-primary-100/50 group',
     className,
   )
 
