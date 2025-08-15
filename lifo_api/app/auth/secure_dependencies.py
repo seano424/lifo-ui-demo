@@ -10,27 +10,25 @@ from typing import Any, Optional
 
 import structlog
 from fastapi import Depends, Header, HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.auth.supabase_jwt import SupabaseAuthError, get_supabase_auth
+from app.auth.supabase_api_key_auth import SupabaseAPIKeyError, get_api_key_auth, APIKeyUser
 from app.core.config import settings
 from app.utils.mvp_exceptions import AuthenticationException, AuthorizationException
 
 logger = structlog.get_logger()
 
-# Initialize authentication
-# Use lazy initialization instead of creating instance at import time
-security = HTTPBearer()
+# Initialize authentication using new API key system
+# No need for HTTPBearer since we handle requests directly
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
 ) -> dict[str, Any]:
     """
-    Get current authenticated user from JWT token
+    Get current authenticated user using Supabase API key authentication
 
     Args:
-        credentials: Bearer token from request
+        request: FastAPI request object
 
     Returns:
         Dict containing user information
@@ -39,17 +37,9 @@ async def get_current_user(
         AuthenticationException: If authentication fails
     """
     try:
-        if not credentials:
-            logger.warning("No authentication credentials provided")
-            raise AuthenticationException("Authentication required")
-
-        token = credentials.credentials
-        if not token:
-            logger.warning("Empty authentication token")
-            raise AuthenticationException("Invalid authentication token")
-
-        # Verify token with Supabase
-        user = await get_supabase_auth().verify_token(token)
+        # Use the new API key authentication system
+        auth = get_api_key_auth()
+        user = await auth.validate_api_request(request)
 
         # Log successful authentication (without sensitive data)
         logger.info("User authenticated successfully", user_id=user.user_id, role=user.role)
@@ -60,11 +50,11 @@ async def get_current_user(
             "role": user.role,
             "aud": user.aud,
             "authenticated": True,
-            "token": token,  # Include token for further validation
+            "permissions": auth.get_user_permissions(user),
         }
 
-    except SupabaseAuthError as e:
-        logger.warning("Supabase authentication failed", error=str(e))
+    except SupabaseAPIKeyError as e:
+        logger.warning("Supabase API key authentication failed", error=str(e))
         raise AuthenticationException("Invalid authentication token")
     except Exception as e:
         logger.error("Authentication error", error=str(e))
@@ -72,44 +62,56 @@ async def get_current_user(
 
 
 async def get_optional_user(
-    authorization: Optional[str] = Header(None),
+    request: Request,
 ) -> Optional[dict[str, Any]]:
     """
     Get current user if authenticated, None otherwise
     Used for endpoints that work with or without authentication
     """
-    if not authorization or not authorization.startswith("Bearer "):
-        return None
-
     try:
-        token = authorization[7:]  # Remove "Bearer " prefix
-        user = await get_supabase_auth().verify_token(token)
+        # Check if Authorization header exists
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            return None
+
+        # Use the new API key authentication system
+        auth = get_api_key_auth()
+        user = await auth.validate_api_request(request)
+        
         return {
             "sub": user.user_id,
             "email": user.email,
             "role": user.role,
             "authenticated": True,
+            "permissions": auth.get_user_permissions(user),
         }
     except Exception:
         return None
 
 
 async def require_service_role(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
 ) -> dict[str, Any]:
     """
     Require service role authentication
     Used for admin/internal endpoints
     """
     try:
-        token = credentials.credentials
-        if not get_supabase_auth().verify_service_role_token(token):
-            logger.warning("Service role authentication failed")
+        # Use the new API key authentication system
+        auth = get_api_key_auth()
+        user = await auth.validate_api_request(request)
+        
+        # Check if user has service role
+        if user.role != "service_role":
+            logger.warning("Service role required but user has different role", role=user.role)
             raise AuthorizationException("Service role required")
 
         logger.info("Service role authenticated")
-        return {"role": "service_role", "authenticated": True}
+        return {"role": "service_role", "authenticated": True, "user_id": user.user_id}
 
+    except SupabaseAPIKeyError as e:
+        logger.error("Service role authentication error", error=str(e))
+        raise AuthorizationException("Service role authentication failed")
     except Exception as e:
         logger.error("Service role authentication error", error=str(e))
         raise AuthorizationException("Service role authentication failed")
