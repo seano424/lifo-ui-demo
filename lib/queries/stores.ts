@@ -224,3 +224,46 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
     throw err
   }
 }
+
+// Smart store selection logic
+export function selectDefaultStore(
+  userStores: UserStore[],
+  primaryStoreId: string | null,
+  lastActiveStoreId: string | null,
+): Store | null {
+  if (!userStores || userStores.length === 0) {
+    return null
+  }
+
+  // 1. Try to use last active store if it's still accessible
+  if (lastActiveStoreId) {
+    const lastActiveStore = userStores.find(us => us.store.store_id === lastActiveStoreId)
+    if (lastActiveStore) {
+      return lastActiveStore.store
+    }
+  }
+
+  // 2. Try to use primary store from database if set
+  if (primaryStoreId) {
+    const primaryStore = userStores.find(us => us.store.store_id === primaryStoreId)
+    if (primaryStore) {
+      return primaryStore.store
+    }
+  }
+
+  // 3. Fallback to intelligent defaults
+  // First, try to find a store where user is owner
+  const ownedStore = userStores.find(us => us.role === 'owner')
+  if (ownedStore) {
+    return ownedStore.store
+  }
+
+  // Then try manager role
+  const managedStore = userStores.find(us => us.role === 'manager')
+  if (managedStore) {
+    return managedStore.store
+  }
+
+  // Finally, just use the first store
+  return userStores[0].store
+}
