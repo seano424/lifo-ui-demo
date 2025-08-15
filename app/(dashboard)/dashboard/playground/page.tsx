@@ -19,7 +19,8 @@ export default function PlaygroundPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">BottomSheet Component Playground</h1>
         <p className="text-muted-foreground">
-          Test the BottomSheet component with different content types. On mobile, sheets slide up from bottom with swipe-to-dismiss. On desktop, they appear as centered modals.
+          Test the BottomSheet component with different content types. On mobile, sheets slide up
+          from bottom with swipe-to-dismiss. On desktop, they appear as centered modals.
         </p>
       </div>
 
@@ -81,15 +82,12 @@ export default function PlaygroundPage() {
         <div className="space-y-4">
           <div>
             <Label htmlFor="discount-type">Discount Type</Label>
-            <select
-              id="discount-type"
-              className="w-full mt-1 px-3 py-2 border rounded-md"
-            >
+            <select id="discount-type" className="w-full mt-1 px-3 py-2 border rounded-md">
               <option>Percentage (%)</option>
               <option>Fixed Amount ($)</option>
             </select>
           </div>
-          
+
           <div>
             <Label htmlFor="discount-value">Discount Value</Label>
             <Input
@@ -102,11 +100,7 @@ export default function PlaygroundPage() {
 
           <div>
             <Label htmlFor="reason">Reason (Optional)</Label>
-            <Input
-              id="reason"
-              placeholder="e.g., Damaged packaging"
-              className="mt-1"
-            />
+            <Input id="reason" placeholder="e.g., Damaged packaging" className="mt-1" />
           </div>
 
           <div className="flex gap-2 pt-4">
@@ -146,10 +140,7 @@ export default function PlaygroundPage() {
 
           <div>
             <Label htmlFor="donation-org">Donation Organization</Label>
-            <select
-              id="donation-org"
-              className="w-full mt-1 px-3 py-2 border rounded-md"
-            >
+            <select id="donation-org" className="w-full mt-1 px-3 py-2 border rounded-md">
               <option>Local Food Bank</option>
               <option>Community Kitchen</option>
               <option>Shelter Services</option>
@@ -180,6 +171,7 @@ export default function PlaygroundPage() {
 
       <BottomSheet
         isOpen={detailsModal}
+        variant="fullHeight"
         onClose={() => setDetailsModal(false)}
         title="Product Details"
       >
@@ -246,8 +238,8 @@ export default function PlaygroundPage() {
       >
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            This is a full height modal variant that takes up 90% of the viewport height. 
-            It's useful for content that needs more vertical space.
+            This is a full height modal variant that takes up 90% of the viewport height. It's
+            useful for content that needs more vertical space.
           </p>
 
           {Array.from({ length: 20 }, (_, i) => (
@@ -260,8 +252,8 @@ export default function PlaygroundPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                  Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                  incididunt ut labore et dolore magna aliqua.
                 </p>
               </CardContent>
             </Card>
