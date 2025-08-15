@@ -16,6 +16,35 @@
     "products": "Produits"
   },
   "dashboard": {
+    "quickActions": {
+      "title": "Actions Rapides",
+      "addProducts": {
+        "title": "Ajouter des Produits",
+        "description": "Ajoutez de nouveaux produits à votre inventaire en scannant des codes-barres ou en saisissant manuellement.",
+        "action": "Ajouter des produits"
+      },
+      "todoSuggestions": {
+        "title": "Suggestions de Todo",
+        "description": "Afficher et gérer les tâches suggérées par LIFO.AI pour optimiser votre inventaire.",
+        "action": "Afficher les todos"
+      },
+      "removeProducts": {
+        "title": "Supprimer des Produits",
+        "description": "Enregistrer les ventes, les dons ou les déchets pour les articles quittant votre inventaire.",
+        "action": "Supprimer des produits"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "Aucun Magasin Trouvé",
+        "description": "Vous devez créer un magasin avant de pouvoir gérer des produits. Veuillez configurer votre premier magasin pour continuer.",
+        "tip": {
+          "title": "Pourquoi ai-je besoin d'un magasin?",
+          "description": "Les magasins vous aident à organiser votre inventaire et à suivre les produits de manière efficace. Chaque magasin peut avoir son propre inventaire, ses paramètres et ses membres d'équipe."
+        },
+        "button": "Créer Votre Premier Magasin"
+      }
+    },
     "kpis": {
       "title": "Aperçu des métriques clés",
       "refresh": "Actualiser",
@@ -366,6 +395,8 @@
     "more": "Plus"
   },
   "breadcrumbs": {
+    "batches": "Lots",
+    "billing": "Facturations",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
     "input": "Entrées",

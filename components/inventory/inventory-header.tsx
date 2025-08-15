@@ -14,26 +14,28 @@ export default function InventoryHeader() {
   const isBatches = pathname.includes('batches')
 
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex gap-5 items-center">
+    <div className="flex justify-between items-center mb-8">
+      <div className="flex gap-8 items-center">
         <Link href="/dashboard/inventory/products">
           <Typography
             variant="h2"
             className={cn(
-              'font-black italic uppercase',
-              isProducts && 'text-primary-600 underline underline-offset-4',
+              'transition-colors hover:text-primary-500 border-b-2 border-transparent pb-1',
+              isProducts
+                ? 'text-primary-600 border-b-2 border-primary-500'
+                : 'text-muted-foreground',
             )}
           >
             {t('products')}
           </Typography>
         </Link>
-        <span className="text-primary-600">/</span>
+        <span className="text-muted-foreground text-xl">|</span>
         <Link href="/dashboard/inventory/batches">
           <Typography
             variant="h2"
             className={cn(
-              'font-black italic uppercase',
-              isBatches && 'text-primary-600 underline underline-offset-4',
+              'transition-colors hover:text-primary-500 border-b-2 border-transparent pb-1',
+              isBatches ? 'text-primary-600 border-primary-500' : 'text-muted-foreground',
             )}
           >
             {t('batches')}

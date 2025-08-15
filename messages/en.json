@@ -16,6 +16,35 @@
     "products": "Products"
   },
   "dashboard": {
+    "quickActions": {
+      "title": "Quick Actions",
+      "addProducts": {
+        "title": "Add Products",
+        "description": "Add new products to your inventory with barcode scanning or manual entry.",
+        "action": "Add new products"
+      },
+      "todoSuggestions": {
+        "title": "Todo Suggestions",
+        "description": "View and manage tasks suggested by LIFO.AI to optimize your inventory.",
+        "action": "View todos"
+      },
+      "removeProducts": {
+        "title": "Remove Products",
+        "description": "Register sales, donations, or waste for items leaving your inventory.",
+        "action": "Remove products"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "No Stores Found",
+        "description": "You need to create a store before you can manage products. Please set up your first store to continue.",
+        "tip": {
+          "title": "Why do I need a store?",
+          "description": "Stores help you organize your inventory and track products efficiently. Each store can have its own inventory, settings, and team members."
+        },
+        "button": "Create Your First Store"
+      }
+    },
     "kpis": {
       "title": "Key Metrics Overview",
       "refresh": "Refresh",
@@ -406,6 +435,8 @@
     "more": "More"
   },
   "breadcrumbs": {
+    "batches": "Batches",
+    "billing": "Billings",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
     "input": "Input",

@@ -16,6 +16,35 @@
     "products": "Producten"
   },
   "dashboard": {
+    "quickActions": {
+      "title": "Snelle Acties",
+      "addProducts": {
+        "title": "Producten Toevoegen",
+        "description": "Voeg nieuwe producten toe aan uw voorraad met behulp van barcode-scanning of handmatige invoer.",
+        "action": "Nieuwe producten toevoegen"
+      },
+      "todoSuggestions": {
+        "title": "Todo Suggesties",
+        "description": "Bekijk en beheer taken die door LIFO.AI zijn voorgesteld om uw voorraad te optimaliseren.",
+        "action": "Bekijk todos"
+      },
+      "removeProducts": {
+        "title": "Producten Verwijderen",
+        "description": "Registreer verkopen, donaties of afval voor artikelen die uw voorraad verlaten.",
+        "action": "Verwijder producten"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "Geen Winkels Gevonden",
+        "description": "U moet een winkel aanmaken voordat u producten kunt beheren. Stel uw eerste winkel in om door te gaan.",
+        "tip": {
+          "title": "Waarom heb ik een winkel nodig?",
+          "description": "Winkels helpen u uw voorraad te organiseren en producten efficiënt te volgen. Elke winkel kan zijn eigen voorraad, instellingen en teamleden hebben."
+        },
+        "button": "Maak uw eerste winkel aan"
+      }
+    },
     "kpis": {
       "title": "Overzicht belangrijke statistieken",
       "refresh": "Vernieuwen",
@@ -366,6 +395,8 @@
     "more": "Meer"
   },
   "breadcrumbs": {
+    "batches": "Partijen",
+    "billing": "Facturering",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
     "input": "Inkomend",
