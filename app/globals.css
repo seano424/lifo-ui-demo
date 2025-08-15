@@ -3,6 +3,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @plugin 'tailwind-scrollbar';
+@plugin 'tailwindcss-debug-screens' {
+  classname: 'debug-screens';
+  position: 'bottom, left';
+  prefix: 'screen: ';
+}
 
 @theme {
   --color-background: hsl(var(--background));
@@ -77,6 +82,16 @@
   --font-mono:
     var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
+
+  /* Breakpoints */
+  --breakpoint-*: initial;
+  --breakpoint-xs: 360px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
 }
 
 @layer base {
@@ -182,6 +197,15 @@
   [role='tab']:not(:disabled),
   [role='menuitem']:not(:disabled) {
     cursor: pointer;
+  }
+
+  /* Add margin to debug screens indicator */
+  .debug-screens::before {
+    margin-left: 4rem !important;
+    margin-bottom: 1.5rem !important;
+    padding: 0.5rem !important;
+    border-radius: 4px;
+    font-weight: bold;
   }
 }
 
