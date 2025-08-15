@@ -1,10 +1,17 @@
-# LIFO AI Engine Documentation
+# LIFO.AI Documentation
 
-Welcome to the LIFO AI Engine documentation hub. This directory contains all the documentation you need to understand, develop, deploy, and maintain the LIFO application.
+Welcome to the LIFO.AI documentation hub. This directory contains all the documentation you need to understand, develop, deploy, and maintain the LIFO application.
+
+## 🚀 Quick Start
+
+**New to LIFO.AI?** Start here:
+- **[Complete Setup & Testing Guide](./COMPLETE_SETUP_TESTING_GUIDE.md)** - Get LIFO running locally in 15 minutes
+- **[Unified Python Setup Guide](./UNIFIED_PYTHON_SETUP_GUIDE.md)** - Single environment setup for API and core
+- **[Quick Auth Test](./QUICK_AUTH_TEST.md)** - Verify your setup works
 
 ## 📚 Core Documentation
 
-### 🚀 **[Comprehensive FastAPI Microservice Documentation](./COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)**
+### 🔧 **[Comprehensive FastAPI Microservice Documentation](./COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)**
 **The complete guide to the LIFO AI Engine** - covers everything from setup to deployment with examples and troubleshooting.
 
 ## 📖 Documentation Categories
@@ -25,9 +32,8 @@ Welcome to the LIFO AI Engine documentation hub. This directory contains all the
 - **[LIFO AI Core](./LIFO_AI_CORE_README.md)** - Core module documentation
 
 ### Features
-- **[OCR Integration](./OCR_INTEGRATION_SUMMARY.md)** - Google Vision API integration
-- **[CSV Processing](./CSV_CONSOLIDATION_SUMMARY.md)** - Bulk data processing
-- **[Donation Engine](./DONATION_ENGINE_MIGRATION.md)** - Donation system migration
+- **[CSV Processing Guide](./CSV_PROCESSING_GUIDE.md)** - Complete CSV upload and processing guide
+- **[CSV Column Mapping Demo](../lifo_api/test_csv_data/CSV_COLUMN_MAPPING_DEMO.md)** - Flexible column mapping examples
 - **[Backend Capabilities](./BACKEND_CAPABILITIES_DEMO.md)** - Backend feature demonstration
 
 ### Deployment & Operations
