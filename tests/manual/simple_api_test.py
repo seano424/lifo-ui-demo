@@ -7,7 +7,7 @@ import requests
 import time
 import json
 
-BASE_URL = "http://localhost:8002"
+BASE_URL = "http://localhost:8000"
 
 def test_endpoint(endpoint, method="GET", expected_codes=[200]):
     """Test a single endpoint"""

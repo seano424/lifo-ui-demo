@@ -153,6 +153,73 @@ class TestScoringMathematicalVulnerabilities:
 
 class TestScoringBusinessLogicVulnerabilities:
     """Test business logic vulnerabilities in scoring"""
+    
+    def test_expired_product_eu_compliance(self):
+        """\ud83d\udd12 COMPLIANCE: Test EU-compliant expired product handling"""
+        scorer = InventoryScorer()
+        
+        # Test various expired product scenarios
+        expired_scenarios = [
+            (-1, "fresh_produce", 50.0),  # 1 day expired, high margin
+            (-7, "dairy", 30.0),          # 1 week expired, medium margin
+            (-30, "canned_jarred", 80.0), # 1 month expired, very high margin
+            (0, "fresh_meat_fish", 25.0), # Just expired, low margin
+        ]
+        
+        for days_expired, category, margin_percent in expired_scenarios:
+            # Test direct expired recommendation function
+            recommendation = scorer._generate_expired_recommendation(
+                days_to_expiry=days_expired,
+                current_margin_percent=margin_percent,
+                current_quantity=10.0
+            )
+            
+            # EU compliance requirements for expired products
+            assert recommendation["action"] == "dispose", (
+                f"Expired products must be disposed, got {recommendation['action']}"
+            )
+            assert recommendation["urgency"] == "critical", (
+                f"Expired products must be critical urgency, got {recommendation['urgency']}"
+            )
+            assert recommendation["reason"] == "product expired", (
+                f"Must specify expired reason, got {recommendation['reason']}"
+            )
+            assert recommendation["discount_percent"] == 0, (
+                f"No discounts allowed on expired products, got {recommendation['discount_percent']}"
+            )
+            assert recommendation["priority"] == 1, (
+                f"Expired products must be highest priority, got {recommendation['priority']}"
+            )
+    
+    def test_expired_product_recommendation_consistency(self):
+        """\ud83d\udd12 COMPLIANCE: Test expired product recommendation is consistent regardless of other factors"""
+        scorer = InventoryScorer()
+        
+        # Test that expired recommendation is consistent regardless of input variation
+        base_recommendation = scorer._generate_expired_recommendation(
+            days_to_expiry=-1,
+            current_margin_percent=50.0,
+            current_quantity=10.0
+        )
+        
+        # Test with different parameters - should always return identical result
+        test_variations = [
+            (-1, 0.0, 1.0),      # Different margin and quantity
+            (-365, 100.0, 1000.0), # Very old expiry, high margin, large quantity
+            (0, 10.0, 0.1),      # Just expired, low margin, tiny quantity
+        ]
+        
+        for days, margin, quantity in test_variations:
+            variation_recommendation = scorer._generate_expired_recommendation(
+                days_to_expiry=days,
+                current_margin_percent=margin,
+                current_quantity=quantity
+            )
+            
+            # All expired product recommendations must be identical
+            assert variation_recommendation == base_recommendation, (
+                f"Expired product recommendations must be consistent regardless of other factors"
+            )
 
     def test_discount_calculation_manipulation(self):
         """🚨 HIGH: Discount calculation can be manipulated"""
@@ -167,20 +234,35 @@ class TestScoringBusinessLogicVulnerabilities:
         ]
 
         for cost, selling in extreme_margins:
+            # Test with non-expired products first
             recommendation = scorer.generate_recommendation(
                 composite_score=0.8,  # High urgency
-                days_to_expiry=1,
+                days_to_expiry=1,  # Not expired
                 current_margin_percent=((selling - cost) / selling) * 100,
                 current_quantity=10.0,
             )
 
             discount = recommendation.get("discount_percent", 0)
 
-            # Discount should be reasonable
+            # Discount should be reasonable for non-expired products
             if discount > 100:
                 pytest.fail(f"Discount > 100%: {discount} for margin {cost}/{selling}")
             if discount < 0:
                 pytest.fail(f"Negative discount: {discount} for margin {cost}/{selling}")
+            
+            # Test with expired products - should always return disposal recommendation
+            expired_recommendation = scorer.generate_recommendation(
+                composite_score=0.8,  # High urgency (irrelevant for expired)
+                days_to_expiry=0,  # Expired
+                current_margin_percent=((selling - cost) / selling) * 100,
+                current_quantity=10.0,
+            )
+            
+            # Expired products must follow EU compliance
+            assert expired_recommendation["action"] == "dispose"
+            assert expired_recommendation["urgency"] == "critical" 
+            assert expired_recommendation["discount_percent"] == 0
+            assert expired_recommendation["priority"] == 1
 
     def test_composite_score_amplification_vulnerability(self):
         """🚨 MEDIUM: Composite score amplification can be exploited"""

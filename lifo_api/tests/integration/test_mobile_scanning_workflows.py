@@ -82,7 +82,7 @@ class TestCompleteMobileScanningWorkflow:
             
             mock_opt_instance.get_batch_quick_score_data.return_value = {
                 "batch_id": urgent_batch_id,
-                "days_to_expiry": 0,
+                "days_to_expiry": 0,  # Expired - should trigger disposal
                 "category": "fresh_produce",
                 "cost_price": 1.00,
                 "selling_price": 2.50,
@@ -100,8 +100,10 @@ class TestCompleteMobileScanningWorkflow:
             assert performance_timer.elapsed_ms < 200  # Scoring performance target
             
             score_data = score_response.json()
-            assert score_data["urgency_level"] in ["critical", "high"]
-            assert score_data["suggested_action"] is not None
+            # Expired products should always be critical and require disposal
+            assert score_data["urgency_level"] == "critical"
+            assert score_data["suggested_action"] == "dispose"
+            assert score_data["discount_percent"] == 0  # No discounts on expired products
             
             # Step 4: Check store health after scanning
             health_response = await async_client.get(
@@ -534,7 +536,7 @@ class TestMobileScanningDataIntegrity:
         # Test batch data
         batch_data = test_data_factory.create_inventory_batch(
             batch_id=batch_id,
-            days_to_expiry=1,  # Should be high urgency
+            days_to_expiry=1,  # Should be high urgency (but not expired)
             category="fresh_produce",
             cost_price=1.00,
             selling_price=2.50
@@ -587,6 +589,28 @@ class TestMobileScanningDataIntegrity:
             # Urgency scores should be similar (allowing for algorithm differences)
             # Both should indicate high urgency for 1-day expiry
             assert summary_urgency >= 0.8, f"Summary urgency too low: {summary_urgency}"
+            
+            # Test with expired product to verify disposal recommendation
+            mock_opt_instance.get_batch_quick_score_data.return_value = {
+                "batch_id": "expired-test-batch",
+                "days_to_expiry": 0,  # Expired
+                "category": "fresh_produce",
+                "cost_price": 1.00,
+                "selling_price": 2.50,
+                "typical_shelf_life_days": 7
+            }
+            
+            expired_score_response = await async_client.post(
+                f"/api/v1/batch-quick-score/expired-test-batch?store_id={store_id}",
+                headers=headers
+            )
+            assert expired_score_response.status_code == 200
+            expired_score_data = expired_score_response.json()
+            
+            # Expired products must always be critical disposal
+            assert expired_score_data["urgency_level"] == "critical"
+            assert expired_score_data["suggested_action"] == "dispose"
+            assert expired_score_data["discount_percent"] == 0
 
     @pytest.mark.asyncio
     async def test_mobile_filtering_accuracy(

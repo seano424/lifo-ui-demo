@@ -207,7 +207,7 @@ class TestMobileEndpointFunctionality:
                     "current_quantity": 5,
                     "selling_price": 3.00,
                     "cost_price": 1.50,
-                    "days_to_expiry": 0,  # Expired - should be urgent
+                    "days_to_expiry": 0,  # Expired - should be critical for disposal
                     "location_code": "A1"
                 },
                 {
@@ -237,11 +237,11 @@ class TestMobileEndpointFunctionality:
             for field in required_fields:
                 assert field in data, f"Missing required field: {field}"
 
-            # Verify urgent batch was identified
+            # Verify urgent batch was identified (expired = critical urgency)
             assert len(data["urgent_batches"]) >= 1
             urgent_batch = data["urgent_batches"][0]
             assert urgent_batch["batch_id"] == "urgent-001"
-            assert urgent_batch["urgency_score"] >= 0.8
+            assert urgent_batch["urgency_score"] >= 0.95  # Expired products get maximum urgency
 
     @pytest.mark.asyncio
     async def test_mobile_summary_data_compression(
@@ -309,8 +309,30 @@ class TestMobileEndpointFunctionality:
             assert data["urgency_level"] in ["critical", "high", "medium", "low"]
             assert data["days_to_expiry"] == 1
             
-            # With 1 day to expiry, should be high urgency
+            # With 1 day to expiry, should be high urgency (but not expired)
             assert data["urgency_level"] in ["critical", "high"]
+            
+            # Test expired product scoring
+            mock_opt_instance.get_batch_quick_score_data.return_value = {
+                "batch_id": "expired-batch-001",
+                "days_to_expiry": 0,  # Expired
+                "category": "fresh_produce",
+                "cost_price": 1.00,
+                "selling_price": 2.50,
+                "typical_shelf_life_days": 7
+            }
+            
+            expired_response = await async_client.post(
+                f"/api/v1/batch-quick-score/expired-batch-001?store_id={store_id}"
+            )
+            
+            assert expired_response.status_code == 200
+            expired_data = expired_response.json()
+            
+            # Expired products should always be critical and suggest disposal
+            assert expired_data["urgency_level"] == "critical"
+            assert expired_data["suggested_action"] == "dispose"
+            assert expired_data["discount_percent"] == 0
 
     @pytest.mark.asyncio
     async def test_batch_list_filtering(
@@ -329,7 +351,7 @@ class TestMobileEndpointFunctionality:
                     "current_quantity": 5,
                     "selling_price": 2.00,
                     "cost_price": 1.00,
-                    "days_to_expiry": 0,  # Critical
+                    "days_to_expiry": 0,  # Expired - critical for disposal
                     "location_code": "A1"
                 },
                 {
@@ -425,6 +447,18 @@ class TestMobileHelperFunctions:
 
     def test_get_quick_recommendation(self):
         """Test quick recommendation logic"""
+        # Test expired products (days_to_expiry <= 0) - should always be critical disposal
+        urgency, rec, action, discount = _get_quick_recommendation(0.9, 0)
+        assert urgency == "critical"
+        assert "dispose" in action or "disposal" in rec.lower()
+        assert discount == 0  # No discount for expired products
+
+        urgency, rec, action, discount = _get_quick_recommendation(0.5, -1)
+        assert urgency == "critical"
+        assert "dispose" in action or "disposal" in rec.lower()
+        assert discount == 0  # No discount for expired products
+
+        # Test non-expired products - normal recommendation logic
         # Critical score
         urgency, rec, action, discount = _get_quick_recommendation(0.9, 1)
         assert urgency == "critical"
@@ -560,7 +594,7 @@ class TestMobileEndpointErrorHandling:
                     "current_quantity": 5,
                     "selling_price": 2.00,
                     "cost_price": 1.00,
-                    "days_to_expiry": 0,  # All urgent
+                    "days_to_expiry": 0,  # All expired - critical for disposal
                     "location_code": "A1"
                 }
                 for i in range(20)

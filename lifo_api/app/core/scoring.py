@@ -228,49 +228,16 @@ class InventoryScorer:
         current_quantity: float = None,
     ) -> dict[str, Any]:
         """
-        Generate recommendations for expired products based on days past expiry and category
+        Generate EU-compliant recommendations for expired products
+        All expired products must be disposed for legal compliance
         """
-        # Determine action based on how long expired
-        if days_to_expiry <= -30:
-            return {
-                "action": "dispose",
-                "urgency": "critical",
-                "reason": f"Product expired {abs(days_to_expiry)} days ago - dispose immediately for safety",
-                "discount_percent": 0,
-                "priority": 1,
-            }
-        elif days_to_expiry <= -14:
-            return {
-                "action": "dispose",
-                "urgency": "critical",
-                "reason": f"Product expired {abs(days_to_expiry)} days ago - disposal recommended",
-                "discount_percent": 0,
-                "priority": 1,
-            }
-        elif days_to_expiry <= -7:
-            return {
-                "action": "heavy_discount_or_dispose",
-                "urgency": "critical",
-                "reason": f"Product expired {abs(days_to_expiry)} days ago - heavy discount or dispose",
-                "discount_percent": min(80, max(60, int(current_margin_percent * 0.9))),
-                "priority": 1,
-            }
-        elif days_to_expiry <= -3:
-            return {
-                "action": "discount_aggressive",
-                "urgency": "critical",
-                "reason": f"Product expired {abs(days_to_expiry)} days ago - aggressive discount needed",
-                "discount_percent": min(70, max(40, int(current_margin_percent * 0.8))),
-                "priority": 1,
-            }
-        else:  # -1 to -3 days
-            return {
-                "action": "discount_immediate",
-                "urgency": "critical",
-                "reason": f"Product expired {abs(days_to_expiry)} day(s) ago - immediate discount required",
-                "discount_percent": min(60, max(30, int(current_margin_percent * 0.7))),
-                "priority": 1,
-            }
+        return {
+            "action": "dispose",
+            "urgency": "critical",
+            "reason": "product expired",
+            "discount_percent": 0,
+            "priority": 1,
+        }
 
     def calculate_velocity_score(
         self,

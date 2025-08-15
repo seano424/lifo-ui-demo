@@ -115,7 +115,6 @@ async def init_database():
             # Import all models to ensure they're registered
 
             # Skip table creation in development - use Supabase migrations instead
-            # Your database already has the correct schema from migrations
             if settings.debug:
                 # await conn.run_sync(Base.metadata.create_all)  # Disabled - use migrations
                 logger.info(

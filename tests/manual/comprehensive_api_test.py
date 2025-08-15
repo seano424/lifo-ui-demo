@@ -13,7 +13,7 @@ import base64
 import os
 
 # Configuration
-BASE_URL = "http://localhost:8002"
+BASE_URL = "http://localhost:8000"
 API_V1_PREFIX = "/api/v1"
 
 # Test data from Supabase
