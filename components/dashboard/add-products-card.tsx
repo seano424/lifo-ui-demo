@@ -12,28 +12,29 @@ export function AddProductsCard() {
 
   return (
     <Link href="/dashboard/inbound" className="block h-full">
-      <Card className="border-l-4 border-l-blue-500 border-t-0 border-r-0 border-b-0 shadow-sm hover:shadow-md transition-all hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent dark:hover:from-blue-900/10 dark:hover:to-transparent h-full rounded-md overflow-hidden group">
-        <CardContent className="p-3 py-2.5 flex items-center gap-3">
-          <div className="p-1.5 bg-gradient-to-br from-blue-500 via-purple-500 to-blue-600 rounded-md flex-shrink-0 text-white shadow-sm">
-            <Plus className="h-3.5 w-3.5" />
+      <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:bg-primary/5 h-full rounded-md overflow-hidden group">
+        <CardContent className="border-l-4 border-l-primary p-3 py-3 flex flex-col">
+          <div className="flex items-start gap-3 mb-1.5">
+            <div className="p-1.5 bg-primary rounded-md flex-shrink-0 text-primary-foreground shadow-sm">
+              <Plus className="h-3.5 w-3.5" />
+            </div>
+
+            <div className="flex-grow">
+              <div className="flex items-center justify-between">
+                <Typography variant="h4" className="font-semibold text-sm text-primary">
+                  {t('addProducts.title')}
+                </Typography>
+                <ShoppingBag className="h-4 w-4 text-primary/70" />
+              </div>
+            </div>
           </div>
 
-          <div className="flex-grow">
-            <div className="flex items-center justify-between">
-              <Typography
-                variant="h4"
-                className="font-semibold text-sm bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 inline-block text-transparent bg-clip-text"
-              >
-                {t('addProducts.title')}
-              </Typography>
-              <ShoppingBag className="h-4 w-4 text-blue-500/70 dark:text-blue-400/70" />
-            </div>
-            <Typography variant="p" className="text-xs text-muted-foreground line-clamp-1">
+          <div className="flex items-center justify-between">
+            <Typography variant="p" className="text-xs text-muted-foreground pl-8 pr-5">
               {t('addProducts.description')}
             </Typography>
+            <ArrowRight className="h-4 w-4 text-primary transform transition-transform group-hover:translate-x-1 flex-shrink-0" />
           </div>
-
-          <ArrowRight className="h-4 w-4 text-blue-500 transform transition-transform group-hover:translate-x-1" />
         </CardContent>
       </Card>
     </Link>
