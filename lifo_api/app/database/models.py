@@ -135,7 +135,6 @@ class Store(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationships
-    products = relationship("Product", back_populates="store")  # Legacy products
     batches = relationship("Batch", back_populates="store")
     store_products = relationship(
         "StoreProduct", back_populates="store"
@@ -186,89 +185,7 @@ class StoreSettings(Base):
 # This legacy model conflicted with the new normalized products table
 
 
-class Batch(Base):
-    """Inventory batches - the core of LIFO tracking with global products support"""
-
-    __tablename__ = "batches"
-    __table_args__ = (
-        UniqueConstraint("store_id", "batch_number", name="uq_store_batch_number"),
-        CheckConstraint(
-            "status IN ('active', 'sold', 'expired', 'damaged', 'returned')",
-            name="chk_batch_status",
-        ),
-        CheckConstraint(
-            "batch_source IN ('manual', 'ocr', 'barcode', 'import', 'api')",
-            name="chk_batch_source",
-        ),
-        CheckConstraint(
-            "verification_status IN ('verified', 'pending', 'flagged', 'rejected')",
-            name="chk_verification_status",
-        ),
-        CheckConstraint(
-            "recognition_confidence IS NULL OR (recognition_confidence >= 0.0 AND recognition_confidence <= 1.0)",
-            name="chk_confidence_range",
-        ),
-        CheckConstraint(
-            "product_id IS NOT NULL",
-            name="chk_product_reference",
-        ),
-        {"schema": "inventory"},
-    )
-
-    batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
-    # Product reference (normalized products in inventory schema)
-    product_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
-    )
-
-    batch_number = Column(String(100), nullable=False)
-
-    # Quantities
-    initial_quantity = Column(NUMERIC(12, 4), nullable=False)
-    current_quantity = Column(NUMERIC(12, 4), nullable=False)
-    reserved_quantity = Column(NUMERIC(12, 4), default=0)
-    available_quantity = Column(NUMERIC(12, 4))  # Computed: current - reserved
-
-    # Dates
-    manufacture_date = Column(Date)
-    expiry_date = Column(Date, nullable=False)
-    received_date = Column(Date, default=func.current_date())
-
-    # Pricing (can inherit from store_product or be overridden)
-    cost_price = Column(NUMERIC(12, 4))  # Optional - can inherit from store_product
-    selling_price = Column(NUMERIC(12, 4))  # Optional - can inherit from store_product
-    inherited_from_store_product = Column(Boolean, default=True)
-
-    # Supplier and sourcing
-    supplier = Column(String(100))
-
-    # Enhanced batch tracking
-    batch_source = Column(String(50), default="manual")  # manual, ocr, barcode, import, api
-    recognition_confidence = Column(NUMERIC(3, 2))  # For OCR/barcode recognized batches
-    verification_status = Column(
-        String(20), default="verified"
-    )  # verified, pending, flagged, rejected
-    barcode_scanned = Column(String(50))  # Barcode used to create this batch
-    # ocr_session_id = Column(UUID(as_uuid=True))  # OCR integration simplified/removed
-
-    # Location and status
-    location_code = Column(String(50), default="MAIN")
-    status = Column(String(20), default="active")
-
-    # Multi-tenant support
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"))
-
-    # Audit
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    created_by = Column(UUID(as_uuid=True))
-    updated_by = Column(UUID(as_uuid=True))
-
-    # Relationships
-    store = relationship("Store", back_populates="batches")
-    product = relationship("Product", back_populates="batches")
-    scores = relationship("ProductScore", back_populates="batch")
+# Batch model moved to inventory_models.py to avoid duplication
 
 
 class CategoryWeight(Base):

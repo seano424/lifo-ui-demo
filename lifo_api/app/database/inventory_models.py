@@ -18,10 +18,43 @@ from sqlalchemy import (
     String,
     Text,
 )
+from sqlalchemy import (
+    Enum as SQLEnum,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app.database.models import Base
+from app.database.connection import Base
+
+
+class Store(Base):
+    """
+    Minimal Store model for foreign key relationships
+    Maps to Supabase business.stores table
+    """
+    __tablename__ = "stores"
+    __table_args__ = {"schema": "business", "extend_existing": True}
+    
+    store_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    store_name = Column(String(255))
+    store_code = Column(String(50))
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class User(Base):
+    """
+    Minimal User model for foreign key relationships
+    Maps to Supabase auth.users table
+    """
+    __tablename__ = "users"
+    __table_args__ = {"schema": "auth", "extend_existing": True}
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = Column(String(255))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class Product(Base):
@@ -32,7 +65,7 @@ class Product(Base):
     """
 
     __tablename__ = "products"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     product_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
@@ -50,6 +83,10 @@ class Product(Base):
 
     # AI scoring support
     typical_shelf_life_days = Column(Integer, nullable=False)  # For expiry urgency calculation
+    
+    # Required pricing fields from Supabase schema
+    base_cost_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
+    base_selling_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
 
     # Barcode verification tracking
     is_verified = Column(Boolean, default=False)
@@ -74,7 +111,7 @@ class StoreProduct(Base):
     """
 
     __tablename__ = "store_products"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
     product_id = Column(
@@ -98,7 +135,8 @@ class StoreProduct(Base):
 
     # Relationships
     product = relationship("Product", back_populates="store_products")
-    # store relationship handled by business models
+    # Store relationship - using module path to avoid circular imports
+    # store = relationship("Store", back_populates="store_products")
 
 
 class BatchSource(Enum):
@@ -127,7 +165,7 @@ class Batch(Base):
     """
 
     __tablename__ = "batches"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     product_id = Column(
@@ -171,7 +209,9 @@ class Batch(Base):
     # Relationships
     product = relationship("Product", back_populates="batches")
     actions = relationship("BatchAction", back_populates="batch")
-    # store relationship handled by business models
+    # Store relationship - using module path to avoid circular imports  
+    # store = relationship("Store", back_populates="batches")
+    # scores = relationship("ProductScore", back_populates="batch")  # ProductScore is in models.py
 
 
 class ActionType(Enum):
@@ -206,7 +246,7 @@ class BatchAction(Base):
     """
 
     __tablename__ = "batch_actions"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     action_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     batch_id = Column(
@@ -217,8 +257,8 @@ class BatchAction(Base):
     store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     # What was recommended vs what was done
-    recommended_action = Column(String(20), nullable=False)  # ActionType enum
-    actual_action = Column(String(20), nullable=False)  # ActionType enum
+    recommended_action = Column(SQLEnum(ActionType), nullable=False)
+    actual_action = Column(SQLEnum(ActionType), nullable=False)
     ai_score = Column(DECIMAL(3, 2))  # AI score that triggered recommendation (0.00-1.00)
 
     # Tracking details
@@ -250,13 +290,13 @@ class DonationRecipient(Base):
     """
 
     __tablename__ = "donation_recipients"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     recipient_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
-    recipient_type = Column(String(50), nullable=False)  # DonationRecipientType enum
+    recipient_type = Column(SQLEnum(DonationRecipientType), nullable=False)
 
     # Minimal compliance fields
     is_certified = Column(Boolean, default=False)

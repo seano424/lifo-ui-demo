@@ -5,7 +5,7 @@ Creates inventory batches from frontend scan data using existing database schema
 
 import uuid
 from datetime import date, datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 import structlog
 from pydantic import BaseModel, Field
@@ -74,7 +74,7 @@ class BatchCreationService:
             try:
                 # 1. Find or create product
                 product_id, was_created, was_updated = await self._find_or_create_product(
-                    session, store_id, batch_data
+                    session, store_id, user_id, batch_data
                 )
                 
                 # 2. Generate unique batch number
@@ -125,6 +125,7 @@ class BatchCreationService:
         self,
         session: AsyncSession,
         store_id: str,
+        user_id: str,
         batch_data: BatchFromScanRequest
     ) -> tuple[uuid.UUID, bool, bool]:
         """Find existing product by barcode or create new one"""
@@ -165,7 +166,10 @@ class BatchCreationService:
             typical_shelf_life_days=30,  # Default
             barcode=batch_data.barcode,
             is_verified=True,
-            created_by=uuid.UUID(user_id)
+            created_by=uuid.UUID(user_id),
+            # Required pricing fields from Supabase schema (must be > 0 due to check constraints)
+            base_cost_price=batch_data.cost_price if batch_data.cost_price and batch_data.cost_price > 0 else 0.01,
+            base_selling_price=batch_data.selling_price if batch_data.selling_price and batch_data.selling_price > 0 else 0.01
         )
         session.add(new_product)
         await session.flush()  # Get the product_id
@@ -288,3 +292,274 @@ class BatchCreationService:
                 })
             
             return batches
+
+    async def create_batches_from_csv_bulk(
+        self,
+        store_id: str,
+        user_id: str,
+        batch_requests: List[BatchFromScanRequest],
+        chunk_size: int = 50
+    ) -> Dict[str, Any]:
+        """
+        Create multiple batches from CSV data with transaction management and chunking
+        
+        Args:
+            store_id: Store ID for the batches
+            user_id: User ID creating the batches
+            batch_requests: List of batch creation requests from CSV
+            chunk_size: Number of batches to process per transaction chunk
+            
+        Returns:
+            Dictionary with creation results and statistics
+        """
+        if not batch_requests:
+            raise ValueError("No batch requests provided")
+        
+        if chunk_size < 1 or chunk_size > 100:
+            raise ValueError("Chunk size must be between 1 and 100")
+        
+        total_requests = len(batch_requests)
+        successful_batches = []
+        failed_batches = []
+        created_products = []
+        updated_products = []
+        
+        logger.info(
+            "Starting bulk CSV batch creation",
+            total_requests=total_requests,
+            chunk_size=chunk_size,
+            store_id=store_id,
+            user_id=user_id
+        )
+        
+        # Process in chunks to avoid large transactions
+        for chunk_start in range(0, total_requests, chunk_size):
+            chunk_end = min(chunk_start + chunk_size, total_requests)
+            chunk_requests = batch_requests[chunk_start:chunk_end]
+            
+            try:
+                chunk_results = await self._process_batch_chunk(
+                    store_id, user_id, chunk_requests, chunk_start
+                )
+                
+                successful_batches.extend(chunk_results["successful"])
+                failed_batches.extend(chunk_results["failed"])
+                created_products.extend(chunk_results["created_products"])
+                updated_products.extend(chunk_results["updated_products"])
+                
+                logger.info(
+                    "Chunk processed successfully",
+                    chunk_start=chunk_start,
+                    chunk_end=chunk_end,
+                    successful=len(chunk_results["successful"]),
+                    failed=len(chunk_results["failed"])
+                )
+                
+            except Exception as e:
+                logger.error(
+                    "Chunk processing failed",
+                    chunk_start=chunk_start,
+                    chunk_end=chunk_end,
+                    error=str(e)
+                )
+                
+                # Mark entire chunk as failed
+                for i, request in enumerate(chunk_requests):
+                    failed_batches.append({
+                        "index": chunk_start + i,
+                        "barcode": request.barcode,
+                        "product_name": request.product_name,
+                        "error": f"Chunk processing failed: {str(e)}"
+                    })
+        
+        # Calculate final statistics
+        success_rate = (len(successful_batches) / total_requests) * 100 if total_requests > 0 else 0
+        
+        return {
+            "store_id": store_id,
+            "user_id": user_id,
+            "total_requests": total_requests,
+            "successful": len(successful_batches),
+            "failed": len(failed_batches),
+            "success_rate": round(success_rate, 2),
+            "successful_batches": successful_batches,
+            "failed_batches": failed_batches,
+            "product_statistics": {
+                "created_products": len(created_products),
+                "updated_products": len(updated_products),
+                "unique_products": len(set(created_products + updated_products))
+            },
+            "processing_metadata": {
+                "chunk_size": chunk_size,
+                "total_chunks": (total_requests + chunk_size - 1) // chunk_size,
+                "processed_at": datetime.utcnow().isoformat()
+            }
+        }
+
+    async def _process_batch_chunk(
+        self,
+        store_id: str,
+        user_id: str,
+        chunk_requests: List[BatchFromScanRequest],
+        chunk_start: int
+    ) -> Dict[str, List]:
+        """
+        Process a chunk of batch requests in a single transaction
+        
+        Args:
+            store_id: Store ID
+            user_id: User ID
+            chunk_requests: List of batch requests to process
+            chunk_start: Starting index for this chunk
+            
+        Returns:
+            Dictionary with successful and failed batch results
+        """
+        async with self.async_session() as session:
+            try:
+                successful = []
+                failed = []
+                created_products = []
+                updated_products = []
+                
+                for i, batch_request in enumerate(chunk_requests):
+                    request_index = chunk_start + i
+                    
+                    try:
+                        # Validate batch request
+                        self._validate_batch_request(batch_request, request_index)
+                        
+                        # Find or create product
+                        product_id, was_created, was_updated = await self._find_or_create_product(
+                            session, store_id, user_id, batch_request
+                        )
+                        
+                        if was_created:
+                            created_products.append(str(product_id))
+                        elif was_updated:
+                            updated_products.append(str(product_id))
+                        
+                        # Generate batch number
+                        batch_number = await self._generate_csv_batch_number(
+                            session, store_id, chunk_start, i
+                        )
+                        
+                        # Create batch record
+                        batch_id = await self._create_csv_batch_record(
+                            session, store_id, user_id, product_id, batch_number, batch_request
+                        )
+                        
+                        successful.append({
+                            "index": request_index,
+                            "batch_id": str(batch_id),
+                            "product_id": str(product_id),
+                            "batch_number": batch_number,
+                            "barcode": batch_request.barcode,
+                            "product_name": batch_request.product_name,
+                            "quantity": batch_request.quantity,
+                            "was_product_created": was_created,
+                            "was_product_updated": was_updated
+                        })
+                        
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to process individual batch request",
+                            request_index=request_index,
+                            barcode=batch_request.barcode,
+                            error=str(e)
+                        )
+                        
+                        failed.append({
+                            "index": request_index,
+                            "barcode": batch_request.barcode,
+                            "product_name": batch_request.product_name,
+                            "error": str(e)
+                        })
+                
+                # Commit the entire chunk
+                await session.commit()
+                
+                return {
+                    "successful": successful,
+                    "failed": failed,
+                    "created_products": created_products,
+                    "updated_products": updated_products
+                }
+                
+            except Exception as e:
+                await session.rollback()
+                raise
+
+    def _validate_batch_request(self, request: BatchFromScanRequest, index: int):
+        """Validate a batch request before processing"""
+        if not request.barcode or len(request.barcode.strip()) < 8:
+            raise ValueError(f"Row {index}: Invalid barcode - must be at least 8 characters")
+        
+        if not request.product_name or not request.product_name.strip():
+            raise ValueError(f"Row {index}: Product name is required")
+        
+        if request.quantity <= 0:
+            raise ValueError(f"Row {index}: Quantity must be positive")
+        
+        # Check expiry date is reasonable
+        today = date.today()
+        if request.expiry_date < today - timedelta(days=30):
+            raise ValueError(f"Row {index}: Expiry date is too far in the past")
+        
+        if request.expiry_date > today + timedelta(days=3650):  # 10 years
+            raise ValueError(f"Row {index}: Expiry date is too far in the future")
+
+    async def _generate_csv_batch_number(
+        self,
+        session: AsyncSession,
+        store_id: str,
+        chunk_start: int,
+        chunk_index: int
+    ) -> str:
+        """Generate unique batch number for CSV import"""
+        today = date.today()
+        # Use chunk info to ensure uniqueness
+        sequence = (chunk_start + chunk_index + 1)
+        return f"CSV-{today.strftime('%Y%m%d')}-{sequence:05d}"
+
+    async def _create_csv_batch_record(
+        self,
+        session: AsyncSession,
+        store_id: str,
+        user_id: str,
+        product_id: uuid.UUID,
+        batch_number: str,
+        batch_data: BatchFromScanRequest
+    ) -> uuid.UUID:
+        """Create batch record specifically for CSV imports"""
+        from app.database.inventory_models import Batch
+        
+        # Calculate manufacture date (default to 30 days before expiry)
+        manufacture_date = batch_data.expiry_date - timedelta(days=30)
+        
+        batch = Batch(
+            product_id=product_id,
+            batch_number=batch_number,
+            initial_quantity=batch_data.quantity,
+            current_quantity=batch_data.quantity,
+            manufacture_date=manufacture_date,
+            expiry_date=batch_data.expiry_date,
+            cost_price=batch_data.cost_price or 0,
+            selling_price=batch_data.selling_price or 0,
+            
+            # CSV-specific metadata
+            batch_source="csv_import",
+            scanned_barcode=batch_data.barcode,
+            scan_confidence=1.0,  # CSV data is considered 100% confident
+            verification_status="verified",
+            
+            # Store and audit
+            store_id=uuid.UUID(store_id),
+            created_by=uuid.UUID(user_id),
+            status="active"
+        )
+        
+        session.add(batch)
+        await session.flush()
+        
+        return batch.batch_id
