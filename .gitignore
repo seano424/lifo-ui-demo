@@ -34,6 +34,13 @@ yarn-error.log*
 .env.local
 .env
 
+# Google Cloud credentials
+credentials/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
 # vercel
 .vercel
 
