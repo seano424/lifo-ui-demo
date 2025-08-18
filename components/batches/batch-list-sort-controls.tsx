@@ -14,6 +14,7 @@ import {
   TrendingUp,
   DollarSign,
   Clock,
+  Calendar,
 } from 'lucide-react'
 import type { BatchSort, BatchSortField } from '@/lib/queries/batches'
 
@@ -43,6 +44,12 @@ export function BatchListSortControls({
           </div>
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="created_at">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Created Date
+            </div>
+          </SelectItem>
           <SelectItem value="expiry_date">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />

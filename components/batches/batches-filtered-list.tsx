@@ -137,7 +137,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
       <Card>
         <div className="p-4 border-b">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 md:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 :flex-row sm:items-center sm:justify-between">
               <BatchListFilters
                 filters={{
                   expiringInDays: filters.expiringInDays,
@@ -162,8 +162,8 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
         </div>
 
         <BatchTable
-          isLoading={isLoading}
           data={data}
+          isLoading={isLoading}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
           updateSort={field => {
             const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
