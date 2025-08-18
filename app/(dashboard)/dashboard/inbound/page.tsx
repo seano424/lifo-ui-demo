@@ -6,9 +6,11 @@ import { useStoreState } from '@/lib/stores/store-context'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
+  const isMobile = useIsMobile()
   return (
     <div className="max-w-screen-lg mx-auto space-y-6">
       {/* Mobile Tabs */}
@@ -26,7 +28,7 @@ export default function InboundPage() {
 
         <TabsContent value="scan" className="mt-6">
           <div className="max-w-screen-sm mx-auto">
-            <StreamlinedScanningInterface />
+            {isMobile && <StreamlinedScanningInterface />}
           </div>
         </TabsContent>
 
@@ -51,7 +53,6 @@ export default function InboundPage() {
       </Tabs>
 
       {/* Desktop Bulk Import */}
-
       <div className="max-w-4xl mx-auto hidden lg:block">
         {currentStore ? (
           <CSVUploadForm
