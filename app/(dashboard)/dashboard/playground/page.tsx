@@ -238,7 +238,7 @@ export default function PlaygroundPage() {
       >
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            This is a full height modal variant that takes up 90% of the viewport height. It's
+            This is a full height modal variant that takes up 90% of the viewport height. It&apos;s
             useful for content that needs more vertical space.
           </p>
 
