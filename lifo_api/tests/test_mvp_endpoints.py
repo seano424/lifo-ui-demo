@@ -139,7 +139,9 @@ class TestMobileEndpoints:
 
     def test_store_health_mobile(self, auth_headers):
         """Test mobile store health endpoint"""
-        response = client.get(f"/api/v1/mobile/store-health/{TEST_STORE_ID}", headers=auth_headers)
+        response = client.get(
+            f"/api/v1/mobile/store-health/{TEST_STORE_ID}", headers=auth_headers
+        )
 
         assert response.status_code in [200, 500]  # May fail without database
 
@@ -238,7 +240,9 @@ class TestImageRecognition:
     def test_analyze_image_endpoint_structure(self, auth_headers):
         """Test image analysis endpoint structure (without actual image)"""
         # This tests the endpoint exists and validates input
-        response = client.post(f"/api/v1/image/analyze-image/{TEST_STORE_ID}", headers=auth_headers)
+        response = client.post(
+            f"/api/v1/image/analyze-image/{TEST_STORE_ID}", headers=auth_headers
+        )
 
         # Should return 422 for missing required file parameter
         assert response.status_code == 422
@@ -265,7 +269,9 @@ class TestPerformanceRequirements:
 
             # Allow for some tolerance in test environment
             # In production, this should be < 500ms
-            assert response_time_ms < 2000, f"Endpoint {endpoint} took {response_time_ms:.1f}ms"
+            assert response_time_ms < 2000, (
+                f"Endpoint {endpoint} took {response_time_ms:.1f}ms"
+            )
 
     def test_response_compression(self, auth_headers):
         """Test that mobile responses are appropriately sized"""
@@ -276,7 +282,9 @@ class TestPerformanceRequirements:
         if response.status_code == 200:
             # Check response size is reasonable for mobile
             response_size = len(response.content)
-            assert response_size < 50000, f"Response too large for mobile: {response_size} bytes"
+            assert response_size < 50000, (
+                f"Response too large for mobile: {response_size} bytes"
+            )
 
 
 class TestErrorHandling:
@@ -284,7 +292,9 @@ class TestErrorHandling:
 
     def test_invalid_store_id_format(self, auth_headers):
         """Test error handling for invalid store ID format"""
-        response = client.get("/api/v1/mobile/mobile-summary/invalid-uuid", headers=auth_headers)
+        response = client.get(
+            "/api/v1/mobile/mobile-summary/invalid-uuid", headers=auth_headers
+        )
 
         assert response.status_code == 400
         data = response.json()
@@ -355,7 +365,9 @@ class TestDataValidation:
             )
 
             if test_case["should_fail"]:
-                assert response.status_code == 400, f"Should fail: {test_case['error_reason']}"
+                assert response.status_code == 400, (
+                    f"Should fail: {test_case['error_reason']}"
+                )
 
     def test_uuid_validation(self, auth_headers):
         """Test UUID format validation"""

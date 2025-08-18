@@ -55,7 +55,11 @@ class User(Base):
     # Properties to access custom fields from raw_user_meta_data
     @property
     def full_name(self):
-        return self.raw_user_meta_data.get("full_name") if self.raw_user_meta_data else None
+        return (
+            self.raw_user_meta_data.get("full_name")
+            if self.raw_user_meta_data
+            else None
+        )
 
     @property
     def phone(self):
@@ -71,7 +75,11 @@ class User(Base):
 
     @property
     def language(self):
-        return self.raw_user_meta_data.get("language", "fr") if self.raw_user_meta_data else "fr"
+        return (
+            self.raw_user_meta_data.get("language", "fr")
+            if self.raw_user_meta_data
+            else "fr"
+        )
 
 
 class Role(Base):
@@ -94,7 +102,9 @@ class UserRole(Base):
     __table_args__ = ({"schema": "user_mgmt"},)
 
     user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"), primary_key=True)
-    role_id = Column(UUID(as_uuid=True), ForeignKey("user_mgmt.roles.id"), primary_key=True)
+    role_id = Column(
+        UUID(as_uuid=True), ForeignKey("user_mgmt.roles.id"), primary_key=True
+    )
     assigned_at = Column(DateTime, default=func.now())
     assigned_by = Column(UUID(as_uuid=True))
 
@@ -147,7 +157,9 @@ class StoreUser(Base):
     __tablename__ = "store_users"
     __table_args__ = ({"schema": "business"},)
 
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+    )
     user_id = Column(UUID(as_uuid=True), primary_key=True)
     role_in_store = Column(String(50), default="staff")
     permissions = Column(
@@ -169,12 +181,20 @@ class StoreSettings(Base):
     __tablename__ = "store_settings"
     __table_args__ = {"schema": "business"}
 
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
-    scoring_weights = Column(JSONB, default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2})
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+    )
+    scoring_weights = Column(
+        JSONB, default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
+    )
     critical_threshold = Column(NUMERIC(3, 2), default=0.80)
     warning_threshold = Column(NUMERIC(3, 2), default=0.60)
-    opening_hours = Column(JSONB, default={"monday": {"open": "08:00", "close": "20:00"}})
-    peak_hours = Column(JSONB, default={"morning": "08:00-10:00", "evening": "17:00-19:00"})
+    opening_hours = Column(
+        JSONB, default={"monday": {"open": "08:00", "close": "20:00"}}
+    )
+    peak_hours = Column(
+        JSONB, default={"morning": "08:00-10:00", "evening": "17:00-19:00"}
+    )
     weather_location_lat = Column(NUMERIC(10, 8))
     weather_location_lon = Column(NUMERIC(11, 8))
     currency = Column(String(3), default="EUR")
@@ -228,9 +248,15 @@ class ProductScore(Base):
     __tablename__ = "product_scores"
     __table_args__ = (
         UniqueConstraint("batch_id", name="uq_batch_score"),
-        CheckConstraint("expiry_score >= 0 AND expiry_score <= 1", name="chk_expiry_score"),
-        CheckConstraint("velocity_score >= 0 AND velocity_score <= 1", name="chk_velocity_score"),
-        CheckConstraint("margin_score >= 0 AND margin_score <= 1", name="chk_margin_score"),
+        CheckConstraint(
+            "expiry_score >= 0 AND expiry_score <= 1", name="chk_expiry_score"
+        ),
+        CheckConstraint(
+            "velocity_score >= 0 AND velocity_score <= 1", name="chk_velocity_score"
+        ),
+        CheckConstraint(
+            "margin_score >= 0 AND margin_score <= 1", name="chk_margin_score"
+        ),
         CheckConstraint(
             "composite_score >= 0 AND composite_score <= 1", name="chk_composite_score"
         ),

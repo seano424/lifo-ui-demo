@@ -5,13 +5,16 @@ Intelligent inventory scoring and waste reduction microservice
 
 import os
 import time
+
 from dotenv import load_dotenv
 
 # CRITICAL: Load environment variables FIRST before any other imports
 # This ensures all modules can access environment variables during import
 env_paths = [
-    os.path.join(os.path.dirname(__file__), "../../.env.local"),  # Root level (unified config)
-    os.path.join(os.path.dirname(__file__), "../.env.local"),    # API level (fallback)
+    os.path.join(
+        os.path.dirname(__file__), "../../.env.local"
+    ),  # Root level (unified config)
+    os.path.join(os.path.dirname(__file__), "../.env.local"),  # API level (fallback)
     os.path.join(os.path.dirname(__file__), "../.env"),
     ".env.local",
     ".env",
@@ -36,21 +39,21 @@ from typing import Any
 import structlog
 import uvicorn
 from fastapi import FastAPI, Request, Response
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
 from slowapi.errors import RateLimitExceeded
 
 from app.api.v1.router import router as api_v1_router
-from app.core.config import settings, get_monitoring_config
+from app.core.config import get_monitoring_config, settings
 from app.database.connection import engine, init_database
-from app.models.base import HealthResponse
-from app.monitoring.metrics import get_metrics_collector
-from app.monitoring.alerts import get_alert_manager
-from app.middleware.performance_monitoring import PerformanceMonitoringMiddleware
 from app.middleware.comprehensive_security import ComprehensiveSecurityMiddleware
-from app.security.security_monitor import get_security_monitor
+from app.middleware.error_handling import (
+    ErrorHandlingMiddleware,
+    get_custom_exception_handler,
+)
+from app.middleware.performance_monitoring import PerformanceMonitoringMiddleware
 from app.middleware.rate_limiting import (
     check_blocked_ip,
     limiter,
@@ -60,6 +63,11 @@ from app.middleware.security_headers import (
     ProductionSecurityMiddleware,
     SecurityHeadersMiddleware,
 )
+from app.models.base import HealthResponse
+from app.monitoring.alerts import get_alert_manager
+from app.monitoring.metrics import get_metrics_collector
+from app.security.security_monitor import get_security_monitor
+from app.utils.error_handling import get_error_tracker
 from app.utils.exceptions import setup_exception_handlers
 from app.utils.logging import setup_logging
 from app.utils.mvp_exceptions import (
@@ -71,11 +79,6 @@ from app.utils.mvp_exceptions import (
     performance_exception_handler,
     validation_exception_handler,
 )
-from app.middleware.error_handling import (
-    ErrorHandlingMiddleware,
-    get_custom_exception_handler,
-)
-from app.utils.error_handling import get_error_tracker
 
 # Environment validation (secure logging)
 if os.getenv("ENVIRONMENT") == "development":
@@ -111,12 +114,12 @@ logger = structlog.get_logger()
 # Custom JSON Response class for proper datetime serialization
 class CustomJSONResponse(JSONResponse):
     """Custom JSON response with proper datetime and date serialization"""
-    
+
     def render(self, content) -> bytes:
         import json
-        from datetime import datetime, date
+        from datetime import date, datetime
         from decimal import Decimal
-        
+
         def custom_serializer(obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
@@ -126,15 +129,17 @@ class CustomJSONResponse(JSONResponse):
                 return float(obj)
             # For any other non-serializable types, convert to string
             return str(obj)
-        
+
         try:
             # First try FastAPI's jsonable_encoder
             encoded_content = jsonable_encoder(content)
             return super().render(encoded_content)
         except (TypeError, ValueError):
             # If that fails, use our custom serializer
-            json_str = json.dumps(content, default=custom_serializer, ensure_ascii=False)
-            return json_str.encode('utf-8')
+            json_str = json.dumps(
+                content, default=custom_serializer, ensure_ascii=False
+            )
+            return json_str.encode("utf-8")
 
 
 @asynccontextmanager
@@ -146,42 +151,61 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         # Test Supabase connection (our primary database service)
         from app.database.supabase_service import get_supabase_service
+
         supabase_service = get_supabase_service()
         connection_ok = await supabase_service.test_connection()
-        
+
         if connection_ok:
             logger.info("Supabase database connection established successfully")
         else:
-            logger.warning("Supabase connection test failed, but continuing with startup")
-            
+            logger.warning(
+                "Supabase connection test failed, but continuing with startup"
+            )
+
         # Try SQLAlchemy connection (optional for complex queries)
         try:
             await init_database()
             logger.info("SQLAlchemy database connection also established")
         except Exception as sql_error:
-            logger.warning("SQLAlchemy connection failed, using Supabase only", error=str(sql_error))
-    
+            logger.warning(
+                "SQLAlchemy connection failed, using Supabase only",
+                error=str(sql_error),
+            )
+
         # Initialize performance monitoring system
         if settings.enable_performance_monitoring:
-            logger.info("Performance monitoring system initialized", config=get_monitoring_config())
-            
+            logger.info(
+                "Performance monitoring system initialized",
+                config=get_monitoring_config(),
+            )
+
             # Start metrics collection
             metrics_collector = get_metrics_collector()
-            logger.info("Metrics collector started", cache_stats=metrics_collector.metrics.get("system_resources", {}))
-            
+            logger.info(
+                "Metrics collector started",
+                cache_stats=metrics_collector.metrics.get("system_resources", {}),
+            )
+
             # Initialize alert manager if alerting is enabled
             if settings.enable_alerting:
                 alert_manager = get_alert_manager()
-                logger.info("Alert manager initialized", rules_count=len(alert_manager.alert_rules))
+                logger.info(
+                    "Alert manager initialized",
+                    rules_count=len(alert_manager.alert_rules),
+                )
         else:
-            logger.warning("Performance monitoring disabled - production visibility will be limited")
-            
+            logger.warning(
+                "Performance monitoring disabled - production visibility will be limited"
+            )
+
         # Initialize comprehensive security monitoring
         security_monitor = get_security_monitor()
-        logger.info("Security monitoring system initialized", 
-                   environment=settings.environment,
-                   high_security_mode=settings.environment == "production")
-            
+        logger.info(
+            "Security monitoring system initialized",
+            environment=settings.environment,
+            high_security_mode=settings.environment == "production",
+        )
+
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
         # Don't raise - allow server to start with Supabase-only mode
@@ -190,19 +214,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Shutdown
     logger.info("Shutting down LIFO AI Engine")
-    
+
     # Performance monitoring shutdown
     if settings.enable_performance_monitoring:
         try:
             metrics_collector = get_metrics_collector()
             final_stats = metrics_collector.get_metrics_summary()
-            logger.info("Final performance statistics", 
-                       api_requests=len(final_stats.get("api_metrics", {})),
-                       db_queries=len(final_stats.get("database_metrics", {})),
-                       cache_operations=len(final_stats.get("cache_metrics", {})))
+            logger.info(
+                "Final performance statistics",
+                api_requests=len(final_stats.get("api_metrics", {})),
+                db_queries=len(final_stats.get("database_metrics", {})),
+                cache_operations=len(final_stats.get("cache_metrics", {})),
+            )
         except Exception as e:
             logger.error("Error collecting final performance statistics", error=str(e))
-    
+
     await engine().dispose()
 
 
@@ -261,7 +287,7 @@ app.add_middleware(ComprehensiveSecurityMiddleware)
 if settings.enable_performance_monitoring:
     app.add_middleware(
         PerformanceMonitoringMiddleware,
-        enable_detailed_logging=settings.enable_detailed_request_logging
+        enable_detailed_logging=settings.enable_detailed_request_logging,
     )
 
 # Rate limiting middleware
@@ -286,7 +312,7 @@ app.add_middleware(
 @app.middleware("http")
 async def enhanced_request_logging(request: Request, call_next: Any) -> Response:
     start_time = time.time()
-    
+
     # Only do detailed logging in development or when explicitly enabled
     if settings.enable_detailed_request_logging or settings.debug:
         # Log request (sanitize sensitive headers)
@@ -301,7 +327,9 @@ async def enhanced_request_logging(request: Request, call_next: Any) -> Response
             "Request started",
             method=request.method,
             url=str(request.url),
-            user_agent=request.headers.get("user-agent", "unknown")[:100]  # Truncate long user agents
+            user_agent=request.headers.get("user-agent", "unknown")[
+                :100
+            ],  # Truncate long user agents
         )
 
     response: Response = await call_next(request)
@@ -309,38 +337,38 @@ async def enhanced_request_logging(request: Request, call_next: Any) -> Response
     # Always log completion with performance data
     process_time = time.time() - start_time
     process_time_ms = process_time * 1000
-    
+
     # Determine log level based on performance and status
     if response.status_code >= 500:
         log_level = "error"
     elif response.status_code >= 400:
-        log_level = "warning" 
+        log_level = "warning"
     elif process_time_ms > 1000:  # Slow requests
         log_level = "warning"
     else:
         log_level = "info"
-    
+
     getattr(logger, log_level)(
         "Request completed",
         method=request.method,
         path=request.url.path,
         status_code=response.status_code,
         process_time_ms=round(process_time_ms, 2),
-        performance_status="slow" if process_time_ms > 500 else "normal"
+        performance_status="slow" if process_time_ms > 500 else "normal",
     )
-    
+
     # Trigger alerts for performance monitoring
     if settings.enable_alerting and settings.enable_performance_monitoring:
         try:
             metrics_collector = get_metrics_collector()
             alert_manager = get_alert_manager()
-            
+
             # Check metrics periodically (every 10th request to reduce overhead)
-            if hasattr(request.state, 'request_count'):
+            if hasattr(request.state, "request_count"):
                 request.state.request_count += 1
             else:
                 request.state.request_count = 1
-                
+
             if request.state.request_count % 10 == 0:
                 metrics_summary = metrics_collector.get_metrics_summary()
                 alert_manager.check_metrics(metrics_summary)
@@ -355,12 +383,16 @@ async def enhanced_request_logging(request: Request, call_next: Any) -> Response
 setup_exception_handlers(app)
 
 # Add comprehensive error handling exception handlers
-from sqlalchemy.exc import SQLAlchemyError
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 custom_exception_handler = get_custom_exception_handler()
-app.add_exception_handler(SQLAlchemyError, custom_exception_handler.database_error_handler)  # type: ignore
-app.add_exception_handler(ValidationError, custom_exception_handler.validation_error_handler)  # type: ignore
+app.add_exception_handler(
+    SQLAlchemyError, custom_exception_handler.database_error_handler
+)  # type: ignore
+app.add_exception_handler(
+    ValidationError, custom_exception_handler.validation_error_handler
+)  # type: ignore
 
 # Add MVP-specific exception handlers (after comprehensive handlers)
 app.add_exception_handler(MVPBaseException, mvp_exception_handler)  # type: ignore
@@ -407,12 +439,12 @@ async def health_check() -> HealthResponse:
         from app.database.connection import test_connection
 
         db_healthy = await test_connection()
-        
+
         return HealthResponse(
             status="healthy" if db_healthy else "unhealthy",
             database_connected=db_healthy,
             version=settings.api_version,
-            uptime=None  # Can be calculated if needed
+            uptime=None,  # Can be calculated if needed
         )
     except Exception as e:
         logger.error("Health check failed", error=str(e))
@@ -420,7 +452,7 @@ async def health_check() -> HealthResponse:
             status="unhealthy",
             database_connected=False,
             version=settings.api_version,
-            uptime=None
+            uptime=None,
         )
 
 
@@ -470,24 +502,23 @@ async def get_error_statistics():
     try:
         error_tracker = get_error_tracker()
         stats = error_tracker.get_error_statistics()
-        
+
         return {
             "error_tracking": stats,
             "system_health": {
-                "overall_status": "healthy" if stats["errors_last_1h"] < 10 else "degraded",
+                "overall_status": "healthy"
+                if stats["errors_last_1h"] < 10
+                else "degraded",
                 "error_rate_last_hour": stats["errors_last_1h"],
                 "error_rate_last_24h": stats["errors_last_24h"],
-                "monitoring_active": stats["monitoring_health"] == "active"
-            }
+                "monitoring_active": stats["monitoring_health"] == "active",
+            },
         }
     except Exception as e:
         logger.error("Failed to get error statistics", error=str(e))
         return JSONResponse(
             status_code=500,
-            content={
-                "error": "Failed to retrieve error statistics",
-                "message": str(e)
-            }
+            content={"error": "Failed to retrieve error statistics", "message": str(e)},
         )
 
 
@@ -500,20 +531,24 @@ async def get_endpoint_error_analysis(endpoint_path: str):
     try:
         error_tracker = get_error_tracker()
         # Ensure endpoint starts with /
-        if not endpoint_path.startswith('/'):
-            endpoint_path = f'/{endpoint_path}'
-        
+        if not endpoint_path.startswith("/"):
+            endpoint_path = f"/{endpoint_path}"
+
         analysis = error_tracker.get_endpoint_error_analysis(endpoint_path)
         return {"endpoint_analysis": analysis}
     except Exception as e:
-        logger.error("Failed to get endpoint error analysis", error=str(e), endpoint=endpoint_path)
+        logger.error(
+            "Failed to get endpoint error analysis",
+            error=str(e),
+            endpoint=endpoint_path,
+        )
         return JSONResponse(
             status_code=500,
             content={
                 "error": "Failed to retrieve endpoint error analysis",
                 "message": str(e),
-                "endpoint": endpoint_path
-            }
+                "endpoint": endpoint_path,
+            },
         )
 
 

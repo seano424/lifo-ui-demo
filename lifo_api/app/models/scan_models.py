@@ -9,7 +9,8 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
+
 from .base import ConfigurableModel
 
 
@@ -27,18 +28,28 @@ class ScanOutAction(str, Enum):
 class ScanInRequest(BaseModel):
     """Request model for scan-in workflow (proof of delivery)"""
 
-    product_sku: str = Field(..., min_length=1, max_length=100, description="Product SKU")
+    product_sku: str = Field(
+        ..., min_length=1, max_length=100, description="Product SKU"
+    )
     barcode: Optional[str] = Field(None, max_length=50, description="Product barcode")
     expiry_date: date = Field(..., description="Product expiry date")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity received")
-    location_code: Optional[str] = Field("MAIN", max_length=50, description="Storage location")
-    cost_price: Optional[float] = Field(None, ge=0, le=10000, description="Cost price per unit")
+    location_code: Optional[str] = Field(
+        "MAIN", max_length=50, description="Storage location"
+    )
+    cost_price: Optional[float] = Field(
+        None, ge=0, le=10000, description="Cost price per unit"
+    )
     selling_price: Optional[float] = Field(
         None, ge=0, le=10000, description="Selling price per unit"
     )
-    batch_number: Optional[str] = Field(None, max_length=100, description="Optional batch number")
+    batch_number: Optional[str] = Field(
+        None, max_length=100, description="Optional batch number"
+    )
     manufacture_date: Optional[date] = Field(None, description="Manufacture date")
-    temperature: Optional[float] = Field(None, ge=-50, le=50, description="Storage temperature")
+    temperature: Optional[float] = Field(
+        None, ge=-50, le=50, description="Storage temperature"
+    )
     notes: Optional[str] = Field(None, max_length=500, description="Additional notes")
 
     # Note: expiry date validation moved to business logic for OpenAPI compatibility
@@ -53,7 +64,9 @@ class ScanOutRequest(BaseModel):
 
     action: ScanOutAction = Field(..., description="Action being taken")
     quantity_moved: int = Field(..., gt=0, description="Quantity being moved/sold")
-    actual_selling_price: Optional[float] = Field(None, ge=0, description="Actual selling price")
+    actual_selling_price: Optional[float] = Field(
+        None, ge=0, description="Actual selling price"
+    )
     discount_percent: Optional[float] = Field(
         None, ge=0, le=100, description="Discount percentage applied"
     )
@@ -61,8 +74,12 @@ class ScanOutRequest(BaseModel):
         None, max_length=50, description="Destination location"
     )
     notes: Optional[str] = Field(None, max_length=500, description="Action notes")
-    customer_type: Optional[str] = Field("regular", max_length=50, description="Customer type")
-    channel: Optional[str] = Field("in_store", max_length=50, description="Sales channel")
+    customer_type: Optional[str] = Field(
+        "regular", max_length=50, description="Customer type"
+    )
+    channel: Optional[str] = Field(
+        "in_store", max_length=50, description="Sales channel"
+    )
 
     # Note: discount validation moved to business logic for OpenAPI compatibility
 
@@ -70,16 +87,25 @@ class ScanOutRequest(BaseModel):
 class ProcessScanRequest(ConfigurableModel):
     """Request model for combined scan processing (future image recognition ready)"""
 
-    barcode: str = Field(..., min_length=1, max_length=50, description="Product barcode")
+    barcode: str = Field(
+        ..., min_length=1, max_length=50, description="Product barcode"
+    )
     expiry_date: date = Field(..., description="Expiry date from scan/OCR")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity scanned")
-    confidence_score: Optional[float] = Field(1.0, ge=0, le=1, description="OCR confidence score")
+    confidence_score: Optional[float] = Field(
+        1.0, ge=0, le=1, description="OCR confidence score"
+    )
     location_code: Optional[str] = Field("MAIN", max_length=50, description="Location")
     scan_timestamp: Optional[str] = Field(
-        default_factory=lambda: datetime.utcnow().isoformat(), description="When scan occurred"
+        default_factory=lambda: datetime.utcnow().isoformat(),
+        description="When scan occurred",
     )
-    image_url: Optional[str] = Field(None, max_length=500, description="Reference to scanned image")
-    ocr_data: Optional[dict[str, Any]] = Field(None, description="Raw OCR extraction data")
+    image_url: Optional[str] = Field(
+        None, max_length=500, description="Reference to scanned image"
+    )
+    ocr_data: Optional[dict[str, Any]] = Field(
+        None, description="Raw OCR extraction data"
+    )
 
 
 class ScanInResponse(BaseModel):
@@ -175,7 +201,9 @@ class RealtimeUpdate(ConfigurableModel):
 class MVPException(Exception):
     """Base exception for MVP-specific errors"""
 
-    def __init__(self, message: str, error_code: str = "MVP_ERROR", status_code: int = 400):
+    def __init__(
+        self, message: str, error_code: str = "MVP_ERROR", status_code: int = 400
+    ):
         self.message = message
         self.error_code = error_code
         self.status_code = status_code

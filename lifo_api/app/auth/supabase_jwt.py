@@ -52,7 +52,9 @@ class SupabaseAuth:
     """
 
     def __init__(self):
-        self.jwt_secret = settings.supabase_jwt_secret or "test-jwt-secret-for-development"
+        self.jwt_secret = (
+            settings.supabase_jwt_secret or "test-jwt-secret-for-development"
+        )
         self.supabase_url = settings.supabase_url or "https://test.supabase.co"
         self.logger = structlog.get_logger().bind(component="supabase_auth")
 
@@ -119,7 +121,9 @@ class SupabaseAuth:
                 sub=user_id,
             )
 
-            self.logger.info("Token verified successfully", user_id=user_id, email=email)
+            self.logger.info(
+                "Token verified successfully", user_id=user_id, email=email
+            )
 
             return user
 
@@ -152,7 +156,8 @@ class SupabaseAuth:
             auth_url = f"{self.supabase_url}/auth/v1/user"
             headers = {
                 "Authorization": f"Bearer {token}",
-                "apikey": settings.supabase_anon_key or settings.supabase_service_role_key,
+                "apikey": settings.supabase_anon_key
+                or settings.supabase_service_role_key,
             }
 
             self.logger.info(
@@ -192,7 +197,8 @@ class SupabaseAuth:
                         app_metadata=user_data.get("app_metadata", {}),
                         user_metadata=user_data.get("user_metadata", {}),
                         aud="authenticated",
-                        exp=int(datetime.now(timezone.utc).timestamp()) + 3600,  # Estimate expiry
+                        exp=int(datetime.now(timezone.utc).timestamp())
+                        + 3600,  # Estimate expiry
                         iat=int(datetime.now(timezone.utc).timestamp()),
                         iss=f"{self.supabase_url}/auth/v1",
                         sub=user_data.get("id"),
@@ -329,7 +335,9 @@ class SupabaseAuth:
         # Fallback to main role field
         return user.role
 
-    def check_user_permissions(self, user: SupabaseUser, required_permission: str) -> bool:
+    def check_user_permissions(
+        self, user: SupabaseUser, required_permission: str
+    ) -> bool:
         """
         Check if user has required permission
 

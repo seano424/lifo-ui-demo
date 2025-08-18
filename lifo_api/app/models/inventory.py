@@ -6,7 +6,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field, field_validator, ValidationInfo, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 from app.models.base import (
     BatchStatus,
@@ -28,9 +28,15 @@ class InventoryFilterParams(FilterParams):
     expiring_days: Optional[int] = Field(
         None, ge=0, le=365, description="Items expiring within N days"
     )
-    min_quantity: Optional[float] = Field(None, ge=0, description="Minimum quantity filter")
-    max_quantity: Optional[float] = Field(None, ge=0, description="Maximum quantity filter")
-    location_code: Optional[str] = Field(None, max_length=50, description="Filter by location")
+    min_quantity: Optional[float] = Field(
+        None, ge=0, description="Minimum quantity filter"
+    )
+    max_quantity: Optional[float] = Field(
+        None, ge=0, description="Maximum quantity filter"
+    )
+    location_code: Optional[str] = Field(
+        None, max_length=50, description="Filter by location"
+    )
 
     # Note: quantity range validation moved to business logic for OpenAPI compatibility
 
@@ -49,8 +55,12 @@ class BatchUpdateRequest(BaseModel):
     """Request to update batch information"""
 
     current_quantity: Optional[float] = Field(None, ge=0, description="New quantity")
-    selling_price: Optional[Decimal] = Field(None, gt=0, description="New selling price")
-    location_code: Optional[str] = Field(None, max_length=50, description="New location")
+    selling_price: Optional[Decimal] = Field(
+        None, gt=0, description="New selling price"
+    )
+    location_code: Optional[str] = Field(
+        None, max_length=50, description="New location"
+    )
     status: Optional[BatchStatus] = None
 
     # Note: quantity validation moved to business logic for OpenAPI compatibility
@@ -59,19 +69,29 @@ class BatchUpdateRequest(BaseModel):
 class DiscountRequest(BaseModel):
     """Request to apply discount to batch"""
 
-    discount_percent: float = Field(..., ge=0, le=90, description="Discount percentage (0-90)")
-    reason: Optional[str] = Field(None, max_length=255, description="Reason for discount")
+    discount_percent: float = Field(
+        ..., ge=0, le=90, description="Discount percentage (0-90)"
+    )
+    reason: Optional[str] = Field(
+        None, max_length=255, description="Reason for discount"
+    )
 
     class Config:
-        schema_extra = {"example": {"discount_percent": 25.0, "reason": "Approaching expiry date"}}
+        schema_extra = {
+            "example": {"discount_percent": 25.0, "reason": "Approaching expiry date"}
+        }
 
 
 class BulkActionRequest(BaseModel):
     """Request for bulk actions on multiple batches"""
 
-    batch_ids: list[str] = Field(..., min_length=1, max_length=100, description="List of batch IDs")
+    batch_ids: list[str] = Field(
+        ..., min_length=1, max_length=100, description="List of batch IDs"
+    )
     action_type: str = Field(..., description="Type of action to perform")
-    parameters: Optional[dict[str, Any]] = Field(None, description="Action-specific parameters")
+    parameters: Optional[dict[str, Any]] = Field(
+        None, description="Action-specific parameters"
+    )
 
     class Config:
         schema_extra = {

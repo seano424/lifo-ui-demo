@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import get_current_user, validate_store_access
 from app.database.connection import get_db
-from app.security.csv_security import validate_and_sanitize_csv, CSVSecurityError
+from app.security.csv_security import CSVSecurityError, validate_and_sanitize_csv
 
 # Import the unified processor (now properly installed)
 from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
@@ -51,7 +51,9 @@ class FastAPICSVIntegration:
             processor = UnifiedCSVProcessor(store_id, user_id)
 
             # Create temporary file for processing
-            with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(
+                mode="wb", suffix=".csv", delete=False
+            ) as temp_file:
                 temp_file.write(file_content)
                 temp_file_path = temp_file.name
 
@@ -67,7 +69,9 @@ class FastAPICSVIntegration:
                     pass
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"CSV processing failed: {e!s}") from None
+            raise HTTPException(
+                status_code=400, detail=f"CSV processing failed: {e!s}"
+            ) from None
 
 
 @router.post("/upload")
@@ -103,28 +107,33 @@ async def upload_csv(
         # SECURITY: Comprehensive CSV validation and sanitization
         # Sanitize filename to prevent path traversal false positives
         safe_filename = Path(file.filename).name if file.filename else "unknown.csv"
-        
+
         try:
             security_result = validate_and_sanitize_csv(file_content, safe_filename)
         except CSVSecurityError as e:
             raise HTTPException(
-                status_code=400, 
-                detail=f"Security validation failed: {str(e)}"
+                status_code=400, detail=f"Security validation failed: {str(e)}"
             )
 
         # Use sanitized content for processing
-        sanitized_content = security_result["sanitized_content"].encode('utf-8')
-        
+        sanitized_content = security_result["sanitized_content"].encode("utf-8")
+
         # Log security actions if any
         if security_result["sanitization_changes"]:
-            print(f"CSV Security: {len(security_result['sanitization_changes'])} changes made")
-            
+            print(
+                f"CSV Security: {len(security_result['sanitization_changes'])} changes made"
+            )
+
         if security_result["validation"]["security_issues"]:
-            print(f"CSV Security: {len(security_result['validation']['security_issues'])} issues detected")
+            print(
+                f"CSV Security: {len(security_result['validation']['security_issues'])} issues detected"
+            )
 
         # Process CSV using unified processor with sanitized content
         integration = FastAPICSVIntegration()
-        result = await integration.process_csv_upload(sanitized_content, store_id, current_user["sub"])
+        result = await integration.process_csv_upload(
+            sanitized_content, store_id, current_user["sub"]
+        )
 
         # Check processing result status
         if result["status"] == "error":
@@ -151,8 +160,12 @@ async def upload_csv(
                 "metadata": result.get("metadata", {}),
                 "security": {
                     "status": security_result["security_status"],
-                    "sanitization_applied": len(security_result["sanitization_changes"]) > 0,
-                    "security_issues_detected": len(security_result["validation"]["security_issues"]) > 0,
+                    "sanitization_applied": len(security_result["sanitization_changes"])
+                    > 0,
+                    "security_issues_detected": len(
+                        security_result["validation"]["security_issues"]
+                    )
+                    > 0,
                     "file_size_original": security_result["original_size"],
                     "file_size_processed": security_result["sanitized_size"],
                 },
@@ -323,11 +336,15 @@ async def validate_csv(
 
         # Validate file size
         if len(file_content) > 10 * 1024 * 1024:
-            raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
+            raise HTTPException(
+                status_code=400, detail="File too large. Maximum size is 10MB."
+            )
 
         # Process CSV in validation-only mode
         integration = FastAPICSVIntegration()
-        result = await integration.process_csv_upload(file_content, store_id, current_user["sub"])
+        result = await integration.process_csv_upload(
+            file_content, store_id, current_user["sub"]
+        )
 
         # Return validation results
         return {
@@ -351,7 +368,9 @@ async def validate_csv(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Validation failed: {e!s}") from None
+        raise HTTPException(
+            status_code=500, detail=f"Validation failed: {e!s}"
+        ) from None
 
 
 @router.post("/upload-and-create-batches")
@@ -364,14 +383,14 @@ async def upload_csv_and_create_batches(
 ):
     """
     Upload CSV file, validate data, and create inventory batches in Supabase
-    
+
     This endpoint combines CSV processing with batch creation:
     1. Validates and processes CSV file using unified processor
     2. Converts CSV data to batch creation requests
     3. Creates inventory batches in Supabase database with transaction management
     4. Returns comprehensive results with statistics
     """
-    
+
     # Validate file type
     if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(
@@ -380,7 +399,7 @@ async def upload_csv_and_create_batches(
 
     # Validate store access
     await validate_store_access(store_id, current_user)
-    
+
     # Validate chunk size
     if chunk_size < 1 or chunk_size > 100:
         raise HTTPException(
@@ -390,25 +409,26 @@ async def upload_csv_and_create_batches(
     try:
         # Read and validate file content
         file_content = await file.read()
-        
+
         # Validate file size (10MB limit)
         if len(file_content) > 10 * 1024 * 1024:
-            raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
-        
+            raise HTTPException(
+                status_code=400, detail="File too large. Maximum size is 10MB."
+            )
+
         # SECURITY: Comprehensive CSV validation and sanitization
         safe_filename = Path(file.filename).name if file.filename else "unknown.csv"
-        
+
         try:
             security_result = validate_and_sanitize_csv(file_content, safe_filename)
         except CSVSecurityError as e:
             raise HTTPException(
-                status_code=400, 
-                detail=f"Security validation failed: {str(e)}"
+                status_code=400, detail=f"Security validation failed: {str(e)}"
             )
 
         # Use sanitized content for processing
-        sanitized_content = security_result["sanitized_content"].encode('utf-8')
-        
+        sanitized_content = security_result["sanitized_content"].encode("utf-8")
+
         # Step 1: Process CSV using unified processor
         integration = FastAPICSVIntegration()
         csv_result = await integration.process_csv_upload(
@@ -425,46 +445,46 @@ async def upload_csv_and_create_batches(
                     "warnings": csv_result.get("warnings", []),
                 },
             )
-        
+
         # Step 2: Convert CSV data to batch requests
         from app.utils.csv_to_batch_adapter import CSVToBatchAdapter
-        
+
         try:
             batch_requests = CSVToBatchAdapter.convert_csv_data_to_batch_requests(
                 csv_data=csv_result["data"],
                 store_id=store_id,
-                user_id=current_user["sub"]
+                user_id=current_user["sub"],
             )
         except Exception as e:
             raise HTTPException(
                 status_code=400,
-                detail=f"Failed to convert CSV data to batch requests: {str(e)}"
+                detail=f"Failed to convert CSV data to batch requests: {str(e)}",
             )
-        
+
         if not batch_requests:
             raise HTTPException(
                 status_code=400,
-                detail="No valid batch requests could be created from CSV data"
+                detail="No valid batch requests could be created from CSV data",
             )
-        
+
         # Step 3: Create batches in Supabase using bulk service
         from app.services.batch_creation_service import BatchCreationService
-        
+
         batch_service = BatchCreationService()
         batch_results = await batch_service.create_batches_from_csv_bulk(
             store_id=store_id,
             user_id=current_user["sub"],
             batch_requests=batch_requests,
-            chunk_size=chunk_size
+            chunk_size=chunk_size,
         )
-        
+
         # Step 4: Create comprehensive summary
         csv_summary = CSVToBatchAdapter.create_csv_batch_summary(
             batch_requests=batch_requests,
             store_id=store_id,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
-        
+
         # Prepare final response
         response_data = {
             "success": True,
@@ -475,7 +495,8 @@ async def upload_csv_and_create_batches(
                 "csv_warnings": csv_result.get("warnings", []),
                 "csv_errors": csv_result.get("errors", []),
                 "security_status": security_result["security_status"],
-                "sanitization_applied": len(security_result["sanitization_changes"]) > 0
+                "sanitization_applied": len(security_result["sanitization_changes"])
+                > 0,
             },
             "batch_creation": {
                 "total_requests": batch_results["total_requests"],
@@ -483,19 +504,23 @@ async def upload_csv_and_create_batches(
                 "failed_batches": batch_results["failed"],
                 "success_rate": batch_results["success_rate"],
                 "processing_metadata": batch_results["processing_metadata"],
-                "product_statistics": batch_results["product_statistics"]
+                "product_statistics": batch_results["product_statistics"],
             },
             "data_summary": csv_summary,
-            "failed_items": batch_results["failed_batches"] if batch_results["failed"] > 0 else [],
+            "failed_items": batch_results["failed_batches"]
+            if batch_results["failed"] > 0
+            else [],
             "store_id": store_id,
             "processed_at": datetime.utcnow().isoformat(),
-            "processed_by": current_user["sub"]
+            "processed_by": current_user["sub"],
         }
-        
+
         # Add success details to response
         if batch_results["successful"] > 0:
-            response_data["successful_batches_sample"] = batch_results["successful_batches"][:5]  # First 5 for preview
-        
+            response_data["successful_batches_sample"] = batch_results[
+                "successful_batches"
+            ][:5]  # First 5 for preview
+
         # Log comprehensive operation
         logger.info(
             "CSV upload and batch creation completed",
@@ -507,9 +532,9 @@ async def upload_csv_and_create_batches(
             batches_created=batch_results["successful"],
             batches_failed=batch_results["failed"],
             success_rate=batch_results["success_rate"],
-            chunk_size=chunk_size
+            chunk_size=chunk_size,
         )
-        
+
         return response_data
 
     except HTTPException:
@@ -520,7 +545,7 @@ async def upload_csv_and_create_batches(
             store_id=store_id,
             user_id=current_user["sub"],
             filename=file.filename if file else "unknown",
-            error=str(e)
+            error=str(e),
         )
         raise HTTPException(
             status_code=500,

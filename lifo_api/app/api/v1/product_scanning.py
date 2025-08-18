@@ -14,9 +14,9 @@ from app.auth.secure_dependencies import get_current_user, validate_store_id_for
 from app.database.connection import get_db
 from app.middleware.rate_limiting import ai_endpoint_rate_limit
 from app.services.product_scanning_service import (
+    ProductScanningError,
     ProductScanningService,
     ScanningWorkflow,
-    ProductScanningError
 )
 from app.utils.mvp_exceptions import ValidationException
 
@@ -37,7 +37,7 @@ def _validate_image_upload(image: UploadFile) -> UploadFile:
             field="image",
             validation_errors=[f"Only {', '.join(allowed_types)} are supported"],
         )
-    
+
     return image
 
 
@@ -58,39 +58,41 @@ async def extract_expiry_date_ocr(
     """
     try:
         store_id = validate_store_id_format(store_id)
-        
+
         # Validate and read image
         image = _validate_image_upload(image)
         image_data = await image.read()
-        
+
         if len(image_data) > 10 * 1024 * 1024:  # 10MB limit for expiry extraction
             raise ValidationException(
                 message="Image file too large for expiry extraction",
                 field="image",
-                validation_errors=["Maximum file size is 10MB for expiry date extraction"],
+                validation_errors=[
+                    "Maximum file size is 10MB for expiry date extraction"
+                ],
             )
-        
+
         # Extract expiry date using simple method
         expiry_date = await scanning_service.extract_expiry_date(image_data)
-        
+
         logger.info(
             "Expiry date extraction completed",
             store_id=store_id,
             has_expiry=expiry_date is not None,
             user_id=current_user["sub"],
         )
-        
+
         # Create JSON-safe response
         response_data = {
             "success": True,
             "scan_type": "expiry_date_extraction",
             "expiry_date": expiry_date.isoformat() if expiry_date is not None else None,
             "confidence_threshold": confidence_threshold,
-            "processing_type": "google_vision_ocr"
+            "processing_type": "google_vision_ocr",
         }
-        
+
         return response_data
-        
+
     except ValidationException:
         raise
     except ProductScanningError as e:
@@ -100,7 +102,9 @@ async def extract_expiry_date_ocr(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=422, detail=f"Expiry date extraction failed: {str(e)}")
+        raise HTTPException(
+            status_code=422, detail=f"Expiry date extraction failed: {str(e)}"
+        )
     except Exception as e:
         logger.error(
             "Expiry date extraction error",
@@ -128,49 +132,48 @@ async def full_ocr_analysis(
     """
     try:
         store_id = validate_store_id_format(store_id)
-        
+
         # Validate and read image
         image = _validate_image_upload(image)
         image_data = await image.read()
-        
+
         if len(image_data) > 15 * 1024 * 1024:  # 15MB limit for full analysis
             raise ValidationException(
                 message="Image file too large for full OCR analysis",
                 field="image",
                 validation_errors=["Maximum file size is 15MB for complete analysis"],
             )
-        
+
         # Configure comprehensive scanning workflow
         workflow = ScanningWorkflow(
             enable_barcode_detection=True,
             enable_expiry_extraction=True,
             enable_text_extraction=True,
             confidence_threshold=confidence_threshold,
-            max_processing_time_ms=max_processing_time_ms
+            max_processing_time_ms=max_processing_time_ms,
         )
-        
+
         # Perform complete OCR analysis
         scan_result = await scanning_service.scan_product_image(image_data, workflow)
-        
+
         # Get dual dates with metadata
         dual_dates = scanning_service.get_last_dual_dates()
-        
-        
+
         logger.info(
             "Full OCR analysis completed",
             store_id=store_id,
             barcode=scan_result.primary_barcode,
             has_expiry=scan_result.suggested_expiry_date is not None,
-            has_manufacture=dual_dates.get('manufacture_date') is not None,
+            has_manufacture=dual_dates.get("manufacture_date") is not None,
             confidence=scan_result.confidence_score,
             processing_time_ms=scan_result.processing_time_ms,
             user_id=current_user["sub"],
         )
-        
+
         # Safely extract dates
-        expiry_date = dual_dates.get('expiry_date')
-        manufacture_date = dual_dates.get('manufacture_date')
-        
+        expiry_date = dual_dates.get("expiry_date")
+        manufacture_date = dual_dates.get("manufacture_date")
+
         # Create JSON-safe response
         response_data = {
             "success": True,
@@ -179,7 +182,9 @@ async def full_ocr_analysis(
             "suggested_name": scan_result.suggested_name,
             # Dual date extraction - both expiry and manufacture dates
             "expiry_date": expiry_date.isoformat() if expiry_date is not None else None,
-            "manufacture_date": manufacture_date.isoformat() if manufacture_date is not None else None,
+            "manufacture_date": manufacture_date.isoformat()
+            if manufacture_date is not None
+            else None,
             "raw_text_blocks": scan_result.raw_text_blocks,
             "confidence_scores": {
                 "overall": scan_result.confidence_score,
@@ -198,11 +203,11 @@ async def full_ocr_analysis(
                 "expiry_candidates": len(scan_result.vision_result.expiry_dates),
             },
             # Enhanced metadata for dual date extraction
-            "date_extraction_metadata": dual_dates.get('metadata', {})
+            "date_extraction_metadata": dual_dates.get("metadata", {}),
         }
-        
+
         return response_data
-        
+
     except ValidationException:
         raise
     except ProductScanningError as e:
@@ -239,36 +244,37 @@ async def extract_text_only(
     """
     try:
         store_id = validate_store_id_format(store_id)
-        
+
         # Validate and read image
         image = _validate_image_upload(image)
         image_data = await image.read()
-        
+
         if len(image_data) > 8 * 1024 * 1024:  # 8MB limit for text extraction
             raise ValidationException(
                 message="Image file too large for text extraction",
                 field="image",
                 validation_errors=["Maximum file size is 8MB for text extraction"],
             )
-        
+
         # Configure text-only workflow
         workflow = ScanningWorkflow(
             enable_barcode_detection=False,
             enable_expiry_extraction=False,
             enable_text_extraction=True,
             confidence_threshold=confidence_threshold,
-            max_processing_time_ms=3000
+            max_processing_time_ms=3000,
         )
-        
+
         # Perform text extraction
         scan_result = await scanning_service.scan_product_image(image_data, workflow)
-        
+
         # Filter text blocks by confidence
         high_confidence_text = [
-            text for text in scan_result.raw_text_blocks 
+            text
+            for text in scan_result.raw_text_blocks
             if len(text.strip()) > 2  # Ignore very short text
         ]
-        
+
         logger.info(
             "Text extraction completed",
             store_id=store_id,
@@ -276,7 +282,7 @@ async def extract_text_only(
             processing_time_ms=scan_result.processing_time_ms,
             user_id=current_user["sub"],
         )
-        
+
         return {
             "success": True,
             "scan_type": "text_extraction",
@@ -286,10 +292,10 @@ async def extract_text_only(
             "processing_info": {
                 "processing_time_ms": scan_result.processing_time_ms,
                 "total_text_blocks": len(scan_result.raw_text_blocks),
-                "high_confidence_blocks": len(high_confidence_text)
-            }
+                "high_confidence_blocks": len(high_confidence_text),
+            },
         }
-        
+
     except ValidationException:
         raise
     except ProductScanningError as e:

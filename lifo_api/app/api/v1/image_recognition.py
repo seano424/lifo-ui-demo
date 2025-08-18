@@ -97,7 +97,9 @@ async def analyze_product_image(
             raise ValidationException(
                 message="Invalid image format",
                 field="image",
-                validation_errors=[f"Only {', '.join(allowed_image_types)} are supported"],
+                validation_errors=[
+                    f"Only {', '.join(allowed_image_types)} are supported"
+                ],
             )
 
         # Read image data
@@ -141,7 +143,9 @@ async def analyze_product_image(
             "analysis_results": analysis_results,
             "processing_info": {
                 "model_version": "google_vision_v1",
-                "processing_time_ms": analysis_results.get("analysis_metadata", {}).get("processing_time_ms", 0),
+                "processing_time_ms": analysis_results.get("analysis_metadata", {}).get(
+                    "processing_time_ms", 0
+                ),
                 "image_size_bytes": len(image_data),
             },
             "next_steps": [
@@ -169,7 +173,9 @@ async def extract_expiry_date_from_image(
     store_id: str,
     request: Request,
     image: UploadFile = File(...),
-    date_format_hint: Optional[str] = Form(None, description="Expected date format hint"),
+    date_format_hint: Optional[str] = Form(
+        None, description="Expected date format hint"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -279,100 +285,130 @@ async def get_ml_models_status(
         }
 
     except Exception as e:
-        logger.error("ML models status check failed", error=str(e), user_id=current_user["sub"])
+        logger.error(
+            "ML models status check failed", error=str(e), user_id=current_user["sub"]
+        )
         raise HTTPException(status_code=500, detail="Status check failed")
 
 
 # Helper functions for real Vision API integration
 
+
 async def _analyze_with_vision_api(
-    vision_service: GoogleVisionService, 
-    image_data: bytes, 
-    analysis_type: str, 
-    confidence_threshold: float
+    vision_service: GoogleVisionService,
+    image_data: bytes,
+    analysis_type: str,
+    confidence_threshold: float,
 ) -> dict[str, Any]:
     """Analyze image using real Google Vision API"""
     import asyncio
     import time
-    
+
     start_time = time.time()
-    
+
     try:
         # Run the Google Vision analysis
         vision_result = await asyncio.to_thread(
-            vision_service.analyze_product_image, 
-            image_data
+            vision_service.analyze_product_image, image_data
         )
-        
+
         detections = []
-        
+
         # Convert Vision API results to expected format
         if analysis_type in ["expiry_date", "full"]:
             for expiry_result in vision_result.expiry_dates:
                 if expiry_result.confidence >= confidence_threshold:
-                    detections.append({
-                        "type": "expiry_date",
-                        "value": expiry_result.date.strftime("%Y-%m-%d") if expiry_result.date else expiry_result.raw_text,
-                        "confidence": expiry_result.confidence,
-                        "bounding_box": expiry_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
-                        "original_text": expiry_result.raw_text,
-                        "format_detected": expiry_result.format_detected
-                    })
-        
+                    detections.append(
+                        {
+                            "type": "expiry_date",
+                            "value": expiry_result.date.strftime("%Y-%m-%d")
+                            if expiry_result.date
+                            else expiry_result.raw_text,
+                            "confidence": expiry_result.confidence,
+                            "bounding_box": expiry_result.bounding_box
+                            or {"x": 0, "y": 0, "width": 0, "height": 0},
+                            "original_text": expiry_result.raw_text,
+                            "format_detected": expiry_result.format_detected,
+                        }
+                    )
+
         if analysis_type in ["barcode", "full"]:
             for barcode_result in vision_result.barcodes:
                 if barcode_result.confidence >= confidence_threshold:
-                    detections.append({
-                        "type": f"barcode_{barcode_result.format.lower()}",
-                        "value": barcode_result.value,
-                        "confidence": barcode_result.confidence,
-                        "bounding_box": barcode_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
-                        "barcode_type": barcode_result.format
-                    })
-        
+                    detections.append(
+                        {
+                            "type": f"barcode_{barcode_result.format.lower()}",
+                            "value": barcode_result.value,
+                            "confidence": barcode_result.confidence,
+                            "bounding_box": barcode_result.bounding_box
+                            or {"x": 0, "y": 0, "width": 0, "height": 0},
+                            "barcode_type": barcode_result.format,
+                        }
+                    )
+
         # Extract product names from OCR text if doing full analysis
         if analysis_type == "full":
-            product_names = _extract_product_names_from_ocr(vision_result.raw_text, confidence_threshold)
+            product_names = _extract_product_names_from_ocr(
+                vision_result.raw_text, confidence_threshold
+            )
             detections.extend(product_names)
-        
+
         processing_time_ms = (time.time() - start_time) * 1000
-        
+
         return {
             "detections": detections,
             "analysis_metadata": {
                 "image_quality": _assess_image_quality(vision_result),
                 "total_regions_found": len(vision_result.raw_text),
                 "processing_confidence": vision_result.overall_confidence,
-                "processing_time_ms": processing_time_ms
-            }
+                "processing_time_ms": processing_time_ms,
+            },
         }
-        
+
     except Exception as e:
         logger.error("Google Vision analysis failed", error=str(e))
         # Fallback to mock data if Vision API fails
-        return await _mock_image_analysis(image_data, analysis_type, confidence_threshold)
+        return await _mock_image_analysis(
+            image_data, analysis_type, confidence_threshold
+        )
 
 
-def _extract_product_names_from_ocr(ocr_results: list, confidence_threshold: float) -> list[dict]:
+def _extract_product_names_from_ocr(
+    ocr_results: list, confidence_threshold: float
+) -> list[dict]:
     """Extract likely product names from OCR text results"""
     product_detections = []
-    
+
     for ocr_result in ocr_results:
         if ocr_result.confidence >= confidence_threshold:
             text = ocr_result.text.strip()
-            
+
             # Simple heuristics for product name detection
-            if (len(text) > 5 and 
-                any(keyword in text.upper() for keyword in ['SIGNATURE', 'BRAND', 'ORGANIC', 'REDUCED', 'FAT', 'MILK']) and
-                not any(char in text for char in ['/', '%', '$'])):  # Likely not date/price
-                
-                product_detections.append({
-                    "type": "product_name",
-                    "value": text,
-                    "confidence": ocr_result.confidence,
-                    "bounding_box": ocr_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0}
-                })
-    
+            if (
+                len(text) > 5
+                and any(
+                    keyword in text.upper()
+                    for keyword in [
+                        "SIGNATURE",
+                        "BRAND",
+                        "ORGANIC",
+                        "REDUCED",
+                        "FAT",
+                        "MILK",
+                    ]
+                )
+                and not any(char in text for char in ["/", "%", "$"])
+            ):  # Likely not date/price
+                product_detections.append(
+                    {
+                        "type": "product_name",
+                        "value": text,
+                        "confidence": ocr_result.confidence,
+                        "bounding_box": ocr_result.bounding_box
+                        or {"x": 0, "y": 0, "width": 0, "height": 0},
+                    }
+                )
+
     return product_detections
 
 
@@ -389,6 +425,7 @@ def _assess_image_quality(vision_result) -> str:
 
 
 # Helper functions for mock implementations (kept as fallback)
+
 
 async def _mock_image_analysis(
     image_data: bytes, analysis_type: str, confidence_threshold: float
@@ -484,7 +521,9 @@ async def _mock_expiry_date_extraction(
     }
 
 
-async def _mock_barcode_detection(image_data: bytes, barcode_types: list[str]) -> dict[str, Any]:
+async def _mock_barcode_detection(
+    image_data: bytes, barcode_types: list[str]
+) -> dict[str, Any]:
     """Mock barcode detection results"""
 
     return {

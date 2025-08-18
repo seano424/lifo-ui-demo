@@ -4,17 +4,17 @@ Tests database connectivity and service health
 """
 
 import asyncio
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any, Dict
 
 import structlog
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.database.connection import test_connection, get_db_manager
+from app.auth.secure_dependencies import get_current_user
+from app.database.connection import get_db_manager, test_connection
 from app.database.supabase_service import supabase_health_check
 from app.monitoring.metrics import get_metrics_collector
 from app.utils.performance import mobile_performance_health_check
-from app.auth.secure_dependencies import get_current_user
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -26,72 +26,69 @@ async def health_check() -> Dict[str, Any]:
     Comprehensive health check for all services
     """
     start_time = asyncio.get_event_loop().time()
-    
+
     health_status = {
         "status": "healthy",
         "timestamp": asyncio.get_event_loop().time(),
-        "services": {}
+        "services": {},
     }
-    
+
     # Test Supabase connectivity
     try:
         supabase_health = await supabase_health_check()
         health_status["services"]["supabase"] = supabase_health
-        
+
         if supabase_health["status"] != "healthy":
             health_status["status"] = "degraded"
-            
+
     except Exception as e:
         logger.error("Supabase health check failed", error=str(e))
-        health_status["services"]["supabase"] = {
-            "status": "unhealthy",
-            "error": str(e)
-        }
+        health_status["services"]["supabase"] = {"status": "unhealthy", "error": str(e)}
         health_status["status"] = "unhealthy"
-    
+
     # Test SQLAlchemy connection (if available)
     try:
         sqlalchemy_healthy = await test_connection()
         health_status["services"]["sqlalchemy"] = {
             "status": "healthy" if sqlalchemy_healthy else "unhealthy",
-            "connection_type": "postgresql+asyncpg"
+            "connection_type": "postgresql+asyncpg",
         }
-        
+
         if not sqlalchemy_healthy:
             health_status["status"] = "degraded"
-            
+
     except Exception as e:
         logger.error("SQLAlchemy health check failed", error=str(e))
         health_status["services"]["sqlalchemy"] = {
             "status": "unhealthy",
-            "error": str(e)
+            "error": str(e),
         }
         # Don't fail overall health if SQLAlchemy is down but Supabase works
-    
+
     # Add database manager info
     try:
         db_manager = get_db_manager()
         db_info = await db_manager.get_connection_info()
         health_status["services"]["database_manager"] = {
             "status": "healthy",
-            "info": db_info
+            "info": db_info,
         }
     except Exception as e:
         health_status["services"]["database_manager"] = {
             "status": "unhealthy",
-            "error": str(e)
+            "error": str(e),
         }
-    
+
     end_time = asyncio.get_event_loop().time()
     health_status["total_response_time_ms"] = round((end_time - start_time) * 1000, 2)
-    
+
     # Return appropriate HTTP status
     if health_status["status"] == "unhealthy":
         raise HTTPException(status_code=503, detail=health_status)
     elif health_status["status"] == "degraded":
         # Still return 200 but indicate degraded performance
         health_status["warning"] = "Some services are experiencing issues"
-    
+
     return health_status
 
 
@@ -105,12 +102,8 @@ async def supabase_health() -> Dict[str, Any]:
     except Exception as e:
         logger.error("Supabase health check failed", error=str(e))
         raise HTTPException(
-            status_code=503, 
-            detail={
-                "status": "unhealthy",
-                "service": "supabase",
-                "error": str(e)
-            }
+            status_code=503,
+            detail={"status": "unhealthy", "service": "supabase", "error": str(e)},
         )
 
 
@@ -126,11 +119,7 @@ async def database_health() -> Dict[str, Any]:
         logger.error("Database health check failed", error=str(e))
         raise HTTPException(
             status_code=503,
-            detail={
-                "status": "unhealthy",
-                "service": "database",
-                "error": str(e)
-            }
+            detail={"status": "unhealthy", "service": "database", "error": str(e)},
         )
 
 
@@ -146,31 +135,20 @@ async def readiness_check() -> Dict[str, Any]:
         if supabase_health["status"] != "healthy":
             raise HTTPException(
                 status_code=503,
-                detail={
-                    "ready": False,
-                    "reason": "Supabase service unavailable"
-                }
+                detail={"ready": False, "reason": "Supabase service unavailable"},
             )
-        
+
         return {
             "ready": True,
             "timestamp": asyncio.get_event_loop().time(),
-            "services": {
-                "supabase": "healthy"
-            }
+            "services": {"supabase": "healthy"},
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error("Readiness check failed", error=str(e))
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "ready": False,
-                "reason": str(e)
-            }
-        )
+        raise HTTPException(status_code=503, detail={"ready": False, "reason": str(e)})
 
 
 @router.get("/health/live")
@@ -182,13 +160,13 @@ async def liveness_check() -> Dict[str, Any]:
     return {
         "alive": True,
         "timestamp": asyncio.get_event_loop().time(),
-        "version": "1.0.0"
+        "version": "1.0.0",
     }
 
 
 @router.get("/health/performance")
 async def performance_health_check(
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """
     Comprehensive performance health check
@@ -196,16 +174,16 @@ async def performance_health_check(
     """
     try:
         start_time = asyncio.get_event_loop().time()
-        
+
         # Get metrics collector
         metrics_collector = get_metrics_collector()
-        
+
         # Get comprehensive performance health
         performance_health = await mobile_performance_health_check()
-        
+
         # Get current metrics summary
         metrics_summary = metrics_collector.get_metrics_summary()
-        
+
         # Combine all health data
         health_report = {
             "timestamp": datetime.utcnow(),
@@ -213,31 +191,39 @@ async def performance_health_check(
             "performance_health": performance_health,
             "metrics_summary": metrics_summary,
             "mobile_optimization": {
-                "bounded_cache_active": performance_health.get("memory_leak_fixed", False),
-                "mobile_targets_met": _check_mobile_performance_targets(metrics_summary),
-                "cache_utilization": performance_health.get("cache_statistics", {}).get("utilization", 0)
+                "bounded_cache_active": performance_health.get(
+                    "memory_leak_fixed", False
+                ),
+                "mobile_targets_met": _check_mobile_performance_targets(
+                    metrics_summary
+                ),
+                "cache_utilization": performance_health.get("cache_statistics", {}).get(
+                    "utilization", 0
+                ),
             },
             "system_health": {
                 "database_performance": _assess_database_performance(metrics_summary),
                 "api_performance": _assess_api_performance(metrics_summary),
-                "cache_performance": _assess_cache_performance(metrics_summary)
-            }
+                "cache_performance": _assess_cache_performance(metrics_summary),
+            },
         }
-        
+
         # Calculate response time
         end_time = asyncio.get_event_loop().time()
         health_report["health_check_time_ms"] = round((end_time - start_time) * 1000, 2)
-        
+
         # Determine HTTP status based on health
-        overall_health_score = metrics_summary.get("performance_health", {}).get("overall_health_score", 1.0)
-        
+        overall_health_score = metrics_summary.get("performance_health", {}).get(
+            "overall_health_score", 1.0
+        )
+
         if overall_health_score < 0.5:
             raise HTTPException(status_code=503, detail=health_report)
         elif overall_health_score < 0.7:
             health_report["warning"] = "Performance degradation detected"
-        
+
         return health_report
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -247,14 +233,14 @@ async def performance_health_check(
             detail={
                 "status": "error",
                 "message": "Performance health check failed",
-                "error": str(e)
-            }
+                "error": str(e),
+            },
         )
 
 
 @router.get("/health/mobile-performance")
 async def mobile_performance_health(
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """
     Mobile-specific performance health check
@@ -263,26 +249,26 @@ async def mobile_performance_health(
     try:
         metrics_collector = get_metrics_collector()
         metrics_summary = metrics_collector.get_metrics_summary()
-        
+
         # Analyze mobile endpoint performance
         mobile_endpoints = {
             "/mobile-summary/": {"target_ms": 300, "critical": True},
             "/batch-quick-score/": {"target_ms": 200, "critical": True},
             "/store-health/": {"target_ms": 300, "critical": False},
-            "/batch-list-mobile/": {"target_ms": 300, "critical": False}
+            "/batch-list-mobile/": {"target_ms": 300, "critical": False},
         }
-        
+
         mobile_health = {
             "timestamp": datetime.utcnow(),
             "mobile_targets_status": "optimal",
             "endpoint_performance": {},
             "violations": [],
-            "recommendations": []
+            "recommendations": [],
         }
-        
+
         total_violations = 0
         critical_violations = 0
-        
+
         # Check each mobile endpoint
         api_metrics = metrics_summary.get("api_metrics", {})
         for endpoint_pattern, config in mobile_endpoints.items():
@@ -291,51 +277,61 @@ async def mobile_performance_health(
                     avg_time = metrics.get("avg_response_time_ms", 0)
                     violations = metrics.get("mobile_target_violations", 0)
                     total_requests = metrics.get("total_requests", 0)
-                    
+
                     endpoint_health = {
                         "avg_response_time_ms": avg_time,
                         "target_ms": config["target_ms"],
                         "meets_target": avg_time <= config["target_ms"],
-                        "violation_rate": violations / total_requests if total_requests > 0 else 0,
+                        "violation_rate": violations / total_requests
+                        if total_requests > 0
+                        else 0,
                         "total_requests": total_requests,
-                        "critical_endpoint": config["critical"]
+                        "critical_endpoint": config["critical"],
                     }
-                    
-                    mobile_health["endpoint_performance"][endpoint_key] = endpoint_health
-                    
+
+                    mobile_health["endpoint_performance"][endpoint_key] = (
+                        endpoint_health
+                    )
+
                     # Count violations
                     if not endpoint_health["meets_target"]:
                         total_violations += 1
                         if config["critical"]:
                             critical_violations += 1
-                        
+
                         violation_msg = f"{endpoint_key}: {avg_time:.1f}ms (target: {config['target_ms']}ms)"
                         mobile_health["violations"].append(violation_msg)
-        
+
         # Determine overall mobile status
         if critical_violations > 0:
             mobile_health["mobile_targets_status"] = "critical"
         elif total_violations > 0:
             mobile_health["mobile_targets_status"] = "degraded"
-        
+
         # Add recommendations
         if critical_violations > 0:
-            mobile_health["recommendations"].append("Critical mobile endpoints exceeding targets - immediate optimization needed")
+            mobile_health["recommendations"].append(
+                "Critical mobile endpoints exceeding targets - immediate optimization needed"
+            )
         elif total_violations > 0:
-            mobile_health["recommendations"].append("Some mobile endpoints need performance optimization")
+            mobile_health["recommendations"].append(
+                "Some mobile endpoints need performance optimization"
+            )
         else:
             mobile_health["recommendations"].append("Mobile performance is optimal")
-        
+
         # Check cache performance for mobile
         cache_metrics = metrics_summary.get("cache_metrics", {})
         mobile_cache_health = cache_metrics.get("mobile_cache", {})
         if mobile_cache_health:
             hit_rate = mobile_cache_health.get("hit_rate_percent", 0)
             if hit_rate < 60:
-                mobile_health["recommendations"].append(f"Mobile cache hit rate is {hit_rate:.1f}% - consider cache optimization")
-        
+                mobile_health["recommendations"].append(
+                    f"Mobile cache hit rate is {hit_rate:.1f}% - consider cache optimization"
+                )
+
         return mobile_health
-        
+
     except Exception as e:
         logger.error("Mobile performance health check failed", error=str(e))
         raise HTTPException(
@@ -343,15 +339,14 @@ async def mobile_performance_health(
             detail={
                 "status": "error",
                 "message": "Mobile performance health check failed",
-                "error": str(e)
-            }
+                "error": str(e),
+            },
         )
 
 
 @router.get("/metrics")
 async def get_performance_metrics(
-    hours: int = 24,
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    hours: int = 24, current_user: Dict[str, Any] = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     Get comprehensive performance metrics
@@ -359,39 +354,39 @@ async def get_performance_metrics(
     """
     try:
         metrics_collector = get_metrics_collector()
-        
+
         # Get comprehensive metrics summary
         metrics_summary = metrics_collector.get_metrics_summary()
-        
+
         # Add time series data for key metrics
         time_series_data = {}
-        
+
         # Mobile endpoint response times
         mobile_endpoints = [
             "api_get_mobile_summary",
-            "api_post_batch_quick_score", 
+            "api_post_batch_quick_score",
             "api_get_store_health",
-            "api_get_batch_list_mobile"
+            "api_get_batch_list_mobile",
         ]
-        
+
         for endpoint in mobile_endpoints:
             time_series_key = f"{endpoint}_response_time"
             time_series_data[endpoint] = metrics_collector.get_time_series_data(
                 time_series_key, hours=hours
             )
-        
+
         # System metrics time series
         system_metrics = [
             "system_cpu_usage_percent",
             "system_memory_usage_percent",
-            "system_disk_usage_percent"
+            "system_disk_usage_percent",
         ]
-        
+
         for metric in system_metrics:
             time_series_data[metric] = metrics_collector.get_time_series_data(
                 metric, hours=hours
             )
-        
+
         return {
             "timestamp": datetime.utcnow(),
             "time_period_hours": hours,
@@ -399,10 +394,10 @@ async def get_performance_metrics(
             "time_series_data": time_series_data,
             "data_retention": {
                 "max_data_points_per_metric": 1000,
-                "collection_interval_seconds": 30
-            }
+                "collection_interval_seconds": 30,
+            },
         }
-        
+
     except Exception as e:
         logger.error("Failed to get performance metrics", error=str(e))
         raise HTTPException(
@@ -410,48 +405,52 @@ async def get_performance_metrics(
             detail={
                 "status": "error",
                 "message": "Failed to retrieve performance metrics",
-                "error": str(e)
-            }
+                "error": str(e),
+            },
         )
 
 
 def _check_mobile_performance_targets(metrics_summary: Dict[str, Any]) -> bool:
     """Check if mobile performance targets are being met"""
     api_metrics = metrics_summary.get("api_metrics", {})
-    
+
     mobile_endpoints = [
-        "get/mobile/summary", "post/batch/quick/score", 
-        "get/store/health", "get/batch/list/mobile"
+        "get/mobile/summary",
+        "post/batch/quick/score",
+        "get/store/health",
+        "get/batch/list/mobile",
     ]
-    
+
     for endpoint_key, metrics in api_metrics.items():
         if any(mobile_ep in endpoint_key for mobile_ep in mobile_endpoints):
             avg_time = metrics.get("avg_response_time_ms", 0)
             if avg_time > 300:  # Mobile target
                 return False
-    
+
     return True
 
 
 def _assess_database_performance(metrics_summary: Dict[str, Any]) -> str:
     """Assess database performance health"""
     db_metrics = metrics_summary.get("database_metrics", {})
-    
+
     if not db_metrics:
         return "unknown"
-    
+
     slow_queries = 0
     total_queries = 0
-    
+
     for query_name, metrics in db_metrics.items():
         total_queries += metrics.get("total_queries", 0)
-        slow_queries += metrics.get("slow_query_rate", 0) * metrics.get("total_queries", 0)
-    
+        slow_queries += metrics.get("slow_query_rate", 0) * metrics.get(
+            "total_queries", 0
+        )
+
     if total_queries == 0:
         return "no_data"
-    
+
     slow_query_rate = slow_queries / total_queries
-    
+
     if slow_query_rate > 0.2:  # >20% slow queries
         return "poor"
     elif slow_query_rate > 0.1:  # >10% slow queries
@@ -465,20 +464,20 @@ def _assess_database_performance(metrics_summary: Dict[str, Any]) -> str:
 def _assess_api_performance(metrics_summary: Dict[str, Any]) -> str:
     """Assess API performance health"""
     api_metrics = metrics_summary.get("api_metrics", {})
-    
+
     if not api_metrics:
         return "unknown"
-    
+
     slow_endpoints = 0
     total_endpoints = len(api_metrics)
-    
+
     for endpoint_key, metrics in api_metrics.items():
         avg_time = metrics.get("avg_response_time_ms", 0)
         if avg_time > 500:  # General API threshold
             slow_endpoints += 1
-    
+
     slow_endpoint_rate = slow_endpoints / total_endpoints if total_endpoints > 0 else 0
-    
+
     if slow_endpoint_rate > 0.3:  # >30% slow endpoints
         return "poor"
     elif slow_endpoint_rate > 0.1:  # >10% slow endpoints
@@ -492,20 +491,20 @@ def _assess_api_performance(metrics_summary: Dict[str, Any]) -> str:
 def _assess_cache_performance(metrics_summary: Dict[str, Any]) -> str:
     """Assess cache performance health"""
     cache_metrics = metrics_summary.get("cache_metrics", {})
-    
+
     if not cache_metrics:
         return "unknown"
-    
+
     low_hit_rate_caches = 0
     total_caches = len(cache_metrics)
-    
+
     for cache_name, metrics in cache_metrics.items():
         hit_rate = metrics.get("hit_rate_percent", 0)
         if hit_rate < 60:  # <60% hit rate is concerning
             low_hit_rate_caches += 1
-    
+
     low_hit_rate_ratio = low_hit_rate_caches / total_caches if total_caches > 0 else 0
-    
+
     if low_hit_rate_ratio > 0.5:  # >50% caches with low hit rate
         return "poor"
     elif low_hit_rate_ratio > 0.2:  # >20% caches with low hit rate

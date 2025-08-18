@@ -61,15 +61,22 @@ class StructuredLogger:
             try:
                 exc_info = record["exception"]
                 log_entry["exception"] = {
-                    "type": getattr(exc_info.type, '__name__', str(exc_info.type)) if hasattr(exc_info, 'type') else 'Unknown',
-                    "value": str(exc_info.value) if hasattr(exc_info, 'value') else str(exc_info),
-                    "traceback": exc_info.traceback.format() if hasattr(exc_info, 'traceback') and hasattr(exc_info.traceback, 'format') else 'No traceback available',
+                    "type": getattr(exc_info.type, "__name__", str(exc_info.type))
+                    if hasattr(exc_info, "type")
+                    else "Unknown",
+                    "value": str(exc_info.value)
+                    if hasattr(exc_info, "value")
+                    else str(exc_info),
+                    "traceback": exc_info.traceback.format()
+                    if hasattr(exc_info, "traceback")
+                    and hasattr(exc_info.traceback, "format")
+                    else "No traceback available",
                 }
             except AttributeError as e:
                 log_entry["exception"] = {
                     "type": "ExceptionParsingError",
                     "value": f"Failed to parse exception: {e}",
-                    "traceback": "Unable to extract traceback"
+                    "traceback": "Unable to extract traceback",
                 }
 
         return json.dumps(log_entry)
@@ -99,7 +106,9 @@ class StructuredLogger:
 _logger = None
 
 
-def get_logger(service_name: str = "lifo_ai_core", log_level: str = "INFO") -> StructuredLogger:
+def get_logger(
+    service_name: str = "lifo_ai_core", log_level: str = "INFO"
+) -> StructuredLogger:
     """Get or create logger instance"""
     global _logger
     if _logger is None:
@@ -131,7 +140,9 @@ def log_csv_processing(
         total_rows=row_count,
         successful_rows=success_count,
         error_rows=error_count,
-        success_rate=round((success_count / row_count) * 100, 2) if row_count > 0 else 0,
+        success_rate=round((success_count / row_count) * 100, 2)
+        if row_count > 0
+        else 0,
     )
 
 
@@ -151,4 +162,6 @@ def log_database_operation(
 
 def log_error_with_context(error: Exception, context: dict[str, Any]) -> None:
     """Log error with additional context"""
-    get_logger().exception(f"Error occurred: {error!s}", error_type=type(error).__name__, **context)
+    get_logger().exception(
+        f"Error occurred: {error!s}", error_type=type(error).__name__, **context
+    )

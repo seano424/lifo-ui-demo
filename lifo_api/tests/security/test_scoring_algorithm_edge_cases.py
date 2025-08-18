@@ -33,8 +33,12 @@ class TestScoringMathematicalVulnerabilities:
             try:
                 score = scorer.calculate_velocity_score(quantity, sales, days)
                 # System should handle division by zero gracefully
-                assert not math.isinf(score), f"Infinite score from {quantity}/{sales}/{days}"
-                assert not math.isnan(score), f"NaN score from {quantity}/{sales}/{days}"
+                assert not math.isinf(score), (
+                    f"Infinite score from {quantity}/{sales}/{days}"
+                )
+                assert not math.isnan(score), (
+                    f"NaN score from {quantity}/{sales}/{days}"
+                )
             except ZeroDivisionError:
                 pytest.fail(f"Division by zero not handled: {quantity}/{sales}/{days}")
 
@@ -62,15 +66,23 @@ class TestScoringMathematicalVulnerabilities:
                 margin_score = scorer.calculate_margin_score(cost, selling, days)
 
                 # Scores should be finite and in valid range
-                assert math.isfinite(velocity_score), f"Non-finite velocity score: {velocity_score}"
-                assert math.isfinite(margin_score), f"Non-finite margin score: {margin_score}"
+                assert math.isfinite(velocity_score), (
+                    f"Non-finite velocity score: {velocity_score}"
+                )
+                assert math.isfinite(margin_score), (
+                    f"Non-finite margin score: {margin_score}"
+                )
                 assert 0.0 <= velocity_score <= 1.0, (
                     f"Velocity score out of range: {velocity_score}"
                 )
-                assert 0.0 <= margin_score <= 1.0, f"Margin score out of range: {margin_score}"
+                assert 0.0 <= margin_score <= 1.0, (
+                    f"Margin score out of range: {margin_score}"
+                )
 
             except Exception as e:
-                pytest.fail(f"Exception with extreme values {quantity}/{sales}/{days}: {e}")
+                pytest.fail(
+                    f"Exception with extreme values {quantity}/{sales}/{days}: {e}"
+                )
 
     def test_floating_point_precision_issues(self):
         """🚨 MEDIUM: Floating point precision causes incorrect calculations"""
@@ -93,13 +105,17 @@ class TestScoringMathematicalVulnerabilities:
             assert velocity_score >= 0.0, (
                 f"Negative velocity score due to precision: {velocity_score}"
             )
-            assert margin_score >= 0.0, f"Negative margin score due to precision: {margin_score}"
+            assert margin_score >= 0.0, (
+                f"Negative margin score due to precision: {margin_score}"
+            )
 
     def test_weight_sum_validation_bypass(self):
         """🚨 HIGH: Weight validation can be bypassed"""
 
         # Test 1: Weights that sum to more than 1.0
-        malicious_weights_1 = ScoringWeights(expiry=0.5, velocity=0.5, margin=0.5)  # Sum = 1.5
+        malicious_weights_1 = ScoringWeights(
+            expiry=0.5, velocity=0.5, margin=0.5
+        )  # Sum = 1.5
 
         # Validation should fail but might not be called
         try:
@@ -120,14 +136,18 @@ class TestScoringMathematicalVulnerabilities:
         # If scorer accepts any object with weight attributes
         try:
             scorer = InventoryScorer()
-            scorer.weights = malicious_weights_2  # Direct assignment bypasses validation
+            scorer.weights = (
+                malicious_weights_2  # Direct assignment bypasses validation
+            )
 
             # Calculations would use invalid weights
             composite = scorer.calculate_composite_score(0.5, 0.5, 0.5)
 
             # Should detect invalid weights
             if composite > 1.0:
-                pytest.fail(f"Invalid weights produced composite score > 1.0: {composite}")
+                pytest.fail(
+                    f"Invalid weights produced composite score > 1.0: {composite}"
+                )
 
         except Exception:
             pass  # Expected if validation works
@@ -136,11 +156,15 @@ class TestScoringMathematicalVulnerabilities:
         """🚨 HIGH: Negative weights can manipulate scores"""
         # Malicious weights with negative values
         try:
-            malicious_weights = ScoringWeights(expiry=-0.5, velocity=0.8, margin=0.7)  # Sum = 1.0
+            malicious_weights = ScoringWeights(
+                expiry=-0.5, velocity=0.8, margin=0.7
+            )  # Sum = 1.0
             scorer = InventoryScorer(weights=malicious_weights)
 
             # Negative weight would invert scoring logic
-            composite = scorer.calculate_composite_score(1.0, 1.0, 1.0)  # High urgency inputs
+            composite = scorer.calculate_composite_score(
+                1.0, 1.0, 1.0
+            )  # High urgency inputs
 
             # With negative expiry weight, high expiry score would reduce composite score
             # This could hide urgent items from attention
@@ -153,27 +177,27 @@ class TestScoringMathematicalVulnerabilities:
 
 class TestScoringBusinessLogicVulnerabilities:
     """Test business logic vulnerabilities in scoring"""
-    
+
     def test_expired_product_eu_compliance(self):
         """\ud83d\udd12 COMPLIANCE: Test EU-compliant expired product handling"""
         scorer = InventoryScorer()
-        
+
         # Test various expired product scenarios
         expired_scenarios = [
             (-1, "fresh_produce", 50.0),  # 1 day expired, high margin
-            (-7, "dairy", 30.0),          # 1 week expired, medium margin
-            (-30, "canned_jarred", 80.0), # 1 month expired, very high margin
-            (0, "fresh_meat_fish", 25.0), # Just expired, low margin
+            (-7, "dairy", 30.0),  # 1 week expired, medium margin
+            (-30, "canned_jarred", 80.0),  # 1 month expired, very high margin
+            (0, "fresh_meat_fish", 25.0),  # Just expired, low margin
         ]
-        
+
         for days_expired, category, margin_percent in expired_scenarios:
             # Test direct expired recommendation function
             recommendation = scorer._generate_expired_recommendation(
                 days_to_expiry=days_expired,
                 current_margin_percent=margin_percent,
-                current_quantity=10.0
+                current_quantity=10.0,
             )
-            
+
             # EU compliance requirements for expired products
             assert recommendation["action"] == "dispose", (
                 f"Expired products must be disposed, got {recommendation['action']}"
@@ -190,32 +214,30 @@ class TestScoringBusinessLogicVulnerabilities:
             assert recommendation["priority"] == 1, (
                 f"Expired products must be highest priority, got {recommendation['priority']}"
             )
-    
+
     def test_expired_product_recommendation_consistency(self):
         """\ud83d\udd12 COMPLIANCE: Test expired product recommendation is consistent regardless of other factors"""
         scorer = InventoryScorer()
-        
+
         # Test that expired recommendation is consistent regardless of input variation
         base_recommendation = scorer._generate_expired_recommendation(
-            days_to_expiry=-1,
-            current_margin_percent=50.0,
-            current_quantity=10.0
+            days_to_expiry=-1, current_margin_percent=50.0, current_quantity=10.0
         )
-        
+
         # Test with different parameters - should always return identical result
         test_variations = [
-            (-1, 0.0, 1.0),      # Different margin and quantity
-            (-365, 100.0, 1000.0), # Very old expiry, high margin, large quantity
-            (0, 10.0, 0.1),      # Just expired, low margin, tiny quantity
+            (-1, 0.0, 1.0),  # Different margin and quantity
+            (-365, 100.0, 1000.0),  # Very old expiry, high margin, large quantity
+            (0, 10.0, 0.1),  # Just expired, low margin, tiny quantity
         ]
-        
+
         for days, margin, quantity in test_variations:
             variation_recommendation = scorer._generate_expired_recommendation(
                 days_to_expiry=days,
                 current_margin_percent=margin,
-                current_quantity=quantity
+                current_quantity=quantity,
             )
-            
+
             # All expired product recommendations must be identical
             assert variation_recommendation == base_recommendation, (
                 f"Expired product recommendations must be consistent regardless of other factors"
@@ -248,8 +270,10 @@ class TestScoringBusinessLogicVulnerabilities:
             if discount > 100:
                 pytest.fail(f"Discount > 100%: {discount} for margin {cost}/{selling}")
             if discount < 0:
-                pytest.fail(f"Negative discount: {discount} for margin {cost}/{selling}")
-            
+                pytest.fail(
+                    f"Negative discount: {discount} for margin {cost}/{selling}"
+                )
+
             # Test with expired products - should always return disposal recommendation
             expired_recommendation = scorer.generate_recommendation(
                 composite_score=0.8,  # High urgency (irrelevant for expired)
@@ -257,10 +281,10 @@ class TestScoringBusinessLogicVulnerabilities:
                 current_margin_percent=((selling - cost) / selling) * 100,
                 current_quantity=10.0,
             )
-            
+
             # Expired products must follow EU compliance
             assert expired_recommendation["action"] == "dispose"
-            assert expired_recommendation["urgency"] == "critical" 
+            assert expired_recommendation["urgency"] == "critical"
             assert expired_recommendation["discount_percent"] == 0
             assert expired_recommendation["priority"] == 1
 
@@ -274,14 +298,18 @@ class TestScoringBusinessLogicVulnerabilities:
         edge_scores = [0.79, 0.80, 0.81, 0.90, 0.95]
 
         for base_score in edge_scores:
-            composite = scorer.calculate_composite_score(base_score, base_score, base_score)
+            composite = scorer.calculate_composite_score(
+                base_score, base_score, base_score
+            )
 
             # Check for unexpected amplification
             if base_score >= 0.8:
                 # Should be amplified but not exceed 1.0
                 expected_amplified = min(1.0, base_score * 1.1)
                 if abs(composite - expected_amplified) > 0.01:
-                    pytest.fail(f"Unexpected amplification: {base_score} -> {composite}")
+                    pytest.fail(
+                        f"Unexpected amplification: {base_score} -> {composite}"
+                    )
 
     def test_category_weight_injection(self):
         """🚨 HIGH: Category weights can be injected/manipulated"""
@@ -303,7 +331,9 @@ class TestScoringBusinessLogicVulnerabilities:
 
         # Should reject malicious weights or produce reasonable result
         if composite > 1.0 or composite < 0.0:
-            pytest.fail(f"Malicious category weights produced invalid score: {composite}")
+            pytest.fail(
+                f"Malicious category weights produced invalid score: {composite}"
+            )
 
     def test_urgency_level_manipulation(self):
         """🚨 MEDIUM: Urgency levels can be manipulated through edge inputs"""
@@ -323,9 +353,13 @@ class TestScoringBusinessLogicVulnerabilities:
             expiry_score = scorer.calculate_expiry_score(days, shelf_life)
 
             if should_be_urgent and expiry_score < 0.7:
-                pytest.fail(f"Failed to detect urgency: {days}/{shelf_life} -> {expiry_score}")
+                pytest.fail(
+                    f"Failed to detect urgency: {days}/{shelf_life} -> {expiry_score}"
+                )
             elif not should_be_urgent and expiry_score > 0.8:
-                pytest.fail(f"False urgency detected: {days}/{shelf_life} -> {expiry_score}")
+                pytest.fail(
+                    f"False urgency detected: {days}/{shelf_life} -> {expiry_score}"
+                )
 
     def test_margin_calculation_bypass(self):
         """🚨 HIGH: Margin calculation can be bypassed with edge cases"""
@@ -347,8 +381,12 @@ class TestScoringBusinessLogicVulnerabilities:
                 margin_score = scorer.calculate_margin_score(cost, selling, days)
 
                 # Should handle edge cases gracefully
-                assert 0.0 <= margin_score <= 1.0, f"Invalid margin score: {margin_score}"
-                assert math.isfinite(margin_score), f"Non-finite margin score: {margin_score}"
+                assert 0.0 <= margin_score <= 1.0, (
+                    f"Invalid margin score: {margin_score}"
+                )
+                assert math.isfinite(margin_score), (
+                    f"Non-finite margin score: {margin_score}"
+                )
 
             except Exception as e:
                 # Should not crash on edge cases

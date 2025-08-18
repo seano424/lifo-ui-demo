@@ -57,8 +57,12 @@ def get_engine():
                 database_url,
                 echo=False,
                 future=True,
-                pool_size=min(settings.db_pool_size, 10),  # MOBILE: Smaller pool for mobile workloads
-                max_overflow=min(settings.db_max_overflow, 20),  # MOBILE: Limited overflow
+                pool_size=min(
+                    settings.db_pool_size, 10
+                ),  # MOBILE: Smaller pool for mobile workloads
+                max_overflow=min(
+                    settings.db_max_overflow, 20
+                ),  # MOBILE: Limited overflow
                 pool_pre_ping=True,
                 pool_recycle=1800,  # MOBILE: 30min recycle for mobile stability
                 pool_timeout=10,  # MOBILE: Fast timeout for mobile responsiveness
@@ -343,7 +347,9 @@ class DatabaseManager:
 
                     # Get connection count
                     result = await session.execute(
-                        text("SELECT count(*) FROM pg_stat_activity WHERE state = 'active'")
+                        text(
+                            "SELECT count(*) FROM pg_stat_activity WHERE state = 'active'"
+                        )
                     )
                     active_connections = result.scalar()
 
@@ -388,7 +394,9 @@ class DatabaseManager:
                     }
                 else:
                     # PostgreSQL health check
-                    result = await session.execute(text("SELECT COUNT(*) FROM business.stores"))
+                    result = await session.execute(
+                        text("SELECT COUNT(*) FROM business.stores")
+                    )
                     store_count = result.scalar()
 
                     end_time = asyncio.get_event_loop().time()

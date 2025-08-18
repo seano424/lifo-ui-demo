@@ -11,7 +11,11 @@ from typing import Any, Optional
 import structlog
 from fastapi import Depends, Header, HTTPException, Request
 
-from app.auth.supabase_api_key_auth import SupabaseAPIKeyError, get_api_key_auth, APIKeyUser
+from app.auth.supabase_api_key_auth import (
+    APIKeyUser,
+    SupabaseAPIKeyError,
+    get_api_key_auth,
+)
 from app.core.config import settings
 from app.utils.mvp_exceptions import AuthenticationException, AuthorizationException
 
@@ -42,7 +46,9 @@ async def get_current_user(
         user = await auth.validate_api_request(request)
 
         # Log successful authentication (without sensitive data)
-        logger.info("User authenticated successfully", user_id=user.user_id, role=user.role)
+        logger.info(
+            "User authenticated successfully", user_id=user.user_id, role=user.role
+        )
 
         return {
             "sub": user.user_id,
@@ -77,7 +83,7 @@ async def get_optional_user(
         # Use the new API key authentication system
         auth = get_api_key_auth()
         user = await auth.validate_api_request(request)
-        
+
         return {
             "sub": user.user_id,
             "email": user.email,
@@ -100,10 +106,12 @@ async def require_service_role(
         # Use the new API key authentication system
         auth = get_api_key_auth()
         user = await auth.validate_api_request(request)
-        
+
         # Check if user has service role
         if user.role != "service_role":
-            logger.warning("Service role required but user has different role", role=user.role)
+            logger.warning(
+                "Service role required but user has different role", role=user.role
+            )
             raise AuthorizationException("Service role required")
 
         logger.info("Service role authenticated")
@@ -246,16 +254,22 @@ def validate_date_range(
         try:
             start_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid start_date format. Use ISO 8601")
+            raise HTTPException(
+                status_code=400, detail="Invalid start_date format. Use ISO 8601"
+            )
 
     if end_date:
         try:
             end_dt = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid end_date format. Use ISO 8601")
+            raise HTTPException(
+                status_code=400, detail="Invalid end_date format. Use ISO 8601"
+            )
 
     if start_dt and end_dt and start_dt > end_dt:
-        raise HTTPException(status_code=400, detail="start_date must be before end_date")
+        raise HTTPException(
+            status_code=400, detail="start_date must be before end_date"
+        )
 
     # Prevent excessive date ranges (more than 2 years)
     if start_dt and end_dt and (end_dt - start_dt).days > 730:
@@ -264,7 +278,9 @@ def validate_date_range(
     return start_dt, end_dt
 
 
-def sanitize_string_input(value: str, max_length: int = 255, field_name: str = "field") -> str:
+def sanitize_string_input(
+    value: str, max_length: int = 255, field_name: str = "field"
+) -> str:
     """
     Sanitize string input to prevent injection attacks
     """
@@ -305,8 +321,12 @@ def sanitize_string_input(value: str, max_length: int = 255, field_name: str = "
     value_lower = value.lower()
     for pattern in dangerous_patterns:
         if re.search(pattern, value_lower):
-            logger.warning("Dangerous pattern detected in input", pattern=pattern, field=field_name)
-            raise HTTPException(status_code=400, detail=f"Invalid content in {field_name}")
+            logger.warning(
+                "Dangerous pattern detected in input", pattern=pattern, field=field_name
+            )
+            raise HTTPException(
+                status_code=400, detail=f"Invalid content in {field_name}"
+            )
 
     return value
 

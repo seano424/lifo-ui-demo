@@ -33,7 +33,9 @@ async def test_auth_module():
     # Option 2: For testing with user credentials (if you have them)
     print("\n2. Testing user authentication:")
     print("You can authenticate with email/password for testing:")
-    print("session = await supabase_client.authenticate_with_email_password(email, password)")
+    print(
+        "session = await supabase_client.authenticate_with_email_password(email, password)"
+    )
     print("access_token = session.get('access_token')")
 
     # Option 3: Use your manually extracted token for now

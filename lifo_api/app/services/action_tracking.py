@@ -118,7 +118,9 @@ class ActionTrackingService:
             ai_score=Decimal(str(ai_score)),
             action_date=datetime.utcnow(),
             performed_by=uuid.UUID(user_id),
-            quantity_affected=Decimal(str(quantity_affected)) if quantity_affected else None,
+            quantity_affected=Decimal(str(quantity_affected))
+            if quantity_affected
+            else None,
             original_value=Decimal(str(original_value)) if original_value else None,
             recovered_value=Decimal(str(recovered_value)) if recovered_value else None,
             notes=notes,
@@ -177,7 +179,9 @@ class ActionTrackingService:
                     "total_recovered_value": float(row.total_recovered_value)
                     if row.total_recovered_value
                     else 0,
-                    "follow_rate": 1.0 if row.recommended_action == row.actual_action else 0.0,
+                    "follow_rate": 1.0
+                    if row.recommended_action == row.actual_action
+                    else 0.0,
                 }
                 for row in analytics_data
             ],

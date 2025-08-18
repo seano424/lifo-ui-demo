@@ -282,7 +282,9 @@ async def get_user_stores(
         return store_ids
 
     except Exception as e:
-        logger.error("Failed to get user stores", user_id=current_user.user_id, error=str(e))
+        logger.error(
+            "Failed to get user stores", user_id=current_user.user_id, error=str(e)
+        )
         return []
 
 

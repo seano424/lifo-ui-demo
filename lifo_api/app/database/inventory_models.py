@@ -32,9 +32,10 @@ class Store(Base):
     Minimal Store model for foreign key relationships
     Maps to Supabase business.stores table
     """
+
     __tablename__ = "stores"
     __table_args__ = {"schema": "business", "extend_existing": True}
-    
+
     store_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     store_name = Column(String(255))
     store_code = Column(String(50))
@@ -48,9 +49,10 @@ class User(Base):
     Minimal User model for foreign key relationships
     Maps to Supabase auth.users table
     """
+
     __tablename__ = "users"
     __table_args__ = {"schema": "auth", "extend_existing": True}
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String(255))
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
@@ -82,8 +84,10 @@ class Product(Base):
     barcode_type = Column(String(20))  # Type of barcode format
 
     # AI scoring support
-    typical_shelf_life_days = Column(Integer, nullable=False)  # For expiry urgency calculation
-    
+    typical_shelf_life_days = Column(
+        Integer, nullable=False
+    )  # For expiry urgency calculation
+
     # Required pricing fields from Supabase schema
     base_cost_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
     base_selling_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
@@ -113,9 +117,13 @@ class StoreProduct(Base):
     __tablename__ = "store_products"
     __table_args__ = {"schema": "inventory", "extend_existing": True}
 
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+    )
     product_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), primary_key=True
+        UUID(as_uuid=True),
+        ForeignKey("inventory.products.product_id"),
+        primary_key=True,
     )
 
     # Store-specific pricing (needed for margin calculations in AI scoring)
@@ -171,7 +179,9 @@ class Batch(Base):
     product_id = Column(
         UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
     )
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+    )
 
     # Core batch information
     batch_number = Column(String(100), nullable=False)
@@ -199,7 +209,9 @@ class Batch(Base):
     batch_source = Column(String(50), default="manual")  # BatchSource enum values
     scanned_barcode = Column(String(50))  # Barcode that created this batch
     scan_confidence = Column(DECIMAL(3, 2))  # Confidence score (0.00-1.00)
-    verification_status = Column(String(20), default="verified")  # VerificationStatus enum values
+    verification_status = Column(
+        String(20), default="verified"
+    )  # VerificationStatus enum values
 
     # Audit fields
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
@@ -209,7 +221,7 @@ class Batch(Base):
     # Relationships
     product = relationship("Product", back_populates="batches")
     actions = relationship("BatchAction", back_populates="batch")
-    # Store relationship - using module path to avoid circular imports  
+    # Store relationship - using module path to avoid circular imports
     # store = relationship("Store", back_populates="batches")
     # scores = relationship("ProductScore", back_populates="batch")  # ProductScore is in models.py
 
@@ -254,12 +266,16 @@ class BatchAction(Base):
         ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"),
         nullable=False,
     )
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+    )
 
     # What was recommended vs what was done
     recommended_action = Column(SQLEnum(ActionType), nullable=False)
     actual_action = Column(SQLEnum(ActionType), nullable=False)
-    ai_score = Column(DECIMAL(3, 2))  # AI score that triggered recommendation (0.00-1.00)
+    ai_score = Column(
+        DECIMAL(3, 2)
+    )  # AI score that triggered recommendation (0.00-1.00)
 
     # Tracking details
     action_date = Column(DateTime, default=lambda: datetime.now(timezone.utc))
@@ -280,7 +296,9 @@ class BatchAction(Base):
 
     # Relationships
     batch = relationship("Batch", back_populates="actions")
-    donation_recipient = relationship("DonationRecipient", back_populates="batch_actions")
+    donation_recipient = relationship(
+        "DonationRecipient", back_populates="batch_actions"
+    )
 
 
 class DonationRecipient(Base):
@@ -307,7 +325,9 @@ class DonationRecipient(Base):
     max_distance_km = Column(Integer, default=10)
 
     # Store association
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+    )
 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

@@ -7,7 +7,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator, ValidationInfo, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 
 class ConfigurableModel(BaseModel):
@@ -95,7 +95,9 @@ class FilterParams(BaseModel):
     """Base filtering parameters"""
 
     search: Optional[str] = Field(None, max_length=100, description="Search term")
-    category: Optional[str] = Field(None, max_length=50, description="Filter by category")
+    category: Optional[str] = Field(
+        None, max_length=50, description="Filter by category"
+    )
     status: Optional[str] = Field("active", description="Filter by status")
 
 

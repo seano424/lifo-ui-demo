@@ -95,7 +95,9 @@ async def get_dashboard_data(
                 "expiring_soon": analytics_data.get("inventory_summary", {}).get(
                     "expiring_soon_count", 0
                 ),
-                "high_urgency": analytics_data.get("urgency_distribution", {}).get("high", 0)
+                "high_urgency": analytics_data.get("urgency_distribution", {}).get(
+                    "high", 0
+                )
                 + analytics_data.get("urgency_distribution", {}).get("critical", 0),
             },
             "top_categories": analytics_data.get("category_breakdown", [])[:5],
@@ -103,7 +105,9 @@ async def get_dashboard_data(
             "last_updated": datetime.utcnow(),
         }
 
-        logger.info("Dashboard data retrieved", store_id=store_id, user_id=current_user["sub"])
+        logger.info(
+            "Dashboard data retrieved", store_id=store_id, user_id=current_user["sub"]
+        )
 
         return dashboard_data
 
@@ -131,7 +135,9 @@ async def get_performance_metrics(
     """
     try:
         # Validate store access
-        if not await validate_store_access(store_id, current_user["sub"], "manager", db):
+        if not await validate_store_access(
+            store_id, current_user["sub"], "manager", db
+        ):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get analytics data
@@ -197,7 +203,9 @@ async def get_performance_metrics(
 @router.get("/trends/{store_id}")
 async def get_trend_analysis(
     store_id: str,
-    metric: str = Query("waste", description="Metric to analyze (waste, revenue, velocity)"),
+    metric: str = Query(
+        "waste", description="Metric to analyze (waste, revenue, velocity)"
+    ),
     days: int = Query(90, ge=30, le=365, description="Analysis period in days"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -207,7 +215,9 @@ async def get_trend_analysis(
     """
     try:
         # Validate store access
-        if not await validate_store_access(store_id, current_user["sub"], "manager", db):
+        if not await validate_store_access(
+            store_id, current_user["sub"], "manager", db
+        ):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get analytics data
@@ -268,7 +278,9 @@ async def get_export_data(
     """
     try:
         # Validate store access
-        if not await validate_store_access(store_id, current_user["sub"], "manager", db):
+        if not await validate_store_access(
+            store_id, current_user["sub"], "manager", db
+        ):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get the requested data

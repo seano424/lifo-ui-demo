@@ -308,7 +308,9 @@ class TestTransactionConsistency:
         # Example: Inventory sale operation should be atomic
         async def process_sale(db, batch_id, quantity_sold):
             # Step 1: Reduce inventory
-            await db.execute(f"UPDATE batches SET quantity = quantity - {quantity_sold}")
+            await db.execute(
+                f"UPDATE batches SET quantity = quantity - {quantity_sold}"
+            )
 
             # Step 2: Record sale (could fail)
             if quantity_sold > 100:  # Simulated business logic failure
@@ -359,13 +361,17 @@ class TestTransactionConsistency:
 
         async def count_expired_items(db):
             # First count
-            result1 = await db.execute("SELECT COUNT(*) FROM batches WHERE expiry_date < NOW()")
+            result1 = await db.execute(
+                "SELECT COUNT(*) FROM batches WHERE expiry_date < NOW()"
+            )
             count1 = result1.scalar()
 
             await asyncio.sleep(0.1)  # Processing time
 
             # Second count in same transaction
-            result2 = await db.execute("SELECT COUNT(*) FROM batches WHERE expiry_date < NOW()")
+            result2 = await db.execute(
+                "SELECT COUNT(*) FROM batches WHERE expiry_date < NOW()"
+            )
             count2 = result2.scalar()
 
             # Counts might be different due to phantom reads
@@ -405,7 +411,9 @@ class TestConnectionPoolVulnerabilities:
         """🚨 MEDIUM: No connection validation before use"""
         # Connections might be stale/broken
         mock_connection = AsyncMock()
-        mock_connection.execute.side_effect = OperationalError("Connection lost", None, None)
+        mock_connection.execute.side_effect = OperationalError(
+            "Connection lost", None, None
+        )
 
         # System should validate connection before use
         # And reconnect if necessary

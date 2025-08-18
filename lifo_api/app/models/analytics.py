@@ -5,7 +5,7 @@ Pydantic models for analytics-related API endpoints
 from datetime import date, datetime
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.base import ConfigurableModel, decimal_to_float
 
@@ -22,9 +22,13 @@ class AnalyticsRequest(BaseModel):
 class TrendAnalysisRequest(BaseModel):
     """Request for trend analysis"""
 
-    metric: str = Field("waste", description="Metric to analyze (waste, revenue, velocity)")
+    metric: str = Field(
+        "waste", description="Metric to analyze (waste, revenue, velocity)"
+    )
     days: int = Field(90, ge=30, le=365, description="Analysis period in days")
-    granularity: str = Field("daily", description="Data granularity (daily, weekly, monthly)")
+    granularity: str = Field(
+        "daily", description="Data granularity (daily, weekly, monthly)"
+    )
 
 
 # Response Models
@@ -144,7 +148,9 @@ class DashboardAlert(ConfigurableModel):
 
     type: str = Field(..., description="Alert type (expired, expiring, high_urgency)")
     count: int = Field(..., description="Number of items")
-    severity: str = Field(..., description="Alert severity (low, medium, high, critical)")
+    severity: str = Field(
+        ..., description="Alert severity (low, medium, high, critical)"
+    )
     message: str = Field(..., description="Alert message")
 
 

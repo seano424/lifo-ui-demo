@@ -94,13 +94,13 @@ class BoundedCache:
         async with self._lock:
             if key not in self._cache:
                 return None
-            
+
             # Check TTL expiry
             cache_item = self._cache[key]
             if datetime.utcnow() >= cache_item["expires_at"]:
                 await self._remove(key)
                 return None
-            
+
             # Update access time for LRU tracking
             self._access_times[key] = datetime.utcnow()
             logger.debug("Cache hit", key=key, cache_size=len(self._cache))
@@ -110,17 +110,22 @@ class BoundedCache:
         """Set item in cache with automatic LRU eviction"""
         async with self._lock:
             ttl = ttl or self.default_ttl
-            
+
             # Evict LRU items if at capacity
             while len(self._cache) >= self.max_size:
                 await self._evict_lru()
-            
+
             # Set new item
             expires_at = datetime.utcnow() + timedelta(seconds=ttl)
             self._cache[key] = {"data": data, "expires_at": expires_at}
             self._access_times[key] = datetime.utcnow()
-            
-            logger.debug("Cache set", key=key, cache_size=len(self._cache), max_size=self.max_size)
+
+            logger.debug(
+                "Cache set",
+                key=key,
+                cache_size=len(self._cache),
+                max_size=self.max_size,
+            )
 
     async def clear_prefix(self, prefix: str) -> None:
         """Clear all cache entries with given prefix"""
@@ -128,8 +133,10 @@ class BoundedCache:
             keys_to_delete = [k for k in self._cache.keys() if k.startswith(prefix)]
             for key in keys_to_delete:
                 await self._remove(key)
-            
-            logger.info("Cache prefix cleared", prefix=prefix, keys_removed=len(keys_to_delete))
+
+            logger.info(
+                "Cache prefix cleared", prefix=prefix, keys_removed=len(keys_to_delete)
+            )
 
     def cache_size(self) -> int:
         """Get current cache size (thread-safe read)"""
@@ -140,24 +147,24 @@ class BoundedCache:
         async with self._lock:
             now = datetime.utcnow()
             expired_keys = []
-            
+
             for key, cache_item in self._cache.items():
                 if now >= cache_item["expires_at"]:
                     expired_keys.append(key)
-            
+
             for key in expired_keys:
                 await self._remove(key)
-            
+
             if expired_keys:
                 logger.info("Expired cache entries cleaned", count=len(expired_keys))
-            
+
             return len(expired_keys)
 
     async def _evict_lru(self) -> None:
         """Evict least recently used item"""
         if not self._access_times:
             return
-        
+
         # Find LRU key
         lru_key = min(self._access_times.keys(), key=lambda k: self._access_times[k])
         await self._remove(lru_key)
@@ -204,7 +211,9 @@ def cached_mobile_response(ttl: int = 300, prefix: str = "mobile"):
             # Execute function and cache result (async)
             result = await func(*args, **kwargs)
             await mobile_cache.set(cache_key, result, ttl)
-            logger.debug("Cache miss - stored result", cache_key=cache_key, prefix=prefix)
+            logger.debug(
+                "Cache miss - stored result", cache_key=cache_key, prefix=prefix
+            )
 
             return result
 
@@ -227,7 +236,10 @@ class BatchProcessor:
             return []
 
         # Split into batches
-        batches = [items[i : i + self.batch_size] for i in range(0, len(items), self.batch_size)]
+        batches = [
+            items[i : i + self.batch_size]
+            for i in range(0, len(items), self.batch_size)
+        ]
 
         # Process batches with concurrency limit
         semaphore = asyncio.Semaphore(self.max_concurrent)
@@ -260,7 +272,9 @@ class MobileResponseOptimizer:
     """Optimize responses for mobile consumption"""
 
     @staticmethod
-    def compress_batch_list(batches: list, fields_to_keep: Optional[list] = None) -> list:
+    def compress_batch_list(
+        batches: list, fields_to_keep: Optional[list] = None
+    ) -> list:
         """Compress batch data for mobile transmission"""
         if not fields_to_keep:
             fields_to_keep = [
@@ -283,7 +297,9 @@ class MobileResponseOptimizer:
         return compressed
 
     @staticmethod
-    def paginate_response(data: list, page: int = 1, page_size: int = 20) -> dict[str, Any]:
+    def paginate_response(
+        data: list, page: int = 1, page_size: int = 20
+    ) -> dict[str, Any]:
         """Paginate data for mobile consumption"""
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
@@ -344,10 +360,13 @@ class PerformanceMonitor:
         for operation, stats in self.metrics.items():
             if stats["total_calls"] > 0:
                 summary[operation] = {
-                    "avg_duration_ms": stats["total_duration_ms"] / stats["total_calls"],
+                    "avg_duration_ms": stats["total_duration_ms"]
+                    / stats["total_calls"],
                     "success_rate": stats["success_count"] / stats["total_calls"],
                     "slow_call_rate": stats["slow_calls"] / stats["total_calls"],
-                    "fastest_ms": stats["fastest_ms"] if stats["fastest_ms"] != float("inf") else 0,
+                    "fastest_ms": stats["fastest_ms"]
+                    if stats["fastest_ms"] != float("inf")
+                    else 0,
                     "slowest_ms": stats["slowest_ms"],
                     "total_calls": stats["total_calls"],
                 }
@@ -369,7 +388,9 @@ async def timeout_after(seconds: float):
             try:
                 return await asyncio.wait_for(func(*args, **kwargs), timeout=seconds)
             except asyncio.TimeoutError:
-                logger.warning("Operation timeout", function=func.__name__, timeout_seconds=seconds)
+                logger.warning(
+                    "Operation timeout", function=func.__name__, timeout_seconds=seconds
+                )
                 raise
 
         return wrapper
@@ -405,7 +426,9 @@ def compress_for_mobile(data: Any, compression_level: str = "standard") -> Any:
             }
         elif isinstance(data, list):
             return [
-                compress_for_mobile(item, compression_level) for item in data if item is not None
+                compress_for_mobile(item, compression_level)
+                for item in data
+                if item is not None
             ]
 
     elif compression_level == "standard":
@@ -444,7 +467,11 @@ async def warm_mobile_cache(store_id: str, read_ops):
                 weights = await read_ops.get_category_weights(category)
                 await mobile_cache.set(cache_key, weights, ttl=1800)  # 30 min cache
 
-        logger.info("Mobile cache warmed", store_id=store_id, cache_stats=mobile_cache.get_stats())
+        logger.info(
+            "Mobile cache warmed",
+            store_id=store_id,
+            cache_stats=mobile_cache.get_stats(),
+        )
 
     except Exception as e:
         logger.error("Cache warming failed", store_id=store_id, error=str(e))
@@ -465,11 +492,15 @@ async def mobile_performance_health_check() -> dict[str, Any]:
                 f"{operation} averaging {stats['avg_duration_ms']:.1f}ms (target: <500ms)"
             )
         if stats["success_rate"] < 0.95:
-            issues.append(f"{operation} success rate {stats['success_rate']:.1%} (target: >95%)")
+            issues.append(
+                f"{operation} success rate {stats['success_rate']:.1%} (target: >95%)"
+            )
 
     # Check cache health
     if cache_stats["utilization"] > 90:
-        issues.append(f"Cache utilization {cache_stats['utilization']:.1f}% (target: <90%)")
+        issues.append(
+            f"Cache utilization {cache_stats['utilization']:.1f}% (target: <90%)"
+        )
 
     return {
         "performance_summary": summary,

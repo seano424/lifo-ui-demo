@@ -31,7 +31,9 @@ class CompatibilityCompliance:
     """Compatibility wrapper for compliance result"""
 
     def __init__(self):
-        self.eligibility_status = type("obj", (object,), {"value": "simplified_check"})()
+        self.eligibility_status = type(
+            "obj", (object,), {"value": "simplified_check"}
+        )()
         self.compliance_score = 0.8
         self.regulatory_notes = ["Simplified compliance check"]
         self.temperature_requirements = None
@@ -83,7 +85,9 @@ def create_simplified_donation_engine_compat():
                     ai_score = 0.4
 
             # Call the new simplified engine
-            simple_rec = self.engine.evaluate_action_recommendation(batch_data, ai_score)
+            simple_rec = self.engine.evaluate_action_recommendation(
+                batch_data, ai_score
+            )
 
             # Wrap in compatibility layer
             return CompatibilityRecommendation(simple_rec)

@@ -27,6 +27,9 @@ coverage>=7.2.0
 pytest-benchmark>=4.0.0  # For performance benchmarking
 pytest-timeout>=2.1.0    # For test timeouts
 
+# Environment management
+python-dotenv>=1.0.0  # For loading test environment variables
+
 # Development tools
 black>=23.0.0
 ruff>=0.0.280

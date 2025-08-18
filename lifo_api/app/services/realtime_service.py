@@ -44,7 +44,9 @@ class RealtimeService:
     """
 
     def __init__(self):
-        self.active_subscriptions: dict[str, list[str]] = {}  # store_id -> list of user_ids
+        self.active_subscriptions: dict[
+            str, list[str]
+        ] = {}  # store_id -> list of user_ids
         self.update_queue: list[RealtimeUpdate] = []
         self.logger = structlog.get_logger().bind(component="realtime_service")
 
@@ -55,7 +57,9 @@ class RealtimeService:
 
         if user_id not in self.active_subscriptions[store_id]:
             self.active_subscriptions[store_id].append(user_id)
-            self.logger.info("User subscribed to store updates", store_id=store_id, user_id=user_id)
+            self.logger.info(
+                "User subscribed to store updates", store_id=store_id, user_id=user_id
+            )
 
     async def unsubscribe_from_store(self, store_id: str, user_id: str):
         """Unsubscribe user from store updates"""
@@ -94,7 +98,9 @@ class RealtimeService:
         # In production, this would integrate with Supabase real-time
         await self._send_to_supabase_realtime(update, subscribers)
 
-    async def _send_to_supabase_realtime(self, update: RealtimeUpdate, subscribers: list[str]):
+    async def _send_to_supabase_realtime(
+        self, update: RealtimeUpdate, subscribers: list[str]
+    ):
         """Send update to Supabase real-time (placeholder for actual integration)"""
         try:
             # Prepare payload for Supabase real-time
@@ -165,7 +171,9 @@ class RealtimeService:
 
         await self.broadcast_update(update)
 
-    async def trigger_urgency_alert(self, store_id: str, batch_id: str, alert_data: dict[str, Any]):
+    async def trigger_urgency_alert(
+        self, store_id: str, batch_id: str, alert_data: dict[str, Any]
+    ):
         """Trigger urgency alert for immediate attention"""
         update = RealtimeUpdate(
             store_id=store_id,
@@ -179,7 +187,9 @@ class RealtimeService:
                 "recommended_action": alert_data.get("recommended_action"),
                 "potential_loss": alert_data.get("potential_loss"),
             },
-            priority="critical" if alert_data.get("urgency_level") == "critical" else "high",
+            priority="critical"
+            if alert_data.get("urgency_level") == "critical"
+            else "high",
         )
 
         await self.broadcast_update(update)
@@ -229,7 +239,10 @@ class RealtimeService:
 
     def get_active_subscriptions(self) -> dict[str, int]:
         """Get count of active subscriptions per store"""
-        return {store_id: len(users) for store_id, users in self.active_subscriptions.items()}
+        return {
+            store_id: len(users)
+            for store_id, users in self.active_subscriptions.items()
+        }
 
     def get_update_queue_size(self) -> int:
         """Get current update queue size"""
@@ -262,7 +275,9 @@ class RealtimeService:
             remaining_queue_size=len(self.update_queue),
         )
 
-    async def _process_store_updates(self, store_id: str, updates: list[RealtimeUpdate]):
+    async def _process_store_updates(
+        self, store_id: str, updates: list[RealtimeUpdate]
+    ):
         """Process updates for a specific store"""
         try:
             # Sort by priority and timestamp
@@ -276,7 +291,9 @@ class RealtimeService:
                     await self._send_to_supabase_realtime(update, subscribers)
 
         except Exception as e:
-            self.logger.error("Failed to process store updates", store_id=store_id, error=str(e))
+            self.logger.error(
+                "Failed to process store updates", store_id=store_id, error=str(e)
+            )
 
 
 # Global realtime service instance
@@ -295,15 +312,21 @@ async def notify_scan_completion(
     store_id: str, batch_id: str, scan_result: dict[str, Any], scan_type: str
 ):
     """Convenience function to notify scan completion"""
-    await realtime_service.trigger_scan_completion(store_id, batch_id, scan_result, scan_type)
+    await realtime_service.trigger_scan_completion(
+        store_id, batch_id, scan_result, scan_type
+    )
 
 
-async def notify_urgency_alert(store_id: str, batch_id: str, alert_info: dict[str, Any]):
+async def notify_urgency_alert(
+    store_id: str, batch_id: str, alert_info: dict[str, Any]
+):
     """Convenience function to send urgency alerts"""
     await realtime_service.trigger_urgency_alert(store_id, batch_id, alert_info)
 
 
-async def notify_batch_change(store_id: str, batch_id: str, change_info: dict[str, Any]):
+async def notify_batch_change(
+    store_id: str, batch_id: str, change_info: dict[str, Any]
+):
     """Convenience function to notify batch changes"""
     await realtime_service.trigger_batch_status_change(store_id, batch_id, change_info)
 
@@ -341,7 +364,9 @@ class RealtimeHealthMonitor:
             "total_messages": self.message_count,
             "error_count": self.error_count,
             "error_rate": error_rate,
-            "last_message": self.last_message_time.isoformat() if self.last_message_time else None,
+            "last_message": self.last_message_time.isoformat()
+            if self.last_message_time
+            else None,
             "active_subscriptions": realtime_service.get_active_subscriptions(),
             "queue_size": realtime_service.get_update_queue_size(),
         }

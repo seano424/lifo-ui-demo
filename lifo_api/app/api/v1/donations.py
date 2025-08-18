@@ -41,7 +41,7 @@ class DonationEligibilityResponse(BaseModel):
     "/eligibility/{batch_id}",
     response_model=DonationEligibilityResponse,
     summary="Check donation eligibility for a batch",
-    description="Evaluate if a product batch is eligible for donation under EU regulations"
+    description="Evaluate if a product batch is eligible for donation under EU regulations",
 )
 async def check_donation_eligibility(
     batch_id: str,
@@ -52,10 +52,10 @@ async def check_donation_eligibility(
     """
     # Simplified implementation for OpenAPI compatibility
     # TODO: Re-integrate with donation engine after fixing field validators
-    
+
     if not batch_id or len(batch_id.strip()) < 5:
         raise HTTPException(status_code=400, detail="Invalid batch ID")
-    
+
     # Mock response for now
     return DonationEligibilityResponse(
         batch_id=batch_id,
@@ -72,7 +72,7 @@ async def check_donation_eligibility(
 @router.get(
     "/health",
     summary="Donation system health check",
-    description="Check if donation system is operational"
+    description="Check if donation system is operational",
 )
 async def donation_health_check():
     """Health check for donation system"""

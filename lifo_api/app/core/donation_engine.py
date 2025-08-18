@@ -59,7 +59,9 @@ class SimplifiedDonationEngine:
     """
 
     def __init__(self):
-        self.logger = structlog.get_logger().bind(component="simplified_donation_engine")
+        self.logger = structlog.get_logger().bind(
+            component="simplified_donation_engine"
+        )
 
         # Simplified business configuration
         self.action_thresholds = {
@@ -80,7 +82,12 @@ class SimplifiedDonationEngine:
         }
 
         # Categories requiring special handling
-        self.special_handling_categories = {"fresh_meat_fish", "dairy", "deli_prepared", "frozen"}
+        self.special_handling_categories = {
+            "fresh_meat_fish",
+            "dairy",
+            "deli_prepared",
+            "frozen",
+        }
 
     def evaluate_action_recommendation(
         self,
@@ -115,7 +122,9 @@ class SimplifiedDonationEngine:
 
             # Calculate financial metrics
             margin_percent = (
-                ((selling_price - cost_price) / selling_price) * 100 if selling_price > 0 else 0
+                ((selling_price - cost_price) / selling_price) * 100
+                if selling_price > 0
+                else 0
             )
             original_value = current_quantity * selling_price
 
@@ -203,7 +212,9 @@ class SimplifiedDonationEngine:
             # Very urgent - need immediate action
             if margin_percent > self.action_thresholds["discount_margin_threshold"]:
                 action = ActionType.DISCOUNT
-                reasoning = "High margin product expiring soon - try discount to recover value"
+                reasoning = (
+                    "High margin product expiring soon - try discount to recover value"
+                )
                 factors.append(f"High margin ({margin_percent:.1f}%)")
             elif category in self.donation_suitable_categories:
                 action = ActionType.DONATE
@@ -250,7 +261,9 @@ class SimplifiedDonationEngine:
                 reasoning = "No immediate action needed - continue normal sales"
                 factors.append("Normal sales conditions")
 
-            factors.append(f"Expires in {days_to_expiry} days - planning time available")
+            factors.append(
+                f"Expires in {days_to_expiry} days - planning time available"
+            )
 
         # Quantity considerations
         if (

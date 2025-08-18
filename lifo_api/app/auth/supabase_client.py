@@ -115,8 +115,9 @@ class SupabaseClient:
             return None
 
         # Check if token is still valid (with 5 minute buffer)
-        if self.session_expires_at and self.session_expires_at > datetime.utcnow() + timedelta(
-            minutes=5
+        if (
+            self.session_expires_at
+            and self.session_expires_at > datetime.utcnow() + timedelta(minutes=5)
         ):
             return self.current_session.get("access_token")
 
@@ -136,7 +137,9 @@ class SupabaseClient:
         """
         return self.service_role_key
 
-    async def create_api_client(self, use_service_role: bool = False) -> httpx.AsyncClient:
+    async def create_api_client(
+        self, use_service_role: bool = False
+    ) -> httpx.AsyncClient:
         """
         Create an HTTP client with proper authentication headers
         """

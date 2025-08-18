@@ -63,7 +63,9 @@ class TestAuthenticationVulnerabilities:
         }
 
         # encode without proper signing
-        malicious_token = jwt.encode(malicious_payload, "wrong-secret", algorithm="HS256")
+        malicious_token = jwt.encode(
+            malicious_payload, "wrong-secret", algorithm="HS256"
+        )
 
         # extract_user_claims doesn't verify signature - VULNERABILITY
         claims = supabase_auth.extract_user_claims(malicious_token)
@@ -80,7 +82,9 @@ class TestAuthenticationVulnerabilities:
 
         # Test 2: Service role JWT with wrong signature
         service_payload = {"role": "service_role", "exp": int(time.time()) + 3600}
-        fake_service_token = jwt.encode(service_payload, "wrong-secret", algorithm="HS256")
+        fake_service_token = jwt.encode(
+            service_payload, "wrong-secret", algorithm="HS256"
+        )
 
         # This might pass due to verification bypass in service role path
         supabase_auth.verify_service_role_token(fake_service_token)
@@ -314,7 +318,9 @@ class TestAuthorizationBypass:
         admin_user.role = "admin"
 
         # Admin bypasses specific permission check
-        has_permission = supabase_auth.check_user_permissions(admin_user, "dangerous_permission")
+        has_permission = supabase_auth.check_user_permissions(
+            admin_user, "dangerous_permission"
+        )
         assert has_permission  # Admin bypasses everything!
 
         # This could allow privilege escalation if admin role is compromised
