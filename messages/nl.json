@@ -730,15 +730,17 @@
       "chooseFile": "Bestand kiezen"
     },
     "preview": {
-      "title": "Voorbeeld (Eerste 10 rijen)",
-      "badge": "Duplicaten worden automatisch overgeslagen tijdens upload",
+      "title": "Voorbeeld",
       "table": {
         "sku": "SKU",
         "productName": "Productnaam",
         "category": "Categorie",
         "quantity": "Aantal",
         "expiryDate": "Vervaldatum"
-      }
+      },
+      "selectDate": "Selecteer datum",
+      "missingExpiryDate": "Vervaldatum ontbreekt",
+      "quantityLabel": "Aantal:"
     },
     "buttons": {
       "upload": "Uploaden (Auto-sla duplicaten over)",

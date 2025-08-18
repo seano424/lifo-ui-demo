@@ -14,15 +14,15 @@ export default function InboundPage() {
   return (
     <div className="max-w-screen-lg mx-auto space-y-6">
       {/* Mobile Tabs */}
-      <Tabs defaultValue="scan" className="w-full lg:hidden">
+      <Tabs defaultValue="csv" className="w-full lg:hidden">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scan" className="flex items-center gap-2">
-            <Scan className="w-4 h-4" />
-            Barcode Scanning
-          </TabsTrigger>
           <TabsTrigger value="csv" className="flex items-center gap-2">
             <Upload className="w-4 h-4" />
             CSV Bulk Import
+          </TabsTrigger>
+          <TabsTrigger value="scan" className="flex items-center gap-2">
+            <Scan className="w-4 h-4" />
+            Barcode Scanning
           </TabsTrigger>
         </TabsList>
 

@@ -730,15 +730,17 @@
       "chooseFile": "Choisir un fichier"
     },
     "preview": {
-      "title": "Aperçu (10 premières lignes)",
-      "badge": "Les doublons sont automatiquement ignorés lors du téléchargement",
+      "title": "Aperçu",
       "table": {
         "sku": "SKU",
         "productName": "Nom du produit",
         "category": "Catégorie",
         "quantity": "Qté",
         "expiryDate": "Date d'expiration"
-      }
+      },
+      "selectDate": "Sélectionner une date",
+      "missingExpiryDate": "Date d'expiration manquante",
+      "quantityLabel": "Qté :"
     },
     "buttons": {
       "upload": "Télécharger (Ignorer auto. les doublons)",

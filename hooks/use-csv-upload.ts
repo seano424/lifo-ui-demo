@@ -35,9 +35,18 @@ interface CsvPreviewItem {
   Expiry_Date: string
 }
 
+interface CsvColumnMapping {
+  hasExpiryColumn: boolean
+  itemsWithoutExpiry: number
+}
+
 export function useCSVUpload() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
   const [isPreviewReady, setIsPreviewReady] = useState(false)
+  const [columnMapping, setColumnMapping] = useState<CsvColumnMapping>({
+    hasExpiryColumn: false,
+    itemsWithoutExpiry: 0,
+  })
   const queryClient = useQueryClient()
 
   // Simple CSV preview (first 10 rows)
@@ -75,17 +84,24 @@ export function useCSVUpload() {
       expiry: expiryIndex >= 0 ? headers[expiryIndex] : 'NOT_FOUND',
     })
 
-    const previewLimit = Math.min(11, lines.length)
-    console.log(`🔍 [USE-CSV-UPLOAD] Processing ${previewLimit - 1} preview rows...`)
+    const hasExpiryColumn = expiryIndex >= 0
+    let itemsWithoutExpiry = 0
 
-    for (let i = 1; i < previewLimit; i++) {
+    console.log(`🔍 [USE-CSV-UPLOAD] Processing all ${lines.length - 1} rows...`)
+
+    for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+      const expiryValue = values[expiryIndex] || ''
+      if (!expiryValue) {
+        itemsWithoutExpiry++
+      }
+
       const previewItem = {
         SKU: values[skuIndex] || `AUTO-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
         Category: values[categoryIndex] || 'dry_goods',
         Quantity: parseInt(values[qtyIndex] || '1') || 1,
-        Expiry_Date: values[expiryIndex] || '',
+        Expiry_Date: expiryValue,
       }
 
       preview.push(previewItem)
@@ -101,6 +117,26 @@ export function useCSVUpload() {
     )
     console.log(`📊 [USE-CSV-UPLOAD] Preview ready: ${preview.length} items`)
 
+    // Count total items without expiry in the entire file (not just preview)
+    let totalItemsWithoutExpiry = 0
+    if (!hasExpiryColumn) {
+      totalItemsWithoutExpiry = lines.length - 1 // All data rows
+    } else {
+      // Count empty expiry dates in the entire file
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+        const expiryValue = values[expiryIndex] || ''
+        if (!expiryValue) {
+          totalItemsWithoutExpiry++
+        }
+      }
+    }
+
+    console.log(
+      `📊 [USE-CSV-UPLOAD] Expiry analysis: ${totalItemsWithoutExpiry} items without expiry date`,
+    )
+
+    setColumnMapping({ hasExpiryColumn, itemsWithoutExpiry: totalItemsWithoutExpiry })
     setCsvPreview(preview)
     setIsPreviewReady(true)
     return preview
@@ -110,16 +146,25 @@ export function useCSVUpload() {
     mutationFn: async ({
       file,
       storeId,
+      csvData,
     }: {
       file: File
       storeId: string
+      csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
       console.log('🚀 [USE-CSV-UPLOAD] Mutation started - preparing form data')
       const mutationStartTime = performance.now()
 
       const formData = new FormData()
-      formData.append('file', file)
-      formData.append('storeId', storeId)
+
+      // If we have modified CSV data, send it as JSON instead of the original file
+      if (csvData && csvData.length > 0) {
+        formData.append('csvData', JSON.stringify(csvData))
+        formData.append('storeId', storeId)
+      } else {
+        formData.append('file', file)
+        formData.append('storeId', storeId)
+      }
 
       console.log(
         '📤 [USE-CSV-UPLOAD] Form data prepared, making API call to /api/inventory/upload',
@@ -245,6 +290,29 @@ export function useCSVUpload() {
     resetPreview: () => {
       setCsvPreview([])
       setIsPreviewReady(false)
+      setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
+    },
+    columnMapping,
+    updateCsvItemExpiry: (index: number, newExpiryDate: string) => {
+      setCsvPreview(prev => {
+        const newPreview = prev.map((item, i) =>
+          i === index ? { ...item, Expiry_Date: newExpiryDate } : item,
+        )
+
+        // Update the count of items without expiry based on the full CSV data
+        // Note: this only updates the preview, the full count would need recalculation
+        const itemsWithoutExpiry = newPreview.filter(item => !item.Expiry_Date).length
+        setColumnMapping(prevMapping => ({ ...prevMapping, itemsWithoutExpiry }))
+
+        return newPreview
+      })
+    },
+    updateCsvItemQuantity: (index: number, newQuantity: number) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) =>
+          i === index ? { ...item, Quantity: Math.max(1, newQuantity) } : item,
+        )
+      })
     },
   }
 }

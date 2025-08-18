@@ -713,18 +713,20 @@
       "chooseFile": "Choose File"
     },
     "preview": {
-      "title": "Preview (First 10 rows)",
-      "badge": "Duplicates auto-skipped during upload",
+      "title": "Preview",
       "table": {
         "sku": "SKU",
         "productName": "Product Name",
         "category": "Category",
         "quantity": "Qty",
         "expiryDate": "Expiry Date"
-      }
+      },
+      "selectDate": "Select date",
+      "missingExpiryDate": "Missing expiry date",
+      "quantityLabel": "Qty:"
     },
     "buttons": {
-      "upload": "Upload (Auto-skip duplicates)",
+      "upload": "Upload",
       "processing": "Processing...",
       "reset": "Reset",
       "uploadAnother": "Upload Another File"

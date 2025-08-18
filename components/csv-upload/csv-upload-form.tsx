@@ -5,11 +5,24 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Upload, FileCheck, CheckCircle, Zap, Clock, SkipForward } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import {
+  Upload,
+  FileCheck,
+  CheckCircle,
+  Zap,
+  Clock,
+  SkipForward,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Minus,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
   storeId: string
@@ -20,7 +33,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const t = useTranslations('csvUpload')
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [currentPage, setCurrentPage] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const itemsPerPage = 10
 
   const {
     csvPreview,
@@ -31,6 +47,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     data: uploadResult,
     error,
     resetPreview,
+    columnMapping,
+    updateCsvItemExpiry,
+    updateCsvItemQuantity,
   } = useCSVUpload()
 
   const handleDrag = (e: React.DragEvent) => {
@@ -111,7 +130,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     console.log('⚡ [CSV-UPLOAD-FORM] Calling mutation with BULK OPTIMIZATION ENABLED')
 
     try {
-      upload({ file: selectedFile, storeId })
+      upload({
+        file: selectedFile,
+        storeId,
+        csvData: csvPreview, // Send the modified CSV data with individual expiry dates
+      })
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] Upload initiation error:', error)
       toast.error(t('errors.startFailed'))
@@ -121,6 +144,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const handleReset = () => {
     console.log('🔄 [CSV-UPLOAD-FORM] Resetting form state')
     setSelectedFile(null)
+    setCurrentPage(0)
     resetPreview()
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -128,8 +152,26 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     console.log('✅ [CSV-UPLOAD-FORM] Form reset complete')
   }
 
+  // Pagination calculations
+  const totalPages = Math.ceil(csvPreview.length / itemsPerPage)
+  const startIndex = currentPage * itemsPerPage
+  const endIndex = Math.min(startIndex + itemsPerPage, csvPreview.length)
+  const currentItems = csvPreview.slice(startIndex, endIndex)
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Ultra-Fast Upload Header */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -191,13 +233,43 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <FileCheck className="h-5 w-5 text-green-500" />
-              <h3 className="font-semibold">{t('preview.title')}</h3>
-              <Badge variant="secondary">{t('preview.badge')}</Badge>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileCheck className="h-5 w-5 text-green-500" />
+                <Typography variant="h3">{t('preview.title')}</Typography>
+                <span className="text-sm text-gray-600">
+                  ({startIndex + 1}-{endIndex} of {csvPreview.length} items)
+                </span>
+              </div>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 0}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-xs text-gray-500 min-w-[60px] text-center">
+                    Page {currentPage + 1} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages - 1}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Desktop table view */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full border-collapse border border-gray-200 text-sm">
                 <thead>
                   <tr className="bg-gray-50">
@@ -219,28 +291,153 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {csvPreview.slice(0, 10).map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
-                      <td className="border border-gray-200 p-2">{item.Product_Name}</td>
-                      <td className="border border-gray-200 p-2">
-                        <Badge variant="outline" className="text-xs">
-                          {item.Category}
-                        </Badge>
-                      </td>
-                      <td className="border border-gray-200 p-2 text-center">{item.Quantity}</td>
-                      <td className="border border-gray-200 p-2 font-mono text-xs">
-                        {item.Expiry_Date}
-                      </td>
-                    </tr>
-                  ))}
+                  {currentItems.map((item, index) => {
+                    const actualIndex = startIndex + index
+                    return (
+                      <tr key={actualIndex} className="hover:bg-gray-50">
+                        <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
+                        <td className="border border-gray-200 p-2">{item.Product_Name}</td>
+                        <td className="border border-gray-200 p-2">
+                          <Badge variant="outline" className="text-xs">
+                            {item.Category}
+                          </Badge>
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <div className="flex items-center justify-center gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
+                              disabled={item.Quantity <= 1}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="min-w-[30px] text-center font-mono text-sm">
+                              {item.Quantity}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          {item.Expiry_Date ? (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="date"
+                                value={item.Expiry_Date}
+                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                                className="text-xs h-7 min-w-[120px]"
+                                min={new Date().toISOString().split('T')[0]}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="date"
+                                value=""
+                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                                placeholder={t('preview.selectDate')}
+                                className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
+                                min={new Date().toISOString().split('T')[0]}
+                              />
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
 
+            {/* Mobile card view */}
+            <div className="md:hidden space-y-3">
+              {currentItems.map((item, index) => {
+                const actualIndex = startIndex + index
+                return (
+                  <div key={actualIndex} className="border border-gray-200 rounded-lg p-3 bg-white">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {item.Category}
+                        </Badge>
+                      </div>
+                      <div className="font-medium">{item.Product_Name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
+                            disabled={item.Quantity <= 1}
+                            className="h-6 w-6 p-0"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="min-w-[30px] text-center font-mono text-sm">
+                            {item.Quantity}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
+                            className="h-6 w-6 p-0"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-700">
+                          {t('preview.table.expiryDate')}
+                        </label>
+                        {item.Expiry_Date ? (
+                          <Input
+                            type="date"
+                            value={item.Expiry_Date}
+                            onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                            className="text-sm h-8"
+                            min={new Date().toISOString().split('T')[0]}
+                          />
+                        ) : (
+                          <div className="space-y-1">
+                            <Input
+                              type="date"
+                              value=""
+                              onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                              placeholder={t('preview.selectDate')}
+                              className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                            <span className="text-xs text-yellow-600">
+                              {t('preview.missingExpiryDate')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
             {/* Upload Actions */}
             <div className="flex gap-3">
-              <Button onClick={handleUpload} disabled={isUploading} className="flex-1" size="lg">
+              <Button
+                onClick={handleUpload}
+                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0}
+                className="flex-1"
+                size="lg"
+              >
                 {isUploading ? (
                   <>
                     <Clock className="h-4 w-4 mr-2 animate-spin" />
@@ -270,21 +467,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <CheckCircle className="h-6 w-6 text-green-600" />
               <h3 className="font-semibold text-green-800 text-lg">{t('results.title')}</h3>
             </div>
-
-            {/* Debug: Log detailed results */}
-            {(() => {
-              console.log('🎉 [CSV-UPLOAD-FORM] Upload results received:', {
-                success: uploadResult.success,
-                processed: uploadResult.processed,
-                skipped: uploadResult.skipped,
-                total_items: uploadResult.total_items,
-                processing_time_ms: uploadResult.processing_time_ms,
-                performance_metrics: uploadResult.performance_metrics,
-                duplicates_count: uploadResult.duplicates_skipped?.length || 0,
-                errors_count: uploadResult.errors?.length || 0,
-              })
-              return null
-            })()}
 
             {/* Success Summary */}
             <div className="text-center p-3 bg-white rounded border border-green-300">
