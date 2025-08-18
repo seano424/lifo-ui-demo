@@ -723,7 +723,7 @@
   },
   "csvUpload": {
     "title": "Téléchargement CSV ultra-rapide",
-    "subtitle": "Traitement ultra-rapide avec saut automatique des doublons",
+    "subtitle": "Traitement ultra-rapide",
     "dropZone": {
       "dropHere": "Déposez votre fichier CSV ici",
       "orBrowse": "ou cliquez pour parcourir",

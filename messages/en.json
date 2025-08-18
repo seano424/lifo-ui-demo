@@ -706,7 +706,7 @@
   },
   "csvUpload": {
     "title": "Ultra-Fast CSV Upload",
-    "subtitle": "Lightning-fast processing with automatic duplicate skipping",
+    "subtitle": "Lightning-fast processing",
     "dropZone": {
       "dropHere": "Drop your CSV file here",
       "orBrowse": "or click to browse",

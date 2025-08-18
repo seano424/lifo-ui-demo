@@ -171,7 +171,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 xs:min-w-sm sm:min-w-xl lg:w-3xl mx-auto">
       {/* Ultra-Fast Upload Header */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -233,10 +233,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileCheck className="h-5 w-5 text-green-500" />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2">
                 <Typography variant="h3">{t('preview.title')}</Typography>
+
                 <span className="text-sm text-gray-600">
                   ({startIndex + 1}-{endIndex} of {csvPreview.length} items)
                 </span>
@@ -640,26 +640,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           </AlertDescription>
         </Alert>
       )}
-
-      {/* Performance Info */}
-      <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-        <div className="text-center text-sm text-blue-800">
-          <div className="font-semibold mb-2 flex items-center justify-center gap-2">
-            <Zap className="h-4 w-4 text-yellow-500" />
-            {t('performanceInfo.title')}
-            <Zap className="h-4 w-4 text-yellow-500" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-            <div>• {t('performanceInfo.features.bulkOps')}</div>
-            <div>• {t('performanceInfo.features.autoDuplicate')}</div>
-            <div>• {t('performanceInfo.features.realtime')}</div>
-            <div>• {t('performanceInfo.features.target')}</div>
-          </div>
-          <div className="mt-2 text-xs text-purple-700 font-medium">
-            {t('performanceInfo.footer')}
-          </div>
-        </div>
-      </Card>
     </div>
   )
 }

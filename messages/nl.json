@@ -723,7 +723,7 @@
   },
   "csvUpload": {
     "title": "Ultra-snelle CSV Upload",
-    "subtitle": "Bliksemsnel verwerken met automatisch overslaan van duplicaten",
+    "subtitle": "Bliksemsnel verwerken",
     "dropZone": {
       "dropHere": "Sleep je CSV-bestand hierheen",
       "orBrowse": "of klik om te bladeren",
