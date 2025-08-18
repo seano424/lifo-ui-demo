@@ -60,26 +60,26 @@ function useNavigationData() {
           url: '/dashboard/inventory',
           icon: Box,
         },
-        {
-          title: t('performance'),
-          url: '/dashboard/performance',
-          icon: BarChart,
-        },
-        {
-          title: t('milestones'),
-          url: '/dashboard/milestones',
-          icon: Target,
-        },
+        // {
+        //   title: t('performance'),
+        //   url: '/dashboard/performance',
+        //   icon: BarChart,
+        // },
+        // {
+        //   title: t('milestones'),
+        //   url: '/dashboard/milestones',
+        //   icon: Target,
+        // },
         {
           title: t('settings'),
           url: '/dashboard/settings',
           icon: SettingsIcon,
         },
-        {
-          title: t('helpCenter'),
-          url: '/dashboard/help-center',
-          icon: HelpCircle,
-        },
+        // {
+        //   title: t('helpCenter'),
+        //   url: '/dashboard/help-center',
+        //   icon: HelpCircle,
+        // },
       ],
     }),
     [t],
