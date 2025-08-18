@@ -7,7 +7,7 @@ import asyncio
 import inspect
 import traceback
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Callable, Type
 from functools import wraps
 from collections import defaultdict, deque
@@ -70,7 +70,7 @@ class ErrorEvent:
         self.context = context or {}
         self.recovery_attempted = recovery_attempted
         self.recovery_successful = recovery_successful
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.now(timezone.utc)
         self.traceback = traceback.format_exc()
         self.error_id = self._generate_error_id()
     
@@ -193,7 +193,7 @@ class ErrorTracker:
     def get_error_statistics(self) -> Dict[str, Any]:
         """Get comprehensive error statistics"""
         with self.lock:
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             
             # Time-based statistics
             last_24h = [e for e in self.error_events if e.timestamp > now - timedelta(hours=24)]
@@ -256,7 +256,7 @@ class ErrorTracker:
                 return {"endpoint": endpoint, "no_errors": True}
             
             # Recent errors (last 24h)
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             recent_errors = [
                 e for e in endpoint_events
                 if e.timestamp > now - timedelta(hours=24)
@@ -308,7 +308,7 @@ class ErrorTracker:
             while True:
                 try:
                     with self.lock:
-                        now = datetime.utcnow()
+                        now = datetime.now(timezone.utc)
                         cutoff = now - timedelta(hours=72)  # Keep 72 hours
                         
                         # Clean up old data

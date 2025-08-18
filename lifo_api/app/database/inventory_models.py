@@ -4,7 +4,7 @@ Focuses on scoring, recommendations, and action tracking rather than traditional
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from sqlalchemy import (
@@ -39,8 +39,8 @@ class Store(Base):
     store_name = Column(String(255))
     store_code = Column(String(50))
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
 class User(Base):
@@ -53,8 +53,8 @@ class User(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String(255))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
 class Product(Base):
@@ -94,8 +94,8 @@ class Product(Base):
     last_scanned_at = Column(DateTime)
 
     # Audit fields
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 
     # Relationships
@@ -130,8 +130,8 @@ class StoreProduct(Base):
     # Audit and tracking
     added_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     updated_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     product = relationship("Product", back_populates="store_products")
@@ -180,7 +180,7 @@ class Batch(Base):
     # Critical dates for LIFO scoring
     manufacture_date = Column(Date, nullable=False)
     expiry_date = Column(Date, nullable=False)  # Core input for expiry_urgency score
-    received_date = Column(Date, default=datetime.utcnow().date())
+    received_date = Column(Date, default=lambda: datetime.now(timezone.utc).date())
 
     # Quantities for tracking
     initial_quantity = Column(DECIMAL(12, 4), nullable=False)
@@ -203,8 +203,8 @@ class Batch(Base):
 
     # Audit fields
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     product = relationship("Product", back_populates="batches")
@@ -262,7 +262,7 @@ class BatchAction(Base):
     ai_score = Column(DECIMAL(3, 2))  # AI score that triggered recommendation (0.00-1.00)
 
     # Tracking details
-    action_date = Column(DateTime, default=datetime.utcnow)
+    action_date = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     quantity_affected = Column(DECIMAL(12, 4))
     notes = Column(Text)  # User notes (e.g., "donated to local food bank")
 
@@ -276,7 +276,7 @@ class BatchAction(Base):
         UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
     )
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     batch = relationship("Batch", back_populates="actions")
@@ -310,7 +310,7 @@ class DonationRecipient(Base):
     store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
 
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 
     # Relationships

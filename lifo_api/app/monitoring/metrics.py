@@ -6,7 +6,7 @@ Real-time performance metrics with mobile optimization focus
 import asyncio
 import time
 import psutil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional, List
 from collections import defaultdict, deque
 import threading
@@ -69,7 +69,7 @@ class MetricsCollector:
     ):
         """Record API request metrics with mobile performance focus"""
         with self.lock:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now(timezone.utc)
             
             # Update request metrics
             metric_key = f"api_{method.lower()}_{endpoint.replace('/', '_')}"
@@ -149,7 +149,7 @@ class MetricsCollector:
     ):
         """Record database query performance metrics"""
         with self.lock:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now(timezone.utc)
             metric_key = f"db_query_{query_name}"
             
             if metric_key not in self.metrics:
@@ -209,7 +209,7 @@ class MetricsCollector:
     ):
         """Record cache performance metrics"""
         with self.lock:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now(timezone.utc)
             metric_key = f"cache_{cache_name}"
             
             if metric_key not in self.metrics:
@@ -255,7 +255,7 @@ class MetricsCollector:
     ):
         """Record business metrics (store health, batch processing, etc.)"""
         with self.lock:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now(timezone.utc)
             metric_key = f"business_{metric_name}"
             
             if store_id:
@@ -291,7 +291,7 @@ class MetricsCollector:
                     memory = psutil.virtual_memory()
                     disk = psutil.disk_usage('/')
                     
-                    timestamp = datetime.utcnow()
+                    timestamp = datetime.now(timezone.utc)
                     
                     # Record system metrics
                     system_metrics = {
@@ -338,7 +338,7 @@ class MetricsCollector:
             "type": alert_type,
             "message": message,
             "context": context,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "severity": self._get_alert_severity(alert_type)
         }
         
@@ -372,7 +372,7 @@ class MetricsCollector:
         """Get comprehensive metrics summary"""
         with self.lock:
             summary = {
-                "collection_timestamp": datetime.utcnow().isoformat(),
+                "collection_timestamp": datetime.now(timezone.utc).isoformat(),
                 "api_metrics": {},
                 "database_metrics": {},
                 "cache_metrics": {},
@@ -432,7 +432,7 @@ class MetricsCollector:
         recent_alerts = []
         alert_counts = defaultdict(int)
         
-        cutoff_time = datetime.utcnow() - timedelta(hours=24)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
         
         for alert_type, alerts in self.alerts_triggered.items():
             for alert in alerts:
@@ -536,7 +536,7 @@ class MetricsCollector:
             if metric_name not in self.time_series_metrics:
                 return []
             
-            cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+            cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
             
             filtered_data = []
             for data_point in self.time_series_metrics[metric_name]:

@@ -6,7 +6,7 @@ Multi-layer protection with adaptive thresholds and intelligent blocking
 import asyncio
 import time
 from collections import defaultdict, deque
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 import threading
 import hashlib
@@ -47,7 +47,7 @@ class AdvancedRateLimiter:
         self.endpoint_requests = defaultdict(lambda: deque(maxlen=5000))  # Last 5000 requests per endpoint
         
         # Suspicious activity tracking
-        self.suspicious_ips = defaultdict(lambda: {"score": 0, "last_seen": datetime.utcnow()})
+        self.suspicious_ips = defaultdict(lambda: {"score": 0, "last_seen": datetime.now(timezone.utc)})
         
         # Rate limit configurations
         self.rate_limits = {
@@ -124,7 +124,7 @@ class AdvancedRateLimiter:
         with self.lock:
             if ip in self.ip_ban_list:
                 ban_until = self.ip_ban_list[ip]
-                if datetime.utcnow() < ban_until:
+                if datetime.now(timezone.utc) < ban_until:
                     return True
                 else:
                     # Ban expired, remove from list
@@ -151,7 +151,7 @@ class AdvancedRateLimiter:
             return False, "IP temporarily banned due to suspicious activity"
         
         with self.lock:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             
             # Get rate limit configuration for this endpoint
             category = self.get_endpoint_category(endpoint_path)
@@ -227,7 +227,7 @@ class AdvancedRateLimiter:
         # Update suspicious activity score
         suspicious_data = self.suspicious_ips[ip]
         suspicious_data["score"] += 10  # Increase suspicion score
-        suspicious_data["last_seen"] = datetime.utcnow()
+        suspicious_data["last_seen"] = datetime.now(timezone.utc)
         
         logger.warning(
             "Rate limit violation recorded",
@@ -243,7 +243,7 @@ class AdvancedRateLimiter:
     
     def _ban_ip(self, ip: str, duration_minutes: int = 30):
         """Ban an IP address for specified duration"""
-        ban_until = datetime.utcnow() + timedelta(minutes=duration_minutes)
+        ban_until = datetime.now(timezone.utc) + timedelta(minutes=duration_minutes)
         self.ip_ban_list[ip] = ban_until
         
         logger.warning(
@@ -275,7 +275,7 @@ class AdvancedRateLimiter:
         client_ip = self._get_client_ip(request)
         
         with self.lock:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             requests = self.ip_requests[client_ip]
             
             if not requests:
@@ -336,7 +336,7 @@ class AdvancedRateLimiter:
             if status_code >= 400:
                 suspicious_data = self.suspicious_ips[client_ip]
                 suspicious_data["score"] += 1 if status_code < 500 else 5
-                suspicious_data["last_seen"] = datetime.utcnow()
+                suspicious_data["last_seen"] = datetime.now(timezone.utc)
     
     def get_rate_limit_status(self, request: Request) -> Dict:
         """Get current rate limit status for an IP"""
@@ -346,7 +346,7 @@ class AdvancedRateLimiter:
         limits = self.rate_limits[category]
         
         with self.lock:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             requests = self.ip_requests[client_ip]
             
             # Count requests in current window
@@ -378,7 +378,7 @@ class AdvancedRateLimiter:
             while True:
                 try:
                     with self.lock:
-                        current_time = datetime.utcnow()
+                        current_time = datetime.now(timezone.utc)
                         
                         # Clean up old IP violations (reset after 1 hour)
                         hour_ago = current_time - timedelta(hours=1)

@@ -7,7 +7,7 @@ import asyncio
 import json
 import time
 from collections import defaultdict, deque
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Any
 import threading
 import hashlib
@@ -56,7 +56,7 @@ class SecurityEvent:
         self.details = details or {}
         self.user_id = user_id
         self.user_agent = user_agent
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.now(timezone.utc)
         self.event_id = self._generate_event_id()
     
     def _generate_event_id(self) -> str:
@@ -170,7 +170,7 @@ class SecurityMonitor:
             
             # Track first-time IPs
             if client_ip not in self.ip_first_seen:
-                self.ip_first_seen[client_ip] = datetime.utcnow()
+                self.ip_first_seen[client_ip] = datetime.now(timezone.utc)
         
         # Log the event
         log_level = self._get_log_level(severity)
@@ -231,12 +231,12 @@ class SecurityMonitor:
         
         with self.lock:
             # Record failed attempt
-            self.failed_auth_attempts[client_ip].append(datetime.utcnow())
+            self.failed_auth_attempts[client_ip].append(datetime.now(timezone.utc))
             
             # Check for brute force pattern
             recent_failures = [
                 attempt for attempt in self.failed_auth_attempts[client_ip]
-                if attempt > datetime.utcnow() - timedelta(minutes=15)
+                if attempt > datetime.now(timezone.utc) - timedelta(minutes=15)
             ]
             
             if len(recent_failures) >= 5:  # 5 failures in 15 minutes
@@ -265,7 +265,7 @@ class SecurityMonitor:
             
             if len(ip_events) >= 10:
                 # Check for rapid requests to different endpoints
-                recent_events = [e for e in ip_events if e.timestamp > datetime.utcnow() - timedelta(minutes=5)]
+                recent_events = [e for e in ip_events if e.timestamp > datetime.now(timezone.utc) - timedelta(minutes=5)]
                 unique_endpoints = len(set(e.endpoint for e in recent_events))
                 
                 if unique_endpoints >= 10:  # 10+ different endpoints in 5 minutes
@@ -377,7 +377,7 @@ class SecurityMonitor:
             # Rapid event detection
             recent_events = [
                 e for e in ip_events
-                if e.timestamp > datetime.utcnow() - timedelta(minutes=5)
+                if e.timestamp > datetime.now(timezone.utc) - timedelta(minutes=5)
             ]
             
             if len(recent_events) >= 20:  # 20+ events in 5 minutes
@@ -391,7 +391,7 @@ class SecurityMonitor:
     def get_security_statistics(self) -> Dict[str, Any]:
         """Get comprehensive security statistics"""
         with self.lock:
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             
             # Time-based statistics
             last_24h = [e for e in self.security_events if e.timestamp > now - timedelta(hours=24)]
@@ -455,7 +455,7 @@ class SecurityMonitor:
             # Recent activity
             recent_events = [
                 e for e in ip_events
-                if e.timestamp > datetime.utcnow() - timedelta(hours=24)
+                if e.timestamp > datetime.now(timezone.utc) - timedelta(hours=24)
             ]
             
             return {
@@ -511,7 +511,7 @@ class SecurityMonitor:
             while True:
                 try:
                     with self.lock:
-                        now = datetime.utcnow()
+                        now = datetime.now(timezone.utc)
                         cutoff = now - timedelta(hours=72)  # Keep 72 hours of data
                         
                         # Clean up old IP events
