@@ -79,6 +79,7 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.10",
     "tailwindcss-animate": "^1.0.7",
+    "tailwindcss-debug-screens": "^3.0.1",
     "typescript": "^5"
   }
 }
