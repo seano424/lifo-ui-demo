@@ -201,11 +201,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <table className="min-w-full border-collapse border border-gray-200 text-sm">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.sku')}</th>
-                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.productName')}</th>
-                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.category')}</th>
-                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.quantity')}</th>
-                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.expiryDate')}</th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.sku')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.productName')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.category')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.quantity')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.expiryDate')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -282,7 +292,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 {uploadResult.processed || 0 > 0
                   ? t('results.successSummary', { processed: uploadResult.processed || 0 })
                   : t('results.uploadCompleted')}
-                {(uploadResult.skipped || 0) > 0 && t('results.duplicatesSkipped', { skipped: uploadResult.skipped })}
+                {(uploadResult.skipped || 0) > 0 &&
+                  t('results.duplicatesSkipped', { skipped: uploadResult.skipped })}
               </p>
               {uploadResult.processing_time_ms && (
                 <p className="text-sm text-green-600 mt-1">
@@ -343,7 +354,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="font-bold text-cyan-600">
                         {uploadResult.performance_metrics.product_resolution_ms}ms
                       </div>
-                      <div className="text-gray-600">{t('results.performance.productResolution')}</div>
+                      <div className="text-gray-600">
+                        {t('results.performance.productResolution')}
+                      </div>
                     </div>
                   )}
                   {uploadResult.performance_metrics.batch_insertion_ms > 0 && (
@@ -360,7 +373,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         <div className="font-bold text-emerald-600">
                           {uploadResult.performance_metrics.products_created}
                         </div>
-                        <div className="text-gray-600">{t('results.performance.productsCreated')}</div>
+                        <div className="text-gray-600">
+                          {t('results.performance.productsCreated')}
+                        </div>
                       </div>
                     )}
                   {uploadResult.performance_metrics.database_processing_time_ms &&
@@ -379,7 +394,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       0,
                       Math.round(
                         (1 -
-                          (uploadResult.processing_time_ms || 0) / (uploadResult.total_items * 50)) *
+                          (uploadResult.processing_time_ms || 0) /
+                            (uploadResult.total_items * 50)) *
                           100,
                       ),
                     ),
@@ -393,7 +409,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <details className="bg-white rounded p-4 border">
                 <summary className="cursor-pointer font-semibold text-gray-700 flex items-center gap-2">
                   <SkipForward className="h-4 w-4" />
-                  {t('results.duplicates.viewSkipped', { count: uploadResult.duplicates_skipped.length })}
+                  {t('results.duplicates.viewSkipped', {
+                    count: uploadResult.duplicates_skipped.length,
+                  })}
                 </summary>
                 <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
                   {uploadResult.duplicates_skipped.map(
