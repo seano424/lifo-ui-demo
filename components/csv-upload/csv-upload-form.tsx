@@ -352,22 +352,24 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="text-gray-600">Batch Insertion</div>
                     </div>
                   )}
-                  {uploadResult.performance_metrics.products_created > 0 && (
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="font-bold text-emerald-600">
-                        {uploadResult.performance_metrics.products_created}
+                  {uploadResult.performance_metrics.products_created &&
+                    uploadResult.performance_metrics.products_created > 0 && (
+                      <div className="text-center p-2 bg-gray-50 rounded">
+                        <div className="font-bold text-emerald-600">
+                          {uploadResult.performance_metrics.products_created}
+                        </div>
+                        <div className="text-gray-600">Products Created</div>
                       </div>
-                      <div className="text-gray-600">Products Created</div>
-                    </div>
-                  )}
-                  {uploadResult.performance_metrics.database_processing_time_ms > 0 && (
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="font-bold text-purple-600">
-                        {uploadResult.performance_metrics.database_processing_time_ms}ms
+                    )}
+                  {uploadResult.performance_metrics.database_processing_time_ms &&
+                    uploadResult.performance_metrics.database_processing_time_ms > 0 && (
+                      <div className="text-center p-2 bg-gray-50 rounded">
+                        <div className="font-bold text-purple-600">
+                          {uploadResult.performance_metrics.database_processing_time_ms}ms
+                        </div>
+                        <div className="text-gray-600">DB Processing</div>
                       </div>
-                      <div className="text-gray-600">DB Processing</div>
-                    </div>
-                  )}
+                    )}
                 </div>
                 <div className="mt-2 text-xs text-gray-500 text-center">
                   ⚡ Bulk operations reduced processing time by{' '}

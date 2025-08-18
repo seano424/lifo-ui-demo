@@ -21,6 +21,9 @@ interface CSVUploadResponse {
     product_resolution_ms: number
     batch_insertion_ms: number
     database_operations_ms: number
+    store_products_linked?: number
+    products_created?: number
+    database_processing_time_ms?: number
   }
 }
 
