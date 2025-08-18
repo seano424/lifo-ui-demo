@@ -439,8 +439,8 @@
     "billing": "Billings",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "input": "Input",
-    "output": "Output",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
     "analytics": "Analytics",
     "performance": "Performance",
     "milestones": "Milestones",
@@ -702,6 +702,76 @@
         "title": "Personalized Follow-up",
         "description": "Each request is handled individually with personalized follow-up."
       }
+    }
+  },
+  "csvUpload": {
+    "title": "Ultra-Fast CSV Upload",
+    "subtitle": "Lightning-fast processing with automatic duplicate skipping",
+    "dropZone": {
+      "dropHere": "Drop your CSV file here",
+      "orBrowse": "or click to browse",
+      "chooseFile": "Choose File"
+    },
+    "preview": {
+      "title": "Preview (First 10 rows)",
+      "badge": "Duplicates auto-skipped during upload",
+      "table": {
+        "sku": "SKU",
+        "productName": "Product Name",
+        "category": "Category",
+        "quantity": "Qty",
+        "expiryDate": "Expiry Date"
+      }
+    },
+    "buttons": {
+      "upload": "Upload (Auto-skip duplicates)",
+      "processing": "Processing...",
+      "reset": "Reset",
+      "uploadAnother": "Upload Another File"
+    },
+    "results": {
+      "title": "Upload Complete!",
+      "successSummary": "Successfully processed {processed} items",
+      "duplicatesSkipped": " • {skipped} duplicates skipped",
+      "uploadCompleted": "Upload completed",
+      "completedIn": "⚡ Completed in {time}ms",
+      "metrics": {
+        "processed": "Processed",
+        "skipped": "Skipped",
+        "itemsPerSec": "Items/sec",
+        "totalTime": "Total time"
+      },
+      "performance": {
+        "title": "Bulk Operation Performance Breakdown",
+        "duplicateCheck": "Duplicate Check",
+        "productResolution": "Product Resolution",
+        "batchInsertion": "Batch Insertion",
+        "productsCreated": "Products Created",
+        "dbProcessing": "DB Processing",
+        "optimization": "⚡ Bulk operations reduced processing time by {percentage}% compared to individual processing"
+      },
+      "duplicates": {
+        "viewSkipped": "View Skipped Duplicates ({count})",
+        "expiry": "Expiry"
+      }
+    },
+    "errors": {
+      "invalidFile": "Please select a CSV file",
+      "analysisFailure": "Failed to analyze CSV file",
+      "noFile": "Please select a file first",
+      "noStore": "Store information is missing. Please refresh and try again.",
+      "uploadFailed": "Upload Failed",
+      "startFailed": "Failed to start upload. Please try again."
+    },
+    "performanceInfo": {
+      "title": "Bulk-Optimized Ultra-Fast Performance",
+      "features": {
+        "bulkOps": "3 bulk database operations instead of N individual calls",
+        "autoDuplicate": "Automatic duplicate detection with zero user intervention",
+        "realtime": "Real-time performance metrics and timing breakdown",
+        "target": "Target: 1000+ items/sec with database RPC functions"
+      },
+      "footer": "🚀 Optimized for maximum speed while maintaining data integrity"
     }
   },
   "footer": {

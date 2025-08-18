@@ -399,8 +399,8 @@
     "billing": "Facturering",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
-    "input": "Inkomend",
-    "output": "Uitgaand",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
     "analytics": "Analyses",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
@@ -719,6 +719,76 @@
     "expiry": {
       "expired": "Verlopen",
       "daysLeft": "{days}d over"
+    }
+  },
+  "csvUpload": {
+    "title": "Ultra-snelle CSV Upload",
+    "subtitle": "Bliksemsnel verwerken met automatisch overslaan van duplicaten",
+    "dropZone": {
+      "dropHere": "Sleep je CSV-bestand hierheen",
+      "orBrowse": "of klik om te bladeren",
+      "chooseFile": "Bestand kiezen"
+    },
+    "preview": {
+      "title": "Voorbeeld (Eerste 10 rijen)",
+      "badge": "Duplicaten worden automatisch overgeslagen tijdens upload",
+      "table": {
+        "sku": "SKU",
+        "productName": "Productnaam",
+        "category": "Categorie",
+        "quantity": "Aantal",
+        "expiryDate": "Vervaldatum"
+      }
+    },
+    "buttons": {
+      "upload": "Uploaden (Auto-sla duplicaten over)",
+      "processing": "Verwerken...",
+      "reset": "Reset",
+      "uploadAnother": "Upload een ander bestand"
+    },
+    "results": {
+      "title": "Upload voltooid!",
+      "successSummary": "Succesvol {processed} items verwerkt",
+      "duplicatesSkipped": " • {skipped} duplicaten overgeslagen",
+      "uploadCompleted": "Upload voltooid",
+      "completedIn": "⚡ Voltooid in {time}ms",
+      "metrics": {
+        "processed": "Verwerkt",
+        "skipped": "Overgeslagen",
+        "itemsPerSec": "Items/sec",
+        "totalTime": "Totale tijd"
+      },
+      "performance": {
+        "title": "Bulk Operatie Prestatie Uitsplitsing",
+        "duplicateCheck": "Duplicaat Controle",
+        "productResolution": "Product Resolutie",
+        "batchInsertion": "Batch Invoegen",
+        "productsCreated": "Producten Aangemaakt",
+        "dbProcessing": "DB Verwerking",
+        "optimization": "⚡ Bulk operaties verminderde verwerkingstijd met {percentage}% vergeleken met individuele verwerking"
+      },
+      "duplicates": {
+        "viewSkipped": "Bekijk overgeslagen duplicaten ({count})",
+        "expiry": "Verval"
+      }
+    },
+    "errors": {
+      "invalidFile": "Selecteer een CSV-bestand",
+      "analysisFailure": "CSV-bestand analyse mislukt",
+      "noFile": "Selecteer eerst een bestand",
+      "noStore": "Winkelinformatie ontbreekt. Vernieuw en probeer opnieuw.",
+      "uploadFailed": "Upload mislukt",
+      "startFailed": "Kan upload niet starten. Probeer het opnieuw."
+    },
+    "performanceInfo": {
+      "title": "Bulk-geoptimaliseerde Ultra-snelle Prestaties",
+      "features": {
+        "bulkOps": "3 bulk database operaties in plaats van N individuele aanroepen",
+        "autoDuplicate": "Automatische duplicaat detectie zonder gebruikersinterventie",
+        "realtime": "Real-time prestatiemetrieken en tijdsuitsplitsing",
+        "target": "Doel: 1000+ items/sec met database RPC functies"
+      },
+      "footer": "🚀 Geoptimaliseerd voor maximale snelheid met behoud van data-integriteit"
     }
   }
 }

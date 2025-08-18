@@ -11,7 +11,8 @@ export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
   return (
     <div className="max-w-screen-lg mx-auto space-y-6">
-      <Tabs defaultValue="scan" className="w-full">
+      {/* Mobile Tabs */}
+      <Tabs defaultValue="scan" className="w-full lg:hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="scan" className="flex items-center gap-2">
             <Scan className="w-4 h-4" />
@@ -48,6 +49,25 @@ export default function InboundPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Desktop Bulk Import */}
+
+      <div className="max-w-4xl mx-auto hidden lg:block">
+        {currentStore ? (
+          <CSVUploadForm
+            storeId={currentStore.store_id}
+            onUploadComplete={result => {
+              console.log('Upload completed:', result)
+            }}
+          />
+        ) : (
+          <Card className="p-6">
+            <div className="text-center text-muted-foreground">
+              Please select a store to upload inventory data.
+            </div>
+          </Card>
+        )}
+      </div>
     </div>
   )
 }

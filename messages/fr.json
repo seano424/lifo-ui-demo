@@ -399,8 +399,8 @@
     "billing": "Facturations",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
-    "input": "Entrées",
-    "output": "Sorties",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
     "analytics": "Analyses",
     "performance": "Performance",
     "milestones": "Étapes",
@@ -719,6 +719,76 @@
     "expiry": {
       "expired": "Expiré",
       "daysLeft": "{days}j restants"
+    }
+  },
+  "csvUpload": {
+    "title": "Téléchargement CSV ultra-rapide",
+    "subtitle": "Traitement ultra-rapide avec saut automatique des doublons",
+    "dropZone": {
+      "dropHere": "Déposez votre fichier CSV ici",
+      "orBrowse": "ou cliquez pour parcourir",
+      "chooseFile": "Choisir un fichier"
+    },
+    "preview": {
+      "title": "Aperçu (10 premières lignes)",
+      "badge": "Les doublons sont automatiquement ignorés lors du téléchargement",
+      "table": {
+        "sku": "SKU",
+        "productName": "Nom du produit",
+        "category": "Catégorie",
+        "quantity": "Qté",
+        "expiryDate": "Date d'expiration"
+      }
+    },
+    "buttons": {
+      "upload": "Télécharger (Ignorer auto. les doublons)",
+      "processing": "Traitement...",
+      "reset": "Réinitialiser",
+      "uploadAnother": "Télécharger un autre fichier"
+    },
+    "results": {
+      "title": "Téléchargement terminé !",
+      "successSummary": "{processed} articles traités avec succès",
+      "duplicatesSkipped": " • {skipped} doublons ignorés",
+      "uploadCompleted": "Téléchargement terminé",
+      "completedIn": "⚡ Terminé en {time}ms",
+      "metrics": {
+        "processed": "Traités",
+        "skipped": "Ignorés",
+        "itemsPerSec": "Articles/sec",
+        "totalTime": "Temps total"
+      },
+      "performance": {
+        "title": "Décomposition des performances des opérations groupées",
+        "duplicateCheck": "Vérification des doublons",
+        "productResolution": "Résolution des produits",
+        "batchInsertion": "Insertion par lot",
+        "productsCreated": "Produits créés",
+        "dbProcessing": "Traitement BD",
+        "optimization": "⚡ Les opérations groupées ont réduit le temps de traitement de {percentage}% par rapport au traitement individuel"
+      },
+      "duplicates": {
+        "viewSkipped": "Voir les doublons ignorés ({count})",
+        "expiry": "Expiration"
+      }
+    },
+    "errors": {
+      "invalidFile": "Veuillez sélectionner un fichier CSV",
+      "analysisFailure": "Échec de l'analyse du fichier CSV",
+      "noFile": "Veuillez d'abord sélectionner un fichier",
+      "noStore": "Informations du magasin manquantes. Actualisez et réessayez.",
+      "uploadFailed": "Échec du téléchargement",
+      "startFailed": "Impossible de démarrer le téléchargement. Veuillez réessayer."
+    },
+    "performanceInfo": {
+      "title": "Performances ultra-rapides optimisées en masse",
+      "features": {
+        "bulkOps": "3 opérations de base de données en masse au lieu de N appels individuels",
+        "autoDuplicate": "Détection automatique des doublons sans intervention de l'utilisateur",
+        "realtime": "Métriques de performance et décomposition temporelle en temps réel",
+        "target": "Objectif : 1000+ articles/sec avec les fonctions RPC de base de données"
+      },
+      "footer": "🚀 Optimisé pour une vitesse maximale tout en maintenant l'intégrité des données"
     }
   }
 }
