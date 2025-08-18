@@ -11,23 +11,36 @@ import {
 
 export function ProductListSkeleton() {
   return (
-    <Card>
+    <Card className="border-0 border-t rounded-t-none shadow-none">
       <CardContent className="p-0">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Product</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead className="text-right">Stock</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Active Batches</TableHead>
-              <TableHead>Date Added</TableHead>
-              <TableHead></TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
+              <TableHead className="text-right">
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
+              <TableHead className="text-right">
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
+              <TableHead className="text-right">
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-12" />
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 20 }).map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="space-y-2">

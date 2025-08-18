@@ -105,9 +105,9 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
   return (
     <div className="space-y-4">
       <Card>
-        <div className="p-4 border-b">
+        <div className="p-4">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 md:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <ProductListFilters
                 filters={{
                   category: filters.category,
@@ -131,8 +131,8 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
         </div>
 
         <ProductTable
-          isLoading={isLoading}
           data={data}
+          isLoading={isLoading}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
           updateSort={field => {
             const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
