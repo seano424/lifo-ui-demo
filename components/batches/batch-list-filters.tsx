@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
 
 interface BatchListFiltersProps {
   filters?: {
@@ -82,9 +81,7 @@ export function BatchListFilters({
         </Skeleton>
       )}
       {!isLoading && count > 0 && (
-        <span className="text-sm flex items-center text-muted-foreground px-2">
-          {count} items
-        </span>
+        <span className="text-sm flex items-center text-muted-foreground px-2">{count} items</span>
       )}
     </div>
   )
