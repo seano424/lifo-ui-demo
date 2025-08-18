@@ -15,6 +15,8 @@ import {
   SkipForward,
   ChevronLeft,
   ChevronRight,
+  Plus,
+  Minus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
@@ -47,6 +49,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     resetPreview,
     columnMapping,
     updateCsvItemExpiry,
+    updateCsvItemQuantity,
   } = useCSVUpload()
 
   const handleDrag = (e: React.DragEvent) => {
@@ -300,7 +303,28 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             {item.Category}
                           </Badge>
                         </td>
-                        <td className="border border-gray-200 p-2 text-center">{item.Quantity}</td>
+                        <td className="border border-gray-200 p-2">
+                          <div className="flex items-center justify-center gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
+                              disabled={item.Quantity <= 1}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="min-w-[30px] text-center font-mono text-sm">{item.Quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </td>
                         <td className="border border-gray-200 p-2">
                           {item.Expiry_Date ? (
                             <div className="flex items-center gap-2">
@@ -346,7 +370,29 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         </Badge>
                       </div>
                       <div className="font-medium">{item.Product_Name}</div>
-                      <div className="text-sm text-gray-600">{t('preview.quantityLabel')} {item.Quantity}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
+                            disabled={item.Quantity <= 1}
+                            className="h-6 w-6 p-0"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="min-w-[30px] text-center font-mono text-sm">{item.Quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
+                            className="h-6 w-6 p-0"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
                       <div className="space-y-1">
                         <label className="text-xs font-medium text-gray-700">{t('preview.table.expiryDate')}</label>
                         {item.Expiry_Date ? (

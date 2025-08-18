@@ -307,6 +307,13 @@ export function useCSVUpload() {
         return newPreview
       })
     },
+    updateCsvItemQuantity: (index: number, newQuantity: number) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) =>
+          i === index ? { ...item, Quantity: Math.max(1, newQuantity) } : item,
+        )
+      })
+    },
   }
 }
 
