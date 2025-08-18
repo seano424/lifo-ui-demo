@@ -112,13 +112,13 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
     },
   })
 
-  if (isLoading && data.length === 0) {
+  if (isLoading) {
     return <BatchListSkeleton />
   }
 
-  if (!isLoading && data.length === 0) {
+  if (data.length === 0) {
     return (
-      <Card>
+      <Card className="border-0 shadow-none">
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
           <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>

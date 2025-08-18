@@ -29,15 +29,7 @@ export function BatchListFilters({
   }
 
   return (
-    <div className="flex items-center justify-end gap-2">
-      {isLoading && (
-        <Skeleton className="h-6 w-16 flex justify-center items-center">
-          <Loader2 className="h-2 w-2 text-muted-foreground animate-spin" />
-        </Skeleton>
-      )}
-      {!isLoading && count > 0 && (
-        <span className="text-sm text-muted-foreground mr-2">{count} items</span>
-      )}
+    <div className="flex justify-end gap-2">
       <Select
         value={filters?.expiringInDays?.toString() || 'all'}
         onValueChange={value =>
@@ -82,6 +74,18 @@ export function BatchListFilters({
           <SelectItem value="reserved">Reserved</SelectItem>
         </SelectContent>
       </Select>
+
+      {isLoading && (
+        <Skeleton className="flex justify-center items-center gap-1 px-2">
+          <Skeleton className="h-2 w-4 bg-muted-foreground/10" />
+          <Skeleton className="h-2 w-16 bg-muted-foreground/10" />
+        </Skeleton>
+      )}
+      {!isLoading && count > 0 && (
+        <span className="text-sm flex items-center text-muted-foreground px-2">
+          {count} items
+        </span>
+      )}
     </div>
   )
 }

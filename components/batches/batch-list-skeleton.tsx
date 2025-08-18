@@ -14,7 +14,7 @@ export function BatchListSkeleton() {
   const t = useTranslations('batches.table')
 
   return (
-    <Card>
+    <Card className="border-0 shadow-none">
       <Table>
         <TableHeader>
           <TableRow>
