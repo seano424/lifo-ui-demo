@@ -9,6 +9,7 @@ import { Upload, FileCheck, CheckCircle, Zap, Clock, SkipForward } from 'lucide-
 import { cn } from '@/lib/utils'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface CSVUploadFormProps {
   storeId: string
@@ -16,6 +17,7 @@ interface CSVUploadFormProps {
 }
 
 export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
+  const t = useTranslations('csvUpload')
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -62,7 +64,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
       console.warn('❌ [CSV-UPLOAD-FORM] Invalid file type:', file.name)
-      toast.error('Please select a CSV file')
+      toast.error(t('errors.invalidFile'))
       return
     }
 
@@ -79,7 +81,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       )
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
-      toast.error('Failed to analyze CSV file')
+      toast.error(t('errors.analysisFailure'))
     }
   }
 
@@ -88,13 +90,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
     if (!selectedFile) {
       console.warn('❌ [CSV-UPLOAD-FORM] No file selected')
-      toast.error('Please select a file first')
+      toast.error(t('errors.noFile'))
       return
     }
 
     if (!storeId) {
       console.error('❌ [CSV-UPLOAD-FORM] No store ID provided')
-      toast.error('Store information is missing. Please refresh and try again.')
+      toast.error(t('errors.noStore'))
       return
     }
 
@@ -112,7 +114,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       upload({ file: selectedFile, storeId })
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] Upload initiation error:', error)
-      toast.error('Failed to start upload. Please try again.')
+      toast.error(t('errors.startFailed'))
     }
   }
 
@@ -132,10 +134,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Zap className="h-6 w-6 text-yellow-500" />
-          <h2 className="text-2xl font-bold">Ultra-Fast CSV Upload</h2>
+          <h2 className="text-2xl font-bold">{t('title')}</h2>
           <Zap className="h-6 w-6 text-yellow-500" />
         </div>
-        <p className="text-gray-600">Lightning-fast processing with automatic duplicate skipping</p>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       {/* File Upload Area */}
@@ -174,11 +176,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             <div className="space-y-4">
               <Upload className="h-12 w-12 text-gray-400 mx-auto" />
               <div>
-                <h3 className="font-semibold text-lg">Drop your CSV file here</h3>
-                <p className="text-gray-600">or click to browse</p>
+                <h3 className="font-semibold text-lg">{t('dropZone.dropHere')}</h3>
+                <p className="text-gray-600">{t('dropZone.orBrowse')}</p>
               </div>
               <Button onClick={() => fileInputRef.current?.click()} variant="outline">
-                Choose File
+                {t('dropZone.chooseFile')}
               </Button>
             </div>
           )}
@@ -191,19 +193,19 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <FileCheck className="h-5 w-5 text-green-500" />
-              <h3 className="font-semibold">Preview (First 10 rows)</h3>
-              <Badge variant="secondary">Duplicates auto-skipped during upload</Badge>
+              <h3 className="font-semibold">{t('preview.title')}</h3>
+              <Badge variant="secondary">{t('preview.badge')}</Badge>
             </div>
 
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse border border-gray-200 text-sm">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="border border-gray-200 p-2 text-left">SKU</th>
-                    <th className="border border-gray-200 p-2 text-left">Product Name</th>
-                    <th className="border border-gray-200 p-2 text-left">Category</th>
-                    <th className="border border-gray-200 p-2 text-left">Qty</th>
-                    <th className="border border-gray-200 p-2 text-left">Expiry Date</th>
+                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.sku')}</th>
+                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.productName')}</th>
+                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.category')}</th>
+                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.quantity')}</th>
+                    <th className="border border-gray-200 p-2 text-left">{t('preview.table.expiryDate')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -232,18 +234,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 {isUploading ? (
                   <>
                     <Clock className="h-4 w-4 mr-2 animate-spin" />
-                    Processing...
+                    {t('buttons.processing')}
                   </>
                 ) : (
                   <>
                     <Zap className="h-4 w-4 mr-2" />
-                    Upload (Auto-skip duplicates)
+                    {t('buttons.upload')}
                   </>
                 )}
               </Button>
 
               <Button onClick={handleReset} variant="outline" disabled={isUploading}>
-                Reset
+                {t('buttons.reset')}
               </Button>
             </div>
           </div>
@@ -256,7 +258,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-6 w-6 text-green-600" />
-              <h3 className="font-semibold text-green-800 text-lg">Upload Complete! 🎉</h3>
+              <h3 className="font-semibold text-green-800 text-lg">{t('results.title')}</h3>
             </div>
 
             {/* Debug: Log detailed results */}
@@ -278,13 +280,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             <div className="text-center p-3 bg-white rounded border border-green-300">
               <p className="text-green-800 font-medium">
                 {uploadResult.processed || 0 > 0
-                  ? `Successfully processed ${uploadResult.processed || 0} items`
-                  : 'Upload completed'}
-                {(uploadResult.skipped || 0) > 0 && ` • ${uploadResult.skipped} duplicates skipped`}
+                  ? t('results.successSummary', { processed: uploadResult.processed || 0 })
+                  : t('results.uploadCompleted')}
+                {(uploadResult.skipped || 0) > 0 && t('results.duplicatesSkipped', { skipped: uploadResult.skipped })}
               </p>
               {uploadResult.processing_time_ms && (
                 <p className="text-sm text-green-600 mt-1">
-                  ⚡ Completed in {uploadResult.processing_time_ms}ms
+                  {t('results.completedIn', { time: uploadResult.processing_time_ms })}
                 </p>
               )}
             </div>
@@ -295,28 +297,28 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 <div className="text-2xl font-bold text-green-600">
                   {uploadResult.processed || 0}
                 </div>
-                <div className="text-sm text-gray-600">Processed</div>
+                <div className="text-sm text-gray-600">{t('results.metrics.processed')}</div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-600">
                   {uploadResult.skipped || 0}
                 </div>
-                <div className="text-sm text-gray-600">Skipped</div>
+                <div className="text-sm text-gray-600">{t('results.metrics.skipped')}</div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
                   {uploadResult.performance_metrics?.items_per_second || 0}
                 </div>
-                <div className="text-sm text-gray-600">Items/sec</div>
+                <div className="text-sm text-gray-600">{t('results.metrics.itemsPerSec')}</div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {uploadResult.processing_time_ms || 0}ms
                 </div>
-                <div className="text-sm text-gray-600">Total time</div>
+                <div className="text-sm text-gray-600">{t('results.metrics.totalTime')}</div>
               </div>
             </div>
 
@@ -325,7 +327,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <Zap className="h-4 w-4 text-blue-500" />
-                  Bulk Operation Performance Breakdown
+                  {t('results.performance.title')}
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                   {uploadResult.performance_metrics.duplicate_detection_ms > 0 && (
@@ -333,7 +335,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="font-bold text-orange-600">
                         {uploadResult.performance_metrics.duplicate_detection_ms}ms
                       </div>
-                      <div className="text-gray-600">Duplicate Check</div>
+                      <div className="text-gray-600">{t('results.performance.duplicateCheck')}</div>
                     </div>
                   )}
                   {uploadResult.performance_metrics.product_resolution_ms > 0 && (
@@ -341,7 +343,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="font-bold text-cyan-600">
                         {uploadResult.performance_metrics.product_resolution_ms}ms
                       </div>
-                      <div className="text-gray-600">Product Resolution</div>
+                      <div className="text-gray-600">{t('results.performance.productResolution')}</div>
                     </div>
                   )}
                   {uploadResult.performance_metrics.batch_insertion_ms > 0 && (
@@ -349,7 +351,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="font-bold text-indigo-600">
                         {uploadResult.performance_metrics.batch_insertion_ms}ms
                       </div>
-                      <div className="text-gray-600">Batch Insertion</div>
+                      <div className="text-gray-600">{t('results.performance.batchInsertion')}</div>
                     </div>
                   )}
                   {uploadResult.performance_metrics.products_created &&
@@ -358,7 +360,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         <div className="font-bold text-emerald-600">
                           {uploadResult.performance_metrics.products_created}
                         </div>
-                        <div className="text-gray-600">Products Created</div>
+                        <div className="text-gray-600">{t('results.performance.productsCreated')}</div>
                       </div>
                     )}
                   {uploadResult.performance_metrics.database_processing_time_ms &&
@@ -367,21 +369,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         <div className="font-bold text-purple-600">
                           {uploadResult.performance_metrics.database_processing_time_ms}ms
                         </div>
-                        <div className="text-gray-600">DB Processing</div>
+                        <div className="text-gray-600">{t('results.performance.dbProcessing')}</div>
                       </div>
                     )}
                 </div>
                 <div className="mt-2 text-xs text-gray-500 text-center">
-                  ⚡ Bulk operations reduced processing time by{' '}
-                  {Math.max(
-                    0,
-                    Math.round(
-                      (1 -
-                        (uploadResult.processing_time_ms || 0) / (uploadResult.total_items * 50)) *
-                        100,
+                  {t('results.performance.optimization', {
+                    percentage: Math.max(
+                      0,
+                      Math.round(
+                        (1 -
+                          (uploadResult.processing_time_ms || 0) / (uploadResult.total_items * 50)) *
+                          100,
+                      ),
                     ),
-                  )}
-                  % compared to individual processing
+                  })}
                 </div>
               </div>
             )}
@@ -391,7 +393,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <details className="bg-white rounded p-4 border">
                 <summary className="cursor-pointer font-semibold text-gray-700 flex items-center gap-2">
                   <SkipForward className="h-4 w-4" />
-                  View Skipped Duplicates ({uploadResult.duplicates_skipped.length})
+                  {t('results.duplicates.viewSkipped', { count: uploadResult.duplicates_skipped.length })}
                 </summary>
                 <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
                   {uploadResult.duplicates_skipped.map(
@@ -412,7 +414,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           {dup.sku} - {dup.product_name}
                         </div>
                         <div className="text-gray-600">
-                          Expiry: {dup.expiry_date} • {dup.reason}
+                          {t('results.duplicates.expiry')}: {dup.expiry_date} • {dup.reason}
                         </div>
                       </div>
                     ),
@@ -423,7 +425,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
             {/* Action Button */}
             <Button onClick={handleReset} className="w-full">
-              Upload Another File
+              {t('buttons.uploadAnother')}
             </Button>
           </div>
         </Card>
@@ -432,7 +434,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {/* Error Display */}
       {error && (
         <Alert variant="destructive">
-          <AlertTitle>Upload Failed</AlertTitle>
+          <AlertTitle>{t('errors.uploadFailed')}</AlertTitle>
           <AlertDescription>
             {error instanceof Error ? error.message : String(error)}
           </AlertDescription>
@@ -444,17 +446,17 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
         <div className="text-center text-sm text-blue-800">
           <div className="font-semibold mb-2 flex items-center justify-center gap-2">
             <Zap className="h-4 w-4 text-yellow-500" />
-            Bulk-Optimized Ultra-Fast Performance
+            {t('performanceInfo.title')}
             <Zap className="h-4 w-4 text-yellow-500" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-            <div>• 3 bulk database operations instead of N individual calls</div>
-            <div>• Automatic duplicate detection with zero user intervention</div>
-            <div>• Real-time performance metrics and timing breakdown</div>
-            <div>• Target: 1000+ items/sec with database RPC functions</div>
+            <div>• {t('performanceInfo.features.bulkOps')}</div>
+            <div>• {t('performanceInfo.features.autoDuplicate')}</div>
+            <div>• {t('performanceInfo.features.realtime')}</div>
+            <div>• {t('performanceInfo.features.target')}</div>
           </div>
           <div className="mt-2 text-xs text-purple-700 font-medium">
-            🚀 Optimized for maximum speed while maintaining data integrity
+            {t('performanceInfo.footer')}
           </div>
         </div>
       </Card>
