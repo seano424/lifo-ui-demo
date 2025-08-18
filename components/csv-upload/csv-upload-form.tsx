@@ -318,7 +318,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                 type="date"
                                 value=""
                                 onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                                placeholder="Select date"
+                                placeholder={t('preview.selectDate')}
                                 className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
                                 min={new Date().toISOString().split('T')[0]}
                               />
@@ -346,9 +346,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         </Badge>
                       </div>
                       <div className="font-medium">{item.Product_Name}</div>
-                      <div className="text-sm text-gray-600">Qty: {item.Quantity}</div>
+                      <div className="text-sm text-gray-600">{t('preview.quantityLabel')} {item.Quantity}</div>
                       <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-700">Expiry Date</label>
+                        <label className="text-xs font-medium text-gray-700">{t('preview.table.expiryDate')}</label>
                         {item.Expiry_Date ? (
                           <Input
                             type="date"
@@ -363,11 +363,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               type="date"
                               value=""
                               onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                              placeholder="Select date"
+                              placeholder={t('preview.selectDate')}
                               className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
                               min={new Date().toISOString().split('T')[0]}
                             />
-                            <span className="text-xs text-yellow-600">Missing expiry date</span>
+                            <span className="text-xs text-yellow-600">{t('preview.missingExpiryDate')}</span>
                           </div>
                         )}
                       </div>

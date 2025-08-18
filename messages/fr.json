@@ -737,7 +737,10 @@
         "category": "Catégorie",
         "quantity": "Qté",
         "expiryDate": "Date d'expiration"
-      }
+      },
+      "selectDate": "Sélectionner une date",
+      "missingExpiryDate": "Date d'expiration manquante",
+      "quantityLabel": "Qté :"
     },
     "buttons": {
       "upload": "Télécharger (Ignorer auto. les doublons)",

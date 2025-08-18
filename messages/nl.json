@@ -737,7 +737,10 @@
         "category": "Categorie",
         "quantity": "Aantal",
         "expiryDate": "Vervaldatum"
-      }
+      },
+      "selectDate": "Selecteer datum",
+      "missingExpiryDate": "Vervaldatum ontbreekt",
+      "quantityLabel": "Aantal:"
     },
     "buttons": {
       "upload": "Uploaden (Auto-sla duplicaten over)",

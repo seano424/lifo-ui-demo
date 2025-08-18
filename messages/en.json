@@ -720,7 +720,10 @@
         "category": "Category",
         "quantity": "Qty",
         "expiryDate": "Expiry Date"
-      }
+      },
+      "selectDate": "Select date",
+      "missingExpiryDate": "Missing expiry date",
+      "quantityLabel": "Qty:"
     },
     "buttons": {
       "upload": "Upload",
