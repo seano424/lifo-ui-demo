@@ -101,7 +101,11 @@ export async function POST(request: NextRequest) {
 
     if (defaultExpiryDate) {
       const itemsWithDefaultExpiry = csvData.filter(
-        (item: any) => item.Expiry_Date === defaultExpiryDate,
+        (item: Record<string, unknown>) =>
+          typeof item === 'object' &&
+          item !== null &&
+          'Expiry_Date' in item &&
+          item.Expiry_Date === defaultExpiryDate,
       ).length
       console.log(`📅 [UPLOAD-API] Applied default expiry date to ${itemsWithDefaultExpiry} items`)
     }

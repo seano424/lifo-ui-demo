@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import { Upload, FileCheck, CheckCircle, Zap, Clock, SkipForward, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
-import { CsvPreviewTable } from './csv-preview-table'
+import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
   storeId: string
@@ -200,25 +201,113 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <FileCheck className="h-5 w-5 text-green-500" />
-              <h3 className="font-semibold">{t('preview.title')}</h3>
-              <Badge variant="secondary">{t('preview.badge')}</Badge>
+              <Typography variant="h3">{t('preview.title')}</Typography>
             </div>
 
-            <CsvPreviewTable data={csvPreview} updateCsvItemExpiry={updateCsvItemExpiry} />
+            {/* Desktop table view */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full border-collapse border border-gray-200 text-sm">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.sku')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.productName')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.category')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.quantity')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.expiryDate')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {csvPreview.slice(0, 10).map((item, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
+                      <td className="border border-gray-200 p-2">{item.Product_Name}</td>
+                      <td className="border border-gray-200 p-2">
+                        <Badge variant="outline" className="text-xs">
+                          {item.Category}
+                        </Badge>
+                      </td>
+                      <td className="border border-gray-200 p-2 text-center">{item.Quantity}</td>
+                      <td className="border border-gray-200 p-2">
+                        {item.Expiry_Date ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="date"
+                              value={item.Expiry_Date}
+                              onChange={e => updateCsvItemExpiry(index, e.target.value)}
+                              className="text-xs h-7 min-w-[120px]"
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="date"
+                              value=""
+                              onChange={e => updateCsvItemExpiry(index, e.target.value)}
+                              placeholder="Select date"
+                              className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-            {/* Missing Expiry Dates Info */}
-            {columnMapping.itemsWithoutExpiry > 0 && (
-              <div className="space-y-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-yellow-600" />
-                  <h4 className="font-medium text-yellow-800">Missing Expiration Dates Detected</h4>
+            {/* Mobile card view */}
+            <div className="md:hidden space-y-3">
+              {csvPreview.slice(0, 10).map((item, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {item.Category}
+                      </Badge>
+                    </div>
+                    <div className="font-medium">{item.Product_Name}</div>
+                    <div className="text-sm text-gray-600">Qty: {item.Quantity}</div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-gray-700">Expiry Date</label>
+                      {item.Expiry_Date ? (
+                        <Input
+                          type="date"
+                          value={item.Expiry_Date}
+                          onChange={e => updateCsvItemExpiry(index, e.target.value)}
+                          className="text-sm h-8"
+                          min={new Date().toISOString().split('T')[0]}
+                        />
+                      ) : (
+                        <div className="space-y-1">
+                          <Input
+                            type="date"
+                            value=""
+                            onChange={e => updateCsvItemExpiry(index, e.target.value)}
+                            placeholder="Select date"
+                            className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
+                            min={new Date().toISOString().split('T')[0]}
+                          />
+                          <span className="text-xs text-yellow-600">Missing expiry date</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-yellow-700">
-                  {columnMapping.itemsWithoutExpiry} items don&apos;t have expiration dates. Please
-                  set individual expiration dates in the table above before uploading.
-                </p>
-              </div>
-            )}
+              ))}
+            </div>
 
             {/* Upload Actions */}
             <div className="flex gap-3">
