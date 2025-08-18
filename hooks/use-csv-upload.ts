@@ -87,10 +87,9 @@ export function useCSVUpload() {
     const hasExpiryColumn = expiryIndex >= 0
     let itemsWithoutExpiry = 0
 
-    const previewLimit = Math.min(11, lines.length)
-    console.log(`🔍 [USE-CSV-UPLOAD] Processing ${previewLimit - 1} preview rows...`)
+    console.log(`🔍 [USE-CSV-UPLOAD] Processing all ${lines.length - 1} rows...`)
 
-    for (let i = 1; i < previewLimit; i++) {
+    for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
       const expiryValue = values[expiryIndex] || ''
       if (!expiryValue) {

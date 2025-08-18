@@ -6,7 +6,16 @@ import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Upload, FileCheck, CheckCircle, Zap, Clock, SkipForward, Calendar } from 'lucide-react'
+import {
+  Upload,
+  FileCheck,
+  CheckCircle,
+  Zap,
+  Clock,
+  SkipForward,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { toast } from 'sonner'
@@ -22,7 +31,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const t = useTranslations('csvUpload')
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [currentPage, setCurrentPage] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const itemsPerPage = 10
 
   const {
     csvPreview,
@@ -129,11 +141,31 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const handleReset = () => {
     console.log('🔄 [CSV-UPLOAD-FORM] Resetting form state')
     setSelectedFile(null)
+    setCurrentPage(0)
     resetPreview()
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
     console.log('✅ [CSV-UPLOAD-FORM] Form reset complete')
+  }
+
+  // Pagination calculations
+  const totalPages = Math.ceil(csvPreview.length / itemsPerPage)
+  const startIndex = currentPage * itemsPerPage
+  const endIndex = Math.min(startIndex + itemsPerPage, csvPreview.length)
+  const currentItems = csvPreview.slice(startIndex, endIndex)
+
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1)
+    }
   }
 
   return (
@@ -199,9 +231,39 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <FileCheck className="h-5 w-5 text-green-500" />
-              <Typography variant="h3">{t('preview.title')}</Typography>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileCheck className="h-5 w-5 text-green-500" />
+                <Typography variant="h3">{t('preview.title')}</Typography>
+                <span className="text-sm text-gray-600">
+                  ({startIndex + 1}-{endIndex} of {csvPreview.length} items)
+                </span>
+              </div>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 0}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-xs text-gray-500 min-w-[60px] text-center">
+                    Page {currentPage + 1} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages - 1}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Desktop table view */}
@@ -227,86 +289,92 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {csvPreview.slice(0, 10).map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
-                      <td className="border border-gray-200 p-2">{item.Product_Name}</td>
-                      <td className="border border-gray-200 p-2">
-                        <Badge variant="outline" className="text-xs">
-                          {item.Category}
-                        </Badge>
-                      </td>
-                      <td className="border border-gray-200 p-2 text-center">{item.Quantity}</td>
-                      <td className="border border-gray-200 p-2">
-                        {item.Expiry_Date ? (
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="date"
-                              value={item.Expiry_Date}
-                              onChange={e => updateCsvItemExpiry(index, e.target.value)}
-                              className="text-xs h-7 min-w-[120px]"
-                              min={new Date().toISOString().split('T')[0]}
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="date"
-                              value=""
-                              onChange={e => updateCsvItemExpiry(index, e.target.value)}
-                              placeholder="Select date"
-                              className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
-                              min={new Date().toISOString().split('T')[0]}
-                            />
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {currentItems.map((item, index) => {
+                    const actualIndex = startIndex + index
+                    return (
+                      <tr key={actualIndex} className="hover:bg-gray-50">
+                        <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
+                        <td className="border border-gray-200 p-2">{item.Product_Name}</td>
+                        <td className="border border-gray-200 p-2">
+                          <Badge variant="outline" className="text-xs">
+                            {item.Category}
+                          </Badge>
+                        </td>
+                        <td className="border border-gray-200 p-2 text-center">{item.Quantity}</td>
+                        <td className="border border-gray-200 p-2">
+                          {item.Expiry_Date ? (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="date"
+                                value={item.Expiry_Date}
+                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                                className="text-xs h-7 min-w-[120px]"
+                                min={new Date().toISOString().split('T')[0]}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="date"
+                                value=""
+                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                                placeholder="Select date"
+                                className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
+                                min={new Date().toISOString().split('T')[0]}
+                              />
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile card view */}
             <div className="md:hidden space-y-3">
-              {csvPreview.slice(0, 10).map((item, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-3 bg-white">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {item.Category}
-                      </Badge>
-                    </div>
-                    <div className="font-medium">{item.Product_Name}</div>
-                    <div className="text-sm text-gray-600">Qty: {item.Quantity}</div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-gray-700">Expiry Date</label>
-                      {item.Expiry_Date ? (
-                        <Input
-                          type="date"
-                          value={item.Expiry_Date}
-                          onChange={e => updateCsvItemExpiry(index, e.target.value)}
-                          className="text-sm h-8"
-                          min={new Date().toISOString().split('T')[0]}
-                        />
-                      ) : (
-                        <div className="space-y-1">
+              {currentItems.map((item, index) => {
+                const actualIndex = startIndex + index
+                return (
+                  <div key={actualIndex} className="border border-gray-200 rounded-lg p-3 bg-white">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {item.Category}
+                        </Badge>
+                      </div>
+                      <div className="font-medium">{item.Product_Name}</div>
+                      <div className="text-sm text-gray-600">Qty: {item.Quantity}</div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-700">Expiry Date</label>
+                        {item.Expiry_Date ? (
                           <Input
                             type="date"
-                            value=""
-                            onChange={e => updateCsvItemExpiry(index, e.target.value)}
-                            placeholder="Select date"
-                            className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
+                            value={item.Expiry_Date}
+                            onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                            className="text-sm h-8"
                             min={new Date().toISOString().split('T')[0]}
                           />
-                          <span className="text-xs text-yellow-600">Missing expiry date</span>
-                        </div>
-                      )}
+                        ) : (
+                          <div className="space-y-1">
+                            <Input
+                              type="date"
+                              value=""
+                              onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                              placeholder="Select date"
+                              className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                            <span className="text-xs text-yellow-600">Missing expiry date</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Upload Actions */}

@@ -730,8 +730,7 @@
       "chooseFile": "Choisir un fichier"
     },
     "preview": {
-      "title": "Aperçu (10 premières lignes)",
-      "badge": "Les doublons sont automatiquement ignorés lors du téléchargement",
+      "title": "Aperçu",
       "table": {
         "sku": "SKU",
         "productName": "Nom du produit",

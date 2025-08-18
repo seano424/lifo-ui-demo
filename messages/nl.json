@@ -730,8 +730,7 @@
       "chooseFile": "Bestand kiezen"
     },
     "preview": {
-      "title": "Voorbeeld (Eerste 10 rijen)",
-      "badge": "Duplicaten worden automatisch overgeslagen tijdens upload",
+      "title": "Voorbeeld",
       "table": {
         "sku": "SKU",
         "productName": "Productnaam",

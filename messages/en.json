@@ -713,8 +713,7 @@
       "chooseFile": "Choose File"
     },
     "preview": {
-      "title": "Preview (First 10 rows)",
-      "badge": "Duplicates auto-skipped during upload",
+      "title": "Preview",
       "table": {
         "sku": "SKU",
         "productName": "Product Name",
@@ -724,7 +723,7 @@
       }
     },
     "buttons": {
-      "upload": "Upload (Auto-skip duplicates)",
+      "upload": "Upload",
       "processing": "Processing...",
       "reset": "Reset",
       "uploadAnother": "Upload Another File"
