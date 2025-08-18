@@ -47,12 +47,14 @@ export async function POST(request: NextRequest) {
 
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
+    const defaultExpiryDate = formData.get('defaultExpiryDate') as string
 
     console.log('📁 [UPLOAD-API] File and store info received:', {
       fileName: file?.name,
       fileSize: file?.size,
       fileType: file?.type,
       storeId,
+      defaultExpiryDate: defaultExpiryDate || 'none',
       hasFile: !!file,
       hasStoreId: !!storeId,
     })
@@ -91,11 +93,18 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 [UPLOAD-API] Parsing CSV content...')
     const csvParseStartTime = Date.now()
-    const csvData = fastParseCSV(csvContent)
+    const csvData = fastParseCSV(csvContent, defaultExpiryDate)
     const csvParseEndTime = Date.now()
     console.log(
       `✅ [UPLOAD-API] CSV parsed in ${csvParseEndTime - csvParseStartTime}ms, items found: ${csvData.length}`,
     )
+
+    if (defaultExpiryDate) {
+      const itemsWithDefaultExpiry = csvData.filter(
+        (item: any) => item.Expiry_Date === defaultExpiryDate,
+      ).length
+      console.log(`📅 [UPLOAD-API] Applied default expiry date to ${itemsWithDefaultExpiry} items`)
+    }
 
     if (csvData.length === 0) {
       console.error('❌ [UPLOAD-API] No valid data found in CSV file')
@@ -203,7 +212,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Fast CSV parser with intelligent header detection
-function fastParseCSV(csvContent: string) {
+function fastParseCSV(csvContent: string, defaultExpiryDate?: string) {
   const lines = csvContent.trim().split('\n')
   if (lines.length < 2) return []
 
@@ -239,12 +248,15 @@ function fastParseCSV(csvContent: string) {
 
       if (values.length < 3) continue
 
+      const expiryValue = values[expiryIndex] || ''
+      const finalExpiryDate = expiryValue || defaultExpiryDate || ''
+
       const item = {
         SKU: values[skuIndex] || `AUTO-${Date.now()}-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
         Category: values[categoryIndex] || 'dry_goods',
         Quantity: parseInt(values[qtyIndex] || '1') || 1,
-        Expiry_Date: values[expiryIndex] || '',
+        Expiry_Date: finalExpiryDate,
         Brand: values[brandIndex] || 'Unknown',
         Cost_Price: parseFloat(values[costIndex] || '0') || 0,
         Selling_Price: parseFloat(values[priceIndex] || '0') || 0,
@@ -253,6 +265,9 @@ function fastParseCSV(csvContent: string) {
       }
 
       if (item.Product_Name && item.Expiry_Date) {
+        data.push(item)
+      } else if (item.Product_Name && defaultExpiryDate) {
+        // Allow items without expiry date if we have a default
         data.push(item)
       }
     } catch (error) {

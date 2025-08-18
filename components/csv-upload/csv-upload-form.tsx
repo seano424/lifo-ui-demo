@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Upload, FileCheck, CheckCircle, Zap, Clock, SkipForward } from 'lucide-react'
+import { Upload, FileCheck, CheckCircle, Zap, Clock, SkipForward, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { CsvPreviewTable } from './csv-preview-table'
 
 interface CSVUploadFormProps {
   storeId: string
@@ -31,6 +32,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     data: uploadResult,
     error,
     resetPreview,
+    columnMapping,
+    updateCsvItemExpiry,
   } = useCSVUpload()
 
   const handleDrag = (e: React.DragEvent) => {
@@ -111,7 +114,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     console.log('⚡ [CSV-UPLOAD-FORM] Calling mutation with BULK OPTIMIZATION ENABLED')
 
     try {
-      upload({ file: selectedFile, storeId })
+      upload({
+        file: selectedFile,
+        storeId,
+        csvData: csvPreview, // Send the modified CSV data with individual expiry dates
+      })
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] Upload initiation error:', error)
       toast.error(t('errors.startFailed'))
@@ -129,7 +136,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Ultra-Fast Upload Header */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -197,50 +204,30 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <Badge variant="secondary">{t('preview.badge')}</Badge>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-200 text-sm">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.sku')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.productName')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.category')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.quantity')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.expiryDate')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {csvPreview.slice(0, 10).map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
-                      <td className="border border-gray-200 p-2">{item.Product_Name}</td>
-                      <td className="border border-gray-200 p-2">
-                        <Badge variant="outline" className="text-xs">
-                          {item.Category}
-                        </Badge>
-                      </td>
-                      <td className="border border-gray-200 p-2 text-center">{item.Quantity}</td>
-                      <td className="border border-gray-200 p-2 font-mono text-xs">
-                        {item.Expiry_Date}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CsvPreviewTable data={csvPreview} updateCsvItemExpiry={updateCsvItemExpiry} />
+
+            {/* Missing Expiry Dates Info */}
+            {columnMapping.itemsWithoutExpiry > 0 && (
+              <div className="space-y-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-yellow-600" />
+                  <h4 className="font-medium text-yellow-800">Missing Expiration Dates Detected</h4>
+                </div>
+                <p className="text-sm text-yellow-700">
+                  {columnMapping.itemsWithoutExpiry} items don&apos;t have expiration dates. Please
+                  set individual expiration dates in the table above before uploading.
+                </p>
+              </div>
+            )}
 
             {/* Upload Actions */}
             <div className="flex gap-3">
-              <Button onClick={handleUpload} disabled={isUploading} className="flex-1" size="lg">
+              <Button
+                onClick={handleUpload}
+                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0}
+                className="flex-1"
+                size="lg"
+              >
                 {isUploading ? (
                   <>
                     <Clock className="h-4 w-4 mr-2 animate-spin" />
@@ -270,21 +257,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <CheckCircle className="h-6 w-6 text-green-600" />
               <h3 className="font-semibold text-green-800 text-lg">{t('results.title')}</h3>
             </div>
-
-            {/* Debug: Log detailed results */}
-            {(() => {
-              console.log('🎉 [CSV-UPLOAD-FORM] Upload results received:', {
-                success: uploadResult.success,
-                processed: uploadResult.processed,
-                skipped: uploadResult.skipped,
-                total_items: uploadResult.total_items,
-                processing_time_ms: uploadResult.processing_time_ms,
-                performance_metrics: uploadResult.performance_metrics,
-                duplicates_count: uploadResult.duplicates_skipped?.length || 0,
-                errors_count: uploadResult.errors?.length || 0,
-              })
-              return null
-            })()}
 
             {/* Success Summary */}
             <div className="text-center p-3 bg-white rounded border border-green-300">
