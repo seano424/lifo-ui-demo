@@ -158,7 +158,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const endIndex = Math.min(startIndex + itemsPerPage, csvPreview.length)
   const currentItems = csvPreview.slice(startIndex, endIndex)
 
-
   const goToNextPage = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1)
@@ -314,7 +313,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="min-w-[30px] text-center font-mono text-sm">{item.Quantity}</span>
+                            <span className="min-w-[30px] text-center font-mono text-sm">
+                              {item.Quantity}
+                            </span>
                             <Button
                               variant="outline"
                               size="sm"
@@ -382,7 +383,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="min-w-[30px] text-center font-mono text-sm">{item.Quantity}</span>
+                          <span className="min-w-[30px] text-center font-mono text-sm">
+                            {item.Quantity}
+                          </span>
                           <Button
                             variant="outline"
                             size="sm"
@@ -394,7 +397,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-700">{t('preview.table.expiryDate')}</label>
+                        <label className="text-xs font-medium text-gray-700">
+                          {t('preview.table.expiryDate')}
+                        </label>
                         {item.Expiry_Date ? (
                           <Input
                             type="date"
@@ -413,7 +418,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
                               min={new Date().toISOString().split('T')[0]}
                             />
-                            <span className="text-xs text-yellow-600">{t('preview.missingExpiryDate')}</span>
+                            <span className="text-xs text-yellow-600">
+                              {t('preview.missingExpiryDate')}
+                            </span>
                           </div>
                         )}
                       </div>
