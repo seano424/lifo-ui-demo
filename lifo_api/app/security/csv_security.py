@@ -4,10 +4,9 @@ Provides comprehensive security for CSV file uploads and processing
 Prevents formula injection, validates file content, and sanitizes data
 """
 
-import mimetypes
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import magic
 import structlog
@@ -63,7 +62,7 @@ class CSVSecurityValidator:
 
     def validate_file_upload(
         self, file_content: bytes, filename: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Comprehensive file upload validation
 
@@ -133,7 +132,7 @@ class CSVSecurityValidator:
             self.logger.error("File validation error", error=str(e))
             raise CSVSecurityError(f"Validation failed: {str(e)}")
 
-    def sanitize_csv_content(self, content: str) -> Tuple[str, List[str]]:
+    def sanitize_csv_content(self, content: str) -> tuple[str, list[str]]:
         """
         Sanitize CSV content to prevent formula injection attacks
 
@@ -195,7 +194,7 @@ class CSVSecurityValidator:
             # Fallback to basic detection
             return "text/plain"
 
-    def _validate_content_structure(self, file_content: bytes) -> Dict[str, Any]:
+    def _validate_content_structure(self, file_content: bytes) -> dict[str, Any]:
         """Validate CSV content structure"""
         try:
             # Decode content
@@ -228,7 +227,7 @@ class CSVSecurityValidator:
             "content_preview": content[:500] if content else "",
         }
 
-    def _scan_for_security_threats(self, file_content: bytes) -> List[str]:
+    def _scan_for_security_threats(self, file_content: bytes) -> list[str]:
         """Scan for security threats in file content"""
         threats = []
 
@@ -266,7 +265,7 @@ class CSVSecurityValidator:
 
         return threats
 
-    def _parse_csv_fields(self, line: str) -> List[str]:
+    def _parse_csv_fields(self, line: str) -> list[str]:
         """Simple CSV field parsing for security (not full CSV parser)"""
         # Handle quoted fields properly
         fields = []
@@ -293,7 +292,7 @@ class CSVSecurityValidator:
 
         return fields
 
-    def _sanitize_field(self, field: str) -> Tuple[str, List[str]]:
+    def _sanitize_field(self, field: str) -> tuple[str, list[str]]:
         """Sanitize individual CSV field"""
         changes = []
         original_field = field
@@ -343,7 +342,7 @@ class CSVSecurityValidator:
         return field, changes
 
 
-def validate_and_sanitize_csv(file_content: bytes, filename: str) -> Dict[str, Any]:
+def validate_and_sanitize_csv(file_content: bytes, filename: str) -> dict[str, Any]:
     """
     Main function to validate and sanitize CSV uploads
 

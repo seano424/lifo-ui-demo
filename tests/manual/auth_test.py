@@ -4,10 +4,7 @@ Authentication Testing for LIFO AI Engine
 Tests JWT token creation and authentication flow
 """
 
-import json
-import os
 import time
-from datetime import datetime, timedelta
 
 import jwt
 import requests
@@ -68,7 +65,7 @@ def main():
 
     results = []
 
-    for user_id, store_id in zip(test_users, test_stores):
+    for user_id, store_id in zip(test_users, test_stores, strict=False):
         print(f"\n🧪 Testing with User: {user_id[-8:]} | Store: {store_id[-8:]}")
         print("-" * 40)
 
@@ -115,10 +112,10 @@ def main():
                             )
                     elif status_code == 403:
                         print(
-                            f"      🔒 Still forbidden - may need different auth or permissions"
+                            "      🔒 Still forbidden - may need different auth or permissions"
                         )
                     elif status_code == 404:
-                        print(f"      🔍 Endpoint exists but no data found")
+                        print("      🔍 Endpoint exists but no data found")
 
                     results.append(
                         {
@@ -146,7 +143,7 @@ def main():
             print(f"❌ Failed to create JWT token: {e}")
 
     # Test without authentication for comparison
-    print(f"\n🔓 Testing without authentication (comparison)")
+    print("\n🔓 Testing without authentication (comparison)")
     print("-" * 40)
 
     test_endpoint = f"/api/v1/scoring/batch/{test_stores[0]}"
@@ -157,7 +154,7 @@ def main():
         print(f"  No Auth: Error - {e}")
 
     # Summary
-    print(f"\n📊 AUTHENTICATION TEST SUMMARY")
+    print("\n📊 AUTHENTICATION TEST SUMMARY")
     print("=" * 50)
 
     successful_auth = len([r for r in results if r.get("status_code") in [200, 404]])
@@ -169,15 +166,15 @@ def main():
     print(f"🔧 Total auth tests: {total_tests}")
 
     if successful_auth > 0:
-        print(f"\n🎉 JWT authentication is working! Some endpoints are accessible.")
+        print("\n🎉 JWT authentication is working! Some endpoints are accessible.")
     elif still_forbidden == total_tests:
-        print(f"\n⚠️ JWT tokens created but endpoints still return 403.")
-        print(f"   This may indicate:")
-        print(f"   - Additional permissions/roles required")
-        print(f"   - Row Level Security (RLS) policies blocking access")
-        print(f"   - Different token format expected")
+        print("\n⚠️ JWT tokens created but endpoints still return 403.")
+        print("   This may indicate:")
+        print("   - Additional permissions/roles required")
+        print("   - Row Level Security (RLS) policies blocking access")
+        print("   - Different token format expected")
     else:
-        print(f"\n❌ Authentication test inconclusive.")
+        print("\n❌ Authentication test inconclusive.")
 
     return results
 

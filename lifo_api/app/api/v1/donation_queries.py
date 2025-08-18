@@ -5,7 +5,7 @@ Based on simplified schema from migration 017
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -27,8 +27,8 @@ router = APIRouter()
 
 @router.get("/recipients")
 async def get_donation_recipients(
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
-    recipient_type: Optional[DonationRecipientType] = Query(
+    store_id: str | None = Query(None, description="Filter by store ID"),
+    recipient_type: DonationRecipientType | None = Query(
         None, description="Filter by recipient type"
     ),
     is_active: bool = Query(True, description="Filter by active status"),
@@ -86,8 +86,8 @@ async def get_donation_recipients(
 
 @router.get("/actions")
 async def get_batch_actions(
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
-    action_type: Optional[ActionType] = Query(
+    store_id: str | None = Query(None, description="Filter by store ID"),
+    action_type: ActionType | None = Query(
         None, description="Filter by action type"
     ),
     days: int = Query(30, description="Number of days to look back"),
@@ -153,7 +153,7 @@ async def get_batch_actions(
 
 @router.get("/analytics/summary")
 async def get_donation_analytics_summary(
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
+    store_id: str | None = Query(None, description="Filter by store ID"),
     days: int = Query(30, description="Number of days to analyze"),
     db: AsyncSession = Depends(get_database),
     current_user: dict[str, Any] = Depends(get_current_user),

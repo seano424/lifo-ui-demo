@@ -3,15 +3,14 @@ Comprehensive alerting system for LIFO AI Engine
 Proactive monitoring with configurable thresholds and notifications
 """
 
-import asyncio
-import json
 import threading
 import time
 from collections import defaultdict, deque
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import structlog
 
@@ -43,11 +42,11 @@ class Alert:
     severity: AlertSeverity
     title: str
     message: str
-    context: Dict[str, Any]
+    context: dict[str, Any]
     timestamp: datetime
     status: AlertStatus = AlertStatus.ACTIVE
-    resolved_at: Optional[datetime] = None
-    suppressed_until: Optional[datetime] = None
+    resolved_at: datetime | None = None
+    suppressed_until: datetime | None = None
     escalation_level: int = 0
     notification_count: int = 0
 
@@ -104,7 +103,7 @@ class AlertManager:
     def add_alert_rule(
         self,
         name: str,
-        condition: Callable[[Dict[str, Any]], Optional[Dict[str, Any]]],
+        condition: Callable[[dict[str, Any]], dict[str, Any] | None],
         severity: AlertSeverity,
         title: str,
         message_template: str,
@@ -125,7 +124,7 @@ class AlertManager:
 
         logger.info("Alert rule added", rule_name=name, severity=severity.value)
 
-    def check_metrics(self, metrics: Dict[str, Any]):
+    def check_metrics(self, metrics: dict[str, Any]):
         """Check metrics against all alert rules"""
         with self.lock:
             current_time = datetime.utcnow()
@@ -167,8 +166,8 @@ class AlertManager:
     def _create_alert(
         self,
         rule_name: str,
-        rule_config: Dict[str, Any],
-        context: Dict[str, Any],
+        rule_config: dict[str, Any],
+        context: dict[str, Any],
         timestamp: datetime,
     ) -> Alert:
         """Create a new alert from rule and context"""
@@ -278,8 +277,8 @@ class AlertManager:
         processor_thread.start()
 
     def _check_mobile_response_time(
-        self, metrics: Dict[str, Any], threshold_ms: float, endpoint_pattern: str
-    ) -> Optional[Dict[str, Any]]:
+        self, metrics: dict[str, Any], threshold_ms: float, endpoint_pattern: str
+    ) -> dict[str, Any] | None:
         """Check mobile endpoint response times"""
         api_metrics = metrics.get("api_metrics", {})
 
@@ -296,12 +295,12 @@ class AlertManager:
 
         return None
 
-    def get_active_alerts(self) -> List[Dict[str, Any]]:
+    def get_active_alerts(self) -> list[dict[str, Any]]:
         """Get all active alerts"""
         with self.lock:
             return [asdict(alert) for alert in self.active_alerts.values()]
 
-    def get_alert_history(self, hours: int = 24) -> List[Dict[str, Any]]:
+    def get_alert_history(self, hours: int = 24) -> list[dict[str, Any]]:
         """Get alert history for specified time period"""
         cutoff_time = datetime.utcnow() - timedelta(hours=hours)
 

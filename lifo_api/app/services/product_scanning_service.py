@@ -6,10 +6,9 @@ Focused on complex image processing while frontend handles simple product lookup
 import asyncio
 import re
 from datetime import datetime, timedelta
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 import structlog
-from pydantic import BaseModel
 
 from app.models.base import ConfigurableModel
 from app.services.vision_service import GoogleVisionService, VisionScanResult
@@ -24,12 +23,12 @@ class ProductScanResult(ConfigurableModel):
     vision_result: VisionScanResult
 
     # Extracted data from image processing
-    primary_barcode: Optional[str] = None
-    suggested_expiry_date: Optional[datetime] = None
+    primary_barcode: str | None = None
+    suggested_expiry_date: datetime | None = None
     confidence_score: float = 0.0
 
     # OCR extracted text suggestions
-    suggested_name: Optional[str] = None
+    suggested_name: str | None = None
     raw_text_blocks: list[str] = []
 
     # Processing metadata
@@ -68,7 +67,7 @@ class ProductScanningService:
     Focused on OCR, barcode detection, and text extraction
     """
 
-    def __init__(self, vision_service: Optional[GoogleVisionService] = None):
+    def __init__(self, vision_service: GoogleVisionService | None = None):
         """Initialize scanning service with vision API client"""
         self.vision_service = vision_service or GoogleVisionService()
 
@@ -80,7 +79,7 @@ class ProductScanningService:
         self._last_dual_dates = {"expiry_date": None, "manufacture_date": None}
 
     async def scan_product_image(
-        self, image_data: bytes, workflow: Optional[ScanningWorkflow] = None
+        self, image_data: bytes, workflow: ScanningWorkflow | None = None
     ) -> ProductScanResult:
         """
         Perform image scanning focused on OCR and barcode detection
@@ -158,7 +157,7 @@ class ProductScanningService:
             )
             raise ProductScanningError(f"Image processing failed: {str(e)}")
 
-    async def extract_primary_barcode(self, image_data: bytes) -> Optional[str]:
+    async def extract_primary_barcode(self, image_data: bytes) -> str | None:
         """Extract primary barcode from image - simple wrapper for frontend"""
         try:
             vision_result = await self._process_image_with_timeout(
@@ -169,7 +168,7 @@ class ProductScanningService:
             logger.warning(f"Barcode extraction failed: {e}")
             return None
 
-    async def extract_expiry_date(self, image_data: bytes) -> Optional[datetime]:
+    async def extract_expiry_date(self, image_data: bytes) -> datetime | None:
         """Extract expiry date from image - simple wrapper for frontend"""
         try:
             vision_result = await self._process_image_with_timeout(
@@ -188,7 +187,7 @@ class ProductScanningService:
             return await asyncio.wait_for(
                 self.vision_service.process_image(image_data), timeout=timeout_ms / 1000
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise ProductScanningError(
                 f"Vision processing timed out after {timeout_ms}ms",
                 error_type="timeout_error",
@@ -196,7 +195,7 @@ class ProductScanningService:
 
     def _extract_primary_barcode(
         self, vision_result: VisionScanResult
-    ) -> Optional[str]:
+    ) -> str | None:
         """Extract the most confident barcode from vision results"""
         if not vision_result.barcodes:
             return None
@@ -211,7 +210,7 @@ class ProductScanningService:
 
     def _extract_all_dates_with_classification(
         self, vision_result: VisionScanResult
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Extract and classify ALL dates as manufacture vs expiry for dual extraction"""
 
         all_candidate_dates = []
@@ -279,7 +278,7 @@ class ProductScanningService:
 
     def _extract_best_expiry_date(
         self, vision_result: VisionScanResult
-    ) -> Optional[datetime]:
+    ) -> datetime | None:
         """Extract the best expiry date (legacy method for backward compatibility)"""
         dual_dates = self._select_best_manufacture_and_expiry_dates(vision_result)
         return dual_dates.get("expiry_date")
@@ -417,10 +416,10 @@ class ProductScanningService:
         }
         return priority_scores.get(date_type, 0.0)
 
-    def _try_parse_barcode_as_date(self, barcode_value: str) -> Optional[datetime]:
+    def _try_parse_barcode_as_date(self, barcode_value: str) -> datetime | None:
         """Try to parse a barcode value as a date"""
         import re
-        from datetime import datetime, timedelta
+        from datetime import datetime
 
         # Common date patterns that might be misclassified as barcodes
         date_patterns = [
@@ -647,7 +646,7 @@ class ProductScanningService:
         },
     }
 
-    def _detect_european_date_type(self, text: str) -> Tuple[str, float, str]:
+    def _detect_european_date_type(self, text: str) -> tuple[str, float, str]:
         """Detect date type with enhanced European language support for dual extraction"""
         if not text:
             return "unknown", 0.3, "unknown"
@@ -732,10 +731,10 @@ class ProductScanningService:
 
         return max(0.0, min(1.0, final_score))  # Clamp to [0.0, 1.0]
 
-    def _extract_dates_from_text_fragments(self, text_blocks) -> List[dict]:
+    def _extract_dates_from_text_fragments(self, text_blocks) -> list[dict]:
         """Extract dates from fragmented OCR text blocks"""
         import re
-        from datetime import datetime, timedelta
+        from datetime import datetime
 
         candidate_dates = []
 
@@ -870,7 +869,7 @@ class ProductScanningService:
 
         return candidate_dates
 
-    def _select_best_expiry_date(self, candidate_dates: list[dict]) -> Optional[dict]:
+    def _select_best_expiry_date(self, candidate_dates: list[dict]) -> dict | None:
         """Select the best expiry date from candidates using European date type priority"""
         if not candidate_dates:
             return None
@@ -923,7 +922,7 @@ class ProductScanningService:
 
         return best_candidate
 
-    def _parse_european_month(self, month_name: str) -> Optional[int]:
+    def _parse_european_month(self, month_name: str) -> int | None:
         """Parse European month name to month number"""
         if not month_name:
             return None
@@ -951,13 +950,13 @@ class ProductScanningService:
 
         return None
 
-    def get_last_date_metadata(self) -> Optional[dict]:
+    def get_last_date_metadata(self) -> dict | None:
         """Get metadata for the last selected expiry date"""
         return self._last_selected_date_metadata
 
     def _construct_product_name(
         self, text_blocks: list[str], raw_ocr: list
-    ) -> Optional[str]:
+    ) -> str | None:
         """Universal product name construction using intelligent text analysis"""
 
         # Filter and score text blocks
@@ -1200,7 +1199,7 @@ class ProductScanningService:
 
     def _strategy_brand_product_descriptor(
         self, candidates: list[dict]
-    ) -> Optional[str]:
+    ) -> str | None:
         """Try to construct name with brand + product + descriptors"""
         brands = [c for c in candidates if c["category"] == "brand"][:2]
         products = [c for c in candidates if c["category"] == "product"][:2]
@@ -1217,7 +1216,7 @@ class ProductScanningService:
 
     def _strategy_longest_meaningful_sequence(
         self, candidates: list[dict]
-    ) -> Optional[str]:
+    ) -> str | None:
         """Find the longest sequence of high-scoring adjacent blocks"""
         if len(candidates) < 2:
             return None
@@ -1239,14 +1238,14 @@ class ProductScanningService:
             return " ".join(best_sequence[:5])  # Max 5 words
         return None
 
-    def _strategy_high_confidence_blocks(self, candidates: list[dict]) -> Optional[str]:
+    def _strategy_high_confidence_blocks(self, candidates: list[dict]) -> str | None:
         """Use highest-scoring individual blocks"""
         high_conf = [c for c in candidates if c["score"] >= 0.5][:4]
         if len(high_conf) >= 2:
             return " ".join([c["text"] for c in high_conf])
         return None
 
-    def _strategy_alphabetic_blocks(self, candidates: list[dict]) -> Optional[str]:
+    def _strategy_alphabetic_blocks(self, candidates: list[dict]) -> str | None:
         """Fallback: use any alphabetic blocks with decent scores"""
         alpha_blocks = [
             c for c in candidates if c["text"].isalpha() and c["score"] >= 0.3
@@ -1323,8 +1322,8 @@ class ProductScanningService:
     def _calculate_confidence_scores(
         self,
         vision_result: VisionScanResult,
-        primary_barcode: Optional[str],
-        suggested_expiry: Optional[datetime],
+        primary_barcode: str | None,
+        suggested_expiry: datetime | None,
     ) -> dict[str, float]:
         """Calculate confidence scores for different aspects"""
 

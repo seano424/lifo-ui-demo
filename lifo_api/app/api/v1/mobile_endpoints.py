@@ -7,7 +7,7 @@ Target: <0.5s response time, minimal data transfer
 import time
 from datetime import date, datetime
 from functools import lru_cache
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -36,8 +36,6 @@ from app.utils.mobile_queries import create_mobile_query_optimizer, mobile_query
 from app.utils.performance import (
     cached_mobile_response,
     compress_for_mobile,
-    measure_time,
-    mobile_cache,
 )
 
 
@@ -394,8 +392,8 @@ async def get_mobile_store_health(
 async def get_mobile_batch_list(
     store_id: str,
     request: Request,
-    category: Optional[str] = Query(None, description="Filter by category"),
-    urgency_filter: Optional[str] = Query(
+    category: str | None = Query(None, description="Filter by category"),
+    urgency_filter: str | None = Query(
         None, description="Filter by urgency: critical, high, medium, low"
     ),
     limit: int = Query(20, ge=1, le=100, description="Max items to return"),

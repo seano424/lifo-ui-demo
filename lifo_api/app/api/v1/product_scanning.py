@@ -3,7 +3,6 @@ Optimized product scanning endpoints focused on Google Vision OCR
 Provides only complex image processing capabilities while frontend handles simple tasks
 """
 
-from datetime import datetime
 from typing import Any
 
 import structlog

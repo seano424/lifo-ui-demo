@@ -18,7 +18,7 @@ Key Features:
 import uuid
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Conditional imports to handle missing dependencies gracefully
 try:
@@ -73,10 +73,10 @@ except ImportError:
         logger.error = logger.error if hasattr(logger, "error") else print
 
 # Type aliases for better readability
-ProductDict = Dict[str, Any]
-BatchDict = Dict[str, Any]
-OperationResult = Dict[str, Any]
-FilterParams = Dict[str, Any]
+ProductDict = dict[str, Any]
+BatchDict = dict[str, Any]
+OperationResult = dict[str, Any]
+FilterParams = dict[str, Any]
 
 
 class DatabaseOperationError(Exception):
@@ -93,9 +93,9 @@ class DatabaseOperationError(Exception):
     def __init__(
         self,
         message: str,
-        operation: Optional[str] = None,
-        error_code: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        operation: str | None = None,
+        error_code: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         self.operation = operation
         self.error_code = error_code
@@ -164,7 +164,7 @@ class InventoryOperations:
 
     # Global Product Management Operations
 
-    async def findGlobalProductByBarcode(self, barcode: str) -> Optional[ProductDict]:
+    async def findGlobalProductByBarcode(self, barcode: str) -> ProductDict | None:
         """
         Find global product by barcode
 
@@ -230,7 +230,7 @@ class InventoryOperations:
 
     async def searchGlobalProducts(
         self, search_term: str, store_id: str, limit: int = 10
-    ) -> List[ProductDict]:
+    ) -> list[ProductDict]:
         """
         Search global products by name with fuzzy matching
 
@@ -415,7 +415,7 @@ class InventoryOperations:
         self,
         store_id: str,
         product_id: str,
-        store_product_data: Dict[str, Any],
+        store_product_data: dict[str, Any],
         user_id: str,
     ) -> OperationResult:
         """
@@ -619,10 +619,10 @@ class InventoryOperations:
 
     async def getBatchesForETLProcessing(
         self,
-        store_id: Optional[str] = None,
-        days_to_expiry: Optional[int] = None,
+        store_id: str | None = None,
+        days_to_expiry: int | None = None,
         batch_size: int = 1000,
-    ) -> AsyncGenerator[List[BatchDict], None]:
+    ) -> AsyncGenerator[list[BatchDict], None]:
         """
         Get batches for ETL processing in chunks
 
@@ -770,9 +770,9 @@ class InventoryOperations:
     async def aggregateInventoryMetrics(
         self,
         store_id: str,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
-    ) -> Dict[str, Any]:
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ) -> dict[str, Any]:
         """
         Aggregate inventory metrics for analytics
 
@@ -874,8 +874,8 @@ class InventoryOperations:
     # ML Feature Preparation Operations
 
     async def prepareMLFeatures(
-        self, store_id: str, feature_types: List[str] = None
-    ) -> Dict[str, Any]:
+        self, store_id: str, feature_types: list[str] = None
+    ) -> dict[str, Any]:
         """
         Prepare features for machine learning models
 
@@ -1010,7 +1010,7 @@ class InventoryOperations:
     # Batch Processing Utilities
 
     async def batchUpdateQuantities(
-        self, updates: List[Dict[str, Any]]
+        self, updates: list[dict[str, Any]]
     ) -> OperationResult:
         """
         Batch update quantities for multiple batches (SECURE VERSION)
@@ -1123,7 +1123,7 @@ class InventoryOperations:
 
     # Health Check and Monitoring
 
-    async def healthCheck(self) -> Dict[str, Any]:
+    async def healthCheck(self) -> dict[str, Any]:
         """
         Perform database health check
 
@@ -1250,7 +1250,7 @@ class InventoryOperationsManager:
 # Utility functions for common operations
 
 
-async def validateInventoryData(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+async def validateInventoryData(data: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Validate inventory data for common issues
 

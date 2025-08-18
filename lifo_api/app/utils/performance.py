@@ -6,9 +6,10 @@ Caching, async processing, and mobile-specific optimizations
 import asyncio
 import hashlib
 import time
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable, Optional
+from typing import Any
 
 import structlog
 
@@ -89,7 +90,7 @@ class BoundedCache:
         key_data = f"{prefix}:{args}:{sorted(kwargs.items())}"
         return hashlib.md5(key_data.encode()).hexdigest()
 
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str) -> Any | None:
         """Get item from cache with LRU tracking"""
         async with self._lock:
             if key not in self._cache:
@@ -106,7 +107,7 @@ class BoundedCache:
             logger.debug("Cache hit", key=key, cache_size=len(self._cache))
             return cache_item["data"]
 
-    async def set(self, key: str, data: Any, ttl: Optional[int] = None) -> None:
+    async def set(self, key: str, data: Any, ttl: int | None = None) -> None:
         """Set item in cache with automatic LRU eviction"""
         async with self._lock:
             ttl = ttl or self.default_ttl
@@ -273,7 +274,7 @@ class MobileResponseOptimizer:
 
     @staticmethod
     def compress_batch_list(
-        batches: list, fields_to_keep: Optional[list] = None
+        batches: list, fields_to_keep: list | None = None
     ) -> list:
         """Compress batch data for mobile transmission"""
         if not fields_to_keep:
@@ -387,7 +388,7 @@ async def timeout_after(seconds: float):
         async def wrapper(*args, **kwargs):
             try:
                 return await asyncio.wait_for(func(*args, **kwargs), timeout=seconds)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.warning(
                     "Operation timeout", function=func.__name__, timeout_seconds=seconds
                 )

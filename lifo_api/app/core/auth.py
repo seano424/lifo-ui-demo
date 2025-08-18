@@ -4,7 +4,7 @@ Provides JWT token validation and role-based access control for all schemas
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import jwt
 import structlog
@@ -213,7 +213,7 @@ async def validate_global_product_access(
 
 async def validate_donation_access(
     user_id: str,
-    store_id: Optional[str] = None,
+    store_id: str | None = None,
     action: str = "read",
     db: AsyncSession = Depends(get_database),
 ) -> bool:
@@ -296,7 +296,7 @@ class PermissionChecker:
         return await validate_global_product_access(self.user_id, action, self.db)
 
     async def check_donation_access(
-        self, action: str = "read", store_id: Optional[str] = None
+        self, action: str = "read", store_id: str | None = None
     ) -> bool:
         """Check donation schema access"""
         return await validate_donation_access(self.user_id, store_id, action, self.db)
@@ -324,7 +324,7 @@ class PermissionChecker:
         return check()
 
     def require_donation_access(
-        self, action: str = "read", store_id: Optional[str] = None
+        self, action: str = "read", store_id: str | None = None
     ):
         """Raise exception if user lacks donation access"""
 
@@ -381,7 +381,7 @@ def require_global_product_permission(action: str = "read"):
     return permission_check
 
 
-def require_donation_permission(action: str = "read", store_id: Optional[str] = None):
+def require_donation_permission(action: str = "read", store_id: str | None = None):
     """Dependency factory for donation permission requirements"""
 
     async def permission_check(

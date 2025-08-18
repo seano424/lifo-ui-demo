@@ -5,7 +5,7 @@ Tests database connectivity and service health
 
 import asyncio
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException
@@ -21,7 +21,7 @@ logger = structlog.get_logger()
 
 
 @router.get("/health")
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     """
     Comprehensive health check for all services
     """
@@ -93,7 +93,7 @@ async def health_check() -> Dict[str, Any]:
 
 
 @router.get("/health/supabase")
-async def supabase_health() -> Dict[str, Any]:
+async def supabase_health() -> dict[str, Any]:
     """
     Supabase-specific health check
     """
@@ -108,7 +108,7 @@ async def supabase_health() -> Dict[str, Any]:
 
 
 @router.get("/health/database")
-async def database_health() -> Dict[str, Any]:
+async def database_health() -> dict[str, Any]:
     """
     Database connectivity health check
     """
@@ -124,7 +124,7 @@ async def database_health() -> Dict[str, Any]:
 
 
 @router.get("/health/ready")
-async def readiness_check() -> Dict[str, Any]:
+async def readiness_check() -> dict[str, Any]:
     """
     Kubernetes-style readiness check
     Returns 200 only if all critical services are healthy
@@ -152,7 +152,7 @@ async def readiness_check() -> Dict[str, Any]:
 
 
 @router.get("/health/live")
-async def liveness_check() -> Dict[str, Any]:
+async def liveness_check() -> dict[str, Any]:
     """
     Kubernetes-style liveness check
     Simple check that the application is running
@@ -166,8 +166,8 @@ async def liveness_check() -> Dict[str, Any]:
 
 @router.get("/health/performance")
 async def performance_health_check(
-    current_user: Dict[str, Any] = Depends(get_current_user),
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
     """
     Comprehensive performance health check
     Includes mobile performance, cache health, and system metrics
@@ -240,8 +240,8 @@ async def performance_health_check(
 
 @router.get("/health/mobile-performance")
 async def mobile_performance_health(
-    current_user: Dict[str, Any] = Depends(get_current_user),
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
     """
     Mobile-specific performance health check
     Validates mobile optimization targets are being met
@@ -346,8 +346,8 @@ async def mobile_performance_health(
 
 @router.get("/metrics")
 async def get_performance_metrics(
-    hours: int = 24, current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    hours: int = 24, current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Get comprehensive performance metrics
     Provides detailed metrics for monitoring dashboards
@@ -410,7 +410,7 @@ async def get_performance_metrics(
         )
 
 
-def _check_mobile_performance_targets(metrics_summary: Dict[str, Any]) -> bool:
+def _check_mobile_performance_targets(metrics_summary: dict[str, Any]) -> bool:
     """Check if mobile performance targets are being met"""
     api_metrics = metrics_summary.get("api_metrics", {})
 
@@ -430,7 +430,7 @@ def _check_mobile_performance_targets(metrics_summary: Dict[str, Any]) -> bool:
     return True
 
 
-def _assess_database_performance(metrics_summary: Dict[str, Any]) -> str:
+def _assess_database_performance(metrics_summary: dict[str, Any]) -> str:
     """Assess database performance health"""
     db_metrics = metrics_summary.get("database_metrics", {})
 
@@ -461,7 +461,7 @@ def _assess_database_performance(metrics_summary: Dict[str, Any]) -> str:
         return "excellent"
 
 
-def _assess_api_performance(metrics_summary: Dict[str, Any]) -> str:
+def _assess_api_performance(metrics_summary: dict[str, Any]) -> str:
     """Assess API performance health"""
     api_metrics = metrics_summary.get("api_metrics", {})
 
@@ -488,7 +488,7 @@ def _assess_api_performance(metrics_summary: Dict[str, Any]) -> str:
         return "excellent"
 
 
-def _assess_cache_performance(metrics_summary: Dict[str, Any]) -> str:
+def _assess_cache_performance(metrics_summary: dict[str, Any]) -> str:
     """Assess cache performance health"""
     cache_metrics = metrics_summary.get("cache_metrics", {})
 

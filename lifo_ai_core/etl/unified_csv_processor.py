@@ -15,7 +15,7 @@ import logging
 import re
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import chardet
 import magic
@@ -162,7 +162,7 @@ class UnifiedCSVProcessor:
     }
 
     def __init__(
-        self, store_id: str, user_id: str, inventory_ops: Optional[Any] = None
+        self, store_id: str, user_id: str, inventory_ops: Any | None = None
     ):
         """
         Initialize processor with store and user context
@@ -180,7 +180,7 @@ class UnifiedCSVProcessor:
         self.processed_count = 0
 
     async def process_csv_file(
-        self, file_path: str, file_content: Optional[bytes] = None
+        self, file_path: str, file_content: bytes | None = None
     ) -> dict[str, Any]:
         """
         Main entry point for CSV processing
@@ -248,7 +248,7 @@ class UnifiedCSVProcessor:
             return self._error_result(f"Processing failed: {e}")
 
     async def _validate_file_security(
-        self, file_path: str, file_content: Optional[bytes] = None
+        self, file_path: str, file_content: bytes | None = None
     ) -> None:
         """Comprehensive security validation"""
 
@@ -289,7 +289,7 @@ class UnifiedCSVProcessor:
                 raise SecurityViolation("Only CSV files are allowed")
 
     async def _load_csv(
-        self, file_path: str, file_content: Optional[bytes] = None
+        self, file_path: str, file_content: bytes | None = None
     ) -> pd.DataFrame:
         """Load CSV with security checks"""
 
@@ -506,7 +506,7 @@ class UnifiedCSVProcessor:
 
     async def _process_single_row(
         self, row: pd.Series, row_num: int
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Process a single CSV row with comprehensive validation"""
 
         processed = {}
@@ -662,7 +662,7 @@ class UnifiedCSVProcessor:
 
     def _validate_price(
         self, price: Any, field_name: str, row_num: int
-    ) -> Optional[float]:
+    ) -> float | None:
         """Validate price fields"""
         if pd.isna(price) or price == "":
             return None
@@ -688,7 +688,7 @@ class UnifiedCSVProcessor:
 
     def _validate_manufacture_date(
         self, mfg_date: Any, expiry_date: str, row_num: int
-    ) -> Optional[str]:
+    ) -> str | None:
         """Validate manufacture date"""
         if pd.isna(mfg_date):
             return None

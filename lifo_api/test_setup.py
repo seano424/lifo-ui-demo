@@ -118,7 +118,7 @@ async def test_comprehensive():
         from app.auth.supabase_jwt import get_supabase_auth
 
         auth = get_supabase_auth()
-        print(f"   ✅ Authentication system initialized")
+        print("   ✅ Authentication system initialized")
         print(f"   JWT Secret configured: {bool(auth.jwt_secret)}")
         print(f"   Supabase URL configured: {bool(auth.supabase_url)}")
     except Exception as e:

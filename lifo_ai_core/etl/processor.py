@@ -4,7 +4,7 @@ import csv
 import io
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -21,7 +21,7 @@ except ImportError:
 
 
 class CSVProcessor:
-    def __init__(self, inventory_ops: Optional[Any] = None):
+    def __init__(self, inventory_ops: Any | None = None):
         self.logger = logging.getLogger(__name__)
         self.inventory_ops = inventory_ops
         self.required_columns = [

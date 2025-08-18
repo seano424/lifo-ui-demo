@@ -4,7 +4,7 @@ Handles token management, refresh, and service role authentication
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 import structlog
@@ -28,7 +28,7 @@ class SupabaseClient:
 
     async def authenticate_with_email_password(
         self, email: str, password: str
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Authenticate with email and password
         Returns session data including access_token
@@ -70,7 +70,7 @@ class SupabaseClient:
             logger.error("Authentication error", error=str(e))
             return None
 
-    async def refresh_session(self, refresh_token: str) -> Optional[dict[str, Any]]:
+    async def refresh_session(self, refresh_token: str) -> dict[str, Any] | None:
         """
         Refresh an existing session using refresh token
         """
@@ -106,7 +106,7 @@ class SupabaseClient:
             logger.error("Session refresh error", error=str(e))
             return None
 
-    async def get_valid_access_token(self) -> Optional[str]:
+    async def get_valid_access_token(self) -> str | None:
         """
         Get a valid access token, refreshing if necessary
         """
@@ -192,7 +192,7 @@ async def get_authenticated_client(use_service_role: bool = False) -> httpx.Asyn
     return await supabase_client.create_api_client(use_service_role=use_service_role)
 
 
-async def authenticate_for_testing(email: str, password: str) -> Optional[str]:
+async def authenticate_for_testing(email: str, password: str) -> str | None:
     """
     Convenience function for testing - authenticate and return access token
     """

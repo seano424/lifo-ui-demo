@@ -4,7 +4,7 @@ Focused on advanced image analysis that frontend cannot handle
 """
 
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
@@ -173,7 +173,7 @@ async def extract_expiry_date_from_image(
     store_id: str,
     request: Request,
     image: UploadFile = File(...),
-    date_format_hint: Optional[str] = Form(
+    date_format_hint: str | None = Form(
         None, description="Expected date format hint"
     ),
     db: AsyncSession = Depends(get_db),
@@ -499,7 +499,7 @@ async def _mock_image_analysis(
 
 
 async def _mock_expiry_date_extraction(
-    image_data: bytes, date_format_hint: Optional[str]
+    image_data: bytes, date_format_hint: str | None
 ) -> dict[str, Any]:
     """Mock expiry date extraction results"""
 

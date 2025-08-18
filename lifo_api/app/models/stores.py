@@ -3,9 +3,8 @@ Pydantic models for store-related API endpoints
 """
 
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, Field
 
 from app.models.base import ConfigurableModel, StoreType, TimestampMixin, UserRole
 
@@ -14,15 +13,15 @@ from app.models.base import ConfigurableModel, StoreType, TimestampMixin, UserRo
 class StoreUpdateRequest(BaseModel):
     """Request to update store information"""
 
-    store_name: Optional[str] = Field(None, max_length=255, description="Store name")
-    business_name: Optional[str] = Field(
+    store_name: str | None = Field(None, max_length=255, description="Store name")
+    business_name: str | None = Field(
         None, max_length=255, description="Business name"
     )
-    address: Optional[str] = Field(None, description="Store address")
-    city: Optional[str] = Field(None, max_length=100, description="City")
-    postal_code: Optional[str] = Field(None, max_length=20, description="Postal code")
-    store_type: Optional[StoreType] = None
-    default_markup_percent: Optional[float] = Field(
+    address: str | None = Field(None, description="Store address")
+    city: str | None = Field(None, max_length=100, description="City")
+    postal_code: str | None = Field(None, max_length=20, description="Postal code")
+    store_type: StoreType | None = None
+    default_markup_percent: float | None = Field(
         None, ge=0, le=100, description="Default markup percentage"
     )
 
@@ -32,7 +31,7 @@ class StoreUserRequest(BaseModel):
 
     user_email: str = Field(..., description="User email to add to store")
     role_in_store: UserRole = Field(default=UserRole.STAFF, description="Role in store")
-    permissions: Optional[dict[str, bool]] = Field(
+    permissions: dict[str, bool] | None = Field(
         default={
             "can_upload_inventory": True,
             "can_apply_discounts": False,
@@ -45,18 +44,18 @@ class StoreUserRequest(BaseModel):
 class StoreSettingsRequest(BaseModel):
     """Request to update store settings"""
 
-    scoring_weights: Optional[dict[str, float]] = Field(
+    scoring_weights: dict[str, float] | None = Field(
         None, description="Scoring weights configuration"
     )
-    thresholds: Optional[dict[str, float]] = Field(None, description="Alert thresholds")
-    notifications: Optional[dict[str, bool]] = Field(
+    thresholds: dict[str, float] | None = Field(None, description="Alert thresholds")
+    notifications: dict[str, bool] | None = Field(
         None, description="Notification settings"
     )
-    business_hours: Optional[dict[str, dict[str, str]]] = Field(
+    business_hours: dict[str, dict[str, str]] | None = Field(
         None, description="Business hours"
     )
-    currency: Optional[str] = Field(None, max_length=3, description="Store currency")
-    timezone: Optional[str] = Field(None, max_length=50, description="Store timezone")
+    currency: str | None = Field(None, max_length=3, description="Store currency")
+    timezone: str | None = Field(None, max_length=50, description="Store timezone")
 
     # Note: scoring weights validation moved to business logic for OpenAPI compatibility
 
@@ -68,10 +67,10 @@ class StoreInfo(ConfigurableModel):
     store_id: str
     store_name: str
     store_code: str
-    business_name: Optional[str] = None
-    store_type: Optional[StoreType] = None
-    city: Optional[str] = None
-    country: Optional[str] = None
+    business_name: str | None = None
+    store_type: StoreType | None = None
+    city: str | None = None
+    country: str | None = None
     is_active: bool = True
 
 
@@ -81,14 +80,14 @@ class UserStoreAccess(ConfigurableModel):
     store_id: str
     store_name: str
     store_code: str
-    business_name: Optional[str] = None
-    store_type: Optional[StoreType] = None
-    city: Optional[str] = None
-    country: Optional[str] = None
+    business_name: str | None = None
+    store_type: StoreType | None = None
+    city: str | None = None
+    country: str | None = None
     user_role: UserRole
     permissions: dict[str, bool]
     is_owner: bool = False
-    assigned_at: Optional[datetime] = None
+    assigned_at: datetime | None = None
 
 
 class StoreDetailsResponse(ConfigurableModel, TimestampMixin):
@@ -97,22 +96,22 @@ class StoreDetailsResponse(ConfigurableModel, TimestampMixin):
     store_id: str
     store_name: str
     store_code: str
-    business_name: Optional[str] = None
+    business_name: str | None = None
 
     # Location
-    address: Optional[str] = None
-    city: Optional[str] = None
-    postal_code: Optional[str] = None
-    country: Optional[str] = None
-    timezone: Optional[str] = None
+    address: str | None = None
+    city: str | None = None
+    postal_code: str | None = None
+    country: str | None = None
+    timezone: str | None = None
 
     # Business details
-    store_type: Optional[StoreType] = None
-    size_category: Optional[str] = None
+    store_type: StoreType | None = None
+    size_category: str | None = None
 
     # Configuration
-    default_markup_percent: Optional[float] = None
-    waste_reduction_target_percent: Optional[float] = None
+    default_markup_percent: float | None = None
+    waste_reduction_target_percent: float | None = None
 
     # Status
     is_active: bool = True
@@ -156,12 +155,12 @@ class StoreUserResponse(ConfigurableModel):
     """Store user information"""
 
     user_id: str
-    user_email: Optional[str] = None
-    full_name: Optional[str] = None
+    user_email: str | None = None
+    full_name: str | None = None
     role_in_store: UserRole
     permissions: dict[str, bool]
     assigned_at: datetime
-    assigned_by: Optional[str] = None
+    assigned_by: str | None = None
     is_active: bool = True
 
 
@@ -276,6 +275,6 @@ class StoreAccessValidationResponse(ConfigurableModel):
     user_id: str
     required_role: str
     has_access: bool
-    current_role: Optional[str] = None
-    permissions: Optional[dict[str, bool]] = None
+    current_role: str | None = None
+    permissions: dict[str, bool] | None = None
     checked_at: datetime

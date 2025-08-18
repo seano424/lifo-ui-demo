@@ -3,9 +3,7 @@ End-to-end integration tests for mobile scanning workflows
 Tests complete mobile scanning scenarios with realistic data flows
 """
 
-import json
 import time
-from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest

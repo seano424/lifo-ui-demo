@@ -4,8 +4,7 @@ Specifically designed for <300ms response times on mobile devices
 """
 
 import time
-from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from sqlalchemy import text
@@ -24,8 +23,8 @@ class MobileQueryOptimizer:
         self.session = session
 
     async def get_store_inventory_fast(
-        self, store_id: str, limit: int = 200, urgency_filter: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+        self, store_id: str, limit: int = 200, urgency_filter: str | None = None
+    ) -> list[dict[str, Any]]:
         """
         Mobile-optimized store inventory query
         Uses indexes and limits results for mobile performance
@@ -122,7 +121,7 @@ class MobileQueryOptimizer:
 
     async def get_batch_quick_score_data(
         self, batch_id: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Ultra-fast batch data retrieval for mobile scoring
         Uses single query with all necessary data
@@ -185,7 +184,7 @@ class MobileQueryOptimizer:
             )
             raise
 
-    async def get_store_health_metrics(self, store_id: str) -> Dict[str, Any]:
+    async def get_store_health_metrics(self, store_id: str) -> dict[str, Any]:
         """
         Single query to get all store health metrics for mobile
         Aggregates multiple metrics in one optimized query
@@ -259,7 +258,7 @@ class MobileQueryOptimizer:
             )
             raise
 
-    async def get_category_summary(self, store_id: str) -> List[Dict[str, Any]]:
+    async def get_category_summary(self, store_id: str) -> list[dict[str, Any]]:
         """
         Mobile-optimized category breakdown for dashboard
         Returns only essential category metrics
@@ -363,7 +362,7 @@ class MobileQueryMonitor:
         stats["fastest_ms"] = min(stats["fastest_ms"], execution_time_ms)
         stats["slowest_ms"] = max(stats["slowest_ms"], execution_time_ms)
 
-    def get_performance_report(self) -> Dict[str, Any]:
+    def get_performance_report(self) -> dict[str, Any]:
         """Get mobile query performance report"""
         report = {}
 

@@ -3,7 +3,6 @@
 Simple API Testing Script for LIFO AI Engine
 """
 
-import json
 import time
 
 import requests
@@ -104,7 +103,7 @@ def main():
     # Failed endpoints
     failed = [r for r in results if not r["success"]]
     if failed:
-        print(f"\n❌ Failed Endpoints:")
+        print("\n❌ Failed Endpoints:")
         for f in failed:
             print(f"   {f['endpoint']} - {f['status_code']}")
 

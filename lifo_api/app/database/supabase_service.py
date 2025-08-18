@@ -5,13 +5,10 @@ Works alongside SQLAlchemy for specific operations that require Supabase auth co
 
 import asyncio
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import httpx
 import structlog
-from gotrue.errors import AuthError
 
-from app.auth.supabase_jwt import SupabaseUser
 from app.core.config import settings
 from supabase import Client, create_client
 
@@ -27,7 +24,7 @@ class SupabaseService:
         self.url = settings.supabase_url
         self.anon_key = settings.supabase_anon_key
         self.service_role_key = settings.supabase_service_role_key
-        self._admin_client: Optional[Client] = None
+        self._admin_client: Client | None = None
 
     def get_admin_client(self) -> Client:
         """Get service role client for admin operations"""
@@ -85,8 +82,8 @@ class SupabaseService:
             return False
 
     async def save_ocr_result(
-        self, user_token: str, store_id: str, ocr_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, user_token: str, store_id: str, ocr_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Save OCR processing result to inventory.ocr_processing_batches
         Uses user authentication context for RLS compliance
@@ -134,8 +131,8 @@ class SupabaseService:
         user_token: str,
         store_id: str,
         ocr_batch_id: str,
-        batch_data: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        batch_data: dict[str, Any],
+    ) -> dict[str, Any]:
         """
         Create inventory batch from OCR processing result
         """
@@ -181,7 +178,7 @@ class SupabaseService:
 
     async def get_store_info(
         self, user_token: str, store_id: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get store information with user context"""
         try:
             user_client = self.get_user_client(user_token)
@@ -222,7 +219,7 @@ class SupabaseService:
             )
             return False
 
-    async def get_user_stores(self, user_token: str) -> List[Dict[str, Any]]:
+    async def get_user_stores(self, user_token: str) -> list[dict[str, Any]]:
         """Get all stores user has access to"""
         try:
             user_client = self.get_user_client(user_token)
@@ -238,7 +235,7 @@ class SupabaseService:
 
 
 # Global service instance
-_supabase_service: Optional[SupabaseService] = None
+_supabase_service: SupabaseService | None = None
 
 
 def get_supabase_service() -> SupabaseService:
@@ -250,7 +247,7 @@ def get_supabase_service() -> SupabaseService:
 
 
 # Health check using Supabase
-async def supabase_health_check() -> Dict[str, Any]:
+async def supabase_health_check() -> dict[str, Any]:
     """Comprehensive Supabase health check"""
     start_time = asyncio.get_event_loop().time()
 

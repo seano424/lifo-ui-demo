@@ -5,7 +5,7 @@ Real-time request/response tracking with mobile optimization focus
 
 import asyncio
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 from urllib.parse import unquote
 
 import structlog
@@ -320,7 +320,7 @@ class CachePerformanceMiddleware:
         self.metrics_collector = get_metrics_collector()
 
     def record_operation(
-        self, operation: str, cache_name: str, key: Optional[str] = None
+        self, operation: str, cache_name: str, key: str | None = None
     ):
         """Record cache operation"""
         start_time = time.time()
@@ -348,6 +348,6 @@ def monitor_db_query(query_name: str):
     return db_perf_monitor(query_name)
 
 
-def monitor_cache_operation(operation: str, cache_name: str, key: Optional[str] = None):
+def monitor_cache_operation(operation: str, cache_name: str, key: str | None = None):
     """Context manager for monitoring cache operations"""
     return cache_perf_monitor.record_operation(operation, cache_name, key)

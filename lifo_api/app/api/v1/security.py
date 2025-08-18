@@ -4,7 +4,7 @@ Provides security statistics, threat monitoring, and security configuration
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -23,8 +23,8 @@ logger = structlog.get_logger()
 async def get_security_statistics(
     request: Request,
     hours: int = Query(24, ge=1, le=168, description="Hours of statistics to retrieve"),
-    current_user: Dict[str, Any] = Depends(get_current_user),
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
     """
     Get comprehensive security statistics
     Requires authentication and appropriate permissions
@@ -86,14 +86,14 @@ async def get_security_statistics(
 @router.get("/security/threats")
 async def get_active_threats(
     request: Request,
-    severity: Optional[str] = Query(
+    severity: str | None = Query(
         None, description="Filter by severity (low, medium, high, critical)"
     ),
     limit: int = Query(
         100, ge=1, le=1000, description="Maximum number of threats to return"
     ),
-    current_user: Dict[str, Any] = Depends(get_current_user),
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
     """
     Get active security threats and high-risk IPs
     """
@@ -184,8 +184,8 @@ async def get_active_threats(
 async def get_ip_security_profile(
     ip_address: str,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
     """
     Get detailed security profile for a specific IP address
     """
@@ -256,8 +256,8 @@ async def get_ip_security_profile(
 
 @router.get("/security/health")
 async def get_security_health(
-    request: Request, current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    request: Request, current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Get overall security system health status
     """
@@ -360,7 +360,7 @@ async def get_security_health(
         )
 
 
-def _get_most_common_attack_types(events: List[Dict]) -> List[Dict[str, Any]]:
+def _get_most_common_attack_types(events: list[dict]) -> list[dict[str, Any]]:
     """Get most common attack types from events"""
     attack_counts = {}
     for event in events:
@@ -375,7 +375,7 @@ def _get_most_common_attack_types(events: List[Dict]) -> List[Dict[str, Any]]:
     ]
 
 
-def _get_ip_recommendation(profile: Dict, is_banned: bool, is_whitelisted: bool) -> str:
+def _get_ip_recommendation(profile: dict, is_banned: bool, is_whitelisted: bool) -> str:
     """Get recommendation for handling an IP address"""
     if is_whitelisted:
         return "IP is whitelisted - no action needed"
@@ -395,7 +395,7 @@ def _get_ip_recommendation(profile: Dict, is_banned: bool, is_whitelisted: bool)
         return "LOW RISK: Normal monitoring sufficient"
 
 
-def _get_security_recommendations(health_score: int, issues: List[str]) -> List[str]:
+def _get_security_recommendations(health_score: int, issues: list[str]) -> list[str]:
     """Get security recommendations based on health status"""
     recommendations = []
 

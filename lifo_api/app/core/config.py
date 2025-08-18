@@ -3,7 +3,7 @@ Configuration management for LIFO AI Engine
 Handles environment variables and application settings
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
@@ -48,8 +48,8 @@ class Settings(BaseSettings):
 
 
     # Production URLs (set via environment variables)
-    frontend_url: Optional[str] = None
-    api_url: Optional[str] = None
+    frontend_url: str | None = None
+    api_url: str | None = None
 
     # Database Configuration
     database_url: str = Field(
@@ -100,11 +100,11 @@ class Settings(BaseSettings):
     batch_processing_size: int = 1000
 
     # Cache Configuration
-    redis_url: Optional[str] = None
+    redis_url: str | None = None
     cache_ttl_seconds: int = 300  # 5 minutes
 
     # External Services
-    weather_api_key: Optional[str] = None
+    weather_api_key: str | None = None
     weather_api_url: str = "http://api.openweathermap.org/data/2.5"
 
     # Performance
@@ -281,7 +281,7 @@ def get_supabase_config() -> dict[str, Any]:
     }
 
 
-def get_scoring_weights(category: Optional[str] = None) -> dict[str, float]:
+def get_scoring_weights(category: str | None = None) -> dict[str, float]:
     """
     Get scoring weights for a specific category or default weights
     """

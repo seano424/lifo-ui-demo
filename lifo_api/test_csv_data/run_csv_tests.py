@@ -4,14 +4,10 @@ Professional CSV ETL Testing Suite for LIFO API
 Comprehensive test suite with proper error handling and detailed reporting
 """
 
-import json
 import logging
-import os
 import sys
 import time
-import traceback
 from pathlib import Path
-from typing import Any, Dict, Optional
 
 import requests
 
@@ -42,7 +38,7 @@ class TestResult:
     """Container for test results"""
 
     def __init__(
-        self, name: str, passed: bool, message: str = "", details: Dict = None
+        self, name: str, passed: bool, message: str = "", details: dict = None
     ):
         self.name = name
         self.passed = passed
@@ -63,7 +59,7 @@ class CSVTestSuite:
         self.results = []
 
     def log_test(
-        self, name: str, passed: bool, message: str = "", details: Dict = None
+        self, name: str, passed: bool, message: str = "", details: dict = None
     ):
         """Log test result"""
         result = TestResult(name, passed, message, details)
@@ -562,7 +558,7 @@ class CSVTestSuite:
                     print(f"  • {result.name}: {result.message}")
 
         if passed > 0:
-            print(f"\n✅ SUCCESSFUL TESTS:")
+            print("\n✅ SUCCESSFUL TESTS:")
             for result in self.results:
                 if result.passed:
                     print(f"  • {result.name}")

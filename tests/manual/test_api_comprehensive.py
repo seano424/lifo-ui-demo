@@ -4,12 +4,10 @@ Comprehensive API Testing Script for LIFO AI Engine
 Tests all endpoints with realistic data and scenarios
 """
 
-import asyncio
 import json
-import os
 import time
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 import requests
 
@@ -44,9 +42,9 @@ class APITester:
         test_name: str,
         passed: bool,
         response_time: float,
-        status_code: Optional[int] = None,
-        error: Optional[str] = None,
-        details: Optional[Dict] = None,
+        status_code: int | None = None,
+        error: str | None = None,
+        details: dict | None = None,
     ):
         """Log test results"""
         self.test_results["total_tests"] += 1
@@ -349,7 +347,6 @@ class APITester:
 
         # Test concurrent requests to health endpoint
         import concurrent.futures
-        import threading
 
         def make_health_request():
             try:
@@ -392,7 +389,7 @@ class APITester:
                 error="No successful requests",
             )
 
-    def generate_report(self) -> Dict[str, Any]:
+    def generate_report(self) -> dict[str, Any]:
         """Generate comprehensive test report"""
         end_time = time.time()
         total_time = end_time - self.test_results["start_time"]
@@ -430,7 +427,7 @@ class APITester:
 
         return report
 
-    def generate_recommendations(self) -> List[str]:
+    def generate_recommendations(self) -> list[str]:
         """Generate recommendations based on test results"""
         recommendations = []
 

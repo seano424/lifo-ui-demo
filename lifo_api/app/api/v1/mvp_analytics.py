@@ -5,7 +5,7 @@ Focus on key metrics mentioned in MVP goals
 
 import time
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -254,7 +254,7 @@ async def get_waste_prevention_impact(
 async def get_action_effectiveness(
     store_id: str,
     request: Request,
-    action_type: Optional[str] = Query(None, description="Filter by action type"),
+    action_type: str | None = Query(None, description="Filter by action type"),
     days: int = Query(14, ge=3, le=60, description="Analysis period"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -556,7 +556,7 @@ async def _calculate_waste_prevention_impact(
 
 
 async def _calculate_action_effectiveness(
-    store_id: str, action_type: Optional[str], days: int, read_ops
+    store_id: str, action_type: str | None, days: int, read_ops
 ) -> dict[str, Any]:
     """Calculate effectiveness of different actions"""
     # In production, this would analyze actual action outcomes

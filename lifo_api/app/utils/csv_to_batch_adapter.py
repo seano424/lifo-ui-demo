@@ -3,9 +3,8 @@ CSV to Batch Adapter Utility
 Converts CSV processed data to BatchFromScanRequest format for batch creation
 """
 
-import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 
@@ -22,8 +21,8 @@ class CSVToBatchAdapter:
 
     @staticmethod
     def convert_csv_data_to_batch_requests(
-        csv_data: List[Dict[str, Any]], store_id: str, user_id: str
-    ) -> List[BatchFromScanRequest]:
+        csv_data: list[dict[str, Any]], store_id: str, user_id: str
+    ) -> list[BatchFromScanRequest]:
         """
         Convert processed CSV data to batch creation requests
 
@@ -68,7 +67,7 @@ class CSVToBatchAdapter:
 
     @staticmethod
     def _convert_single_row(
-        row: Dict[str, Any], row_index: int
+        row: dict[str, Any], row_index: int
     ) -> BatchFromScanRequest:
         """
         Convert a single CSV row to BatchFromScanRequest
@@ -160,7 +159,7 @@ class CSVToBatchAdapter:
         )
 
     @staticmethod
-    def _parse_float(value: Any, field_name: str, row_index: int) -> Optional[float]:
+    def _parse_float(value: Any, field_name: str, row_index: int) -> float | None:
         """Parse float value with error handling"""
         if value is None or value == "":
             return None
@@ -217,8 +216,8 @@ class CSVToBatchAdapter:
 
     @staticmethod
     def create_csv_batch_summary(
-        batch_requests: List[BatchFromScanRequest], store_id: str, user_id: str
-    ) -> Dict[str, Any]:
+        batch_requests: list[BatchFromScanRequest], store_id: str, user_id: str
+    ) -> dict[str, Any]:
         """
         Create a summary of the CSV batch conversion
 

@@ -5,11 +5,10 @@ Mobile-optimized models for scan-in/scan-out workflows
 
 import uuid
 from datetime import date, datetime
-from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field
 
 from .base import ConfigurableModel
 
@@ -31,26 +30,26 @@ class ScanInRequest(BaseModel):
     product_sku: str = Field(
         ..., min_length=1, max_length=100, description="Product SKU"
     )
-    barcode: Optional[str] = Field(None, max_length=50, description="Product barcode")
+    barcode: str | None = Field(None, max_length=50, description="Product barcode")
     expiry_date: date = Field(..., description="Product expiry date")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity received")
-    location_code: Optional[str] = Field(
+    location_code: str | None = Field(
         "MAIN", max_length=50, description="Storage location"
     )
-    cost_price: Optional[float] = Field(
+    cost_price: float | None = Field(
         None, ge=0, le=10000, description="Cost price per unit"
     )
-    selling_price: Optional[float] = Field(
+    selling_price: float | None = Field(
         None, ge=0, le=10000, description="Selling price per unit"
     )
-    batch_number: Optional[str] = Field(
+    batch_number: str | None = Field(
         None, max_length=100, description="Optional batch number"
     )
-    manufacture_date: Optional[date] = Field(None, description="Manufacture date")
-    temperature: Optional[float] = Field(
+    manufacture_date: date | None = Field(None, description="Manufacture date")
+    temperature: float | None = Field(
         None, ge=-50, le=50, description="Storage temperature"
     )
-    notes: Optional[str] = Field(None, max_length=500, description="Additional notes")
+    notes: str | None = Field(None, max_length=500, description="Additional notes")
 
     # Note: expiry date validation moved to business logic for OpenAPI compatibility
 
@@ -64,20 +63,20 @@ class ScanOutRequest(BaseModel):
 
     action: ScanOutAction = Field(..., description="Action being taken")
     quantity_moved: int = Field(..., gt=0, description="Quantity being moved/sold")
-    actual_selling_price: Optional[float] = Field(
+    actual_selling_price: float | None = Field(
         None, ge=0, description="Actual selling price"
     )
-    discount_percent: Optional[float] = Field(
+    discount_percent: float | None = Field(
         None, ge=0, le=100, description="Discount percentage applied"
     )
-    destination_location: Optional[str] = Field(
+    destination_location: str | None = Field(
         None, max_length=50, description="Destination location"
     )
-    notes: Optional[str] = Field(None, max_length=500, description="Action notes")
-    customer_type: Optional[str] = Field(
+    notes: str | None = Field(None, max_length=500, description="Action notes")
+    customer_type: str | None = Field(
         "regular", max_length=50, description="Customer type"
     )
-    channel: Optional[str] = Field(
+    channel: str | None = Field(
         "in_store", max_length=50, description="Sales channel"
     )
 
@@ -92,18 +91,18 @@ class ProcessScanRequest(ConfigurableModel):
     )
     expiry_date: date = Field(..., description="Expiry date from scan/OCR")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity scanned")
-    confidence_score: Optional[float] = Field(
+    confidence_score: float | None = Field(
         1.0, ge=0, le=1, description="OCR confidence score"
     )
-    location_code: Optional[str] = Field("MAIN", max_length=50, description="Location")
-    scan_timestamp: Optional[str] = Field(
+    location_code: str | None = Field("MAIN", max_length=50, description="Location")
+    scan_timestamp: str | None = Field(
         default_factory=lambda: datetime.utcnow().isoformat(),
         description="When scan occurred",
     )
-    image_url: Optional[str] = Field(
+    image_url: str | None = Field(
         None, max_length=500, description="Reference to scanned image"
     )
-    ocr_data: Optional[dict[str, Any]] = Field(
+    ocr_data: dict[str, Any] | None = Field(
         None, description="Raw OCR extraction data"
     )
 
@@ -115,8 +114,8 @@ class ScanInResponse(BaseModel):
     batch_id: str
     batch_number: str
     product_info: dict[str, Any]
-    initial_score: Optional[float] = None
-    urgency_level: Optional[str] = None
+    initial_score: float | None = None
+    urgency_level: str | None = None
     recommendations: list[str] = []
     warnings: list[str] = []
     processing_time_ms: float
@@ -130,9 +129,9 @@ class ScanOutResponse(BaseModel):
     batch_id: str
     remaining_quantity: float
     batch_status: str
-    effectiveness_score: Optional[float] = None
-    revenue_impact: Optional[float] = None
-    waste_prevented: Optional[float] = None
+    effectiveness_score: float | None = None
+    revenue_impact: float | None = None
+    waste_prevented: float | None = None
     processing_time_ms: float
 
 
@@ -156,8 +155,8 @@ class QuickBatchScore(BaseModel):
     urgency_level: str
     recommendation: str
     days_to_expiry: int
-    suggested_action: Optional[str] = None
-    discount_suggestion: Optional[int] = None
+    suggested_action: str | None = None
+    discount_suggestion: int | None = None
     processing_time_ms: float
 
 
@@ -232,7 +231,7 @@ class MobileOptimizedError(ConfigurableModel):
     message: str
     user_message: str  # Simplified message for mobile UI
     retry_allowed: bool = True
-    retry_after_seconds: Optional[int] = None
+    retry_after_seconds: int | None = None
     timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
 
 
@@ -250,7 +249,7 @@ class MobileBatchItem(BaseModel):
     urgency_level: str
     location: str
     estimated_value: float
-    recommended_action: Optional[str] = None
+    recommended_action: str | None = None
 
 
 class MobileStoreHealth(BaseModel):
@@ -261,8 +260,8 @@ class MobileStoreHealth(BaseModel):
     expiring_soon: int
     total_value_at_risk: float
     trends: dict[str, float]
-    last_action_taken: Optional[str] = None
-    next_recommended_action: Optional[str] = None
+    last_action_taken: str | None = None
+    next_recommended_action: str | None = None
 
 
 # Validation helpers

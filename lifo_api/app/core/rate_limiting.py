@@ -4,7 +4,6 @@ Uses slowapi for request rate limiting with Redis backend
 """
 
 import structlog
-from fastapi import Request
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address

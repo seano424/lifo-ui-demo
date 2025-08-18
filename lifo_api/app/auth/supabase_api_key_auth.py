@@ -4,11 +4,9 @@ Modern authentication using Supabase API keys instead of legacy JWT secrets
 Implements the new Supabase authentication approach with proper security
 """
 
-import hashlib
 import hmac
-import time
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
 import structlog
@@ -33,11 +31,11 @@ class APIKeyUser(BaseModel):
     user_id: str
     email: str
     role: str = "authenticated"
-    app_metadata: Dict[str, Any] = {}
-    user_metadata: Dict[str, Any] = {}
+    app_metadata: dict[str, Any] = {}
+    user_metadata: dict[str, Any] = {}
     aud: str = "authenticated"
     authenticated_at: datetime
-    expires_at: Optional[datetime] = None
+    expires_at: datetime | None = None
 
     model_config = ConfigDict(extra="allow")
 
@@ -92,7 +90,7 @@ class SupabaseAPIKeyAuth:
                 role=user_info.get("role", "authenticated"),
                 app_metadata=user_info.get("app_metadata", {}),
                 user_metadata=user_info.get("user_metadata", {}),
-                authenticated_at=datetime.now(timezone.utc),
+                authenticated_at=datetime.now(UTC),
                 expires_at=self._parse_token_expiry(user_info),
             )
 
@@ -120,7 +118,7 @@ class SupabaseAPIKeyAuth:
             self.logger.error("Authentication error", error=str(e))
             raise SupabaseAPIKeyError("Authentication failed")
 
-    async def _get_user_from_token(self, access_token: str) -> Optional[Dict[str, Any]]:
+    async def _get_user_from_token(self, access_token: str) -> dict[str, Any] | None:
         """
         Get user information from Supabase Auth API using access token
         """
@@ -161,13 +159,13 @@ class SupabaseAPIKeyAuth:
             self.logger.error("Auth API request error", error=str(e))
             return None
 
-    def _parse_token_expiry(self, user_info: Dict[str, Any]) -> Optional[datetime]:
+    def _parse_token_expiry(self, user_info: dict[str, Any]) -> datetime | None:
         """Parse token expiry from user info if available"""
         # Supabase tokens typically expire in 1 hour
         # This is an estimate since the exact expiry isn't always provided
         from datetime import timedelta
 
-        return datetime.now(timezone.utc).replace(microsecond=0) + timedelta(hours=1)
+        return datetime.now(UTC).replace(microsecond=0) + timedelta(hours=1)
 
     async def verify_service_key(self, api_key: str) -> bool:
         """
@@ -191,7 +189,7 @@ class SupabaseAPIKeyAuth:
             self.logger.warning("Service key verification failed", error=str(e))
             return False
 
-    async def refresh_token(self, refresh_token: str) -> Dict[str, str]:
+    async def refresh_token(self, refresh_token: str) -> dict[str, str]:
         """
         Refresh access token using refresh token
 
@@ -260,7 +258,7 @@ class SupabaseAPIKeyAuth:
                 user_id="service_role",
                 email="service@lifo.ai",
                 role="service_role",
-                authenticated_at=datetime.now(timezone.utc),
+                authenticated_at=datetime.now(UTC),
             )
 
         # User token authentication
@@ -306,7 +304,7 @@ class SupabaseAPIKeyAuth:
 
 
 # Global authentication instance
-_api_key_auth: Optional[SupabaseAPIKeyAuth] = None
+_api_key_auth: SupabaseAPIKeyAuth | None = None
 
 
 def get_api_key_auth() -> SupabaseAPIKeyAuth:

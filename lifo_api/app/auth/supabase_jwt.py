@@ -4,8 +4,8 @@ Provides seamless integration with existing Supabase authentication
 Updated to use modern JWKS-based verification instead of legacy JWT secret
 """
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
 import jwt
@@ -148,7 +148,7 @@ class SupabaseAuth:
             # Don't expose internal error details to client
             raise SupabaseAuthError("Authentication failed")
 
-    async def _verify_with_auth_server(self, token: str) -> Optional[SupabaseUser]:
+    async def _verify_with_auth_server(self, token: str) -> SupabaseUser | None:
         """
         Verify token with Supabase Auth server (modern approach)
         """
@@ -197,9 +197,9 @@ class SupabaseAuth:
                         app_metadata=user_data.get("app_metadata", {}),
                         user_metadata=user_data.get("user_metadata", {}),
                         aud="authenticated",
-                        exp=int(datetime.now(timezone.utc).timestamp())
+                        exp=int(datetime.now(UTC).timestamp())
                         + 3600,  # Estimate expiry
-                        iat=int(datetime.now(timezone.utc).timestamp()),
+                        iat=int(datetime.now(UTC).timestamp()),
                         iss=f"{self.supabase_url}/auth/v1",
                         sub=user_data.get("id"),
                     )
@@ -374,7 +374,7 @@ class SupabaseAuth:
 
 
 # Global authentication instance (lazy initialization)
-_supabase_auth: Optional[SupabaseAuth] = None
+_supabase_auth: SupabaseAuth | None = None
 
 
 def get_supabase_auth() -> SupabaseAuth:

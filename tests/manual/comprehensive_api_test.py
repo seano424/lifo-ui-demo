@@ -4,12 +4,10 @@ Comprehensive API Testing Script for LIFO AI Engine
 Tests all endpoints with realistic data and scenarios including Supabase integration
 """
 
-import base64
 import json
-import os
 import time
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any
 
 import requests
 
@@ -51,8 +49,8 @@ class ComprehensiveAPITester:
         # JWT token for authenticated requests
         self.auth_token = None
 
-        print(f"🧪 LIFO AI Engine - Comprehensive API Testing")
-        print(f"=" * 70)
+        print("🧪 LIFO AI Engine - Comprehensive API Testing")
+        print("=" * 70)
         print(f"Testing server: {self.base_url}")
         print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"Test stores: {len(TEST_STORES)} stores")
@@ -63,10 +61,10 @@ class ComprehensiveAPITester:
         test_name: str,
         passed: bool,
         response_time: float,
-        status_code: Optional[int] = None,
-        error: Optional[str] = None,
-        details: Optional[Dict] = None,
-        response_data: Optional[Dict] = None,
+        status_code: int | None = None,
+        error: str | None = None,
+        details: dict | None = None,
+        response_data: dict | None = None,
     ):
         """Log test results with enhanced details"""
         self.test_results["total_tests"] += 1
@@ -639,7 +637,7 @@ class ComprehensiveAPITester:
                 error="No successful requests",
             )
 
-    def generate_report(self) -> Dict[str, Any]:
+    def generate_report(self) -> dict[str, Any]:
         """Generate comprehensive test report"""
         end_time = time.time()
         total_time = end_time - self.test_results["start_time"]
@@ -707,7 +705,7 @@ class ComprehensiveAPITester:
 
         return report
 
-    def generate_recommendations(self) -> List[str]:
+    def generate_recommendations(self) -> list[str]:
         """Generate recommendations based on test results"""
         recommendations = []
 
@@ -792,7 +790,7 @@ class ComprehensiveAPITester:
 
         # Performance summary
         if report["performance_metrics"]:
-            print(f"\n📊 PERFORMANCE HIGHLIGHTS:")
+            print("\n📊 PERFORMANCE HIGHLIGHTS:")
             for endpoint, stats in report["performance_metrics"].items():
                 mobile_status = "📱✅" if stats["mobile_performance_ok"] else "📱⚠️"
                 print(
@@ -801,11 +799,11 @@ class ComprehensiveAPITester:
 
         # Error summary
         if report["error_summary"]["total_errors"] > 0:
-            print(f"\n⚠️ ERROR BREAKDOWN:")
+            print("\n⚠️ ERROR BREAKDOWN:")
             for error_type, count in report["error_summary"]["error_breakdown"].items():
                 print(f"   {error_type}: {count} errors")
 
-        print(f"\n🎯 RECOMMENDATIONS:")
+        print("\n🎯 RECOMMENDATIONS:")
         for i, rec in enumerate(report["recommendations"], 1):
             print(f"{i}. {rec}")
 

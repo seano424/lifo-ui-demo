@@ -4,9 +4,9 @@ Pydantic models for inventory-related API endpoints
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field
 
 from app.models.base import (
     BatchStatus,
@@ -16,7 +16,6 @@ from app.models.base import (
     SortParams,
     TimestampMixin,
     UrgencyLevel,
-    decimal_to_float,
 )
 
 
@@ -24,17 +23,17 @@ from app.models.base import (
 class InventoryFilterParams(FilterParams):
     """Advanced filtering for inventory endpoints"""
 
-    urgency_level: Optional[UrgencyLevel] = None
-    expiring_days: Optional[int] = Field(
+    urgency_level: UrgencyLevel | None = None
+    expiring_days: int | None = Field(
         None, ge=0, le=365, description="Items expiring within N days"
     )
-    min_quantity: Optional[float] = Field(
+    min_quantity: float | None = Field(
         None, ge=0, description="Minimum quantity filter"
     )
-    max_quantity: Optional[float] = Field(
+    max_quantity: float | None = Field(
         None, ge=0, description="Maximum quantity filter"
     )
-    location_code: Optional[str] = Field(
+    location_code: str | None = Field(
         None, max_length=50, description="Filter by location"
     )
 
@@ -44,7 +43,7 @@ class InventoryFilterParams(FilterParams):
 class InventorySortParams(SortParams):
     """Sorting options for inventory"""
 
-    sort_field: Optional[str] = Field(
+    sort_field: str | None = Field(
         "expiry_date",
         description="Field to sort by",
         pattern="^(expiry_date|composite_score|product_name|quantity|created_at|urgency_level)$",
@@ -54,14 +53,14 @@ class InventorySortParams(SortParams):
 class BatchUpdateRequest(BaseModel):
     """Request to update batch information"""
 
-    current_quantity: Optional[float] = Field(None, ge=0, description="New quantity")
-    selling_price: Optional[Decimal] = Field(
+    current_quantity: float | None = Field(None, ge=0, description="New quantity")
+    selling_price: Decimal | None = Field(
         None, gt=0, description="New selling price"
     )
-    location_code: Optional[str] = Field(
+    location_code: str | None = Field(
         None, max_length=50, description="New location"
     )
-    status: Optional[BatchStatus] = None
+    status: BatchStatus | None = None
 
     # Note: quantity validation moved to business logic for OpenAPI compatibility
 
@@ -72,7 +71,7 @@ class DiscountRequest(BaseModel):
     discount_percent: float = Field(
         ..., ge=0, le=90, description="Discount percentage (0-90)"
     )
-    reason: Optional[str] = Field(
+    reason: str | None = Field(
         None, max_length=255, description="Reason for discount"
     )
 
@@ -89,7 +88,7 @@ class BulkActionRequest(BaseModel):
         ..., min_length=1, max_length=100, description="List of batch IDs"
     )
     action_type: str = Field(..., description="Type of action to perform")
-    parameters: Optional[dict[str, Any]] = Field(
+    parameters: dict[str, Any] | None = Field(
         None, description="Action-specific parameters"
     )
 
@@ -110,11 +109,11 @@ class ProductInfo(ConfigurableModel):
     product_id: str
     sku: str
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     category: str
-    brand: Optional[str] = None
+    brand: str | None = None
     unit_type: str = "pcs"
-    typical_shelf_life_days: Optional[int] = None
+    typical_shelf_life_days: int | None = None
 
 
 class PricingInfo(ConfigurableModel):
@@ -141,7 +140,7 @@ class QuantityInfo(ConfigurableModel):
 class DateInfo(ConfigurableModel):
     """Date information for batch"""
 
-    manufacture_date: Optional[date] = None
+    manufacture_date: date | None = None
     expiry_date: date
     days_to_expiry: int
     is_expired: bool
@@ -150,17 +149,17 @@ class DateInfo(ConfigurableModel):
 class ScoringInfo(ConfigurableModel):
     """Scoring information for batch"""
 
-    expiry_score: Optional[float] = None
-    velocity_score: Optional[float] = None
-    margin_score: Optional[float] = None
-    composite_score: Optional[float] = None
-    recommendation: Optional[str] = None
-    urgency_level: Optional[UrgencyLevel] = None
-    discount_percent: Optional[int] = None
-    reason: Optional[str] = None
+    expiry_score: float | None = None
+    velocity_score: float | None = None
+    margin_score: float | None = None
+    composite_score: float | None = None
+    recommendation: str | None = None
+    urgency_level: UrgencyLevel | None = None
+    discount_percent: int | None = None
+    reason: str | None = None
     ml_enhanced: bool = False
-    confidence_level: Optional[float] = None
-    calculated_at: Optional[datetime] = None
+    confidence_level: float | None = None
+    calculated_at: datetime | None = None
 
 
 class BatchResponse(ConfigurableModel, TimestampMixin):
@@ -175,7 +174,7 @@ class BatchResponse(ConfigurableModel, TimestampMixin):
     location_code: str
     status: BatchStatus
     store_id: str
-    scoring: Optional[ScoringInfo] = None
+    scoring: ScoringInfo | None = None
 
     class Config:
         schema_extra = {
@@ -218,7 +217,7 @@ class InventoryItemResponse(ConfigurableModel):
     sku: str
     product_name: str
     category: str
-    brand: Optional[str] = None
+    brand: str | None = None
     current_quantity: float
     selling_price: float
     expiry_date: date
@@ -230,9 +229,9 @@ class InventoryItemResponse(ConfigurableModel):
     status: BatchStatus
 
     # Scoring fields (optional)
-    composite_score: Optional[float] = None
-    recommendation: Optional[str] = None
-    discount_percent: Optional[int] = None
+    composite_score: float | None = None
+    recommendation: str | None = None
+    discount_percent: int | None = None
 
     # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
@@ -324,7 +323,7 @@ class ActionResult(ConfigurableModel):
     action_type: str
     success: bool
     message: str
-    details: Optional[dict[str, Any]] = None
+    details: dict[str, Any] | None = None
     executed_at: datetime = Field(default_factory=datetime.utcnow)
 
 

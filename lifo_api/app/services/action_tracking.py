@@ -6,7 +6,7 @@ Handles tracking of AI recommendations vs actual user actions
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +26,7 @@ class ActionTrackingService:
         store_id: str,
         ai_recommendation: str,
         ai_score: float,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
     ) -> BatchAction:
         """
         Create a record when AI generates a recommendation
@@ -53,11 +53,11 @@ class ActionTrackingService:
         action_id: str,
         actual_action: str,
         user_id: str,
-        quantity_affected: Optional[float] = None,
-        original_value: Optional[float] = None,
-        recovered_value: Optional[float] = None,
-        notes: Optional[str] = None,
-        donation_recipient_id: Optional[str] = None,
+        quantity_affected: float | None = None,
+        original_value: float | None = None,
+        recovered_value: float | None = None,
+        notes: str | None = None,
+        donation_recipient_id: str | None = None,
     ) -> BatchAction:
         """
         Update the action record when user takes actual action
@@ -100,11 +100,11 @@ class ActionTrackingService:
         actual_action: str,
         ai_score: float,
         user_id: str,
-        quantity_affected: Optional[float] = None,
-        original_value: Optional[float] = None,
-        recovered_value: Optional[float] = None,
-        notes: Optional[str] = None,
-        donation_recipient_id: Optional[str] = None,
+        quantity_affected: float | None = None,
+        original_value: float | None = None,
+        recovered_value: float | None = None,
+        notes: str | None = None,
+        donation_recipient_id: str | None = None,
     ) -> BatchAction:
         """
         Record when user immediately takes action based on AI recommendation

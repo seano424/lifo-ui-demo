@@ -1,7 +1,6 @@
 """Configuration settings for LIFO AI Core"""
 
 import os
-from typing import Optional
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
@@ -12,7 +11,7 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = ""
-    supabase_db_url: Optional[str] = None
+    supabase_db_url: str | None = None
     database_pool_size: int = 5
     database_max_overflow: int = 10
 

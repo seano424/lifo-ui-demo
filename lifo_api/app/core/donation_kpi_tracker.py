@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Optional
 
 import structlog
 from pydantic import BaseModel
@@ -37,9 +36,9 @@ class DonationImpactData:
     original_value: float
     cost_price: float
     donation_timestamp: datetime
-    pickup_timestamp: Optional[datetime]
-    delivery_timestamp: Optional[datetime]
-    completion_timestamp: Optional[datetime]
+    pickup_timestamp: datetime | None
+    delivery_timestamp: datetime | None
+    completion_timestamp: datetime | None
     eu_compliance_score: float
     temperature_maintained: bool
     recipient_type: str

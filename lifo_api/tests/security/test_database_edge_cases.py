@@ -138,7 +138,7 @@ class TestDatabaseVulnerabilities:
         # Simulate slow database response
         with patch("asyncpg.connect") as mock_connect:
             # Mock connection that hangs
-            mock_connect.side_effect = asyncio.TimeoutError("Connection timeout")
+            mock_connect.side_effect = TimeoutError("Connection timeout")
 
             # System should handle timeouts gracefully
             with pytest.raises(Exception):

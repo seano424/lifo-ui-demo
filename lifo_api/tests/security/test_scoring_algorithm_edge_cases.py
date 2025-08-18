@@ -240,7 +240,7 @@ class TestScoringBusinessLogicVulnerabilities:
 
             # All expired product recommendations must be identical
             assert variation_recommendation == base_recommendation, (
-                f"Expired product recommendations must be consistent regardless of other factors"
+                "Expired product recommendations must be consistent regardless of other factors"
             )
 
     def test_discount_calculation_manipulation(self):

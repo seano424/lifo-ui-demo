@@ -4,7 +4,7 @@ Multi-layer protection with input validation, rate limiting, and threat detectio
 """
 
 import time
-from typing import Callable
+from collections.abc import Callable
 
 import structlog
 from fastapi import HTTPException, Request, Response

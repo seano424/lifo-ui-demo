@@ -7,8 +7,7 @@ import html
 import re
 import urllib.parse
 import uuid
-from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import structlog
 from fastapi import HTTPException
@@ -96,7 +95,7 @@ class SecurityInputValidator:
         self,
         value: Any,
         input_type: str = "general",
-        max_length: Optional[int] = None,
+        max_length: int | None = None,
         allow_html: bool = False,
         strict_mode: bool = True,
     ) -> Any:
@@ -364,8 +363,8 @@ class SecurityInputValidator:
             return False
 
     def validate_json_input(
-        self, json_data: Dict[str, Any], max_depth: int = 10
-    ) -> Dict[str, Any]:
+        self, json_data: dict[str, Any], max_depth: int = 10
+    ) -> dict[str, Any]:
         """Validate JSON input for security issues"""
         if not isinstance(json_data, dict):
             raise InputValidationError("Input must be a JSON object")
@@ -416,7 +415,7 @@ security_validator = SecurityInputValidator()
 def validate_input(
     value: Any,
     input_type: str = "general",
-    max_length: Optional[int] = None,
+    max_length: int | None = None,
     allow_html: bool = False,
     strict_mode: bool = True,
 ) -> Any:

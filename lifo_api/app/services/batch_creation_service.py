@@ -5,7 +5,7 @@ Creates inventory batches from frontend scan data using existing database schema
 
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from pydantic import BaseModel, Field
@@ -29,8 +29,8 @@ class BatchFromScanRequest(BaseModel):
         max_length=255,
         description="Product name from OpenFoodFacts or manual",
     )
-    brand: Optional[str] = Field(None, max_length=100, description="Product brand")
-    category: Optional[str] = Field(
+    brand: str | None = Field(None, max_length=100, description="Product brand")
+    category: str | None = Field(
         None, max_length=100, description="Product category"
     )
 
@@ -39,24 +39,24 @@ class BatchFromScanRequest(BaseModel):
     expiry_date: date = Field(..., description="Product expiry date")
 
     # Pricing (optional)
-    cost_price: Optional[float] = Field(None, ge=0, description="Cost price per unit")
-    selling_price: Optional[float] = Field(
+    cost_price: float | None = Field(None, ge=0, description="Cost price per unit")
+    selling_price: float | None = Field(
         None, ge=0, description="Selling price per unit"
     )
 
     # Scan metadata
-    scan_confidence: Optional[float] = Field(
+    scan_confidence: float | None = Field(
         None, ge=0.0, le=1.0, description="Barcode scan confidence"
     )
-    ocr_extracted_date: Optional[str] = Field(
+    ocr_extracted_date: str | None = Field(
         None, description="Raw OCR text for expiry date"
     )
-    ocr_confidence: Optional[float] = Field(
+    ocr_confidence: float | None = Field(
         None, ge=0.0, le=1.0, description="OCR confidence score"
     )
 
     # OpenFoodFacts data (optional)
-    openfoodfacts_data: Optional[dict] = Field(
+    openfoodfacts_data: dict | None = Field(
         None, description="OpenFoodFacts product data"
     )
 
@@ -277,7 +277,7 @@ class BatchCreationService:
 
     async def get_recent_batches_from_scans(
         self, store_id: str, user_id: str, limit: int = 20
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Get recent batches created from scans"""
         async with self.async_session() as session:
             from app.database.inventory_models import Batch, Product
@@ -320,9 +320,9 @@ class BatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
+        batch_requests: list[BatchFromScanRequest],
         chunk_size: int = 50,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create multiple batches from CSV data with transaction management and chunking
 
@@ -429,9 +429,9 @@ class BatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        chunk_requests: List[BatchFromScanRequest],
+        chunk_requests: list[BatchFromScanRequest],
         chunk_start: int,
-    ) -> Dict[str, List]:
+    ) -> dict[str, list]:
         """
         Process a chunk of batch requests in a single transaction
 
@@ -528,7 +528,7 @@ class BatchCreationService:
                     "updated_products": updated_products,
                 }
 
-            except Exception as e:
+            except Exception:
                 await session.rollback()
                 raise
 

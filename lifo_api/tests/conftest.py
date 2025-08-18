@@ -10,29 +10,26 @@ Provides fixtures for:
 """
 
 import asyncio
-import json
 import os
 import time
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
+
+# =============================================================================
+# CRITICAL: Load test environment FIRST before any app imports
+# =============================================================================
+# This ensures that environment variables are loaded before any module
+# initialization that depends on them (like settings objects)
+# Load .env.test file if it exists
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
-# =============================================================================
-# CRITICAL: Load test environment FIRST before any app imports
-# =============================================================================
-# This ensures that environment variables are loaded before any module 
-# initialization that depends on them (like settings objects)
-
-# Load .env.test file if it exists
-from dotenv import load_dotenv
 
 # Get the directory containing this conftest.py file
 _current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -57,7 +54,7 @@ if 'DATABASE_URL' not in os.environ:
     os.environ['DATABASE_URL'] = 'sqlite+aiosqlite:///:memory:'
 
 # NOW it's safe to import app modules since environment is properly set
-from app.core.config import Settings, settings
+from app.core.config import settings
 from app.database.connection import Base, get_db
 from app.main import app
 from app.utils.performance import BoundedCache, PerformanceMonitor
@@ -162,12 +159,12 @@ def validate_test_environment(test_settings):
         assert test_settings.database_url == TEST_DATABASE_URL, "Test database URL not properly set"
         assert not test_settings.rate_limit_enabled, "Rate limiting should be disabled in tests"
         assert test_settings.debug is True, "Debug mode should be enabled in tests"
-        
+
         # Additional validation for critical test settings
         assert test_settings.rate_limit_per_minute >= 1000, "Rate limit should be high for tests"
         assert not test_settings.enable_performance_monitoring, "Performance monitoring should be disabled in tests"
         assert not test_settings.enable_alerting, "Alerting should be disabled in tests"
-        
+
     except AttributeError as e:
         pytest.fail(f"Missing required setting attribute: {e}")
     except AssertionError as e:
@@ -228,16 +225,16 @@ TEST-001,Test Product 1"""  # Missing required columns
 def test_settings(monkeypatch):
     """Override settings for testing with proper isolation."""
     try:
-        # Since environment variables are now loaded early, we only need to 
+        # Since environment variables are now loaded early, we only need to
         # apply any additional overrides that weren't in the .env.test file
         for key, value in DEFAULT_TEST_ENV.items():
             if key not in os.environ or os.environ[key] != value:
                 monkeypatch.setenv(key, value)
-        
-        # The settings object should already be properly initialized with 
+
+        # The settings object should already be properly initialized with
         # test environment values due to early loading
         test_settings_instance = settings  # Use existing settings instance
-        
+
         # Validate critical settings
         assert test_settings_instance.environment == "testing", (
             f"Failed to set testing environment - got '{test_settings_instance.environment}'. "
@@ -246,9 +243,9 @@ def test_settings(monkeypatch):
         assert test_settings_instance.database_url == TEST_DATABASE_URL, (
             f"Failed to set test database URL - got '{test_settings_instance.database_url}'"
         )
-        
+
         return test_settings_instance
-        
+
     except Exception as e:
         pytest.fail(f"Failed to configure test settings: {e}")
 
@@ -548,7 +545,7 @@ def pytest_configure(config):
     # Register custom markers
     config.addinivalue_line("markers", "requires_settings: Tests that require proper settings configuration")
     config.addinivalue_line("markers", "config_validation: Tests that validate configuration")
-    
+
     # Validate that test environment was loaded correctly
     print(f"pytest_configure: Environment = {os.environ.get('ENVIRONMENT', 'NOT_SET')}")
     print(f"pytest_configure: SUPABASE_URL = {os.environ.get('SUPABASE_URL', 'NOT_SET')}")
@@ -562,11 +559,11 @@ def pytest_runtest_setup(item):
             from app.core.config import settings
             if not hasattr(settings, 'rate_limit_enabled'):
                 pytest.skip("Settings not properly configured - missing rate_limit_enabled field")
-            
+
             # Validate that we're in test environment
             if settings.environment != "testing":
                 pytest.skip(f"Not in testing environment - got '{settings.environment}'")
-                
+
         except ImportError as e:
             pytest.skip(f"Cannot import settings: {e}")
         except AttributeError as e:

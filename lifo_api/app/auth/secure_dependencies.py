@@ -6,13 +6,12 @@ Provides security-hardened authentication and input validation
 import re
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import structlog
-from fastapi import Depends, Header, HTTPException, Request
+from fastapi import HTTPException, Request
 
 from app.auth.supabase_api_key_auth import (
-    APIKeyUser,
     SupabaseAPIKeyError,
     get_api_key_auth,
 )
@@ -69,7 +68,7 @@ async def get_current_user(
 
 async def get_optional_user(
     request: Request,
-) -> Optional[dict[str, Any]]:
+) -> dict[str, Any] | None:
     """
     Get current user if authenticated, None otherwise
     Used for endpoints that work with or without authentication
@@ -242,8 +241,8 @@ def validate_pagination_params(offset: int = 0, limit: int = 20) -> tuple[int, i
 
 
 def validate_date_range(
-    start_date: Optional[str], end_date: Optional[str]
-) -> tuple[Optional[datetime], Optional[datetime]]:
+    start_date: str | None, end_date: str | None
+) -> tuple[datetime | None, datetime | None]:
     """
     Validate date range parameters
     """

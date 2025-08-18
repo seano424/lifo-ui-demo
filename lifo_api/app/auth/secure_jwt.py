@@ -3,8 +3,8 @@ Simplified and Secure JWT Authentication for AI features only
 Part of hybrid architecture security remediation
 """
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import jwt
 import structlog
@@ -72,8 +72,8 @@ class SecureJWTAuth:
             # Additional expiry check
             exp_timestamp = payload.get("exp")
             if exp_timestamp:
-                exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
-                if exp_datetime < datetime.now(timezone.utc):
+                exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=UTC)
+                if exp_datetime < datetime.now(UTC):
                     raise SecureAuthError("Token expired")
 
             # Extract minimal required information
@@ -135,7 +135,7 @@ class SecureJWTAuth:
         except Exception:
             return False
 
-    def extract_user_id_only(self, token: str) -> Optional[str]:
+    def extract_user_id_only(self, token: str) -> str | None:
         """
         Extract only user ID from token for logging purposes
         Does not perform full verification

@@ -7,13 +7,11 @@ import asyncio
 import io
 import re
 from datetime import datetime, timedelta
-from typing import Any, Optional
 
 import structlog
 from google.api_core.client_options import ClientOptions
 from google.cloud import vision
 from PIL import Image
-from pydantic import BaseModel
 
 from app.models.base import ConfigurableModel
 
@@ -26,7 +24,7 @@ class BarcodeResult(ConfigurableModel):
     value: str
     format: str  # EAN_13, UPC_A, CODE_128, etc.
     confidence: float
-    bounding_box: Optional[dict[str, int]] = None
+    bounding_box: dict[str, int] | None = None
 
 
 class OCRResult(ConfigurableModel):
@@ -34,16 +32,16 @@ class OCRResult(ConfigurableModel):
 
     text: str
     confidence: float
-    bounding_box: Optional[dict[str, int]] = None
+    bounding_box: dict[str, int] | None = None
 
 
 class ExpiryDateResult(ConfigurableModel):
     """Parsed expiry date from OCR text"""
 
-    date: Optional[datetime] = None
+    date: datetime | None = None
     raw_text: str
     confidence: float
-    format_detected: Optional[str] = None  # DD/MM/YYYY, MM/DD/YYYY, etc.
+    format_detected: str | None = None  # DD/MM/YYYY, MM/DD/YYYY, etc.
 
 
 class VisionScanResult(ConfigurableModel):
@@ -69,7 +67,7 @@ class GoogleVisionService:
     Handles OCR, barcode detection, and text analysis
     """
 
-    def __init__(self, project_id: Optional[str] = None):
+    def __init__(self, project_id: str | None = None):
         """Initialize Google Vision client"""
         self.project_id = project_id
         self.client = None
@@ -1030,7 +1028,7 @@ class GoogleVisionService:
         text_upper = text.upper()
         return any(keyword in text_upper for keyword in product_keywords)
 
-    def _extract_bounding_box(self, bounding_poly) -> Optional[dict[str, int]]:
+    def _extract_bounding_box(self, bounding_poly) -> dict[str, int] | None:
         """Extract bounding box coordinates from Google Vision bounding poly"""
         try:
             if not bounding_poly or not bounding_poly.vertices:

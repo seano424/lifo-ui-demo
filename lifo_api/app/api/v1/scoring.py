@@ -3,7 +3,7 @@ Secure Scoring API endpoints for AI features only
 Part of hybrid architecture security remediation
 """
 
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -173,7 +173,7 @@ async def get_urgency_alerts(
 async def get_ai_recommendations(
     store_id: str,
     request: Request,
-    category: Optional[str] = Query(None, description="Filter by category"),
+    category: str | None = Query(None, description="Filter by category"),
     limit: int = Query(20, ge=1, le=50, description="Maximum recommendations"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),

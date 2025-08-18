@@ -5,7 +5,7 @@ Custom exceptions and error responses optimized for mobile consumption
 
 import traceback
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import Request
@@ -27,7 +27,7 @@ class MVPBaseException(Exception):
         status_code: int = 400,
         user_message: str = None,
         retry_allowed: bool = True,
-        retry_after_seconds: Optional[int] = None,
+        retry_after_seconds: int | None = None,
     ):
         self.message = message
         self.error_code = error_code

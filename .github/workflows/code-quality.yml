@@ -7,12 +7,16 @@ on:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
       - '.github/workflows/code-quality.yml'
+      - 'requirements.txt'
+      - 'pyproject.toml'
   pull_request:
     branches: [main]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
       - '.github/workflows/code-quality.yml'
+      - 'requirements.txt'
+      - 'pyproject.toml'
 
 jobs:
   quality-and-test:
@@ -24,6 +28,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: lifo_test
+          POSTGRES_USER: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -48,6 +53,11 @@ jobs:
           uv venv
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagic1
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -58,17 +68,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
-      - name: Quality Checks & Tests
-        working-directory: .
+      - name: Install dependencies
         run: |
           uv pip install -r requirements.txt
-          ruff check --select I --fix .
-          ruff format .
-          ruff format --check .
 
-      - name: Run Tests with Coverage
+      - name: Environment setup
         run: |
-          python -m pytest --cov=lifo_ai_core --cov=lifo_api --cov-report=xml
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/lifo_test" >> $GITHUB_ENV
+          echo "ENVIRONMENT=testing" >> $GITHUB_ENV
+          echo "DEBUG=true" >> $GITHUB_ENV
+
+      - name: Lint with Ruff
+        run: |
+          ruff check lifo_ai_core lifo_api --output-format=github
+          ruff format --check lifo_ai_core lifo_api
+
+      - name: Type checking with MyPy
+        run: |
+          mypy lifo_ai_core lifo_api
+
+      - name: Security scan with Ruff
+        run: |
+          ruff check --select=S lifo_ai_core lifo_api --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
+
+      - name: Run tests with coverage
+        run: |
+          python -m pytest lifo_api/tests/ -v \
+            --cov=lifo_ai_core \
+            --cov=lifo_api \
+            --cov-report=xml \
+            --cov-report=term \
+            --junit-xml=test-results.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -76,15 +106,7 @@ jobs:
           file: ./coverage.xml
           fail_ci_if_error: false
 
-      - name: Security Scans
-        run: |
-          cd ./lifo_ai_core
-          ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/ || echo "Security scan completed"
-          cd ../lifo_api
-          ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/ || echo "Security scan completed"
-          cd ..
-
-      - name: Dependency Security Check
+      - name: Dependency security audit
         uses: pypa/gh-action-pip-audit@v1.0.8
         with:
           inputs: requirements.txt

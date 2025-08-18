@@ -434,7 +434,7 @@ class SecureCSVProcessor:
 
                 # Convert row to dict and sanitize
                 row_data = {}
-                for header, value in zip(headers, row):
+                for header, value in zip(headers, row, strict=False):
                     sanitized_value = self._sanitize_csv_cell(value)
                     row_data[header] = sanitized_value
 

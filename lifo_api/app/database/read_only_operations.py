@@ -5,7 +5,7 @@ Part of hybrid architecture security remediation
 
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from sqlalchemy import text
@@ -97,7 +97,7 @@ class SecureReadOnlyOperations:
             )
             return []
 
-    async def get_batch_for_scoring(self, batch_id: str) -> Optional[dict[str, Any]]:
+    async def get_batch_for_scoring(self, batch_id: str) -> dict[str, Any] | None:
         """
         Get single batch data for scoring
         Uses parameterized query to prevent SQL injection

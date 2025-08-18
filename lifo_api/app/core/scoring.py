@@ -5,7 +5,7 @@ Port and enhancement of existing scoring engine with FastAPI integration
 
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from pydantic import BaseModel, Field
@@ -58,8 +58,8 @@ class ScoringInput(BaseModel):
     selling_price: Decimal
     location_code: str
     avg_daily_sales: float = 0.0
-    temperature: Optional[float] = None
-    humidity: Optional[float] = None
+    temperature: float | None = None
+    humidity: float | None = None
 
 
 class ScoringResult(BaseModel):
@@ -98,7 +98,7 @@ class InventoryScorer:
     """
 
     def __init__(
-        self, weights: Optional[ScoringWeights] = None, category: Optional[str] = None
+        self, weights: ScoringWeights | None = None, category: str | None = None
     ):
         """
         Initialize scorer with custom weights or category-specific weights
@@ -349,7 +349,7 @@ class InventoryScorer:
         expiry_score: float,
         velocity_score: float,
         margin_score: float,
-        category_weights: Optional[dict[str, float]] = None,
+        category_weights: dict[str, float] | None = None,
     ) -> float:
         """
         Calculate weighted composite score with enhanced logic
@@ -603,7 +603,7 @@ class ScoringService:
         batch_id: str,
         category_weights: dict[str, float] = None,
         track_recommendation: bool = True,
-    ) -> Optional[ScoringResult]:
+    ) -> ScoringResult | None:
         """Score a single batch with enhanced error handling - SECURE READ-ONLY VERSION"""
         try:
             # Import secure read-only operations
@@ -872,7 +872,7 @@ class ScoringService:
             raise
 
     async def _track_recommendation(
-        self, result: ScoringResult, store_id: Optional[str] = None
+        self, result: ScoringResult, store_id: str | None = None
     ):
         """Track AI recommendation for analytics"""
         try:

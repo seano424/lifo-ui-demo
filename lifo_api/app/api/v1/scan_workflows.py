@@ -6,7 +6,7 @@ Mobile-optimized endpoints for scan-in/scan-out workflows
 import time
 import uuid
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -520,7 +520,7 @@ def _suggest_category_from_sku(sku: str) -> str:
 
 async def _lookup_product_by_barcode(
     barcode: str, store_id: str, read_ops
-) -> Optional[dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Look up product by barcode"""
     # This would query the database for existing products with this barcode
     # For MVP implementation, return None to indicate new product needed
@@ -576,11 +576,11 @@ async def _trigger_realtime_update(
 class DonationScanRequest(BaseModel):
     """Request model for donation scanning workflow"""
 
-    recipient_id: Optional[str] = None
+    recipient_id: str | None = None
     check_donation_eligibility: bool = True
-    temperature_check: Optional[float] = None
+    temperature_check: float | None = None
     packaging_condition: str = "good"
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 @router.post("/scan-donation-check/{store_id}/{batch_id}")
@@ -884,7 +884,7 @@ async def execute_donation_action(
 async def get_donation_quick_scan_list(
     store_id: str,
     request: Request,
-    priority_filter: Optional[str] = Query(
+    priority_filter: str | None = Query(
         "high", description="Priority filter: critical, high, medium, all"
     ),
     limit: int = Query(20, ge=1, le=50, description="Maximum items to return"),

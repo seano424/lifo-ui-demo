@@ -3,9 +3,8 @@ Production-ready error handling middleware
 Comprehensive error processing, logging, and user-friendly responses
 """
 
-import json
 import time
-from typing import Callable
+from collections.abc import Callable
 
 import structlog
 from fastapi import HTTPException, Request, Response

@@ -4,7 +4,6 @@ Handles different authentication methods for different environments
 """
 
 import os
-from typing import Optional
 
 import structlog
 
@@ -22,7 +21,7 @@ class DeploymentAuthManager:
     def __init__(self):
         self.environment = settings.environment
 
-    async def get_auth_token_for_environment(self) -> Optional[str]:
+    async def get_auth_token_for_environment(self) -> str | None:
         """
         Get appropriate auth token based on environment
         """
@@ -33,7 +32,7 @@ class DeploymentAuthManager:
         else:
             return await self._get_staging_token()
 
-    async def _get_production_token(self) -> Optional[str]:
+    async def _get_production_token(self) -> str | None:
         """
         Production authentication - use service role or managed identity
         """
@@ -64,7 +63,7 @@ class DeploymentAuthManager:
         logger.error("No production authentication method available")
         return None
 
-    async def _get_development_token(self) -> Optional[str]:
+    async def _get_development_token(self) -> str | None:
         """
         Development authentication - more flexible options
         """
@@ -97,7 +96,7 @@ class DeploymentAuthManager:
         logger.error("No development authentication method available")
         return None
 
-    async def _get_staging_token(self) -> Optional[str]:
+    async def _get_staging_token(self) -> str | None:
         """
         Staging authentication - balance between security and flexibility
         """

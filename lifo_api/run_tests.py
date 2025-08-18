@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 
@@ -24,10 +25,10 @@ class TestRunner:
     def _setup_test_environment(self):
         """Setup test environment with proper isolation and configuration."""
         print("🔧 Setting up test environment...")
-        
+
         # Path to test environment file
         test_env_file = self.project_root / ".env.test"
-        
+
         if test_env_file.exists():
             print(f"   ✅ Loading test environment from: {test_env_file}")
             load_dotenv(test_env_file, override=True)
@@ -35,7 +36,7 @@ class TestRunner:
             print(f"   ⚠️  Test environment file not found: {test_env_file}")
             print("   ℹ️  Creating minimal test environment variables...")
             self._create_minimal_test_env()
-        
+
         # Set critical environment variables for testing
         os.environ["ENVIRONMENT"] = "testing"
         os.environ["DEBUG"] = "true"
@@ -43,21 +44,21 @@ class TestRunner:
         os.environ["RATE_LIMIT_ENABLED"] = "false"
         os.environ["ENABLE_PERFORMANCE_MONITORING"] = "false"
         os.environ["ENABLE_ALERTING"] = "false"
-        
+
         # Validate critical test environment variables
         self._validate_test_environment()
-        
+
         # Verify test dependencies are installed
         if not self._verify_dependencies():
-            raise EnvironmentError("Required test dependencies are missing")
-        
+            raise OSError("Required test dependencies are missing")
+
         print("   ✅ Test environment configured successfully")
 
     def _create_minimal_test_env(self):
         """Create minimal test environment variables if .env.test doesn't exist."""
         minimal_env = {
             "ENVIRONMENT": "testing",
-            "DEBUG": "true", 
+            "DEBUG": "true",
             "DATABASE_URL": "sqlite+aiosqlite:///:memory:",
             "RATE_LIMIT_ENABLED": "false",
             "SUPABASE_URL": "https://test.supabase.co",
@@ -69,7 +70,7 @@ class TestRunner:
             "ENABLE_PERFORMANCE_MONITORING": "false",
             "ENABLE_ALERTING": "false",
         }
-        
+
         for key, value in minimal_env.items():
             os.environ[key] = value
 
@@ -77,31 +78,31 @@ class TestRunner:
         """Validate that test environment is properly configured."""
         required_vars = [
             "ENVIRONMENT",
-            "DATABASE_URL", 
+            "DATABASE_URL",
             "SUPABASE_URL",
             "JWT_SECRET_KEY"
         ]
-        
+
         missing_vars = []
         for var in required_vars:
             if not os.environ.get(var):
                 missing_vars.append(var)
-        
+
         if missing_vars:
-            raise EnvironmentError(
+            raise OSError(
                 f"Missing required test environment variables: {missing_vars}"
             )
-        
+
         # Validate environment is set to testing
         if os.environ.get("ENVIRONMENT") != "testing":
-            raise EnvironmentError(
+            raise OSError(
                 f"ENVIRONMENT must be 'testing', got: {os.environ.get('ENVIRONMENT')}"
             )
-        
+
         # Validate database URL is test-safe
         db_url = os.environ.get("DATABASE_URL", "")
         if not (db_url.startswith("sqlite") or "test" in db_url):
-            raise EnvironmentError(
+            raise OSError(
                 f"DATABASE_URL appears unsafe for testing: {db_url}"
             )
 
@@ -110,24 +111,24 @@ class TestRunner:
         required_packages = [
             ("pytest", "pytest"),
             ("coverage", "pytest-cov"),
-            ("httpx", "httpx"), 
+            ("httpx", "httpx"),
             ("fastapi", "fastapi"),
             ("sqlalchemy", "sqlalchemy"),
             ("aiosqlite", "aiosqlite"),
         ]
-        
+
         missing_packages = []
         for package_name, import_name in required_packages:
             try:
                 __import__(import_name.replace("-", "_"))
             except ImportError:
                 missing_packages.append(package_name)
-        
+
         if missing_packages:
             print(f"   ⚠️  Missing required packages: {missing_packages}")
             print("   💡 Install with: pip install -r requirements-test.txt")
             return False
-            
+
         print("   ✅ All required test dependencies are installed")
         return True
 
@@ -378,7 +379,7 @@ class TestRunner:
         print(f"\n{'=' * 60}")
         print("🧹 CLEANING UP TEST ENVIRONMENT")
         print(f"{'=' * 60}")
-        
+
         # Clean up test database files if any were created
         test_db_files = list(self.project_root.glob("test*.db"))
         if test_db_files:
@@ -388,7 +389,7 @@ class TestRunner:
                     print(f"   ✅ Removed test database: {db_file.name}")
                 except Exception as e:
                     print(f"   ⚠️  Failed to remove {db_file.name}: {e}")
-        
+
         # Clean up temporary test files
         temp_files = list(self.project_root.glob("temp_*"))
         if temp_files:
@@ -398,7 +399,7 @@ class TestRunner:
                     print(f"   ✅ Removed temporary file: {temp_file.name}")
                 except Exception as e:
                     print(f"   ⚠️  Failed to remove {temp_file.name}: {e}")
-        
+
         print("   ✅ Test environment cleanup completed")
 
 
@@ -431,7 +432,7 @@ def main():
 
     try:
         runner = TestRunner()
-    except EnvironmentError as e:
+    except OSError as e:
         print(f"❌ Environment setup failed: {e}")
         sys.exit(1)
     except Exception as e:
@@ -447,7 +448,7 @@ def main():
 
     print("🧪 LIFO AI Engine - Comprehensive Test Suite")
     print("=" * 80)
-    
+
     # Display environment information
     print(f"Environment: {os.environ.get('ENVIRONMENT', 'unknown')}")
     print(f"Database: {os.environ.get('DATABASE_URL', 'not set')[:50]}...")
@@ -486,7 +487,7 @@ def main():
     # Print summary and generate reports
     runner.print_summary()
     runner.generate_reports()
-    
+
     # Clean up test environment (unless skipped)
     if not args.no_cleanup:
         runner.cleanup_test_environment()

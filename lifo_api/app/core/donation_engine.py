@@ -6,7 +6,7 @@ Provides basic donation recommendations based on expiry and scoring
 
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from pydantic import BaseModel

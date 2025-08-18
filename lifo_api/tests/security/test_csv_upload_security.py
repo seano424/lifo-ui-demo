@@ -3,15 +3,13 @@ Comprehensive security tests for CSV upload functionality
 Tests formula injection prevention, file validation, and sanitization
 """
 
-import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from app.security.csv_security import (
     CSVSecurityError,
     CSVSecurityValidator,
-    validate_and_sanitize_csv,
 )
 
 

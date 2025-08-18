@@ -3,13 +3,10 @@ Comprehensive unit tests for mobile endpoints
 Tests functionality, performance, and mobile optimization features
 """
 
-import json
 import time
-from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from fastapi import HTTPException
 from httpx import AsyncClient
 
 from app.api.v1.mobile_endpoints import (

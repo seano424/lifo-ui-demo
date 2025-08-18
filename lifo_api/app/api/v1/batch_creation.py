@@ -3,13 +3,11 @@ Batch Creation API Endpoints
 Creates inventory batches from scan session data
 """
 
-from typing import List
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.api.dependencies import get_current_user, get_store_access
-from app.core.rate_limiting import limiter
 from app.services.batch_creation_service import (
     BatchCreationResponse,
     BatchCreationService,
@@ -178,7 +176,7 @@ async def get_recent_batches_from_scans(
 # # @limiter.limit("3/minute")  # Lower limit for batch operations
 async def batch_create_from_scans(
     store_id: str,
-    batch_requests: List[BatchFromScanRequest],
+    batch_requests: list[BatchFromScanRequest],
     current_user=Depends(get_current_user),
     store_access=Depends(get_store_access),
 ):

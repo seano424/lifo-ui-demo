@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Literal
 
 import structlog
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 # Temporarily simplified imports for OpenAPI compatibility
