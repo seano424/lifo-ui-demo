@@ -2,17 +2,7 @@
 
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
-import {
-  BookOpen,
-  Bot,
-  SquareTerminal,
-  Calendar,
-  Box,
-  BarChart,
-  Target,
-  HelpCircle,
-  SettingsIcon,
-} from 'lucide-react'
+import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'

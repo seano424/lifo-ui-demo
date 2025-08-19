@@ -6,43 +6,76 @@ export default function TodosPage() {
     <div className="flex flex-col gap-10">
       <section className="flex flex-col gap-4">
         <SectionHeader
-          title="Quick Stats"
-          rightContent={<p className="text-sm text-muted-foreground">12 items</p>}
+          description="Example: 'Good morning! 3 critical batches, 7 discount opportunities, 12 stable items'"
+          title="Daily Summary"
         />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 border border-muted rounded-lg p-4">
-          <Skeleton className="w-full h-32 bg-muted" />
-          <Skeleton className="w-full h-32 bg-muted" />
-          <Skeleton className="w-full h-32 bg-muted" />
-          <Skeleton className="w-full h-32 bg-muted" />
+        <div className="flex flex-col gap-4 border border-muted rounded-lg p-4">
+          <Skeleton className="w-full h-10 aspect-square bg-muted" />
         </div>
       </section>
       <section className="flex flex-col gap-4">
         <SectionHeader
-          title="Urgent Actions"
-          rightContent={<p className="text-sm text-muted-foreground">8 items</p>}
+          title="Expiring Batches"
+          description="Expiring in the next 24-48 hours"
+          rightContent={<p className="text-sm text-muted-foreground">2 items</p>}
         />
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-        </div>
+
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
       </section>
       <section className="flex flex-col gap-4">
         <SectionHeader
-          title="Inventory Suggestions"
+          title="Recently Expired Batches"
+          description="Expired in the last 48 hours"
+          rightContent={<p className="text-sm text-muted-foreground">4 items</p>}
+        />
+
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeader
+          title="Discount Opportunities"
+          description="Example: Greek Yogurt Danone batch 1233: 30% discount could recover €15 (vs €0 if expired)"
           rightContent={<p className="text-sm text-muted-foreground">6 items</p>}
         />
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-          <Skeleton className="w-full h-48 aspect-square bg-muted" />
-        </div>
+
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeader
+          title="Donation Candidates"
+          description="Example: Fresh Vegetables ready for FoodBank pickup - 2 days until expiry"
+          rightContent={<p className="text-sm text-muted-foreground">6 items</p>}
+        />
+
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeader
+          title="Action History"
+          description="Your actions history at a glance. Click for a monthly report."
+          rightContent={<p className="text-sm text-muted-foreground">6 items</p>}
+        />
+
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
+        <Skeleton className="w-full h-10 aspect-square bg-muted" />
       </section>
     </div>
   )
