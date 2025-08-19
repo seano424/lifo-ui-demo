@@ -40,7 +40,7 @@ export default function SettingsTabs() {
         {t('tabs.notifications')}
       </Link>
       <Link
-        href="/dashboard/settings/account"
+        href="/dashboard/settings?tab=account"
         className={cn(
           isAccountSettings && 'border-b-2 border-brand-secondary',
           'flex-1 pb-2 flex items-center justify-center text-center',

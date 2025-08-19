@@ -102,7 +102,7 @@ export function StoreAccessDenied({
       message={`${storeName ? `For ${storeName}: ` : ''}${roleMessage}`}
       customAction={{
         label: 'View Your Profile',
-        href: '/dashboard/settings/account',
+        href: '/dashboard/settings?tab=account',
       }}
     />
   )

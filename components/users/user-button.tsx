@@ -26,7 +26,7 @@ export default function UserButton() {
   return (
     <Button
       asLink
-      href="/dashboard/settings/account"
+      href="/dashboard/settings?tab=account"
       variant="outline"
       size="sm"
       className="rounded-full border h-8 w-8"
