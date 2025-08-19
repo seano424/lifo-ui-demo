@@ -17,7 +17,7 @@ import ComingSoon from '@/components/ui/coming-soon'
 import { Typography } from '@/components/ui/typography'
 
 import { useUnifiedSettings } from '@/hooks/use-unified-settings'
-import { usePermissions } from '@/hooks/use-users'
+import { usePermissionsNew } from '@/hooks/use-complete-user-profile'
 
 type TabValue = 'store' | 'account' | 'team' | 'notifications' | 'billing' | 'security'
 
@@ -29,7 +29,7 @@ export default function UnifiedSettingsPage() {
   
   // Load all data once
   const { data: settingsData, isLoading, error } = useUnifiedSettings()
-  const { isOwner, isManager, isEmployee, isLoading: isLoadingPermissions, storeId } = usePermissions()
+  const { isOwner, isManager, isEmployee, isLoading: isLoadingPermissions, storeId } = usePermissionsNew()
 
   // Handle URL state for tab persistence
   useEffect(() => {
@@ -48,10 +48,15 @@ export default function UnifiedSettingsPage() {
     router.push(`/dashboard/settings?${newSearchParams.toString()}`, { scroll: false })
   }
 
-  // Determine which tabs to show based on permissions
+  // Determine which tabs to show based on permissions (single loading state!)
   const visibleTabs = () => {
-    // If permissions are still loading or no store is selected, show minimal tabs
-    if (isLoadingPermissions || !storeId) {
+    // If permissions are still loading, show skeleton tabs instead of wrong tabs
+    if (isLoadingPermissions) {
+      return null // This will trigger skeleton display
+    }
+
+    // If no store is selected, show minimal tabs
+    if (!storeId) {
       return ['store', 'account', 'notifications'] as TabValue[]
     }
 
@@ -87,7 +92,7 @@ export default function UnifiedSettingsPage() {
     )
   }
 
-  // Show loading state while permissions load
+  // Show loading state while permissions load (now much faster with single query!)
   if (isLoadingPermissions) {
     return (
       <div className="xl:w-[768px] mx-auto space-y-6 w-full">
@@ -114,44 +119,53 @@ export default function UnifiedSettingsPage() {
       />
       
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${visibleTabs().length}, 1fr)` }}>
-          {visibleTabs().includes('store') && (
+        {/* Show skeleton loader for tabs while permissions are loading */}
+        {visibleTabs() === null ? (
+          <div className="flex space-x-1 mb-6">
+            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-10 flex-1" />
+          </div>
+        ) : (
+          <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${visibleTabs()!.length}, 1fr)` }}>
+          {visibleTabs()!.includes('store') && (
             <TabsTrigger value="store" className="flex items-center gap-2">
               <Store className="h-4 w-4" />
               <span className="hidden sm:inline">{t('tabs.store')}</span>
             </TabsTrigger>
           )}
-          {visibleTabs().includes('account') && (
+          {visibleTabs()!.includes('account') && (
             <TabsTrigger value="account" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">{t('tabs.account')}</span>
             </TabsTrigger>
           )}
-          {visibleTabs().includes('team') && (
+          {visibleTabs()!.includes('team') && (
             <TabsTrigger value="team" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">{t('tabs.team')}</span>
             </TabsTrigger>
           )}
-          {visibleTabs().includes('notifications') && (
+          {visibleTabs()!.includes('notifications') && (
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <Bell className="h-4 w-4" />
               <span className="hidden sm:inline">{t('tabs.notifications')}</span>
             </TabsTrigger>
           )}
-          {visibleTabs().includes('billing') && (
+          {visibleTabs()!.includes('billing') && (
             <TabsTrigger value="billing" className="flex items-center gap-2">
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">{t('tabs.billing')}</span>
             </TabsTrigger>
           )}
-          {visibleTabs().includes('security') && (
+          {visibleTabs()!.includes('security') && (
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Lock className="h-4 w-4" />
               <span className="hidden sm:inline">{t('tabs.security')}</span>
             </TabsTrigger>
           )}
         </TabsList>
+        )}
 
         {/* Loading state - show skeleton while data loads */}
         {isLoading ? (
@@ -173,7 +187,7 @@ export default function UnifiedSettingsPage() {
             </TabsContent>
 
             {/* Team Management Tab */}
-            {visibleTabs().includes('team') && (
+            {visibleTabs()!.includes('team') && (
               <TabsContent value="team" className="mt-6">
                 <StoreUsersList />
               </TabsContent>
@@ -195,7 +209,7 @@ export default function UnifiedSettingsPage() {
             </TabsContent>
 
             {/* Billing Tab (Owner only) */}
-            {visibleTabs().includes('billing') && (
+            {visibleTabs()!.includes('billing') && (
               <TabsContent value="billing" className="mt-6">
                 <ComingSoon
                   title={t('billing.comingSoonTitle')}
@@ -212,7 +226,7 @@ export default function UnifiedSettingsPage() {
             )}
 
             {/* Security Tab (Owner/Manager only) */}
-            {visibleTabs().includes('security') && (
+            {visibleTabs()!.includes('security') && (
               <TabsContent value="security" className="mt-6">
                 <ComingSoon
                   title={t('security.comingSoonTitle')}
