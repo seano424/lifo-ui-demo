@@ -114,8 +114,28 @@
       "notifications": "Notifications",
       "account": "Compte",
       "team": "Équipe",
+      "billing": "Facturation",
+      "security": "Sécurité",
       "storeDescription": "Gérez les paramètres de votre magasin.",
       "notificationsDescription": "Gérez vos paramètres de notification."
+    },
+    "errors": {
+      "loadingFailed": "Échec du chargement des paramètres. Veuillez rafraîchir la page."
+    },
+    "notifications": {
+      "comingSoonTitle": "Bientôt disponible : Notifications",
+      "comingSoonDescription": "Nous travaillons sur l'ajout de notifications à votre tableau de bord.",
+      "checkBackSoon": "Veuillez revenir bientôt."
+    },
+    "billing": {
+      "comingSoonTitle": "Bientôt disponible : Facturation",
+      "comingSoonDescription": "Les fonctionnalités de facturation et de gestion des abonnements arrivent bientôt.",
+      "checkBackSoon": "Veuillez revenir bientôt."
+    },
+    "security": {
+      "comingSoonTitle": "Bientôt disponible : Sécurité",
+      "comingSoonDescription": "Paramètres de sécurité avancés et gestion des clés API à venir.",
+      "checkBackSoon": "Veuillez revenir bientôt."
     },
     "storeInformation": {
       "title": "Informations du magasin",

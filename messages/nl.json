@@ -114,8 +114,28 @@
       "notifications": "Meldingen",
       "account": "Account",
       "team": "Team",
+      "billing": "Facturering",
+      "security": "Beveiliging",
       "storeDescription": "Beheer uw winkelinstellingen.",
       "notificationsDescription": "Beheer uw meldingsinstellingen."
+    },
+    "errors": {
+      "loadingFailed": "Kan instellingen niet laden. Probeer de pagina te vernieuwen."
+    },
+    "notifications": {
+      "comingSoonTitle": "Binnenkort: Meldingen",
+      "comingSoonDescription": "We werken aan het toevoegen van meldingen aan uw dashboard.",
+      "checkBackSoon": "Kom binnenkort terug."
+    },
+    "billing": {
+      "comingSoonTitle": "Binnenkort: Facturering",
+      "comingSoonDescription": "Facturering en abonnementsbeheer functies komen eraan.",
+      "checkBackSoon": "Kom binnenkort terug."
+    },
+    "security": {
+      "comingSoonTitle": "Binnenkort: Beveiliging",
+      "comingSoonDescription": "Geavanceerde beveiligingsinstellingen en API-sleutelbeheer komen binnenkort.",
+      "checkBackSoon": "Kom binnenkort terug."
     },
     "storeInformation": {
       "title": "Winkelinformatie",

@@ -7,11 +7,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/dashboard/settings',
-        destination: '/dashboard/settings/store',
-        permanent: false,
-      },
-      {
         source: '/dashboard/inventory',
         destination: '/dashboard/inventory/products',
         permanent: false,

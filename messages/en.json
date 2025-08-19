@@ -113,8 +113,28 @@
       "notifications": "Notifications",
       "account": "Account",
       "team": "Team",
+      "billing": "Billing",
+      "security": "Security",
       "storeDescription": "Manage your store settings.",
       "notificationsDescription": "Manage your notification settings."
+    },
+    "errors": {
+      "loadingFailed": "Failed to load settings. Please try refreshing the page."
+    },
+    "notifications": {
+      "comingSoonTitle": "Coming Soon: Notifications",
+      "comingSoonDescription": "We're working on adding notifications to your dashboard.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "billing": {
+      "comingSoonTitle": "Coming Soon: Billing",
+      "comingSoonDescription": "Billing and subscription management features are on the way.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "security": {
+      "comingSoonTitle": "Coming Soon: Security",
+      "comingSoonDescription": "Advanced security settings and API key management coming soon.",
+      "checkBackSoon": "Please check back soon."
     },
     "storeInformation": {
       "title": "Store Information",

@@ -1,0 +1,235 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle, Store, Bell, User, Users, CreditCard, Lock } from 'lucide-react'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+
+// Import existing components - preserve all functionality
+import StoreInformation from '@/components/settings/store-information'
+import UserAccountInformation from '@/components/account/user-account-information'
+import { StoreUsersList } from '@/components/store-users/store-users-list'
+import ComingSoon from '@/components/ui/coming-soon'
+import { Typography } from '@/components/ui/typography'
+
+import { useUnifiedSettings } from '@/hooks/use-unified-settings'
+import { usePermissions } from '@/hooks/use-users'
+
+type TabValue = 'store' | 'account' | 'team' | 'notifications' | 'billing' | 'security'
+
+export default function UnifiedSettingsPage() {
+  const t = useTranslations('settings')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<TabValue>('store')
+  
+  // Load all data once
+  const { data: settingsData, isLoading, error } = useUnifiedSettings()
+  const { isOwner, isManager, isEmployee, isLoading: isLoadingPermissions, storeId } = usePermissions()
+
+  // Handle URL state for tab persistence
+  useEffect(() => {
+    const tab = searchParams.get('tab') as TabValue
+    if (tab && ['store', 'account', 'team', 'notifications', 'billing', 'security'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
+
+  const handleTabChange = (value: string) => {
+    const newTab = value as TabValue
+    setActiveTab(newTab)
+    // Update URL without causing navigation
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+    newSearchParams.set('tab', newTab)
+    router.push(`/dashboard/settings?${newSearchParams.toString()}`, { scroll: false })
+  }
+
+  // Determine which tabs to show based on permissions
+  const visibleTabs = () => {
+    // If permissions are still loading or no store is selected, show minimal tabs
+    if (isLoadingPermissions || !storeId) {
+      return ['store', 'account', 'notifications'] as TabValue[]
+    }
+
+    const baseTabs: TabValue[] = ['store', 'account', 'notifications']
+    
+    if (isOwner || isManager) {
+      baseTabs.push('team')
+    }
+    
+    if (isOwner) {
+      baseTabs.push('billing', 'security')
+    }
+    
+    return baseTabs
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="xl:w-[768px] mx-auto space-y-6 w-full">
+        <DashboardInsetHeader
+          title={t('title')}
+          description={t('description')}
+          className="py-4"
+        />
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {t('errors.loadingFailed')}
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  // Show loading state while permissions load
+  if (isLoadingPermissions) {
+    return (
+      <div className="xl:w-[768px] mx-auto space-y-6 w-full">
+        <DashboardInsetHeader
+          title={t('title')}
+          description={t('description')}
+          className="py-4"
+        />
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="xl:w-[768px] mx-auto space-y-6 w-full">
+      <DashboardInsetHeader
+        title={t('title')}
+        description={t('description')}
+        className="py-4"
+      />
+      
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${visibleTabs().length}, 1fr)` }}>
+          {visibleTabs().includes('store') && (
+            <TabsTrigger value="store" className="flex items-center gap-2">
+              <Store className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('tabs.store')}</span>
+            </TabsTrigger>
+          )}
+          {visibleTabs().includes('account') && (
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('tabs.account')}</span>
+            </TabsTrigger>
+          )}
+          {visibleTabs().includes('team') && (
+            <TabsTrigger value="team" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('tabs.team')}</span>
+            </TabsTrigger>
+          )}
+          {visibleTabs().includes('notifications') && (
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('tabs.notifications')}</span>
+            </TabsTrigger>
+          )}
+          {visibleTabs().includes('billing') && (
+            <TabsTrigger value="billing" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('tabs.billing')}</span>
+            </TabsTrigger>
+          )}
+          {visibleTabs().includes('security') && (
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('tabs.security')}</span>
+            </TabsTrigger>
+          )}
+        </TabsList>
+
+        {/* Loading state - show skeleton while data loads */}
+        {isLoading ? (
+          <div className="mt-6 space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        ) : (
+          <>
+            {/* Store Settings Tab */}
+            <TabsContent value="store" className="mt-6">
+              <StoreInformation />
+            </TabsContent>
+
+            {/* Account Settings Tab */}
+            <TabsContent value="account" className="mt-6">
+              <UserAccountInformation />
+            </TabsContent>
+
+            {/* Team Management Tab */}
+            {visibleTabs().includes('team') && (
+              <TabsContent value="team" className="mt-6">
+                <StoreUsersList />
+              </TabsContent>
+            )}
+
+            {/* Notifications Tab */}
+            <TabsContent value="notifications" className="mt-6">
+              <ComingSoon
+                title={t('notifications.comingSoonTitle')}
+                description={t('notifications.comingSoonDescription')}
+              >
+                <Typography variant="p" className="text-muted-foreground">
+                  {t('notifications.checkBackSoon')}
+                </Typography>
+                <Typography variant="h4" className="text-muted-foreground">
+                  👀
+                </Typography>
+              </ComingSoon>
+            </TabsContent>
+
+            {/* Billing Tab (Owner only) */}
+            {visibleTabs().includes('billing') && (
+              <TabsContent value="billing" className="mt-6">
+                <ComingSoon
+                  title={t('billing.comingSoonTitle')}
+                  description={t('billing.comingSoonDescription')}
+                >
+                  <Typography variant="p" className="text-muted-foreground">
+                    {t('billing.checkBackSoon')}
+                  </Typography>
+                  <Typography variant="h4" className="text-muted-foreground">
+                    💳
+                  </Typography>
+                </ComingSoon>
+              </TabsContent>
+            )}
+
+            {/* Security Tab (Owner/Manager only) */}
+            {visibleTabs().includes('security') && (
+              <TabsContent value="security" className="mt-6">
+                <ComingSoon
+                  title={t('security.comingSoonTitle')}
+                  description={t('security.comingSoonDescription')}
+                >
+                  <Typography variant="p" className="text-muted-foreground">
+                    {t('security.checkBackSoon')}
+                  </Typography>
+                  <Typography variant="h4" className="text-muted-foreground">
+                    🔒
+                  </Typography>
+                </ComingSoon>
+              </TabsContent>
+            )}
+          </>
+        )}
+      </Tabs>
+    </div>
+  )
+}
