@@ -9,7 +9,7 @@ export interface CompleteUserProfile {
     updated_at: string
     email_verified: boolean
     phone_verified: boolean
-    
+
     // Metadata fields
     username: string
     full_name: string
@@ -17,7 +17,7 @@ export interface CompleteUserProfile {
     avatar_url: string
     language_preference: SupportedLanguage
     last_login: string
-    
+
     // PIN-related fields
     pin_hash: string
     pin_set_at: string
@@ -27,19 +27,19 @@ export interface CompleteUserProfile {
     pin_locked_until: string
     pin_delivery_method: string
     migrated_from_user_mgmt: boolean
-    
+
     // Raw metadata for compatibility
     raw_user_meta_data: Record<string, unknown>
   }
-  
+
   user_stores: UserStoreAccess[]
-  
+
   current_store: CurrentStoreContext | null
-  
+
   global_roles: string[]
-  
+
   permission_summary: PermissionSummary | null
-  
+
   metadata: {
     query_timestamp: string
     has_store_access: boolean

@@ -8,7 +8,7 @@ export default getRequestConfig(async () => {
   try {
     // Try to get user's language preference from Supabase
     const cookieStore = await cookies()
-    
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,11 +21,13 @@ export default getRequestConfig(async () => {
             // No-op in server context
           },
         },
-      }
+      },
     )
 
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (user?.user_metadata?.language_preference) {
       const userLang = user.user_metadata.language_preference
       // Ensure the locale is one we support

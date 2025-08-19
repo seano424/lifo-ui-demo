@@ -26,10 +26,10 @@ export default function UnifiedSettingsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabValue>('store')
-  
+
   // Load all data once
-  const { data: settingsData, isLoading, error } = useUnifiedSettings()
-  const { isOwner, isManager, isEmployee, isLoading: isLoadingPermissions, storeId } = usePermissionsNew()
+  const { isLoading, error } = useUnifiedSettings()
+  const { isOwner, isManager, isLoading: isLoadingPermissions, storeId } = usePermissionsNew()
 
   // Handle URL state for tab persistence
   useEffect(() => {
@@ -61,15 +61,15 @@ export default function UnifiedSettingsPage() {
     }
 
     const baseTabs: TabValue[] = ['store', 'account', 'notifications']
-    
+
     if (isOwner || isManager) {
       baseTabs.push('team')
     }
-    
+
     if (isOwner) {
       baseTabs.push('billing', 'security')
     }
-    
+
     return baseTabs
   }
 
@@ -77,16 +77,10 @@ export default function UnifiedSettingsPage() {
   if (error) {
     return (
       <div className="xl:w-[768px] mx-auto space-y-6 w-full">
-        <DashboardInsetHeader
-          title={t('title')}
-          description={t('description')}
-          className="py-4"
-        />
+        <DashboardInsetHeader title={t('title')} description={t('description')} className="py-4" />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {t('errors.loadingFailed')}
-          </AlertDescription>
+          <AlertDescription>{t('errors.loadingFailed')}</AlertDescription>
         </Alert>
       </div>
     )
@@ -96,11 +90,7 @@ export default function UnifiedSettingsPage() {
   if (isLoadingPermissions) {
     return (
       <div className="xl:w-[768px] mx-auto space-y-6 w-full">
-        <DashboardInsetHeader
-          title={t('title')}
-          description={t('description')}
-          className="py-4"
-        />
+        <DashboardInsetHeader title={t('title')} description={t('description')} className="py-4" />
         <div className="space-y-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-32 w-full" />
@@ -112,12 +102,8 @@ export default function UnifiedSettingsPage() {
 
   return (
     <div className="xl:w-[768px] mx-auto space-y-6 w-full">
-      <DashboardInsetHeader
-        title={t('title')}
-        description={t('description')}
-        className="py-4"
-      />
-      
+      <DashboardInsetHeader title={t('title')} description={t('description')} className="py-4" />
+
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {/* Show skeleton loader for tabs while permissions are loading */}
         {visibleTabs() === null ? (
@@ -127,44 +113,47 @@ export default function UnifiedSettingsPage() {
             <Skeleton className="h-10 flex-1" />
           </div>
         ) : (
-          <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${visibleTabs()!.length}, 1fr)` }}>
-          {visibleTabs()!.includes('store') && (
-            <TabsTrigger value="store" className="flex items-center gap-2">
-              <Store className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('tabs.store')}</span>
-            </TabsTrigger>
-          )}
-          {visibleTabs()!.includes('account') && (
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('tabs.account')}</span>
-            </TabsTrigger>
-          )}
-          {visibleTabs()!.includes('team') && (
-            <TabsTrigger value="team" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('tabs.team')}</span>
-            </TabsTrigger>
-          )}
-          {visibleTabs()!.includes('notifications') && (
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('tabs.notifications')}</span>
-            </TabsTrigger>
-          )}
-          {visibleTabs()!.includes('billing') && (
-            <TabsTrigger value="billing" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('tabs.billing')}</span>
-            </TabsTrigger>
-          )}
-          {visibleTabs()!.includes('security') && (
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Lock className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('tabs.security')}</span>
-            </TabsTrigger>
-          )}
-        </TabsList>
+          <TabsList
+            className="grid w-full"
+            style={{ gridTemplateColumns: `repeat(${visibleTabs()!.length}, 1fr)` }}
+          >
+            {visibleTabs()!.includes('store') && (
+              <TabsTrigger value="store" className="flex items-center gap-2">
+                <Store className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('tabs.store')}</span>
+              </TabsTrigger>
+            )}
+            {visibleTabs()!.includes('account') && (
+              <TabsTrigger value="account" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('tabs.account')}</span>
+              </TabsTrigger>
+            )}
+            {visibleTabs()!.includes('team') && (
+              <TabsTrigger value="team" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('tabs.team')}</span>
+              </TabsTrigger>
+            )}
+            {visibleTabs()!.includes('notifications') && (
+              <TabsTrigger value="notifications" className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('tabs.notifications')}</span>
+              </TabsTrigger>
+            )}
+            {visibleTabs()!.includes('billing') && (
+              <TabsTrigger value="billing" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('tabs.billing')}</span>
+              </TabsTrigger>
+            )}
+            {visibleTabs()!.includes('security') && (
+              <TabsTrigger value="security" className="flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('tabs.security')}</span>
+              </TabsTrigger>
+            )}
+          </TabsList>
         )}
 
         {/* Loading state - show skeleton while data loads */}
