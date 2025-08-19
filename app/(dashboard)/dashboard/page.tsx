@@ -6,12 +6,12 @@ import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-da
 
 export default function Page() {
   return (
-    <div className="space-y-6 my-8">
+    <div className="flex flex-col gap-10 px-10 md:px-20">
       <DashboardInsetHeader title="Dashboard Overview" />
       <UrgentAlerts />
-      <QuickActionCards />
       <DashboardKPICards />
       <StoreInsightsDashboard />
+      <QuickActionCards />
     </div>
   )
 }

@@ -70,7 +70,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
       <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
         <Typography variant="h3">Today&apos;s priority actions</Typography>
 
-        <Button variant="black" asChild>
+        <Button asChild>
           <Link href="/dashboard/actionable-batches">
             Take Action <ArrowRightFromLine className="w-4 h-4" />
           </Link>

@@ -45,7 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="subtle">
+              <Button>
                 <BellIcon className="w-4 h-4" />
                 <span className="hidden md:block">Notifications</span>
               </Button>

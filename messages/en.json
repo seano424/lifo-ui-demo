@@ -589,7 +589,7 @@
       "login": "Login",
       "signup": "Business Signup",
       "logout": "Logout",
-      "goToDashboard": "Go to dashboard"
+      "goToDashboard": "Dashboard"
     }
   },
   "errors": {

@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { MapPin, Settings } from 'lucide-react'
+import { ChevronDown, MapPin, Settings } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -25,6 +25,7 @@ import type { Store } from '@/lib/queries/stores'
 import { cn } from '@/lib/utils'
 import { Typography } from './ui/typography'
 import { Skeleton } from './ui/skeleton'
+import { Button } from './ui/button'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
@@ -50,9 +51,6 @@ export function TeamSwitcher() {
                 'group-data-[state=collapsed]:border-none',
               )}
             >
-              {/* <div className="flex aspect-square size-5 animate-pulse items-center justify-center rounded-lg bg-muted">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted" />
-              </div> */}
               <div className="flex flex-col gap-1">
                 <Skeleton className="h-5 w-32 rounded bg-muted" />
               </div>
@@ -94,14 +92,9 @@ export function TeamSwitcher() {
         <SidebarMenuItem>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                className={cn('flex items-center gap-2 border rounded-lg px-4')}
-                disabled={isChangingStore}
-              >
-                <Typography variant="small" className="truncate">
-                  {activeStore.store_name}
-                </Typography>
-              </SidebarMenuButton>
+              <Button disabled={isChangingStore} variant="outline">
+                {activeStore.store_name}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
