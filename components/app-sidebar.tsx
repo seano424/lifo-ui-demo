@@ -86,17 +86,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   if (!user) return <div>Not logged in</div>
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="group-data-[collapsible=icon]:pt-5" {...props}>
       <SidebarHeader
         className={cn(
           'flex flex-col gap-2 justify-center items-center',
-          'group-data-[collapsible=icon]:items-center',
+          'group-data-[collapsible=icon]:pt-12',
         )}
       >
         <NavbarLogo
+          variant="horizontal"
+          size="md"
+          className={cn('group-data-[collapsible=icon]:hidden hidden sm:flex')}
+        />
+        <NavbarLogo
           variant="vertical"
           size="md"
-          className={cn('group-data-[collapsible=icon]:hidden')}
+          className={cn('group-data-[collapsible=icon]:hidden sm:hidden')}
         />
         <NavbarLogo
           variant="icon"
@@ -104,9 +109,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className={cn('group-data-[collapsible=icon]:block hidden')}
         />
 
-        <TeamSwitcher />
+        <div className={cn('group-data-[collapsible=icon]:hidden sm:hidden')}>
+          <TeamSwitcher />
+        </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="group-data-[collapsible=icon]:pt-5">
         <NavMain items={navigationData.navMain} />
       </SidebarContent>
       <SidebarFooter>
