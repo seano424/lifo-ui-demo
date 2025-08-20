@@ -15,6 +15,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 
 export function NavMain({
@@ -32,6 +33,7 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
+  const { setOpenMobile } = useSidebar()
 
   // Prevent hydration mismatch by tracking when we're hydrated
   const [isHydrated, setIsHydrated] = useState(false)
@@ -52,6 +54,11 @@ export function NavMain({
     }
 
     return false
+  }
+
+  // Close sidebar on mobile when clicking a link
+  const handleLinkClick = () => {
+    setOpenMobile(false)
   }
 
   return (
@@ -85,7 +92,7 @@ export function NavMain({
                         key={subItem.title}
                       >
                         <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                          <Link href={subItem.url} onClick={handleLinkClick}>
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
@@ -106,7 +113,7 @@ export function NavMain({
                 asChild
                 tooltip={item.title}
               >
-                <Link href={item.url} className="flex items-center w-full">
+                <Link href={item.url} className="flex items-center w-full" onClick={handleLinkClick}>
                   {item.icon && <item.icon className="text-secondary-900" />}
                   <span>{item.title}</span>
                 </Link>
