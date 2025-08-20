@@ -26,21 +26,21 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
 
   return user ? (
     <div
-      className={cn('flex items-center gap-4', isMobile && 'flex-col-reverse gap-2 items-start')}
+      className={cn('flex items-center gap-2', isMobile && 'flex-col-reverse gap-2 items-start')}
     >
       <Button asChild size="default" variant={'secondary'} className={cn(isMobile && 'w-full')}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
-      <LogoutButton variant="default" className={cn(isMobile && 'w-full')} />
+      <LogoutButton variant="gray" className={cn(isMobile && 'w-full')} />
     </div>
   ) : (
     <>
       {/* Desktop */}
-      <div className={cn('flex gap-4 items-center uppercase', isMobile && 'hidden')}>
-        <Button asChild size="sm" variant={'secondary'} className="uppercase">
+      <div className={cn('flex gap-2 items-center', isMobile && 'hidden')}>
+        <Button asChild variant={'secondary'}>
           <Link href="/onboarding/create-account">{t('signup')}</Link>
         </Button>
-        <Button asChild size="sm" variant={'default'} className="uppercase">
+        <Button asChild variant={'gray'}>
           <Link href="/auth/login">{t('login')}</Link>
         </Button>
       </div>
@@ -52,7 +52,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
           !isMobile && 'hidden',
         )}
       >
-        <Button asChild variant={'default'} className="uppercase w-full">
+        <Button asChild variant={'gray'} className="uppercase w-full">
           <Link href="/auth/login">{t('login')}</Link>
         </Button>
         <Button asChild variant={'secondary'} className="uppercase w-full">

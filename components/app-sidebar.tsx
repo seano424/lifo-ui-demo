@@ -2,21 +2,11 @@
 
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
-import {
-  BookOpen,
-  Bot,
-  SquareTerminal,
-  Calendar,
-  Box,
-  BarChart,
-  Target,
-  HelpCircle,
-  SettingsIcon,
-} from 'lucide-react'
+import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
-import { TeamSwitcher } from '@/components/team-switcher'
+
 import {
   Sidebar,
   SidebarContent,
@@ -41,18 +31,18 @@ function useNavigationData() {
           isActive: true,
         },
         {
-          title: t('input'),
-          url: '/dashboard/input',
+          title: t('inbound'),
+          url: '/dashboard/inbound',
           icon: Bot,
         },
         {
-          title: t('output'),
-          url: '/dashboard/output',
+          title: t('outbound'),
+          url: '/dashboard/outbound',
           icon: BookOpen,
         },
         {
-          title: t('todo'),
-          url: '/dashboard/to-do',
+          title: t('todos'),
+          url: '/dashboard/todos',
           icon: Calendar,
         },
         {
@@ -60,26 +50,26 @@ function useNavigationData() {
           url: '/dashboard/inventory',
           icon: Box,
         },
-        {
-          title: t('performance'),
-          url: '/dashboard/performance',
-          icon: BarChart,
-        },
-        {
-          title: t('milestones'),
-          url: '/dashboard/milestones',
-          icon: Target,
-        },
+        // {
+        //   title: t('performance'),
+        //   url: '/dashboard/performance',
+        //   icon: BarChart,
+        // },
+        // {
+        //   title: t('milestones'),
+        //   url: '/dashboard/milestones',
+        //   icon: Target,
+        // },
         {
           title: t('settings'),
           url: '/dashboard/settings',
           icon: SettingsIcon,
         },
-        {
-          title: t('helpCenter'),
-          url: '/dashboard/help-center',
-          icon: HelpCircle,
-        },
+        // {
+        //   title: t('helpCenter'),
+        //   url: '/dashboard/help-center',
+        //   icon: HelpCircle,
+        // },
       ],
     }),
     [t],
@@ -96,11 +86,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <div className={cn('flex items-center justify-center')}>
-          <NavbarLogo size="lg" />
-        </div>
-        <TeamSwitcher />
+      <SidebarHeader
+        className={cn('min-h-12 flex justify-center', 'group-data-[collapsible=icon]:items-center')}
+      >
+        <NavbarLogo
+          variant="horizontal"
+          size="md"
+          className={cn('group-data-[collapsible=icon]:hidden')}
+        />
+        <NavbarLogo
+          variant="icon"
+          size="sm"
+          className={cn('group-data-[collapsible=icon]:block hidden')}
+        />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navigationData.navMain} />

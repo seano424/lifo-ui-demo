@@ -1,13 +1,14 @@
+'use client'
 import { Typography } from '@/components/ui/typography'
+import { useTranslations } from 'next-intl'
 
 interface StatProps {
-  value: string
   label: string
   description: string
   subtext: string
 }
 
-function Stat({ value, label, description, subtext }: StatProps) {
+function Stat({ label, description, subtext }: StatProps) {
   return (
     <div className="flex flex-col rounded-xl bg-gradient-to-b from-white via-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl overflow-hidden transform hover:-translate-y-1 transition-all duration-300 h-full">
       {/* Header with plan name */}
@@ -17,17 +18,10 @@ function Stat({ value, label, description, subtext }: StatProps) {
         <div className="relative z-10">
           <Typography
             variant="h2"
-            className="text-xl text-bold text-center font-medium text-blue-800 mb-1"
+            className="text-4xl font-extrabold bg-clip-text text-center text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6"
           >
             {label}
           </Typography>
-
-          {/* Value with large display */}
-          <div className="mb-2 flex justify-center">
-            <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-              {value}
-            </span>
-          </div>
 
           <Typography
             variant="p"
@@ -49,6 +43,8 @@ function Stat({ value, label, description, subtext }: StatProps) {
 }
 
 export function BusinessStats() {
+  const t = useTranslations('landingpage.businessStats')
+
   return (
     <section className="w-full py-8 px-4 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
@@ -57,29 +53,26 @@ export function BusinessStats() {
           as={'h2'}
           className="text-center mb-16 pb-4 text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
         >
-          Maximize Your Profits, Minimize Your Losses
+          {t('title')}
         </Typography>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
           <Stat
-            value="22%"
-            label="Revenue Increase"
-            description="Average increase in business revenue"
-            subtext="Automatic discount suggestions to help move products quickly before they expire."
+            label={t('revenue.label')}
+            description={t('revenue.description')}
+            subtext={t('revenue.subtext')}
           />
 
           <Stat
-            value="85%"
-            label="Loss Reduction"
-            description="Easily reduce waste and save money"
-            subtext="Fewer expired products while doing less inventory management work."
+            label={t('lossReduction.label')}
+            description={t('lossReduction.description')}
+            subtext={t('lossReduction.subtext')}
           />
 
           <Stat
-            value="1500€"
-            label="Tax Credits"
-            description="From the first month on donations"
-            subtext="Increase your tax-deductible donations by connecting with a non-profit organization."
+            label={t('taxCredits.label')}
+            description={t('taxCredits.description')}
+            subtext={t('taxCredits.subtext')}
           />
         </div>
       </div>

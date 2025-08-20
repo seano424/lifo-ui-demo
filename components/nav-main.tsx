@@ -4,13 +4,11 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronRight, type LucideIcon } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -34,16 +32,15 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
-  const t = useTranslations('navigation')
 
-  // 🚀 FIX: Prevent hydration mismatch by tracking when we're hydrated
+  // Prevent hydration mismatch by tracking when we're hydrated
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
     setIsHydrated(true)
   }, [])
 
-  // 🚀 Helper function to check if path is active (only after hydration)
+  // Helper function to check if path is active (only after hydration)
   const isPathActive = (itemUrl: string) => {
     if (!isHydrated) return false // Prevent hydration mismatch
 
@@ -54,12 +51,15 @@ export function NavMain({
       return pathname.startsWith(itemUrl)
     }
 
+    if (itemUrl.includes('/inventory')) {
+      return pathname.startsWith(itemUrl)
+    }
+
     return false
   }
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="uppercase">{t('dashboard-title')}</SidebarGroupLabel>
       <SidebarMenu>
         {items.map(item =>
           item.items && item.items.length > 0 ? (
@@ -96,14 +96,15 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 className={cn(
-                  'hover:bg-muted py-6 px-4 rounded-lg',
-                  isPathActive(item.url) && 'bg-muted hover:!bg-muted',
+                  'hover:bg-secondary-100/80 p-3 rounded-xl font-medium',
+                  isPathActive(item.url) &&
+                    'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
                 )}
                 asChild
                 tooltip={item.title}
               >
                 <Link href={item.url} className="flex items-center w-full">
-                  {item.icon && <item.icon />}
+                  {item.icon && <item.icon className="text-secondary-900" />}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

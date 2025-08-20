@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-md font-medium transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden active:scale-[0.97] cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'rounded-xl tracking-wide font-semibold font-heading transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden active:scale-[0.97] cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -25,7 +25,7 @@ const buttonVariants = cva(
 
         // New subtle variants using lighter shades
         subtle:
-          'bg-primary-50 text-primary-900 shadow-xs hover:bg-primary-200 dark:bg-primary-900/20 dark:text-primary-300 dark:hover:bg-primary-900/30',
+          'bg-primary-600 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
         subtleSecondary:
           'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-200 dark:bg-secondary-900/20 dark:text-secondary-300 dark:hover:bg-secondary-900/30',
         subtleTertiary:
@@ -38,10 +38,12 @@ const buttonVariants = cva(
           'border border-brand-primary bg-background shadow-xs hover:bg-primary-50 hover:text-brand-primary dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
         brandSecondaryOutline:
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
+        black: 'bg-black text-white shadow-sm hover:bg-black/90',
+        gray: 'bg-gray-200 text-gray-900 shadow-sm hover:bg-gray-300',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs',
-        default: 'px-4 py-2 text-sm',
+        default: 'px-6 py-2.5 text-sm',
         lg: 'px-6 py-3 text-base',
         xl: 'px-8 py-4 text-lg',
         icon: 'h-9 w-9',

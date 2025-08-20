@@ -3,7 +3,6 @@ import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
-import { StoreProviderWrapper } from '@/components/providers/store-provider-wrapper'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { getMessages } from 'next-intl/server'
@@ -42,6 +41,8 @@ const robotoMono = Roboto_Mono({
   weight: ['400', '500', '600', '700'],
 })
 
+const devMode = process.env.NODE_ENV === 'development'
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -55,7 +56,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} scroll-smooth`}
     >
-      <body className="font-sans antialiased">
+      <body className={`font-sans antialiased ${devMode && 'debug-screens'}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -64,9 +65,7 @@ export default async function RootLayout({
         >
           <ReactQueryProvider>
             <LanguageProvider>
-              <IntlProvider initialMessages={messages}>
-                <StoreProviderWrapper>{children}</StoreProviderWrapper>
-              </IntlProvider>
+              <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
         </ThemeProvider>

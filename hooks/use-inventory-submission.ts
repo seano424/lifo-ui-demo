@@ -118,14 +118,14 @@ export function useBatchInventorySubmission() {
       return submitMultipleScannedProducts(productsWithStore)
     },
 
-    onMutate: async (products) => {
+    onMutate: async products => {
       // Show optimistic loading state
       toast.loading(`Submitting ${products.length} products to inventory...`, {
         id: 'batch-submission',
       })
     },
 
-    onSuccess: (result) => {
+    onSuccess: result => {
       // Dismiss loading toast
       toast.dismiss('batch-submission')
 
@@ -137,7 +137,7 @@ export function useBatchInventorySubmission() {
         })
 
         // Comprehensive cache invalidation for batch operations
-        
+
         // Invalidate all store-specific product and batch queries
         queryClient.invalidateQueries({
           queryKey: queryKeys.products.byStore(activeStoreId),
@@ -148,9 +148,7 @@ export function useBatchInventorySubmission() {
 
         // Invalidate product-specific batch queries for all affected products
         const uniqueProductIds = new Set(
-          result.results
-            .filter(r => r.success && r.productId)
-            .map(r => r.productId)
+          result.results.filter(r => r.success && r.productId).map(r => r.productId),
         )
 
         uniqueProductIds.forEach(productId => {
@@ -175,7 +173,7 @@ export function useBatchInventorySubmission() {
           toast.success(`Successfully submitted all ${result.successCount} products to inventory`)
         } else if (result.successCount > 0) {
           toast.warning(
-            `Submitted ${result.successCount} products successfully, ${result.failureCount} failed`
+            `Submitted ${result.successCount} products successfully, ${result.failureCount} failed`,
           )
         } else {
           toast.error('All product submissions failed')
@@ -188,7 +186,7 @@ export function useBatchInventorySubmission() {
     onError: (error: Error) => {
       // Dismiss loading toast
       toast.dismiss('batch-submission')
-      
+
       console.error('[useBatchInventorySubmission] Batch submission failed:', error)
       toast.error(`Failed to submit products: ${error.message}`)
     },
@@ -257,7 +255,7 @@ export function useScannedItemConverter() {
           category?: string
           data?: unknown
         }
-      }
+      },
     ): Omit<ScannedProductData, 'storeId'> => ({
       barcode: scannedItem.barcode,
       productName: scannedItem.productName,
@@ -279,7 +277,7 @@ export function useScannedItemConverter() {
         quantity: number
         price: number
       }>,
-      lookupResults?: Map<string, { product?: { category?: string; data?: unknown } }>
+      lookupResults?: Map<string, { product?: { category?: string; data?: unknown } }>,
     ): Array<Omit<ScannedProductData, 'storeId'>> => {
       return scannedItems.map(item => ({
         barcode: item.barcode,

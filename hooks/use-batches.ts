@@ -314,18 +314,22 @@ export function useBatchActions() {
         queryClient.setQueriesData(
           { queryKey: queryKeys.batches.byStore(activeStoreId) },
           (oldData: any) => {
-            if (!oldData) return oldData
+            if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) return oldData
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page: any) => ({
-                ...page,
-                data: page.data.map((batch: Batch) =>
-                  batch.batch_id === batchId
-                    ? { ...batch, ...updates, updated_at: new Date().toISOString() }
-                    : batch,
-                ),
-              })),
+              pages: oldData.pages.map((page: any) => {
+                if (!page || !page.data || !Array.isArray(page.data)) return page
+
+                return {
+                  ...page,
+                  data: page.data.map((batch: Batch) =>
+                    batch.batch_id === batchId
+                      ? { ...batch, ...updates, updated_at: new Date().toISOString() }
+                      : batch,
+                  ),
+                }
+              }),
             }
           },
         )
@@ -383,15 +387,19 @@ export function useBatchActions() {
         queryClient.setQueriesData(
           { queryKey: queryKeys.batches.byStore(activeStoreId) },
           (oldData: any) => {
-            if (!oldData) return oldData
+            if (!oldData || !oldData.pages || !Array.isArray(oldData.pages)) return oldData
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page: any) => ({
-                ...page,
-                data: page.data.filter((batch: Batch) => batch.batch_id !== batchId),
-                count: Math.max(0, page.count - 1),
-              })),
+              pages: oldData.pages.map((page: any) => {
+                if (!page || !page.data || !Array.isArray(page.data)) return page
+
+                return {
+                  ...page,
+                  data: page.data.filter((batch: Batch) => batch.batch_id !== batchId),
+                  count: Math.max(0, (page.count || 0) - 1),
+                }
+              }),
             }
           },
         )

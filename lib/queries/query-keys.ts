@@ -1,4 +1,4 @@
-// lib/queries/query-keys.ts - Updated to include product lookup queries
+// lib/queries/query-keys.ts
 import type { ProductFilters } from './products'
 import type { UserFilters } from './users'
 import type { BatchFilters } from './batches'
@@ -137,7 +137,43 @@ export const queryKeys = {
     all: ['inventorySubmission'] as const,
     single: () => [...queryKeys.inventorySubmission.all, 'single'] as const,
     batch: () => [...queryKeys.inventorySubmission.all, 'batch'] as const,
-    history: (storeId: string) => [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
+    history: (storeId: string) =>
+      [...queryKeys.inventorySubmission.all, 'history', storeId] as const,
+  },
+
+  // Urgent alerts queries for dashboard
+  urgentAlerts: {
+    all: ['urgentAlerts'] as const,
+    byStore: (storeId: string) => [...queryKeys.urgentAlerts.all, 'byStore', storeId] as const,
+  },
+
+  // Dashboard KPI queries
+  dashboardKPIs: {
+    all: ['dashboardKPIs'] as const,
+    byStore: (storeId: string) => [...queryKeys.dashboardKPIs.all, 'byStore', storeId] as const,
+    inventory: (storeId: string) =>
+      [...queryKeys.dashboardKPIs.byStore(storeId), 'inventory'] as const,
+    sales: (storeId: string) => [...queryKeys.dashboardKPIs.byStore(storeId), 'sales'] as const,
+    donations: (storeId: string) =>
+      [...queryKeys.dashboardKPIs.byStore(storeId), 'donations'] as const,
+    waste: (storeId: string) => [...queryKeys.dashboardKPIs.byStore(storeId), 'waste'] as const,
+  },
+
+  // Store insights queries
+  storeInsights: {
+    all: ['storeInsights'] as const,
+    store: (storeId: string) => [...queryKeys.storeInsights.all, 'store', storeId] as const,
+    actionable: (storeId: string) =>
+      [...queryKeys.storeInsights.all, 'actionable', storeId] as const,
+    allStores: () => [...queryKeys.storeInsights.all, 'allStores'] as const,
+  },
+
+  // Donation queries
+  donations: {
+    all: ['donations'] as const,
+    recipients: (storeId: string) => [...queryKeys.donations.all, 'recipients', storeId] as const,
+    actions: (storeId: string) => [...queryKeys.donations.all, 'actions', storeId] as const,
+    analytics: (storeId: string) => [...queryKeys.donations.all, 'analytics', storeId] as const,
   },
 } as const
 

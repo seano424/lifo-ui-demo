@@ -25,6 +25,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     setIsLoading(true)
     setError(null)
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      setIsLoading(false)
+      return
+    }
+
     if (password !== repeatPassword) {
       setError('Passwords do not match')
       setIsLoading(false)
@@ -84,6 +90,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                   type="password"
                   showPasswordToggle
                   required
+                  minLength={6}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                 />

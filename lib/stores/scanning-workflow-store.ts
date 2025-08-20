@@ -172,10 +172,28 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                 state.scannedProduct.productName =
                   result.product.product_name || result.product.product_name_en || 'Unknown Product'
                 state.scannedProduct.brand = result.product.brands || undefined
-                state.scannedProduct.category =
-                  result.product.categories?.split(',')[0] || undefined
+                state.scannedProduct.category = result.product.categories
+                  ? String(result.product.categories).split(',')[0]?.trim() || undefined
+                  : undefined
                 state.scannedProduct.imageUrl =
                   result.product.image_front_url || result.product.image_url || undefined
+              }
+
+              // Auto-advance to OCR step after lookup completes (whether found or not)
+              // This eliminates the manual "Proceed to Expiry Date Scanning" step
+              state.currentStep = 'ocr'
+
+              // Add to history for quick rescanning
+              const existingIndex = state.scanHistory.findIndex(
+                (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
+              )
+
+              if (existingIndex >= 0) {
+                // Update existing entry
+                state.scanHistory[existingIndex] = { ...state.scannedProduct }
+              } else {
+                // Add new entry (keep last 10)
+                state.scanHistory = [{ ...state.scannedProduct }, ...state.scanHistory.slice(0, 9)]
               }
             }
           }),
@@ -353,13 +371,23 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                 break
 
               case 'ocr':
-                // Go back to product confirmation (if we have product data) or barcode scanning
-                if (state.scannedProduct?.productName) {
-                  state.currentStep = 'product'
-                } else {
-                  state.currentStep = 'barcode'
-                  state.scannedProduct = null
+                // Since product step auto-advances now, go back to barcode scanning
+                state.currentStep = 'barcode'
+                // Keep scanned product in history but clear current scan
+                if (state.scannedProduct) {
+                  const existingIndex = state.scanHistory.findIndex(
+                    (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
+                  )
+                  if (existingIndex >= 0) {
+                    state.scanHistory[existingIndex] = { ...state.scannedProduct }
+                  } else {
+                    state.scanHistory = [
+                      { ...state.scannedProduct },
+                      ...state.scanHistory.slice(0, 9),
+                    ]
+                  }
                 }
+                state.scannedProduct = null
                 // Clear expiry info
                 state.expiryInfo = null
                 break
@@ -409,7 +437,7 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
             case 'product':
               return 'Scan Barcode'
             case 'ocr':
-              return state.scannedProduct?.productName ? 'Product Details' : 'Scan Barcode'
+              return 'Scan Barcode' // Since product step auto-advances, go back to barcode
             case 'confirmation':
               return 'Scan Expiry Date'
             case 'complete':

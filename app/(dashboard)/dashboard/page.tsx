@@ -1,20 +1,21 @@
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import DashboardTabs from '@/components/dashboard/dashboard-tabs'
+import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
+import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
+import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
+import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
 
 export default function Page() {
   return (
-    <div className="space-y-6">
-      <DashboardInsetHeader
-        title="Inventory Dashboard"
-        description="Track product batches by expiration date and reduce food waste with data-driven decisions"
-        rightContent={
-          <div className="flex flex-col items-end gap-2">
-            <span className="text-sm text-muted-foreground">Last updated</span>
-            <span className="text-sm font-bold">30-6-2025, 13:22:54</span>
-          </div>
-        }
-      />
-      <DashboardTabs />
+    <div className="flex flex-col gap-10 px-5 md:px-10 mb-40">
+      <DashboardInsetHeader title="Dashboard Overview" />
+      <UrgentAlerts />
+      <div className="bg-muted/50 rounded-2xl border-0 p-5">
+        <DashboardKPICards />
+      </div>
+      <StoreInsightsDashboard />
+      <div className="bg-muted/50 rounded-2xl border-0 p-5">
+        <QuickActionCards />
+      </div>
     </div>
   )
 }

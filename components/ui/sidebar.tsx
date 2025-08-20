@@ -465,15 +465,9 @@ const sidebarMenuButtonVariants = cva(
         outline:
           'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]',
       },
-      size: {
-        default: 'h-8 text-sm',
-        sm: 'h-7 text-xs',
-        lg: 'h-12 text-sm group-data-[collapsible=icon]:p-0!',
-      },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'default',
     },
   },
 )
@@ -482,7 +476,6 @@ function SidebarMenuButton({
   asChild = false,
   isActive = false,
   variant = 'default',
-  size = 'default',
   tooltip,
   className,
   ...props
@@ -498,9 +491,8 @@ function SidebarMenuButton({
     <Comp
       data-slot="sidebar-menu-button"
       data-sidebar="menu-button"
-      data-size={size}
       data-active={isActive}
-      className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+      className={cn(sidebarMenuButtonVariants({ variant }), className)}
       {...props}
     />
   )

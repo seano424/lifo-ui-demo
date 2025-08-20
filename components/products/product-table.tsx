@@ -147,11 +147,11 @@ export function ProductTable() {
                       <div
                         className={product.cost_price ? 'line-through text-muted-foreground' : ''}
                       >
-                        ${product.cost_price.toFixed(2)}
+                        €{product.cost_price.toFixed(2)}
                       </div>
                       {product.selling_price && (
                         <div className="text-blue-600 font-medium">
-                          ${product.selling_price.toFixed(2)}
+                          €{product.selling_price.toFixed(2)}
                         </div>
                       )}
                     </div>

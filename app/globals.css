@@ -2,6 +2,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@plugin 'tailwind-scrollbar';
+@plugin 'tailwindcss-debug-screens' {
+  classname: 'debug-screens';
+  position: 'bottom, left';
+  prefix: 'screen: ';
+}
+
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -35,35 +42,37 @@
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
 
-  /* Your existing custom brand colors (preserved) */
+  /* Your existing custom brand colors (updated with vibrant colors) */
   --color-brand-dark: hsl(225 42% 8%);
   --color-brand-white: hsl(0 0% 100%);
-  --color-brand-primary: hsl(263 82% 45%);
-  --color-brand-secondary: hsl(207 87% 54%);
+  /* Updated brand primary to match your new vibrant purple */
+  --color-brand-primary: hsl(252 100% 57%);
+  /* Updated brand secondary to match your new vibrant blue */
+  --color-brand-secondary: hsl(227 100% 63%);
 
-  /* New Primary Color Palette */
-  --color-primary-50: hsl(263 64% 90%);
-  --color-primary-100: hsl(263 66% 85%);
-  --color-primary-200: hsl(263 68% 80%);
-  --color-primary-300: hsl(263 70% 75%);
-  --color-primary-400: hsl(263 72% 70%);
-  --color-primary-500: hsl(263 74% 65%);
-  --color-primary-600: hsl(263 76% 60%);
-  --color-primary-700: hsl(263 78% 55%);
-  --color-primary-800: hsl(263 80% 50%);
-  --color-primary-900: hsl(263 82% 45%);
+  /* Updated Primary Color Palette - New Vibrant Purple */
+  --color-primary-50: hsl(252 100% 98%);
+  --color-primary-100: hsl(252 100% 95%);
+  --color-primary-200: hsl(252 100% 90%);
+  --color-primary-300: hsl(252 100% 85%);
+  --color-primary-400: hsl(252 100% 80%);
+  --color-primary-500: hsl(252 100% 75%);
+  --color-primary-600: hsl(252 100% 70%);
+  --color-primary-700: hsl(252 100% 65%);
+  --color-primary-800: hsl(252 100% 60%);
+  --color-primary-900: hsl(252 100% 57%);
 
-  /* New Secondary Color Palette */
-  --color-secondary-50: hsl(207 69% 99%);
-  --color-secondary-100: hsl(207 71% 94%);
-  --color-secondary-200: hsl(207 73% 89%);
-  --color-secondary-300: hsl(207 75% 84%);
-  --color-secondary-400: hsl(207 77% 79%);
-  --color-secondary-500: hsl(207 79% 74%);
-  --color-secondary-600: hsl(207 81% 69%);
-  --color-secondary-700: hsl(207 83% 64%);
-  --color-secondary-800: hsl(207 85% 59%);
-  --color-secondary-900: hsl(207 87% 54%);
+  /* Updated Secondary Color Palette - New Vibrant Blue */
+  --color-secondary-50: hsl(227 100% 98%);
+  --color-secondary-100: hsl(227 100% 95%);
+  --color-secondary-200: hsl(227 100% 90%);
+  --color-secondary-300: hsl(227 100% 85%);
+  --color-secondary-400: hsl(227 100% 80%);
+  --color-secondary-500: hsl(227 100% 75%);
+  --color-secondary-600: hsl(227 100% 70%);
+  --color-secondary-700: hsl(227 100% 65%);
+  --color-secondary-800: hsl(227 100% 63%);
+  --color-secondary-900: hsl(227 100% 58%);
 
   /* Font families */
   --font-sans:
@@ -75,6 +84,16 @@
   --font-mono:
     var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
+
+  /* Breakpoints */
+  --breakpoint-*: initial;
+  --breakpoint-xs: 360px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
 }
 
 @layer base {
@@ -87,12 +106,12 @@
     --popover: 0 0% 100%;
     --popover-foreground: 225 42% 8%;
 
-    /* Your brand primary - now using the 900 shade from your palette */
-    --primary: 263 82% 45%;
+    /* Updated primary to use the new vibrant purple */
+    --primary: 252 100% 57%;
     --primary-foreground: 0 0% 100%;
 
-    /* Your brand secondary - now using the 900 shade from your palette */
-    --secondary: 207 87% 54%;
+    /* Updated secondary to use the new vibrant blue */
+    --secondary: 227 100% 63%;
     --secondary-foreground: 0 0% 100%;
 
     /* Muted areas - subtle gray */
@@ -100,8 +119,8 @@
     --muted-foreground: 220 8% 46%;
 
     /* Accent - using primary-50 for consistency */
-    --accent: 263 64% 90%;
-    --accent-foreground: 263 82% 45%;
+    --accent: 252 100% 98%;
+    --accent-foreground: 252 100% 57%;
 
     /* Destructive - red for errors */
     --destructive: 0 84% 60%;
@@ -110,11 +129,11 @@
     /* Borders and inputs - subtle */
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 263 82% 45%;
+    --ring: 252 100% 57%;
 
-    /* Chart colors using your new palettes */
-    --chart-1: 263 82% 45%; /* Primary 900 */
-    --chart-2: 207 87% 54%; /* Secondary 900 */
+    /* Chart colors using your new vibrant palettes */
+    --chart-1: 252 100% 57%; /* New vibrant purple */
+    --chart-2: 227 100% 63%; /* New vibrant blue */
     --chart-3: 142 71% 45%; /* Complementary green */
     --chart-4: 38 92% 50%; /* Complementary orange */
     --chart-5: 346 87% 43%; /* Complementary pink */
@@ -131,21 +150,21 @@
     --popover: 225 42% 8%;
     --popover-foreground: 0 0% 98%;
 
-    /* Your brand primary - using primary-700 for better dark mode contrast */
-    --primary: 263 78% 55%;
+    /* Updated primary for dark mode - slightly adjusted for better contrast */
+    --primary: 252 100% 65%;
     --primary-foreground: 0 0% 100%;
 
-    /* Your brand secondary - using secondary-700 for better dark mode contrast */
-    --secondary: 207 83% 64%;
+    /* Updated secondary for dark mode - slightly adjusted for better contrast */
+    --secondary: 227 100% 70%;
     --secondary-foreground: 0 0% 100%;
 
     /* Muted areas - lighter than background */
     --muted: 225 42% 15%;
     --muted-foreground: 215 20% 65%;
 
-    /* Accent - using primary-900 on dark background */
+    /* Accent - using primary colors on dark background */
     --accent: 225 42% 15%;
-    --accent-foreground: 263 78% 55%;
+    --accent-foreground: 252 100% 65%;
 
     /* Destructive - slightly muted red for dark mode */
     --destructive: 0 63% 31%;
@@ -154,11 +173,11 @@
     /* Borders and inputs */
     --border: 225 42% 15%;
     --input: 225 42% 15%;
-    --ring: 263 78% 55%;
+    --ring: 252 100% 65%;
 
     /* Chart colors - using lighter shades for dark mode */
-    --chart-1: 263 78% 55%; /* Primary 700 */
-    --chart-2: 207 83% 64%; /* Secondary 700 */
+    --chart-1: 252 100% 65%; /* New vibrant purple for dark mode */
+    --chart-2: 227 100% 70%; /* New vibrant blue for dark mode */
     --chart-3: 142 71% 55%; /* Lighter green */
     --chart-4: 38 92% 60%; /* Lighter orange */
     --chart-5: 346 87% 53%; /* Lighter pink */
@@ -181,29 +200,38 @@
   [role='menuitem']:not(:disabled) {
     cursor: pointer;
   }
+
+  /* Add margin to debug screens indicator */
+  .debug-screens::before {
+    margin-left: 4rem !important;
+    margin-bottom: 1.5rem !important;
+    padding: 0.5rem !important;
+    border-radius: 4px;
+    font-weight: bold;
+  }
 }
 
 /* Sidebar variables */
 :root {
   --sidebar: 0 0% 98%;
   --sidebar-foreground: 225 42% 8%;
-  --sidebar-primary: 263 82% 45%;
+  --sidebar-primary: 252 100% 57%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 220 14% 96%;
   --sidebar-accent-foreground: 225 42% 8%;
   --sidebar-border: 220 13% 91%;
-  --sidebar-ring: 263 82% 45%;
+  --sidebar-ring: 252 100% 57%;
 }
 
 .dark {
   --sidebar: 225 42% 10%;
   --sidebar-foreground: 0 0% 98%;
-  --sidebar-primary: 263 78% 55%;
+  --sidebar-primary: 252 100% 65%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 225 42% 15%;
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: 225 42% 15%;
-  --sidebar-ring: 263 78% 55%;
+  --sidebar-ring: 252 100% 65%;
 }
 
 @theme inline {

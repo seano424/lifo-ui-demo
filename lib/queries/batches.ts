@@ -146,9 +146,6 @@ export async function fetchBatchesPage(
       throw new Error('Store ID is required for fetching batches')
     }
 
-    console.log('[fetchBatchesPage] Applying store filter:', filters.storeId)
-
-    // ✅ SIMPLE: Build query for batches only (no nested select to avoid PostgREST issues)
     let query = supabase
       .schema('inventory')
       .from('batches')
@@ -157,37 +154,28 @@ export async function fetchBatchesPage(
 
     // Apply filters one by one
     if (filters.product_id) {
-      console.log('[fetchBatchesPage] Applying product_id filter:', filters.product_id)
       query = query.eq('product_id', filters.product_id)
     }
 
     if (filters.status) {
-      console.log('[fetchBatchesPage] Applying status filter:', filters.status)
       query = query.eq('status', filters.status)
     }
 
     if (filters.location_code) {
-      console.log('[fetchBatchesPage] Applying location filter:', filters.location_code)
       query = query.eq('location_code', filters.location_code)
     }
 
     if (filters.supplier) {
-      console.log('[fetchBatchesPage] Applying supplier filter:', filters.supplier)
       query = query.ilike('supplier', `%${filters.supplier}%`)
     }
 
     if (filters.hasStock) {
-      console.log('[fetchBatchesPage] Applying hasStock filter')
       query = query.gt('current_quantity', 0)
     }
 
     if (filters.expiringInDays) {
       const expiryThreshold = new Date()
       expiryThreshold.setDate(expiryThreshold.getDate() + filters.expiringInDays)
-      console.log('[fetchBatchesPage] Applying expiring filter:', {
-        days: filters.expiringInDays,
-        threshold: expiryThreshold,
-      })
       query = query.lte('expiry_date', expiryThreshold.toISOString().split('T')[0])
     }
 
@@ -208,40 +196,27 @@ export async function fetchBatchesPage(
     }
 
     // ✅ FIXED: Apply single-column sorting compatible with PostgREST
-    console.log('[fetchBatchesPage] Applying sort:', {
-      field: filters.sort?.field,
-      direction: filters.sort?.direction,
-    })
     query = applySingleColumnSort(query, filters.sort)
 
     // Apply pagination
     const rangeFrom = page * pageSize
     const rangeTo = (page + 1) * pageSize - 1
-    console.log('[fetchBatchesPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
 
     const { data: batches, error, count } = await query.range(rangeFrom, rangeTo)
 
     if (error) {
-      console.error('[fetchBatchesPage] Supabase error:', error)
       throw new Error(`Failed to fetch batches page: ${error.message}`)
     }
 
     // ✅ FIXED: Fetch products separately to avoid complex join issues
     const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
 
-    console.log('[fetchBatchesPage] Success:', {
-      storeId: filters.storeId,
-      dataCount: batchesWithProducts.length,
-      totalCount: count,
-      hasNextPage: (count || 0) > (page + 1) * pageSize,
-    })
-
     return {
       data: batchesWithProducts,
       count: count || 0,
       nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined,
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('[fetchBatchesPage] Unexpected error:', err)
     throw err
   }
@@ -272,12 +247,6 @@ export async function createBatch(
     if (!batchData.store_id) {
       throw new Error('Store ID is required when creating a batch')
     }
-
-    console.log('[createBatch] Creating batch:', {
-      storeId: batchData.store_id,
-      batch_number: batchData.batch_number,
-      product_id: batchData.product_id,
-    })
 
     // ✅ VALIDATE: Product exists (products are global, but validate it exists)
     const { data: product, error: productError } = await supabase
@@ -313,8 +282,6 @@ export async function createBatch(
       .single()
 
     if (error) {
-      console.error('[createBatch] Supabase error:', error)
-
       // Handle specific error cases
       if (error.code === '23505') {
         // Unique constraint violation
@@ -324,12 +291,8 @@ export async function createBatch(
       throw new Error(`Failed to create batch: ${error.message}`)
     }
 
-    console.log('[createBatch] Success:', {
-      batchId: data.batch_id,
-      storeId: data.store_id,
-    })
     return data as Batch
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('[createBatch] Unexpected error:', err)
     throw err
   }
@@ -342,8 +305,6 @@ export async function updateBatch(
   const supabase = createClient()
 
   try {
-    console.log('[updateBatch] Updating batch:', { batchId, updates })
-
     // Add updated_at timestamp
     const updateWithTimestamp = {
       ...updates,
@@ -359,8 +320,6 @@ export async function updateBatch(
       .single()
 
     if (error) {
-      console.error('[updateBatch] Supabase error:', error)
-
       // Handle specific error cases
       if (error.code === 'PGRST116') {
         // No rows updated
@@ -375,9 +334,8 @@ export async function updateBatch(
       throw new Error(`Failed to update batch: ${error.message}`)
     }
 
-    console.log('[updateBatch] Success:', { batchId })
     return data as Batch
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('[updateBatch] Unexpected error:', err)
     throw err
   }
@@ -387,8 +345,6 @@ export async function deleteBatch(batchId: string): Promise<void> {
   const supabase = createClient()
 
   try {
-    console.log('[deleteBatch] Deleting batch:', { batchId })
-
     const { error } = await supabase
       .schema('inventory')
       .from('batches')

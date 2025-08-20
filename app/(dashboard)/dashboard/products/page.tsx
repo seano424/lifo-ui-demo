@@ -34,14 +34,14 @@ export default async function ProductsPage() {
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.userPreferences.detail(user.id),
-        queryFn: () => fetchUserPreferences(user.id, serverClient),
+        queryFn: () => fetchUserPreferences(serverClient),
         staleTime: 5 * 60 * 1000,
       }),
     ])
 
     // Get user's stores to determine which store to prefetch products for
     const stores = await fetchUserStores(user.id, serverClient)
-    const preferences = await fetchUserPreferences(user.id, serverClient)
+    const preferences = await fetchUserPreferences(serverClient)
 
     if (stores.length === 0) {
       // User has no stores - redirect to onboarding or show error

@@ -1,0 +1,88 @@
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+interface BatchListFiltersProps {
+  filters?: {
+    expiringInDays?: number
+    status?: string
+  }
+  onFiltersChange?: (filters: { expiringInDays?: number; status?: string }) => void
+  count: number
+  isLoading: boolean
+}
+
+export function BatchListFilters({
+  filters,
+  onFiltersChange,
+  count,
+  isLoading,
+}: BatchListFiltersProps) {
+  if (!onFiltersChange) {
+    return null
+  }
+
+  return (
+    <div className="flex justify-end gap-2">
+      <Select
+        value={filters?.expiringInDays?.toString() || 'all'}
+        onValueChange={value =>
+          onFiltersChange({
+            ...filters,
+            expiringInDays: value === 'all' ? undefined : parseInt(value),
+          })
+        }
+        disabled={isLoading}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Expiry filter" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All items </SelectItem>
+          <SelectItem value="3">Expiring in 3 days</SelectItem>
+          <SelectItem value="7">Expiring in 7 days</SelectItem>
+          <SelectItem value="14">Expiring in 14 days</SelectItem>
+          <SelectItem value="30">Expiring in 30 days</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={filters?.status || 'all'}
+        onValueChange={value =>
+          onFiltersChange({
+            ...filters,
+            status: value === 'all' ? undefined : value,
+          })
+        }
+        disabled={isLoading}
+      >
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All statuses</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="expired">Expired</SelectItem>
+          <SelectItem value="damaged">Damaged</SelectItem>
+          <SelectItem value="sold_out">Sold Out</SelectItem>
+          <SelectItem value="reserved">Reserved</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {isLoading && (
+        <Skeleton className="flex justify-center items-center gap-1 px-2">
+          <Skeleton className="h-2 w-4 bg-muted-foreground/10" />
+          <Skeleton className="h-2 w-16 bg-muted-foreground/10" />
+        </Skeleton>
+      )}
+      {!isLoading && count > 0 && (
+        <span className="text-sm flex items-center text-muted-foreground px-2">{count} items</span>
+      )}
+    </div>
+  )
+}

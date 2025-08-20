@@ -3,15 +3,71 @@
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "input": "Input",
-    "output": "Output",
-    "todo": "To-Do",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "todos": "Todos",
     "performance": "Performance",
     "milestones": "Milestones",
     "analytics": "Analytics",
     "settings": "Settings",
     "helpCenter": "Help Center",
-    "logout": "Logout"
+    "logout": "Logout",
+    "batches": "Batches",
+    "products": "Products"
+  },
+  "dashboard": {
+    "quickActions": {
+      "title": "Quick Actions",
+      "description": "Quickly add, remove, or view products and tasks.",
+      "addProducts": {
+        "title": "Add Products",
+        "description": "Add new products to your inventory with barcode scanning or manual entry.",
+        "action": "Add new products"
+      },
+      "todoSuggestions": {
+        "title": "Todo Suggestions",
+        "description": "View and manage tasks suggested by LIFO.AI to optimize your inventory.",
+        "action": "View todos"
+      },
+      "removeProducts": {
+        "title": "Remove Products",
+        "description": "Register sales, donations, or waste for items leaving your inventory.",
+        "action": "Remove products"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "No Stores Found",
+        "description": "You need to create a store before you can manage products. Please set up your first store to continue.",
+        "tip": {
+          "title": "Why do I need a store?",
+          "description": "Stores help you organize your inventory and track products efficiently. Each store can have its own inventory, settings, and team members."
+        },
+        "button": "Create Your First Store"
+      }
+    },
+    "kpis": {
+      "title": "Key Metrics Overview",
+      "refresh": "Refresh",
+      "inventory": {
+        "label": "Total Inventory Value",
+        "subtitle": "batches",
+        "productCount": "products"
+      },
+      "sales": {
+        "label": "Sales Revenue",
+        "subtitle": "sales"
+      },
+      "donations": {
+        "label": "Donations",
+        "subtitle": "recipients"
+      },
+      "waste": {
+        "label": "Waste Cost",
+        "subtitle": "items"
+      },
+      "errorMessage": "Some metrics could not be loaded. Please try refreshing."
+    }
   },
   "actions": {
     "add": "Add",
@@ -58,8 +114,28 @@
       "notifications": "Notifications",
       "account": "Account",
       "team": "Team",
+      "billing": "Billing",
+      "security": "Security",
       "storeDescription": "Manage your store settings.",
       "notificationsDescription": "Manage your notification settings."
+    },
+    "errors": {
+      "loadingFailed": "Failed to load settings. Please try refreshing the page."
+    },
+    "notifications": {
+      "comingSoonTitle": "Coming Soon: Notifications",
+      "comingSoonDescription": "We're working on adding notifications to your dashboard.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "billing": {
+      "comingSoonTitle": "Coming Soon: Billing",
+      "comingSoonDescription": "Billing and subscription management features are on the way.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "security": {
+      "comingSoonTitle": "Coming Soon: Security",
+      "comingSoonDescription": "Advanced security settings and API key management coming soon.",
+      "checkBackSoon": "Please check back soon."
     },
     "storeInformation": {
       "title": "Store Information",
@@ -153,7 +229,8 @@
         "invalidEmail": "Invalid email format",
         "invalidWebsite": "Invalid website URL",
         "descriptionTooLong": "Description too long"
-      }
+      },
+      "addStore": "Add Store"
     }
   },
   "users": {
@@ -277,12 +354,18 @@
       "save": "Save Changes",
       "cancel": "Cancel",
       "saving": "Saving...",
+      "saveChanges": "Save Changes",
       "validation": {
         "nameRequired": "Full name is required",
         "nameTooLong": "Full name must be less than 100 characters",
         "usernameRequired": "Username must be at least 2 characters",
         "usernameTooLong": "Username must be less than 50 characters",
         "usernameInvalid": "Username can only contain letters, numbers, and underscores"
+      },
+      "placeholders ": {
+        "fullName": "Enter your full name",
+        "email": "Enter your email address",
+        "username": "Enter your username"
       }
     },
     "phone": {
@@ -329,18 +412,60 @@
       "notice": "This is your personal account. You can change your password in the login page."
     }
   },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "Batch #",
+        "product": "Product",
+        "supplier": "Supplier",
+        "expiryDate": "Expiry Date",
+        "stock": "Stock",
+        "costPrice": "Cost Price",
+        "sellPrice": "Sell Price",
+        "status": "Status",
+        "location": "Location"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "editBatch": "Edit Batch",
+        "markAsExpired": "Mark as Expired",
+        "markAsDamaged": "Mark as Damaged",
+        "deleteBatch": "Delete Batch"
+      },
+      "emptyState": {
+        "title": "No batches found",
+        "description": "Try adjusting your search or filters. ",
+        "addFirstBatch": "Add First Batch"
+      },
+      "loadMore": "Load More Batches ({remaining} remaining)",
+      "loading": "Loading more..."
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "damaged": "Damaged",
+      "soldOut": "Sold Out",
+      "reserved": "Reserved"
+    },
+    "expiry": {
+      "expired": "Expired",
+      "daysLeft": "{days}d left"
+    }
+  },
   "common": {
     "more": "More"
   },
   "breadcrumbs": {
+    "batches": "Batches",
+    "billing": "Billings",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
-    "input": "Input",
-    "output": "Output",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
     "analytics": "Analytics",
     "performance": "Performance",
     "milestones": "Milestones",
-    "todo": "To-Do",
+    "todos": "Todos",
     "settings": "Settings",
     "store": "Store",
     "team": "Team",
@@ -354,7 +479,8 @@
     "account": "Account",
     "profile": "Profile",
     "help": "Help",
-    "support": "Support"
+    "support": "Support",
+    "addStore": "Add Store"
   },
   "addEmployee": {
     "title": "Add New Employee",
@@ -390,7 +516,7 @@
     "preview": {
       "username": "Username:",
       "pin": "PIN:",
-      "pinNote": "Will be generated automatically (4 digits)",
+      "pinNote": "Will be generated automatically (6 digits)",
       "loginNote": "The employee can log in using the \"Employee\" tab with their username and PIN"
     },
     "buttons": {
@@ -440,9 +566,11 @@
   },
   "marketing": {
     "nav": {
+      "about": "About",
       "resources": "Resources",
-      "products": "Products",
+      "product": "Product",
       "pricing": "Pricing",
+      "builtFor": "Built for",
       "helpCenter": "Help Center",
       "helpCenterDesc": "Get all the answers you need right here",
       "contactUs": "Contact Us",
@@ -464,7 +592,228 @@
       "login": "Login",
       "signup": "Business Signup",
       "logout": "Logout",
-      "goToDashboard": "Go to dashboard"
+      "goToDashboard": "Dashboard"
+    }
+  },
+  "errors": {
+    "pageNotFoundTitle": "Page not found",
+    "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+    "backToHome": "Back to Home",
+    "goBack": "Go Back",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact our support team"
+  },
+  "landingpage": {
+    "hero": {
+      "title": "The Future of Inventory Management is Here.",
+      "subtitle": "The smart solution to reduce waste and increase your profits",
+      "buttons": {
+        "freeTrial": "Start my free trial",
+        "explore": "Explore the platform"
+      },
+      "badge": {
+        "text": "Enjoy a 14-day free trial"
+      }
+    },
+    "features": {
+      "title": "Revolutionize Your Stock Control",
+      "expiryTracking": {
+        "title": "Real-time Expiry Tracking",
+        "description": "Never miss an expiration date with automated monitoring of your entire inventory."
+      },
+      "predictiveAlerts": {
+        "title": "Predictive Alerts",
+        "description": "Drastically reduce waste with AI-powered notifications before products expire."
+      },
+      "timeSaving": {
+        "title": "Time Saving",
+        "description": "Huge reduction in time spent on manual receipt management and daily inventories."
+      },
+      "errorFree": {
+        "title": "Error-Free Operations",
+        "description": "Elimination of human errors and administrative paperwork."
+      },
+      "discoverButton": "Discover LIFO",
+      "noCommitment": "No commitment!"
+    },
+    "businessStats": {
+      "title": "Maximize Your Profits, Minimize Your Losses",
+      "revenue": {
+        "label": "Revenue Increase",
+        "description": "Average increase in business revenue",
+        "subtext": "Automatic discount suggestions to help move products quickly before they expire."
+      },
+      "lossReduction": {
+        "label": "Loss Reduction",
+        "description": "Easily reduce waste and save money",
+        "subtext": "Fewer expired products while doing less inventory management work."
+      },
+      "taxCredits": {
+        "label": "Tax Credits",
+        "description": "From the first month on donations",
+        "subtext": "Increase your tax-deductible donations by connecting with a non-profit organization."
+      }
+    },
+    "cta": {
+      "title": "Switch to LIFO today",
+      "features": {
+        "quickSetup": {
+          "title": "Quick Setup",
+          "description": "Ready-to-use solution in minutes. No complex configuration required."
+        },
+        "freeTrial": {
+          "title": "30-day Free Trial",
+          "description": "Test all features with no commitment. Easy cancellation at any time."
+        },
+        "support": {
+          "title": "Dedicated Support",
+          "description": "Our team of experts guides you through every step of your journey."
+        },
+        "immediateResults": {
+          "title": "Immediate Results",
+          "description": "Reduce waste and increase profits from the first week of use."
+        }
+      },
+      "card": {
+        "title": "Ready to transform your inventory management?",
+        "description": "Join LIFO to optimize your inventory and maximize profits.",
+        "benefits": {
+          "noCommitment": "No commitment",
+          "instantSetup": "Instant setup",
+          "support": "24/7 Support"
+        },
+        "button": "Join the waitlist",
+        "noCreditCard": "No credit card required"
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contact Us",
+    "subtitle": "We are here to help",
+    "description": "Have a question, suggestion, or need assistance? Our team is ready to assist you.",
+    "form": {
+      "title": "Send us a message",
+      "description": "Fill out the form below and our team will get back to you as soon as possible.",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Subject of your message",
+      "message": "Message",
+      "messagePlaceholder": "Your message...",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "success": "Your message has been sent successfully. We will get back to you as soon as possible.",
+      "error": "An error occurred while sending the message"
+    },
+    "api": {
+      "allFieldsRequired": "All fields are required",
+      "emailSendingFailed": "Failed to send email",
+      "internalServerError": "Internal server error"
+    },
+    "features": {
+      "support": {
+        "title": "Responsive Support",
+        "description": "Our team typically responds within 24 business hours to all your inquiries."
+      },
+      "expertise": {
+        "title": "Dedicated Expertise",
+        "description": "Specialists in inventory management to answer your questions."
+      },
+      "followup": {
+        "title": "Personalized Follow-up",
+        "description": "Each request is handled individually with personalized follow-up."
+      }
+    }
+  },
+  "csvUpload": {
+    "title": "Ultra-Fast CSV Upload",
+    "subtitle": "Lightning-fast processing",
+    "dropZone": {
+      "dropHere": "Drop your CSV file here",
+      "orBrowse": "or click to browse",
+      "chooseFile": "Choose File"
+    },
+    "preview": {
+      "title": "Preview",
+      "table": {
+        "sku": "SKU",
+        "productName": "Product Name",
+        "category": "Category",
+        "quantity": "Qty",
+        "expiryDate": "Expiry Date"
+      },
+      "selectDate": "Select date",
+      "missingExpiryDate": "Missing expiry date",
+      "quantityLabel": "Qty:"
+    },
+    "buttons": {
+      "upload": "Upload",
+      "processing": "Processing...",
+      "reset": "Reset",
+      "uploadAnother": "Upload Another File"
+    },
+    "results": {
+      "title": "Upload Complete!",
+      "successSummary": "Successfully processed {processed} items",
+      "duplicatesSkipped": " • {skipped} duplicates skipped",
+      "uploadCompleted": "Upload completed",
+      "completedIn": "⚡ Completed in {time}ms",
+      "metrics": {
+        "processed": "Processed",
+        "skipped": "Skipped",
+        "itemsPerSec": "Items/sec",
+        "totalTime": "Total time"
+      },
+      "performance": {
+        "title": "Bulk Operation Performance Breakdown",
+        "duplicateCheck": "Duplicate Check",
+        "productResolution": "Product Resolution",
+        "batchInsertion": "Batch Insertion",
+        "productsCreated": "Products Created",
+        "dbProcessing": "DB Processing",
+        "optimization": "⚡ Bulk operations reduced processing time by {percentage}% compared to individual processing"
+      },
+      "duplicates": {
+        "viewSkipped": "View Skipped Duplicates ({count})",
+        "expiry": "Expiry"
+      }
+    },
+    "errors": {
+      "invalidFile": "Please select a CSV file",
+      "analysisFailure": "Failed to analyze CSV file",
+      "noFile": "Please select a file first",
+      "noStore": "Store information is missing. Please refresh and try again.",
+      "uploadFailed": "Upload Failed",
+      "startFailed": "Failed to start upload. Please try again."
+    },
+    "performanceInfo": {
+      "title": "Bulk-Optimized Ultra-Fast Performance",
+      "features": {
+        "bulkOps": "3 bulk database operations instead of N individual calls",
+        "autoDuplicate": "Automatic duplicate detection with zero user intervention",
+        "realtime": "Real-time performance metrics and timing breakdown",
+        "target": "Target: 1000+ items/sec with database RPC functions"
+      },
+      "footer": "🚀 Optimized for maximum speed while maintaining data integrity"
+    }
+  },
+  "footer": {
+    "description": "Helping businesses optimize inventory management with intelligent solutions to reduce waste and maximize profits.",
+    "quickLinks": "Quick Links",
+    "links": {
+      "aboutUs": "About Us",
+      "products": "Products",
+      "pricing": "Pricing",
+      "blog": "Blog"
+    },
+    "contactUs": "Contact Us",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. All rights reserved.",
+    "legal": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
     }
   }
 }

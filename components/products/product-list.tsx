@@ -25,7 +25,7 @@ import {
   Package,
   Edit,
   Trash2,
-  DollarSign,
+  Euro,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -270,10 +270,10 @@ export function ProductsList() {
                     <TableCell className="text-right">
                       <div>
                         <div className="font-bold text-lg">
-                          ${product.base_selling_price?.toFixed(2) || '0.00'}
+                          €{product.base_selling_price?.toFixed(2) || '0.00'}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Cost: ${product.base_cost_price?.toFixed(2) || '0.00'}
+                          Cost: €{product.base_cost_price?.toFixed(2) || '0.00'}
                         </div>
                       </div>
                     </TableCell>
@@ -301,7 +301,7 @@ export function ProductsList() {
                             onClick={() => handleUpdatePrice(product.product_id)}
                             disabled={isUpdating}
                           >
-                            <DollarSign className="mr-2 h-4 w-4" />
+                            <Euro className="mr-2 h-4 w-4" />
                             Update Price
                           </DropdownMenuItem>
                           <DropdownMenuItem
