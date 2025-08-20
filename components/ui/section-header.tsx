@@ -13,8 +13,10 @@ export default function SectionHeader({
   className?: string
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className={cn('flex justify-between items-center', className)}>
+    <div className="flex flex-col items-center text-center sm:text-left gap-2">
+      <div
+        className={cn('flex flex-col sm:flex-row sm:justify-between items-center gap-1', className)}
+      >
         <Typography variant="h2" className="font-bold">
           {title}
         </Typography>
