@@ -4,7 +4,6 @@ Handles different authentication methods for different environments
 """
 
 import os
-from typing import Optional
 
 import structlog
 
@@ -22,7 +21,7 @@ class DeploymentAuthManager:
     def __init__(self):
         self.environment = settings.environment
 
-    async def get_auth_token_for_environment(self) -> Optional[str]:
+    async def get_auth_token_for_environment(self) -> str | None:
         """
         Get appropriate auth token based on environment
         """
@@ -33,14 +32,17 @@ class DeploymentAuthManager:
         else:
             return await self._get_staging_token()
 
-    async def _get_production_token(self) -> Optional[str]:
+    async def _get_production_token(self) -> str | None:
         """
         Production authentication - use service role or managed identity
         """
         logger.info("Using production authentication")
 
         # Option 1: Service role (for server-to-server)
-        if hasattr(settings, "supabase_service_role_key") and settings.supabase_service_role_key:
+        if (
+            hasattr(settings, "supabase_service_role_key")
+            and settings.supabase_service_role_key
+        ):
             return settings.supabase_service_role_key
 
         # Option 2: Machine-to-machine authentication
@@ -61,14 +63,17 @@ class DeploymentAuthManager:
         logger.error("No production authentication method available")
         return None
 
-    async def _get_development_token(self) -> Optional[str]:
+    async def _get_development_token(self) -> str | None:
         """
         Development authentication - more flexible options
         """
         logger.info("Using development authentication")
 
         # Option 1: Service role (easiest for development)
-        if hasattr(settings, "supabase_service_role_key") and settings.supabase_service_role_key:
+        if (
+            hasattr(settings, "supabase_service_role_key")
+            and settings.supabase_service_role_key
+        ):
             return settings.supabase_service_role_key
 
         # Option 2: Development user credentials
@@ -91,14 +96,17 @@ class DeploymentAuthManager:
         logger.error("No development authentication method available")
         return None
 
-    async def _get_staging_token(self) -> Optional[str]:
+    async def _get_staging_token(self) -> str | None:
         """
         Staging authentication - balance between security and flexibility
         """
         logger.info("Using staging authentication")
 
         # Similar to production but with more logging and flexibility
-        if hasattr(settings, "supabase_service_role_key") and settings.supabase_service_role_key:
+        if (
+            hasattr(settings, "supabase_service_role_key")
+            and settings.supabase_service_role_key
+        ):
             return settings.supabase_service_role_key
 
         # Staging-specific service account
@@ -129,7 +137,9 @@ class DeploymentAuthManager:
             # Use environment-specific token
             token = await self.get_auth_token_for_environment()
             if not token:
-                raise ValueError(f"No authentication token available for {self.environment}")
+                raise ValueError(
+                    f"No authentication token available for {self.environment}"
+                )
 
             # Temporarily set the token and create client
             supabase_client.current_session = {"access_token": token}

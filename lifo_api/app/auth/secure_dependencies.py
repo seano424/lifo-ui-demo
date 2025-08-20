@@ -6,31 +6,32 @@ Provides security-hardened authentication and input validation
 import re
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import structlog
-from fastapi import Depends, Header, HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import HTTPException, Request
 
-from app.auth.supabase_jwt import SupabaseAuthError, get_supabase_auth
+from app.auth.supabase_api_key_auth import (
+    SupabaseAPIKeyError,
+    get_api_key_auth,
+)
 from app.core.config import settings
 from app.utils.mvp_exceptions import AuthenticationException, AuthorizationException
 
 logger = structlog.get_logger()
 
-# Initialize authentication
-# Use lazy initialization instead of creating instance at import time
-security = HTTPBearer()
+# Initialize authentication using new API key system
+# No need for HTTPBearer since we handle requests directly
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
 ) -> dict[str, Any]:
     """
-    Get current authenticated user from JWT token
+    Get current authenticated user using Supabase API key authentication
 
     Args:
-        credentials: Bearer token from request
+        request: FastAPI request object
 
     Returns:
         Dict containing user information
@@ -39,20 +40,14 @@ async def get_current_user(
         AuthenticationException: If authentication fails
     """
     try:
-        if not credentials:
-            logger.warning("No authentication credentials provided")
-            raise AuthenticationException("Authentication required")
-
-        token = credentials.credentials
-        if not token:
-            logger.warning("Empty authentication token")
-            raise AuthenticationException("Invalid authentication token")
-
-        # Verify token with Supabase
-        user = await get_supabase_auth().verify_token(token)
+        # Use the new API key authentication system
+        auth = get_api_key_auth()
+        user = await auth.validate_api_request(request)
 
         # Log successful authentication (without sensitive data)
-        logger.info("User authenticated successfully", user_id=user.user_id, role=user.role)
+        logger.info(
+            "User authenticated successfully", user_id=user.user_id, role=user.role
+        )
 
         return {
             "sub": user.user_id,
@@ -60,11 +55,11 @@ async def get_current_user(
             "role": user.role,
             "aud": user.aud,
             "authenticated": True,
-            "token": token,  # Include token for further validation
+            "permissions": auth.get_user_permissions(user),
         }
 
-    except SupabaseAuthError as e:
-        logger.warning("Supabase authentication failed", error=str(e))
+    except SupabaseAPIKeyError as e:
+        logger.warning("Supabase API key authentication failed", error=str(e))
         raise AuthenticationException("Invalid authentication token")
     except Exception as e:
         logger.error("Authentication error", error=str(e))
@@ -72,44 +67,58 @@ async def get_current_user(
 
 
 async def get_optional_user(
-    authorization: Optional[str] = Header(None),
-) -> Optional[dict[str, Any]]:
+    request: Request,
+) -> dict[str, Any] | None:
     """
     Get current user if authenticated, None otherwise
     Used for endpoints that work with or without authentication
     """
-    if not authorization or not authorization.startswith("Bearer "):
-        return None
-
     try:
-        token = authorization[7:]  # Remove "Bearer " prefix
-        user = await get_supabase_auth().verify_token(token)
+        # Check if Authorization header exists
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            return None
+
+        # Use the new API key authentication system
+        auth = get_api_key_auth()
+        user = await auth.validate_api_request(request)
+
         return {
             "sub": user.user_id,
             "email": user.email,
             "role": user.role,
             "authenticated": True,
+            "permissions": auth.get_user_permissions(user),
         }
     except Exception:
         return None
 
 
 async def require_service_role(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
 ) -> dict[str, Any]:
     """
     Require service role authentication
     Used for admin/internal endpoints
     """
     try:
-        token = credentials.credentials
-        if not get_supabase_auth().verify_service_role_token(token):
-            logger.warning("Service role authentication failed")
+        # Use the new API key authentication system
+        auth = get_api_key_auth()
+        user = await auth.validate_api_request(request)
+
+        # Check if user has service role
+        if user.role != "service_role":
+            logger.warning(
+                "Service role required but user has different role", role=user.role
+            )
             raise AuthorizationException("Service role required")
 
         logger.info("Service role authenticated")
-        return {"role": "service_role", "authenticated": True}
+        return {"role": "service_role", "authenticated": True, "user_id": user.user_id}
 
+    except SupabaseAPIKeyError as e:
+        logger.error("Service role authentication error", error=str(e))
+        raise AuthorizationException("Service role authentication failed")
     except Exception as e:
         logger.error("Service role authentication error", error=str(e))
         raise AuthorizationException("Service role authentication failed")
@@ -232,8 +241,8 @@ def validate_pagination_params(offset: int = 0, limit: int = 20) -> tuple[int, i
 
 
 def validate_date_range(
-    start_date: Optional[str], end_date: Optional[str]
-) -> tuple[Optional[datetime], Optional[datetime]]:
+    start_date: str | None, end_date: str | None
+) -> tuple[datetime | None, datetime | None]:
     """
     Validate date range parameters
     """
@@ -244,16 +253,22 @@ def validate_date_range(
         try:
             start_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid start_date format. Use ISO 8601")
+            raise HTTPException(
+                status_code=400, detail="Invalid start_date format. Use ISO 8601"
+            )
 
     if end_date:
         try:
             end_dt = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
         except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid end_date format. Use ISO 8601")
+            raise HTTPException(
+                status_code=400, detail="Invalid end_date format. Use ISO 8601"
+            )
 
     if start_dt and end_dt and start_dt > end_dt:
-        raise HTTPException(status_code=400, detail="start_date must be before end_date")
+        raise HTTPException(
+            status_code=400, detail="start_date must be before end_date"
+        )
 
     # Prevent excessive date ranges (more than 2 years)
     if start_dt and end_dt and (end_dt - start_dt).days > 730:
@@ -262,7 +277,9 @@ def validate_date_range(
     return start_dt, end_dt
 
 
-def sanitize_string_input(value: str, max_length: int = 255, field_name: str = "field") -> str:
+def sanitize_string_input(
+    value: str, max_length: int = 255, field_name: str = "field"
+) -> str:
     """
     Sanitize string input to prevent injection attacks
     """
@@ -303,8 +320,12 @@ def sanitize_string_input(value: str, max_length: int = 255, field_name: str = "
     value_lower = value.lower()
     for pattern in dangerous_patterns:
         if re.search(pattern, value_lower):
-            logger.warning("Dangerous pattern detected in input", pattern=pattern, field=field_name)
-            raise HTTPException(status_code=400, detail=f"Invalid content in {field_name}")
+            logger.warning(
+                "Dangerous pattern detected in input", pattern=pattern, field=field_name
+            )
+            raise HTTPException(
+                status_code=400, detail=f"Invalid content in {field_name}"
+            )
 
     return value
 

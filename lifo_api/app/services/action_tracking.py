@@ -6,7 +6,7 @@ Handles tracking of AI recommendations vs actual user actions
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +26,7 @@ class ActionTrackingService:
         store_id: str,
         ai_recommendation: str,
         ai_score: float,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
     ) -> BatchAction:
         """
         Create a record when AI generates a recommendation
@@ -53,11 +53,11 @@ class ActionTrackingService:
         action_id: str,
         actual_action: str,
         user_id: str,
-        quantity_affected: Optional[float] = None,
-        original_value: Optional[float] = None,
-        recovered_value: Optional[float] = None,
-        notes: Optional[str] = None,
-        donation_recipient_id: Optional[str] = None,
+        quantity_affected: float | None = None,
+        original_value: float | None = None,
+        recovered_value: float | None = None,
+        notes: str | None = None,
+        donation_recipient_id: str | None = None,
     ) -> BatchAction:
         """
         Update the action record when user takes actual action
@@ -100,11 +100,11 @@ class ActionTrackingService:
         actual_action: str,
         ai_score: float,
         user_id: str,
-        quantity_affected: Optional[float] = None,
-        original_value: Optional[float] = None,
-        recovered_value: Optional[float] = None,
-        notes: Optional[str] = None,
-        donation_recipient_id: Optional[str] = None,
+        quantity_affected: float | None = None,
+        original_value: float | None = None,
+        recovered_value: float | None = None,
+        notes: str | None = None,
+        donation_recipient_id: str | None = None,
     ) -> BatchAction:
         """
         Record when user immediately takes action based on AI recommendation
@@ -118,7 +118,9 @@ class ActionTrackingService:
             ai_score=Decimal(str(ai_score)),
             action_date=datetime.utcnow(),
             performed_by=uuid.UUID(user_id),
-            quantity_affected=Decimal(str(quantity_affected)) if quantity_affected else None,
+            quantity_affected=Decimal(str(quantity_affected))
+            if quantity_affected
+            else None,
             original_value=Decimal(str(original_value)) if original_value else None,
             recovered_value=Decimal(str(recovered_value)) if recovered_value else None,
             notes=notes,
@@ -177,7 +179,9 @@ class ActionTrackingService:
                     "total_recovered_value": float(row.total_recovered_value)
                     if row.total_recovered_value
                     else 0,
-                    "follow_rate": 1.0 if row.recommended_action == row.actual_action else 0.0,
+                    "follow_rate": 1.0
+                    if row.recommended_action == row.actual_action
+                    else 0.0,
                 }
                 for row in analytics_data
             ],

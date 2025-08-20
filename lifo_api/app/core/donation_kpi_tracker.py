@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Optional
 
 import structlog
 from pydantic import BaseModel
@@ -37,9 +36,9 @@ class DonationImpactData:
     original_value: float
     cost_price: float
     donation_timestamp: datetime
-    pickup_timestamp: Optional[datetime]
-    delivery_timestamp: Optional[datetime]
-    completion_timestamp: Optional[datetime]
+    pickup_timestamp: datetime | None
+    delivery_timestamp: datetime | None
+    completion_timestamp: datetime | None
     eu_compliance_score: float
     temperature_maintained: bool
     recipient_type: str
@@ -231,10 +230,14 @@ class DonationKPITracker:
         try:
             # Calculate individual metric categories
             financial_metrics = self._calculate_financial_metrics(donations_data)
-            environmental_metrics = self._calculate_environmental_metrics(donations_data)
+            environmental_metrics = self._calculate_environmental_metrics(
+                donations_data
+            )
             social_metrics = self._calculate_social_metrics(donations_data)
             compliance_metrics = self._calculate_eu_compliance_metrics(donations_data)
-            efficiency_metrics = self._calculate_operational_efficiency_metrics(donations_data)
+            efficiency_metrics = self._calculate_operational_efficiency_metrics(
+                donations_data
+            )
 
             # Calculate summary statistics
             total_donations = len(donations_data)
@@ -258,7 +261,9 @@ class DonationKPITracker:
                 efficiency_metrics,
                 total_donations,
             )
-            recommendations = self._generate_recommendations(compliance_metrics, efficiency_metrics)
+            recommendations = self._generate_recommendations(
+                compliance_metrics, efficiency_metrics
+            )
 
             # Calculate data quality score
             data_quality = self._assess_data_quality(donations_data)
@@ -338,7 +343,10 @@ class DonationKPITracker:
             net_financial_benefit=Decimal(str(net_benefit)),
             avg_donation_value=Decimal(str(total_value / len(donations_data))),
             cost_per_kg_donated=Decimal(
-                str(sum(d.cost_price * d.quantity_donated for d in donations_data) / total_quantity)
+                str(
+                    sum(d.cost_price * d.quantity_donated for d in donations_data)
+                    / total_quantity
+                )
             ),
         )
 
@@ -374,7 +382,9 @@ class DonationKPITracker:
             total_waste_diverted += quantity
 
         # Methane emissions avoided (approximately 25x more potent than CO2)
-        methane_avoided = total_waste_diverted * 0.1  # Estimate 0.1 kg methane per kg food waste
+        methane_avoided = (
+            total_waste_diverted * 0.1
+        )  # Estimate 0.1 kg methane per kg food waste
 
         # Packaging waste (estimate 5% of food weight)
         packaging_avoided = total_waste_diverted * 0.05
@@ -414,15 +424,16 @@ class DonationKPITracker:
 
         for donation in donations_data:
             meals_per_kg = self.social_factors["meals_per_kg"].get(donation.category, 4)
-            nutritional_multiplier = self.social_factors["nutritional_value_multiplier"].get(
-                donation.category, 1.0
-            )
+            nutritional_multiplier = self.social_factors[
+                "nutritional_value_multiplier"
+            ].get(donation.category, 1.0)
 
             meals = donation.quantity_donated * meals_per_kg * nutritional_multiplier
             total_meals += int(meals)
 
             social_value = (
-                donation.original_value * self.financial_factors["social_value_multiplier"]
+                donation.original_value
+                * self.financial_factors["social_value_multiplier"]
             )
             total_social_value += social_value
 
@@ -430,11 +441,15 @@ class DonationKPITracker:
         people_served = int(total_meals / 2.5)
 
         # Food security impact score (0-1 scale based on quantity and nutritional value)
-        food_security_score = min(1.0, total_meals / 1000)  # Normalize against 1000 meals
+        food_security_score = min(
+            1.0, total_meals / 1000
+        )  # Normalize against 1000 meals
 
         # Community benefit rating (based on diversity and volume)
         unique_recipients = len({d.recipient_type for d in donations_data})
-        community_benefit = min(5.0, (unique_recipients * total_meals) / 200)  # Scale to 1-5
+        community_benefit = min(
+            5.0, (unique_recipients * total_meals) / 200
+        )  # Scale to 1-5
 
         return SocialImpactMetrics(
             estimated_meals_provided=total_meals,
@@ -466,8 +481,12 @@ class DonationKPITracker:
             )
 
         total_donations = len(donations_data)
-        compliant_donations = sum(1 for d in donations_data if d.eu_compliance_score >= 0.9)
-        temperature_compliant = sum(1 for d in donations_data if d.temperature_maintained)
+        compliant_donations = sum(
+            1 for d in donations_data if d.eu_compliance_score >= 0.9
+        )
+        temperature_compliant = sum(
+            1 for d in donations_data if d.temperature_maintained
+        )
 
         # Simulate some compliance metrics based on data
         overall_compliance = compliant_donations / total_donations
@@ -481,7 +500,9 @@ class DonationKPITracker:
             1.0
             if not animal_product_donations
             else (
-                sum(1 for d in animal_product_donations if d.eu_compliance_score >= 0.95)
+                sum(
+                    1 for d in animal_product_donations if d.eu_compliance_score >= 0.95
+                )
                 / len(animal_product_donations)
             )
         )
@@ -494,7 +515,9 @@ class DonationKPITracker:
         return EUComplianceMetrics(
             overall_compliance_rate=overall_compliance,
             regulation_178_2002_compliance=overall_compliance,  # General Food Law
-            regulation_852_2004_compliance=min(1.0, overall_compliance + 0.05),  # Food Hygiene
+            regulation_852_2004_compliance=min(
+                1.0, overall_compliance + 0.05
+            ),  # Food Hygiene
             regulation_853_2004_compliance=regulation_853_compliance,  # Animal Products
             temperature_compliance_rate=temperature_compliance,
             traceability_compliance_rate=0.98,  # High rate for digital tracking
@@ -541,14 +564,22 @@ class DonationKPITracker:
 
         # Success rate calculation
         completed_donations = sum(1 for d in donations_data if d.completion_timestamp)
-        success_rate = completed_donations / len(donations_data) if donations_data else 1.0
+        success_rate = (
+            completed_donations / len(donations_data) if donations_data else 1.0
+        )
 
         # Process cost calculation (fixed cost + variable cost based on distance)
-        total_cost = sum(12.0 + (d.transportation_distance_km * 0.3) for d in donations_data)
-        avg_cost_per_donation = total_cost / len(donations_data) if donations_data else 15.50
+        total_cost = sum(
+            12.0 + (d.transportation_distance_km * 0.3) for d in donations_data
+        )
+        avg_cost_per_donation = (
+            total_cost / len(donations_data) if donations_data else 15.50
+        )
 
         return OperationalEfficiencyMetrics(
-            avg_time_identification_to_donation_hours=sum(identification_to_donation_times)
+            avg_time_identification_to_donation_hours=sum(
+                identification_to_donation_times
+            )
             / len(identification_to_donation_times)
             if identification_to_donation_times
             else 0.0,
@@ -579,11 +610,19 @@ class DonationKPITracker:
         first_half = donations_data[:mid_point]
         second_half = donations_data[mid_point:]
 
-        first_half_avg_value = sum(d.original_value for d in first_half) / len(first_half)
-        second_half_avg_value = sum(d.original_value for d in second_half) / len(second_half)
+        first_half_avg_value = sum(d.original_value for d in first_half) / len(
+            first_half
+        )
+        second_half_avg_value = sum(d.original_value for d in second_half) / len(
+            second_half
+        )
 
-        first_half_compliance = sum(d.eu_compliance_score for d in first_half) / len(first_half)
-        second_half_compliance = sum(d.eu_compliance_score for d in second_half) / len(second_half)
+        first_half_compliance = sum(d.eu_compliance_score for d in first_half) / len(
+            first_half
+        )
+        second_half_compliance = sum(d.eu_compliance_score for d in second_half) / len(
+            second_half
+        )
 
         value_trend = (
             "increasing"
@@ -605,7 +644,8 @@ class DonationKPITracker:
             "donation_value": value_trend,
             "compliance_score": compliance_trend,
             "overall": "positive"
-            if value_trend == "increasing" and compliance_trend in ["improving", "stable"]
+            if value_trend == "increasing"
+            and compliance_trend in ["improving", "stable"]
             else "stable",
         }
 
@@ -660,7 +700,9 @@ class DonationKPITracker:
         recommendations = []
 
         if compliance.overall_compliance_rate < 0.95:
-            recommendations.append("Implement additional EU compliance training for staff")
+            recommendations.append(
+                "Implement additional EU compliance training for staff"
+            )
 
         if compliance.temperature_compliance_rate < 0.9:
             recommendations.append(
@@ -668,10 +710,14 @@ class DonationKPITracker:
             )
 
         if efficiency.avg_time_identification_to_donation_hours > 12:
-            recommendations.append("Streamline donation identification and approval process")
+            recommendations.append(
+                "Streamline donation identification and approval process"
+            )
 
         if efficiency.cost_per_donation_process > 20:
-            recommendations.append("Optimize logistics routes to reduce donation processing costs")
+            recommendations.append(
+                "Optimize logistics routes to reduce donation processing costs"
+            )
 
         if compliance.critical_violations > 0:
             recommendations.append(

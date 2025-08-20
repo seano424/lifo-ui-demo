@@ -15,7 +15,6 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
-    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -55,7 +54,11 @@ class User(Base):
     # Properties to access custom fields from raw_user_meta_data
     @property
     def full_name(self):
-        return self.raw_user_meta_data.get("full_name") if self.raw_user_meta_data else None
+        return (
+            self.raw_user_meta_data.get("full_name")
+            if self.raw_user_meta_data
+            else None
+        )
 
     @property
     def phone(self):
@@ -71,7 +74,11 @@ class User(Base):
 
     @property
     def language(self):
-        return self.raw_user_meta_data.get("language", "fr") if self.raw_user_meta_data else "fr"
+        return (
+            self.raw_user_meta_data.get("language", "fr")
+            if self.raw_user_meta_data
+            else "fr"
+        )
 
 
 class Role(Base):
@@ -94,7 +101,9 @@ class UserRole(Base):
     __table_args__ = ({"schema": "user_mgmt"},)
 
     user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"), primary_key=True)
-    role_id = Column(UUID(as_uuid=True), ForeignKey("user_mgmt.roles.id"), primary_key=True)
+    role_id = Column(
+        UUID(as_uuid=True), ForeignKey("user_mgmt.roles.id"), primary_key=True
+    )
     assigned_at = Column(DateTime, default=func.now())
     assigned_by = Column(UUID(as_uuid=True))
 
@@ -135,7 +144,6 @@ class Store(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationships
-    products = relationship("Product", back_populates="store")  # Legacy products
     batches = relationship("Batch", back_populates="store")
     store_products = relationship(
         "StoreProduct", back_populates="store"
@@ -148,7 +156,9 @@ class StoreUser(Base):
     __tablename__ = "store_users"
     __table_args__ = ({"schema": "business"},)
 
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+    )
     user_id = Column(UUID(as_uuid=True), primary_key=True)
     role_in_store = Column(String(50), default="staff")
     permissions = Column(
@@ -170,12 +180,20 @@ class StoreSettings(Base):
     __tablename__ = "store_settings"
     __table_args__ = {"schema": "business"}
 
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
-    scoring_weights = Column(JSONB, default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2})
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+    )
+    scoring_weights = Column(
+        JSONB, default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
+    )
     critical_threshold = Column(NUMERIC(3, 2), default=0.80)
     warning_threshold = Column(NUMERIC(3, 2), default=0.60)
-    opening_hours = Column(JSONB, default={"monday": {"open": "08:00", "close": "20:00"}})
-    peak_hours = Column(JSONB, default={"morning": "08:00-10:00", "evening": "17:00-19:00"})
+    opening_hours = Column(
+        JSONB, default={"monday": {"open": "08:00", "close": "20:00"}}
+    )
+    peak_hours = Column(
+        JSONB, default={"morning": "08:00-10:00", "evening": "17:00-19:00"}
+    )
     weather_location_lat = Column(NUMERIC(10, 8))
     weather_location_lon = Column(NUMERIC(11, 8))
     currency = Column(String(3), default="EUR")
@@ -186,89 +204,7 @@ class StoreSettings(Base):
 # This legacy model conflicted with the new normalized products table
 
 
-class Batch(Base):
-    """Inventory batches - the core of LIFO tracking with global products support"""
-
-    __tablename__ = "batches"
-    __table_args__ = (
-        UniqueConstraint("store_id", "batch_number", name="uq_store_batch_number"),
-        CheckConstraint(
-            "status IN ('active', 'sold', 'expired', 'damaged', 'returned')",
-            name="chk_batch_status",
-        ),
-        CheckConstraint(
-            "batch_source IN ('manual', 'ocr', 'barcode', 'import', 'api')",
-            name="chk_batch_source",
-        ),
-        CheckConstraint(
-            "verification_status IN ('verified', 'pending', 'flagged', 'rejected')",
-            name="chk_verification_status",
-        ),
-        CheckConstraint(
-            "recognition_confidence IS NULL OR (recognition_confidence >= 0.0 AND recognition_confidence <= 1.0)",
-            name="chk_confidence_range",
-        ),
-        CheckConstraint(
-            "product_id IS NOT NULL",
-            name="chk_product_reference",
-        ),
-        {"schema": "inventory"},
-    )
-
-    batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
-    # Product reference (normalized products in inventory schema)
-    product_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
-    )
-
-    batch_number = Column(String(100), nullable=False)
-
-    # Quantities
-    initial_quantity = Column(NUMERIC(12, 4), nullable=False)
-    current_quantity = Column(NUMERIC(12, 4), nullable=False)
-    reserved_quantity = Column(NUMERIC(12, 4), default=0)
-    available_quantity = Column(NUMERIC(12, 4))  # Computed: current - reserved
-
-    # Dates
-    manufacture_date = Column(Date)
-    expiry_date = Column(Date, nullable=False)
-    received_date = Column(Date, default=func.current_date())
-
-    # Pricing (can inherit from store_product or be overridden)
-    cost_price = Column(NUMERIC(12, 4))  # Optional - can inherit from store_product
-    selling_price = Column(NUMERIC(12, 4))  # Optional - can inherit from store_product
-    inherited_from_store_product = Column(Boolean, default=True)
-
-    # Supplier and sourcing
-    supplier = Column(String(100))
-
-    # Enhanced batch tracking
-    batch_source = Column(String(50), default="manual")  # manual, ocr, barcode, import, api
-    recognition_confidence = Column(NUMERIC(3, 2))  # For OCR/barcode recognized batches
-    verification_status = Column(
-        String(20), default="verified"
-    )  # verified, pending, flagged, rejected
-    barcode_scanned = Column(String(50))  # Barcode used to create this batch
-    # ocr_session_id = Column(UUID(as_uuid=True))  # OCR integration simplified/removed
-
-    # Location and status
-    location_code = Column(String(50), default="MAIN")
-    status = Column(String(20), default="active")
-
-    # Multi-tenant support
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"))
-
-    # Audit
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    created_by = Column(UUID(as_uuid=True))
-    updated_by = Column(UUID(as_uuid=True))
-
-    # Relationships
-    store = relationship("Store", back_populates="batches")
-    product = relationship("Product", back_populates="batches")
-    scores = relationship("ProductScore", back_populates="batch")
+# Batch model moved to inventory_models.py to avoid duplication
 
 
 class CategoryWeight(Base):
@@ -311,9 +247,15 @@ class ProductScore(Base):
     __tablename__ = "product_scores"
     __table_args__ = (
         UniqueConstraint("batch_id", name="uq_batch_score"),
-        CheckConstraint("expiry_score >= 0 AND expiry_score <= 1", name="chk_expiry_score"),
-        CheckConstraint("velocity_score >= 0 AND velocity_score <= 1", name="chk_velocity_score"),
-        CheckConstraint("margin_score >= 0 AND margin_score <= 1", name="chk_margin_score"),
+        CheckConstraint(
+            "expiry_score >= 0 AND expiry_score <= 1", name="chk_expiry_score"
+        ),
+        CheckConstraint(
+            "velocity_score >= 0 AND velocity_score <= 1", name="chk_velocity_score"
+        ),
+        CheckConstraint(
+            "margin_score >= 0 AND margin_score <= 1", name="chk_margin_score"
+        ),
         CheckConstraint(
             "composite_score >= 0 AND composite_score <= 1", name="chk_composite_score"
         ),

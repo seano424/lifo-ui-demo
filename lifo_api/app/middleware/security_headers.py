@@ -108,7 +108,9 @@ class ProductionSecurityMiddleware(BaseHTTPMiddleware):
         if not self._validate_request_security(request):
             from fastapi.responses import JSONResponse
 
-            return JSONResponse(status_code=400, content={"error": "Security validation failed"})
+            return JSONResponse(
+                status_code=400, content={"error": "Security validation failed"}
+            )
 
         response = await call_next(request)
 
@@ -169,7 +171,9 @@ class ProductionSecurityMiddleware(BaseHTTPMiddleware):
 
         # Cache control for sensitive endpoints
         if hasattr(response, "status_code") and response.status_code == 200:
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+            response.headers["Cache-Control"] = (
+                "no-store, no-cache, must-revalidate, private"
+            )
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
 

@@ -4,7 +4,7 @@ Focuses on scoring, recommendations, and action tracking rather than traditional
 """
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 
 from sqlalchemy import (
@@ -18,10 +18,45 @@ from sqlalchemy import (
     String,
     Text,
 )
+from sqlalchemy import (
+    Enum as SQLEnum,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app.database.models import Base
+from app.database.connection import Base
+
+
+class Store(Base):
+    """
+    Minimal Store model for foreign key relationships
+    Maps to Supabase business.stores table
+    """
+
+    __tablename__ = "stores"
+    __table_args__ = {"schema": "business", "extend_existing": True}
+
+    store_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    store_name = Column(String(255))
+    store_code = Column(String(50))
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+
+
+class User(Base):
+    """
+    Minimal User model for foreign key relationships
+    Maps to Supabase auth.users table
+    """
+
+    __tablename__ = "users"
+    __table_args__ = {"schema": "auth", "extend_existing": True}
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = Column(String(255))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
 
 class Product(Base):
@@ -32,7 +67,7 @@ class Product(Base):
     """
 
     __tablename__ = "products"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     product_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
@@ -49,7 +84,13 @@ class Product(Base):
     barcode_type = Column(String(20))  # Type of barcode format
 
     # AI scoring support
-    typical_shelf_life_days = Column(Integer, nullable=False)  # For expiry urgency calculation
+    typical_shelf_life_days = Column(
+        Integer, nullable=False
+    )  # For expiry urgency calculation
+
+    # Required pricing fields from Supabase schema
+    base_cost_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
+    base_selling_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
 
     # Barcode verification tracking
     is_verified = Column(Boolean, default=False)
@@ -57,8 +98,8 @@ class Product(Base):
     last_scanned_at = Column(DateTime)
 
     # Audit fields
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 
     # Relationships
@@ -74,11 +115,15 @@ class StoreProduct(Base):
     """
 
     __tablename__ = "store_products"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+    )
     product_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), primary_key=True
+        UUID(as_uuid=True),
+        ForeignKey("inventory.products.product_id"),
+        primary_key=True,
     )
 
     # Store-specific pricing (needed for margin calculations in AI scoring)
@@ -93,12 +138,13 @@ class StoreProduct(Base):
     # Audit and tracking
     added_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     updated_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     # Relationships
     product = relationship("Product", back_populates="store_products")
-    # store relationship handled by business models
+    # Store relationship - using module path to avoid circular imports
+    # store = relationship("Store", back_populates="store_products")
 
 
 class BatchSource(Enum):
@@ -127,13 +173,15 @@ class Batch(Base):
     """
 
     __tablename__ = "batches"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     product_id = Column(
         UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
     )
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+    )
 
     # Core batch information
     batch_number = Column(String(100), nullable=False)
@@ -142,7 +190,7 @@ class Batch(Base):
     # Critical dates for LIFO scoring
     manufacture_date = Column(Date, nullable=False)
     expiry_date = Column(Date, nullable=False)  # Core input for expiry_urgency score
-    received_date = Column(Date, default=datetime.utcnow().date())
+    received_date = Column(Date, default=lambda: datetime.now(UTC).date())
 
     # Quantities for tracking
     initial_quantity = Column(DECIMAL(12, 4), nullable=False)
@@ -161,17 +209,21 @@ class Batch(Base):
     batch_source = Column(String(50), default="manual")  # BatchSource enum values
     scanned_barcode = Column(String(50))  # Barcode that created this batch
     scan_confidence = Column(DECIMAL(3, 2))  # Confidence score (0.00-1.00)
-    verification_status = Column(String(20), default="verified")  # VerificationStatus enum values
+    verification_status = Column(
+        String(20), default="verified"
+    )  # VerificationStatus enum values
 
     # Audit fields
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     # Relationships
     product = relationship("Product", back_populates="batches")
     actions = relationship("BatchAction", back_populates="batch")
-    # store relationship handled by business models
+    # Store relationship - using module path to avoid circular imports
+    # store = relationship("Store", back_populates="batches")
+    # scores = relationship("ProductScore", back_populates="batch")  # ProductScore is in models.py
 
 
 class ActionType(Enum):
@@ -206,7 +258,7 @@ class BatchAction(Base):
     """
 
     __tablename__ = "batch_actions"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     action_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     batch_id = Column(
@@ -214,15 +266,19 @@ class BatchAction(Base):
         ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"),
         nullable=False,
     )
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+    )
 
     # What was recommended vs what was done
-    recommended_action = Column(String(20), nullable=False)  # ActionType enum
-    actual_action = Column(String(20), nullable=False)  # ActionType enum
-    ai_score = Column(DECIMAL(3, 2))  # AI score that triggered recommendation (0.00-1.00)
+    recommended_action = Column(SQLEnum(ActionType), nullable=False)
+    actual_action = Column(SQLEnum(ActionType), nullable=False)
+    ai_score = Column(
+        DECIMAL(3, 2)
+    )  # AI score that triggered recommendation (0.00-1.00)
 
     # Tracking details
-    action_date = Column(DateTime, default=datetime.utcnow)
+    action_date = Column(DateTime, default=lambda: datetime.now(UTC))
     quantity_affected = Column(DECIMAL(12, 4))
     notes = Column(Text)  # User notes (e.g., "donated to local food bank")
 
@@ -236,11 +292,13 @@ class BatchAction(Base):
         UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
     )
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
 
     # Relationships
     batch = relationship("Batch", back_populates="actions")
-    donation_recipient = relationship("DonationRecipient", back_populates="batch_actions")
+    donation_recipient = relationship(
+        "DonationRecipient", back_populates="batch_actions"
+    )
 
 
 class DonationRecipient(Base):
@@ -250,13 +308,13 @@ class DonationRecipient(Base):
     """
 
     __tablename__ = "donation_recipients"
-    __table_args__ = {"schema": "inventory"}
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
     recipient_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
-    recipient_type = Column(String(50), nullable=False)  # DonationRecipientType enum
+    recipient_type = Column(SQLEnum(DonationRecipientType), nullable=False)
 
     # Minimal compliance fields
     is_certified = Column(Boolean, default=False)
@@ -267,10 +325,12 @@ class DonationRecipient(Base):
     max_distance_km = Column(Integer, default=10)
 
     # Store association
-    store_id = Column(UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False)
+    store_id = Column(
+        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+    )
 
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 
     # Relationships

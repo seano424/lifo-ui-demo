@@ -113,7 +113,9 @@ async def get_secure_csv_template(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Template generation failed") from None
+        raise HTTPException(
+            status_code=500, detail="Template generation failed"
+        ) from None
 
 
 @router.post("/analyze/{store_id}")

@@ -3,7 +3,7 @@ Secure Scoring API endpoints for AI features only
 Part of hybrid architecture security remediation
 """
 
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -24,7 +24,9 @@ logger = structlog.get_logger()
 async def score_store_batch(
     store_id: str,
     request: Request,
-    force_recalculate: bool = Query(False, description="Force recalculation of all scores"),
+    force_recalculate: bool = Query(
+        False, description="Force recalculation of all scores"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -73,7 +75,9 @@ async def score_store_batch(
 async def get_urgency_alerts(
     store_id: str,
     request: Request,
-    threshold: float = Query(0.6, ge=0.0, le=1.0, description="Urgency threshold (0.0-1.0)"),
+    threshold: float = Query(
+        0.6, ge=0.0, le=1.0, description="Urgency threshold (0.0-1.0)"
+    ),
     limit: int = Query(50, ge=1, le=100, description="Maximum alerts to return"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -126,7 +130,8 @@ async def get_urgency_alerts(
                         "days_to_expiry": days_to_expiry,
                         "urgency_score": urgency_score,
                         "urgency_level": "critical" if urgency_score >= 0.8 else "high",
-                        "potential_loss": item["current_quantity"] * item["selling_price"],
+                        "potential_loss": item["current_quantity"]
+                        * item["selling_price"],
                         "recommendation": "Immediate action required"
                         if urgency_score >= 0.8
                         else "Action needed soon",
@@ -168,7 +173,7 @@ async def get_urgency_alerts(
 async def get_ai_recommendations(
     store_id: str,
     request: Request,
-    category: Optional[str] = Query(None, description="Filter by category"),
+    category: str | None = Query(None, description="Filter by category"),
     limit: int = Query(20, ge=1, le=50, description="Maximum recommendations"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -188,7 +193,9 @@ async def get_ai_recommendations(
 
         # Filter by category if specified
         if category:
-            inventory_data = [item for item in inventory_data if item["category"] == category]
+            inventory_data = [
+                item for item in inventory_data if item["category"] == category
+            ]
 
         # Generate AI recommendations
         recommendations = []
@@ -209,8 +216,12 @@ async def get_ai_recommendations(
                         "action": "Apply 30-50% discount immediately",
                         "reason": f"Expires in {days_to_expiry} day(s)",
                         "priority": "critical",
-                        "suggested_discount": min(50, max(20, int(margin_percent * 0.6))),
-                        "potential_savings": item["current_quantity"] * item["selling_price"] * 0.8,
+                        "suggested_discount": min(
+                            50, max(20, int(margin_percent * 0.6))
+                        ),
+                        "potential_savings": item["current_quantity"]
+                        * item["selling_price"]
+                        * 0.8,
                     }
                 )
             elif days_to_expiry <= 3:
@@ -223,8 +234,12 @@ async def get_ai_recommendations(
                         "action": "Apply 15-25% discount",
                         "reason": f"Expires in {days_to_expiry} day(s)",
                         "priority": "high",
-                        "suggested_discount": min(25, max(10, int(margin_percent * 0.4))),
-                        "potential_savings": item["current_quantity"] * item["selling_price"] * 0.6,
+                        "suggested_discount": min(
+                            25, max(10, int(margin_percent * 0.4))
+                        ),
+                        "potential_savings": item["current_quantity"]
+                        * item["selling_price"]
+                        * 0.6,
                     }
                 )
             elif item["current_quantity"] > 50:  # High quantity
@@ -238,7 +253,9 @@ async def get_ai_recommendations(
                         "reason": f"High quantity ({item['current_quantity']}) may not sell in time",
                         "priority": "medium",
                         "suggested_discount": 10,
-                        "potential_savings": item["current_quantity"] * item["selling_price"] * 0.3,
+                        "potential_savings": item["current_quantity"]
+                        * item["selling_price"]
+                        * 0.3,
                     }
                 )
 
@@ -261,8 +278,12 @@ async def get_ai_recommendations(
             "filters": {"category": category},
             "total_count": len(recommendations),
             "ai_insights": {
-                "urgent_items": len([r for r in recommendations if r["priority"] == "critical"]),
-                "high_priority_items": len([r for r in recommendations if r["priority"] == "high"]),
+                "urgent_items": len(
+                    [r for r in recommendations if r["priority"] == "critical"]
+                ),
+                "high_priority_items": len(
+                    [r for r in recommendations if r["priority"] == "high"]
+                ),
                 "total_potential_savings": sum(
                     r.get("potential_savings", 0) for r in recommendations
                 ),

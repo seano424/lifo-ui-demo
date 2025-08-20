@@ -3,7 +3,6 @@ FastAPI authentication dependencies for LIFO AI Engine
 Provides dependency injection for authentication and authorization
 """
 
-from typing import Optional
 
 import structlog
 from fastapi import Depends, HTTPException, Security, status
@@ -20,7 +19,7 @@ security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Security(security),
+    credentials: HTTPAuthorizationCredentials | None = Security(security),
 ) -> SupabaseUser:
     """
     FastAPI dependency to get current authenticated user
@@ -53,8 +52,8 @@ async def get_current_user(
 
 
 async def get_current_user_optional(
-    credentials: Optional[HTTPAuthorizationCredentials] = Security(security),
-) -> Optional[SupabaseUser]:
+    credentials: HTTPAuthorizationCredentials | None = Security(security),
+) -> SupabaseUser | None:
     """
     FastAPI dependency to get current user (optional)
     Returns None if not authenticated instead of raising exception
@@ -76,7 +75,7 @@ async def get_current_user_optional(
 
 
 async def get_service_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Security(security),
+    credentials: HTTPAuthorizationCredentials | None = Security(security),
 ) -> bool:
     """
     FastAPI dependency for service role authentication
@@ -282,7 +281,9 @@ async def get_user_stores(
         return store_ids
 
     except Exception as e:
-        logger.error("Failed to get user stores", user_id=current_user.user_id, error=str(e))
+        logger.error(
+            "Failed to get user stores", user_id=current_user.user_id, error=str(e)
+        )
         return []
 
 

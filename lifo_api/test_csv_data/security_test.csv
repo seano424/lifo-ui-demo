@@ -1,0 +1,9 @@
+sku,product_name,category,quantity,expiry_date,brand,cost_price,selling_price
+SEC-001,"=SUM(1+1)",dairy,10,2025-08-20,Normal Brand,1.00,2.00
+SEC-002,Normal Product,fresh_produce,15,2025-08-25,"=DDE(""cmd"")","2.00","3.00"
+SEC-003,@INDIRECT(A1),bakery_fresh,5,2025-08-15,Test Brand,1.50,3.50
+SEC-004,"+HYPERLINK(""http://evil.com"",""Click"")",beverages,20,2025-09-01,Safe Brand,1.00,2.50
+SEC-005,-EXEC(shutdown),dry_goods,30,2025-12-31,Regular Brand,0.80,2.00
+SEC-006,"<script>alert('xss')</script>",general,10,2025-08-20,Script Brand,2.00,4.00
+SEC-007,"javascript:alert(1)",spices_condiments,25,2025-10-15,JS Brand,3.00,6.00
+SEC-008,"vbscript:msgbox(1)",canned_jarred,40,2026-01-01,VB Brand,1.20,2.80

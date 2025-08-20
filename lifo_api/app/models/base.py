@@ -5,33 +5,53 @@ Base Pydantic models and common schemas for LIFO AI Engine
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator, ValidationInfo, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class ConfigurableModel(BaseModel):
+    """Base model with common configuration"""
+
+    model_config = ConfigDict(
+        # Enable ORM mode for SQLAlchemy integration
+        from_attributes=True,
+        # Use enum values instead of names
+        use_enum_values=True,
+        # Validate assignment
+        validate_assignment=True,
+        # JSON encoders for special types
+        json_encoders={
+            datetime: lambda v: v.isoformat() if v else None,
+            date: lambda v: v.isoformat() if v else None,
+            Decimal: lambda v: float(v) if v else None,
+        },
+        # Schema extra
+        json_schema_extra={"example": {}},
+    )
 
 
 class TimestampMixin(BaseModel):
     """Mixin for timestamp fields"""
 
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
-class ResponseBase(BaseModel):
+class ResponseBase(ConfigurableModel):
     """Base response model"""
 
     success: bool = True
-    message: Optional[str] = None
+    message: str | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
-class ErrorResponse(BaseModel):
+class ErrorResponse(ConfigurableModel):
     """Error response model"""
 
     success: bool = False
     error: str
-    details: Optional[str] = None
-    error_code: Optional[str] = None
+    details: str | None = None
+    error_code: str | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -66,16 +86,18 @@ class PaginationResponse(BaseModel):
 class SortParams(BaseModel):
     """Sorting parameters"""
 
-    sort_field: Optional[str] = "created_at"
+    sort_field: str | None = "created_at"
     sort_direction: str = Field("asc", pattern="^(asc|desc)$")
 
 
 class FilterParams(BaseModel):
     """Base filtering parameters"""
 
-    search: Optional[str] = Field(None, max_length=100, description="Search term")
-    category: Optional[str] = Field(None, max_length=50, description="Filter by category")
-    status: Optional[str] = Field("active", description="Filter by status")
+    search: str | None = Field(None, max_length=100, description="Search term")
+    category: str | None = Field(
+        None, max_length=50, description="Filter by category"
+    )
+    status: str | None = Field("active", description="Filter by status")
 
 
 class UrgencyLevel(str, Enum):
@@ -130,17 +152,17 @@ class BatchStatus(str, Enum):
     RETURNED = "returned"
 
 
-class HealthResponse(BaseModel):
+class HealthResponse(ConfigurableModel):
     """Health check response"""
 
     status: str
     database_connected: bool
     version: str
-    uptime: Optional[str] = None
+    uptime: str | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
-class MetricsResponse(BaseModel):
+class MetricsResponse(ConfigurableModel):
     """Metrics response for monitoring"""
 
     inventory_count: int
@@ -152,34 +174,13 @@ class MetricsResponse(BaseModel):
 
 
 # Utility functions for model conversion
-def decimal_to_float(value: Optional[Decimal]) -> Optional[float]:
+def decimal_to_float(value: Decimal | None) -> float | None:
     """Convert Decimal to float for JSON serialization"""
     return float(value) if value is not None else None
 
 
-def ensure_decimal(value: Union[float, int, str, Decimal]) -> Decimal:
+def ensure_decimal(value: float | int | str | Decimal) -> Decimal:
     """Ensure value is converted to Decimal"""
     if isinstance(value, Decimal):
         return value
     return Decimal(str(value))
-
-
-class ConfigurableModel(BaseModel):
-    """Base model with common configuration"""
-
-    model_config = ConfigDict(
-        # Enable ORM mode for SQLAlchemy integration
-        from_attributes=True,
-        # Use enum values instead of names
-        use_enum_values=True,
-        # Validate assignment
-        validate_assignment=True,
-        # JSON encoders for special types
-        json_encoders={
-            datetime: lambda v: v.isoformat() if v else None,
-            date: lambda v: v.isoformat() if v else None,
-            Decimal: lambda v: float(v) if v else None,
-        },
-        # Schema extra
-        json_schema_extra={"example": {}},
-    )

@@ -5,7 +5,7 @@ Part of hybrid architecture security remediation
 
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from sqlalchemy import text
@@ -24,7 +24,9 @@ class SecureReadOnlyOperations:
         self.db = db
         self.logger = structlog.get_logger().bind(component="read_only_ops")
 
-    async def get_store_inventory_for_scoring(self, store_id: str) -> list[dict[str, Any]]:
+    async def get_store_inventory_for_scoring(
+        self, store_id: str
+    ) -> list[dict[str, Any]]:
         """
         Get inventory data for scoring calculations only
         Uses read-only view to prevent SQL injection
@@ -95,7 +97,7 @@ class SecureReadOnlyOperations:
             )
             return []
 
-    async def get_batch_for_scoring(self, batch_id: str) -> Optional[dict[str, Any]]:
+    async def get_batch_for_scoring(self, batch_id: str) -> dict[str, Any] | None:
         """
         Get single batch data for scoring
         Uses parameterized query to prevent SQL injection
@@ -156,7 +158,9 @@ class SecureReadOnlyOperations:
             return batch_data
 
         except Exception as e:
-            self.logger.error("Failed to get batch for scoring", batch_id=batch_id, error=str(e))
+            self.logger.error(
+                "Failed to get batch for scoring", batch_id=batch_id, error=str(e)
+            )
             return None
 
     async def get_sales_velocity_data(
@@ -183,7 +187,9 @@ class SecureReadOnlyOperations:
                     try:
                         product_uuid = uuid.UUID(product_id)
                     except ValueError:
-                        self.logger.error("Invalid product_id format", product_id=product_id)
+                        self.logger.error(
+                            "Invalid product_id format", product_id=product_id
+                        )
                         return {}
                 else:
                     product_uuid = product_id
@@ -272,7 +278,9 @@ class SecureReadOnlyOperations:
             return {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
 
         except Exception as e:
-            self.logger.error("Failed to get category weights", category=category, error=str(e))
+            self.logger.error(
+                "Failed to get category weights", category=category, error=str(e)
+            )
             return {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
 
     async def store_score_results(self, scores: list[dict[str, Any]]) -> bool:
@@ -323,6 +331,15 @@ class SecureReadOnlyOperations:
                 "Failed to store score results", scores_count=len(scores), error=str(e)
             )
             return False
+
+    async def get_store_analytics(
+        self, store_id: str, days: int = 30
+    ) -> dict[str, Any]:
+        """
+        Get store analytics data for API endpoints
+        Uses parameterized query to prevent SQL injection
+        """
+        return await self.get_analytics_data(store_id, days)
 
     async def get_analytics_data(self, store_id: str, days: int = 30) -> dict[str, Any]:
         """
@@ -395,7 +412,9 @@ class SecureReadOnlyOperations:
             }
 
         except Exception as e:
-            self.logger.error("Failed to get analytics data", store_id=store_id, error=str(e))
+            self.logger.error(
+                "Failed to get analytics data", store_id=store_id, error=str(e)
+            )
             return {}
 
 

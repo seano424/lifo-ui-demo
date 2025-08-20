@@ -71,7 +71,7 @@ The LIFO AI Core is a Python-based ETL (Extract, Transform, Load) engine designe
 
 3. **Configure environment**
    ```bash
-   # Create .env file with your database configuration
+   # Create .env file from unified root-level configuration
    cp .env.example .env
    # Edit .env with your settings
    ```
@@ -282,6 +282,8 @@ def generate_recommendations(score: float, category: str, days_to_expiry: int) -
 ## 🔧 Configuration
 
 ### Environment Configuration
+
+> **Note**: We now use a unified `.env.example` file at the root level instead of separate environment files. This configuration applies to the entire LIFO.AI platform.
 
 ```python
 # config/settings.py

@@ -5,11 +5,12 @@ Mobile-optimized models for scan-in/scan-out workflows
 
 import uuid
 from datetime import date, datetime
-from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from pydantic import BaseModel, Field
+
+from .base import ConfigurableModel
 
 
 class ScanOutAction(str, Enum):
@@ -26,19 +27,29 @@ class ScanOutAction(str, Enum):
 class ScanInRequest(BaseModel):
     """Request model for scan-in workflow (proof of delivery)"""
 
-    product_sku: str = Field(..., min_length=1, max_length=100, description="Product SKU")
-    barcode: Optional[str] = Field(None, max_length=50, description="Product barcode")
+    product_sku: str = Field(
+        ..., min_length=1, max_length=100, description="Product SKU"
+    )
+    barcode: str | None = Field(None, max_length=50, description="Product barcode")
     expiry_date: date = Field(..., description="Product expiry date")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity received")
-    location_code: Optional[str] = Field("MAIN", max_length=50, description="Storage location")
-    cost_price: Optional[float] = Field(None, ge=0, le=10000, description="Cost price per unit")
-    selling_price: Optional[float] = Field(
+    location_code: str | None = Field(
+        "MAIN", max_length=50, description="Storage location"
+    )
+    cost_price: float | None = Field(
+        None, ge=0, le=10000, description="Cost price per unit"
+    )
+    selling_price: float | None = Field(
         None, ge=0, le=10000, description="Selling price per unit"
     )
-    batch_number: Optional[str] = Field(None, max_length=100, description="Optional batch number")
-    manufacture_date: Optional[date] = Field(None, description="Manufacture date")
-    temperature: Optional[float] = Field(None, ge=-50, le=50, description="Storage temperature")
-    notes: Optional[str] = Field(None, max_length=500, description="Additional notes")
+    batch_number: str | None = Field(
+        None, max_length=100, description="Optional batch number"
+    )
+    manufacture_date: date | None = Field(None, description="Manufacture date")
+    temperature: float | None = Field(
+        None, ge=-50, le=50, description="Storage temperature"
+    )
+    notes: str | None = Field(None, max_length=500, description="Additional notes")
 
     # Note: expiry date validation moved to business logic for OpenAPI compatibility
 
@@ -52,33 +63,48 @@ class ScanOutRequest(BaseModel):
 
     action: ScanOutAction = Field(..., description="Action being taken")
     quantity_moved: int = Field(..., gt=0, description="Quantity being moved/sold")
-    actual_selling_price: Optional[float] = Field(None, ge=0, description="Actual selling price")
-    discount_percent: Optional[float] = Field(
+    actual_selling_price: float | None = Field(
+        None, ge=0, description="Actual selling price"
+    )
+    discount_percent: float | None = Field(
         None, ge=0, le=100, description="Discount percentage applied"
     )
-    destination_location: Optional[str] = Field(
+    destination_location: str | None = Field(
         None, max_length=50, description="Destination location"
     )
-    notes: Optional[str] = Field(None, max_length=500, description="Action notes")
-    customer_type: Optional[str] = Field("regular", max_length=50, description="Customer type")
-    channel: Optional[str] = Field("in_store", max_length=50, description="Sales channel")
+    notes: str | None = Field(None, max_length=500, description="Action notes")
+    customer_type: str | None = Field(
+        "regular", max_length=50, description="Customer type"
+    )
+    channel: str | None = Field(
+        "in_store", max_length=50, description="Sales channel"
+    )
 
     # Note: discount validation moved to business logic for OpenAPI compatibility
 
 
-class ProcessScanRequest(BaseModel):
+class ProcessScanRequest(ConfigurableModel):
     """Request model for combined scan processing (future image recognition ready)"""
 
-    barcode: str = Field(..., min_length=1, max_length=50, description="Product barcode")
+    barcode: str = Field(
+        ..., min_length=1, max_length=50, description="Product barcode"
+    )
     expiry_date: date = Field(..., description="Expiry date from scan/OCR")
     quantity: int = Field(..., gt=0, le=10000, description="Quantity scanned")
-    confidence_score: Optional[float] = Field(1.0, ge=0, le=1, description="OCR confidence score")
-    location_code: Optional[str] = Field("MAIN", max_length=50, description="Location")
-    scan_timestamp: Optional[datetime] = Field(
-        default_factory=datetime.utcnow, description="When scan occurred"
+    confidence_score: float | None = Field(
+        1.0, ge=0, le=1, description="OCR confidence score"
     )
-    image_url: Optional[str] = Field(None, max_length=500, description="Reference to scanned image")
-    ocr_data: Optional[dict[str, Any]] = Field(None, description="Raw OCR extraction data")
+    location_code: str | None = Field("MAIN", max_length=50, description="Location")
+    scan_timestamp: str | None = Field(
+        default_factory=lambda: datetime.utcnow().isoformat(),
+        description="When scan occurred",
+    )
+    image_url: str | None = Field(
+        None, max_length=500, description="Reference to scanned image"
+    )
+    ocr_data: dict[str, Any] | None = Field(
+        None, description="Raw OCR extraction data"
+    )
 
 
 class ScanInResponse(BaseModel):
@@ -88,8 +114,8 @@ class ScanInResponse(BaseModel):
     batch_id: str
     batch_number: str
     product_info: dict[str, Any]
-    initial_score: Optional[float] = None
-    urgency_level: Optional[str] = None
+    initial_score: float | None = None
+    urgency_level: str | None = None
     recommendations: list[str] = []
     warnings: list[str] = []
     processing_time_ms: float
@@ -103,13 +129,13 @@ class ScanOutResponse(BaseModel):
     batch_id: str
     remaining_quantity: float
     batch_status: str
-    effectiveness_score: Optional[float] = None
-    revenue_impact: Optional[float] = None
-    waste_prevented: Optional[float] = None
+    effectiveness_score: float | None = None
+    revenue_impact: float | None = None
+    waste_prevented: float | None = None
     processing_time_ms: float
 
 
-class MobileBatchSummary(BaseModel):
+class MobileBatchSummary(ConfigurableModel):
     """Mobile-optimized batch summary response"""
 
     urgent_batches: list[dict[str, Any]] = []
@@ -117,7 +143,7 @@ class MobileBatchSummary(BaseModel):
     action_needed: list[dict[str, Any]] = []
     total_active_batches: int = 0
     store_health_score: float = 0.0
-    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    last_updated: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     cache_expires_in: int = 300  # seconds
 
 
@@ -129,8 +155,8 @@ class QuickBatchScore(BaseModel):
     urgency_level: str
     recommendation: str
     days_to_expiry: int
-    suggested_action: Optional[str] = None
-    discount_suggestion: Optional[int] = None
+    suggested_action: str | None = None
+    discount_suggestion: int | None = None
     processing_time_ms: float
 
 
@@ -160,21 +186,23 @@ class BatchInsights(BaseModel):
     seasonal_patterns: dict[str, Any] = {}
 
 
-class RealtimeUpdate(BaseModel):
+class RealtimeUpdate(ConfigurableModel):
     """Real-time update notification model"""
 
     store_id: str
     batch_id: str
     update_type: str  # 'score_change', 'new_batch', 'status_change'
     data: dict[str, Any]
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     priority: str = "normal"  # 'low', 'normal', 'high', 'critical'
 
 
 class MVPException(Exception):
     """Base exception for MVP-specific errors"""
 
-    def __init__(self, message: str, error_code: str = "MVP_ERROR", status_code: int = 400):
+    def __init__(
+        self, message: str, error_code: str = "MVP_ERROR", status_code: int = 400
+    ):
         self.message = message
         self.error_code = error_code
         self.status_code = status_code
@@ -195,7 +223,7 @@ class ScanWorkflowException(MVPException):
         super().__init__(message, error_code, status_code)
 
 
-class MobileOptimizedError(BaseModel):
+class MobileOptimizedError(ConfigurableModel):
     """Mobile-friendly error response"""
 
     success: bool = False
@@ -203,8 +231,8 @@ class MobileOptimizedError(BaseModel):
     message: str
     user_message: str  # Simplified message for mobile UI
     retry_allowed: bool = True
-    retry_after_seconds: Optional[int] = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    retry_after_seconds: int | None = None
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
 
 
 # Response schemas for mobile optimization
@@ -221,7 +249,7 @@ class MobileBatchItem(BaseModel):
     urgency_level: str
     location: str
     estimated_value: float
-    recommended_action: Optional[str] = None
+    recommended_action: str | None = None
 
 
 class MobileStoreHealth(BaseModel):
@@ -232,8 +260,8 @@ class MobileStoreHealth(BaseModel):
     expiring_soon: int
     total_value_at_risk: float
     trends: dict[str, float]
-    last_action_taken: Optional[str] = None
-    next_recommended_action: Optional[str] = None
+    last_action_taken: str | None = None
+    next_recommended_action: str | None = None
 
 
 # Validation helpers

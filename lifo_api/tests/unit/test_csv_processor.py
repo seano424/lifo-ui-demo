@@ -58,7 +58,9 @@ class TestCSVProcessor:
 
     def test_parse_csv_structure_quoted_values(self, csv_processor):
         """Test parsing CSV with quoted values."""
-        csv_content = 'sku,product_name,description\nTEST-001,"Test Product","A test, product"'
+        csv_content = (
+            'sku,product_name,description\nTEST-001,"Test Product","A test, product"'
+        )
         result = csv_processor._parse_csv_structure(csv_content)
 
         assert result["headers"] == ["sku", "product_name", "description"]
@@ -145,7 +147,9 @@ class TestCSVProcessor:
     @pytest.mark.asyncio
     async def test_validate_category_invalid(self, csv_processor):
         """Test category validation with invalid input."""
-        result = await csv_processor._validate_category("invalid_category", "category", 1)
+        result = await csv_processor._validate_category(
+            "invalid_category", "category", 1
+        )
         assert result == "general"  # Falls back to default
 
     def test_generate_csv_template_inventory(self, csv_processor):
@@ -175,7 +179,9 @@ class TestCSVProcessor:
         }
 
         with pytest.raises(CSVValidationError, match="Missing required columns"):
-            await csv_processor._validate_csv_data(parsed_data, "inventory", "test-store")
+            await csv_processor._validate_csv_data(
+                parsed_data, "inventory", "test-store"
+            )
 
     @pytest.mark.asyncio
     async def test_validate_business_rules_expired_product(self, csv_processor):
@@ -198,7 +204,9 @@ class TestCSVProcessor:
         )
 
         assert len(result["warnings"]) > 0
-        assert any("expired" in warning["warning"].lower() for warning in result["warnings"])
+        assert any(
+            "expired" in warning["warning"].lower() for warning in result["warnings"]
+        )
 
     @pytest.mark.asyncio
     async def test_validate_business_rules_low_margin(self, csv_processor):
@@ -217,4 +225,6 @@ class TestCSVProcessor:
         )
 
         assert len(result["warnings"]) > 0
-        assert any("price" in warning["warning"].lower() for warning in result["warnings"])
+        assert any(
+            "price" in warning["warning"].lower() for warning in result["warnings"]
+        )

@@ -1,0 +1,4 @@
+sku,productName,category,quantity,expiryDate,brand,costPrice,sellingPrice,locationCode,unitType
+CAMEL-001,Fresh Apples,fresh_produce,100,2025-08-25,OrchardBest,0.95,1.89,PRODUCE,kg
+CAMEL-002,Whole Milk,dairy,40,2025-08-22,MilkCo,1.10,2.15,FRIDGE,liter
+CAMEL-003,Sourdough Loaf,bakery_fresh,20,2025-08-17,ArtisanBread,1.80,3.25,BAKERY,pcs

@@ -4,7 +4,7 @@ Provides JWT token validation and role-based access control for all schemas
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import jwt
 import structlog
@@ -180,7 +180,9 @@ async def validate_global_product_access(
         # For write operations, check if user has store management permissions
         if action in ["create", "update", "verify"]:
             # Check if user owns any active stores or has manager role
-            owner_query = select(Store).where(and_(Store.owner_id == user_id, Store.is_active))
+            owner_query = select(Store).where(
+                and_(Store.owner_id == user_id, Store.is_active)
+            )
             owner_result = await db.execute(owner_query)
             if owner_result.scalar_one_or_none():
                 return True
@@ -211,7 +213,7 @@ async def validate_global_product_access(
 
 async def validate_donation_access(
     user_id: str,
-    store_id: Optional[str] = None,
+    store_id: str | None = None,
     action: str = "read",
     db: AsyncSession = Depends(get_database),
 ) -> bool:
@@ -281,16 +283,20 @@ class PermissionChecker:
         self.db = db
         self.user_id = user["user_id"]
 
-    async def check_store_access(self, store_id: str, required_role: str = "staff") -> bool:
+    async def check_store_access(
+        self, store_id: str, required_role: str = "staff"
+    ) -> bool:
         """Check store access with role requirement"""
-        return await validate_store_access(store_id, self.user_id, required_role, self.db)
+        return await validate_store_access(
+            store_id, self.user_id, required_role, self.db
+        )
 
     async def check_global_product_access(self, action: str = "read") -> bool:
         """Check global product access"""
         return await validate_global_product_access(self.user_id, action, self.db)
 
     async def check_donation_access(
-        self, action: str = "read", store_id: Optional[str] = None
+        self, action: str = "read", store_id: str | None = None
     ) -> bool:
         """Check donation schema access"""
         return await validate_donation_access(self.user_id, store_id, action, self.db)
@@ -300,7 +306,9 @@ class PermissionChecker:
 
         async def check():
             if not await self.check_store_access(store_id, required_role):
-                raise AuthorizationError(f"Insufficient permissions for store {store_id}")
+                raise AuthorizationError(
+                    f"Insufficient permissions for store {store_id}"
+                )
 
         return check()
 
@@ -309,16 +317,22 @@ class PermissionChecker:
 
         async def check():
             if not await self.check_global_product_access(action):
-                raise AuthorizationError(f"Insufficient permissions for global product {action}")
+                raise AuthorizationError(
+                    f"Insufficient permissions for global product {action}"
+                )
 
         return check()
 
-    def require_donation_access(self, action: str = "read", store_id: Optional[str] = None):
+    def require_donation_access(
+        self, action: str = "read", store_id: str | None = None
+    ):
         """Raise exception if user lacks donation access"""
 
         async def check():
             if not await self.check_donation_access(action, store_id):
-                raise AuthorizationError(f"Insufficient permissions for donation {action}")
+                raise AuthorizationError(
+                    f"Insufficient permissions for donation {action}"
+                )
 
         return check()
 
@@ -367,7 +381,7 @@ def require_global_product_permission(action: str = "read"):
     return permission_check
 
 
-def require_donation_permission(action: str = "read", store_id: Optional[str] = None):
+def require_donation_permission(action: str = "read", store_id: str | None = None):
     """Dependency factory for donation permission requirements"""
 
     async def permission_check(

@@ -3,11 +3,11 @@ Pydantic models for analytics-related API endpoints
 """
 
 from datetime import date, datetime
-from typing import Any, Optional, Union
+from typing import Any
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field
 
-from app.models.base import ConfigurableModel, decimal_to_float
+from app.models.base import ConfigurableModel
 
 
 # Request Models
@@ -16,15 +16,19 @@ class AnalyticsRequest(BaseModel):
 
     days: int = Field(30, ge=1, le=365, description="Analysis period in days")
     include_detailed: bool = Field(False, description="Include detailed breakdown")
-    categories: Optional[list[str]] = Field(None, description="Filter by categories")
+    categories: list[str] | None = Field(None, description="Filter by categories")
 
 
 class TrendAnalysisRequest(BaseModel):
     """Request for trend analysis"""
 
-    metric: str = Field("waste", description="Metric to analyze (waste, revenue, velocity)")
+    metric: str = Field(
+        "waste", description="Metric to analyze (waste, revenue, velocity)"
+    )
     days: int = Field(90, ge=30, le=365, description="Analysis period in days")
-    granularity: str = Field("daily", description="Data granularity (daily, weekly, monthly)")
+    granularity: str = Field(
+        "daily", description="Data granularity (daily, weekly, monthly)"
+    )
 
 
 # Response Models
@@ -69,13 +73,13 @@ class RecentAction(ConfigurableModel):
 
     action_id: str
     action_type: str
-    batch_id: Optional[str] = None
-    original_price: Optional[float] = None
-    new_price: Optional[float] = None
-    discount_percent: Optional[float] = None
+    batch_id: str | None = None
+    original_price: float | None = None
+    new_price: float | None = None
+    discount_percent: float | None = None
     executed_at: datetime
-    executed_by: Optional[str] = None
-    effectiveness_score: Optional[float] = None
+    executed_by: str | None = None
+    effectiveness_score: float | None = None
 
     # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
@@ -144,7 +148,9 @@ class DashboardAlert(ConfigurableModel):
 
     type: str = Field(..., description="Alert type (expired, expiring, high_urgency)")
     count: int = Field(..., description="Number of items")
-    severity: str = Field(..., description="Alert severity (low, medium, high, critical)")
+    severity: str = Field(
+        ..., description="Alert severity (low, medium, high, critical)"
+    )
     message: str = Field(..., description="Alert message")
 
 
@@ -232,7 +238,7 @@ class TrendPoint(ConfigurableModel):
 
     date: date
     value: float
-    category: Optional[str] = None
+    category: str | None = None
 
     # Note: decimal conversion handled in business logic for OpenAPI compatibility
 
@@ -315,7 +321,7 @@ class ExportMetadata(ConfigurableModel):
     export_format: str
     period_days: int
     total_records: int
-    file_size_bytes: Optional[int] = None
+    file_size_bytes: int | None = None
     exported_at: datetime
     exported_by: str
 
@@ -325,9 +331,9 @@ class ExportResponse(ConfigurableModel):
 
     store_id: str
     metadata: ExportMetadata
-    data: Union[dict[str, Any], list[dict[str, Any]]]
-    download_url: Optional[str] = None
-    expires_at: Optional[datetime] = None
+    data: dict[str, Any] | list[dict[str, Any]]
+    download_url: str | None = None
+    expires_at: datetime | None = None
 
     class Config:
         schema_extra = {

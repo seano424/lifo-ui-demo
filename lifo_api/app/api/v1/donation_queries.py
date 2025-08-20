@@ -5,7 +5,7 @@ Based on simplified schema from migration 017
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import get_current_user
 from app.database.connection import get_database
-from app.database.donation_models import (
+from app.database.inventory_models import (
     ActionType,
     BatchAction,
     DonationRecipient,
@@ -27,8 +27,8 @@ router = APIRouter()
 
 @router.get("/recipients")
 async def get_donation_recipients(
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
-    recipient_type: Optional[DonationRecipientType] = Query(
+    store_id: str | None = Query(None, description="Filter by store ID"),
+    recipient_type: DonationRecipientType | None = Query(
         None, description="Filter by recipient type"
     ),
     is_active: bool = Query(True, description="Filter by active status"),
@@ -40,7 +40,9 @@ async def get_donation_recipients(
     Simplified version for MVP
     """
     try:
-        query = select(DonationRecipient).where(DonationRecipient.is_active == is_active)
+        query = select(DonationRecipient).where(
+            DonationRecipient.is_active == is_active
+        )
 
         if store_id:
             query = query.where(DonationRecipient.store_id == store_id)
@@ -77,13 +79,17 @@ async def get_donation_recipients(
 
     except Exception as e:
         logger.error("Failed to get donation recipients", error=str(e))
-        raise HTTPException(status_code=500, detail="Failed to retrieve donation recipients")
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve donation recipients"
+        )
 
 
 @router.get("/actions")
 async def get_batch_actions(
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
-    action_type: Optional[ActionType] = Query(None, description="Filter by action type"),
+    store_id: str | None = Query(None, description="Filter by store ID"),
+    action_type: ActionType | None = Query(
+        None, description="Filter by action type"
+    ),
     days: int = Query(30, description="Number of days to look back"),
     limit: int = Query(100, description="Maximum number of results"),
     db: AsyncSession = Depends(get_database),
@@ -117,7 +123,9 @@ async def get_batch_actions(
                     "recommended_action": action.recommended_action.value,
                     "actual_action": action.actual_action.value,
                     "ai_score": float(action.ai_score) if action.ai_score else None,
-                    "action_date": action.action_date.isoformat() if action.action_date else None,
+                    "action_date": action.action_date.isoformat()
+                    if action.action_date
+                    else None,
                     "quantity_affected": float(action.quantity_affected)
                     if action.quantity_affected
                     else None,
@@ -145,7 +153,7 @@ async def get_batch_actions(
 
 @router.get("/analytics/summary")
 async def get_donation_analytics_summary(
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
+    store_id: str | None = Query(None, description="Filter by store ID"),
     days: int = Query(30, description="Number of days to analyze"),
     db: AsyncSession = Depends(get_database),
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -171,11 +179,15 @@ async def get_donation_analytics_summary(
         donation_actions = [a for a in actions if a.actual_action == ActionType.DONATE]
 
         total_donated_value = sum(
-            float(action.original_value) for action in donation_actions if action.original_value
+            float(action.original_value)
+            for action in donation_actions
+            if action.original_value
         )
 
         total_recovered_value = sum(
-            float(action.recovered_value) for action in donation_actions if action.recovered_value
+            float(action.recovered_value)
+            for action in donation_actions
+            if action.recovered_value
         )
 
         # Action type breakdown
@@ -212,14 +224,19 @@ async def get_donation_analytics_summary(
 
     except Exception as e:
         logger.error("Failed to get donation analytics", error=str(e))
-        raise HTTPException(status_code=500, detail="Failed to retrieve donation analytics")
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve donation analytics"
+        )
 
 
 # Legacy endpoint stubs for backwards compatibility
 @router.get("/compliance/alerts")
 async def get_compliance_alerts():
     """Legacy endpoint - returns empty for simplified system"""
-    return {"alerts": [], "message": "Compliance alerts not implemented in simplified system"}
+    return {
+        "alerts": [],
+        "message": "Compliance alerts not implemented in simplified system",
+    }
 
 
 @router.get("/analytics/kpi")

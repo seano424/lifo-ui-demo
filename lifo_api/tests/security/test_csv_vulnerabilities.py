@@ -185,7 +185,9 @@ class TestCSVParsingVulnerabilities:
 
         # CSV bomb: excessive rows
         headers = "sku,name,price"
-        rows = "\n".join([f"item{i},Product {i},1.00" for i in range(1000000)])  # 1M rows
+        rows = "\n".join(
+            [f"item{i},Product {i},1.00" for i in range(1000000)]
+        )  # 1M rows
         csv_bomb_rows = f"{headers}\n{rows}"
 
         # No limits on number of rows
@@ -264,7 +266,9 @@ class TestCSVParsingVulnerabilities:
         assert parse_time < 5.0  # Shouldn't take more than 5 seconds
 
         # Test 2: Malformed CSV with unmatched quotes
-        malformed_csv = 'header1,header2\n"unclosed quote field,normal field\nrow2,data2'
+        malformed_csv = (
+            'header1,header2\n"unclosed quote field,normal field\nrow2,data2'
+        )
 
         # Malformed CSV could cause parser to hang or crash
         try:
@@ -298,7 +302,9 @@ class TestDataValidationVulnerabilities:
                 result = await validator(very_long_string, field_name, 1)
                 # Should reject very long strings
                 if len(result) > 1000:  # Arbitrary reasonable limit
-                    pytest.fail(f"Validator {field_name} accepts excessive length: {len(result)}")
+                    pytest.fail(
+                        f"Validator {field_name} accepts excessive length: {len(result)}"
+                    )
             except Exception:
                 pass  # Expected to fail validation
 
@@ -351,7 +357,9 @@ class TestDataValidationVulnerabilities:
                     # Check if malicious content preserved
                     date_str = str(result)
                     if any(char in date_str for char in [";", "DROP", "\x00", "../"]):
-                        pytest.fail(f"Date validator preserves malicious content: {date_str}")
+                        pytest.fail(
+                            f"Date validator preserves malicious content: {date_str}"
+                        )
             except Exception:
                 pass  # Expected to fail validation
 
@@ -378,7 +386,9 @@ class TestDataValidationVulnerabilities:
                     # Check if dangerous characters preserved
                     dangerous_chars = ["'", '"', "<", ">", "\x00", "../", "\r", "\n"]
                     if any(char in result for char in dangerous_chars):
-                        pytest.fail(f"SKU validator preserves dangerous characters: {result}")
+                        pytest.fail(
+                            f"SKU validator preserves dangerous characters: {result}"
+                        )
             except Exception:
                 pass  # Expected to fail validation
 

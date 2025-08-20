@@ -5,7 +5,7 @@ Custom exceptions and error responses optimized for mobile consumption
 
 import traceback
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from fastapi import Request
@@ -27,7 +27,7 @@ class MVPBaseException(Exception):
         status_code: int = 400,
         user_message: str = None,
         retry_allowed: bool = True,
-        retry_after_seconds: Optional[int] = None,
+        retry_after_seconds: int | None = None,
     ):
         self.message = message
         self.error_code = error_code
@@ -78,7 +78,9 @@ class MobilePerformanceException(MVPBaseException):
 class ValidationException(MVPBaseException):
     """Exception for data validation errors"""
 
-    def __init__(self, message: str, field: str = None, validation_errors: list[str] = None):
+    def __init__(
+        self, message: str, field: str = None, validation_errors: list[str] = None
+    ):
         self.field = field
         self.validation_errors = validation_errors or []
 
@@ -225,7 +227,7 @@ def create_mobile_error_response(
         user_message=exception.user_message,
         retry_allowed=exception.retry_allowed,
         retry_after_seconds=exception.retry_after_seconds,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.utcnow().isoformat(),
     )
 
     # Add debug information in development
@@ -269,7 +271,11 @@ async def mvp_exception_handler(request: Request, exc: MVPBaseException):
         headers={
             "X-Error-Code": exc.error_code,
             "X-Retry-Allowed": str(exc.retry_allowed).lower(),
-            **({"Retry-After": str(exc.retry_after_seconds)} if exc.retry_after_seconds else {}),
+            **(
+                {"Retry-After": str(exc.retry_after_seconds)}
+                if exc.retry_after_seconds
+                else {}
+            ),
         },
     )
 
@@ -291,7 +297,9 @@ async def validation_exception_handler(request: Request, exc: ValidationExceptio
     )
 
 
-async def performance_exception_handler(request: Request, exc: MobilePerformanceException):
+async def performance_exception_handler(
+    request: Request, exc: MobilePerformanceException
+):
     """Handle performance exceptions with timing information"""
     response_data = create_mobile_error_response(exc, request).dict()
 
@@ -359,7 +367,7 @@ class ErrorTracker:
                 "error_code": error_code,
                 "endpoint": endpoint,
                 "user_id": user_id,
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.utcnow().isoformat(),
             }
         )
 
@@ -419,7 +427,9 @@ def raise_if_not_found(item: Any, item_type: str, identifier: str):
         raise ValidationException(
             message=f"{item_type} not found",
             field="id",
-            validation_errors=[f"{item_type} with identifier '{identifier}' does not exist"],
+            validation_errors=[
+                f"{item_type} with identifier '{identifier}' does not exist"
+            ],
         )
 
 

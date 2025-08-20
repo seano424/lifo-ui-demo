@@ -52,7 +52,9 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     # Add rate limit headers
     response.headers["X-RateLimit-Limit"] = str(exc.detail)
     response.headers["X-RateLimit-Remaining"] = "0"
-    response.headers["X-RateLimit-Reset"] = str(int(time.time()) + getattr(exc, "retry_after", 60))
+    response.headers["X-RateLimit-Reset"] = str(
+        int(time.time()) + getattr(exc, "retry_after", 60)
+    )
     response.headers["Retry-After"] = str(getattr(exc, "retry_after", 60))
 
     logger.warning(
@@ -140,12 +142,16 @@ class SecurityRateLimiter:
         if client_ip not in self.failed_attempts:
             self.failed_attempts[client_ip] = []
 
-        self.failed_attempts[client_ip].append({"endpoint": endpoint, "timestamp": time.time()})
+        self.failed_attempts[client_ip].append(
+            {"endpoint": endpoint, "timestamp": time.time()}
+        )
 
         # Clean old attempts (older than 1 hour)
         cutoff = time.time() - 3600
         self.failed_attempts[client_ip] = [
-            attempt for attempt in self.failed_attempts[client_ip] if attempt["timestamp"] > cutoff
+            attempt
+            for attempt in self.failed_attempts[client_ip]
+            if attempt["timestamp"] > cutoff
         ]
 
         # Block IP if too many failed attempts

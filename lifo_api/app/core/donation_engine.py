@@ -6,37 +6,14 @@ Provides basic donation recommendations based on expiry and scoring
 
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from pydantic import BaseModel
 
+from app.database.inventory_models import ActionType, DonationRecipientType
+
 logger = structlog.get_logger()
-
-
-class ActionType(Enum):
-    """Simple action types matching database schema"""
-
-    DISCOUNT = "discount"
-    DONATE = "donate"
-    DISPOSE = "dispose"
-    MAINTAIN = "maintain"
-    IGNORED = "ignored"
-
-
-class DonationRecipientType(Enum):
-    """Common donation recipient types for better UX"""
-
-    FOOD_BANK = "food_bank"
-    SOUP_KITCHEN = "soup_kitchen"
-    CHARITY = "charity"
-    RELIGIOUS_ORG = "religious_org"
-    COMMUNITY_GROUP = "community_group"
-    ANIMAL_SHELTER = "animal_shelter"
-    SCHOOL = "school"
-    ELDERLY_CARE = "elderly_care"
-    HOMELESS_SHELTER = "homeless_shelter"
-    OTHER = "other"
 
 
 class DonationPriority(Enum):
@@ -82,7 +59,9 @@ class SimplifiedDonationEngine:
     """
 
     def __init__(self):
-        self.logger = structlog.get_logger().bind(component="simplified_donation_engine")
+        self.logger = structlog.get_logger().bind(
+            component="simplified_donation_engine"
+        )
 
         # Simplified business configuration
         self.action_thresholds = {
@@ -103,7 +82,12 @@ class SimplifiedDonationEngine:
         }
 
         # Categories requiring special handling
-        self.special_handling_categories = {"fresh_meat_fish", "dairy", "deli_prepared", "frozen"}
+        self.special_handling_categories = {
+            "fresh_meat_fish",
+            "dairy",
+            "deli_prepared",
+            "frozen",
+        }
 
     def evaluate_action_recommendation(
         self,
@@ -138,7 +122,9 @@ class SimplifiedDonationEngine:
 
             # Calculate financial metrics
             margin_percent = (
-                ((selling_price - cost_price) / selling_price) * 100 if selling_price > 0 else 0
+                ((selling_price - cost_price) / selling_price) * 100
+                if selling_price > 0
+                else 0
             )
             original_value = current_quantity * selling_price
 
@@ -226,7 +212,9 @@ class SimplifiedDonationEngine:
             # Very urgent - need immediate action
             if margin_percent > self.action_thresholds["discount_margin_threshold"]:
                 action = ActionType.DISCOUNT
-                reasoning = "High margin product expiring soon - try discount to recover value"
+                reasoning = (
+                    "High margin product expiring soon - try discount to recover value"
+                )
                 factors.append(f"High margin ({margin_percent:.1f}%)")
             elif category in self.donation_suitable_categories:
                 action = ActionType.DONATE
@@ -273,7 +261,9 @@ class SimplifiedDonationEngine:
                 reasoning = "No immediate action needed - continue normal sales"
                 factors.append("Normal sales conditions")
 
-            factors.append(f"Expires in {days_to_expiry} days - planning time available")
+            factors.append(
+                f"Expires in {days_to_expiry} days - planning time available"
+            )
 
         # Quantity considerations
         if (
