@@ -29,6 +29,7 @@ export function NavMain({
     items?: {
       title: string
       url: string
+      icon?: LucideIcon
     }[]
   }[]
 }) {
@@ -70,7 +71,7 @@ export function NavMain({
               key={item.title}
               asChild
               defaultOpen={item.isActive}
-              className="group/collapsible"
+              className="group/collapsible flex flex-col items-center"
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
@@ -93,6 +94,7 @@ export function NavMain({
                       >
                         <SidebarMenuSubButton asChild>
                           <Link href={subItem.url} onClick={handleLinkClick}>
+                            {subItem.icon && <subItem.icon />}
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
@@ -103,7 +105,7 @@ export function NavMain({
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem className="flex flex-col items-center" key={item.title}>
               <SidebarMenuButton
                 className={cn(
                   'hover:bg-secondary-100/80 rounded-none p-4 font-medium',
@@ -113,7 +115,11 @@ export function NavMain({
                 asChild
                 tooltip={item.title}
               >
-                <Link href={item.url} className="flex items-center w-full" onClick={handleLinkClick}>
+                <Link
+                  href={item.url}
+                  className="flex items-center w-full"
+                  onClick={handleLinkClick}
+                >
                   {item.icon && <item.icon className="text-secondary-900" />}
                   <span>{item.title}</span>
                 </Link>

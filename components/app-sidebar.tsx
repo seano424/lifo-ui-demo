@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
-import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon } from 'lucide-react'
+import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon, Package, Layers } from 'lucide-react'
 import { TeamSwitcher } from './team-switcher'
 
 import { NavMain } from '@/components/nav-main'
@@ -54,13 +54,13 @@ function useNavigationData() {
             {
               title: t('products'),
               url: '/dashboard/inventory/products',
-              icon: Box,
+              icon: Package,
               isActive: true,
             },
             {
               title: t('batches'),
               url: '/dashboard/inventory/batches',
-              icon: Box,
+              icon: Layers,
             },
           ],
           isActive: true,
