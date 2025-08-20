@@ -4,8 +4,9 @@ import { cn } from '@/lib/utils'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Typography } from './typography'
 
-type LogoVariant = 'vertical' | 'horizontal' | 'icon'
+type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text'
 type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
 
 interface LogoProps {
@@ -41,6 +42,16 @@ export function Logo({
 
   // Determine which logo to show based on theme
   const isDark = darkMode ?? theme === 'dark'
+
+  if (variant === 'text') {
+    return (
+      <Link href={href}>
+        <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
+          LIFO.ai
+        </Typography>
+      </Link>
+    )
+  }
 
   const getLogoPath = () => {
     switch (variant) {

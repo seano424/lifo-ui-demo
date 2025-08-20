@@ -526,9 +526,11 @@
   },
   "marketing": {
     "nav": {
+      "about": "À propos",
       "resources": "Ressources",
-      "products": "Produits",
+      "product": "Produit",
       "pricing": "Tarifs",
+      "builtFor": "Conçu pour",
       "helpCenter": "Centre d'aide",
       "helpCenterDesc": "Obtenez toutes les réponses dont vous avez besoin ici",
       "contactUs": "Nous contacter",

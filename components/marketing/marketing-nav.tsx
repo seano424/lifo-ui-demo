@@ -49,6 +49,67 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
 
   const defaultMenu = [
     {
+      title: t('product'),
+      url: '#',
+      items: [
+        {
+          title: t('blog'),
+          description: t('blogDesc'),
+          icon: <Book className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('company'),
+          description: t('companyDesc'),
+          icon: <Trees className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('careers'),
+          description: t('careersDesc'),
+          icon: <Sunset className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('support'),
+          description: t('supportDesc'),
+          icon: <Zap className="size-5 shrink-0" />,
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: t('builtFor'),
+      url: '#',
+      items: [
+        {
+          title: t('contactUs'),
+          description: t('contactUsDesc'),
+          icon: <Sunset className="size-5 shrink-0" />,
+          url: '/contact',
+        },
+        {
+          title: t('helpCenter'),
+          description: t('helpCenterDesc'),
+          icon: <Zap className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('status'),
+          description: t('statusDesc'),
+          icon: <Trees className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('terms'),
+          description: t('termsDesc'),
+          icon: <Book className="size-5 shrink-0" />,
+          url: '#',
+        },
+      ],
+    },
+
+    {
       title: t('resources'),
       url: '#',
       items: [
@@ -79,36 +140,6 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       ],
     },
     {
-      title: t('products'),
-      url: '#',
-      items: [
-        {
-          title: t('blog'),
-          description: t('blogDesc'),
-          icon: <Book className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('company'),
-          description: t('companyDesc'),
-          icon: <Trees className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('careers'),
-          description: t('careersDesc'),
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('support'),
-          description: t('supportDesc'),
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-      ],
-    },
-    {
       title: t('pricing'),
       url: '#',
     },
@@ -116,25 +147,26 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
 
   const menuItems = menu || defaultMenu
   return (
-    <section className="py-4 px-4 fixed top-0 left-0 right-0 z-50 h-20 backdrop-blur-xs flex flex-col justify-center bg-background/80 border-b border-foreground/10 shadow-sm">
+    <section className="py-4 px-4 fixed top-0 left-0 right-0 z-50 h-20 flex flex-col justify-center bg-background border-b border-foreground/10">
       <nav className="hidden justify-between lg:flex container mx-auto">
-        <NavbarLogo />
+        <div className="flex items-center gap-8">
+          <NavbarLogo variant="text" />
 
-        <div className="flex items-center gap-2">
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
           </NavigationMenu>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <CompactLanguageSwitcher />
-            {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
-          </div>
+        <div className="flex items-center gap-2">
+          <CompactLanguageSwitcher />
+          {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
         </div>
       </nav>
 
+      {/* Mobile */}
       <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
-          <NavbarLogo />
+          <NavbarLogo variant="text" />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -172,7 +204,9 @@ const renderMenuItem = (item: MenuItem) => {
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+        <NavigationMenuTrigger className="rounded-xl tracking-wide font-medium font-heading text-sm">
+          {item.title}
+        </NavigationMenuTrigger>
         <NavigationMenuContent className="bg-popover text-popover-foreground w-full min-w-80">
           {item.items.map(subItem => (
             <NavigationMenuLink asChild key={subItem.title}>
@@ -188,7 +222,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-xs uppercase transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-white"
+        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-white rounded-xl tracking-wide font-medium font-heading text-sm"
       >
         {item.title}
       </NavigationMenuLink>

@@ -19,11 +19,12 @@ interface LogoutButtonProps {
     | 'brand'
     | 'brandOutline'
     | 'brandSecondaryOutline'
+    | 'gray'
     | null
     | undefined
 }
 
-export function LogoutButton({ className, variant = 'default' }: LogoutButtonProps) {
+export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps) {
   const t = useTranslations('marketing.auth')
   const router = useRouter()
 

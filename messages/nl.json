@@ -526,9 +526,11 @@
   },
   "marketing": {
     "nav": {
+      "about": "Over",
       "resources": "Bronnen",
-      "products": "Producten",
+      "product": "Product",
       "pricing": "Prijzen",
+      "builtFor": "Gemaakt voor",
       "helpCenter": "Helpcentrum",
       "helpCenterDesc": "Krijg hier alle antwoorden die je nodig hebt",
       "contactUs": "Contact",

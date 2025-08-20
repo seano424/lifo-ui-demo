@@ -566,9 +566,11 @@
   },
   "marketing": {
     "nav": {
+      "about": "About",
       "resources": "Resources",
-      "products": "Products",
+      "product": "Product",
       "pricing": "Pricing",
+      "builtFor": "Built for",
       "helpCenter": "Help Center",
       "helpCenterDesc": "Get all the answers you need right here",
       "contactUs": "Contact Us",
