@@ -285,7 +285,7 @@ export default function BarcodeScanner({
   const displayError = error || detectionError
 
   return (
-    <div className={cn('w-full sm:min-w-[600px] flex flex-col gap-4', className)}>
+    <div className={cn('w-full text-center sm:min-w-[600px] flex flex-col gap-4', className)}>
       <div className="flex items-center justify-center gap-2 flex-col">
         <div className="flex items-center gap-2">
           <Scan className="w-5 h-5" />

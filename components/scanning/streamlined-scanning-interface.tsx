@@ -894,7 +894,7 @@ export default function WorkingStreamlinedScanningInterface({
           )}
 
           {/* Footer */}
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center sm:gap-4">
             {canGoBack && (
               <div className="flex justify-center pt-4">
                 <Button
@@ -1163,7 +1163,7 @@ export default function WorkingStreamlinedScanningInterface({
               </div>
             </div>
 
-            <DialogFooter className="mt-6">
+            <DialogFooter className="mt-6 flex flex-col sm:flex-row gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowSubmissionDialog(false)}

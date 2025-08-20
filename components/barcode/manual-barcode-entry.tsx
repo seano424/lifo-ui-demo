@@ -155,22 +155,21 @@ export default function ManualBarcodeEntry({
           {!selectedProduct && (
             <>
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      type="text"
-                      value={barcode}
-                      onChange={e => setBarcode(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' && barcode.length >= 8) {
-                          handleBarcodeSubmit()
-                        }
-                      }}
-                      placeholder="Enter barcode number (8+ digits)..."
-                      className="font-mono"
-                      disabled={isLookingUp}
-                    />
-                  </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Input
+                    type="text"
+                    value={barcode}
+                    onChange={e => setBarcode(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && barcode.length >= 8) {
+                        handleBarcodeSubmit()
+                      }
+                    }}
+                    placeholder="Barcode number (8+ digits)..."
+                    className="font-mono"
+                    disabled={isLookingUp}
+                  />
+
                   <Button
                     onClick={handleBarcodeSubmit}
                     disabled={barcode.length < 8 || isLookingUp}
@@ -318,7 +317,7 @@ export default function ManualBarcodeEntry({
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
                           <label className="block text-xs font-medium mb-1">Brand</label>
                           <Input
