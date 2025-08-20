@@ -71,11 +71,16 @@ export function NavMain({
               key={item.title}
               asChild
               defaultOpen={item.isActive}
-              className="group/collapsible flex flex-col items-center"
+              className={cn(
+                'group/collapsible group-data-[state=open]/collapsible:flex group-data-[state=open]/collapsible:flex-col group-data-[state=open]/collapsible:items-center',
+              )}
             >
-              <SidebarMenuItem>
+              <SidebarMenuItem className="">
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton className="p-4 font-medium" tooltip={item.title}>
+                  <SidebarMenuButton
+                    className="p-4 font-medium group-data-[collapsible=icon]:hidden"
+                    tooltip={item.title}
+                  >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -86,15 +91,16 @@ export function NavMain({
                     {item.items.map(subItem => (
                       <SidebarMenuSubItem
                         className={cn(
-                          'hover:bg-secondary-100/80 p-4 pl-10 rounded-none font-medium',
+                          'hover:bg-secondary-100/80 rounded-none font-medium pl-6 py-2',
                           isPathActive(subItem.url) &&
                             'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
+                          'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0',
                         )}
                         key={subItem.title}
                       >
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton asChild tooltip={subItem.title}>
                           <Link href={subItem.url} onClick={handleLinkClick}>
-                            {subItem.icon && <subItem.icon />}
+                            {subItem.icon && <subItem.icon className="!text-secondary-900" />}
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>

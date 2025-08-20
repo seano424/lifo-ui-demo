@@ -66,8 +66,8 @@ function SidebarProvider({
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(false) // TODO: remove this
-  // const [_open, _setOpen] = React.useState(defaultOpen)
+  // const [_open, _setOpen] = React.useState(false) // TODO: remove this
+  const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -611,8 +611,8 @@ function SidebarMenuSub({ className, ...props }: React.ComponentProps<'ul'>) {
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        'flex min-w-0 flex-col gap-1',
-        'group-data-[collapsible=icon]:hidden',
+        'flex min-w-0 flex-col',
+        'group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:gap-1 group-data-[collapsible=icon]:justify-center',
         className,
       )}
       {...props}
@@ -635,16 +635,19 @@ function SidebarMenuSubButton({
   asChild = false,
   size = 'md',
   isActive = false,
+  tooltip,
   className,
   ...props
 }: React.ComponentProps<'a'> & {
   asChild?: boolean
   size?: 'sm' | 'md'
   isActive?: boolean
+  tooltip?: string | React.ComponentProps<typeof TooltipContent>
 }) {
   const Comp = asChild ? Slot : 'a'
+  const { isMobile, state } = useSidebar()
 
-  return (
+  const button = (
     <Comp
       data-slot="sidebar-menu-sub-button"
       data-sidebar="menu-sub-button"
@@ -655,11 +658,31 @@ function SidebarMenuSubButton({
         'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
         size === 'sm' && 'text-xs',
         size === 'md' && 'text-sm',
-        'group-data-[collapsible=icon]:hidden',
+        'group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:[&>span]:hidden group-data-[collapsible=icon]:translate-x-0',
         className,
       )}
       {...props}
     />
+  )
+
+  if (!tooltip) {
+    return button
+  }
+  if (typeof tooltip === 'string') {
+    tooltip = {
+      children: tooltip,
+    }
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        align="center"
+        hidden={state !== 'collapsed' || isMobile}
+        {...tooltip}
+      />
+    </Tooltip>
   )
 }
 
