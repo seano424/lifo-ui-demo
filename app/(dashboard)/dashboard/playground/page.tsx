@@ -53,7 +53,7 @@ function getSupabaseToken(): string | null {
           }
 
           // Check all nested properties for various token field names
-          const searchForToken = (obj: any, path = ''): string | null => {
+          const searchForToken = (obj: unknown, path = ''): string | null => {
             if (typeof obj !== 'object' || obj === null) return null
 
             for (const [key, value] of Object.entries(obj)) {
@@ -234,9 +234,9 @@ function TestResults({
   onRefetch,
 }: {
   title: string
-  data: any
+  data: unknown | null | undefined
   isLoading: boolean
-  error: any
+  error: Error | null
   onRefetch: () => void
 }) {
   return (
@@ -272,14 +272,16 @@ function TestResults({
           </div>
         )}
 
-        {data && !error && (
+        {data !== null && data !== undefined && !error && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-green-700">
               <CheckCircle className="h-4 w-4" />
               <span className="text-sm font-medium">Success</span>
             </div>
             <div className="bg-gray-50 p-3 rounded-md">
-              <pre className="text-xs overflow-auto max-h-64">{JSON.stringify(data, null, 2)}</pre>
+              <pre className="text-xs overflow-auto max-h-64">
+                {JSON.stringify(data as Record<string, unknown>, null, 2)}
+              </pre>
             </div>
           </div>
         )}

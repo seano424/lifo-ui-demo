@@ -551,7 +551,7 @@
       "logout": "Déconnexion",
       "goToDashboard": "Tableau de bord"
     }
-  },  
+  },
   "errors": {
     "pageNotFoundTitle": "Page non trouvée",
     "pageNotFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",

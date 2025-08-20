@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, MapPin, Settings } from 'lucide-react'
+import { MapPin, Settings } from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -23,7 +23,7 @@ import { useUserStores, useStoreActions } from '@/hooks/use-stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import type { Store } from '@/lib/queries/stores'
 import { cn } from '@/lib/utils'
-import { Typography } from './ui/typography'
+
 import { Skeleton } from './ui/skeleton'
 import { Button } from './ui/button'
 

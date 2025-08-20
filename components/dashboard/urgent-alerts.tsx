@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+
 import { Skeleton } from '@/components/ui/skeleton'
 import { useUrgentAlerts } from '@/hooks/use-urgent-alerts'
 import { getAlertMessage } from '@/lib/queries/urgent-alerts'
-import { cn } from '@/lib/utils'
+
 import { Typography } from '@/components/ui/typography'
 
 export function UrgentAlerts() {
