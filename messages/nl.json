@@ -18,6 +18,7 @@
   "dashboard": {
     "quickActions": {
       "title": "Snelle Acties",
+      "description": "Voeg snel producten toe, verwijder of bekijk producten en taken.",
       "addProducts": {
         "title": "Producten Toevoegen",
         "description": "Voeg nieuwe producten toe aan uw voorraad met behulp van barcode-scanning of handmatige invoer.",

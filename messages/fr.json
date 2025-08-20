@@ -18,6 +18,7 @@
   "dashboard": {
     "quickActions": {
       "title": "Actions Rapides",
+      "description": "Ajoutez rapidement des produits, supprimez ou consultez des produits et des tâches.",
       "addProducts": {
         "title": "Ajouter des Produits",
         "description": "Ajoutez de nouveaux produits à votre inventaire en scannant des codes-barres ou en saisissant manuellement.",

@@ -63,6 +63,21 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
 
   const { actionable_batches: batches, summary } = actionableBatches
 
+  if (!batches) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Actionable Batches</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground py-8">
+            No immediate actions required! All batches are in good condition.
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (batches.length === 0) {
     return (
       <Card>

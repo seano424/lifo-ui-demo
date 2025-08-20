@@ -18,6 +18,7 @@
   "dashboard": {
     "quickActions": {
       "title": "Quick Actions",
+      "description": "Quickly add, remove, or view products and tasks.",
       "addProducts": {
         "title": "Add Products",
         "description": "Add new products to your inventory with barcode scanning or manual entry.",
