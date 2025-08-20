@@ -147,7 +147,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
 
   const menuItems = menu || defaultMenu
   return (
-    <section className="py-4 px-4 fixed top-0 left-0 right-0 z-50 h-20 flex flex-col justify-center bg-background border-b border-foreground/10">
+    <section>
       <nav className="hidden justify-between lg:flex container mx-auto">
         <div className="flex items-center gap-8">
           <NavbarLogo variant="text" />

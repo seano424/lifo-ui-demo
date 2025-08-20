@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
 import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon } from 'lucide-react'
+import { TeamSwitcher } from './team-switcher'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
@@ -87,10 +88,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader
-        className={cn('min-h-12 flex justify-center', 'group-data-[collapsible=icon]:items-center')}
+        className={cn(
+          'flex flex-col gap-2 justify-center items-center',
+          'group-data-[collapsible=icon]:items-center',
+        )}
       >
         <NavbarLogo
-          variant="horizontal"
+          variant="vertical"
           size="md"
           className={cn('group-data-[collapsible=icon]:hidden')}
         />
@@ -99,6 +103,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           size="sm"
           className={cn('group-data-[collapsible=icon]:block hidden')}
         />
+
+        <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navigationData.navMain} />

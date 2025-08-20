@@ -71,7 +71,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
+      <div className="flex items-center justify-between flex-col sm:flex-row gap-4 text-center sm:text-left">
         <div className="flex flex-col gap-2">
           <Typography variant="h4" className="font-bold">
             Today&apos;s priority actions
@@ -88,7 +88,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
         </Button>
       </div>
       <div className="space-y-6">
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 text-center sm:text-left">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5 text-center sm:text-left">
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">Expiring Soon</Typography>
             <Typography variant="p">Expiring in 1-2 days</Typography>
@@ -117,17 +117,17 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
         {true && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex text-center sm:text-left justify-center sm:justify-start items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
                 Store Overview
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-center sm:text-left">
                 {summary.total_actionable_items} actionable items of {summary.total_active_batches}{' '}
                 active batches
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-4 text-center sm:text-left">
                 {(expiring_soon.count > 0 ||
                   ready_for_discount.count > 0 ||
                   perfect_for_donation.count > 0) && (
@@ -141,7 +141,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                   </Alert>
                 )}
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <p className="text-sm text-muted-foreground">
                     {summary.action_required_percentage.toFixed(1)}% of non-expired inventory needs
                     action

@@ -91,7 +91,7 @@ export function TeamSwitcher() {
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="w-full">
               <Button disabled={isChangingStore} variant="outline">
                 {activeStore.store_name}
               </Button>
