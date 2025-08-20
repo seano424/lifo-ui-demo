@@ -51,10 +51,6 @@ export function NavMain({
       return pathname.startsWith(itemUrl)
     }
 
-    if (itemUrl.includes('/inventory')) {
-      return pathname.startsWith(itemUrl)
-    }
-
     return false
   }
 
@@ -71,7 +67,7 @@ export function NavMain({
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title}>
+                  <SidebarMenuButton className="p-4 font-medium" tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -80,7 +76,14 @@ export function NavMain({
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items.map(subItem => (
-                      <SidebarMenuSubItem key={subItem.title}>
+                      <SidebarMenuSubItem
+                        className={cn(
+                          'hover:bg-secondary-100/80 p-4 pl-10 rounded-none font-medium',
+                          isPathActive(subItem.url) &&
+                            'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
+                        )}
+                        key={subItem.title}
+                      >
                         <SidebarMenuSubButton asChild>
                           <Link href={subItem.url}>
                             <span>{subItem.title}</span>
@@ -96,7 +99,7 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 className={cn(
-                  'hover:bg-secondary-100/80 p-3 rounded-xl font-medium',
+                  'hover:bg-secondary-100/80 rounded-none p-4 font-medium',
                   isPathActive(item.url) &&
                     'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
                 )}

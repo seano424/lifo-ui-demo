@@ -50,6 +50,20 @@ function useNavigationData() {
           title: t('inventory'),
           url: '/dashboard/inventory',
           icon: Box,
+          items: [
+            {
+              title: t('products'),
+              url: '/dashboard/inventory/products',
+              icon: Box,
+              isActive: true,
+            },
+            {
+              title: t('batches'),
+              url: '/dashboard/inventory/batches',
+              icon: Box,
+            },
+          ],
+          isActive: true,
         },
         // {
         //   title: t('performance'),
@@ -116,7 +130,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="group-data-[collapsible=icon]:pt-5">
         <NavMain items={navigationData.navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="py-4">
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />

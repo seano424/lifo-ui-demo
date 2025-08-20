@@ -14,16 +14,14 @@ export default function InventoryHeader() {
   const isBatches = pathname.includes('batches')
 
   return (
-    <div className="flex justify-between items-center mb-8">
+    <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
       <div className="flex gap-8 items-center">
         <Link href="/dashboard/inventory/products">
           <Typography
             variant="h2"
             className={cn(
-              'transition-colors hover:text-primary-500 border-b-2 border-transparent pb-1',
-              isProducts
-                ? 'text-primary-600 border-b-2 border-primary-500'
-                : 'text-muted-foreground',
+              'transition-colors duration-100 ease-in-out hover:text-primary border-b-2 border-transparent pb-1 font-bold',
+              isProducts ? 'text-primary border-b-2 border-primary-500' : 'text-secondary-500',
             )}
           >
             {t('products')}
@@ -34,8 +32,8 @@ export default function InventoryHeader() {
           <Typography
             variant="h2"
             className={cn(
-              'transition-colors hover:text-primary-500 border-b-2 border-transparent pb-1',
-              isBatches ? 'text-primary-600 border-primary-500' : 'text-muted-foreground',
+              'transition-colors duration-100 ease-in-out hover:text-primary border-b-2 border-transparent pb-1 font-bold',
+              isBatches ? 'text-primary border-primary-500' : 'text-secondary-500',
             )}
           >
             {t('batches')}
