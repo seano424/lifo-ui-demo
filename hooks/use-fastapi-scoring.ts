@@ -75,10 +75,10 @@ export interface AnalyticsResponse {
  * @param category - Filter by category
  */
 export function useScoringAlerts(
-  storeId: string | null, 
+  storeId: string | null,
   threshold: number = 0.6,
   urgencyLevel?: string,
-  category?: string
+  category?: string,
 ) {
   return useQuery({
     queryKey: queryKeys.fastapi.scoring.alerts(storeId!, threshold),
@@ -87,10 +87,10 @@ export function useScoringAlerts(
         storeId: storeId!,
         threshold: threshold.toString(),
       })
-      
+
       if (urgencyLevel) params.append('urgency', urgencyLevel)
       if (category) params.append('category', category)
-      
+
       const response = await fetch(`/api/alerts?${params}`)
       if (!response.ok) {
         throw new Error(`Failed to fetch alerts: ${response.statusText}`)
@@ -111,9 +111,9 @@ export function useScoringAlerts(
  * @param metric - Specific metric type (optional)
  */
 export function useStoreAnalytics(
-  storeId: string | null, 
+  storeId: string | null,
   timeframe: string = '7d',
-  metric?: string
+  metric?: string,
 ) {
   return useQuery({
     queryKey: queryKeys.fastapi.analytics.store(storeId!, timeframe),
@@ -122,9 +122,9 @@ export function useStoreAnalytics(
         storeId: storeId!,
         timeframe,
       })
-      
+
       if (metric) params.append('metric', metric)
-      
+
       const response = await fetch(`/api/analytics?${params}`)
       if (!response.ok) {
         throw new Error(`Failed to fetch analytics: ${response.statusText}`)
@@ -141,10 +141,7 @@ export function useStoreAnalytics(
 /**
  * Alias for scoring alerts (for backward compatibility)
  */
-export function useScoringRecommendations(
-  storeId: string | null, 
-  category?: string
-) {
+export function useScoringRecommendations(storeId: string | null, category?: string) {
   return useScoringAlerts(storeId, 0.5, undefined, category)
 }
 
@@ -166,36 +163,36 @@ export function useMobileSummary(storeId: string | null) {
 
 // Direct fetch functions (for compatibility with existing code)
 export async function fetchScoringAlerts(
-  storeId: string, 
-  threshold: number = 0.6
+  storeId: string,
+  threshold: number = 0.6,
 ): Promise<ScoringAlert[]> {
   const params = new URLSearchParams({
     storeId,
     threshold: threshold.toString(),
   })
-  
+
   const response = await fetch(`/api/alerts?${params}`)
   if (!response.ok) {
     throw new Error(`Failed to fetch alerts: ${response.statusText}`)
   }
-  
+
   const data = await response.json()
   return data.alerts
 }
 
 export async function fetchStoreAnalytics(
-  storeId: string, 
-  timeframe: string = '7d'
+  storeId: string,
+  timeframe: string = '7d',
 ): Promise<AnalyticsResponse> {
   const params = new URLSearchParams({
     storeId,
     timeframe,
   })
-  
+
   const response = await fetch(`/api/analytics?${params}`)
   if (!response.ok) {
     throw new Error(`Failed to fetch analytics: ${response.statusText}`)
   }
-  
+
   return response.json()
 }

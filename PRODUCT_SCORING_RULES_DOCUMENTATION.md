@@ -15,6 +15,7 @@ The LIFO AI system uses a comprehensive scoring algorithm to determine the urgen
 **Implementation**: `lifo_api/app/core/scoring.py:110-149`
 
 #### Critical Thresholds (Universal)
+
 - **Expired (≤0 days)**: Score = `1.0` (Maximum urgency)
 - **1 day to expiry**: Score = `0.95` (Critical)
 - **2 days to expiry**: Score = `0.9` (Critical)
@@ -22,6 +23,7 @@ The LIFO AI system uses a comprehensive scoring algorithm to determine the urgen
 - **7 days to expiry**: Score = `0.6` (Medium urgency)
 
 #### Ratio-Based Scoring (For longer shelf life)
+
 ```
 ratio = days_to_expiry / shelf_life_days
 
@@ -31,7 +33,8 @@ elif ratio ≤ 0.3:   score = 0.3  # Less than 30% shelf life left
 ```
 
 #### Special Category Rules
-- **Very perishable (≤3 days shelf life)**: 
+
+- **Very perishable (≤3 days shelf life)**:
   - If `days_to_expiry ≤ shelf_life_days * 0.5`: Score = `0.6`
 - **Long shelf life (≥365 days)**:
   - If `days_to_expiry ≤ 30`: Score = `0.4`
@@ -41,7 +44,8 @@ elif ratio ≤ 0.3:   score = 0.3  # Less than 30% shelf life left
 
 **Purpose**: Evaluates if current stock will sell before expiry based on sales velocity.
 
-**Formula**: 
+**Formula**:
+
 ```
 days_to_sell = current_quantity / avg_daily_sales
 safety_buffer = max(0.7, 1 - (days_to_expiry / 30))
@@ -50,6 +54,7 @@ safety_buffer = max(0.7, 1 - (days_to_expiry / 30))
 **Implementation**: `lifo_api/app/core/scoring.py:275-316`
 
 #### Velocity Score Calculation
+
 ```
 if days_to_sell ≤ days_to_expiry * safety_buffer:
     score = 0.1    # Low risk - selling fast enough
@@ -66,6 +71,7 @@ else:
 ```
 
 #### Default Daily Sales by Category
+
 ```python
 category_velocities = {
     "fresh_produce": 4.0,      # units/day
@@ -82,13 +88,15 @@ category_velocities = {
 ```
 
 #### Expired Products Disposal (EU Compliant)
+
 For expired products (days_to_expiry ≤ 0), velocity score returns maximum urgency (1.0) regardless of category, ensuring immediate disposal action.
 
 ### 3. Margin Score Algorithm
 
 **Purpose**: Assesses discount flexibility based on profit margins.
 
-**Formula**: 
+**Formula**:
+
 ```
 margin_percent = ((selling_price - cost_price) / selling_price) * 100
 ```
@@ -96,6 +104,7 @@ margin_percent = ((selling_price - cost_price) / selling_price) * 100
 **Implementation**: `lifo_api/app/core/scoring.py:317-359`
 
 #### Fresh Products Margin Thresholds
+
 With urgency multiplier applied based on days to expiry:
 
 ```
@@ -108,6 +117,7 @@ else:                        score = 0.9 * urgency_multiplier   # Avoid discount
 ```
 
 #### Urgency Multipliers
+
 ```
 if days_to_expiry ≤ 1:       urgency_multiplier = 0.5
 elif days_to_expiry ≤ 3:     urgency_multiplier = 0.7
@@ -116,13 +126,15 @@ else:                        urgency_multiplier = 1.0
 ```
 
 #### Expired Products Margin
+
 For expired products (days_to_expiry ≤ 0), margin score returns maximum urgency (1.0) regardless of original margin or category, prioritizing disposal over any recovery considerations.
 
 ## Composite Score Calculation
 
 **Purpose**: Combines all individual scores into a single actionable metric.
 
-**Formula**: 
+**Formula**:
+
 ```
 composite_score = (expiry_score * w_expiry) + (velocity_score * w_velocity) + (margin_score * w_margin)
 ```
@@ -130,15 +142,17 @@ composite_score = (expiry_score * w_expiry) + (velocity_score * w_velocity) + (m
 **Implementation**: `lifo_api/app/core/scoring.py:360-391`
 
 ### Default Weights
+
 ```python
 default_weights = {
     "expiry": 0.5,     # 50% weight
-    "velocity": 0.3,   # 30% weight  
+    "velocity": 0.3,   # 30% weight
     "margin": 0.2      # 20% weight
 }
 ```
 
 ### Category-Specific Weights
+
 **Source**: `lifo_api/app/core/config.py`
 
 ```python
@@ -152,12 +166,13 @@ category_weights = {
 ```
 
 ### Non-Linear Scaling
+
 ```python
 if composite_score ≥ 0.8:
     # Amplification for high scores (steeper curve above 0.8)
     amplification = 0.8 + (composite_score - 0.8) * 2.5
     composite_score = min(1.0, amplification)
-    
+
 elif composite_score ≤ 0.2:
     # Dampen very low scores
     composite_score = composite_score * 0.9
@@ -172,6 +187,7 @@ elif composite_score ≤ 0.2:
 ### Fresh Products Recommendations
 
 #### Critical Urgency (Score ≥ 0.8)
+
 ```
 Action: "discount_aggressive"
 Discount: min(50%, max(20%, composite_score * 60%))
@@ -182,6 +198,7 @@ Time to Act: "< 4 hours"
 ```
 
 #### High Urgency (Score ≥ 0.6)
+
 ```
 Action: "discount_moderate"
 Discount: min(30%, max(10%, composite_score * 40%))
@@ -192,6 +209,7 @@ Time to Act: "< 24 hours"
 ```
 
 #### Medium Urgency (Score ≥ 0.4)
+
 ```
 Action: "alert"
 Discount: 0%
@@ -201,6 +219,7 @@ Time to Act: "< 48 hours"
 ```
 
 #### Low Urgency (Score ≥ 0.2)
+
 ```
 Action: "monitor"
 Discount: 0%
@@ -210,6 +229,7 @@ Time to Act: "< 1 week"
 ```
 
 #### No Action (Score < 0.2)
+
 ```
 Action: "maintain"
 Discount: 0%
@@ -225,6 +245,7 @@ Time to Act: "none"
 **Implementation**: `lifo_api/app/core/donation_engine.py`
 
 #### Donation Decision Process
+
 ```python
 # Evaluation trigger points:
 - Days to expiry ≤ critical_days_threshold (1 day): Immediate evaluation
@@ -246,6 +267,7 @@ elif days_to_expiry ≤ 3:
 ```
 
 #### Value Recovery Estimation
+
 ```python
 # For donations:
 - Tax benefit = cost_basis * 0.6  # 60% of cost basis (German tax law)
@@ -255,21 +277,26 @@ cost_basis = original_value * (1 - margin_percent / 100)
 #### Category-Based Recipient Selection
 
 **Special Handling Categories** (restricted distribution):
+
 - Products: meat_fish, dairy, deli_prepared, frozen
 - Recipients: Food Banks only (certified)
 
 **Fresh Produce**:
+
 - Base Recipients: Food Banks, Charities, Community Groups
 - Additional: Soup Kitchens, Animal Shelters, Schools
 
 **Bakery Fresh**:
+
 - Base Recipients: Food Banks, Charities, Community Groups
 - Additional: Soup Kitchens, Elderly Care, Homeless Shelters
 
 **Standard Categories**:
+
 - Recipients: Food Banks, Charities, Community Groups
 
 #### Non-Eligible Products
+
 ```
 Conditions for Non-Eligibility:
 - Expired products
@@ -286,6 +313,7 @@ Follow: Standard discount recommendations
 **Note**: Updated for EU compliance - all expired products must be disposed regardless of category or days past expiry.
 
 #### All Expired Products (days_to_expiry ≤ 0)
+
 ```
 Action: "dispose"
 Discount: 0%
@@ -299,6 +327,7 @@ Reason: "product expired"
 ## Urgency Level Determination
 
 **Formula**:
+
 ```python
 def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
     if days_to_expiry <= 0 or composite_score >= 0.9:
@@ -316,12 +345,14 @@ def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
 ## Data Sources and Fallbacks
 
 ### Sales Velocity Data Priority
+
 1. **Batch-specific sales** (last 30 days)
 2. **Category sales for store** (last 30 days)
 3. **Category sales for store** (last 90 days)
 4. **Category default velocity** (fallback)
 
 ### Weight Configuration Priority
+
 1. **Database category weights** (if configured)
 2. **Config file category weights**
 3. **Default weights** (fallback)
@@ -329,12 +360,14 @@ def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
 ## Error Handling and Defaults
 
 ### Missing Data Defaults
+
 - **Unknown daily sales**: 1.0 units/day
 - **Unknown category**: Uses default weights
 - **Invalid selling price**: Margin score = 1.0
 - **Missing expiry date**: Uses current date
 
 ### Validation Rules
+
 - All scores clamped to [0.0, 1.0] range
 - Weights must sum to 1.0 (±0.01 tolerance)
 - Discounts cannot exceed available margin
@@ -343,11 +376,13 @@ def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
 ## Configuration Files
 
 ### Primary Configuration
+
 - **Scoring weights**: `lifo_api/app/core/config.py`
 - **Main scoring logic**: `lifo_api/app/core/scoring.py`
 - **Category mappings**: Database `category_weights` table
 
 ### Database Models
+
 - **Product scores**: `product_scores` table
 - **Category weights**: `category_weights` table
 - **Sales events**: `sales_events` table
@@ -356,6 +391,7 @@ def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
 ## Performance Considerations
 
 ### Optimization Features
+
 - Read-only database operations for scoring
 - Batch processing for store inventory
 - Cached category weights
@@ -363,6 +399,7 @@ def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
 - Memory-efficient result handling
 
 ### Monitoring
+
 - Processing time tracking
 - Error rate monitoring
 - Recommendation accuracy tracking
@@ -370,4 +407,4 @@ def _get_urgency_level(days_to_expiry: int, composite_score: float) -> str:
 
 ---
 
-*This documentation reflects the current implementation as of the scoring engine located in `lifo_api/app/core/scoring.py`. For the most up-to-date formulas and thresholds, refer to the source code.*
+_This documentation reflects the current implementation as of the scoring engine located in `lifo_api/app/core/scoring.py`. For the most up-to-date formulas and thresholds, refer to the source code._

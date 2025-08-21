@@ -21,72 +21,6 @@ import {
 // FastAPI scoring endpoints testing
 const FASTAPI_BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
 
-// Helper to get the correct token from Supabase session
-function getSupabaseToken(): Promise<string | null> {
-  return new Promise(async resolve => {
-    try {
-      // Get the current session from Supabase client
-      const supabase = createClient()
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession()
-
-      if (error) {
-        console.error('Error getting Supabase session:', error)
-        resolve(null)
-        return
-      }
-
-      if (session?.access_token) {
-        console.log('Got token from Supabase session')
-        resolve(session.access_token)
-        return
-      }
-
-      console.warn('No active Supabase session found')
-      resolve(null)
-    } catch (e) {
-      console.error('Error getting Supabase token:', e)
-      resolve(null)
-    }
-  })
-}
-
-async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  try {
-    const token = await getSupabaseToken()
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...((options.headers as Record<string, string>) || {}),
-    }
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-      console.log('Using token (first 20 chars):', token.substring(0, 20) + '...')
-    } else {
-      console.warn('No authentication token found in Supabase session')
-    }
-
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      method: options.method || 'GET',
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
-    }
-
-    return response.json()
-  } catch (error) {
-    console.error('Fetch error:', error)
-    throw error
-  }
-}
-
 async function fetchHealthCheck() {
   try {
     const response = await fetch(`${FASTAPI_BASE_URL}/health`)
@@ -224,7 +158,10 @@ export default function PlaygroundPage() {
 
   // Integrated Scoring System (using existing backend with scoring)
   const alertsQuery = useScoringAlerts(activeStoreId, alertThreshold)
-  const recommendationsQuery = useScoringRecommendations(activeStoreId, recommendationCategory || undefined)
+  const recommendationsQuery = useScoringRecommendations(
+    activeStoreId,
+    recommendationCategory || undefined,
+  )
   const analyticsQuery = useStoreAnalytics(activeStoreId, '7d')
   const dashboardQuery = useDashboardInsights(activeStoreId)
 

@@ -46,9 +46,8 @@ export function UrgentAlerts() {
     )
   }
 
-  const alerts = data?.alerts || []
   const summary = data?.summary
-  
+
   const getSeverity = () => {
     if (!summary) return 'low'
     if (summary.critical_count > 0) return 'critical'
@@ -60,7 +59,8 @@ export function UrgentAlerts() {
     if (!summary) return 'Loading alert data...'
     const totalAlerts = summary.total_alerts
     if (totalAlerts === 0) return 'All items are within safe thresholds'
-    if (summary.critical_count > 0) return `${summary.critical_count} critical items need immediate action`
+    if (summary.critical_count > 0)
+      return `${summary.critical_count} critical items need immediate action`
     if (summary.high_count > 0) return `${summary.high_count} items require attention soon`
     return `${totalAlerts} items flagged by scoring system`
   }
@@ -74,14 +74,12 @@ export function UrgentAlerts() {
         <Typography variant="h4" className="font-bold capitalize">
           AI {severity} Alerts
         </Typography>
-        <Typography variant="p">
-          🤖 {message}
-        </Typography>
+        <Typography variant="p">🤖 {message}</Typography>
       </div>
 
       <Link href="/dashboard/inventory/batches?filter=expiring">
-        <Button 
-          variant={summary?.critical_count ? "destructive" : "subtleSecondary"} 
+        <Button
+          variant={summary?.critical_count ? 'destructive' : 'subtleSecondary'}
           className="gap-2"
         >
           View urgent items

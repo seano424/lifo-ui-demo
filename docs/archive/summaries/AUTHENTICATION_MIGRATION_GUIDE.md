@@ -1,9 +1,10 @@
 # Supabase Authentication Migration Guide
+
 ## From JWT Secrets to API Keys
 
 **Date:** August 4, 2025  
 **Migration Reason:** Supabase is deprecating JWT secrets in favor of API keys  
-**Impact:** Enhanced security and simplified authentication flow  
+**Impact:** Enhanced security and simplified authentication flow
 
 ---
 
@@ -13,32 +14,38 @@ Supabase is transitioning from JWT secret-based authentication to API key-based 
 
 ### Current State vs Target State
 
-| Aspect | Current (JWT Secret) | Target (API Keys) |
-|--------|---------------------|-------------------|
-| **Authentication Method** | JWT secret validation | API key + Auth server |
-| **Token Verification** | Local JWT decode | Supabase Auth API call |
-| **Key Management** | Static JWT secret | Rotatable API keys |
-| **Security** | Shared secret risk | Individual key pairs |
-| **Fallback Strategy** | JWT secret fallback | No fallback needed |
+| Aspect                    | Current (JWT Secret)  | Target (API Keys)      |
+| ------------------------- | --------------------- | ---------------------- |
+| **Authentication Method** | JWT secret validation | API key + Auth server  |
+| **Token Verification**    | Local JWT decode      | Supabase Auth API call |
+| **Key Management**        | Static JWT secret     | Rotatable API keys     |
+| **Security**              | Shared secret risk    | Individual key pairs   |
+| **Fallback Strategy**     | JWT secret fallback   | No fallback needed     |
 
 ---
 
 ## Migration Strategy
 
 ### Phase 1: Parallel Implementation (Current)
+
 ✅ **Already Implemented**
+
 - JWT authentication with Auth server verification
 - Fallback to JWT secret for compatibility
 - API key foundation in place
 
 ### Phase 2: API Key Primary (Recommended)
+
 🎯 **Implementation Ready**
+
 - New API key authentication system
 - JWT as fallback during transition
 - Enhanced error handling and logging
 
 ### Phase 3: JWT Deprecation (Future)
+
 📅 **After Supabase API key rollout**
+
 - Remove JWT secret dependency
 - Pure API key authentication
 - Clean up legacy code
@@ -54,7 +61,7 @@ sequenceDiagram
     participant Client
     participant FastAPI
     participant Supabase Auth
-    
+
     Client->>FastAPI: Request with Authorization: Bearer <token>
     FastAPI->>Supabase Auth: GET /auth/v1/user (with apikey header)
     Supabase Auth->>FastAPI: User info or 401/403
@@ -64,12 +71,14 @@ sequenceDiagram
 ### Key Components
 
 1. **SupabaseAPIKeyAuth Class** (`supabase_api_key_auth.py`)
+
    - Modern authentication using Supabase Auth API
    - Token validation through Supabase servers
    - Service role key verification
    - Token refresh capabilities
 
-2. **Updated Dependencies** 
+2. **Updated Dependencies**
+
    - `get_current_user()` - Extract authenticated user
    - `require_permission()` - Permission-based access control
    - Role-based authentication helpers
@@ -87,6 +96,7 @@ sequenceDiagram
 ### Environment Variables
 
 **Required for API Key Authentication:**
+
 ```bash
 # Core Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
@@ -98,6 +108,7 @@ SUPABASE_JWT_SECRET=your-jwt-secret                 # Remove after full migratio
 ```
 
 **Updated `.env.local` Structure:**
+
 ```bash
 # =============================================================================
 # SUPABASE AUTHENTICATION (API KEY BASED)
@@ -118,23 +129,26 @@ DATABASE_URL=postgresql+asyncpg://...
 ### Creating New Supabase API Keys
 
 1. **Access Supabase Dashboard**
+
    ```bash
    # Navigate to your project settings
    https://app.supabase.com/project/[your-project]/settings/api
    ```
 
 2. **Generate New API Keys**
+
    - **Anon Key**: For client-side authentication
    - **Service Role Key**: For server-side admin operations
    - Copy and securely store both keys
 
 3. **Test API Keys**
+
    ```bash
    # Test anon key
    curl -H "apikey: your-anon-key" \
         https://your-project.supabase.co/rest/v1/
 
-   # Test service role key  
+   # Test service role key
    curl -H "apikey: your-service-role-key" \
         -H "Authorization: Bearer your-service-role-key" \
         https://your-project.supabase.co/rest/v1/
@@ -145,6 +159,7 @@ DATABASE_URL=postgresql+asyncpg://...
 ## Code Migration Examples
 
 ### Before: JWT Secret Authentication
+
 ```python
 # Old approach - JWT secret validation
 async def verify_token(token: str) -> SupabaseUser:
@@ -157,6 +172,7 @@ async def verify_token(token: str) -> SupabaseUser:
 ```
 
 ### After: API Key Authentication
+
 ```python
 # New approach - API key with Auth server
 async def verify_user_token(access_token: str) -> APIKeyUser:
@@ -164,7 +180,7 @@ async def verify_user_token(access_token: str) -> APIKeyUser:
         "Authorization": f"Bearer {access_token}",
         "apikey": settings.SUPABASE_ANON_KEY  # Dynamic API key
     }
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.get(
             f"{settings.SUPABASE_URL}/auth/v1/user",
@@ -172,11 +188,12 @@ async def verify_user_token(access_token: str) -> APIKeyUser:
         )
         response.raise_for_status()
         user_data = response.json()
-        
+
     return APIKeyUser(**user_data)
 ```
 
 ### Endpoint Migration
+
 ```python
 # Before: JWT dependency injection
 @app.get("/api/v1/protected")
@@ -185,7 +202,7 @@ async def protected_endpoint(
 ):
     return {"user_id": current_user.user_id}
 
-# After: API key dependency injection  
+# After: API key dependency injection
 @app.get("/api/v1/protected")
 async def protected_endpoint(
     current_user: APIKeyUser = Depends(get_current_user)
@@ -198,6 +215,7 @@ async def protected_endpoint(
 ## Security Improvements
 
 ### 1. Enhanced Token Validation
+
 ```python
 # Comprehensive validation with API keys
 async def validate_api_request(self, request: Request) -> APIKeyUser:
@@ -205,17 +223,18 @@ async def validate_api_request(self, request: Request) -> APIKeyUser:
     authorization = request.headers.get("Authorization")
     if not authorization:
         raise SupabaseAPIKeyError("Authorization header required")
-    
+
     # Support both user tokens and service keys
     api_key = request.headers.get("apikey")
     if api_key and await self.verify_service_key(api_key):
         return self.create_service_user()
-    
+
     # Validate user access token via Supabase Auth
     return await self.verify_user_token(authorization)
 ```
 
 ### 2. Service Role Key Security
+
 ```python
 # Constant-time comparison prevents timing attacks
 def verify_service_key(self, api_key: str) -> bool:
@@ -223,6 +242,7 @@ def verify_service_key(self, api_key: str) -> bool:
 ```
 
 ### 3. Token Refresh Support
+
 ```python
 # Built-in token refresh capability
 async def refresh_token(self, refresh_token: str) -> Dict[str, str]:
@@ -239,6 +259,7 @@ async def refresh_token(self, refresh_token: str) -> Dict[str, str]:
 ## Testing Strategy
 
 ### 1. Parallel Authentication Testing
+
 ```python
 # Test both authentication methods during transition
 @pytest.mark.asyncio
@@ -246,16 +267,17 @@ async def test_parallel_auth():
     # Test API key auth (primary)
     api_key_user = await api_key_auth.verify_user_token(valid_token)
     assert api_key_user.user_id == expected_user_id
-    
+
     # Test JWT auth (fallback)
     jwt_user = await jwt_auth.verify_token(valid_token)
     assert jwt_user.user_id == expected_user_id
-    
+
     # Ensure consistent results
     assert api_key_user.user_id == jwt_user.user_id
 ```
 
 ### 2. API Key Validation Testing
+
 ```python
 # Test API key security features
 @pytest.mark.asyncio
@@ -263,11 +285,11 @@ async def test_api_key_security():
     # Test invalid API key
     with pytest.raises(SupabaseAPIKeyError):
         await api_key_auth.verify_user_token("invalid_token")
-    
+
     # Test service role key
     is_valid = await api_key_auth.verify_service_key(service_role_key)
     assert is_valid is True
-    
+
     # Test timing attack resistance
     start_time = time.time()
     await api_key_auth.verify_service_key("wrong_key")
@@ -276,6 +298,7 @@ async def test_api_key_security():
 ```
 
 ### 3. Performance Testing
+
 ```python
 # Compare authentication performance
 @pytest.mark.benchmark
@@ -285,13 +308,13 @@ async def test_auth_performance():
     for _ in range(100):
         await api_key_auth.verify_user_token(valid_token)
     api_key_duration = time.time() - start
-    
+
     # Benchmark JWT auth
     start = time.time()
     for _ in range(100):
         await jwt_auth.verify_token(valid_token)
     jwt_duration = time.time() - start
-    
+
     # API key auth should be comparable or better
     assert api_key_duration < jwt_duration * 2  # Allow for network overhead
 ```
@@ -301,24 +324,28 @@ async def test_auth_performance():
 ## Migration Timeline
 
 ### Immediate (Week 1)
+
 - [x] ✅ Implement API key authentication system
 - [x] ✅ Create migration documentation
 - [ ] 🔄 Update environment configuration
 - [ ] 🔄 Generate new Supabase API keys
 
 ### Short-term (Week 2-3)
+
 - [ ] 📋 Deploy API key authentication alongside JWT
 - [ ] 📋 Update client applications to use API keys
 - [ ] 📋 Comprehensive testing of both authentication methods
 - [ ] 📋 Monitor authentication performance and errors
 
 ### Medium-term (Week 4-6)
+
 - [ ] 📅 Gradually migrate endpoints to API key primary
 - [ ] 📅 Update documentation and developer guides
 - [ ] 📅 Train team on new authentication flow
 - [ ] 📅 Performance optimization and monitoring
 
 ### Long-term (Month 2-3)
+
 - [ ] 🎯 Remove JWT secret dependency
 - [ ] 🎯 Clean up legacy authentication code
 - [ ] 🎯 Full API key authentication deployment
@@ -329,6 +356,7 @@ async def test_auth_performance():
 ## Rollback Strategy
 
 ### Emergency Rollback
+
 If API key authentication fails, the system maintains JWT fallback:
 
 ```python
@@ -339,12 +367,13 @@ async def verify_token_with_fallback(token: str) -> SupabaseUser:
         return await api_key_auth.verify_user_token(token)
     except Exception as e:
         logger.warning("API key auth failed, falling back to JWT", error=str(e))
-        
+
         # Fallback to JWT authentication
         return await jwt_auth.verify_token(token)
 ```
 
 ### Rollback Checklist
+
 - [ ] Revert to JWT-only authentication
 - [ ] Update environment variables
 - [ ] Rollback client-side changes
@@ -356,18 +385,21 @@ async def verify_token_with_fallback(token: str) -> SupabaseUser:
 ## Benefits of API Key Migration
 
 ### Security Benefits
+
 - **🔐 Enhanced Security**: No shared JWT secrets
 - **🔄 Key Rotation**: Easy API key rotation without service interruption
 - **🛡️ Reduced Attack Surface**: Server-side token validation only
 - **📊 Better Audit Trail**: Detailed authentication logging
 
 ### Operational Benefits
+
 - **🚀 Improved Performance**: Reduced JWT decoding overhead
 - **🔧 Easier Debugging**: Clear authentication flow
 - **📈 Better Monitoring**: Real-time authentication metrics
 - **🔄 Simplified Deployment**: No JWT secret management
 
 ### Developer Experience
+
 - **📚 Clearer Documentation**: Straightforward API key usage
 - **🧪 Better Testing**: Mock-friendly authentication
 - **🐛 Easier Debugging**: Clear error messages and logging
@@ -380,26 +412,29 @@ async def verify_token_with_fallback(token: str) -> SupabaseUser:
 ### Common Issues
 
 1. **API Key Not Working**
+
    ```bash
    # Check API key configuration
    curl -H "apikey: your-anon-key" \
         https://your-project.supabase.co/rest/v1/
-   
+
    # Expected: 200 OK with API info
    # If 401: API key is invalid
    # If 403: API key permissions issue
    ```
 
 2. **Token Validation Failures**
+
    ```python
    # Enable debug logging
    logging.getLogger("lifo_api.app.auth").setLevel(logging.DEBUG)
-   
+
    # Check logs for detailed error information
    # Common causes: expired tokens, network issues, wrong API key
    ```
 
 3. **Performance Issues**
+
    ```python
    # Monitor authentication latency
    @app.middleware("http")
@@ -408,14 +443,15 @@ async def verify_token_with_fallback(token: str) -> SupabaseUser:
            start_time = time.time()
            response = await call_next(request)
            auth_time = time.time() - start_time
-           
+
            if auth_time > 1.0:  # Log slow authentication
                logger.warning("Slow authentication", duration=auth_time)
-           
+
            return response
    ```
 
 ### Support Resources
+
 - **Supabase Documentation**: https://supabase.com/docs/guides/auth
 - **API Key Management**: https://supabase.com/docs/guides/api/api-keys
 - **Migration Support**: Contact Supabase support for migration assistance
@@ -427,7 +463,7 @@ async def verify_token_with_fallback(token: str) -> SupabaseUser:
 The migration from JWT secrets to API keys represents a significant security and operational improvement for the LIFO AI Engine. The new authentication system provides:
 
 - **Enhanced security** through server-side token validation
-- **Better operational control** with key rotation capabilities  
+- **Better operational control** with key rotation capabilities
 - **Improved developer experience** with clearer authentication patterns
 - **Future-proof architecture** aligned with Supabase roadmap
 

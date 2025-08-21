@@ -16,19 +16,19 @@ export async function GET(request: NextRequest) {
   console.log('[/api/analytics] Request received:', {
     url: request.url,
     method: request.method,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   })
 
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser()
-  
+
   if (error || !user) {
     console.log('[/api/analytics] Authentication failed:', {
       error: error?.message,
       hasUser: !!user,
-      userId: user?.id
+      userId: user?.id,
     })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     userId: user.id,
     storeId,
     timeframe,
-    metric
+    metric,
   })
 
   if (!storeId) {
@@ -53,18 +53,18 @@ export async function GET(request: NextRequest) {
   try {
     console.log('[/api/analytics] Initializing InventoryOperations...')
     const operations = new InventoryOperations(supabase)
-    
+
     console.log('[/api/analytics] Checking store access...', {
       storeId,
-      userId: user.id
+      userId: user.id,
     })
-    
+
     const hasAccess = await operations.validateStoreAccess(storeId, user.id)
-    
+
     console.log('[/api/analytics] Store access validation result:', {
       hasAccess,
       storeId,
-      userId: user.id
+      userId: user.id,
     })
 
     if (!hasAccess) {
@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
           details: {
             userId: user.id,
             storeId,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         },
         { status: 403 },
       )

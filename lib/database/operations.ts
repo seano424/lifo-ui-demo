@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 import { Database } from '@/types/supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
 
@@ -23,7 +24,7 @@ export class InventoryOperations {
     console.log('[InventoryOperations.validateStoreAccess] Starting validation:', {
       storeId,
       userId,
-      requiredRole
+      requiredRole,
     })
 
     try {

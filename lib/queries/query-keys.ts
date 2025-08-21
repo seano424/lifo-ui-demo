@@ -1,4 +1,5 @@
 // lib/queries/query-keys.ts
+/* eslint-disable prettier/prettier */
 import type { ProductFilters } from './products'
 import type { UserFilters } from './users'
 import type { BatchFilters } from './batches'

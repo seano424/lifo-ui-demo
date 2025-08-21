@@ -2,7 +2,16 @@
 
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
-import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon, Package, Layers } from 'lucide-react'
+import {
+  BookOpen,
+  Bot,
+  SquareTerminal,
+  Calendar,
+  Box,
+  SettingsIcon,
+  Package,
+  Layers,
+} from 'lucide-react'
 import { TeamSwitcher } from './team-switcher'
 
 import { NavMain } from '@/components/nav-main'

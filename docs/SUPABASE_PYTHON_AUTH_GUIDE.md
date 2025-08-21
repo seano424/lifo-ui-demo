@@ -40,7 +40,7 @@ client.auth.set_session()          # ✅ OFFICIAL METHOD
 def get_user_client(self, user_token: str) -> Client:
     """Get client with user context for RLS-compliant operations"""
     client = create_client(self.url, self.anon_key)
-    
+
     # Official method: Use set_session with access token
     # refresh_token can be None for server-side JWT scenarios
     try:
@@ -49,11 +49,12 @@ def get_user_client(self, user_token: str) -> Client:
         logger.warning("Failed to set session with token", error=str(e))
         # Fallback to header method
         client.options.headers["Authorization"] = f"Bearer {user_token}"
-    
+
     return client
 ```
 
 **Why this works:**
+
 - Uses the official Supabase API method
 - Documented in Supabase Python reference
 - Handles JWT validation and session management
@@ -65,14 +66,15 @@ def get_user_client(self, user_token: str) -> Client:
 def get_user_client(self, user_token: str) -> Client:
     """Get client with user context for RLS-compliant operations"""
     client = create_client(self.url, self.anon_key)
-    
+
     # Direct header manipulation (correct path)
     client.options.headers["Authorization"] = f"Bearer {user_token}"
-    
+
     return client
 ```
 
 **Why this works:**
+
 - `client.options.headers` is the correct public API path
 - This is where the client actually reads headers from
 - Matches the internal `_get_auth_headers()` method behavior
@@ -84,19 +86,20 @@ from supabase.lib.client_options import SyncClientOptions
 
 def get_user_client(self, user_token: str) -> Client:
     """Get client with user context for RLS-compliant operations"""
-    
+
     # Create client options with Authorization header
     options = SyncClientOptions(
         headers={
             "Authorization": f"Bearer {user_token}"
         }
     )
-    
+
     client = create_client(self.url, self.anon_key, options=options)
     return client
 ```
 
 **Why this works:**
+
 - Sets headers during client initialization
 - Most efficient (no post-creation modifications)
 - Clean separation of concerns
@@ -110,7 +113,7 @@ import time
 def get_user_client(self, user_token: str) -> Client:
     """Get client with user context for RLS-compliant operations"""
     client = create_client(self.url, self.anon_key)
-    
+
     # Create session object manually for advanced control
     session = Session(
         access_token=user_token,
@@ -120,12 +123,12 @@ def get_user_client(self, user_token: str) -> Client:
         refresh_token=None,
         user=None  # Will be populated when used
     )
-    
+
     client.auth.set_session(
         access_token=session.access_token,
         refresh_token=session.refresh_token
     )
-    
+
     return client
 ```
 
@@ -157,23 +160,23 @@ def _get_auth_headers(self, authorization: Optional[str] = None) -> Dict[str, st
 # Test script to verify authentication works
 def test_authentication(supabase_url: str, anon_key: str, user_token: str):
     from app.database.supabase_service import get_supabase_service
-    
+
     service = get_supabase_service()
-    
+
     try:
         # Test user client creation
         user_client = service.get_user_client(user_token)
-        
+
         # Verify headers are set correctly
         auth_header = user_client.options.headers.get("Authorization")
         assert auth_header == f"Bearer {user_token}", "Authorization header not set correctly"
-        
+
         # Test a simple query (this will verify RLS works)
         result = user_client.table("stores").select("*").limit(1).execute()
-        
+
         print("✅ Authentication working correctly")
         return True
-        
+
     except Exception as e:
         print(f"❌ Authentication failed: {e}")
         return False
@@ -190,16 +193,19 @@ def test_authentication(supabase_url: str, anon_key: str, user_token: str):
 ## Alternative Approaches for Different Scenarios
 
 ### Scenario 1: You have both access_token and refresh_token
+
 ```python
 client.auth.set_session(access_token=access_token, refresh_token=refresh_token)
 ```
 
 ### Scenario 2: Server-side with JWT only (your case)
+
 ```python
 client.auth.set_session(access_token=user_token, refresh_token=None)
 ```
 
 ### Scenario 3: Custom HTTP client with pre-configured headers
+
 ```python
 import httpx
 from supabase.lib.client_options import SyncClientOptions

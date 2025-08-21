@@ -56,7 +56,9 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>Failed to load scoring recommendations. Please try again.</AlertDescription>
+        <AlertDescription>
+          Failed to load scoring recommendations. Please try again.
+        </AlertDescription>
       </Alert>
     )
   }
@@ -104,17 +106,25 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
 
   const getUrgencyColor = (urgencyLevel: string) => {
     switch (urgencyLevel) {
-      case 'critical': return 'destructive'
-      case 'high': return 'default'
-      case 'medium': return 'secondary'
-      default: return 'outline'
+      case 'critical':
+        return 'destructive'
+      case 'high':
+        return 'default'
+      case 'medium':
+        return 'secondary'
+      default:
+        return 'outline'
     }
   }
 
   const getActionIcon = (recommendation: string) => {
     if (recommendation.toLowerCase().includes('discount')) return <Percent className="h-4 w-4" />
     if (recommendation.toLowerCase().includes('donate')) return <Heart className="h-4 w-4" />
-    if (recommendation.toLowerCase().includes('urgent') || recommendation.toLowerCase().includes('remove')) return <AlertTriangle className="h-4 w-4" />
+    if (
+      recommendation.toLowerCase().includes('urgent') ||
+      recommendation.toLowerCase().includes('remove')
+    )
+      return <AlertTriangle className="h-4 w-4" />
     return <Clock className="h-4 w-4" />
   }
 
@@ -122,7 +132,9 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Scoring-Based Recommendations ({summary?.total_alerts || batches.length})</CardTitle>
+          <CardTitle>
+            Scoring-Based Recommendations ({summary?.total_alerts || batches.length})
+          </CardTitle>
           <div className="flex gap-4 text-sm text-muted-foreground">
             <span>Critical: {summary?.critical_count || 0}</span>
             <span>High: {summary?.high_count || 0}</span>
@@ -181,9 +193,9 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
 
                   {/* Always show a manual donate option for categories suitable for donation */}
                   {!batch.recommendation.toLowerCase().includes('donate') &&
-                    (batch.category?.toLowerCase().includes('bread') || 
-                     batch.category?.toLowerCase().includes('produce') ||
-                     batch.category?.toLowerCase().includes('bakery')) && (
+                    (batch.category?.toLowerCase().includes('bread') ||
+                      batch.category?.toLowerCase().includes('produce') ||
+                      batch.category?.toLowerCase().includes('bakery')) && (
                       <Button
                         size="sm"
                         variant="ghost"
@@ -203,7 +215,8 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                   <AlertDescription className="text-xs">
                     <strong>Scoring Recommendation:</strong> {batch.recommendation}
                     <span className="ml-2 text-muted-foreground">
-                      • Urgency: {batch.urgency_level} • Score: {(batch.composite_score * 100).toFixed(0)}%
+                      • Urgency: {batch.urgency_level} • Score:{' '}
+                      {(batch.composite_score * 100).toFixed(0)}%
                     </span>
                   </AlertDescription>
                 </Alert>

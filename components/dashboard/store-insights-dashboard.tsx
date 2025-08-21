@@ -134,7 +134,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Scoring Alert:</strong> {urgentBatches} urgent batches need immediate attention to prevent losses.
+                    <strong>Scoring Alert:</strong> {urgentBatches} urgent batches need immediate
+                    attention to prevent losses.
                   </AlertDescription>
                 </Alert>
               )}
@@ -156,7 +157,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground">
-                  Average Score: {(avgScore * 100).toFixed(1)}% • €{discountValue.toFixed(0)} discounts applied
+                  Average Score: {(avgScore * 100).toFixed(1)}% • €{discountValue.toFixed(0)}{' '}
+                  discounts applied
                 </p>
                 <Button
                   variant="outline"

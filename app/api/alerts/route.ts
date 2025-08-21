@@ -1,6 +1,58 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+interface ScoringData {
+  batch_id: string
+  composite_score: number
+  recommendation: string
+  calculated_at: string
+}
+
+interface AlertData {
+  batch_id: string
+  batch_number: string
+  current_quantity: number
+  selling_price: number
+  cost_price: number
+  expiry_date: string
+  location_code: string
+  supplier: string
+  sku?: string
+  product_name?: string
+  category?: string
+  brand?: string
+  unit_type?: string
+  composite_score?: number
+  recommendation?: string
+  calculated_at?: string
+}
+
+interface EnhancedAlert {
+  batch_id: string
+  batch_number: string
+  sku: string
+  product_name: string
+  category: string
+  brand: string
+  quantity: number
+  unit_type: string
+  days_to_expiry: number
+  expiry_date: string
+  current_price: number
+  cost_price: number
+  margin_percent: number
+  composite_score: number
+  recommendation: string
+  urgency_level: string
+  potential_loss: number
+  location: string
+  supplier: string
+  calculated_at: string | null
+  suggested_actions: string[]
+  priority_score: number
+}
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -8,19 +60,19 @@ export async function GET(request: NextRequest) {
   console.log('[/api/alerts] Request received:', {
     url: request.url,
     method: request.method,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   })
 
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser()
-  
+
   if (error || !user) {
     console.log('[/api/alerts] Authentication failed:', {
       error: error?.message,
       hasUser: !!user,
-      userId: user?.id
+      userId: user?.id,
     })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -38,7 +90,7 @@ export async function GET(request: NextRequest) {
     threshold,
     urgencyLevel,
     category,
-    limit
+    limit,
   })
 
   if (!storeId) {
@@ -60,18 +112,18 @@ export async function GET(request: NextRequest) {
   try {
     console.log('[/api/alerts] Initializing InventoryOperations...')
     const operations = new InventoryOperations(supabase)
-    
+
     console.log('[/api/alerts] Checking store access...', {
       storeId,
-      userId: user.id
+      userId: user.id,
     })
-    
+
     const hasAccess = await operations.validateStoreAccess(storeId, user.id)
-    
+
     console.log('[/api/alerts] Store access validation result:', {
       hasAccess,
       storeId,
-      userId: user.id
+      userId: user.id,
     })
 
     if (!hasAccess) {
@@ -82,8 +134,8 @@ export async function GET(request: NextRequest) {
           details: {
             userId: user.id,
             storeId,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         },
         { status: 403 },
       )
@@ -93,7 +145,7 @@ export async function GET(request: NextRequest) {
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
 
     // Enhance alerts with calculated fields
-    const enhancedAlerts = alerts.map((alert: any) => {
+    const enhancedAlerts = alerts.map((alert: AlertData) => {
       const daysToExpiry = Math.floor(
         (new Date(alert.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
@@ -152,17 +204,19 @@ export async function GET(request: NextRequest) {
     let filteredAlerts = enhancedAlerts
 
     if (urgencyLevel) {
-      filteredAlerts = filteredAlerts.filter((alert: any) => alert.urgency_level === urgencyLevel)
+      filteredAlerts = filteredAlerts.filter(
+        (alert: EnhancedAlert) => alert.urgency_level === urgencyLevel,
+      )
     }
 
     if (category) {
-      filteredAlerts = filteredAlerts.filter((alert: any) =>
+      filteredAlerts = filteredAlerts.filter((alert: EnhancedAlert) =>
         alert.category.toLowerCase().includes(category.toLowerCase()),
       )
     }
 
     // Sort by priority score (highest first), then by days to expiry
-    filteredAlerts.sort((a: any, b: any) => {
+    filteredAlerts.sort((a: EnhancedAlert, b: EnhancedAlert) => {
       if (b.priority_score !== a.priority_score) {
         return b.priority_score - a.priority_score
       }
@@ -175,19 +229,26 @@ export async function GET(request: NextRequest) {
     // Calculate summary statistics
     const summary = {
       total_alerts: filteredAlerts.length,
-      critical_count: filteredAlerts.filter((a: any) => a.urgency_level === 'critical').length,
-      high_count: filteredAlerts.filter((a: any) => a.urgency_level === 'high').length,
-      medium_count: filteredAlerts.filter((a: any) => a.urgency_level === 'medium').length,
-      low_count: filteredAlerts.filter((a: any) => a.urgency_level === 'low').length,
-      total_potential_loss: filteredAlerts.reduce((sum: number, alert: any) => sum + alert.potential_loss, 0),
-      categories_affected: [...new Set(filteredAlerts.map((a: any) => a.category))].length,
+      critical_count: filteredAlerts.filter((a: EnhancedAlert) => a.urgency_level === 'critical')
+        .length,
+      high_count: filteredAlerts.filter((a: EnhancedAlert) => a.urgency_level === 'high').length,
+      medium_count: filteredAlerts.filter((a: EnhancedAlert) => a.urgency_level === 'medium')
+        .length,
+      low_count: filteredAlerts.filter((a: EnhancedAlert) => a.urgency_level === 'low').length,
+      total_potential_loss: filteredAlerts.reduce(
+        (sum: number, alert: EnhancedAlert) => sum + alert.potential_loss,
+        0,
+      ),
+      categories_affected: [...new Set(filteredAlerts.map((a: EnhancedAlert) => a.category))]
+        .length,
       avg_days_to_expiry:
         filteredAlerts.length > 0
           ? Math.round(
-              filteredAlerts.reduce((sum: number, a: any) => sum + a.days_to_expiry, 0) / filteredAlerts.length,
+              filteredAlerts.reduce((sum: number, a: EnhancedAlert) => sum + a.days_to_expiry, 0) /
+                filteredAlerts.length,
             )
           : 0,
-      expired_items: filteredAlerts.filter((a: any) => a.days_to_expiry < 0).length,
+      expired_items: filteredAlerts.filter((a: EnhancedAlert) => a.days_to_expiry < 0).length,
     }
 
     return NextResponse.json({
@@ -214,13 +275,14 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper function to get alerts from database with scoring
-async function getStoreAlerts(supabase: any, storeId: string, threshold: number) {
+async function getStoreAlerts(supabase: SupabaseClient, storeId: string, threshold: number) {
   try {
     // Get batches with scoring data using the existing structure
     const { data: batches, error } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         batch_id,
         batch_number,
         current_quantity,
@@ -236,7 +298,8 @@ async function getStoreAlerts(supabase: any, storeId: string, threshold: number)
           brand,
           unit_type
         )
-      `)
+      `,
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .order('expiry_date', { ascending: true })
@@ -249,7 +312,7 @@ async function getStoreAlerts(supabase: any, storeId: string, threshold: number)
     }
 
     // Get batch IDs for scoring lookup
-    const batchIds = batches.map((batch: any) => batch.batch_id)
+    const batchIds = batches.map(batch => batch.batch_id)
 
     // Get scoring data separately from scoring schema
     const { data: scoringData, error: scoringError } = await supabase
@@ -265,34 +328,40 @@ async function getStoreAlerts(supabase: any, storeId: string, threshold: number)
 
     // Create a map of batch_id to scoring data for quick lookup
     const scoringMap = new Map()
-    scoringData?.forEach((score: any) => {
+    scoringData?.forEach((score: ScoringData) => {
       scoringMap.set(score.batch_id, score)
     })
 
     // Filter by threshold and format data
-    const alerts = batches
-      ?.map((batch: any) => {
-        const scoring = scoringMap.get(batch.batch_id)
-        return {
-          batch_id: batch.batch_id,
-          batch_number: batch.batch_number,
-          current_quantity: batch.current_quantity,
-          selling_price: batch.selling_price,
-          cost_price: batch.cost_price,
-          expiry_date: batch.expiry_date,
-          location_code: batch.location_code,
-          supplier: batch.supplier,
-          sku: batch.products?.sku,
-          product_name: batch.products?.name,
-          category: batch.products?.category,
-          brand: batch.products?.brand,
-          unit_type: batch.products?.unit_type,
-          composite_score: scoring?.composite_score || 0,
-          recommendation: scoring?.recommendation,
-          calculated_at: scoring?.calculated_at,
-        }
-      })
-      .filter((alert: any) => (alert.composite_score || 0) >= threshold) || []
+    const alerts =
+      batches
+        ?.map(batch => {
+          const scoring = scoringMap.get(batch.batch_id)
+          return {
+            batch_id: batch.batch_id,
+            batch_number: batch.batch_number,
+            current_quantity: batch.current_quantity,
+            selling_price: batch.selling_price,
+            cost_price: batch.cost_price,
+            expiry_date: batch.expiry_date,
+            location_code: batch.location_code,
+            supplier: batch.supplier,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            sku: (batch as any).products?.sku,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            product_name: (batch as any).products?.name,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            category: (batch as any).products?.category,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            brand: (batch as any).products?.brand,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            unit_type: (batch as any).products?.unit_type,
+            composite_score: scoring?.composite_score || 0,
+            recommendation: scoring?.recommendation,
+            calculated_at: scoring?.calculated_at,
+          }
+        })
+        .filter((alert: AlertData) => (alert.composite_score || 0) >= threshold) || []
 
     return alerts
   } catch (error) {

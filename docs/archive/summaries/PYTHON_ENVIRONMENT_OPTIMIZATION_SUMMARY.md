@@ -22,6 +22,7 @@ lifo-app/
 ```
 
 **Problems:**
+
 - 🔴 **Duplicate Dependencies**: 50% overlap (pydantic, sqlalchemy, pytest, etc.)
 - 🔴 **Environment Confusion**: Developers managing two venvs
 - 🔴 **Import Hacks**: `sys.path` manipulation for cross-module imports
@@ -49,6 +50,7 @@ lifo-app/
 ```
 
 **Benefits:**
+
 - ✅ **Single Environment**: One `.venv` for everything
 - ✅ **No Duplicates**: Optimized 107 unique packages
 - ✅ **Proper Imports**: `from lifo_ai_core.etl import ...`
@@ -88,13 +90,13 @@ Installed 107 packages in 3.82s
 
 ### **Performance Improvements:**
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Setup Time** | ~8-12 minutes | ~5 minutes | **40-60% faster** |
-| **Dependencies** | 87 total (44+43) | 107 unique | **Optimized** |
-| **Disk Space** | ~500MB (2 venvs) | ~300MB (1 venv) | **40% less** |
-| **Setup Commands** | 6+ commands | 1 command | **85% simpler** |
-| **Import Complexity** | `sys.path` hacks | Clean imports | **100% cleaner** |
+| Metric                | Before           | After           | Improvement       |
+| --------------------- | ---------------- | --------------- | ----------------- |
+| **Setup Time**        | ~8-12 minutes    | ~5 minutes      | **40-60% faster** |
+| **Dependencies**      | 87 total (44+43) | 107 unique      | **Optimized**     |
+| **Disk Space**        | ~500MB (2 venvs) | ~300MB (1 venv) | **40% less**      |
+| **Setup Commands**    | 6+ commands      | 1 command       | **85% simpler**   |
+| **Import Complexity** | `sys.path` hacks | Clean imports   | **100% cleaner**  |
 
 ## 📁 New Unified Structure Features
 
@@ -121,7 +123,7 @@ testpaths = ["lifo_api/tests", "lifo_ai_core/tests"]
 ### **2. Unified Configuration Management**
 
 - **Single `ruff.toml`**: Consistent linting across both components
-- **Single `mypy.ini`**: Unified type checking configuration  
+- **Single `mypy.ini`**: Unified type checking configuration
 - **Single `requirements.txt`**: All dependencies in one place
 - **`.python-version`**: Explicit Python version requirement
 
@@ -158,7 +160,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-cd ../lifo_ai_core  
+cd ../lifo_ai_core
 # Different venv setup...
 ./scripts/dev-setup.sh
 
@@ -277,7 +279,7 @@ CMD ["uvicorn", "lifo_api.app.main:app", "--host", "0.0.0.0"]
 
 ### **Problem → Solution:**
 
-**Your Question**: *"Is having two folders with two venv and corresponding requirements.txt optimal?"*
+**Your Question**: _"Is having two folders with two venv and corresponding requirements.txt optimal?"_
 
 **Answer**: **Absolutely not!** And now it's fixed.
 

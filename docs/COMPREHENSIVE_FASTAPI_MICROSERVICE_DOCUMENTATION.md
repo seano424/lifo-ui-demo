@@ -43,7 +43,7 @@ graph TB
         A[Next.js Frontend] --> B[OpenFoodFacts API]
         A --> C[Mobile Scanner]
     end
-    
+
     subgraph "LIFO AI Engine (FastAPI)"
         D[Main Application] --> E[Error Handling Middleware]
         E --> F[Security Middleware]
@@ -55,20 +55,20 @@ graph TB
         H --> L[CSV Processing]
         H --> M[Mobile Endpoints]
     end
-    
+
     subgraph "Data Layer"
         N[Supabase PostgreSQL] --> O[Row Level Security]
         P[Google Vision API] --> I
         Q[Redis Cache] --> J
     end
-    
+
     subgraph "Monitoring & Recovery"
         R[Error Tracker] --> S[Recovery Manager]
         T[Metrics Collector] --> U[Alert Manager]
         E --> R
         G --> T
     end
-    
+
     A --> D
     D --> N
 ```
@@ -195,33 +195,33 @@ open http://localhost:8000/docs
 
 #### Core API Settings
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `ENVIRONMENT` | Deployment environment | `development` | No |
-| `API_VERSION` | API version string | `1.0.0` | No |
-| `DEBUG` | Enable debug mode | `false` | No |
-| `LOG_LEVEL` | Logging level | `INFO` | No |
-| `HOST` | Server host | `0.0.0.0` | No |
-| `PORT` | Server port | `8000` | No |
+| Variable      | Description            | Default       | Required |
+| ------------- | ---------------------- | ------------- | -------- |
+| `ENVIRONMENT` | Deployment environment | `development` | No       |
+| `API_VERSION` | API version string     | `1.0.0`       | No       |
+| `DEBUG`       | Enable debug mode      | `false`       | No       |
+| `LOG_LEVEL`   | Logging level          | `INFO`        | No       |
+| `HOST`        | Server host            | `0.0.0.0`     | No       |
+| `PORT`        | Server port            | `8000`        | No       |
 
 #### Database Configuration
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `SUPABASE_URL` | Supabase project URL | Yes |
-| `SUPABASE_JWT_SECRET` | JWT secret for token validation | Yes |
-| `SUPABASE_ANON_KEY` | Anonymous key for public access | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role key for admin operations | Yes |
+| Variable                    | Description                           | Required |
+| --------------------------- | ------------------------------------- | -------- |
+| `DATABASE_URL`              | PostgreSQL connection string          | Yes      |
+| `SUPABASE_URL`              | Supabase project URL                  | Yes      |
+| `SUPABASE_JWT_SECRET`       | JWT secret for token validation       | Yes      |
+| `SUPABASE_ANON_KEY`         | Anonymous key for public access       | Yes      |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key for admin operations | Yes      |
 
 #### External Services
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud service account JSON | Yes |
-| `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud project ID | Yes |
-| `REDIS_URL` | Redis connection string | No |
-| `WEATHER_API_KEY` | OpenWeatherMap API key | No |
+| Variable                         | Description                               | Required |
+| -------------------------------- | ----------------------------------------- | -------- |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud service account JSON | Yes      |
+| `GOOGLE_CLOUD_PROJECT_ID`        | Google Cloud project ID                   | Yes      |
+| `REDIS_URL`                      | Redis connection string                   | No       |
+| `WEATHER_API_KEY`                | OpenWeatherMap API key                    | No       |
 
 ### Development vs Production Settings
 
@@ -280,9 +280,11 @@ DB_POOL_RECYCLE=3600
 ### Health and System Endpoints
 
 #### `GET /` - API Root
+
 Returns basic service information and status.
 
 **Response:**
+
 ```json
 {
   "service": "LIFO AI Engine",
@@ -300,9 +302,11 @@ Returns basic service information and status.
 ```
 
 #### `GET /health` - Health Check
+
 Comprehensive health check including database connectivity.
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -315,14 +319,17 @@ Comprehensive health check including database connectivity.
 ```
 
 #### `GET /api/info` - Detailed API Information
+
 Extended API capabilities and endpoint information.
 
 ### Mobile-Optimized Endpoints
 
 #### `GET /api/v1/mobile/mobile-summary/{store_id}` - Mobile Dashboard
+
 Fast overview for mobile scanning interface (target <300ms).
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `include_details` (query, optional): Include detailed batch information
 - `limit_urgent` (query, optional): Limit urgent items returned (default: 10)
@@ -330,12 +337,14 @@ Fast overview for mobile scanning interface (target <300ms).
 **Authentication**: JWT Bearer token required
 
 **Request:**
+
 ```bash
 curl -X GET "http://localhost:8000/api/v1/mobile/mobile-summary/123e4567-e89b-12d3-a456-426614174000?include_details=true" \
   -H "Authorization: Bearer $JWT_TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "urgent_batches": [
@@ -369,19 +378,23 @@ curl -X GET "http://localhost:8000/api/v1/mobile/mobile-summary/123e4567-e89b-12
 ```
 
 #### `POST /api/v1/mobile/batch-quick-score/{batch_id}` - Quick Batch Scoring
+
 Real-time scoring for scanned items (target <200ms).
 
 **Parameters:**
+
 - `batch_id` (path, required): Batch UUID
 - `store_id` (query, required): Store UUID
 
 **Request:**
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/mobile/batch-quick-score/456e7890-f12a-34b5-c678-567890123456?store_id=123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer $JWT_TOKEN"
 ```
 
 **Response:**
+
 ```json
 {
   "batch_id": "456e7890-f12a-34b5-c678-567890123456",
@@ -406,15 +419,18 @@ curl -X POST "http://localhost:8000/api/v1/mobile/batch-quick-score/456e7890-f12
 ### Google Vision OCR Endpoints
 
 #### `POST /api/v1/vision/analyze-image/{store_id}` - Advanced Image Analysis
+
 Comprehensive image analysis with Google Vision API for complex scenarios.
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `image` (form, required): Image file (JPEG, PNG, WebP, max 10MB)
 - `analysis_type` (form, optional): "expiry_date", "barcode", "full" (default: "full")
 - `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.7)
 
 **Request:**
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer $JWT_TOKEN" \
@@ -424,6 +440,7 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/123e4567-e89b-12
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -464,15 +481,18 @@ curl -X POST "http://localhost:8000/api/v1/vision/analyze-image/123e4567-e89b-12
 ### OCR Product Scanning Endpoints
 
 #### `POST /api/v1/ocr/scan/full-ocr/{store_id}` - Complete OCR Analysis
+
 Comprehensive OCR analysis with barcode detection, text extraction, and expiry date parsing.
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `image` (form, required): Image file (JPEG, PNG, WebP, max 15MB)
 - `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.7)
 - `max_processing_time_ms` (form, optional): 1000-10000 (default: 5000)
 
 **Request:**
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer $JWT_TOKEN" \
@@ -481,6 +501,7 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3-
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -516,14 +537,17 @@ curl -X POST "http://localhost:8000/api/v1/ocr/scan/full-ocr/123e4567-e89b-12d3-
 ```
 
 #### `POST /api/v1/ocr/scan/ocr-expiry/{store_id}` - OCR Expiry Date Extraction
+
 Extract expiry dates from product images using Google Vision OCR.
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `image` (form, required): Image file (JPEG, PNG, WebP, max 10MB)
 - `confidence_threshold` (form, optional): 0.1-1.0 (default: 0.65)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -542,9 +566,11 @@ Extract expiry dates from product images using Google Vision OCR.
 ### Scan Workflow Endpoints
 
 #### `POST /api/v1/scan/scan-in/{store_id}` - Scan-In Workflow
+
 Register new inventory via mobile scanning (proof of delivery).
 
 **Request Body:**
+
 ```json
 {
   "product_sku": "APPLE-RED-001",
@@ -564,6 +590,7 @@ Register new inventory via mobile scanning (proof of delivery).
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -582,9 +609,11 @@ Register new inventory via mobile scanning (proof of delivery).
 ```
 
 #### `POST /api/v1/scan/scan-out/{store_id}/{batch_id}` - Scan-Out Workflow
+
 Track when inventory is sold, discounted, or disposed.
 
 **Request Body:**
+
 ```json
 {
   "action": "sold_discounted",
@@ -599,6 +628,7 @@ Track when inventory is sold, discounted, or disposed.
 ```
 
 **Action Types:**
+
 - `sold_full_price` - Regular sale at full price
 - `sold_discounted` - Discounted sale
 - `donated` - Donation to charity
@@ -609,13 +639,16 @@ Track when inventory is sold, discounted, or disposed.
 ### CSV Processing Endpoints
 
 #### `POST /api/v1/csv/upload` - Upload CSV File
+
 Upload and process CSV inventory file with comprehensive validation.
 
 **Parameters:**
+
 - `store_id` (form, required): Store UUID
 - `file` (form, required): CSV file (max 10MB)
 
 **Request:**
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/csv/upload" \
   -H "Authorization: Bearer $JWT_TOKEN" \
@@ -624,6 +657,7 @@ curl -X POST "http://localhost:8000/api/v1/csv/upload" \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -652,21 +686,51 @@ curl -X POST "http://localhost:8000/api/v1/csv/upload" \
 ```
 
 #### `GET /api/v1/csv/template` - Download CSV Template
+
 Get CSV template with sample data and formatting guidelines.
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "content": "sku,product_name,category,quantity,expiry_date,brand,cost_price,selling_price...",
     "filename": "inventory_template.csv",
-    "headers": ["sku", "product_name", "category", "quantity", "expiry_date", "brand", "cost_price", "selling_price", "manufacture_date", "location_code", "unit_type"],
+    "headers": [
+      "sku",
+      "product_name",
+      "category",
+      "quantity",
+      "expiry_date",
+      "brand",
+      "cost_price",
+      "selling_price",
+      "manufacture_date",
+      "location_code",
+      "unit_type"
+    ],
     "sample_rows": 3,
     "instructions": {
       "required_columns": ["sku", "product_name", "category", "quantity", "expiry_date"],
-      "optional_columns": ["brand", "cost_price", "selling_price", "manufacture_date", "location_code", "unit_type"],
-      "category_examples": ["fresh_produce", "fresh_meat_fish", "dairy", "bakery_fresh", "frozen", "beverages", "dry_goods", "canned_jarred"],
+      "optional_columns": [
+        "brand",
+        "cost_price",
+        "selling_price",
+        "manufacture_date",
+        "location_code",
+        "unit_type"
+      ],
+      "category_examples": [
+        "fresh_produce",
+        "fresh_meat_fish",
+        "dairy",
+        "bakery_fresh",
+        "frozen",
+        "beverages",
+        "dry_goods",
+        "canned_jarred"
+      ],
       "date_format": "YYYY-MM-DD (e.g., 2024-07-20)"
     }
   }
@@ -676,13 +740,16 @@ Get CSV template with sample data and formatting guidelines.
 ### Analytics Endpoints
 
 #### `GET /api/v1/analytics/store/{store_id}` - Store Analytics
+
 Comprehensive analytics for a store with configurable time periods.
 
 **Parameters:**
+
 - `store_id` (path, required): Store UUID
 - `days` (query, optional): Analysis period in days (default: 30, max: 365)
 
 **Response:**
+
 ```json
 {
   "store_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -725,9 +792,11 @@ Comprehensive analytics for a store with configurable time periods.
 ### Scoring Endpoints
 
 #### `POST /api/v1/scoring/calculate-score` - Calculate Batch Score
+
 Calculate urgency score for a specific batch.
 
 **Request Body:**
+
 ```json
 {
   "store_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -736,6 +805,7 @@ Calculate urgency score for a specific batch.
 ```
 
 **Response:**
+
 ```json
 {
   "batch_id": "456e7890-f12a-34b5-c678-567890123456",
@@ -830,6 +900,7 @@ async def validate_store_access(
 ```
 
 **Role Levels:**
+
 - **employee** (1): Basic store access
 - **staff** (2): Standard operations
 - **manager** (3): Management functions
@@ -839,13 +910,13 @@ async def validate_store_access(
 
 #### Rate Limits by Endpoint Category
 
-| Category | Development | Production | Time Window |
-|----------|-------------|------------|-------------|
-| Mobile Endpoints | 60/minute | 40/minute | Per IP |
-| Scan Workflows | 40/minute | 30/minute | Per User |
-| CSV Processing | 10/hour | 3/hour | Per User |
-| Analytics | 60/minute | 30/minute | Per User |
-| OCR/Vision | 30/minute | 20/minute | Per User |
+| Category         | Development | Production | Time Window |
+| ---------------- | ----------- | ---------- | ----------- |
+| Mobile Endpoints | 60/minute   | 40/minute  | Per IP      |
+| Scan Workflows   | 40/minute   | 30/minute  | Per User    |
+| CSV Processing   | 10/hour     | 3/hour     | Per User    |
+| Analytics        | 60/minute   | 30/minute  | Per User    |
+| OCR/Vision       | 30/minute   | 20/minute  | Per User    |
 
 #### Rate Limit Headers
 
@@ -911,17 +982,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Primary: Supabase service for RLS and real-time features
     supabase_service = get_supabase_service()
     connection_ok = await supabase_service.test_connection()
-    
+
     if connection_ok:
         logger.info("Supabase database connection established successfully")
-    
+
     # Secondary: SQLAlchemy for complex analytical queries
     try:
         await init_database()
         logger.info("SQLAlchemy database connection also established")
     except Exception as sql_error:
         logger.warning("SQLAlchemy connection failed, using Supabase only", error=str(sql_error))
-    
+
     yield
     await engine().dispose()
 ```
@@ -935,8 +1006,8 @@ Supabase RLS policies ensure multi-tenant data isolation:
 CREATE POLICY "Users can only access their store's batches" ON inventory_batches
 FOR ALL USING (
   EXISTS (
-    SELECT 1 FROM store_users 
-    WHERE store_users.store_id = inventory_batches.store_id 
+    SELECT 1 FROM store_users
+    WHERE store_users.store_id = inventory_batches.store_id
     AND store_users.user_id = auth.uid()
     AND store_users.is_active = true
   )
@@ -1013,7 +1084,7 @@ async def health_check() -> dict:
         async with engine().begin() as conn:
             # Test basic connectivity
             await conn.execute(text("SELECT 1"))
-            
+
             # Get connection pool status
             return {
                 "status": "healthy",
@@ -1042,6 +1113,7 @@ The LIFO AI Engine implements a comprehensive error handling and monitoring syst
 The system categorizes errors into specific types with defined severity levels:
 
 **Error Categories:**
+
 - **Database**: Connection issues, query failures, integrity violations
 - **Authentication**: JWT validation, user verification failures
 - **Authorization**: Permission denied, resource access errors
@@ -1053,6 +1125,7 @@ The system categorizes errors into specific types with defined severity levels:
 - **Security**: Rate limiting violations, suspicious activity
 
 **Severity Levels:**
+
 - **Low**: Minor issues, validation errors (logged as info)
 - **Medium**: Service degradation, auth failures (logged as warning)
 - **High**: System errors, external service failures (logged as error)
@@ -1101,6 +1174,7 @@ async def database_operation():
 ```
 
 **Recovery Strategy:**
+
 1. Test current connection
 2. Reinitialize database connection if needed
 3. Retry operation with exponential backoff
@@ -1121,6 +1195,7 @@ GET /api/errors/stats
 ```
 
 **Response:**
+
 ```json
 {
   "error_tracking": {
@@ -1165,6 +1240,7 @@ GET /api/errors/endpoints/api/v1/mobile/scan
 ```
 
 **Response:**
+
 ```json
 {
   "endpoint_analysis": {
@@ -1203,7 +1279,8 @@ All errors follow a standardized response format:
   "code": "VALIDATION_ERROR",
   "message": "The request data is invalid. Please check your input and try again.",
   "timestamp": "2024-01-15T10:30:00Z",
-  "debug": {                    // Only in debug mode
+  "debug": {
+    // Only in debug mode
     "error_type": "ValidationError",
     "error_message": "Field 'store_id' is required",
     "category": "validation",
@@ -1213,6 +1290,7 @@ All errors follow a standardized response format:
 ```
 
 **Response Headers:**
+
 ```
 X-Error-ID: abc123def456
 X-Error-Category: validation
@@ -1234,6 +1312,7 @@ The error handling system integrates with performance monitoring:
 #### Alert Thresholds
 
 **Automatic Alerts:**
+
 - Error rate > 10 errors/hour on any endpoint
 - Critical severity errors (immediate alert)
 - Recovery failure rate > 50% for any error type
@@ -1438,6 +1517,7 @@ mypy app/ --html-report=mypy-report/
 #### Configuration Files
 
 **pyproject.toml:**
+
 ```toml
 [tool.ruff]
 target-version = "py39"
@@ -1518,42 +1598,42 @@ async def process_inventory_batch(
 ) -> BatchResponse:
     """
     Process new inventory batch with validation and scoring.
-    
+
     Args:
         batch_data: Batch creation request data
         store_id: Store UUID for the batch
         user: Current authenticated user
         db: Database session
-        
+
     Returns:
         BatchResponse: Created batch with initial scoring
-        
+
     Raises:
         HTTPException: If validation fails or processing error occurs
     """
     try:
         # Validate store access
         await validate_store_access(str(store_id), user, db)
-        
+
         # Process batch creation
         batch = await create_batch_from_data(batch_data, store_id, db)
-        
+
         # Calculate initial score
         score = await calculate_batch_score(batch.batch_id, db)
-        
+
         logger.info(
             "Batch created successfully",
             batch_id=batch.batch_id,
             store_id=store_id,
             user_id=user.user_id
         )
-        
+
         return BatchResponse(
             batch_id=batch.batch_id,
             initial_score=score.score,
             urgency_level=score.urgency_level
         )
-        
+
     except ValidationException as e:
         logger.error("Batch validation failed", error=str(e))
         raise HTTPException(status_code=422, detail=str(e))
@@ -1601,6 +1681,7 @@ CACHE_TTL_SECONDS=300
 #### Docker Deployment
 
 **Dockerfile:**
+
 ```dockerfile
 FROM python:3.11-slim
 
@@ -1638,6 +1719,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--worker
 ```
 
 **docker-compose.yml:**
+
 ```yaml
 version: '3.8'
 
@@ -1645,7 +1727,7 @@ services:
   lifo-api:
     build: .
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - ENVIRONMENT=production
       - DATABASE_URL=${DATABASE_URL}
@@ -1655,15 +1737,15 @@ services:
     volumes:
       - ./credentials:/app/credentials:ro
     restart: unless-stopped
-    
+
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     restart: unless-stopped
-    
+
 volumes:
   redis_data:
 ```
@@ -1671,37 +1753,38 @@ volumes:
 #### Digital Ocean App Platform
 
 **app.yaml:**
+
 ```yaml
 name: lifo-ai-engine
 services:
-- name: api
-  source_dir: /
-  github:
-    repo: your-org/lifo-app
-    branch: main
-  run_command: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
-  environment_slug: python
-  instance_count: 2
-  instance_size_slug: basic-s
-  
-  envs:
-  - key: ENVIRONMENT
-    value: production
-  - key: DATABASE_URL
-    value: ${DATABASE_URL}
-  - key: SUPABASE_JWT_SECRET
-    value: ${SUPABASE_JWT_SECRET}
-    type: SECRET
-  - key: GOOGLE_APPLICATION_CREDENTIALS
-    value: /app/service-account.json
-    
-  health_check:
-    http_path: /health
-    
+  - name: api
+    source_dir: /
+    github:
+      repo: your-org/lifo-app
+      branch: main
+    run_command: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
+    environment_slug: python
+    instance_count: 2
+    instance_size_slug: basic-s
+
+    envs:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        value: ${DATABASE_URL}
+      - key: SUPABASE_JWT_SECRET
+        value: ${SUPABASE_JWT_SECRET}
+        type: SECRET
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /app/service-account.json
+
+    health_check:
+      http_path: /health
+
 databases:
-- name: redis
-  engine: REDIS
-  version: "7"
+  - name: redis
+    engine: REDIS
+    version: '7'
 ```
 
 ### Health Checks and Monitoring
@@ -1719,7 +1802,7 @@ async def comprehensive_health_check():
         "environment": settings.environment,
         "checks": {}
     }
-    
+
     # Database health
     try:
         db_healthy = await test_connection()
@@ -1732,7 +1815,7 @@ async def comprehensive_health_check():
             "status": "unhealthy",
             "error": str(e)
         }
-    
+
     # Redis health (if configured)
     if settings.redis_url:
         try:
@@ -1745,7 +1828,7 @@ async def comprehensive_health_check():
                 "status": "unhealthy",
                 "error": str(e)
             }
-    
+
     # Google Vision API health
     try:
         vision_healthy = await test_vision_api()
@@ -1757,17 +1840,17 @@ async def comprehensive_health_check():
             "status": "unhealthy",
             "error": str(e)
         }
-    
+
     # Overall status
     all_healthy = all(
-        check.get("status") == "healthy" 
+        check.get("status") == "healthy"
         for check in health_status["checks"].values()
     )
-    
+
     if not all_healthy:
         health_status["status"] = "unhealthy"
         return JSONResponse(status_code=503, content=health_status)
-    
+
     return health_status
 ```
 
@@ -1783,9 +1866,9 @@ REQUEST_DURATION = Histogram('http_request_duration_seconds', 'HTTP request dura
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     start_time = time.time()
-    
+
     response = await call_next(request)
-    
+
     duration = time.time() - start_time
     REQUEST_DURATION.observe(duration)
     REQUEST_COUNT.labels(
@@ -1793,7 +1876,7 @@ async def metrics_middleware(request: Request, call_next):
         endpoint=request.url.path,
         status=response.status_code
     ).inc()
-    
+
     return response
 
 @app.get("/metrics")
@@ -1844,16 +1927,16 @@ def cache_result(ttl: int = 300):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
-            
+
             # Try to get from cache
             cached = await redis_client.get(cache_key)
             if cached:
                 return json.loads(cached)
-            
+
             # Execute function and cache result
             result = await func(*args, **kwargs)
             await redis_client.setex(cache_key, ttl, json.dumps(result, default=str))
-            
+
             return result
         return wrapper
     return decorator
@@ -1874,109 +1957,108 @@ async def get_store_analytics(store_id: str, days: int = 30):
 
 ```typescript
 interface ApiClientConfig {
-  baseUrl: string;
-  token: string;
-  timeout?: number;
+  baseUrl: string
+  token: string
+  timeout?: number
 }
 
 class LifoApiClient {
-  private baseUrl: string;
-  private token: string;
-  private timeout: number;
+  private baseUrl: string
+  private token: string
+  private timeout: number
 
   constructor(config: ApiClientConfig) {
-    this.baseUrl = config.baseUrl.replace(/\/$/, '');
-    this.token = config.token;
-    this.timeout = config.timeout || 30000;
+    this.baseUrl = config.baseUrl.replace(/\/$/, '')
+    this.token = config.token
+    this.timeout = config.timeout || 30000
   }
 
-  private async request<T>(
-    endpoint: string, 
-    options: RequestInit = {}
-  ): Promise<T> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          Authorization: `Bearer ${this.token}`,
           'Content-Type': 'application/json',
           ...options.headers,
         },
         signal: controller.signal,
-      });
+      })
 
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `API Error ${response.status}: ${errorData.error || response.statusText}`
-        );
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(`API Error ${response.status}: ${errorData.error || response.statusText}`)
       }
 
-      return response.json();
+      return response.json()
     } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
+      clearTimeout(timeoutId)
+      throw error
     }
   }
 
   // Mobile endpoints
   async getMobileSummary(
-    storeId: string, 
-    options: { includeDetails?: boolean; limitUrgent?: number } = {}
+    storeId: string,
+    options: { includeDetails?: boolean; limitUrgent?: number } = {},
   ): Promise<MobileSummaryResponse> {
-    const params = new URLSearchParams();
-    if (options.includeDetails) params.set('include_details', 'true');
-    if (options.limitUrgent) params.set('limit_urgent', options.limitUrgent.toString());
-    
-    return this.request(`/api/v1/mobile/mobile-summary/${storeId}?${params}`);
+    const params = new URLSearchParams()
+    if (options.includeDetails) params.set('include_details', 'true')
+    if (options.limitUrgent) params.set('limit_urgent', options.limitUrgent.toString())
+
+    return this.request(`/api/v1/mobile/mobile-summary/${storeId}?${params}`)
   }
 
   async quickScoreBatch(batchId: string, storeId: string): Promise<QuickScoreResponse> {
     return this.request(`/api/v1/mobile/batch-quick-score/${batchId}?store_id=${storeId}`, {
       method: 'POST',
-    });
+    })
   }
 
   // OCR scanning endpoints
-  async fullOcrScan(storeId: string, image: File, options: {
-    confidenceThreshold?: number;
-    maxProcessingTime?: number;
-  } = {}): Promise<FullOcrResponse> {
-    const formData = new FormData();
-    formData.append('image', image);
+  async fullOcrScan(
+    storeId: string,
+    image: File,
+    options: {
+      confidenceThreshold?: number
+      maxProcessingTime?: number
+    } = {},
+  ): Promise<FullOcrResponse> {
+    const formData = new FormData()
+    formData.append('image', image)
     if (options.confidenceThreshold) {
-      formData.append('confidence_threshold', options.confidenceThreshold.toString());
+      formData.append('confidence_threshold', options.confidenceThreshold.toString())
     }
     if (options.maxProcessingTime) {
-      formData.append('max_processing_time_ms', options.maxProcessingTime.toString());
+      formData.append('max_processing_time_ms', options.maxProcessingTime.toString())
     }
 
     return this.request(`/api/v1/ocr/scan/full-ocr/${storeId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
         // Don't set Content-Type for FormData
       },
       body: formData,
-    });
+    })
   }
 
   async expiryDateScan(storeId: string, image: File): Promise<ExpiryDateResponse> {
-    const formData = new FormData();
-    formData.append('image', image);
+    const formData = new FormData()
+    formData.append('image', image)
 
     return this.request(`/api/v1/ocr/scan/ocr-expiry/${storeId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
       },
       body: formData,
-    });
+    })
   }
 
   // Scan workflow endpoints
@@ -1984,46 +2066,42 @@ class LifoApiClient {
     return this.request(`/api/v1/scan/scan-in/${storeId}`, {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    })
   }
 
-  async scanOut(
-    storeId: string, 
-    batchId: string, 
-    data: ScanOutRequest
-  ): Promise<ScanOutResponse> {
+  async scanOut(storeId: string, batchId: string, data: ScanOutRequest): Promise<ScanOutResponse> {
     return this.request(`/api/v1/scan/scan-out/${storeId}/${batchId}`, {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    })
   }
 
   // Analytics endpoints
   async getStoreAnalytics(storeId: string, days: number = 30): Promise<AnalyticsResponse> {
-    return this.request(`/api/v1/analytics/store/${storeId}?days=${days}`);
+    return this.request(`/api/v1/analytics/store/${storeId}?days=${days}`)
   }
 
   async getDashboardData(storeId: string): Promise<DashboardResponse> {
-    return this.request(`/api/v1/analytics/dashboard/${storeId}`);
+    return this.request(`/api/v1/analytics/dashboard/${storeId}`)
   }
 
   // CSV processing
   async uploadCsv(storeId: string, file: File): Promise<CsvUploadResponse> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('store_id', storeId);
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('store_id', storeId)
 
     return this.request('/api/v1/csv/upload', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
       },
       body: formData,
-    });
+    })
   }
 
   async getCsvTemplate(): Promise<CsvTemplateResponse> {
-    return this.request('/api/v1/csv/template');
+    return this.request('/api/v1/csv/template')
   }
 
   // Scoring
@@ -2031,7 +2109,7 @@ class LifoApiClient {
     return this.request('/api/v1/scoring/calculate-score', {
       method: 'POST',
       body: JSON.stringify({ store_id: storeId, batch_id: batchId }),
-    });
+    })
   }
 }
 
@@ -2040,54 +2118,57 @@ const client = new LifoApiClient({
   baseUrl: 'https://api.lifoai.com',
   token: userToken,
   timeout: 30000,
-});
+})
 
 // React hook for mobile scanning
 function useMobileScanning(storeId: string) {
-  const [summary, setSummary] = useState<MobileSummaryResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [summary, setSummary] = useState<MobileSummaryResponse | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const refreshSummary = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
+    setLoading(true)
+    setError(null)
+
     try {
       const data = await client.getMobileSummary(storeId, {
         includeDetails: true,
         limitUrgent: 15,
-      });
-      setSummary(data);
+      })
+      setSummary(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [storeId]);
+  }, [storeId])
 
-  const scanProduct = useCallback(async (image: File) => {
-    try {
-      const result = await client.fullOcrScan(storeId, image, {
-        confidenceThreshold: 0.7,
-        maxProcessingTime: 5000,
-      });
-      
-      if (result.success && result.barcode) {
-        // Process successful scan
-        await refreshSummary(); // Refresh dashboard
-        return result;
+  const scanProduct = useCallback(
+    async (image: File) => {
+      try {
+        const result = await client.fullOcrScan(storeId, image, {
+          confidenceThreshold: 0.7,
+          maxProcessingTime: 5000,
+        })
+
+        if (result.success && result.barcode) {
+          // Process successful scan
+          await refreshSummary() // Refresh dashboard
+          return result
+        }
+
+        throw new Error('Scan failed or no barcode detected')
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Scan failed')
+        throw err
       }
-      
-      throw new Error('Scan failed or no barcode detected');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Scan failed');
-      throw err;
-    }
-  }, [storeId, refreshSummary]);
+    },
+    [storeId, refreshSummary],
+  )
 
   useEffect(() => {
-    refreshSummary();
-  }, [refreshSummary]);
+    refreshSummary()
+  }, [refreshSummary])
 
   return {
     summary,
@@ -2095,7 +2176,7 @@ function useMobileScanning(storeId: string) {
     error,
     refreshSummary,
     scanProduct,
-  };
+  }
 }
 ```
 
@@ -2113,11 +2194,11 @@ from pydantic import BaseModel
 
 class LifoApiClient:
     """Async Python client for LIFO AI Engine API"""
-    
+
     def __init__(
-        self, 
-        base_url: str, 
-        token: str, 
+        self,
+        base_url: str,
+        token: str,
         timeout: int = 30
     ):
         self.base_url = base_url.rstrip('/')
@@ -2142,7 +2223,7 @@ class LifoApiClient:
     ) -> Dict[str, Any]:
         """Make authenticated API request"""
         url = f"{self.base_url}{endpoint}"
-        
+
         try:
             response = await self.client.request(method, url, **kwargs)
             response.raise_for_status()
@@ -2201,7 +2282,7 @@ class LifoApiClient:
                 'confidence_threshold': confidence_threshold,
                 'max_processing_time_ms': max_processing_time
             }
-            
+
             return await self.request(
                 'POST',
                 f'/api/v1/ocr/scan/full-ocr/{store_id}',
@@ -2219,7 +2300,7 @@ class LifoApiClient:
         with open(image_path, 'rb') as img_file:
             files = {'image': img_file}
             data = {'confidence_threshold': confidence_threshold}
-            
+
             return await self.request(
                 'POST',
                 f'/api/v1/ocr/scan/ocr-expiry/{store_id}',
@@ -2286,7 +2367,7 @@ class LifoApiClient:
         with open(csv_file_path, 'rb') as csv_file:
             files = {'file': csv_file}
             data = {'store_id': store_id}
-            
+
             return await self.request(
                 'POST',
                 '/api/v1/csv/upload',
@@ -2319,19 +2400,19 @@ class LifoApiClient:
 # Usage examples
 async def main():
     """Example usage of the LIFO API client"""
-    
+
     async with LifoApiClient(
         base_url='https://api.lifoai.com',
         token='your-jwt-token',
         timeout=30
     ) as client:
-        
+
         store_id = "123e4567-e89b-12d3-a456-426614174000"
-        
+
         # Health check
         health = await client.health_check()
         print(f"API Status: {health['status']}")
-        
+
         # Get mobile summary
         try:
             summary = await client.get_mobile_summary(
@@ -2341,15 +2422,15 @@ async def main():
             )
             print(f"Store health score: {summary['store_health_score']}")
             print(f"Urgent batches: {len(summary['urgent_batches'])}")
-            
+
             # Process urgent batches
             for batch in summary['urgent_batches']:
                 if batch['urgency_level'] == 'critical':
                     print(f"CRITICAL: {batch['product_name']} expires in {batch['expires_in_hours']} hours")
-                    
+
         except Exception as e:
             print(f"Failed to get mobile summary: {e}")
-        
+
         # OCR scanning example
         try:
             image_path = Path("test_images/product_scan.jpg")
@@ -2359,14 +2440,14 @@ async def main():
                     image_path=image_path,
                     confidence_threshold=0.7
                 )
-                
+
                 if ocr_result['success']:
                     print(f"OCR Detection:")
                     print(f"  Barcode: {ocr_result.get('barcode', 'Not detected')}")
                     print(f"  Product: {ocr_result.get('suggested_name', 'Not detected')}")
                     print(f"  Expiry: {ocr_result.get('expiry_date', 'Not detected')}")
                     print(f"  Confidence: {ocr_result['confidence_scores']['overall']}")
-                    
+
                     # If OCR was successful, create a batch
                     if ocr_result.get('barcode') and ocr_result.get('expiry_date'):
                         product_data = {
@@ -2379,48 +2460,48 @@ async def main():
                             'cost_price': 0.0,  # Would be filled by user
                             'selling_price': 0.0,  # Would be filled by user
                         }
-                        
+
                         scan_result = await client.scan_in_product(store_id, product_data)
                         print(f"Created batch: {scan_result['batch_id']}")
                         print(f"Initial score: {scan_result['initial_score']}")
-                        
+
         except Exception as e:
             print(f"OCR scanning failed: {e}")
-        
+
         # Analytics example
         try:
             analytics = await client.get_store_analytics(store_id, days=7)
-            
+
             print(f"\n7-Day Analytics:")
             print(f"  Total batches: {analytics['data']['inventory_summary']['total_batches']}")
             print(f"  Active batches: {analytics['data']['inventory_summary']['active_batches']}")
             print(f"  Expired count: {analytics['data']['inventory_summary']['expired_count']}")
             print(f"  Total value: €{analytics['data']['inventory_summary']['total_value_eur']}")
-            
+
             # Category breakdown
             for category in analytics['data']['category_breakdown']:
                 print(f"  {category['category']}: {category['batch_count']} batches, {category['waste_rate']:.1%} waste rate")
-                
+
         except Exception as e:
             print(f"Analytics retrieval failed: {e}")
 
 # Batch processing example
 class ProductBatchProcessor:
     """Process multiple products efficiently"""
-    
+
     def __init__(self, client: LifoApiClient, store_id: str):
         self.client = client
         self.store_id = store_id
-        
+
     async def process_image_directory(
-        self, 
+        self,
         image_dir: Path,
         max_concurrent: int = 3
     ) -> List[Dict[str, Any]]:
         """Process all images in a directory concurrently"""
-        
+
         image_files = list(image_dir.glob("*.jpg")) + list(image_dir.glob("*.png"))
-        
+
         async def process_single_image(image_path: Path) -> Dict[str, Any]:
             try:
                 result = await self.client.full_ocr_scan(
@@ -2436,25 +2517,25 @@ class ProductBatchProcessor:
                     'success': False,
                     'error': str(e)
                 }
-        
+
         # Process images with concurrency limit
         semaphore = asyncio.Semaphore(max_concurrent)
-        
+
         async def process_with_semaphore(image_path: Path):
             async with semaphore:
                 return await process_single_image(image_path)
-        
+
         tasks = [process_with_semaphore(img) for img in image_files]
         results = await asyncio.gather(*tasks)
-        
+
         # Summary
         successful = [r for r in results if r.get('success')]
         failed = [r for r in results if not r.get('success')]
-        
+
         print(f"Processed {len(image_files)} images:")
         print(f"  Successful: {len(successful)}")
         print(f"  Failed: {len(failed)}")
-        
+
         return results
 
 # Run the examples
@@ -2479,10 +2560,10 @@ class ErrorSeverity(Enum):
 
 class LifoApiError(Exception):
     """Base exception for LIFO API errors"""
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         status_code: Optional[int] = None,
         error_code: Optional[str] = None,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
@@ -2497,19 +2578,19 @@ class LifoApiError(Exception):
 
 class ApiErrorHandler:
     """Centralized error handling for API interactions"""
-    
+
     def __init__(self, logger: Optional[logging.Logger] = None):
         self.logger = logger or logging.getLogger(__name__)
-    
+
     def handle_api_error(self, error: Exception, context: Dict[str, Any] = None) -> LifoApiError:
         """Convert various error types to standardized LifoApiError"""
-        
+
         context = context or {}
-        
+
         if isinstance(error, httpx.HTTPStatusError):
             # HTTP errors from API
             status_code = error.response.status_code
-            
+
             try:
                 error_data = error.response.json()
                 message = error_data.get('error', error_data.get('detail', str(error)))
@@ -2517,9 +2598,9 @@ class ApiErrorHandler:
             except:
                 message = str(error)
                 error_code = f'HTTP_{status_code}'
-            
+
             severity = self._determine_severity(status_code)
-            
+
             self.logger.error(
                 f"API HTTP Error: {message}",
                 extra={
@@ -2528,7 +2609,7 @@ class ApiErrorHandler:
                     'context': context
                 }
             )
-            
+
             return LifoApiError(
                 message=message,
                 status_code=status_code,
@@ -2536,55 +2617,55 @@ class ApiErrorHandler:
                 severity=severity,
                 context=context
             )
-            
+
         elif isinstance(error, httpx.TimeoutException):
             # Timeout errors
             message = f"API request timed out: {str(error)}"
-            
+
             self.logger.warning(
                 f"API Timeout: {message}",
                 extra={'context': context}
             )
-            
+
             return LifoApiError(
                 message=message,
                 error_code='TIMEOUT',
                 severity=ErrorSeverity.MEDIUM,
                 context=context
             )
-            
+
         elif isinstance(error, httpx.NetworkError):
             # Network connectivity errors
             message = f"Network error: {str(error)}"
-            
+
             self.logger.error(
                 f"API Network Error: {message}",
                 extra={'context': context}
             )
-            
+
             return LifoApiError(
                 message=message,
                 error_code='NETWORK_ERROR',
                 severity=ErrorSeverity.HIGH,
                 context=context
             )
-            
+
         else:
             # Generic errors
             message = f"Unexpected error: {str(error)}"
-            
+
             self.logger.error(
                 f"API Unexpected Error: {message}",
                 extra={'context': context, 'error_type': type(error).__name__}
             )
-            
+
             return LifoApiError(
                 message=message,
                 error_code='UNEXPECTED_ERROR',
                 severity=ErrorSeverity.HIGH,
                 context=context
             )
-    
+
     def _determine_severity(self, status_code: int) -> ErrorSeverity:
         """Determine error severity based on HTTP status code"""
         if status_code >= 500:
@@ -2601,7 +2682,7 @@ class ApiErrorHandler:
 # Usage in client with error handling
 class RobustLifoApiClient(LifoApiClient):
     """LIFO API client with comprehensive error handling"""
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.error_handler = ApiErrorHandler()
@@ -2610,7 +2691,7 @@ class RobustLifoApiClient(LifoApiClient):
             'backoff_factor': 1.0,
             'retry_status_codes': [500, 502, 503, 504]
         }
-    
+
     async def request_with_retry(
         self,
         method: str,
@@ -2619,49 +2700,49 @@ class RobustLifoApiClient(LifoApiClient):
         **kwargs
     ) -> Dict[str, Any]:
         """Make API request with retry logic and error handling"""
-        
+
         context = context or {}
         last_error = None
-        
+
         for attempt in range(self.retry_config['max_retries'] + 1):
             try:
                 return await self.request(method, endpoint, **kwargs)
-                
+
             except Exception as e:
                 last_error = e
-                
+
                 # Convert to standardized error
                 api_error = self.error_handler.handle_api_error(e, context)
-                
+
                 # Check if we should retry
                 should_retry = (
                     attempt < self.retry_config['max_retries'] and
                     self._should_retry_error(api_error)
                 )
-                
+
                 if not should_retry:
                     raise api_error
-                
+
                 # Wait before retry
                 wait_time = self.retry_config['backoff_factor'] * (2 ** attempt)
                 await asyncio.sleep(wait_time)
-                
+
                 context['retry_attempt'] = attempt + 1
-        
+
         # If we get here, all retries failed
         raise self.error_handler.handle_api_error(last_error, context)
-    
+
     def _should_retry_error(self, error: LifoApiError) -> bool:
         """Determine if an error should trigger a retry"""
-        
+
         # Don't retry client errors (4xx except rate limit)
         if error.status_code and 400 <= error.status_code < 500 and error.status_code != 429:
             return False
-        
+
         # Don't retry authentication errors
         if error.error_code in ['AUTHENTICATION_ERROR', 'AUTHORIZATION_ERROR']:
             return False
-        
+
         # Retry server errors, timeouts, and network errors
         return error.status_code in self.retry_config['retry_status_codes'] or \
                error.error_code in ['TIMEOUT', 'NETWORK_ERROR']
@@ -2669,15 +2750,15 @@ class RobustLifoApiClient(LifoApiClient):
 # Usage example with error handling
 async def robust_scanning_workflow():
     """Example of robust error handling in scanning workflow"""
-    
+
     async with RobustLifoApiClient(
         base_url='https://api.lifoai.com',
         token='your-token'
     ) as client:
-        
+
         store_id = "your-store-id"
         image_path = Path("product_image.jpg")
-        
+
         try:
             # Attempt OCR scanning with retry logic
             result = await client.request_with_retry(
@@ -2691,10 +2772,10 @@ async def robust_scanning_workflow():
                 files={'image': open(image_path, 'rb')},
                 data={'confidence_threshold': 0.7}
             )
-            
+
             if result['success'] and result.get('barcode'):
                 print(f"✅ OCR successful: {result['suggested_name']}")
-                
+
                 # Proceed with batch creation
                 try:
                     batch_data = {
@@ -2705,7 +2786,7 @@ async def robust_scanning_workflow():
                         'quantity': 1,
                         'category': 'unknown'
                     }
-                    
+
                     batch_result = await client.request_with_retry(
                         'POST',
                         f'/api/v1/scan/scan-in/{store_id}',
@@ -2715,10 +2796,10 @@ async def robust_scanning_workflow():
                         },
                         json=batch_data
                     )
-                    
+
                     print(f"✅ Batch created: {batch_result['batch_id']}")
                     print(f"   Initial score: {batch_result['initial_score']}")
-                    
+
                 except LifoApiError as e:
                     if e.severity in [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL]:
                         print(f"❌ Critical batch creation error: {e.message}")
@@ -2728,7 +2809,7 @@ async def robust_scanning_workflow():
                         # Might retry later or use fallback
             else:
                 print("⚠️  OCR completed but no usable data extracted")
-                
+
         except LifoApiError as e:
             # Handle different error types appropriately
             if e.error_code == 'AUTHENTICATION_ERROR':
@@ -2743,7 +2824,7 @@ async def robust_scanning_workflow():
             else:
                 print(f"❌ Operation failed: {e.message}")
                 # Log for debugging
-                
+
         except Exception as e:
             print(f"💥 Unexpected error: {e}")
             # Fallback error handling
@@ -2788,6 +2869,7 @@ print('JWT Secret configured:', bool(supabase_auth.jwt_secret))
 ```
 
 **Environment Check:**
+
 ```env
 # Ensure these are set correctly
 SUPABASE_JWT_SECRET=your-actual-jwt-secret
@@ -2861,7 +2943,7 @@ from google.cloud import vision
 try:
     client = vision.ImageAnnotatorClient()
     print('✅ Google Vision API client initialized successfully')
-    
+
     # Test with a simple request
     image = vision.Image()
     image.content = b'dummy'
@@ -2929,7 +3011,7 @@ RATE_LIMITS = {
     },
     "production": {
         "csv_upload": "3/hour",
-        "ocr_scan": "30/minute", 
+        "ocr_scan": "30/minute",
         "mobile_endpoints": "40/minute"
     }
 }
@@ -2942,7 +3024,7 @@ async def handle_rate_limit(client, endpoint, **kwargs):
     """Handle rate limiting with exponential backoff"""
     max_retries = 3
     base_delay = 1
-    
+
     for attempt in range(max_retries):
         try:
             return await client.request(endpoint, **kwargs)
@@ -2953,7 +3035,7 @@ async def handle_rate_limit(client, endpoint, **kwargs):
                 await asyncio.sleep(retry_after)
                 continue
             raise
-    
+
     raise Exception("Max retries exceeded due to rate limiting")
 ```
 
@@ -3032,7 +3114,7 @@ def check_memory():
     memory_info = process.memory_info()
     print(f"RSS: {memory_info.rss / 1024 / 1024:.2f} MB")
     print(f"VMS: {memory_info.vms / 1024 / 1024:.2f} MB")
-    
+
     # System memory
     system_memory = psutil.virtual_memory()
     print(f"System memory usage: {system_memory.percent}%")
@@ -3104,7 +3186,7 @@ Add these endpoints for debugging in development:
 
 ```python
 if settings.environment == "development":
-    
+
     @app.get("/debug/config")
     async def debug_config():
         """Debug configuration (development only)"""
@@ -3117,15 +3199,15 @@ if settings.environment == "development":
             "cors_origins": settings.get_cors_origins(),
             "allowed_hosts": settings.get_allowed_hosts(),
         }
-    
+
     @app.get("/debug/health/detailed")
     async def debug_detailed_health():
         """Detailed health check for debugging"""
         from app.database.connection import get_db_manager
-        
+
         db_manager = get_db_manager()
         health_data = await db_manager.health_check()
-        
+
         return {
             "timestamp": time.time(),
             "database": health_data,
@@ -3196,7 +3278,7 @@ if [ -f "test_image.jpg" ]; then
         -F "image=@test_image.jpg" \
         "$API_URL/api/v1/ocr/scan/ocr-expiry/test-store")
     ocr_http_code=$(echo $ocr_response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    
+
     if [ $ocr_http_code -eq 200 ]; then
         log_with_timestamp "✅ OCR Endpoint: OK"
     else
