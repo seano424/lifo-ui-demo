@@ -104,7 +104,7 @@ export function useStoreSettings(storeId?: string) {
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: false, // 🚀 CRITICAL: Prevent refetch if we have cached data
     refetchOnWindowFocus: false,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       if (error?.message?.includes('permission denied') || error?.message?.includes('403')) {
         return false
       }

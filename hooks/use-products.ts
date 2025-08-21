@@ -40,7 +40,7 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId, // Only fetch when we have a store
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       // Don't retry on PostgREST ordering errors
       if (error?.message?.includes('failed to parse order')) {
         console.error('[useProducts] PostgREST ordering error - not retrying:', error)

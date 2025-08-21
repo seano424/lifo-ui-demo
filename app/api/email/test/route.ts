@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       store_name: 'Test Store LIFO',
     }
 
-    let result
+    let result: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }
     if (type === 'welcome') {
       result = await sendWelcomeEmail(testCredentials)
     } else if (type === 'pin_reset') {

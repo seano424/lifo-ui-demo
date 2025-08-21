@@ -111,7 +111,7 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
     },
     enabled: enabled && !!activeStoreId && !!currentUser?.id && !userLoading && isHydrated,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       // Don't retry on permission errors
       if (error?.message?.includes('No access') || error?.message?.includes('permission denied')) {
         return false

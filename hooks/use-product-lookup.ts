@@ -160,7 +160,7 @@ export function useVerifyProduct() {
     }) => {
       const supabase = createClient()
 
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         is_verified: isCorrect,
         verification_count: isCorrect ? 1 : 0,
         last_verified: new Date().toISOString(),
@@ -173,7 +173,7 @@ export function useVerifyProduct() {
 
         // Update the open_food_facts_data as well
         updateData.open_food_facts_data = {
-          ...updateData.open_food_facts_data,
+          ...(updateData.open_food_facts_data || {}),
           product_name: corrections.product_name,
           brands: corrections.brand,
           categories: corrections.category,

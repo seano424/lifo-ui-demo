@@ -22,7 +22,7 @@ export function IntlProvider({
   const loadMessages = useCallback(
     async (language: string) => {
       try {
-        let newMessages
+        let newMessages: { default: Record<string, unknown> }
         switch (language) {
           case 'en':
             newMessages = await import(`../../messages/en.json`)

@@ -1,4 +1,10 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  type InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
@@ -167,12 +173,12 @@ export function useStoreUserActions() {
       // ✅ Also update in store-specific infinite query caches (same as products)
       queryClient.setQueriesData(
         { queryKey: queryKeys.storeUsers.byStore(activeStoreId) }, // ✅ Centralized keys
-        (oldData: any) => {
+        (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
           if (!oldData) return oldData
 
           return {
             ...oldData,
-            pages: oldData.pages.map((page: any) => ({
+            pages: oldData.pages.map(page => ({
               ...page,
               data: page.data.map((user: StoreUser) =>
                 user.user_id === userId ? { ...user, ...updates } : user,

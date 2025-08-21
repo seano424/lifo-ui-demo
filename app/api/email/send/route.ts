@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send appropriate email
-    let emailResult
+    let emailResult: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }
     if (type === 'welcome') {
       emailResult = await sendWelcomeEmail(enhancedCredentials)
     } else if (type === 'pin_reset') {

@@ -228,7 +228,7 @@ export function useCurrentUserStoreRole() {
     },
     enabled: !!activeStoreId,
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       if (error?.message?.includes('Not authenticated') || error?.message?.includes('not found')) {
         return false
       }

@@ -616,7 +616,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       index: number,
                     ) => (
                       <div
-                        key={`duplicate-${dup.barcode || dup.sku || index}`}
+                        key={`duplicate-${dup.sku || index}`}
                         className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
                       >
                         <div className="font-semibold">

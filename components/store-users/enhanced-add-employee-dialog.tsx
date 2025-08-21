@@ -218,12 +218,12 @@ export function EnhancedAddEmployeeDialog({
   }, [formData.email, checkUserExists])
 
   // Generate suggested username (first.last pattern)
-  const generateSuggestedUsername = (firstName: string, lastName: string): string => {
+  const generateSuggestedUsername = useCallback((firstName: string, lastName: string): string => {
     if (!firstName || !lastName) return ''
     const cleanFirst = firstName.toLowerCase().replace(/[^a-z]/g, '')
     const cleanLast = lastName.toLowerCase().replace(/[^a-z]/g, '')
     return `${cleanFirst}.${cleanLast}`
-  }
+  }, [])
 
   // Auto-update username when first/last name changes (only for new users)
   useEffect(() => {

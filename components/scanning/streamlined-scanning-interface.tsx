@@ -14,7 +14,7 @@ import {
   Package,
   RefreshCcw,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 // Import working components from BarcodeDemo
 import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
@@ -144,8 +144,14 @@ export default function WorkingStreamlinedScanningInterface({
     }
   }, [lookupResult, lookupBarcode, workflowActions])
 
-  // Updated workflow sync effect in WorkingStreamlinedScanningInterface
+  // Convert ISO datetime to date input format (YYYY-MM-DD)
+  const formatDateForInput = useCallback((isoDate: string): string => {
+    if (!isoDate) return ''
+    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
+    return isoDate.split('T')[0]
+  }, [])
 
+  // Updated workflow sync effect in WorkingStreamlinedScanningInterface
   useEffect(() => {
     switch (currentStep) {
       case 'barcode':
@@ -193,7 +199,7 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-barcode')
         break
     }
-  }, [currentStep, scannedProduct, expiryInfo, isRescanning])
+  }, [currentStep, scannedProduct, expiryInfo, isRescanning, formatDateForInput])
 
   // Handle barcode scan
   const handleScan = (barcode: string, detection?: BarcodeDetection) => {
@@ -412,13 +418,6 @@ export default function WorkingStreamlinedScanningInterface({
 
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
-
-  // Convert ISO datetime to date input format (YYYY-MM-DD)
-  const formatDateForInput = (isoDate: string): string => {
-    if (!isoDate) return ''
-    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
-    return isoDate.split('T')[0]
-  }
 
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)

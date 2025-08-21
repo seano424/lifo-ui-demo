@@ -20,7 +20,7 @@ export function useUrgentAlerts() {
     enabled: !!activeStoreId,
     refetchInterval: 60000, // Refresh every minute
     staleTime: 30000, // Consider data stale after 30 seconds
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       // Don't retry on "No active store" errors
       if (error?.message?.includes('No active store')) {
         return false

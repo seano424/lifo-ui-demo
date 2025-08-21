@@ -53,7 +53,7 @@ export function useCompleteUserProfile() {
       return data as CompleteUserProfile
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       // Don't retry authentication errors
       if (error?.message?.includes('Not authenticated')) {
         return false
