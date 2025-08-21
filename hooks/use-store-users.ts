@@ -250,7 +250,6 @@ export function useStoreUserActions() {
       userId,
       roleInStore,
       permissions,
-      assignedBy,
     }: {
       userId: string
       roleInStore: 'owner' | 'manager' | 'employee' | 'staff'

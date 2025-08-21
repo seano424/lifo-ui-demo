@@ -162,7 +162,7 @@ export function ProductsListPresentation({
           <div className="space-y-3">
             {[...Array(8)].map((_, i) => (
               <div
-                key={i}
+                key={`skeleton-${i + 1}`}
                 className="flex items-center space-x-4 p-4 border rounded-lg animate-pulse"
               >
                 <div className="h-4 bg-muted rounded w-1/4"></div>
@@ -271,7 +271,8 @@ export function ProductsListPresentation({
                       <div className="text-sm">
                         <span className="font-medium">{product.active_batches_count || 0}</span>
                         <span className="text-muted-foreground ml-1">
-                          batch{(product.active_batches_count || 0) !== 1 ? 'es' : ''}
+                          batch
+                          {(product.active_batches_count || 0) !== 1 ? 'es' : ''}
                         </span>
                       </div>
                     </TableCell>

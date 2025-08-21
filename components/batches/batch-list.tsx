@@ -118,7 +118,7 @@ export function BatchList({
         {title && <Typography variant="h2">{title}</Typography>}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={`skeleton-${i + 1}`} className="animate-pulse">
               <CardHeader>
                 <div className="h-6 bg-muted rounded w-3/4"></div>
                 <div className="h-4 bg-muted rounded w-1/2"></div>

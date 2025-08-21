@@ -400,7 +400,7 @@ export default function BarcodeScanner({
             <div className="space-y-1">
               {scanningHistory.map((barcode, index) => (
                 <div
-                  key={`${barcode}-${index}`}
+                  key={`scan-${barcode}-${Date.now()}-${index}`}
                   className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
                 >
                   <span className="font-mono">{barcode}</span>

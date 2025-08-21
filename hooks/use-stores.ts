@@ -30,12 +30,7 @@ function useCurrentAuthUser() {
         error,
       } = await supabase.auth.getUser()
 
-      console.log(
-        '[useCurrentAuthUser] Auth result - user:',
-        user?.id,
-        'error:',
-        error
-      )
+      console.log('[useCurrentAuthUser] Auth result - user:', user?.id, 'error:', error)
 
       if (error || !user) {
         throw new Error('Not authenticated')
@@ -51,19 +46,14 @@ function useCurrentAuthUser() {
 // Hook to get user's stores and automatically set active store
 export function useUserStores() {
   const { data: currentUser } = useCurrentAuthUser()
-  const {
-    setActiveStore,
-    setUserStores,
-    setLoadingStores,
-    activeStore,
-    userStores,
-  } = useStoreState()
+  const { setActiveStore, setUserStores, setLoadingStores, activeStore, userStores } =
+    useStoreState()
 
   console.log(
     '[useUserStores] Hook called - currentUser:',
     currentUser?.id,
     'activeStore:',
-    activeStore?.store_id
+    activeStore?.store_id,
   )
 
   const userStoresResult = useQuery({
@@ -92,18 +82,14 @@ export function useUserStores() {
       '[useUserStores.useEffect] Checking store selection - stores:',
       userStoresResult.data?.length,
       'activeStore:',
-      activeStore?.store_id
+      activeStore?.store_id,
     )
 
-    if (
-      userStoresResult.data &&
-      userStoresResult.data.length > 0 &&
-      !activeStore
-    ) {
+    if (userStoresResult.data && userStoresResult.data.length > 0 && !activeStore) {
       console.log(
         '[useUserStores.useEffect] Setting up stores - found',
         userStoresResult.data.length,
-        'stores'
+        'stores',
       )
       setLoadingStores(userStoresResult.isLoading)
 
@@ -112,29 +98,27 @@ export function useUserStores() {
 
       // Get last active store from localStorage
       const lastActiveStoreId =
-        typeof window !== 'undefined'
-          ? localStorage.getItem(ACTIVE_STORE_KEY)
-          : null
+        typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
       const primaryStoreId = userPreferencesResult.data?.primary_store_id
 
       console.log('[useUserStores.useEffect] Store selection context:', {
         lastActiveStoreId,
         primaryStoreId,
-        availableStores: userStoresResult.data.map((us) => us.store.store_id),
+        availableStores: userStoresResult.data.map(us => us.store.store_id),
       })
 
       // Use smart selection logic
       const storeToSelect = selectDefaultStore(
         userStoresResult.data,
         primaryStoreId || null,
-        lastActiveStoreId
+        lastActiveStoreId,
       )
 
       if (storeToSelect) {
         console.log(
           '[useUserStores.useEffect] Setting active store:',
           storeToSelect.store_id,
-          storeToSelect.store_name
+          storeToSelect.store_name,
         )
         setActiveStore(storeToSelect)
       }
@@ -172,7 +156,7 @@ export function useStoreActions() {
     '[useStoreActions] Hook called - currentUser:',
     currentUser?.id,
     'activeStore:',
-    activeStore?.store_id
+    activeStore?.store_id,
   )
 
   const updatePrimaryStoreMutation = useMutation({
@@ -199,13 +183,11 @@ export function useStoreActions() {
       'to',
       newStore.store_id,
       'makePrimary:',
-      makePrimary
+      makePrimary,
     )
 
     if (!currentUser || newStore.store_id === activeStore?.store_id) {
-      console.log(
-        '[useStoreActions.switchStore] Skipping - same store or no user'
-      )
+      console.log('[useStoreActions.switchStore] Skipping - same store or no user')
       return
     }
 
@@ -215,7 +197,7 @@ export function useStoreActions() {
       console.log(
         '[useStoreActions.switchStore] Setting new active store:',
         newStore.store_id,
-        newStore.store_name
+        newStore.store_name,
       )
       // Update active store in state (localStorage persistence happens automatically in setActiveStore)
       setActiveStore(newStore)
@@ -224,9 +206,7 @@ export function useStoreActions() {
       await setActiveStoreCookie(newStore.store_id)
 
       // Invalidate all store-specific queries to refetch for new store
-      console.log(
-        '[useStoreActions.switchStore] Invalidating store-specific queries'
-      )
+      console.log('[useStoreActions.switchStore] Invalidating store-specific queries')
       queryClient.invalidateQueries({
         queryKey: ['products', 'byStore'],
       })
@@ -236,9 +216,7 @@ export function useStoreActions() {
 
       // Update primary store in database only if requested
       if (makePrimary) {
-        console.log(
-          '[useStoreActions.switchStore] Updating primary store preference in database'
-        )
+        console.log('[useStoreActions.switchStore] Updating primary store preference in database')
         updatePrimaryStoreMutation.mutate({
           userId: currentUser.id,
           storeId: newStore.store_id,

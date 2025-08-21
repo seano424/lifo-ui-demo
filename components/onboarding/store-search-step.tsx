@@ -139,6 +139,7 @@ export function StoreSearchStep() {
           <div className="max-h-[300px] overflow-y-auto border shadow-lg divide-y divide-border rounded-lg bg-background">
             {searchResults.map(place => (
               <button
+                type="button"
                 key={place.place_id}
                 className="cursor-pointer hover:bg-accent transition-colors w-full text-left disabled:opacity-50"
                 onClick={() => handlePlaceSelect(place)}

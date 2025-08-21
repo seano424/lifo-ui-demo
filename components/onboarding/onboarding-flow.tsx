@@ -35,6 +35,7 @@ export function OnboardingFlow() {
 
             return (
               <button
+                type="button"
                 onClick={() => isAccessible && setCurrentStep(stepNumber)}
                 key={step.label}
                 disabled={!isAccessible}

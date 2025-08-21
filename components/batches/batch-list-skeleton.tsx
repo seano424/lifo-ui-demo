@@ -31,7 +31,7 @@ export function BatchListSkeleton() {
         </TableHeader>
         <TableBody>
           {Array.from({ length: 10 }).map((_, i) => (
-            <TableRow key={i}>
+            <TableRow key={`skeleton-${i + 1}`}>
               <TableCell>
                 <Skeleton className="h-4 w-20" />
               </TableCell>

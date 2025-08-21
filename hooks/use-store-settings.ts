@@ -402,7 +402,7 @@ export function useStoreImageUpload() {
   const activeStoreId = useActiveStoreId()
 
   const uploadImage = useMutation({
-    mutationFn: async ({ file, type }: { file: File; type: 'logo' | 'cover' }) => {
+    mutationFn: async ({ type }: { type: 'logo' | 'cover' }) => {
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }

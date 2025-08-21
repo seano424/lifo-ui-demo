@@ -96,6 +96,7 @@ export function AddStoreFlow() {
 
             return (
               <button
+                type="button"
                 onClick={() => isAccessible && !isCreating && setCurrentStep(stepNumber)}
                 key={step.label}
                 disabled={!isAccessible || isCreating}

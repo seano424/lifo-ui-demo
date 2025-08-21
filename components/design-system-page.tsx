@@ -112,13 +112,21 @@ export default function DesignSystemPage() {
     color,
     showHex = false,
   }: {
-    color: { name: string; value: string; cssVar: string; hex: string; usage: string }
+    color: {
+      name: string
+      value: string
+      cssVar: string
+      hex: string
+      usage: string
+    }
     showHex: boolean
   }) => (
     <div className="space-y-3">
       <div
         className="w-full h-24 rounded-lg border shadow-sm"
-        style={{ backgroundColor: showHex ? color.hex : `hsl(var(--${color.cssVar}))` }}
+        style={{
+          backgroundColor: showHex ? color.hex : `hsl(var(--${color.cssVar}))`,
+        }}
       />
       <div className="space-y-1">
         <Typography variant="h4">{color.name}</Typography>
@@ -203,16 +211,6 @@ export default function DesignSystemPage() {
           ))}
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="pt-8 border-t">
-        <Typography variant="p" color="muted">
-          Design System v1.0 • Last updated: January 2025 •
-          <a href="#" className="text-primary hover:underline ml-1">
-            View in Figma
-          </a>
-        </Typography>
-      </footer>
     </div>
   )
 }

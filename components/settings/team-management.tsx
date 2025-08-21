@@ -69,7 +69,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="space-y-2">
+              <div key={`skeleton-${i + 1}`} className="space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-8 w-full" />
               </div>

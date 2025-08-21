@@ -41,7 +41,7 @@ export function ProductListSkeleton() {
           </TableHeader>
           <TableBody>
             {Array.from({ length: 20 }).map((_, i) => (
-              <TableRow key={i}>
+              <TableRow key={`skeleton-${i + 1}`}>
                 <TableCell>
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-32" />

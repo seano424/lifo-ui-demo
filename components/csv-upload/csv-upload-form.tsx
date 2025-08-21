@@ -471,15 +471,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             {/* Success Summary */}
             <div className="text-center p-3 bg-white rounded border border-green-300">
               <p className="text-green-800 font-medium">
-                {uploadResult.processed || 0 > 0
-                  ? t('results.successSummary', { processed: uploadResult.processed || 0 })
+                {(uploadResult.processed || 0) > 0
+                  ? t('results.successSummary', {
+                      processed: uploadResult.processed || 0,
+                    })
                   : t('results.uploadCompleted')}
                 {(uploadResult.skipped || 0) > 0 &&
-                  t('results.duplicatesSkipped', { skipped: uploadResult.skipped })}
+                  t('results.duplicatesSkipped', {
+                    skipped: uploadResult.skipped,
+                  })}
               </p>
               {uploadResult.processing_time_ms && (
                 <p className="text-sm text-green-600 mt-1">
-                  {t('results.completedIn', { time: uploadResult.processing_time_ms })}
+                  {t('results.completedIn', {
+                    time: uploadResult.processing_time_ms,
+                  })}
                 </p>
               )}
             </div>
@@ -526,7 +532,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {uploadResult.performance_metrics.duplicate_detection_ms > 0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-orange-600">
-                        {uploadResult.performance_metrics.duplicate_detection_ms}ms
+                        {uploadResult.performance_metrics.duplicate_detection_ms}
+                        ms
                       </div>
                       <div className="text-gray-600">{t('results.performance.duplicateCheck')}</div>
                     </div>
@@ -534,7 +541,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {uploadResult.performance_metrics.product_resolution_ms > 0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-cyan-600">
-                        {uploadResult.performance_metrics.product_resolution_ms}ms
+                        {uploadResult.performance_metrics.product_resolution_ms}
+                        ms
                       </div>
                       <div className="text-gray-600">
                         {t('results.performance.productResolution')}
@@ -564,7 +572,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     uploadResult.performance_metrics.database_processing_time_ms > 0 && (
                       <div className="text-center p-2 bg-gray-50 rounded">
                         <div className="font-bold text-purple-600">
-                          {uploadResult.performance_metrics.database_processing_time_ms}ms
+                          {uploadResult.performance_metrics.database_processing_time_ms}
+                          ms
                         </div>
                         <div className="text-gray-600">{t('results.performance.dbProcessing')}</div>
                       </div>
@@ -607,7 +616,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       index: number,
                     ) => (
                       <div
-                        key={index}
+                        key={`duplicate-${dup.barcode || dup.sku || index}`}
                         className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
                       >
                         <div className="font-semibold">

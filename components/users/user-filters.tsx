@@ -2,11 +2,11 @@
 'use client'
 
 import { useState } from 'react'
-import type { UserFilters } from '@/lib/queries/users'
+import type { UserFilters as UserFiltersType } from '@/lib/queries/users'
 
 interface UserFiltersProps {
-  filters: UserFilters
-  onFiltersChange: (filters: UserFilters) => void
+  filters: UserFiltersType
+  onFiltersChange: (filters: UserFiltersType) => void
 }
 
 export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
@@ -61,6 +61,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <button
+              type="button"
               onClick={handleEmailSearch}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
@@ -115,6 +116,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
           </div>
 
           <button
+            type="button"
             onClick={clearFilters}
             className="text-sm text-gray-600 hover:text-gray-900 underline"
           >

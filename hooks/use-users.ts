@@ -288,7 +288,7 @@ export function useCurrentUserRoles() {
 }
 
 export function useCurrentUserHasRole(roleName: string) {
-  const { data: roles, isLoading } = useCurrentUserRoles()
+  const { data: roles } = useCurrentUserRoles()
 
   return useQuery({
     queryKey: [...queryKeys.auth.currentUserRoles(), 'hasRole', roleName] as const,
