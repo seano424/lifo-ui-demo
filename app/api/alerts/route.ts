@@ -1,20 +1,8 @@
-// TODO: Re-enable when InventoryOperations is ready
-// import { createClient } from '@/lib/supabase/server'
-import { NextRequest } from 'next/server'
-// TODO: Re-enable when InventoryOperations is ready
-// import { NextResponse } from 'next/server'
-// import { InventoryOperations } from '@/lifo-ai-core/database/operations'
+import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { InventoryOperations } from '@/lib/database/operations'
 
-// TODO: Re-enable when alerts functionality is ready
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
-  // TODO: Re-enable when InventoryOperations is ready
-  return new Response(JSON.stringify({ message: 'Alerts API temporarily disabled' }), {
-    status: 501,
-    headers: { 'Content-Type': 'application/json' },
-  })
-
-  /*
   const supabase = await createClient()
 
   const {
@@ -59,8 +47,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get base alerts from operations
-    const alerts = await operations.getStoreInventoryAlerts(storeId, threshold)
+    // Get alerts using the existing scoring system
+    const alerts = await getStoreAlerts(supabase, storeId, threshold)
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map(alert => {
@@ -83,29 +71,29 @@ export async function GET(request: NextRequest) {
       return {
         batch_id: alert.batch_id,
         batch_number: alert.batch_number,
-        sku: alert.products?.sku || 'Unknown',
-        product_name: alert.products?.name || 'Unknown Product',
-        category: alert.products?.category || 'Unknown',
-        brand: alert.products?.brand || '',
-        quantity: parseFloat(alert.current_quantity),
-        unit_type: alert.products?.unit_type || 'pcs',
+        sku: alert.sku || 'Unknown',
+        product_name: alert.product_name || 'Unknown Product',
+        category: alert.category || 'Unknown',
+        brand: alert.brand || '',
+        quantity: parseFloat(alert.current_quantity.toString()),
+        unit_type: alert.unit_type || 'pcs',
         days_to_expiry: daysToExpiry,
         expiry_date: alert.expiry_date,
-        current_price: parseFloat(alert.selling_price),
-        cost_price: parseFloat(alert.cost_price),
+        current_price: parseFloat(alert.selling_price.toString()),
+        cost_price: parseFloat(alert.cost_price.toString()),
         margin_percent: Math.round(marginPercent * 100) / 100,
-        composite_score: alert.product_scores?.[0]?.composite_score || 0,
-        recommendation: alert.product_scores?.[0]?.recommendation || 'unknown',
+        composite_score: alert.composite_score || 0,
+        recommendation: alert.recommendation || 'unknown',
         urgency_level: urgencyLevel,
         potential_loss: Math.round(potentialLoss * 100) / 100,
         location: alert.location_code || 'Unknown',
         supplier: alert.supplier || '',
-        calculated_at: alert.product_scores?.[0]?.calculated_at || null,
+        calculated_at: alert.calculated_at || null,
 
         // Action suggestions based on urgency and score
         suggested_actions: generateActionSuggestions(
           daysToExpiry,
-          alert.product_scores?.[0]?.composite_score || 0,
+          alert.composite_score || 0,
           marginPercent,
         ),
 
@@ -113,7 +101,7 @@ export async function GET(request: NextRequest) {
         priority_score: calculatePriorityScore(
           daysToExpiry,
           potentialLoss,
-          alert.product_scores?.[0]?.composite_score || 0,
+          alert.composite_score || 0,
         ),
       }
     })
@@ -181,11 +169,72 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     )
   }
-  */
 }
 
-// TODO: Re-enable when alerts functionality is ready
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Helper function to get alerts from database with scoring
+async function getStoreAlerts(supabase: any, storeId: string, threshold: number) {
+  try {
+    // Get batches with scoring data using the existing structure
+    const { data: batches, error } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select(`
+        batch_id,
+        batch_number,
+        current_quantity,
+        selling_price,
+        cost_price,
+        expiry_date,
+        location_code,
+        supplier,
+        products:product_id (
+          sku,
+          name,
+          category,
+          brand,
+          unit_type
+        ),
+        product_scores!batch_id (
+          composite_score,
+          recommendation,
+          calculated_at
+        )
+      `)
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+      .order('expiry_date', { ascending: true })
+
+    if (error) throw error
+
+    // Filter by threshold and format data
+    const alerts = batches
+      ?.map(batch => ({
+        batch_id: batch.batch_id,
+        batch_number: batch.batch_number,
+        current_quantity: batch.current_quantity,
+        selling_price: batch.selling_price,
+        cost_price: batch.cost_price,
+        expiry_date: batch.expiry_date,
+        location_code: batch.location_code,
+        supplier: batch.supplier,
+        sku: batch.products?.sku,
+        product_name: batch.products?.name,
+        category: batch.products?.category,
+        brand: batch.products?.brand,
+        unit_type: batch.products?.unit_type,
+        composite_score: batch.product_scores?.[0]?.composite_score || 0,
+        recommendation: batch.product_scores?.[0]?.recommendation,
+        calculated_at: batch.product_scores?.[0]?.calculated_at,
+      }))
+      .filter(alert => (alert.composite_score || 0) >= threshold) || []
+
+    return alerts
+  } catch (error) {
+    console.error('Error fetching store alerts:', error)
+    return []
+  }
+}
+
 function generateActionSuggestions(
   daysToExpiry: number,
   compositeScore: number,
@@ -235,8 +284,6 @@ function generateActionSuggestions(
   return suggestions
 }
 
-// TODO: Re-enable when alerts functionality is ready
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function calculatePriorityScore(
   daysToExpiry: number,
   potentialLoss: number,

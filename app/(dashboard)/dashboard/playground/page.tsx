@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,138 +10,70 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertTriangle, CheckCircle, Loader2, RefreshCw } from 'lucide-react'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
+import {
+  useScoringAlerts,
+  useScoringRecommendations,
+  useStoreAnalytics,
+  useDashboardInsights,
+} from '@/hooks/use-fastapi-scoring'
 
 // FastAPI scoring endpoints testing
 const FASTAPI_BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
 
 // Helper to get the correct token from Supabase session
-function getSupabaseToken(): string | null {
-  try {
-    // Method 1: Check ALL auth-related localStorage keys (including studio auth)
-    const authKeys = Object.keys(localStorage).filter(
-      key => key.includes('auth') && key.includes('token'),
-    )
+function getSupabaseToken(): Promise<string | null> {
+  return new Promise(async resolve => {
+    try {
+      // Get the current session from Supabase client
+      const supabase = createClient()
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession()
 
-    console.log('Found auth keys:', authKeys)
-
-    for (const key of authKeys) {
-      try {
-        const sessionData = localStorage.getItem(key)
-        if (sessionData) {
-          console.log(`Checking key: ${key}`)
-          console.log(`Raw data (first 100 chars):`, sessionData.substring(0, 100))
-          const parsed = JSON.parse(sessionData)
-          console.log('Parsed object structure:', Object.keys(parsed))
-          console.log('Full parsed object:', parsed)
-
-          // Handle different token structures
-          if (parsed?.access_token) {
-            console.log('Found access_token in parsed object')
-            return parsed.access_token
-          }
-
-          // Check if it's a nested session object
-          if (parsed?.session?.access_token) {
-            console.log('Found access_token in session object')
-            return parsed.session.access_token
-          }
-
-          // Check for studio token format (token field instead of access_token)
-          if (parsed?.token && typeof parsed.token === 'string' && parsed.token.length > 50) {
-            console.log('Found studio token in parsed object')
-            return parsed.token
-          }
-
-          // Check all nested properties for various token field names
-          const searchForToken = (obj: unknown, path = ''): string | null => {
-            if (typeof obj !== 'object' || obj === null) return null
-
-            for (const [key, value] of Object.entries(obj)) {
-              const currentPath = path ? `${path}.${key}` : key
-
-              // Look for various token field names
-              if (
-                (key === 'access_token' || key === 'token' || key === 'jwt') &&
-                typeof value === 'string' &&
-                value.length > 50
-              ) {
-                console.log(`Found ${key} at path: ${currentPath}`)
-                return value as string
-              }
-
-              if (typeof value === 'object' && value !== null) {
-                const found = searchForToken(value, currentPath)
-                if (found) return found
-              }
-            }
-            return null
-          }
-
-          const foundToken = searchForToken(parsed)
-          if (foundToken) return foundToken
-
-          // Check if the whole thing is a token string
-          if (typeof parsed === 'string' && parsed.length > 100) {
-            console.log('Found token as direct string')
-            return parsed
-          }
-        }
-      } catch (e) {
-        console.log(`Failed to parse ${key}:`, e)
-        // Continue to next key
+      if (error) {
+        console.error('Error getting Supabase session:', error)
+        resolve(null)
+        return
       }
-    }
 
-    // Method 2: Check Supabase-specific patterns
-    const supabaseKeys = Object.keys(localStorage).filter(
-      key => key.startsWith('sb-') || key.includes('supabase'),
-    )
-
-    console.log('Found Supabase keys:', supabaseKeys)
-
-    for (const key of supabaseKeys) {
-      try {
-        const value = localStorage.getItem(key)
-        if (value) {
-          const parsed = JSON.parse(value)
-          if (parsed?.access_token) return parsed.access_token
-          if (parsed?.session?.access_token) return parsed.session.access_token
-        }
-      } catch {
-        // Continue
+      if (session?.access_token) {
+        console.log('Got token from Supabase session')
+        resolve(session.access_token)
+        return
       }
-    }
 
-    return null
-  } catch (e) {
-    console.error('Error getting Supabase token:', e)
-    return null
-  }
+      console.warn('No active Supabase session found')
+      resolve(null)
+    } catch (e) {
+      console.error('Error getting Supabase token:', e)
+      resolve(null)
+    }
+  })
 }
 
-async function fetchWithAuth(url: string) {
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
   try {
-    const token = getSupabaseToken()
+    const token = await getSupabaseToken()
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...((options.headers as Record<string, string>) || {}),
     }
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
       console.log('Using token (first 20 chars):', token.substring(0, 20) + '...')
     } else {
-      console.warn('No authentication token found in localStorage')
-      // Log all localStorage keys for debugging
-      console.log(
-        'Available localStorage keys:',
-        Object.keys(localStorage).filter(
-          k => k.includes('auth') || k.includes('token') || k.startsWith('sb-'),
-        ),
-      )
+      console.warn('No authentication token found in Supabase session')
     }
 
-    const response = await fetch(url, { headers })
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      method: options.method || 'GET',
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -195,33 +127,6 @@ function useDatabaseHealthCheck() {
   return useQuery({
     queryKey: ['database-health-check'],
     queryFn: fetchDatabaseHealth,
-    retry: 1,
-  })
-}
-
-function useScoringAlerts(storeId: string | null, threshold: number = 0.6) {
-  return useQuery({
-    queryKey: ['scoring-alerts', storeId, threshold],
-    queryFn: () =>
-      fetchWithAuth(
-        `${FASTAPI_BASE_URL}/api/v1/scoring/alerts/${storeId}?threshold=${threshold}&limit=50`,
-      ),
-    enabled: !!storeId,
-    retry: 1,
-  })
-}
-
-function useScoringRecommendations(storeId: string | null, category?: string) {
-  return useQuery({
-    queryKey: ['scoring-recommendations', storeId, category],
-    queryFn: () => {
-      const params = new URLSearchParams({ limit: '20' })
-      if (category) params.append('category', category)
-      return fetchWithAuth(
-        `${FASTAPI_BASE_URL}/api/v1/scoring/recommendations/${storeId}?${params}`,
-      )
-    },
-    enabled: !!storeId,
     retry: 1,
   })
 }
@@ -294,16 +199,34 @@ export default function PlaygroundPage() {
   // FastAPI Testing State
   const [alertThreshold, setAlertThreshold] = useState(0.6)
   const [recommendationCategory, setRecommendationCategory] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const activeStoreId = useActiveStoreId()
 
-  // FastAPI Queries
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setIsAuthenticated(!!session)
+
+      if (!session) {
+        console.warn('No active session - API calls requiring authentication will fail')
+      }
+    }
+    checkAuth()
+  }, [])
+
+  // FastAPI Health Checks (direct calls)
   const healthQuery = useHealthCheck()
   const dbHealthQuery = useDatabaseHealthCheck()
+
+  // Integrated Scoring System (using existing backend with scoring)
   const alertsQuery = useScoringAlerts(activeStoreId, alertThreshold)
-  const recommendationsQuery = useScoringRecommendations(
-    activeStoreId,
-    recommendationCategory || undefined,
-  )
+  const recommendationsQuery = useScoringRecommendations(activeStoreId, recommendationCategory || undefined)
+  const analyticsQuery = useStoreAnalytics(activeStoreId, '7d')
+  const dashboardQuery = useDashboardInsights(activeStoreId)
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -312,6 +235,16 @@ export default function PlaygroundPage() {
         <p className="text-muted-foreground">
           Test components and API endpoints. Current store: {activeStoreId || 'None selected'}
         </p>
+        {!isAuthenticated && (
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+            <div className="flex items-center gap-2 text-yellow-800">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="text-sm">
+                Not authenticated - API calls requiring auth will fail
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* FastAPI Scoring Endpoints Testing */}
@@ -392,6 +325,41 @@ export default function PlaygroundPage() {
               isLoading={recommendationsQuery.isLoading}
               error={recommendationsQuery.error}
               onRefetch={recommendationsQuery.refetch}
+            />
+          </div>
+        </div>
+
+        {/* Integrated Scoring System Tests */}
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-4">Integrated Scoring System Tests</h3>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <TestResults
+              title="Alerts (via /api/alerts)"
+              data={alertsQuery.data}
+              isLoading={alertsQuery.isLoading}
+              error={alertsQuery.error}
+              onRefetch={alertsQuery.refetch}
+            />
+            <TestResults
+              title="Recommendations (low threshold alerts)"
+              data={recommendationsQuery.data}
+              isLoading={recommendationsQuery.isLoading}
+              error={recommendationsQuery.error}
+              onRefetch={recommendationsQuery.refetch}
+            />
+            <TestResults
+              title="Store Analytics (via /api/analytics)"
+              data={analyticsQuery.data}
+              isLoading={analyticsQuery.isLoading}
+              error={analyticsQuery.error}
+              onRefetch={analyticsQuery.refetch}
+            />
+            <TestResults
+              title="Dashboard Insights (overview analytics)"
+              data={dashboardQuery.data}
+              isLoading={dashboardQuery.isLoading}
+              error={dashboardQuery.error}
+              onRefetch={dashboardQuery.refetch}
             />
           </div>
         </div>

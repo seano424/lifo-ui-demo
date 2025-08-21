@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Loader2, AlertTriangle, ArrowRightFromLine, TrendingUp } from 'lucide-react'
 
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useStoreInsights } from '@/hooks/use-store-insights'
+import { useDashboardInsights } from '@/hooks/use-fastapi-scoring'
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
@@ -28,7 +28,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     data: insights,
     isLoading: insightsLoading,
     error: insightsError,
-  } = useStoreInsights(storeId)
+  } = useDashboardInsights(storeId)
 
   if (!storeId) {
     return null
@@ -66,8 +66,12 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     )
   }
 
-  const { insights: data } = insights
-  const { expiring_soon, ready_for_discount, perfect_for_donation, high_urgency, summary } = data
+  // Transform analytics data to match component interface
+  const overview = insights?.analytics?.overview || {}
+  const urgentBatches = overview.urgent_items || 0
+  const totalActions = overview.actions_taken || 0
+  const discountValue = overview.total_discount_value || 0
+  const avgScore = overview.avg_composite_score || 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -77,7 +81,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
             Today&apos;s priority actions
           </Typography>
           <Typography variant="p" className="text-muted-foreground">
-            Review and take action on the most urgent items.
+            Review and take action on the most urgent items from AI scoring.
           </Typography>
         </div>
 
@@ -90,74 +94,81 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
       <div className="space-y-6">
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5 text-center sm:text-left">
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Expiring Soon</Typography>
-            <Typography variant="p">Expiring in 1-2 days</Typography>
-            <Typography variant="p">{expiring_soon.count}</Typography>
+            <Typography variant="h4">Urgent Items</Typography>
+            <Typography variant="p">High urgency batches</Typography>
+            <Typography variant="p">{urgentBatches}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Ready for Discount</Typography>
-            <Typography variant="p">Suggested for discount</Typography>
-            <Typography variant="p">{ready_for_discount.count}</Typography>
+            <Typography variant="h4">Actions Taken</Typography>
+            <Typography variant="p">Total actions this period</Typography>
+            <Typography variant="p">{totalActions}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Perfect for Donation</Typography>
-            <Typography variant="p">Suggested for donation</Typography>
-            <Typography variant="p">{perfect_for_donation.count}</Typography>
+            <Typography variant="h4">Discount Value</Typography>
+            <Typography variant="p">Total discounts applied</Typography>
+            <Typography variant="p">€{discountValue.toFixed(0)}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">High Urgency</Typography>
-            <Typography variant="p">Needs attention</Typography>
-            <Typography variant="p">{high_urgency.count}</Typography>
+            <Typography variant="h4">Avg Score</Typography>
+            <Typography variant="p">Average urgency score</Typography>
+            <Typography variant="p">{(avgScore * 100).toFixed(1)}%</Typography>
           </div>
         </div>
 
-        {true && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex text-center sm:text-left justify-center sm:justify-start items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Store Overview
-              </CardTitle>
-              <CardDescription className="text-center sm:text-left">
-                {summary.total_actionable_items} actionable items of {summary.total_active_batches}{' '}
-                active batches
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4 text-center sm:text-left">
-                {(expiring_soon.count > 0 ||
-                  ready_for_discount.count > 0 ||
-                  perfect_for_donation.count > 0) && (
-                  <Alert>
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>
-                      <strong>Action Required:</strong> You have{' '}
-                      {expiring_soon.count + ready_for_discount.count + perfect_for_donation.count}{' '}
-                      batches that need immediate attention.
-                    </AlertDescription>
-                  </Alert>
-                )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex text-center sm:text-left justify-center sm:justify-start items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Store Overview & Analytics
+            </CardTitle>
+            <CardDescription className="text-center sm:text-left">
+              {totalActions} actions taken • {urgentBatches} urgent items tracked
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 text-center sm:text-left">
+              {urgentBatches > 0 && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Scoring Alert:</strong> {urgentBatches} urgent batches need immediate attention to prevent losses.
+                  </AlertDescription>
+                </Alert>
+              )}
 
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">
-                    {summary.action_required_percentage.toFixed(1)}% of non-expired inventory needs
-                    action
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowDetailedView(!showDetailedView)}
-                  >
-                    {showDetailedView ? 'Hide Details' : 'Show Details'}
-                  </Button>
+              {/* Analytics Summary */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Recent Activity</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="p-3 bg-blue-50 rounded">
+                    <p className="font-medium">Actions Taken</p>
+                    <p className="text-blue-600">{totalActions} this period</p>
+                  </div>
+                  <div className="p-3 bg-green-50 rounded">
+                    <p className="font-medium">Discounts Applied</p>
+                    <p className="text-green-600">€{discountValue.toFixed(0)} saved</p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">
+                  Average Score: {(avgScore * 100).toFixed(1)}% • €{discountValue.toFixed(0)} discounts applied
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDetailedView(!showDetailedView)}
+                >
+                  {showDetailedView ? 'Hide Details' : 'Show Details'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Detailed Actionable Batches */}
         {showDetailedView && <ActionableBatchesEnhanced storeId={storeId} />}

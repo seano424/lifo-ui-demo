@@ -175,6 +175,36 @@ export const queryKeys = {
     actions: (storeId: string) => [...queryKeys.donations.all, 'actions', storeId] as const,
     analytics: (storeId: string) => [...queryKeys.donations.all, 'analytics', storeId] as const,
   },
+
+  // FastAPI scoring and analytics queries
+  fastapi: {
+    all: ['fastapi'] as const,
+    
+    // Scoring endpoints
+    scoring: {
+      all: ['fastapi', 'scoring'] as const,
+      alerts: (storeId: string, threshold?: number) => 
+        [...queryKeys.fastapi.scoring.all, 'alerts', storeId, threshold] as const,
+      recommendations: (storeId: string, category?: string) =>
+        [...queryKeys.fastapi.scoring.all, 'recommendations', storeId, category] as const,
+    },
+
+    // Analytics endpoints  
+    analytics: {
+      all: ['fastapi', 'analytics'] as const,
+      store: (storeId: string, timeframe?: string) =>
+        [...queryKeys.fastapi.analytics.all, 'store', storeId, timeframe] as const,
+      dashboard: (storeId: string) =>
+        [...queryKeys.fastapi.analytics.all, 'dashboard', storeId] as const,
+    },
+
+    // Mobile endpoints
+    mobile: {
+      all: ['fastapi', 'mobile'] as const,
+      summary: (storeId: string) =>
+        [...queryKeys.fastapi.mobile.all, 'summary', storeId] as const,
+    },
+  },
 } as const
 
 // Type helpers for query key validation
