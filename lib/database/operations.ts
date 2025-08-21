@@ -20,17 +20,78 @@ export class InventoryOperations {
     userId: string,
     requiredRole: string = 'staff',
   ): Promise<boolean> {
-    const { data, error } = await this.supabase.rpc('user_has_store_access', {
-      target_store_id: storeId,
-      required_role: requiredRole,
+    console.log('[InventoryOperations.validateStoreAccess] Starting validation:', {
+      storeId,
+      userId,
+      requiredRole
     })
 
-    if (error) {
-      console.error('Error validating store access:', error)
+    try {
+      // First try the RPC function
+      const { data, error } = await this.supabase.rpc('user_has_store_access', {
+        target_store_id: storeId,
+        required_role: requiredRole,
+      })
+
+      if (error) {
+        console.error('[InventoryOperations.validateStoreAccess] RPC error:', error)
+        console.log('[InventoryOperations.validateStoreAccess] Falling back to direct query...')
+        
+        // Fallback: Check directly in store_users table
+        const { data: storeUsers, error: queryError } = await this.supabase
+          .schema('business')
+          .from('store_users')
+          .select('role')
+          .eq('store_id', storeId)
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .single()
+
+        if (queryError) {
+          console.error('[InventoryOperations.validateStoreAccess] Fallback query error:', queryError)
+          
+          // Final fallback: Check if user is store owner
+          const { data: store, error: storeError } = await this.supabase
+            .schema('business')
+            .from('stores')
+            .select('owner_id')
+            .eq('store_id', storeId)
+            .single()
+
+          if (storeError) {
+            console.error('[InventoryOperations.validateStoreAccess] Store owner check error:', storeError)
+            return false
+          }
+
+          const isOwner = store?.owner_id === userId
+          console.log('[InventoryOperations.validateStoreAccess] Owner check result:', {
+            isOwner,
+            storeOwnerId: store?.owner_id,
+            userId
+          })
+          
+          return isOwner
+        }
+
+        const hasAccess = !!storeUsers
+        console.log('[InventoryOperations.validateStoreAccess] Fallback result:', {
+          hasAccess,
+          userRole: storeUsers?.role
+        })
+        
+        return hasAccess
+      }
+
+      console.log('[InventoryOperations.validateStoreAccess] RPC result:', {
+        data,
+        hasAccess: !!data
+      })
+
+      return data || false
+    } catch (error) {
+      console.error('[InventoryOperations.validateStoreAccess] Unexpected error:', error)
       return false
     }
-
-    return data || false
   }
 
   async getUserStores(userId: string): Promise<Store[]> {

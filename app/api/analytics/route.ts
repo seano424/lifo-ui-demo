@@ -13,11 +13,23 @@ type BatchWithJoins = Database['inventory']['Tables']['batches']['Row'] & {
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
+  console.log('[/api/analytics] Request received:', {
+    url: request.url,
+    method: request.method,
+    timestamp: new Date().toISOString()
+  })
+
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser()
+  
   if (error || !user) {
+    console.log('[/api/analytics] Authentication failed:', {
+      error: error?.message,
+      hasUser: !!user,
+      userId: user?.id
+    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -26,18 +38,45 @@ export async function GET(request: NextRequest) {
   const timeframe = searchParams.get('timeframe') || '7d' // 1d, 7d, 30d, 90d
   const metric = searchParams.get('metric') // 'overview', 'waste', 'revenue', 'categories'
 
+  console.log('[/api/analytics] Request parameters:', {
+    userId: user.id,
+    storeId,
+    timeframe,
+    metric
+  })
+
   if (!storeId) {
+    console.log('[/api/analytics] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
 
   try {
+    console.log('[/api/analytics] Initializing InventoryOperations...')
     const operations = new InventoryOperations(supabase)
+    
+    console.log('[/api/analytics] Checking store access...', {
+      storeId,
+      userId: user.id
+    })
+    
     const hasAccess = await operations.validateStoreAccess(storeId, user.id)
+    
+    console.log('[/api/analytics] Store access validation result:', {
+      hasAccess,
+      storeId,
+      userId: user.id
+    })
 
     if (!hasAccess) {
+      console.log('[/api/analytics] Access denied - user does not have permission for store')
       return NextResponse.json(
         {
           error: 'No access to this store',
+          details: {
+            userId: user.id,
+            storeId,
+            timestamp: new Date().toISOString()
+          }
         },
         { status: 403 },
       )

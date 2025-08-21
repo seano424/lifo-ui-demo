@@ -5,11 +5,23 @@ import { InventoryOperations } from '@/lib/database/operations'
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
+  console.log('[/api/alerts] Request received:', {
+    url: request.url,
+    method: request.method,
+    timestamp: new Date().toISOString()
+  })
+
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser()
+  
   if (error || !user) {
+    console.log('[/api/alerts] Authentication failed:', {
+      error: error?.message,
+      hasUser: !!user,
+      userId: user?.id
+    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -20,12 +32,23 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get('category')
   const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500)
 
+  console.log('[/api/alerts] Request parameters:', {
+    userId: user.id,
+    storeId,
+    threshold,
+    urgencyLevel,
+    category,
+    limit
+  })
+
   if (!storeId) {
+    console.log('[/api/alerts] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
 
   // Validate threshold
   if (threshold < 0 || threshold > 1) {
+    console.log('[/api/alerts] Invalid threshold:', threshold)
     return NextResponse.json(
       {
         error: 'Threshold must be between 0 and 1',
@@ -35,13 +58,32 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    console.log('[/api/alerts] Initializing InventoryOperations...')
     const operations = new InventoryOperations(supabase)
+    
+    console.log('[/api/alerts] Checking store access...', {
+      storeId,
+      userId: user.id
+    })
+    
     const hasAccess = await operations.validateStoreAccess(storeId, user.id)
+    
+    console.log('[/api/alerts] Store access validation result:', {
+      hasAccess,
+      storeId,
+      userId: user.id
+    })
 
     if (!hasAccess) {
+      console.log('[/api/alerts] Access denied - user does not have permission for store')
       return NextResponse.json(
         {
           error: 'No access to this store',
+          details: {
+            userId: user.id,
+            storeId,
+            timestamp: new Date().toISOString()
+          }
         },
         { status: 403 },
       )
@@ -51,7 +93,7 @@ export async function GET(request: NextRequest) {
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
 
     // Enhance alerts with calculated fields
-    const enhancedAlerts = alerts.map(alert => {
+    const enhancedAlerts = alerts.map((alert: any) => {
       const daysToExpiry = Math.floor(
         (new Date(alert.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       )
@@ -110,17 +152,17 @@ export async function GET(request: NextRequest) {
     let filteredAlerts = enhancedAlerts
 
     if (urgencyLevel) {
-      filteredAlerts = filteredAlerts.filter(alert => alert.urgency_level === urgencyLevel)
+      filteredAlerts = filteredAlerts.filter((alert: any) => alert.urgency_level === urgencyLevel)
     }
 
     if (category) {
-      filteredAlerts = filteredAlerts.filter(alert =>
+      filteredAlerts = filteredAlerts.filter((alert: any) =>
         alert.category.toLowerCase().includes(category.toLowerCase()),
       )
     }
 
     // Sort by priority score (highest first), then by days to expiry
-    filteredAlerts.sort((a, b) => {
+    filteredAlerts.sort((a: any, b: any) => {
       if (b.priority_score !== a.priority_score) {
         return b.priority_score - a.priority_score
       }
@@ -133,19 +175,19 @@ export async function GET(request: NextRequest) {
     // Calculate summary statistics
     const summary = {
       total_alerts: filteredAlerts.length,
-      critical_count: filteredAlerts.filter(a => a.urgency_level === 'critical').length,
-      high_count: filteredAlerts.filter(a => a.urgency_level === 'high').length,
-      medium_count: filteredAlerts.filter(a => a.urgency_level === 'medium').length,
-      low_count: filteredAlerts.filter(a => a.urgency_level === 'low').length,
-      total_potential_loss: filteredAlerts.reduce((sum, alert) => sum + alert.potential_loss, 0),
-      categories_affected: [...new Set(filteredAlerts.map(a => a.category))].length,
+      critical_count: filteredAlerts.filter((a: any) => a.urgency_level === 'critical').length,
+      high_count: filteredAlerts.filter((a: any) => a.urgency_level === 'high').length,
+      medium_count: filteredAlerts.filter((a: any) => a.urgency_level === 'medium').length,
+      low_count: filteredAlerts.filter((a: any) => a.urgency_level === 'low').length,
+      total_potential_loss: filteredAlerts.reduce((sum: number, alert: any) => sum + alert.potential_loss, 0),
+      categories_affected: [...new Set(filteredAlerts.map((a: any) => a.category))].length,
       avg_days_to_expiry:
         filteredAlerts.length > 0
           ? Math.round(
-              filteredAlerts.reduce((sum, a) => sum + a.days_to_expiry, 0) / filteredAlerts.length,
+              filteredAlerts.reduce((sum: number, a: any) => sum + a.days_to_expiry, 0) / filteredAlerts.length,
             )
           : 0,
-      expired_items: filteredAlerts.filter(a => a.days_to_expiry < 0).length,
+      expired_items: filteredAlerts.filter((a: any) => a.days_to_expiry < 0).length,
     }
 
     return NextResponse.json({
@@ -193,11 +235,6 @@ async function getStoreAlerts(supabase: any, storeId: string, threshold: number)
           category,
           brand,
           unit_type
-        ),
-        product_scores!batch_id (
-          composite_score,
-          recommendation,
-          calculated_at
         )
       `)
       .eq('store_id', storeId)
@@ -206,27 +243,56 @@ async function getStoreAlerts(supabase: any, storeId: string, threshold: number)
 
     if (error) throw error
 
+    if (!batches || batches.length === 0) {
+      console.log('[getStoreAlerts] No batches found for store:', storeId)
+      return []
+    }
+
+    // Get batch IDs for scoring lookup
+    const batchIds = batches.map((batch: any) => batch.batch_id)
+
+    // Get scoring data separately from scoring schema
+    const { data: scoringData, error: scoringError } = await supabase
+      .schema('scoring')
+      .from('product_scores')
+      .select('batch_id, composite_score, recommendation, calculated_at')
+      .eq('store_id', storeId)
+      .in('batch_id', batchIds)
+
+    if (scoringError) {
+      console.warn('[getStoreAlerts] Error fetching scoring data:', scoringError)
+    }
+
+    // Create a map of batch_id to scoring data for quick lookup
+    const scoringMap = new Map()
+    scoringData?.forEach((score: any) => {
+      scoringMap.set(score.batch_id, score)
+    })
+
     // Filter by threshold and format data
     const alerts = batches
-      ?.map(batch => ({
-        batch_id: batch.batch_id,
-        batch_number: batch.batch_number,
-        current_quantity: batch.current_quantity,
-        selling_price: batch.selling_price,
-        cost_price: batch.cost_price,
-        expiry_date: batch.expiry_date,
-        location_code: batch.location_code,
-        supplier: batch.supplier,
-        sku: batch.products?.sku,
-        product_name: batch.products?.name,
-        category: batch.products?.category,
-        brand: batch.products?.brand,
-        unit_type: batch.products?.unit_type,
-        composite_score: batch.product_scores?.[0]?.composite_score || 0,
-        recommendation: batch.product_scores?.[0]?.recommendation,
-        calculated_at: batch.product_scores?.[0]?.calculated_at,
-      }))
-      .filter(alert => (alert.composite_score || 0) >= threshold) || []
+      ?.map((batch: any) => {
+        const scoring = scoringMap.get(batch.batch_id)
+        return {
+          batch_id: batch.batch_id,
+          batch_number: batch.batch_number,
+          current_quantity: batch.current_quantity,
+          selling_price: batch.selling_price,
+          cost_price: batch.cost_price,
+          expiry_date: batch.expiry_date,
+          location_code: batch.location_code,
+          supplier: batch.supplier,
+          sku: batch.products?.sku,
+          product_name: batch.products?.name,
+          category: batch.products?.category,
+          brand: batch.products?.brand,
+          unit_type: batch.products?.unit_type,
+          composite_score: scoring?.composite_score || 0,
+          recommendation: scoring?.recommendation,
+          calculated_at: scoring?.calculated_at,
+        }
+      })
+      .filter((alert: any) => (alert.composite_score || 0) >= threshold) || []
 
     return alerts
   } catch (error) {
