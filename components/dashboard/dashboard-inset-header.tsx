@@ -16,7 +16,12 @@ export default function DashboardInsetHeader({
   className?: string
 }) {
   return (
-    <div className={cn('flex justify-between items-center capitalize', className)}>
+    <div
+      className={cn(
+        'flex flex-col sm:flex-row gap-4 justify-between items-center capitalize text-center sm:text-left',
+        className,
+      )}
+    >
       <div className="flex flex-col gap-1">
         {isLoading ? (
           <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-full" />

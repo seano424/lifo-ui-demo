@@ -6,7 +6,7 @@ import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-da
 
 export default function Page() {
   return (
-    <div className="flex flex-col gap-10 px-5 md:px-10 mb-40">
+    <div className="flex flex-col gap-10 px-2 md:px-10 mb-40">
       <DashboardInsetHeader title="Dashboard Overview" />
       <UrgentAlerts />
       <div className="bg-muted/50 rounded-2xl border-0 p-5">

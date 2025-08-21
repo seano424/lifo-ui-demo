@@ -34,8 +34,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <HydrationBoundary state={dashboardData.dehydratedState}>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 justify-between px-4 border-b mb-4">
+        <SidebarInset className="overflow-visible">
+          <header className="flex sticky top-0 bg-background z-50 h-16 shrink-0 items-center gap-2 justify-between px-4 border-b">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
@@ -45,15 +45,20 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
 
             <div className="flex items-center gap-2">
-              <Button>
+              <Button size="icon" className="rounded-full border md:hidden">
                 <BellIcon className="w-4 h-4" />
-                <span className="hidden md:block">Notifications</span>
               </Button>
-              <TeamSwitcher />
+              <Button size="default" className="rounded-full border hidden md:flex">
+                <BellIcon className="w-4 h-4" />
+                Notifications
+              </Button>
+              <div className="hidden md:block">
+                <TeamSwitcher />
+              </div>
               <UserButton />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 px-6 py-4">{children}</div>
+          <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </HydrationBoundary>

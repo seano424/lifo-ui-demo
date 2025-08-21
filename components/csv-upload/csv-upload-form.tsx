@@ -171,7 +171,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 xs:min-w-sm sm:min-w-xl lg:w-3xl mx-auto">
+    <div className="flex flex-col gap-6 sm:min-w-xl lg:w-3xl mx-auto">
       {/* Ultra-Fast Upload Header */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">

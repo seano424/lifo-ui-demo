@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 import { useTranslations } from 'next-intl'
-import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon } from 'lucide-react'
+import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon, Package, Layers } from 'lucide-react'
+import { TeamSwitcher } from './team-switcher'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
@@ -49,6 +50,20 @@ function useNavigationData() {
           title: t('inventory'),
           url: '/dashboard/inventory',
           icon: Box,
+          items: [
+            {
+              title: t('products'),
+              url: '/dashboard/inventory/products',
+              icon: Package,
+              isActive: true,
+            },
+            {
+              title: t('batches'),
+              url: '/dashboard/inventory/batches',
+              icon: Layers,
+            },
+          ],
+          isActive: true,
         },
         // {
         //   title: t('performance'),
@@ -85,25 +100,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   if (!user) return <div>Not logged in</div>
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="group-data-[collapsible=icon]:pt-5" {...props}>
       <SidebarHeader
-        className={cn('min-h-12 flex justify-center', 'group-data-[collapsible=icon]:items-center')}
+        className={cn(
+          'flex flex-col gap-2 justify-center items-center',
+          'group-data-[collapsible=icon]:pt-12',
+        )}
       >
         <NavbarLogo
           variant="horizontal"
           size="md"
-          className={cn('group-data-[collapsible=icon]:hidden')}
+          className={cn('group-data-[collapsible=icon]:hidden hidden sm:flex')}
+        />
+        <NavbarLogo
+          variant="vertical"
+          size="md"
+          className={cn('group-data-[collapsible=icon]:hidden sm:hidden')}
         />
         <NavbarLogo
           variant="icon"
           size="sm"
           className={cn('group-data-[collapsible=icon]:block hidden')}
         />
+
+        <div className={cn('group-data-[collapsible=icon]:hidden sm:hidden')}>
+          <TeamSwitcher />
+        </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="group-data-[collapsible=icon]:pt-5">
         <NavMain items={navigationData.navMain} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="py-4">
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />

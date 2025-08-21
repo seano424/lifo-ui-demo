@@ -203,7 +203,7 @@ export function TimeSelector({ value, onChange, className }: TimeSelectorProps) 
         Comparing with {currentRange.compareLabel}
       </p>
       <Select value={value} onValueChange={val => onChange(val as TimePeriod)}>
-        <SelectTrigger className="w-[200px] bg-white border transition-colors">
+        <SelectTrigger className="w-full sm:w-[200px] bg-white border transition-colors">
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" />
             <SelectValue />

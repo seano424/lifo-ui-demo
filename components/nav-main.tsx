@@ -15,6 +15,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 
 export function NavMain({
@@ -28,10 +29,12 @@ export function NavMain({
     items?: {
       title: string
       url: string
+      icon?: LucideIcon
     }[]
   }[]
 }) {
   const pathname = usePathname()
+  const { setOpenMobile } = useSidebar()
 
   // Prevent hydration mismatch by tracking when we're hydrated
   const [isHydrated, setIsHydrated] = useState(false)
@@ -51,11 +54,12 @@ export function NavMain({
       return pathname.startsWith(itemUrl)
     }
 
-    if (itemUrl.includes('/inventory')) {
-      return pathname.startsWith(itemUrl)
-    }
-
     return false
+  }
+
+  // Close sidebar on mobile when clicking a link
+  const handleLinkClick = () => {
+    setOpenMobile(false)
   }
 
   return (
@@ -67,11 +71,16 @@ export function NavMain({
               key={item.title}
               asChild
               defaultOpen={item.isActive}
-              className="group/collapsible"
+              className={cn(
+                'group/collapsible group-data-[state=open]/collapsible:flex group-data-[state=open]/collapsible:flex-col group-data-[state=open]/collapsible:items-center',
+              )}
             >
-              <SidebarMenuItem>
+              <SidebarMenuItem className="">
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title}>
+                  <SidebarMenuButton
+                    className="p-4 font-medium group-data-[collapsible=icon]:hidden"
+                    tooltip={item.title}
+                  >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -80,9 +89,18 @@ export function NavMain({
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items.map(subItem => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                      <SidebarMenuSubItem
+                        className={cn(
+                          'hover:bg-secondary-100/80 rounded-none font-medium pl-6 py-2',
+                          isPathActive(subItem.url) &&
+                            'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
+                          'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0',
+                        )}
+                        key={subItem.title}
+                      >
+                        <SidebarMenuSubButton asChild tooltip={subItem.title}>
+                          <Link href={subItem.url} onClick={handleLinkClick}>
+                            {subItem.icon && <subItem.icon className="!text-secondary-900" />}
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
@@ -93,17 +111,21 @@ export function NavMain({
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem className="flex flex-col items-center" key={item.title}>
               <SidebarMenuButton
                 className={cn(
-                  'hover:bg-secondary-100/80 p-3 rounded-xl font-medium',
+                  'hover:bg-secondary-100/80 rounded-none p-4 font-medium',
                   isPathActive(item.url) &&
                     'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
                 )}
                 asChild
                 tooltip={item.title}
               >
-                <Link href={item.url} className="flex items-center w-full">
+                <Link
+                  href={item.url}
+                  className="flex items-center w-full"
+                  onClick={handleLinkClick}
+                >
                   {item.icon && <item.icon className="text-secondary-900" />}
                   <span>{item.title}</span>
                 </Link>

@@ -31,14 +31,14 @@ export function BatchListSortControls({
 }: BatchListSortControlsProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
+      <span className="hidden md:block text-sm font-medium text-muted-foreground">Sort by:</span>
 
       <Select
         value={currentSort.field}
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full md:w-[180px]">
           <div className="flex items-center gap-2">
             <SelectValue />
           </div>
@@ -97,16 +97,17 @@ export function BatchListSortControls({
 
       <Button
         variant="outline"
+        size="sm"
         onClick={() => updateSort(currentSort.field)}
         disabled={isLoading}
-        className="px-3 hover:text-accent-foreground hover:bg-transparent"
+        className="h-9 px-3 rounded-md text-sm font-normal w-full md:w-auto"
       >
         {currentSort.direction === 'asc' ? (
-          <ArrowUp className="h-4 w-4" />
+          <ArrowUp className="h-4 w-4 opacity-50" />
         ) : (
-          <ArrowDown className="h-4 w-4" />
+          <ArrowDown className="h-4 w-4 opacity-50" />
         )}
-        <span className="ml-1">{currentSort.direction === 'asc' ? 'ASC' : 'DESC'}</span>
+        {currentSort.direction === 'asc' ? 'ASC' : 'DESC'}
       </Button>
     </div>
   )

@@ -27,7 +27,7 @@ export function ProductListFilters({
   }
 
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex flex-col-reverse items-center md:items-end md:flex-row justify-end gap-2">
       <Select
         value={filters?.category || 'all'}
         onValueChange={value =>
@@ -56,9 +56,9 @@ export function ProductListFilters({
       </Select>
 
       {isLoading && (
-        <Skeleton className="flex justify-center items-center gap-1 px-2">
-          <Skeleton className="h-2 w-4 bg-muted-foreground/10" />
-          <Skeleton className="h-2 w-16 bg-muted-foreground/10" />
+        <Skeleton className="flex justify-between gap-1">
+          <Skeleton className="h-5 w-6 bg-muted-foreground/10" />
+          <Skeleton className="h-5 w-16 bg-muted-foreground/10" />
         </Skeleton>
       )}
       {!isLoading && count > 0 && (
