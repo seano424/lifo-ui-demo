@@ -10,19 +10,18 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 })
 
-const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
-  {
-    files: ['**/*.{js,jsx,ts,tsx}'],
-    plugins: {
-      prettier: prettier,
-    },
-    rules: {
-      'prettier/prettier': 'error',
-      'arrow-body-style': 'off',
-      'prefer-arrow-callback': 'off',
-    },
+const eslintConfig = [{
+  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]
+}, ...compat.extends('next/core-web-vitals', 'next/typescript'), {
+  files: ['**/*.{js,jsx,ts,tsx}'],
+  plugins: {
+    prettier: prettier,
   },
-]
+  rules: {
+    'prettier/prettier': 'error',
+    'arrow-body-style': 'off',
+    'prefer-arrow-callback': 'off',
+  },
+}]
 
 export default eslintConfig

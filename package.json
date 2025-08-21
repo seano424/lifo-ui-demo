@@ -4,7 +4,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "email": "email dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
