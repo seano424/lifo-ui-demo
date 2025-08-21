@@ -1,32 +1,28 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  useInventoryKPI,
-  useSalesKPI,
-  useDonationKPI,
-  useWasteKPI,
-} from '@/hooks/use-dashboard-kpis'
-
-import {
-  useInventoryKPITrends,
-  useSalesKPITrends,
-  useDonationKPITrends,
-  useWasteKPITrends,
-} from '@/hooks/use-kpi-trends'
-
-import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-
-import { RefreshCw } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-
+import { useState } from 'react'
+import { KPICard } from '@/components/dashboard/kpi-card'
+import { type TimePeriod, TimeSelector } from '@/components/dashboard/TimeSelector'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { KPICard } from '@/components/dashboard/kpi-card'
-import { TimeSelector, TimePeriod } from '@/components/dashboard/TimeSelector'
-import { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
+import {
+  useDonationKPI,
+  useInventoryKPI,
+  useSalesKPI,
+  useWasteKPI,
+} from '@/hooks/use-dashboard-kpis'
+import {
+  useDonationKPITrends,
+  useInventoryKPITrends,
+  useSalesKPITrends,
+  useWasteKPITrends,
+} from '@/hooks/use-kpi-trends'
+import type { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 export function DashboardKPICards() {
   const t = useTranslations('dashboard.kpis')

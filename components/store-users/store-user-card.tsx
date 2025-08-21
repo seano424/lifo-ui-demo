@@ -1,19 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  AlertTriangle,
+  Clock,
+  Crown,
+  MoreHorizontal,
+  Pin,
+  Shield,
+  User,
+  UserCheck,
+  UserMinus,
+  Users,
+} from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,18 +24,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
-  MoreHorizontal,
-  User,
-  Crown,
-  UserCheck,
-  Users,
-  Shield,
-  Pin,
-  UserMinus,
-  Clock,
-  AlertTriangle,
-} from 'lucide-react'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Typography } from '@/components/ui/typography'
 import type { StoreUser } from '@/lib/queries/store-users'
 

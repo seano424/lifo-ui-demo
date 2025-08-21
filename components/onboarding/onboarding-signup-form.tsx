@@ -1,19 +1,18 @@
 'use client'
 
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
+import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+import { useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CheckCircle, AlertTriangle } from 'lucide-react'
 import { useCurrentUser } from '@/hooks/use-users'
+import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { createClient } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
 
 const ONBOARDING_MODE = process.env.NEXT_PUBLIC_ONBOARDING_MODE || 'production'
 
@@ -90,7 +89,7 @@ export function OnboardingSignUpForm({
           console.log('🎭 Mock mode: Generated user ID:', userId)
           break
 
-        case 'test':
+        case 'test': {
           // Test mode: use current logged-in user
           const currentUserId = currentUser?.id
           if (!currentUserId) {
@@ -101,9 +100,8 @@ export function OnboardingSignUpForm({
           userId = currentUserId
           console.log('🧪 Test mode: Using current user ID:', userId)
           break
-
-        case 'production':
-        default:
+        }
+        default: {
           // Production mode: create new auth user
           console.log('🔐 Production mode: Creating new user')
           const supabase = createClient()
@@ -126,6 +124,7 @@ export function OnboardingSignUpForm({
           userId = authData.user.id
           console.log('🔐 Production: Created user ID:', userId)
           break
+        }
       }
 
       // Prepare store data for API call

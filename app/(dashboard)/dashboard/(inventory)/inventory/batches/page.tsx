@@ -1,20 +1,18 @@
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-
-import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { queryKeys } from '@/lib/queries/query-keys'
+import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
+import BatchesHeader from '@/components/batches/batches-header'
+import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import {
-  fetchBatchesPage,
-  fetchExpiringBatches,
   type BatchFilters,
   type BatchSortField,
+  fetchBatchesPage,
+  fetchExpiringBatches,
 } from '@/lib/queries/batches'
-import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
-
-import BatchesHeader from '@/components/batches/batches-header'
-import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
-import { NoStoresError } from '@/components/dashboard/no-stores-error'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
+import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 interface InventoryBatchesPageProps {
   searchParams: Promise<{
@@ -76,7 +74,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
     // Handle expiring filter
     if (params.filter === 'expiring') {
-      filters.expiringInDays = parseInt(params.expiringDays || '7')
+      filters.expiringInDays = parseInt(params.expiringDays || '7', 10)
     }
 
     // Handle status filter

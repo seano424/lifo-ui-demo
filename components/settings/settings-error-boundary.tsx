@@ -1,7 +1,7 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 
 interface SettingsErrorProps {
   errorType: 'unauthorized' | 'forbidden' | 'not-found' | 'server-error'

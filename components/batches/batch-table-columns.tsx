@@ -1,18 +1,18 @@
 'use client'
 
+import type { ColumnDef, Header } from '@tanstack/react-table'
 import {
   AlertTriangle,
-  Package,
   Calendar,
   DollarSign,
-  MoreHorizontal,
-  Eye,
   Edit,
+  Eye,
+  MoreHorizontal,
+  Package,
   Trash2,
 } from 'lucide-react'
-import type { ColumnDef, Header } from '@tanstack/react-table'
-import type { BatchWithProduct, BatchSort, BatchSortField } from '@/lib/queries/batches'
-import { getStatusBadge, getExpiryBadge } from '@/lib/utils/batch-utils'
+import { SortableHeader } from '@/components/batches/sortable-header'
+import { Button } from '@/components/ui/button'
 
 import {
   DropdownMenu,
@@ -22,8 +22,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { SortableHeader } from '@/components/batches/sortable-header'
+import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
+import { getExpiryBadge, getStatusBadge } from '@/lib/utils/batch-utils'
 
 interface ColumnResizerProps {
   header: Header<BatchWithProduct, unknown>

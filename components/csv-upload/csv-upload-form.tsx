@@ -1,27 +1,27 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import {
-  Upload,
-  FileCheck,
   CheckCircle,
-  Zap,
-  Clock,
-  SkipForward,
   ChevronLeft,
   ChevronRight,
-  Plus,
+  Clock,
+  FileCheck,
   Minus,
+  Plus,
+  SkipForward,
+  Upload,
+  Zap,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useCSVUpload } from '@/hooks/use-csv-upload'
-import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { useCSVUpload } from '@/hooks/use-csv-upload'
+import { cn } from '@/lib/utils'
 import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
@@ -68,7 +68,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     setDragActive(false)
 
     const files = e.dataTransfer.files
-    if (files && files[0]) {
+    if (files?.[0]) {
       await handleFileSelect(files[0])
     }
   }

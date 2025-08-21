@@ -1,27 +1,27 @@
 // hooks/use-batches.ts
 
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
-import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
-  fetchBatchesPage,
+  type Batch,
+  type BatchFilters,
+  type BatchSort,
+  type BatchSortDirection,
+  type BatchSortField,
+  type BatchWithProduct,
+  createBatch,
+  deleteBatch,
   fetchBatchById,
   fetchBatchesForProduct,
+  fetchBatchesPage,
   fetchExpiringBatches,
   fetchLowStockBatches,
-  createBatch,
   updateBatch,
-  deleteBatch,
-  type BatchFilters,
-  type Batch,
-  type BatchWithProduct,
-  type BatchSort,
-  type BatchSortField,
-  type BatchSortDirection,
 } from '@/lib/queries/batches'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { Database } from '@/types/supabase'
-import { useCallback, useState } from 'react'
 
 // ✅ READING DATA - Store-aware infinite scroll batches list with sorting
 export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
@@ -338,7 +338,7 @@ export function useBatchActions() {
       return { previousBatch, batchId }
     },
 
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // Revert on error
       if (context?.previousBatch) {
         queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
@@ -347,7 +347,7 @@ export function useBatchActions() {
       toast.error('Failed to update batch')
     },
 
-    onSettled: (data, error, { batchId }) => {
+    onSettled: (data, _error, { batchId }) => {
       // Always refetch after mutation
       queryClient.invalidateQueries({ queryKey: queryKeys.batches.detail(batchId) })
       if (activeStoreId) {
@@ -408,7 +408,7 @@ export function useBatchActions() {
       return { previousBatch, batchId }
     },
 
-    onError: (err, batchId, context) => {
+    onError: (err, _batchId, context) => {
       // Restore the batch if deletion failed
       if (context?.previousBatch) {
         queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
@@ -417,7 +417,7 @@ export function useBatchActions() {
       toast.error('Failed to delete batch')
     },
 
-    onSettled: (data, error, batchId, context) => {
+    onSettled: (_data, _error, _batchId, context) => {
       // Refetch to ensure consistency
       if (activeStoreId) {
         queryClient.invalidateQueries({ queryKey: queryKeys.batches.byStore(activeStoreId) })
@@ -600,7 +600,7 @@ export function useBatchAlerts() {
 }
 
 // ✅ CONVENIENCE HOOKS for common filters (store-aware)
-export function useBatchesByCategory(category: string) {
+export function useBatchesByCategory(_category: string) {
   // Note: Category filtering would need to be done via product join
   // For now, this returns all batches (would need backend enhancement)
   return useBatches({

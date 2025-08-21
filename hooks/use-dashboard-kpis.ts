@@ -1,11 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import {
+  fetchDashboardKPIs,
+  fetchDonationKPI,
   fetchInventoryKPI,
   fetchSalesKPI,
-  fetchDonationKPI,
   fetchWasteKPI,
-  fetchDashboardKPIs,
 } from '@/lib/queries/dashboard-kpis'
-import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 

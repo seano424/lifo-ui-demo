@@ -1,8 +1,8 @@
 'use client'
 
+import { Typography } from '@/components/ui/typography'
 import { useUserRoles } from '@/hooks/use-users'
 import type { User } from '@/lib/types/user'
-import { Typography } from '@/components/ui/typography'
 
 interface UserCardProps {
   user: User
@@ -21,10 +21,10 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
 
   const getDisplayName = (user: User): string => {
     // Priority: full_name -> username -> email
-    if (user.full_name && user.full_name.trim()) {
+    if (user.full_name?.trim()) {
       return user.full_name
     }
-    if (user.username && user.username.trim()) {
+    if (user.username?.trim()) {
       return user.username
     }
     return user.email || 'Unknown User'
@@ -33,7 +33,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
   const getInitials = (user: User): string => {
     const displayName = getDisplayName(user)
 
-    if (user.full_name && user.full_name.includes(' ')) {
+    if (user.full_name?.includes(' ')) {
       // For full names with spaces, take first letter of each word
       return user.full_name
         .split(' ')

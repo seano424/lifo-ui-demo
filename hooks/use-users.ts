@@ -1,28 +1,28 @@
-import {
-  fetchUsersPage,
-  fetchUserById,
-  fetchUserRoles,
-  checkUserHasRole,
-  updateUser,
-  updateUserPhone,
-  updateUserLanguagePreference,
-  type UserFilters,
-} from '@/lib/queries/users'
-import {
-  User,
-  SupportedLanguage,
-  SUPPORTED_LANGUAGES,
-  UpdatePhoneResponse,
-  UpdateLanguageResponse,
-  UserCreate,
-  UserUpdate,
-} from '@/lib/types/user'
+import type { UseQueryResult } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { createClient } from '@/lib/supabase/client'
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { UseQueryResult } from '@tanstack/react-query'
+import {
+  checkUserHasRole,
+  fetchUserById,
+  fetchUserRoles,
+  fetchUsersPage,
+  type UserFilters,
+  updateUser,
+  updateUserLanguagePreference,
+  updateUserPhone,
+} from '@/lib/queries/users'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
+import {
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+  type UpdateLanguageResponse,
+  type UpdatePhoneResponse,
+  type User,
+  type UserCreate,
+  type UserUpdate,
+} from '@/lib/types/user'
 
 // Legacy UserRole type (for global roles)
 type UserRole = 'admin' | 'manager' | 'employee'
@@ -490,7 +490,7 @@ export function useUpdatePhone() {
   return useMutation({
     mutationFn: ({ userId, phone }: { userId: string; phone: string | null }) =>
       updateUserPhone(userId, phone),
-    onSuccess: (data: UpdatePhoneResponse, { phone }) => {
+    onSuccess: (_data: UpdatePhoneResponse, { phone }) => {
       // Invalidate user queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
       queryClient.invalidateQueries({ queryKey: ['users'] })
@@ -515,7 +515,7 @@ export function useUpdateLanguagePreference() {
   return useMutation({
     mutationFn: ({ userId, language }: { userId: string; language: SupportedLanguage }) =>
       updateUserLanguagePreference(userId, language),
-    onSuccess: (data: UpdateLanguageResponse, { language }) => {
+    onSuccess: (_data: UpdateLanguageResponse, { language }) => {
       // Invalidate user queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
       queryClient.invalidateQueries({ queryKey: ['users'] })
@@ -540,7 +540,7 @@ export function useUserActions() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation<User, Error, UserCreate>({
-    mutationFn: async userData => {
+    mutationFn: async _userData => {
       throw new Error('User creation must be handled server-side')
     },
     onSuccess: newUser => {
@@ -570,14 +570,14 @@ export function useUserActions() {
 
       return { previousUser, id }
     },
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       if (context?.previousUser) {
         queryClient.setQueryData(queryKeys.users.detail(context.id), context.previousUser)
       }
       console.error('Update error:', err)
       toast.error(`Failed to update user: ${err.message}`)
     },
-    onSettled: (data, error, { id }) => {
+    onSettled: (_data, _error, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(id) })
       queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
@@ -588,7 +588,7 @@ export function useUserActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: async (userId: string) => {
+    mutationFn: async (_userId: string) => {
       throw new Error('User deletion must be handled server-side')
     },
     onSuccess: () => {

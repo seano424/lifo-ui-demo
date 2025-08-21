@@ -1,23 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { AlertCircle, Bell, CreditCard, Lock, Store, User, Users } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle, Store, Bell, User, Users, CreditCard, Lock } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import UserAccountInformation from '@/components/account/user-account-information'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-
 // Import existing components - preserve all functionality
 import StoreInformation from '@/components/settings/store-information'
-import UserAccountInformation from '@/components/account/user-account-information'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import ComingSoon from '@/components/ui/coming-soon'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-
-import { useUnifiedSettings } from '@/hooks/use-unified-settings'
 import { usePermissionsNew } from '@/hooks/use-complete-user-profile'
+import { useUnifiedSettings } from '@/hooks/use-unified-settings'
 
 type TabValue = 'store' | 'account' | 'team' | 'notifications' | 'billing' | 'security'
 
@@ -115,39 +113,39 @@ export default function UnifiedSettingsPage() {
         ) : (
           <TabsList
             className="grid w-full"
-            style={{ gridTemplateColumns: `repeat(${visibleTabs()!.length}, 1fr)` }}
+            style={{ gridTemplateColumns: `repeat(${visibleTabs()?.length}, 1fr)` }}
           >
-            {visibleTabs()!.includes('store') && (
+            {visibleTabs()?.includes('store') && (
               <TabsTrigger value="store" className="flex items-center gap-2">
                 <Store className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('tabs.store')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()!.includes('account') && (
+            {visibleTabs()?.includes('account') && (
               <TabsTrigger value="account" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('tabs.account')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()!.includes('team') && (
+            {visibleTabs()?.includes('team') && (
               <TabsTrigger value="team" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('tabs.team')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()!.includes('notifications') && (
+            {visibleTabs()?.includes('notifications') && (
               <TabsTrigger value="notifications" className="flex items-center gap-2">
                 <Bell className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('tabs.notifications')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()!.includes('billing') && (
+            {visibleTabs()?.includes('billing') && (
               <TabsTrigger value="billing" className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('tabs.billing')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()!.includes('security') && (
+            {visibleTabs()?.includes('security') && (
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Lock className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('tabs.security')}</span>
@@ -176,7 +174,7 @@ export default function UnifiedSettingsPage() {
             </TabsContent>
 
             {/* Team Management Tab */}
-            {visibleTabs()!.includes('team') && (
+            {visibleTabs()?.includes('team') && (
               <TabsContent value="team" className="mt-6">
                 <StoreUsersList />
               </TabsContent>
@@ -198,7 +196,7 @@ export default function UnifiedSettingsPage() {
             </TabsContent>
 
             {/* Billing Tab (Owner only) */}
-            {visibleTabs()!.includes('billing') && (
+            {visibleTabs()?.includes('billing') && (
               <TabsContent value="billing" className="mt-6">
                 <ComingSoon
                   title={t('billing.comingSoonTitle')}
@@ -215,7 +213,7 @@ export default function UnifiedSettingsPage() {
             )}
 
             {/* Security Tab (Owner/Manager only) */}
-            {visibleTabs()!.includes('security') && (
+            {visibleTabs()?.includes('security') && (
               <TabsContent value="security" className="mt-6">
                 <ComingSoon
                   title={t('security.comingSoonTitle')}

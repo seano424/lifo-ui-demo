@@ -1,18 +1,18 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Typography } from '@/components/ui/typography'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useBatchAlerts, useBatchSummary } from '@/hooks/use-batches'
 import {
-  Package,
-  AlertTriangle,
-  TrendingDown,
-  DollarSign,
-  Calendar,
   Activity,
+  AlertTriangle,
   BarChart3,
+  Calendar,
+  DollarSign,
+  Package,
+  TrendingDown,
 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
+import { useBatchAlerts, useBatchSummary } from '@/hooks/use-batches'
 
 export function BatchDashboardStats() {
   const { totalBatches, activeBatches, expiredBatches, totalStock, totalValue } = useBatchSummary()

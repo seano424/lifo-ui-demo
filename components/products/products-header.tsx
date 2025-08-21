@@ -1,8 +1,8 @@
 'use client'
 
+import { Download, Plus } from 'lucide-react'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { Button } from '@/components/ui/button'
-import { Download, Plus } from 'lucide-react'
 
 export default function ProductsHeader({
   title,

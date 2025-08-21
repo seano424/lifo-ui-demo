@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-import { createClient } from '@/lib/supabase/client'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
 import type { CompleteUserProfile } from '@/lib/types/complete-user-profile'
 import {
-  hasStoreAccess,
-  hasCurrentStoreAccess,
   getCurrentStore,
   getPermissions,
-  isPinLocked,
-  hasGlobalRole,
-  isUserActive,
   getUserLanguage,
+  hasCurrentStoreAccess,
+  hasGlobalRole,
+  hasStoreAccess,
+  isPinLocked,
+  isUserActive,
 } from '@/lib/types/complete-user-profile'
 
 // Query key for the consolidated profile

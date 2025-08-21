@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -8,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Skeleton } from '@/components/ui/skeleton'
 
 export function BatchListSkeleton() {
   const t = useTranslations('batches.table')

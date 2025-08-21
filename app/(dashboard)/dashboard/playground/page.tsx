@@ -1,14 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { AlertTriangle, CheckCircle, Loader2, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AlertTriangle, CheckCircle, Loader2, RefreshCw } from 'lucide-react'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 // FastAPI scoring endpoints testing
@@ -128,8 +128,8 @@ async function fetchWithAuth(url: string) {
     }
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-      console.log('Using token (first 20 chars):', token.substring(0, 20) + '...')
+      headers.Authorization = `Bearer ${token}`
+      console.log('Using token (first 20 chars):', `${token.substring(0, 20)}...`)
     } else {
       console.warn('No authentication token found in localStorage')
       // Log all localStorage keys for debugging

@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { hasEnvVars } from '@/lib/utils'
 import { AuthButton } from '@/components/auth-button'
-import { Typography } from '@/components/ui/typography'
-import { ThemeSwitcher } from '@/components/theme-switcher'
 import { EnvVarWarning } from '@/components/env-var-warning'
+import { ThemeSwitcher } from '@/components/theme-switcher'
+import { Typography } from '@/components/ui/typography'
+import { hasEnvVars } from '@/lib/utils'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (

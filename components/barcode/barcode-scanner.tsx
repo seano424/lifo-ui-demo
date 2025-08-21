@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, AlertCircle, CheckCircle, StopCircle, Scan } from 'lucide-react'
+import { AlertCircle, Camera, CheckCircle, Scan, StopCircle } from 'lucide-react'
+import type React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
 import { Typography } from '@/components/ui/typography'
+import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
 import { cn } from '@/lib/utils'
 
 export interface BarcodeDetection {

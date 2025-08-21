@@ -1,13 +1,13 @@
 // TODO: Re-enable when InventoryOperations is ready
 // import { createClient } from '@/lib/supabase/server'
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 // TODO: Re-enable when InventoryOperations is ready
 // import { NextResponse } from 'next/server'
 // import { InventoryOperations } from '@/lifo-ai-core/database/operations'
 
 // TODO: Re-enable when alerts functionality is ready
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   // TODO: Re-enable when InventoryOperations is ready
   return new Response(JSON.stringify({ message: 'Alerts API temporarily disabled' }), {
     status: 501,
@@ -186,7 +186,7 @@ export async function GET(request: NextRequest) {
 
 // TODO: Re-enable when alerts functionality is ready
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function generateActionSuggestions(
+function _generateActionSuggestions(
   daysToExpiry: number,
   compositeScore: number,
   marginPercent: number,
@@ -237,7 +237,7 @@ function generateActionSuggestions(
 
 // TODO: Re-enable when alerts functionality is ready
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function calculatePriorityScore(
+function _calculatePriorityScore(
   daysToExpiry: number,
   potentialLoss: number,
   compositeScore: number,

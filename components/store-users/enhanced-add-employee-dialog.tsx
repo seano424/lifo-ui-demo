@@ -1,12 +1,34 @@
 // Enhanced Add Employee Dialog that handles both new users and existing user invitations
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useTranslations } from 'next-intl'
-import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '@/lib/queries/query-keys'
+import {
+  AlertTriangle,
+  Check,
+  Copy,
+  Crown,
+  Key,
+  Mail,
+  RefreshCw,
+  RotateCcw,
+  UserCheck,
+  UserPlus,
+  Users,
+} from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -16,32 +38,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
-import {
-  UserPlus,
-  Key,
-  Mail,
-  Copy,
-  Check,
-  AlertTriangle,
-  RefreshCw,
-  RotateCcw,
-  UserCheck,
-  Crown,
-  Users,
-} from 'lucide-react'
-import { sendWelcomeEmail, getEmailErrorMessage, type EmailSendResult } from '@/lib/email/client'
+import { type EmailSendResult, getEmailErrorMessage, sendWelcomeEmail } from '@/lib/email/client'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { createClient } from '@/lib/supabase/client'
 
 interface EnhancedAddEmployeeDialogProps {
   isOpen: boolean
@@ -233,7 +233,13 @@ export function EnhancedAddEmployeeDialog({
         setFormData(prev => ({ ...prev, username: suggested }))
       }
     }
-  }, [formData.firstName, formData.lastName, flowType, existingUser?.user_id, formData.username])
+  }, [
+    formData.firstName,
+    formData.lastName,
+    flowType,
+    formData.username,
+    generateSuggestedUsername,
+  ])
 
   // Check username availability (only for new users)
   const checkUsernameAvailability = useCallback(
@@ -811,19 +817,15 @@ export function EnhancedAddEmployeeDialog({
                       <RefreshCw className="w-4 h-4 animate-spin" />
                       {flowType === 'invite_existing' ? 'Inviting...' : t('buttons.creating')}
                     </>
+                  ) : flowType === 'invite_existing' ? (
+                    <>
+                      <UserCheck className="w-4 h-4" />
+                      Send Invitation
+                    </>
                   ) : (
                     <>
-                      {flowType === 'invite_existing' ? (
-                        <>
-                          <UserCheck className="w-4 h-4" />
-                          Send Invitation
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus className="w-4 h-4" />
-                          {t('buttons.create')}
-                        </>
-                      )}
+                      <UserPlus className="w-4 h-4" />
+                      {t('buttons.create')}
                     </>
                   )}
                 </Button>

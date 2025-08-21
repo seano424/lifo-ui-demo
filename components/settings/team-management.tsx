@@ -1,35 +1,35 @@
 'use client'
 
-import React, { useState } from 'react'
+import {
+  Activity,
+  AlertCircle,
+  Crown,
+  Shield,
+  TrendingUp,
+  User,
+  UserCheck,
+  UserPlus,
+  Users,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Typography } from '@/components/ui/typography'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
+import { useState } from 'react'
+import { StoreUsersList } from '@/components/store-users/store-users-list'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Typography } from '@/components/ui/typography'
 import { useStorePermissions } from '@/hooks/use-store-permissions'
 import {
-  useStoreUsers,
-  useStoreOwners,
-  useStoreManagers,
-  useStoreEmployees,
   useActiveStoreUsers,
+  useStoreEmployees,
+  useStoreManagers,
+  useStoreOwners,
+  useStoreUsers,
 } from '@/hooks/use-store-users'
 import type { UserStorePermissions } from '@/lib/server/permissions'
-import {
-  Users,
-  UserPlus,
-  Crown,
-  UserCheck,
-  User,
-  Shield,
-  AlertCircle,
-  TrendingUp,
-  Activity,
-} from 'lucide-react'
-import { StoreUsersList } from '@/components/store-users/store-users-list'
 
 interface TeamManagementProps {
   serverPermissions?: UserStorePermissions

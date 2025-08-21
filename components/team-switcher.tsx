@@ -1,8 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import { MapPin, Settings } from 'lucide-react'
-
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,14 +17,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { Badge } from '@/components/ui/badge'
-import { useUserStores, useStoreActions } from '@/hooks/use-stores'
-import { useStoreState } from '@/lib/stores/store-context'
+import { useStoreActions, useUserStores } from '@/hooks/use-stores'
 import type { Store } from '@/lib/queries/stores'
+import { useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
-
-import { Skeleton } from './ui/skeleton'
 import { Button } from './ui/button'
+import { Skeleton } from './ui/skeleton'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()

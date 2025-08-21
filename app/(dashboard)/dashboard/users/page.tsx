@@ -1,14 +1,14 @@
 // path: /dashboard/users/page.tsx
 
-import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchUserStores } from '@/lib/queries/stores'
-import { fetchStoreUsersPage } from '@/lib/queries/store-users'
-import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { StoreUsersList } from '@/components/store-users/store-users-list'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { StoreUsersList } from '@/components/store-users/store-users-list'
 import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchStoreUsersPage } from '@/lib/queries/store-users'
+import { fetchUserStores } from '@/lib/queries/stores'
+import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 export default async function UsersPage() {
   const { queryClient } = await createPrefetchedQuery()

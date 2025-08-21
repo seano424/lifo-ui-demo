@@ -1,11 +1,11 @@
 // hooks/use-product-lookup.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '@/lib/queries/query-keys'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   openFoodFactsClient,
-  transformOpenFoodFactsProduct,
   type ProductLookupResult,
+  transformOpenFoodFactsProduct,
 } from '@/lib/queries/open-food-facts'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 
 // Hook to lookup product by barcode with caching

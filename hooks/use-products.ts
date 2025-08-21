@@ -1,24 +1,24 @@
 // hooks/use-products.ts
 
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
+import {
+  type CreateProductData,
+  createProduct,
+  deleteProduct,
+  fetchProductById,
+  fetchProductsPage,
+  type Product,
+  type ProductFilters,
+  type ProductSort,
+  type SortDirection,
+  type SortField,
+  type UpdateProductData,
+  updateProduct,
+} from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import {
-  fetchProductsPage,
-  fetchProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  type ProductFilters,
-  type Product,
-  type ProductSort,
-  type SortField,
-  type SortDirection,
-  type CreateProductData,
-  type UpdateProductData,
-} from '@/lib/queries/products'
-import { useCallback, useState } from 'react'
 
 // ✅ FIXED: Store-aware infinite scroll products list with simplified sorting
 export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
@@ -199,7 +199,7 @@ export function useProductActions() {
       return { previousProduct, productId }
     },
 
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // Revert on error
       if (context?.previousProduct) {
         queryClient.setQueryData(
@@ -211,7 +211,7 @@ export function useProductActions() {
       toast.error(`Failed to update product: ${err.message}`)
     },
 
-    onSettled: (data, error, { productId }) => {
+    onSettled: (_data, _error, { productId }) => {
       // Always refetch after mutation
       queryClient.invalidateQueries({ queryKey: queryKeys.products.detail(productId) })
       if (activeStoreId) {
@@ -264,7 +264,7 @@ export function useProductActions() {
       return { previousProduct, productId }
     },
 
-    onError: (err, productId, context) => {
+    onError: (err, _productId, context) => {
       // Restore the product if deletion failed
       if (context?.previousProduct) {
         queryClient.setQueryData(

@@ -1,8 +1,7 @@
 'use client'
 
+import { CheckSquare, ListTodo, Minus, PackageOpen, Plus, ShoppingBag } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Plus, ShoppingBag } from 'lucide-react'
-import { Minus, CheckSquare, ListTodo, PackageOpen } from 'lucide-react'
 
 import { Typography } from '@/components/ui/typography'
 import { QuickActionCard } from './quick-action-card'

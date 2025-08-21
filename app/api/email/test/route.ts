@@ -1,6 +1,6 @@
 // app/api/email/test/route.ts
-import { NextRequest, NextResponse } from 'next/server'
-import { sendWelcomeEmail, sendPinResetEmail } from '@/lib/email/resend'
+import { type NextRequest, NextResponse } from 'next/server'
+import { sendPinResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
 
 export async function POST(request: NextRequest) {
   // Only allow in development

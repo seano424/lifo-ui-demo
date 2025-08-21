@@ -1,35 +1,35 @@
 'use client'
 
+import { addDays, formatDistanceToNow, isBefore } from 'date-fns'
+import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  DollarSign,
+  Edit,
+  Lock,
+  MapPin,
+  MoreHorizontal,
+  Package,
+  Trash2,
+  Truck,
+  XCircle,
+} from 'lucide-react'
 import { useState } from 'react'
-import { Typography } from '@/components/ui/typography'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  DollarSign,
-  Package,
-  MapPin,
-  Calendar,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Lock,
-  Truck,
-} from 'lucide-react'
-import type { BatchWithProduct } from '@/lib/queries/batches'
+import { Typography } from '@/components/ui/typography'
 import { usePermissions } from '@/hooks/use-users'
-import { formatDistanceToNow, isBefore, addDays } from 'date-fns'
-import { toast } from 'sonner'
+import type { BatchWithProduct } from '@/lib/queries/batches'
 
 interface BatchCardProps {
   batch: BatchWithProduct
@@ -146,7 +146,7 @@ export function BatchCard({
     }
 
     const newQuantity = prompt('Enter new quantity:', batch.current_quantity.toString())
-    if (newQuantity && !isNaN(Number(newQuantity)) && Number(newQuantity) >= 0) {
+    if (newQuantity && !Number.isNaN(Number(newQuantity)) && Number(newQuantity) >= 0) {
       onUpdateQuantity(Number(newQuantity))
     }
   }
@@ -158,10 +158,10 @@ export function BatchCard({
     }
 
     const costPrice = prompt('Enter cost price:', batch.cost_price.toString())
-    if (!costPrice || isNaN(Number(costPrice))) return
+    if (!costPrice || Number.isNaN(Number(costPrice))) return
 
     const sellingPrice = prompt('Enter selling price:', batch.selling_price.toString())
-    if (!sellingPrice || isNaN(Number(sellingPrice))) return
+    if (!sellingPrice || Number.isNaN(Number(sellingPrice))) return
 
     onUpdatePrice(Number(costPrice), Number(sellingPrice))
   }

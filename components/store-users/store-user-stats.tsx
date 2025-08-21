@@ -1,17 +1,17 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Crown, Shield, Store, TrendingUp, User, UserCheck, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  useStoreUsers,
-  useStoreOwners,
-  useStoreManagers,
-  useStoreEmployees,
-  usePinEnabledUsers,
   useActiveStoreUsers,
+  usePinEnabledUsers,
+  useStoreEmployees,
+  useStoreManagers,
+  useStoreOwners,
+  useStoreUsers,
 } from '@/hooks/use-store-users'
 import { useStoreState } from '@/lib/stores/store-context'
-import { Users, Crown, UserCheck, User, Shield, TrendingUp, Store } from 'lucide-react'
 
 export function StoreUserStats() {
   const { activeStore } = useStoreState()

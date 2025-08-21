@@ -1,17 +1,14 @@
 'use client'
 
+import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Loader2, AlertTriangle, ArrowRightFromLine, TrendingUp } from 'lucide-react'
-
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useStoreInsights } from '@/hooks/use-store-insights'
-
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
+import { useStoreInsights } from '@/hooks/use-store-insights'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { ActionableBatchesEnhanced } from './actionable-batches-enhanced'
 
 interface StoreInsightsDashboardProps {

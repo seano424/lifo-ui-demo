@@ -5,14 +5,14 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import {
+  type InventorySubmissionResult,
+  type ScannedProductData,
+  submitMultipleScannedProducts,
+  submitScannedProductToInventory,
+} from '@/lib/queries/inventory'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import {
-  submitScannedProductToInventory,
-  submitMultipleScannedProducts,
-  type ScannedProductData,
-  type InventorySubmissionResult,
-} from '@/lib/queries/inventory'
 
 /**
  * Hook for submitting a single scanned product to inventory

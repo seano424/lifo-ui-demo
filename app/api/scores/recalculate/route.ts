@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lib/database/operations'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
+import { InventoryOperations } from '@/lib/database/operations'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -116,9 +116,7 @@ async function calculateScoresTypeScript(
 
         // Calculate days to expiry
         const expiryDate = new Date(batch.expiry_date)
-        const daysToExpiry = Math.floor(
-          (expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-        )
+        const daysToExpiry = Math.floor((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
 
         // Get category weights
         const { data: categoryWeights } = await supabase

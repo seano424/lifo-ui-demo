@@ -1,5 +1,5 @@
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
 import type { BatchSort, BatchSortField } from '@/lib/queries/batches'
 
 interface SortableHeaderProps {

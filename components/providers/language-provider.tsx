@@ -14,7 +14,7 @@ export function LanguageProvider({
 
   useEffect(() => {
     initializeLanguage()
-  }, [userId, initializeLanguage])
+  }, [initializeLanguage])
 
   return <>{children}</>
 }

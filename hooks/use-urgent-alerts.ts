@@ -2,8 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 import { fetchUrgentAlerts, type UrgentAlertData } from '@/lib/queries/urgent-alerts'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 // Store-aware urgent alerts hook
 export function useUrgentAlerts() {

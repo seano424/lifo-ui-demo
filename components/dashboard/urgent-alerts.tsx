@@ -1,14 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
 import { useUrgentAlerts } from '@/hooks/use-urgent-alerts'
 import { getAlertMessage } from '@/lib/queries/urgent-alerts'
-
-import { Typography } from '@/components/ui/typography'
 
 export function UrgentAlerts() {
   const { data, isLoading } = useUrgentAlerts()

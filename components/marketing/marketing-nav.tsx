@@ -1,10 +1,8 @@
 'use client'
 
-import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
-import { NavbarLogo } from '@/components/ui/logo'
 import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +10,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
+import { NavbarLogo } from '@/components/ui/logo'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -24,7 +24,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { hasEnvVars } from '@/lib/utils'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
-import Link from 'next/link'
 
 interface MenuItem {
   title: string

@@ -1,10 +1,10 @@
 // hooks/use-store-permissions.ts - IMPROVED VERSION (Hydration Safe)
 import { useQuery } from '@tanstack/react-query'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useCurrentUser } from '@/hooks/use-users'
-import { createClient } from '@/lib/supabase/client'
-import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useEffect, useState } from 'react'
+import { useCurrentUser } from '@/hooks/use-users'
+import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
 
 interface UseStorePermissionsOptions {
   serverPermissions?: UserStorePermissions // Server-computed permissions as fallback

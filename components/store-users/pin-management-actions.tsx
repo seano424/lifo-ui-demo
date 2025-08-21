@@ -2,9 +2,12 @@
 
 'use client'
 
+import { AlertTriangle, Check, Copy, Key, Lock, Mail, RefreshCw, Unlock } from 'lucide-react'
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { toast } from 'sonner'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -13,14 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
-import { Key, RefreshCw, Unlock, Lock, Copy, Check, AlertTriangle, Mail } from 'lucide-react'
-import { sendPinResetEmail, getEmailErrorMessage, type EmailSendResult } from '@/lib/email/client'
-
-import { type StoreUser } from '@/lib/queries/store-users'
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { type EmailSendResult, getEmailErrorMessage, sendPinResetEmail } from '@/lib/email/client'
+import type { StoreUser } from '@/lib/queries/store-users'
+import { createClient } from '@/lib/supabase/client'
 
 interface PINManagementActionsProps {
   user: StoreUser

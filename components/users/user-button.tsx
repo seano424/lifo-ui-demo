@@ -1,9 +1,9 @@
 'use client'
 
+import { UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser } from '@/hooks/use-users'
-import { UserIcon } from 'lucide-react'
 
 export default function UserButton() {
   const { data: user, isLoading, isError } = useCurrentUser()

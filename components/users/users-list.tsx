@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { Typography } from '@/components/ui/typography'
-import { useUsers, useUserActions } from '@/hooks/use-users'
 import { UserCard } from '@/components/users/user-card'
 import { UserFilters } from '@/components/users/user-filters'
+import { useUserActions, useUsers } from '@/hooks/use-users'
 import type { UserFilters as UserFiltersType } from '@/lib/queries/users'
 
 export function UsersList() {

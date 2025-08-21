@@ -1,7 +1,7 @@
-import Link from 'next/link'
-import { TutorialStep } from './tutorial-step'
 import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
 import { Typography } from '@/components/ui/typography'
+import { TutorialStep } from './tutorial-step'
 
 export function SignUpUserSteps() {
   return (

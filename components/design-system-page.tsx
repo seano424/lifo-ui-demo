@@ -1,7 +1,7 @@
+import { Grid, Layers, Palette, Type } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { Palette, Type, Grid, Layers } from 'lucide-react'
 
 export default function DesignSystemPage() {
   const brandColors = [

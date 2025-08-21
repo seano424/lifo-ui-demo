@@ -1,16 +1,16 @@
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import {
-  fetchStoreUsersPage,
-  fetchStoreUserById,
-  updateStoreUser,
-  removeUserFromStore,
   addUserToStore,
+  fetchStoreUserById,
+  fetchStoreUsersPage,
+  removeUserFromStore,
   type StoreUser,
   type StoreUserFilters,
+  updateStoreUser,
 } from '@/lib/queries/store-users'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 // ✅ READING DATA - Store-aware infinite scroll users list
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
@@ -185,7 +185,7 @@ export function useStoreUserActions() {
       return { previousStoreUser, activeStoreId, userId }
     },
 
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // Revert on error
       if (context?.previousStoreUser && context?.activeStoreId && context?.userId) {
         queryClient.setQueryData(
@@ -197,7 +197,7 @@ export function useStoreUserActions() {
       toast.error(`Failed to update user: ${err.message}`)
     },
 
-    onSettled: (data, error, { userId }) => {
+    onSettled: (_data, _error, { userId }) => {
       if (!activeStoreId) return
 
       // Always refetch after mutation

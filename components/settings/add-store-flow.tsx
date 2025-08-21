@@ -1,14 +1,13 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { ArrowLeftIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle } from 'lucide-react'
-import { useAddStoreStore, type StoreFormData } from '@/lib/stores/add-store-store'
-import { AddStoreSearchStep } from '@/components/settings/add-store-search-step'
+import { AlertCircle, ArrowLeftIcon } from 'lucide-react'
 import { AddStoreDetailsStep } from '@/components/settings/add-store-details-step'
+import { AddStoreSearchStep } from '@/components/settings/add-store-search-step'
 import { AddStoreSuccess } from '@/components/settings/add-store-success'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { type StoreFormData, useAddStoreStore } from '@/lib/stores/add-store-store'
+import { cn } from '@/lib/utils'
 
 export function AddStoreFlow() {
   const {

@@ -1,5 +1,8 @@
 'use client'
 
+import { Filter, Search, X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,9 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { X, Search, Filter } from 'lucide-react'
 import type { StoreUserFilters as StoreUserFiltersType } from '@/lib/queries/store-users'
 
 interface StoreUserFiltersProps {

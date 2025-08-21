@@ -1,15 +1,14 @@
 import { HydrationBoundary } from '@tanstack/react-query'
+import { BellIcon } from 'lucide-react'
 import { AppSidebar } from '@/components/app-sidebar'
-import { Separator } from '@/components/ui/separator'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
-
-import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 import { SettingsError } from '@/components/settings/settings-error-boundary'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { Button } from '@/components/ui/button'
-import { BellIcon } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import UserButton from '@/components/users/user-button'
+import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const dashboardData = await prefetchDashboardData()

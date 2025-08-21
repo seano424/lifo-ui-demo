@@ -1,12 +1,13 @@
 'use client'
 
+import { Euro, GiftIcon, type LucideIcon, Trash2, ZapIcon } from 'lucide-react'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
+import type { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
+import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
-import { Euro, Trash2, GiftIcon, LucideIcon, ZapIcon } from 'lucide-react'
+
 interface KPICardProps {
   icon: 'euro' | 'sales' | 'donation' | 'waste'
   label: string

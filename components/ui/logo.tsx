@@ -1,9 +1,9 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
+import { cn } from '@/lib/utils'
 import { Typography } from './typography'
 
 type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text'
