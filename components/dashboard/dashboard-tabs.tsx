@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ProductTable } from '@/components/products/product-table'
-import { BatchAnalytics } from '@/components/batches/batch-analysis'
 import { ActionLog } from '@/components/actions/action-log'
 import { AddProductForm } from '@/components/actions/add-product-form'
+import { BatchAnalytics } from '@/components/batches/batch-analysis'
+import { ProductTable } from '@/components/products/product-table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function DashboardTabs() {
   const [activeTab, setActiveTab] = useState('dashboard')

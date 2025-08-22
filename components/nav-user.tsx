@@ -1,9 +1,8 @@
 'use client'
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Sparkles, Globe } from 'lucide-react'
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Globe, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { LogoutButton } from '@/components/logout-button'
-import { LanguageButtonGroup } from '@/components/ui/language-switcher'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -14,13 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { LanguageButtonGroup } from '@/components/ui/language-switcher'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { User } from '@/lib/types/user'
+import type { User } from '@/lib/types/user'
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()

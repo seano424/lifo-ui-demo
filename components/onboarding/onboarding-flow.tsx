@@ -1,13 +1,13 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import { ArrowLeftIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { StoreSearchStep } from '@/components/onboarding/store-search-step'
-import { StoreTypeStep } from '@/components/onboarding/store-type-step'
 import { ConfirmDetailsStep } from '@/components/onboarding/confirm-details-step'
 import { OnboardingSignUpForm } from '@/components/onboarding/onboarding-signup-form'
+import { StoreSearchStep } from '@/components/onboarding/store-search-step'
+import { StoreTypeStep } from '@/components/onboarding/store-type-step'
+import { Button } from '@/components/ui/button'
+import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { cn } from '@/lib/utils'
 
 export function OnboardingFlow() {
   const { currentStep, setCurrentStep, businessCheckResult } = useOnboardingStore()
@@ -35,6 +35,7 @@ export function OnboardingFlow() {
 
             return (
               <button
+                type="button"
                 onClick={() => isAccessible && setCurrentStep(stepNumber)}
                 key={step.label}
                 disabled={!isAccessible}

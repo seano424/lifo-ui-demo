@@ -1,21 +1,17 @@
 'use client'
 
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, Check, Edit, Globe, X } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import React, { useState, useEffect } from 'react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Edit, Check, X, AlertCircle, Globe } from 'lucide-react'
-
+import { z } from 'zod'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Typography } from '@/components/ui/typography'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
@@ -23,11 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import type { UserStorePermissions } from '@/lib/server/permissions'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
+import { Typography } from '@/components/ui/typography'
+import { useStoreActions, useStorePermissions, useStoreSettings } from '@/hooks/use-store-settings'
 import { useCurrentUser } from '@/hooks/use-users'
-import { useStoreSettings, useStoreActions, useStorePermissions } from '@/hooks/use-store-settings'
+import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createSkeletonKeys } from '@/lib/utils/skeleton-keys'
 
 // Interface for server permissions prop
 interface StoreInformationProps {
@@ -266,8 +265,8 @@ export default function StoreInformation({
         </CardHeader>
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="space-y-2">
+            {createSkeletonKeys(8, 'field').map(skeleton => (
+              <div key={skeleton.id} className="space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
               </div>

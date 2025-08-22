@@ -1,5 +1,5 @@
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import type { ProductSort, SortField } from '@/lib/queries/products'
 import { cn } from '@/lib/utils'
 

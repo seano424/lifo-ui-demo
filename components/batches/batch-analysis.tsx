@@ -1,10 +1,10 @@
 'use client'
 
+import { BarChart3, TrendingDown, TrendingUp } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
-import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react'
 import { sampleBatchPerformance } from '@/lib/sample-data'
 
 export function BatchAnalytics() {

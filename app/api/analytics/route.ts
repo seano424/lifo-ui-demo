@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lib/database/operations'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
+import { InventoryOperations } from '@/lib/database/operations'
+import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 // Helper type for joined batch with optional products and product_scores
@@ -364,7 +364,7 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
       }
 
       const daysToExpiry = Math.floor(
-        (new Date(b.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+        (new Date(b.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
       )
 
       const score = b.product_scores?.[0]?.composite_score || 0

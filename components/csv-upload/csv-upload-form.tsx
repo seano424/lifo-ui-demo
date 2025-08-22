@@ -1,27 +1,27 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import {
-  Upload,
-  FileCheck,
   CheckCircle,
-  Zap,
-  Clock,
-  SkipForward,
   ChevronLeft,
   ChevronRight,
-  Plus,
+  Clock,
+  FileCheck,
   Minus,
+  Plus,
+  SkipForward,
+  Upload,
+  Zap,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useCSVUpload } from '@/hooks/use-csv-upload'
-import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { useCSVUpload } from '@/hooks/use-csv-upload'
+import { cn } from '@/lib/utils'
 import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
@@ -68,7 +68,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     setDragActive(false)
 
     const files = e.dataTransfer.files
-    if (files && files[0]) {
+    if (files?.[0]) {
       await handleFileSelect(files[0])
     }
   }
@@ -471,15 +471,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             {/* Success Summary */}
             <div className="text-center p-3 bg-white rounded border border-green-300">
               <p className="text-green-800 font-medium">
-                {uploadResult.processed || 0 > 0
-                  ? t('results.successSummary', { processed: uploadResult.processed || 0 })
+                {(uploadResult.processed || 0) > 0
+                  ? t('results.successSummary', {
+                      processed: uploadResult.processed || 0,
+                    })
                   : t('results.uploadCompleted')}
                 {(uploadResult.skipped || 0) > 0 &&
-                  t('results.duplicatesSkipped', { skipped: uploadResult.skipped })}
+                  t('results.duplicatesSkipped', {
+                    skipped: uploadResult.skipped,
+                  })}
               </p>
               {uploadResult.processing_time_ms && (
                 <p className="text-sm text-green-600 mt-1">
-                  {t('results.completedIn', { time: uploadResult.processing_time_ms })}
+                  {t('results.completedIn', {
+                    time: uploadResult.processing_time_ms,
+                  })}
                 </p>
               )}
             </div>
@@ -526,7 +532,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {uploadResult.performance_metrics.duplicate_detection_ms > 0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-orange-600">
-                        {uploadResult.performance_metrics.duplicate_detection_ms}ms
+                        {uploadResult.performance_metrics.duplicate_detection_ms}
+                        ms
                       </div>
                       <div className="text-gray-600">{t('results.performance.duplicateCheck')}</div>
                     </div>
@@ -534,7 +541,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {uploadResult.performance_metrics.product_resolution_ms > 0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-cyan-600">
-                        {uploadResult.performance_metrics.product_resolution_ms}ms
+                        {uploadResult.performance_metrics.product_resolution_ms}
+                        ms
                       </div>
                       <div className="text-gray-600">
                         {t('results.performance.productResolution')}
@@ -564,7 +572,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     uploadResult.performance_metrics.database_processing_time_ms > 0 && (
                       <div className="text-center p-2 bg-gray-50 rounded">
                         <div className="font-bold text-purple-600">
-                          {uploadResult.performance_metrics.database_processing_time_ms}ms
+                          {uploadResult.performance_metrics.database_processing_time_ms}
+                          ms
                         </div>
                         <div className="text-gray-600">{t('results.performance.dbProcessing')}</div>
                       </div>
@@ -607,7 +616,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       index: number,
                     ) => (
                       <div
-                        key={index}
+                        key={`duplicate-${dup.sku || index}`}
                         className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
                       >
                         <div className="font-semibold">

@@ -1,16 +1,22 @@
+import {
+  type InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useInfiniteQuery, useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import {
-  fetchStoreUsersPage,
-  fetchStoreUserById,
-  updateStoreUser,
-  removeUserFromStore,
   addUserToStore,
+  fetchStoreUserById,
+  fetchStoreUsersPage,
+  removeUserFromStore,
   type StoreUser,
   type StoreUserFilters,
+  updateStoreUser,
 } from '@/lib/queries/store-users'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 // ✅ READING DATA - Store-aware infinite scroll users list
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
@@ -167,12 +173,12 @@ export function useStoreUserActions() {
       // ✅ Also update in store-specific infinite query caches (same as products)
       queryClient.setQueriesData(
         { queryKey: queryKeys.storeUsers.byStore(activeStoreId) }, // ✅ Centralized keys
-        (oldData: any) => {
+        (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
           if (!oldData) return oldData
 
           return {
             ...oldData,
-            pages: oldData.pages.map((page: any) => ({
+            pages: oldData.pages.map(page => ({
               ...page,
               data: page.data.map((user: StoreUser) =>
                 user.user_id === userId ? { ...user, ...updates } : user,
@@ -185,7 +191,7 @@ export function useStoreUserActions() {
       return { previousStoreUser, activeStoreId, userId }
     },
 
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // Revert on error
       if (context?.previousStoreUser && context?.activeStoreId && context?.userId) {
         queryClient.setQueryData(
@@ -197,7 +203,7 @@ export function useStoreUserActions() {
       toast.error(`Failed to update user: ${err.message}`)
     },
 
-    onSettled: (data, error, { userId }) => {
+    onSettled: (_data, _error, { userId }) => {
       if (!activeStoreId) return
 
       // Always refetch after mutation
@@ -250,7 +256,6 @@ export function useStoreUserActions() {
       userId,
       roleInStore,
       permissions,
-      assignedBy,
     }: {
       userId: string
       roleInStore: 'owner' | 'manager' | 'employee' | 'staff'

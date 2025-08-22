@@ -1,8 +1,8 @@
 'use client'
 
+import { Typography } from '@/components/ui/typography'
 import { useUserRoles } from '@/hooks/use-users'
 import type { User } from '@/lib/types/user'
-import { Typography } from '@/components/ui/typography'
 
 interface UserCardProps {
   user: User
@@ -21,10 +21,10 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
 
   const getDisplayName = (user: User): string => {
     // Priority: full_name -> username -> email
-    if (user.full_name && user.full_name.trim()) {
+    if (user.full_name?.trim()) {
       return user.full_name
     }
-    if (user.username && user.username.trim()) {
+    if (user.username?.trim()) {
       return user.username
     }
     return user.email || 'Unknown User'
@@ -33,7 +33,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
   const getInitials = (user: User): string => {
     const displayName = getDisplayName(user)
 
-    if (user.full_name && user.full_name.includes(' ')) {
+    if (user.full_name?.includes(' ')) {
       // For full names with spaces, take first letter of each word
       return user.full_name
         .split(' ')
@@ -119,7 +119,10 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
         ) : roles.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {roles.map((role, index) => (
-              <span key={index} className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded">
+              <span
+                key={role || `role-${index}`}
+                className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded"
+              >
                 {role}
               </span>
             ))}
@@ -143,6 +146,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
       {/* Actions */}
       <div className="flex gap-2">
         <button
+          type="button"
           className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
           disabled={isUpdating}
         >
@@ -151,6 +155,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
 
         {user.is_active ? (
           <button
+            type="button"
             onClick={onDeactivate}
             disabled={isUpdating}
             className="px-3 py-2 text-sm text-red-600 border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50"
@@ -159,6 +164,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
           </button>
         ) : (
           <button
+            type="button"
             onClick={onActivate}
             disabled={isUpdating}
             className="px-3 py-2 text-sm text-green-600 border border-green-300 rounded-lg hover:bg-green-50 disabled:opacity-50"

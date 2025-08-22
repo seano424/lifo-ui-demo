@@ -1,10 +1,10 @@
 // hooks/use-store-permissions.ts - IMPROVED VERSION (Hydration Safe)
 import { useQuery } from '@tanstack/react-query'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useCurrentUser } from '@/hooks/use-users'
-import { createClient } from '@/lib/supabase/client'
-import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useEffect, useState } from 'react'
+import { useCurrentUser } from '@/hooks/use-users'
+import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
 
 interface UseStorePermissionsOptions {
   serverPermissions?: UserStorePermissions // Server-computed permissions as fallback
@@ -111,7 +111,7 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
     },
     enabled: enabled && !!activeStoreId && !!currentUser?.id && !userLoading && isHydrated,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       // Don't retry on permission errors
       if (error?.message?.includes('No access') || error?.message?.includes('permission denied')) {
         return false

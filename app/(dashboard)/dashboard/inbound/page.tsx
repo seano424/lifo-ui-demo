@@ -1,12 +1,12 @@
 'use client'
 
-import { Card } from '@/components/ui/card'
 import { Scan, Upload } from 'lucide-react'
-import { useStoreState } from '@/lib/stores/store-context'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
+import { Card } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useStoreState } from '@/lib/stores/store-context'
 
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()

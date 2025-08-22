@@ -1,8 +1,8 @@
 'use client'
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
 import { ArrowRight, Calendar, Check, Clock, Shield, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 
 interface CtaFeatureProps {
   icon: React.ReactNode

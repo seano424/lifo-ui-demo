@@ -1,7 +1,7 @@
 'use client'
 
-import { useUsers, useActiveUsers, useInactiveUsers } from '@/hooks/use-users'
 import { Typography } from '@/components/ui/typography'
+import { useActiveUsers, useInactiveUsers, useUsers } from '@/hooks/use-users'
 
 export function UserStats() {
   const { count: totalUsers } = useUsers({}, 1) // Just get count, minimal page size

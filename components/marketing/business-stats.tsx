@@ -1,6 +1,6 @@
 'use client'
-import { Typography } from '@/components/ui/typography'
 import { useTranslations } from 'next-intl'
+import { Typography } from '@/components/ui/typography'
 
 interface StatProps {
   label: string

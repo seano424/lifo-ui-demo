@@ -1,19 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-import { useProducts } from '@/hooks/use-products'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import type { ProductSort, ProductFilters, SortField } from '@/lib/queries/products'
-
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ProductTable } from '@/components/products/products-table'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useEffect, useState } from 'react'
 import { ProductListFilters } from '@/components/products/product-list-filters'
 import { ProductListSortControls } from '@/components/products/product-list-sort-controls'
+import { ProductTable } from '@/components/products/products-table'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { useProducts } from '@/hooks/use-products'
+import type { ProductFilters, ProductSort, SortField } from '@/lib/queries/products'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface ProductsFilteredListProps {
   initialFilters?: {

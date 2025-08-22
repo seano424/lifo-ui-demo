@@ -1,6 +1,6 @@
 'use client'
 
-import { Store, MapPin, Building2 } from 'lucide-react'
+import { Building2, MapPin, Store } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useStoreState } from '@/lib/stores/store-context'

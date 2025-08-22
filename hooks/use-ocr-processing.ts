@@ -5,13 +5,13 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query'
 import {
-  extractExpiryDate,
-  performFullOCRAnalysis,
-  extractTextOnly,
   checkBackendHealth,
-  OCRError,
+  extractExpiryDate,
+  extractTextOnly,
+  type OCRError,
+  performFullOCRAnalysis,
 } from '@/lib/api/ocr-client'
-import { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
+import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 
 // Query keys for React Query caching
 export const ocrQueryKeys = {

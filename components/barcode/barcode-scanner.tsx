@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Camera, AlertCircle, CheckCircle, StopCircle, Scan } from 'lucide-react'
+import { AlertCircle, Camera, CheckCircle, Scan, StopCircle } from 'lucide-react'
+import type React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
 import { Typography } from '@/components/ui/typography'
+import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
 import { cn } from '@/lib/utils'
 
 export interface BarcodeDetection {
@@ -399,7 +400,7 @@ export default function BarcodeScanner({
             <div className="space-y-1">
               {scanningHistory.map((barcode, index) => (
                 <div
-                  key={`${barcode}-${index}`}
+                  key={`scan-${barcode}-${Date.now()}-${index}`}
                   className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
                 >
                   <span className="font-mono">{barcode}</span>

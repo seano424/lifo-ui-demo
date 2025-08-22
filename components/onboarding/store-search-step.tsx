@@ -1,17 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { CardContent } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Typography } from '@/components/ui/typography'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useDebouncedValue } from '@/hooks/use-debounce-search'
 import { useGooglePlaces } from '@/hooks/use-google-places'
 import type { PlaceAutocompleteResult } from '@/lib/services/google-places'
 import type { StoreFormData } from '@/lib/stores/onboarding-store'
+import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 
 type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 'error'
 
@@ -139,6 +139,7 @@ export function StoreSearchStep() {
           <div className="max-h-[300px] overflow-y-auto border shadow-lg divide-y divide-border rounded-lg bg-background">
             {searchResults.map(place => (
               <button
+                type="button"
                 key={place.place_id}
                 className="cursor-pointer hover:bg-accent transition-colors w-full text-left disabled:opacity-50"
                 onClick={() => handlePlaceSelect(place)}

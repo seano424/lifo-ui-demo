@@ -1,14 +1,14 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { fetchProductsPage } from '@/lib/queries/products'
-import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
-import { queryKeys } from '@/lib/queries/query-keys'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { redirect } from 'next/navigation'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { ProductSortList } from '@/components/products/product-sort-list'
 import { StoreHeaderDisplay } from '@/components/stores/store-header-display'
 import { Button } from '@/components/ui/button'
-import { redirect } from 'next/navigation'
+import { fetchProductsPage } from '@/lib/queries/products'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
+import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 export default async function ProductsPage() {
   const { queryClient } = await createPrefetchedQuery()

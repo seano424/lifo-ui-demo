@@ -1,17 +1,18 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Crown, Shield, Store, TrendingUp, User, UserCheck, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  useStoreUsers,
-  useStoreOwners,
-  useStoreManagers,
-  useStoreEmployees,
-  usePinEnabledUsers,
   useActiveStoreUsers,
+  usePinEnabledUsers,
+  useStoreEmployees,
+  useStoreManagers,
+  useStoreOwners,
+  useStoreUsers,
 } from '@/hooks/use-store-users'
 import { useStoreState } from '@/lib/stores/store-context'
-import { Users, Crown, UserCheck, User, Shield, TrendingUp, Store } from 'lucide-react'
+import { createSkeletonKeys } from '@/lib/utils/skeleton-keys'
 
 export function StoreUserStats() {
   const { activeStore } = useStoreState()
@@ -53,10 +54,12 @@ export function StoreUserStats() {
   }
 
   if (isLoading) {
+    const skeletonCards = createSkeletonKeys(4, 'card')
+
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
-          <Card key={i}>
+        {skeletonCards.map(skeleton => (
+          <Card key={skeleton.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
               <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />

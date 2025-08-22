@@ -1,5 +1,6 @@
 'use client'
 
+import { AlertTriangle, Clock, Heart, Loader2, Percent } from 'lucide-react'
 import { useState } from 'react'
 import { useScoringRecommendations } from '@/hooks/use-fastapi-scoring'
 import type { ScoringAlert } from '@/hooks/use-fastapi-scoring'
@@ -7,8 +8,7 @@ import { useActiveDonationRecipients, useDonationAction } from '@/hooks/use-dona
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -24,8 +25,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Loader2, AlertTriangle, Heart, Percent, Clock } from 'lucide-react'
+import { useActiveDonationRecipients, useDonationAction } from '@/hooks/use-donations'
+import { useActionableBatches } from '@/hooks/use-store-insights'
+import type { ActionableBatch } from '@/lib/queries/store-insights'
 
 interface ActionableBatchesEnhancedProps {
   storeId: string

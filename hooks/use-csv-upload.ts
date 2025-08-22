@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface CSVUploadResponse {
@@ -85,7 +85,7 @@ export function useCSVUpload() {
     })
 
     const hasExpiryColumn = expiryIndex >= 0
-    let itemsWithoutExpiry = 0
+    let _itemsWithoutExpiry = 0
 
     console.log(`🔍 [USE-CSV-UPLOAD] Processing all ${lines.length - 1} rows...`)
 
@@ -93,14 +93,14 @@ export function useCSVUpload() {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
       const expiryValue = values[expiryIndex] || ''
       if (!expiryValue) {
-        itemsWithoutExpiry++
+        _itemsWithoutExpiry++
       }
 
       const previewItem = {
         SKU: values[skuIndex] || `AUTO-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
         Category: values[categoryIndex] || 'dry_goods',
-        Quantity: parseInt(values[qtyIndex] || '1') || 1,
+        Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
         Expiry_Date: expiryValue,
       }
 

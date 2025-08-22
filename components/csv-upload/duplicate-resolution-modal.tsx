@@ -1,5 +1,10 @@
 'use client'
 
+import { AlertTriangle, Package, Plus, X } from 'lucide-react'
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -8,14 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { AlertTriangle, Package, Plus, X } from 'lucide-react'
-import { DuplicateWarning, DuplicateAction, DuplicateResolution } from '@/types/duplicate-detection'
-import { useState } from 'react'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import type {
+  DuplicateAction,
+  DuplicateResolution,
+  DuplicateWarning,
+} from '@/types/duplicate-detection'
 
 interface DuplicateResolutionModalProps {
   open: boolean

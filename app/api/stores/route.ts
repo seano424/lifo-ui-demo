@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import { createClient } from '@/lib/supabase/server'
 
 // GET /api/stores - List user's stores
 export async function GET() {

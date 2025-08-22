@@ -1,12 +1,12 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Home } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 
 export default function NotFound() {
   const t = useTranslations('errors')

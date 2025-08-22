@@ -1,9 +1,9 @@
 // app/api/email/send-pin-reset/route.ts
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { sendPinResetEmail } from '@/lib/email/resend'
+import { type NextRequest, NextResponse } from 'next/server'
 import type { EmailCredentials } from '@/lib/email/client'
+import { sendPinResetEmail } from '@/lib/email/resend'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,15 +1,13 @@
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-
-import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
-import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchProductsPage, type ProductFilters, type SortField } from '@/lib/queries/products'
-import { fetchUserStores, fetchUserPreferences } from '@/lib/queries/stores'
-
-import ProductsHeader from '@/components/products/products-header'
-import { ProductsFilteredList } from '@/components/products/products-filtered-list'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
+import { ProductsFilteredList } from '@/components/products/products-filtered-list'
+import ProductsHeader from '@/components/products/products-header'
+import { fetchProductsPage, type ProductFilters, type SortField } from '@/lib/queries/products'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
+import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 interface InventoryProductsPageProps {
   searchParams: Promise<{

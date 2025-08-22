@@ -1,11 +1,11 @@
 // hooks/use-product-lookup.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '@/lib/queries/query-keys'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   openFoodFactsClient,
-  transformOpenFoodFactsProduct,
   type ProductLookupResult,
+  transformOpenFoodFactsProduct,
 } from '@/lib/queries/open-food-facts'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 
 // Hook to lookup product by barcode with caching
@@ -160,7 +160,7 @@ export function useVerifyProduct() {
     }) => {
       const supabase = createClient()
 
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         is_verified: isCorrect,
         verification_count: isCorrect ? 1 : 0,
         last_verified: new Date().toISOString(),
@@ -173,7 +173,7 @@ export function useVerifyProduct() {
 
         // Update the open_food_facts_data as well
         updateData.open_food_facts_data = {
-          ...updateData.open_food_facts_data,
+          ...(updateData.open_food_facts_data || {}),
           product_name: corrections.product_name,
           brands: corrections.brand,
           categories: corrections.category,

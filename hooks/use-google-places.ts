@@ -1,6 +1,6 @@
 // hooks/use-google-places.ts
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import {
   googlePlacesService,
   type PlaceAutocompleteResult,

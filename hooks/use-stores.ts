@@ -1,18 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import { setActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
-  fetchUserStores,
   fetchStoreById,
   fetchUserPreferences,
-  updateUserPrimaryStore,
-  selectDefaultStore,
+  fetchUserStores,
   type Store,
+  selectDefaultStore,
+  updateUserPrimaryStore,
 } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
-import { setActiveStoreCookie } from '@/lib/actions/store-actions'
 
 const ACTIVE_STORE_KEY = 'activeStoreId'
 
@@ -59,8 +59,8 @@ export function useUserStores() {
   const userStoresResult = useQuery({
     queryKey: queryKeys.stores.userStores(currentUser?.id || ''),
     queryFn: () => {
-      console.log('[useUserStores] Fetching stores for user:', currentUser!.id)
-      return fetchUserStores(currentUser!.id)
+      console.log('[useUserStores] Fetching stores for user:', currentUser?.id)
+      return fetchUserStores(currentUser?.id || '')
     },
     enabled: !!currentUser?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -130,6 +130,7 @@ export function useUserStores() {
     setActiveStore,
     setUserStores,
     setLoadingStores,
+    userStoresResult.isLoading,
   ])
 
   return {

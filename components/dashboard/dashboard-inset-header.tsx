@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
+import { cn } from '@/lib/utils'
 
 export default function DashboardInsetHeader({
   title,

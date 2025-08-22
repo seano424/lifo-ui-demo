@@ -1,14 +1,14 @@
 'use client'
 
+import { Filter } from 'lucide-react'
 import { useState } from 'react'
-import { ProductsListPresentation } from './product-list-presentation'
-import { ProductsSortToolbar, QuickSortButtons } from './product-sort-toolbar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { useProductsWithSort } from '@/hooks/use-products'
-import { Filter } from 'lucide-react'
 import type { ProductSort } from '@/lib/queries/products'
+import { ProductsListPresentation } from './product-list-presentation'
+import { ProductsSortToolbar, QuickSortButtons } from './product-sort-toolbar'
 
 interface ProductSortListProps {
   initialSort?: ProductSort

@@ -1,11 +1,11 @@
 // app/(onboarding)/onboarding/success/page.tsx
 
-import { Suspense } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
-import { CheckCircle, Mail, ArrowRight } from 'lucide-react'
+import { ArrowRight, CheckCircle, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 
 function SuccessContent() {
   return (

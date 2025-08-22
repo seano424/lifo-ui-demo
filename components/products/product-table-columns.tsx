@@ -1,9 +1,10 @@
 'use client'
 
-import { Package, Euro, MoreHorizontal, Eye, Edit, Trash2, Tag, Building2 } from 'lucide-react'
 import type { ColumnDef, Header } from '@tanstack/react-table'
-import type { Product, ProductSort, SortField } from '@/lib/queries/products'
-
+import { Building2, Edit, Euro, Eye, MoreHorizontal, Package, Tag, Trash2 } from 'lucide-react'
+import { SortableHeader } from '@/components/products/sortable-header'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { SortableHeader } from '@/components/products/sortable-header'
+import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 interface ColumnResizerProps {
   header: Header<Product, unknown>
@@ -281,7 +280,7 @@ export function createProductTableColumns({
               onClick={() => {
                 const currentPrice = row.original.base_selling_price || 0
                 const newPrice = prompt('Enter new price (€):', currentPrice.toString())
-                if (newPrice && !isNaN(Number(newPrice))) {
+                if (newPrice && !Number.isNaN(Number(newPrice))) {
                   updateProductPrice(row.original.product_id, Number(newPrice))
                 }
               }}

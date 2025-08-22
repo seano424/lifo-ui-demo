@@ -1,7 +1,7 @@
 'use client'
 
+import { Plus, Scan } from 'lucide-react'
 import type React from 'react'
-
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Plus, Scan } from 'lucide-react'
 
 export function AddProductForm() {
   const [formData, setFormData] = useState({

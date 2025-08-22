@@ -1,8 +1,8 @@
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
 import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
 import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
+import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
 
 export default function Page() {
   return (

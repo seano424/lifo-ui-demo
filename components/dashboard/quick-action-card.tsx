@@ -1,11 +1,10 @@
 'use client'
 
-import { Typography } from '@/components/ui/typography'
-import { useTranslations } from 'next-intl'
-
 import { ArrowRight } from 'lucide-react'
-import { Card } from '@/components/ui/card'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Card } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 
 type QuickActionCardProps = {

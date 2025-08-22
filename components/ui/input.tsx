@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-
-import { cn } from '@/lib/utils'
+import * as React from 'react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export interface InputProps extends React.ComponentProps<'input'> {
   showPasswordToggle?: boolean

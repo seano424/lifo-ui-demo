@@ -1,14 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertTriangle, CheckCircle, Phone } from 'lucide-react'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 import { useBusinessCheck } from '@/hooks/use-business-check'
-import { STORE_TYPE_LABELS, convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
+import { convertFormDataToStoreInsert, STORE_TYPE_LABELS } from '@/lib/schemas/store-schemas'
+import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 
 export function ConfirmDetailsStep() {
   const {
@@ -55,8 +55,7 @@ export function ConfirmDetailsStep() {
 
   const handleConfirm = () => {
     if (
-      selectedStoreForm &&
-      selectedStoreForm.store_type // Ensure store_type is not null
+      selectedStoreForm?.store_type // Ensure store_type is not null
     ) {
       const tempStoreCode = `${selectedStoreForm.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
       // Patch: cast store_type to correct type for insert

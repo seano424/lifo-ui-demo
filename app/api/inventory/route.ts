@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
 import type { Batch } from '@/lib/queries/batches'
+import { createClient } from '@/lib/supabase/server'
 
 // Extended type for batch with product scores
 type BatchWithScores = Batch & {
@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const storeId = searchParams.get('storeId')
-  const page = parseInt(searchParams.get('page') || '1')
-  const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100) // Max 100 items per page
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100) // Max 100 items per page
   const category = searchParams.get('category')
   const status = searchParams.get('status') || 'active'
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     // Calculate additional metrics for each item
     const inventory = data.map((batch: BatchWithScores) => {
       const daysToExpiry = Math.floor(
-        (new Date(batch.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+        (new Date(batch.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
       )
 
       type UrgencyLevel = 'critical' | 'high' | 'medium' | 'low'

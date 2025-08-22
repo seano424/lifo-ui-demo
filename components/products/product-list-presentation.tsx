@@ -1,11 +1,25 @@
 'use client'
 
-import { useMemo, useCallback } from 'react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Edit,
+  Euro,
+  MoreHorizontal,
+  Package,
+  Trash2,
+} from 'lucide-react'
+import { useCallback, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
-import { useProductActions } from '@/hooks/use-products'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -14,23 +28,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  MoreHorizontal,
-  Package,
-  Edit,
-  Trash2,
-  Euro,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-} from 'lucide-react'
-import type { SortField, ProductSort, Product } from '@/lib/queries/products'
+import { Typography } from '@/components/ui/typography'
+import { useProductActions } from '@/hooks/use-products'
+import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 // ✅ Sortable Table Header Component
 interface SortableHeaderProps {
@@ -131,7 +131,7 @@ export function ProductsListPresentation({
       const product = products.find(p => p.product_id === productId)
       const currentPrice = product?.base_selling_price || 0
       const newPrice = prompt('Enter new price:', currentPrice.toString())
-      if (newPrice && !isNaN(Number(newPrice))) {
+      if (newPrice && !Number.isNaN(Number(newPrice))) {
         updateProductPrice(productId, Number(newPrice))
       }
     },
@@ -162,7 +162,7 @@ export function ProductsListPresentation({
           <div className="space-y-3">
             {[...Array(8)].map((_, i) => (
               <div
-                key={i}
+                key={`skeleton-${i + 1}`}
                 className="flex items-center space-x-4 p-4 border rounded-lg animate-pulse"
               >
                 <div className="h-4 bg-muted rounded w-1/4"></div>
@@ -271,7 +271,8 @@ export function ProductsListPresentation({
                       <div className="text-sm">
                         <span className="font-medium">{product.active_batches_count || 0}</span>
                         <span className="text-muted-foreground ml-1">
-                          batch{(product.active_batches_count || 0) !== 1 ? 'es' : ''}
+                          batch
+                          {(product.active_batches_count || 0) !== 1 ? 'es' : ''}
                         </span>
                       </div>
                     </TableCell>

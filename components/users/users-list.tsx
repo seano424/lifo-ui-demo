@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { Typography } from '@/components/ui/typography'
-import { useUsers, useUserActions } from '@/hooks/use-users'
 import { UserCard } from '@/components/users/user-card'
 import { UserFilters } from '@/components/users/user-filters'
+import { useUserActions, useUsers } from '@/hooks/use-users'
 import type { UserFilters as UserFiltersType } from '@/lib/queries/users'
 
 export function UsersList() {
@@ -29,8 +29,13 @@ export function UsersList() {
 
         {/* View Toggle */}
         <div className="flex rounded-lg border border-gray-200">
-          <button className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-l-lg">Grid</button>
-          <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded-r-lg">
+          <button type="button" className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-l-lg">
+            Grid
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded-r-lg"
+          >
             Table
           </button>
         </div>
@@ -68,7 +73,10 @@ export function UsersList() {
               ? 'Try adjusting your filters to see more results.'
               : 'Get started by adding your first team member.'}
           </Typography>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button
+            type="button"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
             Add First User
           </button>
         </div>
@@ -78,6 +86,7 @@ export function UsersList() {
       {hasMore && (
         <div className="flex justify-center mt-8">
           <button
+            type="button"
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
             className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"

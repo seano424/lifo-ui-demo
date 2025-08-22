@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useStoreState } from '@/lib/stores/store-context'
-import { fetchStoreUsersPage } from '@/lib/queries/store-users'
+import { useEffect } from 'react'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchStoreUsersPage } from '@/lib/queries/store-users'
+import { useStoreState } from '@/lib/stores/store-context'
 
 /**
  * This component handles prefetching store users data when the active store changes.

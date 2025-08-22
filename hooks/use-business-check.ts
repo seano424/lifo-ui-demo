@@ -1,8 +1,8 @@
 // hooks/use-business-check.ts
 
 import { useState } from 'react'
-import { BusinessCheckResult } from '@/lib/stores/onboarding-store'
-import { businessCheckSchema, type BusinessCheckRequest } from '@/lib/schemas/store-schemas'
+import { type BusinessCheckRequest, businessCheckSchema } from '@/lib/schemas/store-schemas'
+import type { BusinessCheckResult } from '@/lib/stores/onboarding-store'
 
 export function useBusinessCheck() {
   const [isLoading, setIsLoading] = useState(false)

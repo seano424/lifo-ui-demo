@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/queries/query-keys'
 import {
-  fetchStoreInsights,
   fetchActionableBatches,
   fetchAllStoresInsights,
+  fetchStoreInsights,
 } from '@/lib/queries/store-insights'
-import { queryKeys } from '@/lib/queries/query-keys'
 
 // Hook for getting high-level store insights
 export function useStoreInsights(storeId: string) {

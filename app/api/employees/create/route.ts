@@ -1,9 +1,9 @@
 // app/api/employees/create/route.ts
 // FIXED SERVER-SIDE EMPLOYEE CREATION - Corrected Permission Logic
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 interface CreateEmployeeRequest {
   firstName: string
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     console.log('🔧 Creating user with Admin API:', {
       authEmail,
       username,
-      pin: pin.substring(0, 2) + '**', // Mask PIN in logs
+      pin: `${pin.substring(0, 2)}**`, // Mask PIN in logs
       storeId,
     })
 

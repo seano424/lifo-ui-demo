@@ -1,6 +1,6 @@
 // app/api/email/test/route.ts
-import { NextRequest, NextResponse } from 'next/server'
-import { sendWelcomeEmail, sendPinResetEmail } from '@/lib/email/resend'
+import { type NextRequest, NextResponse } from 'next/server'
+import { sendPinResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
 
 export async function POST(request: NextRequest) {
   // Only allow in development
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       store_name: 'Test Store LIFO',
     }
 
-    let result
+    let result: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }
     if (type === 'welcome') {
       result = await sendWelcomeEmail(testCredentials)
     } else if (type === 'pin_reset') {

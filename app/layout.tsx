@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
-import { ReactQueryProvider } from '@/lib/react-query/provider'
-import { LanguageProvider } from '@/components/providers/language-provider'
-import { IntlProvider } from '@/components/providers/intl-provider'
 import { getMessages } from 'next-intl/server'
+import { IntlProvider } from '@/components/providers/intl-provider'
+import { LanguageProvider } from '@/components/providers/language-provider'
+import { ReactQueryProvider } from '@/lib/react-query/provider'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`

@@ -1,12 +1,10 @@
 'use client'
 
-import { cn } from '@/lib/utils'
+import { ChevronRight, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ChevronRight, type LucideIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-
 import {
   SidebarGroup,
   SidebarMenu,
@@ -17,6 +15,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { cn } from '@/lib/utils'
 
 export function NavMain({
   items,

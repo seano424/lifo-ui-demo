@@ -1,8 +1,8 @@
 'use client'
 
 import { NextIntlClientProvider } from 'next-intl'
+import { useCallback, useEffect, useState } from 'react'
 import { useLanguageStore } from '@/lib/stores/language-store'
-import { useEffect, useState, useCallback } from 'react'
 
 interface Messages {
   [key: string]: unknown
@@ -22,7 +22,7 @@ export function IntlProvider({
   const loadMessages = useCallback(
     async (language: string) => {
       try {
-        let newMessages
+        let newMessages: { default: Record<string, unknown> }
         switch (language) {
           case 'en':
             newMessages = await import(`../../messages/en.json`)
@@ -30,7 +30,6 @@ export function IntlProvider({
           case 'nl':
             newMessages = await import(`../../messages/nl.json`)
             break
-          case 'fr':
           default:
             newMessages = await import(`../../messages/fr.json`)
             break

@@ -1,13 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
-  fetchDonationRecipients,
-  fetchDonationActions,
-  fetchDonationAnalytics,
   checkDonationEligibility,
   executeDonationAction,
+  fetchDonationActions,
+  fetchDonationAnalytics,
+  fetchDonationRecipients,
 } from '@/lib/queries/donations'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { toast } from 'sonner'
 
 // Hook for getting donation recipients
 export function useDonationRecipients(
@@ -83,7 +83,7 @@ export function useDonationAction() {
       recipientId: string
       notes?: string
     }) => executeDonationAction(batchId, recipientId, notes),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, _variables) => {
       toast.success(`Successfully donated batch to recipient`)
 
       // Invalidate relevant queries
