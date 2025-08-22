@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   console.log('🚀 [UPLOAD-API] === CSV BULK UPLOAD API CALLED ===')
@@ -259,7 +259,7 @@ function fastParseCSV(csvContent: string, defaultExpiryDate?: string) {
         SKU: values[skuIndex] || `AUTO-${Date.now()}-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
         Category: values[categoryIndex] || 'dry_goods',
-        Quantity: parseInt(values[qtyIndex] || '1') || 1,
+        Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
         Expiry_Date: finalExpiryDate,
         Brand: values[brandIndex] || 'Unknown',
         Cost_Price: parseFloat(values[costIndex] || '0') || 0,

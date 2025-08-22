@@ -1,6 +1,6 @@
 'use client'
 import { useTranslations } from 'next-intl'
-import React from 'react'
+import type React from 'react'
 
 type AnimatedBadgeProps = {
   icon: React.ReactNode

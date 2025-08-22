@@ -1,64 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { Typography } from '@/components/ui/typography'
-import { useStoreUsers, useStoreUserActions } from '@/hooks/use-store-users'
-import { type StoreUser } from '@/lib/queries/store-users'
-import { useStoreState, useActiveStoreId } from '@/lib/stores/store-context'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-
 import {
+  Crown,
+  Key,
+  Lock,
   MoreHorizontal,
+  RefreshCw,
+  Unlock,
+  User,
   UserCheck,
   UserMinus,
   UserPlus,
   Users,
-  Crown,
-  User,
-  Key,
-  Lock,
-  RefreshCw,
-  Unlock,
 } from 'lucide-react'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog'
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu'
-
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,12 +26,49 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Typography } from '@/components/ui/typography'
+import { useStoreUserActions, useStoreUsers } from '@/hooks/use-store-users'
 import { usePermissions, useUserRole } from '@/hooks/use-users'
-import { Card, CardContent, CardHeader } from '../ui/card'
-import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import type { StoreUser } from '@/lib/queries/store-users'
 import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
+import { cn } from '@/lib/utils'
+import { Card, CardContent, CardHeader } from '../ui/card'
 
 // Import the new components
 

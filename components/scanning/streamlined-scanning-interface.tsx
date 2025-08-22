@@ -1,61 +1,56 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
 import {
-  Camera,
-  ArrowLeft,
-  CheckCircle,
-  Euro,
-  Edit3,
   AlertCircle,
+  ArrowLeft,
   ArrowRight,
-  Keyboard,
-  Package,
   ArrowUp,
   BarChart3,
+  Camera,
+  CheckCircle,
+  Edit3,
+  Euro,
+  Keyboard,
+  Package,
   RefreshCcw,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-
-import { Typography } from '@/components/ui/typography'
-import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
-
+import { useCallback, useEffect, useState } from 'react'
 // Import working components from BarcodeDemo
-import BarcodeScanner, { BarcodeDetection } from '@/components/barcode/barcode-scanner'
-
-// Import working store integration
-import {
-  useScanningStep,
-  useScannedProduct,
-  useScanningActions,
-  useExpiryInfo,
-  // useScanningError,
-  useScanningProcessing,
-  useCanGoBack,
-  usePreviousStepName,
-} from '@/lib/stores/scanning-workflow-store'
-import { useStoreState } from '@/lib/stores/store-context'
-import { useProductLookup } from '@/hooks/use-product-lookup'
+import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
+import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogDescription,
 } from '@/components/ui/dialog'
-
-// Import OCR hooks and utilities
-import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
-import { captureImageFromVideo } from '@/lib/api/ocr-client'
-
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Typography } from '@/components/ui/typography'
 // Import inventory submission hook
 import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
+// Import OCR hooks and utilities
+import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
+import { useProductLookup } from '@/hooks/use-product-lookup'
+import { captureImageFromVideo } from '@/lib/api/ocr-client'
+// Import working store integration
+import {
+  useCanGoBack,
+  useExpiryInfo,
+  usePreviousStepName,
+  useScannedProduct,
+  useScanningActions,
+  // useScanningError,
+  useScanningProcessing,
+  useScanningStep,
+} from '@/lib/stores/scanning-workflow-store'
+import { useStoreState } from '@/lib/stores/store-context'
 
 // Types for our streamlined workflow
 interface ScannedItem {
@@ -149,8 +144,14 @@ export default function WorkingStreamlinedScanningInterface({
     }
   }, [lookupResult, lookupBarcode, workflowActions])
 
-  // Updated workflow sync effect in WorkingStreamlinedScanningInterface
+  // Convert ISO datetime to date input format (YYYY-MM-DD)
+  const formatDateForInput = useCallback((isoDate: string): string => {
+    if (!isoDate) return ''
+    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
+    return isoDate.split('T')[0]
+  }, [])
 
+  // Updated workflow sync effect in WorkingStreamlinedScanningInterface
   useEffect(() => {
     switch (currentStep) {
       case 'barcode':
@@ -198,7 +199,7 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-barcode')
         break
     }
-  }, [currentStep, scannedProduct, expiryInfo, isRescanning])
+  }, [currentStep, scannedProduct, expiryInfo, isRescanning, formatDateForInput])
 
   // Handle barcode scan
   const handleScan = (barcode: string, detection?: BarcodeDetection) => {
@@ -418,13 +419,6 @@ export default function WorkingStreamlinedScanningInterface({
   // Format price
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
-  // Convert ISO datetime to date input format (YYYY-MM-DD)
-  const formatDateForInput = (isoDate: string): string => {
-    if (!isoDate) return ''
-    // Extract just the date part from ISO string (2026-04-22T00:00:00 -> 2026-04-22)
-    return isoDate.split('T')[0]
-  }
-
   const handleEditItem = (item: ScannedItem) => {
     console.log('Editing item:', item)
     setEditingItem(item)
@@ -464,7 +458,14 @@ export default function WorkingStreamlinedScanningInterface({
     setIsEditingItem(false)
     setEditingItem(null)
     setShowAdvancedEdit(false)
-    setEditForm({ expiryDate: '', quantity: 1, price: 0, productName: '', brand: '', barcode: '' })
+    setEditForm({
+      expiryDate: '',
+      quantity: 1,
+      price: 0,
+      productName: '',
+      brand: '',
+      barcode: '',
+    })
   }
 
   return (
@@ -723,7 +724,7 @@ export default function WorkingStreamlinedScanningInterface({
                           id="quantity"
                           type="number"
                           value={quantity}
-                          onChange={e => setQuantity(parseInt(e.target.value) || 1)}
+                          onChange={e => setQuantity(parseInt(e.target.value, 10) || 1)}
                           min="0"
                         />
                       </div>
@@ -787,7 +788,7 @@ export default function WorkingStreamlinedScanningInterface({
                         <Input
                           type="number"
                           value={quantity}
-                          onChange={e => setQuantity(parseInt(e.target.value) || 1)}
+                          onChange={e => setQuantity(parseInt(e.target.value, 10) || 1)}
                           min="0"
                           className="text-sm"
                         />
@@ -917,7 +918,8 @@ export default function WorkingStreamlinedScanningInterface({
                   onClick={handleFinalSubmission}
                 >
                   <CheckCircle className="w-4 h-4" />
-                  Finish and submit {scannedItems.length} item{scannedItems.length > 1 ? 's' : ''}
+                  Finish and submit {scannedItems.length} item
+                  {scannedItems.length > 1 ? 's' : ''}
                 </Button>
               </div>
             )}
@@ -960,7 +962,10 @@ export default function WorkingStreamlinedScanningInterface({
                       type="text"
                       value={editForm.productName}
                       onChange={e =>
-                        setEditForm(prev => ({ ...prev, productName: e.target.value }))
+                        setEditForm(prev => ({
+                          ...prev,
+                          productName: e.target.value,
+                        }))
                       }
                       className="mt-1"
                       placeholder="Enter product name"
@@ -976,7 +981,12 @@ export default function WorkingStreamlinedScanningInterface({
                         id="edit-brand"
                         type="text"
                         value={editForm.brand}
-                        onChange={e => setEditForm(prev => ({ ...prev, brand: e.target.value }))}
+                        onChange={e =>
+                          setEditForm(prev => ({
+                            ...prev,
+                            brand: e.target.value,
+                          }))
+                        }
                         className="mt-1"
                         placeholder="Brand name"
                       />
@@ -990,7 +1000,12 @@ export default function WorkingStreamlinedScanningInterface({
                         id="edit-barcode"
                         type="text"
                         value={editForm.barcode}
-                        onChange={e => setEditForm(prev => ({ ...prev, barcode: e.target.value }))}
+                        onChange={e =>
+                          setEditForm(prev => ({
+                            ...prev,
+                            barcode: e.target.value,
+                          }))
+                        }
                         className="mt-1 font-mono text-sm"
                         placeholder="Barcode number"
                       />
@@ -1033,7 +1048,12 @@ export default function WorkingStreamlinedScanningInterface({
                     id="edit-expiry"
                     type="date"
                     value={editForm.expiryDate}
-                    onChange={e => setEditForm(prev => ({ ...prev, expiryDate: e.target.value }))}
+                    onChange={e =>
+                      setEditForm(prev => ({
+                        ...prev,
+                        expiryDate: e.target.value,
+                      }))
+                    }
                     className="mt-1"
                   />
                 </div>
@@ -1049,7 +1069,10 @@ export default function WorkingStreamlinedScanningInterface({
                       min="0"
                       value={editForm.quantity}
                       onChange={e =>
-                        setEditForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))
+                        setEditForm(prev => ({
+                          ...prev,
+                          quantity: parseInt(e.target.value, 10) || 1,
+                        }))
                       }
                       className="mt-1"
                     />
@@ -1068,7 +1091,10 @@ export default function WorkingStreamlinedScanningInterface({
                         step="0.01"
                         value={editForm.price}
                         onChange={e =>
-                          setEditForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))
+                          setEditForm(prev => ({
+                            ...prev,
+                            price: parseFloat(e.target.value) || 0,
+                          }))
                         }
                         className="pl-10"
                       />

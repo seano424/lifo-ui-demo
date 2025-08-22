@@ -1,21 +1,21 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Typography } from '@/components/ui/typography'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
-import { isValidPhoneNumber, formatPhoneNumber } from '@/lib/types/user'
-import { Edit, Check, X, AlertCircle, Shield } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
+import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
+import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
 
 const createProfileSchema = (t: (key: string) => string) =>
   z.object({
@@ -130,7 +130,7 @@ export default function UserAccountInformation() {
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="space-y-2">
+              <div key={`skeleton-${i + 1}`} className="space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
               </div>

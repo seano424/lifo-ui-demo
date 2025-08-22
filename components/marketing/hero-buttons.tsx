@@ -1,7 +1,7 @@
 'use client'
-import { Button } from '@/components/ui/button'
 import { BookOpen, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
 
 export function HeroButtons() {
   const t = useTranslations('landingpage.hero.buttons')

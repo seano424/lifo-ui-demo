@@ -1,12 +1,12 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
 @plugin 'tailwind-scrollbar';
 @plugin 'tailwindcss-debug-screens' {
-  classname: 'debug-screens';
-  position: 'bottom, left';
-  prefix: 'screen: ';
+  classname: "debug-screens";
+  position: "bottom, left";
+  prefix: "screen: ";
 }
 
 @theme {
@@ -76,17 +76,16 @@
 
   /* Font families */
   --font-sans:
-    var(--font-montserrat), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    var(--font-montserrat), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --font-heading:
-    var(--font-raleway), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    var(--font-raleway), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   --font-mono:
     var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    'Liberation Mono', 'Courier New', monospace;
+    "Liberation Mono", "Courier New", monospace;
 
   /* Breakpoints */
-  --breakpoint-*: initial;
   --breakpoint-xs: 360px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
@@ -195,17 +194,17 @@
 
 @layer base {
   button:not(:disabled),
-  [role='button']:not(:disabled),
-  [role='tab']:not(:disabled),
-  [role='menuitem']:not(:disabled) {
+  [role="button"]:not(:disabled),
+  [role="tab"]:not(:disabled),
+  [role="menuitem"]:not(:disabled) {
     cursor: pointer;
   }
 
   /* Add margin to debug screens indicator */
   .debug-screens::before {
-    margin-left: 4rem !important;
-    margin-bottom: 1.5rem !important;
-    padding: 0.5rem !important;
+    margin-left: 4rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
     border-radius: 4px;
     font-weight: bold;
   }

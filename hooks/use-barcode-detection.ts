@@ -1,5 +1,5 @@
 // hooks/use-barcode-detection.ts
-import { useState, useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { UniversalBarcodeDetector } from '@/lib/barcode/barcode-detector'
 
 export function useBarcodeDetection() {

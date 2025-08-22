@@ -1,22 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useCurrentUser, usePermissions } from '@/hooks/use-users'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
-import { usePermissions, useCurrentUser } from '@/hooks/use-users'
-
-import { convertStoreBasicInfoToStore } from '@/lib/utils'
 import {
+  debugStoreAccess,
   fetchStoreSettings,
-  updateStoreBasicInfo,
+  type StoreAdvancedSettings,
+  type StoreBasicInfo,
+  type StoreSettingsData,
   updateStoreAdvancedSettings,
+  updateStoreBasicInfo,
   validateStoreCode,
   validateStoreEmail,
-  debugStoreAccess,
-  type StoreBasicInfo,
-  type StoreAdvancedSettings,
-  type StoreSettingsData,
 } from '@/lib/queries/store-settings'
 import type { UserStorePermissions } from '@/lib/server/permissions'
+import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
+import { convertStoreBasicInfoToStore } from '@/lib/utils'
 
 export function useStorePermissions({
   serverPermissions,
@@ -105,7 +104,7 @@ export function useStoreSettings(storeId?: string) {
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: false, // 🚀 CRITICAL: Prevent refetch if we have cached data
     refetchOnWindowFocus: false,
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: Error) => {
       if (error?.message?.includes('permission denied') || error?.message?.includes('403')) {
         return false
       }
@@ -171,7 +170,7 @@ export function useUpdateStoreBasicInfo() {
 
       return { previousStore, activeStoreId }
     },
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // Revert on error
       if (context?.previousStore && context?.activeStoreId) {
         queryClient.setQueryData(
@@ -276,7 +275,7 @@ export function useUpdateStoreAdvancedSettings() {
 
       return { previousStore, activeStoreId }
     },
-    onError: (err, variables, context) => {
+    onError: (err, _variables, context) => {
       // Revert on error
       if (context?.previousStore && context?.activeStoreId) {
         queryClient.setQueryData(
@@ -403,7 +402,7 @@ export function useStoreImageUpload() {
   const activeStoreId = useActiveStoreId()
 
   const uploadImage = useMutation({
-    mutationFn: async ({ file, type }: { file: File; type: 'logo' | 'cover' }) => {
+    mutationFn: async ({ type }: { type: 'logo' | 'cover' }) => {
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }

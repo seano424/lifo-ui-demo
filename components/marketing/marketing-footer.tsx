@@ -1,11 +1,11 @@
 'use client'
 
+import Image from 'next/image'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Typography } from '@/components/ui/typography'
-import { useTranslations } from 'next-intl'
-import Image from 'next/image'
-import Link from 'next/link'
 
 export function MarketingFooter() {
   const currentYear = new Date().getFullYear()

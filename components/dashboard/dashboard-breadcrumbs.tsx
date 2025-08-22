@@ -1,16 +1,16 @@
 'use client'
 
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React from 'react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 
 export default function DashboardBreadcrumbs() {
   const t = useTranslations('breadcrumbs')
@@ -31,7 +31,7 @@ export default function DashboardBreadcrumbs() {
       // Fallback to capitalized segment if no translation exists
       return (
         segment.charAt(0).toUpperCase() +
-        segment.slice(1).replace(/-([a-z])/g, (_, letter) => ' ' + letter.toUpperCase())
+        segment.slice(1).replace(/-([a-z])/g, (_, letter) => ` ${letter.toUpperCase()}`)
       )
     }
   }

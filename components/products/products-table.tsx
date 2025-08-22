@@ -1,19 +1,21 @@
 'use client'
 
 import {
-  useReactTable,
+  flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  flexRender,
   type SortingState,
+  useReactTable,
 } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
-import { useState, useEffect } from 'react'
-
-import { useProductActions } from '@/hooks/use-products'
-import { useProductColumnSizing } from '@/hooks/use-product-column-sizing'
-import type { Product, ProductSort, SortField } from '@/lib/queries/products'
-
+import { useEffect, useState } from 'react'
+import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
+import {
+  ColumnResizer,
+  createProductTableColumns,
+} from '@/components/products/product-table-columns'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -22,13 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import {
-  createProductTableColumns,
-  ColumnResizer,
-} from '@/components/products/product-table-columns'
-import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
-import { Card, CardDescription, CardContent, CardTitle } from '@/components/ui/card'
+import { useProductColumnSizing } from '@/hooks/use-product-column-sizing'
+import { useProductActions } from '@/hooks/use-products'
+import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 const VALID_COLUMN_IDS = [
   'name',
@@ -111,7 +109,7 @@ export function ProductTable({ data, currentSort, updateSort, isLoading }: Produ
     return <ProductListSkeleton />
   }
 
-  if (data.length == 0) {
+  if (data.length === 0) {
     return (
       <Card className="border-0 border-t rounded-t-none shadow-none">
         <CardContent className="flex flex-col items-center justify-center py-12">

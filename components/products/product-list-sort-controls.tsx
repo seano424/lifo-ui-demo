@@ -1,3 +1,4 @@
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -5,7 +6,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import type { ProductSort, SortField } from '@/lib/queries/products'
 
 interface ProductListSortControlsProps {

@@ -1,5 +1,6 @@
 'use client'
 
+import { Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -7,8 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useLanguageStore, type Language } from '@/lib/stores/language-store'
-import { Globe } from 'lucide-react'
+import { type Language, useLanguageStore } from '@/lib/stores/language-store'
 
 const LIFO_LANGUAGES = {
   fr: { name: 'Français' },

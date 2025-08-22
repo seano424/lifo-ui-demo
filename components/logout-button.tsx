@@ -1,9 +1,9 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 interface LogoutButtonProps {
   className?: string

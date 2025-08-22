@@ -1,6 +1,7 @@
 'use client'
 
-import { useLanguageStore, type Language } from '@/lib/stores/language-store'
+import { Globe } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -8,8 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Globe } from 'lucide-react'
+import { type Language, useLanguageStore } from '@/lib/stores/language-store'
 
 const LIFO_LANGUAGES = {
   fr: { name: 'Français' },

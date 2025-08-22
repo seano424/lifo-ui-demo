@@ -1,7 +1,7 @@
 // app/api/debug/check-permissions/route.ts
 // DEBUGGING TOOL - Check user permissions for a specific store
 
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {

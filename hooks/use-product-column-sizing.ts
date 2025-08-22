@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const COLUMN_WIDTHS_STORAGE_KEY = 'lifo-product-table-columns'
 

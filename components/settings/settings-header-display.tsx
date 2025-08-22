@@ -1,9 +1,9 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useStoreState } from '@/lib/stores/store-context'
-import { Typography } from '@/components/ui/typography'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
+import { useStoreState } from '@/lib/stores/store-context'
 
 export default function SettingsHeaderDisplay() {
   const { isLoadingStores, isChangingStore } = useStoreState()

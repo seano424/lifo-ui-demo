@@ -1,17 +1,9 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Form,
   FormControl,
@@ -20,10 +12,22 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { useAddStoreStore } from '@/lib/stores/add-store-store'
-import { storeFormSchema, STORE_TYPE_LABELS, type StoreFormData } from '@/lib/schemas/store-schemas'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
-import { STORE_TYPES } from '@/lib/schemas/store-schemas'
+import {
+  STORE_TYPE_LABELS,
+  STORE_TYPES,
+  type StoreFormData,
+  storeFormSchema,
+} from '@/lib/schemas/store-schemas'
+import { useAddStoreStore } from '@/lib/stores/add-store-store'
 
 // Type guard for store_type
 function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {

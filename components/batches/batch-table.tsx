@@ -1,20 +1,19 @@
 'use client'
 
 import {
-  useReactTable,
+  flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  flexRender,
   type SortingState,
+  useReactTable,
 } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useState, useEffect } from 'react'
-
-import { useBatchActions } from '@/hooks/use-batches'
-import { useColumnSizing } from '@/hooks/use-column-sizing'
-import type { BatchWithProduct, BatchSort, BatchSortField } from '@/lib/queries/batches'
-
+import { useEffect, useState } from 'react'
+import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
+import { ColumnResizer, createBatchTableColumns } from '@/components/batches/batch-table-columns'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -23,10 +22,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { createBatchTableColumns, ColumnResizer } from '@/components/batches/batch-table-columns'
-import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
-import { Card, CardDescription, CardContent, CardTitle } from '@/components/ui/card'
+import { useBatchActions } from '@/hooks/use-batches'
+import { useColumnSizing } from '@/hooks/use-column-sizing'
+import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 
 const VALID_COLUMN_IDS = [
   'batch_number',

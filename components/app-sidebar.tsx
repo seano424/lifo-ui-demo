@@ -1,13 +1,19 @@
 'use client'
 
-import * as React from 'react'
+import {
+  BookOpen,
+  Bot,
+  Box,
+  Calendar,
+  Layers,
+  Package,
+  SettingsIcon,
+  SquareTerminal,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { BookOpen, Bot, SquareTerminal, Calendar, Box, SettingsIcon, Package, Layers } from 'lucide-react'
-import { TeamSwitcher } from './team-switcher'
-
+import * as React from 'react'
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
-
 import {
   Sidebar,
   SidebarContent,
@@ -16,8 +22,9 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar'
 import { useCurrentUser } from '@/hooks/use-users'
-import { NavbarLogo } from './ui/logo'
 import { cn } from '@/lib/utils'
+import { TeamSwitcher } from './team-switcher'
+import { NavbarLogo } from './ui/logo'
 
 function useNavigationData() {
   const t = useTranslations('navigation')

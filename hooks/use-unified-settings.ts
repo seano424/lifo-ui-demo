@@ -1,10 +1,10 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useCurrentUser } from '@/hooks/use-users'
 import { fetchStoreSettings } from '@/lib/queries/store-settings'
 import { fetchStoreUsers } from '@/lib/queries/store-users'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 export function useUnifiedSettings() {
   const storeId = useActiveStoreId()

@@ -1,20 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-import { useBatches } from '@/hooks/use-batches'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import type { BatchSort, BatchFilters, BatchSortField } from '@/lib/queries/batches'
-
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { BatchTable } from '@/components/batches/batch-table'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 import { BatchListFilters } from '@/components/batches/batch-list-filters'
 import { BatchListSortControls } from '@/components/batches/batch-list-sort-controls'
+import { BatchTable } from '@/components/batches/batch-table'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { useBatches } from '@/hooks/use-batches'
+import type { BatchFilters, BatchSort, BatchSortField } from '@/lib/queries/batches'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface BatchesFilteredListProps {
   initialFilters?: {
@@ -39,7 +37,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     }
 
     if (initialFilters?.filter === 'expiring') {
-      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '7')
+      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '7', 10)
     }
 
     if (initialFilters?.status) {

@@ -1,9 +1,9 @@
 'use client'
 
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
-import { useTranslations } from 'next-intl'
-import Link from 'next/link'
 import { LogoutButton } from './logout-button'
 import { Button } from './ui/button'
 

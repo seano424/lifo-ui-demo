@@ -130,7 +130,7 @@ export type OCRErrorType = 'network' | 'api' | 'timeout' | 'validation' | 'proce
 export interface OCRError {
   message: string
   type: OCRErrorType
-  details?: any
+  details?: Record<string, unknown>
   retry?: boolean
 }
 
@@ -204,18 +204,37 @@ export interface OCRAnalytics {
 }
 
 // Export utility type guards
-export function isOCRExpiryResponse(response: any): response is OCRExpiryResponse {
-  return response && response.scan_type === 'expiry_date_extraction'
+export function isOCRExpiryResponse(response: unknown): response is OCRExpiryResponse {
+  return (
+    response !== null &&
+    typeof response === 'object' &&
+    (response as Record<string, unknown>).scan_type === 'expiry_date_extraction'
+  )
 }
 
-export function isOCRFullAnalysisResponse(response: any): response is OCRFullAnalysisResponse {
-  return response && response.scan_type === 'full_ocr_analysis'
+export function isOCRFullAnalysisResponse(response: unknown): response is OCRFullAnalysisResponse {
+  return (
+    response !== null &&
+    typeof response === 'object' &&
+    (response as Record<string, unknown>).scan_type === 'full_ocr_analysis'
+  )
 }
 
-export function isOCRTextExtractionResponse(response: any): response is OCRTextExtractionResponse {
-  return response && response.scan_type === 'text_extraction'
+export function isOCRTextExtractionResponse(
+  response: unknown,
+): response is OCRTextExtractionResponse {
+  return (
+    response !== null &&
+    typeof response === 'object' &&
+    (response as Record<string, unknown>).scan_type === 'text_extraction'
+  )
 }
 
-export function isOCRError(error: any): error is OCRError {
-  return error && typeof error.message === 'string' && typeof error.type === 'string'
+export function isOCRError(error: unknown): error is OCRError {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    typeof (error as Record<string, unknown>).message === 'string' &&
+    typeof (error as Record<string, unknown>).type === 'string'
+  )
 }

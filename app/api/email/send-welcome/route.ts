@@ -1,8 +1,8 @@
 // app/api/email/send-welcome/route.ts
 
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { createClient } from '@/lib/supabase/server'
 
 const resend = new Resend(process.env.RESEND_API)
 

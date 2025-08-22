@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { TimePeriod, getTimeRange } from '@/components/dashboard/TimeSelector'
+import { getTimeRange, type TimePeriod } from '@/components/dashboard/TimeSelector'
 import {
+  fetchDashboardKPITrends,
+  fetchDonationKPITrends,
   fetchInventoryKPITrends,
   fetchSalesKPITrends,
-  fetchDonationKPITrends,
   fetchWasteKPITrends,
-  fetchDashboardKPITrends,
 } from '@/lib/queries/dashboard-kpi-trends'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 
 export function useInventoryKPITrends(period: TimePeriod) {
   const activeStoreId = useActiveStoreId()

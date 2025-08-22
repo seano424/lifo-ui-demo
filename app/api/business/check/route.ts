@@ -1,7 +1,7 @@
 // app/api/business/check/route.ts
 
-import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
 import { businessCheckSchema } from '@/lib/schemas/store-schemas'
 
 export async function POST(request: NextRequest) {

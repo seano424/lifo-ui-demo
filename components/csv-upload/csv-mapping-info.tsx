@@ -1,10 +1,10 @@
 'use client'
 
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronDown, ChevronRight, Brain, CheckCircle, AlertCircle } from 'lucide-react'
+import { AlertCircle, Brain, CheckCircle, ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 interface MappingRule {
   field: string

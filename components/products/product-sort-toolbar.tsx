@@ -1,5 +1,18 @@
 'use client'
 
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Boxes,
+  Building,
+  Calendar,
+  DollarSign,
+  Package,
+  SortAsc,
+  Tag,
+} from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -9,21 +22,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Badge } from '@/components/ui/badge'
-import {
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  SortAsc,
-  Package,
-  Tag,
-  Building,
-  Boxes,
-  DollarSign,
-  Calendar,
-} from 'lucide-react'
-import type { SortField, SortDirection, ProductSort } from '@/lib/queries/products'
 import { Typography } from '@/components/ui/typography'
+import type { ProductSort, SortDirection, SortField } from '@/lib/queries/products'
 
 interface ProductsSortToolbarProps {
   currentSort: ProductSort

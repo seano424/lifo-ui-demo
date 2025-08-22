@@ -1,7 +1,7 @@
 // app/api/email/send/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
+import { type EmailCredentials, sendPinResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
 import { createClient } from '@/lib/supabase/server'
-import { sendWelcomeEmail, sendPinResetEmail, type EmailCredentials } from '@/lib/email/resend'
 
 export interface EmailRequest {
   type: 'welcome' | 'pin_reset'
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send appropriate email
-    let emailResult
+    let emailResult: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }
     if (type === 'welcome') {
       emailResult = await sendWelcomeEmail(enhancedCredentials)
     } else if (type === 'pin_reset') {

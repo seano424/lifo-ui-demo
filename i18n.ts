@@ -1,6 +1,6 @@
-import { getRequestConfig } from 'next-intl/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { getRequestConfig } from 'next-intl/server'
 
 export default getRequestConfig(async () => {
   let locale = 'fr' // Default to French
@@ -17,7 +17,7 @@ export default getRequestConfig(async () => {
           getAll() {
             return cookieStore.getAll()
           },
-          setAll(cookiesToSet) {
+          setAll(_cookiesToSet) {
             // No-op in server context
           },
         },

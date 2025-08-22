@@ -1,18 +1,18 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Typography } from '@/components/ui/typography'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useBatchAlerts, useBatchSummary } from '@/hooks/use-batches'
 import {
-  Package,
-  AlertTriangle,
-  TrendingDown,
-  DollarSign,
-  Calendar,
   Activity,
+  AlertTriangle,
   BarChart3,
+  Calendar,
+  DollarSign,
+  Package,
+  TrendingDown,
 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
+import { useBatchAlerts, useBatchSummary } from '@/hooks/use-batches'
 
 export function BatchDashboardStats() {
   const { totalBatches, activeBatches, expiredBatches, totalStock, totalValue } = useBatchSummary()
@@ -100,7 +100,7 @@ export function BatchDashboardStats() {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {[...Array(6)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={`skeleton-${i + 1}`} className="animate-pulse">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="h-4 bg-muted rounded w-20"></div>
               <div className="h-4 w-4 bg-muted rounded"></div>
@@ -147,7 +147,7 @@ export function BatchDashboardStats() {
           const Icon = stat.icon
           return (
             <Card
-              key={index}
+              key={stat.title || `stat-${index}`}
               className={`transition-all hover:shadow-md ${getTrendBg(stat.trend, stat.alert)}`}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

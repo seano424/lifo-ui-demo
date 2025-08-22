@@ -1,4 +1,3 @@
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -6,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface BatchListFiltersProps {
   filters?: {
@@ -35,7 +35,7 @@ export function BatchListFilters({
           onValueChange={value =>
             onFiltersChange({
               ...filters,
-              expiringInDays: value === 'all' ? undefined : parseInt(value),
+              expiringInDays: value === 'all' ? undefined : parseInt(value, 10),
             })
           }
           disabled={isLoading}

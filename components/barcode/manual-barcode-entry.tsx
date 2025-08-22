@@ -1,15 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Search, Package, Loader2, AlertCircle, X, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertCircle, ArrowRight, Loader2, Package, Search, X } from 'lucide-react'
+import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
-import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Typography } from '@/components/ui/typography'
-import type { ProductLookupResult, OpenFoodFactsSearchResult } from '@/lib/queries/open-food-facts'
+import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
+import type { OpenFoodFactsSearchResult, ProductLookupResult } from '@/lib/queries/open-food-facts'
+import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 
 interface ProductData {
   barcode: string

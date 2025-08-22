@@ -1,20 +1,20 @@
 'use client'
 
+import { DollarSign, Edit, Lock, MoreHorizontal, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Edit, Trash2, DollarSign, Lock } from 'lucide-react'
-import type { Product } from '@/lib/queries/products'
-import { usePermissions } from '@/hooks/use-users'
-import { toast } from 'sonner'
 import { Typography } from '@/components/ui/typography'
+import { usePermissions } from '@/hooks/use-users'
+import type { Product } from '@/lib/queries/products'
 
 interface ProductCardProps {
   product: Product
@@ -44,7 +44,7 @@ export function ProductCard({
     }
 
     const newPrice = prompt('Enter new price:', product.base_selling_price.toString())
-    if (newPrice && !isNaN(Number(newPrice))) {
+    if (newPrice && !Number.isNaN(Number(newPrice))) {
       onUpdatePrice(Number(newPrice))
     }
   }

@@ -1,7 +1,7 @@
 // app/api/onboarding/route.ts
 
-import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
 import { convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
 import type { StoreFormData } from '@/lib/stores/onboarding-store'
 
@@ -81,8 +81,6 @@ export async function POST(request: NextRequest) {
       case 'test':
         console.log('🧪 TEST MODE: Real database with current user')
         return await handleTestOnboarding(userId, store)
-
-      case 'production':
       default:
         console.log('🔐 PRODUCTION MODE: Full signup flow')
         return await handleProductionOnboarding(userId, store)

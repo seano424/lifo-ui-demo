@@ -1,8 +1,8 @@
 'use client'
 
+import type React from 'react'
 import { DotPattern, GradientGrid, WavePattern } from '@/components/ui/grid-background'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
-import React from 'react'
 
 interface SectionWithBackgroundProps {
   children: React.ReactNode

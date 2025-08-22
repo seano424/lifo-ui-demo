@@ -1,7 +1,7 @@
-import ContactEmailTemplate from '@/emails/contact-email-template'
+import { type NextRequest, NextResponse } from 'next/server'
 import { getTranslations } from 'next-intl/server'
-import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import ContactEmailTemplate from '@/emails/contact-email-template'
 
 // Initialize Resend with your API key
 const resend = new Resend(process.env.RESEND_API)

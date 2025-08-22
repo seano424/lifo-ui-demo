@@ -1,10 +1,12 @@
 'use client'
 
-import { Typography } from '@/components/ui/typography'
+import { AlertTriangle, Calendar, Filter, MapPin, Package, Search, Truck } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { BatchCard } from '@/components/batches/batch-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -12,12 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { type BatchFilters } from '@/lib/queries/batches'
-import { useBatches, useBatchActions } from '@/hooks/use-batches'
-import { useBatchesForProduct } from '@/hooks/use-batches'
-import { BatchCard } from '@/components/batches/batch-card'
-import { Package, Filter, AlertTriangle, Calendar, MapPin, Truck, Search } from 'lucide-react'
+import { Typography } from '@/components/ui/typography'
+import { useBatchActions, useBatches, useBatchesForProduct } from '@/hooks/use-batches'
+import type { BatchFilters } from '@/lib/queries/batches'
 
 interface BatchListProps {
   productId?: string // If provided, show batches for specific product
@@ -119,7 +118,7 @@ export function BatchList({
         {title && <Typography variant="h2">{title}</Typography>}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={`skeleton-${i + 1}`} className="animate-pulse">
               <CardHeader>
                 <div className="h-6 bg-muted rounded w-3/4"></div>
                 <div className="h-4 bg-muted rounded w-1/2"></div>
