@@ -11,17 +11,7 @@ import {
   SquareTerminal,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import {
-  BookOpen,
-  Bot,
-  SquareTerminal,
-  Calendar,
-  Box,
-  SettingsIcon,
-  Package,
-  Layers,
-} from 'lucide-react'
-import { TeamSwitcher } from './team-switcher'
+import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'

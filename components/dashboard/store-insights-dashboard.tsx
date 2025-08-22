@@ -3,18 +3,11 @@
 import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Loader2, AlertTriangle, ArrowRightFromLine, TrendingUp } from 'lucide-react'
-
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useDashboardInsights } from '@/hooks/use-fastapi-scoring'
-
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
-import { useStoreInsights } from '@/hooks/use-store-insights'
+import { useDashboardInsights } from '@/hooks/use-fastapi-scoring'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { ActionableBatchesEnhanced } from './actionable-batches-enhanced'
 
@@ -71,11 +64,12 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
   }
 
   // Transform analytics data to match component interface
-  const overview = insights?.analytics?.overview || {}
-  const urgentBatches = overview.urgent_items || 0
-  const totalActions = overview.actions_taken || 0
-  const discountValue = overview.total_discount_value || 0
-  const avgScore = overview.avg_composite_score || 0
+  const overview = insights?.analytics?.overview
+  const isValidOverview = overview && !('error' in overview)
+  const urgentBatches = isValidOverview ? overview.urgent_items : 0
+  const totalActions = isValidOverview ? overview.actions_taken : 0
+  const discountValue = isValidOverview ? overview.total_discount_value : 0
+  const avgScore = isValidOverview ? overview.avg_composite_score : 0
 
   return (
     <div className="flex flex-col gap-6">

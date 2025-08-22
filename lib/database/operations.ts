@@ -77,7 +77,7 @@ export class InventoryOperations {
         const hasAccess = !!storeUsers
         console.log('[InventoryOperations.validateStoreAccess] Fallback result:', {
           hasAccess,
-          userRole: storeUsers?.role
+          userRole: storeUsers ? (storeUsers as any).role : undefined
         })
         
         return hasAccess

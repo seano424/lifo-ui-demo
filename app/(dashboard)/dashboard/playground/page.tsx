@@ -1,35 +1,32 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, CheckCircle, Loader2, RefreshCw } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { createClient } from '@/lib/supabase/client'
 import {
+  useDashboardInsights,
   useScoringAlerts,
   useScoringRecommendations,
   useStoreAnalytics,
-  useDashboardInsights,
 } from '@/hooks/use-fastapi-scoring'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
 
 // FastAPI scoring endpoints testing
-const FASTAPI_BASE_URL =
-  process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+const FASTAPI_BASE_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
 
 async function fetchHealthCheck() {
   try {
     const response = await fetch(`${FASTAPI_BASE_URL}/health`)
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(
-        `HTTP ${response.status}: ${response.statusText}\n${errorText}`
-      )
+      throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
     }
     return response.json()
   } catch (error) {
@@ -40,14 +37,10 @@ async function fetchHealthCheck() {
 
 async function fetchDatabaseHealth() {
   try {
-    const response = await fetch(
-      `${FASTAPI_BASE_URL}/api/v1/health/health/database`
-    )
+    const response = await fetch(`${FASTAPI_BASE_URL}/api/v1/health/health/database`)
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(
-        `HTTP ${response.status}: ${response.statusText}\n${errorText}`
-      )
+      throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
     }
     return response.json()
   } catch (error) {
@@ -90,12 +83,7 @@ function TestResults({
       <CardHeader className="flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{title}</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefetch}
-            disabled={isLoading}
-          >
+          <Button variant="outline" size="sm" onClick={onRefetch} disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -158,9 +146,7 @@ export default function PlaygroundPage() {
       setIsAuthenticated(!!session)
 
       if (!session) {
-        console.warn(
-          'No active session - API calls requiring authentication will fail'
-        )
+        console.warn('No active session - API calls requiring authentication will fail')
       }
     }
     checkAuth()
@@ -174,7 +160,7 @@ export default function PlaygroundPage() {
   const alertsQuery = useScoringAlerts(activeStoreId, alertThreshold)
   const recommendationsQuery = useScoringRecommendations(
     activeStoreId,
-    recommendationCategory || undefined
+    recommendationCategory || undefined,
   )
   const analyticsQuery = useStoreAnalytics(activeStoreId, '7d')
   const dashboardQuery = useDashboardInsights(activeStoreId)
@@ -184,8 +170,7 @@ export default function PlaygroundPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Development Playground</h1>
         <p className="text-muted-foreground">
-          Test components and API endpoints. Current store:{' '}
-          {activeStoreId || 'None selected'}
+          Test components and API endpoints. Current store: {activeStoreId || 'None selected'}
         </p>
         {!isAuthenticated && (
           <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
@@ -201,9 +186,7 @@ export default function PlaygroundPage() {
 
       {/* FastAPI Scoring Endpoints Testing */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">
-          FastAPI Scoring Endpoints Test
-        </h2>
+        <h2 className="text-2xl font-bold mb-4">FastAPI Scoring Endpoints Test</h2>
 
         {/* Health Checks First */}
         <div className="grid gap-4 lg:grid-cols-2 mb-6">
@@ -235,9 +218,7 @@ export default function PlaygroundPage() {
                   max="1"
                   step="0.1"
                   value={alertThreshold}
-                  onChange={(e) =>
-                    setAlertThreshold(parseFloat(e.target.value))
-                  }
+                  onChange={e => setAlertThreshold(parseFloat(e.target.value))}
                   className="mt-1"
                 />
               </div>
@@ -259,7 +240,7 @@ export default function PlaygroundPage() {
                 <select
                   id="category"
                   value={recommendationCategory}
-                  onChange={(e) => setRecommendationCategory(e.target.value)}
+                  onChange={e => setRecommendationCategory(e.target.value)}
                   className="w-full mt-1 px-3 py-2 border rounded-md"
                 >
                   <option value="">All Categories</option>
@@ -273,9 +254,7 @@ export default function PlaygroundPage() {
                   <option value="canned_jarred">Canned & Jarred</option>
                 </select>
               </div>
-              <Button onClick={() => recommendationsQuery.refetch()}>
-                Test Recommendations
-              </Button>
+              <Button onClick={() => recommendationsQuery.refetch()}>Test Recommendations</Button>
             </div>
             <TestResults
               title="AI Recommendations API"
@@ -289,9 +268,7 @@ export default function PlaygroundPage() {
 
         {/* Integrated Scoring System Tests */}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">
-            Integrated Scoring System Tests
-          </h3>
+          <h3 className="text-xl font-semibold mb-4">Integrated Scoring System Tests</h3>
           <div className="grid gap-4 lg:grid-cols-2">
             <TestResults
               title="Alerts (via /api/alerts)"
@@ -335,18 +312,10 @@ export default function PlaygroundPage() {
                 <p className="font-medium">General Health:</p>
                 <Badge
                   variant={
-                    healthQuery.error
-                      ? 'destructive'
-                      : healthQuery.data
-                        ? 'default'
-                        : 'secondary'
+                    healthQuery.error ? 'destructive' : healthQuery.data ? 'default' : 'secondary'
                   }
                 >
-                  {healthQuery.error
-                    ? 'Failed'
-                    : healthQuery.data
-                      ? 'Working'
-                      : 'Untested'}
+                  {healthQuery.error ? 'Failed' : healthQuery.data ? 'Working' : 'Untested'}
                 </Badge>
               </div>
               <div>
@@ -360,29 +329,17 @@ export default function PlaygroundPage() {
                         : 'secondary'
                   }
                 >
-                  {dbHealthQuery.error
-                    ? 'Failed'
-                    : dbHealthQuery.data
-                      ? 'Connected'
-                      : 'Untested'}
+                  {dbHealthQuery.error ? 'Failed' : dbHealthQuery.data ? 'Connected' : 'Untested'}
                 </Badge>
               </div>
               <div>
                 <p className="font-medium">Alerts Endpoint:</p>
                 <Badge
                   variant={
-                    alertsQuery.error
-                      ? 'destructive'
-                      : alertsQuery.data
-                        ? 'default'
-                        : 'secondary'
+                    alertsQuery.error ? 'destructive' : alertsQuery.data ? 'default' : 'secondary'
                   }
                 >
-                  {alertsQuery.error
-                    ? 'Failed'
-                    : alertsQuery.data
-                      ? 'Working'
-                      : 'Untested'}
+                  {alertsQuery.error ? 'Failed' : alertsQuery.data ? 'Working' : 'Untested'}
                 </Badge>
               </div>
               <div>
@@ -409,9 +366,7 @@ export default function PlaygroundPage() {
               </div>
               <div>
                 <p className="font-medium">Active Store:</p>
-                <p className="font-mono text-xs">
-                  {activeStoreId || 'Not selected'}
-                </p>
+                <p className="font-mono text-xs">{activeStoreId || 'Not selected'}</p>
               </div>
             </div>
           </CardContent>

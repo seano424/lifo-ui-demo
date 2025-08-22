@@ -1,13 +1,33 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lib/database/operations'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
+import { InventoryOperations } from '@/lib/database/operations'
+import { createClient } from '@/lib/supabase/server'
 
 interface ScoringData {
   batch_id: string
   composite_score: number
   recommendation: string
   calculated_at: string
+}
+
+interface BatchWithProduct {
+  batch_id: string
+  batch_number: string
+  current_quantity: number
+  selling_price: number
+  cost_price: number
+  expiry_date: string
+  location_code: string
+  supplier: string
+  products:
+    | {
+        sku: string
+        name: string
+        category: string
+        brand: string
+        unit_type: string
+      }[]
+    | null
 }
 
 interface AlertData {
@@ -82,7 +102,7 @@ export async function GET(request: NextRequest) {
   const threshold = parseFloat(searchParams.get('threshold') || '0.6')
   const urgencyLevel = searchParams.get('urgency') // critical, high, medium, low
   const category = searchParams.get('category')
-  const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500)
+  const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500)
 
   console.log('[/api/alerts] Request parameters:', {
     userId: user.id,
@@ -147,7 +167,7 @@ export async function GET(request: NextRequest) {
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
       const daysToExpiry = Math.floor(
-        (new Date(alert.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+        (new Date(alert.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
       )
 
       const urgencyLevel =
@@ -335,8 +355,9 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
     // Filter by threshold and format data
     const alerts =
       batches
-        ?.map(batch => {
+        ?.map((batch: BatchWithProduct) => {
           const scoring = scoringMap.get(batch.batch_id)
+          const product = batch.products?.[0] // Get first product from array
           return {
             batch_id: batch.batch_id,
             batch_number: batch.batch_number,
@@ -346,16 +367,11 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
             expiry_date: batch.expiry_date,
             location_code: batch.location_code,
             supplier: batch.supplier,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            sku: (batch as any).products?.sku,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            product_name: (batch as any).products?.name,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            category: (batch as any).products?.category,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            brand: (batch as any).products?.brand,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            unit_type: (batch as any).products?.unit_type,
+            sku: product?.sku,
+            product_name: product?.name,
+            category: product?.category,
+            brand: product?.brand,
+            unit_type: product?.unit_type,
             composite_score: scoring?.composite_score || 0,
             recommendation: scoring?.recommendation,
             calculated_at: scoring?.calculated_at,

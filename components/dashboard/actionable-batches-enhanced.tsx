@@ -2,10 +2,7 @@
 
 import { AlertTriangle, Clock, Heart, Loader2, Percent } from 'lucide-react'
 import { useState } from 'react'
-import { useScoringRecommendations } from '@/hooks/use-fastapi-scoring'
-import type { ScoringAlert } from '@/hooks/use-fastapi-scoring'
-import { useActiveDonationRecipients, useDonationAction } from '@/hooks/use-donations'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,8 +23,8 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useActiveDonationRecipients, useDonationAction } from '@/hooks/use-donations'
-import { useActionableBatches } from '@/hooks/use-store-insights'
-import type { ActionableBatch } from '@/lib/queries/store-insights'
+import type { ScoringAlert } from '@/hooks/use-fastapi-scoring'
+import { useScoringRecommendations } from '@/hooks/use-fastapi-scoring'
 
 interface ActionableBatchesEnhancedProps {
   storeId: string
@@ -244,7 +241,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
               <div className="bg-muted p-3 rounded-lg">
                 <h4 className="font-medium">{selectedBatch.product_name}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Quantity: {selectedBatch.current_quantity} • Expires:{' '}
+                  Quantity: {selectedBatch.quantity} • Expires:{' '}
                   {new Date(selectedBatch.expiry_date).toLocaleDateString()}
                 </p>
               </div>

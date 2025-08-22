@@ -5,10 +5,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
 import { useScoringAlerts } from '@/hooks/use-fastapi-scoring'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-
-import { Typography } from '@/components/ui/typography'
 
 export function UrgentAlerts() {
   const activeStoreId = useActiveStoreId()

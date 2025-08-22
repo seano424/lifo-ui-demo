@@ -53,15 +53,51 @@ export interface AlertsResponse {
   }
 }
 
+interface OverviewAnalytics {
+  urgent_items: number
+  actions_taken: number
+  discount_actions: number
+  total_discount_value: number
+  avg_composite_score: number
+  [key: string]: number | string | undefined // For other store stats
+}
+
+interface WasteAnalytics {
+  expired_items: number
+  expiring_soon: number
+  waste_value: number
+  waste_by_category: Record<string, number>
+  prevention_potential: number
+}
+
+interface RevenueAnalytics {
+  total_discounts_applied: number
+  total_discount_value: number
+  revenue_recovered: number
+  waste_prevented: number
+  recovery_rate: number
+  avg_discount_percent: number
+}
+
+interface CategoryAnalytics {
+  [category: string]: {
+    total_items: number
+    total_value: number
+    high_urgency: number
+    avg_score: number
+    expiring_3days: number
+  }
+}
+
 export interface AnalyticsResponse {
   analytics: {
     timeframe: string
     store_id: string
     generated_at: string
-    overview?: any
-    waste?: any
-    revenue?: any
-    categories?: any
+    overview?: OverviewAnalytics | { error: string }
+    waste?: WasteAnalytics | { error: string }
+    revenue?: RevenueAnalytics | { error: string }
+    categories?: CategoryAnalytics | { error: string }
   }
 }
 
