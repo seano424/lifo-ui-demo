@@ -2,33 +2,30 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { getRequestConfig } from 'next-intl/server'
 
-async function detectLanguageFromHeaders(): Promise<string> {
+function detectLanguageFromHeaders(): string {
   try {
-    const headersList = await headers()
+    const headersList = headers()
     const acceptLanguage = headersList.get('accept-language')
-
+    
     if (!acceptLanguage) return 'fr'
-
+    
     // Parse Accept-Language header (e.g., "en-US,en;q=0.9,fr;q=0.8")
     const languages = acceptLanguage
       .split(',')
-      .map((lang: string) => {
+      .map(lang => {
         const [locale, q = 'q=1'] = lang.trim().split(';')
         const quality = parseFloat(q.split('=')[1] || '1')
         return { locale: locale.split('-')[0], quality }
       })
-      .sort(
-        (a: { locale: string; quality: number }, b: { locale: string; quality: number }) =>
-          b.quality - a.quality,
-      )
-
+      .sort((a, b) => b.quality - a.quality)
+    
     // Find first supported language
     for (const { locale } of languages) {
-      if (['en', 'fr', 'nl'].includes(locale)) {
+      if (['en', 'fr'].includes(locale)) {
         return locale
       }
     }
-
+    
     return 'fr'
   } catch {
     return 'fr'
@@ -37,12 +34,12 @@ async function detectLanguageFromHeaders(): Promise<string> {
 
 export default getRequestConfig(async () => {
   // 1. Start with header-based detection
-  let locale = await detectLanguageFromHeaders()
-
+  let locale = detectLanguageFromHeaders()
+  
   try {
     // 2. Try to get user's saved preference from Supabase
     const cookieStore = await cookies()
-
+    
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -58,14 +55,12 @@ export default getRequestConfig(async () => {
       },
     )
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
     // 3. User preference takes precedence
     if (user?.user_metadata?.language_preference) {
       const userLang = user.user_metadata.language_preference
-      if (['en', 'fr', 'nl'].includes(userLang)) {
+      if (['en', 'fr'].includes(userLang)) {
         locale = userLang
       }
     }
@@ -76,10 +71,13 @@ export default getRequestConfig(async () => {
     }
   }
 
+  // 4. Detect timezone for locale-specific formatting
+  const timezone = detectTimezone()
+
   return {
     locale,
     messages: (await import(`./messages/${locale}.json`)).default,
-    timeZone: 'Europe/Paris',
+    timeZone: timezone,
     onError(error) {
       if (process.env.NODE_ENV === 'development') {
         console.warn('i18n error:', error.message)
@@ -91,3 +89,9 @@ export default getRequestConfig(async () => {
     },
   }
 })
+
+function detectTimezone(): string {
+  // Server-side timezone detection is limited
+  // You'd typically handle this client-side or use IP geolocation
+  return 'Europe/Paris'
+}
