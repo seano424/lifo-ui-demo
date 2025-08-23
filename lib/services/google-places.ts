@@ -51,7 +51,7 @@ class GooglePlacesService {
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || ''
 
-    if (!this.apiKey) {
+    if (!this.apiKey && process.env.NODE_ENV === 'development') {
       console.warn('Google Places API key not found. Using mock data.')
     }
   }
