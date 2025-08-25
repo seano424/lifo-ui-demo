@@ -18,8 +18,8 @@ export default function DashboardInsetHeader({
   return (
     <div
       className={cn(
-        'flex flex-col sm:flex-row gap-4 justify-between items-center capitalize text-center sm:text-left',
-        className,
+        'flex flex-col lg:flex-row gap-4 justify-between items-center capitalize text-center lg:text-left',
+        className
       )}
     >
       <div className="flex flex-col gap-1">
@@ -27,11 +27,17 @@ export default function DashboardInsetHeader({
           <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-full" />
         ) : (
           <>
-            <Typography variant="h2" className="font-bold">
+            <Typography
+              variant="h2"
+              className="font-bold"
+            >
               {title}
             </Typography>
             {description && (
-              <Typography variant="p" color="muted">
+              <Typography
+                variant="p"
+                color="muted"
+              >
                 {description}
               </Typography>
             )}

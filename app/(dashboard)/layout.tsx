@@ -49,7 +49,7 @@ export default async function DashboardLayout({
                 orientation="vertical"
                 className="mr-2 data-[orientation=vertical]:h-4"
               />
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <DashboardBreadcrumbs />
               </div>
             </div>
@@ -57,17 +57,17 @@ export default async function DashboardLayout({
             <div className="flex items-center gap-2">
               <Button
                 size="icon"
-                className="rounded-full border md:hidden"
+                className="border rounded-full"
               >
                 <BellIcon className="w-4 h-4" />
               </Button>
-              <Button
+              {/* <Button
                 size="default"
-                className="rounded-full border hidden md:flex"
+                className="border hidden md:flex"
               >
                 <BellIcon className="w-4 h-4" />
                 Notifications
-              </Button>
+              </Button> */}
               <div className="hidden md:block">
                 <TeamSwitcher />
               </div>

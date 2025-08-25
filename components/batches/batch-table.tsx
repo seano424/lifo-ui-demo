@@ -11,9 +11,17 @@ import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
-import { ColumnResizer, createBatchTableColumns } from '@/components/batches/batch-table-columns'
+import {
+  ColumnResizer,
+  createBatchTableColumns,
+} from '@/components/batches/batch-table-columns'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -24,7 +32,11 @@ import {
 } from '@/components/ui/table'
 import { useBatchActions } from '@/hooks/use-batches'
 import { useColumnSizing } from '@/hooks/use-column-sizing'
-import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
+import type {
+  BatchSort,
+  BatchSortField,
+  BatchWithProduct,
+} from '@/lib/queries/batches'
 
 const VALID_COLUMN_IDS = [
   'batch_number',
@@ -44,13 +56,20 @@ interface BatchTableProps {
   isLoading: boolean
 }
 
-export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTableProps) {
-  const { markBatchAsExpired, markBatchAsDamaged, isUpdating } = useBatchActions()
+export function BatchTable({
+  data,
+  currentSort,
+  updateSort,
+  isLoading,
+}: BatchTableProps) {
+  const { markBatchAsExpired, markBatchAsDamaged, isUpdating } =
+    useBatchActions()
   const t = useTranslations('batches.table')
   const tStatus = useTranslations('batches.status')
   const tExpiry = useTranslations('batches.expiry')
 
-  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useColumnSizing()
+  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } =
+    useColumnSizing()
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
@@ -119,7 +138,9 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
       <Card className="border-0 shadow-none">
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
+          <CardTitle className="text-lg mb-2">
+            {t('emptyState.title')}
+          </CardTitle>
           <CardDescription className="text-center max-w-md">
             {t('emptyState.description')}
           </CardDescription>
@@ -133,14 +154,13 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
     <div className="overflow-x-auto">
       <Table
         style={{
-          width: table.getCenterTotalSize(),
           tableLayout: 'fixed',
         }}
       >
         <TableHeader>
-          {table.getHeaderGroups().map(headerGroup => (
+          {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
+              {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
                   className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
@@ -153,17 +173,22 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
                 >
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                  {header.column.getCanResize() && <ColumnResizer header={header} />}
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                  {header.column.getCanResize() && (
+                    <ColumnResizer header={header} />
+                  )}
                 </TableHead>
               ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map(row => (
+          {table.getRowModel().rows.map((row) => (
             <TableRow key={row.id}>
-              {row.getVisibleCells().map(cell => (
+              {row.getVisibleCells().map((cell) => (
                 <TableCell
                   key={cell.id}
                   style={{
