@@ -193,7 +193,16 @@ async function getWasteAnalytics(
     const { data: expiredBatches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select('*')
+      .select(`
+        *,
+        store_products!inner (
+          products (
+            category,
+            name,
+            sku
+          )
+        )
+      `)
       .eq('store_id', storeId)
       .eq('status', 'expired')
       .gte('updated_at', startDate.toISOString())
@@ -206,7 +215,16 @@ async function getWasteAnalytics(
     const { data: expiringSoon } = await supabase
       .schema('inventory')
       .from('batches')
-      .select('*')
+      .select(`
+        *,
+        store_products!inner (
+          products (
+            category,
+            name,
+            sku
+          )
+        )
+      `)
       .eq('store_id', storeId)
       .eq('status', 'active')
       .lte('expiry_date', soonExpiryDate.toISOString().split('T')[0])
@@ -219,8 +237,8 @@ async function getWasteAnalytics(
 
     const wasteByCategory: Record<string, { count: number; value: number }> = {}
     expiredBatches?.forEach(batch => {
-      const b = batch as BatchWithJoins
-      const category = b.products?.category || 'unknown'
+      const b = batch as any // Use any to handle the joined structure
+      const category = b.store_products?.products?.category || 'unknown'
       if (!wasteByCategory[category]) {
         wasteByCategory[category] = { count: 0, value: 0 }
       }
@@ -309,9 +327,25 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     const { data: batches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select('*')
+      .select(`
+        *,
+        store_products!inner (
+          products (
+            category,
+            name,
+            sku
+          )
+        )
+      `)
       .eq('store_id', storeId)
       .eq('status', 'active')
+
+    // Get product scores separately to avoid cross-schema JOIN issues
+    const { data: productScores } = await supabase
+      .schema('scoring')
+      .from('product_scores')
+      .select('batch_id, composite_score, recommendation')
+      .eq('store_id', storeId)
 
     // Define the type for category stats
     type CategoryStats = {
@@ -327,8 +361,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     const categoryStats: Record<string, CategoryStats> = {}
 
     batches?.forEach(batch => {
-      const b = batch as BatchWithJoins
-      const category = b.products?.category || 'unknown'
+      const b = batch as any // Use any to handle the joined structure
+      const category = b.store_products?.products?.category || 'unknown'
 
       if (!categoryStats[category]) {
         categoryStats[category] = {
@@ -344,7 +378,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
         (new Date(b.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
       )
 
-      const score = b.product_scores?.[0]?.composite_score || 0
+      const scoreRecord = productScores?.find(ps => ps.batch_id === batch.batch_id)
+      const score = scoreRecord?.composite_score || 0
       const value = (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
 
       categoryStats[category].total_items += 1

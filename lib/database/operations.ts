@@ -1095,7 +1095,17 @@ export class InventoryOperations {
       const { data: batches, error: batchError } = await this.supabase
         .schema('inventory')
         .from('batches')
-        .select('current_quantity, selling_price, expiry_date')
+        .select(`
+          current_quantity, 
+          selling_price, 
+          expiry_date,
+          store_products!inner (
+            products (
+              category,
+              name
+            )
+          )
+        `)
         .eq('store_id', storeId)
         .eq('status', 'active')
 
