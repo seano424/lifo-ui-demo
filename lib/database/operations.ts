@@ -1076,14 +1076,77 @@ export class InventoryOperations {
     totalValue: number
     expiringItems: number
   }> {
-    // TODO: Re-enable when all systems are ready
-    console.warn('Store stats functionality temporarily disabled')
-    return {
-      totalProducts: 0,
-      totalBatches: 0,
-      activeAlerts: 0,
-      totalValue: 0,
-      expiringItems: 0,
+    try {
+      console.log(`[InventoryOperations.getStoreStats] Calculating stats for store: ${storeId}`)
+
+      // Get total store products
+      const { count: productCount, error: productError } = await this.supabase
+        .schema('inventory')
+        .from('store_products')
+        .select('*', { count: 'exact', head: true })
+        .eq('store_id', storeId)
+        .eq('is_active', true)
+
+      if (productError) {
+        console.error('[getStoreStats] Error counting products:', productError)
+      }
+
+      // Get active batches and their values
+      const { data: batches, error: batchError } = await this.supabase
+        .schema('inventory')
+        .from('batches')
+        .select('current_quantity, selling_price, expiry_date')
+        .eq('store_id', storeId)
+        .eq('status', 'active')
+
+      if (batchError) {
+        console.error('[getStoreStats] Error fetching batches:', batchError)
+      }
+
+      // Calculate total value
+      const totalValue = batches?.reduce((sum, batch) => {
+        return sum + (batch.current_quantity || 0) * (batch.selling_price || 0)
+      }, 0) || 0
+
+      // Calculate expiring items (expiring within 3 days)
+      const threeDaysFromNow = new Date()
+      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
+      const expiringItems = batches?.filter(batch => {
+        const expiryDate = new Date(batch.expiry_date)
+        return expiryDate <= threeDaysFromNow
+      }).length || 0
+
+      // Get high urgency items from scoring schema (for activeAlerts)
+      const { data: urgentItems, error: urgentError } = await this.supabase
+        .schema('scoring')
+        .from('product_scores')
+        .select('*', { count: 'exact' })
+        .eq('store_id', storeId)
+        .gte('composite_score', 0.6)
+
+      if (urgentError) {
+        console.error('[getStoreStats] Error fetching urgent items:', urgentError)
+      }
+
+      const stats = {
+        totalProducts: productCount || 0,
+        totalBatches: batches?.length || 0,
+        activeAlerts: urgentItems?.length || 0,
+        totalValue: Math.round(totalValue * 100) / 100,
+        expiringItems,
+      }
+
+      console.log(`[InventoryOperations.getStoreStats] Stats calculated:`, stats)
+      return stats
+    } catch (error) {
+      console.error('[InventoryOperations.getStoreStats] Unexpected error:', error)
+      return {
+        totalProducts: 0,
+        totalBatches: 0,
+        activeAlerts: 0,
+        totalValue: 0,
+        expiringItems: 0,
+      }
     }
   }
 }
