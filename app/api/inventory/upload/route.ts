@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import { handleScoringError, scoreAfterCsvUpload } from '@/lib/scoring/batch-scoring-integration'
 import { createClient } from '@/lib/supabase/server'
-import { scoreAfterCsvUpload, handleScoringError } from '@/lib/scoring/batch-scoring-integration'
 
 export async function POST(request: NextRequest) {
   console.log('🚀 [UPLOAD-API] === CSV BULK UPLOAD API CALLED ===')
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
 
     if (process.env.ENABLE_AUTO_SCORING !== 'false' && result.processed > 0) {
       const scoringStartTime = Date.now()
-      
+
       try {
         scoringResult = await scoreAfterCsvUpload(storeId, result.processed, {
           force_recalculate: true, // New batches always need scoring
@@ -231,7 +231,6 @@ export async function POST(request: NextRequest) {
           scoringWarning = errorHandling.userMessage
           console.log('📝 [UPLOAD-API]', errorHandling.logMessage)
         }
-
       } catch (scoringError) {
         const scoringTime = Date.now() - scoringStartTime
         console.error('❌ [UPLOAD-API] Scoring integration error (non-critical):', {
@@ -240,7 +239,8 @@ export async function POST(request: NextRequest) {
           scoring_time_ms: scoringTime,
         })
 
-        scoringWarning = 'Batches created successfully. Scoring will be calculated in the background.'
+        scoringWarning =
+          'Batches created successfully. Scoring will be calculated in the background.'
       }
     } else {
       console.log('⏭️ [UPLOAD-API] Automatic scoring disabled or no batches to score')
