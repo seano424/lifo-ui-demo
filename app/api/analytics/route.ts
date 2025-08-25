@@ -4,10 +4,11 @@ import { InventoryOperations } from '@/lib/database/operations'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
-// Helper type for joined batch with optional products and product_scores
-type BatchWithJoins = Database['inventory']['Tables']['batches']['Row'] & {
-  products?: { category?: string; name?: string; sku?: string }
-  product_scores?: { composite_score?: number; recommendation?: string }[]
+// Helper type for batch with store_products join
+type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] & {
+  store_products?: {
+    products?: { category?: string; name?: string; sku?: string }
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -237,7 +238,7 @@ async function getWasteAnalytics(
 
     const wasteByCategory: Record<string, { count: number; value: number }> = {}
     expiredBatches?.forEach(batch => {
-      const b = batch as any // Use any to handle the joined structure
+      const b = batch as BatchWithStoreProduct
       const category = b.store_products?.products?.category || 'unknown'
       if (!wasteByCategory[category]) {
         wasteByCategory[category] = { count: 0, value: 0 }
@@ -361,7 +362,7 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     const categoryStats: Record<string, CategoryStats> = {}
 
     batches?.forEach(batch => {
-      const b = batch as any // Use any to handle the joined structure
+      const b = batch as BatchWithStoreProduct
       const category = b.store_products?.products?.category || 'unknown'
 
       if (!categoryStats[category]) {
