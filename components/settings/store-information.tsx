@@ -265,7 +265,7 @@ export default function StoreInformation({
         </CardHeader>
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {createSkeletonKeys(8, 'field').map(skeleton => (
+            {createSkeletonKeys(8, 'field').map((skeleton: { id: string; label: string }) => (
               <div key={skeleton.id} className="space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
