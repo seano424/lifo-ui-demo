@@ -12,7 +12,10 @@ interface BatchListFiltersProps {
     expiringInDays?: number
     status?: string
   }
-  onFiltersChange?: (filters: { expiringInDays?: number; status?: string }) => void
+  onFiltersChange?: (filters: {
+    expiringInDays?: number
+    status?: string
+  }) => void
   count: number
   isLoading: boolean
 }
@@ -28,11 +31,11 @@ export function BatchListFilters({
   }
 
   return (
-    <div className="flex flex-col-reverse items-center md:items-end md:flex-row justify-end gap-2">
+    <div className="flex flex-col-reverse items-center md:flex-row justify-end gap-2">
       <div className="flex items-center gap-2">
         <Select
           value={filters?.expiringInDays?.toString() || 'all'}
-          onValueChange={value =>
+          onValueChange={(value) =>
             onFiltersChange({
               ...filters,
               expiringInDays: value === 'all' ? undefined : parseInt(value, 10),
@@ -54,7 +57,7 @@ export function BatchListFilters({
 
         <Select
           value={filters?.status || 'all'}
-          onValueChange={value =>
+          onValueChange={(value) =>
             onFiltersChange({
               ...filters,
               status: value === 'all' ? undefined : value,

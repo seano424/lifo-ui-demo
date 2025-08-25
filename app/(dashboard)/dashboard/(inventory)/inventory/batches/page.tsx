@@ -24,7 +24,9 @@ interface InventoryBatchesPageProps {
   }>
 }
 
-export default async function InventoryBatchesPage({ searchParams }: InventoryBatchesPageProps) {
+export default async function InventoryBatchesPage({
+  searchParams,
+}: InventoryBatchesPageProps) {
   // Await searchParams as required in Next.js 15
   const params = await searchParams
   const { queryClient } = await createPrefetchedQuery()
@@ -66,7 +68,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
     // Determine which store to prefetch data for
     const primaryStoreId = preferences?.primary_store_id
-    const primaryStore = stores.find(s => s.store.store_id === primaryStoreId)
+    const primaryStore = stores.find((s) => s.store.store_id === primaryStoreId)
     const storeToUse = primaryStore ? primaryStore.store : stores[0].store
 
     // Build filters based on search params
@@ -79,7 +81,12 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
     // Handle status filter
     if (params.status) {
-      filters.status = params.status as 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved'
+      filters.status = params.status as
+        | 'active'
+        | 'expired'
+        | 'damaged'
+        | 'sold_out'
+        | 'reserved'
     }
 
     // Handle sorting
@@ -94,9 +101,13 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.batches.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchBatchesPage({ page: pageParam, pageSize: 20 }, filters, serverClient),
+        fetchBatchesPage(
+          { page: pageParam, pageSize: 20 },
+          filters,
+          serverClient
+        ),
       initialPageParam: 0,
-      getNextPageParam: lastPage => lastPage.nextPage,
+      getNextPageParam: (lastPage) => lastPage.nextPage,
       pages: 1, // Only prefetch first page
     })
 
@@ -109,7 +120,11 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
           { daysAhead: filters.expiringInDays },
         ],
         queryFn: () =>
-          fetchExpiringBatches(storeToUse.store_id, filters.expiringInDays, serverClient),
+          fetchExpiringBatches(
+            storeToUse.store_id,
+            filters.expiringInDays,
+            serverClient
+          ),
       })
     }
 
@@ -117,7 +132,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       '[InventoryBatchesPage] Prefetched data for store:',
       storeToUse.store_name,
       'with filters:',
-      filters,
+      filters
     )
   } catch (error) {
     console.error('[InventoryBatchesPage] Error prefetching data:', error)
@@ -134,9 +149,11 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        <BatchesHeader title={pageTitle} description={pageDescription} />
+        <BatchesHeader
+          title={pageTitle}
+          description={pageDescription}
+        />
 
-        {/* Client-side filtered batch list */}
         <BatchesFilteredList
           initialFilters={{
             filter: params.filter,

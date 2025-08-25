@@ -27,10 +27,10 @@ export function ProductListFilters({
   }
 
   return (
-    <div className="flex flex-col-reverse items-center md:items-end md:flex-row justify-end gap-2">
+    <div className="flex flex-col-reverse items-center md:flex-row justify-end gap-2">
       <Select
         value={filters?.category || 'all'}
-        onValueChange={value =>
+        onValueChange={(value) =>
           onFiltersChange({
             ...filters,
             category: value === 'all' ? undefined : value,

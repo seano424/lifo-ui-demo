@@ -11,7 +11,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useBatches } from '@/hooks/use-batches'
-import type { BatchFilters, BatchSort, BatchSortField } from '@/lib/queries/batches'
+import type {
+  BatchFilters,
+  BatchSort,
+  BatchSortField,
+} from '@/lib/queries/batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface BatchesFilteredListProps {
@@ -25,7 +29,10 @@ interface BatchesFilteredListProps {
   pageSize?: number
 }
 
-export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFilteredListProps) {
+export function BatchesFilteredList({
+  initialFilters,
+  pageSize = 20,
+}: BatchesFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
@@ -37,7 +44,10 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     }
 
     if (initialFilters?.filter === 'expiring') {
-      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '7', 10)
+      baseFilters.expiringInDays = parseInt(
+        initialFilters.expiringDays || '7',
+        10
+      )
     }
 
     if (initialFilters?.status) {
@@ -64,13 +74,18 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     return baseFilters
   })
 
-  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useBatches(
-    filters,
-    pageSize,
-  )
+  const {
+    data,
+    count,
+    isLoading,
+    error,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useBatches(filters, pageSize)
 
   useEffect(() => {
-    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
+    setFilters((prev) => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
   const updateFilters = (newFilters: Partial<BatchFilters>) => {
@@ -108,7 +123,10 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     updateFilters({ sort: newSort })
   }
 
-  const handleFiltersChange = (newFilters: { expiringInDays?: number; status?: string }) => {
+  const handleFiltersChange = (newFilters: {
+    expiringInDays?: number
+    status?: string
+  }) => {
     updateFilters({
       expiringInDays: newFilters.expiringInDays,
       status: newFilters.status as
@@ -125,17 +143,19 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>Failed to load batches: {error.message}</AlertDescription>
+        <AlertDescription>
+          Failed to load batches: {error.message}
+        </AlertDescription>
       </Alert>
     )
   }
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="overflow-x-auto">
         <div className="p-4 border-b">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 md:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 lg:flex-row sm:items-center sm:justify-between">
               <BatchListFilters
                 filters={{
                   expiringInDays: filters.expiringInDays,
@@ -146,11 +166,19 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
                 isLoading={isLoading}
               />
               <BatchListSortControls
-                currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-                updateSort={field => {
-                  const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+                currentSort={
+                  filters.sort || { field: 'created_at', direction: 'desc' }
+                }
+                updateSort={(field) => {
+                  const currentSort = filters.sort || {
+                    field: 'created_at',
+                    direction: 'desc',
+                  }
                   const newDirection =
-                    currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+                    currentSort.field === field &&
+                    currentSort.direction === 'asc'
+                      ? 'desc'
+                      : 'asc'
                   handleSortChange({ field, direction: newDirection })
                 }}
                 isLoading={isLoading}
@@ -162,11 +190,18 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
         <BatchTable
           data={data}
           isLoading={isLoading}
-          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          updateSort={field => {
-            const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+          currentSort={
+            filters.sort || { field: 'created_at', direction: 'desc' }
+          }
+          updateSort={(field) => {
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
             const newDirection =
-              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+              currentSort.field === field && currentSort.direction === 'asc'
+                ? 'desc'
+                : 'asc'
             handleSortChange({ field, direction: newDirection })
           }}
         />
@@ -174,7 +209,12 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
 
       {hasMore && (
         <div className="flex justify-center pt-6">
-          <Button variant="outline" onClick={fetchNextPage} disabled={isFetchingNextPage} size="lg">
+          <Button
+            variant="outline"
+            onClick={fetchNextPage}
+            disabled={isFetchingNextPage}
+            size="lg"
+          >
             {isFetchingNextPage ? (
               <>
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
