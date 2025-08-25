@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
 
   try {
     console.log('[/api/alerts] Initializing InventoryOperations...')
-    const operations = new InventoryOperations(supabase)
+    const _operations = new InventoryOperations(supabase)
 
     console.log('[/api/alerts] Skipping store access validation for read operation...', {
       storeId,
@@ -334,7 +334,8 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
       batches
         ?.map((batch: BatchWithProduct) => {
           const scoring = scoringMap.get(batch.batch_id)
-          const product = batch.products?.[0] // Get first product from array
+          // Handle both single object and array cases from Supabase join
+          const product = Array.isArray(batch.products) ? batch.products[0] : batch.products
           return {
             batch_id: batch.batch_id,
             batch_number: batch.batch_number,

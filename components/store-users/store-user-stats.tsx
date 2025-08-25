@@ -12,7 +12,6 @@ import {
   useStoreUsers,
 } from '@/hooks/use-store-users'
 import { useStoreState } from '@/lib/stores/store-context'
-import { createSkeletonKeys } from '@/lib/utils/skeleton-keys'
 
 export function StoreUserStats() {
   const { activeStore } = useStoreState()
@@ -54,11 +53,11 @@ export function StoreUserStats() {
   }
 
   if (isLoading) {
-    const skeletonCards = createSkeletonKeys(4, 'card')
+    const skeletonCards = Array.from({ length: 4 }, (_, i) => ({ id: `skeleton-${i}` }))
 
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {skeletonCards.map(skeleton => (
+        {skeletonCards.map((skeleton: { id: string }) => (
           <Card key={skeleton.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />

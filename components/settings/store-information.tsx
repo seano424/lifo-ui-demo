@@ -26,7 +26,6 @@ import { useStoreActions, useStorePermissions, useStoreSettings } from '@/hooks/
 import { useCurrentUser } from '@/hooks/use-users'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import { createSkeletonKeys } from '@/lib/utils/skeleton-keys'
 
 // Interface for server permissions prop
 interface StoreInformationProps {
@@ -101,8 +100,14 @@ type StoreInfoFormData = z.infer<ReturnType<typeof createStoreInfoSchema>>
 // Configuration constants
 const createStoreTypes = (t: TranslationFunction) =>
   [
-    { value: 'supermarket', label: t('storeInformation.storeTypes.supermarket') },
-    { value: 'convenience', label: t('storeInformation.storeTypes.convenience') },
+    {
+      value: 'supermarket',
+      label: t('storeInformation.storeTypes.supermarket'),
+    },
+    {
+      value: 'convenience',
+      label: t('storeInformation.storeTypes.convenience'),
+    },
     { value: 'restaurant', label: t('storeInformation.storeTypes.restaurant') },
     { value: 'bakery', label: t('storeInformation.storeTypes.bakery') },
     { value: 'butcher', label: t('storeInformation.storeTypes.butcher') },
@@ -114,13 +119,19 @@ const createSizeCategories = (t: TranslationFunction) =>
     { value: 'small', label: t('storeInformation.sizeCategories.small') },
     { value: 'medium', label: t('storeInformation.sizeCategories.medium') },
     { value: 'large', label: t('storeInformation.sizeCategories.large') },
-    { value: 'hypermarket', label: t('storeInformation.sizeCategories.hypermarket') },
+    {
+      value: 'hypermarket',
+      label: t('storeInformation.sizeCategories.hypermarket'),
+    },
   ] as const
 
 const createCountries = (t: TranslationFunction) =>
   [
     { value: 'France', label: t('storeInformation.countries.France') },
-    { value: 'Netherlands', label: t('storeInformation.countries.Netherlands') },
+    {
+      value: 'Netherlands',
+      label: t('storeInformation.countries.Netherlands'),
+    },
     { value: 'Belgium', label: t('storeInformation.countries.Belgium') },
     { value: 'Germany', label: t('storeInformation.countries.Germany') },
     { value: 'Spain', label: t('storeInformation.countries.Spain') },
@@ -250,6 +261,11 @@ export default function StoreInformation({
     setHasUnsavedChanges(false)
   }
 
+  const createSkeletonKeys = (count: number, prefix: string) =>
+    Array.from({ length: count }, (_, i) => ({ id: `${prefix}-${i}` }))
+
+  const skeletonCards = createSkeletonKeys(8, 'field')
+
   // Only show loading when we don't have an effective storeId OR data is loading
   if (isLoading) {
     return (
@@ -265,7 +281,7 @@ export default function StoreInformation({
         </CardHeader>
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {createSkeletonKeys(8, 'field').map(skeleton => (
+            {skeletonCards.map(skeleton => (
               <div key={skeleton.id} className="space-y-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
@@ -664,7 +680,9 @@ export default function StoreInformation({
                       min="0"
                       max="100"
                       step="0.1"
-                      {...form.register('default_markup_percent', { valueAsNumber: true })}
+                      {...form.register('default_markup_percent', {
+                        valueAsNumber: true,
+                      })}
                     />
                   ) : (
                     <Typography variant="p">
@@ -686,7 +704,9 @@ export default function StoreInformation({
                       min="0"
                       max="100"
                       step="0.1"
-                      {...form.register('waste_reduction_target_percent', { valueAsNumber: true })}
+                      {...form.register('waste_reduction_target_percent', {
+                        valueAsNumber: true,
+                      })}
                     />
                   ) : (
                     <Typography variant="p">

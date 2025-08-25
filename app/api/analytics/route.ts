@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
   try {
     console.log('[/api/analytics] Initializing InventoryOperations...')
-    const operations = new InventoryOperations(supabase)
+    const _operations = new InventoryOperations(supabase)
 
     console.log('[/api/analytics] Skipping store access validation for read operation...', {
       storeId,
