@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 import { BATCH_SOURCES } from '@/types/inventory'
 import { Json } from '@/types/supabase'
+import { scoreAfterScanIn, handleScoringError } from '@/lib/scoring/batch-scoring-integration'
 
 export interface ScannedProductData {
   barcode: string
@@ -32,6 +33,14 @@ export interface InventorySubmissionResult {
   storeProductCreated: boolean
   batchId: string
   message: string
+  scoring?: {
+    attempted: boolean
+    success: boolean
+    processed: number
+    high_priority_count: number
+    processing_time_ms: number
+    warning?: string
+  }
 }
 
 /**
@@ -70,12 +79,79 @@ export async function submitScannedProductToInventory(
     const batch = await createProductBatch(product.product_id, productData)
     console.log('[submitScannedProductToInventory] Batch created:', batch.batch_id)
 
+    // Step 4: Automatic scoring integration (if enabled)
+    let scoringResult = null
+    let scoringInfo = {
+      attempted: false,
+      success: false,
+      processed: 0,
+      high_priority_count: 0,
+      processing_time_ms: 0,
+      warning: undefined as string | undefined,
+    }
+
+    const autoScoringEnabled = process.env.ENABLE_AUTO_SCORING !== 'false'
+    console.log('[submitScannedProductToInventory] Auto-scoring enabled:', autoScoringEnabled)
+
+    if (autoScoringEnabled) {
+      const scoringStartTime = Date.now()
+      scoringInfo.attempted = true
+
+      try {
+        console.log('[submitScannedProductToInventory] Starting automatic scoring for batch:', batch.batch_id)
+        
+        scoringResult = await scoreAfterScanIn(productData.storeId, batch.batch_id, {
+          force_recalculate: false, // Use existing scores if available
+        })
+
+        const scoringTime = Date.now() - scoringStartTime
+        scoringInfo.processing_time_ms = scoringTime
+
+        if (scoringResult.success) {
+          console.log('[submitScannedProductToInventory] Scoring completed successfully:', {
+            batchId: batch.batch_id,
+            processed: scoringResult.data.processed,
+            high_priority: scoringResult.data.high_priority_count,
+            scoring_time_ms: scoringTime,
+          })
+
+          scoringInfo.success = true
+          scoringInfo.processed = scoringResult.data.processed
+          scoringInfo.high_priority_count = scoringResult.data.high_priority_count
+        } else {
+          console.warn('[submitScannedProductToInventory] Scoring failed (non-critical):', {
+            batchId: batch.batch_id,
+            error: scoringResult.error,
+            scoring_time_ms: scoringTime,
+          })
+
+          // Handle scoring error gracefully
+          const errorHandling = handleScoringError(scoringResult, 'scan_in')
+          scoringInfo.warning = errorHandling.userMessage
+          console.log('[submitScannedProductToInventory]', errorHandling.logMessage)
+        }
+
+      } catch (scoringError) {
+        const scoringTime = Date.now() - scoringStartTime
+        scoringInfo.processing_time_ms = scoringTime
+
+        console.error('[submitScannedProductToInventory] Scoring integration error (non-critical):', {
+          batchId: batch.batch_id,
+          error: scoringError instanceof Error ? scoringError.message : 'Unknown error',
+          scoring_time_ms: scoringTime,
+        })
+
+        scoringInfo.warning = 'Product added successfully. Scoring will be calculated in the background.'
+      }
+    }
+
     return {
       success: true,
       productId: product.product_id,
       storeProductCreated,
       batchId: batch.batch_id,
       message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
+      scoring: scoringInfo,
     }
   } catch (error) {
     console.error('[submitScannedProductToInventory] Submission failed:', error)
