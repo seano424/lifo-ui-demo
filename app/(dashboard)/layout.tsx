@@ -6,19 +6,11 @@ import { SettingsError } from '@/components/settings/settings-error-boundary'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import UserButton from '@/components/users/user-button'
 import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const dashboardData = await prefetchDashboardData()
 
   // Handle authentication errors at the dashboard level
@@ -45,20 +37,14 @@ export default async function DashboardLayout({
           <header className="flex sticky top-0 bg-background z-50 h-16 shrink-0 items-center gap-2 justify-between px-4 border-b">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
+              <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
               <div className="hidden lg:block">
                 <DashboardBreadcrumbs />
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                size="icon"
-                className="border rounded-full"
-              >
+              <Button size="icon" className="border rounded-full">
                 <BellIcon className="w-4 h-4" />
               </Button>
               {/* <Button
@@ -74,9 +60,7 @@ export default async function DashboardLayout({
               <UserButton />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto">
-            {children}
-          </div>
+          <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </HydrationBoundary>

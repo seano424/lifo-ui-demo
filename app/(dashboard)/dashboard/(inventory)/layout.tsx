@@ -1,8 +1,4 @@
-export default function InventoryLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function InventoryLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="space-y-6">
       <div className="w-full">{children}</div>
