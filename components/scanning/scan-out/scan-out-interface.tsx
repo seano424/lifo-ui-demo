@@ -21,7 +21,6 @@ import ScanningCamera from '../shared/scanning-camera'
 import BatchSelectionList from '../shared/batch-selection-list'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
-import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 
 interface AvailableBatch {
   batch_id: string
@@ -59,7 +58,6 @@ interface ScanOutInterfaceProps {
 
 export default function ScanOutInterface({
   onItemRemoved,
-  className,
 }: ScanOutInterfaceProps) {
   const { activeStore } = useStoreState()
   const {
@@ -68,7 +66,6 @@ export default function ScanOutInterface({
     findAvailableBatches,
     matchBatchByExpiry,
   } = useScanOutActions()
-  const workflowActions = useScanningActions()
 
   // OCR processing hook for expiry date capture
   const {

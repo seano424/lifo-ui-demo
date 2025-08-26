@@ -515,9 +515,10 @@ export default function RefactoredScanningInterface({
           {/* Scanned Items List */}
           <ScannedItemsList
             items={scannedItems}
-            onEditItem={(item) => {
-              // TODO: Implement edit functionality
-              console.log('Edit item:', item)
+            onItemUpdated={(updatedItem) => {
+              setScannedItems(prev => prev.map(item => 
+                item.id === updatedItem.id ? updatedItem : item
+              ))
             }}
           />
 
