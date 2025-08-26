@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle, ArrowRight, Loader2, Package, Search, X } from 'lucide-react'
+import { AlertCircle, ArrowRight, Check, Loader2, Package, Search, X } from 'lucide-react'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -203,7 +203,12 @@ export default function ManualBarcodeEntry({
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
-                        <Typography variant="h3">Product Found!</Typography>
+                        <div className="flex justify-center items-center gap-2">
+                          <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                          <Typography variant="h3" className="text-primary-800 font-black">
+                            Product Found!
+                          </Typography>
+                        </div>
 
                         {lookupResult.product && (
                           <div className="text-sm space-y-2">
