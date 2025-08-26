@@ -90,16 +90,18 @@ export function NavMain({
                     {item.items.map(subItem => (
                       <SidebarMenuSubItem
                         className={cn(
-                          'hover:bg-secondary-100/80 rounded-none font-medium pl-6 py-2',
+                          'hover:bg-secondary-100/80 dark:hover:bg-primary-900 dark:active:bg-primary-900 rounded-none font-medium pl-6 py-2',
                           isPathActive(subItem.url) &&
-                            'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
+                            'bg-secondary-100/80 hover:bg-secondary-100/80 dark:hover:bg-primary-900 dark:bg-primary-900 dark:active:bg-primary-900 font-bold',
                           'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0',
                         )}
                         key={subItem.title}
                       >
                         <SidebarMenuSubButton asChild tooltip={subItem.title}>
                           <Link href={subItem.url} onClick={handleLinkClick}>
-                            {subItem.icon && <subItem.icon className="!text-secondary-900" />}
+                            {subItem.icon && (
+                              <subItem.icon className="!text-secondary-900 dark:!text-primary-50" />
+                            )}
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
@@ -113,9 +115,9 @@ export function NavMain({
             <SidebarMenuItem className="flex flex-col items-center" key={item.title}>
               <SidebarMenuButton
                 className={cn(
-                  'hover:bg-secondary-100/80 rounded-none p-4 font-medium',
+                  'hover:bg-secondary-100/80 dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 rounded-none p-4 font-medium',
                   isPathActive(item.url) &&
-                    'bg-secondary-100/80 hover:bg-secondary-100/80 font-bold',
+                    'bg-secondary-100/80 hover:bg-secondary-100/80 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 font-bold',
                 )}
                 asChild
                 tooltip={item.title}
@@ -125,7 +127,7 @@ export function NavMain({
                   className="flex items-center w-full"
                   onClick={handleLinkClick}
                 >
-                  {item.icon && <item.icon className="text-secondary-900" />}
+                  {item.icon && <item.icon className="text-secondary-900 dark:text-primary-50" />}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

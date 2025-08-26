@@ -18,7 +18,7 @@ export default function DashboardInsetHeader({
   return (
     <div
       className={cn(
-        'flex flex-col sm:flex-row gap-4 justify-between items-center capitalize text-center sm:text-left',
+        'flex flex-col lg:flex-row gap-4 justify-between items-center capitalize text-center lg:text-left',
         className,
       )}
     >

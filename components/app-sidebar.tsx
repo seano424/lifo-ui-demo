@@ -25,6 +25,7 @@ import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
 import { TeamSwitcher } from './team-switcher'
 import { NavbarLogo } from './ui/logo'
+import { Typography } from './ui/typography'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
@@ -114,11 +115,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           'group-data-[collapsible=icon]:pt-12',
         )}
       >
-        <NavbarLogo
-          variant="horizontal"
-          size="md"
-          className={cn('group-data-[collapsible=icon]:hidden hidden sm:flex')}
-        />
+        <div
+          className={cn('group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2')}
+        >
+          <NavbarLogo variant="icon" size="md" />
+          <Typography
+            variant="h1"
+            className="text-transparent bg-clip-text bg-gradient-to-r from-primary-900 to-secondary-900 dark:from-primary-50 dark:text-primary-900"
+          >
+            LIFO
+          </Typography>
+        </div>
         <NavbarLogo
           variant="vertical"
           size="md"

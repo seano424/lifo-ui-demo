@@ -133,7 +133,6 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
     <div className="overflow-x-auto">
       <Table
         style={{
-          width: table.getCenterTotalSize(),
           tableLayout: 'fixed',
         }}
       >

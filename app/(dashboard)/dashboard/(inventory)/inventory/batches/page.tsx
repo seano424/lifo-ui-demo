@@ -136,7 +136,6 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       <div className="space-y-6">
         <BatchesHeader title={pageTitle} description={pageDescription} />
 
-        {/* Client-side filtered batch list */}
         <BatchesFilteredList
           initialFilters={{
             filter: params.filter,

@@ -6,14 +6,16 @@ import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
 
 export default function Page() {
   return (
-    <div className="flex flex-col gap-10 px-2 md:px-10 mb-40">
+    <div className="flex flex-col gap-8 px-2 md:px-10 mb-40">
       <DashboardInsetHeader title="Dashboard Overview" />
       <UrgentAlerts />
-      <div className="bg-muted/50 rounded-2xl border-0 p-5">
+      <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
         <DashboardKPICards />
       </div>
-      <StoreInsightsDashboard />
-      <div className="bg-muted/50 rounded-2xl border-0 p-5">
+      <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+        <StoreInsightsDashboard />
+      </div>
+      <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
         <QuickActionCards />
       </div>
     </div>
