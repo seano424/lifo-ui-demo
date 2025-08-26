@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertCircle, BarChart3, Check, RefreshCcw } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,10 +13,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useStoreState } from '@/lib/stores/store-context'
-import BaseScanningInterface, {
-  type BaseScanningCallbacks,
-  type BaseScanningConfig,
-} from '../base-scanning-interface'
+// Note: We're not using BaseScanningInterface in this implementation
+// Instead we have a custom workflow with manual state management
 import type { ScannedItem } from '../shared'
 import { useScanOutActions } from './use-scan-out-actions'
 import ScanningCamera from '../shared/scanning-camera'
@@ -91,26 +89,8 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
   const [ocrError, setOcrError] = useState<string | null>(null)
   const [quantity, setQuantity] = useState<number>(1)
 
-  // Scan-out specific configuration
-  const config: BaseScanningConfig = {
-    workflowType: 'scan-out',
-    enableBarcodeScanning: true,
-    enableOCRScanning: true, // Enable OCR for expiry date capture in batch selection
-    enableProductLookup: false, // We'll handle product lookup ourselves
-    enableManualEntry: true,
-    enableBatchSubmission: true,
-    showQuantityField: true,
-    showPriceField: false, // Price comes from existing inventory
-    showExpiryField: false, // Expiry date selected from available batches
-    scanningTitle: 'Scan Product to Remove',
-    confirmationTitle: 'Remove from Inventory',
-    submitButtonText: 'Remove from Inventory',
-  }
-
   // Custom barcode scan handler for scan-out
   const handleCustomBarcodeScanned = async (barcode: string) => {
-    console.log('Custom barcode scan for scan-out:', barcode)
-    
     if (!activeStore) {
       console.error('No active store selected')
       return
@@ -120,84 +100,29 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
       const batches = await findAvailableBatches(barcode, activeStore.store_id)
 
       if (batches.length === 0) {
-        // No inventory available for this product
         console.warn('No inventory found for barcode:', barcode)
         return
       }
 
-      // Always show batch list regardless of count
       setAvailableBatches(batches)
       setCurrentProduct({
         barcode,
         productName: batches[0]?.products.product_name || 'Unknown Product'
       })
       setCurrentStep('batch-selection')
-      setSelectedBatch(null) // Reset selection
-      
-      console.log(`Found ${batches.length} batches for ${barcode}`)
+      setSelectedBatch(null)
     } catch (error) {
       console.error('Error finding available batches:', error)
     }
   }
 
-  const callbacks: BaseScanningCallbacks = {
-    onItemProcessed: item => {
-      console.log('Item processed for scan-out:', item)
-      onItemRemoved?.(item)
-    },
-
-    onBatchSubmitted: async items => {
-      setPendingItems(items)
-      setShowSubmissionDialog(true)
-    },
-
-    onError: error => {
-      console.error('Scan-out error:', error)
-    },
-
-    onProductFound: async product => {
-      console.log('Product scanned for scan-out:', product)
-
-      // Instead of using OpenFoodFacts, we look up available batches from our inventory
-      if (product.barcode && activeStore) {
-        try {
-          const batches = await findAvailableBatches(product.barcode, activeStore.store_id)
-
-          if (batches.length === 0) {
-            // No inventory available for this product
-            return { error: 'No inventory found for this product' }
-          }
-
-          // Always show batch list regardless of count
-          // This provides consistent UX and allows users to see all available options
-          setAvailableBatches(batches)
-          setCurrentProduct(product)
-          setCurrentStep('batch-selection')
-          
-          // Return a pending state - the workflow will wait for batch selection
-          return { pending: true }
-        } catch (error) {
-          console.error('Error finding available batches:', error)
-          return { error: 'Failed to lookup inventory' }
-        }
-      }
-      
-      return { error: 'No barcode or store provided' }
-    },
-
-    onWorkflowComplete: () => {
-      console.log('Scan-out workflow completed')
-    },
-  }
-
-  const handleBatchSelected = (batch: AvailableBatch) => {
+  const handleBatchSelected = useCallback((batch: AvailableBatch) => {
     if (currentProduct) {
       setSelectedBatch(batch)
-      setQuantity(1) // Default quantity
+      setQuantity(1)
       setCurrentStep('quantity-entry')
-      console.log('Batch selected:', batch.batch_id, 'Moving to quantity entry')
     }
-  }
+  }, [currentProduct])
 
   const handleQuantityConfirmed = () => {
     if (currentProduct && selectedBatch) {
@@ -212,7 +137,6 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
         timestamp: new Date(),
       }
       
-      console.log('Item processed:', scannedItem)
       onItemRemoved?.(scannedItem)
       
       // Reset to scanning state for next product

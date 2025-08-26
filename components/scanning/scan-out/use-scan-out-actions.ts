@@ -120,8 +120,9 @@ export function useScanOutActions() {
     const supabase = createClient()
 
     try {
-      // First, find the product by barcode
+      // First, find the product by barcode (using inventory schema)
       const { data: product, error: productError } = await supabase
+        .schema('inventory')
         .from('products')
         .select('product_id, name, brand, category, unit_type, image_url, barcode')
         .eq('barcode', barcode)
@@ -134,6 +135,7 @@ export function useScanOutActions() {
 
       // Then find all available batches for this product in the current store  
       const { data: batches, error: batchError } = await supabase
+        .schema('inventory')
         .from('batches')
         .select(`
           batch_id,
@@ -210,6 +212,7 @@ export function useScanOutActions() {
         try {
           // Start a transaction to ensure data consistency
           const { data: batch, error: fetchError } = await supabase
+            .schema('inventory')
             .from('batches')
             .select('batch_id, current_quantity, product_id, store_id')
             .eq('batch_id', item.batchId)
@@ -239,6 +242,7 @@ export function useScanOutActions() {
           // Update the batch quantity
           const newQuantity = batch.current_quantity - item.quantityRemoved
           const { error: updateError } = await supabase
+            .schema('inventory')
             .from('batches')
             .update({ current_quantity: newQuantity })
             .eq('batch_id', item.batchId)
