@@ -50,6 +50,61 @@ export function useScanOutActions() {
   const queryClient = useQueryClient()
 
   /**
+   * Match a captured expiry date to an available batch
+   * Returns the batch with the closest matching expiry date, or null if no match
+   */
+  const matchBatchByExpiry = (
+    batches: AvailableBatch[],
+    capturedExpiryDate: string,
+  ): AvailableBatch | null => {
+    if (!batches.length) return null
+
+    // Parse the captured date
+    let targetDate: Date
+    try {
+      targetDate = new Date(capturedExpiryDate)
+      if (isNaN(targetDate.getTime())) {
+        console.warn('Invalid expiry date format:', capturedExpiryDate)
+        return null
+      }
+    } catch (error) {
+      console.warn('Failed to parse expiry date:', capturedExpiryDate, error)
+      return null
+    }
+
+    // Find exact match first
+    const exactMatch = batches.find(batch => {
+      const batchDate = new Date(batch.expiry_date)
+      return (
+        batchDate.getFullYear() === targetDate.getFullYear() &&
+        batchDate.getMonth() === targetDate.getMonth() &&
+        batchDate.getDate() === targetDate.getDate()
+      )
+    })
+
+    if (exactMatch) return exactMatch
+
+    // If no exact match, find the closest date (within 7 days)
+    const TOLERANCE_DAYS = 7
+    const toleranceMs = TOLERANCE_DAYS * 24 * 60 * 60 * 1000
+
+    let closestBatch: AvailableBatch | null = null
+    let smallestDifference = Infinity
+
+    for (const batch of batches) {
+      const batchDate = new Date(batch.expiry_date)
+      const difference = Math.abs(batchDate.getTime() - targetDate.getTime())
+
+      if (difference <= toleranceMs && difference < smallestDifference) {
+        smallestDifference = difference
+        closestBatch = batch
+      }
+    }
+
+    return closestBatch
+  }
+
+  /**
    * Find available inventory batches for a product by barcode and store
    * This replaces the OpenFoodFacts lookup for scan-out workflows
    */
@@ -238,6 +293,7 @@ export function useScanOutActions() {
   return {
     // Functions
     findAvailableBatches,
+    matchBatchByExpiry,
     submitCheckout: checkoutMutation.mutate,
     submitCheckoutAsync: checkoutMutation.mutateAsync,
 

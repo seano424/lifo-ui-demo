@@ -19,6 +19,10 @@ import BaseScanningInterface, {
 } from '../base-scanning-interface'
 import type { ScannedItem } from '../shared'
 import { useScanOutActions } from './use-scan-out-actions'
+import ScanningCamera from '../shared/scanning-camera'
+import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
+import { captureImageFromVideo } from '@/lib/api/ocr-client'
+import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 
 interface AvailableBatch {
   batch_id: string
@@ -52,7 +56,15 @@ interface ScanOutInterfaceProps {
 
 export default function ScanOutInterface({ onItemRemoved, className }: ScanOutInterfaceProps) {
   const { activeStore } = useStoreState()
-  const { submitCheckout, isSubmittingCheckout, findAvailableBatches } = useScanOutActions()
+  const { submitCheckout, isSubmittingCheckout, findAvailableBatches, matchBatchByExpiry } = useScanOutActions()
+  const workflowActions = useScanningActions()
+  
+  // OCR processing hook for expiry date capture
+  const {
+    processExpiryDate,
+    isLoading: isOCRProcessing,
+    isBackendHealthy,
+  } = useOCRWithFallback()
 
   // Dialog states
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -67,12 +79,13 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
   const [showBatchSelector, setShowBatchSelector] = useState(false)
   const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(null)
+  const [ocrError, setOcrError] = useState<string | null>(null)
 
   // Scan-out specific configuration
   const config: BaseScanningConfig = {
     workflowType: 'scan-out',
     enableBarcodeScanning: true,
-    enableOCRScanning: false, // No OCR needed - products exist in system
+    enableOCRScanning: true, // Enable OCR for expiry date capture in batch selection
     enableProductLookup: false, // We look up from our inventory instead
     enableManualEntry: true,
     enableBatchSubmission: true,
@@ -114,24 +127,49 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
 
           if (batches.length === 1) {
             // Only one batch available, auto-select it
+            const selectedBatch = batches[0]
             setCurrentProduct({
               ...product,
-              batch: batches[0],
-              availableQuantity: batches[0].current_quantity,
-              expiryDate: batches[0].expiry_date,
-              price: batches[0].cost_price,
+              batch: selectedBatch,
+              availableQuantity: selectedBatch.current_quantity,
+              expiryDate: selectedBatch.expiry_date,
+              price: selectedBatch.cost_price,
             })
+
+            // Return the product data with batch info for the workflow
+            return {
+              barcode: product.barcode,
+              found: true,
+              source: 'cache' as const,
+              product: {
+                _id: selectedBatch.batch_id,
+                product_name: selectedBatch.products.product_name,
+                brands: selectedBatch.products.brand_name,
+                batchInfo: {
+                  batchId: selectedBatch.batch_id,
+                  expiryDate: selectedBatch.expiry_date,
+                  availableQuantity: selectedBatch.current_quantity,
+                  costPrice: selectedBatch.cost_price,
+                },
+              }
+            }
           } else {
             // Multiple batches available, show selector
+            // Don't return anything yet - wait for user selection
             setAvailableBatches(batches)
             setCurrentProduct(product)
             setShowBatchSelector(true)
+            
+            // Return a pending state - the workflow will wait
+            return { pending: true }
           }
         } catch (error) {
           console.error('Error finding available batches:', error)
           return { error: 'Failed to lookup inventory' }
         }
       }
+      
+      return { error: 'No barcode or store provided' }
     },
 
     onWorkflowComplete: () => {
@@ -141,16 +179,82 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
 
   const handleBatchSelected = (batch: AvailableBatch) => {
     if (currentProduct) {
-      setCurrentProduct({
+      const updatedProduct = {
         ...currentProduct,
         batch,
         availableQuantity: batch.current_quantity,
         expiryDate: batch.expiry_date,
         price: batch.cost_price,
-      })
+      }
+      setCurrentProduct(updatedProduct)
+
+      // Create a lookup result for the workflow to process
+      const lookupResult = {
+        barcode: currentProduct.barcode,
+        found: true,
+        source: 'cache' as const,
+        product: {
+          _id: batch.batch_id,
+          product_name: batch.products.product_name,
+          brands: batch.products.brand_name,
+          // Additional data for scan-out workflow
+          batchInfo: {
+            batchId: batch.batch_id,
+            expiryDate: batch.expiry_date,
+            availableQuantity: batch.current_quantity,
+            costPrice: batch.cost_price,
+          },
+        },
+      }
+
+      // Update the workflow store with the selected product/batch
+      workflowActions.setProductLookupResult(lookupResult)
     }
     setShowBatchSelector(false)
     setAvailableBatches([])
+  }
+
+  const handleOCRExpiryCapture = async () => {
+    if (!activeStore) {
+      setOcrError('No active store selected')
+      return
+    }
+
+    try {
+      setOcrError(null)
+      
+      const videoElement = document.querySelector('video') as HTMLVideoElement
+      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+        throw new Error('Camera not ready')
+      }
+
+      const imageBlob = await captureImageFromVideo(videoElement)
+      const result = await processExpiryDate(imageBlob, activeStore.store_id, {
+        confidenceThreshold: 0.65,
+        maxProcessingTimeMs: 5000,
+      })
+      
+      if (result.success && result.expiryDateInfo?.extractedDate && availableBatches.length > 0) {
+        // Try to match the captured date to an available batch
+        const matchedBatch = matchBatchByExpiry(availableBatches, result.expiryDateInfo.extractedDate)
+        
+        if (matchedBatch) {
+          handleBatchSelected(matchedBatch)
+        } else {
+          // No matching batch found
+          setOcrError(`No batch found with expiry date: ${result.expiryDateInfo.extractedDate}`)
+        }
+      } else {
+        setOcrError(result.error?.message || 'OCR processing failed')
+      }
+    } catch (error) {
+      console.error('OCR capture failed:', error)
+      setOcrError(error instanceof Error ? error.message : 'OCR processing failed')
+    }
+  }
+
+  const clearOCRError = () => {
+    setOcrError(null)
   }
 
   const handleConfirmSubmission = () => {
@@ -211,31 +315,56 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
                 Product: <strong>{currentProduct?.productName || 'Unknown Product'}</strong>
               </div>
 
-              <div className="space-y-2">
-                {availableBatches.map(batch => (
-                  <div
-                    key={batch.batch_id}
-                    className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleBatchSelected(batch)}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium">
-                          Expires: {new Date(batch.expiry_date).toLocaleDateString()}
+              {/* OCR Expiry Date Capture */}
+              <div className="border rounded-lg p-4 bg-purple-50">
+                <div className="text-sm font-medium text-purple-900 mb-3">
+                  Scan Expiry Date to Auto-Select Batch
+                </div>
+                <ScanningCamera
+                  mode="ocr"
+                  onOCRCapture={handleOCRExpiryCapture}
+                  isOCRProcessing={isOCRProcessing}
+                  ocrError={ocrError}
+                  onClearOCRError={clearOCRError}
+                  isBackendHealthy={isBackendHealthy}
+                  title="Capture Expiry Date"
+                  subtitle="Point camera at expiry date"
+                  autoStart={false}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Manual Batch Selection */}
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-gray-700">
+                  Or manually select a batch:
+                </div>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {availableBatches.map(batch => (
+                    <div
+                      key={batch.batch_id}
+                      className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleBatchSelected(batch)}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">
+                            Expires: {new Date(batch.expiry_date).toLocaleDateString()}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Available: {batch.current_quantity} units
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Cost: {formatPrice(batch.cost_price)}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Available: {batch.current_quantity} units
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          Cost: {formatPrice(batch.cost_price)}
-                        </div>
+                        <Button variant="outline" size="sm">
+                          Select
+                        </Button>
                       </div>
-                      <Button variant="outline" size="sm">
-                        Select
-                      </Button>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
 
