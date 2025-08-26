@@ -440,14 +440,14 @@ async def health_check() -> HealthResponse:
         from app.database.supabase_service import supabase_health_check
 
         db_healthy = await test_connection()
-        
+
         # Check Supabase health
         try:
             supabase_result = await supabase_health_check()
             supabase_healthy = supabase_result.get("status") == "healthy"
-        except:
+        except Exception:
             supabase_healthy = False
-        
+
         # Consider healthy if either connection works (Supabase is sufficient for OCR)
         overall_healthy = supabase_healthy or db_healthy
 
