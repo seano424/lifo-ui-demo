@@ -1,11 +1,22 @@
 'use client'
 
-import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowRightFromLine,
+  Loader2,
+  TrendingUp,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { useStoreInsights } from '@/hooks/use-store-insights'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -15,7 +26,9 @@ interface StoreInsightsDashboardProps {
   storeId?: string
 }
 
-export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDashboardProps) {
+export function StoreInsightsDashboard({
+  storeId: propStoreId,
+}: StoreInsightsDashboardProps) {
   const activeStoreId = useActiveStoreId()
   const storeId = propStoreId || activeStoreId || ''
 
@@ -53,9 +66,12 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Failed to load store insights: {insightsError?.message || 'Unknown error'}
+              Failed to load store insights:{' '}
+              {insightsError?.message || 'Unknown error'}
               <br />
-              <small className="text-muted-foreground mt-2 block">Store ID: {storeId}</small>
+              <small className="text-muted-foreground mt-2 block">
+                Store ID: {storeId}
+              </small>
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -64,21 +80,45 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
   }
 
   const { insights: data } = insights
-  const { expiring_soon, ready_for_discount, perfect_for_donation, high_urgency, summary } = data
+  const {
+    expiring_soon,
+    ready_for_discount,
+    perfect_for_donation,
+    high_urgency,
+    summary,
+  } = data
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-col sm:flex-row gap-4 text-center sm:text-left">
         <div className="flex flex-col gap-2">
-          <Typography variant="h4" className="font-bold">
+          <Typography
+            variant="h4"
+            className="font-bold"
+          >
             Today&apos;s priority actions
           </Typography>
-          <Typography variant="p" className="text-muted-foreground">
+          <Typography
+            variant="p"
+            className="text-muted-foreground dark:text-secondary-50"
+          >
             Review and take action on the most urgent items.
           </Typography>
         </div>
 
-        <Button asChild>
+        <Button
+          className="flex dark:hidden"
+          asChild
+        >
+          <Link href="/dashboard/actionable-batches">
+            Take Action <ArrowRightFromLine className="w-4 h-4" />
+          </Link>
+        </Button>
+        <Button
+          className="hidden dark:flex"
+          variant="black"
+          asChild
+        >
           <Link href="/dashboard/actionable-batches">
             Take Action <ArrowRightFromLine className="w-4 h-4" />
           </Link>
@@ -119,8 +159,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                 Store Overview
               </CardTitle>
               <CardDescription className="text-center sm:text-left">
-                {summary.total_actionable_items} actionable items of {summary.total_active_batches}{' '}
-                active batches
+                {summary.total_actionable_items} actionable items of{' '}
+                {summary.total_active_batches} active batches
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -132,7 +172,9 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
                       <strong>Action Required:</strong> You have{' '}
-                      {expiring_soon.count + ready_for_discount.count + perfect_for_donation.count}{' '}
+                      {expiring_soon.count +
+                        ready_for_discount.count +
+                        perfect_for_donation.count}{' '}
                       batches that need immediate attention.
                     </AlertDescription>
                   </Alert>
@@ -140,8 +182,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <p className="text-sm text-muted-foreground">
-                    {summary.action_required_percentage.toFixed(1)}% of non-expired inventory needs
-                    action
+                    {summary.action_required_percentage.toFixed(1)}% of
+                    non-expired inventory needs action
                   </p>
                   <Button
                     variant="outline"

@@ -5,7 +5,10 @@ import { RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { KPICard } from '@/components/dashboard/kpi-card'
-import { type TimePeriod, TimeSelector } from '@/components/dashboard/TimeSelector'
+import {
+  type TimePeriod,
+  TimeSelector,
+} from '@/components/dashboard/TimeSelector'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import {
@@ -35,9 +38,13 @@ export function DashboardKPICards() {
   const donationQuery = useDonationKPI()
   const wasteQuery = useWasteKPI()
 
-  const inventoryTrendsQuery = useInventoryKPITrends(selectedPeriod || 'this_week')
+  const inventoryTrendsQuery = useInventoryKPITrends(
+    selectedPeriod || 'this_week'
+  )
   const salesTrendsQuery = useSalesKPITrends(selectedPeriod || 'this_week')
-  const donationTrendsQuery = useDonationKPITrends(selectedPeriod || 'this_week')
+  const donationTrendsQuery = useDonationKPITrends(
+    selectedPeriod || 'this_week'
+  )
   const wasteTrendsQuery = useWasteKPITrends(selectedPeriod || 'this_week')
 
   const inventoryData = inventoryQuery.data
@@ -46,7 +53,9 @@ export function DashboardKPICards() {
   const wasteData = wasteQuery.data
 
   const showTrends = selectedPeriod !== null
-  const inventoryTrendData = inventoryTrendsQuery.data as KPITrendData | undefined
+  const inventoryTrendData = inventoryTrendsQuery.data as
+    | KPITrendData
+    | undefined
   const salesTrendData = salesTrendsQuery.data as KPITrendData | undefined
   const donationTrendData = donationTrendsQuery.data as KPITrendData | undefined
   const wasteTrendData = wasteTrendsQuery.data as KPITrendData | undefined
@@ -106,10 +115,16 @@ export function DashboardKPICards() {
     <div className="w-full flex flex-col gap-4">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row items-center gap-2 justify-between">
-          <Typography variant="h4" className="font-bold">
+          <Typography
+            variant="h4"
+            className="font-bold"
+          >
             {t('title')}
           </Typography>
-          <Typography variant="p" className="text-muted-foreground">
+          <Typography
+            variant="p"
+            className="text-muted-foreground dark:text-secondary-50"
+          >
             Last updated: {new Date().toLocaleDateString()}
           </Typography>
         </div>
@@ -117,11 +132,17 @@ export function DashboardKPICards() {
         <div className="flex flex-col sm:flex-row sm:items-end gap-4">
           <TimeSelector
             value={selectedPeriod || 'this_week'}
-            onChange={period => setSelectedPeriod(period)}
+            onChange={(period) => setSelectedPeriod(period)}
           />
 
-          <Button variant="outline" onClick={handleRefresh} disabled={isAnyFetching}>
-            <RefreshCw className={`h-4 w-4 ${isAnyFetching ? 'animate-spin' : ''}`} />
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={isAnyFetching}
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isAnyFetching ? 'animate-spin' : ''}`}
+            />
             <span>{t('refresh')}</span>
           </Button>
         </div>
@@ -134,11 +155,19 @@ export function DashboardKPICards() {
           label={t('inventory.label')}
           value={inventoryData?.totalValue ?? 0}
           productCount={
-            showTrends ? inventoryTrendData?.metadata?.productCount : inventoryData?.productCount
+            showTrends
+              ? inventoryTrendData?.metadata?.productCount
+              : inventoryData?.productCount
           }
           subtitle={`${showTrends ? (inventoryTrendData?.metadata?.batchCount ?? 0) : (inventoryData?.batchCount ?? 0)} ${t('inventory.subtitle')}`}
-          isLoading={inventoryQuery.isLoading || (showTrends && inventoryTrendsQuery.isLoading)}
-          isError={inventoryQuery.isError || (showTrends && inventoryTrendsQuery.isError)}
+          isLoading={
+            inventoryQuery.isLoading ||
+            (showTrends && inventoryTrendsQuery.isLoading)
+          }
+          isError={
+            inventoryQuery.isError ||
+            (showTrends && inventoryTrendsQuery.isError)
+          }
           isLink={true}
           link="/dashboard/inventory"
           showTrends={showTrends}
@@ -152,8 +181,12 @@ export function DashboardKPICards() {
           change={salesData?.change ?? 0}
           changePercent={salesData?.changePercent ?? 0}
           subtitle={`${showTrends ? (salesTrendData?.metadata?.transactionCount ?? 0) : (salesData?.transactionCount ?? 0)} ${t('sales.subtitle')}`}
-          isLoading={salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)}
-          isError={salesQuery.isError || (showTrends && salesTrendsQuery.isError)}
+          isLoading={
+            salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)
+          }
+          isError={
+            salesQuery.isError || (showTrends && salesTrendsQuery.isError)
+          }
           isLink={true}
           link="/dashboard/outbound"
           showTrends={showTrends}
@@ -167,8 +200,13 @@ export function DashboardKPICards() {
           change={donationData?.change ?? 0}
           changePercent={donationData?.changePercent ?? 0}
           subtitle={`${showTrends ? (donationTrendData?.metadata?.recipientCount ?? 0) : (donationData?.recipientCount ?? 0)} ${t('donations.subtitle')}`}
-          isLoading={donationQuery.isLoading || (showTrends && donationTrendsQuery.isLoading)}
-          isError={donationQuery.isError || (showTrends && donationTrendsQuery.isError)}
+          isLoading={
+            donationQuery.isLoading ||
+            (showTrends && donationTrendsQuery.isLoading)
+          }
+          isError={
+            donationQuery.isError || (showTrends && donationTrendsQuery.isError)
+          }
           isLink={true}
           link="/dashboard/donations"
           showTrends={showTrends}
@@ -182,8 +220,12 @@ export function DashboardKPICards() {
           change={wasteData?.change ?? 0}
           changePercent={wasteData?.changePercent ?? 0}
           subtitle={`${showTrends ? (wasteTrendData?.metadata?.itemCount ?? 0) : (wasteData?.itemCount ?? 0)} ${t('waste.subtitle')}`}
-          isLoading={wasteQuery.isLoading || (showTrends && wasteTrendsQuery.isLoading)}
-          isError={wasteQuery.isError || (showTrends && wasteTrendsQuery.isError)}
+          isLoading={
+            wasteQuery.isLoading || (showTrends && wasteTrendsQuery.isLoading)
+          }
+          isError={
+            wasteQuery.isError || (showTrends && wasteTrendsQuery.isError)
+          }
           isLink={true}
           link="/dashboard/waste"
           showTrends={showTrends}

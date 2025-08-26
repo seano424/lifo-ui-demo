@@ -28,7 +28,7 @@ const buttonVariants = cva(
         subtle:
           'bg-primary-600 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
         subtleSecondary:
-          'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-200 dark:bg-secondary-900/20 dark:text-secondary-300 dark:hover:bg-secondary-900/30',
+          'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-200 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900/30',
         subtleTertiary:
           'bg-tertiary-100 text-tertiary-900 shadow-xs hover:bg-tertiary-200 dark:bg-tertiary-900/20 dark:text-tertiary-300 dark:hover:bg-tertiary-900/30',
 

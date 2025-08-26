@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
 
 export type TimePeriod =
   | 'this_week'
@@ -31,7 +30,6 @@ export interface TimeRange {
 interface TimeSelectorProps {
   value: TimePeriod
   onChange: (period: TimePeriod) => void
-  className?: string
 }
 
 export function getTimeRange(period: TimePeriod): TimeRange {
@@ -214,39 +212,28 @@ const periodOptions: { value: TimePeriod; label: string }[] = [
   { value: 'all_time', label: 'All Time' },
 ]
 
-export function TimeSelector({
-  value,
-  onChange,
-  className,
-}: TimeSelectorProps) {
-  const currentRange = getTimeRange(value)
-
+export function TimeSelector({ value, onChange }: TimeSelectorProps) {
   return (
-    <div className={cn(className, 'flex flex-col gap-2')}>
-      <p className="text-xs text-gray-500 text-nowrap">
-        Comparing with {currentRange.compareLabel}
-      </p>
-      <Select
-        value={value}
-        onValueChange={(val) => onChange(val as TimePeriod)}
-      >
-        <SelectTrigger className="w-full sm:w-[200px] bg-white border transition-colors">
-          <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4" />
-            <SelectValue />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {periodOptions.map((option) => (
-            <SelectItem
-              key={option.value}
-              value={option.value}
-            >
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={value}
+      onValueChange={(val) => onChange(val as TimePeriod)}
+    >
+      <SelectTrigger className="w-full sm:w-[200px] bg-white border transition-colors">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4" />
+          <SelectValue />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {periodOptions.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+          >
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
