@@ -66,8 +66,8 @@ export function KPICard({
     return (
       <div
         className={cn(
-          'bg-white rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center',
-          className,
+          'bg-white dark:bg-brand-dark dark:border-primary-900 rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center',
+          className
         )}
       >
         <Skeleton className="h-8 w-full rounded-4xl" />
@@ -82,18 +82,23 @@ export function KPICard({
     return (
       <div
         className={cn(
-          'bg-white rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center min-h-[200px] justify-center',
-          className,
+          'bg-white dark:bg-brand-dark dark:border-primary-900 rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center min-h-[200px] justify-center',
+          className
         )}
       >
-        <Typography className="text-secondary-600">Failed to load data</Typography>
+        <Typography className="text-secondary-600">
+          Failed to load data
+        </Typography>
       </div>
     )
   }
 
   const cardContent = (
     <div className="space-y-2 flex flex-col items-center text-center">
-      <Typography variant="h4" className="font-bold flex items-center gap-2">
+      <Typography
+        variant="h4"
+        className="font-bold flex items-center gap-2"
+      >
         {iconMap[icon as keyof typeof iconMap] &&
           (() => {
             const IconComponent = iconMap[icon as keyof typeof iconMap]
@@ -106,14 +111,22 @@ export function KPICard({
       </Typography>
 
       <div className="flex flex-col gap-3 items-center">
-        <Typography variant="h3" className="font-bold">
-          {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
+        <Typography
+          variant="h3"
+          className="font-bold"
+        >
+          {showTrends && trendData
+            ? formatValue(trendData.current)
+            : formatValue(value)}
         </Typography>
 
         <div className="flex items-center gap-2 mb-2">
           <Typography variant="p">{subtitle}</Typography>
           {productCount && (
-            <Typography variant="p" className="">
+            <Typography
+              variant="p"
+              className=""
+            >
               {productCount} product{productCount > 1 ? 's' : ''}
             </Typography>
           )}
@@ -125,16 +138,20 @@ export function KPICard({
   )
 
   const cardClassName = cn(
-    'bg-white rounded py-6 border',
+    'rounded-4xl py-6 border bg-white dark:bg-brand-dark dark:border-primary-900',
     'transition-all duration-200',
-    (isLink || onClick) && 'cursor-pointer hover:shadow-md hover:border-primary-100/50 group',
-    className,
+    (isLink || onClick) &&
+      'cursor-pointer hover:shadow-md hover:border-primary-100/50 group',
+    className
   )
 
   // If isLink is true and link is provided, render as Next.js Link
   if (isLink && link) {
     return (
-      <Link href={link} className={cardClassName}>
+      <Link
+        href={link}
+        className={cardClassName}
+      >
         {cardContent}
       </Link>
     )
@@ -142,7 +159,10 @@ export function KPICard({
 
   // Otherwise render as a clickable div
   return (
-    <div className={cardClassName} onClick={onClick}>
+    <div
+      className={cardClassName}
+      onClick={onClick}
+    >
       {cardContent}
     </div>
   )

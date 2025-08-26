@@ -88,7 +88,11 @@ export function getTimeRange(period: TimePeriod): TimeRange {
       const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
       endOfMonth.setHours(23, 59, 59, 999)
 
-      const compareStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+      const compareStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1
+      )
       const compareEnd = new Date(today.getFullYear(), today.getMonth(), 0)
       compareEnd.setHours(23, 59, 59, 999)
 
@@ -103,11 +107,19 @@ export function getTimeRange(period: TimePeriod): TimeRange {
     }
 
     case 'last_month': {
-      const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+      const startOfLastMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1
+      )
       const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0)
       endOfLastMonth.setHours(23, 59, 59, 999)
 
-      const compareStart = new Date(today.getFullYear(), today.getMonth() - 2, 1)
+      const compareStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 2,
+        1
+      )
       const compareEnd = new Date(today.getFullYear(), today.getMonth() - 1, 0)
       compareEnd.setHours(23, 59, 59, 999)
 
@@ -170,7 +182,15 @@ export function getTimeRange(period: TimePeriod): TimeRange {
       const endOfYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999)
 
       const compareStartOfYear = new Date(today.getFullYear() - 1, 0, 1)
-      const compareEndOfYear = new Date(today.getFullYear() - 1, 11, 31, 23, 59, 59, 999)
+      const compareEndOfYear = new Date(
+        today.getFullYear() - 1,
+        11,
+        31,
+        23,
+        59,
+        59,
+        999
+      )
 
       return {
         start: new Date('2000-01-01'), // Very early date to capture all data
@@ -194,7 +214,11 @@ const periodOptions: { value: TimePeriod; label: string }[] = [
   { value: 'all_time', label: 'All Time' },
 ]
 
-export function TimeSelector({ value, onChange, className }: TimeSelectorProps) {
+export function TimeSelector({
+  value,
+  onChange,
+  className,
+}: TimeSelectorProps) {
   const currentRange = getTimeRange(value)
 
   return (
@@ -202,7 +226,10 @@ export function TimeSelector({ value, onChange, className }: TimeSelectorProps) 
       <p className="text-xs text-gray-500 text-nowrap">
         Comparing with {currentRange.compareLabel}
       </p>
-      <Select value={value} onValueChange={val => onChange(val as TimePeriod)}>
+      <Select
+        value={value}
+        onValueChange={(val) => onChange(val as TimePeriod)}
+      >
         <SelectTrigger className="w-full sm:w-[200px] bg-white border transition-colors">
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" />
@@ -210,8 +237,11 @@ export function TimeSelector({ value, onChange, className }: TimeSelectorProps) 
           </div>
         </SelectTrigger>
         <SelectContent>
-          {periodOptions.map(option => (
-            <SelectItem key={option.value} value={option.value}>
+          {periodOptions.map((option) => (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+            >
               {option.label}
             </SelectItem>
           ))}
