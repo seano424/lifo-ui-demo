@@ -1,6 +1,12 @@
 'use client'
 
-import { AlertCircle, Camera, CheckCircle, Scan, StopCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  Camera,
+  CheckCircle,
+  Scan,
+  StopCircle,
+} from 'lucide-react'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -67,7 +73,7 @@ export default function BarcodeScanner({
   const stopCamera = useCallback(() => {
     // Stop the media stream
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
+      streamRef.current.getTracks().forEach((track) => {
         track.stop()
       })
       streamRef.current = null
@@ -93,7 +99,13 @@ export default function BarcodeScanner({
 
   // Start camera stream
   const startCamera = useCallback(async () => {
-    if (isStartingRef.current || isScanning || !isMounted || userStoppedCamera || !isInitialized) {
+    if (
+      isStartingRef.current ||
+      isScanning ||
+      !isMounted ||
+      userStoppedCamera ||
+      !isInitialized
+    ) {
       return
     }
 
@@ -106,7 +118,7 @@ export default function BarcodeScanner({
       if (streamRef.current) {
         stopCamera()
         // Wait a bit for cleanup
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
       }
 
       // Request camera permission
@@ -120,7 +132,7 @@ export default function BarcodeScanner({
 
       // Check if component is still mounted and user hasn't stopped
       if (!isMounted || userStoppedCamera) {
-        stream.getTracks().forEach(track => track.stop())
+        stream.getTracks().forEach((track) => track.stop())
         return
       }
 
@@ -139,18 +151,32 @@ export default function BarcodeScanner({
         }
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to access camera'
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to access camera'
       setError(errorMessage)
       setHasPermission(false)
       onError?.(new Error(errorMessage))
     } finally {
       isStartingRef.current = false
     }
-  }, [onError, isScanning, isMounted, stopCamera, userStoppedCamera, isInitialized])
+  }, [
+    onError,
+    isScanning,
+    isMounted,
+    stopCamera,
+    userStoppedCamera,
+    isInitialized,
+  ])
 
   // Scan for barcodes in video feed
   const scanForBarcode = useCallback(async () => {
-    if (!videoRef.current || !canvasRef.current || !isScanning || !isInitialized || !isMounted) {
+    if (
+      !videoRef.current ||
+      !canvasRef.current ||
+      !isScanning ||
+      !isInitialized ||
+      !isMounted
+    ) {
       return
     }
 
@@ -179,7 +205,7 @@ export default function BarcodeScanner({
           if (isMounted) {
             // Call handleBarcodeDetected directly with current values
             const barcode = detection.rawValue
-            setScanningHistory(prev => [barcode, ...prev.slice(0, 4)])
+            setScanningHistory((prev) => [barcode, ...prev.slice(0, 4)])
             setDetectedBarcode(null)
             onScan(barcode, detection)
 
@@ -205,7 +231,7 @@ export default function BarcodeScanner({
     (barcode: string, detection?: BarcodeDetection) => {
       if (!isMounted) return
 
-      setScanningHistory(prev => [barcode, ...prev.slice(0, 4)])
+      setScanningHistory((prev) => [barcode, ...prev.slice(0, 4)])
       setDetectedBarcode(null)
       onScan(barcode, detection)
 
@@ -216,7 +242,7 @@ export default function BarcodeScanner({
         }
       }, 500)
     },
-    [onScan, isMounted],
+    [onScan, isMounted]
   )
 
   // Set up scanning interval
@@ -286,11 +312,21 @@ export default function BarcodeScanner({
   const displayError = error || detectionError
 
   return (
-    <div className={cn('w-full text-center sm:min-w-[600px] flex flex-col gap-4', className)}>
-      <div className="flex items-center justify-center gap-2 flex-col">
+    <div
+      className={cn(
+        'w-full text-center sm:min-w-[600px] flex flex-col gap-4',
+        className
+      )}
+    >
+      <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-2">
-          <Scan className="w-5 h-5" />
-          <Typography variant="h3">{title}</Typography>
+          <Scan className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+          <Typography
+            variant="h3"
+            className="text-primary-800 font-black"
+          >
+            {title}
+          </Typography>
         </div>
         <Typography variant="p">{subtitle}</Typography>
       </div>
@@ -308,7 +344,9 @@ export default function BarcodeScanner({
         {!isInitialized && !detectionError && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>Initializing barcode detection...</AlertDescription>
+            <AlertDescription>
+              Initializing barcode detection...
+            </AlertDescription>
           </Alert>
         )}
 
@@ -347,7 +385,9 @@ export default function BarcodeScanner({
 
               {!isScanning && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <Typography variant="p">Start scanning to see your camera</Typography>
+                  <Typography variant="p">
+                    Start scanning to see your camera
+                  </Typography>
                 </div>
               )}
 
@@ -367,7 +407,10 @@ export default function BarcodeScanner({
               )}
 
               {/* Hidden canvas for barcode detection */}
-              <canvas ref={canvasRef} className="hidden" />
+              <canvas
+                ref={canvasRef}
+                className="hidden"
+              />
             </>
           )}
         </div>
@@ -385,7 +428,11 @@ export default function BarcodeScanner({
                 {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
               </Button>
             ) : (
-              <Button onClick={handleUserStop} variant="destructive" className="flex-1">
+              <Button
+                onClick={handleUserStop}
+                variant="destructive"
+                className="flex-1"
+              >
                 <StopCircle className="w-4 h-4 mr-2" />
                 Stop Scanning
               </Button>
@@ -421,7 +468,8 @@ export default function BarcodeScanner({
         {/* Instructions */}
         {hasPermission && isScanning && isInitialized && isBarcodeScanner && (
           <div className="text-xs text-gray-500 text-center">
-            Point camera at barcode to scan automatically • Real detection active
+            Point camera at barcode to scan automatically • Real detection
+            active
           </div>
         )}
       </div>

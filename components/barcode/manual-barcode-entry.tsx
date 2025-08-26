@@ -1,6 +1,14 @@
 'use client'
 
-import { AlertCircle, ArrowRight, Loader2, Package, Search, X } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  Check,
+  Loader2,
+  Package,
+  Search,
+  X,
+} from 'lucide-react'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -8,7 +16,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Typography } from '@/components/ui/typography'
 import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
-import type { OpenFoodFactsSearchResult, ProductLookupResult } from '@/lib/queries/open-food-facts'
+import type {
+  OpenFoodFactsSearchResult,
+  ProductLookupResult,
+} from '@/lib/queries/open-food-facts'
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 
 interface ProductData {
@@ -33,7 +44,9 @@ export default function ManualBarcodeEntry({
   className = '',
 }: ManualBarcodeEntryProps) {
   const [barcode, setBarcode] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(
+    null
+  )
   const [manualProductData, setManualProductData] = useState({
     productName: '',
     brand: '',
@@ -70,7 +83,9 @@ export default function ManualBarcodeEntry({
       category: selectedProduct.category,
       imageUrl: selectedProduct.imageUrl,
       isManualEntry: true,
-      lookupResult: selectedProduct.lookupResult as ProductLookupResult | undefined,
+      lookupResult: selectedProduct.lookupResult as
+        | ProductLookupResult
+        | undefined,
     })
 
     onProductSelected?.(selectedProduct.barcode, selectedProduct)
@@ -95,7 +110,11 @@ export default function ManualBarcodeEntry({
               <Package className="w-5 h-5" />
               Manual Product Entry
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+            >
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -124,7 +143,9 @@ export default function ManualBarcodeEntry({
                       )}
                       <div>
                         <strong>Barcode:</strong>{' '}
-                        <code className="text-xs">{selectedProduct.barcode}</code>
+                        <code className="text-xs">
+                          {selectedProduct.barcode}
+                        </code>
                       </div>
                     </div>
                   </div>
@@ -138,14 +159,18 @@ export default function ManualBarcodeEntry({
                     Select Product
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                  <Button variant="outline" onClick={() => setSelectedProduct(null)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedProduct(null)}
+                  >
                     Change
                   </Button>
                 </div>
                 <Alert className="mt-3">
                   <ArrowRight className="h-4 w-4 text-blue-600" />
                   <AlertDescription className="text-xs">
-                    Will automatically proceed to expiry date scanning after selection
+                    Will automatically proceed to expiry date scanning after
+                    selection
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -159,8 +184,8 @@ export default function ManualBarcodeEntry({
                   <Input
                     type="text"
                     value={barcode}
-                    onChange={e => setBarcode(e.target.value)}
-                    onKeyDown={e => {
+                    onChange={(e) => setBarcode(e.target.value)}
+                    onKeyDown={(e) => {
                       if (e.key === 'Enter' && barcode.length >= 8) {
                         handleBarcodeSubmit()
                       }
@@ -185,7 +210,9 @@ export default function ManualBarcodeEntry({
                 </div>
 
                 {barcode && barcode.length < 8 && (
-                  <p className="text-xs text-orange-600">Barcode must be at least 8 digits long</p>
+                  <p className="text-xs text-orange-600">
+                    Barcode must be at least 8 digits long
+                  </p>
                 )}
               </div>
 
@@ -203,7 +230,15 @@ export default function ManualBarcodeEntry({
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
-                        <Typography variant="h3">Product Found!</Typography>
+                        <div className="flex justify-center items-center gap-2">
+                          <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                          <Typography
+                            variant="h3"
+                            className="text-primary-800 font-black"
+                          >
+                            Product Found!
+                          </Typography>
+                        </div>
 
                         {lookupResult.product && (
                           <div className="text-sm space-y-2">
@@ -214,14 +249,17 @@ export default function ManualBarcodeEntry({
                             </div>
                             {lookupResult.product.brands && (
                               <div>
-                                <strong>Brand:</strong> {lookupResult.product.brands}
+                                <strong>Brand:</strong>{' '}
+                                {lookupResult.product.brands}
                               </div>
                             )}
                             {lookupResult.product.categories && (
                               <div>
                                 <strong>Category:</strong>{' '}
                                 {lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim()
+                                  ? String(lookupResult.product.categories)
+                                      .split(',')[0]
+                                      ?.trim()
                                   : 'Unknown'}
                               </div>
                             )}
@@ -233,19 +271,25 @@ export default function ManualBarcodeEntry({
                             if (lookupResult.product) {
                               const productData = {
                                 barcode,
-                                productName: (lookupResult.product.product_name ||
+                                productName: (lookupResult.product
+                                  .product_name ||
                                   lookupResult.product.product_name_en ||
                                   'Unknown Product') as string,
-                                brand: (lookupResult.product.brands || '') as string,
+                                brand: (lookupResult.product.brands ||
+                                  '') as string,
                                 category: (lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim() ||
-                                    ''
+                                  ? String(lookupResult.product.categories)
+                                      .split(',')[0]
+                                      ?.trim() || ''
                                   : '') as string,
-                                imageUrl: (lookupResult.product.image_front_url ||
+                                imageUrl: (lookupResult.product
+                                  .image_front_url ||
                                   lookupResult.product.image_url ||
                                   '') as string,
                                 isManualEntry: true,
-                                lookupResult: lookupResult as ProductLookupResult | undefined,
+                                lookupResult: lookupResult as
+                                  | ProductLookupResult
+                                  | undefined,
                               }
 
                               setProductSelected(productData)
@@ -274,7 +318,8 @@ export default function ManualBarcodeEntry({
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        Product not found in database. You can add it manually below.
+                        Product not found in database. You can add it manually
+                        below.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -292,10 +337,12 @@ export default function ManualBarcodeEntry({
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
-                        <label className="block text-xs font-medium mb-1">Barcode *</label>
+                        <label className="block text-xs font-medium mb-1">
+                          Barcode *
+                        </label>
                         <Input
                           value={barcode}
-                          onChange={e => setBarcode(e.target.value)}
+                          onChange={(e) => setBarcode(e.target.value)}
                           placeholder="e.g., 078000113464"
                           className="font-mono"
                           required
@@ -303,11 +350,13 @@ export default function ManualBarcodeEntry({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium mb-1">Product Name *</label>
+                        <label className="block text-xs font-medium mb-1">
+                          Product Name *
+                        </label>
                         <Input
                           value={manualProductData.productName}
-                          onChange={e =>
-                            setManualProductData(prev => ({
+                          onChange={(e) =>
+                            setManualProductData((prev) => ({
                               ...prev,
                               productName: e.target.value,
                             }))
@@ -319,11 +368,13 @@ export default function ManualBarcodeEntry({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-xs font-medium mb-1">Brand</label>
+                          <label className="block text-xs font-medium mb-1">
+                            Brand
+                          </label>
                           <Input
                             value={manualProductData.brand}
-                            onChange={e =>
-                              setManualProductData(prev => ({
+                            onChange={(e) =>
+                              setManualProductData((prev) => ({
                                 ...prev,
                                 brand: e.target.value,
                               }))
@@ -333,11 +384,13 @@ export default function ManualBarcodeEntry({
                         </div>
 
                         <div>
-                          <label className="block text-xs font-medium mb-1">Category</label>
+                          <label className="block text-xs font-medium mb-1">
+                            Category
+                          </label>
                           <Input
                             value={manualProductData.category}
-                            onChange={e =>
-                              setManualProductData(prev => ({
+                            onChange={(e) =>
+                              setManualProductData((prev) => ({
                                 ...prev,
                                 category: e.target.value,
                               }))
@@ -352,7 +405,7 @@ export default function ManualBarcodeEntry({
                       <div className="flex gap-2 w-full">
                         <Input
                           placeholder="Search Open Food Facts..."
-                          onKeyDown={e => {
+                          onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               handleProductSearch(e.currentTarget.value)
                             }
@@ -364,7 +417,7 @@ export default function ManualBarcodeEntry({
                           variant="outline"
                           onClick={() => {
                             const input = document.querySelector(
-                              'input[placeholder="Search Open Food Facts..."]',
+                              'input[placeholder="Search Open Food Facts..."]'
                             ) as HTMLInputElement
                             if (input?.value) {
                               handleProductSearch(input.value)
@@ -397,7 +450,8 @@ export default function ManualBarcodeEntry({
                                       'Unknown Product') as string,
                                     brand: (product.brands || '') as string,
                                     category: '', // categories not available in search results
-                                    imageUrl: (product.image_front_small_url || '') as string,
+                                    imageUrl: (product.image_front_small_url ||
+                                      '') as string,
                                     isManualEntry: true,
                                   }
 
@@ -421,7 +475,9 @@ export default function ManualBarcodeEntry({
                                     {product.product_name || 'Unknown Product'}
                                   </div>
                                   {product.brands && (
-                                    <div className="text-gray-500">{product.brands}</div>
+                                    <div className="text-gray-500">
+                                      {product.brands}
+                                    </div>
                                   )}
                                 </div>
                               </Button>
