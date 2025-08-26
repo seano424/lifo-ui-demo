@@ -6,12 +6,16 @@ import { createClient } from '@/lib/supabase/client'
 // Custom type for available batches with product info
 interface AvailableBatch {
   batch_id: string
+  batch_number: string | null
   product_id: string
   store_id: string
   expiry_date: string
   current_quantity: number
+  available_quantity: number
   cost_price: number
   selling_price: number
+  location_code: string | null
+  status: string
   created_at: string
   products: {
     product_name: string
@@ -107,6 +111,7 @@ export function useScanOutActions() {
   /**
    * Find available inventory batches for a product by barcode and store
    * This replaces the OpenFoodFacts lookup for scan-out workflows
+   * Uses the correct database schema from inventory.batches and inventory.products
    */
   const findAvailableBatches = async (
     barcode: string,
@@ -116,32 +121,37 @@ export function useScanOutActions() {
 
     try {
       // First, find the product by barcode
-      const { data: products, error: productError } = await supabase
+      const { data: product, error: productError } = await supabase
         .from('products')
-        .select('product_id, product_name, brand_name')
+        .select('product_id, name, brand, category, unit_type, image_url, barcode')
         .eq('barcode', barcode)
         .single()
 
-      if (productError || !products) {
+      if (productError || !product) {
         console.log('Product not found for barcode:', barcode)
         return []
       }
 
-      // Then find all available batches for this product in the current store
+      // Then find all available batches for this product in the current store  
       const { data: batches, error: batchError } = await supabase
         .from('batches')
         .select(`
           batch_id,
+          batch_number,
           product_id,
           store_id,
           expiry_date,
           current_quantity,
+          available_quantity,
           cost_price,
           selling_price,
+          location_code,
+          status,
           created_at
         `)
-        .eq('product_id', products.product_id)
+        .eq('product_id', product.product_id)
         .eq('store_id', storeId)
+        .eq('status', 'active')
         .gt('current_quantity', 0) // Only batches with available inventory
         .order('expiry_date', { ascending: true }) // FIFO - oldest expiry first
 
@@ -150,16 +160,33 @@ export function useScanOutActions() {
         throw new Error('Failed to fetch available inventory')
       }
 
-      // Transform batches to include product information
-      const transformedBatches: AvailableBatch[] = (batches || []).map(batch => ({
-        ...batch,
+      if (!batches || batches.length === 0) {
+        console.log('No active batches found for product:', product.product_id)
+        return []
+      }
+
+      // Transform to match the expected interface
+      const transformedBatches: AvailableBatch[] = batches.map(batch => ({
+        batch_id: batch.batch_id,
+        batch_number: batch.batch_number,
+        product_id: batch.product_id,
+        store_id: batch.store_id,
+        expiry_date: batch.expiry_date,
+        current_quantity: batch.current_quantity,
+        available_quantity: batch.available_quantity,
+        cost_price: batch.cost_price,
+        selling_price: batch.selling_price,
+        location_code: batch.location_code,
+        status: batch.status,
+        created_at: batch.created_at,
         products: {
-          product_name: products.product_name,
-          brand_name: products.brand_name,
-          barcode: barcode,
+          product_name: product.name || 'Unknown Product',
+          brand_name: product.brand || 'Unknown Brand', 
+          barcode: product.barcode || barcode,
         },
       }))
 
+      console.log(`Found ${transformedBatches.length} available batches for ${barcode}`)
       return transformedBatches
     } catch (error) {
       console.error('Error in findAvailableBatches:', error)

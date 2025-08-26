@@ -20,18 +20,23 @@ import BaseScanningInterface, {
 import type { ScannedItem } from '../shared'
 import { useScanOutActions } from './use-scan-out-actions'
 import ScanningCamera from '../shared/scanning-camera'
+import BatchSelectionList from '../shared/batch-selection-list'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 
 interface AvailableBatch {
   batch_id: string
+  batch_number: string | null
   product_id: string
   store_id: string
   expiry_date: string
   current_quantity: number
+  available_quantity: number
   cost_price: number
   selling_price: number
+  location_code: string | null
+  status: string
   created_at: string
   products: {
     product_name: string
@@ -75,18 +80,23 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
   } | null>(null)
   const [pendingItems, setPendingItems] = useState<ScannedItem[]>([])
 
+  // Workflow states
+  type ScanOutStep = 'scanning' | 'batch-selection' | 'quantity-entry'
+  const [currentStep, setCurrentStep] = useState<ScanOutStep>('scanning')
+  
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
-  const [showBatchSelector, setShowBatchSelector] = useState(false)
   const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(null)
+  const [selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(null)
   const [ocrError, setOcrError] = useState<string | null>(null)
+  const [quantity, setQuantity] = useState<number>(1)
 
   // Scan-out specific configuration
   const config: BaseScanningConfig = {
     workflowType: 'scan-out',
     enableBarcodeScanning: true,
     enableOCRScanning: true, // Enable OCR for expiry date capture in batch selection
-    enableProductLookup: false, // We look up from our inventory instead
+    enableProductLookup: false, // We'll handle product lookup ourselves
     enableManualEntry: true,
     enableBatchSubmission: true,
     showQuantityField: true,
@@ -95,6 +105,39 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
     scanningTitle: 'Scan Product to Remove',
     confirmationTitle: 'Remove from Inventory',
     submitButtonText: 'Remove from Inventory',
+  }
+
+  // Custom barcode scan handler for scan-out
+  const handleCustomBarcodeScanned = async (barcode: string) => {
+    console.log('Custom barcode scan for scan-out:', barcode)
+    
+    if (!activeStore) {
+      console.error('No active store selected')
+      return
+    }
+
+    try {
+      const batches = await findAvailableBatches(barcode, activeStore.store_id)
+
+      if (batches.length === 0) {
+        // No inventory available for this product
+        console.warn('No inventory found for barcode:', barcode)
+        return
+      }
+
+      // Always show batch list regardless of count
+      setAvailableBatches(batches)
+      setCurrentProduct({
+        barcode,
+        productName: batches[0]?.products.product_name || 'Unknown Product'
+      })
+      setCurrentStep('batch-selection')
+      setSelectedBatch(null) // Reset selection
+      
+      console.log(`Found ${batches.length} batches for ${barcode}`)
+    } catch (error) {
+      console.error('Error finding available batches:', error)
+    }
   }
 
   const callbacks: BaseScanningCallbacks = {
@@ -125,44 +168,14 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
             return { error: 'No inventory found for this product' }
           }
 
-          if (batches.length === 1) {
-            // Only one batch available, auto-select it
-            const selectedBatch = batches[0]
-            setCurrentProduct({
-              ...product,
-              batch: selectedBatch,
-              availableQuantity: selectedBatch.current_quantity,
-              expiryDate: selectedBatch.expiry_date,
-              price: selectedBatch.cost_price,
-            })
-
-            // Return the product data with batch info for the workflow
-            return {
-              barcode: product.barcode,
-              found: true,
-              source: 'cache' as const,
-              product: {
-                _id: selectedBatch.batch_id,
-                product_name: selectedBatch.products.product_name,
-                brands: selectedBatch.products.brand_name,
-                batchInfo: {
-                  batchId: selectedBatch.batch_id,
-                  expiryDate: selectedBatch.expiry_date,
-                  availableQuantity: selectedBatch.current_quantity,
-                  costPrice: selectedBatch.cost_price,
-                },
-              }
-            }
-          } else {
-            // Multiple batches available, show selector
-            // Don't return anything yet - wait for user selection
-            setAvailableBatches(batches)
-            setCurrentProduct(product)
-            setShowBatchSelector(true)
-            
-            // Return a pending state - the workflow will wait
-            return { pending: true }
-          }
+          // Always show batch list regardless of count
+          // This provides consistent UX and allows users to see all available options
+          setAvailableBatches(batches)
+          setCurrentProduct(product)
+          setCurrentStep('batch-selection')
+          
+          // Return a pending state - the workflow will wait for batch selection
+          return { pending: true }
         } catch (error) {
           console.error('Error finding available batches:', error)
           return { error: 'Failed to lookup inventory' }
@@ -179,39 +192,44 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
 
   const handleBatchSelected = (batch: AvailableBatch) => {
     if (currentProduct) {
-      const updatedProduct = {
-        ...currentProduct,
-        batch,
-        availableQuantity: batch.current_quantity,
-        expiryDate: batch.expiry_date,
-        price: batch.cost_price,
-      }
-      setCurrentProduct(updatedProduct)
-
-      // Create a lookup result for the workflow to process
-      const lookupResult = {
-        barcode: currentProduct.barcode,
-        found: true,
-        source: 'cache' as const,
-        product: {
-          _id: batch.batch_id,
-          product_name: batch.products.product_name,
-          brands: batch.products.brand_name,
-          // Additional data for scan-out workflow
-          batchInfo: {
-            batchId: batch.batch_id,
-            expiryDate: batch.expiry_date,
-            availableQuantity: batch.current_quantity,
-            costPrice: batch.cost_price,
-          },
-        },
-      }
-
-      // Update the workflow store with the selected product/batch
-      workflowActions.setProductLookupResult(lookupResult)
+      setSelectedBatch(batch)
+      setQuantity(1) // Default quantity
+      setCurrentStep('quantity-entry')
+      console.log('Batch selected:', batch.batch_id, 'Moving to quantity entry')
     }
-    setShowBatchSelector(false)
+  }
+
+  const handleQuantityConfirmed = () => {
+    if (currentProduct && selectedBatch) {
+      const scannedItem: ScannedItem = {
+        id: selectedBatch.batch_id,
+        barcode: currentProduct.barcode,
+        productName: selectedBatch.products.product_name,
+        brand: selectedBatch.products.brand_name,
+        quantity: quantity,
+        expiryDate: selectedBatch.expiry_date,
+        price: selectedBatch.cost_price,
+        timestamp: new Date(),
+      }
+      
+      console.log('Item processed:', scannedItem)
+      onItemRemoved?.(scannedItem)
+      
+      // Reset to scanning state for next product
+      setCurrentStep('scanning')
+      setCurrentProduct(null)
+      setAvailableBatches([])
+      setSelectedBatch(null)
+      setQuantity(1)
+    }
+  }
+
+  const handleBackToScanning = () => {
+    setCurrentStep('scanning')
+    setCurrentProduct(null)
     setAvailableBatches([])
+    setSelectedBatch(null)
+    setQuantity(1)
   }
 
   const handleOCRExpiryCapture = async () => {
@@ -297,28 +315,49 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
 
   return (
     <>
-      <BaseScanningInterface config={config} callbacks={callbacks} className={className} />
+      {/* Step 1: Barcode Scanning */}
+      {currentStep === 'scanning' && (
+        <div className="space-y-4">
+          <ScanningCamera
+            mode="barcode"
+            onBarcodeScanned={handleCustomBarcodeScanned}
+            onScanError={(error) => console.error('Barcode scan error:', error)}
+            showManualEntry={true}
+            onToggleManualEntry={() => console.log('Toggle manual entry')}
+            onManualProductSelected={handleCustomBarcodeScanned}
+            onCloseManualEntry={() => console.log('Close manual entry')}
+            title="Scan Product to Remove"
+            subtitle="Point camera at product barcode"
+            className="w-full"
+          />
+        </div>
+      )}
 
-      {/* Batch Selection Dialog */}
-      {showBatchSelector && (
-        <Dialog open={showBatchSelector} onOpenChange={setShowBatchSelector}>
-          <DialogContent className="sm:max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Select Batch to Remove</DialogTitle>
-              <DialogDescription>
-                Multiple batches are available for this product. Select which one to remove from:
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div className="text-sm text-gray-600">
-                Product: <strong>{currentProduct?.productName || 'Unknown Product'}</strong>
+      {/* Step 2: Batch Selection */}
+      {currentStep === 'batch-selection' && currentProduct && (
+        <div className="mt-6 space-y-6">
+          {/* Product Context */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <div className="text-green-600 text-lg">✅</div>
+              <div>
+                <div className="font-medium text-green-900">
+                  Product Found: {currentProduct.productName || 'Unknown Product'}
+                </div>
+                <div className="text-sm text-green-700 mt-1">
+                  Ready to select batch for removal
+                </div>
               </div>
+            </div>
+          </div>
 
-              {/* OCR Expiry Date Capture */}
+          {/* Main Selection Interface */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Left Column: OCR Expiry Date Capture */}
+            <div className="space-y-4">
               <div className="border rounded-lg p-4 bg-purple-50">
                 <div className="text-sm font-medium text-purple-900 mb-3">
-                  Scan Expiry Date to Auto-Select Batch
+                  📸 Scan Expiry Date to Auto-Match
                 </div>
                 <ScanningCamera
                   mode="ocr"
@@ -333,48 +372,114 @@ export default function ScanOutInterface({ onItemRemoved, className }: ScanOutIn
                   className="w-full"
                 />
               </div>
+            </div>
 
-              {/* Manual Batch Selection */}
-              <div className="space-y-3">
-                <div className="text-sm font-medium text-gray-700">
-                  Or manually select a batch:
+            {/* Right Column: Batch Selection List */}
+            <div className="space-y-4">
+              <BatchSelectionList
+                batches={availableBatches}
+                onBatchSelected={handleBatchSelected}
+                selectedBatchId={selectedBatch?.batch_id}
+                className="border rounded-lg p-4 bg-gray-50"
+              />
+            </div>
+          </div>
+
+          {/* Back Button */}
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              onClick={handleBackToScanning}
+              className="flex items-center gap-2"
+            >
+              ← Back to Change Product
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Quantity Entry */}
+      {currentStep === 'quantity-entry' && currentProduct && selectedBatch && (
+        <div className="mt-6 space-y-6">
+          {/* Product Context */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <div className="text-blue-600 text-lg">📦</div>
+              <div>
+                <div className="font-medium text-blue-900">
+                  Selected: {selectedBatch.products.product_name}
                 </div>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {availableBatches.map(batch => (
-                    <div
-                      key={batch.batch_id}
-                      className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleBatchSelected(batch)}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">
-                            Expires: {new Date(batch.expiry_date).toLocaleDateString()}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Available: {batch.current_quantity} units
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Cost: {formatPrice(batch.cost_price)}
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Select
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="text-sm text-blue-700 mt-1">
+                  Batch #{selectedBatch.batch_number || selectedBatch.batch_id.slice(-8)} • 
+                  Expires: {new Date(selectedBatch.expiry_date).toLocaleDateString()} • 
+                  Available: {selectedBatch.available_quantity || selectedBatch.current_quantity} units
+                  {selectedBatch.location_code && ` • Location: ${selectedBatch.location_code}`}
                 </div>
               </div>
             </div>
+          </div>
 
-            <DialogFooter className="mt-6">
-              <Button variant="outline" onClick={() => setShowBatchSelector(false)}>
-                Cancel
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          {/* Quantity Selection */}
+          <div className="bg-white border rounded-lg p-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantity to Remove
+                </label>
+                <div className="flex items-center space-x-3">
+                  <Button
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                  >
+                    -
+                  </Button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, Math.min(selectedBatch.current_quantity, parseInt(e.target.value) || 1)))}
+                    className="w-20 text-center border rounded px-3 py-2"
+                    min="1"
+                    max={selectedBatch.current_quantity}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm" 
+                    onClick={() => setQuantity(Math.min(selectedBatch.current_quantity, quantity + 1))}
+                    disabled={quantity >= selectedBatch.current_quantity}
+                  >
+                    +
+                  </Button>
+                  <span className="text-sm text-gray-500">
+                    of {selectedBatch.current_quantity} available
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-600">
+                <div>Cost per unit: {formatPrice(selectedBatch.cost_price)}</div>
+                <div className="font-medium">Total cost: {formatPrice(selectedBatch.cost_price * quantity)}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 justify-center">
+            <Button 
+              variant="outline" 
+              onClick={() => setCurrentStep('batch-selection')}
+            >
+              ← Back to Batches
+            </Button>
+            <Button 
+              onClick={handleQuantityConfirmed}
+              className="bg-red-600 hover:bg-red-700 text-white px-8"
+            >
+              Remove {quantity} unit{quantity > 1 ? 's' : ''} from Inventory
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* Submission Confirmation Dialog */}
