@@ -299,7 +299,9 @@ export default function BarcodeScanner({
         <Typography variant="p">{subtitle}</Typography>
       </div>
 
-      <div className="space-y-4">
+      {/* Fixed size container wrapper to prevent layout shift */}
+      <div className="w-full max-w-[638px] mx-auto">
+        <div className="space-y-4">
         {/* Error Display */}
         {displayError && (
           <Alert variant="destructive">
@@ -316,8 +318,8 @@ export default function BarcodeScanner({
           </Alert>
         )}
 
-        {/* Camera container - ALWAYS maintains aspect ratio */}
-        <div className="relative w-full aspect-video border border-black rounded-3xl bg-gray-100 dark:bg-brand-dark">
+        {/* Camera container - fixed size matching camera's native 638×358 */}
+        <div className="relative w-full aspect-[638/358] border border-black rounded-3xl bg-gray-100 dark:bg-brand-dark">
           {/* Camera Permission Request */}
           {(hasPermission === false || hasPermission === null) && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-3xl">
@@ -342,7 +344,7 @@ export default function BarcodeScanner({
             <>
               <video
                 ref={videoRef}
-                className="w-full h-full aspect-video rounded-3xl object-cover"
+                className="w-full h-full aspect-[638/358] rounded-3xl object-cover"
                 playsInline
                 muted
               />
@@ -426,6 +428,7 @@ export default function BarcodeScanner({
             Point camera at barcode to scan automatically • Real detection active
           </div>
         )}
+      </div>
       </div>
     </div>
   )

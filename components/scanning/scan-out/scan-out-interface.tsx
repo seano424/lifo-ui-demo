@@ -392,7 +392,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             storeId={activeStore?.store_id}
             title="Scan Product to Remove"
             subtitle="Point camera at product barcode"
-            className="w-full"
           />
         </div>
       )}
@@ -435,7 +434,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               title="Capture Expiry Date"
               subtitle="Point camera at expiry date"
               autoStart={true}
-              className="w-full"
             />
 
             {/* Batch Selection List */}
