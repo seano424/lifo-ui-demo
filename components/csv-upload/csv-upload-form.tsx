@@ -87,7 +87,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       return
     }
 
-    console.log('✅ [CSV-UPLOAD-FORM] Valid CSV file detected, setting selected file')
+    console.log(
+      '✅ [CSV-UPLOAD-FORM] Valid CSV file detected, setting selected file'
+    )
     setSelectedFile(file)
 
     try {
@@ -96,7 +98,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       await previewCsvFile(file)
       const endTime = performance.now()
       console.log(
-        `✅ [CSV-UPLOAD-FORM] File preview completed in ${Math.round(endTime - startTime)}ms`,
+        `✅ [CSV-UPLOAD-FORM] File preview completed in ${Math.round(endTime - startTime)}ms`
       )
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
@@ -127,7 +129,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       timestamp: new Date().toISOString(),
     })
 
-    console.log('⚡ [CSV-UPLOAD-FORM] Calling mutation with BULK OPTIMIZATION ENABLED')
+    console.log(
+      '⚡ [CSV-UPLOAD-FORM] Calling mutation with BULK OPTIMIZATION ENABLED'
+    )
 
     try {
       upload({
@@ -173,13 +177,19 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   return (
     <div className="flex flex-col gap-6 sm:min-w-xl lg:w-3xl mx-auto">
       {/* Ultra-Fast Upload Header */}
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Zap className="h-6 w-6 text-yellow-500" />
-          <h2 className="text-2xl font-bold">{t('title')}</h2>
-          <Zap className="h-6 w-6 text-yellow-500" />
+
+      <div className="flex items-center gap-2 flex-col justify-center">
+        <div className="flex items-center gap-1">
+          <Zap className="w-6 h-6 text-secondary-900 fill-primary-100" />
+          <Typography
+            variant="h3"
+            className="text-primary-800 font-black"
+          >
+            {t('title')}
+          </Typography>
+          <Zap className="w-6 h-6 text-secondary-900 fill-primary-100" />
         </div>
-        <p className="text-gray-600">{t('subtitle')}</p>
+        <Typography variant="p">{t('subtitle')}</Typography>
       </div>
 
       {/* File Upload Area */}
@@ -188,7 +198,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           className={cn(
             'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
             dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300',
-            !selectedFile && 'hover:border-gray-400',
+            !selectedFile && 'hover:border-gray-400'
           )}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -199,7 +209,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             ref={fileInputRef}
             type="file"
             accept=".csv"
-            onChange={e => {
+            onChange={(e) => {
               const file = e.target.files?.[0]
               if (file) handleFileSelect(file)
             }}
@@ -211,17 +221,24 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               <FileCheck className="h-12 w-12 text-green-500 mx-auto" />
               <div>
                 <h3 className="font-semibold text-lg">{selectedFile.name}</h3>
-                <p className="text-gray-600">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                <p className="text-gray-600">
+                  {(selectedFile.size / 1024).toFixed(1)} KB
+                </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               <Upload className="h-12 w-12 text-gray-400 mx-auto" />
               <div>
-                <h3 className="font-semibold text-lg">{t('dropZone.dropHere')}</h3>
+                <h3 className="font-semibold text-lg">
+                  {t('dropZone.dropHere')}
+                </h3>
                 <p className="text-gray-600">{t('dropZone.orBrowse')}</p>
               </div>
-              <Button onClick={() => fileInputRef.current?.click()} variant="outline">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="outline"
+              >
                 {t('dropZone.chooseFile')}
               </Button>
             </div>
@@ -294,11 +311,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {currentItems.map((item, index) => {
                     const actualIndex = startIndex + index
                     return (
-                      <tr key={actualIndex} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
-                        <td className="border border-gray-200 p-2">{item.Product_Name}</td>
+                      <tr
+                        key={actualIndex}
+                        className="hover:bg-gray-50"
+                      >
+                        <td className="border border-gray-200 p-2 font-mono text-xs">
+                          {item.SKU}
+                        </td>
                         <td className="border border-gray-200 p-2">
-                          <Badge variant="outline" className="text-xs">
+                          {item.Product_Name}
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <Badge
+                            variant="outline"
+                            className="text-xs"
+                          >
                             {item.Category}
                           </Badge>
                         </td>
@@ -307,7 +334,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
+                              onClick={() =>
+                                updateCsvItemQuantity(
+                                  actualIndex,
+                                  item.Quantity - 1
+                                )
+                              }
                               disabled={item.Quantity <= 1}
                               className="h-6 w-6 p-0"
                             >
@@ -319,7 +351,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
+                              onClick={() =>
+                                updateCsvItemQuantity(
+                                  actualIndex,
+                                  item.Quantity + 1
+                                )
+                              }
                               className="h-6 w-6 p-0"
                             >
                               <Plus className="h-3 w-3" />
@@ -332,7 +369,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               <Input
                                 type="date"
                                 value={item.Expiry_Date}
-                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                                onChange={(e) =>
+                                  updateCsvItemExpiry(
+                                    actualIndex,
+                                    e.target.value
+                                  )
+                                }
                                 className="text-xs h-7 min-w-[120px]"
                                 min={new Date().toISOString().split('T')[0]}
                               />
@@ -342,7 +384,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               <Input
                                 type="date"
                                 value=""
-                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                                onChange={(e) =>
+                                  updateCsvItemExpiry(
+                                    actualIndex,
+                                    e.target.value
+                                  )
+                                }
                                 placeholder={t('preview.selectDate')}
                                 className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
                                 min={new Date().toISOString().split('T')[0]}
@@ -362,22 +409,37 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               {currentItems.map((item, index) => {
                 const actualIndex = startIndex + index
                 return (
-                  <div key={actualIndex} className="border border-gray-200 rounded-lg p-3 bg-white">
+                  <div
+                    key={actualIndex}
+                    className="border border-gray-200 rounded-lg p-3 bg-white"
+                  >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
-                        <Badge variant="outline" className="text-xs">
+                        <span className="font-mono text-xs text-gray-500">
+                          {item.SKU}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {item.Category}
                         </Badge>
                       </div>
                       <div className="font-medium">{item.Product_Name}</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
+                        <span className="text-sm text-gray-600">
+                          {t('preview.quantityLabel')}
+                        </span>
                         <div className="flex items-center gap-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
+                            onClick={() =>
+                              updateCsvItemQuantity(
+                                actualIndex,
+                                item.Quantity - 1
+                              )
+                            }
                             disabled={item.Quantity <= 1}
                             className="h-6 w-6 p-0"
                           >
@@ -389,7 +451,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
+                            onClick={() =>
+                              updateCsvItemQuantity(
+                                actualIndex,
+                                item.Quantity + 1
+                              )
+                            }
                             className="h-6 w-6 p-0"
                           >
                             <Plus className="h-3 w-3" />
@@ -404,7 +471,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           <Input
                             type="date"
                             value={item.Expiry_Date}
-                            onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                            onChange={(e) =>
+                              updateCsvItemExpiry(actualIndex, e.target.value)
+                            }
                             className="text-sm h-8"
                             min={new Date().toISOString().split('T')[0]}
                           />
@@ -413,7 +482,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             <Input
                               type="date"
                               value=""
-                              onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                              onChange={(e) =>
+                                updateCsvItemExpiry(actualIndex, e.target.value)
+                              }
                               placeholder={t('preview.selectDate')}
                               className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
                               min={new Date().toISOString().split('T')[0]}
@@ -451,7 +522,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 )}
               </Button>
 
-              <Button onClick={handleReset} variant="outline" disabled={isUploading}>
+              <Button
+                onClick={handleReset}
+                variant="outline"
+                disabled={isUploading}
+              >
                 {t('buttons.reset')}
               </Button>
             </div>
@@ -465,7 +540,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-6 w-6 text-green-600" />
-              <h3 className="font-semibold text-green-800 text-lg">{t('results.title')}</h3>
+              <h3 className="font-semibold text-green-800 text-lg">
+                {t('results.title')}
+              </h3>
             </div>
 
             {/* Success Summary */}
@@ -496,28 +573,36 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 <div className="text-2xl font-bold text-green-600">
                   {uploadResult.processed || 0}
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.processed')}</div>
+                <div className="text-sm text-gray-600">
+                  {t('results.metrics.processed')}
+                </div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-600">
                   {uploadResult.skipped || 0}
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.skipped')}</div>
+                <div className="text-sm text-gray-600">
+                  {t('results.metrics.skipped')}
+                </div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
                   {uploadResult.performance_metrics?.items_per_second || 0}
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.itemsPerSec')}</div>
+                <div className="text-sm text-gray-600">
+                  {t('results.metrics.itemsPerSec')}
+                </div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {uploadResult.processing_time_ms || 0}ms
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.totalTime')}</div>
+                <div className="text-sm text-gray-600">
+                  {t('results.metrics.totalTime')}
+                </div>
               </div>
             </div>
 
@@ -529,16 +614,23 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {t('results.performance.title')}
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                  {uploadResult.performance_metrics.duplicate_detection_ms > 0 && (
+                  {uploadResult.performance_metrics.duplicate_detection_ms >
+                    0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-orange-600">
-                        {uploadResult.performance_metrics.duplicate_detection_ms}
+                        {
+                          uploadResult.performance_metrics
+                            .duplicate_detection_ms
+                        }
                         ms
                       </div>
-                      <div className="text-gray-600">{t('results.performance.duplicateCheck')}</div>
+                      <div className="text-gray-600">
+                        {t('results.performance.duplicateCheck')}
+                      </div>
                     </div>
                   )}
-                  {uploadResult.performance_metrics.product_resolution_ms > 0 && (
+                  {uploadResult.performance_metrics.product_resolution_ms >
+                    0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-cyan-600">
                         {uploadResult.performance_metrics.product_resolution_ms}
@@ -554,7 +646,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="font-bold text-indigo-600">
                         {uploadResult.performance_metrics.batch_insertion_ms}ms
                       </div>
-                      <div className="text-gray-600">{t('results.performance.batchInsertion')}</div>
+                      <div className="text-gray-600">
+                        {t('results.performance.batchInsertion')}
+                      </div>
                     </div>
                   )}
                   {uploadResult.performance_metrics.products_created &&
@@ -568,14 +662,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         </div>
                       </div>
                     )}
-                  {uploadResult.performance_metrics.database_processing_time_ms &&
-                    uploadResult.performance_metrics.database_processing_time_ms > 0 && (
+                  {uploadResult.performance_metrics
+                    .database_processing_time_ms &&
+                    uploadResult.performance_metrics
+                      .database_processing_time_ms > 0 && (
                       <div className="text-center p-2 bg-gray-50 rounded">
                         <div className="font-bold text-purple-600">
-                          {uploadResult.performance_metrics.database_processing_time_ms}
+                          {
+                            uploadResult.performance_metrics
+                              .database_processing_time_ms
+                          }
                           ms
                         </div>
-                        <div className="text-gray-600">{t('results.performance.dbProcessing')}</div>
+                        <div className="text-gray-600">
+                          {t('results.performance.dbProcessing')}
+                        </div>
                       </div>
                     )}
                 </div>
@@ -587,8 +688,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         (1 -
                           (uploadResult.processing_time_ms || 0) /
                             (uploadResult.total_items * 50)) *
-                          100,
-                      ),
+                          100
+                      )
                     ),
                   })}
                 </div>
@@ -613,7 +714,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         expiry_date: string
                         reason: string
                       },
-                      index: number,
+                      index: number
                     ) => (
                       <div
                         key={`duplicate-${dup.sku || index}`}
@@ -623,17 +724,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           {dup.sku} - {dup.product_name}
                         </div>
                         <div className="text-gray-600">
-                          {t('results.duplicates.expiry')}: {dup.expiry_date} • {dup.reason}
+                          {t('results.duplicates.expiry')}: {dup.expiry_date} •{' '}
+                          {dup.reason}
                         </div>
                       </div>
-                    ),
+                    )
                   )}
                 </div>
               </details>
             )}
 
             {/* Action Button */}
-            <Button onClick={handleReset} className="w-full">
+            <Button
+              onClick={handleReset}
+              className="w-full"
+            >
               {t('buttons.uploadAnother')}
             </Button>
           </div>
