@@ -16,7 +16,7 @@ import { useStoreState } from '@/lib/stores/store-context'
 import BaseScanningInterface, {
   type BaseScanningCallbacks,
   type BaseScanningConfig,
-} from '../base-scanning-interface'
+} from '../configurable-scanning-interface'
 import type { ScannedItem } from '../shared'
 
 interface ScanInInterfaceProps {

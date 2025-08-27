@@ -2,7 +2,7 @@
 
 import { Scan, Upload } from 'lucide-react'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
-import ScanningInterface from '@/components/scanning/refactored-scanning-interface'
+import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useMediaQuery } from '@/hooks/use-mobile'
