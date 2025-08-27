@@ -103,6 +103,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   // Workflow states
   type ScanOutStep = 'scanning' | 'batch-selection'
   const [currentStep, setCurrentStep] = useState<ScanOutStep>('scanning')
+  const [showManualEntry, setShowManualEntry] = useState(false)
 
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
@@ -377,10 +378,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             mode="barcode"
             onBarcodeScanned={handleCustomBarcodeScanned}
             onScanError={error => console.error('Barcode scan error:', error)}
-            showManualEntry={true}
-            onToggleManualEntry={() => console.log('Toggle manual entry')}
-            onManualProductSelected={handleCustomBarcodeScanned}
-            onCloseManualEntry={() => console.log('Close manual entry')}
+            showManualEntry={showManualEntry}
+            onToggleManualEntry={() => setShowManualEntry(!showManualEntry)}
+            onManualProductSelected={(barcode: string) => {
+              handleCustomBarcodeScanned(barcode)
+              setShowManualEntry(false)
+            }}
+            onCloseManualEntry={() => setShowManualEntry(false)}
             manualEntryMode="outbound"
             storeId={activeStore?.store_id}
             title="Scan Product to Remove"
