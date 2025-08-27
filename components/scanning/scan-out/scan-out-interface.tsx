@@ -415,7 +415,7 @@ export default function ScanOutInterface({
   )
 
   return (
-    <>
+    <div className="space-y-4">
       {/* Step 1: Barcode Scanning */}
       {currentStep === 'scanning' && (
         <div className="space-y-4">
@@ -440,7 +440,7 @@ export default function ScanOutInterface({
 
       {/* Step 2: Batch Selection */}
       {currentStep === 'batch-selection' && currentProduct && (
-        <div className="space-y-4 w-full max-w-[638px] mx-auto">
+        <>
           {/* Main Selection Interface */}
           <ScanningCamera
             mode="ocr"
@@ -469,7 +469,7 @@ export default function ScanOutInterface({
               ← Back to Change Product
             </Button>
           </div>
-        </div>
+        </>
       )}
 
       {pendingItems.length > 0 && (
@@ -720,6 +720,6 @@ export default function ScanOutInterface({
           </AlertDescription>
         </Alert>
       )}
-    </>
+    </div>
   )
 }
