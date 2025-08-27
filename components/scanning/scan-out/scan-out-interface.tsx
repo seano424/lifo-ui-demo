@@ -1,10 +1,19 @@
 'use client'
 
-import { AlertCircle, BarChart3, Check, Package, RefreshCcw } from 'lucide-react'
+import {
+  AlertCircle,
+  BarChart3,
+  Check,
+  Minus,
+  Package,
+  Plus,
+  RefreshCcw,
+  Trash2,
+} from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -64,6 +73,11 @@ interface CurrentProduct {
   price?: number
 }
 
+interface PendingItem extends ScannedItem {
+  batchId: string
+  maxQuantity: number
+}
+
 interface ScanOutInterfaceProps {
   onItemRemoved?: (item: ScannedItem) => void
   className?: string
@@ -84,18 +98,18 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
     successCount: number
     totalCount: number
   } | null>(null)
-  const [pendingItems, setPendingItems] = useState<ScannedItem[]>([])
+  const [pendingItems, setPendingItems] = useState<PendingItem[]>([])
 
   // Workflow states
-  type ScanOutStep = 'scanning' | 'batch-selection' | 'quantity-entry'
+  type ScanOutStep = 'scanning' | 'batch-selection'
   const [currentStep, setCurrentStep] = useState<ScanOutStep>('scanning')
 
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
   const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(null)
-  const [selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(null)
+  const [_selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(null)
   const [ocrError, setOcrError] = useState<string | null>(null)
-  const [quantity, setQuantity] = useState<number>(1)
+  const [_quantity, setQuantity] = useState<number>(1)
 
   // Custom barcode scan handler for scan-out
   const handleCustomBarcodeScanned = async (barcode: string, _productData?: unknown) => {
@@ -187,59 +201,69 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const handleBatchSelected = useCallback(
     (batch: AvailableBatch) => {
       if (currentProduct) {
-        setSelectedBatch(batch)
-        setQuantity(1)
-        setCurrentStep('quantity-entry')
+        // Add to pending list with default quantity of 1
+        const newItem: PendingItem = {
+          id: batch.batch_id,
+          batchId: batch.batch_id,
+          barcode: currentProduct.barcode,
+          productName: batch.products.product_name,
+          brand: batch.products.brand_name,
+          quantity: 1,
+          maxQuantity: batch.current_quantity,
+          expiryDate: batch.expiry_date,
+          price: batch.cost_price,
+          timestamp: new Date(),
+        }
+
+        setPendingItems(prev => {
+          // Check if this batch is already in the list
+          const existingIndex = prev.findIndex(item => item.batchId === batch.batch_id)
+          if (existingIndex >= 0) {
+            // Increment quantity if already exists
+            const updated = [...prev]
+            updated[existingIndex] = {
+              ...updated[existingIndex],
+              quantity: Math.min(
+                updated[existingIndex].quantity + 1,
+                updated[existingIndex].maxQuantity,
+              ),
+            }
+            return updated
+          }
+          // Add new item to the beginning of the list
+          return [newItem, ...prev]
+        })
+
+        // Reset to scanning for next product
+        setCurrentStep('scanning')
+        setCurrentProduct(null)
+        setAvailableBatches([])
+        setSelectedBatch(null)
       }
     },
     [currentProduct],
   )
 
-  const handleQuantityConfirmed = () => {
-    if (currentProduct && selectedBatch) {
-      const scannedItem: ScannedItem = {
-        id: selectedBatch.batch_id,
-        barcode: currentProduct.barcode,
-        productName: selectedBatch.products.product_name,
-        brand: selectedBatch.products.brand_name,
-        quantity: quantity,
-        expiryDate: selectedBatch.expiry_date,
-        price: selectedBatch.cost_price,
-        timestamp: new Date(),
-      }
+  // Update item quantity in the pending list
+  const updateItemQuantity = (batchId: string, newQuantity: number) => {
+    setPendingItems(prev =>
+      prev.map(item =>
+        item.batchId === batchId
+          ? { ...item, quantity: Math.max(1, Math.min(newQuantity, item.maxQuantity)) }
+          : item,
+      ),
+    )
+  }
 
-      // Submit the removal immediately to the database
-      submitCheckout(
-        [
-          {
-            batchId: selectedBatch.batch_id,
-            quantityRemoved: quantity,
-            reason: 'scan-out',
-            storeId: activeStore?.store_id || '',
-            notes: `Removed ${quantity} unit(s) of ${selectedBatch.products.product_name}`,
-          },
-        ],
-        {
-          onSuccess: result => {
-            console.log('Item removed successfully:', result)
+  // Remove item from pending list
+  const removeItemFromList = (batchId: string) => {
+    setPendingItems(prev => prev.filter(item => item.batchId !== batchId))
+  }
 
-            // Call the parent callback for UI update
-            onItemRemoved?.(scannedItem)
-
-            // Reset to scanning state for next product
-            setCurrentStep('scanning')
-            setCurrentProduct(null)
-            setAvailableBatches([])
-            setSelectedBatch(null)
-            setQuantity(1)
-          },
-          onError: error => {
-            console.error('Failed to remove item from inventory:', error)
-            // Keep the current state so user can retry
-          },
-        },
-      )
-    }
+  // Submit all pending items
+  const handleSubmitAll = () => {
+    if (pendingItems.length === 0) return
+    setShowSubmissionDialog(true)
   }
 
   const handleBackToScanning = () => {
@@ -302,10 +326,11 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
     // Submit the checkout/removal to inventory
     submitCheckout(
       pendingItems.map(item => ({
-        batchId: item.id, // This would be the actual batch ID in a real implementation
+        batchId: item.batchId,
         quantityRemoved: item.quantity,
-        reason: 'scan-out', // Could be 'sale', 'waste', 'transfer', etc.
+        reason: 'scan-out',
         storeId: activeStore?.store_id || '',
+        notes: `Batch removal: ${item.productName} x${item.quantity}`,
       })),
       {
         onSuccess: result => {
@@ -315,6 +340,11 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           setSubmissionResult({
             successCount: result.successCount || pendingItems.length,
             totalCount: pendingItems.length,
+          })
+
+          // Notify parent with all items
+          pendingItems.forEach(item => {
+            onItemRemoved?.(item)
           })
 
           // Clear the batch and close submission dialog
@@ -333,6 +363,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+
+  // Calculate totals for pending items
+  const totalItems = pendingItems.reduce((sum, item) => sum + item.quantity, 0)
+  const totalValue = pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0)
 
   return (
     <>
@@ -418,7 +452,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               <BatchSelectionList
                 batches={availableBatches}
                 onBatchSelected={handleBatchSelected}
-                selectedBatchId={selectedBatch?.batch_id}
+                selectedBatchId={undefined}
               />
             </div>
           </div>
@@ -436,105 +470,83 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         </div>
       )}
 
-      {/* Step 3: Quantity Entry */}
-      {currentStep === 'quantity-entry' && currentProduct && selectedBatch && (
-        <div className="mt-6 space-y-6">
-          {/* Product Context */}
-          <Card className="border-primary-50 shadow-primary-100">
-            <CardContent className="p-3">
-              <div className="flex justify-center items-center gap-2">
-                <div className="flex flex-col gap-2 justify-center items-center">
-                  <Typography className="text-secondary-900 font-black" variant="p">
-                    Selected Product
-                  </Typography>
-                  <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
-                    <Package className="w-4 h-4 text-gray-500" />
-
-                    <Typography variant="p">
-                      {selectedBatch.current_quantity} units available
-                    </Typography>
-                    <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.productName}</Typography>
-                    <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.barcode}</Typography>
+      {/* Pending Items List - Always Visible When Items Exist */}
+      {pendingItems.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex justify-between items-center">
+              <span>Items to Remove ({totalItems})</span>
+              <span className="text-sm font-normal">Total: {formatPrice(totalValue)}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {pendingItems.map(item => (
+              <div
+                key={item.batchId}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+              >
+                <div className="flex-1">
+                  <div className="font-medium">{item.productName}</div>
+                  <div className="text-sm text-gray-500">
+                    {item.brand} • Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {formatPrice(item.price)} × {item.quantity} ={' '}
+                    {formatPrice(item.price * item.quantity)}
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quantity Selection */}
-          <div className="bg-white border border-primary-50 shadow-primary-100 shadow-md rounded-3xl p-6">
-            <div className="space-y-4 flex flex-col justify-center items-center text-center">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quantity to Remove
-                </label>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-2">
                   <Button
-                    variant="outline"
                     size="sm"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
+                    variant="outline"
+                    onClick={() => updateItemQuantity(item.batchId, item.quantity - 1)}
+                    disabled={item.quantity <= 1}
                   >
-                    -
+                    <Minus className="h-3 w-3" />
                   </Button>
                   <input
                     type="number"
-                    value={quantity}
+                    value={item.quantity}
                     onChange={e =>
-                      setQuantity(
-                        Math.max(
-                          1,
-                          Math.min(
-                            selectedBatch.current_quantity,
-                            parseInt(e.target.value, 10) || 1,
-                          ),
-                        ),
-                      )
+                      updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
                     }
-                    className="w-20 text-center border rounded px-3 py-2"
+                    className="w-12 text-center border rounded px-1 py-1 text-sm"
                     min="1"
-                    max={selectedBatch.current_quantity}
+                    max={item.maxQuantity}
                   />
                   <Button
-                    variant="outline"
                     size="sm"
-                    onClick={() =>
-                      setQuantity(Math.min(selectedBatch.current_quantity, quantity + 1))
-                    }
-                    disabled={quantity >= selectedBatch.current_quantity}
+                    variant="outline"
+                    onClick={() => updateItemQuantity(item.batchId, item.quantity + 1)}
+                    disabled={item.quantity >= item.maxQuantity}
                   >
-                    +
+                    <Plus className="h-3 w-3" />
                   </Button>
-                  <span className="text-sm text-gray-500">
-                    of {selectedBatch.current_quantity} available
-                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => removeItemFromList(item.batchId)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
+            ))}
 
-              <div className="text-sm text-gray-600">
-                <div>Cost per unit: {formatPrice(selectedBatch.cost_price)}</div>
-                <div className="font-medium">
-                  Total cost: {formatPrice(selectedBatch.cost_price * quantity)}
-                </div>
-              </div>
+            <div className="flex gap-2 pt-3">
+              <Button variant="outline" onClick={() => setPendingItems([])} className="flex-1">
+                Clear All
+              </Button>
+              <Button
+                onClick={handleSubmitAll}
+                className="flex-1 bg-primary-900 hover:bg-primary-700 text-white"
+              >
+                Submit All ({totalItems} items)
+              </Button>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={() => setCurrentStep('batch-selection')}>
-              ← Back to Batches
-            </Button>
-            <Button
-              onClick={handleQuantityConfirmed}
-              className="bg-primary-900 hover:bg-primary-700 text-white px-8 min-w-80"
-            >
-              Remove {quantity} unit{quantity > 1 ? 's' : ''} from Inventory
-            </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Submission Confirmation Dialog */}
@@ -557,10 +569,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
                 {pendingItems.map(item => {
-                  const totalValue = item.quantity * item.price
+                  const itemTotal = item.quantity * item.price
                   return (
                     <div
-                      key={item.id}
+                      key={item.batchId}
                       className="flex justify-between items-start p-2 bg-white rounded border text-sm"
                     >
                       <div className="flex-1">
@@ -574,9 +586,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                         <div className="font-medium text-red-600">
                           -{item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-red-500">
-                          Remove: {formatPrice(totalValue)}
-                        </div>
+                        <div className="text-xs text-red-500">Remove: {formatPrice(itemTotal)}</div>
                       </div>
                     </div>
                   )
