@@ -223,7 +223,7 @@ export function useSupabaseProductSearch(storeId?: string) {
       }
 
       const supabase = createClient()
-      
+
       // For outbound (when storeId is provided), search BATCHES with available stock
       if (storeId) {
         // First get products that match the search query
@@ -274,29 +274,38 @@ export function useSupabaseProductSearch(storeId?: string) {
 
         // Aggregate batches by product
         const productMap = new Map<string, SupabaseProductSearchResult>()
-        
+
         batchesWithProducts?.forEach(batch => {
-          const product = batch.products as any
+          const product = batch.products as unknown as {
+            product_id: string
+            name: string
+            brand: string | null
+            category: string | null
+            barcode: string | null
+            image_url: string | null
+            unit_type: string | null
+          }
           const productId = batch.product_id
-          
+
           if (productMap.has(productId)) {
             // Update existing product entry with additional batch quantity
             const existing = productMap.get(productId)!
-            existing.total_available_quantity = (existing.total_available_quantity || 0) + batch.current_quantity
+            existing.total_available_quantity =
+              (existing.total_available_quantity || 0) + batch.current_quantity
             existing.batch_count = (existing.batch_count || 0) + 1
           } else {
             // Create new product entry
             productMap.set(productId, {
               product_id: productId,
               name: product.name,
-              brand: product.brand,
-              category: product.category,
-              barcode: product.barcode,
-              image_url: product.image_url,
-              unit_type: product.unit_type,
+              brand: product.brand || undefined,
+              category: product.category || undefined,
+              barcode: product.barcode || undefined,
+              image_url: product.image_url || undefined,
+              unit_type: product.unit_type || undefined,
               total_available_quantity: batch.current_quantity,
               batch_count: 1,
-              isOutOfStock: batch.current_quantity === 0
+              isOutOfStock: batch.current_quantity === 0,
             })
           }
         })
@@ -307,14 +316,14 @@ export function useSupabaseProductSearch(storeId?: string) {
             productMap.set(product.product_id, {
               product_id: product.product_id,
               name: product.name,
-              brand: product.brand,
-              category: product.category,
-              barcode: product.barcode,
-              image_url: product.image_url,
-              unit_type: product.unit_type,
+              brand: product.brand || undefined,
+              category: product.category || undefined,
+              barcode: product.barcode || undefined,
+              image_url: product.image_url || undefined,
+              unit_type: product.unit_type || undefined,
               total_available_quantity: 0,
               batch_count: 0,
-              isOutOfStock: true
+              isOutOfStock: true,
             })
           }
         })
@@ -340,9 +349,10 @@ export function useSupabaseProductSearch(storeId?: string) {
 
         const inStockCount = results.filter(p => !p.isOutOfStock).length
         const outOfStockCount = results.length - inStockCount
-        console.log(`[SupabaseProductSearch] Found ${results.length} products for query "${query}" in store ${storeId} (${inStockCount} in stock, ${outOfStockCount} out of stock)`)
+        console.log(
+          `[SupabaseProductSearch] Found ${results.length} products for query "${query}" in store ${storeId} (${inStockCount} in stock, ${outOfStockCount} out of stock)`,
+        )
         return results
-
       } else {
         // For inbound (no storeId), show all products regardless of stock
         // This is for adding new inventory

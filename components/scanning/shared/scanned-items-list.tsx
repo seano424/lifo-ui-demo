@@ -135,7 +135,7 @@ export default function ScannedItemsList({
 
             {(onEditItem || onItemUpdated) && (
               <Button
-                onClick={() => onEditItem ? onEditItem(item) : handleEditItem(item)}
+                onClick={() => (onEditItem ? onEditItem(item) : handleEditItem(item))}
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0"

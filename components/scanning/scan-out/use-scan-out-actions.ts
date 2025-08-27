@@ -67,7 +67,7 @@ export function useScanOutActions() {
     let targetDate: Date
     try {
       targetDate = new Date(capturedExpiryDate)
-      if (isNaN(targetDate.getTime())) {
+      if (Number.isNaN(targetDate.getTime())) {
         console.warn('Invalid expiry date format:', capturedExpiryDate)
         return null
       }
@@ -133,7 +133,7 @@ export function useScanOutActions() {
         return []
       }
 
-      // Then find all available batches for this product in the current store  
+      // Then find all available batches for this product in the current store
       const { data: batches, error: batchError } = await supabase
         .schema('inventory')
         .from('batches')
@@ -183,7 +183,7 @@ export function useScanOutActions() {
         created_at: batch.created_at,
         products: {
           product_name: product.name || 'Unknown Product',
-          brand_name: product.brand || 'Unknown Brand', 
+          brand_name: product.brand || 'Unknown Brand',
           barcode: product.barcode || barcode,
         },
       }))
@@ -208,7 +208,10 @@ export function useScanOutActions() {
       let failureCount = 0
 
       // 🔍 DEBUG: Check authentication context
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser()
       console.log('🔍 Scan-Out Auth Debug:', {
         userId: user?.id,
         email: user?.email,
@@ -231,10 +234,10 @@ export function useScanOutActions() {
           .eq('store_id', items[0].storeId)
           .eq('user_id', user.id)
           .single()
-        
-        console.log('🏪 Store Access Test:', { 
+
+        console.log('🏪 Store Access Test:', {
           storeId: items[0].storeId,
-          storeAccess, 
+          storeAccess,
           storeAccessError,
           hasAccess: !!storeAccess && storeAccess.is_active,
         })
@@ -255,10 +258,10 @@ export function useScanOutActions() {
             .select('batch_id, store_id, current_quantity')
             .eq('batch_id', item.batchId)
             .single()
-          
-          console.log('🔍 RLS Test Query for batch:', { 
+
+          console.log('🔍 RLS Test Query for batch:', {
             batchId: item.batchId,
-            testQuery, 
+            testQuery,
             testError,
             canRead: !!testQuery,
           })
@@ -301,7 +304,7 @@ export function useScanOutActions() {
 
           // Update the batch quantity
           const newQuantity = batch.current_quantity - item.quantityRemoved
-          
+
           console.log('📝 Attempting batch update:', {
             batchId: item.batchId,
             currentQuantity: batch.current_quantity,
@@ -309,13 +312,13 @@ export function useScanOutActions() {
             newQuantity,
             storeId: batch.store_id,
           })
-          
+
           const { data: updateData, error: updateError } = await supabase
             .schema('inventory')
             .from('batches')
-            .update({ 
+            .update({
               current_quantity: newQuantity,
-              updated_at: new Date().toISOString(), 
+              updated_at: new Date().toISOString(),
             })
             .eq('batch_id', item.batchId)
             .select()
@@ -329,12 +332,15 @@ export function useScanOutActions() {
               hint: updateError.hint,
               code: updateError.code,
             })
-            
+
             // Add specific error for RLS issues
             if (updateError.message?.includes('policy') || updateError.code === '42501') {
-              console.error('🔒 RLS Policy Violation - Check user permissions for store:', batch.store_id)
+              console.error(
+                '🔒 RLS Policy Violation - Check user permissions for store:',
+                batch.store_id,
+              )
             }
-            
+
             results.push({
               batchId: item.batchId,
               success: false,
@@ -401,19 +407,19 @@ export function useScanOutActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.all,
         })
-        
+
         // If we have store ID from the items, invalidate store-specific queries
         if (items.length > 0 && items[0].storeId) {
           queryClient.invalidateQueries({
             queryKey: queryKeys.batches.byStore(items[0].storeId),
           })
-          
+
           // Also invalidate product queries since inventory levels have changed
           queryClient.invalidateQueries({
             queryKey: queryKeys.products.byStore(items[0].storeId),
           })
         }
-        
+
         // Invalidate product lookup cache as inventory levels have changed
         queryClient.invalidateQueries({
           queryKey: queryKeys.productLookup.all,
