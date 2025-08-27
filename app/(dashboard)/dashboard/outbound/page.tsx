@@ -13,18 +13,7 @@ export default function OutboundPage() {
   }
 
   return (
-    <div className="space-y-6 px-4">
-      {/* <div className="flex flex-col gap-3 text-center">
-        <Typography variant="h1">Outbound Scanning</Typography>
-        <Typography
-          variant="p"
-          className="max-w-md mx-auto"
-        >
-          Scan products to remove them from inventory. Perfect for sales, waste
-          tracking, or transfers.
-        </Typography>
-      </div> */}
-
+    <div className="space-y-6 px-4 max-w-screen-3xl mx-auto">
       <ScanOutInterface onItemRemoved={handleItemRemoved} />
 
       {removedItems.length > 0 && (
