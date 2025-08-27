@@ -1,6 +1,13 @@
 'use client'
 
-import { AlertCircle, BarChart3, Check, RefreshCcw } from 'lucide-react'
+import {
+  AlertCircle,
+  BarChart3,
+  Check,
+  RefreshCcw,
+  Package,
+  ArrowRight,
+} from 'lucide-react'
 import { useState, useCallback } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -21,6 +28,8 @@ import ScanningCamera from '../shared/scanning-camera'
 import BatchSelectionList from '../shared/batch-selection-list'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
+import { Card, CardContent } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 
 interface AvailableBatch {
   batch_id: string
@@ -292,7 +301,7 @@ export default function ScanOutInterface({
       {currentStep === 'batch-selection' && currentProduct && (
         <div className="mt-6 space-y-6">
           {/* Product Context */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          {/* <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <div className="flex items-center gap-2">
               <div className="text-green-600 text-lg">✅</div>
               <div>
@@ -305,30 +314,52 @@ export default function ScanOutInterface({
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
+
+          <Card className="border-primary-50 shadow-primary-100">
+            <CardContent className="p-3">
+              <div className="flex justify-center items-center gap-2">
+                <div className="flex flex-col gap-2 justify-center items-center">
+                  <Typography
+                    className="text-secondary-900 font-black"
+                    variant="p"
+                  >
+                    Selected Product
+                  </Typography>
+                  <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
+                    <Package className="w-4 h-4 text-gray-500" />
+
+                    <Typography variant="p">
+                      {currentProduct?.availableQuantity} units available
+                    </Typography>
+                    <Typography variant="p">•</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.productName}
+                    </Typography>
+                    <Typography variant="p">•</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.barcode}
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Main Selection Interface */}
           <div className="flex flex-col gap-6">
-            {/* OCR Expiry Date Capture */}
-            <div className="space-y-4">
-              <div className="border rounded-lg p-4 bg-purple-50">
-                <div className="text-sm font-medium text-purple-900 mb-3">
-                  📸 Scan Expiry Date to Auto-Match
-                </div>
-                <ScanningCamera
-                  mode="ocr"
-                  onOCRCapture={handleOCRExpiryCapture}
-                  isOCRProcessing={isOCRProcessing}
-                  ocrError={ocrError}
-                  onClearOCRError={clearOCRError}
-                  isBackendHealthy={isBackendHealthy}
-                  title="Capture Expiry Date"
-                  subtitle="Point camera at expiry date"
-                  autoStart={false}
-                  className="w-full"
-                />
-              </div>
-            </div>
+            <ScanningCamera
+              mode="ocr"
+              onOCRCapture={handleOCRExpiryCapture}
+              isOCRProcessing={isOCRProcessing}
+              ocrError={ocrError}
+              onClearOCRError={clearOCRError}
+              isBackendHealthy={isBackendHealthy}
+              title="Capture Expiry Date"
+              subtitle="Point camera at expiry date"
+              autoStart={false}
+              className="w-full"
+            />
 
             {/* Batch Selection List */}
             <div className="space-y-4">
@@ -336,7 +367,7 @@ export default function ScanOutInterface({
                 batches={availableBatches}
                 onBatchSelected={handleBatchSelected}
                 selectedBatchId={selectedBatch?.batch_id}
-                className="border rounded-lg p-4 bg-gray-50"
+                className="rounded-lg p-4 bg-gray-50"
               />
             </div>
           </div>
@@ -358,33 +389,39 @@ export default function ScanOutInterface({
       {currentStep === 'quantity-entry' && currentProduct && selectedBatch && (
         <div className="mt-6 space-y-6">
           {/* Product Context */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <div className="text-blue-600 text-lg">📦</div>
-              <div>
-                <div className="font-medium text-blue-900">
-                  Selected: {selectedBatch.products.product_name}
-                </div>
-                <div className="text-sm text-blue-700 mt-1">
-                  Batch #
-                  {selectedBatch.batch_number ||
-                    selectedBatch.batch_id.slice(-8)}{' '}
-                  • Expires:{' '}
-                  {new Date(selectedBatch.expiry_date).toLocaleDateString()} •
-                  Available:{' '}
-                  {selectedBatch.available_quantity ||
-                    selectedBatch.current_quantity}{' '}
-                  units
-                  {selectedBatch.location_code &&
-                    ` • Location: ${selectedBatch.location_code}`}
+          <Card className="border-primary-50 shadow-primary-100">
+            <CardContent className="p-3">
+              <div className="flex justify-center items-center gap-2">
+                <div className="flex flex-col gap-2 justify-center items-center">
+                  <Typography
+                    className="text-secondary-900 font-black"
+                    variant="p"
+                  >
+                    Selected Product
+                  </Typography>
+                  <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
+                    <Package className="w-4 h-4 text-gray-500" />
+
+                    <Typography variant="p">
+                      {selectedBatch.current_quantity} units available
+                    </Typography>
+                    <Typography variant="p">•</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.productName}
+                    </Typography>
+                    <Typography variant="p">•</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.barcode}
+                    </Typography>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Quantity Selection */}
-          <div className="bg-white border rounded-lg p-6">
-            <div className="space-y-4">
+          <div className="bg-white border border-primary-50 shadow-primary-100 shadow-md rounded-3xl p-6">
+            <div className="space-y-4 flex flex-col justify-center items-center text-center">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Quantity to Remove
