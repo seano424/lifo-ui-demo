@@ -25,6 +25,7 @@ import { useStoreState } from '@/lib/stores/store-context'
 import type { ScannedItem } from '../shared'
 import { useScanOutActions } from './use-scan-out-actions'
 import ScanningCamera from '../shared/scanning-camera'
+import { createClient } from '@/lib/supabase/client'
 import BatchSelectionList from '../shared/batch-selection-list'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
@@ -108,14 +109,71 @@ export default function ScanOutInterface({
   const [quantity, setQuantity] = useState<number>(1)
 
   // Custom barcode scan handler for scan-out
-  const handleCustomBarcodeScanned = async (barcode: string) => {
+  const handleCustomBarcodeScanned = async (barcode: string, productData?: any) => {
     if (!activeStore) {
       console.error('No active store selected')
       return
     }
 
     try {
-      const batches = await findAvailableBatches(barcode, activeStore.store_id)
+      let batches: AvailableBatch[] = []
+
+      // Check if this is an internal product ID (from manual search)
+      if (barcode.startsWith('INTERNAL-')) {
+        const productId = barcode.replace('INTERNAL-', '')
+        console.log('Using internal product ID:', productId)
+        
+        // Get batches directly by product_id instead of barcode
+        const supabase = createClient()
+        const { data: batchesData, error } = await supabase
+          .schema('inventory')
+          .from('batches')
+          .select(`
+            batch_id,
+            batch_number,
+            product_id,
+            store_id,
+            expiry_date,
+            current_quantity,
+            available_quantity,
+            cost_price,
+            selling_price,
+            location_code,
+            status,
+            created_at,
+            products (
+              product_id,
+              name,
+              brand,
+              category,
+              barcode,
+              image_url,
+              unit_type
+            )
+          `)
+          .eq('product_id', productId)
+          .eq('store_id', activeStore.store_id)
+          .eq('status', 'active')
+          .gt('current_quantity', 0)
+          .order('expiry_date', { ascending: true })
+
+        if (error) {
+          console.error('Error fetching batches by product_id:', error)
+          return
+        }
+
+        batches = batchesData?.map(batch => ({
+          ...batch,
+          products: {
+            product_name: (batch.products as any)?.name || 'Unknown Product',
+            brand_name: (batch.products as any)?.brand || 'Unknown Brand',
+            barcode: (batch.products as any)?.barcode || '',
+          }
+        })) || []
+      } else {
+        // Regular barcode lookup
+        batches = await findAvailableBatches(barcode, activeStore.store_id)
+      }
 
       if (batches.length === 0) {
         console.warn('No inventory found for barcode:', barcode)
@@ -311,6 +369,8 @@ export default function ScanOutInterface({
             onToggleManualEntry={() => console.log('Toggle manual entry')}
             onManualProductSelected={handleCustomBarcodeScanned}
             onCloseManualEntry={() => console.log('Close manual entry')}
+            manualEntryMode="outbound"
+            storeId={activeStore?.store_id}
             title="Scan Product to Remove"
             subtitle="Point camera at product barcode"
             className="w-full"

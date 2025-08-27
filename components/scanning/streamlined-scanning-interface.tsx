@@ -535,7 +535,8 @@ export default function WorkingStreamlinedScanningInterface({
                 <div className="space-y-4">
                   <ManualBarcodeEntry
                     onProductSelected={handleManualProductSelected}
-                    onClose={() => setShowManualBarcode(false)}
+                    mode="inbound"
+                    storeId={activeStore?.store_id}
                   />
                 </div>
               )}

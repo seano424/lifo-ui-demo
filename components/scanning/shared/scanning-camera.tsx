@@ -28,6 +28,8 @@ export interface ScanningCameraProps {
   onToggleManualEntry?: () => void
   onManualProductSelected?: (barcode: string) => void
   onCloseManualEntry?: () => void
+  manualEntryMode?: 'inbound' | 'outbound' // For ManualBarcodeEntry mode
+  storeId?: string // For outbound manual entry
 
   // Backend health
   isBackendHealthy?: boolean | null
@@ -48,6 +50,8 @@ export default function ScanningCamera({
   ocrError,
   onClearOCRError,
   showManualEntry = false,
+  manualEntryMode = 'inbound',
+  storeId,
   onToggleManualEntry,
   onManualProductSelected,
   onCloseManualEntry,
@@ -129,7 +133,8 @@ export default function ScanningCamera({
             <div className="space-y-4">
               <ManualBarcodeEntry
                 onProductSelected={onManualProductSelected}
-                onClose={onCloseManualEntry}
+                mode={manualEntryMode}
+                storeId={storeId}
               />
             </div>
           )}

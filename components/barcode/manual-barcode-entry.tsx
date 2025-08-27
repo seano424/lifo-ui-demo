@@ -7,15 +7,19 @@ import {
   Loader2,
   Package,
   Search,
-  X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Typography } from '@/components/ui/typography'
-import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
+import { 
+  useProductLookup, 
+  useProductSearch, 
+  useSupabaseProductSearch,
+  type SupabaseProductSearchResult 
+} from '@/hooks/use-product-lookup'
 import type {
   OpenFoodFactsSearchResult,
   ProductLookupResult,
@@ -30,16 +34,21 @@ interface ProductData {
   imageUrl: string
   isManualEntry: boolean
   lookupResult?: unknown
+  productId?: string // For Supabase products without barcodes
 }
 
 interface ManualBarcodeEntryProps {
   onProductSelected?: (barcode: string, productData: ProductData) => void
   className?: string
+  mode?: 'inbound' | 'outbound' // Determines which API to use
+  storeId?: string // Required for outbound mode to filter products by store
 }
 
 export default function ManualBarcodeEntry({
   onProductSelected,
   className = '',
+  mode = 'inbound', // Default to inbound for backward compatibility
+  storeId,
 }: ManualBarcodeEntryProps) {
   const [barcode, setBarcode] = useState('')
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(
@@ -54,11 +63,6 @@ export default function ManualBarcodeEntry({
 
   const { setProductSelected } = useScanningActions()
 
-  const [isOpen, setIsOpen] = useState(false)
-
-  const handleClose = () => {
-    setIsOpen(false)
-  }
 
   const {
     data: lookupResult,
@@ -66,7 +70,14 @@ export default function ManualBarcodeEntry({
     error: lookupError,
   } = useProductLookup(barcode, barcode.length >= 8)
 
-  const productSearch = useProductSearch()
+  const productSearch = useProductSearch() // OpenFoodFacts search
+  const supabaseSearch = useSupabaseProductSearch(storeId) // Supabase search
+  const [productNameQuery, setProductNameQuery] = useState('')
+  const [showProductSearchResults, setShowProductSearchResults] = useState(false)
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Use the appropriate search based on mode
+  const activeSearch = mode === 'outbound' ? supabaseSearch : productSearch
 
   const handleBarcodeSubmit = async () => {
     if (!barcode || barcode.length < 8) return
@@ -76,6 +87,57 @@ export default function ManualBarcodeEntry({
     if (query.length < 3) return
     await productSearch.mutateAsync(query)
   }
+
+  // Debounced search function
+  const debouncedProductNameSearch = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setShowProductSearchResults(false)
+      return
+    }
+    
+    try {
+      if (mode === 'outbound') {
+        if (!storeId) {
+          console.error('Store ID is required for outbound product search')
+          return
+        }
+        await supabaseSearch.mutateAsync(query)
+      } else {
+        await productSearch.mutateAsync(query)
+      }
+      setShowProductSearchResults(true)
+    } catch (error) {
+      console.error('Product search error:', error)
+      setShowProductSearchResults(false)
+    }
+  }, [mode, storeId, supabaseSearch, productSearch])
+
+  const handleProductNameSearch = useCallback((query: string) => {
+    // Clear previous timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+
+    // If query is too short, hide results immediately
+    if (query.length < 2) {
+      setShowProductSearchResults(false)
+      return
+    }
+
+    // Set new timeout for debounced search
+    debounceTimeoutRef.current = setTimeout(() => {
+      debouncedProductNameSearch(query)
+    }, 300) // 300ms debounce delay
+  }, [debouncedProductNameSearch])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const handleConfirmAndProceed = () => {
     if (!selectedProduct) return
@@ -102,7 +164,6 @@ export default function ManualBarcodeEntry({
       category: '',
       imageUrl: '',
     })
-    handleClose()
   }
 
   return (
@@ -176,41 +237,176 @@ export default function ManualBarcodeEntry({
 
           {!selectedProduct && (
             <>
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Input
-                    type="text"
-                    value={barcode}
-                    onChange={(e) => setBarcode(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && barcode.length >= 8) {
-                        handleBarcodeSubmit()
-                      }
-                    }}
-                    placeholder="Barcode number (8+ digits)..."
-                    className="font-mono"
-                    disabled={isLookingUp}
-                  />
+              <div className="space-y-4">
+                {/* Barcode Lookup */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Search by Barcode</label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      type="text"
+                      value={barcode}
+                      onChange={(e) => setBarcode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && barcode.length >= 8) {
+                          handleBarcodeSubmit()
+                        }
+                      }}
+                      placeholder="Barcode number (8+ digits)..."
+                      className="font-mono"
+                      disabled={isLookingUp}
+                    />
 
-                  <Button
-                    onClick={handleBarcodeSubmit}
-                    disabled={barcode.length < 8 || isLookingUp}
-                    className="shrink-0"
-                  >
-                    {isLookingUp ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Search className="w-4 h-4" />
-                    )}
-                    Lookup
-                  </Button>
+                    <Button
+                      onClick={handleBarcodeSubmit}
+                      disabled={barcode.length < 8 || isLookingUp}
+                      className="shrink-0"
+                    >
+                      {isLookingUp ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Search className="w-4 h-4" />
+                      )}
+                      Lookup
+                    </Button>
+                  </div>
+                  {barcode && barcode.length < 8 && (
+                    <p className="text-xs text-orange-600">
+                      Barcode must be at least 8 digits long
+                    </p>
+                  )}
                 </div>
 
-                {barcode && barcode.length < 8 && (
-                  <p className="text-xs text-orange-600">
-                    Barcode must be at least 8 digits long
-                  </p>
-                )}
+                {/* Product Name Search */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Or Search by Product Name
+                    {mode === 'outbound' && (
+                      <span className="text-xs text-gray-500 ml-2">
+                        (In-stock items only)
+                      </span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      value={productNameQuery}
+                      onChange={(e) => {
+                        setProductNameQuery(e.target.value)
+                        handleProductNameSearch(e.target.value)
+                      }}
+                      placeholder={
+                        mode === 'outbound' 
+                          ? "Search products in inventory..." 
+                          : "Search Open Food Facts database..."
+                      }
+                      disabled={activeSearch.isPending}
+                    />
+                    {activeSearch.isPending && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Search Results Dropdown */}
+                  {showProductSearchResults && activeSearch.data && activeSearch.data.length > 0 && (
+                    <div className="border rounded-lg max-h-64 overflow-y-auto bg-white shadow-lg">
+                      {mode === 'outbound' ? (
+                        // Supabase results for outbound
+                        (activeSearch.data as SupabaseProductSearchResult[]).map((product) => (
+                          <Button
+                            key={product.product_id}
+                            variant="ghost"
+                            className="w-full justify-start text-left p-3 hover:bg-gray-50"
+                            onClick={() => {
+                              // For outbound/Supabase results, use the product_id if no barcode exists
+                              // This ensures we have a unique identifier that won't cause lookup failures
+                              const effectiveBarcode = product.barcode && product.barcode.trim() !== '' 
+                                ? product.barcode 
+                                : `INTERNAL-${product.product_id}`
+                              
+                              const productData = {
+                                barcode: effectiveBarcode,
+                                productName: product.name,
+                                brand: product.brand || '',
+                                category: product.category || '',
+                                imageUrl: product.image_url || '',
+                                isManualEntry: true,
+                                // Store the actual product_id for outbound operations
+                                productId: product.product_id,
+                              }
+
+                              setProductSelected(productData)
+                              onProductSelected?.(effectiveBarcode, productData)
+
+                              // Reset search
+                              setProductNameQuery('')
+                              setShowProductSearchResults(false)
+                              setBarcode('')
+                            }}
+                          >
+                            <div className="flex-1">
+                              <div className="font-medium">{product.name}</div>
+                              {product.brand && (
+                                <div className="text-sm text-gray-500">{product.brand}</div>
+                              )}
+                              {product.total_available_quantity && (
+                                <div className="text-xs text-green-600">
+                                  {product.total_available_quantity} units available
+                                  {product.batch_count && product.batch_count > 1 && 
+                                    ` (${product.batch_count} batches)`
+                                  }
+                                </div>
+                              )}
+                            </div>
+                          </Button>
+                        ))
+                      ) : (
+                        // OpenFoodFacts results for inbound
+                        (activeSearch.data as OpenFoodFactsSearchResult[]).map((product) => (
+                          <Button
+                            key={product.code}
+                            variant="ghost"
+                            className="w-full justify-start text-left p-3 hover:bg-gray-50"
+                            onClick={() => {
+                              const productData = {
+                                barcode: product.code,
+                                productName: product.product_name || 'Unknown Product',
+                                brand: product.brands || '',
+                                category: '',
+                                imageUrl: product.image_front_small_url || '',
+                                isManualEntry: true,
+                              }
+
+                              setProductSelected(productData)
+                              onProductSelected?.(product.code, productData)
+
+                              // Reset search
+                              setProductNameQuery('')
+                              setShowProductSearchResults(false)
+                              setBarcode('')
+                            }}
+                          >
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {product.product_name || 'Unknown Product'}
+                              </div>
+                              {product.brands && (
+                                <div className="text-sm text-gray-500">{product.brands}</div>
+                              )}
+                            </div>
+                          </Button>
+                        ))
+                      )}
+                    </div>
+                  )}
+
+                  {showProductSearchResults && activeSearch.data && activeSearch.data.length === 0 && (
+                    <div className="text-sm text-gray-500 p-3 border rounded-lg">
+                      No products found matching "{productNameQuery}"
+                    </div>
+                  )}
+                </div>
               </div>
 
               {lookupError && (
@@ -301,8 +497,7 @@ export default function ManualBarcodeEntry({
                                 category: '',
                                 imageUrl: '',
                               })
-                              handleClose()
-                            }
+                                                      }
                           }}
                           className="w-full mt-3"
                           disabled={!lookupResult.product}
@@ -464,8 +659,7 @@ export default function ManualBarcodeEntry({
                                     category: '',
                                     imageUrl: '',
                                   })
-                                  handleClose()
-                                }}
+                                                              }}
                               >
                                 <div className="text-left">
                                   <div className="font-medium">
@@ -508,8 +702,7 @@ export default function ManualBarcodeEntry({
                           category: '',
                           imageUrl: '',
                         })
-                        handleClose()
-                      }}
+                                          }}
                       disabled={!manualProductData.productName || !barcode}
                       className="w-full"
                     >
