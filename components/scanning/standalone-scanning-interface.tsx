@@ -1,6 +1,12 @@
 'use client'
 
-import { AlertCircle, ArrowRight, BarChart3, Check, RefreshCcw } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  BarChart3,
+  Check,
+  RefreshCcw,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 // Import existing hooks and utilities
@@ -14,7 +20,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
+import {
+  useInventoryActions,
+  useScannedItemConverter,
+} from '@/hooks/use-inventory-submission'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { useProductLookup } from '@/hooks/use-product-lookup'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
@@ -43,9 +52,16 @@ interface ScanningProps {
   className?: string
 }
 
-type UIStep = 'camera-barcode' | 'product-success' | 'camera-expiry' | 'batch-success'
+type UIStep =
+  | 'camera-barcode'
+  | 'product-success'
+  | 'camera-expiry'
+  | 'batch-success'
 
-export default function ScanningInterface({ onItemAdded, className }: ScanningProps) {
+export default function ScanningInterface({
+  onItemAdded,
+  className,
+}: ScanningProps) {
   // Existing workflow state
   const currentStep = useScanningStep()
   const scannedProduct = useScannedProduct()
@@ -58,7 +74,11 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   const workflowActions = useScanningActions()
 
   // OCR processing
-  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  const {
+    processExpiryDate,
+    isLoading: isOCRProcessing,
+    isBackendHealthy,
+  } = useOCRWithFallback()
 
   // Inventory submission
   const { submitBatch, isSubmittingBatch } = useInventoryActions()
@@ -126,7 +146,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
         if (scannedProduct?.productName) {
           setUIStep('product-success')
           if (scannedProduct.lookupResult?.product) {
-            setInventoryData(prev => ({ ...prev, price: 2.99 }))
+            setInventoryData((prev) => ({ ...prev, price: 2.99 }))
           }
         }
         break
@@ -137,7 +157,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
         setUIStep('camera-expiry')
         if (expiryInfo?.extractedDate) {
           const formattedDate = expiryInfo.extractedDate.split('T')[0]
-          setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+          setInventoryData((prev) => ({ ...prev, expiryDate: formattedDate }))
         }
         break
       case 'complete':
@@ -182,7 +202,10 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
     try {
       const videoElement = document.querySelector('video') as HTMLVideoElement
-      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+      if (
+        !videoElement ||
+        videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA
+      ) {
         throw new Error('Camera not ready')
       }
 
@@ -195,8 +218,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
       if (result.success && result.expiryDateInfo) {
         workflowActions.setExpiryDateResult(result.expiryDateInfo)
         if (result.expiryDateInfo.extractedDate) {
-          const formattedDate = result.expiryDateInfo.extractedDate.split('T')[0]
-          setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+          const formattedDate =
+            result.expiryDateInfo.extractedDate.split('T')[0]
+          setInventoryData((prev) => ({ ...prev, expiryDate: formattedDate }))
         }
         setOcrError(null)
       } else {
@@ -204,7 +228,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
         workflowActions.setExpiryDateProcessing(false)
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to capture image'
       setOcrError(errorMessage)
       workflowActions.setError(errorMessage)
       workflowActions.setExpiryDateProcessing(false)
@@ -231,7 +256,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
         price: inventoryData.price,
         timestamp: new Date(),
       }
-      setScannedItems(prev => [newItem, ...prev])
+      setScannedItems((prev) => [newItem, ...prev])
       onItemAdded?.(newItem)
 
       // Reset for next item
@@ -263,26 +288,26 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
     // Convert scanned items to the format expected by the inventory submission
     const productsToSubmit = convertMultipleScannedItems(
-      scannedItems.map(item => ({
+      scannedItems.map((item) => ({
         barcode: item.barcode,
         productName: item.productName,
         brand: item.brand,
         expiryDate: item.expiryDate,
         quantity: item.quantity,
         price: item.price,
-      })),
+      }))
     )
 
     // Submit the batch to inventory using the React Query hook
     submitBatch(
-      productsToSubmit.map(product => ({
+      productsToSubmit.map((product) => ({
         ...product,
         storeId: activeStore?.store_id || '',
         ocrExtractedDate: new Date().toISOString(),
         ocrConfidence: 1,
       })),
       {
-        onSuccess: result => {
+        onSuccess: (result) => {
           console.log('Batch submission completed:', result)
 
           // Store the result for the success dialog
@@ -298,11 +323,11 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: error => {
+        onError: (error) => {
           console.error('Batch submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
-      },
+      }
     )
   }
 
@@ -316,6 +341,23 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           {/* Step 1: Barcode Scanning */}
           {uiStep === 'camera-barcode' && (
             <>
+              {/* Camera Interface */}
+              <ScanningCamera
+                mode="barcode"
+                title={
+                  scannedProduct ? 'Scan Different Product' : 'Scan Product'
+                }
+                onBarcodeScanned={handleScan}
+                onScanError={handleError}
+                showManualEntry={showManualBarcode}
+                onToggleManualEntry={() =>
+                  setShowManualBarcode(!showManualBarcode)
+                }
+                onManualProductSelected={handleManualProductSelected}
+                onCloseManualEntry={() => setShowManualBarcode(false)}
+                autoStart
+              />
+
               {/* Selected Product Display */}
               {scannedProduct && (
                 <ProductCard
@@ -334,25 +376,22 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   onProceed={() => workflowActions.setCurrentStep('ocr')}
                 />
               )}
-
-              {/* Camera Interface */}
-              <ScanningCamera
-                mode="barcode"
-                title={scannedProduct ? 'Scan Different Product' : 'Scan Product'}
-                onBarcodeScanned={handleScan}
-                onScanError={handleError}
-                showManualEntry={showManualBarcode}
-                onToggleManualEntry={() => setShowManualBarcode(!showManualBarcode)}
-                onManualProductSelected={handleManualProductSelected}
-                onCloseManualEntry={() => setShowManualBarcode(false)}
-                autoStart
-              />
             </>
           )}
 
           {/* Step 2: Product Success */}
           {uiStep === 'product-success' && scannedProduct && (
             <div className="space-y-4">
+              {/* Lookup Status */}
+              {lookupError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Lookup failed: {lookupError.message}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <ProductCard
                 product={{
                   barcode: scannedProduct.barcode,
@@ -360,14 +399,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   brand: scannedProduct.brand,
                 }}
               />
-
-              {/* Lookup Status */}
-              {lookupError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
-                </Alert>
-              )}
 
               {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
                 <>
@@ -382,7 +413,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        Product not found in database. You may need to add it manually.
+                        Product not found in database. You may need to add it
+                        manually.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -401,18 +433,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           {/* Step 3: Expiry Date Scanning */}
           {uiStep === 'camera-expiry' && (
             <div className="space-y-4">
-              {/* Product Context */}
-              {scannedProduct && (
-                <ProductCard
-                  product={{
-                    barcode: scannedProduct.barcode,
-                    productName: scannedProduct.productName,
-                    brand: scannedProduct.brand,
-                  }}
-                  mode="selected"
-                />
-              )}
-
               {/* Camera for OCR */}
               {!inventoryData.expiryDate && (
                 <ScanningCamera
@@ -425,6 +445,18 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     workflowActions.setError(null)
                   }}
                   isBackendHealthy={isBackendHealthy}
+                />
+              )}
+
+              {/* Product Context */}
+              {scannedProduct && (
+                <ProductCard
+                  product={{
+                    barcode: scannedProduct.barcode,
+                    productName: scannedProduct.productName,
+                    brand: scannedProduct.brand,
+                  }}
+                  mode="selected"
                 />
               )}
 
@@ -445,18 +477,25 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
               {/* Success Form */}
               {inventoryData.expiryDate && (
-                <InventoryForm data={inventoryData} onChange={setInventoryData} mode="confirm" />
+                <InventoryForm
+                  data={inventoryData}
+                  onChange={setInventoryData}
+                  mode="confirm"
+                />
               )}
 
               {/* Add to Inventory */}
               {inventoryData.expiryDate && (
                 <div className="flex justify-center">
                   <Button
-                    disabled={inventoryData.quantity <= 0 || inventoryData.price <= 0}
+                    disabled={
+                      inventoryData.quantity <= 0 || inventoryData.price <= 0
+                    }
                     onClick={handleAddToInventory}
                     variant="secondary"
                   >
-                    Add to Inventory • {inventoryData.quantity}x €{inventoryData.price.toFixed(2)}
+                    Add to Inventory • {inventoryData.quantity}x €
+                    {inventoryData.price.toFixed(2)}
                   </Button>
                 </div>
               )}
@@ -467,7 +506,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
             <Alert className="font-mono flex items-center justify-center border-none">
               <AlertDescription>
-                Added {scannedItems[0].productName} to your list! Scan the next product.
+                Added {scannedItems[0].productName} to your list! Scan the next
+                product.
               </AlertDescription>
             </Alert>
           )}
@@ -475,9 +515,11 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           {/* Scanned Items List */}
           <ScannedItemsList
             items={scannedItems}
-            onItemUpdated={updatedItem => {
-              setScannedItems(prev =>
-                prev.map(item => (item.id === updatedItem.id ? updatedItem : item)),
+            onItemUpdated={(updatedItem) => {
+              setScannedItems((prev) =>
+                prev.map((item) =>
+                  item.id === updatedItem.id ? updatedItem : item
+                )
               )
             }}
           />
@@ -486,7 +528,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           <ScanningControls
             canGoBack={canGoBack}
             onGoBack={handleGoBack}
-            backButtonText={previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
+            backButtonText={
+              previousStepName ? `Back to ${previousStepName}` : 'Go Back'
+            }
             showPrimaryAction={scannedItems.length > 0}
             onPrimaryAction={handleFinalSubmission}
             primaryActionText={`Finish and submit ${scannedItems.length} item${scannedItems.length > 1 ? 's' : ''}`}
@@ -496,7 +540,10 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
       {/* Submission Confirmation Dialog */}
       {showSubmissionDialog && (
-        <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
+        <Dialog
+          open={showSubmissionDialog}
+          onOpenChange={setShowSubmissionDialog}
+        >
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Submission</DialogTitle>
@@ -513,7 +560,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
-                {scannedItems.map(item => {
+                {scannedItems.map((item) => {
                   const totalValue = item.quantity * item.price
                   return (
                     <div
@@ -522,9 +569,14 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     >
                       <div className="flex-1">
                         <div className="font-medium">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
+                        {item.brand && (
+                          <div className="text-xs text-gray-600">
+                            {item.brand}
+                          </div>
+                        )}
                         <div className="text-xs text-gray-500">
-                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                          Expires:{' '}
+                          {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
@@ -544,13 +596,18 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               <div className="border-t pt-3">
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Items:</span>
-                  <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                  <span>
+                    {scannedItems.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Value:</span>
                   <span>
                     {formatPrice(
-                      scannedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
+                      scannedItems.reduce(
+                        (sum, item) => sum + item.quantity * item.price,
+                        0
+                      )
                     )}
                   </span>
                 </div>
@@ -580,7 +637,10 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
       {/* Success Dialog */}
       {showSuccessDialog && submissionResult && (
-        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <Dialog
+          open={showSuccessDialog}
+          onOpenChange={setShowSuccessDialog}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">

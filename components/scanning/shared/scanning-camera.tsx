@@ -1,7 +1,9 @@
 'use client'
 
 import { AlertCircle, Camera, Keyboard } from 'lucide-react'
-import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
+import BarcodeScanner, {
+  type BarcodeDetection,
+} from '@/components/barcode/barcode-scanner'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -60,9 +62,13 @@ export default function ScanningCamera({
   autoStart = true,
 }: ScanningCameraProps) {
   // Get appropriate title based on mode
-  const cameraTitle = title || (mode === 'barcode' ? 'Scan Product' : 'Scan Expiry Date')
+  const cameraTitle =
+    title || (mode === 'barcode' ? 'Scan Product' : 'Scan Expiry Date')
   const cameraSubtitle =
-    subtitle || (mode === 'barcode' ? 'Point camera at barcode' : 'Point camera at expiry date')
+    subtitle ||
+    (mode === 'barcode'
+      ? 'Point camera at barcode'
+      : 'Point camera at expiry date')
   const permissionMessage =
     mode === 'barcode'
       ? 'Camera access is required for barcode scanning.'
@@ -73,7 +79,9 @@ export default function ScanningCamera({
       {/* Camera Scanner */}
       <div className="space-y-2">
         <BarcodeScanner
-          onScan={mode === 'barcode' && onBarcodeScanned ? onBarcodeScanned : () => {}}
+          onScan={
+            mode === 'barcode' && onBarcodeScanned ? onBarcodeScanned : () => {}
+          }
           onError={onScanError || (() => {})}
           autoStart={autoStart}
           title={cameraTitle}
@@ -85,6 +93,20 @@ export default function ScanningCamera({
       {/* OCR Mode - Capture Button and Error Display */}
       {mode === 'ocr' && (
         <>
+          {/* Backend Health Warning */}
+          {isBackendHealthy === false && !ocrError && (
+            <Alert
+              variant="default"
+              className="border-none flex justify-center"
+            >
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Sorry, this service is currently unavailable. Please use manual
+                date entry.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* OCR Error Display */}
           {ocrError && (
             <Alert variant="destructive">
@@ -101,30 +123,26 @@ export default function ScanningCamera({
           )}
 
           {/* OCR Action Buttons */}
-          <div className="flex gap-2">
-            <Button
-              onClick={onOCRCapture}
-              className="flex-1 "
-              disabled={isOCRProcessing || isBackendHealthy === false}
-            >
-              <Camera className="w-4 h-4 mr-2" />
-              {isOCRProcessing ? 'Processing OCR...' : 'Capture Expiry Date'}
-            </Button>
-            {ocrError && onClearOCRError && (
-              <Button onClick={onClearOCRError} variant="outline" size="sm">
-                Clear Error
+          {isBackendHealthy !== false && (
+            <div className="flex gap-2">
+              <Button
+                onClick={onOCRCapture}
+                className="flex-1 "
+                disabled={isOCRProcessing}
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                {isOCRProcessing ? 'Processing OCR...' : 'Capture Expiry Date'}
               </Button>
-            )}
-          </div>
-
-          {/* Backend Health Warning */}
-          {isBackendHealthy === false && !ocrError && (
-            <Alert variant="default" className="border-none flex justify-center">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Sorry, this service is currently unavailable. Please use manual date entry.
-              </AlertDescription>
-            </Alert>
+              {ocrError && onClearOCRError && (
+                <Button
+                  onClick={onClearOCRError}
+                  variant="outline"
+                  size="sm"
+                >
+                  Clear Error
+                </Button>
+              )}
+            </div>
           )}
         </>
       )}
@@ -145,7 +163,11 @@ export default function ScanningCamera({
 
           {!showManualEntry && onToggleManualEntry && (
             <div className="flex gap-2">
-              <Button variant="outline" onClick={onToggleManualEntry} className="flex-1">
+              <Button
+                variant="outline"
+                onClick={onToggleManualEntry}
+                className="flex-1"
+              >
                 <Keyboard className="w-4 h-4 mr-2" />
                 Manual Entry
               </Button>
@@ -161,8 +183,9 @@ export default function ScanningCamera({
             <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 flex-shrink-0 h-8 w-8" />
           </div>
           <AlertDescription>
-            Point your camera at any product barcode. The scanner will automatically detect
-            supported formats and look up product information from Open Food Facts.
+            Point your camera at any product barcode. The scanner will
+            automatically detect supported formats and look up product
+            information from Open Food Facts.
           </AlertDescription>
         </Alert>
       )}

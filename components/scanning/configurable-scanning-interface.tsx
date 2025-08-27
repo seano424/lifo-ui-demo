@@ -94,7 +94,7 @@ export interface BaseScanningState {
 // Custom hook for base scanning logic
 export function useBaseScanningLogic(
   config: BaseScanningConfig,
-  callbacks?: BaseScanningCallbacks,
+  callbacks?: BaseScanningCallbacks
 ) {
   // Workflow state
   const currentStep = useScanningStep()
@@ -106,7 +106,11 @@ export function useBaseScanningLogic(
   const workflowActions = useScanningActions()
 
   // OCR processing
-  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  const {
+    processExpiryDate,
+    isLoading: isOCRProcessing,
+    isBackendHealthy,
+  } = useOCRWithFallback()
 
   // Local state
   const [state, setState] = useState<BaseScanningState>({
@@ -130,7 +134,10 @@ export function useBaseScanningLogic(
     data: lookupResult,
     isLoading: isLookingUp,
     error: lookupError,
-  } = useProductLookup(state.lookupBarcode, !!(config.enableProductLookup && state.lookupBarcode))
+  } = useProductLookup(
+    state.lookupBarcode,
+    !!(config.enableProductLookup && state.lookupBarcode)
+  )
 
   // Initialize store
   useEffect(() => {
@@ -145,26 +152,36 @@ export function useBaseScanningLogic(
       workflowActions.setProductLookupResult(lookupResult)
       callbacks?.onProductFound?.(lookupResult)
     }
-  }, [lookupResult, state.lookupBarcode, workflowActions, callbacks, config.enableProductLookup])
+  }, [
+    lookupResult,
+    state.lookupBarcode,
+    workflowActions,
+    callbacks,
+    config.enableProductLookup,
+  ])
 
   // Sync workflow state with UI
   useEffect(() => {
     switch (currentStep) {
       case 'barcode':
-        setState(prev => ({ ...prev, currentUIStep: 'barcode', showManualEntry: false }))
+        setState((prev) => ({
+          ...prev,
+          currentUIStep: 'barcode',
+          showManualEntry: false,
+        }))
         if (!scannedProduct) {
-          setState(prev => ({ ...prev, lookupBarcode: null }))
+          setState((prev) => ({ ...prev, lookupBarcode: null }))
         }
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           formData: { expiryDate: '', quantity: 1, price: 0 },
         }))
         break
       case 'product':
         if (scannedProduct?.productName) {
-          setState(prev => ({ ...prev, currentUIStep: 'product' }))
+          setState((prev) => ({ ...prev, currentUIStep: 'product' }))
           if (scannedProduct.lookupResult?.product) {
-            setState(prev => ({
+            setState((prev) => ({
               ...prev,
               formData: { ...prev.formData, price: 2.99 },
             }))
@@ -172,27 +189,33 @@ export function useBaseScanningLogic(
         }
         break
       case 'ocr':
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           currentUIStep: config.enableOCRScanning ? 'processing' : 'form',
         }))
         break
       case 'confirmation':
-        setState(prev => ({ ...prev, currentUIStep: 'confirmation' }))
+        setState((prev) => ({ ...prev, currentUIStep: 'confirmation' }))
         if (expiryInfo?.extractedDate) {
           const formattedDate = expiryInfo.extractedDate.split('T')[0]
-          setState(prev => ({
+          setState((prev) => ({
             ...prev,
             formData: { ...prev.formData, expiryDate: formattedDate },
           }))
         }
         break
       case 'complete':
-        setState(prev => ({ ...prev, currentUIStep: 'barcode' }))
+        setState((prev) => ({ ...prev, currentUIStep: 'barcode' }))
         callbacks?.onWorkflowComplete?.()
         break
     }
-  }, [currentStep, scannedProduct, expiryInfo, config.enableOCRScanning, callbacks])
+  }, [
+    currentStep,
+    scannedProduct,
+    expiryInfo,
+    config.enableOCRScanning,
+    callbacks,
+  ])
 
   // Event handlers
   const handleBarcodeScanned = useCallback(
@@ -200,9 +223,13 @@ export function useBaseScanningLogic(
       if (!config.enableBarcodeScanning) return
 
       workflowActions.setBarcodeScanned(barcode, detection)
-      setState(prev => ({ ...prev, lookupBarcode: barcode, showManualEntry: false }))
+      setState((prev) => ({
+        ...prev,
+        lookupBarcode: barcode,
+        showManualEntry: false,
+      }))
     },
-    [config.enableBarcodeScanning, workflowActions],
+    [config.enableBarcodeScanning, workflowActions]
   )
 
   const handleScanError = useCallback(
@@ -210,21 +237,25 @@ export function useBaseScanningLogic(
       workflowActions.setError(error.message)
       callbacks?.onError?.(error.message)
     },
-    [workflowActions, callbacks],
+    [workflowActions, callbacks]
   )
 
   const handleManualProductSelected = useCallback(
     (barcode: string) => {
       if (!config.enableManualEntry) return
 
-      setState(prev => ({ ...prev, lookupBarcode: barcode, showManualEntry: false }))
+      setState((prev) => ({
+        ...prev,
+        lookupBarcode: barcode,
+        showManualEntry: false,
+      }))
     },
-    [config.enableManualEntry],
+    [config.enableManualEntry]
   )
 
   const handleGoBack = useCallback(() => {
     workflowActions.goBackStep()
-    setState(prev => ({ ...prev, showManualEntry: false }))
+    setState((prev) => ({ ...prev, showManualEntry: false }))
   }, [workflowActions])
 
   const handleOCRCapture = useCallback(async () => {
@@ -233,12 +264,15 @@ export function useBaseScanningLogic(
       return
     }
 
-    setState(prev => ({ ...prev, ocrError: null }))
+    setState((prev) => ({ ...prev, ocrError: null }))
     workflowActions.setExpiryDateProcessing(true)
 
     try {
       const videoElement = document.querySelector('video') as HTMLVideoElement
-      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+      if (
+        !videoElement ||
+        videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA
+      ) {
         throw new Error('Camera not ready')
       }
 
@@ -251,25 +285,36 @@ export function useBaseScanningLogic(
       if (result.success && result.expiryDateInfo) {
         workflowActions.setExpiryDateResult(result.expiryDateInfo)
         if (result.expiryDateInfo.extractedDate) {
-          const formattedDate = result.expiryDateInfo.extractedDate.split('T')[0]
-          setState(prev => ({
+          const formattedDate =
+            result.expiryDateInfo.extractedDate.split('T')[0]
+          setState((prev) => ({
             ...prev,
             formData: { ...prev.formData, expiryDate: formattedDate },
           }))
         }
-        setState(prev => ({ ...prev, ocrError: null }))
+        setState((prev) => ({ ...prev, ocrError: null }))
       } else {
-        setState(prev => ({ ...prev, ocrError: result.error?.message || 'OCR processing failed' }))
+        setState((prev) => ({
+          ...prev,
+          ocrError: result.error?.message || 'OCR processing failed',
+        }))
         workflowActions.setExpiryDateProcessing(false)
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
-      setState(prev => ({ ...prev, ocrError: errorMessage }))
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to capture image'
+      setState((prev) => ({ ...prev, ocrError: errorMessage }))
       workflowActions.setError(errorMessage)
       workflowActions.setExpiryDateProcessing(false)
       callbacks?.onError?.(errorMessage)
     }
-  }, [config.enableOCRScanning, activeStore, workflowActions, processExpiryDate, callbacks])
+  }, [
+    config.enableOCRScanning,
+    activeStore,
+    workflowActions,
+    processExpiryDate,
+    callbacks,
+  ])
 
   const handleFormSubmit = useCallback(() => {
     if (state.formData.expiryDate) {
@@ -291,7 +336,7 @@ export function useBaseScanningLogic(
       timestamp: new Date(),
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       processedItems: [newItem, ...prev.processedItems],
       formData: { expiryDate: '', quantity: 1, price: 0 },
@@ -301,7 +346,11 @@ export function useBaseScanningLogic(
 
     // Reset workflow for next item
     workflowActions.resetWorkflow()
-    setState(prev => ({ ...prev, lookupBarcode: null, showManualEntry: false }))
+    setState((prev) => ({
+      ...prev,
+      lookupBarcode: null,
+      showManualEntry: false,
+    }))
 
     // Set batch data and complete workflow
     workflowActions.setBatchData({
@@ -313,9 +362,10 @@ export function useBaseScanningLogic(
   }, [scannedProduct, state.formData, workflowActions, callbacks])
 
   const handleBatchSubmission = useCallback(async () => {
-    if (!config.enableBatchSubmission || state.processedItems.length === 0) return
+    if (!config.enableBatchSubmission || state.processedItems.length === 0)
+      return
 
-    setState(prev => ({ ...prev, showSubmissionDialog: true }))
+    setState((prev) => ({ ...prev, showSubmissionDialog: true }))
   }, [config.enableBatchSubmission, state.processedItems.length])
 
   const handleConfirmBatchSubmission = useCallback(async () => {
@@ -323,7 +373,7 @@ export function useBaseScanningLogic(
 
     try {
       await callbacks.onBatchSubmitted(state.processedItems)
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         submissionResult: {
           successCount: prev.processedItems.length,
@@ -334,7 +384,9 @@ export function useBaseScanningLogic(
         showSuccessDialog: true,
       }))
     } catch (error) {
-      callbacks?.onError?.(error instanceof Error ? error.message : 'Submission failed')
+      callbacks?.onError?.(
+        error instanceof Error ? error.message : 'Submission failed'
+      )
     }
   }, [callbacks, state.processedItems])
 
@@ -375,7 +427,11 @@ export function useBaseScanningLogic(
 }
 
 // Base scanning interface component
-export default function BaseScanningInterface({ config, callbacks, className }: BaseScanningProps) {
+export default function BaseScanningInterface({
+  config,
+  callbacks,
+  className,
+}: BaseScanningProps) {
   const logic = useBaseScanningLogic(config, callbacks)
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
@@ -387,6 +443,36 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
           {/* Step 1: Barcode Scanning */}
           {logic.state.currentUIStep === 'barcode' && (
             <>
+              {/* Camera Interface */}
+              {config.enableBarcodeScanning && (
+                <ScanningCamera
+                  mode="barcode"
+                  title={
+                    config.scanningTitle ||
+                    (logic.scannedProduct
+                      ? 'Scan Different Product'
+                      : 'Scan Product')
+                  }
+                  onBarcodeScanned={logic.handleBarcodeScanned}
+                  onScanError={logic.handleScanError}
+                  showManualEntry={logic.state.showManualEntry}
+                  onToggleManualEntry={() =>
+                    logic.setState((prev) => ({
+                      ...prev,
+                      showManualEntry: !prev.showManualEntry,
+                    }))
+                  }
+                  onManualProductSelected={logic.handleManualProductSelected}
+                  onCloseManualEntry={() =>
+                    logic.setState((prev) => ({
+                      ...prev,
+                      showManualEntry: false,
+                    }))
+                  }
+                  autoStart
+                />
+              )}
+
               {/* Selected Product Display */}
               {logic.scannedProduct && (
                 <ProductCard
@@ -400,31 +486,9 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                   showProceedButton={config.workflowType === 'scan-in'}
                   onRemove={() => {
                     logic.workflowActions.resetWorkflow()
-                    logic.setState(prev => ({ ...prev, lookupBarcode: null }))
+                    logic.setState((prev) => ({ ...prev, lookupBarcode: null }))
                   }}
                   onProceed={() => logic.workflowActions.setCurrentStep('ocr')}
-                />
-              )}
-
-              {/* Camera Interface */}
-              {config.enableBarcodeScanning && (
-                <ScanningCamera
-                  mode="barcode"
-                  title={
-                    config.scanningTitle ||
-                    (logic.scannedProduct ? 'Scan Different Product' : 'Scan Product')
-                  }
-                  onBarcodeScanned={logic.handleBarcodeScanned}
-                  onScanError={logic.handleScanError}
-                  showManualEntry={logic.state.showManualEntry}
-                  onToggleManualEntry={() =>
-                    logic.setState(prev => ({ ...prev, showManualEntry: !prev.showManualEntry }))
-                  }
-                  onManualProductSelected={logic.handleManualProductSelected}
-                  onCloseManualEntry={() =>
-                    logic.setState(prev => ({ ...prev, showManualEntry: false }))
-                  }
-                  autoStart
                 />
               )}
             </>
@@ -433,6 +497,17 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
           {/* Step 2: Product Display */}
           {logic.state.currentUIStep === 'product' && logic.scannedProduct && (
             <div className="space-y-4">
+              {/* Auto-advancing to next step */}
+              {!logic.isLookingUp &&
+                !logic.lookupError &&
+                logic.scannedProduct.lookupResult && (
+                  <Alert>
+                    <AlertDescription>
+                      Proceeding to next step...
+                    </AlertDescription>
+                  </Alert>
+                )}
+
               <ProductCard
                 product={{
                   barcode: logic.scannedProduct.barcode,
@@ -440,18 +515,12 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                   brand: logic.scannedProduct.brand,
                 }}
               />
-
-              {/* Auto-advancing to next step */}
-              {!logic.isLookingUp && !logic.lookupError && logic.scannedProduct.lookupResult && (
-                <Alert>
-                  <AlertDescription>Proceeding to next step...</AlertDescription>
-                </Alert>
-              )}
             </div>
           )}
 
           {/* Step 3: Processing/Form */}
-          {(logic.state.currentUIStep === 'processing' || logic.state.currentUIStep === 'form') && (
+          {(logic.state.currentUIStep === 'processing' ||
+            logic.state.currentUIStep === 'form') && (
             <div className="space-y-4">
               {/* Product Context */}
               {logic.scannedProduct && (
@@ -473,7 +542,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                   isOCRProcessing={logic.isOCRProcessing}
                   ocrError={logic.state.ocrError}
                   onClearOCRError={() => {
-                    logic.setState(prev => ({ ...prev, ocrError: null }))
+                    logic.setState((prev) => ({ ...prev, ocrError: null }))
                     logic.workflowActions.setError(null)
                   }}
                   isBackendHealthy={logic.isBackendHealthy}
@@ -483,7 +552,9 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
               {/* Form */}
               <InventoryForm
                 data={logic.state.formData}
-                onChange={data => logic.setState(prev => ({ ...prev, formData: data }))}
+                onChange={(data) =>
+                  logic.setState((prev) => ({ ...prev, formData: data }))
+                }
                 onSubmit={logic.handleFormSubmit}
                 showExpiryDate={config.showExpiryField}
                 showQuantity={config.showQuantityField}
@@ -512,7 +583,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
           <ScannedItemsList
             items={logic.state.processedItems}
             title={`Total items ${config.workflowType === 'scan-in' ? 'scanned' : 'processed'}`}
-            onEditItem={item => {
+            onEditItem={(item) => {
               // TODO: Implement edit functionality
               console.log('Edit item:', item)
             }}
@@ -523,10 +594,13 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
             canGoBack={logic.canGoBack}
             onGoBack={logic.handleGoBack}
             backButtonText={
-              logic.previousStepName ? `Back to ${logic.previousStepName}` : 'Go Back'
+              logic.previousStepName
+                ? `Back to ${logic.previousStepName}`
+                : 'Go Back'
             }
             showPrimaryAction={
-              config.enableBatchSubmission && logic.state.processedItems.length > 0
+              config.enableBatchSubmission &&
+              logic.state.processedItems.length > 0
             }
             onPrimaryAction={logic.handleBatchSubmission}
             primaryActionText={`Finish and submit ${logic.state.processedItems.length} item${logic.state.processedItems.length > 1 ? 's' : ''}`}
