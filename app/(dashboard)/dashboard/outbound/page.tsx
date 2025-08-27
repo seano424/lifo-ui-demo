@@ -13,7 +13,7 @@ export default function OutboundPage() {
   }
 
   return (
-    <div className="lg:max-w-screen-sm lg:mx-auto">
+    <div className="lg:max-w-screen-sm lg:mx-auto pb-40">
       <div className="space-y-6 px-4">
         <ScanOutInterface onItemRemoved={handleItemRemoved} />
 
