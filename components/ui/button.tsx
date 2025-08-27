@@ -14,7 +14,8 @@ const buttonVariants = cva(
         // Enhanced variants using new color palettes
         default:
           'bg-primary-900 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
-        destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
         subtleDestructive: 'bg-red-100 text-red-900 shadow-xs hover:bg-red-200',
         outline:
           'border border-input bg-background shadow-xs hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
@@ -41,6 +42,7 @@ const buttonVariants = cva(
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
         black: 'bg-black text-white shadow-sm hover:bg-black/90',
         gray: 'bg-gray-200 text-gray-900 shadow-sm hover:bg-gray-300',
+        subtleGray: 'bg-gray-100 text-gray-900 shadow-sm hover:bg-gray-200',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs',
@@ -54,7 +56,7 @@ const buttonVariants = cva(
       variant: 'default',
       size: 'default',
     },
-  },
+  }
 )
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>
@@ -77,101 +79,106 @@ type ButtonPropsBase = {
   children?: React.ReactNode
   loading?: boolean
   loadingText?: string
-  onClick?: (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement, MouseEvent>) => void
+  onClick?: (
+    event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement, MouseEvent>
+  ) => void
 } & VariantProps<typeof buttonVariants>
 
 export type ButtonProps =
-  | (ButtonPropsBase & React.ButtonHTMLAttributes<HTMLButtonElement> & { asLink?: false })
-  | (ButtonPropsBase & Omit<AnchorProps, ButtonOnlyProps> & { asLink: true; href: string })
+  | (ButtonPropsBase &
+      React.ButtonHTMLAttributes<HTMLButtonElement> & { asLink?: false })
+  | (ButtonPropsBase &
+      Omit<AnchorProps, ButtonOnlyProps> & { asLink: true; href: string })
 
-const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
-  (props, ref) => {
-    const {
-      className,
-      variant = 'default',
-      size,
-      asChild = false,
-      asLink = false,
-      href,
-      children,
-      loading = false,
-      loadingText,
-      disabled,
-      ...rest
-    } = props as ButtonProps & {
-      href?: string
-      loading?: boolean
-      loadingText?: string
-      disabled?: boolean
+const Button = React.forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  ButtonProps
+>((props, ref) => {
+  const {
+    className,
+    variant = 'default',
+    size,
+    asChild = false,
+    asLink = false,
+    href,
+    children,
+    loading = false,
+    loadingText,
+    disabled,
+    ...rest
+  } = props as ButtonProps & {
+    href?: string
+    loading?: boolean
+    loadingText?: string
+    disabled?: boolean
+  }
+
+  // Show loading content when loading is true
+  const content = loading ? (
+    <>
+      <Loader2 className="animate-spin" />
+      {loadingText || 'Loading...'}
+    </>
+  ) : (
+    children
+  )
+
+  // Disable button when loading
+  const isDisabled = disabled || loading
+
+  if (asLink && href) {
+    const isInternal = href.startsWith('/')
+    const anchorProps = rest as AnchorProps
+
+    if (isInternal) {
+      // Internal: use Next.js Link directly
+      return (
+        <Link
+          href={href}
+          className={cn(
+            buttonVariants({ variant, size, className }),
+            isDisabled && 'opacity-50 pointer-events-none'
+          )}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          {...anchorProps}
+        >
+          {content}
+        </Link>
+      )
+    } else {
+      // External: use <a> with security attributes
+      return (
+        <a
+          href={href}
+          className={cn(
+            buttonVariants({ variant, size, className }),
+            isDisabled && 'opacity-50 pointer-events-none'
+          )}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          rel="noopener noreferrer"
+          target="_blank"
+          {...anchorProps}
+        >
+          {content}
+        </a>
+      )
     }
+  }
 
-    // Show loading content when loading is true
-    const content = loading ? (
-      <>
-        <Loader2 className="animate-spin" />
-        {loadingText || 'Loading...'}
-      </>
-    ) : (
-      children
-    )
+  const Comp = asChild ? Slot : 'button'
+  const buttonProps = rest as React.ButtonHTMLAttributes<HTMLButtonElement>
 
-    // Disable button when loading
-    const isDisabled = disabled || loading
-
-    if (asLink && href) {
-      const isInternal = href.startsWith('/')
-      const anchorProps = rest as AnchorProps
-
-      if (isInternal) {
-        // Internal: use Next.js Link directly
-        return (
-          <Link
-            href={href}
-            className={cn(
-              buttonVariants({ variant, size, className }),
-              isDisabled && 'opacity-50 pointer-events-none',
-            )}
-            ref={ref as React.Ref<HTMLAnchorElement>}
-            {...anchorProps}
-          >
-            {content}
-          </Link>
-        )
-      } else {
-        // External: use <a> with security attributes
-        return (
-          <a
-            href={href}
-            className={cn(
-              buttonVariants({ variant, size, className }),
-              isDisabled && 'opacity-50 pointer-events-none',
-            )}
-            ref={ref as React.Ref<HTMLAnchorElement>}
-            rel="noopener noreferrer"
-            target="_blank"
-            {...anchorProps}
-          >
-            {content}
-          </a>
-        )
-      }
-    }
-
-    const Comp = asChild ? Slot : 'button'
-    const buttonProps = rest as React.ButtonHTMLAttributes<HTMLButtonElement>
-
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref as React.Ref<HTMLButtonElement>}
-        disabled={isDisabled}
-        {...buttonProps}
-      >
-        {content}
-      </Comp>
-    )
-  },
-)
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, className }))}
+      ref={ref as React.Ref<HTMLButtonElement>}
+      disabled={isDisabled}
+      {...buttonProps}
+    >
+      {content}
+    </Comp>
+  )
+})
 Button.displayName = 'Button'
 
 export { Button, buttonVariants }
