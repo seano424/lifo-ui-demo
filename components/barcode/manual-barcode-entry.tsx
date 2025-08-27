@@ -317,8 +317,15 @@ export default function ManualBarcodeEntry({
                           <Button
                             key={product.product_id}
                             variant="ghost"
-                            className="w-full justify-start text-left p-3 hover:bg-gray-50"
+                            className={`w-full justify-start text-left p-3 ${
+                              product.isOutOfStock 
+                                ? 'opacity-50 cursor-not-allowed hover:bg-gray-50' 
+                                : 'hover:bg-gray-50'
+                            }`}
+                            disabled={product.isOutOfStock}
                             onClick={() => {
+                              if (product.isOutOfStock) return
+                              
                               // For outbound/Supabase results, use the product_id if no barcode exists
                               // This ensures we have a unique identifier that won't cause lookup failures
                               const effectiveBarcode = product.barcode && product.barcode.trim() !== '' 
@@ -350,14 +357,18 @@ export default function ManualBarcodeEntry({
                               {product.brand && (
                                 <div className="text-sm text-gray-500">{product.brand}</div>
                               )}
-                              {product.total_available_quantity && (
+                              {product.isOutOfStock ? (
+                                <div className="text-xs text-red-600 font-medium">
+                                  Out of Stock
+                                </div>
+                              ) : product.total_available_quantity ? (
                                 <div className="text-xs text-green-600">
                                   {product.total_available_quantity} units available
                                   {product.batch_count && product.batch_count > 1 && 
                                     ` (${product.batch_count} batches)`
                                   }
                                 </div>
-                              )}
+                              ) : null}
                             </div>
                           </Button>
                         ))

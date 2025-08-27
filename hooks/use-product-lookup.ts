@@ -212,6 +212,7 @@ export interface SupabaseProductSearchResult {
   unit_type?: string
   total_available_quantity?: number // Total available across all batches
   batch_count?: number // Number of batches available
+  isOutOfStock?: boolean // True if no stock available
 }
 
 export function useSupabaseProductSearch(storeId?: string) {
@@ -229,7 +230,7 @@ export function useSupabaseProductSearch(storeId?: string) {
         const { data: matchingProducts, error: productError } = await supabase
           .schema('inventory')
           .from('products')
-          .select('product_id')
+          .select('product_id, name, brand, category, barcode, image_url, unit_type')
           .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
 
         if (productError) {
@@ -243,7 +244,7 @@ export function useSupabaseProductSearch(storeId?: string) {
 
         const productIds = matchingProducts.map(p => p.product_id)
 
-        // Now get batches for these products with stock
+        // Now get ALL batches for these products (including out of stock)
         const { data: batchesWithProducts, error } = await supabase
           .schema('inventory')
           .from('batches')
@@ -263,7 +264,7 @@ export function useSupabaseProductSearch(storeId?: string) {
           `)
           .eq('store_id', storeId)
           .eq('status', 'active')
-          .gt('current_quantity', 0) // MUST have at least 1 stock remaining
+          .gte('current_quantity', 0) // Include items with 0 stock
           .in('product_id', productIds)
 
         if (error) {
@@ -271,14 +272,10 @@ export function useSupabaseProductSearch(storeId?: string) {
           throw error
         }
 
-        if (!batchesWithProducts || batchesWithProducts.length === 0) {
-          return []
-        }
-
         // Aggregate batches by product
         const productMap = new Map<string, SupabaseProductSearchResult>()
         
-        batchesWithProducts.forEach(batch => {
+        batchesWithProducts?.forEach(batch => {
           const product = batch.products as any
           const productId = batch.product_id
           
@@ -298,20 +295,52 @@ export function useSupabaseProductSearch(storeId?: string) {
               image_url: product.image_url,
               unit_type: product.unit_type,
               total_available_quantity: batch.current_quantity,
-              batch_count: 1
+              batch_count: 1,
+              isOutOfStock: batch.current_quantity === 0
             })
           }
         })
 
-        // Convert to array and sort by total available quantity
+        // Add products that have no batches in this store (completely out of stock)
+        matchingProducts.forEach(product => {
+          if (!productMap.has(product.product_id)) {
+            productMap.set(product.product_id, {
+              product_id: product.product_id,
+              name: product.name,
+              brand: product.brand,
+              category: product.category,
+              barcode: product.barcode,
+              image_url: product.image_url,
+              unit_type: product.unit_type,
+              total_available_quantity: 0,
+              batch_count: 0,
+              isOutOfStock: true
+            })
+          }
+        })
+
+        // Update isOutOfStock flag for products with zero total quantity
+        productMap.forEach(product => {
+          if ((product.total_available_quantity || 0) === 0) {
+            product.isOutOfStock = true
+          }
+        })
+
+        // Convert to array and sort: in-stock items first, then out-of-stock
         const results = Array.from(productMap.values())
           .sort((a, b) => {
-            // Sort by total available quantity (highest first)
+            // First sort by stock status (in-stock items first)
+            if (a.isOutOfStock !== b.isOutOfStock) {
+              return a.isOutOfStock ? 1 : -1
+            }
+            // Then sort by total available quantity (highest first)
             return (b.total_available_quantity || 0) - (a.total_available_quantity || 0)
           })
           .slice(0, 20)
 
-        console.log(`[SupabaseProductSearch] Found ${results.length} products with available batches for query "${query}" in store ${storeId}`)
+        const inStockCount = results.filter(p => !p.isOutOfStock).length
+        const outOfStockCount = results.length - inStockCount
+        console.log(`[SupabaseProductSearch] Found ${results.length} products for query "${query}" in store ${storeId} (${inStockCount} in stock, ${outOfStockCount} out of stock)`)
         return results
 
       } else {
