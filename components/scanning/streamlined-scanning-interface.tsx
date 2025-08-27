@@ -16,9 +16,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 // Import working components from BarcodeDemo
-import BarcodeScanner, {
-  type BarcodeDetection,
-} from '@/components/barcode/barcode-scanner'
+import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -36,10 +34,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 // Import inventory submission hook
-import {
-  useInventoryActions,
-  useScannedItemConverter,
-} from '@/hooks/use-inventory-submission'
+import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 // Import OCR hooks and utilities
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { useProductLookup } from '@/hooks/use-product-lookup'
@@ -74,11 +69,7 @@ interface WorkingStreamlinedScanningProps {
   className?: string
 }
 
-type UIStep =
-  | 'camera-barcode'
-  | 'product-success'
-  | 'camera-expiry'
-  | 'batch-success'
+type UIStep = 'camera-barcode' | 'product-success' | 'camera-expiry' | 'batch-success'
 
 export default function WorkingStreamlinedScanningInterface({
   onItemAdded,
@@ -96,11 +87,7 @@ export default function WorkingStreamlinedScanningInterface({
   const workflowActions = useScanningActions()
 
   // OCR processing hook
-  const {
-    processExpiryDate,
-    isLoading: isOCRProcessing,
-    isBackendHealthy,
-  } = useOCRWithFallback()
+  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
 
   // Inventory submission hooks
   const { submitBatch, isSubmittingBatch } = useInventoryActions()
@@ -204,10 +191,7 @@ export default function WorkingStreamlinedScanningInterface({
         // Stay on expiry step but show the confirmation form
         setUIStep('camera-expiry')
         if (expiryInfo?.extractedDate && !isRescanning) {
-          console.log(
-            'Workflow sync: setting date from expiryInfo:',
-            expiryInfo.extractedDate
-          )
+          console.log('Workflow sync: setting date from expiryInfo:', expiryInfo.extractedDate)
           const formattedDate = formatDateForInput(expiryInfo.extractedDate)
           setManualExpiryDate(formattedDate)
         }
@@ -218,13 +202,7 @@ export default function WorkingStreamlinedScanningInterface({
         setUIStep('camera-barcode')
         break
     }
-  }, [
-    currentStep,
-    scannedProduct,
-    expiryInfo,
-    isRescanning,
-    formatDateForInput,
-  ])
+  }, [currentStep, scannedProduct, expiryInfo, isRescanning, formatDateForInput])
 
   // Handle barcode scan
   const handleScan = (barcode: string, detection?: BarcodeDetection) => {
@@ -293,13 +271,8 @@ export default function WorkingStreamlinedScanningInterface({
       // Find the video element from the BarcodeScanner component
       const videoElement = document.querySelector('video') as HTMLVideoElement
 
-      if (
-        !videoElement ||
-        videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA
-      ) {
-        throw new Error(
-          'Camera not ready. Please ensure camera is active and showing video.'
-        )
+      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+        throw new Error('Camera not ready. Please ensure camera is active and showing video.')
       }
 
       console.log('Capturing image from video for OCR processing...')
@@ -307,9 +280,7 @@ export default function WorkingStreamlinedScanningInterface({
       // Capture image from video element
       const imageBlob = await captureImageFromVideo(videoElement)
 
-      console.log(
-        `Captured image: ${imageBlob.size} bytes, type: ${imageBlob.type}`
-      )
+      console.log(`Captured image: ${imageBlob.size} bytes, type: ${imageBlob.type}`)
 
       // Process with OCR API
       const result = await processExpiryDate(imageBlob, activeStore.store_id, {
@@ -325,9 +296,7 @@ export default function WorkingStreamlinedScanningInterface({
 
         // Update local state for UI with properly formatted date
         if (result.expiryDateInfo.extractedDate) {
-          const formattedDate = formatDateForInput(
-            result.expiryDateInfo.extractedDate
-          )
+          const formattedDate = formatDateForInput(result.expiryDateInfo.extractedDate)
           setManualExpiryDate(formattedDate)
         }
 
@@ -348,8 +317,7 @@ export default function WorkingStreamlinedScanningInterface({
     } catch (error) {
       console.error('OCR capture failed:', error)
 
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to capture image'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
       setOcrError(errorMessage)
       workflowActions.setError(errorMessage)
       workflowActions.setExpiryDateProcessing(false)
@@ -377,7 +345,7 @@ export default function WorkingStreamlinedScanningInterface({
         price,
         timestamp: new Date(),
       }
-      setScannedItems((prev) => [newItem, ...prev])
+      setScannedItems(prev => [newItem, ...prev])
       onItemAdded?.(newItem)
 
       // Reset workflow for next item
@@ -408,26 +376,26 @@ export default function WorkingStreamlinedScanningInterface({
 
     // Convert scanned items to the format expected by the inventory submission
     const productsToSubmit = convertMultipleScannedItems(
-      scannedItems.map((item) => ({
+      scannedItems.map(item => ({
         barcode: item.barcode,
         productName: item.productName,
         brand: item.brand,
         expiryDate: item.expiryDate,
         quantity: item.quantity,
         price: item.price,
-      }))
+      })),
     )
 
     // Submit the batch to inventory using the React Query hook
     submitBatch(
-      productsToSubmit.map((product) => ({
+      productsToSubmit.map(product => ({
         ...product,
         storeId: activeStore?.store_id || '',
         ocrExtractedDate: new Date().toISOString(),
         ocrConfidence: 1,
       })),
       {
-        onSuccess: (result) => {
+        onSuccess: result => {
           console.log('Batch submission completed:', result)
 
           // Store the result for the success dialog
@@ -443,11 +411,11 @@ export default function WorkingStreamlinedScanningInterface({
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: (error) => {
+        onError: error => {
           console.error('Batch submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
-      }
+      },
     )
   }
 
@@ -482,9 +450,7 @@ export default function WorkingStreamlinedScanningInterface({
       barcode: editForm.barcode,
     }
 
-    setScannedItems((prev) =>
-      prev.map((item) => (item.id === editingItem.id ? updatedItem : item))
-    )
+    setScannedItems(prev => prev.map(item => (item.id === editingItem.id ? updatedItem : item)))
 
     setIsEditingItem(false)
     setEditingItem(null)
@@ -529,26 +495,17 @@ export default function WorkingStreamlinedScanningInterface({
                         X
                       </Button>
                       <div className="flex flex-col gap-2 justify-center items-center">
-                        <Typography
-                          className="text-secondary-900 font-black"
-                          variant="p"
-                        >
+                        <Typography className="text-secondary-900 font-black" variant="p">
                           Selected Product
                         </Typography>
                         <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
                           <Package className="w-4 h-4 text-gray-500" />
 
-                          <Typography variant="p">
-                            {scannedProduct?.brand}
-                          </Typography>
+                          <Typography variant="p">{scannedProduct?.brand}</Typography>
                           <Typography variant="p">•</Typography>
-                          <Typography variant="p">
-                            {scannedProduct?.productName}
-                          </Typography>
+                          <Typography variant="p">{scannedProduct?.productName}</Typography>
                           <Typography variant="p">•</Typography>
-                          <Typography variant="p">
-                            {scannedProduct?.barcode}
-                          </Typography>
+                          <Typography variant="p">{scannedProduct?.barcode}</Typography>
                         </div>
                       </div>
                       <Button
@@ -568,9 +525,7 @@ export default function WorkingStreamlinedScanningInterface({
                   onScan={handleScan}
                   onError={handleError}
                   autoStart={true}
-                  title={
-                    scannedProduct ? 'Scan Different Product' : 'Scan Product'
-                  }
+                  title={scannedProduct ? 'Scan Different Product' : 'Scan Product'}
                 />
               </div>
 
@@ -604,9 +559,8 @@ export default function WorkingStreamlinedScanningInterface({
                     <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 flex-shrink-0 h-8 w-8" />
                   </div>
                   <AlertDescription>
-                    Point your camera at any product barcode. The scanner will
-                    automatically detect supported formats and look up product
-                    information from Open Food Facts.
+                    Point your camera at any product barcode. The scanner will automatically detect
+                    supported formats and look up product information from Open Food Facts.
                   </AlertDescription>
                 </Alert>
               )}
@@ -622,10 +576,7 @@ export default function WorkingStreamlinedScanningInterface({
                     <h4 className="font-medium">Product Scanned</h4>
                     <div className="flex items-center gap-2">
                       {isLookingUp && (
-                        <Badge
-                          variant="outline"
-                          className="animate-pulse"
-                        >
+                        <Badge variant="outline" className="animate-pulse">
                           Looking up...
                         </Badge>
                       )}
@@ -636,8 +587,7 @@ export default function WorkingStreamlinedScanningInterface({
                   </div>
                   <div className="text-sm space-y-1">
                     <div>
-                      <strong>Barcode:</strong>{' '}
-                      <code>{scannedProduct.barcode}</code>
+                      <strong>Barcode:</strong> <code>{scannedProduct.barcode}</code>
                     </div>
                     {scannedProduct.productName && (
                       <div>
@@ -663,9 +613,7 @@ export default function WorkingStreamlinedScanningInterface({
                   {lookupError && (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Lookup failed: {lookupError.message}
-                      </AlertDescription>
+                      <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
                     </Alert>
                   )}
 
@@ -677,33 +625,29 @@ export default function WorkingStreamlinedScanningInterface({
                       <Alert>
                         <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                         <AlertDescription>
-                          Product found! Ready to proceed to expiry date
-                          scanning.
+                          Product found! Ready to proceed to expiry date scanning.
                         </AlertDescription>
                       </Alert>
                     ) : (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>
-                          Product not found in database. You may need to add it
-                          manually.
+                          Product not found in database. You may need to add it manually.
                         </AlertDescription>
                       </Alert>
                     ))}
 
                   {/* Auto-advancing message */}
-                  {!isLookingUp &&
-                    !lookupError &&
-                    scannedProduct.lookupResult && (
-                      <div className="pt-2">
-                        <Alert>
-                          <ArrowRight className="h-4 w-4 text-blue-600" />
-                          <AlertDescription>
-                            Automatically proceeding to expiry date scanning...
-                          </AlertDescription>
-                        </Alert>
-                      </div>
-                    )}
+                  {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
+                    <div className="pt-2">
+                      <Alert>
+                        <ArrowRight className="h-4 w-4 text-blue-600" />
+                        <AlertDescription>
+                          Automatically proceeding to expiry date scanning...
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -716,26 +660,17 @@ export default function WorkingStreamlinedScanningInterface({
               <Card className="border-primary-50 shadow-primary-100">
                 <CardContent className="p-3">
                   <div className="flex flex-col gap-2 justify-center items-center">
-                    <Typography
-                      className="text-secondary-900 font-black"
-                      variant="p"
-                    >
+                    <Typography className="text-secondary-900 font-black" variant="p">
                       Selected Product
                     </Typography>
                     <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
                       <Package className="w-4 h-4 text-gray-500" />
 
-                      <Typography variant="p">
-                        {scannedProduct?.brand}
-                      </Typography>
+                      <Typography variant="p">{scannedProduct?.brand}</Typography>
                       <Typography variant="p">•</Typography>
-                      <Typography variant="p">
-                        {scannedProduct?.productName}
-                      </Typography>
+                      <Typography variant="p">{scannedProduct?.productName}</Typography>
                       <Typography variant="p">•</Typography>
-                      <Typography variant="p">
-                        {scannedProduct?.barcode}
-                      </Typography>
+                      <Typography variant="p">{scannedProduct?.barcode}</Typography>
                     </div>
                   </div>
                 </CardContent>
@@ -763,8 +698,7 @@ export default function WorkingStreamlinedScanningInterface({
                         OCR Error: {ocrError}
                         {isBackendHealthy === false && (
                           <span className="block mt-1 text-xs">
-                            FastAPI backend is not available. Please use manual
-                            entry.
+                            FastAPI backend is not available. Please use manual entry.
                           </span>
                         )}
                       </AlertDescription>
@@ -773,14 +707,10 @@ export default function WorkingStreamlinedScanningInterface({
 
                   {/* Backend Health Warning */}
                   {isBackendHealthy === false && !ocrError && (
-                    <Alert
-                      variant="default"
-                      className="border-none flex justify-center"
-                    >
+                    <Alert variant="default" className="border-none flex justify-center">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        OCR service is currently unavailable. Please use manual
-                        date entry.
+                        OCR service is currently unavailable. Please use manual date entry.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -790,9 +720,7 @@ export default function WorkingStreamlinedScanningInterface({
                       onClick={handleOCRCapture}
                       className="flex-1"
                       disabled={
-                        isWorkflowProcessing ||
-                        isOCRProcessing ||
-                        isBackendHealthy === false
+                        isWorkflowProcessing || isOCRProcessing || isBackendHealthy === false
                       }
                     >
                       <Camera className="w-4 h-4 mr-2" />
@@ -829,42 +757,31 @@ export default function WorkingStreamlinedScanningInterface({
                     </Label>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <Label
-                          htmlFor="expiry"
-                          className="text-xs"
-                        >
+                        <Label htmlFor="expiry" className="text-xs">
                           Expiry Date
                         </Label>
                         <Input
                           id="expiry"
                           type="date"
                           value={manualExpiryDate}
-                          onChange={(e) => setManualExpiryDate(e.target.value)}
+                          onChange={e => setManualExpiryDate(e.target.value)}
                         />
                       </div>
                       <div>
-                        <Label
-                          htmlFor="quantity"
-                          className="text-xs"
-                        >
+                        <Label htmlFor="quantity" className="text-xs">
                           Quantity
                         </Label>
                         <Input
                           id="quantity"
                           type="number"
                           value={quantity}
-                          onChange={(e) =>
-                            setQuantity(parseInt(e.target.value, 10) || 1)
-                          }
+                          onChange={e => setQuantity(parseInt(e.target.value, 10) || 1)}
                           min="0"
                         />
                       </div>
                     </div>
                     <div>
-                      <Label
-                        htmlFor="price"
-                        className="text-xs"
-                      >
+                      <Label htmlFor="price" className="text-xs">
                         Price per unit (€)
                       </Label>
                       <div className="relative">
@@ -875,9 +792,7 @@ export default function WorkingStreamlinedScanningInterface({
                           min="0"
                           step="0.01"
                           value={price}
-                          onChange={(e) =>
-                            setPrice(parseFloat(e.target.value) || 0)
-                          }
+                          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
                           className="pl-10"
                         />
                       </div>
@@ -903,30 +818,22 @@ export default function WorkingStreamlinedScanningInterface({
                     <div className="flex flex-col items-center text-center mb-3">
                       <div className="flex items-center gap-2">
                         <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                        <Typography
-                          variant="h3"
-                          className="text-primary-800 font-black"
-                        >
+                        <Typography variant="h3" className="text-primary-800 font-black">
                           Date captured successfully
                         </Typography>
                       </div>
-                      <Typography
-                        variant="h3"
-                        className="text-primary-700 font-black"
-                      >
+                      <Typography variant="h3" className="text-primary-700 font-black">
                         Finish and submit to inventory
                       </Typography>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-xs">
-                          Expiry Date (editable)
-                        </Label>
+                        <Label className="text-xs">Expiry Date (editable)</Label>
                         <Input
                           type="date"
                           value={manualExpiryDate}
-                          onChange={(e) => setManualExpiryDate(e.target.value)}
+                          onChange={e => setManualExpiryDate(e.target.value)}
                           className="text-sm"
                         />
                       </div>
@@ -935,9 +842,7 @@ export default function WorkingStreamlinedScanningInterface({
                         <Input
                           type="number"
                           value={quantity}
-                          onChange={(e) =>
-                            setQuantity(parseInt(e.target.value, 10) || 1)
-                          }
+                          onChange={e => setQuantity(parseInt(e.target.value, 10) || 1)}
                           min="0"
                           className="text-sm"
                         />
@@ -953,9 +858,7 @@ export default function WorkingStreamlinedScanningInterface({
                           type="number"
                           step="0.01"
                           value={price}
-                          onChange={(e) =>
-                            setPrice(parseFloat(e.target.value) || 0)
-                          }
+                          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
                           className="pl-10 text-sm"
                         />
                       </div>
@@ -997,8 +900,7 @@ export default function WorkingStreamlinedScanningInterface({
           {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
             <Alert className="font-mono flex items-center justify-center border-none">
               <AlertDescription>
-                Added {scannedItems[0].productName} to your list! Scan the next
-                product.
+                Added {scannedItems[0].productName} to your list! Scan the next product.
               </AlertDescription>
             </Alert>
           )}
@@ -1014,28 +916,20 @@ export default function WorkingStreamlinedScanningInterface({
               </div>
 
               <div className="space-y-2 max-h-80 overflow-y-auto">
-                {scannedItems.map((item) => (
+                {scannedItems.map(item => (
                   <div
                     key={item.id}
                     className="flex items-center justify-between p-2 border rounded text-sm"
                   >
                     <div className="flex-1">
                       <Typography variant="p">
-                        <span className="text-gray-500">Product:</span>{' '}
-                        {item.productName}
+                        <span className="text-gray-500">Product:</span> {item.productName}
                       </Typography>
                       <Typography variant="p">
-                        <span className="font-normal text-gray-500">
-                          Quantity:
-                        </span>{' '}
-                        {item.quantity}x{' '}
-                        <span className="font-normal text-gray-500">
-                          Price:
-                        </span>{' '}
+                        <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}
+                        x <span className="font-normal text-gray-500">Price:</span>{' '}
                         {formatPrice(item.price)}{' '}
-                        <span className="font-normal text-gray-500">
-                          Expiry:
-                        </span>{' '}
+                        <span className="font-normal text-gray-500">Expiry:</span>{' '}
                         {new Date(item.expiryDate).toLocaleDateString()}
                       </Typography>
                     </div>
@@ -1088,10 +982,7 @@ export default function WorkingStreamlinedScanningInterface({
       </div>
 
       {isEditingItem && editingItem && (
-        <Dialog
-          open={isEditingItem}
-          onOpenChange={setIsEditingItem}
-        >
+        <Dialog open={isEditingItem} onOpenChange={setIsEditingItem}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
@@ -1106,37 +997,26 @@ export default function WorkingStreamlinedScanningInterface({
               {/* Product Info - Now editable in advanced mode */}
               {!showAdvancedEdit ? (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="text-sm font-medium">
-                    {editingItem.productName}
-                  </div>
+                  <div className="text-sm font-medium">{editingItem.productName}</div>
                   {editingItem.brand && (
-                    <div className="text-xs text-gray-600">
-                      {editingItem.brand}
-                    </div>
+                    <div className="text-xs text-gray-600">{editingItem.brand}</div>
                   )}
-                  <div className="text-xs text-gray-500 font-mono">
-                    {editingItem.barcode}
-                  </div>
+                  <div className="text-xs text-gray-500 font-mono">{editingItem.barcode}</div>
                 </div>
               ) : (
                 <div className="space-y-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-sm font-medium text-blue-800 mb-2">
-                    Product Details
-                  </div>
+                  <div className="text-sm font-medium text-blue-800 mb-2">Product Details</div>
 
                   <div>
-                    <Label
-                      htmlFor="edit-product-name"
-                      className="text-sm font-medium"
-                    >
+                    <Label htmlFor="edit-product-name" className="text-sm font-medium">
                       Product Name
                     </Label>
                     <Input
                       id="edit-product-name"
                       type="text"
                       value={editForm.productName}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({
+                      onChange={e =>
+                        setEditForm(prev => ({
                           ...prev,
                           productName: e.target.value,
                         }))
@@ -1148,18 +1028,15 @@ export default function WorkingStreamlinedScanningInterface({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label
-                        htmlFor="edit-brand"
-                        className="text-sm font-medium"
-                      >
+                      <Label htmlFor="edit-brand" className="text-sm font-medium">
                         Brand
                       </Label>
                       <Input
                         id="edit-brand"
                         type="text"
                         value={editForm.brand}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({
+                        onChange={e =>
+                          setEditForm(prev => ({
                             ...prev,
                             brand: e.target.value,
                           }))
@@ -1170,18 +1047,15 @@ export default function WorkingStreamlinedScanningInterface({
                     </div>
 
                     <div>
-                      <Label
-                        htmlFor="edit-barcode"
-                        className="text-sm font-medium"
-                      >
+                      <Label htmlFor="edit-barcode" className="text-sm font-medium">
                         Barcode
                       </Label>
                       <Input
                         id="edit-barcode"
                         type="text"
                         value={editForm.barcode}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({
+                        onChange={e =>
+                          setEditForm(prev => ({
                             ...prev,
                             barcode: e.target.value,
                           }))
@@ -1221,18 +1095,15 @@ export default function WorkingStreamlinedScanningInterface({
                 </div>
 
                 <div>
-                  <Label
-                    htmlFor="edit-expiry"
-                    className="text-sm font-medium"
-                  >
+                  <Label htmlFor="edit-expiry" className="text-sm font-medium">
                     Expiry Date
                   </Label>
                   <Input
                     id="edit-expiry"
                     type="date"
                     value={editForm.expiryDate}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({
+                    onChange={e =>
+                      setEditForm(prev => ({
                         ...prev,
                         expiryDate: e.target.value,
                       }))
@@ -1243,10 +1114,7 @@ export default function WorkingStreamlinedScanningInterface({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label
-                      htmlFor="edit-quantity"
-                      className="text-sm font-medium"
-                    >
+                    <Label htmlFor="edit-quantity" className="text-sm font-medium">
                       Quantity
                     </Label>
                     <Input
@@ -1254,8 +1122,8 @@ export default function WorkingStreamlinedScanningInterface({
                       type="number"
                       min="0"
                       value={editForm.quantity}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({
+                      onChange={e =>
+                        setEditForm(prev => ({
                           ...prev,
                           quantity: parseInt(e.target.value, 10) || 1,
                         }))
@@ -1265,10 +1133,7 @@ export default function WorkingStreamlinedScanningInterface({
                   </div>
 
                   <div>
-                    <Label
-                      htmlFor="edit-price"
-                      className="text-sm font-medium"
-                    >
+                    <Label htmlFor="edit-price" className="text-sm font-medium">
                       Price (€)
                     </Label>
                     <div className="relative mt-1">
@@ -1279,8 +1144,8 @@ export default function WorkingStreamlinedScanningInterface({
                         min="0"
                         step="0.01"
                         value={editForm.price}
-                        onChange={(e) =>
-                          setEditForm((prev) => ({
+                        onChange={e =>
+                          setEditForm(prev => ({
                             ...prev,
                             price: parseFloat(e.target.value) || 0,
                           }))
@@ -1294,10 +1159,7 @@ export default function WorkingStreamlinedScanningInterface({
             </div>
 
             <DialogFooter className="mt-6">
-              <Button
-                variant="outline"
-                onClick={handleCancelEdit}
-              >
+              <Button variant="outline" onClick={handleCancelEdit}>
                 Cancel
               </Button>
               <Button
@@ -1320,10 +1182,7 @@ export default function WorkingStreamlinedScanningInterface({
 
       {/* Submission Confirmation Dialog */}
       {showSubmissionDialog && (
-        <Dialog
-          open={showSubmissionDialog}
-          onOpenChange={setShowSubmissionDialog}
-        >
+        <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Submission</DialogTitle>
@@ -1340,7 +1199,7 @@ export default function WorkingStreamlinedScanningInterface({
 
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
-                {scannedItems.map((item) => {
+                {scannedItems.map(item => {
                   const totalValue = item.quantity * item.price
                   return (
                     <div
@@ -1349,14 +1208,9 @@ export default function WorkingStreamlinedScanningInterface({
                     >
                       <div className="flex-1">
                         <div className="font-medium">{item.productName}</div>
-                        {item.brand && (
-                          <div className="text-xs text-gray-600">
-                            {item.brand}
-                          </div>
-                        )}
+                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
-                          Expires:{' '}
-                          {new Date(item.expiryDate).toLocaleDateString()}
+                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
@@ -1376,18 +1230,13 @@ export default function WorkingStreamlinedScanningInterface({
               <div className="border-t pt-3">
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Items:</span>
-                  <span>
-                    {scannedItems.reduce((sum, item) => sum + item.quantity, 0)}
-                  </span>
+                  <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Value:</span>
                   <span>
                     {formatPrice(
-                      scannedItems.reduce(
-                        (sum, item) => sum + item.quantity * item.price,
-                        0
-                      )
+                      scannedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
                     )}
                   </span>
                 </div>
@@ -1417,10 +1266,7 @@ export default function WorkingStreamlinedScanningInterface({
 
       {/* Success Dialog */}
       {showSuccessDialog && submissionResult && (
-        <Dialog
-          open={showSuccessDialog}
-          onOpenChange={setShowSuccessDialog}
-        >
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
