@@ -13,7 +13,7 @@ const typographyVariants = cva('', {
       h4: 'scroll-m-20 text-xl font-semibold tracking-tight font-heading',
       p: 'text-base leading-5 font-sans',
       muted: 'text-sm text-muted-foreground font-sans',
-      small: 'text-sm font-medium font-sans',
+      small: 'text-sm font-sans',
       blockquote: 'mt-6 border-l-2 pl-6 italic font-sans',
       code: 'rounded bg-muted px-1.5 py-1 font-mono text-sm font-semibold font-sans',
     },
@@ -37,7 +37,10 @@ export type TypographyProps = {
   VariantProps<typeof typographyVariants>
 
 const Typography = React.forwardRef<HTMLElement, TypographyProps>(
-  ({ className, variant, color, asChild = false, as: CompProp, ...props }, ref) => {
+  (
+    { className, variant, color, asChild = false, as: CompProp, ...props },
+    ref
+  ) => {
     const Comp = asChild ? Slot : CompProp || 'p'
     return (
       <Comp
@@ -46,7 +49,7 @@ const Typography = React.forwardRef<HTMLElement, TypographyProps>(
         {...props}
       />
     )
-  },
+  }
 )
 
 Typography.displayName = 'Typography'

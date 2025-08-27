@@ -5,7 +5,6 @@ import {
   BarChart3,
   Check,
   Minus,
-  Package,
   Plus,
   RefreshCcw,
   Trash2,
@@ -399,29 +398,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       {/* Step 2: Batch Selection */}
       {currentStep === 'batch-selection' && currentProduct && (
         <div className="mt-6 space-y-6">
-          <Card className="border-primary-50 shadow-primary-100">
-            <CardContent className="p-3">
-              <div className="flex justify-center items-center gap-2">
-                <div className="flex flex-col gap-2 justify-center items-center">
-                  <Typography className="text-secondary-900 font-black" variant="p">
-                    Selected Product
-                  </Typography>
-                  <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
-                    <Package className="w-4 h-4 text-gray-500" />
-
-                    <Typography variant="p">
-                      {currentProduct?.availableQuantity} units available
-                    </Typography>
-                    <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.productName}</Typography>
-                    <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.barcode}</Typography>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Main Selection Interface */}
           <div className="flex flex-col gap-6">
             <ScanningCamera
