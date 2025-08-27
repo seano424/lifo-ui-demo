@@ -302,133 +302,133 @@ export default function BarcodeScanner({
       {/* Fixed size container wrapper to prevent layout shift */}
       <div className="w-full max-w-[638px] mx-auto">
         <div className="space-y-4">
-        {/* Error Display */}
-        {displayError && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{displayError}</AlertDescription>
-          </Alert>
-        )}
+          {/* Error Display */}
+          {displayError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{displayError}</AlertDescription>
+            </Alert>
+          )}
 
-        {/* Initialization Status */}
-        {!isInitialized && !detectionError && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>Initializing barcode detection...</AlertDescription>
-          </Alert>
-        )}
+          {/* Initialization Status */}
+          {!isInitialized && !detectionError && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>Initializing barcode detection...</AlertDescription>
+            </Alert>
+          )}
 
-        {/* Camera container - fixed size matching camera's native 638×358 */}
-        <div className="relative w-full aspect-[638/358] border border-black rounded-3xl bg-gray-100 dark:bg-brand-dark">
-          {/* Camera Permission Request */}
-          {(hasPermission === false || hasPermission === null) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-3xl">
-              <div className="text-center space-y-4">
-                <Alert className="border-none bg-transparent shadow-none">
-                  <Camera className="h-4 w-4" />
-                  <AlertDescription>{permissionMessage}</AlertDescription>
-                </Alert>
+          {/* Camera container - fixed size matching camera's native 638×358 */}
+          <div className="relative w-full aspect-[638/358] border border-black rounded-3xl bg-gray-100 dark:bg-brand-dark">
+            {/* Camera Permission Request */}
+            {(hasPermission === false || hasPermission === null) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-3xl">
+                <div className="text-center space-y-4">
+                  <Alert className="border-none bg-transparent shadow-none">
+                    <Camera className="h-4 w-4" />
+                    <AlertDescription>{permissionMessage}</AlertDescription>
+                  </Alert>
+                  <Button
+                    onClick={handleUserStart}
+                    disabled={!isInitialized || isStartingRef.current}
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    {isStartingRef.current ? 'Starting...' : 'Enable Camera'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Camera Video */}
+            {hasPermission && (
+              <>
+                <video
+                  ref={videoRef}
+                  className="w-full h-full aspect-[638/358] rounded-3xl object-cover"
+                  playsInline
+                  muted
+                />
+
+                {!isScanning && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <Typography variant="p">Start scanning to see your camera</Typography>
+                  </div>
+                )}
+
+                {/* Scanning overlay */}
+                {isScanning && isInitialized && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="border-2 border-green-400 w-64 h-32 rounded-lg relative">
+                      <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
+                      {detectedBarcode && (
+                        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm">
+                          <CheckCircle className="w-3 h-3 inline mr-1" />
+                          Detected: {detectedBarcode}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Hidden canvas for barcode detection */}
+                <canvas ref={canvasRef} className="hidden" />
+              </>
+            )}
+          </div>
+
+          {hasPermission && (
+            <div className="flex gap-2">
+              {!isScanning ? (
                 <Button
                   onClick={handleUserStart}
+                  className="flex-1"
+                  variant="default"
                   disabled={!isInitialized || isStartingRef.current}
                 >
                   <Camera className="w-4 h-4 mr-2" />
-                  {isStartingRef.current ? 'Starting...' : 'Enable Camera'}
+                  {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
                 </Button>
+              ) : (
+                <Button onClick={handleUserStop} variant="default" className="flex-1">
+                  <StopCircle className="w-4 h-4 mr-2" />
+                  Stop Scanning
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Scanning History */}
+          {scanningHistory.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-gray-600">Recent Scans</h4>
+              <div className="space-y-1">
+                {scanningHistory.map((barcode, index) => (
+                  <div
+                    key={`scan-${barcode}-${Date.now()}-${index}`}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                  >
+                    <span className="font-mono">{barcode}</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleBarcodeDetected(barcode)}
+                      className="h-6 px-2 text-xs"
+                    >
+                      Re-scan
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Camera Video */}
-          {hasPermission && (
-            <>
-              <video
-                ref={videoRef}
-                className="w-full h-full aspect-[638/358] rounded-3xl object-cover"
-                playsInline
-                muted
-              />
-
-              {!isScanning && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <Typography variant="p">Start scanning to see your camera</Typography>
-                </div>
-              )}
-
-              {/* Scanning overlay */}
-              {isScanning && isInitialized && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-2 border-green-400 w-64 h-32 rounded-lg relative">
-                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
-                    {detectedBarcode && (
-                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm">
-                        <CheckCircle className="w-3 h-3 inline mr-1" />
-                        Detected: {detectedBarcode}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Hidden canvas for barcode detection */}
-              <canvas ref={canvasRef} className="hidden" />
-            </>
+          {/* Instructions */}
+          {hasPermission && isScanning && isInitialized && isBarcodeScanner && (
+            <div className="text-xs text-gray-500 text-center">
+              Point camera at barcode to scan automatically • Real detection active
+            </div>
           )}
         </div>
-
-        {hasPermission && (
-          <div className="flex gap-2">
-            {!isScanning ? (
-              <Button
-                onClick={handleUserStart}
-                className="flex-1"
-                variant="default"
-                disabled={!isInitialized || isStartingRef.current}
-              >
-                <Camera className="w-4 h-4 mr-2" />
-                {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
-              </Button>
-            ) : (
-              <Button onClick={handleUserStop} variant="default" className="flex-1">
-                <StopCircle className="w-4 h-4 mr-2" />
-                Stop Scanning
-              </Button>
-            )}
-          </div>
-        )}
-
-        {/* Scanning History */}
-        {scanningHistory.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-600">Recent Scans</h4>
-            <div className="space-y-1">
-              {scanningHistory.map((barcode, index) => (
-                <div
-                  key={`scan-${barcode}-${Date.now()}-${index}`}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
-                >
-                  <span className="font-mono">{barcode}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleBarcodeDetected(barcode)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    Re-scan
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Instructions */}
-        {hasPermission && isScanning && isInitialized && isBarcodeScanner && (
-          <div className="text-xs text-gray-500 text-center">
-            Point camera at barcode to scan automatically • Real detection active
-          </div>
-        )}
-      </div>
       </div>
     </div>
   )
