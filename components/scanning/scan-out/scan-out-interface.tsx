@@ -1,6 +1,12 @@
 'use client'
 
-import { AlertCircle, BarChart3, Check, Package, RefreshCcw } from 'lucide-react'
+import {
+  AlertCircle,
+  BarChart3,
+  Check,
+  Package,
+  RefreshCcw,
+} from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -69,13 +75,23 @@ interface ScanOutInterfaceProps {
   className?: string
 }
 
-export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProps) {
+export default function ScanOutInterface({
+  onItemRemoved,
+}: ScanOutInterfaceProps) {
   const { activeStore } = useStoreState()
-  const { submitCheckout, isSubmittingCheckout, findAvailableBatches, matchBatchByExpiry } =
-    useScanOutActions()
+  const {
+    submitCheckout,
+    isSubmittingCheckout,
+    findAvailableBatches,
+    matchBatchByExpiry,
+  } = useScanOutActions()
 
   // OCR processing hook for expiry date capture
-  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  const {
+    processExpiryDate,
+    isLoading: isOCRProcessing,
+    isBackendHealthy,
+  } = useOCRWithFallback()
 
   // Dialog states
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -92,13 +108,20 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
-  const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(null)
-  const [selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(null)
+  const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(
+    null
+  )
+  const [selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(
+    null
+  )
   const [ocrError, setOcrError] = useState<string | null>(null)
   const [quantity, setQuantity] = useState<number>(1)
 
   // Custom barcode scan handler for scan-out
-  const handleCustomBarcodeScanned = async (barcode: string, _productData?: unknown) => {
+  const handleCustomBarcodeScanned = async (
+    barcode: string,
+    _productData?: unknown
+  ) => {
     if (!activeStore) {
       console.error('No active store selected')
       return
@@ -117,7 +140,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         const { data: batchesData, error } = await supabase
           .schema('inventory')
           .from('batches')
-          .select(`
+          .select(
+            `
             batch_id,
             batch_number,
             product_id,
@@ -139,7 +163,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               image_url,
               unit_type
             )
-          `)
+          `
+          )
           .eq('product_id', productId)
           .eq('store_id', activeStore.store_id)
           .eq('status', 'active')
@@ -152,12 +177,17 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         }
 
         batches =
-          batchesData?.map(batch => ({
+          batchesData?.map((batch) => ({
             ...batch,
             products: {
-              product_name: (batch.products as unknown as ProductData)?.name || 'Unknown Product',
-              brand_name: (batch.products as unknown as ProductData)?.brand || 'Unknown Brand',
-              barcode: (batch.products as unknown as ProductData)?.barcode || '',
+              product_name:
+                (batch.products as unknown as ProductData)?.name ||
+                'Unknown Product',
+              brand_name:
+                (batch.products as unknown as ProductData)?.brand ||
+                'Unknown Brand',
+              barcode:
+                (batch.products as unknown as ProductData)?.barcode || '',
             },
           })) || []
       } else {
@@ -190,7 +220,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         setCurrentStep('quantity-entry')
       }
     },
-    [currentProduct],
+    [currentProduct]
   )
 
   const handleQuantityConfirmed = () => {
@@ -218,7 +248,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           },
         ],
         {
-          onSuccess: result => {
+          onSuccess: (result) => {
             console.log('Item removed successfully:', result)
 
             // Call the parent callback for UI update
@@ -231,11 +261,11 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             setSelectedBatch(null)
             setQuantity(1)
           },
-          onError: error => {
+          onError: (error) => {
             console.error('Failed to remove item from inventory:', error)
             // Keep the current state so user can retry
           },
-        },
+        }
       )
     }
   }
@@ -258,7 +288,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       setOcrError(null)
 
       const videoElement = document.querySelector('video') as HTMLVideoElement
-      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+      if (
+        !videoElement ||
+        videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA
+      ) {
         throw new Error('Camera not ready')
       }
 
@@ -268,25 +301,33 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         maxProcessingTimeMs: 5000,
       })
 
-      if (result.success && result.expiryDateInfo?.extractedDate && availableBatches.length > 0) {
+      if (
+        result.success &&
+        result.expiryDateInfo?.extractedDate &&
+        availableBatches.length > 0
+      ) {
         // Try to match the captured date to an available batch
         const matchedBatch = matchBatchByExpiry(
           availableBatches,
-          result.expiryDateInfo.extractedDate,
+          result.expiryDateInfo.extractedDate
         )
 
         if (matchedBatch) {
           handleBatchSelected(matchedBatch)
         } else {
           // No matching batch found
-          setOcrError(`No batch found with expiry date: ${result.expiryDateInfo.extractedDate}`)
+          setOcrError(
+            `No batch found with expiry date: ${result.expiryDateInfo.extractedDate}`
+          )
         }
       } else {
         setOcrError(result.error?.message || 'OCR processing failed')
       }
     } catch (error) {
       console.error('OCR capture failed:', error)
-      setOcrError(error instanceof Error ? error.message : 'OCR processing failed')
+      setOcrError(
+        error instanceof Error ? error.message : 'OCR processing failed'
+      )
     }
   }
 
@@ -295,18 +336,23 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleConfirmSubmission = () => {
-    console.log('Submitting scan-out for', pendingItems.length, 'items:', pendingItems)
+    console.log(
+      'Submitting scan-out for',
+      pendingItems.length,
+      'items:',
+      pendingItems
+    )
 
     // Submit the checkout/removal to inventory
     submitCheckout(
-      pendingItems.map(item => ({
+      pendingItems.map((item) => ({
         batchId: item.id, // This would be the actual batch ID in a real implementation
         quantityRemoved: item.quantity,
         reason: 'scan-out', // Could be 'sale', 'waste', 'transfer', etc.
         storeId: activeStore?.store_id || '',
       })),
       {
-        onSuccess: result => {
+        onSuccess: (result) => {
           console.log('Checkout submission completed:', result)
 
           // Store the result for the success dialog
@@ -322,11 +368,11 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: error => {
+        onError: (error) => {
           console.error('Checkout submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
-      },
+      }
     )
   }
 
@@ -340,7 +386,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <ScanningCamera
             mode="barcode"
             onBarcodeScanned={handleCustomBarcodeScanned}
-            onScanError={error => console.error('Barcode scan error:', error)}
+            onScanError={(error) => console.error('Barcode scan error:', error)}
             showManualEntry={true}
             onToggleManualEntry={() => console.log('Toggle manual entry')}
             onManualProductSelected={handleCustomBarcodeScanned}
@@ -377,7 +423,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             <CardContent className="p-3">
               <div className="flex justify-center items-center gap-2">
                 <div className="flex flex-col gap-2 justify-center items-center">
-                  <Typography className="text-secondary-900 font-black" variant="p">
+                  <Typography
+                    className="text-secondary-900 font-black"
+                    variant="p"
+                  >
                     Selected Product
                   </Typography>
                   <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
@@ -387,9 +436,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       {currentProduct?.availableQuantity} units available
                     </Typography>
                     <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.productName}</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.productName}
+                    </Typography>
                     <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.barcode}</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.barcode}
+                    </Typography>
                   </div>
                 </div>
               </div>
@@ -417,7 +470,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 batches={availableBatches}
                 onBatchSelected={handleBatchSelected}
                 selectedBatchId={selectedBatch?.batch_id}
-                className="rounded-lg p-4 bg-gray-50"
               />
             </div>
           </div>
@@ -443,7 +495,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             <CardContent className="p-3">
               <div className="flex justify-center items-center gap-2">
                 <div className="flex flex-col gap-2 justify-center items-center">
-                  <Typography className="text-secondary-900 font-black" variant="p">
+                  <Typography
+                    className="text-secondary-900 font-black"
+                    variant="p"
+                  >
                     Selected Product
                   </Typography>
                   <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
@@ -453,9 +508,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       {selectedBatch.current_quantity} units available
                     </Typography>
                     <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.productName}</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.productName}
+                    </Typography>
                     <Typography variant="p">•</Typography>
-                    <Typography variant="p">{currentProduct?.barcode}</Typography>
+                    <Typography variant="p">
+                      {currentProduct?.barcode}
+                    </Typography>
                   </div>
                 </div>
               </div>
@@ -481,15 +540,15 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                   <input
                     type="number"
                     value={quantity}
-                    onChange={e =>
+                    onChange={(e) =>
                       setQuantity(
                         Math.max(
                           1,
                           Math.min(
                             selectedBatch.current_quantity,
-                            parseInt(e.target.value, 10) || 1,
-                          ),
-                        ),
+                            parseInt(e.target.value, 10) || 1
+                          )
+                        )
                       )
                     }
                     className="w-20 text-center border rounded px-3 py-2"
@@ -500,7 +559,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      setQuantity(Math.min(selectedBatch.current_quantity, quantity + 1))
+                      setQuantity(
+                        Math.min(selectedBatch.current_quantity, quantity + 1)
+                      )
                     }
                     disabled={quantity >= selectedBatch.current_quantity}
                   >
@@ -513,7 +574,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               </div>
 
               <div className="text-sm text-gray-600">
-                <div>Cost per unit: {formatPrice(selectedBatch.cost_price)}</div>
+                <div>
+                  Cost per unit: {formatPrice(selectedBatch.cost_price)}
+                </div>
                 <div className="font-medium">
                   Total cost: {formatPrice(selectedBatch.cost_price * quantity)}
                 </div>
@@ -523,12 +586,15 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
           {/* Action Buttons */}
           <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={() => setCurrentStep('batch-selection')}>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentStep('batch-selection')}
+            >
               ← Back to Batches
             </Button>
             <Button
               onClick={handleQuantityConfirmed}
-              className="bg-red-600 hover:bg-red-700 text-white px-8"
+              className="bg-primary-900 hover:bg-primary-700 text-white px-8 min-w-80"
             >
               Remove {quantity} unit{quantity > 1 ? 's' : ''} from Inventory
             </Button>
@@ -538,7 +604,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
       {/* Submission Confirmation Dialog */}
       {showSubmissionDialog && (
-        <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
+        <Dialog
+          open={showSubmissionDialog}
+          onOpenChange={setShowSubmissionDialog}
+        >
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Checkout</DialogTitle>
@@ -555,7 +624,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
-                {pendingItems.map(item => {
+                {pendingItems.map((item) => {
                   const totalValue = item.quantity * item.price
                   return (
                     <div
@@ -564,9 +633,14 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                     >
                       <div className="flex-1">
                         <div className="font-medium">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
+                        {item.brand && (
+                          <div className="text-xs text-gray-600">
+                            {item.brand}
+                          </div>
+                        )}
                         <div className="text-xs text-gray-500">
-                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                          Expires:{' '}
+                          {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
@@ -587,7 +661,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Items Removed:</span>
                   <span className="text-red-600">
-                    -{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
+                    -
+                    {pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
@@ -595,7 +670,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                   <span className="text-red-600">
                     -
                     {formatPrice(
-                      pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
+                      pendingItems.reduce(
+                        (sum, item) => sum + item.quantity * item.price,
+                        0
+                      )
                     )}
                   </span>
                 </div>
@@ -625,7 +703,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
       {/* Success Dialog */}
       {showSuccessDialog && submissionResult && (
-        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <Dialog
+          open={showSuccessDialog}
+          onOpenChange={setShowSuccessDialog}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -670,7 +751,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
       {/* No Inventory Alert */}
       {!availableBatches.length && currentProduct && (
-        <Alert variant="destructive" className="mt-4">
+        <Alert
+          variant="destructive"
+          className="mt-4"
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             No inventory available for this product in the current store.

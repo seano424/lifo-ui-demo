@@ -58,7 +58,10 @@ export default function BatchSelectionList({
 
   return (
     <div className={`space-y-3 ${className}`}>
-      <Typography variant="h3" className="border-b pb-2 font-black">
+      <Typography
+        variant="h3"
+        className="border-b pb-2 font-black"
+      >
         Available Batches ({batches.length})
       </Typography>
 
@@ -104,18 +107,30 @@ export default function BatchSelectionList({
 
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <Typography variant="p">Expires: {formatDate(batch.expiry_date)}</Typography>
-
-                  <Typography variant="p" className="text-sm text-gray-600 mt-1">
-                    Available: {batch.available_quantity || batch.current_quantity} units
+                  <Typography variant="p">
+                    Expires: {formatDate(batch.expiry_date)}
                   </Typography>
 
-                  <Typography variant="p" className="text-sm text-gray-600">
+                  <Typography
+                    variant="p"
+                    className="text-sm text-gray-600 mt-1"
+                  >
+                    Available:{' '}
+                    {batch.available_quantity || batch.current_quantity} units
+                  </Typography>
+
+                  <Typography
+                    variant="p"
+                    className="text-sm text-gray-600"
+                  >
                     Cost: {formatPrice(batch.cost_price)}
                   </Typography>
 
                   {isRecommended && !isSelected && (
-                    <Typography variant="small" className="text-xs text-blue-600 mt-2 font-light">
+                    <Typography
+                      variant="small"
+                      className="text-xs text-blue-600 mt-2 font-light"
+                    >
                       ↑ Recommended (First to expire)
                     </Typography>
                   )}
@@ -124,8 +139,10 @@ export default function BatchSelectionList({
                 <Button
                   variant={isSelected ? 'default' : 'outline'}
                   size="sm"
-                  className={isSelected ? 'bg-primary-600 hover:bg-primary-700' : ''}
-                  onClick={e => {
+                  className={
+                    isSelected ? 'bg-primary-600 hover:bg-primary-700' : ''
+                  }
+                  onClick={(e) => {
                     e.stopPropagation()
                     onBatchSelected(batch)
                   }}
@@ -139,9 +156,9 @@ export default function BatchSelectionList({
       </div>
 
       {/* Helper Text */}
-      <div className="text-xs text-gray-500 mt-3 p-2 bg-gray-50 rounded">
-        💡 <strong>Tip:</strong> Select a batch directly, or scan/enter the expiry date below to
-        auto-match
+      <div className="text-xs text-gray-500 mt-3 p-2 bg-gray-50 rounded-2xl">
+        💡 <strong>Tip:</strong> Select a batch directly, or scan/enter the
+        expiry date below to auto-match
       </div>
     </div>
   )
