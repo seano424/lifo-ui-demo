@@ -8,7 +8,10 @@ export type {
 } from './base-scanning-interface'
 
 // Base interface (Phase 2)
-export { default as BaseScanningInterface, useBaseScanningLogic } from './base-scanning-interface'
+export {
+  default as BaseScanningInterface,
+  useBaseScanningLogic,
+} from './base-scanning-interface'
 export { default as RefactoredScanningInterface } from './refactored-scanning-interface'
 
 // Scan-in interface (Phase 2)
@@ -18,5 +21,3 @@ export { default as ScanInInterface } from './scan-in/scan-in-interface'
 export { default as ScanOutInterface } from './scan-out/scan-out-interface'
 // Shared components (Phase 1)
 export * from './shared'
-// Legacy interfaces (keeping for compatibility)
-export { default as StreamlinedScanningInterface } from './streamlined-scanning-interface'
