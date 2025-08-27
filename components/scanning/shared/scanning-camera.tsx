@@ -108,20 +108,6 @@ export default function ScanningCamera({
             </Alert>
           )}
 
-          {/* Backend Health Warning */}
-          {isBackendHealthy === false && !ocrError && (
-            <Alert
-              variant="default"
-              className="border-none flex justify-center"
-            >
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                OCR service is currently unavailable. Please use manual date
-                entry.
-              </AlertDescription>
-            </Alert>
-          )}
-
           {/* OCR Action Buttons */}
           <div className="flex gap-2">
             <Button
@@ -142,6 +128,20 @@ export default function ScanningCamera({
               </Button>
             )}
           </div>
+
+          {/* Backend Health Warning */}
+          {isBackendHealthy === false && !ocrError && (
+            <Alert
+              variant="default"
+              className="border-none flex justify-center"
+            >
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Sorry, this service is currently unavailable. Please use manual
+                date entry.
+              </AlertDescription>
+            </Alert>
+          )}
         </>
       )}
 
