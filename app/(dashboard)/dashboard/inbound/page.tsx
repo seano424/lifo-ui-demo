@@ -13,7 +13,7 @@ export default function InboundPage() {
   const { isTablet, isMobile } = useMediaQuery()
 
   return (
-    <div className="space-y-6 border-8">
+    <div className="space-y-6">
       {/* Mobile Tabs */}
       <Tabs
         defaultValue="scan"
@@ -24,7 +24,7 @@ export default function InboundPage() {
             value="scan"
             className="flex items-center gap-2"
           >
-            <Scan className="w-4 h-4 stroke-2 border-2  rounded-full p-[2px] bg-primary-100" />
+            <Scan className="w-4 h-4 stroke-2 border-2 rounded-full p-[2px] bg-primary-100" />
             Barcode Scanning
           </TabsTrigger>
           <TabsTrigger
