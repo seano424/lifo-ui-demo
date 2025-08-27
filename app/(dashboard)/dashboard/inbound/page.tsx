@@ -28,7 +28,7 @@ export default function InboundPage() {
         </TabsList>
 
         <TabsContent value="scan" className="mt-6">
-          <div className="max-w-screen-sm mx-auto">
+          <div className="max-w-2xl mx-auto">
             {(isMobile || isTablet) && <ScanningInterface />}
           </div>
         </TabsContent>
