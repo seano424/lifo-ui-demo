@@ -207,9 +207,62 @@ export function useScanOutActions() {
       let successCount = 0
       let failureCount = 0
 
+      // 🔍 DEBUG: Check authentication context
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      console.log('🔍 Scan-Out Auth Debug:', {
+        userId: user?.id,
+        email: user?.email,
+        authError,
+        timestamp: new Date().toISOString(),
+        itemsToProcess: items.length,
+      })
+
+      if (authError || !user) {
+        console.error('🚨 Authentication Error:', authError)
+        throw new Error('User not authenticated. Please sign in and try again.')
+      }
+
+      // 🔍 DEBUG: Test store access for the user
+      if (items.length > 0 && items[0].storeId) {
+        const { data: storeAccess, error: storeAccessError } = await supabase
+          .schema('business')
+          .from('store_users')
+          .select('user_id, role_in_store, is_active')
+          .eq('store_id', items[0].storeId)
+          .eq('user_id', user.id)
+          .single()
+        
+        console.log('🏪 Store Access Test:', { 
+          storeId: items[0].storeId,
+          storeAccess, 
+          storeAccessError,
+          hasAccess: !!storeAccess && storeAccess.is_active,
+        })
+
+        if (!storeAccess || !storeAccess.is_active) {
+          console.error('🔒 Store Access Denied:', { storeId: items[0].storeId, userId: user.id })
+          throw new Error('You do not have active access to this store')
+        }
+      }
+
       // Process each item in the checkout
       for (const item of items) {
         try {
+          // 🔍 DEBUG: Test RLS policy with a SELECT first
+          const { data: testQuery, error: testError } = await supabase
+            .schema('inventory')
+            .from('batches')
+            .select('batch_id, store_id, current_quantity')
+            .eq('batch_id', item.batchId)
+            .single()
+          
+          console.log('🔍 RLS Test Query for batch:', { 
+            batchId: item.batchId,
+            testQuery, 
+            testError,
+            canRead: !!testQuery,
+          })
+
           // Start a transaction to ensure data consistency
           const { data: batch, error: fetchError } = await supabase
             .schema('inventory')
@@ -219,10 +272,17 @@ export function useScanOutActions() {
             .single()
 
           if (fetchError || !batch) {
+            console.error('🚨 Batch fetch failed:', {
+              batchId: item.batchId,
+              error: fetchError,
+              message: fetchError?.message,
+              details: fetchError?.details,
+              hint: fetchError?.hint,
+            })
             results.push({
               batchId: item.batchId,
               success: false,
-              error: 'Batch not found',
+              error: fetchError?.message || 'Batch not found',
             })
             failureCount++
             continue
@@ -241,13 +301,40 @@ export function useScanOutActions() {
 
           // Update the batch quantity
           const newQuantity = batch.current_quantity - item.quantityRemoved
-          const { error: updateError } = await supabase
+          
+          console.log('📝 Attempting batch update:', {
+            batchId: item.batchId,
+            currentQuantity: batch.current_quantity,
+            quantityToRemove: item.quantityRemoved,
+            newQuantity,
+            storeId: batch.store_id,
+          })
+          
+          const { data: updateData, error: updateError } = await supabase
             .schema('inventory')
             .from('batches')
-            .update({ current_quantity: newQuantity })
+            .update({ 
+              current_quantity: newQuantity,
+              updated_at: new Date().toISOString(), 
+            })
             .eq('batch_id', item.batchId)
+            .select()
 
           if (updateError) {
+            console.error('🚨 Batch Update Failed:', {
+              batchId: item.batchId,
+              error: updateError,
+              message: updateError.message,
+              details: updateError.details,
+              hint: updateError.hint,
+              code: updateError.code,
+            })
+            
+            // Add specific error for RLS issues
+            if (updateError.message?.includes('policy') || updateError.code === '42501') {
+              console.error('🔒 RLS Policy Violation - Check user permissions for store:', batch.store_id)
+            }
+            
             results.push({
               batchId: item.batchId,
               success: false,
@@ -256,6 +343,13 @@ export function useScanOutActions() {
             failureCount++
             continue
           }
+
+          console.log('✅ Batch updated successfully:', {
+            batchId: item.batchId,
+            updatedData: updateData,
+            previousQuantity: batch.current_quantity,
+            newQuantity,
+          })
 
           // TODO: Log the transaction in a transactions/movements table
           // This would track the removal for audit purposes
@@ -285,7 +379,7 @@ export function useScanOutActions() {
         }
       }
 
-      return {
+      const finalResult = {
         success: successCount > 0,
         successCount,
         failureCount,
@@ -295,13 +389,34 @@ export function useScanOutActions() {
             : `Processed ${successCount} items successfully, ${failureCount} failed`,
         results,
       }
+
+      console.log('📊 Checkout Summary:', finalResult)
+      return finalResult
     },
 
-    onSuccess: result => {
+    onSuccess: (result, items) => {
       if (result.success) {
         // Invalidate relevant queries to refresh the UI
+        // Invalidate all batch queries to ensure UI updates
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.all,
+        })
+        
+        // If we have store ID from the items, invalidate store-specific queries
+        if (items.length > 0 && items[0].storeId) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.byStore(items[0].storeId),
+          })
+          
+          // Also invalidate product queries since inventory levels have changed
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.products.byStore(items[0].storeId),
+          })
+        }
+        
+        // Invalidate product lookup cache as inventory levels have changed
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.productLookup.all,
         })
 
         // Show success message

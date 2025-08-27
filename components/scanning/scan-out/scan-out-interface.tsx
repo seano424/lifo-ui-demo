@@ -158,14 +158,35 @@ export default function ScanOutInterface({
         timestamp: new Date(),
       }
 
-      onItemRemoved?.(scannedItem)
-
-      // Reset to scanning state for next product
-      setCurrentStep('scanning')
-      setCurrentProduct(null)
-      setAvailableBatches([])
-      setSelectedBatch(null)
-      setQuantity(1)
+      // Submit the removal immediately to the database
+      submitCheckout(
+        [{
+          batchId: selectedBatch.batch_id,
+          quantityRemoved: quantity,
+          reason: 'scan-out',
+          storeId: activeStore?.store_id || '',
+          notes: `Removed ${quantity} unit(s) of ${selectedBatch.products.product_name}`,
+        }],
+        {
+          onSuccess: (result) => {
+            console.log('Item removed successfully:', result)
+            
+            // Call the parent callback for UI update
+            onItemRemoved?.(scannedItem)
+            
+            // Reset to scanning state for next product
+            setCurrentStep('scanning')
+            setCurrentProduct(null)
+            setAvailableBatches([])
+            setSelectedBatch(null)
+            setQuantity(1)
+          },
+          onError: (error) => {
+            console.error('Failed to remove item from inventory:', error)
+            // Keep the current state so user can retry
+          },
+        }
+      )
     }
   }
 
