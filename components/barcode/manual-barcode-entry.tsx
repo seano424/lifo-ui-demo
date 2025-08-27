@@ -8,23 +8,25 @@ import {
   Package,
   Search,
 } from 'lucide-react'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Typography } from '@/components/ui/typography'
-import { 
-  useProductLookup, 
-  useProductSearch, 
+import {
+  useProductLookup,
+  useProductSearch,
   useSupabaseProductSearch,
-  type SupabaseProductSearchResult 
+  type SupabaseProductSearchResult,
 } from '@/hooks/use-product-lookup'
 import type {
   OpenFoodFactsSearchResult,
   ProductLookupResult,
 } from '@/lib/queries/open-food-facts'
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
+import { useStoreState } from '@/lib/stores/store-context'
+import { createClient } from '@/lib/supabase/client'
 
 interface ProductData {
   barcode: string
@@ -62,7 +64,7 @@ export default function ManualBarcodeEntry({
   })
 
   const { setProductSelected } = useScanningActions()
-
+  const { activeStore } = useStoreState()
 
   const {
     data: lookupResult,
@@ -73,15 +75,65 @@ export default function ManualBarcodeEntry({
   const productSearch = useProductSearch() // OpenFoodFacts search
   const supabaseSearch = useSupabaseProductSearch(storeId) // Supabase search
   const [productNameQuery, setProductNameQuery] = useState('')
-  const [showProductSearchResults, setShowProductSearchResults] = useState(false)
+  const [showProductSearchResults, setShowProductSearchResults] =
+    useState(false)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Use the appropriate search based on mode
   const activeSearch = mode === 'outbound' ? supabaseSearch : productSearch
 
+  const [barcodeStockStatus, setBarcodeStockStatus] = useState<{
+    hasStock: boolean
+    availableQuantity: number
+  } | null>(null)
+
   const handleBarcodeSubmit = async () => {
     if (!barcode || barcode.length < 8) return
+    setBarcodeStockStatus(null) // Reset stock status
   }
+
+  // Check stock status when lookup result changes in outbound mode
+  const checkStockStatus = useCallback(
+    async (barcode: string) => {
+      if (mode !== 'outbound' || !storeId || !activeStore) {
+        return
+      }
+
+      try {
+        const supabase = createClient()
+        const { data: batches, error } = await supabase
+          .schema('inventory')
+          .from('batches')
+          .select('current_quantity, products!inner(barcode)')
+          .eq('products.barcode', barcode)
+          .eq('store_id', storeId)
+          .eq('status', 'active')
+          .gte('current_quantity', 0)
+
+        if (error) {
+          console.error('Error checking stock status:', error)
+          return
+        }
+
+        const totalStock =
+          batches?.reduce((sum, batch) => sum + batch.current_quantity, 0) || 0
+        setBarcodeStockStatus({
+          hasStock: totalStock > 0,
+          availableQuantity: totalStock,
+        })
+      } catch (error) {
+        console.error('Error checking stock status:', error)
+      }
+    },
+    [mode, storeId, activeStore]
+  )
+
+  // Check stock when lookup result changes
+  React.useEffect(() => {
+    if (lookupResult?.found && lookupResult.product && mode === 'outbound') {
+      checkStockStatus(barcode)
+    }
+  }, [lookupResult, barcode, mode, checkStockStatus])
 
   const handleProductSearch = async (query: string) => {
     if (query.length < 3) return
@@ -89,46 +141,52 @@ export default function ManualBarcodeEntry({
   }
 
   // Debounced search function
-  const debouncedProductNameSearch = useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setShowProductSearchResults(false)
-      return
-    }
-    
-    try {
-      if (mode === 'outbound') {
-        if (!storeId) {
-          console.error('Store ID is required for outbound product search')
-          return
-        }
-        await supabaseSearch.mutateAsync(query)
-      } else {
-        await productSearch.mutateAsync(query)
+  const debouncedProductNameSearch = useCallback(
+    async (query: string) => {
+      if (query.length < 2) {
+        setShowProductSearchResults(false)
+        return
       }
-      setShowProductSearchResults(true)
-    } catch (error) {
-      console.error('Product search error:', error)
-      setShowProductSearchResults(false)
-    }
-  }, [mode, storeId, supabaseSearch, productSearch])
 
-  const handleProductNameSearch = useCallback((query: string) => {
-    // Clear previous timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
+      try {
+        if (mode === 'outbound') {
+          if (!storeId) {
+            console.error('Store ID is required for outbound product search')
+            return
+          }
+          await supabaseSearch.mutateAsync(query)
+        } else {
+          await productSearch.mutateAsync(query)
+        }
+        setShowProductSearchResults(true)
+      } catch (error) {
+        console.error('Product search error:', error)
+        setShowProductSearchResults(false)
+      }
+    },
+    [mode, storeId, supabaseSearch, productSearch]
+  )
 
-    // If query is too short, hide results immediately
-    if (query.length < 2) {
-      setShowProductSearchResults(false)
-      return
-    }
+  const handleProductNameSearch = useCallback(
+    (query: string) => {
+      // Clear previous timeout
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
 
-    // Set new timeout for debounced search
-    debounceTimeoutRef.current = setTimeout(() => {
-      debouncedProductNameSearch(query)
-    }, 300) // 300ms debounce delay
-  }, [debouncedProductNameSearch])
+      // If query is too short, hide results immediately
+      if (query.length < 2) {
+        setShowProductSearchResults(false)
+        return
+      }
+
+      // Set new timeout for debounced search
+      debounceTimeoutRef.current = setTimeout(() => {
+        debouncedProductNameSearch(query)
+      }, 300) // 300ms debounce delay
+    },
+    [debouncedProductNameSearch]
+  )
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -240,7 +298,9 @@ export default function ManualBarcodeEntry({
               <div className="space-y-4">
                 {/* Barcode Lookup */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Search by Barcode</label>
+                  <label className="text-sm font-medium">
+                    Search by Barcode
+                  </label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       type="text"
@@ -295,9 +355,9 @@ export default function ManualBarcodeEntry({
                         handleProductNameSearch(e.target.value)
                       }}
                       placeholder={
-                        mode === 'outbound' 
-                          ? "Search products in inventory..." 
-                          : "Search Open Food Facts database..."
+                        mode === 'outbound'
+                          ? 'Search products in inventory...'
+                          : 'Search Open Food Facts database...'
                       }
                       disabled={activeSearch.isPending}
                     />
@@ -309,114 +369,134 @@ export default function ManualBarcodeEntry({
                   </div>
 
                   {/* Search Results Dropdown */}
-                  {showProductSearchResults && activeSearch.data && activeSearch.data.length > 0 && (
-                    <div className="border rounded-lg max-h-64 overflow-y-auto bg-white shadow-lg">
-                      {mode === 'outbound' ? (
-                        // Supabase results for outbound
-                        (activeSearch.data as SupabaseProductSearchResult[]).map((product) => (
-                          <Button
-                            key={product.product_id}
-                            variant="ghost"
-                            className={`w-full justify-start text-left p-3 ${
-                              product.isOutOfStock 
-                                ? 'opacity-50 cursor-not-allowed hover:bg-gray-50' 
-                                : 'hover:bg-gray-50'
-                            }`}
-                            disabled={product.isOutOfStock}
-                            onClick={() => {
-                              if (product.isOutOfStock) return
-                              
-                              // For outbound/Supabase results, use the product_id if no barcode exists
-                              // This ensures we have a unique identifier that won't cause lookup failures
-                              const effectiveBarcode = product.barcode && product.barcode.trim() !== '' 
-                                ? product.barcode 
-                                : `INTERNAL-${product.product_id}`
-                              
-                              const productData = {
-                                barcode: effectiveBarcode,
-                                productName: product.name,
-                                brand: product.brand || '',
-                                category: product.category || '',
-                                imageUrl: product.image_url || '',
-                                isManualEntry: true,
-                                // Store the actual product_id for outbound operations
-                                productId: product.product_id,
-                              }
+                  {showProductSearchResults &&
+                    activeSearch.data &&
+                    activeSearch.data.length > 0 && (
+                      <div className="border rounded-lg max-h-64 overflow-y-auto bg-white shadow-lg">
+                        {mode === 'outbound'
+                          ? // Supabase results for outbound
+                            (
+                              activeSearch.data as SupabaseProductSearchResult[]
+                            ).map((product) => (
+                              <Button
+                                key={product.product_id}
+                                variant="ghost"
+                                className={`w-full justify-start text-left p-3 ${
+                                  product.isOutOfStock
+                                    ? 'opacity-50 cursor-not-allowed hover:bg-gray-50'
+                                    : 'hover:bg-gray-50'
+                                }`}
+                                disabled={product.isOutOfStock}
+                                onClick={() => {
+                                  if (product.isOutOfStock) return
 
-                              setProductSelected(productData)
-                              onProductSelected?.(effectiveBarcode, productData)
+                                  // For outbound/Supabase results, use the product_id if no barcode exists
+                                  // This ensures we have a unique identifier that won't cause lookup failures
+                                  const effectiveBarcode =
+                                    product.barcode &&
+                                    product.barcode.trim() !== ''
+                                      ? product.barcode
+                                      : `INTERNAL-${product.product_id}`
 
-                              // Reset search
-                              setProductNameQuery('')
-                              setShowProductSearchResults(false)
-                              setBarcode('')
-                            }}
-                          >
-                            <div className="flex-1">
-                              <div className="font-medium">{product.name}</div>
-                              {product.brand && (
-                                <div className="text-sm text-gray-500">{product.brand}</div>
-                              )}
-                              {product.isOutOfStock ? (
-                                <div className="text-xs text-red-600 font-medium">
-                                  Out of Stock
-                                </div>
-                              ) : product.total_available_quantity ? (
-                                <div className="text-xs text-green-600">
-                                  {product.total_available_quantity} units available
-                                  {product.batch_count && product.batch_count > 1 && 
-                                    ` (${product.batch_count} batches)`
+                                  const productData = {
+                                    barcode: effectiveBarcode,
+                                    productName: product.name,
+                                    brand: product.brand || '',
+                                    category: product.category || '',
+                                    imageUrl: product.image_url || '',
+                                    isManualEntry: true,
+                                    // Store the actual product_id for outbound operations
+                                    productId: product.product_id,
                                   }
+
+                                  setProductSelected(productData)
+                                  onProductSelected?.(
+                                    effectiveBarcode,
+                                    productData
+                                  )
+
+                                  // Reset search
+                                  setProductNameQuery('')
+                                  setShowProductSearchResults(false)
+                                  setBarcode('')
+                                }}
+                              >
+                                <div className="flex-1">
+                                  <div className="font-medium">
+                                    {product.name}
+                                  </div>
+                                  {product.brand && (
+                                    <div className="text-sm text-gray-500">
+                                      {product.brand}
+                                    </div>
+                                  )}
+                                  {product.isOutOfStock ? (
+                                    <div className="text-xs text-red-600 font-medium">
+                                      Out of Stock
+                                    </div>
+                                  ) : product.total_available_quantity ? (
+                                    <div className="text-xs text-primary-900">
+                                      {product.total_available_quantity} units
+                                      available
+                                      {product.batch_count &&
+                                        product.batch_count > 1 &&
+                                        ` (${product.batch_count} batches)`}
+                                    </div>
+                                  ) : null}
                                 </div>
-                              ) : null}
-                            </div>
-                          </Button>
-                        ))
-                      ) : (
-                        // OpenFoodFacts results for inbound
-                        (activeSearch.data as OpenFoodFactsSearchResult[]).map((product) => (
-                          <Button
-                            key={product.code}
-                            variant="ghost"
-                            className="w-full justify-start text-left p-3 hover:bg-gray-50"
-                            onClick={() => {
-                              const productData = {
-                                barcode: product.code,
-                                productName: product.product_name || 'Unknown Product',
-                                brand: product.brands || '',
-                                category: '',
-                                imageUrl: product.image_front_small_url || '',
-                                isManualEntry: true,
-                              }
+                              </Button>
+                            ))
+                          : // OpenFoodFacts results for inbound
+                            (
+                              activeSearch.data as OpenFoodFactsSearchResult[]
+                            ).map((product) => (
+                              <Button
+                                key={product.code}
+                                variant="ghost"
+                                className="w-full justify-start text-left p-3 hover:bg-gray-50"
+                                onClick={() => {
+                                  const productData = {
+                                    barcode: product.code,
+                                    productName:
+                                      product.product_name || 'Unknown Product',
+                                    brand: product.brands || '',
+                                    category: '',
+                                    imageUrl:
+                                      product.image_front_small_url || '',
+                                    isManualEntry: true,
+                                  }
 
-                              setProductSelected(productData)
-                              onProductSelected?.(product.code, productData)
+                                  setProductSelected(productData)
+                                  onProductSelected?.(product.code, productData)
 
-                              // Reset search
-                              setProductNameQuery('')
-                              setShowProductSearchResults(false)
-                              setBarcode('')
-                            }}
-                          >
-                            <div className="flex-1">
-                              <div className="font-medium">
-                                {product.product_name || 'Unknown Product'}
-                              </div>
-                              {product.brands && (
-                                <div className="text-sm text-gray-500">{product.brands}</div>
-                              )}
-                            </div>
-                          </Button>
-                        ))
-                      )}
-                    </div>
-                  )}
+                                  // Reset search
+                                  setProductNameQuery('')
+                                  setShowProductSearchResults(false)
+                                  setBarcode('')
+                                }}
+                              >
+                                <div className="flex-1">
+                                  <div className="font-medium">
+                                    {product.product_name || 'Unknown Product'}
+                                  </div>
+                                  {product.brands && (
+                                    <div className="text-sm text-gray-500">
+                                      {product.brands}
+                                    </div>
+                                  )}
+                                </div>
+                              </Button>
+                            ))}
+                      </div>
+                    )}
 
-                  {showProductSearchResults && activeSearch.data && activeSearch.data.length === 0 && (
-                    <div className="text-sm text-gray-500 p-3 border rounded-lg">
-                      No products found matching "{productNameQuery}"
-                    </div>
-                  )}
+                  {showProductSearchResults &&
+                    activeSearch.data &&
+                    activeSearch.data.length === 0 && (
+                      <div className="text-sm text-gray-500 p-3 border rounded-lg">
+                        No products found matching "{productNameQuery}"
+                      </div>
+                    )}
                 </div>
               </div>
 
@@ -434,15 +514,40 @@ export default function ManualBarcodeEntry({
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
-                        <div className="flex justify-center items-center gap-2">
-                          <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                          <Typography
-                            variant="h3"
-                            className="text-primary-800 font-black"
-                          >
-                            Product Found!
-                          </Typography>
-                        </div>
+                        {/* Show different status based on stock availability in outbound mode */}
+                        {mode === 'outbound' && barcodeStockStatus !== null ? (
+                          barcodeStockStatus.hasStock ? (
+                            <div className="flex justify-center items-center gap-2">
+                              <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                              <Typography
+                                variant="h3"
+                                className="text-primary-800 font-black"
+                              >
+                                Product Found!
+                              </Typography>
+                            </div>
+                          ) : (
+                            <div className="flex justify-center items-center gap-2">
+                              <AlertCircle className="w-6 h-6 text-red-600" />
+                              <Typography
+                                variant="h3"
+                                className="text-red-600 font-black"
+                              >
+                                Out of Stock
+                              </Typography>
+                            </div>
+                          )
+                        ) : (
+                          <div className="flex justify-center items-center gap-2">
+                            <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                            <Typography
+                              variant="h3"
+                              className="text-primary-800 font-black"
+                            >
+                              Product Found!
+                            </Typography>
+                          </div>
+                        )}
 
                         {lookupResult.product && (
                           <div className="text-sm space-y-2">
@@ -467,6 +572,24 @@ export default function ManualBarcodeEntry({
                                   : 'Unknown'}
                               </div>
                             )}
+
+                            {/* Show stock information for outbound mode */}
+                            {mode === 'outbound' &&
+                              barcodeStockStatus !== null && (
+                                <div>
+                                  <strong>Stock:</strong>{' '}
+                                  {barcodeStockStatus.hasStock ? (
+                                    <span className="text-green-600">
+                                      {barcodeStockStatus.availableQuantity}{' '}
+                                      units available
+                                    </span>
+                                  ) : (
+                                    <span className="text-red-600">
+                                      No stock available in this store
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                           </div>
                         )}
 
@@ -508,12 +631,27 @@ export default function ManualBarcodeEntry({
                                 category: '',
                                 imageUrl: '',
                               })
-                                                      }
+                            }
                           }}
-                          className="w-full mt-3"
-                          disabled={!lookupResult.product}
+                          className={`w-full mt-3 ${
+                            mode === 'outbound' &&
+                            barcodeStockStatus !== null &&
+                            !barcodeStockStatus.hasStock
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          }`}
+                          disabled={
+                            !lookupResult.product ||
+                            (mode === 'outbound' &&
+                              barcodeStockStatus !== null &&
+                              !barcodeStockStatus.hasStock)
+                          }
                         >
-                          Select This Product
+                          {mode === 'outbound' &&
+                          barcodeStockStatus !== null &&
+                          !barcodeStockStatus.hasStock
+                            ? 'Out of Stock - Cannot Select'
+                            : 'Select This Product'}
                         </Button>
                       </CardContent>
                     </Card>
@@ -670,7 +808,7 @@ export default function ManualBarcodeEntry({
                                     category: '',
                                     imageUrl: '',
                                   })
-                                                              }}
+                                }}
                               >
                                 <div className="text-left">
                                   <div className="font-medium">
@@ -713,7 +851,7 @@ export default function ManualBarcodeEntry({
                           category: '',
                           imageUrl: '',
                         })
-                                          }}
+                      }}
                       disabled={!manualProductData.productName || !barcode}
                       className="w-full"
                     >
