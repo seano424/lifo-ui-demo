@@ -474,7 +474,7 @@ export default function WorkingStreamlinedScanningInterface({
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       {/* Consistent width container for all scanning steps */}
-      <div className="w-full">
+      <div className="w-full space-y-4">
         <div className="px-4 space-y-4">
           {/* STEP 1: Camera Barcode Scanning */}
           {uiStep === 'camera-barcode' && (

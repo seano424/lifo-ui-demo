@@ -65,7 +65,7 @@ export default function ScanningCamera({
     subtitle || (mode === 'barcode' ? 'Point camera at barcode' : 'Point camera at expiry date')
 
   return (
-    <div className={cn(className)}>
+    <div className={cn(className, 'space-y-4')}>
       {/* Camera Scanner */}
       <div className="space-y-2">
         <BarcodeScanner
