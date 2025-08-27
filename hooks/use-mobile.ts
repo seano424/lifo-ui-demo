@@ -8,7 +8,7 @@ const BREAKPOINTS = {
   lg: 1024,
   xl: 1280,
   '2xl': 1536,
-  '3xl': 1920
+  '3xl': 1920,
 } as const
 
 export function useIsMobile() {
@@ -31,7 +31,9 @@ export function useIsTablet() {
   const [isTablet, setIsTablet] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
-    const mql = window.matchMedia(`(min-width: ${BREAKPOINTS.md}px) and (max-width: ${BREAKPOINTS.lg - 1}px)`)
+    const mql = window.matchMedia(
+      `(min-width: ${BREAKPOINTS.md}px) and (max-width: ${BREAKPOINTS.lg - 1}px)`,
+    )
     const onChange = () => {
       const width = window.innerWidth
       setIsTablet(width >= BREAKPOINTS.md && width < BREAKPOINTS.lg)
@@ -51,24 +53,34 @@ export function useMediaQuery() {
     const handleResize = () => {
       setWindowWidth(window.innerWidth)
     }
-    
+
     handleResize()
     window.addEventListener('resize', handleResize)
-    
+
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   return {
     isMobile: windowWidth !== undefined && windowWidth < BREAKPOINTS.md,
-    isTablet: windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
+    isTablet:
+      windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
     isDesktop: windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg,
     isXs: windowWidth !== undefined && windowWidth < BREAKPOINTS.xs,
-    isSm: windowWidth !== undefined && windowWidth >= BREAKPOINTS.sm && windowWidth < BREAKPOINTS.md,
-    isMd: windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
-    isLg: windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg && windowWidth < BREAKPOINTS.xl,
-    isXl: windowWidth !== undefined && windowWidth >= BREAKPOINTS.xl && windowWidth < BREAKPOINTS['2xl'],
-    is2xl: windowWidth !== undefined && windowWidth >= BREAKPOINTS['2xl'] && windowWidth < BREAKPOINTS['3xl'],
+    isSm:
+      windowWidth !== undefined && windowWidth >= BREAKPOINTS.sm && windowWidth < BREAKPOINTS.md,
+    isMd:
+      windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
+    isLg:
+      windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg && windowWidth < BREAKPOINTS.xl,
+    isXl:
+      windowWidth !== undefined &&
+      windowWidth >= BREAKPOINTS.xl &&
+      windowWidth < BREAKPOINTS['2xl'],
+    is2xl:
+      windowWidth !== undefined &&
+      windowWidth >= BREAKPOINTS['2xl'] &&
+      windowWidth < BREAKPOINTS['3xl'],
     is3xl: windowWidth !== undefined && windowWidth >= BREAKPOINTS['3xl'],
-    width: windowWidth
+    width: windowWidth,
   }
 }
