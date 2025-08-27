@@ -380,11 +380,10 @@ export default function ManualBarcodeEntry({
                             ).map((product) => (
                               <Button
                                 key={product.product_id}
-                                variant="ghost"
-                                className={`w-full justify-start text-left p-3 ${
-                                  product.isOutOfStock
-                                    ? 'opacity-50 cursor-not-allowed hover:bg-gray-50'
-                                    : 'hover:bg-gray-50'
+                                variant="gray"
+                                className={`w-full rounded-none justify-start text-left p-3 ${
+                                  product.isOutOfStock &&
+                                  'opacity-50 cursor-not-allowed'
                                 }`}
                                 disabled={product.isOutOfStock}
                                 onClick={() => {
@@ -422,26 +421,32 @@ export default function ManualBarcodeEntry({
                                 }}
                               >
                                 <div className="flex-1">
-                                  <div className="font-medium">
+                                  <Typography variant="p">
                                     {product.name}
-                                  </div>
+                                  </Typography>
                                   {product.brand && (
-                                    <div className="text-sm text-gray-500">
+                                    <Typography variant="p">
                                       {product.brand}
-                                    </div>
+                                    </Typography>
                                   )}
                                   {product.isOutOfStock ? (
-                                    <div className="text-xs text-red-600 font-medium">
+                                    <Typography
+                                      variant="small"
+                                      className="text-red-600"
+                                    >
                                       Out of Stock
-                                    </div>
+                                    </Typography>
                                   ) : product.total_available_quantity ? (
-                                    <div className="text-xs text-primary-900">
+                                    <Typography
+                                      variant="small"
+                                      className="text-primary-900"
+                                    >
                                       {product.total_available_quantity} units
                                       available
                                       {product.batch_count &&
                                         product.batch_count > 1 &&
                                         ` (${product.batch_count} batches)`}
-                                    </div>
+                                    </Typography>
                                   ) : null}
                                 </div>
                               </Button>
