@@ -114,13 +114,6 @@ export default function ManualBarcodeEntry({
               <Package className="w-5 h-5" />
               Manual Product Entry
             </CardTitle>
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClose}
-            >
-              <X className="w-4 h-4" />
-            </Button> */}
           </div>
         </CardHeader>
 
