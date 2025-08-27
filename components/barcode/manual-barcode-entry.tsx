@@ -270,7 +270,7 @@ export default function ManualBarcodeEntry({
                 <div className="mt-4 flex gap-2">
                   <Button
                     onClick={handleConfirmAndProceed}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    className="flex-1 bg-primary-600 hover:bg-primary-700"
                   >
                     Select Product
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -579,7 +579,7 @@ export default function ManualBarcodeEntry({
                                 <div>
                                   <strong>Stock:</strong>{' '}
                                   {barcodeStockStatus.hasStock ? (
-                                    <span className="text-green-600">
+                                    <span className="text-primary-600">
                                       {barcodeStockStatus.availableQuantity}{' '}
                                       units available
                                     </span>
