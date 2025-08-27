@@ -28,9 +28,7 @@ export default function InboundPage() {
         </TabsList>
 
         <TabsContent value="scan" className="mt-6">
-          <div className="max-w-2xl mx-auto">
-            {(isMobile || isTablet) && <ScanningInterface />}
-          </div>
+          <div className="max-w-2xl mx-auto">{(isMobile || isTablet) && <ScanningInterface />}</div>
         </TabsContent>
 
         <TabsContent value="csv" className="mt-6">

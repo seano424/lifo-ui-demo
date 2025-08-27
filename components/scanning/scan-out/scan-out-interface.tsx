@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  AlertCircle,
-  BarChart3,
-  Check,
-  Minus,
-  Plus,
-  RefreshCcw,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, BarChart3, Check, Minus, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -21,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Typography } from '@/components/ui/typography'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
@@ -82,23 +73,13 @@ interface ScanOutInterfaceProps {
   className?: string
 }
 
-export default function ScanOutInterface({
-  onItemRemoved,
-}: ScanOutInterfaceProps) {
+export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProps) {
   const { activeStore } = useStoreState()
-  const {
-    submitCheckout,
-    isSubmittingCheckout,
-    findAvailableBatches,
-    matchBatchByExpiry,
-  } = useScanOutActions()
+  const { submitCheckout, isSubmittingCheckout, findAvailableBatches, matchBatchByExpiry } =
+    useScanOutActions()
 
   // OCR processing hook for expiry date capture
-  const {
-    processExpiryDate,
-    isLoading: isOCRProcessing,
-    isBackendHealthy,
-  } = useOCRWithFallback()
+  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
 
   // Dialog states
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -116,20 +97,13 @@ export default function ScanOutInterface({
 
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
-  const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(
-    null
-  )
-  const [_selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(
-    null
-  )
+  const [currentProduct, setCurrentProduct] = useState<CurrentProduct | null>(null)
+  const [_selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(null)
   const [ocrError, setOcrError] = useState<string | null>(null)
   const [_quantity, setQuantity] = useState<number>(1)
 
   // Custom barcode scan handler for scan-out
-  const handleCustomBarcodeScanned = async (
-    barcode: string,
-    _productData?: unknown
-  ) => {
+  const handleCustomBarcodeScanned = async (barcode: string, _productData?: unknown) => {
     if (!activeStore) {
       console.error('No active store selected')
       return
@@ -171,7 +145,7 @@ export default function ScanOutInterface({
               image_url,
               unit_type
             )
-          `
+          `,
           )
           .eq('product_id', productId)
           .eq('store_id', activeStore.store_id)
@@ -185,17 +159,12 @@ export default function ScanOutInterface({
         }
 
         batches =
-          batchesData?.map((batch) => ({
+          batchesData?.map(batch => ({
             ...batch,
             products: {
-              product_name:
-                (batch.products as unknown as ProductData)?.name ||
-                'Unknown Product',
-              brand_name:
-                (batch.products as unknown as ProductData)?.brand ||
-                'Unknown Brand',
-              barcode:
-                (batch.products as unknown as ProductData)?.barcode || '',
+              product_name: (batch.products as unknown as ProductData)?.name || 'Unknown Product',
+              brand_name: (batch.products as unknown as ProductData)?.brand || 'Unknown Brand',
+              barcode: (batch.products as unknown as ProductData)?.barcode || '',
             },
           })) || []
       } else {
@@ -237,11 +206,9 @@ export default function ScanOutInterface({
           timestamp: new Date(),
         }
 
-        setPendingItems((prev) => {
+        setPendingItems(prev => {
           // Check if this batch is already in the list
-          const existingIndex = prev.findIndex(
-            (item) => item.batchId === batch.batch_id
-          )
+          const existingIndex = prev.findIndex(item => item.batchId === batch.batch_id)
           if (existingIndex >= 0) {
             // Increment quantity if already exists
             const updated = [...prev]
@@ -249,7 +216,7 @@ export default function ScanOutInterface({
               ...updated[existingIndex],
               quantity: Math.min(
                 updated[existingIndex].quantity + 1,
-                updated[existingIndex].maxQuantity
+                updated[existingIndex].maxQuantity,
               ),
             }
             return updated
@@ -265,26 +232,26 @@ export default function ScanOutInterface({
         setSelectedBatch(null)
       }
     },
-    [currentProduct]
+    [currentProduct],
   )
 
   // Update item quantity in the pending list
   const updateItemQuantity = (batchId: string, newQuantity: number) => {
-    setPendingItems((prev) =>
-      prev.map((item) =>
+    setPendingItems(prev =>
+      prev.map(item =>
         item.batchId === batchId
           ? {
               ...item,
               quantity: Math.max(1, Math.min(newQuantity, item.maxQuantity)),
             }
-          : item
-      )
+          : item,
+      ),
     )
   }
 
   // Remove item from pending list
   const removeItemFromList = (batchId: string) => {
-    setPendingItems((prev) => prev.filter((item) => item.batchId !== batchId))
+    setPendingItems(prev => prev.filter(item => item.batchId !== batchId))
   }
 
   // Submit all pending items
@@ -311,10 +278,7 @@ export default function ScanOutInterface({
       setOcrError(null)
 
       const videoElement = document.querySelector('video') as HTMLVideoElement
-      if (
-        !videoElement ||
-        videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA
-      ) {
+      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
         throw new Error('Camera not ready')
       }
 
@@ -324,33 +288,25 @@ export default function ScanOutInterface({
         maxProcessingTimeMs: 5000,
       })
 
-      if (
-        result.success &&
-        result.expiryDateInfo?.extractedDate &&
-        availableBatches.length > 0
-      ) {
+      if (result.success && result.expiryDateInfo?.extractedDate && availableBatches.length > 0) {
         // Try to match the captured date to an available batch
         const matchedBatch = matchBatchByExpiry(
           availableBatches,
-          result.expiryDateInfo.extractedDate
+          result.expiryDateInfo.extractedDate,
         )
 
         if (matchedBatch) {
           handleBatchSelected(matchedBatch)
         } else {
           // No matching batch found
-          setOcrError(
-            `No batch found with expiry date: ${result.expiryDateInfo.extractedDate}`
-          )
+          setOcrError(`No batch found with expiry date: ${result.expiryDateInfo.extractedDate}`)
         }
       } else {
         setOcrError(result.error?.message || 'OCR processing failed')
       }
     } catch (error) {
       console.error('OCR capture failed:', error)
-      setOcrError(
-        error instanceof Error ? error.message : 'OCR processing failed'
-      )
+      setOcrError(error instanceof Error ? error.message : 'OCR processing failed')
     }
   }
 
@@ -359,16 +315,11 @@ export default function ScanOutInterface({
   }
 
   const handleConfirmSubmission = () => {
-    console.log(
-      'Submitting scan-out for',
-      pendingItems.length,
-      'items:',
-      pendingItems
-    )
+    console.log('Submitting scan-out for', pendingItems.length, 'items:', pendingItems)
 
     // Submit the checkout/removal to inventory
     submitCheckout(
-      pendingItems.map((item) => ({
+      pendingItems.map(item => ({
         batchId: item.batchId,
         quantityRemoved: item.quantity,
         reason: 'scan-out',
@@ -376,7 +327,7 @@ export default function ScanOutInterface({
         notes: `Batch removal: ${item.productName} x${item.quantity}`,
       })),
       {
-        onSuccess: (result) => {
+        onSuccess: result => {
           console.log('Checkout submission completed:', result)
 
           // Store the result for the success dialog
@@ -386,7 +337,7 @@ export default function ScanOutInterface({
           })
 
           // Notify parent with all items
-          pendingItems.forEach((item) => {
+          pendingItems.forEach(item => {
             onItemRemoved?.(item)
           })
 
@@ -397,11 +348,11 @@ export default function ScanOutInterface({
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: (error) => {
+        onError: error => {
           console.error('Checkout submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
-      }
+      },
     )
   }
 
@@ -409,10 +360,7 @@ export default function ScanOutInterface({
 
   // Calculate totals for pending items
   const totalItems = pendingItems.reduce((sum, item) => sum + item.quantity, 0)
-  const totalValue = pendingItems.reduce(
-    (sum, item) => sum + item.quantity * item.price,
-    0
-  )
+  const totalValue = pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0)
 
   return (
     <div className="space-y-4">
@@ -422,7 +370,7 @@ export default function ScanOutInterface({
           <ScanningCamera
             mode="barcode"
             onBarcodeScanned={handleCustomBarcodeScanned}
-            onScanError={(error) => console.error('Barcode scan error:', error)}
+            onScanError={error => console.error('Barcode scan error:', error)}
             showManualEntry={showManualEntry}
             onToggleManualEntry={() => setShowManualEntry(!showManualEntry)}
             onManualProductSelected={(barcode: string) => {
@@ -477,13 +425,11 @@ export default function ScanOutInterface({
           <CardHeader className="pb-3">
             <CardTitle className="flex justify-between items-center">
               <span>Items to Remove ({totalItems})</span>
-              <span className="text-sm font-normal">
-                Total: {formatPrice(totalValue)}
-              </span>
+              <span className="text-sm font-normal">Total: {formatPrice(totalValue)}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {pendingItems.map((item) => (
+            {pendingItems.map(item => (
               <div
                 key={item.batchId}
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
@@ -491,8 +437,7 @@ export default function ScanOutInterface({
                 <div className="flex-1">
                   <div className="font-medium">{item.productName}</div>
                   <div className="text-sm text-gray-500">
-                    {item.brand} • Expires:{' '}
-                    {new Date(item.expiryDate).toLocaleDateString()}
+                    {item.brand} • Expires: {new Date(item.expiryDate).toLocaleDateString()}
                   </div>
                   <div className="text-sm text-gray-600">
                     {formatPrice(item.price)} × {item.quantity} ={' '}
@@ -503,9 +448,7 @@ export default function ScanOutInterface({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() =>
-                      updateItemQuantity(item.batchId, item.quantity - 1)
-                    }
+                    onClick={() => updateItemQuantity(item.batchId, item.quantity - 1)}
                     disabled={item.quantity <= 1}
                   >
                     <Minus className="h-3 w-3" />
@@ -513,11 +456,8 @@ export default function ScanOutInterface({
                   <input
                     type="number"
                     value={item.quantity}
-                    onChange={(e) =>
-                      updateItemQuantity(
-                        item.batchId,
-                        parseInt(e.target.value, 10) || 1
-                      )
+                    onChange={e =>
+                      updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
                     }
                     className="w-12 text-center border rounded px-1 py-1 text-sm"
                     min="1"
@@ -526,9 +466,7 @@ export default function ScanOutInterface({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() =>
-                      updateItemQuantity(item.batchId, item.quantity + 1)
-                    }
+                    onClick={() => updateItemQuantity(item.batchId, item.quantity + 1)}
                     disabled={item.quantity >= item.maxQuantity}
                   >
                     <Plus className="h-3 w-3" />
@@ -546,11 +484,7 @@ export default function ScanOutInterface({
             ))}
 
             <div className="flex gap-2 pt-3">
-              <Button
-                variant="outline"
-                onClick={() => setPendingItems([])}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => setPendingItems([])} className="flex-1">
                 Clear All
               </Button>
               <Button
@@ -565,10 +499,7 @@ export default function ScanOutInterface({
       )}
 
       {showSubmissionDialog && (
-        <Dialog
-          open={showSubmissionDialog}
-          onOpenChange={setShowSubmissionDialog}
-        >
+        <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Confirm Checkout</DialogTitle>
@@ -585,7 +516,7 @@ export default function ScanOutInterface({
 
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
-                {pendingItems.map((item) => {
+                {pendingItems.map(item => {
                   const itemTotal = item.quantity * item.price
                   return (
                     <div
@@ -594,23 +525,16 @@ export default function ScanOutInterface({
                     >
                       <div className="flex-1">
                         <div className="font-medium">{item.productName}</div>
-                        {item.brand && (
-                          <div className="text-xs text-gray-600">
-                            {item.brand}
-                          </div>
-                        )}
+                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
-                          Expires:{' '}
-                          {new Date(item.expiryDate).toLocaleDateString()}
+                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="font-medium text-red-600">
                           -{item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-red-500">
-                          Remove: {formatPrice(itemTotal)}
-                        </div>
+                        <div className="text-xs text-red-500">Remove: {formatPrice(itemTotal)}</div>
                       </div>
                     </div>
                   )
@@ -622,8 +546,7 @@ export default function ScanOutInterface({
                 <div className="flex justify-between items-center font-medium">
                   <span>Total Items Removed:</span>
                   <span className="text-red-600">
-                    -
-                    {pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
+                    -{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
@@ -631,10 +554,7 @@ export default function ScanOutInterface({
                   <span className="text-red-600">
                     -
                     {formatPrice(
-                      pendingItems.reduce(
-                        (sum, item) => sum + item.quantity * item.price,
-                        0
-                      )
+                      pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
                     )}
                   </span>
                 </div>
@@ -663,10 +583,7 @@ export default function ScanOutInterface({
       )}
 
       {showSuccessDialog && submissionResult && (
-        <Dialog
-          open={showSuccessDialog}
-          onOpenChange={setShowSuccessDialog}
-        >
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -710,10 +627,7 @@ export default function ScanOutInterface({
       )}
 
       {!availableBatches.length && currentProduct && (
-        <Alert
-          variant="destructive"
-          className="mt-4"
-        >
+        <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             No inventory available for this product in the current store.
