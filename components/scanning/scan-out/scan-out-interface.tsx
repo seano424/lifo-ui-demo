@@ -614,7 +614,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 onClick={() => {
                   setShowSuccessDialog(false)
                   // Navigate to dashboard
-                  window.location.href = '/dashboard'
+                  window.location.href = '/dashboard/inventory/batches'
                 }}
                 className="w-full"
               >

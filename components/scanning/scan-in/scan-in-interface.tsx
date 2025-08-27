@@ -249,7 +249,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                 onClick={() => {
                   setShowSuccessDialog(false)
                   // Navigate to dashboard
-                  window.location.href = '/dashboard'
+                  window.location.href = '/dashboard/inventory/batches'
                 }}
                 className="w-full"
               >

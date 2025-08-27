@@ -672,7 +672,7 @@ export default function ScanningInterface({
                 onClick={() => {
                   setShowSuccessDialog(false)
                   // Navigate to dashboard - you might need to add navigation logic here
-                  window.location.href = '/dashboard'
+                  window.location.href = '/dashboard/inventory/batches'
                 }}
                 className="w-full"
               >
