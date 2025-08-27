@@ -434,7 +434,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               isBackendHealthy={isBackendHealthy}
               title="Capture Expiry Date"
               subtitle="Point camera at expiry date"
-              autoStart={false}
+              autoStart={true}
               className="w-full"
             />
 

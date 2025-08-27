@@ -63,6 +63,9 @@ export default function ScanningCamera({
   const cameraTitle = title || (mode === 'barcode' ? 'Scan Product' : 'Scan Expiry Date')
   const cameraSubtitle =
     subtitle || (mode === 'barcode' ? 'Point camera at barcode' : 'Point camera at expiry date')
+  const permissionMessage = mode === 'barcode' 
+    ? 'Camera access is required for barcode scanning.'
+    : 'Camera access is required for capturing expiry dates.'
 
   return (
     <div className={cn(className, 'space-y-4')}>
@@ -75,6 +78,7 @@ export default function ScanningCamera({
           title={cameraTitle}
           subtitle={cameraSubtitle}
           isBarcodeScanner={mode === 'barcode'}
+          permissionMessage={permissionMessage}
         />
       </div>
 

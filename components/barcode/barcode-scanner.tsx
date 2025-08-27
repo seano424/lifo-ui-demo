@@ -23,6 +23,7 @@ interface BarcodeScannerProps {
   title?: string
   subtitle?: string
   isBarcodeScanner?: boolean
+  permissionMessage?: string
 }
 
 export default function BarcodeScanner({
@@ -33,6 +34,7 @@ export default function BarcodeScanner({
   title = 'Scan Product',
   subtitle = 'Scan a barcode to add a product to your inventory',
   isBarcodeScanner = false,
+  permissionMessage = 'Camera access is required for scanning.',
 }: BarcodeScannerProps): React.JSX.Element {
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -322,9 +324,7 @@ export default function BarcodeScanner({
               <div className="text-center space-y-4">
                 <Alert className="border-none bg-transparent shadow-none">
                   <Camera className="h-4 w-4" />
-                  <AlertDescription>
-                    Camera access is required for barcode scanning.
-                  </AlertDescription>
+                  <AlertDescription>{permissionMessage}</AlertDescription>
                 </Alert>
                 <Button
                   onClick={handleUserStart}
