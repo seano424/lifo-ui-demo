@@ -215,7 +215,7 @@ export default function ManualBarcodeEntry({
           <div className="flex justify-between">
             <CardTitle className="flex items-center gap-2">
               <Package className="w-5 h-5" />
-              Manual Product Entry
+              {mode === 'outbound' ? 'Manual Product Search' : 'Manual Product Entry'}
             </CardTitle>
           </div>
         </CardHeader>
@@ -601,7 +601,7 @@ export default function ManualBarcodeEntry({
                 </div>
               )}
 
-              {!lookupResult?.found && (
+              {!lookupResult?.found && mode === 'inbound' && (
                 <div className="border-dashed border-2 p-4 rounded-xl">
                   <div className="pb-3">
                     <div className="text-sm flex items-center gap-2">
