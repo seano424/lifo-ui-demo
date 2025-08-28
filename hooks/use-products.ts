@@ -308,10 +308,10 @@ export function useProductActions() {
   )
 
   const updateProductCategory = useCallback(
-    (productId: string, category: string) =>
+    (productId: string, category_id: string) =>
       updateMutation.mutate({
         productId,
-        updates: { category }, // Global category
+        updates: { category_id }, // Global category_id
       }),
     [updateMutation],
   )

@@ -56,6 +56,7 @@ export type Product = BaseProduct & {
   store_sku?: string | null
   supplier_code?: string | null
   // Category information from standardized categories table
+  category_code?: string
   category_display_name?: string
   category_display_name_fr?: string
 }
@@ -80,7 +81,7 @@ export type ProductSort = {
 // Type for a product filter (enhanced with store and sorting)
 export type ProductFilters = {
   storeId?: string // ✅ STORE FILTER ADDED
-  category?: Database['inventory']['Tables']['products']['Row']['category_id']
+  category?: string // category_code from categories table
   brand?: string
   expiringOnly?: boolean
   sort?: ProductSort
@@ -135,7 +136,7 @@ export async function fetchProducts(
           product_id,
           name,
           brand,
-          category,
+          category_id,
           barcode,
           typical_shelf_life_days,
           base_cost_price,
@@ -148,7 +149,14 @@ export async function fetchProducts(
           updated_at,
           created_by,
           last_verified,
-          open_food_facts_data
+          open_food_facts_data,
+          categories:category_id (
+            category_id,
+            category_code,
+            display_name_en,
+            display_name_fr,
+            typical_shelf_life_days
+          )
         )
       `,
       )
@@ -219,9 +227,17 @@ export async function fetchProducts(
         active_batches_count: 0
       }
 
+      // Extract category information from the nested categories table
+      const categoryData = storeProduct.products?.categories || null
+
       return {
         ...storeProduct.products, // Global product data
-        store_cost_price: storeProduct.cost_price, // Store-specific pricing
+        // Add category information from the standardized categories table
+        category_code: categoryData?.category_code,
+        category_display_name: categoryData?.display_name_en,
+        category_display_name_fr: categoryData?.display_name_fr,
+        // Store-specific pricing and settings
+        store_cost_price: storeProduct.cost_price,
         store_selling_price: storeProduct.selling_price,
         store_is_active: storeProduct.is_active,
         store_sku: storeProduct.store_sku,
@@ -276,7 +292,6 @@ export async function fetchProductsPage(
           product_id,
           name,
           brand,
-          category,
           category_id,
           barcode,
           typical_shelf_life_days,
@@ -343,7 +358,8 @@ export async function fetchProductsPage(
       // For product name, we need to use embedded ordering
       query = query.order('products(name)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'category') {
-      query = query.order('products(category)', { ascending: filters.sort.direction === 'asc' })
+      // Sort by category display name from joined categories table
+      query = query.order('products(categories(display_name_en))', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'brand') {
       query = query.order('products(brand)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'base_selling_price') {
@@ -496,6 +512,7 @@ export async function fetchProductsPage(
         ...productData, // Global product data (may be empty object)
         product_id: storeProduct.product_id, // Ensure product_id is always present
         // Add category information from the standardized categories table
+        category_code: categoryData?.category_code,
         category_display_name: categoryData?.display_name_en,
         category_display_name_fr: categoryData?.display_name_fr,
         category_id: categoryData?.category_id || (productData as any)?.category_id,
@@ -582,7 +599,7 @@ export interface CreateProductData {
   // Global product data
   name: string
   brand?: string
-  category: string
+  category_id?: string // References categories table
   barcode?: string
   typical_shelf_life_days: number
   base_cost_price: number
@@ -614,7 +631,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
     const globalProductData = {
       name: productData.name,
       brand: productData.brand,
-      category: productData.category,
+      category_id: productData.category_id,
       barcode: productData.barcode,
       typical_shelf_life_days: productData.typical_shelf_life_days,
       base_cost_price: productData.base_cost_price,
@@ -696,7 +713,7 @@ export interface UpdateProductData {
   // Global product updates
   name?: string
   brand?: string
-  category?: string
+  category_id?: string
   description?: string
   image_url?: string
   typical_shelf_life_days?: number
@@ -727,7 +744,7 @@ export async function updateProduct(
     // Global product updates
     if (updates.name !== undefined) globalUpdates.name = updates.name
     if (updates.brand !== undefined) globalUpdates.brand = updates.brand
-    if (updates.category !== undefined) globalUpdates.category = updates.category
+    if (updates.category_id !== undefined) globalUpdates.category_id = updates.category_id
     if (updates.description !== undefined) globalUpdates.description = updates.description
     if (updates.image_url !== undefined) globalUpdates.image_url = updates.image_url
     if (updates.typical_shelf_life_days !== undefined)
@@ -841,35 +858,36 @@ export async function deleteProduct(productId: string, storeId: string): Promise
   }
 }
 
-// Fetch available categories for filter dropdown
+// Fetch available categories for filter dropdown using database function
 export async function fetchCategories(serverClient?: ServerClient): Promise<{
   category_id: string
   category_code: string
   display_name_en: string
   display_name_fr: string
+  product_count?: number
 }[]> {
   const supabase = serverClient || createClient()
   
   try {
-    console.log('[fetchCategories] Fetching standardized categories')
+    console.log('[fetchCategories] Fetching standardized categories with product counts')
     
     const { data: categories, error } = await supabase
       .schema('inventory')
-      .from('categories')
-      .select(`
-        category_id,
-        category_code,
-        display_name_en,
-        display_name_fr
-      `)
-      .order('display_name_en', { ascending: true })
+      .rpc('get_categories_for_dropdown')
     
     if (error) {
       console.error('[fetchCategories] Error fetching categories:', error)
       throw new Error(`Failed to fetch categories: ${error.message}`)
     }
     
-    console.log('[fetchCategories] Success:', { count: categories?.length || 0 })
+    console.log('[fetchCategories] Success:', { 
+      count: categories?.length || 0,
+      sampleCategories: categories?.slice(0, 3).map((c: any) => ({ 
+        code: c.category_code, 
+        name: c.display_name_en,
+        products: c.product_count
+      }))
+    })
     return categories || []
   } catch (err) {
     console.error('[fetchCategories] Unexpected error:', err)
@@ -898,7 +916,7 @@ export async function fetchProductById(
           product_id,
           name,
           brand,
-          category,
+          category_id,
           barcode,
           typical_shelf_life_days,
           base_cost_price,
@@ -911,7 +929,14 @@ export async function fetchProductById(
           updated_at,
           created_by,
           last_verified,
-          open_food_facts_data
+          open_food_facts_data,
+          categories:category_id (
+            category_id,
+            category_code,
+            display_name_en,
+            display_name_fr,
+            typical_shelf_life_days
+          )
         )
       `,
       )
@@ -963,9 +988,17 @@ export async function fetchProductById(
       })
     }
 
+    // Extract category information from the nested categories table
+    const categoryData = data.products?.categories || null
+
     // Transform the data with store-specific stock calculations
     const combinedProduct = {
       ...data.products,
+      // Add category information from the standardized categories table
+      category_code: categoryData?.category_code,
+      category_display_name: categoryData?.display_name_en,
+      category_display_name_fr: categoryData?.display_name_fr,
+      // Store-specific data
       store_cost_price: data.cost_price,
       store_selling_price: data.selling_price,
       store_is_active: data.is_active,

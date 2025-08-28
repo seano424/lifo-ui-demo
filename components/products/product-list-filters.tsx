@@ -14,6 +14,7 @@ interface Category {
   category_code: string
   display_name_en: string
   display_name_fr: string
+  product_count?: number
 }
 
 interface ProductListFiltersProps {
