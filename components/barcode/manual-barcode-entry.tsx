@@ -158,6 +158,7 @@ export default function ManualBarcodeEntry({
       // Clear previous timeout
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current)
+        debounceTimeoutRef.current = null
       }
 
       // If query is too short, hide results immediately
@@ -169,6 +170,7 @@ export default function ManualBarcodeEntry({
       // Set new timeout for debounced search
       debounceTimeoutRef.current = setTimeout(() => {
         debouncedProductNameSearch(query)
+        debounceTimeoutRef.current = null
       }, 300) // 300ms debounce delay
     },
     [debouncedProductNameSearch],
