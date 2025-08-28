@@ -5,12 +5,16 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ProductListFilters } from '@/components/products/product-list-filters'
 import { ProductListSortControls } from '@/components/products/product-list-sort-controls'
-import { ProductTable } from '@/components/products/products-table'
+import { ProductsTable } from '@/components/products/products-table'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useProducts } from '@/hooks/use-products'
-import type { ProductFilters, ProductSort, SortField } from '@/lib/queries/products'
+import type {
+  ProductFilters,
+  ProductSort,
+  SortField,
+} from '@/lib/queries/products'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface ProductsFilteredListProps {
@@ -23,7 +27,10 @@ interface ProductsFilteredListProps {
   pageSize?: number
 }
 
-export function ProductsFilteredList({ initialFilters, pageSize = 20 }: ProductsFilteredListProps) {
+export function ProductsFilteredList({
+  initialFilters,
+  pageSize = 20,
+}: ProductsFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
@@ -49,13 +56,18 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
     return baseFilters
   })
 
-  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useProducts(
-    filters,
-    pageSize,
-  )
+  const {
+    data,
+    count,
+    isLoading,
+    error,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useProducts(filters, pageSize)
 
   useEffect(() => {
-    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
+    setFilters((prev) => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
   const updateFilters = (newFilters: Partial<ProductFilters>) => {
@@ -95,7 +107,9 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>Failed to load products: {error.message}</AlertDescription>
+        <AlertDescription>
+          Failed to load products: {error.message}
+        </AlertDescription>
       </Alert>
     )
   }
@@ -115,11 +129,19 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
                 isLoading={isLoading}
               />
               <ProductListSortControls
-                currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-                updateSort={field => {
-                  const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+                currentSort={
+                  filters.sort || { field: 'created_at', direction: 'desc' }
+                }
+                updateSort={(field) => {
+                  const currentSort = filters.sort || {
+                    field: 'created_at',
+                    direction: 'desc',
+                  }
                   const newDirection =
-                    currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+                    currentSort.field === field &&
+                    currentSort.direction === 'asc'
+                      ? 'desc'
+                      : 'asc'
                   handleSortChange({ field, direction: newDirection })
                 }}
                 isLoading={isLoading}
@@ -128,14 +150,21 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
           </div>
         </div>
 
-        <ProductTable
+        <ProductsTable
           data={data}
           isLoading={isLoading}
-          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          updateSort={field => {
-            const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+          currentSort={
+            filters.sort || { field: 'created_at', direction: 'desc' }
+          }
+          updateSort={(field) => {
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
             const newDirection =
-              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+              currentSort.field === field && currentSort.direction === 'asc'
+                ? 'desc'
+                : 'asc'
             handleSortChange({ field, direction: newDirection })
           }}
         />
@@ -143,7 +172,12 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
 
       {hasMore && (
         <div className="flex justify-center pt-6">
-          <Button variant="outline" onClick={fetchNextPage} disabled={isFetchingNextPage} size="lg">
+          <Button
+            variant="outline"
+            onClick={fetchNextPage}
+            disabled={isFetchingNextPage}
+            size="lg"
+          >
             {isFetchingNextPage ? (
               <>
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
