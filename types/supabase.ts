@@ -730,6 +730,53 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          category_code: string
+          category_id: string
+          created_at: string | null
+          display_name_en: string
+          display_name_fr: string | null
+          is_active: boolean | null
+          parent_category_id: string | null
+          sort_order: number | null
+          typical_shelf_life_days: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_code: string
+          category_id?: string
+          created_at?: string | null
+          display_name_en: string
+          display_name_fr?: string | null
+          is_active?: boolean | null
+          parent_category_id?: string | null
+          sort_order?: number | null
+          typical_shelf_life_days?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_code?: string
+          category_id?: string
+          created_at?: string | null
+          display_name_en?: string
+          display_name_fr?: string | null
+          is_active?: boolean | null
+          parent_category_id?: string | null
+          sort_order?: number | null
+          typical_shelf_life_days?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_category_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["category_id"]
+          },
+        ]
+      }
       donation_recipients: {
         Row: {
           accepts_pickups: boolean | null
@@ -872,6 +919,7 @@ export type Database = {
           base_selling_price: number
           brand: string | null
           category: string
+          category_id: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
@@ -898,6 +946,7 @@ export type Database = {
           base_selling_price: number
           brand?: string | null
           category: string
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -924,6 +973,7 @@ export type Database = {
           base_selling_price?: number
           brand?: string | null
           category?: string
+          category_id?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -941,7 +991,15 @@ export type Database = {
           updated_at?: string | null
           verification_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["category_id"]
+          },
+        ]
       }
       store_products: {
         Row: {
@@ -1010,6 +1068,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products_needing_barcodes"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_categories"
             referencedColumns: ["product_id"]
           },
         ]
@@ -1147,6 +1212,21 @@ export type Database = {
           supplier?: string | null
           turnover_days?: never
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      categories_hierarchy: {
+        Row: {
+          category_code: string | null
+          category_id: string | null
+          display_name_en: string | null
+          display_name_fr: string | null
+          level: number | null
+          parent_category_id: string | null
+          path: string[] | null
+          root_category: string | null
+          sort_order: number | null
+          typical_shelf_life_days: number | null
         }
         Relationships: []
       }
@@ -1375,6 +1455,13 @@ export type Database = {
             referencedRelation: "products_needing_barcodes"
             referencedColumns: ["product_id"]
           },
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_categories"
+            referencedColumns: ["product_id"]
+          },
         ]
       }
       products_needing_barcodes: {
@@ -1388,6 +1475,49 @@ export type Database = {
           store_count: number | null
         }
         Relationships: []
+      }
+      products_with_categories: {
+        Row: {
+          active_batches_count: number | null
+          avg_days_to_expiry: number | null
+          barcode: string | null
+          barcode_type: string | null
+          base_cost_price: number | null
+          base_selling_price: number | null
+          brand: string | null
+          category: string | null
+          category_code: string | null
+          category_display_name_en: string | null
+          category_display_name_fr: string | null
+          category_id: string | null
+          category_shelf_life: number | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          effective_shelf_life: number | null
+          image_url: string | null
+          is_verified: boolean | null
+          last_scanned_at: string | null
+          last_verified: string | null
+          name: string | null
+          open_food_facts_data: Json | null
+          product_id: string | null
+          sku: string | null
+          total_stock: number | null
+          typical_shelf_life_days: number | null
+          unit_type: string | null
+          updated_at: string | null
+          verification_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["category_id"]
+          },
+        ]
       }
       recommendation_analytics: {
         Row: {
@@ -1535,6 +1665,16 @@ export type Database = {
           verified_at: string
         }[]
       }
+      get_category_info: {
+        Args: { category_text?: string; category_uuid?: string }
+        Returns: {
+          category_code: string
+          category_id: string
+          display_name_en: string
+          display_name_fr: string
+          typical_shelf_life_days: number
+        }[]
+      }
       get_donation_recipients: {
         Args: { p_store_id: string }
         Returns: {
@@ -1585,9 +1725,17 @@ export type Database = {
         Args: { batch_uuid: string }
         Returns: boolean
       }
+      map_legacy_category: {
+        Args: { legacy_category: string }
+        Returns: string
+      }
       record_batch_actions: {
         Args: { p_actions: Json; p_batch_id: string }
         Returns: Json
+      }
+      resolve_category_from_off_data: {
+        Args: { off_categories: string[] }
+        Returns: string
       }
       trigger_manual_expiry_cleanup: {
         Args: Record<PropertyKey, never>
@@ -1712,6 +1860,16 @@ export type Database = {
         }[]
       }
       bulk_insert_csv_batches_with_store_link: {
+        Args: { p_created_by: string; p_data: Json; p_store_id: string }
+        Returns: {
+          batch_ids: string[]
+          inserted_count: number
+          processing_time_ms: number
+          products_created: number
+          store_products_linked: number
+        }[]
+      }
+      bulk_insert_csv_batches_with_store_link_v2: {
         Args: { p_created_by: string; p_data: Json; p_store_id: string }
         Returns: {
           batch_ids: string[]
