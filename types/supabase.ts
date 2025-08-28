@@ -1,10 +1,16 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '12.2.3 (519615d)'
+    PostgrestVersion: "12.2.3 (519615d)"
   }
   analytics: {
     Tables: {
@@ -144,11 +150,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_settings_store_id_fkey'
-            columns: ['store_id']
+            foreignKeyName: "store_settings_store_id_fkey"
+            columns: ["store_id"]
             isOneToOne: true
-            referencedRelation: 'stores'
-            referencedColumns: ['store_id']
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -191,11 +197,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_users_store_id_fkey'
-            columns: ['store_id']
+            foreignKeyName: "store_users_store_id_fkey"
+            columns: ["store_id"]
             isOneToOne: false
-            referencedRelation: 'stores'
-            referencedColumns: ['store_id']
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -222,7 +228,7 @@ export type Database = {
           store_code: string
           store_id: string
           store_name: string
-          store_type: Database['business']['Enums']['store_type_enum'] | null
+          store_type: Database["business"]["Enums"]["store_type_enum"] | null
           timezone: string | null
           updated_at: string | null
           waste_reduction_target_percent: number | null
@@ -250,7 +256,7 @@ export type Database = {
           store_code: string
           store_id?: string
           store_name: string
-          store_type?: Database['business']['Enums']['store_type_enum'] | null
+          store_type?: Database["business"]["Enums"]["store_type_enum"] | null
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
@@ -278,7 +284,7 @@ export type Database = {
           store_code?: string
           store_id?: string
           store_name?: string
-          store_type?: Database['business']['Enums']['store_type_enum'] | null
+          store_type?: Database["business"]["Enums"]["store_type_enum"] | null
           timezone?: string | null
           updated_at?: string | null
           waste_reduction_target_percent?: number | null
@@ -290,7 +296,9 @@ export type Database = {
     Views: {
       store_type_reference: {
         Row: {
-          store_type_value: Database['business']['Enums']['store_type_enum'] | null
+          store_type_value:
+            | Database["business"]["Enums"]["store_type_enum"]
+            | null
         }
         Relationships: []
       }
@@ -298,16 +306,16 @@ export type Database = {
     Functions: {
       create_store_for_user: {
         Args: {
-          p_store_name: string
-          p_store_code: string
-          p_store_type?: string
           p_address?: string
-          p_city?: string
-          p_postal_code?: string
-          p_country?: string
           p_business_name?: string
+          p_city?: string
+          p_country?: string
           p_phone?: string
+          p_postal_code?: string
           p_size_category?: string
+          p_store_code: string
+          p_store_name: string
+          p_store_type?: string
           p_timezone?: string
         }
         Returns: {
@@ -332,7 +340,7 @@ export type Database = {
           store_code: string
           store_id: string
           store_name: string
-          store_type: Database['business']['Enums']['store_type_enum'] | null
+          store_type: Database["business"]["Enums"]["store_type_enum"] | null
           timezone: string | null
           updated_at: string | null
           waste_reduction_target_percent: number | null
@@ -341,7 +349,7 @@ export type Database = {
       }
       get_store_types: {
         Args: Record<PropertyKey, never>
-        Returns: Database['business']['Enums']['store_type_enum'][]
+        Returns: Database["business"]["Enums"]["store_type_enum"][]
       }
       user_can_manage_store_users: {
         Args: { target_store_id: string; target_user_id?: string }
@@ -354,12 +362,12 @@ export type Database = {
     }
     Enums: {
       store_type_enum:
-        | 'supermarket'
-        | 'convenience'
-        | 'restaurant'
-        | 'bakery'
-        | 'butcher'
-        | 'organic'
+        | "supermarket"
+        | "convenience"
+        | "restaurant"
+        | "bakery"
+        | "butcher"
+        | "organic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -369,7 +377,7 @@ export type Database = {
     Tables: {
       batch_action_entries: {
         Row: {
-          action_type: Database['public']['Enums']['action_type']
+          action_type: Database["public"]["Enums"]["action_type"]
           batch_id: string
           batch_initial_quantity: number
           discount_percentage: number | null
@@ -386,7 +394,7 @@ export type Database = {
           verified_by: string | null
         }
         Insert: {
-          action_type: Database['public']['Enums']['action_type']
+          action_type: Database["public"]["Enums"]["action_type"]
           batch_id: string
           batch_initial_quantity: number
           discount_percentage?: number | null
@@ -403,7 +411,7 @@ export type Database = {
           verified_by?: string | null
         }
         Update: {
-          action_type?: Database['public']['Enums']['action_type']
+          action_type?: Database["public"]["Enums"]["action_type"]
           batch_id?: string
           batch_initial_quantity?: number
           discount_percentage?: number | null
@@ -421,60 +429,60 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_action_summary'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_action_summary"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_expiry_status'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_expiry_status"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_status'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_status"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "expiring_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['batch_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'my_store_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "my_store_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_action_entries_donation_recipient_id_fkey'
-            columns: ['donation_recipient_id']
+            foreignKeyName: "batch_action_entries_donation_recipient_id_fkey"
+            columns: ["donation_recipient_id"]
             isOneToOne: false
-            referencedRelation: 'donation_recipients'
-            referencedColumns: ['recipient_id']
+            referencedRelation: "donation_recipients"
+            referencedColumns: ["recipient_id"]
           },
         ]
       }
@@ -482,7 +490,7 @@ export type Database = {
         Row: {
           action_date: string | null
           action_id: string
-          actual_action: Database['public']['Enums']['action_type']
+          actual_action: Database["public"]["Enums"]["action_type"]
           ai_score: number | null
           batch_id: string
           created_at: string | null
@@ -491,14 +499,14 @@ export type Database = {
           original_value: number | null
           performed_by: string | null
           quantity_affected: number | null
-          recommended_action: Database['public']['Enums']['action_type']
+          recommended_action: Database["public"]["Enums"]["action_type"]
           recovered_value: number | null
           store_id: string
         }
         Insert: {
           action_date?: string | null
           action_id?: string
-          actual_action: Database['public']['Enums']['action_type']
+          actual_action: Database["public"]["Enums"]["action_type"]
           ai_score?: number | null
           batch_id: string
           created_at?: string | null
@@ -507,14 +515,14 @@ export type Database = {
           original_value?: number | null
           performed_by?: string | null
           quantity_affected?: number | null
-          recommended_action: Database['public']['Enums']['action_type']
+          recommended_action: Database["public"]["Enums"]["action_type"]
           recovered_value?: number | null
           store_id: string
         }
         Update: {
           action_date?: string | null
           action_id?: string
-          actual_action?: Database['public']['Enums']['action_type']
+          actual_action?: Database["public"]["Enums"]["action_type"]
           ai_score?: number | null
           batch_id?: string
           created_at?: string | null
@@ -523,66 +531,66 @@ export type Database = {
           original_value?: number | null
           performed_by?: string | null
           quantity_affected?: number | null
-          recommended_action?: Database['public']['Enums']['action_type']
+          recommended_action?: Database["public"]["Enums"]["action_type"]
           recovered_value?: number | null
           store_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_action_summary'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_action_summary"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_expiry_status'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_expiry_status"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_status'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_status"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "expiring_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['batch_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'my_store_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "my_store_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batch_actions_donation_recipient_id_fkey'
-            columns: ['donation_recipient_id']
+            foreignKeyName: "batch_actions_donation_recipient_id_fkey"
+            columns: ["donation_recipient_id"]
             isOneToOne: false
-            referencedRelation: 'donation_recipients'
-            referencedColumns: ['recipient_id']
+            referencedRelation: "donation_recipients"
+            referencedColumns: ["recipient_id"]
           },
         ]
       }
@@ -637,7 +645,7 @@ export type Database = {
           scanned_barcode: string | null
           selling_price: number
           status: string | null
-          store_id: string | null
+          store_id: string
           supplier: string | null
           updated_at: string | null
           verification_status: string | null
@@ -665,7 +673,7 @@ export type Database = {
           scanned_barcode?: string | null
           selling_price: number
           status?: string | null
-          store_id?: string | null
+          store_id: string
           supplier?: string | null
           updated_at?: string | null
           verification_status?: string | null
@@ -693,46 +701,32 @@ export type Database = {
           scanned_barcode?: string | null
           selling_price?: number
           status?: string | null
-          store_id?: string | null
+          store_id?: string
           supplier?: string | null
           updated_at?: string | null
           verification_status?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: 'batches_processing_batch_id_fkey'
-            columns: ['processing_batch_id']
+            foreignKeyName: "batches_processing_batch_id_fkey"
+            columns: ["processing_batch_id"]
             isOneToOne: false
-            referencedRelation: 'ocr_processing_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "ocr_processing_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "my_store_products"
+            referencedColumns: ["store_id", "product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products_needing_barcodes'
-            referencedColumns: ['product_id']
+            referencedRelation: "store_products"
+            referencedColumns: ["store_id", "product_id"]
           },
         ]
       }
@@ -749,7 +743,7 @@ export type Database = {
           max_distance_km: number | null
           name: string
           recipient_id: string
-          recipient_type: Database['public']['Enums']['donation_recipient_type']
+          recipient_type: Database["public"]["Enums"]["donation_recipient_type"]
           store_id: string
         }
         Insert: {
@@ -764,7 +758,7 @@ export type Database = {
           max_distance_km?: number | null
           name: string
           recipient_id?: string
-          recipient_type: Database['public']['Enums']['donation_recipient_type']
+          recipient_type: Database["public"]["Enums"]["donation_recipient_type"]
           store_id: string
         }
         Update: {
@@ -779,7 +773,7 @@ export type Database = {
           max_distance_km?: number | null
           name?: string
           recipient_id?: string
-          recipient_type?: Database['public']['Enums']['donation_recipient_type']
+          recipient_type?: Database["public"]["Enums"]["donation_recipient_type"]
           store_id?: string
         }
         Relationships: []
@@ -991,32 +985,32 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "low_stock_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products_needing_barcodes'
-            referencedColumns: ['product_id']
+            referencedRelation: "products_needing_barcodes"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -1154,43 +1148,16 @@ export type Database = {
           turnover_days?: never
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products_needing_barcodes'
-            referencedColumns: ['product_id']
-          },
-        ]
+        Relationships: []
       }
       donation_impact: {
         Row: {
           donation_count: number | null
           last_donation_date: string | null
           recipient_name: string | null
-          recipient_type: Database['public']['Enums']['donation_recipient_type'] | null
+          recipient_type:
+            | Database["public"]["Enums"]["donation_recipient_type"]
+            | null
           store_id: string | null
           total_quantity_donated: number | null
           total_tax_benefit: number | null
@@ -1338,39 +1305,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'batches_processing_batch_id_fkey'
-            columns: ['processing_batch_id']
+            foreignKeyName: "batches_processing_batch_id_fkey"
+            columns: ["processing_batch_id"]
             isOneToOne: false
-            referencedRelation: 'ocr_processing_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "ocr_processing_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "my_store_products"
+            referencedColumns: ["store_id", "product_id"]
           },
           {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
-          },
-          {
-            foreignKeyName: 'batches_product_id_fkey'
-            columns: ['product_id']
-            isOneToOne: false
-            referencedRelation: 'products_needing_barcodes'
-            referencedColumns: ['product_id']
+            referencedRelation: "store_products"
+            referencedColumns: ["store_id", "product_id"]
           },
         ]
       }
@@ -1395,32 +1348,32 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'low_stock_products'
-            referencedColumns: ['product_id']
+            referencedRelation: "low_stock_products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products'
-            referencedColumns: ['product_id']
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
           },
           {
-            foreignKeyName: 'store_products_product_id_fkey'
-            columns: ['product_id']
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: 'products_needing_barcodes'
-            referencedColumns: ['product_id']
+            referencedRelation: "products_needing_barcodes"
+            referencedColumns: ["product_id"]
           },
         ]
       }
@@ -1438,10 +1391,10 @@ export type Database = {
       }
       recommendation_analytics: {
         Row: {
-          actual_action: Database['public']['Enums']['action_type'] | null
+          actual_action: Database["public"]["Enums"]["action_type"] | null
           avg_ai_score: number | null
           recommendation_count: number | null
-          recommended_action: Database['public']['Enums']['action_type'] | null
+          recommended_action: Database["public"]["Enums"]["action_type"] | null
           recovery_percentage: number | null
           store_id: string | null
           total_original_value: number | null
@@ -1488,53 +1441,53 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_action_summary'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_action_summary"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_expiry_status'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_expiry_status"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batch_status'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batch_status"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "expiring_batches"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'expiring_products'
-            referencedColumns: ['batch_id']
+            referencedRelation: "expiring_products"
+            referencedColumns: ["batch_id"]
           },
           {
-            foreignKeyName: 'sales_events_batch_id_fkey'
-            columns: ['batch_id']
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: 'my_store_batches'
-            referencedColumns: ['batch_id']
+            referencedRelation: "my_store_batches"
+            referencedColumns: ["batch_id"]
           },
         ]
       }
@@ -1549,83 +1502,83 @@ export type Database = {
         Returns: undefined
       }
       get_action_statistics: {
-        Args: { p_store_id: string; p_start_date?: string; p_end_date?: string }
+        Args: { p_end_date?: string; p_start_date?: string; p_store_id: string }
         Returns: {
-          action_type: Database['public']['Enums']['action_type']
-          total_actions: number
-          total_quantity: number
-          total_original_value: number
-          total_recovered_value: number
+          action_type: Database["public"]["Enums"]["action_type"]
           avg_recovery_rate: number
           most_common_day_of_week: string
+          total_actions: number
+          total_original_value: number
+          total_quantity: number
+          total_recovered_value: number
         }[]
       }
       get_batch_action_breakdown: {
         Args: { p_batch_id: string }
         Returns: {
+          action_type: Database["public"]["Enums"]["action_type"]
           batch_id: string
           batch_number: string
-          product_name: string
-          initial_quantity: number
           current_quantity: number
-          action_type: Database['public']['Enums']['action_type']
-          quantity_affected: number
-          percentage_of_batch: number
-          original_value: number
-          recovered_value: number
           discount_percentage: number
-          donation_recipient_name: string
           disposal_reason: string
-          performed_by_name: string
-          performed_at: string
-          verified_at: string
+          donation_recipient_name: string
+          initial_quantity: number
           notes: string
+          original_value: number
+          percentage_of_batch: number
+          performed_at: string
+          performed_by_name: string
+          product_name: string
+          quantity_affected: number
+          recovered_value: number
+          verified_at: string
         }[]
       }
       get_donation_recipients: {
         Args: { p_store_id: string }
         Returns: {
-          recipient_id: string
-          name: string
-          recipient_type: Database['public']['Enums']['donation_recipient_type']
+          accepts_pickups: boolean
           contact_email: string
           contact_phone: string
           is_certified: boolean
-          accepts_pickups: boolean
           max_distance_km: number
+          name: string
+          recipient_id: string
+          recipient_type: Database["public"]["Enums"]["donation_recipient_type"]
         }[]
       }
       get_expiry_job_status: {
         Args: Record<PropertyKey, never>
         Returns: {
+          active: boolean
+          command: string
           jobid: number
           jobname: string
           schedule: string
-          active: boolean
-          command: string
         }[]
       }
       get_recent_actions: {
-        Args: { p_store_id: string; p_limit?: number }
+        Args: { p_limit?: number; p_store_id: string }
         Returns: {
-          entry_id: string
+          action_type: Database["public"]["Enums"]["action_type"]
           batch_number: string
-          product_name: string
-          action_type: Database['public']['Enums']['action_type']
-          quantity_affected: number
-          original_value: number
-          recovered_value: number
-          performed_by_email: string
-          performed_at: string
+          entry_id: string
           notes: string
+          original_value: number
+          performed_at: string
+          performed_by_email: string
+          product_name: string
+          quantity_affected: number
+          recovered_value: number
         }[]
       }
       get_user_stores: {
         Args: Record<PropertyKey, never>
         Returns: {
+          role_in_store: string
           store_id: string
           store_name: string
-          role_in_store: string
         }[]
       }
       manual_expire_batch: {
@@ -1633,7 +1586,7 @@ export type Database = {
         Returns: boolean
       }
       record_batch_actions: {
-        Args: { p_batch_id: string; p_actions: Json }
+        Args: { p_actions: Json; p_batch_id: string }
         Returns: Json
       }
       trigger_manual_expiry_cleanup: {
@@ -1649,11 +1602,11 @@ export type Database = {
         Returns: boolean
       }
       validate_batch_actions: {
-        Args: { p_batch_id: string; p_actions: Json }
+        Args: { p_actions: Json; p_batch_id: string }
         Returns: {
-          is_valid: boolean
-          error_message: string
           available_quantity: number
+          error_message: string
+          is_valid: boolean
           requested_quantity: number
         }[]
       }
@@ -1708,64 +1661,64 @@ export type Database = {
     Functions: {
       add_existing_user_to_store: {
         Args: {
+          input_role?: string
           input_store_id: string
           input_user_email: string
-          input_role?: string
         }
         Returns: {
+          message: string
           success: boolean
           user_id: string
-          message: string
         }[]
       }
       add_product_to_store_safely: {
         Args: {
-          p_store_id: string
-          p_product_id: string
           p_cost_price?: number
+          p_product_id: string
           p_selling_price?: number
+          p_store_id: string
           p_store_sku?: string
         }
         Returns: string
       }
       admin_add_test_user: {
         Args: {
-          input_store_id: string
           input_email: string
           input_full_name: string
           input_role?: string
+          input_store_id: string
         }
         Returns: {
+          message: string
           success: boolean
           user_id: string
-          message: string
         }[]
       }
       bulk_csv_import: {
-        Args: { p_store_id: string; p_user_id: string; p_csv_data: Json }
+        Args: { p_csv_data: Json; p_store_id: string; p_user_id: string }
         Returns: {
-          processed_count: number
-          error_messages: string[]
-          product_ids_result: string[]
           batch_ids_result: string[]
+          error_messages: string[]
+          processed_count: number
+          product_ids_result: string[]
         }[]
       }
       bulk_insert_csv_batches: {
-        Args: { p_store_id: string; p_created_by: string; p_data: Json }
+        Args: { p_created_by: string; p_data: Json; p_store_id: string }
         Returns: {
-          inserted_count: number
           batch_ids: string[]
+          inserted_count: number
           processing_time_ms: number
         }[]
       }
       bulk_insert_csv_batches_with_store_link: {
-        Args: { p_store_id: string; p_created_by: string; p_data: Json }
+        Args: { p_created_by: string; p_data: Json; p_store_id: string }
         Returns: {
-          inserted_count: number
           batch_ids: string[]
+          inserted_count: number
           processing_time_ms: number
-          store_products_linked: number
           products_created: number
+          store_products_linked: number
         }[]
       }
       check_bulk_duplicates: {
@@ -1776,9 +1729,9 @@ export type Database = {
         }
         Returns: {
           barcode: string
+          existing_batch_id: string
           exp_date: string
           is_duplicate: boolean
-          existing_batch_id: string
         }[]
       }
       check_pin_lock_status: {
@@ -1788,9 +1741,9 @@ export type Database = {
       check_security_warnings: {
         Args: Record<PropertyKey, never>
         Returns: {
-          warning_type: string
           item: string
           status: string
+          warning_type: string
         }[]
       }
       check_user_exists_by_email: {
@@ -1809,47 +1762,51 @@ export type Database = {
         Args: {
           p_email: string
           p_full_name: string
-          p_username: string
-          p_pin: string
-          p_store_id: string
-          p_role: string
           p_language_preference: string
+          p_pin: string
+          p_role: string
+          p_store_id: string
+          p_username: string
         }
         Returns: Json
       }
       fast_csv_import_skip_duplicates: {
-        Args: { p_store_id: string; p_user_id: string; p_csv_data: Json }
+        Args: { p_csv_data: Json; p_store_id: string; p_user_id: string }
         Returns: Json
       }
       find_duplicate_batches_bulk: {
-        Args: { p_store_id: string; p_sku_expiry_pairs: string }
+        Args: { p_sku_expiry_pairs: string; p_store_id: string }
         Returns: {
-          sku: string
-          expiry_date: string
           batch_id: string
           batch_number: string
           current_quantity: number
+          expiry_date: string
+          sku: string
         }[]
       }
       generate_pin_hash: {
         Args: { pin_text: string }
         Returns: string
       }
+      get_actionable_batches: {
+        Args: { input_store_id: string }
+        Returns: Json
+      }
       get_csv_upload_stats: {
-        Args: { p_store_id: string; p_days_back?: number }
+        Args: { p_days_back?: number; p_store_id: string }
         Returns: {
-          batch_source: string
-          upload_count: number
-          total_batches: number
           avg_batches_per_upload: number
+          batch_source: string
           latest_upload: string
+          total_batches: number
+          upload_count: number
         }[]
       }
       get_current_kpis: {
         Args: { p_store_id: string }
         Returns: {
-          kpi_name: string
           current_value: number
+          kpi_name: string
           last_updated: string
         }[]
       }
@@ -1863,19 +1820,23 @@ export type Database = {
       }
       get_kpi_comparison: {
         Args: {
-          p_store_id: string
-          p_current_start: string
-          p_current_end: string
-          p_compare_start: string
           p_compare_end: string
+          p_compare_start: string
+          p_current_end: string
+          p_current_start: string
+          p_store_id: string
         }
         Returns: {
-          kpi_name: string
-          current_value: number
-          previous_value: number
-          change_value: number
           change_percent: number
+          change_value: number
+          current_value: number
+          kpi_name: string
+          previous_value: number
         }[]
+      }
+      get_store_insights: {
+        Args: { input_store_id: string }
+        Returns: Json
       }
       get_store_settings: {
         Args: { store_id_param: string }
@@ -1884,20 +1845,20 @@ export type Database = {
       get_store_users: {
         Args: { input_store_id: string }
         Returns: {
-          store_id: string
-          user_id: string
-          role_in_store: string
-          permissions: Json
           assigned_at: string
           assigned_by: string
-          is_active: boolean
           can_use_pin_auth: boolean
+          created_at: string
+          email: string
+          is_active: boolean
+          permissions: Json
           pin_access_level: string
           pin_permissions: Json
-          email: string
-          created_at: string
-          updated_at: string
           raw_user_meta_data: Json
+          role_in_store: string
+          store_id: string
+          updated_at: string
+          user_id: string
         }[]
       }
       get_store_users_paginated: {
@@ -1905,97 +1866,101 @@ export type Database = {
           input_store_id: string
           page_number?: number
           page_size?: number
-          role_filter?: string
           pin_auth_filter?: boolean
+          role_filter?: string
         }
         Returns: {
-          store_id: string
-          user_id: string
-          role_in_store: string
-          permissions: Json
           assigned_at: string
           assigned_by: string
-          is_active: boolean
           can_use_pin_auth: boolean
+          created_at: string
+          email: string
+          is_active: boolean
+          permissions: Json
           pin_access_level: string
           pin_permissions: Json
-          email: string
-          created_at: string
-          updated_at: string
           raw_user_meta_data: Json
+          role_in_store: string
+          store_id: string
           total_count: number
+          updated_at: string
+          user_id: string
         }[]
       }
       get_stores_with_batch_counts: {
         Args: { store_ids: string[] }
         Returns: {
-          store_id: string
-          store_name: string
-          store_code: string
-          business_name: string
           address: string
+          batch_count: number
+          business_name: string
           city: string
-          postal_code: string
           country: string
-          timezone: string
-          store_type: string
-          size_category: string
+          created_at: string
           default_markup_percent: number
-          waste_reduction_target_percent: number
-          owner_id: string
           is_active: boolean
           onboarding_completed: boolean
-          created_at: string
-          updated_at: string
-          batch_count: number
-        }[]
-      }
-      get_user_store_role: {
-        Args: { p_user_id: string; p_store_id: string }
-        Returns: {
-          user_id: string
-          role_in_store: string
-          permissions: Json
-          is_active: boolean
-          can_use_pin_auth: boolean
-          pin_access_level: string
+          owner_id: string
+          postal_code: string
+          size_category: string
+          store_code: string
           store_id: string
           store_name: string
+          store_type: string
+          timezone: string
+          updated_at: string
+          waste_reduction_target_percent: number
+        }[]
+      }
+      get_user_complete_profile: {
+        Args: { p_store_id?: string; p_user_id: string }
+        Returns: Json
+      }
+      get_user_store_role: {
+        Args: { p_store_id: string; p_user_id: string }
+        Returns: {
+          can_use_pin_auth: boolean
+          is_active: boolean
+          permissions: Json
+          pin_access_level: string
+          role_in_store: string
+          store_id: string
+          store_name: string
+          user_id: string
         }[]
       }
       get_users_with_metadata: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
-          email: string
-          created_at: string
-          updated_at: string
-          raw_user_meta_data: Json
-          username: string
-          full_name: string
-          is_active: boolean
           avatar_url: string
-          last_login: string
-          pin_hash: string
-          pin_set_at: string
-          pin_attempts: number
-          requires_pin: boolean
+          created_at: string
+          email: string
           email_verified: boolean
-          phone_verified: boolean
-          pin_expires_at: string
-          pin_locked_until: string
-          pin_delivery_method: string
+          full_name: string
+          id: string
+          is_active: boolean
+          language_preference: string
+          last_login: string
           migrated_from_user_mgmt: boolean
           phone: string
-          language_preference: string
+          phone_verified: boolean
+          pin_attempts: number
+          pin_delivery_method: string
+          pin_expires_at: string
+          pin_hash: string
+          pin_locked_until: string
+          pin_set_at: string
+          raw_user_meta_data: Json
+          requires_pin: boolean
+          updated_at: string
+          username: string
         }[]
       }
       invite_user_to_store: {
         Args: {
-          p_user_email: string
-          p_store_id: string
-          p_role_in_store?: string
           p_permissions?: Json
+          p_role_in_store?: string
+          p_store_id: string
+          p_user_email: string
         }
         Returns: Json
       }
@@ -2004,58 +1969,58 @@ export type Database = {
         Returns: Json
       }
       reset_user_pin: {
-        Args: { p_user_id: string } | { p_user_id: string; p_new_pin: string }
+        Args: { p_new_pin: string; p_user_id: string } | { p_user_id: string }
         Returns: Json
       }
       resolve_bulk_products: {
-        Args: { p_skus: string[]; p_barcodes: string[]; p_names: string[] }
+        Args: { p_barcodes: string[]; p_names: string[]; p_skus: string[] }
         Returns: {
-          input_index: number
-          product_id: string
           found_method: string
-          sku: string
+          input_index: number
           name: string
+          product_id: string
+          sku: string
         }[]
       }
       resolve_bulk_products_simple: {
-        Args: { p_skus: string[]; p_barcodes: string[]; p_names: string[] }
+        Args: { p_barcodes: string[]; p_names: string[]; p_skus: string[] }
         Returns: {
+          found_method: string
           input_index: number
           product_id: string
-          found_method: string
         }[]
       }
       security_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
-          total_issues: number
-          rls_issues: number
-          function_issues: number
           compliance_status: string
+          function_issues: number
+          rls_issues: number
+          total_issues: number
         }[]
       }
       simple_update_store_user_test: {
         Args: {
+          input_can_use_pin_auth: boolean
           input_store_id: string
           input_user_id: string
-          input_can_use_pin_auth: boolean
         }
         Returns: string
       }
       test_business_schema_access: {
         Args: Record<PropertyKey, never>
         Returns: {
-          user_count: number
           store_count: number
+          user_count: number
         }[]
       }
       test_csv_performance: {
-        Args: { p_store_id: string; p_item_count: number }
+        Args: { p_item_count: number; p_store_id: string }
         Returns: {
-          operation_type: string
           duration_ms: number
           item_count: number
           items_per_second: number
+          operation_type: string
         }[]
       }
       unlock_user_pin: {
@@ -2064,71 +2029,71 @@ export type Database = {
       }
       update_store_settings: {
         Args: {
+          address_param?: string
+          business_name_param?: string
+          city_param?: string
+          country_param?: string
+          default_markup_percent_param?: number
+          description_param?: string
+          email_param?: string
+          phone_param?: string
+          postal_code_param?: string
+          size_category_param?: string
+          store_code_param?: string
           store_id_param: string
           store_name_param?: string
-          business_name_param?: string
-          store_code_param?: string
           store_type_param?: string
-          size_category_param?: string
-          address_param?: string
-          city_param?: string
-          postal_code_param?: string
-          country_param?: string
-          phone_param?: string
-          email_param?: string
-          website_url_param?: string
-          description_param?: string
-          default_markup_percent_param?: number
           waste_reduction_target_percent_param?: number
+          website_url_param?: string
         }
         Returns: Json
       }
       update_store_user_safe: {
         Args: {
-          input_store_id: string
-          input_user_id: string
-          input_role_in_store?: string
-          input_permissions?: Json
-          input_is_active?: boolean
           input_can_use_pin_auth?: boolean
+          input_is_active?: boolean
+          input_permissions?: Json
           input_pin_access_level?: string
           input_pin_permissions?: Json
+          input_role_in_store?: string
+          input_store_id: string
+          input_user_id: string
         }
         Returns: {
-          store_id: string
-          user_id: string
-          role_in_store: string
-          permissions: Json
           assigned_at: string
           assigned_by: string
-          is_active: boolean
           can_use_pin_auth: boolean
+          created_at: string
+          email: string
+          is_active: boolean
+          permissions: Json
           pin_access_level: string
           pin_permissions: Json
-          email: string
-          created_at: string
-          updated_at: string
           raw_user_meta_data: Json
+          role_in_store: string
+          store_id: string
+          updated_at: string
+          user_id: string
         }[]
       }
       update_user_email: {
-        Args: { target_user_id: string; new_email: string }
+        Args: { new_email: string; target_user_id: string }
         Returns: Json
       }
       update_user_language_preference: {
-        Args: { target_user_id: string; new_language_preference: string }
+        Args: { new_language_preference: string; target_user_id: string }
         Returns: Json
       }
       update_user_metadata: {
-        Args: { target_user_id: string; metadata_updates: Json }
+        Args: { metadata_updates: Json; target_user_id: string }
         Returns: Json
       }
       update_user_phone: {
-        Args: { target_user_id: string; new_phone: string }
+        Args: { new_phone: string; target_user_id: string }
         Returns: Json
       }
       update_user_pin: {
-        Args: { p_user_id: string; p_new_pin: string }
+        Args: { p_new_pin: string; p_user_id: string }
         Returns: Json
       }
       user_has_pin_access: {
@@ -2136,27 +2101,27 @@ export type Database = {
         Returns: boolean
       }
       user_has_store_access: {
-        Args: { target_store_id: string; required_role?: string }
+        Args: { required_role?: string; target_store_id: string }
         Returns: boolean
       }
       validate_pin_login: {
-        Args: { p_username: string; p_pin: string }
+        Args: { p_pin: string; p_username: string }
         Returns: Json
       }
     }
     Enums: {
-      action_type: 'discount' | 'donate' | 'dispose' | 'maintain' | 'ignored'
+      action_type: "discount" | "donate" | "dispose" | "maintain" | "ignored"
       donation_recipient_type:
-        | 'food_bank'
-        | 'soup_kitchen'
-        | 'charity'
-        | 'religious_org'
-        | 'community_group'
-        | 'animal_shelter'
-        | 'school'
-        | 'elderly_care'
-        | 'homeless_shelter'
-        | 'other'
+        | "food_bank"
+        | "soup_kitchen"
+        | "charity"
+        | "religious_org"
+        | "community_group"
+        | "animal_shelter"
+        | "school"
+        | "elderly_care"
+        | "homeless_shelter"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2529,11 +2494,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_roles_role_id_fkey'
-            columns: ['role_id']
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: 'roles'
-            referencedColumns: ['role_id']
+            referencedRelation: "roles"
+            referencedColumns: ["role_id"]
           },
         ]
       }
@@ -2668,31 +2633,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -2701,23 +2668,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -2726,23 +2693,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -2751,36 +2718,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -2789,7 +2756,14 @@ export const Constants = {
   },
   business: {
     Enums: {
-      store_type_enum: ['supermarket', 'convenience', 'restaurant', 'bakery', 'butcher', 'organic'],
+      store_type_enum: [
+        "supermarket",
+        "convenience",
+        "restaurant",
+        "bakery",
+        "butcher",
+        "organic",
+      ],
     },
   },
   inventory: {
@@ -2797,18 +2771,18 @@ export const Constants = {
   },
   public: {
     Enums: {
-      action_type: ['discount', 'donate', 'dispose', 'maintain', 'ignored'],
+      action_type: ["discount", "donate", "dispose", "maintain", "ignored"],
       donation_recipient_type: [
-        'food_bank',
-        'soup_kitchen',
-        'charity',
-        'religious_org',
-        'community_group',
-        'animal_shelter',
-        'school',
-        'elderly_care',
-        'homeless_shelter',
-        'other',
+        "food_bank",
+        "soup_kitchen",
+        "charity",
+        "religious_org",
+        "community_group",
+        "animal_shelter",
+        "school",
+        "elderly_care",
+        "homeless_shelter",
+        "other",
       ],
     },
   },
