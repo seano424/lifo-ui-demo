@@ -97,7 +97,7 @@ async def create_batch_from_scan(
             store_id=store_id,
             user_id=current_user.user_id,
         )
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         logger.error(
             "Failed to create batch from scan",
@@ -109,7 +109,7 @@ async def create_batch_from_scan(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create batch from scan",
-        )
+        ) from e
 
 
 @router.get(
@@ -154,7 +154,7 @@ async def get_recent_batches_from_scans(
             store_id=store_id,
             user_id=current_user.user_id,
         )
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
         logger.error(
             "Failed to get recent scan batches",
@@ -165,7 +165,7 @@ async def get_recent_batches_from_scans(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get recent scan batches",
-        )
+        ) from e
 
 
 @router.post(
@@ -271,7 +271,7 @@ async def batch_create_from_scans(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to batch create from scans",
-        )
+        ) from e
 
 
 @router.get(
@@ -295,7 +295,7 @@ async def get_scan_batch_stats(
         db = get_database()
 
         query = text("""
-            SELECT 
+            SELECT
                 COUNT(*) as total_scan_batches,
                 COUNT(CASE WHEN b.batch_source = 'barcode' THEN 1 END) as barcode_batches,
                 COUNT(CASE WHEN b.expiry_source = 'ocr' THEN 1 END) as ocr_expiry_batches,
@@ -386,4 +386,4 @@ async def get_scan_batch_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get scan batch statistics",
-        )
+        ) from e

@@ -738,27 +738,23 @@ class TestMobileEndpointCaching:
             assert response1.status_code == 200
 
             # Second request should be faster due to caching
-            performance_timer = (
-                performance_timer
-                if "performance_timer" in locals()
-                else type(
-                    "Timer",
-                    (),
-                    {
-                        "start": lambda: setattr(
-                            performance_timer, "start_time", time.time()
-                        ),
-                        "stop": lambda: setattr(
-                            performance_timer, "end_time", time.time()
-                        ),
-                        "elapsed_ms": property(
-                            lambda self: (self.end_time - self.start_time) * 1000
-                            if hasattr(self, "start_time") and hasattr(self, "end_time")
-                            else 0
-                        ),
-                    },
-                )()
-            )
+            class Timer:
+                def __init__(self):
+                    self.start_time = None
+                    self.end_time = None
+                
+                def start(self):
+                    self.start_time = time.time()
+                
+                def stop(self):
+                    self.end_time = time.time()
+                
+                @property
+                def elapsed_ms(self):
+                    return ((self.end_time - self.start_time) * 1000
+                           if self.start_time and self.end_time else 0)
+            
+            performance_timer = Timer()
 
             performance_timer.start()
             response2 = await async_client.post(
