@@ -292,7 +292,7 @@ async def security_headers_middleware(request: Request, call_next):
    - Implement constant-time comparison for sensitive operations
    - Log authentication events for security monitoring
 
-4. **File Handling**
+5. **File Handling**
    - Validate file content, not just extensions
    - Check magic numbers for file type verification
    - Implement file size and type restrictions

@@ -158,6 +158,7 @@ curl https://your-api-url.ondigitalocean.app/api/info
 ```
 
 **Example Error Monitoring Response:**
+
 ```json
 {
   "error_tracking": {
@@ -201,6 +202,7 @@ ENABLE_DETAILED_REQUEST_LOGGING=false  # Reduce log volume in production
 #### Error Alert Monitoring
 
 Monitor these key metrics in production:
+
 - Error rate exceeding 10 errors/hour on any endpoint
 - Critical severity errors (require immediate attention)
 - Recovery failure rate above 50% for any error type
@@ -367,6 +369,7 @@ docker-compose down
 ## Production Checklist
 
 ### Pre-Deployment
+
 - [ ] Update repository URLs in `.do/app.yaml`
 - [ ] Set all environment variables
 - [ ] Configure Supabase JWT settings
@@ -374,6 +377,7 @@ docker-compose down
 - [ ] Verify CORS configuration
 
 ### Deployment & Verification
+
 - [ ] Deploy application to App Platform
 - [ ] Run comprehensive health checks (`/health`)
 - [ ] Test error monitoring endpoints (`/api/errors/stats`)
@@ -382,6 +386,7 @@ docker-compose down
 - [ ] Validate error tracking is active
 
 ### Production Monitoring Setup
+
 - [x] **Built-in Error Monitoring** - Comprehensive error tracking system active
 - [x] **Performance Monitoring** - Real-time metrics collection enabled
 - [x] **Health Check Endpoints** - Enhanced health monitoring available
@@ -391,6 +396,7 @@ docker-compose down
 - [ ] Set up custom alerting (optional)
 
 ### Post-Deployment
+
 - [ ] Monitor application logs for errors
 - [ ] Check error statistics via `/api/errors/stats`
 - [ ] Verify automatic recovery mechanisms
@@ -400,6 +406,7 @@ docker-compose down
 - [ ] Test disaster recovery procedures
 
 ### Monitoring Endpoints to Bookmark
+
 - `GET /health` - System health with error statistics
 - `GET /api/errors/stats` - Comprehensive error tracking data
 - `GET /api/errors/endpoints/{path}` - Endpoint-specific error analysis

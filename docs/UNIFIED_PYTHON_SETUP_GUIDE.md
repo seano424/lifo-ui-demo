@@ -23,6 +23,7 @@ The LIFO AI Engine now uses a **single, unified Python environment** for both th
 ```
 
 This script will:
+
 - ✅ Check Python 3.12 is installed
 - ✅ Create a unified virtual environment (`.venv`)
 - ✅ Install all dependencies using `uv` (faster than pip)
@@ -144,17 +145,18 @@ ruff format .
 
 ### What Changed
 
-| Before | After |
-|--------|-------|
-| Two `requirements.txt` files | ✨ Single `requirements.txt` |
-| Two virtual environments | ✨ Single `.venv` directory |
-| Path manipulation for imports | ✨ Proper Python packages |
-| Separate ruff/mypy configs | ✨ Unified configuration |
-| Manual dependency management | ✨ Modern `pyproject.toml` |
+| Before                        | After                        |
+| ----------------------------- | ---------------------------- |
+| Two `requirements.txt` files  | ✨ Single `requirements.txt` |
+| Two virtual environments      | ✨ Single `.venv` directory  |
+| Path manipulation for imports | ✨ Proper Python packages    |
+| Separate ruff/mypy configs    | ✨ Unified configuration     |
+| Manual dependency management  | ✨ Modern `pyproject.toml`   |
 
 ### Import Changes
 
 **Old Import Pattern:**
+
 ```python
 # lifo_api/app/api/v1/csv_upload.py
 sys.path.insert(0, str(lifo_core_path))
@@ -162,6 +164,7 @@ from etl.unified_csv_processor import UnifiedCSVProcessor
 ```
 
 **New Import Pattern:**
+
 ```python
 # lifo_api/app/api/v1/csv_upload.py
 from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
@@ -170,6 +173,7 @@ from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
 ### Backup Files
 
 All old configuration files have been backed up with `.backup` extension:
+
 - `lifo_api/requirements.txt.backup`
 - `lifo_api/ruff.toml.backup`
 - `lifo_api/mypy.ini.backup`
@@ -236,18 +240,21 @@ print('✅ CSV upload endpoint can import UnifiedCSVProcessor')
 ### Common Issues
 
 **❌ Import Error: `ModuleNotFoundError: No module named 'lifo_ai_core'`**
+
 ```bash
 # Solution: Install in development mode
 pip install -e .
 ```
 
 **❌ `uv` command not found**
+
 ```bash
 # Solution: Install uv
 pip install uv
 ```
 
 **❌ Python 3.12 not found**
+
 ```bash
 # Solution: Install Python 3.12
 # Ubuntu/Debian:
@@ -260,6 +267,7 @@ brew install python@3.12
 ```
 
 **❌ Tests can't find modules**
+
 ```bash
 # Solution: Run tests from project root, not subdirectories
 cd /path/to/lifo-app  # Project root

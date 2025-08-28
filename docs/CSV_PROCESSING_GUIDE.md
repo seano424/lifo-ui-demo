@@ -16,14 +16,14 @@ LIFO.AI features a comprehensive CSV processing system that allows for bulk inve
 
 The system accepts flexible column names and automatically maps them to standard fields:
 
-| Standard Field | Accepted Variations |
-|---------------|-------------------|
-| `sku` | SKU, sku |
-| `product_name` | "Product Name", "productName", "name" |
-| `category` | "Category", "CATEGORY" |
-| `quantity` | "Quantity", "qty", "QTY" |
-| `expiry_date` | "Expiry Date", "expiryDate", "expiry" |
-| `cost_price` | "Cost Price", "costPrice", "costprice" |
+| Standard Field  | Accepted Variations                      |
+| --------------- | ---------------------------------------- |
+| `sku`           | SKU, sku                                 |
+| `product_name`  | "Product Name", "productName", "name"    |
+| `category`      | "Category", "CATEGORY"                   |
+| `quantity`      | "Quantity", "qty", "QTY"                 |
+| `expiry_date`   | "Expiry Date", "expiryDate", "expiry"    |
+| `cost_price`    | "Cost Price", "costPrice", "costprice"   |
 | `selling_price` | "Selling Price", "price", "sellingPrice" |
 
 **See [CSV Column Mapping Demo](../lifo_api/test_csv_data/CSV_COLUMN_MAPPING_DEMO.md) for complete examples.**
@@ -46,6 +46,7 @@ The system accepts flexible column names and automatically maps them to standard
 ## API Endpoints
 
 ### 1. Get CSV Template
+
 ```http
 GET /api/v1/csv-upload/template
 Authorization: Bearer {jwt_token}
@@ -54,6 +55,7 @@ Authorization: Bearer {jwt_token}
 Returns a CSV template with sample data and field descriptions.
 
 ### 2. Validate CSV (Dry Run)
+
 ```http
 POST /api/v1/csv-upload/validate
 Authorization: Bearer {jwt_token}
@@ -66,6 +68,7 @@ store_id: {store_uuid}
 Validates CSV structure and data without creating batches.
 
 ### 3. Upload and Create Batches
+
 ```http
 POST /api/v1/csv-upload/upload-and-create-batches
 Authorization: Bearer {jwt_token}
@@ -81,6 +84,7 @@ Processes CSV and creates inventory batches in the database.
 ## Response Format
 
 ### Successful Response
+
 ```json
 {
   "success": true,
@@ -107,6 +111,7 @@ Processes CSV and creates inventory batches in the database.
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -129,11 +134,13 @@ Processes CSV and creates inventory batches in the database.
 The CSV processor creates records in three main tables:
 
 1. **`inventory.products`** - Global product catalog
+
    - Normalized product information
    - Barcode and verification data
    - Required pricing fields (base_cost_price, base_selling_price)
 
 2. **`inventory.store_products`** - Store-specific product settings
+
    - Junction table linking stores to products
    - Store-specific pricing and settings
 
@@ -151,6 +158,7 @@ Use the provided test files in `/lifo_api/test_csv_data/`:
 - **Edge Cases**: `validation_errors_test.csv` - Error handling
 
 ### Running Tests
+
 ```bash
 cd lifo_api/test_csv_data
 python run_csv_tests.py
@@ -159,14 +167,17 @@ python run_csv_tests.py
 ## Common Issues & Solutions
 
 ### Schema Mismatches
+
 - **Issue**: "base_cost_price" constraint violations
 - **Solution**: Ensure pricing fields are > 0 (fixed in batch creation service)
 
 ### Foreign Key Errors
+
 - **Issue**: Missing table references
 - **Solution**: Ensure all SQLAlchemy models are properly defined
 
 ### Column Mapping Failures
+
 - **Issue**: Unrecognized column names
 - **Solution**: Use supported aliases or update mapping configuration
 
