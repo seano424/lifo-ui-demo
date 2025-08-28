@@ -23,6 +23,7 @@ from sqlalchemy import (
     Enum as SQLEnum,
 )
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import String as SQLString
 from sqlalchemy.orm import relationship
 
 from app.database.connection import Base
@@ -33,6 +34,11 @@ def get_auth_users_fk() -> str:
     return "users.id" if os.getenv("ENVIRONMENT") == "testing" else "auth.users.id"
 
 
+def get_uuid_type():
+    """Get the correct UUID type based on environment (String for SQLite, UUID for PostgreSQL)"""
+    return SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else get_uuid_type()
+
+
 class Category(Base):
     """
     Product categories table for LIFO.AI
@@ -40,14 +46,19 @@ class Category(Base):
     """
 
     __tablename__ = "categories"
-    __table_args__ = {"schema": "inventory", "extend_existing": True}
+    __table_args__ = (
+        {"schema": "inventory", "extend_existing": True}
+        if os.getenv("ENVIRONMENT") != "testing"
+        else {"extend_existing": True}
+    )
 
-    category_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    category_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     category_code = Column(String(100), unique=True, nullable=False)
     display_name_en = Column(String(255))
     display_name_fr = Column(String(255))
     parent_category_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.categories.category_id")
+        get_uuid_type(), 
+        ForeignKey("categories.category_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.categories.category_id")
     )
     typical_shelf_life_days = Column(Integer)
     is_active = Column(Boolean, default=True)
@@ -74,16 +85,21 @@ class Product(Base):
     """
 
     __tablename__ = "products"
-    __table_args__ = {"schema": "inventory", "extend_existing": True}
+    __table_args__ = (
+        {"schema": "inventory", "extend_existing": True}
+        if os.getenv("ENVIRONMENT") != "testing"
+        else {"extend_existing": True}
+    )
 
-    product_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    product_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
 
     # Core product identification
     sku = Column(String(100), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
     description = Column(Text)
     category_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.categories.category_id")
+        get_uuid_type(), 
+        ForeignKey("categories.category_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.categories.category_id")
     )
     brand = Column(String(100))
     unit_type = Column(String(20), default="pcs")
@@ -112,8 +128,8 @@ class Product(Base):
         DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
     created_by = Column(
-        UUID(as_uuid=True),
-        ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None,
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
     )
 
     # Relationships
@@ -130,14 +146,20 @@ class StoreProduct(Base):
     """
 
     __tablename__ = "store_products"
-    __table_args__ = {"schema": "inventory", "extend_existing": True}
+    __table_args__ = (
+        {"schema": "inventory", "extend_existing": True}
+        if os.getenv("ENVIRONMENT") != "testing"
+        else {"extend_existing": True}
+    )
 
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), primary_key=True
+        get_uuid_type(), 
+        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
+        primary_key=True
     )
     product_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("inventory.products.product_id"),
+        get_uuid_type(),
+        ForeignKey("products.product_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.products.product_id"),
         primary_key=True,
     )
 
@@ -152,12 +174,12 @@ class StoreProduct(Base):
 
     # Audit and tracking
     added_by = Column(
-        UUID(as_uuid=True),
-        ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None,
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
     )
     updated_by = Column(
-        UUID(as_uuid=True),
-        ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None,
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
     )
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(
@@ -196,14 +218,22 @@ class Batch(Base):
     """
 
     __tablename__ = "batches"
-    __table_args__ = {"schema": "inventory", "extend_existing": True}
+    __table_args__ = (
+        {"schema": "inventory", "extend_existing": True}
+        if os.getenv("ENVIRONMENT") != "testing"
+        else {"extend_existing": True}
+    )
 
-    batch_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    batch_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     product_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.products.product_id"), nullable=False
+        get_uuid_type(), 
+        ForeignKey("products.product_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.products.product_id"), 
+        nullable=False
     )
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+        get_uuid_type(), 
+        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
+        nullable=False
     )
 
     # Core batch information
@@ -238,8 +268,8 @@ class Batch(Base):
 
     # Audit fields
     created_by = Column(
-        UUID(as_uuid=True),
-        ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None,
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
     )
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(
@@ -286,16 +316,22 @@ class BatchAction(Base):
     """
 
     __tablename__ = "batch_actions"
-    __table_args__ = {"schema": "inventory", "extend_existing": True}
+    __table_args__ = (
+        {"schema": "inventory", "extend_existing": True}
+        if os.getenv("ENVIRONMENT") != "testing"
+        else {"extend_existing": True}
+    )
 
-    action_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    action_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     batch_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("inventory.batches.batch_id", ondelete="CASCADE"),
+        get_uuid_type(),
+        ForeignKey("batches.batch_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.batches.batch_id", ondelete="CASCADE"),
         nullable=False,
     )
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+        get_uuid_type(), 
+        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
+        nullable=False
     )
 
     # What was recommended vs what was done
@@ -316,11 +352,12 @@ class BatchAction(Base):
 
     # User and donation tracking
     performed_by = Column(
-        UUID(as_uuid=True),
-        ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None,
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
     )
     donation_recipient_id = Column(
-        UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
+        get_uuid_type(), 
+        ForeignKey("donation_recipients.recipient_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.donation_recipients.recipient_id")
     )
 
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
@@ -339,9 +376,13 @@ class DonationRecipient(Base):
     """
 
     __tablename__ = "donation_recipients"
-    __table_args__ = {"schema": "inventory", "extend_existing": True}
+    __table_args__ = (
+        {"schema": "inventory", "extend_existing": True}
+        if os.getenv("ENVIRONMENT") != "testing"
+        else {"extend_existing": True}
+    )
 
-    recipient_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    recipient_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
@@ -357,14 +398,16 @@ class DonationRecipient(Base):
 
     # Store association
     store_id = Column(
-        UUID(as_uuid=True), ForeignKey("business.stores.store_id"), nullable=False
+        get_uuid_type(), 
+        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
+        nullable=False
     )
 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     created_by = Column(
-        UUID(as_uuid=True),
-        ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None,
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
     )
 
     # Relationships
