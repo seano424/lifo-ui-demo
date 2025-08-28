@@ -6,7 +6,7 @@ Handles environment variables and application settings
 from typing import Any
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -23,18 +23,15 @@ class Settings(BaseSettings):
     # Server Configuration
     host: str = "0.0.0.0"  # noqa: S104  # Intentional for containerized deployment
     port: int = 8000
-    allowed_hosts: list[str] = Field(
-        default=["*"], description="Allowed hosts for the server"
+    allowed_hosts: str | list[str] = Field(
+        default="*",
+        description="Allowed hosts for the server (comma-separated string or list)",
     )
 
     # CORS Configuration
-    cors_origins: list[str] = Field(
-        default=[
-            "http://localhost:3000",  # Next.js development
-            "http://localhost:3001",  # Alternative dev port
-            "http://127.0.0.1:3000",  # IPv4 localhost
-        ],
-        description="CORS allowed origins",
+    cors_origins: str | list[str] = Field(
+        default="http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000",
+        description="CORS allowed origins (comma-separated string or list)",
     )
 
     # Production URLs (set via environment variables)
@@ -113,7 +110,9 @@ class Settings(BaseSettings):
 
     # Security
     enable_api_key_auth: bool = False
-    api_keys: list[str] = []
+    api_keys: str | list[str] = Field(
+        default="", description="API keys (comma-separated string or list)"
+    )
     rate_limit_per_minute: int = 100
     rate_limit_enabled: bool = True
 
@@ -172,7 +171,8 @@ class Settings(BaseSettings):
 
     @field_validator("cors_origins", "allowed_hosts", "api_keys", mode="before")
     @classmethod
-    def parse_list_fields(cls, v):
+    def parse_list_fields(cls, v) -> list[str]:
+        """Parse comma-separated strings or lists into lists of strings"""
         if isinstance(v, str):
             if not v.strip():
                 return []
@@ -180,6 +180,27 @@ class Settings(BaseSettings):
         elif isinstance(v, list):
             return v
         return []
+
+    @property
+    def allowed_hosts_list(self) -> list[str]:
+        """Get allowed_hosts as a list"""
+        if isinstance(self.allowed_hosts, str):
+            return self.parse_list_fields(self.allowed_hosts)
+        return self.allowed_hosts or ["*"]
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Get cors_origins as a list"""
+        if isinstance(self.cors_origins, str):
+            return self.parse_list_fields(self.cors_origins)
+        return self.cors_origins or []
+
+    @property
+    def api_keys_list(self) -> list[str]:
+        """Get api_keys as a list"""
+        if isinstance(self.api_keys, str):
+            return self.parse_list_fields(self.api_keys)
+        return self.api_keys or []
 
     def get_cors_origins(self) -> list[str]:
         """Get CORS origins based on environment - SECURE VERSION"""
@@ -218,7 +239,7 @@ class Settings(BaseSettings):
             return origins
 
         # Development only - use default origins
-        return self.cors_origins
+        return self.cors_origins_list
 
     def get_allowed_hosts(self) -> list[str]:
         """Get allowed hosts based on environment - SECURE VERSION"""
@@ -251,15 +272,16 @@ class Settings(BaseSettings):
             return hosts
 
         # Development - use configured hosts
-        return self.allowed_hosts
+        return self.allowed_hosts_list
 
-    model_config = {
-        "env_file": ".env.local",
-        "env_file_encoding": "utf-8",
-        "case_sensitive": False,
-        "extra": "ignore",  # Ignore extra environment variables not defined in the model
-        "env_parse_none_str": "None",
-    }
+    model_config = SettingsConfigDict(
+        env_file=".env.local",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",  # Ignore extra environment variables not defined in the model
+        env_parse_none_str="None",
+        env_nested_delimiter=None,  # Disable nested parsing
+    )
 
 
 # Create global settings instance

@@ -3,7 +3,7 @@
 import os
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -58,9 +58,11 @@ class Settings(BaseSettings):
             raise ValueError(f"log_level must be one of {valid_levels}")
         return v.upper()
 
-    class Config:
-        env_file = ".env"
-        env_prefix = "LIFO_"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="LIFO_",
+        protected_namespaces=("settings_",),
+    )
 
 
 # Global settings instance

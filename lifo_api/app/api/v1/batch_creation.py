@@ -6,7 +6,8 @@ Creates inventory batches from scan session data
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from app.api.dependencies import get_current_user, get_store_access
+from app.api.dependencies import get_store_access
+from app.auth.dependencies import get_current_user
 from app.services.batch_creation_service import (
     BatchCreationResponse,
     BatchCreationService,
