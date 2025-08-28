@@ -7,7 +7,7 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 ## 🚀 Key Features
 
 - **🤖 AI-Powered Scoring**: Multi-factor inventory scoring with intelligent recommendations
-- **🔍 Google Vision OCR**: Automated barcode scanning and expiry date extraction  
+- **🔍 Google Vision OCR**: Automated barcode scanning and expiry date extraction
 - **📱 Mobile-Optimized**: Sub-300ms response times for mobile scanning interfaces
 - **📊 Real-time Analytics**: Comprehensive store performance metrics
 - **📁 Bulk Processing**: CSV upload with validation and error handling
@@ -19,6 +19,7 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 **👉 [Complete FastAPI Microservice Documentation](./docs/COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)** - The definitive guide covering setup, API routes, deployment, and usage examples.
 
 ### Quick Links
+
 - **[📖 Documentation Hub](./docs/README.md)** - All documentation organized by topic
 - **[⚡ Quick Setup Guide](./docs/COMPLETE_SETUP_TESTING_GUIDE.md)** - Get running in 15 minutes
 - **[🔌 API Reference](./docs/API_DOCUMENTATION.md)** - Complete endpoint documentation
@@ -29,7 +30,7 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 ```
 lifo-app/
 ├── app/                      # Next.js 15 Frontend & API Routes
-├── lifo_api/                # FastAPI Backend Application  
+├── lifo_api/                # FastAPI Backend Application
 ├── lifo_ai_core/            # Python Data Processing Core
 ├── components/              # React UI Components
 ├── supabase/migrations/     # Database schema & migrations
@@ -39,7 +40,7 @@ lifo-app/
 ## 🛠️ Technology Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend**: FastAPI (Python), Supabase PostgreSQL  
+- **Backend**: FastAPI (Python), Supabase PostgreSQL
 - **AI/ML**: Google Vision API, OpenFoodFacts API, pandas
 - **Testing**: 124+ comprehensive tests with pytest
 
@@ -70,15 +71,16 @@ npm run dev
 ## 🏃‍♂️ Getting Started
 
 1. **[📖 Read the Complete Documentation](./docs/COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)** - Everything you need to know
-2. **[⚡ Follow the Setup Guide](./docs/COMPLETE_SETUP_TESTING_GUIDE.md)** - Get running in 15 minutes  
+2. **[⚡ Follow the Setup Guide](./docs/COMPLETE_SETUP_TESTING_GUIDE.md)** - Get running in 15 minutes
 3. **[🔌 Explore the API](./docs/API_DOCUMENTATION.md)** - Complete endpoint reference
 4. **[🚀 Deploy to Production](./docs/DEPLOYMENT.md)** - Production deployment guide
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Documentation Hub](./docs/README.md) for:
+
 - Development setup instructions
-- API documentation and examples  
+- API documentation and examples
 - Architecture guides and best practices
 - Deployment and production guidelines
 

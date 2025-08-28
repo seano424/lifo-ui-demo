@@ -28,6 +28,7 @@ tests/
 **Purpose**: Validate mobile API endpoints meet performance targets and functionality requirements.
 
 **Key Test Classes**:
+
 - `TestMobileEndpointPerformance`: Performance validation (<300ms mobile targets)
 - `TestMobileEndpointFunctionality`: Response structure and data correctness
 - `TestMobileHelperFunctions`: Algorithm accuracy and helper functions
@@ -35,6 +36,7 @@ tests/
 - `TestMobileEndpointCaching`: Cache behavior and effectiveness
 
 **Performance Targets**:
+
 - Mobile Summary: <300ms
 - Quick Batch Score: <200ms
 - Store Health: <400ms
@@ -47,12 +49,14 @@ tests/
 **Purpose**: Validate CSV security prevents formula injection and validates uploads.
 
 **Key Test Classes**:
+
 - `TestCSVSecurityValidator`: File validation and security checks
 - `TestCSVSanitization`: Content sanitization and threat neutralization
 - `TestCSVUploadEndpointSecurity`: Endpoint integration security
 - `TestCSVSecurityEdgeCases`: Edge cases and boundary conditions
 
 **Security Validations**:
+
 - Formula injection prevention (=, +, -, @, DDE)
 - File size and type validation
 - MIME type verification
@@ -64,12 +68,14 @@ tests/
 **Purpose**: Validate API key authentication and CORS security.
 
 **Key Test Classes**:
+
 - `TestAPIKeyAuthentication`: API key validation and authorization
 - `TestAuthenticationSecurityMeasures`: Timing attacks and security measures
 - `TestCORSSecurityConfiguration`: CORS origin and header validation
 - `TestEndToEndAuthenticationSecurity`: Complete auth workflow validation
 
 **Security Features**:
+
 - Valid/invalid API key handling
 - Store-level access authorization
 - Role-based access control
@@ -81,6 +87,7 @@ tests/
 **Purpose**: Validate database optimization, caching, and memory management.
 
 **Key Test Classes**:
+
 - `TestBoundedCachePerformance`: Memory-safe caching performance
 - `TestPerformanceMonitoring`: Performance metrics accuracy
 - `TestMobileQueryOptimization`: Mobile query optimization
@@ -88,6 +95,7 @@ tests/
 - `TestSystemPerformanceHealth`: Overall system health monitoring
 
 **Performance Validations**:
+
 - Cache memory bounds and LRU eviction
 - Query optimization effectiveness
 - Memory leak prevention
@@ -99,11 +107,13 @@ tests/
 **Purpose**: End-to-end mobile scanning workflow validation.
 
 **Key Test Classes**:
+
 - `TestCompleteMobileScanningWorkflow`: Complete scanning scenarios
 - `TestMobileScanningPerformanceIntegration`: Performance under realistic loads
 - `TestMobileScanningDataIntegrity`: Data consistency across endpoints
 
 **Workflow Scenarios**:
+
 - Complete store scanning (summary → batch list → scoring → health)
 - Multi-store scanning workflows
 - Cache optimization in workflows
@@ -113,6 +123,7 @@ tests/
 ## Test Configuration
 
 ### pytest.ini
+
 - Coverage targets: 85% minimum
 - Performance assertions enabled
 - Memory leak detection
@@ -121,6 +132,7 @@ tests/
 ### Fixtures and Utilities
 
 **Key Fixtures** (in `conftest.py`):
+
 - `performance_timer`: Accurate performance measurement
 - `memory_tracker`: Memory leak detection
 - `mock_api_key_auth`: Authentication mocking
@@ -173,12 +185,14 @@ pytest tests/ -v --cov=app --cov-report=html --junit-xml=results.xml
 ### GitHub Actions Workflow (`.github/workflows/test.yml`)
 
 **Test Jobs**:
+
 1. **test**: Main test execution across Python versions
 2. **mobile-performance-check**: Mobile performance validation
 3. **security-audit**: Comprehensive security scanning
 4. **coverage-report**: Coverage analysis and reporting
 
 **Validation Gates**:
+
 - All tests must pass
 - Coverage must be ≥85%
 - Mobile endpoints must meet performance targets
@@ -189,12 +203,12 @@ pytest tests/ -v --cov=app --cov-report=html --junit-xml=results.xml
 
 ### Mobile Performance Requirements
 
-| Endpoint | Target | Validation Method |
-|----------|--------|-------------------|
-| Mobile Summary | <300ms | `perf_assert.assert_mobile_performance()` |
-| Quick Batch Score | <200ms | `performance_timer.assert_under_ms(200)` |
-| Store Health | <400ms | Response time measurement |
-| Batch List | <300ms | Performance timer validation |
+| Endpoint          | Target | Validation Method                         |
+| ----------------- | ------ | ----------------------------------------- |
+| Mobile Summary    | <300ms | `perf_assert.assert_mobile_performance()` |
+| Quick Batch Score | <200ms | `performance_timer.assert_under_ms(200)`  |
+| Store Health      | <400ms | Response time measurement                 |
+| Batch List        | <300ms | Performance timer validation              |
 
 ### Memory Management
 
@@ -323,6 +337,6 @@ The comprehensive test suite validates that the LIFO AI Engine system achieves:
 ✅ **Performance Optimization**: <300ms mobile targets and memory leak prevention  
 ✅ **Database Optimization**: Indexed queries and bounded caching  
 ✅ **Integration Reliability**: End-to-end workflows validated  
-✅ **Production Readiness**: 95%+ test coverage and comprehensive validation  
+✅ **Production Readiness**: 95%+ test coverage and comprehensive validation
 
 This testing framework ensures the system is ready for production deployment with full confidence in reliability, security, and performance.

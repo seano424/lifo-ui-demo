@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 import { BATCH_SOURCES } from '@/types/inventory'
 import { Json } from '@/types/supabase'
+import { scoreAfterScanInClient } from '@/lib/scoring/client-scoring-integration'
 
 export interface ScannedProductData {
   barcode: string
@@ -32,6 +33,14 @@ export interface InventorySubmissionResult {
   storeProductCreated: boolean
   batchId: string
   message: string
+  scoring?: {
+    attempted: boolean
+    success: boolean
+    processed: number
+    high_priority_count: number
+    processing_time_ms: number
+    warning?: string
+  }
 }
 
 /**
@@ -70,12 +79,18 @@ export async function submitScannedProductToInventory(
     const batch = await createProductBatch(product.product_id, productData)
     console.log('[submitScannedProductToInventory] Batch created:', batch.batch_id)
 
+    // Step 4: Automatic scoring integration (if enabled)
+    console.log('[submitScannedProductToInventory] Starting client-side scoring for batch:', batch.batch_id)
+    
+    const scoringInfo = await scoreAfterScanInClient(productData.storeId, batch.batch_id)
+
     return {
       success: true,
       productId: product.product_id,
       storeProductCreated,
       batchId: batch.batch_id,
       message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
+      scoring: scoringInfo,
     }
   } catch (error) {
     console.error('[submitScannedProductToInventory] Submission failed:', error)

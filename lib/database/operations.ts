@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 import { Database } from '@/types/supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
 
@@ -20,17 +21,78 @@ export class InventoryOperations {
     userId: string,
     requiredRole: string = 'staff',
   ): Promise<boolean> {
-    const { data, error } = await this.supabase.rpc('user_has_store_access', {
-      target_store_id: storeId,
-      required_role: requiredRole,
+    console.log('[InventoryOperations.validateStoreAccess] Starting validation:', {
+      storeId,
+      userId,
+      requiredRole,
     })
 
-    if (error) {
-      console.error('Error validating store access:', error)
+    try {
+      // First try the RPC function
+      const { data, error } = await this.supabase.rpc('user_has_store_access', {
+        target_store_id: storeId,
+        required_role: requiredRole,
+      })
+
+      if (error) {
+        console.error('[InventoryOperations.validateStoreAccess] RPC error:', error)
+        console.log('[InventoryOperations.validateStoreAccess] Falling back to direct query...')
+        
+        // Fallback: Check directly in store_users table
+        const { data: storeUsers, error: queryError } = await this.supabase
+          .schema('business')
+          .from('store_users')
+          .select('role')
+          .eq('store_id', storeId)
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .single()
+
+        if (queryError) {
+          console.error('[InventoryOperations.validateStoreAccess] Fallback query error:', queryError)
+          
+          // Final fallback: Check if user is store owner
+          const { data: store, error: storeError } = await this.supabase
+            .schema('business')
+            .from('stores')
+            .select('owner_id')
+            .eq('store_id', storeId)
+            .single()
+
+          if (storeError) {
+            console.error('[InventoryOperations.validateStoreAccess] Store owner check error:', storeError)
+            return false
+          }
+
+          const isOwner = store?.owner_id === userId
+          console.log('[InventoryOperations.validateStoreAccess] Owner check result:', {
+            isOwner,
+            storeOwnerId: store?.owner_id,
+            userId
+          })
+          
+          return isOwner
+        }
+
+        const hasAccess = !!storeUsers
+        console.log('[InventoryOperations.validateStoreAccess] Fallback result:', {
+          hasAccess,
+          userRole: storeUsers ? (storeUsers as any).role : undefined
+        })
+        
+        return hasAccess
+      }
+
+      console.log('[InventoryOperations.validateStoreAccess] RPC result:', {
+        data,
+        hasAccess: !!data
+      })
+
+      return data || false
+    } catch (error) {
+      console.error('[InventoryOperations.validateStoreAccess] Unexpected error:', error)
       return false
     }
-
-    return data || false
   }
 
   async getUserStores(userId: string): Promise<Store[]> {
@@ -1015,14 +1077,87 @@ export class InventoryOperations {
     totalValue: number
     expiringItems: number
   }> {
-    // TODO: Re-enable when all systems are ready
-    console.warn('Store stats functionality temporarily disabled')
-    return {
-      totalProducts: 0,
-      totalBatches: 0,
-      activeAlerts: 0,
-      totalValue: 0,
-      expiringItems: 0,
+    try {
+      console.log(`[InventoryOperations.getStoreStats] Calculating stats for store: ${storeId}`)
+
+      // Get total store products
+      const { count: productCount, error: productError } = await this.supabase
+        .schema('inventory')
+        .from('store_products')
+        .select('*', { count: 'exact', head: true })
+        .eq('store_id', storeId)
+        .eq('is_active', true)
+
+      if (productError) {
+        console.error('[getStoreStats] Error counting products:', productError)
+      }
+
+      // Get active batches and their values
+      const { data: batches, error: batchError } = await this.supabase
+        .schema('inventory')
+        .from('batches')
+        .select(`
+          current_quantity, 
+          selling_price, 
+          expiry_date,
+          store_products!inner (
+            products (
+              category,
+              name
+            )
+          )
+        `)
+        .eq('store_id', storeId)
+        .eq('status', 'active')
+
+      if (batchError) {
+        console.error('[getStoreStats] Error fetching batches:', batchError)
+      }
+
+      // Calculate total value
+      const totalValue = batches?.reduce((sum, batch) => {
+        return sum + (batch.current_quantity || 0) * (batch.selling_price || 0)
+      }, 0) || 0
+
+      // Calculate expiring items (expiring within 3 days)
+      const threeDaysFromNow = new Date()
+      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
+      const expiringItems = batches?.filter(batch => {
+        const expiryDate = new Date(batch.expiry_date)
+        return expiryDate <= threeDaysFromNow
+      }).length || 0
+
+      // Get high urgency items from scoring schema (for activeAlerts)
+      const { data: urgentItems, error: urgentError } = await this.supabase
+        .schema('scoring')
+        .from('product_scores')
+        .select('*', { count: 'exact' })
+        .eq('store_id', storeId)
+        .gte('composite_score', 0.6)
+
+      if (urgentError) {
+        console.error('[getStoreStats] Error fetching urgent items:', urgentError)
+      }
+
+      const stats = {
+        totalProducts: productCount || 0,
+        totalBatches: batches?.length || 0,
+        activeAlerts: urgentItems?.length || 0,
+        totalValue: Math.round(totalValue * 100) / 100,
+        expiringItems,
+      }
+
+      console.log(`[InventoryOperations.getStoreStats] Stats calculated:`, stats)
+      return stats
+    } catch (error) {
+      console.error('[InventoryOperations.getStoreStats] Unexpected error:', error)
+      return {
+        totalProducts: 0,
+        totalBatches: 0,
+        activeAlerts: 0,
+        totalValue: 0,
+        expiringItems: 0,
+      }
     }
   }
 }

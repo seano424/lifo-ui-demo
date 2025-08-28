@@ -26,11 +26,13 @@ SUPABASE_DB_PASSWORD=iK24kRUOoWIF1GJk
 
 ### Security Measures Implemented
 
-1. **Service Account Created**: 
+1. **Service Account Created**:
+
    - Created service account key: `credentials/service-account.json`
    - Service account: `lifo-ai@lifo-app-467022.iam.gserviceaccount.com`
 
 2. **Credentials Security**:
+
    - Added `credentials/` directory to `.gitignore`
    - Added `*.json` exclusions to prevent credential leaks
    - Allowed essential JSON files (`package.json`, `tsconfig.json`)
@@ -56,11 +58,13 @@ SUPABASE_DB_PASSWORD=iK24kRUOoWIF1GJk
 ## Security Best Practices
 
 ### ✅ Implemented
+
 - Service account credentials isolated in `credentials/` directory
 - Credentials directory added to `.gitignore`
 - Environment variables properly organized by service
 
 ### 🔒 Security Reminders
+
 - Never commit `.env.local` with real credentials
 - Never commit files in `credentials/` directory
 - Use principle of least privilege for service accounts
@@ -69,6 +73,7 @@ SUPABASE_DB_PASSWORD=iK24kRUOoWIF1GJk
 ### 📋 Production Deployment Notes
 
 For production deployment:
+
 1. Use Google Cloud IAM roles instead of service account keys
 2. Set environment variables through your deployment platform
 3. Use Google Cloud Secret Manager for sensitive data

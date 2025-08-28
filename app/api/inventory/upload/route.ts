@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import { handleScoringError, scoreAfterCsvUpload } from '@/lib/scoring/batch-scoring-integration'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
@@ -189,8 +190,77 @@ export async function POST(request: NextRequest) {
       success_rate: `${Math.round((result.processed / csvData.length) * 100)}%`,
     })
 
-    console.log('📤 [UPLOAD-API] Sending success response to client')
-    return NextResponse.json(response)
+    // PHASE 2: Automatic scoring integration after successful batch creation
+    console.log('🧠 [UPLOAD-API] === STARTING AUTOMATIC SCORING ===')
+    console.log('🎯 [UPLOAD-API] Scoring parameters:', {
+      storeId,
+      processedBatches: result.processed,
+      scoringEnabled: process.env.ENABLE_AUTO_SCORING !== 'false',
+    })
+
+    let scoringResult = null
+    let scoringWarning = null
+
+    if (process.env.ENABLE_AUTO_SCORING !== 'false' && result.processed > 0) {
+      const scoringStartTime = Date.now()
+
+      try {
+        scoringResult = await scoreAfterCsvUpload(storeId, result.processed, {
+          force_recalculate: true, // New batches always need scoring
+        })
+
+        const scoringTime = Date.now() - scoringStartTime
+
+        if (scoringResult.success) {
+          console.log('✅ [UPLOAD-API] Automatic scoring completed:', {
+            storeId,
+            processed: scoringResult.data.processed,
+            high_priority: scoringResult.data.high_priority_count,
+            scoring_time_ms: scoringTime,
+            fastapi_processing_ms: scoringResult.data.processing_time_ms,
+          })
+        } else {
+          console.warn('⚠️ [UPLOAD-API] Scoring failed (non-critical):', {
+            storeId,
+            error: scoringResult.error,
+            scoring_time_ms: scoringTime,
+          })
+
+          // Handle scoring error gracefully
+          const errorHandling = handleScoringError(scoringResult, 'csv_upload')
+          scoringWarning = errorHandling.userMessage
+          console.log('📝 [UPLOAD-API]', errorHandling.logMessage)
+        }
+      } catch (scoringError) {
+        const scoringTime = Date.now() - scoringStartTime
+        console.error('❌ [UPLOAD-API] Scoring integration error (non-critical):', {
+          storeId,
+          error: scoringError instanceof Error ? scoringError.message : 'Unknown error',
+          scoring_time_ms: scoringTime,
+        })
+
+        scoringWarning =
+          'Batches created successfully. Scoring will be calculated in the background.'
+      }
+    } else {
+      console.log('⏭️ [UPLOAD-API] Automatic scoring disabled or no batches to score')
+    }
+
+    // Enhanced response with scoring information
+    const enhancedResponse = {
+      ...response,
+      scoring: {
+        enabled: process.env.ENABLE_AUTO_SCORING !== 'false',
+        success: scoringResult?.success || false,
+        processed: scoringResult?.success ? scoringResult.data.processed : 0,
+        high_priority_count: scoringResult?.success ? scoringResult.data.high_priority_count : 0,
+        processing_time_ms: scoringResult?.success ? scoringResult.data.processing_time_ms : 0,
+        warning: scoringWarning,
+      },
+    }
+
+    console.log('📤 [UPLOAD-API] Sending enhanced response with scoring info to client')
+    return NextResponse.json(enhancedResponse)
   } catch (error) {
     const errorTime = Date.now() - apiStartTime
     console.error('💥 [UPLOAD-API] === BULK UPLOAD FAILED ===')
