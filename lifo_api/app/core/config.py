@@ -37,7 +37,6 @@ class Settings(BaseSettings):
         description="CORS allowed origins",
     )
 
-
     # Production URLs (set via environment variables)
     frontend_url: str | None = None
     api_url: str | None = None
