@@ -73,7 +73,9 @@ async def get_mvp_metrics(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="MVP metrics calculation failed") from e
+        raise HTTPException(
+            status_code=500, detail="MVP metrics calculation failed"
+        ) from e
 
 
 @router.get("/batch-insights/{store_id}", response_model=BatchInsights)
@@ -130,7 +132,9 @@ async def get_batch_insights(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Batch insights generation failed") from e
+        raise HTTPException(
+            status_code=500, detail="Batch insights generation failed"
+        ) from e
 
 
 @router.get("/scan-workflow-stats/{store_id}")

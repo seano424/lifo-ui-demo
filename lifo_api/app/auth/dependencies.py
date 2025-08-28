@@ -3,7 +3,6 @@ FastAPI authentication dependencies for LIFO AI Engine
 Provides dependency injection for authentication and authorization
 """
 
-
 import structlog
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer

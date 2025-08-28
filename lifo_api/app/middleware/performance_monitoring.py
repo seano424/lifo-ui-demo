@@ -320,9 +320,7 @@ class CachePerformanceMiddleware:
     def __init__(self):
         self.metrics_collector = get_metrics_collector()
 
-    def record_operation(
-        self, operation: str, cache_name: str, key: str | None = None
-    ):
+    def record_operation(self, operation: str, cache_name: str, key: str | None = None):
         """Record cache operation"""
         start_time = time.time()
 

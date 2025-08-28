@@ -440,9 +440,7 @@ TEST-003,Product 3,Email: contact@company.com,1.75"""
         assert "2.50" in sanitized_content
 
         # Should not have made unnecessary changes to legitimate data
-        [
-            change for change in changes if "Formula prefix" not in change
-        ]
+        [change for change in changes if "Formula prefix" not in change]
         # Some changes might be acceptable (like quote handling), but should be minimal
 
 

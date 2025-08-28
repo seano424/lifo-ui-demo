@@ -148,7 +148,9 @@ async def readiness_check() -> dict[str, Any]:
         raise
     except Exception as e:
         logger.error("Readiness check failed", error=str(e))
-        raise HTTPException(status_code=503, detail={"ready": False, "reason": str(e)}) from e
+        raise HTTPException(
+            status_code=503, detail={"ready": False, "reason": str(e)}
+        ) from e
 
 
 @router.get("/health/live")

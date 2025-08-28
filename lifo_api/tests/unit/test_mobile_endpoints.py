@@ -751,8 +751,11 @@ class TestMobileEndpointCaching:
 
                 @property
                 def elapsed_ms(self):
-                    return ((self.end_time - self.start_time) * 1000
-                           if self.start_time and self.end_time else 0)
+                    return (
+                        (self.end_time - self.start_time) * 1000
+                        if self.start_time and self.end_time
+                        else 0
+                    )
 
             performance_timer = Timer()
 

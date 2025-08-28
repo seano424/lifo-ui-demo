@@ -119,9 +119,7 @@ class MobileQueryOptimizer:
             )
             raise
 
-    async def get_batch_quick_score_data(
-        self, batch_id: str
-    ) -> dict[str, Any] | None:
+    async def get_batch_quick_score_data(self, batch_id: str) -> dict[str, Any] | None:
         """
         Ultra-fast batch data retrieval for mobile scoring
         Uses single query with all necessary data

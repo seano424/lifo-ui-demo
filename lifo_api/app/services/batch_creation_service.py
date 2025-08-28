@@ -30,9 +30,7 @@ class BatchFromScanRequest(BaseModel):
         description="Product name from OpenFoodFacts or manual",
     )
     brand: str | None = Field(None, max_length=100, description="Product brand")
-    category: str | None = Field(
-        None, max_length=100, description="Product category"
-    )
+    category: str | None = Field(None, max_length=100, description="Product category")
 
     # Batch details
     quantity: float = Field(..., gt=0, description="Initial quantity")

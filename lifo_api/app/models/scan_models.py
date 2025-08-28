@@ -76,9 +76,7 @@ class ScanOutRequest(BaseModel):
     customer_type: str | None = Field(
         "regular", max_length=50, description="Customer type"
     )
-    channel: str | None = Field(
-        "in_store", max_length=50, description="Sales channel"
-    )
+    channel: str | None = Field("in_store", max_length=50, description="Sales channel")
 
     # Note: discount validation moved to business logic for OpenAPI compatibility
 
@@ -102,9 +100,7 @@ class ProcessScanRequest(ConfigurableModel):
     image_url: str | None = Field(
         None, max_length=500, description="Reference to scanned image"
     )
-    ocr_data: dict[str, Any] | None = Field(
-        None, description="Raw OCR extraction data"
-    )
+    ocr_data: dict[str, Any] | None = Field(None, description="Raw OCR extraction data")
 
 
 class ScanInResponse(BaseModel):

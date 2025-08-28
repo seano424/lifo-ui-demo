@@ -196,7 +196,9 @@ async def get_mobile_batch_summary(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Failed to generate mobile summary") from e
+        raise HTTPException(
+            status_code=500, detail="Failed to generate mobile summary"
+        ) from e
 
 
 @router.post("/batch-quick-score/{batch_id}", response_model=QuickBatchScore)
@@ -378,7 +380,9 @@ async def get_mobile_store_health(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Store health calculation failed") from e
+        raise HTTPException(
+            status_code=500, detail="Store health calculation failed"
+        ) from e
 
 
 @router.get("/batch-list-mobile/{store_id}")
@@ -580,7 +584,9 @@ async def get_mobile_performance_health(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Performance health check failed") from e
+        raise HTTPException(
+            status_code=500, detail="Performance health check failed"
+        ) from e
 
 
 def _get_mobile_optimization_recommendations(query_report: dict) -> list[str]:

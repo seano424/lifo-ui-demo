@@ -40,21 +40,24 @@ class Category(Base):
     category_code = Column(String(100), unique=True, nullable=False)
     display_name_en = Column(String(255))
     display_name_fr = Column(String(255))
-    parent_category_id = Column(UUID(as_uuid=True), ForeignKey("inventory.categories.category_id"))
+    parent_category_id = Column(
+        UUID(as_uuid=True), ForeignKey("inventory.categories.category_id")
+    )
     typical_shelf_life_days = Column(Integer)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
 
     # Self-referential relationship for parent categories
-    parent_category = relationship("Category", remote_side=[category_id], back_populates="subcategories")
+    parent_category = relationship(
+        "Category", remote_side=[category_id], back_populates="subcategories"
+    )
     subcategories = relationship("Category", back_populates="parent_category")
 
     # Products in this category
     products = relationship("Product", back_populates="category")
-
-
-
 
 
 class Product(Base):
@@ -73,7 +76,9 @@ class Product(Base):
     sku = Column(String(100), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
     description = Column(Text)
-    category_id = Column(UUID(as_uuid=True), ForeignKey("inventory.categories.category_id"))
+    category_id = Column(
+        UUID(as_uuid=True), ForeignKey("inventory.categories.category_id")
+    )
     brand = Column(String(100))
     unit_type = Column(String(20), default="pcs")
 
@@ -97,7 +102,9 @@ class Product(Base):
 
     # Audit fields
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 
     # Relationships
@@ -138,7 +145,9 @@ class StoreProduct(Base):
     added_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     updated_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
 
     # Relationships
     product = relationship("Product", back_populates="store_products")
@@ -215,7 +224,9 @@ class Batch(Base):
     # Audit fields
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
 
     # Relationships
     product = relationship("Product", back_populates="batches")

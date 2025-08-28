@@ -23,7 +23,9 @@ class Settings(BaseSettings):
     # Server Configuration
     host: str = "0.0.0.0"  # noqa: S104  # Intentional for containerized deployment
     port: int = 8000
-    allowed_hosts: list[str] = Field(default=["*"], description="Allowed hosts for the server")
+    allowed_hosts: list[str] = Field(
+        default=["*"], description="Allowed hosts for the server"
+    )
 
     # CORS Configuration
     cors_origins: list[str] = Field(
@@ -32,7 +34,7 @@ class Settings(BaseSettings):
             "http://localhost:3001",  # Alternative dev port
             "http://127.0.0.1:3000",  # IPv4 localhost
         ],
-        description="CORS allowed origins"
+        description="CORS allowed origins",
     )
 
     @field_validator("cors_origins", "allowed_hosts", "api_keys", mode="before")
@@ -45,7 +47,6 @@ class Settings(BaseSettings):
         elif isinstance(v, list):
             return v
         return []
-
 
     # Production URLs (set via environment variables)
     frontend_url: str | None = None

@@ -297,7 +297,9 @@ async def get_ai_recommendations(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Failed to get recommendations") from e
+        raise HTTPException(
+            status_code=500, detail="Failed to get recommendations"
+        ) from e
 
 
 @router.get("/analytics/{store_id}")

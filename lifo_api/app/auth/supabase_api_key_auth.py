@@ -149,7 +149,9 @@ class SupabaseAPIKeyAuth:
 
         except httpx.TimeoutException as e:
             self.logger.error("Auth API timeout")
-            raise SupabaseAPIKeyError("Authentication service timeout", status_code=503) from e
+            raise SupabaseAPIKeyError(
+                "Authentication service timeout", status_code=503
+            ) from e
 
         except httpx.HTTPStatusError:
             # Re-raise HTTP errors to be handled by caller

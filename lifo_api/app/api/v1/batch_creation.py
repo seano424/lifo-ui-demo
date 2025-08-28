@@ -3,7 +3,6 @@ Batch Creation API Endpoints
 Creates inventory batches from scan session data
 """
 
-
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
@@ -97,7 +96,9 @@ async def create_batch_from_scan(
             store_id=store_id,
             user_id=current_user.user_id,
         )
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
     except Exception as e:
         logger.error(
             "Failed to create batch from scan",
@@ -154,7 +155,9 @@ async def get_recent_batches_from_scans(
             store_id=store_id,
             user_id=current_user.user_id,
         )
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
     except Exception as e:
         logger.error(
             "Failed to get recent scan batches",

@@ -23,6 +23,7 @@ logger = structlog.get_logger()
 
 class ErrorCategory:
     """Error category constants"""
+
     DATABASE = "database"
     AUTHENTICATION = "authentication"
     AUTHORIZATION = "authorization"
@@ -37,6 +38,7 @@ class ErrorCategory:
 
 class ErrorSeverity:
     """Error severity levels"""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -56,7 +58,7 @@ class ErrorEvent:
         client_ip: str | None = None,
         context: dict[str, Any] | None = None,
         recovery_attempted: bool = False,
-        recovery_successful: bool = False
+        recovery_successful: bool = False,
     ):
         self.error = error
         self.error_type = type(error).__name__
@@ -76,7 +78,10 @@ class ErrorEvent:
     def _generate_error_id(self) -> str:
         """Generate unique error ID"""
         import hashlib
-        data = f"{self.timestamp.isoformat()}{self.error_type}{self.endpoint or 'unknown'}"
+
+        data = (
+            f"{self.timestamp.isoformat()}{self.error_type}{self.endpoint or 'unknown'}"
+        )
         return hashlib.sha256(data.encode()).hexdigest()[:12]
 
     def to_dict(self) -> dict[str, Any]:
@@ -94,7 +99,9 @@ class ErrorEvent:
             "recovery_attempted": self.recovery_attempted,
             "recovery_successful": self.recovery_successful,
             "timestamp": self.timestamp.isoformat(),
-            "traceback": self.traceback if self.severity in [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL] else None
+            "traceback": self.traceback
+            if self.severity in [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL]
+            else None,
         }
 
 
@@ -111,9 +118,13 @@ class ErrorTracker:
         self.error_events = deque(maxlen=10000)
 
         # Error frequency tracking
-        self.error_frequency = defaultdict(lambda: deque(maxlen=100))  # Error type -> timestamps
-        self.endpoint_errors = defaultdict(lambda: deque(maxlen=100))  # Endpoint -> error events
-        self.user_errors = defaultdict(lambda: deque(maxlen=50))       # User -> error events
+        self.error_frequency = defaultdict(
+            lambda: deque(maxlen=100)
+        )  # Error type -> timestamps
+        self.endpoint_errors = defaultdict(
+            lambda: deque(maxlen=100)
+        )  # Endpoint -> error events
+        self.user_errors = defaultdict(lambda: deque(maxlen=50))  # User -> error events
 
         # Error pattern detection
         self.error_patterns = defaultdict(int)  # Pattern -> count
@@ -162,7 +173,7 @@ class ErrorTracker:
             category=error_event.category,
             severity=error_event.severity,
             endpoint=error_event.endpoint,
-            message=error_event.error_message[:200]  # Truncate long messages
+            message=error_event.error_message[:200],  # Truncate long messages
         )
 
     def _detect_error_cascade(self, error_event: ErrorEvent):
@@ -170,23 +181,26 @@ class ErrorTracker:
         # Check for multiple errors in short time window
         recent_cutoff = error_event.timestamp - timedelta(minutes=5)
         recent_errors = [
-            e for e in self.error_events
+            e
+            for e in self.error_events
             if e.timestamp >= recent_cutoff and e.endpoint == error_event.endpoint
         ]
 
         if len(recent_errors) >= 5:  # 5+ errors in 5 minutes on same endpoint
-            self.cascade_errors.append({
-                "timestamp": error_event.timestamp.isoformat(),
-                "endpoint": error_event.endpoint,
-                "error_count": len(recent_errors),
-                "error_types": list({e.error_type for e in recent_errors})
-            })
+            self.cascade_errors.append(
+                {
+                    "timestamp": error_event.timestamp.isoformat(),
+                    "endpoint": error_event.endpoint,
+                    "error_count": len(recent_errors),
+                    "error_types": list({e.error_type for e in recent_errors}),
+                }
+            )
 
             logger.warning(
                 "Potential error cascade detected",
                 endpoint=error_event.endpoint,
                 error_count=len(recent_errors),
-                time_window_minutes=5
+                time_window_minutes=5,
             )
 
     def get_error_statistics(self) -> dict[str, Any]:
@@ -195,8 +209,12 @@ class ErrorTracker:
             now = datetime.now(UTC)
 
             # Time-based statistics
-            last_24h = [e for e in self.error_events if e.timestamp > now - timedelta(hours=24)]
-            last_1h = [e for e in self.error_events if e.timestamp > now - timedelta(hours=1)]
+            last_24h = [
+                e for e in self.error_events if e.timestamp > now - timedelta(hours=24)
+            ]
+            last_1h = [
+                e for e in self.error_events if e.timestamp > now - timedelta(hours=1)
+            ]
 
             # Category breakdown
             category_counts = defaultdict(int)
@@ -211,13 +229,13 @@ class ErrorTracker:
             # Top error endpoints
             endpoint_error_counts = defaultdict(int)
             for endpoint, errors in self.endpoint_errors.items():
-                recent_errors = [e for e in errors if e.timestamp > now - timedelta(hours=24)]
+                recent_errors = [
+                    e for e in errors if e.timestamp > now - timedelta(hours=24)
+                ]
                 endpoint_error_counts[endpoint] = len(recent_errors)
 
             top_error_endpoints = sorted(
-                endpoint_error_counts.items(),
-                key=lambda x: x[1],
-                reverse=True
+                endpoint_error_counts.items(), key=lambda x: x[1], reverse=True
             )[:10]
 
             # Recovery success rates
@@ -228,7 +246,7 @@ class ErrorTracker:
                     recovery_rates[error_type] = {
                         "success_rate": success_rate,
                         "attempted": stats["attempted"],
-                        "successful": stats["successful"]
+                        "successful": stats["successful"],
                     }
 
             return {
@@ -238,12 +256,16 @@ class ErrorTracker:
                 "errors_last_1h": len(last_1h),
                 "category_breakdown_24h": dict(category_counts),
                 "severity_breakdown_24h": dict(severity_counts),
-                "top_error_types_24h": dict(sorted(error_type_counts.items(), key=lambda x: x[1], reverse=True)[:10]),
+                "top_error_types_24h": dict(
+                    sorted(error_type_counts.items(), key=lambda x: x[1], reverse=True)[
+                        :10
+                    ]
+                ),
                 "top_error_endpoints": top_error_endpoints,
                 "recovery_success_rates": recovery_rates,
                 "error_cascades_detected": len(self.cascade_errors),
                 "recent_cascades": self.cascade_errors[-5:],  # Last 5 cascades
-                "monitoring_health": "active"
+                "monitoring_health": "active",
             }
 
     def get_endpoint_error_analysis(self, endpoint: str) -> dict[str, Any]:
@@ -257,8 +279,7 @@ class ErrorTracker:
             # Recent errors (last 24h)
             now = datetime.now(UTC)
             recent_errors = [
-                e for e in endpoint_events
-                if e.timestamp > now - timedelta(hours=24)
+                e for e in endpoint_events if e.timestamp > now - timedelta(hours=24)
             ]
 
             # Error type breakdown
@@ -273,9 +294,13 @@ class ErrorTracker:
             if len(endpoint_events) > 1:
                 time_diffs = []
                 for i in range(1, len(endpoint_events)):
-                    diff = (endpoint_events[i].timestamp - endpoint_events[i-1].timestamp).total_seconds()
+                    diff = (
+                        endpoint_events[i].timestamp - endpoint_events[i - 1].timestamp
+                    ).total_seconds()
                     time_diffs.append(diff)
-                avg_time_between_errors = sum(time_diffs) / len(time_diffs) if time_diffs else 0
+                avg_time_between_errors = (
+                    sum(time_diffs) / len(time_diffs) if time_diffs else 0
+                )
             else:
                 avg_time_between_errors = 0
 
@@ -286,9 +311,15 @@ class ErrorTracker:
                 "error_types": dict(error_types),
                 "severity_breakdown": dict(severities),
                 "avg_time_between_errors_seconds": avg_time_between_errors,
-                "first_error": endpoint_events[0].timestamp.isoformat() if endpoint_events else None,
-                "last_error": endpoint_events[-1].timestamp.isoformat() if endpoint_events else None,
-                "most_recent_errors": [e.to_dict() for e in recent_errors[-5:]]  # Last 5 errors
+                "first_error": endpoint_events[0].timestamp.isoformat()
+                if endpoint_events
+                else None,
+                "last_error": endpoint_events[-1].timestamp.isoformat()
+                if endpoint_events
+                else None,
+                "most_recent_errors": [
+                    e.to_dict() for e in recent_errors[-5:]
+                ],  # Last 5 errors
             }
 
     def _get_log_level(self, severity: str) -> str:
@@ -297,12 +328,13 @@ class ErrorTracker:
             ErrorSeverity.LOW: "info",
             ErrorSeverity.MEDIUM: "warning",
             ErrorSeverity.HIGH: "error",
-            ErrorSeverity.CRITICAL: "error"
+            ErrorSeverity.CRITICAL: "error",
         }
         return severity_map.get(severity, "warning")
 
     def _start_analysis_tasks(self):
         """Start background analysis tasks"""
+
         def cleanup_old_errors():
             while True:
                 try:
@@ -311,7 +343,9 @@ class ErrorTracker:
                         cutoff = now - timedelta(hours=72)  # Keep 72 hours
 
                         # Clean up old data
-                        for error_type, timestamps in list(self.error_frequency.items()):
+                        for error_type, timestamps in list(
+                            self.error_frequency.items()
+                        ):
                             while timestamps and timestamps[0] < cutoff:
                                 timestamps.popleft()
                             if not timestamps:
@@ -331,7 +365,8 @@ class ErrorTracker:
 
                         # Clean up old cascades
                         self.cascade_errors = [
-                            cascade for cascade in self.cascade_errors
+                            cascade
+                            for cascade in self.cascade_errors
                             if cascade["timestamp"] > cutoff
                         ]
 
@@ -366,7 +401,7 @@ class ErrorRecoveryManager:
             OperationalError,
             self._recover_database_connection,
             max_retries=3,
-            backoff_multiplier=2
+            backoff_multiplier=2,
         )
 
         # External service recovery
@@ -374,7 +409,7 @@ class ErrorRecoveryManager:
             ConnectionError,
             self._recover_external_service,
             max_retries=2,
-            backoff_multiplier=1.5
+            backoff_multiplier=1.5,
         )
 
         # Validation error recovery
@@ -382,7 +417,7 @@ class ErrorRecoveryManager:
             ValidationError,
             self._recover_validation_error,
             max_retries=1,
-            backoff_multiplier=1
+            backoff_multiplier=1,
         )
 
     def register_recovery_strategy(
@@ -390,21 +425,17 @@ class ErrorRecoveryManager:
         error_type: type[Exception],
         recovery_func: Callable,
         max_retries: int = 3,
-        backoff_multiplier: float = 2.0
+        backoff_multiplier: float = 2.0,
     ):
         """Register a recovery strategy for an error type"""
         self.recovery_strategies[error_type] = {
             "func": recovery_func,
             "max_retries": max_retries,
-            "backoff_multiplier": backoff_multiplier
+            "backoff_multiplier": backoff_multiplier,
         }
 
     async def attempt_recovery(
-        self,
-        error: Exception,
-        operation_func: Callable,
-        *args,
-        **kwargs
+        self, error: Exception, operation_func: Callable, *args, **kwargs
     ) -> tuple[bool, Any]:
         """
         Attempt to recover from an error and retry the operation
@@ -442,7 +473,7 @@ class ErrorRecoveryManager:
                         "Error recovery successful",
                         error_type=error_type.__name__,
                         attempt=attempt + 1,
-                        max_retries=max_retries
+                        max_retries=max_retries,
                     )
 
                     return True, result
@@ -452,23 +483,25 @@ class ErrorRecoveryManager:
                     "Recovery attempt failed",
                     error_type=error_type.__name__,
                     attempt=attempt + 1,
-                    retry_error=str(retry_error)
+                    retry_error=str(retry_error),
                 )
 
             # Wait before next retry (exponential backoff)
             if attempt < max_retries - 1:
-                wait_time = (backoff_multiplier ** attempt)
+                wait_time = backoff_multiplier**attempt
                 await asyncio.sleep(wait_time)
 
         logger.error(
             "Error recovery failed after all attempts",
             error_type=error_type.__name__,
-            max_retries=max_retries
+            max_retries=max_retries,
         )
 
         return False, None
 
-    async def _recover_database_connection(self, error: Exception, attempt: int) -> bool:
+    async def _recover_database_connection(
+        self, error: Exception, attempt: int
+    ) -> bool:
         """Attempt to recover from database connection errors"""
         try:
             # Import here to avoid circular imports
@@ -517,7 +550,7 @@ class ErrorRecoveryManager:
 def error_handler(
     category: str = ErrorCategory.UNKNOWN,
     severity: str = ErrorSeverity.MEDIUM,
-    recovery_enabled: bool = True
+    recovery_enabled: bool = True,
 ):
     """
     Decorator for comprehensive error handling and recovery
@@ -527,6 +560,7 @@ def error_handler(
         severity: Error severity level
         recovery_enabled: Whether to attempt automatic recovery
     """
+
     def decorator(func):
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -554,8 +588,8 @@ def error_handler(
                         "function": func.__name__,
                         "execution_time": execution_time,
                         "args_count": len(args),
-                        "kwargs_keys": list(kwargs.keys())
-                    }
+                        "kwargs_keys": list(kwargs.keys()),
+                    },
                 )
 
                 # Track the error
@@ -564,7 +598,10 @@ def error_handler(
                 # Attempt recovery if enabled
                 if recovery_enabled:
                     error_event.recovery_attempted = True
-                    recovery_successful, recovered_result = await error_recovery_manager.attempt_recovery(
+                    (
+                        recovery_successful,
+                        recovered_result,
+                    ) = await error_recovery_manager.attempt_recovery(
                         e, func, *args, **kwargs
                     )
 
@@ -599,8 +636,8 @@ def error_handler(
                         "function": func.__name__,
                         "execution_time": execution_time,
                         "args_count": len(args),
-                        "kwargs_keys": list(kwargs.keys())
-                    }
+                        "kwargs_keys": list(kwargs.keys()),
+                    },
                 )
 
                 # Track the error
@@ -640,7 +677,11 @@ def _get_user_id_from_context(args: tuple, kwargs: dict) -> str | None:
             if key in kwargs:
                 user_data = kwargs[key]
                 if isinstance(user_data, dict):
-                    return user_data.get("sub") or user_data.get("id") or user_data.get("user_id")
+                    return (
+                        user_data.get("sub")
+                        or user_data.get("id")
+                        or user_data.get("user_id")
+                    )
                 elif hasattr(user_data, "user_id"):
                     return user_data.user_id
                 elif isinstance(user_data, str):

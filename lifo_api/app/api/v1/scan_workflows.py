@@ -698,7 +698,9 @@ async def scan_donation_eligibility_check(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Donation eligibility scan failed") from e
+        raise HTTPException(
+            status_code=500, detail="Donation eligibility scan failed"
+        ) from e
 
 
 @router.post("/scan-donation-action/{store_id}/{batch_id}")
@@ -876,7 +878,9 @@ async def execute_donation_action(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Donation action execution failed") from e
+        raise HTTPException(
+            status_code=500, detail="Donation action execution failed"
+        ) from e
 
 
 @router.get("/scan-donation-quick-list/{store_id}")

@@ -173,9 +173,7 @@ async def extract_expiry_date_from_image(
     store_id: str,
     request: Request,
     image: UploadFile = File(...),
-    date_format_hint: str | None = Form(
-        None, description="Expected date format hint"
-    ),
+    date_format_hint: str | None = Form(None, description="Expected date format hint"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
@@ -223,7 +221,9 @@ async def extract_expiry_date_from_image(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Expiry date extraction failed") from e
+        raise HTTPException(
+            status_code=500, detail="Expiry date extraction failed"
+        ) from e
 
 
 # Barcode detection endpoint removed - frontend handles this natively

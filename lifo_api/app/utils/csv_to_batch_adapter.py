@@ -136,7 +136,9 @@ class CSVToBatchAdapter:
         except ValueError:
             raise
         except Exception as e:
-            raise ValueError(f"Row {row_index}: Failed to convert row data: {str(e)}") from e
+            raise ValueError(
+                f"Row {row_index}: Failed to convert row data: {str(e)}"
+            ) from e
 
     @staticmethod
     def _parse_date(date_str: str, row_index: int) -> date:

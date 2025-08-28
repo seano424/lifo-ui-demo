@@ -133,7 +133,7 @@ class UnifiedCSVProcessor:
         "pain": "bakery_fresh",
         # Frozen (updated to standardized category)
         "frozen": "frozen_foods",
-        "frozen foods": "frozen_foods", 
+        "frozen foods": "frozen_foods",
         "surgelé": "frozen_foods",
         "congelé": "frozen_foods",
         # Beverages
@@ -173,13 +173,11 @@ class UnifiedCSVProcessor:
         "beverages": 180,
         "spices_condiments": 1095,
         "household_other": 180,  # Default for unknown items
-        "specialty_items": 90,   # Moderate shelf life
-        "bulk_items": 365,       # Long shelf life for bulk items
+        "specialty_items": 90,  # Moderate shelf life
+        "bulk_items": 365,  # Long shelf life for bulk items
     }
 
-    def __init__(
-        self, store_id: str, user_id: str, inventory_ops: Any | None = None
-    ):
+    def __init__(self, store_id: str, user_id: str, inventory_ops: Any | None = None):
         """
         Initialize processor with store and user context
 

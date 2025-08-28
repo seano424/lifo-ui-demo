@@ -19,6 +19,7 @@ logger = structlog.get_logger()
 
 class SecurityEventType:
     """Security event type constants"""
+
     AUTHENTICATION_FAILURE = "auth_failure"
     AUTHORIZATION_FAILURE = "authz_failure"
     INPUT_VALIDATION_FAILURE = "input_validation_failure"
@@ -45,7 +46,7 @@ class SecurityEvent:
         severity: str = "medium",
         details: dict[str, Any] | None = None,
         user_id: str | None = None,
-        user_agent: str | None = None
+        user_agent: str | None = None,
     ):
         self.event_type = event_type
         self.client_ip = client_ip
@@ -73,7 +74,7 @@ class SecurityEvent:
             "details": self.details,
             "user_id": self.user_id,
             "user_agent": self.user_agent,
-            "timestamp": self.timestamp.isoformat()
+            "timestamp": self.timestamp.isoformat(),
         }
 
 
@@ -96,10 +97,14 @@ class SecurityMonitor:
 
         # Pattern detection
         self.attack_patterns = defaultdict(int)  # Attack pattern counts
-        self.endpoint_access_patterns = defaultdict(lambda: defaultdict(int))  # IP -> endpoint -> count
+        self.endpoint_access_patterns = defaultdict(
+            lambda: defaultdict(int)
+        )  # IP -> endpoint -> count
 
         # Failed authentication tracking
-        self.failed_auth_attempts = defaultdict(lambda: deque(maxlen=50))  # IP -> failed attempts
+        self.failed_auth_attempts = defaultdict(
+            lambda: deque(maxlen=50)
+        )  # IP -> failed attempts
 
         # Security scan detection
         self.scanner_signatures = [
@@ -115,16 +120,32 @@ class SecurityMonitor:
             r"acunetix",
             r"nessus",
             r"openvas",
-            r"metasploit"
+            r"metasploit",
         ]
-        self.compiled_scanner_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in self.scanner_signatures]
+        self.compiled_scanner_patterns = [
+            re.compile(pattern, re.IGNORECASE) for pattern in self.scanner_signatures
+        ]
 
         # Suspicious endpoints (commonly targeted)
         self.honeypot_endpoints = {
-            "/admin", "/wp-admin", "/phpmyadmin", "/.env", "/backup",
-            "/config", "/debug", "/test", "/api/admin", "/administrator",
-            "/wp-login", "/login.php", "/admin.php", "/wp-config.php",
-            "/.git", "/robots.txt", "/sitemap.xml", "/crossdomain.xml"
+            "/admin",
+            "/wp-admin",
+            "/phpmyadmin",
+            "/.env",
+            "/backup",
+            "/config",
+            "/debug",
+            "/test",
+            "/api/admin",
+            "/administrator",
+            "/wp-login",
+            "/login.php",
+            "/admin.php",
+            "/wp-config.php",
+            "/.git",
+            "/robots.txt",
+            "/sitemap.xml",
+            "/crossdomain.xml",
         }
 
         # Start background monitoring
@@ -136,7 +157,7 @@ class SecurityMonitor:
         request: Request,
         severity: str = "medium",
         details: dict[str, Any] | None = None,
-        user_id: str | None = None
+        user_id: str | None = None,
     ):
         """Record a security event"""
         client_ip = self._get_client_ip(request)
@@ -151,7 +172,7 @@ class SecurityMonitor:
             severity=severity,
             details=details,
             user_id=user_id,
-            user_agent=user_agent
+            user_agent=user_agent,
         )
 
         with self.lock:
@@ -180,7 +201,7 @@ class SecurityMonitor:
             endpoint=endpoint,
             severity=severity,
             details=details,
-            user_id=user_id
+            user_id=user_id,
         )
 
         # Check for immediate threats
@@ -200,8 +221,8 @@ class SecurityMonitor:
                     details={
                         "scanner_detected": True,
                         "user_agent": user_agent,
-                        "detection_method": "user_agent_signature"
-                    }
+                        "detection_method": "user_agent_signature",
+                    },
                 )
                 return True
 
@@ -213,14 +234,16 @@ class SecurityMonitor:
                 severity="medium",
                 details={
                     "honeypot_endpoint": request.url.path,
-                    "detection_method": "honeypot_access"
-                }
+                    "detection_method": "honeypot_access",
+                },
             )
             return True
 
         return False
 
-    def detect_brute_force_attack(self, request: Request, failed_auth: bool = False) -> bool:
+    def detect_brute_force_attack(
+        self, request: Request, failed_auth: bool = False
+    ) -> bool:
         """Detect brute force authentication attempts"""
         if not failed_auth:
             return False
@@ -233,7 +256,8 @@ class SecurityMonitor:
 
             # Check for brute force pattern
             recent_failures = [
-                attempt for attempt in self.failed_auth_attempts[client_ip]
+                attempt
+                for attempt in self.failed_auth_attempts[client_ip]
                 if attempt > datetime.now(UTC) - timedelta(minutes=15)
             ]
 
@@ -245,8 +269,8 @@ class SecurityMonitor:
                     details={
                         "failed_attempts_15min": len(recent_failures),
                         "total_failures": len(self.failed_auth_attempts[client_ip]),
-                        "detection_threshold": 5
-                    }
+                        "detection_threshold": 5,
+                    },
                 )
                 return True
 
@@ -263,14 +287,20 @@ class SecurityMonitor:
 
             if len(ip_events) >= 10:
                 # Check for rapid requests to different endpoints
-                recent_events = [e for e in ip_events if e.timestamp > datetime.now(UTC) - timedelta(minutes=5)]
+                recent_events = [
+                    e
+                    for e in ip_events
+                    if e.timestamp > datetime.now(UTC) - timedelta(minutes=5)
+                ]
                 unique_endpoints = len({e.endpoint for e in recent_events})
 
                 if unique_endpoints >= 10:  # 10+ different endpoints in 5 minutes
                     anomalies.append("endpoint_enumeration")
 
                 # Check for error rate
-                error_events = [e for e in recent_events if e.severity in ["high", "critical"]]
+                error_events = [
+                    e for e in recent_events if e.severity in ["high", "critical"]
+                ]
                 if len(error_events) / len(recent_events) > 0.5:  # >50% error rate
                     anomalies.append("high_error_rate")
 
@@ -290,8 +320,8 @@ class SecurityMonitor:
                 severity="medium",
                 details={
                     "anomalies_detected": anomalies,
-                    "anomaly_count": len(anomalies)
-                }
+                    "anomaly_count": len(anomalies),
+                },
             )
 
         return anomalies
@@ -337,12 +367,9 @@ class SecurityMonitor:
 
     def _update_risk_score(self, client_ip: str, event_type: str, severity: str):
         """Update risk score for an IP address"""
-        score_increment = {
-            "low": 1,
-            "medium": 5,
-            "high": 15,
-            "critical": 30
-        }.get(severity, 5)
+        score_increment = {"low": 1, "medium": 5, "high": 15, "critical": 30}.get(
+            severity, 5
+        )
 
         # Higher scores for more serious events
         event_multipliers = {
@@ -350,7 +377,7 @@ class SecurityMonitor:
             SecurityEventType.XSS_ATTEMPT: 2,
             SecurityEventType.DDOS_ATTACK: 5,
             SecurityEventType.BRUTE_FORCE_ATTEMPT: 4,
-            SecurityEventType.SECURITY_SCAN_DETECTED: 3
+            SecurityEventType.SECURITY_SCAN_DETECTED: 3,
         }
 
         multiplier = event_multipliers.get(event_type, 1)
@@ -369,12 +396,13 @@ class SecurityMonitor:
                     client_ip=client_ip,
                     risk_score=risk_score,
                     event_count=len(ip_events),
-                    latest_event=event.event_type
+                    latest_event=event.event_type,
                 )
 
             # Rapid event detection
             recent_events = [
-                e for e in ip_events
+                e
+                for e in ip_events
                 if e.timestamp > datetime.now(UTC) - timedelta(minutes=5)
             ]
 
@@ -383,7 +411,7 @@ class SecurityMonitor:
                     "Rapid security events detected",
                     client_ip=client_ip,
                     events_5min=len(recent_events),
-                    risk_score=risk_score
+                    risk_score=risk_score,
                 )
 
     def get_security_statistics(self) -> dict[str, Any]:
@@ -392,8 +420,16 @@ class SecurityMonitor:
             now = datetime.now(UTC)
 
             # Time-based statistics
-            last_24h = [e for e in self.security_events if e.timestamp > now - timedelta(hours=24)]
-            last_1h = [e for e in self.security_events if e.timestamp > now - timedelta(hours=1)]
+            last_24h = [
+                e
+                for e in self.security_events
+                if e.timestamp > now - timedelta(hours=24)
+            ]
+            last_1h = [
+                e
+                for e in self.security_events
+                if e.timestamp > now - timedelta(hours=1)
+            ]
 
             # Event type breakdown
             event_type_counts = defaultdict(int)
@@ -409,15 +445,12 @@ class SecurityMonitor:
                 ip_event_counts[event.client_ip] += 1
 
             top_attacking_ips = sorted(
-                ip_event_counts.items(),
-                key=lambda x: x[1],
-                reverse=True
+                ip_event_counts.items(), key=lambda x: x[1], reverse=True
             )[:10]
 
             # High-risk IPs
             high_risk_ips = [
-                (ip, score) for ip, score in self.ip_risk_scores.items()
-                if score >= 50
+                (ip, score) for ip, score in self.ip_risk_scores.items() if score >= 50
             ]
             high_risk_ips.sort(key=lambda x: x[1], reverse=True)
 
@@ -432,7 +465,7 @@ class SecurityMonitor:
                 "high_risk_ips": high_risk_ips[:10],
                 "unique_ips_tracked": len(self.ip_events),
                 "attack_patterns": dict(self.attack_patterns),
-                "monitoring_status": "active"
+                "monitoring_status": "active",
             }
 
     def get_ip_security_profile(self, client_ip: str) -> dict[str, Any]:
@@ -452,7 +485,8 @@ class SecurityMonitor:
 
             # Recent activity
             recent_events = [
-                e for e in ip_events
+                e
+                for e in ip_events
                 if e.timestamp > datetime.now(UTC) - timedelta(hours=24)
             ]
 
@@ -467,7 +501,9 @@ class SecurityMonitor:
                 "failed_auth_attempts": len(self.failed_auth_attempts[client_ip]),
                 "risk_level": self._get_risk_level(risk_score),
                 "is_high_risk": risk_score >= 50,
-                "endpoints_accessed": list(self.endpoint_access_patterns[client_ip].keys())
+                "endpoints_accessed": list(
+                    self.endpoint_access_patterns[client_ip].keys()
+                ),
             }
 
     def _get_risk_level(self, risk_score: int) -> str:
@@ -487,7 +523,7 @@ class SecurityMonitor:
             "low": "info",
             "medium": "warning",
             "high": "error",
-            "critical": "error"
+            "critical": "error",
         }
         return severity_map.get(severity, "warning")
 
@@ -495,16 +531,17 @@ class SecurityMonitor:
         """Extract client IP from request"""
         forwarded_for = request.headers.get("x-forwarded-for")
         if forwarded_for:
-            return forwarded_for.split(',')[0].strip()
+            return forwarded_for.split(",")[0].strip()
 
         real_ip = request.headers.get("x-real-ip")
         if real_ip:
             return real_ip
 
-        return getattr(request.client, 'host', 'unknown')
+        return getattr(request.client, "host", "unknown")
 
     def _start_monitoring_tasks(self):
         """Start background monitoring tasks"""
+
         def cleanup_old_data():
             while True:
                 try:
@@ -535,14 +572,16 @@ class SecurityMonitor:
 
                         # Decay risk scores over time
                         for ip in self.ip_risk_scores:
-                            self.ip_risk_scores[ip] = max(0, self.ip_risk_scores[ip] - 1)
+                            self.ip_risk_scores[ip] = max(
+                                0, self.ip_risk_scores[ip] - 1
+                            )
 
                         if expired_ips:
                             logger.info(
                                 "Security monitor cleanup completed",
                                 expired_ips=len(expired_ips),
                                 active_ips=len(self.ip_events),
-                                total_events=len(self.security_events)
+                                total_events=len(self.security_events),
                             )
 
                     time.sleep(3600)  # Cleanup every hour

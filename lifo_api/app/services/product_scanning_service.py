@@ -193,9 +193,7 @@ class ProductScanningService:
                 error_type="timeout_error",
             ) from e
 
-    def _extract_primary_barcode(
-        self, vision_result: VisionScanResult
-    ) -> str | None:
+    def _extract_primary_barcode(self, vision_result: VisionScanResult) -> str | None:
         """Extract the most confident barcode from vision results"""
         if not vision_result.barcodes:
             return None
@@ -1190,9 +1188,7 @@ class ProductScanningService:
 
         return "general"
 
-    def _strategy_brand_product_descriptor(
-        self, candidates: list[dict]
-    ) -> str | None:
+    def _strategy_brand_product_descriptor(self, candidates: list[dict]) -> str | None:
         """Try to construct name with brand + product + descriptors"""
         brands = [c for c in candidates if c["category"] == "brand"][:2]
         products = [c for c in candidates if c["category"] == "product"][:2]

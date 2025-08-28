@@ -111,7 +111,9 @@ async def extract_expiry_date_ocr(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Expiry date extraction failed") from e
+        raise HTTPException(
+            status_code=500, detail="Expiry date extraction failed"
+        ) from e
 
 
 @router.post("/scan/full-ocr/{store_id}")
@@ -216,7 +218,9 @@ async def full_ocr_analysis(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=422, detail=f"OCR analysis failed: {str(e)}") from e
+        raise HTTPException(
+            status_code=422, detail=f"OCR analysis failed: {str(e)}"
+        ) from e
     except Exception as e:
         logger.error(
             "Full OCR analysis error",
@@ -304,7 +308,9 @@ async def extract_text_only(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=422, detail=f"Text extraction failed: {str(e)}") from e
+        raise HTTPException(
+            status_code=422, detail=f"Text extraction failed: {str(e)}"
+        ) from e
     except Exception as e:
         logger.error(
             "Text extraction error",

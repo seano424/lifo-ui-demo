@@ -176,7 +176,9 @@ async def get_active_threats(
             error=str(e),
             user_id=current_user.get("sub"),
         )
-        raise HTTPException(status_code=500, detail="Failed to retrieve active threats") from e
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve active threats"
+        ) from e
 
 
 @router.get("/security/ip/{ip_address}")
