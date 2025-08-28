@@ -194,7 +194,7 @@ async def get_ai_recommendations(
         # Filter by category if specified
         if category:
             inventory_data = [
-                item for item in inventory_data if item["category"] == category
+                item for item in inventory_data if item.get("category_code") == category
             ]
 
         # Generate AI recommendations

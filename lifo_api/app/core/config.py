@@ -85,13 +85,23 @@ class Settings(BaseSettings):
         "margin": 0.2,
     }
 
-    # Category-specific weights
+    # Category-specific weights (updated for standardized categories)
     category_weights: dict[str, dict[str, float]] = {
         "fresh_produce": {"expiry": 0.6, "velocity": 0.25, "margin": 0.15},
-        "dairy": {"expiry": 0.45, "velocity": 0.35, "margin": 0.2},
+        "dairy_eggs": {"expiry": 0.45, "velocity": 0.35, "margin": 0.2},
         "bakery_fresh": {"expiry": 0.55, "velocity": 0.25, "margin": 0.2},
-        "meat_fish": {"expiry": 0.65, "velocity": 0.2, "margin": 0.15},
-        "frozen": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
+        "fresh_meat_fish": {"expiry": 0.65, "velocity": 0.2, "margin": 0.15},
+        "frozen_foods": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
+        "deli_prepared": {"expiry": 0.65, "velocity": 0.25, "margin": 0.1},
+        "chilled_packaged": {"expiry": 0.4, "velocity": 0.4, "margin": 0.2},
+        "canned_jarred": {"expiry": 0.1, "velocity": 0.6, "margin": 0.3},
+        "dry_goods": {"expiry": 0.15, "velocity": 0.55, "margin": 0.3},
+        "beverages": {"expiry": 0.25, "velocity": 0.45, "margin": 0.3},
+        "spices_condiments": {"expiry": 0.1, "velocity": 0.6, "margin": 0.3},
+        "pantry_staples": {"expiry": 0.15, "velocity": 0.55, "margin": 0.3},
+        "household_other": {"expiry": 0.3, "velocity": 0.4, "margin": 0.3},
+        "specialty_items": {"expiry": 0.4, "velocity": 0.3, "margin": 0.3},
+        "bulk_items": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
     }
 
     # Processing Configuration

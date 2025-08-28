@@ -539,22 +539,48 @@ class SecureCSVProcessor:
         # Category validation
         if "category" in row_data:
             category = row_data["category"].strip().lower()
-            valid_categories = [
-                "fresh_produce",
-                "dairy",
-                "bakery_fresh",
-                "fresh_meat_fish",
-                "frozen",
-                "canned_jarred",
-                "dry_goods",
-                "beverages",
-                "deli_prepared",
-                "spices_condiments",
-                "general",
-            ]
-            if category and category not in valid_categories:
-                category = "general"  # Default to general if invalid
-            validated_row["category"] = category or "general"
+            
+            # Standardized category mapping
+            category_mapping = {
+                # Direct mappings to standardized categories
+                "fresh_produce": "fresh_produce",
+                "dairy_eggs": "dairy_eggs", 
+                "bakery_fresh": "bakery_fresh",
+                "fresh_meat_fish": "fresh_meat_fish",
+                "frozen_foods": "frozen_foods",
+                "deli_prepared": "deli_prepared",
+                "chilled_packaged": "chilled_packaged",
+                "canned_jarred": "canned_jarred",
+                "dry_goods": "dry_goods",
+                "beverages": "beverages",
+                "spices_condiments": "spices_condiments",
+                "pantry_staples": "pantry_staples",
+                "household_other": "household_other",
+                "specialty_items": "specialty_items",
+                "bulk_items": "bulk_items",
+                
+                # Legacy mappings
+                "dairy": "dairy_eggs",
+                "frozen": "frozen_foods",
+                "bakery": "bakery_fresh",
+                "produce": "fresh_produce",
+                "meat": "fresh_meat_fish",
+                "general": "household_other",
+                "pantry": "pantry_staples",
+                "canned": "canned_jarred",
+                "spices": "spices_condiments",
+                "bulk": "bulk_items",
+            }
+            
+            mapped_category = category_mapping.get(category)
+            if not mapped_category:
+                # Try partial matching for flexibility
+                for key, value in category_mapping.items():
+                    if key in category or category in key:
+                        mapped_category = value
+                        break
+                        
+            validated_row["category"] = mapped_category or "household_other"  # Default to household_other
 
         # Copy other safe fields
         for field in ["brand", "batch_number", "location_code", "supplier"]:

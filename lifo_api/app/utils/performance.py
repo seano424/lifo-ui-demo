@@ -461,7 +461,7 @@ async def warm_mobile_cache(store_id: str, read_ops):
             await mobile_cache.set(cache_key, inventory_data, ttl=300)
 
         # Cache category weights
-        common_categories = ["fresh_produce", "dairy", "bakery_fresh", "meat_fish"]
+        common_categories = ["fresh_produce", "dairy_eggs", "bakery_fresh", "fresh_meat_fish"]
         for category in common_categories:
             cache_key = mobile_cache._generate_key("category_weights", category)
             if not await mobile_cache.get(cache_key):

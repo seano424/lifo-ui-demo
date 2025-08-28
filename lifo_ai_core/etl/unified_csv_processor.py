@@ -102,7 +102,7 @@ class UnifiedCSVProcessor:
         r"vbscript:",  # VBScript
     ]
 
-    # Advanced category mapping (from ETL processor)
+    # Advanced category mapping (updated for standardized categories)
     CATEGORY_MAPPING = {
         # Fresh produce
         "produce": "fresh_produce",
@@ -117,48 +117,64 @@ class UnifiedCSVProcessor:
         "poultry": "fresh_meat_fish",
         "viande": "fresh_meat_fish",
         "poisson": "fresh_meat_fish",
-        # Dairy
-        "dairy": "dairy",
-        "milk": "dairy",
-        "cheese": "dairy",
-        "yogurt": "dairy",
-        "eggs": "dairy",
-        "produits laitiers": "dairy",
-        "lait": "dairy",
+        # Dairy and eggs (updated to standardized category)
+        "dairy": "dairy_eggs",
+        "milk": "dairy_eggs",
+        "cheese": "dairy_eggs",
+        "yogurt": "dairy_eggs",
+        "eggs": "dairy_eggs",
+        "produits laitiers": "dairy_eggs",
+        "lait": "dairy_eggs",
         # Bakery
         "bakery": "bakery_fresh",
         "bread": "bakery_fresh",
         "pastry": "bakery_fresh",
         "boulangerie": "bakery_fresh",
         "pain": "bakery_fresh",
-        # Frozen
-        "frozen": "frozen",
-        "surgelé": "frozen",
-        "congelé": "frozen",
+        # Frozen (updated to standardized category)
+        "frozen": "frozen_foods",
+        "frozen foods": "frozen_foods", 
+        "surgelé": "frozen_foods",
+        "congelé": "frozen_foods",
         # Beverages
         "beverages": "beverages",
         "drinks": "beverages",
         "boissons": "beverages",
-        # Default categories
+        # Standardized categories
         "dry_goods": "dry_goods",
         "pantry": "pantry_staples",
         "canned": "canned_jarred",
+        "jarred": "canned_jarred",
+        "deli": "deli_prepared",
+        "prepared": "deli_prepared",
+        "chilled": "chilled_packaged",
+        "packaged": "chilled_packaged",
+        "spices": "spices_condiments",
+        "condiments": "spices_condiments",
+        "bulk": "bulk_items",
+        "specialty": "specialty_items",
+        "general": "household_other",
+        "other": "household_other",
+        "household": "household_other",
     }
 
-    # Shelf life mapping (days) - from ETL processor
+    # Shelf life mapping (days) - updated for standardized categories
     SHELF_LIFE_MAPPING = {
         "fresh_produce": 7,
         "fresh_meat_fish": 3,
         "bakery_fresh": 2,
-        "dairy": 14,
+        "dairy_eggs": 14,  # Updated from "dairy"
         "deli_prepared": 3,
-        "frozen": 365,
+        "frozen_foods": 365,  # Updated from "frozen"
         "chilled_packaged": 21,
         "pantry_staples": 730,
         "canned_jarred": 1095,
         "dry_goods": 365,
         "beverages": 180,
         "spices_condiments": 1095,
+        "household_other": 180,  # Default for unknown items
+        "specialty_items": 90,   # Moderate shelf life
+        "bulk_items": 365,       # Long shelf life for bulk items
     }
 
     def __init__(
@@ -598,9 +614,9 @@ class UnifiedCSVProcessor:
         """Normalize and validate category"""
         if pd.isna(category):
             self.warnings.append(
-                f"Row {row_num}: No category provided, using 'dry_goods'"
+                f"Row {row_num}: No category provided, using 'household_other'"
             )
-            return "dry_goods"
+            return "household_other"
 
         category_str = str(category).lower().strip()
 
@@ -609,11 +625,11 @@ class UnifiedCSVProcessor:
             if key in category_str or category_str in key:
                 return value
 
-        # If no mapping found, return as-is but warn
+        # If no mapping found, default to household_other
         self.warnings.append(
-            f"Row {row_num}: Unknown category '{category}', kept as provided"
+            f"Row {row_num}: Unknown category '{category}', using 'household_other'"
         )
-        return category_str
+        return "household_other"
 
     def _validate_quantity(self, quantity: Any, row_num: int) -> float:
         """Validate quantity field"""
