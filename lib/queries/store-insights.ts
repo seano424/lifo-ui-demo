@@ -64,7 +64,7 @@ export async function fetchStoreInsights(
   const supabase = serverClient || createClient()
 
   const { data, error } = await supabase.rpc('get_store_insights', {
-    input_store_id: storeId,
+    target_store_id: storeId,
   })
 
   if (error) {

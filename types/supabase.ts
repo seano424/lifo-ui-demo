@@ -1772,7 +1772,7 @@ export type Database = {
         }[]
       }
       get_store_insights: {
-        Args: { input_store_id: string }
+        Args: { target_store_id: string }
         Returns: Json
       }
       get_store_settings: {

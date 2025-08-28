@@ -63,8 +63,39 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     )
   }
 
-  const { insights: data } = insights
-  const { expiring_soon, ready_for_discount, perfect_for_donation, high_urgency, summary } = data
+  // Handle both old and new data structures
+  const data = insights?.insights || insights
+  
+  // Add safety checks for data structure
+  if (!data) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Store Insights Dashboard</CardTitle>
+          <CardDescription>No insights data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              No insights data found for store: {storeId}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Extract data with fallbacks for different structures
+  const expiring_soon = data.expiring_soon || { count: data.expiring_soon || 0 }
+  const ready_for_discount = data.ready_for_discount || { count: 0 }
+  const perfect_for_donation = data.perfect_for_donation || { count: 0 }
+  const high_urgency = data.high_urgency || { count: 0 }
+  const summary = data.summary || {
+    total_active_batches: data.active_batches || 0,
+    total_actionable_items: 0,
+    action_required_percentage: 0
+  }
 
   return (
     <div className="flex flex-col gap-6">

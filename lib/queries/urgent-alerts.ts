@@ -46,10 +46,10 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
     }
   }
 
-  // Query the expiring_batches view filtering by batch IDs
+  // Query the batch_expiry_status view filtering by batch IDs
   const { data, error } = await supabase
     .schema('inventory')
-    .from('expiring_batches')
+    .from('batch_expiry_status')
     .select('*')
     .in('batch_id', batchIds)
     .in('urgency_level', ['Critical', 'Urgent'])
