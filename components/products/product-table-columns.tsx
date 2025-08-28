@@ -1,16 +1,7 @@
 'use client'
 
 import type { ColumnDef, Header } from '@tanstack/react-table'
-import {
-  Building2,
-  Edit,
-  Euro,
-  Eye,
-  MoreHorizontal,
-  Package,
-  Tag,
-  Trash2,
-} from 'lucide-react'
+import { Building2, Edit, Euro, Eye, MoreHorizontal, Package, Tag, Trash2 } from 'lucide-react'
 import { SortableHeader } from '@/components/products/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -47,9 +38,7 @@ function ColumnResizer({ header }: ColumnResizerProps) {
     >
       <div
         className={`w-0.5 h-full ml-auto transition-all ${
-          header.column.getIsResizing()
-            ? 'bg-brand-secondary'
-            : 'bg-transparent hover:bg-border'
+          header.column.getIsResizing() ? 'bg-brand-secondary' : 'bg-transparent hover:bg-border'
         }`}
       />
     </div>
@@ -58,17 +47,21 @@ function ColumnResizer({ header }: ColumnResizerProps) {
 
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
-    beverages: 'bg-blue-100 text-blue-800 border-blue-200',
-    bakery: 'bg-orange-100 text-orange-800 border-orange-200',
+    fresh_produce: 'bg-green-100 text-green-800 border-green-200',
+    fresh_meat_fish: 'bg-red-100 text-red-800 border-red-200',
+    bakery_fresh: 'bg-orange-100 text-orange-800 border-orange-200',
     dairy: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    meat: 'bg-red-100 text-red-800 border-red-200',
-    produce: 'bg-green-100 text-green-800 border-green-200',
+    deli_prepared: 'bg-pink-100 text-pink-800 border-pink-200',
     frozen: 'bg-cyan-100 text-cyan-800 border-cyan-200',
-    pantry: 'bg-amber-100 text-amber-800 border-amber-200',
-    snacks: 'bg-purple-100 text-purple-800 border-purple-200',
+    dry_goods: 'bg-amber-100 text-amber-800 border-amber-200',
+    beverages: 'bg-blue-100 text-blue-800 border-blue-200',
+    spices_condiments: 'bg-purple-100 text-purple-800 border-purple-200',
+    canned_jarred: 'bg-stone-100 text-stone-800 border-stone-200',
+    chilled_packaged: 'bg-teal-100 text-teal-800 border-teal-200',
+    pantry_staples: 'bg-slate-100 text-slate-800 border-slate-200',
     other: 'bg-gray-100 text-gray-800 border-gray-200',
   }
-  return colors[category.toLowerCase() as keyof typeof colors] || colors.other
+  return colors[category?.toLowerCase() as keyof typeof colors] || colors.other
 }
 
 export function createProductTableColumns({
@@ -92,20 +85,13 @@ export function createProductTableColumns({
       id: 'name',
       accessorKey: 'name',
       header: () => (
-        <SortableHeader
-          field="name"
-          currentSort={currentSort}
-          updateSort={updateSort}
-        >
+        <SortableHeader field="name" currentSort={currentSort} updateSort={updateSort}>
           Product
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div>
-          <div
-            className="font-medium truncate"
-            title={row.original.name}
-          >
+          <div className="font-medium truncate" title={row.original.name}>
             {row.original.name || 'Unnamed Product'}
           </div>
           <div
@@ -125,23 +111,19 @@ export function createProductTableColumns({
       id: 'category',
       accessorKey: 'category',
       header: () => (
-        <SortableHeader
-          field="category"
-          currentSort={currentSort}
-          updateSort={updateSort}
-        >
+        <SortableHeader field="category" currentSort={currentSort} updateSort={updateSort}>
           Category
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          {row.original.category ? (
+          {row.original.category_display_name ? (
             <Badge
               variant="outline"
-              className={`capitalize ${getCategoryBadgeColor(row.original.category)}`}
+              className={`${getCategoryBadgeColor(row.original.category_display_name)}`}
             >
-              {row.original.category}
+              {row.original.category_display_name}
             </Badge>
           ) : (
             <span className="text-muted-foreground text-sm">Uncategorized</span>
@@ -157,21 +139,14 @@ export function createProductTableColumns({
       id: 'brand',
       accessorKey: 'brand',
       header: () => (
-        <SortableHeader
-          field="brand"
-          currentSort={currentSort}
-          updateSort={updateSort}
-        >
+        <SortableHeader field="brand" currentSort={currentSort} updateSort={updateSort}>
           Brand
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span
-            className="truncate"
-            title={row.original.brand || 'N/A'}
-          >
+          <span className="truncate" title={row.original.brand || 'N/A'}>
             {row.original.brand || 'N/A'}
           </span>
         </div>
@@ -250,10 +225,7 @@ export function createProductTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <Typography
-          variant="small"
-          className="flex items-center gap-2 justify-end text-right"
-        >
+        <Typography variant="small" className="flex items-center gap-2 justify-end text-right">
           <span>{row.original.active_batches_count || 0}</span>
         </Typography>
       ),
@@ -266,19 +238,13 @@ export function createProductTableColumns({
       id: 'created_at',
       accessorKey: 'created_at',
       header: () => (
-        <SortableHeader
-          field="created_at"
-          currentSort={currentSort}
-          updateSort={updateSort}
-        >
+        <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
           Date Added
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground">
-          {row.original.created_at
-            ? new Date(row.original.created_at).toLocaleDateString()
-            : 'N/A'}
+          {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : 'N/A'}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.created_at || 100,
@@ -292,11 +258,7 @@ export function createProductTableColumns({
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={isUpdating}
-            >
+            <Button variant="ghost" size="sm" disabled={isUpdating}>
               <MoreHorizontal className="h-4 w-4" />
               <span className="sr-only">Open menu</span>
             </Button>
@@ -319,10 +281,7 @@ export function createProductTableColumns({
             <DropdownMenuItem
               onClick={() => {
                 const currentPrice = row.original.base_selling_price || 0
-                const newPrice = prompt(
-                  'Enter new price (€):',
-                  currentPrice.toString()
-                )
+                const newPrice = prompt('Enter new price (€):', currentPrice.toString())
                 if (newPrice && !Number.isNaN(Number(newPrice))) {
                   updateProductPrice(row.original.product_id, Number(newPrice))
                 }

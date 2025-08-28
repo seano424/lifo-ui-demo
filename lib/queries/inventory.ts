@@ -130,8 +130,8 @@ async function upsertGlobalProduct(
         if (productData.brand && !existingProduct.brand) {
           updates.brand = productData.brand
         }
-        if (productData.category && !existingProduct.category) {
-          updates.category = productData.category
+        if (productData.category && !existingProduct.category_id) {
+          updates.category_id = productData.category
         }
         if (productData.openFoodFactsData && !existingProduct.open_food_facts_data) {
           updates.open_food_facts_data = productData.openFoodFactsData as Json
@@ -167,7 +167,7 @@ async function upsertGlobalProduct(
     const newProductData: Database['inventory']['Tables']['products']['Insert'] = {
       name: productData.productName,
       brand: productData.brand || null,
-      category: productData.category || 'other',
+      category_id: productData.category || null,
       barcode: productData.barcode || null,
       description: null,
       image_url: null,

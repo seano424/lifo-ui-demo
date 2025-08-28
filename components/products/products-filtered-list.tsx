@@ -108,7 +108,7 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <ProductListFilters
                 filters={{
-                  category: filters.category,
+                  category: filters.category || undefined,
                 }}
                 onFiltersChange={handleFiltersChange}
                 count={count}

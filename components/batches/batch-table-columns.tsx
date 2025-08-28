@@ -115,9 +115,9 @@ export function createBatchTableColumns({
           </div>
           <div
             className="text-sm text-muted-foreground truncate"
-            title={`${row.original.products?.sku} • ${row.original.products?.category}`}
+            title={`${row.original.products?.sku}`}
           >
-            {row.original.products?.sku} • {row.original.products?.category}
+            {row.original.products?.sku}
           </div>
         </div>
       ),

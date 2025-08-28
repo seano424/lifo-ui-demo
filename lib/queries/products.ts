@@ -21,7 +21,7 @@ export type StoreProduct = {
   supplier_code?: string
 }
 
-// Type for the joined query result
+// Type for the joined query result with categories
 type StoreProductWithProduct = {
   store_id: string
   product_id: string
@@ -32,7 +32,15 @@ type StoreProductWithProduct = {
   supplier_code: string | null
   created_at: string
   updated_at: string
-  products: BaseProduct
+  products: BaseProduct & {
+    categories?: {
+      category_id: string
+      category_code: string
+      display_name_en: string
+      display_name_fr: string
+      typical_shelf_life_days?: number | null
+    } | null
+  } | null
 }
 
 // Combined type that includes both global product data and store-specific data
@@ -47,6 +55,9 @@ export type Product = BaseProduct & {
   store_is_active?: boolean
   store_sku?: string | null
   supplier_code?: string | null
+  // Category information from standardized categories table
+  category_display_name?: string
+  category_display_name_fr?: string
 }
 
 // Enhanced sorting types
@@ -69,7 +80,7 @@ export type ProductSort = {
 // Type for a product filter (enhanced with store and sorting)
 export type ProductFilters = {
   storeId?: string // ✅ STORE FILTER ADDED
-  category?: Database['inventory']['Tables']['products']['Row']['category']
+  category?: Database['inventory']['Tables']['products']['Row']['category_id']
   brand?: string
   expiringOnly?: boolean
   sort?: ProductSort
@@ -254,7 +265,7 @@ export async function fetchProductsPage(
 
     console.log('[fetchProductsPage] Fetching with store-specific stock calculations:', filters.storeId)
 
-    // Build the select query - excluding the global aggregation fields
+    // Build the select query with categories join
     let query = supabase
       .schema('inventory')
       .from('store_products')
@@ -266,6 +277,7 @@ export async function fetchProductsPage(
           name,
           brand,
           category,
+          category_id,
           barcode,
           typical_shelf_life_days,
           base_cost_price,
@@ -278,7 +290,14 @@ export async function fetchProductsPage(
           updated_at,
           created_by,
           last_verified,
-          open_food_facts_data
+          open_food_facts_data,
+          categories:category_id (
+            category_id,
+            category_code,
+            display_name_en,
+            display_name_fr,
+            typical_shelf_life_days
+          )
         )
       `,
         { count: 'exact' },
@@ -286,10 +305,10 @@ export async function fetchProductsPage(
       .eq('store_id', filters.storeId)
       .eq('is_active', true) // Only fetch active store products
 
-    // Apply filters using the embedded filtering syntax
+    // Apply filters using category_code if provided
     if (filters.category) {
       console.log('[fetchProductsPage] Applying category filter:', filters.category)
-      query = query.eq('products.category', filters.category)
+      // Filter will be applied post-query to avoid join issues
     }
 
     if (filters.brand) {
@@ -345,7 +364,7 @@ export async function fetchProductsPage(
       console.log('[fetchProductsPage] Fetching all products for stock-based sorting')
       const response = await query
       error = response.error
-      storeProductsData = response.data || []
+      storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
       totalCount = response.count || 0
     } else {
       // Normal pagination
@@ -354,7 +373,7 @@ export async function fetchProductsPage(
       console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
       const response = await query.range(rangeFrom, rangeTo)
       error = response.error
-      storeProductsData = response.data || []
+      storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
       totalCount = response.count || 0
     }
 
@@ -362,6 +381,11 @@ export async function fetchProductsPage(
       console.error('[fetchProductsPage] Supabase error:', error)
       throw new Error(`Failed to fetch products page: ${error.message}`)
     }
+
+    console.log('[fetchProductsPage] Raw response sample:', {
+      count: totalCount,
+      sampleData: storeProductsData?.slice(0, 2)
+    })
 
     if (!storeProductsData || storeProductsData.length === 0) {
       return {
@@ -371,8 +395,45 @@ export async function fetchProductsPage(
       }
     }
 
-    // Extract product IDs for batch aggregation
-    const productIds = storeProductsData.map(sp => sp.product_id)
+    // Check if products join is working
+    const productsWithNullJoin = storeProductsData.filter(sp => !sp.products)
+    if (productsWithNullJoin.length > 0) {
+      console.warn('[fetchProductsPage] Products with null join detected:', {
+        count: productsWithNullJoin.length,
+        total: storeProductsData.length,
+        sampleIds: productsWithNullJoin.slice(0, 3).map(sp => sp.product_id)
+      })
+    }
+
+    // Apply post-query filtering for category using category_code
+    let filteredStoreProductsData = storeProductsData
+    
+    if (filters.category) {
+      console.log('[fetchProductsPage] Applying category filter post-query:', filters.category)
+      
+      // Debug: Check what categories we actually have
+      if (storeProductsData.length > 0) {
+        const categoriesFound = storeProductsData.map(sp => ({
+          product_id: sp.product_id,
+          category_code: sp.products?.categories?.category_code,
+          display_name: sp.products?.categories?.display_name_en,
+          name: sp.products?.name
+        })).slice(0, 3)
+        console.log('[fetchProductsPage] Sample categories in data:', categoriesFound)
+      }
+      
+      filteredStoreProductsData = filteredStoreProductsData.filter(sp => 
+        sp.products?.categories?.category_code === filters.category
+      )
+      console.log('[fetchProductsPage] After category filter:', {
+        before: storeProductsData.length,
+        after: filteredStoreProductsData.length,
+        requestedCategory: filters.category
+      })
+    }
+
+    // Extract product IDs for batch aggregation (from filtered data)
+    const productIds = filteredStoreProductsData.map(sp => sp.product_id)
 
     // Get store-specific batch aggregations for this page's products
     const { data: batchAggregations, error: batchError } = await supabase
@@ -419,14 +480,26 @@ export async function fetchProductsPage(
     }
 
     // Transform the data with store-specific stock calculations
-    let transformedData = storeProductsData.map((storeProduct: StoreProductWithProduct) => {
+    let transformedData = filteredStoreProductsData.map((storeProduct: StoreProductWithProduct) => {
       const aggregation = productAggregations.get(storeProduct.product_id) || {
         total_stock: 0,
         active_batches_count: 0
       }
 
+      // Handle case where products join fails (null products field)
+      const productData = storeProduct.products || {}
+      
+      // Extract category information from the nested categories table
+      const categoryData = storeProduct.products?.categories || null
+      
       return {
-        ...storeProduct.products, // Global product data
+        ...productData, // Global product data (may be empty object)
+        product_id: storeProduct.product_id, // Ensure product_id is always present
+        // Add category information from the standardized categories table
+        category_display_name: categoryData?.display_name_en,
+        category_display_name_fr: categoryData?.display_name_fr,
+        category_id: categoryData?.category_id || (productData as any)?.category_id,
+        // Store-specific data
         store_cost_price: storeProduct.cost_price, // Store-specific pricing
         store_selling_price: storeProduct.selling_price,
         store_is_active: storeProduct.is_active,
@@ -466,7 +539,7 @@ export async function fetchProductsPage(
 
     // Apply pagination after sorting for stock-based sorts
     let finalData = transformedData
-    let finalCount = totalCount
+    let finalCount = transformedData.length // Use actual filtered/transformed count
 
     if (isStockBasedSort) {
       // For stock-based sorting, we fetched all products and sorted them
@@ -490,6 +563,7 @@ export async function fetchProductsPage(
       totalCount: finalCount,
       totalStockAcrossProducts: finalData.reduce((sum, p) => sum + (p.total_stock || 0), 0),
       hasNextPage: finalCount > (page + 1) * pageSize,
+      appliedFilters: { category: filters.category, brand: filters.brand }
     })
 
     return {
@@ -763,6 +837,42 @@ export async function deleteProduct(productId: string, storeId: string): Promise
     console.log('[deleteProduct] Success:', { productId, storeId, globalProductKept: true })
   } catch (err) {
     console.error('[deleteProduct] Unexpected error:', err)
+    throw err
+  }
+}
+
+// Fetch available categories for filter dropdown
+export async function fetchCategories(serverClient?: ServerClient): Promise<{
+  category_id: string
+  category_code: string
+  display_name_en: string
+  display_name_fr: string
+}[]> {
+  const supabase = serverClient || createClient()
+  
+  try {
+    console.log('[fetchCategories] Fetching standardized categories')
+    
+    const { data: categories, error } = await supabase
+      .schema('inventory')
+      .from('categories')
+      .select(`
+        category_id,
+        category_code,
+        display_name_en,
+        display_name_fr
+      `)
+      .order('display_name_en', { ascending: true })
+    
+    if (error) {
+      console.error('[fetchCategories] Error fetching categories:', error)
+      throw new Error(`Failed to fetch categories: ${error.message}`)
+    }
+    
+    console.log('[fetchCategories] Success:', { count: categories?.length || 0 })
+    return categories || []
+  } catch (err) {
+    console.error('[fetchCategories] Unexpected error:', err)
     throw err
   }
 }

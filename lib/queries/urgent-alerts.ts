@@ -4,10 +4,10 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 
 // Type from the database view
-type ExpiringBatchRow = Database['inventory']['Views']['expiring_batches']['Row']
+type ExpiringBatchRow = Database['inventory']['Views']['batch_expiry_status']['Row']
 
 // Extended type with proper urgency level enum
-export type ExpiringBatch = Omit<ExpiringBatchRow, 'urgency_level'> & {
+export type ExpiringBatch = ExpiringBatchRow & {
   urgency_level: 'Critical' | 'Urgent' | 'Warning' | null
 }
 
