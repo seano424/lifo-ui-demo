@@ -6,7 +6,15 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
+import { useCategories } from '@/hooks/use-categories'
 import { useProductLookup, useProductSearch } from '@/hooks/use-product-lookup'
 import type { OpenFoodFactsSearchResult, ProductLookupResult } from '@/lib/queries/open-food-facts'
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
@@ -32,6 +40,8 @@ export default function ManualBarcodeEntry({
   onClose,
   className = '',
 }: ManualBarcodeEntryProps) {
+  const { getCategoriesForDropdown, isLoading: categoriesLoading } = useCategories()
+
   const [barcode, setBarcode] = useState('')
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null)
   const [manualProductData, setManualProductData] = useState({
@@ -339,16 +349,34 @@ export default function ManualBarcodeEntry({
 
                         <div>
                           <label className="block text-xs font-medium mb-1">Category</label>
-                          <Input
+                          <Select
                             value={manualProductData.category}
-                            onChange={e =>
+                            onValueChange={value =>
                               setManualProductData(prev => ({
                                 ...prev,
-                                category: e.target.value,
+                                category: value,
                               }))
                             }
-                            placeholder="e.g., Dairy"
-                          />
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categoriesLoading ? (
+                                <SelectItem value="" disabled>
+                                  Loading categories...
+                                </SelectItem>
+                              ) : (
+                                getCategoriesForDropdown().map(
+                                  (category: { value: string; label: string; code: string }) => (
+                                    <SelectItem key={category.value} value={category.value}>
+                                      {category.label}
+                                    </SelectItem>
+                                  ),
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>

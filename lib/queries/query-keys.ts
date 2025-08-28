@@ -32,6 +32,12 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.products.details(), id] as const,
   },
 
+  // Categories queries
+  categories: {
+    all: ['categories'] as const,
+    list: ['categories', 'list'] as const,
+  },
+
   // Product lookup and recognition queries
   productLookup: {
     all: ['productLookup'] as const,

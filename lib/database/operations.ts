@@ -671,7 +671,7 @@ export class InventoryOperations {
         sku: csvItem.SKU || `AUTO-${Date.now()}-${index}`,
         product_name: csvItem.Product_Name,
         brand: csvItem.Brand,
-        category: csvItem.Category,
+        category: csvItem.Category, // Will be mapped to standardized category in database function
         quantity: csvItem.Quantity,
         expiry_date: csvItem.Expiry_Date,
         cost_price: csvItem.Cost_Price || 0,
@@ -680,7 +680,7 @@ export class InventoryOperations {
         location: csvItem.Location || 'MAIN',
         unit_type: csvItem.Unit_Type || 'units',
         batch_number: csvItem.Batch_Number || `CSV-${Date.now()}-${index}`,
-        typical_shelf_life_days: this.calculateShelfLifeFromCategory(csvItem.Category),
+        typical_shelf_life_days: 30, // Will be determined from database category mapping
       }))
 
       const batchPrepEnd = performance.now()
@@ -845,7 +845,7 @@ export class InventoryOperations {
               brand: csvItem.Brand,
               category: csvItem.Category,
               unit_type: csvItem.Unit_Type || 'units',
-              typical_shelf_life_days: this.calculateShelfLifeFromCategory(csvItem.Category),
+              typical_shelf_life_days: 30, // Will be determined from database category mapping
               base_cost_price: csvItem.Cost_Price || 0,
               base_selling_price: csvItem.Selling_Price || 0,
               created_by: userId,
@@ -939,6 +939,7 @@ export class InventoryOperations {
     return { processed, errors, duplicates_skipped: [] }
   }
 
+  // TODO: Replace with database lookup using inventory.categories table
   private calculateShelfLifeFromCategory(category?: string): number {
     const categoryLifeMap: Record<string, number> = {
       fresh_produce: 7,

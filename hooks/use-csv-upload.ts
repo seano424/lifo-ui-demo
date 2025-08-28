@@ -99,7 +99,7 @@ export function useCSVUpload() {
       const previewItem = {
         SKU: values[skuIndex] || `AUTO-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
-        Category: values[categoryIndex] || 'dry_goods',
+        Category: values[categoryIndex] || 'dry_goods', // Will be mapped using database function
         Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
         Expiry_Date: expiryValue,
       }

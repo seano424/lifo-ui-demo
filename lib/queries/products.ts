@@ -10,6 +10,15 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 // Type for a product row from global products table
 type BaseProduct = Database['inventory']['Tables']['products']['Row']
 
+// Type for category data
+export interface Category {
+  category_id: string
+  category_code: string
+  display_name_en: string
+  display_name_fr: string
+  product_count?: number
+}
+
 // Type for store-specific product data from junction table
 export type StoreProduct = {
   store_id: string
@@ -879,13 +888,7 @@ export async function deleteProduct(productId: string, storeId: string): Promise
 }
 
 // Fetch available categories for filter dropdown using database function
-export async function fetchCategories(serverClient?: ServerClient): Promise<{
-  category_id: string
-  category_code: string
-  display_name_en: string
-  display_name_fr: string
-  product_count?: number
-}[]> {
+export async function fetchCategories(serverClient?: ServerClient): Promise<Category[]> {
   const supabase = serverClient || createClient()
   
   try {
