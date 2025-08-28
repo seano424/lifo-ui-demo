@@ -37,16 +37,6 @@ class Settings(BaseSettings):
         description="CORS allowed origins",
     )
 
-    @field_validator("cors_origins", "allowed_hosts", "api_keys", mode="before")
-    @classmethod
-    def parse_list_fields(cls, v):
-        if isinstance(v, str):
-            if not v.strip():
-                return []
-            return [item.strip() for item in v.split(",") if item.strip()]
-        elif isinstance(v, list):
-            return v
-        return []
 
     # Production URLs (set via environment variables)
     frontend_url: str | None = None
@@ -180,6 +170,17 @@ class Settings(BaseSettings):
     cpu_usage_warning_percent: int = Field(
         default=80, description="CPU usage warning threshold (%)"
     )
+
+    @field_validator("cors_origins", "allowed_hosts", "api_keys", mode="before")
+    @classmethod
+    def parse_list_fields(cls, v):
+        if isinstance(v, str):
+            if not v.strip():
+                return []
+            return [item.strip() for item in v.split(",") if item.strip()]
+        elif isinstance(v, list):
+            return v
+        return []
 
     def get_cors_origins(self) -> list[str]:
         """Get CORS origins based on environment - SECURE VERSION"""
