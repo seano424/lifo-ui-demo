@@ -1,7 +1,16 @@
 'use client'
 
 import type { ColumnDef, Header } from '@tanstack/react-table'
-import { Building2, Edit, Euro, Eye, MoreHorizontal, Package, Tag, Trash2 } from 'lucide-react'
+import {
+  Building2,
+  Edit,
+  Euro,
+  Eye,
+  MoreHorizontal,
+  Package,
+  Tag,
+  Trash2,
+} from 'lucide-react'
 import { SortableHeader } from '@/components/products/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import { Typography } from '../ui/typography'
 
 interface ColumnResizerProps {
   header: Header<Product, unknown>
@@ -37,7 +47,9 @@ function ColumnResizer({ header }: ColumnResizerProps) {
     >
       <div
         className={`w-0.5 h-full ml-auto transition-all ${
-          header.column.getIsResizing() ? 'bg-brand-secondary' : 'bg-transparent hover:bg-border'
+          header.column.getIsResizing()
+            ? 'bg-brand-secondary'
+            : 'bg-transparent hover:bg-border'
         }`}
       />
     </div>
@@ -80,13 +92,20 @@ export function createProductTableColumns({
       id: 'name',
       accessorKey: 'name',
       header: () => (
-        <SortableHeader field="name" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="name"
+          currentSort={currentSort}
+          updateSort={updateSort}
+        >
           Product
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div>
-          <div className="font-medium truncate" title={row.original.name}>
+          <div
+            className="font-medium truncate"
+            title={row.original.name}
+          >
             {row.original.name || 'Unnamed Product'}
           </div>
           <div
@@ -106,7 +125,11 @@ export function createProductTableColumns({
       id: 'category',
       accessorKey: 'category',
       header: () => (
-        <SortableHeader field="category" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="category"
+          currentSort={currentSort}
+          updateSort={updateSort}
+        >
           Category
         </SortableHeader>
       ),
@@ -134,14 +157,21 @@ export function createProductTableColumns({
       id: 'brand',
       accessorKey: 'brand',
       header: () => (
-        <SortableHeader field="brand" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="brand"
+          currentSort={currentSort}
+          updateSort={updateSort}
+        >
           Brand
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="truncate" title={row.original.brand || 'N/A'}>
+          <span
+            className="truncate"
+            title={row.original.brand || 'N/A'}
+          >
             {row.original.brand || 'N/A'}
           </span>
         </div>
@@ -161,7 +191,7 @@ export function createProductTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          Stock
+          Total Stock
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -175,37 +205,37 @@ export function createProductTableColumns({
       maxSize: 120,
       enableResizing: true,
     },
-    {
-      id: 'base_selling_price',
-      accessorKey: 'base_selling_price',
-      header: () => (
-        <SortableHeader
-          field="base_selling_price"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          Price
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="text-right">
-          <div className="flex items-center justify-end gap-1 font-bold">
-            <Euro className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-            <span title={`€${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
-              {Number(row.original.base_selling_price || 0).toFixed(2)}
-            </span>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Cost: €{Number(row.original.base_cost_price || 0).toFixed(2)}
-          </div>
-        </div>
-      ),
-      size: DEFAULT_COLUMN_WIDTHS.base_selling_price || 100,
-      minSize: 80,
-      maxSize: 120,
-      enableResizing: true,
-    },
+    // {
+    //   id: 'base_selling_price',
+    //   accessorKey: 'base_selling_price',
+    //   header: () => (
+    //     <SortableHeader
+    //       field="base_selling_price"
+    //       currentSort={currentSort}
+    //       updateSort={updateSort}
+    //       className="justify-end"
+    //     >
+    //       Price
+    //     </SortableHeader>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-right">
+    //       <div className="flex items-center justify-end gap-1 font-bold">
+    //         <Euro className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+    //         <span title={`€${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
+    //           {Number(row.original.base_selling_price || 0).toFixed(2)}
+    //         </span>
+    //       </div>
+    //       <div className="text-xs text-muted-foreground">
+    //         Cost: €{Number(row.original.base_cost_price || 0).toFixed(2)}
+    //       </div>
+    //     </div>
+    //   ),
+    //   size: DEFAULT_COLUMN_WIDTHS.base_selling_price || 100,
+    //   minSize: 80,
+    //   maxSize: 120,
+    //   enableResizing: true,
+    // },
     {
       id: 'active_batches_count',
       accessorKey: 'active_batches_count',
@@ -220,12 +250,12 @@ export function createProductTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-right">
-          <div className="font-medium">{row.original.active_batches_count || 0}</div>
-          <div className="text-xs text-muted-foreground">
-            batch{(row.original.active_batches_count || 0) !== 1 ? 'es' : ''}
-          </div>
-        </div>
+        <Typography
+          variant="small"
+          className="flex items-center gap-2 justify-end text-right"
+        >
+          <span>{row.original.active_batches_count || 0}</span>
+        </Typography>
       ),
       size: DEFAULT_COLUMN_WIDTHS.active_batches_count || 120,
       minSize: 100,
@@ -236,13 +266,19 @@ export function createProductTableColumns({
       id: 'created_at',
       accessorKey: 'created_at',
       header: () => (
-        <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="created_at"
+          currentSort={currentSort}
+          updateSort={updateSort}
+        >
           Date Added
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground">
-          {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : 'N/A'}
+          {row.original.created_at
+            ? new Date(row.original.created_at).toLocaleDateString()
+            : 'N/A'}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.created_at || 100,
@@ -256,7 +292,11 @@ export function createProductTableColumns({
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" disabled={isUpdating}>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={isUpdating}
+            >
               <MoreHorizontal className="h-4 w-4" />
               <span className="sr-only">Open menu</span>
             </Button>
@@ -279,7 +319,10 @@ export function createProductTableColumns({
             <DropdownMenuItem
               onClick={() => {
                 const currentPrice = row.original.base_selling_price || 0
-                const newPrice = prompt('Enter new price (€):', currentPrice.toString())
+                const newPrice = prompt(
+                  'Enter new price (€):',
+                  currentPrice.toString()
+                )
                 if (newPrice && !Number.isNaN(Number(newPrice))) {
                   updateProductPrice(row.original.product_id, Number(newPrice))
                 }
