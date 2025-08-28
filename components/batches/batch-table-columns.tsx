@@ -198,7 +198,7 @@ export function createBatchTableColumns({
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.current_quantity,
-      minSize: 60,
+      minSize: 90,
       maxSize: calculateMaxWidth(data, item => Number(item.current_quantity).toLocaleString()),
       enableResizing: true,
     },

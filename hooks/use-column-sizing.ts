@@ -7,7 +7,7 @@ const DEFAULT_COLUMN_WIDTHS = {
   product: 200,
   supplier: 120,
   expiry_date: 140,
-  current_quantity: 100,
+  current_quantity: 120,
   cost_price: 110,
   selling_price: 110,
   status: 100,
