@@ -38,6 +38,8 @@ type StoreProductWithProduct = {
 // Combined type that includes both global product data and store-specific data
 // NOTE: When returned by our query functions, total_stock and active_batches_count 
 // are STORE-SPECIFIC calculations from inventory.batches, not global aggregates
+// - total_stock: sum of current_quantity for ALL batches with quantity > 0 (includes expired)
+// - active_batches_count: count of batches with status = 'active' only
 export type Product = BaseProduct & {
   // Store-specific pricing and settings (from store_products junction table)
   store_cost_price?: number | null
@@ -185,8 +187,13 @@ export async function fetchProducts(
           active_batches_count: 0
         }
         
-        if (batch.status === 'active') {
+        // Count all batches with quantity > 0 for total physical inventory
+        if (Number(batch.current_quantity) > 0) {
           current.total_stock += Number(batch.current_quantity) || 0
+        }
+        
+        // Only count active batches for active_batches_count
+        if (batch.status === 'active') {
           current.active_batches_count += 1
         }
         
@@ -397,8 +404,13 @@ export async function fetchProductsPage(
           active_batches_count: 0
         }
         
-        if (batch.status === 'active') {
+        // Count all batches with quantity > 0 for total physical inventory
+        if (Number(batch.current_quantity) > 0) {
           current.total_stock += Number(batch.current_quantity) || 0
+        }
+        
+        // Only count active batches for active_batches_count
+        if (batch.status === 'active') {
           current.active_batches_count += 1
         }
         
@@ -829,8 +841,13 @@ export async function fetchProductById(
 
     if (batchAggregations) {
       batchAggregations.forEach(batch => {
-        if (batch.status === 'active') {
+        // Count all batches with quantity > 0 for total physical inventory
+        if (Number(batch.current_quantity) > 0) {
           total_stock += Number(batch.current_quantity) || 0
+        }
+        
+        // Only count active batches for active_batches_count
+        if (batch.status === 'active') {
           active_batches_count += 1
         }
       })
