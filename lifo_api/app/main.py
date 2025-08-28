@@ -47,10 +47,10 @@ from slowapi.errors import RateLimitExceeded  # noqa: E402
 
 from app.api.v1.router import router as api_v1_router  # noqa: E402
 from app.core.config import get_monitoring_config, settings  # noqa: E402
-from app.database.connection import engine, init_database  # noqa: E402
 
 # Import models to register them with SQLAlchemy Base
-from app.database import models, inventory_models  # noqa: E402, F401
+from app.database import inventory_models, models  # noqa: E402, F401
+from app.database.connection import engine, init_database  # noqa: E402
 from app.middleware.comprehensive_security import (  # noqa: E402
     ComprehensiveSecurityMiddleware,
 )

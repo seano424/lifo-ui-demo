@@ -23,8 +23,8 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy import String as SQLString
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -38,7 +38,9 @@ def get_auth_users_fk() -> str:
 
 def get_uuid_type():
     """Get the correct UUID type based on environment (String for SQLite, UUID for PostgreSQL)"""
-    return SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else UUID(as_uuid=True)
+    return (
+        SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else UUID(as_uuid=True)
+    )
 
 
 def get_json_type():
@@ -104,7 +106,9 @@ class Role(Base):
     """Role definitions - custom role management in user_mgmt schema"""
 
     __tablename__ = "roles"
-    __table_args__ = {"schema": "user_mgmt"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    __table_args__ = (
+        {"schema": "user_mgmt"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     name = Column(String(50), unique=True, nullable=False)
@@ -117,7 +121,9 @@ class UserRole(Base):
     """User role assignments"""
 
     __tablename__ = "user_roles"
-    __table_args__ = ({"schema": "user_mgmt"} if os.getenv("ENVIRONMENT") != "testing" else {},)
+    __table_args__ = (
+        {"schema": "user_mgmt"} if os.getenv("ENVIRONMENT") != "testing" else {},
+    )
 
     user_id = Column(
         get_uuid_type(),
@@ -125,7 +131,13 @@ class UserRole(Base):
         primary_key=True,
     )
     role_id = Column(
-        get_uuid_type(), ForeignKey("roles.id" if os.getenv("ENVIRONMENT") == "testing" else "user_mgmt.roles.id"), primary_key=True
+        get_uuid_type(),
+        ForeignKey(
+            "roles.id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "user_mgmt.roles.id"
+        ),
+        primary_key=True,
     )
     assigned_at = Column(DateTime, default=func.now())
     assigned_by = Column(get_uuid_type())
@@ -135,7 +147,9 @@ class Store(Base):
     """Core stores table (multi-tenant foundation)"""
 
     __tablename__ = "stores"
-    __table_args__ = {"schema": "business"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    __table_args__ = (
+        {"schema": "business"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     store_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     store_name = Column(String(255), nullable=False)
@@ -177,10 +191,18 @@ class StoreUser(Base):
     """Store staff access and permissions"""
 
     __tablename__ = "store_users"
-    __table_args__ = ({"schema": "business"} if os.getenv("ENVIRONMENT") != "testing" else {},)
+    __table_args__ = (
+        {"schema": "business"} if os.getenv("ENVIRONMENT") != "testing" else {},
+    )
 
     store_id = Column(
-        get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), primary_key=True
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+        primary_key=True,
     )
     user_id = Column(get_uuid_type(), primary_key=True)
     role_in_store = Column(String(50), default="staff")
@@ -201,10 +223,18 @@ class StoreSettings(Base):
     """Store configuration"""
 
     __tablename__ = "store_settings"
-    __table_args__ = {"schema": "business"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    __table_args__ = (
+        {"schema": "business"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     store_id = Column(
-        get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), primary_key=True
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+        primary_key=True,
     )
     scoring_weights = Column(
         get_json_type(), default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
@@ -294,8 +324,22 @@ class ProductScore(Base):
     )
 
     score_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
-    batch_id = Column(get_uuid_type(), ForeignKey("batches.batch_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.batches.batch_id"))
-    store_id = Column(get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"))
+    batch_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "batches.batch_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.batches.batch_id"
+        ),
+    )
+    store_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+    )
 
     # Component scores
     expiry_score = Column(NUMERIC(3, 2))
@@ -333,8 +377,22 @@ class Action(Base):
     )
 
     action_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
-    batch_id = Column(get_uuid_type(), ForeignKey("batches.batch_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.batches.batch_id"))
-    store_id = Column(get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"))
+    batch_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "batches.batch_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.batches.batch_id"
+        ),
+    )
+    store_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+    )
     action_type = Column(String(50))
     original_price = Column(NUMERIC(12, 4))
     new_price = Column(NUMERIC(12, 4))
@@ -353,11 +411,27 @@ class InventorySnapshot(Base):
     """Inventory snapshots for pattern analysis"""
 
     __tablename__ = "inventory_snapshots"
-    __table_args__ = {"schema": "timeseries"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    __table_args__ = (
+        {"schema": "timeseries"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     snapshot_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
-    batch_id = Column(get_uuid_type(), ForeignKey("batches.batch_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.batches.batch_id"))
-    store_id = Column(get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"))
+    batch_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "batches.batch_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.batches.batch_id"
+        ),
+    )
+    store_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+    )
     sku = Column(String(100))
     quantity = Column(NUMERIC(12, 4))
     price = Column(NUMERIC(12, 4))
@@ -374,11 +448,27 @@ class SalesEvent(Base):
     """Sales events tracking"""
 
     __tablename__ = "sales_events"
-    __table_args__ = {"schema": "timeseries"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    __table_args__ = (
+        {"schema": "timeseries"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     event_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
-    batch_id = Column(get_uuid_type(), ForeignKey("batches.batch_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.batches.batch_id"))
-    store_id = Column(get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"))
+    batch_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "batches.batch_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.batches.batch_id"
+        ),
+    )
+    store_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+    )
     sku = Column(String(100))
     quantity_sold = Column(NUMERIC(12, 4))
     sale_price = Column(NUMERIC(12, 4))
@@ -391,10 +481,19 @@ class ExternalFactor(Base):
     """External factors for correlation analysis"""
 
     __tablename__ = "external_factors"
-    __table_args__ = {"schema": "timeseries"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    __table_args__ = (
+        {"schema": "timeseries"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     factor_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
-    store_id = Column(get_uuid_type(), ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"))
+    store_id = Column(
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+    )
     recorded_at = Column(DateTime, default=func.now())
     temperature = Column(NUMERIC(5, 2))
     humidity = Column(NUMERIC(5, 2))

@@ -22,7 +22,6 @@ from sqlalchemy import (
 from sqlalchemy import (
     Enum as SQLEnum,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import String as SQLString
 from sqlalchemy.orm import relationship
 
@@ -57,8 +56,12 @@ class Category(Base):
     display_name_en = Column(String(255))
     display_name_fr = Column(String(255))
     parent_category_id = Column(
-        get_uuid_type(), 
-        ForeignKey("categories.category_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.categories.category_id")
+        get_uuid_type(),
+        ForeignKey(
+            "categories.category_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.categories.category_id"
+        ),
     )
     typical_shelf_life_days = Column(Integer)
     is_active = Column(Boolean, default=True)
@@ -98,8 +101,12 @@ class Product(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text)
     category_id = Column(
-        get_uuid_type(), 
-        ForeignKey("categories.category_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.categories.category_id")
+        get_uuid_type(),
+        ForeignKey(
+            "categories.category_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.categories.category_id"
+        ),
     )
     brand = Column(String(100))
     unit_type = Column(String(20), default="pcs")
@@ -153,13 +160,21 @@ class StoreProduct(Base):
     )
 
     store_id = Column(
-        get_uuid_type(), 
-        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
-        primary_key=True
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+        primary_key=True,
     )
     product_id = Column(
         get_uuid_type(),
-        ForeignKey("products.product_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.products.product_id"),
+        ForeignKey(
+            "products.product_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.products.product_id"
+        ),
         primary_key=True,
     )
 
@@ -226,14 +241,22 @@ class Batch(Base):
 
     batch_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     product_id = Column(
-        get_uuid_type(), 
-        ForeignKey("products.product_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.products.product_id"), 
-        nullable=False
+        get_uuid_type(),
+        ForeignKey(
+            "products.product_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.products.product_id"
+        ),
+        nullable=False,
     )
     store_id = Column(
-        get_uuid_type(), 
-        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
-        nullable=False
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+        nullable=False,
     )
 
     # Core batch information
@@ -325,13 +348,22 @@ class BatchAction(Base):
     action_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     batch_id = Column(
         get_uuid_type(),
-        ForeignKey("batches.batch_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.batches.batch_id", ondelete="CASCADE"),
+        ForeignKey(
+            "batches.batch_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.batches.batch_id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
     )
     store_id = Column(
-        get_uuid_type(), 
-        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
-        nullable=False
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+        nullable=False,
     )
 
     # What was recommended vs what was done
@@ -356,8 +388,12 @@ class BatchAction(Base):
         ForeignKey(get_auth_users_fk()),
     )
     donation_recipient_id = Column(
-        get_uuid_type(), 
-        ForeignKey("donation_recipients.recipient_id" if os.getenv("ENVIRONMENT") == "testing" else "inventory.donation_recipients.recipient_id")
+        get_uuid_type(),
+        ForeignKey(
+            "donation_recipients.recipient_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "inventory.donation_recipients.recipient_id"
+        ),
     )
 
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
@@ -398,9 +434,13 @@ class DonationRecipient(Base):
 
     # Store association
     store_id = Column(
-        get_uuid_type(), 
-        ForeignKey("stores.store_id" if os.getenv("ENVIRONMENT") == "testing" else "business.stores.store_id"), 
-        nullable=False
+        get_uuid_type(),
+        ForeignKey(
+            "stores.store_id"
+            if os.getenv("ENVIRONMENT") == "testing"
+            else "business.stores.store_id"
+        ),
+        nullable=False,
     )
 
     is_active = Column(Boolean, default=True)
