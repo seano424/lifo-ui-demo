@@ -50,10 +50,10 @@ async def test_category_weights():
     class MockDB:
         pass
     
-    from app.database.read_only_operations import ReadOnlyOperations
+    from app.database.read_only_operations import SecureReadOnlyOperations
     
     mock_db = MockDB()
-    read_ops = ReadOnlyOperations(mock_db)
+    read_ops = SecureReadOnlyOperations(mock_db)
     
     test_categories = [
         "dairy_eggs",

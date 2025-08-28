@@ -27,36 +27,34 @@ from sqlalchemy.orm import relationship
 from app.database.connection import Base
 
 
-class Store(Base):
+class Category(Base):
     """
-    Minimal Store model for foreign key relationships
-    Maps to Supabase business.stores table
+    Product categories table for LIFO.AI
+    Maps to Supabase inventory.categories table
     """
 
-    __tablename__ = "stores"
-    __table_args__ = {"schema": "business", "extend_existing": True}
+    __tablename__ = "categories"
+    __table_args__ = {"schema": "inventory", "extend_existing": True}
 
-    store_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    store_name = Column(String(255))
-    store_code = Column(String(50))
+    category_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    category_code = Column(String(100), unique=True, nullable=False)
+    display_name_en = Column(String(255))
+    display_name_fr = Column(String(255))
+    parent_category_id = Column(UUID(as_uuid=True), ForeignKey("inventory.categories.category_id"))
+    typical_shelf_life_days = Column(Integer)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
+    # Self-referential relationship for parent categories
+    parent_category = relationship("Category", remote_side=[category_id], back_populates="subcategories")
+    subcategories = relationship("Category", back_populates="parent_category")
+    
+    # Products in this category
+    products = relationship("Product", back_populates="category")
 
-class User(Base):
-    """
-    Minimal User model for foreign key relationships
-    Maps to Supabase auth.users table
-    """
 
-    __tablename__ = "users"
-    __table_args__ = {"schema": "auth", "extend_existing": True}
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = Column(String(255))
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
 
 class Product(Base):
@@ -75,7 +73,7 @@ class Product(Base):
     sku = Column(String(100), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
     description = Column(Text)
-    category = Column(String(100), nullable=False)  # Maps to scoring category weights
+    category_id = Column(UUID(as_uuid=True), ForeignKey("inventory.categories.category_id"))
     brand = Column(String(100))
     unit_type = Column(String(20), default="pcs")
 
@@ -103,6 +101,7 @@ class Product(Base):
     created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
 
     # Relationships
+    category = relationship("Category", back_populates="products")
     store_products = relationship("StoreProduct", back_populates="product")
     batches = relationship("Batch", back_populates="product")
 
