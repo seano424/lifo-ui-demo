@@ -7,16 +7,16 @@ on:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
       - '.github/workflows/code-quality.yml'
-      - 'requirements.txt'
-      - 'pyproject.toml'
+      - 'lifo_api/requirements.txt'
+      - 'lifo_api/pyproject.toml'
   pull_request:
     branches: [main]
     paths:
       - 'lifo_ai_core/**'
       - 'lifo_api/**'
       - '.github/workflows/code-quality.yml'
-      - 'requirements.txt'
-      - 'pyproject.toml'
+      - 'lifo_api/requirements.txt'
+      - 'lifo_api/pyproject.toml'
 
 jobs:
   quality-and-test:
@@ -47,8 +47,6 @@ jobs:
 
       - name: Set up Python 3.12
         run: uv python install 3.12
-      - name: Set up Python 3.12
-        run: uv python install 3.12
 
       - name: Setup virtual environment
         run: |
@@ -72,7 +70,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv pip install -r requirements.txt
+          uv pip install -r lifo_api/requirements.txt
 
       - name: Environment setup
         run: |
@@ -111,4 +109,4 @@ jobs:
       - name: Dependency security audit
         uses: pypa/gh-action-pip-audit@v1.0.8
         with:
-          inputs: requirements.txt
+          inputs: lifo_api/requirements.txt
