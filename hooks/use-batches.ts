@@ -268,6 +268,10 @@ export function useBatchActions() {
   const createMutation = useMutation({
     mutationFn: (batchData: Database['inventory']['Tables']['batches']['Insert']) => {
       // ✅ STORE-AWARE: Automatically add store_id to batch data
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+
       const batchWithStore = {
         ...batchData,
         store_id: activeStoreId,
