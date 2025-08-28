@@ -343,12 +343,17 @@ export async function fetchProductsPage(
       direction: filters.sort?.direction,
     })
 
-    // Handle sorting - special case for total_stock since it requires aggregation across all products
+    // Handle sorting - special cases for fields that require in-memory sorting
+    const isInMemorySort = filters.sort?.field === 'total_stock' || filters.sort?.field === 'active_batches_count' || filters.sort?.field === 'category'
     const isStockBasedSort = filters.sort?.field === 'total_stock' || filters.sort?.field === 'active_batches_count'
     
-    if (isStockBasedSort) {
-      // For stock-based sorting, we need to fetch all products, calculate stock, sort, then paginate
-      console.log('[fetchProductsPage] Stock-based sorting - fetching all products for proper sorting')
+    if (isInMemorySort) {
+      // For in-memory sorting, we need to fetch all products, sort, then paginate
+      if (isStockBasedSort) {
+        console.log('[fetchProductsPage] Stock-based sorting - fetching all products for proper sorting')
+      } else {
+        console.log('[fetchProductsPage] Category sorting - fetching all products for proper sorting')
+      }
       query = query.order('created_at', { ascending: false }) // Fallback sort for fetching all
       // We'll override pagination below for this case
     } else if (filters.sort?.field === 'created_at') {
@@ -358,8 +363,10 @@ export async function fetchProductsPage(
       // For product name, we need to use embedded ordering
       query = query.order('products(name)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'category') {
-      // Sort by category display name from joined categories table
-      query = query.order('products(categories(display_name_en))', { ascending: filters.sort.direction === 'asc' })
+      // Category sorting requires in-memory sorting due to PostgREST limitations with deeply nested joins
+      console.log('[fetchProductsPage] Category sorting - will sort in-memory after data fetch')
+      // For now, fetch with default order and we'll sort in-memory later
+      query = query.order('created_at', { ascending: false })
     } else if (filters.sort?.field === 'brand') {
       query = query.order('products(brand)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'base_selling_price') {
@@ -375,9 +382,9 @@ export async function fetchProductsPage(
     let totalCount: number
     let error: any
 
-    if (isStockBasedSort) {
-      // For stock-based sorting, fetch ALL products first
-      console.log('[fetchProductsPage] Fetching all products for stock-based sorting')
+    if (isInMemorySort) {
+      // For in-memory sorting, fetch ALL products first
+      console.log('[fetchProductsPage] Fetching all products for in-memory sorting')
       const response = await query
       error = response.error
       storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
@@ -529,7 +536,7 @@ export async function fetchProductsPage(
       }
     })
 
-    // Apply in-memory sorting for stock-based fields after aggregation
+    // Apply in-memory sorting for fields that require it
     if (filters.sort?.field === 'total_stock') {
       transformedData.sort((a, b) => {
         const aStock = a.total_stock || 0
@@ -552,14 +559,27 @@ export async function fetchProductsPage(
         firstItemBatches: transformedData[0]?.active_batches_count,
         lastItemBatches: transformedData[transformedData.length - 1]?.active_batches_count
       })
+    } else if (filters.sort?.field === 'category') {
+      transformedData.sort((a, b) => {
+        const aCategory = a.category_display_name || a.category_code || ''
+        const bCategory = b.category_display_name || b.category_code || ''
+        return filters.sort!.direction === 'asc' 
+          ? aCategory.localeCompare(bCategory)
+          : bCategory.localeCompare(aCategory)
+      })
+      console.log('[fetchProductsPage] Applied in-memory category sorting:', {
+        direction: filters.sort.direction,
+        firstItemCategory: transformedData[0]?.category_display_name || transformedData[0]?.category_code,
+        lastItemCategory: transformedData[transformedData.length - 1]?.category_display_name || transformedData[transformedData.length - 1]?.category_code
+      })
     }
 
-    // Apply pagination after sorting for stock-based sorts
+    // Apply pagination after sorting for in-memory sorts
     let finalData = transformedData
     let finalCount = transformedData.length // Use actual filtered/transformed count
 
-    if (isStockBasedSort) {
-      // For stock-based sorting, we fetched all products and sorted them
+    if (isInMemorySort) {
+      // For in-memory sorting, we fetched all products and sorted them
       // Now apply pagination manually
       const rangeFrom = page * pageSize
       const rangeTo = (page + 1) * pageSize
