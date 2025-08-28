@@ -78,12 +78,17 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           <Typography variant="h4" className="font-bold">
             Today&apos;s priority actions
           </Typography>
-          <Typography variant="p" className="text-muted-foreground">
-            Review and take action on the most urgent items from AI scoring.
+          <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
+            Review and take action on the most urgent items.
           </Typography>
         </div>
 
-        <Button asChild>
+        <Button className="flex dark:hidden" asChild>
+          <Link href="/dashboard/actionable-batches">
+            Take Action <ArrowRightFromLine className="w-4 h-4" />
+          </Link>
+        </Button>
+        <Button className="hidden dark:flex" variant="black" asChild>
           <Link href="/dashboard/actionable-batches">
             Take Action <ArrowRightFromLine className="w-4 h-4" />
           </Link>

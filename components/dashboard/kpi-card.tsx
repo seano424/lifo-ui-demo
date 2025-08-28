@@ -66,7 +66,7 @@ export function KPICard({
     return (
       <div
         className={cn(
-          'bg-white rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center',
+          'bg-white dark:bg-brand-dark dark:border-primary-900 rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center',
           className,
         )}
       >
@@ -82,7 +82,7 @@ export function KPICard({
     return (
       <div
         className={cn(
-          'bg-white rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center min-h-[200px] justify-center',
+          'bg-white dark:bg-brand-dark dark:border-primary-900 rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center min-h-[200px] justify-center',
           className,
         )}
       >
@@ -125,7 +125,7 @@ export function KPICard({
   )
 
   const cardClassName = cn(
-    'bg-white rounded py-6 border',
+    'rounded-4xl py-6 border bg-white dark:bg-brand-dark dark:border-primary-900',
     'transition-all duration-200',
     (isLink || onClick) && 'cursor-pointer hover:shadow-md hover:border-primary-100/50 group',
     className,

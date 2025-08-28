@@ -132,10 +132,10 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="overflow-x-auto">
         <div className="p-4 border-b">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 md:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 lg:flex-row sm:items-center sm:justify-between">
               <BatchListFilters
                 filters={{
                   expiringInDays: filters.expiringInDays,
@@ -148,7 +148,10 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
               <BatchListSortControls
                 currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
                 updateSort={field => {
-                  const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+                  const currentSort = filters.sort || {
+                    field: 'created_at',
+                    direction: 'desc',
+                  }
                   const newDirection =
                     currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
                   handleSortChange({ field, direction: newDirection })
@@ -164,7 +167,10 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
           isLoading={isLoading}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
           updateSort={field => {
-            const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
             const newDirection =
               currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
             handleSortChange({ field, direction: newDirection })

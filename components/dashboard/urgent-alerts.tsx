@@ -68,7 +68,7 @@ export function UrgentAlerts() {
   const message = getMessage()
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row text-center sm:text-left items-center justify-between">
+    <div className="flex flex-col gap-4 lg:flex-row text-center lg:text-left items-center justify-between">
       <div className="flex flex-col gap-2">
         <Typography variant="h4" className="font-bold capitalize">
           AI {severity} Alerts

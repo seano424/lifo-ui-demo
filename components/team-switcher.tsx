@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -111,28 +110,35 @@ export function TeamSwitcher() {
                   <DropdownMenuItem
                     key={store.store_id}
                     onClick={() => handleStoreSwitch(store)}
-                    className="gap-2 p-2"
+                    className={cn(
+                      'gap-2 p-2 border-b border-b-border rounded-none',
+                      index === userStores.length - 1 && 'border-b-0',
+                      index === 0 && 'border-t border-t-border/50',
+                    )}
                     disabled={isChangingStore}
                   >
-                    <div className="flex flex-1 flex-col gap-0.5">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-5 justify-between w-full">
+                      <div className="flex flex-1 flex-col gap-1 justify-between">
                         <span className="font-medium">{store.store_name}</span>
+
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="size-3" />
+                          <span>{store.address}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
                         {isActive && (
-                          <Badge variant="default" className="text-xs">
+                          <Badge variant="primary" className="text-xs">
                             Active
                           </Badge>
                         )}
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs capitalize">
                           {userStore.role}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="size-3" />
-                        <span>{store.city}</span>
-                        {store.store_code && <span className="text-xs">• {store.store_code}</span>}
-                      </div>
                     </div>
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+
+                    {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
                   </DropdownMenuItem>
                 )
               })}

@@ -55,30 +55,32 @@ export function RevealAnimation({
   }
 
   return (
-    <motion.div
-      ref={ref}
-      className={`${width === 'full' ? 'w-full' : ''} ${className}`}
-      initial={getHiddenVariant()}
-      animate={controls}
-      variants={{
-        visible: {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          transition: {
-            type: 'spring',
-            damping: 25,
-            stiffness: 100,
+    <div style={{ overflow: 'hidden' }}>
+      <motion.div
+        ref={ref}
+        className={`${width === 'full' ? 'w-full' : ''} ${className}`}
+        initial={getHiddenVariant()}
+        animate={controls}
+        variants={{
+          visible: {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            transition: {
+              type: 'spring',
+              damping: 25,
+              stiffness: 100,
+            },
           },
-        },
-      }}
-      transition={{
-        duration,
-        delay,
-        ease: [0.25, 0.1, 0.25, 1.0], // Cubic bezier easing
-      }}
-    >
-      {children}
-    </motion.div>
+        }}
+        transition={{
+          duration,
+          delay,
+          ease: [0.25, 0.1, 0.25, 1.0], // Cubic bezier easing
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
   )
 }

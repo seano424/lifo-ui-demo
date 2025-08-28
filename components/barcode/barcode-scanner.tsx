@@ -287,10 +287,12 @@ export default function BarcodeScanner({
 
   return (
     <div className={cn('w-full text-center sm:min-w-[600px] flex flex-col gap-4', className)}>
-      <div className="flex items-center justify-center gap-2 flex-col">
+      <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-2">
-          <Scan className="w-5 h-5" />
-          <Typography variant="h3">{title}</Typography>
+          <Scan className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+          <Typography variant="h3" className="text-primary-800 font-black">
+            {title}
+          </Typography>
         </div>
         <Typography variant="p">{subtitle}</Typography>
       </div>

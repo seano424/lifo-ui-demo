@@ -1,14 +1,14 @@
 'use client'
 
 import {
-  BookOpen,
-  Bot,
   Box,
-  Calendar,
+  ChartNoAxesCombined,
   Layers,
+  ListTodo,
   Package,
+  ScanBarcode,
+  ScanSearch,
   SettingsIcon,
-  SquareTerminal,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import * as React from 'react'
@@ -26,6 +26,7 @@ import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
 import { TeamSwitcher } from './team-switcher'
 import { NavbarLogo } from './ui/logo'
+import { Typography } from './ui/typography'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
@@ -36,23 +37,23 @@ function useNavigationData() {
         {
           title: t('dashboard'),
           url: '/dashboard',
-          icon: SquareTerminal,
+          icon: ChartNoAxesCombined,
           isActive: true,
         },
         {
           title: t('inbound'),
           url: '/dashboard/inbound',
-          icon: Bot,
+          icon: ScanSearch,
         },
         {
           title: t('outbound'),
           url: '/dashboard/outbound',
-          icon: BookOpen,
+          icon: ScanBarcode,
         },
         {
           title: t('todos'),
           url: '/dashboard/todos',
-          icon: Calendar,
+          icon: ListTodo,
         },
         {
           title: t('inventory'),
@@ -115,11 +116,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           'group-data-[collapsible=icon]:pt-12',
         )}
       >
-        <NavbarLogo
-          variant="horizontal"
-          size="md"
-          className={cn('group-data-[collapsible=icon]:hidden hidden sm:flex')}
-        />
+        <div
+          className={cn('group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2')}
+        >
+          <NavbarLogo variant="icon" size="md" />
+          <Typography
+            variant="h1"
+            className="text-transparent bg-clip-text bg-gradient-to-r from-primary-900 to-secondary-900 dark:from-primary-50 dark:text-primary-900"
+          >
+            LIFO
+          </Typography>
+        </div>
         <NavbarLogo
           variant="vertical"
           size="md"

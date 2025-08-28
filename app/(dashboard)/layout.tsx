@@ -33,24 +33,27 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <HydrationBoundary state={dashboardData.dehydratedState}>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="overflow-visible">
+        <SidebarInset className="overflow-scroll">
           <header className="flex sticky top-0 bg-background z-50 h-16 shrink-0 items-center gap-2 justify-between px-4 border-b">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <DashboardBreadcrumbs />
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <Button size="icon" className="rounded-full border md:hidden">
+              <Button size="icon" className="border rounded-full">
                 <BellIcon className="w-4 h-4" />
               </Button>
-              <Button size="default" className="rounded-full border hidden md:flex">
+              {/* <Button
+                size="default"
+                className="border hidden md:flex"
+              >
                 <BellIcon className="w-4 h-4" />
                 Notifications
-              </Button>
+              </Button> */}
               <div className="hidden md:block">
                 <TeamSwitcher />
               </div>

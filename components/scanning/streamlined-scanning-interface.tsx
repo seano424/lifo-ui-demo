@@ -7,7 +7,7 @@ import {
   ArrowUp,
   BarChart3,
   Camera,
-  CheckCircle,
+  Check,
   Edit3,
   Euro,
   Keyboard,
@@ -157,7 +157,10 @@ export default function WorkingStreamlinedScanningInterface({
       case 'barcode':
         setUIStep('camera-barcode')
         setShowManualBarcode(false)
-        setLookupBarcode(null)
+        // Only clear lookupBarcode if there's no scannedProduct (preserving it when going back)
+        if (!scannedProduct) {
+          setLookupBarcode(null)
+        }
         setQuantity(1)
         setPrice(0)
         setManualExpiryDate('')
@@ -472,17 +475,58 @@ export default function WorkingStreamlinedScanningInterface({
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       {/* Consistent width container for all scanning steps */}
       <div className="w-full">
-        <div className="p-4 space-y-4">
+        <div className="px-4 space-y-4">
           {/* STEP 1: Camera Barcode Scanning */}
           {uiStep === 'camera-barcode' && (
             <>
+              {/* Show selected product if we have one (when going back from expiry) */}
+              {scannedProduct && (
+                <Card className="border-primary-50 shadow-primary-100">
+                  <CardContent className="p-3">
+                    <div className="flex justify-between items-center gap-2">
+                      <Button
+                        variant="subtleDestructive"
+                        className="rounded-full p-2 h-8 w-8"
+                        onClick={() => {
+                          workflowActions.resetWorkflow()
+                          setLookupBarcode(null)
+                        }}
+                      >
+                        X
+                      </Button>
+                      <div className="flex flex-col gap-2 justify-center items-center">
+                        <Typography className="text-secondary-900 font-black" variant="p">
+                          Selected Product
+                        </Typography>
+                        <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
+                          <Package className="w-4 h-4 text-gray-500" />
+
+                          <Typography variant="p">{scannedProduct?.brand}</Typography>
+                          <Typography variant="p">•</Typography>
+                          <Typography variant="p">{scannedProduct?.productName}</Typography>
+                          <Typography variant="p">•</Typography>
+                          <Typography variant="p">{scannedProduct?.barcode}</Typography>
+                        </div>
+                      </div>
+                      <Button
+                        variant="subtleSecondary"
+                        className="font-semibold rounded-full p-2 h-8 w-8"
+                        onClick={() => workflowActions.setCurrentStep('ocr')}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               <div className="space-y-2">
                 <BarcodeScanner
                   onScan={handleScan}
                   onError={handleError}
                   autoStart={true}
                   className="w-full max-w-xl mx-auto"
-                  title="Scan Product"
+                  title={scannedProduct ? 'Scan Different Product' : 'Scan Product'}
                 />
               </div>
 
@@ -510,8 +554,10 @@ export default function WorkingStreamlinedScanningInterface({
               )}
 
               {currentStep === 'barcode' && (
-                <Alert>
-                  <Camera className="h-4 w-4" />
+                <Alert className="flex items-center gap-4">
+                  <div>
+                    <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 flex-shrink-0 h-8 w-8" />
+                  </div>
                   <AlertDescription>
                     Point your camera at any product barcode. The scanner will automatically detect
                     supported formats and look up product information from Open Food Facts.
@@ -577,7 +623,7 @@ export default function WorkingStreamlinedScanningInterface({
                     scannedProduct.lookupResult &&
                     (scannedProduct.lookupResult.found ? (
                       <Alert>
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                         <AlertDescription>
                           Product found! Ready to proceed to expiry date scanning.
                         </AlertDescription>
@@ -611,15 +657,21 @@ export default function WorkingStreamlinedScanningInterface({
           {uiStep === 'camera-expiry' && (
             <div className="space-y-4">
               {/* Product Context */}
-              <Card>
+              <Card className="border-primary-50 shadow-primary-100">
                 <CardContent className="p-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Package className="w-4 h-4 text-gray-500" />
-                    <span className="font-medium">{scannedProduct?.brand}</span>
-                    <span className="text-gray-500">•</span>
-                    <span className="font-medium">{scannedProduct?.productName}</span>
-                    <span className="text-gray-500">•</span>
-                    <span className="font-mono text-xs">{scannedProduct?.barcode}</span>
+                  <div className="flex flex-col gap-2 justify-center items-center">
+                    <Typography className="text-secondary-900 font-black" variant="p">
+                      Selected Product
+                    </Typography>
+                    <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
+                      <Package className="w-4 h-4 text-gray-500" />
+
+                      <Typography variant="p">{scannedProduct?.brand}</Typography>
+                      <Typography variant="p">•</Typography>
+                      <Typography variant="p">{scannedProduct?.productName}</Typography>
+                      <Typography variant="p">•</Typography>
+                      <Typography variant="p">{scannedProduct?.barcode}</Typography>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -762,14 +814,17 @@ export default function WorkingStreamlinedScanningInterface({
 
               {/* Success with Date Captured - Editable */}
               {manualExpiryDate && (
-                <Card className="border-green-200">
+                <Card className="">
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      <Typography variant="h3" className="text-green-800">
-                        {expiryInfo?.isManual
-                          ? 'Date entered manually'
-                          : 'Date captured successfully'}
+                    <div className="flex flex-col items-center text-center mb-3">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                        <Typography variant="h3" className="text-primary-800 font-black">
+                          Date captured successfully
+                        </Typography>
+                      </div>
+                      <Typography variant="h3" className="text-primary-700 font-black">
+                        Finish and submit to inventory
                       </Typography>
                     </div>
 
@@ -917,7 +972,7 @@ export default function WorkingStreamlinedScanningInterface({
                   className="flex items-center gap-2"
                   onClick={handleFinalSubmission}
                 >
-                  <CheckCircle className="w-4 h-4" />
+                  <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                   Finish and submit {scannedItems.length} item
                   {scannedItems.length > 1 ? 's' : ''}
                 </Button>
@@ -1202,7 +1257,7 @@ export default function WorkingStreamlinedScanningInterface({
                 onClick={handleConfirmSubmission}
                 disabled={isSubmittingBatch}
               >
-                <CheckCircle className="w-4 h-4 mr-2" />
+                <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                 {isSubmittingBatch ? 'Submitting...' : 'Submit to Inventory'}
               </Button>
             </DialogFooter>
@@ -1216,7 +1271,7 @@ export default function WorkingStreamlinedScanningInterface({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <Check className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                 Inventory Updated Successfully!
               </DialogTitle>
               <DialogDescription>

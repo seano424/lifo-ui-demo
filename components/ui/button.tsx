@@ -7,7 +7,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-xl tracking-wide font-semibold font-heading transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden active:scale-[0.97] cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'rounded-2xl tracking-wide font-semibold font-heading transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden active:scale-[0.97] cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -15,6 +15,7 @@ const buttonVariants = cva(
         default:
           'bg-primary-900 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
         destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
+        subtleDestructive: 'bg-red-100 text-red-900 shadow-xs hover:bg-red-200',
         outline:
           'border border-input bg-background shadow-xs hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
         secondary:
@@ -27,7 +28,7 @@ const buttonVariants = cva(
         subtle:
           'bg-primary-600 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
         subtleSecondary:
-          'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-200 dark:bg-secondary-900/20 dark:text-secondary-300 dark:hover:bg-secondary-900/30',
+          'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-200 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900/30',
         subtleTertiary:
           'bg-tertiary-100 text-tertiary-900 shadow-xs hover:bg-tertiary-200 dark:bg-tertiary-900/20 dark:text-tertiary-300 dark:hover:bg-tertiary-900/30',
 

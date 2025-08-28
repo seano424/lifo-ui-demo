@@ -181,7 +181,10 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
 
               // Auto-advance to OCR step after lookup completes (whether found or not)
               // This eliminates the manual "Proceed to Expiry Date Scanning" step
-              state.currentStep = 'ocr'
+              // BUT don't auto-advance if we're already on barcode step (user went back deliberately)
+              if (state.currentStep !== 'barcode') {
+                state.currentStep = 'ocr'
+              }
 
               // Add to history for quick rescanning
               const existingIndex = state.scanHistory.findIndex(
@@ -371,9 +374,9 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                 break
 
               case 'ocr':
-                // Since product step auto-advances now, go back to barcode scanning
+                // Go back to barcode scanning but KEEP the product
                 state.currentStep = 'barcode'
-                // Keep scanned product in history but clear current scan
+                // Keep scanned product in history and PRESERVE current product
                 if (state.scannedProduct) {
                   const existingIndex = state.scanHistory.findIndex(
                     (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
@@ -387,7 +390,8 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                     ]
                   }
                 }
-                state.scannedProduct = null
+                // DON'T clear the scannedProduct - keep it selected
+                // state.scannedProduct = null  // REMOVED
                 // Clear expiry info
                 state.expiryInfo = null
                 break
@@ -437,7 +441,7 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
             case 'product':
               return 'Scan Barcode'
             case 'ocr':
-              return 'Scan Barcode' // Since product step auto-advances, go back to barcode
+              return state.scannedProduct ? 'Change Product' : 'Scan Barcode'
             case 'confirmation':
               return 'Scan Expiry Date'
             case 'complete':
@@ -566,6 +570,9 @@ export const useScanningActions = () => {
   return {
     setStoreId: (storeId: string) => {
       if (isClient) useScanningWorkflowStore.getState().setStoreId(storeId)
+    },
+    setCurrentStep: (step: ScanningStep) => {
+      if (isClient) useScanningWorkflowStore.getState().setCurrentStep(step)
     },
     resetWorkflow: () => {
       if (isClient) useScanningWorkflowStore.getState().resetWorkflow()

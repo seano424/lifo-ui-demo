@@ -2,7 +2,7 @@
 
 import { Scan, Upload } from 'lucide-react'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
-import StreamlinedScanningInterface from '@/components/scanning/streamlined-scanning-interface'
+import ScanningInterface from '@/components/scanning/refactored-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -12,24 +12,22 @@ export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
   const isMobile = useIsMobile()
   return (
-    <div className="max-w-screen-lg mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Mobile Tabs */}
-      <Tabs defaultValue="csv" className="w-full lg:hidden">
+      <Tabs defaultValue="scan" className="w-full lg:hidden">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="csv" className="flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            CSV Bulk Import
-          </TabsTrigger>
           <TabsTrigger value="scan" className="flex items-center gap-2">
-            <Scan className="w-4 h-4" />
+            <Scan className="w-4 h-4 stroke-2 border-2  rounded-full p-[2px] bg-primary-100" />
             Barcode Scanning
+          </TabsTrigger>
+          <TabsTrigger value="csv" className="flex items-center gap-2">
+            <Upload className="w-4 h-4 stroke-2 border-2  rounded-full p-[2px] bg-primary-100" />
+            CSV Bulk Import
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="scan" className="mt-6">
-          <div className="max-w-screen-sm mx-auto">
-            {isMobile && <StreamlinedScanningInterface />}
-          </div>
+          <div className="max-w-screen-sm mx-auto">{isMobile && <ScanningInterface />}</div>
         </TabsContent>
 
         <TabsContent value="csv" className="mt-6">

@@ -109,7 +109,7 @@ export function DashboardKPICards() {
           <Typography variant="h4" className="font-bold">
             {t('title')}
           </Typography>
-          <Typography variant="p" className="text-muted-foreground">
+          <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
             Last updated: {new Date().toLocaleDateString()}
           </Typography>
         </div>
