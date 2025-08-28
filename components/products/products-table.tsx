@@ -33,7 +33,6 @@ const VALID_COLUMN_IDS = [
   'category',
   'brand',
   'total_stock',
-  'base_selling_price',
   'active_batches_count',
   'created_at',
 ]

@@ -7,7 +7,6 @@ const DEFAULT_COLUMN_WIDTHS = {
   category: 140,
   brand: 140,
   total_stock: 100,
-  base_selling_price: 110,
   active_batches_count: 130,
   created_at: 110,
   actions: 60,
