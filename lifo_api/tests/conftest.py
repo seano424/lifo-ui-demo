@@ -27,6 +27,7 @@ import pytest
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -119,7 +120,12 @@ async def test_engine():
     )
 
     async with engine.begin() as conn:
+        # For SQLite testing, disable foreign key constraints during table creation
+        if "sqlite" in str(engine.url):
+            await conn.execute(text("PRAGMA foreign_keys = OFF"))
         await conn.run_sync(Base.metadata.create_all)
+        if "sqlite" in str(engine.url):
+            await conn.execute(text("PRAGMA foreign_keys = ON"))
 
     yield engine
     await engine.dispose()

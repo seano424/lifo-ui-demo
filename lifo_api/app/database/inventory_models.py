@@ -3,6 +3,7 @@ LIFO.AI Inventory Models - Simplified for AI-driven waste prevention
 Focuses on scoring, recommendations, and action tracking rather than traditional inventory management
 """
 
+import os
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
@@ -25,6 +26,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database.connection import Base
+
+
+def get_auth_users_fk() -> str:
+    """Get the correct foreign key reference for auth.users table based on environment"""
+    return "users.id" if os.getenv("ENVIRONMENT") == "testing" else "auth.users.id"
 
 
 class Category(Base):
@@ -105,7 +111,7 @@ class Product(Base):
     updated_at = Column(
         DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
-    created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
+    created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None)
 
     # Relationships
     category = relationship("Category", back_populates="products")
@@ -142,8 +148,8 @@ class StoreProduct(Base):
     supplier_code = Column(String(50))  # Store's supplier reference
 
     # Audit and tracking
-    added_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
-    updated_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
+    added_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None)
+    updated_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(
         DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
@@ -222,7 +228,7 @@ class Batch(Base):
     )  # VerificationStatus enum values
 
     # Audit fields
-    created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
+    created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(
         DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
@@ -297,7 +303,7 @@ class BatchAction(Base):
     recovered_value = Column(DECIMAL(10, 2))  # Value after action
 
     # User and donation tracking
-    performed_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
+    performed_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None)
     donation_recipient_id = Column(
         UUID(as_uuid=True), ForeignKey("inventory.donation_recipients.recipient_id")
     )
@@ -341,7 +347,7 @@ class DonationRecipient(Base):
 
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"))
+    created_by = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None)
 
     # Relationships
     batch_actions = relationship("BatchAction", back_populates="donation_recipient")

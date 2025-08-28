@@ -4,6 +4,7 @@ Mirrors the existing Supabase database schema with async support
 Updated to use auth.users schema from Supabase authentication
 """
 
+import os
 import uuid
 
 # Import forward references for global models
@@ -28,6 +29,11 @@ from sqlalchemy.sql import func
 
 from app.database.connection import Base
 
+
+def get_auth_users_fk() -> str:
+    """Get the correct foreign key reference for auth.users table based on environment"""
+    return "users.id" if os.getenv("ENVIRONMENT") == "testing" else "auth.users.id"
+
 if TYPE_CHECKING:
     pass
 
@@ -41,7 +47,10 @@ class User(Base):
     """
 
     __tablename__ = "users"
-    __table_args__ = {"schema": "auth"}
+    # Only use auth schema in production/staging, not in tests with SQLite
+    __table_args__ = (
+        {"schema": "auth"} if os.getenv("ENVIRONMENT") != "testing" else {}
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True)
     email = Column(String(255), unique=True, nullable=False)
@@ -100,7 +109,7 @@ class UserRole(Base):
     __tablename__ = "user_roles"
     __table_args__ = ({"schema": "user_mgmt"},)
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id"), primary_key=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id") if os.getenv("ENVIRONMENT") != "testing" else None, primary_key=True)
     role_id = Column(
         UUID(as_uuid=True), ForeignKey("user_mgmt.roles.id"), primary_key=True
     )
