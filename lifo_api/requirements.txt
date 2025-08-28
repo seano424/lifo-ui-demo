@@ -70,7 +70,6 @@ mypy>=1.5.0
 
 # Type stubs
 pandas-stubs>=2.0.0
-types-pandas>=2.0.0
 types-PyYAML>=6.0.0
 types-Pygments>=2.0.0
 types-requests>=2.32.0
