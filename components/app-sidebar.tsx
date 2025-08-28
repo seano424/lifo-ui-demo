@@ -1,17 +1,18 @@
 'use client'
 
 import {
-  BookOpen,
-  Bot,
   Box,
-  Calendar,
+  ChartNoAxesCombined,
   Layers,
+  ListTodo,
   Package,
+  ScanBarcode,
+  ScanSearch,
   SettingsIcon,
-  SquareTerminal,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import * as React from 'react'
+
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import {
@@ -36,23 +37,23 @@ function useNavigationData() {
         {
           title: t('dashboard'),
           url: '/dashboard',
-          icon: SquareTerminal,
+          icon: ChartNoAxesCombined,
           isActive: true,
         },
         {
           title: t('inbound'),
           url: '/dashboard/inbound',
-          icon: Bot,
+          icon: ScanSearch,
         },
         {
           title: t('outbound'),
           url: '/dashboard/outbound',
-          icon: BookOpen,
+          icon: ScanBarcode,
         },
         {
           title: t('todos'),
           url: '/dashboard/todos',
-          icon: Calendar,
+          icon: ListTodo,
         },
         {
           title: t('inventory'),

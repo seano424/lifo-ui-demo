@@ -29,24 +29,24 @@ curl -X POST "http://localhost:8000/api/v1/csv-upload/upload-and-create-batches"
 
 ### Required Columns
 
-| Column | Type | Description | Example |
-|--------|------|-------------|---------|
-| `sku` | String | Unique product identifier | `APPLE001` |
-| `product_name` | String | Product display name | `Red Apples` |
-| `category` | String | Product category | `fresh_produce` |
-| `quantity` | Number | Initial quantity | `50` |
-| `expiry_date` | Date | Expiry date (YYYY-MM-DD) | `2025-07-20` |
+| Column         | Type   | Description               | Example         |
+| -------------- | ------ | ------------------------- | --------------- |
+| `sku`          | String | Unique product identifier | `APPLE001`      |
+| `product_name` | String | Product display name      | `Red Apples`    |
+| `category`     | String | Product category          | `fresh_produce` |
+| `quantity`     | Number | Initial quantity          | `50`            |
+| `expiry_date`  | Date   | Expiry date (YYYY-MM-DD)  | `2025-07-20`    |
 
 ### Optional Columns
 
-| Column | Type | Description | Example |
-|--------|------|-------------|---------|
-| `brand` | String | Product brand | `FreshFarms` |
-| `cost_price` | Number | Cost price per unit | `2.50` |
-| `selling_price` | Number | Selling price per unit | `3.99` |
-| `manufacture_date` | Date | Manufacturing date | `2025-07-13` |
-| `location_code` | String | Storage location | `MAIN` |
-| `unit_type` | String | Unit of measurement | `kg` |
+| Column             | Type   | Description            | Example      |
+| ------------------ | ------ | ---------------------- | ------------ |
+| `brand`            | String | Product brand          | `FreshFarms` |
+| `cost_price`       | Number | Cost price per unit    | `2.50`       |
+| `selling_price`    | Number | Selling price per unit | `3.99`       |
+| `manufacture_date` | Date   | Manufacturing date     | `2025-07-13` |
+| `location_code`    | String | Storage location       | `MAIN`       |
+| `unit_type`        | String | Unit of measurement    | `kg`         |
 
 ### Sample CSV File
 
@@ -86,6 +86,7 @@ curl -X GET "http://localhost:8000/api/v1/csv-upload/template" \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -117,6 +118,7 @@ curl -X POST "http://localhost:8000/api/v1/csv-upload/validate" \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -165,6 +167,7 @@ curl -X POST "http://localhost:8000/api/v1/csv-upload/upload" \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -202,6 +205,7 @@ curl -X POST "http://localhost:8000/api/v1/csv-upload/upload" \
 Complete workflow: processes CSV and creates inventory batches in Supabase.
 
 **Parameters:**
+
 - `file`: CSV file (multipart/form-data)
 - `store_id`: Store UUID (form field)
 - `chunk_size`: Batch processing chunk size, 1-100 (form field, default: 50)
@@ -215,6 +219,7 @@ curl -X POST "http://localhost:8000/api/v1/csv-upload/upload-and-create-batches"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -497,34 +502,34 @@ Each CSV processing operation returns comprehensive statistics:
 ```javascript
 // Upload CSV and create batches
 async function uploadCSVAndCreateBatches(file, storeId, token) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('store_id', storeId);
-  formData.append('chunk_size', '50');
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('store_id', storeId)
+  formData.append('chunk_size', '50')
 
   const response = await fetch('/api/v1/csv-upload/upload-and-create-batches', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: formData
-  });
+    body: formData,
+  })
 
-  const result = await response.json();
-  
+  const result = await response.json()
+
   if (result.success) {
-    console.log(`Created ${result.batch_creation.successful_batches} batches`);
-    console.log(`Success rate: ${result.batch_creation.success_rate}%`);
-    
+    console.log(`Created ${result.batch_creation.successful_batches} batches`)
+    console.log(`Success rate: ${result.batch_creation.success_rate}%`)
+
     // Handle failed items
     if (result.failed_items.length > 0) {
-      console.warn('Some items failed:', result.failed_items);
+      console.warn('Some items failed:', result.failed_items)
     }
   } else {
-    console.error('Upload failed:', result.detail);
+    console.error('Upload failed:', result.detail)
   }
-  
-  return result;
+
+  return result
 }
 ```
 
@@ -535,22 +540,22 @@ import requests
 
 def upload_csv_batches(file_path, store_id, token, chunk_size=50):
     url = "http://localhost:8000/api/v1/csv-upload/upload-and-create-batches"
-    
+
     headers = {
         "Authorization": f"Bearer {token}"
     }
-    
+
     files = {
         "file": ("inventory.csv", open(file_path, "rb"), "text/csv")
     }
-    
+
     data = {
         "store_id": store_id,
         "chunk_size": chunk_size
     }
-    
+
     response = requests.post(url, headers=headers, files=files, data=data)
-    
+
     if response.status_code == 200:
         result = response.json()
         print(f"Success: {result['batch_creation']['successful_batches']} batches created")
@@ -566,10 +571,10 @@ def upload_csv_batches(file_path, store_id, token, chunk_size=50):
 ### File Size Recommendations
 
 | File Size | Recommended Chunk Size | Expected Processing Time |
-|-----------|----------------------|-------------------------|
-| < 1MB | 50 | < 30 seconds |
-| 1-5MB | 25-30 | 30-60 seconds |
-| 5-10MB | 20-25 | 1-3 minutes |
+| --------- | ---------------------- | ------------------------ |
+| < 1MB     | 50                     | < 30 seconds             |
+| 1-5MB     | 25-30                  | 30-60 seconds            |
+| 5-10MB    | 20-25                  | 1-3 minutes              |
 
 ### Concurrent Uploads
 

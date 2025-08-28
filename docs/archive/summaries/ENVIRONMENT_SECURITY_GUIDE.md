@@ -6,9 +6,10 @@
 
 **Date**: August 4, 2025  
 **Action**: Production credentials have been secured and replaced with safe placeholders  
-**Impact**: All sensitive production data has been removed from the repository  
+**Impact**: All sensitive production data has been removed from the repository
 
 ### What Was Secured:
+
 - ✅ Supabase API keys (publishable and secret)
 - ✅ Database connection strings with embedded passwords
 - ✅ JWT secrets
@@ -22,6 +23,7 @@
 ### 1. Development vs Production Separation
 
 **Development Environment (.env.local)**:
+
 ```bash
 # Safe placeholder values for development
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -30,6 +32,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-secret-api-key-here
 ```
 
 **Production Environment**:
+
 - Use proper secret management services (AWS Secrets Manager, Azure Key Vault, etc.)
 - Never store production secrets in code repositories
 - Use environment-specific deployment configurations
@@ -37,17 +40,20 @@ SUPABASE_SERVICE_ROLE_KEY=your-secret-api-key-here
 ### 2. File Security Checklist
 
 #### ✅ Secure Files (.gitignore protected):
+
 - `.env.local` - Local development secrets
 - `.env.production` - Production secrets (if used locally)
 - Any files with real API keys or passwords
 
 #### ⚠️ Safe for Repository:
+
 - `.env.example` - Template file with placeholders only
 - Configuration files with no actual secrets
 
 ### 3. Secret Management Hierarchy
 
 **Priority 1 - Critical Secrets (Never in repos)**:
+
 - Database passwords
 - Service role keys
 - JWT secrets
@@ -55,6 +61,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-secret-api-key-here
 - Encryption keys
 
 **Priority 2 - Configuration (Safe with placeholders)**:
+
 - Database hostnames
 - Service URLs
 - Port numbers
@@ -65,11 +72,13 @@ SUPABASE_SERVICE_ROLE_KEY=your-secret-api-key-here
 ## 🛠️ Setting Up Your Development Environment
 
 ### Step 1: Copy Template
+
 ```bash
 cp .env.example .env.local
 ```
 
 ### Step 2: Replace Placeholders
+
 Edit `.env.local` and replace these placeholders with your actual values:
 
 ```bash
@@ -86,6 +95,7 @@ RESEND_API=your-actual-resend-key
 ```
 
 ### Step 3: Verify Security
+
 ```bash
 # Check that .env.local is ignored
 git status
@@ -103,6 +113,7 @@ grep -E "(secret|key|password)" .env.example
 ### 1. Secret Management Services
 
 **AWS Deployment**:
+
 ```bash
 # Use AWS Secrets Manager
 aws secretsmanager get-secret-value --secret-id lifo-ai-engine/supabase
@@ -112,6 +123,7 @@ export SUPABASE_SERVICE_ROLE_KEY="${AWS_SECRET_VALUE}"
 ```
 
 **Docker Deployment**:
+
 ```dockerfile
 # Use Docker secrets
 COPY secrets/supabase_key /run/secrets/supabase_key
@@ -119,6 +131,7 @@ ENV SUPABASE_SERVICE_ROLE_KEY_FILE=/run/secrets/supabase_key
 ```
 
 **Kubernetes Deployment**:
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -131,16 +144,19 @@ data:
 ### 2. Environment-Specific Configuration
 
 **Development**:
+
 - Use `.env.local` with safe development credentials
 - Enable debug logging and development features
 - Use localhost URLs and development databases
 
 **Staging**:
+
 - Use staging-specific secrets
 - Mirror production security but with staging data
 - Test secret rotation and deployment procedures
 
 **Production**:
+
 - Use proper secret management services
 - Enable security monitoring and alerting
 - Implement secret rotation policies
@@ -153,10 +169,11 @@ data:
 ### If Secrets Are Accidentally Committed:
 
 1. **Immediate Action**:
+
    ```bash
    # Remove from git history (if just committed)
    git reset --hard HEAD~1
-   
+
    # Or if already pushed
    git filter-branch --force --index-filter \
    'git rm --cached --ignore-unmatch .env.local' \
@@ -164,6 +181,7 @@ data:
    ```
 
 2. **Rotate All Affected Secrets**:
+
    - Generate new Supabase API keys
    - Update database passwords
    - Replace all exposed API keys
@@ -177,6 +195,7 @@ data:
 ### Security Monitoring
 
 **Regular Audits**:
+
 ```bash
 # Check for accidentally committed secrets
 git log --all --full-history -- .env.local
@@ -190,6 +209,7 @@ grep -r "sk_live_\|pk_live_\|eyJ" . --exclude-dir=node_modules
 ## 📋 Security Checklist
 
 ### Development Setup:
+
 - [ ] `.env.local` contains only development values
 - [ ] `.env.local` is in `.gitignore`
 - [ ] `.env.example` contains only placeholders
@@ -197,6 +217,7 @@ grep -r "sk_live_\|pk_live_\|eyJ" . --exclude-dir=node_modules
 - [ ] Local development uses secure generated keys
 
 ### Production Deployment:
+
 - [ ] Secrets managed through proper secret management service
 - [ ] Environment variables set securely in deployment platform
 - [ ] No secrets in container images or deployment files
@@ -204,6 +225,7 @@ grep -r "sk_live_\|pk_live_\|eyJ" . --exclude-dir=node_modules
 - [ ] Security monitoring and alerting enabled
 
 ### Code Repository:
+
 - [ ] No committed `.env.local` files
 - [ ] Git history clean of secret exposure
 - [ ] `.gitignore` properly configured
@@ -215,6 +237,7 @@ grep -r "sk_live_\|pk_live_\|eyJ" . --exclude-dir=node_modules
 ## 🔧 Development Tools
 
 ### Generate Secure Random Keys:
+
 ```bash
 # For FastAPI SECRET_KEY
 python3 -c "import secrets; print('SECRET_KEY=' + secrets.token_urlsafe(32))"
@@ -227,6 +250,7 @@ openssl rand -base64 64
 ```
 
 ### Validate Environment Security:
+
 ```bash
 # Check for exposed secrets
 ./scripts/check-secrets.sh
