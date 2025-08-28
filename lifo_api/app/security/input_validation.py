@@ -263,8 +263,8 @@ class SecurityInputValidator:
         try:
             uuid_obj = uuid.UUID(uuid_str)
             return str(uuid_obj)
-        except ValueError:
-            raise InputValidationError("Invalid UUID format")
+        except ValueError as e:
+            raise InputValidationError("Invalid UUID format") from e
 
     def _validate_alphanumeric(self, value: str) -> str:
         """Validate alphanumeric input with basic special characters"""
@@ -443,7 +443,7 @@ def validate_input(
         logger.warning("Input validation failed", error=str(e), input_type=input_type)
         raise HTTPException(
             status_code=400, detail=f"Input validation failed: {str(e)}"
-        )
+        ) from e
 
 
 def validate_store_id_format(store_id: str) -> str:

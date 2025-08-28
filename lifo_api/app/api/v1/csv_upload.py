@@ -112,7 +112,7 @@ async def upload_csv(
         except CSVSecurityError as e:
             raise HTTPException(
                 status_code=400, detail=f"Security validation failed: {str(e)}"
-            )
+            ) from e
 
         # Use sanitized content for processing
         sanitized_content = security_result["sanitized_content"].encode("utf-8")
@@ -423,7 +423,7 @@ async def upload_csv_and_create_batches(
         except CSVSecurityError as e:
             raise HTTPException(
                 status_code=400, detail=f"Security validation failed: {str(e)}"
-            )
+            ) from e
 
         # Use sanitized content for processing
         sanitized_content = security_result["sanitized_content"].encode("utf-8")
@@ -458,7 +458,7 @@ async def upload_csv_and_create_batches(
             raise HTTPException(
                 status_code=400,
                 detail=f"Failed to convert CSV data to batch requests: {str(e)}",
-            )
+            ) from e
 
         if not batch_requests:
             raise HTTPException(

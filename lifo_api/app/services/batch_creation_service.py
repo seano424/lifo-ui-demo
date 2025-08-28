@@ -165,7 +165,7 @@ class BatchCreationService:
                 and_(
                     Product.barcode == batch_data.barcode,
                     StoreProduct.store_id == store_id,
-                    StoreProduct.is_active == True,
+                    StoreProduct.is_active,
                 )
             )
         )

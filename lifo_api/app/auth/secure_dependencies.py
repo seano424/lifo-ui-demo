@@ -60,10 +60,10 @@ async def get_current_user(
 
     except SupabaseAPIKeyError as e:
         logger.warning("Supabase API key authentication failed", error=str(e))
-        raise AuthenticationException("Invalid authentication token")
+        raise AuthenticationException("Invalid authentication token") from e
     except Exception as e:
         logger.error("Authentication error", error=str(e))
-        raise AuthenticationException("Authentication failed")
+        raise AuthenticationException("Authentication failed") from e
 
 
 async def get_optional_user(
@@ -118,10 +118,10 @@ async def require_service_role(
 
     except SupabaseAPIKeyError as e:
         logger.error("Service role authentication error", error=str(e))
-        raise AuthorizationException("Service role authentication failed")
+        raise AuthorizationException("Service role authentication failed") from e
     except Exception as e:
         logger.error("Service role authentication error", error=str(e))
-        raise AuthorizationException("Service role authentication failed")
+        raise AuthorizationException("Service role authentication failed") from e
 
 
 # Input Validation Functions
@@ -151,9 +151,9 @@ def validate_store_id_format(store_id: str) -> str:
         uuid_obj = uuid.UUID(store_id)
         # Return canonical string representation
         return str(uuid_obj)
-    except ValueError:
+    except ValueError as e:
         logger.warning("Invalid store ID format", store_id=store_id)
-        raise HTTPException(status_code=400, detail="Invalid store ID format")
+        raise HTTPException(status_code=400, detail="Invalid store ID format") from e
 
 
 def validate_batch_id_format(batch_id: str) -> str:
@@ -180,9 +180,9 @@ def validate_batch_id_format(batch_id: str) -> str:
         uuid_obj = uuid.UUID(batch_id)
         # Return canonical string representation
         return str(uuid_obj)
-    except ValueError:
+    except ValueError as e:
         logger.warning("Invalid batch ID format", batch_id=batch_id)
-        raise HTTPException(status_code=400, detail="Invalid batch ID format")
+        raise HTTPException(status_code=400, detail="Invalid batch ID format") from e
 
 
 def validate_product_id_format(product_id: str) -> str:
@@ -197,9 +197,9 @@ def validate_product_id_format(product_id: str) -> str:
     try:
         uuid_obj = uuid.UUID(product_id)
         return str(uuid_obj)
-    except ValueError:
+    except ValueError as e:
         logger.warning("Invalid product ID format", product_id=product_id)
-        raise HTTPException(status_code=400, detail="Invalid product ID format")
+        raise HTTPException(status_code=400, detail="Invalid product ID format") from e
 
 
 def validate_sku_format(sku: str) -> str:
@@ -252,18 +252,18 @@ def validate_date_range(
     if start_date:
         try:
             start_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
-        except ValueError:
+        except ValueError as e:
             raise HTTPException(
                 status_code=400, detail="Invalid start_date format. Use ISO 8601"
-            )
+            ) from e
 
     if end_date:
         try:
             end_dt = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
-        except ValueError:
+        except ValueError as e:
             raise HTTPException(
                 status_code=400, detail="Invalid end_date format. Use ISO 8601"
-            )
+            ) from e
 
     if start_dt and end_dt and start_dt > end_dt:
         raise HTTPException(
@@ -408,7 +408,8 @@ def rate_limit_key_func(request: Request) -> str:
             if user_id:
                 return f"user:{user_id}"
     except Exception:
-        pass
+        # Token extraction failed, fall back to IP address
+        logger.debug("Failed to extract user ID from token, using IP address fallback")
 
     # Fall back to IP address
     forwarded_for = request.headers.get("x-forwarded-for")

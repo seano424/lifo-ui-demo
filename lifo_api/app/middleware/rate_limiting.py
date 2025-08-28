@@ -100,7 +100,8 @@ def get_user_rate_limit_key(request: Request) -> str:
             # For now, use IP + user agent combination
             return f"{get_remote_address(request)}:{hash(request.headers.get('user-agent', ''))}"
     except Exception:
-        pass
+        # User extraction failed, falling back to IP address
+        logger.debug("Failed to extract user context for rate limiting, using IP fallback")
 
     # Fallback to IP address
     return get_remote_address(request)

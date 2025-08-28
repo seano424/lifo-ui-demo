@@ -5,7 +5,7 @@ Target: <0.5s response time, minimal data transfer
 """
 
 import time
-from datetime import date, datetime
+from datetime import datetime
 from functools import lru_cache
 from typing import Any
 

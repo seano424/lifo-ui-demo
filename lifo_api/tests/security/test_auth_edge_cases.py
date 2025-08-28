@@ -270,12 +270,12 @@ class TestAuthenticationVulnerabilities:
         large_token = jwt.encode(large_payload, "test-secret", algorithm="HS256")
 
         # System should reject oversized tokens but doesn't
-        with pytest.raises(Exception):  # Should implement size limits
+        with pytest.raises(Exception):  # Should implement size limits  # noqa: B017
             supabase_auth.verify_token(large_token)
 
     def test_information_disclosure_in_logs(self, supabase_auth):
         """🚨 MEDIUM: Sensitive information in logs"""
-        malicious_token = "clearly-malicious-token-with-secrets"
+        malicious_token = "clearly-malicious-token-with-secrets"  # noqa: S105
 
         with patch("app.auth.supabase_jwt.logger") as mock_logger:
             with pytest.raises(SupabaseAuthError):

@@ -5,9 +5,8 @@ Tests the CSV upload → Python scoring pipeline after database view fixes
 """
 
 import asyncio
-import tempfile
 import os
-from datetime import datetime, timedelta
+import tempfile
 
 # Test CSV data with legacy categories that should be mapped
 TEST_CSV_CONTENT = """sku,product_name,category,quantity,expiry_date,cost_price,selling_price

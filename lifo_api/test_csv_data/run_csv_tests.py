@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 BASE_URL = "http://localhost:8000"
 STORE_ID = "e3b41480-79a3-4cb7-8151-3fe014a1b60f"  # Replace with your actual store ID
-JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpWTnJkTFFielAyY2xJQlEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2pyZ21ldGRzb2hvd3R4aWNrcWlqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0MjBkMTQwYy0yMzg2LTRkODUtOWQwZC1hNjliYmQzODQyNzYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzU1MjYwNTMwLCJpYXQiOjE3NTUyNTY5MzAsImVtYWlsIjoic2xpbWFuZS5sYWtAb3V0bG9vay5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImF2YXRhcl91cmwiOm51bGwsImVtYWlsIjoic2xpbWFuZS5sYWtAb3V0bG9vay5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoic2xpbWFuZSBsYWtlaGFsIiwiaXNfYWN0aXZlIjp0cnVlLCJsYXN0X2xvZ2luIjpudWxsLCJtaWdyYXRlZF9mcm9tX3VzZXJfbWdtdCI6dHJ1ZSwibWlncmF0aW9uX3RpbWVzdGFtcCI6IjIwMjUtMDctMTNUMDA6NDc6MTQuNzQzMjA4KzAwOjAwIiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJwaW5fYXR0ZW1wdHMiOjAsInBpbl9kZWxpdmVyeV9tZXRob2QiOiJtYW51YWwiLCJwaW5fZXhwaXJlc19hdCI6bnVsbCwicGluX2hhc2giOm51bGwsInBpbl9sb2NrZWRfdW50aWwiOm51bGwsInBpbl9zZXRfYXQiOm51bGwsInJlcXVpcmVzX3BpbiI6ZmFsc2UsInN0b3JlX25hbWUiOiJzbGltIiwic3ViIjoiNDIwZDE0MGMtMjM4Ni00ZDg1LTlkMGQtYTY5YmJkMzg0Mjc2IiwidXNlcm5hbWUiOiJzbGltYW5lLmxhayJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzU0NjQ2MjMwfV0sInNlc3Npb25faWQiOiJjNjU0NDcyNC01YjFiLTQ5MGYtOTY3YS1hYmZlYThlYzYxMzUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.sAGCxzab_aehul7cmIt5nWaQGyvnzBTSpmL8k5ai_yc"
+JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpWTnJkTFFielAyY2xJQlEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2pyZ21ldGRzb2hvd3R4aWNrcWlqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0MjBkMTQwYy0yMzg2LTRkODUtOWQwZC1hNjliYmQzODQyNzYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzU1MjYwNTMwLCJpYXQiOjE3NTUyNTY5MzAsImVtYWlsIjoic2xpbWFuZS5sYWtAb3V0bG9vay5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImF2YXRhcl91cmwiOm51bGwsImVtYWlsIjoic2xpbWFuZS5sYWtAb3V0bG9vay5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoic2xpbWFuZSBsYWtlaGFsIiwiaXNfYWN0aXZlIjp0cnVlLCJsYXN0X2xvZ2luIjpudWxsLCJtaWdyYXRlZF9mcm9tX3VzZXJfbWdtdCI6dHJ1ZSwibWlncmF0aW9uX3RpbWVzdGFtcCI6IjIwMjUtMDctMTNUMDA6NDc6MTQuNzQzMjA4KzAwOjAwIiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJwaW5fYXR0ZW1wdHMiOjAsInBpbl9kZWxpdmVyeV9tZXRob2QiOiJtYW51YWwiLCJwaW5fZXhwaXJlc19hdCI6bnVsbCwicGluX2hhc2giOm51bGwsInBpbl9sb2NrZWRfdW50aWwiOm51bGwsInBpbl9zZXRfYXQiOm51bGwsInJlcXVpcmVzX3BpbiI6ZmFsc2UsInN0b3JlX25hbWUiOiJzbGltIiwic3ViIjoiNDIwZDE0MGMtMjM4Ni00ZDg1LTlkMGQtYTY5YmJkMzg0Mjc2IiwidXNlcm5hbWUiOiJzbGltYW5lLmxhayJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzU0NjQ2MjMwfV0sInNlc3Npb25faWQiOiJjNjU0NDcyNC01YjFiLTQ5MGYtOTY3YS1hYmZlYThlYzYxMzUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.sAGCxzab_aehul7cmIt5nWaQGyvnzBTSpmL8k5ai_yc"  # noqa: S105  # Test token
 
 # Test data files
 TEST_DATA_DIR = Path(__file__).parent
@@ -184,7 +184,7 @@ class CSVTestSuite:
                         test_name, not expected_success, f"Validation error: {detail}"
                     )
                     return not expected_success
-                except:
+                except Exception:
                     self.log_test(test_name, False, f"HTTP 422: {response.text[:100]}")
                     return False
             elif response.status_code == 400:
@@ -195,7 +195,7 @@ class CSVTestSuite:
                         test_name, not expected_success, f"Bad request: {detail}"
                     )
                     return not expected_success
-                except:
+                except Exception:
                     self.log_test(test_name, False, f"HTTP 400: {response.text[:100]}")
                     return False
             else:
@@ -259,7 +259,7 @@ class CSVTestSuite:
                         f"HTTP {response.status_code}: {detail}",
                     )
                     return not expected_success
-                except:
+                except Exception:
                     self.log_test(
                         test_name,
                         False,
@@ -301,7 +301,7 @@ class CSVTestSuite:
                     csv_processed = csv_proc.get("processed_rows", 0)
                     total_requests = batch_creation.get("total_requests", 0)
                     successful_batches = batch_creation.get("successful_batches", 0)
-                    failed_batches = batch_creation.get("failed_batches", 0)
+                    batch_creation.get("failed_batches", 0)
                     success_rate = batch_creation.get("success_rate", 0)
 
                     message = f"CSV: {csv_processed} rows → Batches: {successful_batches}/{total_requests} created ({success_rate}%)"
@@ -320,7 +320,7 @@ class CSVTestSuite:
                     # Some validation errors might be expected (e.g., missing database)
                     self.log_test(test_name, False, f"Validation error: {detail}")
                     return False
-                except:
+                except Exception:
                     self.log_test(test_name, False, f"HTTP 422: {response.text[:100]}")
                     return False
             elif response.status_code >= 500:
@@ -339,7 +339,7 @@ class CSVTestSuite:
                         test_name, False, f"HTTP {response.status_code}: {detail}"
                     )
                     return False
-                except:
+                except Exception:
                     self.log_test(
                         test_name,
                         False,
@@ -580,7 +580,7 @@ class CSVTestSuite:
 def main():
     """Main test runner"""
     # Check if configuration is set
-    if JWT_TOKEN == "your-jwt-token-here" or STORE_ID == "your-test-store-id":
+    if JWT_TOKEN == "your-jwt-token-here" or STORE_ID == "your-test-store-id":  # noqa: S105
         print("❌ Please configure JWT_TOKEN and STORE_ID in the script")
         print("   Set your actual JWT token and store ID at the top of this file")
         sys.exit(1)

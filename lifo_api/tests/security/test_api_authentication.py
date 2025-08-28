@@ -158,7 +158,7 @@ class TestAPIKeyAuthentication:
             ("admin", ["GET", "POST", "PUT", "DELETE"], []),
         ]
 
-        for role, allowed_methods, denied_methods in test_roles:
+        for role, allowed_methods, _denied_methods in test_roles:
             with patch("app.auth.secure_dependencies.get_current_user") as mock_auth:
                 mock_auth.return_value = {
                     "sub": f"{role}-user-123",
@@ -233,7 +233,7 @@ class TestAuthenticationSecurityMeasures:
         failed_attempts = 0
         headers = {"Authorization": "Bearer invalid-key-for-rate-test"}
 
-        for i in range(20):  # Try 20 failed attempts
+        for _i in range(20):  # Try 20 failed attempts
             response = await async_client.get(
                 "/api/v1/mobile-summary/store-123", headers=headers
             )

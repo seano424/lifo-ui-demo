@@ -272,21 +272,21 @@ class SecureReadOnlyOperations:
                 "specialty_items": {"expiry": 0.4, "velocity": 0.3, "margin": 0.3},
                 "bulk_items": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
             }
-            
+
             # Try to get weights for the specific category
             if category in standardized_weights:
                 return standardized_weights[category]
-            
+
             # Legacy category mapping fallback
             legacy_mapping = {
                 "dairy": "dairy_eggs",
-                "frozen": "frozen_foods", 
+                "frozen": "frozen_foods",
                 "bakery": "bakery_fresh",
                 "produce": "fresh_produce",
                 "meat": "fresh_meat_fish",
                 "general": "household_other",
             }
-            
+
             mapped_category = legacy_mapping.get(category.lower())
             if mapped_category and mapped_category in standardized_weights:
                 return standardized_weights[mapped_category]

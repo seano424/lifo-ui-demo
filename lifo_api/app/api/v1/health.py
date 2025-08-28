@@ -104,7 +104,7 @@ async def supabase_health() -> dict[str, Any]:
         raise HTTPException(
             status_code=503,
             detail={"status": "unhealthy", "service": "supabase", "error": str(e)},
-        )
+        ) from e
 
 
 @router.get("/health/database")
@@ -120,7 +120,7 @@ async def database_health() -> dict[str, Any]:
         raise HTTPException(
             status_code=503,
             detail={"status": "unhealthy", "service": "database", "error": str(e)},
-        )
+        ) from e
 
 
 @router.get("/health/ready")
@@ -148,7 +148,7 @@ async def readiness_check() -> dict[str, Any]:
         raise
     except Exception as e:
         logger.error("Readiness check failed", error=str(e))
-        raise HTTPException(status_code=503, detail={"ready": False, "reason": str(e)})
+        raise HTTPException(status_code=503, detail={"ready": False, "reason": str(e)}) from e
 
 
 @router.get("/health/live")
@@ -235,7 +235,7 @@ async def performance_health_check(
                 "message": "Performance health check failed",
                 "error": str(e),
             },
-        )
+        ) from e
 
 
 @router.get("/health/mobile-performance")
@@ -341,7 +341,7 @@ async def mobile_performance_health(
                 "message": "Mobile performance health check failed",
                 "error": str(e),
             },
-        )
+        ) from e
 
 
 @router.get("/metrics")
@@ -407,7 +407,7 @@ async def get_performance_metrics(
                 "message": "Failed to retrieve performance metrics",
                 "error": str(e),
             },
-        )
+        ) from e
 
 
 def _check_mobile_performance_targets(metrics_summary: dict[str, Any]) -> bool:
@@ -440,7 +440,7 @@ def _assess_database_performance(metrics_summary: dict[str, Any]) -> str:
     slow_queries = 0
     total_queries = 0
 
-    for query_name, metrics in db_metrics.items():
+    for _query_name, metrics in db_metrics.items():
         total_queries += metrics.get("total_queries", 0)
         slow_queries += metrics.get("slow_query_rate", 0) * metrics.get(
             "total_queries", 0
@@ -471,7 +471,7 @@ def _assess_api_performance(metrics_summary: dict[str, Any]) -> str:
     slow_endpoints = 0
     total_endpoints = len(api_metrics)
 
-    for endpoint_key, metrics in api_metrics.items():
+    for _endpoint_key, metrics in api_metrics.items():
         avg_time = metrics.get("avg_response_time_ms", 0)
         if avg_time > 500:  # General API threshold
             slow_endpoints += 1
@@ -498,7 +498,7 @@ def _assess_cache_performance(metrics_summary: dict[str, Any]) -> str:
     low_hit_rate_caches = 0
     total_caches = len(cache_metrics)
 
-    for cache_name, metrics in cache_metrics.items():
+    for _cache_name, metrics in cache_metrics.items():
         hit_rate = metrics.get("hit_rate_percent", 0)
         if hit_rate < 60:  # <60% hit rate is concerning
             low_hit_rate_caches += 1

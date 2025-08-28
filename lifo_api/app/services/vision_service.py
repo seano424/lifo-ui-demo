@@ -384,7 +384,7 @@ class GoogleVisionService:
             )
 
             # Also try barcode detection specifically
-            barcode_response = await asyncio.get_event_loop().run_in_executor(
+            await asyncio.get_event_loop().run_in_executor(
                 None,
                 lambda: self.client.annotate_image(
                     {
@@ -535,60 +535,28 @@ class GoogleVisionService:
             "aout": 8,
             "sept": 9,
             "septembre": 9,
-            "oct": 10,
             "octobre": 10,
-            "nov": 11,
             "novembre": 11,
             "déc": 12,
             "décembre": 12,
             # German (full and abbreviated)
             "jän": 1,
             "januar": 1,
-            "feb": 2,
             "februar": 2,
             "mär": 3,
             "märz": 3,
-            "apr": 4,
-            "april": 4,
-            "mai": 5,
-            "jun": 6,
             "juni": 6,
-            "jul": 7,
             "juli": 7,
-            "aug": 8,
-            "august": 8,
-            "sep": 9,
-            "september": 9,
             "okt": 10,
             "oktober": 10,
-            "nov": 11,
-            "november": 11,
             "dez": 12,
             "dezember": 12,
-            # Dutch (full and abbreviated)
-            "jan": 1,
             "januari": 1,
-            "feb": 2,
             "februari": 2,
             "mrt": 3,
             "maart": 3,
-            "apr": 4,
-            "april": 4,
             "mei": 5,
-            "jun": 6,
-            "juni": 6,
-            "jul": 7,
-            "juli": 7,
-            "aug": 8,
             "augustus": 8,
-            "sep": 9,
-            "september": 9,
-            "okt": 10,
-            "oktober": 10,
-            "nov": 11,
-            "november": 11,
-            "dec": 12,
-            "december": 12,
         }
 
         # Parse dates from both individual OCR results and combined text

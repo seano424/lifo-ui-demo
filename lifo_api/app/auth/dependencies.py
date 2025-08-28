@@ -48,7 +48,7 @@ async def get_current_user(
             status_code=e.status_code,
             detail=e.detail,
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
 
 
 async def get_current_user_optional(
@@ -194,7 +194,7 @@ async def validate_store_access(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to validate store access",
-        )
+        ) from e
 
 
 async def require_store_owner(

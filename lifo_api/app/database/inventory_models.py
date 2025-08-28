@@ -49,7 +49,7 @@ class Category(Base):
     # Self-referential relationship for parent categories
     parent_category = relationship("Category", remote_side=[category_id], back_populates="subcategories")
     subcategories = relationship("Category", back_populates="parent_category")
-    
+
     # Products in this category
     products = relationship("Product", back_populates="category")
 

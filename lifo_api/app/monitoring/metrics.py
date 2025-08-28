@@ -306,7 +306,7 @@ class MetricsCollector:
 
                         # Add to time series
                         for metric_name, value in system_metrics.items():
-                            if isinstance(value, (int, float)):
+                            if isinstance(value, int | float):
                                 self.time_series_metrics[f"system_{metric_name}"].append({
                                     "timestamp": timestamp.isoformat(),
                                     "value": value

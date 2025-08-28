@@ -131,7 +131,7 @@ class AdvancedRateLimiter:
     def check_rate_limit(self, request: Request) -> tuple[bool, str | None]:
         """
         Check if request should be rate limited
-        
+
         Returns:
             Tuple of (allowed, reason)
         """
@@ -320,7 +320,6 @@ class AdvancedRateLimiter:
     def record_error_response(self, request: Request, status_code: int):
         """Record an error response for DDoS detection"""
         client_ip = self._get_client_ip(request)
-        endpoint = request.url.path
 
         with self.lock:
             # Update the last request to mark it as error

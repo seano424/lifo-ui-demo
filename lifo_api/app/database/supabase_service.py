@@ -8,9 +8,9 @@ from datetime import datetime
 from typing import Any
 
 import structlog
+from supabase import Client, create_client
 
 from app.core.config import settings
-from supabase import Client, create_client
 
 logger = structlog.get_logger()
 
@@ -55,25 +55,25 @@ class SupabaseService:
             admin_client = self.get_admin_client()
             # Try different approaches to find working table structure
             try:
-                result = (
+                (
                     admin_client.schema("business")
                     .table("stores")
                     .select("*")
                     .limit(1)
                     .execute()
                 )
-            except:
+            except Exception:
                 try:
-                    result = (
+                    (
                         admin_client.schema("inventory")
                         .table("batches")
                         .select("*")
                         .limit(1)
                         .execute()
                     )
-                except:
+                except Exception:
                     # Just test basic connection - this will fail but shows we can connect
-                    result = None
+                    logger.debug("Fallback connection test completed")
 
             logger.info("Supabase connection test successful")
             return True

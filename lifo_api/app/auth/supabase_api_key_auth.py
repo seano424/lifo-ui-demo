@@ -105,18 +105,18 @@ class SupabaseAPIKeyAuth:
 
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 401:
-                raise SupabaseAPIKeyError("Invalid or expired access token")
+                raise SupabaseAPIKeyError("Invalid or expired access token") from e
             elif e.response.status_code == 403:
-                raise SupabaseAPIKeyError("Access forbidden", status_code=403)
+                raise SupabaseAPIKeyError("Access forbidden", status_code=403) from e
             else:
                 self.logger.error("Auth API error", status_code=e.response.status_code)
                 raise SupabaseAPIKeyError(
                     "Authentication service unavailable", status_code=503
-                )
+                ) from e
 
         except Exception as e:
             self.logger.error("Authentication error", error=str(e))
-            raise SupabaseAPIKeyError("Authentication failed")
+            raise SupabaseAPIKeyError("Authentication failed") from e
 
     async def _get_user_from_token(self, access_token: str) -> dict[str, Any] | None:
         """
@@ -147,9 +147,9 @@ class SupabaseAPIKeyAuth:
 
                 return user_data
 
-        except httpx.TimeoutException:
+        except httpx.TimeoutException as e:
             self.logger.error("Auth API timeout")
-            raise SupabaseAPIKeyError("Authentication service timeout", status_code=503)
+            raise SupabaseAPIKeyError("Authentication service timeout", status_code=503) from e
 
         except httpx.HTTPStatusError:
             # Re-raise HTTP errors to be handled by caller
@@ -225,11 +225,11 @@ class SupabaseAPIKeyAuth:
                 else:
                     raise SupabaseAPIKeyError("Token refresh failed")
 
-        except httpx.TimeoutException:
-            raise SupabaseAPIKeyError("Token refresh timeout", status_code=503)
+        except httpx.TimeoutException as e:
+            raise SupabaseAPIKeyError("Token refresh timeout", status_code=503) from e
         except Exception as e:
             self.logger.error("Token refresh error", error=str(e))
-            raise SupabaseAPIKeyError("Token refresh failed")
+            raise SupabaseAPIKeyError("Token refresh failed") from e
 
     async def validate_api_request(self, request: Request) -> APIKeyUser:
         """

@@ -60,7 +60,7 @@ class SecurityEvent:
     def _generate_event_id(self) -> str:
         """Generate unique event ID"""
         data = f"{self.timestamp.isoformat()}{self.client_ip}{self.event_type}"
-        return hashlib.md5(data.encode()).hexdigest()[:16]
+        return hashlib.sha256(data.encode()).hexdigest()[:16]
 
     def to_dict(self) -> dict[str, Any]:
         """Convert event to dictionary for logging/storage"""
@@ -264,7 +264,7 @@ class SecurityMonitor:
             if len(ip_events) >= 10:
                 # Check for rapid requests to different endpoints
                 recent_events = [e for e in ip_events if e.timestamp > datetime.now(UTC) - timedelta(minutes=5)]
-                unique_endpoints = len(set(e.endpoint for e in recent_events))
+                unique_endpoints = len({e.endpoint for e in recent_events})
 
                 if unique_endpoints >= 10:  # 10+ different endpoints in 5 minutes
                     anomalies.append("endpoint_enumeration")

@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Server Configuration
-    host: str = "0.0.0.0"
+    host: str = "0.0.0.0"  # noqa: S104  # Intentional for containerized deployment
     port: int = 8000
     allowed_hosts: list[str] = Field(default=["*"], description="Allowed hosts for the server")
 

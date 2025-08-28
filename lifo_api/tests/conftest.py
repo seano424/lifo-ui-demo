@@ -49,15 +49,15 @@ if 'ENVIRONMENT' not in os.environ:
 if 'SUPABASE_URL' not in os.environ:
     os.environ['SUPABASE_URL'] = 'https://test.supabase.co'
 if 'SUPABASE_JWT_SECRET' not in os.environ:
-    os.environ['SUPABASE_JWT_SECRET'] = 'test-jwt-secret-key-12345'
+    os.environ['SUPABASE_JWT_SECRET'] = 'test-jwt-secret-key-12345'  # noqa: S105
 if 'DATABASE_URL' not in os.environ:
     os.environ['DATABASE_URL'] = 'sqlite+aiosqlite:///:memory:'
 
 # NOW it's safe to import app modules since environment is properly set
-from app.core.config import settings
-from app.database.connection import Base, get_db
-from app.main import app
-from app.utils.performance import BoundedCache, PerformanceMonitor
+from app.core.config import settings  # noqa: E402
+from app.database.connection import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
+from app.utils.performance import BoundedCache, PerformanceMonitor  # noqa: E402
 
 # Verify that the environment was loaded correctly
 print(f"Test environment loaded - ENVIRONMENT: {os.environ.get('ENVIRONMENT')}")

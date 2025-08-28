@@ -67,7 +67,7 @@ async def score_store_batch(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Scoring failed")
+        raise HTTPException(status_code=500, detail="Scoring failed") from e
 
 
 @router.get("/alerts/{store_id}")
@@ -165,7 +165,7 @@ async def get_urgency_alerts(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Failed to get alerts")
+        raise HTTPException(status_code=500, detail="Failed to get alerts") from e
 
 
 @router.get("/recommendations/{store_id}")
@@ -297,7 +297,7 @@ async def get_ai_recommendations(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Failed to get recommendations")
+        raise HTTPException(status_code=500, detail="Failed to get recommendations") from e
 
 
 @router.get("/analytics/{store_id}")
@@ -397,4 +397,4 @@ async def get_scoring_analytics(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Analytics failed")
+        raise HTTPException(status_code=500, detail="Analytics failed") from e

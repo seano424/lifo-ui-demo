@@ -580,7 +580,7 @@ class TestSystemPerformanceHealth:
         assert len(summary) == 10
 
         # All operations should have reasonable statistics
-        for op_name, stats in summary.items():
+        for _op_name, stats in summary.items():
             assert stats["total_calls"] == 100  # Each operation called 100 times
             assert 0 <= stats["success_rate"] <= 1
             assert stats["avg_duration_ms"] > 0

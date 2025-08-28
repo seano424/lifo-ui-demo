@@ -77,7 +77,7 @@ class ErrorEvent:
         """Generate unique error ID"""
         import hashlib
         data = f"{self.timestamp.isoformat()}{self.error_type}{self.endpoint or 'unknown'}"
-        return hashlib.md5(data.encode()).hexdigest()[:12]
+        return hashlib.sha256(data.encode()).hexdigest()[:12]
 
     def to_dict(self) -> dict[str, Any]:
         """Convert error event to dictionary"""
@@ -179,7 +179,7 @@ class ErrorTracker:
                 "timestamp": error_event.timestamp.isoformat(),
                 "endpoint": error_event.endpoint,
                 "error_count": len(recent_errors),
-                "error_types": list(set(e.error_type for e in recent_errors))
+                "error_types": list({e.error_type for e in recent_errors})
             })
 
             logger.warning(
@@ -408,7 +408,7 @@ class ErrorRecoveryManager:
     ) -> tuple[bool, Any]:
         """
         Attempt to recover from an error and retry the operation
-        
+
         Returns:
             Tuple of (recovery_successful, result)
         """
@@ -521,7 +521,7 @@ def error_handler(
 ):
     """
     Decorator for comprehensive error handling and recovery
-    
+
     Args:
         category: Error category for classification
         severity: Error severity level
@@ -626,7 +626,7 @@ def _get_endpoint_from_context() -> str | None:
                     endpoint_file = parts[1].replace(".py", "")
                     return f"/api/v1/{endpoint_file}"
         return None
-    except:
+    except Exception:
         return None
 
 
@@ -647,7 +647,7 @@ def _get_user_id_from_context(args: tuple, kwargs: dict) -> str | None:
                     return user_data
 
         return None
-    except:
+    except Exception:
         return None
 
 

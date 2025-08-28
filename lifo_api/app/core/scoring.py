@@ -520,7 +520,7 @@ class ScoringService:
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.inventory_models import Product, Category
+            from app.database.inventory_models import Category, Product
             from app.database.models import Batch, SalesEvent
 
             # Try to get actual sales data for this specific batch

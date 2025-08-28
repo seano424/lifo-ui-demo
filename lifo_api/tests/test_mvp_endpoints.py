@@ -15,7 +15,7 @@ client = TestClient(app)
 # Test configuration
 TEST_STORE_ID = "123e4567-e89b-12d3-a456-426614174000"
 TEST_BATCH_ID = "456e7890-f12a-34b5-c678-567890123456"
-TEST_JWT_TOKEN = "mock-jwt-token-for-testing"
+TEST_JWT_TOKEN = "mock-jwt-token-for-testing"  # noqa: S105
 
 
 @pytest.fixture

@@ -136,7 +136,7 @@ class CSVToBatchAdapter:
         except ValueError:
             raise
         except Exception as e:
-            raise ValueError(f"Row {row_index}: Failed to convert row data: {str(e)}")
+            raise ValueError(f"Row {row_index}: Failed to convert row data: {str(e)}") from e
 
     @staticmethod
     def _parse_date(date_str: str, row_index: int) -> date:
@@ -169,10 +169,10 @@ class CSVToBatchAdapter:
             if parsed_value < 0:
                 raise ValueError(f"Row {row_index}: {field_name} cannot be negative")
             return parsed_value
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
             raise ValueError(
                 f"Row {row_index}: Invalid {field_name} value '{value}'. Must be a positive number"
-            )
+            ) from e
 
     @staticmethod
     def _generate_barcode_from_sku(sku: str) -> str:
@@ -196,7 +196,7 @@ class CSVToBatchAdapter:
         # Use a predictable hash so same SKU always gets same barcode
         import hashlib
 
-        hash_object = hashlib.md5(clean_sku.encode())
+        hash_object = hashlib.sha256(clean_sku.encode())
         hash_hex = hash_object.hexdigest()
 
         # Convert to numeric barcode (first 12 digits + check digit)

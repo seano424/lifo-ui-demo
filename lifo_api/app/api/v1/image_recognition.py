@@ -164,7 +164,7 @@ async def analyze_product_image(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Image analysis failed")
+        raise HTTPException(status_code=500, detail="Image analysis failed") from e
 
 
 @router.post("/extract-expiry-date/{store_id}")
@@ -223,7 +223,7 @@ async def extract_expiry_date_from_image(
             error=str(e),
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Expiry date extraction failed")
+        raise HTTPException(status_code=500, detail="Expiry date extraction failed") from e
 
 
 # Barcode detection endpoint removed - frontend handles this natively
@@ -288,7 +288,7 @@ async def get_ml_models_status(
         logger.error(
             "ML models status check failed", error=str(e), user_id=current_user["sub"]
         )
-        raise HTTPException(status_code=500, detail="Status check failed")
+        raise HTTPException(status_code=500, detail="Status check failed") from e
 
 
 # Helper functions for real Vision API integration

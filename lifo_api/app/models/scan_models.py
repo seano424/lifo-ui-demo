@@ -270,8 +270,8 @@ def validate_uuid_format(value: str) -> str:
     try:
         uuid.UUID(value)
         return value
-    except ValueError:
-        raise ValueError(f"Invalid UUID format: {value}")
+    except ValueError as e:
+        raise ValueError(f"Invalid UUID format: {value}") from e
 
 
 def sanitize_text_input(value: str) -> str:

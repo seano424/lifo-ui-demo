@@ -143,7 +143,7 @@ class TestRunner:
         start_time = time.time()
 
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603  # Controlled test execution
                 command,
                 cwd=self.project_root,
                 capture_output=False,

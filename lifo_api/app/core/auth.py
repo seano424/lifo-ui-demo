@@ -80,13 +80,13 @@ async def get_current_user(
             "token_payload": payload,
         }
 
-    except jwt.ExpiredSignatureError:
-        raise AuthError("Token has expired")
+    except jwt.ExpiredSignatureError as e:
+        raise AuthError("Token has expired") from e
     except jwt.JWTError as e:
-        raise AuthError(f"Token validation failed: {e!s}")
+        raise AuthError(f"Token validation failed: {e!s}") from e
     except Exception as e:
         logger.error("Authentication error", error=str(e))
-        raise AuthError("Authentication failed")
+        raise AuthError("Authentication failed") from e
 
 
 async def get_current_user_with_store_access(

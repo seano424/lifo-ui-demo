@@ -33,7 +33,7 @@ class MobileQueryOptimizer:
 
         # Base query optimized for mobile with proper indexes
         base_query = """
-        SELECT 
+        SELECT
             b.batch_id,
             p.sku,
             p.category,
@@ -45,7 +45,7 @@ class MobileQueryOptimizer:
             p.typical_shelf_life_days
         FROM inventory.batches b
         INNER JOIN inventory.products p ON b.product_id = p.product_id
-        WHERE b.store_id = :store_id 
+        WHERE b.store_id = :store_id
             AND b.status = 'active'
             AND b.current_quantity > 0
             AND b.expiry_date > (CURRENT_DATE - INTERVAL '7 days')
@@ -65,7 +65,7 @@ class MobileQueryOptimizer:
 
         # Mobile optimization: Order by urgency and limit results
         base_query += """
-        ORDER BY 
+        ORDER BY
             b.best_before_date ASC,
             b.current_quantity * b.selling_price DESC
         LIMIT :limit
@@ -129,7 +129,7 @@ class MobileQueryOptimizer:
         start_time = time.time()
 
         query = """
-        SELECT 
+        SELECT
             b.batch_id,
             p.sku,
             p.category,
@@ -141,7 +141,7 @@ class MobileQueryOptimizer:
             COALESCE(b.location_code, 'MAIN') as location_code
         FROM inventory.batches b
         INNER JOIN inventory.products p ON b.product_id = p.product_id
-        WHERE b.batch_id = :batch_id 
+        WHERE b.batch_id = :batch_id
             AND b.status = 'active'
         LIMIT 1
         """
@@ -201,7 +201,7 @@ class MobileQueryOptimizer:
                 SUM(b.current_quantity * b.selling_price) as total_value,
                 AVG(DATE_PART('day', b.best_before_date - CURRENT_DATE)) as avg_days_to_expiry
             FROM inventory.batches b
-            WHERE b.store_id = :store_id 
+            WHERE b.store_id = :store_id
                 AND b.status = 'active'
                 AND b.current_quantity > 0
         )
@@ -266,14 +266,14 @@ class MobileQueryOptimizer:
         start_time = time.time()
 
         query = """
-        SELECT 
+        SELECT
             p.category,
             COUNT(*) as batch_count,
             COUNT(CASE WHEN b.expiry_date <= (CURRENT_DATE + INTERVAL '1 day') THEN 1 END) as urgent_count,
             SUM(b.current_quantity * b.selling_price) as category_value
         FROM inventory.batches b
         INNER JOIN inventory.products p ON b.product_id = p.product_id
-        WHERE b.store_id = :store_id 
+        WHERE b.store_id = :store_id
             AND b.status = 'active'
             AND b.current_quantity > 0
         GROUP BY p.category

@@ -127,7 +127,7 @@ class SecureCSVProcessor:
                 filename=file.filename,
                 error=str(e),
             )
-            raise HTTPException(status_code=500, detail=f"CSV processing failed: {e!s}")
+            raise HTTPException(status_code=500, detail=f"CSV processing failed: {e!s}") from e
 
     async def _validate_file_security(self, file: UploadFile) -> None:
         """Validate file security constraints"""
@@ -233,8 +233,8 @@ class SecureCSVProcessor:
                     detail="File does not appear to be valid CSV format",
                 )
 
-        except UnicodeDecodeError:
-            raise HTTPException(status_code=400, detail="File is not valid UTF-8 text")
+        except UnicodeDecodeError as e:
+            raise HTTPException(status_code=400, detail="File is not valid UTF-8 text") from e
 
     def _decode_csv_content_secure(self, content: bytes) -> str:
         """Securely decode CSV content with size checks"""
@@ -330,7 +330,7 @@ class SecureCSVProcessor:
             }
 
         except csv.Error as e:
-            raise HTTPException(status_code=400, detail=f"CSV parsing error: {e!s}")
+            raise HTTPException(status_code=400, detail=f"CSV parsing error: {e!s}") from e
 
     def _has_suspicious_content(self, content: str) -> bool:
         """Check for suspicious content patterns"""
@@ -503,8 +503,8 @@ class SecureCSVProcessor:
                 if quantity < 0 or quantity > 100000:
                     raise ValueError("Invalid quantity: must be 0-100000")
                 validated_row["quantity"] = quantity
-            except ValueError:
-                raise ValueError(f"Invalid quantity format: {row_data['quantity']}")
+            except ValueError as e:
+                raise ValueError(f"Invalid quantity format: {row_data['quantity']}") from e
 
         # Price validation
         for price_field in ["cost_price", "selling_price"]:
@@ -514,10 +514,10 @@ class SecureCSVProcessor:
                     if price < 0 or price > Decimal("10000"):
                         raise ValueError(f"Invalid {price_field}: must be 0-10000")
                     validated_row[price_field] = price
-                except (ValueError, InvalidOperation):
+                except (ValueError, InvalidOperation) as e:
                     raise ValueError(
                         f"Invalid {price_field} format: {row_data[price_field]}"
-                    )
+                    ) from e
 
         # Date validation
         if row_data.get("expiry_date"):
@@ -531,20 +531,20 @@ class SecureCSVProcessor:
                 if expiry_date > datetime.now().date() + timedelta(days=365 * 5):
                     raise ValueError(f"Expiry date too far in future: {expiry_date}")
                 validated_row["expiry_date"] = expiry_date.isoformat()
-            except ValueError:
+            except ValueError as e:
                 raise ValueError(
                     f"Invalid expiry date format: {row_data['expiry_date']}. Use YYYY-MM-DD"
-                )
+                ) from e
 
         # Category validation
         if "category" in row_data:
             category = row_data["category"].strip().lower()
-            
+
             # Standardized category mapping
             category_mapping = {
                 # Direct mappings to standardized categories
                 "fresh_produce": "fresh_produce",
-                "dairy_eggs": "dairy_eggs", 
+                "dairy_eggs": "dairy_eggs",
                 "bakery_fresh": "bakery_fresh",
                 "fresh_meat_fish": "fresh_meat_fish",
                 "frozen_foods": "frozen_foods",
@@ -558,7 +558,7 @@ class SecureCSVProcessor:
                 "household_other": "household_other",
                 "specialty_items": "specialty_items",
                 "bulk_items": "bulk_items",
-                
+
                 # Legacy mappings
                 "dairy": "dairy_eggs",
                 "frozen": "frozen_foods",
@@ -571,7 +571,7 @@ class SecureCSVProcessor:
                 "spices": "spices_condiments",
                 "bulk": "bulk_items",
             }
-            
+
             mapped_category = category_mapping.get(category)
             if not mapped_category:
                 # Try partial matching for flexibility
@@ -579,7 +579,7 @@ class SecureCSVProcessor:
                     if key in category or category in key:
                         mapped_category = value
                         break
-                        
+
             validated_row["category"] = mapped_category or "household_other"  # Default to household_other
 
         # Copy other safe fields

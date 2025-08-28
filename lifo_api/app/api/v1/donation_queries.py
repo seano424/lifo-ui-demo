@@ -81,7 +81,7 @@ async def get_donation_recipients(
         logger.error("Failed to get donation recipients", error=str(e))
         raise HTTPException(
             status_code=500, detail="Failed to retrieve donation recipients"
-        )
+        ) from e
 
 
 @router.get("/actions")
@@ -148,7 +148,7 @@ async def get_batch_actions(
 
     except Exception as e:
         logger.error("Failed to get batch actions", error=str(e))
-        raise HTTPException(status_code=500, detail="Failed to retrieve batch actions")
+        raise HTTPException(status_code=500, detail="Failed to retrieve batch actions") from e
 
 
 @router.get("/analytics/summary")
@@ -226,7 +226,7 @@ async def get_donation_analytics_summary(
         logger.error("Failed to get donation analytics", error=str(e))
         raise HTTPException(
             status_code=500, detail="Failed to retrieve donation analytics"
-        )
+        ) from e
 
 
 # Legacy endpoint stubs for backwards compatibility
