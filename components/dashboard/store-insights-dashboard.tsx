@@ -65,7 +65,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
   // Handle both old and new data structures
   const data = insights?.insights || insights
-  
+
   // Add safety checks for data structure
   if (!data) {
     return (
@@ -77,9 +77,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
         <CardContent>
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              No insights data found for store: {storeId}
-            </AlertDescription>
+            <AlertDescription>No insights data found for store: {storeId}</AlertDescription>
           </Alert>
         </CardContent>
       </Card>
@@ -92,9 +90,9 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
   const perfect_for_donation = data.perfect_for_donation || { count: 0 }
   const high_urgency = data.high_urgency || { count: 0 }
   const summary = data.summary || {
-    total_active_batches: data.active_batches || 0,
+    total_active_batches: (data as { active_batches?: number }).active_batches || 0,
     total_actionable_items: 0,
-    action_required_percentage: 0
+    action_required_percentage: 0,
   }
 
   return (
