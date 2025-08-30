@@ -22,7 +22,7 @@ interface BarcodeScannerProps {
   className?: string
   title?: string
   subtitle?: string
-  isBarcodeScanner?: boolean
+  permissionMessage?: string
 }
 
 export default function BarcodeScanner({
@@ -32,7 +32,7 @@ export default function BarcodeScanner({
   className = '',
   title = 'Scan Product',
   subtitle = 'Scan a barcode to add a product to your inventory',
-  isBarcodeScanner = false,
+  permissionMessage = 'Camera access is required for scanning.',
 }: BarcodeScannerProps): React.JSX.Element {
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -286,7 +286,7 @@ export default function BarcodeScanner({
   const displayError = error || detectionError
 
   return (
-    <div className={cn('w-full text-center sm:min-w-[600px] flex flex-col gap-4', className)}>
+    <div className={cn('w-full text-center flex flex-col gap-4', className)}>
       <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-2">
           <Scan className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
@@ -314,17 +314,15 @@ export default function BarcodeScanner({
           </Alert>
         )}
 
-        {/* Camera container - ALWAYS maintains aspect ratio */}
-        <div className="relative w-full aspect-video border border-black rounded-3xl bg-gray-100">
+        {/* Camera container - fixed size matching camera's native 638×358 */}
+        <div className="relative w-full aspect-[638/358] border border-black rounded-3xl bg-gray-100 dark:bg-brand-dark">
           {/* Camera Permission Request */}
           {(hasPermission === false || hasPermission === null) && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-3xl">
               <div className="text-center space-y-4">
                 <Alert className="border-none bg-transparent shadow-none">
                   <Camera className="h-4 w-4" />
-                  <AlertDescription>
-                    Camera access is required for barcode scanning.
-                  </AlertDescription>
+                  <AlertDescription>{permissionMessage}</AlertDescription>
                 </Alert>
                 <Button
                   onClick={handleUserStart}
@@ -342,7 +340,7 @@ export default function BarcodeScanner({
             <>
               <video
                 ref={videoRef}
-                className="w-full h-full aspect-video rounded-3xl object-cover"
+                className="w-full h-full aspect-[638/358] rounded-3xl object-cover"
                 playsInline
                 muted
               />
@@ -380,14 +378,14 @@ export default function BarcodeScanner({
               <Button
                 onClick={handleUserStart}
                 className="flex-1"
-                variant="secondary"
+                variant="default"
                 disabled={!isInitialized || isStartingRef.current}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
               </Button>
             ) : (
-              <Button onClick={handleUserStop} variant="destructive" className="flex-1">
+              <Button onClick={handleUserStop} variant="default" className="flex-1">
                 <StopCircle className="w-4 h-4 mr-2" />
                 Stop Scanning
               </Button>
@@ -417,13 +415,6 @@ export default function BarcodeScanner({
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Instructions */}
-        {hasPermission && isScanning && isInitialized && isBarcodeScanner && (
-          <div className="text-xs text-gray-500 text-center">
-            Point camera at barcode to scan automatically • Real detection active
           </div>
         )}
       </div>

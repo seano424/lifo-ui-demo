@@ -1,5 +1,6 @@
 // Shared scanning components for reuse across scan-in and scan-out workflows
 
+export { default as BatchSelectionList } from './batch-selection-list'
 export type { InventoryFormData, InventoryFormProps } from './inventory-form'
 export { default as InventoryForm } from './inventory-form'
 export type { ProductCardProps, ProductInfo } from './product-card'

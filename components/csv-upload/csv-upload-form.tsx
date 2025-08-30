@@ -173,13 +173,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   return (
     <div className="flex flex-col gap-6 sm:min-w-xl lg:w-3xl mx-auto">
       {/* Ultra-Fast Upload Header */}
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Zap className="h-6 w-6 text-yellow-500" />
-          <h2 className="text-2xl font-bold">{t('title')}</h2>
-          <Zap className="h-6 w-6 text-yellow-500" />
+
+      <div className="flex items-center gap-2 flex-col justify-center">
+        <div className="flex items-center gap-1">
+          <Zap className="w-6 h-6 text-secondary-900 fill-primary-100" />
+          <Typography variant="h3" className="text-primary-800 font-black">
+            {t('title')}
+          </Typography>
+          <Zap className="w-6 h-6 text-secondary-900 fill-primary-100" />
         </div>
-        <p className="text-gray-600">{t('subtitle')}</p>
+        <Typography variant="p">{t('subtitle')}</Typography>
       </div>
 
       {/* File Upload Area */}

@@ -129,17 +129,6 @@ export default function InventoryForm({
               </div>
             </div>
           )}
-
-          <div className="mt-3 flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => handleChange('expiryDate')('')}
-              className="flex-1"
-              disabled={disabled}
-            >
-              Clear & Rescan
-            </Button>
-          </div>
         </CardContent>
       </Card>
     )
