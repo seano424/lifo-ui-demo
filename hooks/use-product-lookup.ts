@@ -198,3 +198,178 @@ export function useVerifyProduct() {
     },
   })
 }
+
+// Hook to search products by name in Supabase (for outbound/scan-out)
+// For outbound: searches batches with available stock
+// For inbound: searches all products
+export interface SupabaseProductSearchResult {
+  product_id: string
+  name: string
+  brand?: string
+  category?: string
+  barcode?: string
+  image_url?: string
+  unit_type?: string
+  total_available_quantity?: number // Total available across all batches
+  batch_count?: number // Number of batches available
+  isOutOfStock?: boolean // True if no stock available
+}
+
+export function useSupabaseProductSearch(storeId?: string) {
+  return useMutation({
+    mutationFn: async (query: string): Promise<SupabaseProductSearchResult[]> => {
+      if (!query || query.length < 2) {
+        return []
+      }
+
+      const supabase = createClient()
+
+      // For outbound (when storeId is provided), search BATCHES with available stock
+      if (storeId) {
+        // First get products that match the search query
+        const { data: matchingProducts, error: productError } = await supabase
+          .schema('inventory')
+          .from('products')
+          .select('product_id, name, brand, category, barcode, image_url, unit_type')
+          .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
+
+        if (productError) {
+          console.error('[SupabaseProductSearch] Failed to search products:', productError)
+          throw productError
+        }
+
+        if (!matchingProducts || matchingProducts.length === 0) {
+          return []
+        }
+
+        const productIds = matchingProducts.map(p => p.product_id)
+
+        // Now get ALL batches for these products (including out of stock)
+        const { data: batchesWithProducts, error } = await supabase
+          .schema('inventory')
+          .from('batches')
+          .select(`
+            batch_id,
+            product_id,
+            current_quantity,
+            products (
+              product_id,
+              name,
+              brand,
+              category,
+              barcode,
+              image_url,
+              unit_type
+            )
+          `)
+          .eq('store_id', storeId)
+          .eq('status', 'active')
+          .gte('current_quantity', 0) // Include items with 0 stock
+          .in('product_id', productIds)
+
+        if (error) {
+          console.error('[SupabaseProductSearch] Failed to search batches:', error)
+          throw error
+        }
+
+        // Aggregate batches by product
+        const productMap = new Map<string, SupabaseProductSearchResult>()
+
+        batchesWithProducts?.forEach(batch => {
+          const product = batch.products as unknown as {
+            product_id: string
+            name: string
+            brand: string | null
+            category: string | null
+            barcode: string | null
+            image_url: string | null
+            unit_type: string | null
+          }
+          const productId = batch.product_id
+
+          if (productMap.has(productId)) {
+            // Update existing product entry with additional batch quantity
+            const existing = productMap.get(productId)!
+            existing.total_available_quantity =
+              (existing.total_available_quantity || 0) + batch.current_quantity
+            existing.batch_count = (existing.batch_count || 0) + 1
+          } else {
+            // Create new product entry
+            productMap.set(productId, {
+              product_id: productId,
+              name: product.name,
+              brand: product.brand || undefined,
+              category: product.category || undefined,
+              barcode: product.barcode || undefined,
+              image_url: product.image_url || undefined,
+              unit_type: product.unit_type || undefined,
+              total_available_quantity: batch.current_quantity,
+              batch_count: 1,
+              isOutOfStock: batch.current_quantity === 0,
+            })
+          }
+        })
+
+        // Add products that have no batches in this store (completely out of stock)
+        matchingProducts.forEach(product => {
+          if (!productMap.has(product.product_id)) {
+            productMap.set(product.product_id, {
+              product_id: product.product_id,
+              name: product.name,
+              brand: product.brand || undefined,
+              category: product.category || undefined,
+              barcode: product.barcode || undefined,
+              image_url: product.image_url || undefined,
+              unit_type: product.unit_type || undefined,
+              total_available_quantity: 0,
+              batch_count: 0,
+              isOutOfStock: true,
+            })
+          }
+        })
+
+        // Update isOutOfStock flag for products with zero total quantity
+        productMap.forEach(product => {
+          if ((product.total_available_quantity || 0) === 0) {
+            product.isOutOfStock = true
+          }
+        })
+
+        // Convert to array and sort: in-stock items first, then out-of-stock
+        const results = Array.from(productMap.values())
+          .sort((a, b) => {
+            // First sort by stock status (in-stock items first)
+            if (a.isOutOfStock !== b.isOutOfStock) {
+              return a.isOutOfStock ? 1 : -1
+            }
+            // Then sort by total available quantity (highest first)
+            return (b.total_available_quantity || 0) - (a.total_available_quantity || 0)
+          })
+          .slice(0, 20)
+
+        const inStockCount = results.filter(p => !p.isOutOfStock).length
+        const outOfStockCount = results.length - inStockCount
+        console.log(
+          `[SupabaseProductSearch] Found ${results.length} products for query "${query}" in store ${storeId} (${inStockCount} in stock, ${outOfStockCount} out of stock)`,
+        )
+        return results
+      } else {
+        // For inbound (no storeId), show all products regardless of stock
+        // This is for adding new inventory
+        const { data, error } = await supabase
+          .schema('inventory')
+          .from('products')
+          .select('product_id, name, brand, category, barcode, image_url, unit_type')
+          .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
+          .limit(20)
+
+        if (error) {
+          console.error('[SupabaseProductSearch] Failed to search products:', error)
+          throw error
+        }
+
+        return data || []
+      }
+    },
+  })
+}

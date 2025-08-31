@@ -38,17 +38,14 @@ import {
   ScanningControls,
 } from './shared'
 
-interface RefactoredScanningProps {
+interface ScanningProps {
   onItemAdded?: (item: ScannedItem) => void
   className?: string
 }
 
 type UIStep = 'camera-barcode' | 'product-success' | 'camera-expiry' | 'batch-success'
 
-export default function RefactoredScanningInterface({
-  onItemAdded,
-  className,
-}: RefactoredScanningProps) {
+export default function ScanningInterface({ onItemAdded, className }: ScanningProps) {
   // Existing workflow state
   const currentStep = useScanningStep()
   const scannedProduct = useScannedProduct()
@@ -319,6 +316,19 @@ export default function RefactoredScanningInterface({
           {/* Step 1: Barcode Scanning */}
           {uiStep === 'camera-barcode' && (
             <>
+              {/* Camera Interface */}
+              <ScanningCamera
+                mode="barcode"
+                title={scannedProduct ? 'Scan Different Product' : 'Scan Product'}
+                onBarcodeScanned={handleScan}
+                onScanError={handleError}
+                showManualEntry={showManualBarcode}
+                onToggleManualEntry={() => setShowManualBarcode(!showManualBarcode)}
+                onManualProductSelected={handleManualProductSelected}
+                onCloseManualEntry={() => setShowManualBarcode(false)}
+                autoStart
+              />
+
               {/* Selected Product Display */}
               {scannedProduct && (
                 <ProductCard
@@ -337,33 +347,12 @@ export default function RefactoredScanningInterface({
                   onProceed={() => workflowActions.setCurrentStep('ocr')}
                 />
               )}
-
-              {/* Camera Interface */}
-              <ScanningCamera
-                mode="barcode"
-                title={scannedProduct ? 'Scan Different Product' : 'Scan Product'}
-                onBarcodeScanned={handleScan}
-                onScanError={handleError}
-                showManualEntry={showManualBarcode}
-                onToggleManualEntry={() => setShowManualBarcode(!showManualBarcode)}
-                onManualProductSelected={handleManualProductSelected}
-                onCloseManualEntry={() => setShowManualBarcode(false)}
-                autoStart
-              />
             </>
           )}
 
           {/* Step 2: Product Success */}
           {uiStep === 'product-success' && scannedProduct && (
             <div className="space-y-4">
-              <ProductCard
-                product={{
-                  barcode: scannedProduct.barcode,
-                  productName: scannedProduct.productName,
-                  brand: scannedProduct.brand,
-                }}
-              />
-
               {/* Lookup Status */}
               {lookupError && (
                 <Alert variant="destructive">
@@ -371,6 +360,14 @@ export default function RefactoredScanningInterface({
                   <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
                 </Alert>
               )}
+
+              <ProductCard
+                product={{
+                  barcode: scannedProduct.barcode,
+                  productName: scannedProduct.productName,
+                  brand: scannedProduct.brand,
+                }}
+              />
 
               {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
                 <>
@@ -404,18 +401,6 @@ export default function RefactoredScanningInterface({
           {/* Step 3: Expiry Date Scanning */}
           {uiStep === 'camera-expiry' && (
             <div className="space-y-4">
-              {/* Product Context */}
-              {scannedProduct && (
-                <ProductCard
-                  product={{
-                    barcode: scannedProduct.barcode,
-                    productName: scannedProduct.productName,
-                    brand: scannedProduct.brand,
-                  }}
-                  mode="selected"
-                />
-              )}
-
               {/* Camera for OCR */}
               {!inventoryData.expiryDate && (
                 <ScanningCamera
@@ -428,6 +413,18 @@ export default function RefactoredScanningInterface({
                     workflowActions.setError(null)
                   }}
                   isBackendHealthy={isBackendHealthy}
+                />
+              )}
+
+              {/* Product Context */}
+              {scannedProduct && (
+                <ProductCard
+                  product={{
+                    barcode: scannedProduct.barcode,
+                    productName: scannedProduct.productName,
+                    brand: scannedProduct.brand,
+                  }}
+                  mode="selected"
                 />
               )}
 
@@ -453,14 +450,15 @@ export default function RefactoredScanningInterface({
 
               {/* Add to Inventory */}
               {inventoryData.expiryDate && (
-                <Button
-                  disabled={inventoryData.quantity <= 0 || inventoryData.price <= 0}
-                  onClick={handleAddToInventory}
-                  className="w-full"
-                  variant="secondary"
-                >
-                  Add to Inventory • {inventoryData.quantity}x €{inventoryData.price.toFixed(2)}
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    disabled={inventoryData.quantity <= 0 || inventoryData.price <= 0}
+                    onClick={handleAddToInventory}
+                    variant="secondary"
+                  >
+                    Add to Inventory • {inventoryData.quantity}x €{inventoryData.price.toFixed(2)}
+                  </Button>
+                </div>
               )}
             </div>
           )}
@@ -477,9 +475,10 @@ export default function RefactoredScanningInterface({
           {/* Scanned Items List */}
           <ScannedItemsList
             items={scannedItems}
-            onEditItem={item => {
-              // TODO: Implement edit functionality
-              console.log('Edit item:', item)
+            onItemUpdated={updatedItem => {
+              setScannedItems(prev =>
+                prev.map(item => (item.id === updatedItem.id ? updatedItem : item)),
+              )
             }}
           />
 
@@ -613,7 +612,7 @@ export default function RefactoredScanningInterface({
                 onClick={() => {
                   setShowSuccessDialog(false)
                   // Navigate to dashboard - you might need to add navigation logic here
-                  window.location.href = '/dashboard'
+                  window.location.href = '/dashboard/inventory/batches'
                 }}
                 className="w-full"
               >

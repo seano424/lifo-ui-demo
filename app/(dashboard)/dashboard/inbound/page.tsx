@@ -2,22 +2,23 @@
 
 import { Scan, Upload } from 'lucide-react'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
-import ScanningInterface from '@/components/scanning/refactored-scanning-interface'
+import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useMediaQuery } from '@/hooks/use-mobile'
 import { useStoreState } from '@/lib/stores/store-context'
 
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
-  const isMobile = useIsMobile()
+  const { isTablet, isMobile } = useMediaQuery()
+
   return (
     <div className="space-y-6">
       {/* Mobile Tabs */}
       <Tabs defaultValue="scan" className="w-full lg:hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="scan" className="flex items-center gap-2">
-            <Scan className="w-4 h-4 stroke-2 border-2  rounded-full p-[2px] bg-primary-100" />
+            <Scan className="w-4 h-4 stroke-2 border-2 rounded-full p-[2px] bg-primary-100" />
             Barcode Scanning
           </TabsTrigger>
           <TabsTrigger value="csv" className="flex items-center gap-2">
@@ -27,7 +28,7 @@ export default function InboundPage() {
         </TabsList>
 
         <TabsContent value="scan" className="mt-6">
-          <div className="max-w-screen-sm mx-auto">{isMobile && <ScanningInterface />}</div>
+          <div className="max-w-2xl mx-auto">{(isMobile || isTablet) && <ScanningInterface />}</div>
         </TabsContent>
 
         <TabsContent value="csv" className="mt-6">

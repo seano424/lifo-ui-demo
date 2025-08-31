@@ -41,6 +41,7 @@ const buttonVariants = cva(
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
         black: 'bg-black text-white shadow-sm hover:bg-black/90',
         gray: 'bg-gray-200 text-gray-900 shadow-sm hover:bg-gray-300',
+        subtleGray: 'bg-gray-100 text-gray-900 shadow-sm hover:bg-gray-200',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs',
