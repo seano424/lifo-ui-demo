@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ProductListFilters } from '@/components/products/product-list-filters'
 import { ProductListSortControls } from '@/components/products/product-list-sort-controls'
-import { ProductTable } from '@/components/products/products-table'
+import { ProductsTable } from '@/components/products/products-table'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -108,7 +108,7 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <ProductListFilters
                 filters={{
-                  category: filters.category,
+                  category: filters.category || undefined,
                 }}
                 onFiltersChange={handleFiltersChange}
                 count={count}
@@ -117,7 +117,10 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
               <ProductListSortControls
                 currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
                 updateSort={field => {
-                  const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+                  const currentSort = filters.sort || {
+                    field: 'created_at',
+                    direction: 'desc',
+                  }
                   const newDirection =
                     currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
                   handleSortChange({ field, direction: newDirection })
@@ -128,12 +131,15 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
           </div>
         </div>
 
-        <ProductTable
+        <ProductsTable
           data={data}
           isLoading={isLoading}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
           updateSort={field => {
-            const currentSort = filters.sort || { field: 'created_at', direction: 'desc' }
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
             const newDirection =
               currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
             handleSortChange({ field, direction: newDirection })

@@ -81,15 +81,13 @@ async def get_donation_recipients(
         logger.error("Failed to get donation recipients", error=str(e))
         raise HTTPException(
             status_code=500, detail="Failed to retrieve donation recipients"
-        )
+        ) from e
 
 
 @router.get("/actions")
 async def get_batch_actions(
     store_id: str | None = Query(None, description="Filter by store ID"),
-    action_type: ActionType | None = Query(
-        None, description="Filter by action type"
-    ),
+    action_type: ActionType | None = Query(None, description="Filter by action type"),
     days: int = Query(30, description="Number of days to look back"),
     limit: int = Query(100, description="Maximum number of results"),
     db: AsyncSession = Depends(get_database),
@@ -148,7 +146,9 @@ async def get_batch_actions(
 
     except Exception as e:
         logger.error("Failed to get batch actions", error=str(e))
-        raise HTTPException(status_code=500, detail="Failed to retrieve batch actions")
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve batch actions"
+        ) from e
 
 
 @router.get("/analytics/summary")
@@ -226,7 +226,7 @@ async def get_donation_analytics_summary(
         logger.error("Failed to get donation analytics", error=str(e))
         raise HTTPException(
             status_code=500, detail="Failed to retrieve donation analytics"
-        )
+        ) from e
 
 
 # Legacy endpoint stubs for backwards compatibility

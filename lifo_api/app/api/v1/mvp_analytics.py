@@ -73,7 +73,9 @@ async def get_mvp_metrics(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="MVP metrics calculation failed")
+        raise HTTPException(
+            status_code=500, detail="MVP metrics calculation failed"
+        ) from e
 
 
 @router.get("/batch-insights/{store_id}", response_model=BatchInsights)
@@ -130,7 +132,9 @@ async def get_batch_insights(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Batch insights generation failed")
+        raise HTTPException(
+            status_code=500, detail="Batch insights generation failed"
+        ) from e
 
 
 @router.get("/scan-workflow-stats/{store_id}")
@@ -194,7 +198,7 @@ async def get_scan_workflow_stats(
         )
         raise HTTPException(
             status_code=500, detail="Scan workflow stats calculation failed"
-        )
+        ) from e
 
 
 @router.get("/waste-prevention-impact/{store_id}")
@@ -246,7 +250,7 @@ async def get_waste_prevention_impact(
         )
         raise HTTPException(
             status_code=500, detail="Waste prevention impact calculation failed"
-        )
+        ) from e
 
 
 @router.get("/action-effectiveness/{store_id}")
@@ -298,7 +302,7 @@ async def get_action_effectiveness(
         )
         raise HTTPException(
             status_code=500, detail="Action effectiveness calculation failed"
-        )
+        ) from e
 
 
 # Helper functions

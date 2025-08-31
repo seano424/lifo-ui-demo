@@ -14,8 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useCategories } from '@/hooks/use-categories'
 
 export function AddProductForm() {
+  const { getCategoriesForDropdown, isLoading: categoriesLoading } = useCategories()
+
   const [formData, setFormData] = useState({
     barcode: '',
     name: '',
@@ -88,12 +91,19 @@ export function AddProductForm() {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dairy">Dairy</SelectItem>
-                  <SelectItem value="meat">Meat</SelectItem>
-                  <SelectItem value="produce">Produce</SelectItem>
-                  <SelectItem value="bakery">Bakery</SelectItem>
-                  <SelectItem value="frozen">Frozen</SelectItem>
-                  <SelectItem value="pantry">Pantry</SelectItem>
+                  {categoriesLoading ? (
+                    <SelectItem value="" disabled>
+                      Loading categories...
+                    </SelectItem>
+                  ) : (
+                    getCategoriesForDropdown().map(
+                      (category: { value: string; label: string; code: string }) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
+                        </SelectItem>
+                      ),
+                    )
+                  )}
                 </SelectContent>
               </Select>
             </div>

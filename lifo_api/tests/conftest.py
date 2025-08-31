@@ -27,6 +27,7 @@ import pytest
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -34,7 +35,7 @@ from sqlalchemy.pool import StaticPool
 # Get the directory containing this conftest.py file
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _api_root = os.path.dirname(_current_dir)  # Go up one level to lifo_api root
-_test_env_path = os.path.join(_api_root, '.env.test')
+_test_env_path = os.path.join(_api_root, ".env.test")
 
 # Load test environment variables with override=True to ensure they take precedence
 if os.path.exists(_test_env_path):
@@ -44,20 +45,20 @@ else:
     print(f"Warning: .env.test file not found at {_test_env_path}")
 
 # Set critical environment variables if not already set
-if 'ENVIRONMENT' not in os.environ:
-    os.environ['ENVIRONMENT'] = 'testing'
-if 'SUPABASE_URL' not in os.environ:
-    os.environ['SUPABASE_URL'] = 'https://test.supabase.co'
-if 'SUPABASE_JWT_SECRET' not in os.environ:
-    os.environ['SUPABASE_JWT_SECRET'] = 'test-jwt-secret-key-12345'
-if 'DATABASE_URL' not in os.environ:
-    os.environ['DATABASE_URL'] = 'sqlite+aiosqlite:///:memory:'
+if "ENVIRONMENT" not in os.environ:
+    os.environ["ENVIRONMENT"] = "testing"
+if "SUPABASE_URL" not in os.environ:
+    os.environ["SUPABASE_URL"] = "https://test.supabase.co"
+if "SUPABASE_JWT_SECRET" not in os.environ:
+    os.environ["SUPABASE_JWT_SECRET"] = "test-jwt-secret-key-12345"  # noqa: S105
+if "DATABASE_URL" not in os.environ:
+    os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 
 # NOW it's safe to import app modules since environment is properly set
-from app.core.config import settings
-from app.database.connection import Base, get_db
-from app.main import app
-from app.utils.performance import BoundedCache, PerformanceMonitor
+from app.core.config import settings  # noqa: E402
+from app.database.connection import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
+from app.utils.performance import BoundedCache, PerformanceMonitor  # noqa: E402
 
 # Verify that the environment was loaded correctly
 print(f"Test environment loaded - ENVIRONMENT: {os.environ.get('ENVIRONMENT')}")
@@ -119,7 +120,12 @@ async def test_engine():
     )
 
     async with engine.begin() as conn:
+        # For SQLite testing, disable foreign key constraints during table creation
+        if "sqlite" in str(engine.url):
+            await conn.execute(text("PRAGMA foreign_keys = OFF"))
         await conn.run_sync(Base.metadata.create_all)
+        if "sqlite" in str(engine.url):
+            await conn.execute(text("PRAGMA foreign_keys = ON"))
 
     yield engine
     await engine.dispose()
@@ -155,14 +161,24 @@ def client(test_db, test_settings):
 def validate_test_environment(test_settings):
     """Validate that test environment is properly configured."""
     try:
-        assert test_settings.environment == "testing", f"Expected 'testing' environment, got '{test_settings.environment}'"
-        assert test_settings.database_url == TEST_DATABASE_URL, "Test database URL not properly set"
-        assert not test_settings.rate_limit_enabled, "Rate limiting should be disabled in tests"
+        assert test_settings.environment == "testing", (
+            f"Expected 'testing' environment, got '{test_settings.environment}'"
+        )
+        assert test_settings.database_url == TEST_DATABASE_URL, (
+            "Test database URL not properly set"
+        )
+        assert not test_settings.rate_limit_enabled, (
+            "Rate limiting should be disabled in tests"
+        )
         assert test_settings.debug is True, "Debug mode should be enabled in tests"
 
         # Additional validation for critical test settings
-        assert test_settings.rate_limit_per_minute >= 1000, "Rate limit should be high for tests"
-        assert not test_settings.enable_performance_monitoring, "Performance monitoring should be disabled in tests"
+        assert test_settings.rate_limit_per_minute >= 1000, (
+            "Rate limit should be high for tests"
+        )
+        assert not test_settings.enable_performance_monitoring, (
+            "Performance monitoring should be disabled in tests"
+        )
         assert not test_settings.enable_alerting, "Alerting should be disabled in tests"
 
     except AttributeError as e:
@@ -543,12 +559,18 @@ def test_environment_info():
 def pytest_configure(config):
     """Configure pytest with custom markers and validation."""
     # Register custom markers
-    config.addinivalue_line("markers", "requires_settings: Tests that require proper settings configuration")
-    config.addinivalue_line("markers", "config_validation: Tests that validate configuration")
+    config.addinivalue_line(
+        "markers", "requires_settings: Tests that require proper settings configuration"
+    )
+    config.addinivalue_line(
+        "markers", "config_validation: Tests that validate configuration"
+    )
 
     # Validate that test environment was loaded correctly
     print(f"pytest_configure: Environment = {os.environ.get('ENVIRONMENT', 'NOT_SET')}")
-    print(f"pytest_configure: SUPABASE_URL = {os.environ.get('SUPABASE_URL', 'NOT_SET')}")
+    print(
+        f"pytest_configure: SUPABASE_URL = {os.environ.get('SUPABASE_URL', 'NOT_SET')}"
+    )
 
 
 def pytest_runtest_setup(item):
@@ -557,12 +579,17 @@ def pytest_runtest_setup(item):
     if item.get_closest_marker("requires_settings"):
         try:
             from app.core.config import settings
-            if not hasattr(settings, 'rate_limit_enabled'):
-                pytest.skip("Settings not properly configured - missing rate_limit_enabled field")
+
+            if not hasattr(settings, "rate_limit_enabled"):
+                pytest.skip(
+                    "Settings not properly configured - missing rate_limit_enabled field"
+                )
 
             # Validate that we're in test environment
             if settings.environment != "testing":
-                pytest.skip(f"Not in testing environment - got '{settings.environment}'")
+                pytest.skip(
+                    f"Not in testing environment - got '{settings.environment}'"
+                )
 
         except ImportError as e:
             pytest.skip(f"Cannot import settings: {e}")

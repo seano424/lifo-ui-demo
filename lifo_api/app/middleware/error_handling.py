@@ -297,10 +297,8 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
     def _categorize_exception(self, error: Exception) -> tuple[str, str]:
         """Categorize general exceptions"""
-        error_type = type(error).__name__
-
         # Database errors
-        if isinstance(error, (SQLAlchemyError, OperationalError)):
+        if isinstance(error, SQLAlchemyError | OperationalError):
             return ErrorCategory.DATABASE, ErrorSeverity.HIGH
         elif isinstance(error, IntegrityError):
             return ErrorCategory.DATABASE, ErrorSeverity.MEDIUM
@@ -308,11 +306,11 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         # Validation errors
         elif isinstance(error, ValidationError):
             return ErrorCategory.VALIDATION, ErrorSeverity.LOW
-        elif isinstance(error, (ValueError, TypeError)):
+        elif isinstance(error, ValueError | TypeError):
             return ErrorCategory.VALIDATION, ErrorSeverity.MEDIUM
 
         # Network/external service errors
-        elif isinstance(error, (ConnectionError, TimeoutError)):
+        elif isinstance(error, ConnectionError | TimeoutError):
             return ErrorCategory.EXTERNAL_SERVICE, ErrorSeverity.MEDIUM
 
         # Permission errors

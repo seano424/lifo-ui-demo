@@ -328,7 +328,7 @@ function fastParseCSV(csvContent: string, defaultExpiryDate?: string) {
       const item = {
         SKU: values[skuIndex] || `AUTO-${Date.now()}-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
-        Category: values[categoryIndex] || 'dry_goods',
+        Category: values[categoryIndex] || 'dry_goods', // Will be mapped using database function
         Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
         Expiry_Date: finalExpiryDate,
         Brand: values[brandIndex] || 'Unknown',

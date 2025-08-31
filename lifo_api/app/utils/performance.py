@@ -88,7 +88,7 @@ class BoundedCache:
     def _generate_key(self, prefix: str, *args, **kwargs) -> str:
         """Generate cache key from arguments"""
         key_data = f"{prefix}:{args}:{sorted(kwargs.items())}"
-        return hashlib.md5(key_data.encode()).hexdigest()
+        return hashlib.sha256(key_data.encode()).hexdigest()
 
     async def get(self, key: str) -> Any | None:
         """Get item from cache with LRU tracking"""
@@ -273,9 +273,7 @@ class MobileResponseOptimizer:
     """Optimize responses for mobile consumption"""
 
     @staticmethod
-    def compress_batch_list(
-        batches: list, fields_to_keep: list | None = None
-    ) -> list:
+    def compress_batch_list(batches: list, fields_to_keep: list | None = None) -> list:
         """Compress batch data for mobile transmission"""
         if not fields_to_keep:
             fields_to_keep = [
@@ -461,7 +459,12 @@ async def warm_mobile_cache(store_id: str, read_ops):
             await mobile_cache.set(cache_key, inventory_data, ttl=300)
 
         # Cache category weights
-        common_categories = ["fresh_produce", "dairy", "bakery_fresh", "meat_fish"]
+        common_categories = [
+            "fresh_produce",
+            "dairy_eggs",
+            "bakery_fresh",
+            "fresh_meat_fish",
+        ]
         for category in common_categories:
             cache_key = mobile_cache._generate_key("category_weights", category)
             if not await mobile_cache.get(cache_key):

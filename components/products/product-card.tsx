@@ -147,7 +147,7 @@ export function ProductCard({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Category</span>
-            <Badge variant="outline">{product.category}</Badge>
+            <Badge variant="outline">{product.category_display_name || 'Uncategorized'}</Badge>
           </div>
 
           {product.brand && (

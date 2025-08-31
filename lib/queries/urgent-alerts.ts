@@ -4,10 +4,10 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 
 // Type from the database view
-type ExpiringBatchRow = Database['inventory']['Views']['expiring_batches']['Row']
+type ExpiringBatchRow = Database['inventory']['Views']['batch_expiry_status']['Row']
 
 // Extended type with proper urgency level enum
-export type ExpiringBatch = Omit<ExpiringBatchRow, 'urgency_level'> & {
+export type ExpiringBatch = ExpiringBatchRow & {
   urgency_level: 'Critical' | 'Urgent' | 'Warning' | null
 }
 
@@ -46,10 +46,10 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
     }
   }
 
-  // Query the expiring_batches view filtering by batch IDs
+  // Query the batch_expiry_status view filtering by batch IDs
   const { data, error } = await supabase
     .schema('inventory')
-    .from('expiring_batches')
+    .from('batch_expiry_status')
     .select('*')
     .in('batch_id', batchIds)
     .in('urgency_level', ['Critical', 'Urgent'])

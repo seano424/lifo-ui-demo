@@ -127,17 +127,17 @@ class SupabaseAuth:
 
             return user
 
-        except jwt.ExpiredSignatureError:
+        except jwt.ExpiredSignatureError as e:
             self.logger.warning("Token expired")
-            raise SupabaseAuthError("Token has expired")
+            raise SupabaseAuthError("Token has expired") from e
 
         except jwt.InvalidTokenError as e:
             self.logger.warning("Invalid token", error=str(e))
-            raise SupabaseAuthError(f"Invalid token: {e!s}")
+            raise SupabaseAuthError(f"Invalid token: {e!s}") from e
 
-        except jwt.InvalidAudienceError:
+        except jwt.InvalidAudienceError as e:
             self.logger.warning("Invalid token audience")
-            raise SupabaseAuthError("Invalid token audience")
+            raise SupabaseAuthError("Invalid token audience") from e
 
         except Exception as e:
             self.logger.error(
@@ -146,7 +146,7 @@ class SupabaseAuth:
                 # Never log token data for security
             )
             # Don't expose internal error details to client
-            raise SupabaseAuthError("Authentication failed")
+            raise SupabaseAuthError("Authentication failed") from e
 
     async def _verify_with_auth_server(self, token: str) -> SupabaseUser | None:
         """

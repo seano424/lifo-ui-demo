@@ -149,7 +149,7 @@ class TestScoringMathematicalVulnerabilities:
                     f"Invalid weights produced composite score > 1.0: {composite}"
                 )
 
-        except Exception:
+        except Exception:  # noqa: S110
             pass  # Expected if validation works
 
     def test_negative_weight_attack(self):
@@ -190,7 +190,7 @@ class TestScoringBusinessLogicVulnerabilities:
             (0, "fresh_meat_fish", 25.0),  # Just expired, low margin
         ]
 
-        for days_expired, category, margin_percent in expired_scenarios:
+        for days_expired, _category, margin_percent in expired_scenarios:
             # Test direct expired recommendation function
             recommendation = scorer._generate_expired_recommendation(
                 days_to_expiry=days_expired,
@@ -429,7 +429,7 @@ class TestScoringInputValidationVulnerabilities:
             if len(malicious_input.store_id) > 100:
                 pytest.fail("Extremely long store_id accepted")
 
-        except Exception:
+        except Exception:  # noqa: S110
             pass  # Expected if validation works
 
     def test_type_confusion_attack(self):
@@ -448,7 +448,7 @@ class TestScoringInputValidationVulnerabilities:
             ScoringInput(**type_confusion_inputs)
             # Should reject type mismatches
             pytest.fail("Type confusion attack succeeded")
-        except Exception:
+        except Exception:  # noqa: S110
             pass  # Expected
 
     def test_unicode_normalization_bypass(self):
@@ -486,7 +486,7 @@ class TestScoringAlgorithmPerformance:
                     selling_price=float(i + 0.001),
                     days_to_expiry=1,
                 )
-            except Exception:
+            except Exception:  # noqa: S110
                 pass
 
         execution_time = time.time() - start_time

@@ -32,6 +32,25 @@ import { Typography } from '@/components/ui/typography'
 import { useProductActions } from '@/hooks/use-products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
+const getCategoryBadgeColor = (category: string) => {
+  const colors = {
+    fresh_produce: 'bg-green-100 text-green-800 border-green-200',
+    fresh_meat_fish: 'bg-red-100 text-red-800 border-red-200',
+    bakery_fresh: 'bg-orange-100 text-orange-800 border-orange-200',
+    dairy: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    deli_prepared: 'bg-pink-100 text-pink-800 border-pink-200',
+    frozen: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+    dry_goods: 'bg-amber-100 text-amber-800 border-amber-200',
+    beverages: 'bg-blue-100 text-blue-800 border-blue-200',
+    spices_condiments: 'bg-purple-100 text-purple-800 border-purple-200',
+    canned_jarred: 'bg-stone-100 text-stone-800 border-stone-200',
+    chilled_packaged: 'bg-teal-100 text-teal-800 border-teal-200',
+    pantry_staples: 'bg-slate-100 text-slate-800 border-slate-200',
+    other: 'bg-gray-100 text-gray-800 border-gray-200',
+  }
+  return colors[category?.toLowerCase() as keyof typeof colors] || colors.other
+}
+
 // ✅ Sortable Table Header Component
 interface SortableHeaderProps {
   field: SortField
@@ -239,8 +258,11 @@ export function ProductsListPresentation({
                     </TableCell>
                     <TableCell>
                       {product.category ? (
-                        <Badge variant="outline" className="capitalize">
-                          {product.category}
+                        <Badge
+                          variant="outline"
+                          className={getCategoryBadgeColor(product.category)}
+                        >
+                          {product.category_display_name || product.category}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground text-sm">Uncategorized</span>

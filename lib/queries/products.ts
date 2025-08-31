@@ -10,6 +10,15 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 // Type for a product row from global products table
 type BaseProduct = Database['inventory']['Tables']['products']['Row']
 
+// Type for category data
+export interface Category {
+  category_id: string
+  category_code: string
+  display_name_en: string
+  display_name_fr: string
+  product_count?: number
+}
+
 // Type for store-specific product data from junction table
 export type StoreProduct = {
   store_id: string
@@ -21,7 +30,7 @@ export type StoreProduct = {
   supplier_code?: string
 }
 
-// Type for the joined query result
+// Type for the joined query result with categories
 type StoreProductWithProduct = {
   store_id: string
   product_id: string
@@ -32,10 +41,22 @@ type StoreProductWithProduct = {
   supplier_code: string | null
   created_at: string
   updated_at: string
-  products: BaseProduct
+  products: BaseProduct & {
+    categories?: {
+      category_id: string
+      category_code: string
+      display_name_en: string
+      display_name_fr: string
+      typical_shelf_life_days?: number | null
+    } | null
+  } | null
 }
 
 // Combined type that includes both global product data and store-specific data
+// NOTE: When returned by our query functions, total_stock and active_batches_count 
+// are STORE-SPECIFIC calculations from inventory.batches, not global aggregates
+// - total_stock: sum of current_quantity for ALL batches with quantity > 0 (includes expired)
+// - active_batches_count: count of batches with status = 'active' only
 export type Product = BaseProduct & {
   // Store-specific pricing and settings (from store_products junction table)
   store_cost_price?: number | null
@@ -43,6 +64,10 @@ export type Product = BaseProduct & {
   store_is_active?: boolean
   store_sku?: string | null
   supplier_code?: string | null
+  // Category information from standardized categories table
+  category_code?: string
+  category_display_name?: string
+  category_display_name_fr?: string
 }
 
 // Enhanced sorting types
@@ -65,7 +90,7 @@ export type ProductSort = {
 // Type for a product filter (enhanced with store and sorting)
 export type ProductFilters = {
   storeId?: string // ✅ STORE FILTER ADDED
-  category?: Database['inventory']['Tables']['products']['Row']['category']
+  category?: string // category_code from categories table
   brand?: string
   expiringOnly?: boolean
   sort?: ProductSort
@@ -106,11 +131,11 @@ export async function fetchProducts(
   serverClient?: ServerClient,
 ): Promise<Product[]> {
   const supabase = serverClient || createClient()
-  console.log('[fetchProducts] Querying store_products junction table for store:', { storeId })
+  console.log('[fetchProducts] Querying store_products with store-specific stock calculations:', { storeId })
 
   try {
-    // Query through the store_products junction table to get store-specific products
-    const { data, error } = await supabase
+    // First get store products with their base product info
+    const { data: storeProductsData, error: storeError } = await supabase
       .schema('inventory')
       .from('store_products')
       .select(
@@ -120,7 +145,7 @@ export async function fetchProducts(
           product_id,
           name,
           brand,
-          category,
+          category_id,
           barcode,
           typical_shelf_life_days,
           base_cost_price,
@@ -134,33 +159,110 @@ export async function fetchProducts(
           created_by,
           last_verified,
           open_food_facts_data,
-          total_stock,
-          active_batches_count,
-          avg_days_to_expiry
+          categories:category_id (
+            category_id,
+            category_code,
+            display_name_en,
+            display_name_fr,
+            typical_shelf_life_days
+          )
         )
       `,
       )
       .eq('store_id', storeId)
-      .eq('is_active', true) // Only fetch active store products
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('[fetchProducts] Supabase error:', error)
-      throw new Error(`Failed to fetch products: ${error.message}`)
+    if (storeError) {
+      console.error('[fetchProducts] Error fetching store products:', storeError)
+      throw new Error(`Failed to fetch store products: ${storeError.message}`)
     }
 
-    // Transform the data to flatten the structure
-    const transformedData =
-      data?.map((storeProduct: StoreProductWithProduct) => ({
+    if (!storeProductsData || storeProductsData.length === 0) {
+      return []
+    }
+
+    // Extract product IDs for batch aggregation
+    const productIds = storeProductsData.map(sp => sp.product_id)
+
+    // Get store-specific batch aggregations
+    const { data: batchAggregations, error: batchError } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select(`
+        product_id,
+        current_quantity,
+        status
+      `)
+      .eq('store_id', storeId)
+      .in('product_id', productIds)
+
+    if (batchError) {
+      console.warn('[fetchProducts] Error fetching batch data:', batchError)
+      // Continue without batch data rather than failing
+    }
+
+    // Calculate store-specific aggregations for each product
+    const productAggregations = new Map<string, {
+      total_stock: number;
+      active_batches_count: number;
+    }>()
+
+    if (batchAggregations) {
+      batchAggregations.forEach(batch => {
+        const current = productAggregations.get(batch.product_id) || {
+          total_stock: 0,
+          active_batches_count: 0
+        }
+        
+        // Count all batches with quantity > 0 for total physical inventory
+        if (Number(batch.current_quantity) > 0) {
+          current.total_stock += Number(batch.current_quantity) || 0
+        }
+        
+        // Only count active batches for active_batches_count
+        if (batch.status === 'active') {
+          current.active_batches_count += 1
+        }
+        
+        productAggregations.set(batch.product_id, current)
+      })
+    }
+
+    // Transform the data with store-specific stock calculations
+    const transformedData = storeProductsData.map((storeProduct: StoreProductWithProduct) => {
+      const aggregation = productAggregations.get(storeProduct.product_id) || {
+        total_stock: 0,
+        active_batches_count: 0
+      }
+
+      // Extract category information from the nested categories table
+      const categoryData = storeProduct.products?.categories || null
+
+      return {
         ...storeProduct.products, // Global product data
-        store_cost_price: storeProduct.cost_price, // Store-specific pricing
+        // Add category information from the standardized categories table
+        category_code: categoryData?.category_code,
+        category_display_name: categoryData?.display_name_en,
+        category_display_name_fr: categoryData?.display_name_fr,
+        // Store-specific pricing and settings
+        store_cost_price: storeProduct.cost_price,
         store_selling_price: storeProduct.selling_price,
         store_is_active: storeProduct.is_active,
         store_sku: storeProduct.store_sku,
         supplier_code: storeProduct.supplier_code,
-      })) || []
+        // Override with store-specific calculations
+        total_stock: aggregation.total_stock,
+        active_batches_count: aggregation.active_batches_count,
+        avg_days_to_expiry: null // TODO: Could calculate this if needed
+      }
+    })
 
-    console.log('[fetchProducts] Success:', { storeId, count: transformedData?.length })
+    console.log('[fetchProducts] Success with store-specific stock:', { 
+      storeId, 
+      count: transformedData.length,
+      totalStock: transformedData.reduce((sum, p) => sum + (p.total_stock || 0), 0)
+    })
     return transformedData as Product[]
   } catch (err) {
     console.error('[fetchProducts] Unexpected error:', err)
@@ -168,7 +270,7 @@ export async function fetchProducts(
   }
 }
 
-// ✅ FIXED: Simplified ordering approach for PostgREST
+// ✅ FIXED: Store-specific stock calculations with pagination
 export async function fetchProductsPage(
   { page, pageSize }: ProductsPageParam,
   filters: ProductFilters = {},
@@ -186,9 +288,9 @@ export async function fetchProductsPage(
       throw new Error('Store ID is required for fetching products')
     }
 
-    console.log('[fetchProductsPage] Applying store filter:', filters.storeId)
+    console.log('[fetchProductsPage] Fetching with store-specific stock calculations:', filters.storeId)
 
-    // Build the select query with embedded filtering
+    // Build the select query with categories join
     let query = supabase
       .schema('inventory')
       .from('store_products')
@@ -199,7 +301,7 @@ export async function fetchProductsPage(
           product_id,
           name,
           brand,
-          category,
+          category_id,
           barcode,
           typical_shelf_life_days,
           base_cost_price,
@@ -213,9 +315,13 @@ export async function fetchProductsPage(
           created_by,
           last_verified,
           open_food_facts_data,
-          total_stock,
-          active_batches_count,
-          avg_days_to_expiry
+          categories:category_id (
+            category_id,
+            category_code,
+            display_name_en,
+            display_name_fr,
+            typical_shelf_life_days
+          )
         )
       `,
         { count: 'exact' },
@@ -223,10 +329,10 @@ export async function fetchProductsPage(
       .eq('store_id', filters.storeId)
       .eq('is_active', true) // Only fetch active store products
 
-    // Apply filters using the embedded filtering syntax
+    // Apply filters using category_code if provided
     if (filters.category) {
       console.log('[fetchProductsPage] Applying category filter:', filters.category)
-      query = query.eq('products.category', filters.category)
+      // Filter will be applied post-query to avoid join issues
     }
 
     if (filters.brand) {
@@ -246,15 +352,30 @@ export async function fetchProductsPage(
       direction: filters.sort?.direction,
     })
 
-    // Use simple ordering on the junction table first, then on products table
-    if (filters.sort?.field === 'created_at') {
+    // Handle sorting - special cases for fields that require in-memory sorting
+    const isInMemorySort = filters.sort?.field === 'total_stock' || filters.sort?.field === 'active_batches_count' || filters.sort?.field === 'category'
+    const isStockBasedSort = filters.sort?.field === 'total_stock' || filters.sort?.field === 'active_batches_count'
+    
+    if (isInMemorySort) {
+      // For in-memory sorting, we need to fetch all products, sort, then paginate
+      if (isStockBasedSort) {
+        console.log('[fetchProductsPage] Stock-based sorting - fetching all products for proper sorting')
+      } else {
+        console.log('[fetchProductsPage] Category sorting - fetching all products for proper sorting')
+      }
+      query = query.order('created_at', { ascending: false }) // Fallback sort for fetching all
+      // We'll override pagination below for this case
+    } else if (filters.sort?.field === 'created_at') {
       // Sort by store_products created_at (when product was added to store)
       query = query.order('created_at', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'name') {
       // For product name, we need to use embedded ordering
       query = query.order('products(name)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'category') {
-      query = query.order('products(category)', { ascending: filters.sort.direction === 'asc' })
+      // Category sorting requires in-memory sorting due to PostgREST limitations with deeply nested joins
+      console.log('[fetchProductsPage] Category sorting - will sort in-memory after data fetch')
+      // For now, fetch with default order and we'll sort in-memory later
+      query = query.order('created_at', { ascending: false })
     } else if (filters.sort?.field === 'brand') {
       query = query.order('products(brand)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'base_selling_price') {
@@ -266,39 +387,235 @@ export async function fetchProductsPage(
       query = query.order('created_at', { ascending: false })
     }
 
-    const rangeFrom = page * pageSize
-    const rangeTo = (page + 1) * pageSize - 1
-    console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
+    let storeProductsData: StoreProductWithProduct[]
+    let totalCount: number
+    let error: any
 
-    const { data, error, count } = await query.range(rangeFrom, rangeTo)
+    if (isInMemorySort) {
+      // For in-memory sorting, fetch ALL products first
+      console.log('[fetchProductsPage] Fetching all products for in-memory sorting')
+      const response = await query
+      error = response.error
+      storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
+      totalCount = response.count || 0
+    } else {
+      // Normal pagination
+      const rangeFrom = page * pageSize
+      const rangeTo = (page + 1) * pageSize - 1
+      console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
+      const response = await query.range(rangeFrom, rangeTo)
+      error = response.error
+      storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
+      totalCount = response.count || 0
+    }
 
     if (error) {
       console.error('[fetchProductsPage] Supabase error:', error)
       throw new Error(`Failed to fetch products page: ${error.message}`)
     }
 
-    // Transform the data to flatten the structure
-    const transformedData =
-      data?.map((storeProduct: StoreProductWithProduct) => ({
-        ...storeProduct.products, // Global product data
+    console.log('[fetchProductsPage] Raw response sample:', {
+      count: totalCount,
+      sampleData: storeProductsData?.slice(0, 2)
+    })
+
+    if (!storeProductsData || storeProductsData.length === 0) {
+      return {
+        data: [],
+        count: totalCount,
+        nextPage: undefined,
+      }
+    }
+
+    // Check if products join is working
+    const productsWithNullJoin = storeProductsData.filter(sp => !sp.products)
+    if (productsWithNullJoin.length > 0) {
+      console.warn('[fetchProductsPage] Products with null join detected:', {
+        count: productsWithNullJoin.length,
+        total: storeProductsData.length,
+        sampleIds: productsWithNullJoin.slice(0, 3).map(sp => sp.product_id)
+      })
+    }
+
+    // Apply post-query filtering for category using category_code
+    let filteredStoreProductsData = storeProductsData
+    
+    if (filters.category) {
+      console.log('[fetchProductsPage] Applying category filter post-query:', filters.category)
+      
+      // Debug: Check what categories we actually have
+      if (storeProductsData.length > 0) {
+        const categoriesFound = storeProductsData.map(sp => ({
+          product_id: sp.product_id,
+          category_code: sp.products?.categories?.category_code,
+          display_name: sp.products?.categories?.display_name_en,
+          name: sp.products?.name
+        })).slice(0, 3)
+        console.log('[fetchProductsPage] Sample categories in data:', categoriesFound)
+      }
+      
+      filteredStoreProductsData = filteredStoreProductsData.filter(sp => 
+        sp.products?.categories?.category_code === filters.category
+      )
+      console.log('[fetchProductsPage] After category filter:', {
+        before: storeProductsData.length,
+        after: filteredStoreProductsData.length,
+        requestedCategory: filters.category
+      })
+    }
+
+    // Extract product IDs for batch aggregation (from filtered data)
+    const productIds = filteredStoreProductsData.map(sp => sp.product_id)
+
+    // Get store-specific batch aggregations for this page's products
+    const { data: batchAggregations, error: batchError } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select(`
+        product_id,
+        current_quantity,
+        status
+      `)
+      .eq('store_id', filters.storeId)
+      .in('product_id', productIds)
+
+    if (batchError) {
+      console.warn('[fetchProductsPage] Error fetching batch data:', batchError)
+      // Continue without batch data rather than failing
+    }
+
+    // Calculate store-specific aggregations for each product
+    const productAggregations = new Map<string, {
+      total_stock: number;
+      active_batches_count: number;
+    }>()
+
+    if (batchAggregations) {
+      batchAggregations.forEach(batch => {
+        const current = productAggregations.get(batch.product_id) || {
+          total_stock: 0,
+          active_batches_count: 0
+        }
+        
+        // Count all batches with quantity > 0 for total physical inventory
+        if (Number(batch.current_quantity) > 0) {
+          current.total_stock += Number(batch.current_quantity) || 0
+        }
+        
+        // Only count active batches for active_batches_count
+        if (batch.status === 'active') {
+          current.active_batches_count += 1
+        }
+        
+        productAggregations.set(batch.product_id, current)
+      })
+    }
+
+    // Transform the data with store-specific stock calculations
+    let transformedData = filteredStoreProductsData.map((storeProduct: StoreProductWithProduct) => {
+      const aggregation = productAggregations.get(storeProduct.product_id) || {
+        total_stock: 0,
+        active_batches_count: 0
+      }
+
+      // Handle case where products join fails (null products field)
+      const productData = storeProduct.products || {}
+      
+      // Extract category information from the nested categories table
+      const categoryData = storeProduct.products?.categories || null
+      
+      return {
+        ...productData, // Global product data (may be empty object)
+        product_id: storeProduct.product_id, // Ensure product_id is always present
+        // Add category information from the standardized categories table
+        category_code: categoryData?.category_code,
+        category_display_name: categoryData?.display_name_en,
+        category_display_name_fr: categoryData?.display_name_fr,
+        category_id: categoryData?.category_id || (productData as any)?.category_id,
+        // Store-specific data
         store_cost_price: storeProduct.cost_price, // Store-specific pricing
         store_selling_price: storeProduct.selling_price,
         store_is_active: storeProduct.is_active,
         store_sku: storeProduct.store_sku,
         supplier_code: storeProduct.supplier_code,
-      })) || []
+        // Override with store-specific calculations
+        total_stock: aggregation.total_stock,
+        active_batches_count: aggregation.active_batches_count,
+        avg_days_to_expiry: null // TODO: Could calculate this if needed
+      }
+    })
 
-    console.log('[fetchProductsPage] Success:', {
+    // Apply in-memory sorting for fields that require it
+    if (filters.sort?.field === 'total_stock') {
+      transformedData.sort((a, b) => {
+        const aStock = a.total_stock || 0
+        const bStock = b.total_stock || 0
+        return filters.sort!.direction === 'asc' ? aStock - bStock : bStock - aStock
+      })
+      console.log('[fetchProductsPage] Applied in-memory total_stock sorting:', {
+        direction: filters.sort.direction,
+        firstItemStock: transformedData[0]?.total_stock,
+        lastItemStock: transformedData[transformedData.length - 1]?.total_stock
+      })
+    } else if (filters.sort?.field === 'active_batches_count') {
+      transformedData.sort((a, b) => {
+        const aBatches = a.active_batches_count || 0
+        const bBatches = b.active_batches_count || 0
+        return filters.sort!.direction === 'asc' ? aBatches - bBatches : bBatches - aBatches
+      })
+      console.log('[fetchProductsPage] Applied in-memory active_batches_count sorting:', {
+        direction: filters.sort.direction,
+        firstItemBatches: transformedData[0]?.active_batches_count,
+        lastItemBatches: transformedData[transformedData.length - 1]?.active_batches_count
+      })
+    } else if (filters.sort?.field === 'category') {
+      transformedData.sort((a, b) => {
+        const aCategory = a.category_display_name || a.category_code || ''
+        const bCategory = b.category_display_name || b.category_code || ''
+        return filters.sort!.direction === 'asc' 
+          ? aCategory.localeCompare(bCategory)
+          : bCategory.localeCompare(aCategory)
+      })
+      console.log('[fetchProductsPage] Applied in-memory category sorting:', {
+        direction: filters.sort.direction,
+        firstItemCategory: transformedData[0]?.category_display_name || transformedData[0]?.category_code,
+        lastItemCategory: transformedData[transformedData.length - 1]?.category_display_name || transformedData[transformedData.length - 1]?.category_code
+      })
+    }
+
+    // Apply pagination after sorting for in-memory sorts
+    let finalData = transformedData
+    let finalCount = transformedData.length // Use actual filtered/transformed count
+
+    if (isInMemorySort) {
+      // For in-memory sorting, we fetched all products and sorted them
+      // Now apply pagination manually
+      const rangeFrom = page * pageSize
+      const rangeTo = (page + 1) * pageSize
+      finalData = transformedData.slice(rangeFrom, rangeTo)
+      finalCount = transformedData.length // Total after transformation
+      
+      console.log('[fetchProductsPage] Applied post-sort pagination:', {
+        totalProducts: transformedData.length,
+        pageStart: rangeFrom,
+        pageEnd: rangeTo,
+        returnedProducts: finalData.length
+      })
+    }
+
+    console.log('[fetchProductsPage] Success with store-specific stock:', {
       storeId: filters.storeId,
-      dataCount: transformedData?.length,
-      totalCount: count,
-      hasNextPage: (count || 0) > (page + 1) * pageSize,
+      dataCount: finalData.length,
+      totalCount: finalCount,
+      totalStockAcrossProducts: finalData.reduce((sum, p) => sum + (p.total_stock || 0), 0),
+      hasNextPage: finalCount > (page + 1) * pageSize,
+      appliedFilters: { category: filters.category, brand: filters.brand }
     })
 
     return {
-      data: transformedData as Product[],
-      count: count || 0,
-      nextPage: (count || 0) > (page + 1) * pageSize ? page + 1 : undefined,
+      data: finalData as Product[],
+      count: finalCount,
+      nextPage: finalCount > (page + 1) * pageSize ? page + 1 : undefined,
     }
   } catch (err) {
     console.error('[fetchProductsPage] Unexpected error:', err)
@@ -311,7 +628,7 @@ export interface CreateProductData {
   // Global product data
   name: string
   brand?: string
-  category: string
+  category_id?: string // References categories table
   barcode?: string
   typical_shelf_life_days: number
   base_cost_price: number
@@ -343,7 +660,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
     const globalProductData = {
       name: productData.name,
       brand: productData.brand,
-      category: productData.category,
+      category_id: productData.category_id,
       barcode: productData.barcode,
       typical_shelf_life_days: productData.typical_shelf_life_days,
       base_cost_price: productData.base_cost_price,
@@ -425,7 +742,7 @@ export interface UpdateProductData {
   // Global product updates
   name?: string
   brand?: string
-  category?: string
+  category_id?: string
   description?: string
   image_url?: string
   typical_shelf_life_days?: number
@@ -456,7 +773,7 @@ export async function updateProduct(
     // Global product updates
     if (updates.name !== undefined) globalUpdates.name = updates.name
     if (updates.brand !== undefined) globalUpdates.brand = updates.brand
-    if (updates.category !== undefined) globalUpdates.category = updates.category
+    if (updates.category_id !== undefined) globalUpdates.category_id = updates.category_id
     if (updates.description !== undefined) globalUpdates.description = updates.description
     if (updates.image_url !== undefined) globalUpdates.image_url = updates.image_url
     if (updates.typical_shelf_life_days !== undefined)
@@ -570,6 +887,37 @@ export async function deleteProduct(productId: string, storeId: string): Promise
   }
 }
 
+// Fetch available categories for filter dropdown using database function
+export async function fetchCategories(serverClient?: ServerClient): Promise<Category[]> {
+  const supabase = serverClient || createClient()
+  
+  try {
+    console.log('[fetchCategories] Fetching standardized categories with product counts')
+    
+    const { data: categories, error } = await supabase
+      .schema('inventory')
+      .rpc('get_categories_for_dropdown')
+    
+    if (error) {
+      console.error('[fetchCategories] Error fetching categories:', error)
+      throw new Error(`Failed to fetch categories: ${error.message}`)
+    }
+    
+    console.log('[fetchCategories] Success:', { 
+      count: categories?.length || 0,
+      sampleCategories: categories?.slice(0, 3).map((c: any) => ({ 
+        code: c.category_code, 
+        name: c.display_name_en,
+        products: c.product_count
+      }))
+    })
+    return categories || []
+  } catch (err) {
+    console.error('[fetchCategories] Unexpected error:', err)
+    throw err
+  }
+}
+
 export async function fetchProductById(
   productId: string,
   storeId: string,
@@ -578,7 +926,7 @@ export async function fetchProductById(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchProductById] Fetching product:', { productId, storeId })
+    console.log('[fetchProductById] Fetching product with store-specific stock:', { productId, storeId })
 
     // Get the product through the store_products junction table
     const { data, error } = await supabase
@@ -591,7 +939,7 @@ export async function fetchProductById(
           product_id,
           name,
           brand,
-          category,
+          category_id,
           barcode,
           typical_shelf_life_days,
           base_cost_price,
@@ -605,9 +953,13 @@ export async function fetchProductById(
           created_by,
           last_verified,
           open_food_facts_data,
-          total_stock,
-          active_batches_count,
-          avg_days_to_expiry
+          categories:category_id (
+            category_id,
+            category_code,
+            display_name_en,
+            display_name_fr,
+            typical_shelf_life_days
+          )
         )
       `,
       )
@@ -625,17 +977,68 @@ export async function fetchProductById(
       throw new Error(`Failed to fetch product: ${error.message}`)
     }
 
-    // Transform the data to flatten the structure
+    // Get store-specific batch aggregations for this product
+    const { data: batchAggregations, error: batchError } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select(`
+        current_quantity,
+        status
+      `)
+      .eq('store_id', storeId)
+      .eq('product_id', productId)
+
+    if (batchError) {
+      console.warn('[fetchProductById] Error fetching batch data:', batchError)
+      // Continue without batch data rather than failing
+    }
+
+    // Calculate store-specific aggregations
+    let total_stock = 0
+    let active_batches_count = 0
+
+    if (batchAggregations) {
+      batchAggregations.forEach(batch => {
+        // Count all batches with quantity > 0 for total physical inventory
+        if (Number(batch.current_quantity) > 0) {
+          total_stock += Number(batch.current_quantity) || 0
+        }
+        
+        // Only count active batches for active_batches_count
+        if (batch.status === 'active') {
+          active_batches_count += 1
+        }
+      })
+    }
+
+    // Extract category information from the nested categories table
+    const categoryData = data.products?.categories || null
+
+    // Transform the data with store-specific stock calculations
     const combinedProduct = {
       ...data.products,
+      // Add category information from the standardized categories table
+      category_code: categoryData?.category_code,
+      category_display_name: categoryData?.display_name_en,
+      category_display_name_fr: categoryData?.display_name_fr,
+      // Store-specific data
       store_cost_price: data.cost_price,
       store_selling_price: data.selling_price,
       store_is_active: data.is_active,
       store_sku: data.store_sku,
       supplier_code: data.supplier_code,
+      // Override with store-specific calculations
+      total_stock,
+      active_batches_count,
+      avg_days_to_expiry: null // TODO: Could calculate this if needed
     }
 
-    console.log('[fetchProductById] Success:', { productId, storeId })
+    console.log('[fetchProductById] Success with store-specific stock:', { 
+      productId, 
+      storeId, 
+      total_stock, 
+      active_batches_count 
+    })
     return combinedProduct as Product
   } catch (err) {
     console.error('[fetchProductById] Unexpected error:', err)

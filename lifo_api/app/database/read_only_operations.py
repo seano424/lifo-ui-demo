@@ -251,28 +251,45 @@ class SecureReadOnlyOperations:
     async def get_category_weights(self, category: str) -> dict[str, float]:
         """
         Get category-specific scoring weights
-        Uses parameterized query to prevent SQL injection
+        Uses standardized category mappings with fallback to defaults
         """
         try:
-            query = text("""
-                SELECT
-                    spoilage_risk_weight,
-                    turnover_speed_weight,
-                    value_impact_weight
-                FROM category_weights_view
-                WHERE category = :category
-                AND is_active = true
-            """)
+            # Standardized category weights for new category system
+            standardized_weights = {
+                "fresh_produce": {"expiry": 0.6, "velocity": 0.25, "margin": 0.15},
+                "dairy_eggs": {"expiry": 0.45, "velocity": 0.35, "margin": 0.2},
+                "bakery_fresh": {"expiry": 0.55, "velocity": 0.25, "margin": 0.2},
+                "fresh_meat_fish": {"expiry": 0.7, "velocity": 0.2, "margin": 0.1},
+                "frozen_foods": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
+                "deli_prepared": {"expiry": 0.65, "velocity": 0.25, "margin": 0.1},
+                "chilled_packaged": {"expiry": 0.4, "velocity": 0.4, "margin": 0.2},
+                "canned_jarred": {"expiry": 0.1, "velocity": 0.6, "margin": 0.3},
+                "dry_goods": {"expiry": 0.15, "velocity": 0.55, "margin": 0.3},
+                "beverages": {"expiry": 0.25, "velocity": 0.45, "margin": 0.3},
+                "spices_condiments": {"expiry": 0.1, "velocity": 0.6, "margin": 0.3},
+                "pantry_staples": {"expiry": 0.15, "velocity": 0.55, "margin": 0.3},
+                "household_other": {"expiry": 0.3, "velocity": 0.4, "margin": 0.3},
+                "specialty_items": {"expiry": 0.4, "velocity": 0.3, "margin": 0.3},
+                "bulk_items": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
+            }
 
-            result = await self.db.execute(query, {"category": category})
-            row = result.first()
+            # Try to get weights for the specific category
+            if category in standardized_weights:
+                return standardized_weights[category]
 
-            if row:
-                return {
-                    "expiry": float(row.spoilage_risk_weight),
-                    "velocity": float(row.turnover_speed_weight),
-                    "margin": float(row.value_impact_weight),
-                }
+            # Legacy category mapping fallback
+            legacy_mapping = {
+                "dairy": "dairy_eggs",
+                "frozen": "frozen_foods",
+                "bakery": "bakery_fresh",
+                "produce": "fresh_produce",
+                "meat": "fresh_meat_fish",
+                "general": "household_other",
+            }
+
+            mapped_category = legacy_mapping.get(category.lower())
+            if mapped_category and mapped_category in standardized_weights:
+                return standardized_weights[mapped_category]
 
             # Return default weights if not found
             return {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}

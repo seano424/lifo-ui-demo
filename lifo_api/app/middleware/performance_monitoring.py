@@ -46,7 +46,7 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
         method = request.method
         path = unquote(request.url.path)
         client_ip = self._get_client_ip(request)
-        user_agent = request.headers.get("user-agent", "unknown")
+        request.headers.get("user-agent", "unknown")
 
         # Identify mobile requests
         is_mobile_request = self._is_mobile_request(request)
@@ -72,7 +72,8 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
                     store_id = path_parts[i + 1]
                     break
         except Exception:
-            pass  # User context not available
+            # User context extraction failed, metrics will use generic identifiers
+            logger.debug("Failed to extract user context from request path")
 
         # Initialize response variables
         response = None
@@ -319,9 +320,7 @@ class CachePerformanceMiddleware:
     def __init__(self):
         self.metrics_collector = get_metrics_collector()
 
-    def record_operation(
-        self, operation: str, cache_name: str, key: str | None = None
-    ):
+    def record_operation(self, operation: str, cache_name: str, key: str | None = None):
         """Record cache operation"""
         start_time = time.time()
 

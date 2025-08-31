@@ -11,9 +11,13 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 // Type for a batch row
 export type Batch = Database['inventory']['Tables']['batches']['Row']
 
-// Type for batch with product relationship
+// Type for batch with product relationship including category info
 export type BatchWithProduct = Batch & {
-  products?: Database['inventory']['Tables']['products']['Row']
+  products?: Database['inventory']['Tables']['products']['Row'] & {
+    category_code?: string
+    category_display_name?: string
+    category_display_name_fr?: string
+  }
 }
 
 // Enhanced sorting types for batches
@@ -105,11 +109,19 @@ async function fetchBatchesWithProducts(
   // Get unique product IDs
   const productIds = [...new Set(batches.map(b => b.product_id))]
 
-  // Fetch products separately - simple query
+  // Fetch products with category information - simple query with join
   const { data: products, error: productsError } = await supabase
     .schema('inventory')
     .from('products')
-    .select('*')
+    .select(`
+      *,
+      categories:category_id (
+        category_id,
+        category_code,
+        display_name_en,
+        display_name_fr
+      )
+    `)
     .in('product_id', productIds)
 
   if (productsError) {
@@ -118,12 +130,27 @@ async function fetchBatchesWithProducts(
     return batches.map(batch => ({ ...batch, products: undefined }))
   }
 
-  // Map products to batches
+  // Map products to batches, including category information
   return batches.map(batch => {
-    const product = products?.find(p => p.product_id === batch.product_id)
+    const productData = products?.find(p => p.product_id === batch.product_id)
+    
+    if (!productData) {
+      return { ...batch, products: undefined }
+    }
+
+    // Extract category information
+    const categoryData = (productData as any).categories || null
+    
+    const productWithCategory = {
+      ...productData,
+      category_code: categoryData?.category_code,
+      category_display_name: categoryData?.display_name_en,
+      category_display_name_fr: categoryData?.display_name_fr,
+    }
+
     return {
       ...batch,
-      products: product || undefined,
+      products: productWithCategory,
     }
   })
 }
@@ -392,17 +419,37 @@ export async function fetchBatchById(
       throw new Error(`Failed to fetch batch: ${error.message}`)
     }
 
-    // Fetch product separately
+    // Fetch product with category information
     const { data: product } = await supabase
       .schema('inventory')
       .from('products')
-      .select('*')
+      .select(`
+        *,
+        categories:category_id (
+          category_id,
+          category_code,
+          display_name_en,
+          display_name_fr
+        )
+      `)
       .eq('product_id', batch.product_id)
       .single()
 
+    // Transform product data to include category information
+    let productWithCategory = undefined
+    if (product) {
+      const categoryData = (product as any).categories || null
+      productWithCategory = {
+        ...product,
+        category_code: categoryData?.category_code,
+        category_display_name: categoryData?.display_name_en,
+        category_display_name_fr: categoryData?.display_name_fr,
+      }
+    }
+
     const batchWithProduct: BatchWithProduct = {
       ...batch,
-      products: product || undefined,
+      products: productWithCategory,
     }
 
     console.log('[fetchBatchById] Success:', { batchId })

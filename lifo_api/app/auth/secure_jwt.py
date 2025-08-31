@@ -92,21 +92,21 @@ class SecureJWTAuth:
 
             return user_info
 
-        except jwt.ExpiredSignatureError:
+        except jwt.ExpiredSignatureError as e:
             self.logger.warning("Token expired")
-            raise SecureAuthError("Token expired")
+            raise SecureAuthError("Token expired") from e
 
-        except jwt.InvalidTokenError:
+        except jwt.InvalidTokenError as e:
             self.logger.warning("Invalid token format")
-            raise SecureAuthError("Invalid token")
+            raise SecureAuthError("Invalid token") from e
 
-        except jwt.InvalidAudienceError:
+        except jwt.InvalidAudienceError as e:
             self.logger.warning("Invalid token audience")
-            raise SecureAuthError("Invalid token")
+            raise SecureAuthError("Invalid token") from e
 
         except Exception as e:
             self.logger.error("Token verification failed", error_type=type(e).__name__)
-            raise SecureAuthError("Authentication failed")
+            raise SecureAuthError("Authentication failed") from e
 
     def is_valid_token_format(self, token: str) -> bool:
         """

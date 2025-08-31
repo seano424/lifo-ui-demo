@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import { Typography } from '../ui/typography'
 
 interface ColumnResizerProps {
   header: Header<Product, unknown>
@@ -46,17 +47,21 @@ function ColumnResizer({ header }: ColumnResizerProps) {
 
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
-    beverages: 'bg-blue-100 text-blue-800 border-blue-200',
-    bakery: 'bg-orange-100 text-orange-800 border-orange-200',
+    fresh_produce: 'bg-green-100 text-green-800 border-green-200',
+    fresh_meat_fish: 'bg-red-100 text-red-800 border-red-200',
+    bakery_fresh: 'bg-orange-100 text-orange-800 border-orange-200',
     dairy: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    meat: 'bg-red-100 text-red-800 border-red-200',
-    produce: 'bg-green-100 text-green-800 border-green-200',
+    deli_prepared: 'bg-pink-100 text-pink-800 border-pink-200',
     frozen: 'bg-cyan-100 text-cyan-800 border-cyan-200',
-    pantry: 'bg-amber-100 text-amber-800 border-amber-200',
-    snacks: 'bg-purple-100 text-purple-800 border-purple-200',
+    dry_goods: 'bg-amber-100 text-amber-800 border-amber-200',
+    beverages: 'bg-blue-100 text-blue-800 border-blue-200',
+    spices_condiments: 'bg-purple-100 text-purple-800 border-purple-200',
+    canned_jarred: 'bg-stone-100 text-stone-800 border-stone-200',
+    chilled_packaged: 'bg-teal-100 text-teal-800 border-teal-200',
+    pantry_staples: 'bg-slate-100 text-slate-800 border-slate-200',
     other: 'bg-gray-100 text-gray-800 border-gray-200',
   }
-  return colors[category.toLowerCase() as keyof typeof colors] || colors.other
+  return colors[category?.toLowerCase() as keyof typeof colors] || colors.other
 }
 
 export function createProductTableColumns({
@@ -113,12 +118,12 @@ export function createProductTableColumns({
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          {row.original.category ? (
+          {row.original.category_display_name ? (
             <Badge
               variant="outline"
-              className={`capitalize ${getCategoryBadgeColor(row.original.category)}`}
+              className={`${getCategoryBadgeColor(row.original.category_display_name)}`}
             >
-              {row.original.category}
+              {row.original.category_display_name}
             </Badge>
           ) : (
             <span className="text-muted-foreground text-sm">Uncategorized</span>
@@ -161,13 +166,13 @@ export function createProductTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          Stock
+          Total Stock
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="text-right">
           <div className="font-medium">{row.original.total_stock || 0}</div>
-          <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div>
+          {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.total_stock || 80,
@@ -175,37 +180,37 @@ export function createProductTableColumns({
       maxSize: 120,
       enableResizing: true,
     },
-    {
-      id: 'base_selling_price',
-      accessorKey: 'base_selling_price',
-      header: () => (
-        <SortableHeader
-          field="base_selling_price"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          Price
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="text-right">
-          <div className="flex items-center justify-end gap-1 font-bold">
-            <Euro className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-            <span title={`€${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
-              {Number(row.original.base_selling_price || 0).toFixed(2)}
-            </span>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Cost: €{Number(row.original.base_cost_price || 0).toFixed(2)}
-          </div>
-        </div>
-      ),
-      size: DEFAULT_COLUMN_WIDTHS.base_selling_price || 100,
-      minSize: 80,
-      maxSize: 120,
-      enableResizing: true,
-    },
+    // {
+    //   id: 'base_selling_price',
+    //   accessorKey: 'base_selling_price',
+    //   header: () => (
+    //     <SortableHeader
+    //       field="base_selling_price"
+    //       currentSort={currentSort}
+    //       updateSort={updateSort}
+    //       className="justify-end"
+    //     >
+    //       Price
+    //     </SortableHeader>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className="text-right">
+    //       <div className="flex items-center justify-end gap-1 font-bold">
+    //         <Euro className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+    //         <span title={`€${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
+    //           {Number(row.original.base_selling_price || 0).toFixed(2)}
+    //         </span>
+    //       </div>
+    //       <div className="text-xs text-muted-foreground">
+    //         Cost: €{Number(row.original.base_cost_price || 0).toFixed(2)}
+    //       </div>
+    //     </div>
+    //   ),
+    //   size: DEFAULT_COLUMN_WIDTHS.base_selling_price || 100,
+    //   minSize: 80,
+    //   maxSize: 120,
+    //   enableResizing: true,
+    // },
     {
       id: 'active_batches_count',
       accessorKey: 'active_batches_count',
@@ -220,12 +225,9 @@ export function createProductTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-right">
-          <div className="font-medium">{row.original.active_batches_count || 0}</div>
-          <div className="text-xs text-muted-foreground">
-            batch{(row.original.active_batches_count || 0) !== 1 ? 'es' : ''}
-          </div>
-        </div>
+        <Typography variant="small" className="flex items-center gap-2 justify-end text-right">
+          <span>{row.original.active_batches_count || 0}</span>
+        </Typography>
       ),
       size: DEFAULT_COLUMN_WIDTHS.active_batches_count || 120,
       minSize: 100,

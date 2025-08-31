@@ -18,11 +18,13 @@ logger = structlog.get_logger()
 
 class RateLimitExceeded(Exception):
     """Exception raised when rate limit is exceeded"""
+
     pass
 
 
 class IPBanned(Exception):
     """Exception raised when IP is banned"""
+
     pass
 
 
@@ -36,51 +38,69 @@ class AdvancedRateLimiter:
         self.lock = threading.RLock()
 
         # Request tracking by IP
-        self.ip_requests = defaultdict(lambda: deque(maxlen=1000))  # Last 1000 requests per IP
+        self.ip_requests = defaultdict(
+            lambda: deque(maxlen=1000)
+        )  # Last 1000 requests per IP
         self.ip_violations = defaultdict(int)  # Violation count per IP
         self.ip_ban_list = {}  # IP -> ban_until_timestamp
 
         # Request tracking by endpoint
-        self.endpoint_requests = defaultdict(lambda: deque(maxlen=5000))  # Last 5000 requests per endpoint
+        self.endpoint_requests = defaultdict(
+            lambda: deque(maxlen=5000)
+        )  # Last 5000 requests per endpoint
 
         # Suspicious activity tracking
-        self.suspicious_ips = defaultdict(lambda: {"score": 0, "last_seen": datetime.now(UTC)})
+        self.suspicious_ips = defaultdict(
+            lambda: {"score": 0, "last_seen": datetime.now(UTC)}
+        )
 
         # Rate limit configurations
         self.rate_limits = {
             # General API limits
-            "default": {"requests": 100, "window": 60, "burst": 20},  # 100 req/min, burst 20
-
+            "default": {
+                "requests": 100,
+                "window": 60,
+                "burst": 20,
+            },  # 100 req/min, burst 20
             # Mobile endpoints (higher limits for better UX)
-            "mobile": {"requests": 200, "window": 60, "burst": 50},   # 200 req/min, burst 50
-
+            "mobile": {
+                "requests": 200,
+                "window": 60,
+                "burst": 50,
+            },  # 200 req/min, burst 50
             # Authentication endpoints (stricter limits)
-            "auth": {"requests": 10, "window": 60, "burst": 3},       # 10 req/min, burst 3
-
+            "auth": {"requests": 10, "window": 60, "burst": 3},  # 10 req/min, burst 3
             # File upload endpoints (very strict)
-            "upload": {"requests": 5, "window": 60, "burst": 2},      # 5 req/min, burst 2
-
+            "upload": {"requests": 5, "window": 60, "burst": 2},  # 5 req/min, burst 2
             # Health check endpoints (more lenient)
-            "health": {"requests": 300, "window": 60, "burst": 100},  # 300 req/min, burst 100
-
+            "health": {
+                "requests": 300,
+                "window": 60,
+                "burst": 100,
+            },  # 300 req/min, burst 100
             # Analytics endpoints (moderate limits)
-            "analytics": {"requests": 50, "window": 60, "burst": 10}, # 50 req/min, burst 10
+            "analytics": {
+                "requests": 50,
+                "window": 60,
+                "burst": 10,
+            },  # 50 req/min, burst 10
         }
 
         # DDoS detection thresholds
         self.ddos_thresholds = {
-            "requests_per_second": 50,     # 50 requests per second from single IP
-            "requests_per_minute": 500,    # 500 requests per minute from single IP
-            "error_rate_threshold": 0.8,   # 80% error rate indicates attack
-            "suspicious_score_limit": 100, # Suspicion score limit for auto-ban
+            "requests_per_second": 50,  # 50 requests per second from single IP
+            "requests_per_minute": 500,  # 500 requests per minute from single IP
+            "error_rate_threshold": 0.8,  # 80% error rate indicates attack
+            "suspicious_score_limit": 100,  # Suspicion score limit for auto-ban
         }
 
         # Whitelist for internal/trusted IPs
         self.ip_whitelist = {
-            "127.0.0.1", "::1",           # Localhost
-            "10.0.0.0/8",                 # Private networks
+            "127.0.0.1",
+            "::1",  # Localhost
+            "10.0.0.0/8",  # Private networks
             "172.16.0.0/12",
-            "192.168.0.0/16"
+            "192.168.0.0/16",
         }
 
         # Start cleanup background task
@@ -131,7 +151,7 @@ class AdvancedRateLimiter:
     def check_rate_limit(self, request: Request) -> tuple[bool, str | None]:
         """
         Check if request should be rate limited
-        
+
         Returns:
             Tuple of (allowed, reason)
         """
@@ -158,19 +178,29 @@ class AdvancedRateLimiter:
             ip_allowed = self._check_ip_rate_limit(client_ip, limits, current_time)
             if not ip_allowed:
                 self._record_violation(client_ip, "rate_limit_exceeded")
-                return False, f"Rate limit exceeded for IP: {limits['requests']} requests per {limits['window']} seconds"
+                return (
+                    False,
+                    f"Rate limit exceeded for IP: {limits['requests']} requests per {limits['window']} seconds",
+                )
 
             # Check endpoint-based rate limits (global per endpoint)
-            endpoint_allowed = self._check_endpoint_rate_limit(endpoint_path, limits, current_time)
+            endpoint_allowed = self._check_endpoint_rate_limit(
+                endpoint_path, limits, current_time
+            )
             if not endpoint_allowed:
-                return False, f"Endpoint rate limit exceeded: {limits['requests']} requests per {limits['window']} seconds"
+                return (
+                    False,
+                    f"Endpoint rate limit exceeded: {limits['requests']} requests per {limits['window']} seconds",
+                )
 
             # Record successful request
             self._record_request(client_ip, endpoint_path, current_time)
 
             return True, None
 
-    def _check_ip_rate_limit(self, ip: str, limits: dict, current_time: datetime) -> bool:
+    def _check_ip_rate_limit(
+        self, ip: str, limits: dict, current_time: datetime
+    ) -> bool:
         """Check rate limit for specific IP"""
         requests = self.ip_requests[ip]
         window_start = current_time - timedelta(seconds=limits["window"])
@@ -192,7 +222,9 @@ class AdvancedRateLimiter:
 
         return True
 
-    def _check_endpoint_rate_limit(self, endpoint: str, limits: dict, current_time: datetime) -> bool:
+    def _check_endpoint_rate_limit(
+        self, endpoint: str, limits: dict, current_time: datetime
+    ) -> bool:
         """Check rate limit for specific endpoint (global)"""
         requests = self.endpoint_requests[endpoint]
         window_start = current_time - timedelta(seconds=limits["window"])
@@ -211,7 +243,7 @@ class AdvancedRateLimiter:
         request_data = {
             "timestamp": timestamp,
             "endpoint": endpoint,
-            "status": "success"
+            "status": "success",
         }
 
         self.ip_requests[ip].append(request_data)
@@ -231,11 +263,15 @@ class AdvancedRateLimiter:
             ip=ip,
             violation_type=violation_type,
             total_violations=self.ip_violations[ip],
-            suspicious_score=suspicious_data["score"]
+            suspicious_score=suspicious_data["score"],
         )
 
         # Auto-ban if too many violations
-        if self.ip_violations[ip] >= 10 or suspicious_data["score"] >= self.ddos_thresholds["suspicious_score_limit"]:
+        if (
+            self.ip_violations[ip] >= 10
+            or suspicious_data["score"]
+            >= self.ddos_thresholds["suspicious_score_limit"]
+        ):
             self._ban_ip(ip, duration_minutes=30)
 
     def _ban_ip(self, ip: str, duration_minutes: int = 30):
@@ -249,7 +285,7 @@ class AdvancedRateLimiter:
             duration_minutes=duration_minutes,
             ban_until=ban_until.isoformat(),
             violations=self.ip_violations[ip],
-            suspicious_score=self.suspicious_ips[ip]["score"]
+            suspicious_score=self.suspicious_ips[ip]["score"],
         )
 
     def _get_client_ip(self, request: Request) -> str:
@@ -258,14 +294,14 @@ class AdvancedRateLimiter:
         forwarded_for = request.headers.get("x-forwarded-for")
         if forwarded_for:
             # Take the first IP in case of multiple forwards
-            return forwarded_for.split(',')[0].strip()
+            return forwarded_for.split(",")[0].strip()
 
         real_ip = request.headers.get("x-real-ip")
         if real_ip:
             return real_ip
 
         # Fallback to direct client IP
-        return getattr(request.client, 'host', 'unknown')
+        return getattr(request.client, "host", "unknown")
 
     def detect_ddos_attack(self, request: Request) -> bool:
         """Detect potential DDoS attack patterns"""
@@ -280,38 +316,44 @@ class AdvancedRateLimiter:
 
             # Check requests per second
             one_second_ago = current_time - timedelta(seconds=1)
-            recent_requests = sum(1 for req in requests if req["timestamp"] >= one_second_ago)
+            recent_requests = sum(
+                1 for req in requests if req["timestamp"] >= one_second_ago
+            )
 
             if recent_requests > self.ddos_thresholds["requests_per_second"]:
                 logger.warning(
                     "DDoS attack detected - high request rate",
                     ip=client_ip,
-                    requests_per_second=recent_requests
+                    requests_per_second=recent_requests,
                 )
                 return True
 
             # Check requests per minute
             one_minute_ago = current_time - timedelta(minutes=1)
-            minute_requests = sum(1 for req in requests if req["timestamp"] >= one_minute_ago)
+            minute_requests = sum(
+                1 for req in requests if req["timestamp"] >= one_minute_ago
+            )
 
             if minute_requests > self.ddos_thresholds["requests_per_minute"]:
                 logger.warning(
                     "DDoS attack detected - high request volume",
                     ip=client_ip,
-                    requests_per_minute=minute_requests
+                    requests_per_minute=minute_requests,
                 )
                 return True
 
             # Check error rate (if we have enough requests)
             if len(requests) >= 10:
-                error_requests = sum(1 for req in requests if req.get("status") == "error")
+                error_requests = sum(
+                    1 for req in requests if req.get("status") == "error"
+                )
                 error_rate = error_requests / len(requests)
 
                 if error_rate > self.ddos_thresholds["error_rate_threshold"]:
                     logger.warning(
                         "Potential attack detected - high error rate",
                         ip=client_ip,
-                        error_rate=error_rate
+                        error_rate=error_rate,
                     )
                     return True
 
@@ -320,7 +362,6 @@ class AdvancedRateLimiter:
     def record_error_response(self, request: Request, status_code: int):
         """Record an error response for DDoS detection"""
         client_ip = self._get_client_ip(request)
-        endpoint = request.url.path
 
         with self.lock:
             # Update the last request to mark it as error
@@ -348,11 +389,15 @@ class AdvancedRateLimiter:
 
             # Count requests in current window
             window_start = current_time - timedelta(seconds=limits["window"])
-            current_requests = sum(1 for req in requests if req["timestamp"] >= window_start)
+            current_requests = sum(
+                1 for req in requests if req["timestamp"] >= window_start
+            )
 
             # Count burst requests
             burst_start = current_time - timedelta(seconds=10)
-            burst_requests = sum(1 for req in requests if req["timestamp"] >= burst_start)
+            burst_requests = sum(
+                1 for req in requests if req["timestamp"] >= burst_start
+            )
 
             return {
                 "ip": client_ip,
@@ -371,6 +416,7 @@ class AdvancedRateLimiter:
 
     def _start_cleanup_task(self):
         """Start background cleanup task"""
+
         def cleanup_old_data():
             while True:
                 try:
@@ -381,7 +427,15 @@ class AdvancedRateLimiter:
                         hour_ago = current_time - timedelta(hours=1)
                         expired_ips = []
 
-                        for ip, last_request_time in [(ip, max(req["timestamp"] for req in reqs) if reqs else hour_ago) for ip, reqs in self.ip_requests.items()]:
+                        for ip, last_request_time in [
+                            (
+                                ip,
+                                max(req["timestamp"] for req in reqs)
+                                if reqs
+                                else hour_ago,
+                            )
+                            for ip, reqs in self.ip_requests.items()
+                        ]:
                             if last_request_time < hour_ago:
                                 expired_ips.append(ip)
 
@@ -394,7 +448,11 @@ class AdvancedRateLimiter:
                                 del self.suspicious_ips[ip]
 
                         # Clean up expired bans
-                        expired_bans = [ip for ip, ban_until in self.ip_ban_list.items() if current_time >= ban_until]
+                        expired_bans = [
+                            ip
+                            for ip, ban_until in self.ip_ban_list.items()
+                            if current_time >= ban_until
+                        ]
                         for ip in expired_bans:
                             del self.ip_ban_list[ip]
                             logger.info("IP ban expired", ip=ip)
@@ -405,7 +463,7 @@ class AdvancedRateLimiter:
                                 expired_ips=len(expired_ips),
                                 expired_bans=len(expired_bans),
                                 active_ips=len(self.ip_requests),
-                                banned_ips=len(self.ip_ban_list)
+                                banned_ips=len(self.ip_ban_list),
                             )
 
                     time.sleep(300)  # Cleanup every 5 minutes
@@ -438,22 +496,25 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
             # Check for DDoS attack
             if self.rate_limiter.detect_ddos_attack(request):
                 client_ip = self.rate_limiter._get_client_ip(request)
-                self.rate_limiter._ban_ip(client_ip, duration_minutes=60)  # Longer ban for DDoS
+                self.rate_limiter._ban_ip(
+                    client_ip, duration_minutes=60
+                )  # Longer ban for DDoS
 
             from fastapi.responses import JSONResponse
+
             return JSONResponse(
                 status_code=429,
                 content={
                     "error": "Rate limit exceeded",
                     "message": reason,
-                    "retry_after": 60
+                    "retry_after": 60,
                 },
                 headers={
                     "Retry-After": "60",
                     "X-RateLimit-Limit": "100",
                     "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(int(time.time()) + 60)
-                }
+                    "X-RateLimit-Reset": str(int(time.time()) + 60),
+                },
             )
 
         # Process request
@@ -466,8 +527,12 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
         # Add rate limit headers
         rate_limit_status = self.rate_limiter.get_rate_limit_status(request)
         response.headers["X-RateLimit-Limit"] = str(rate_limit_status["window_limit"])
-        response.headers["X-RateLimit-Remaining"] = str(rate_limit_status["remaining_requests"])
-        response.headers["X-RateLimit-Reset"] = str(int(time.time()) + rate_limit_status["window_seconds"])
+        response.headers["X-RateLimit-Remaining"] = str(
+            rate_limit_status["remaining_requests"]
+        )
+        response.headers["X-RateLimit-Reset"] = str(
+            int(time.time()) + rate_limit_status["window_seconds"]
+        )
 
         return response
 

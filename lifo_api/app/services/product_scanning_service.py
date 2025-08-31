@@ -155,7 +155,7 @@ class ProductScanningService:
                 error=str(e),
                 processing_time_ms=processing_time_ms,
             )
-            raise ProductScanningError(f"Image processing failed: {str(e)}")
+            raise ProductScanningError(f"Image processing failed: {str(e)}") from e
 
     async def extract_primary_barcode(self, image_data: bytes) -> str | None:
         """Extract primary barcode from image - simple wrapper for frontend"""
@@ -187,15 +187,13 @@ class ProductScanningService:
             return await asyncio.wait_for(
                 self.vision_service.process_image(image_data), timeout=timeout_ms / 1000
             )
-        except TimeoutError:
+        except TimeoutError as e:
             raise ProductScanningError(
                 f"Vision processing timed out after {timeout_ms}ms",
                 error_type="timeout_error",
-            )
+            ) from e
 
-    def _extract_primary_barcode(
-        self, vision_result: VisionScanResult
-    ) -> str | None:
+    def _extract_primary_barcode(self, vision_result: VisionScanResult) -> str | None:
         """Extract the most confident barcode from vision results"""
         if not vision_result.barcodes:
             return None
@@ -486,7 +484,6 @@ class ProductScanningService:
             "february": 2,
             "march": 3,
             "april": 4,
-            "may": 5,
             "june": 6,
             "july": 7,
             "august": 8,
@@ -510,12 +507,8 @@ class ProductScanningService:
             "déc": 12,
             "janvier": 1,
             "février": 2,
-            "mars": 3,
             "avril": 4,
-            "mai": 5,
-            "juin": 6,
             "juillet": 7,
-            "août": 8,
             "septembre": 9,
             "octobre": 10,
             "novembre": 11,
@@ -538,7 +531,6 @@ class ProductScanningService:
             "februar": 2,
             "märz": 3,
             "april": 4,
-            "mai": 5,
             "juni": 6,
             "juli": 7,
             "august": 8,
@@ -564,7 +556,6 @@ class ProductScanningService:
             "februari": 2,
             "maart": 3,
             "april": 4,
-            "mei": 5,
             "juni": 6,
             "juli": 7,
             "augustus": 8,
@@ -944,7 +935,7 @@ class ProductScanningService:
         )
 
         # Check all European month dictionaries
-        for lang, months in self.EUROPEAN_MONTHS.items():
+        for _lang, months in self.EUROPEAN_MONTHS.items():
             if month_normalized in months:
                 return months[month_normalized]
 
@@ -1197,9 +1188,7 @@ class ProductScanningService:
 
         return "general"
 
-    def _strategy_brand_product_descriptor(
-        self, candidates: list[dict]
-    ) -> str | None:
+    def _strategy_brand_product_descriptor(self, candidates: list[dict]) -> str | None:
         """Try to construct name with brand + product + descriptors"""
         brands = [c for c in candidates if c["category"] == "brand"][:2]
         products = [c for c in candidates if c["category"] == "product"][:2]

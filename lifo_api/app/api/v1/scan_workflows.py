@@ -202,7 +202,7 @@ async def scan_in_batch(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Scan-in processing failed")
+        raise HTTPException(status_code=500, detail="Scan-in processing failed") from e
 
 
 @router.post("/scan-out/{store_id}/{batch_id}", response_model=ScanOutResponse)
@@ -358,7 +358,7 @@ async def scan_out_batch(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Scan-out processing failed")
+        raise HTTPException(status_code=500, detail="Scan-out processing failed") from e
 
 
 @router.post("/process-scan/{store_id}")
@@ -460,7 +460,7 @@ async def process_scanned_batch(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Scan processing failed")
+        raise HTTPException(status_code=500, detail="Scan processing failed") from e
 
 
 # Helper functions
@@ -698,7 +698,9 @@ async def scan_donation_eligibility_check(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Donation eligibility scan failed")
+        raise HTTPException(
+            status_code=500, detail="Donation eligibility scan failed"
+        ) from e
 
 
 @router.post("/scan-donation-action/{store_id}/{batch_id}")
@@ -876,7 +878,9 @@ async def execute_donation_action(
             processing_time_ms=processing_time_ms,
             user_id=current_user["sub"],
         )
-        raise HTTPException(status_code=500, detail="Donation action execution failed")
+        raise HTTPException(
+            status_code=500, detail="Donation action execution failed"
+        ) from e
 
 
 @router.get("/scan-donation-quick-list/{store_id}")
@@ -1040,7 +1044,7 @@ async def get_donation_quick_scan_list(
         )
         raise HTTPException(
             status_code=500, detail="Failed to generate donation scan list"
-        )
+        ) from e
 
 
 # Helper functions for mobile donation workflows

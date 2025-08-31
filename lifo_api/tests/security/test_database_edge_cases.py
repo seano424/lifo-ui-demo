@@ -52,7 +52,7 @@ class TestDatabaseVulnerabilities:
 
         for query in malicious_queries:
             # Raw query execution is vulnerable to SQL injection
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: B017  # noqa: B017
                 await db_manager.execute_raw_query(query)
 
     @pytest.mark.asyncio
@@ -73,7 +73,7 @@ class TestDatabaseVulnerabilities:
             await mock_db.execute("UPDATE scores SET calculated = true")
 
         # Operation fails partway through - data inconsistency!
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             await mock_complex_inventory_update()
 
         # No transaction rollback - database left in inconsistent state
@@ -103,7 +103,7 @@ class TestDatabaseVulnerabilities:
             for conn in connections:
                 try:
                     await conn.aclose()
-                except Exception:
+                except Exception:  # noqa: S110
                     pass
 
     @pytest.mark.asyncio
@@ -129,7 +129,7 @@ class TestDatabaseVulnerabilities:
         # System could hang indefinitely
         tasks = [transaction1(), transaction2()]
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             await asyncio.wait_for(asyncio.gather(*tasks), timeout=1.0)
 
     @pytest.mark.asyncio
@@ -141,7 +141,7 @@ class TestDatabaseVulnerabilities:
             mock_connect.side_effect = TimeoutError("Connection timeout")
 
             # System should handle timeouts gracefully
-            with pytest.raises(Exception):
+            with pytest.raises(Exception):  # noqa: B017  # noqa: B017
                 await test_connection()
 
     @pytest.mark.asyncio
@@ -166,7 +166,7 @@ class TestDatabaseVulnerabilities:
             try:
                 await store_ops.get_user_stores(malicious_input)
                 # Should validate and reject malicious input
-            except Exception:
+            except Exception:  # noqa: S110
                 pass  # Expected to fail
 
     @pytest.mark.asyncio
@@ -184,7 +184,7 @@ class TestDatabaseVulnerabilities:
         ]
 
         # Bulk operations don't validate individual records
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             await db_manager.bulk_insert(object, malicious_data)
 
     @pytest.mark.asyncio
@@ -202,7 +202,7 @@ class TestDatabaseVulnerabilities:
             new_quantity = batch_data["current_quantity"] - 5
             await asyncio.sleep(0.1)  # Simulate processing time
             # User 1 updates to 5
-            await mock_db.execute(f"UPDATE batches SET quantity = {new_quantity}")
+            await mock_db.execute(f"UPDATE batches SET quantity = {new_quantity}")  # noqa: S608
 
         async def user2_update():
             # User 2 reads batch quantity: 10 (same as user 1)
@@ -211,7 +211,7 @@ class TestDatabaseVulnerabilities:
             new_quantity = batch_data["current_quantity"] - 3
             await asyncio.sleep(0.05)  # Slightly faster
             # User 2 updates to 7
-            await mock_db.execute(f"UPDATE batches SET quantity = {new_quantity}")
+            await mock_db.execute(f"UPDATE batches SET quantity = {new_quantity}")  # noqa: S608
 
         # Both users read same initial value
         # Final result could be either 5 or 7, not the correct 2
@@ -234,7 +234,7 @@ class TestDatabaseVulnerabilities:
         # No protection against resource-intensive queries
         try:
             await inventory_ops.get_store_inventory("store123", large_filter)
-        except Exception:
+        except Exception:  # noqa: S110
             pass  # Expected to fail
 
     @pytest.mark.asyncio
@@ -309,7 +309,7 @@ class TestTransactionConsistency:
         async def process_sale(db, batch_id, quantity_sold):
             # Step 1: Reduce inventory
             await db.execute(
-                f"UPDATE batches SET quantity = quantity - {quantity_sold}"
+                f"UPDATE batches SET quantity = quantity - {quantity_sold}"  # noqa: S608
             )
 
             # Step 2: Record sale (could fail)
@@ -324,7 +324,7 @@ class TestTransactionConsistency:
 
         mock_db = AsyncMock(spec=AsyncSession)
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             await process_sale(mock_db, "batch123", 150)
 
         # Inventory was reduced but sale wasn't recorded

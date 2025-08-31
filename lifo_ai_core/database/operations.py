@@ -1054,7 +1054,7 @@ class InventoryOperations:
                     except (ValueError, TypeError) as e:
                         raise ValueError(
                             f"Invalid quantity in update {i}: {update.get('new_quantity')} - {str(e)}"
-                        )
+                        ) from e
 
                     validated_updates.append(
                         {"batch_id": batch_id, "new_quantity": quantity}

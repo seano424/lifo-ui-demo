@@ -80,7 +80,7 @@ class TestRunner:
             "ENVIRONMENT",
             "DATABASE_URL",
             "SUPABASE_URL",
-            "JWT_SECRET_KEY"
+            "JWT_SECRET_KEY",
         ]
 
         missing_vars = []
@@ -102,9 +102,7 @@ class TestRunner:
         # Validate database URL is test-safe
         db_url = os.environ.get("DATABASE_URL", "")
         if not (db_url.startswith("sqlite") or "test" in db_url):
-            raise OSError(
-                f"DATABASE_URL appears unsafe for testing: {db_url}"
-            )
+            raise OSError(f"DATABASE_URL appears unsafe for testing: {db_url}")
 
     def _verify_dependencies(self):
         """Verify that required test dependencies are installed."""
@@ -143,7 +141,7 @@ class TestRunner:
         start_time = time.time()
 
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603  # Controlled test execution
                 command,
                 cwd=self.project_root,
                 capture_output=False,
@@ -425,8 +423,14 @@ def main():
     )
     parser.add_argument("--no-lint", action="store_true", help="Skip linting checks")
     parser.add_argument("--parallel", action="store_true", help="Run tests in parallel")
-    parser.add_argument("--verify-env", action="store_true", help="Verify test environment setup and exit")
-    parser.add_argument("--no-cleanup", action="store_true", help="Skip cleanup after tests")
+    parser.add_argument(
+        "--verify-env",
+        action="store_true",
+        help="Verify test environment setup and exit",
+    )
+    parser.add_argument(
+        "--no-cleanup", action="store_true", help="Skip cleanup after tests"
+    )
 
     args = parser.parse_args()
 
@@ -452,8 +456,12 @@ def main():
     # Display environment information
     print(f"Environment: {os.environ.get('ENVIRONMENT', 'unknown')}")
     print(f"Database: {os.environ.get('DATABASE_URL', 'not set')[:50]}...")
-    print(f"Rate limiting: {'disabled' if os.environ.get('RATE_LIMIT_ENABLED') == 'false' else 'enabled'}")
-    print(f"Performance monitoring: {'disabled' if os.environ.get('ENABLE_PERFORMANCE_MONITORING') == 'false' else 'enabled'}")
+    print(
+        f"Rate limiting: {'disabled' if os.environ.get('RATE_LIMIT_ENABLED') == 'false' else 'enabled'}"
+    )
+    print(
+        f"Performance monitoring: {'disabled' if os.environ.get('ENABLE_PERFORMANCE_MONITORING') == 'false' else 'enabled'}"
+    )
     print("=" * 80)
 
     # Run linting first unless skipped

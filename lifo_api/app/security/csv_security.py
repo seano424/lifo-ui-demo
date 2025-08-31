@@ -130,7 +130,7 @@ class CSVSecurityValidator:
             raise
         except Exception as e:
             self.logger.error("File validation error", error=str(e))
-            raise CSVSecurityError(f"Validation failed: {str(e)}")
+            raise CSVSecurityError(f"Validation failed: {str(e)}") from e
 
     def sanitize_csv_content(self, content: str) -> tuple[str, list[str]]:
         """
@@ -202,8 +202,8 @@ class CSVSecurityValidator:
         except UnicodeDecodeError:
             try:
                 content = file_content.decode("latin1")  # Fallback encoding
-            except UnicodeDecodeError:
-                raise CSVSecurityError("Invalid file encoding")
+            except UnicodeDecodeError as e:
+                raise CSVSecurityError("Invalid file encoding") from e
 
         lines = content.split("\n")
         non_empty_lines = [line for line in lines if line.strip()]
@@ -233,7 +233,7 @@ class CSVSecurityValidator:
 
         try:
             content = file_content.decode("utf-8-sig", errors="ignore")
-        except:
+        except (UnicodeDecodeError, AttributeError):
             content = file_content.decode("latin1", errors="ignore")
 
         # Check for formula injection patterns
@@ -295,7 +295,6 @@ class CSVSecurityValidator:
     def _sanitize_field(self, field: str) -> tuple[str, list[str]]:
         """Sanitize individual CSV field"""
         changes = []
-        original_field = field
 
         # Remove quotes for processing
         if field.startswith('"') and field.endswith('"'):

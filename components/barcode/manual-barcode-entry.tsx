@@ -6,6 +6,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
 import {
   type SupabaseProductSearchResult,
@@ -42,6 +49,8 @@ export default function ManualBarcodeEntry({
   mode = 'inbound', // Default to inbound for backward compatibility
   storeId,
 }: ManualBarcodeEntryProps) {
+  const { getCategoriesForDropdown, isLoading: categoriesLoading } = useCategories()
+
   const [barcode, setBarcode] = useState('')
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null)
   const [manualProductData, setManualProductData] = useState({
@@ -656,16 +665,34 @@ export default function ManualBarcodeEntry({
 
                         <div>
                           <label className="block text-xs font-medium mb-1">Category</label>
-                          <Input
+                          <Select
                             value={manualProductData.category}
-                            onChange={e =>
+                            onValueChange={value =>
                               setManualProductData(prev => ({
                                 ...prev,
-                                category: e.target.value,
+                                category: value,
                               }))
                             }
-                            placeholder="e.g., Dairy"
-                          />
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categoriesLoading ? (
+                                <SelectItem value="" disabled>
+                                  Loading categories...
+                                </SelectItem>
+                              ) : (
+                                getCategoriesForDropdown().map(
+                                  (category: { value: string; label: string; code: string }) => (
+                                    <SelectItem key={category.value} value={category.value}>
+                                      {category.label}
+                                    </SelectItem>
+                                  ),
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>

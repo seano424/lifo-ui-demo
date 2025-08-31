@@ -115,9 +115,9 @@ export function createBatchTableColumns({
           </div>
           <div
             className="text-sm text-muted-foreground truncate"
-            title={`${row.original.products?.sku} • ${row.original.products?.category}`}
+            title={`${row.original.products?.sku}`}
           >
-            {row.original.products?.sku} • {row.original.products?.category}
+            {row.original.products?.sku}
           </div>
         </div>
       ),
@@ -198,7 +198,7 @@ export function createBatchTableColumns({
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.current_quantity,
-      minSize: 60,
+      minSize: 90,
       maxSize: calculateMaxWidth(data, item => Number(item.current_quantity).toLocaleString()),
       enableResizing: true,
     },

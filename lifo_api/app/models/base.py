@@ -94,9 +94,7 @@ class FilterParams(BaseModel):
     """Base filtering parameters"""
 
     search: str | None = Field(None, max_length=100, description="Search term")
-    category: str | None = Field(
-        None, max_length=50, description="Filter by category"
-    )
+    category: str | None = Field(None, max_length=50, description="Filter by category")
     status: str | None = Field("active", description="Filter by status")
 
 

@@ -520,7 +520,7 @@ class ScoringService:
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.inventory_models import Product
+            from app.database.inventory_models import Category, Product
             from app.database.models import Batch, SalesEvent
 
             # Try to get actual sales data for this specific batch
@@ -542,11 +542,11 @@ class ScoringService:
             # FIX: Use proper JOIN with Products table instead of SKU string matching
             result = await self.db.execute(
                 select(func.avg(SalesEvent.quantity_sold))
-                .select_from(SalesEvent.join(Batch).join(Product))
+                .select_from(SalesEvent.join(Batch).join(Product).join(Category))
                 .where(
                     and_(
                         SalesEvent.store_id == store_id,
-                        Product.category == category,
+                        Category.category_code == category,
                         SalesEvent.sale_timestamp
                         >= datetime.utcnow() - timedelta(days=30),
                     )
@@ -559,11 +559,11 @@ class ScoringService:
             # If no batch-level data, try product-level sales for same category
             result = await self.db.execute(
                 select(func.avg(SalesEvent.quantity_sold))
-                .select_from(SalesEvent.join(Batch).join(Product))
+                .select_from(SalesEvent.join(Batch).join(Product).join(Category))
                 .where(
                     and_(
                         SalesEvent.store_id == store_id,
-                        Product.category == category,
+                        Category.category_code == category,
                         SalesEvent.sale_timestamp
                         >= datetime.utcnow() - timedelta(days=90),  # Wider time window
                     )
@@ -573,18 +573,26 @@ class ScoringService:
             if avg_sales and avg_sales > 0:
                 return float(avg_sales)
 
-            # Fallback to category-based estimates
+            # Fallback to category-based estimates using standardized category codes
             category_velocities = {
                 "fresh_produce": 4.0,
-                "dairy": 2.5,
+                "dairy_eggs": 2.5,  # Updated from "dairy"
                 "bakery_fresh": 3.0,
                 "fresh_meat_fish": 1.5,
-                "frozen": 1.0,
+                "frozen_foods": 1.0,  # Updated from "frozen"
                 "canned_jarred": 0.5,
                 "dry_goods": 0.8,
                 "beverages": 2.0,
                 "deli_prepared": 2.5,
                 "spices_condiments": 0.3,
+                "chilled_packaged": 2.0,
+                "pantry_staples": 0.8,
+                "household_other": 0.5,
+                "specialty_items": 1.2,
+                "bulk_items": 0.6,
+                # Legacy fallbacks
+                "dairy": 2.5,
+                "frozen": 1.0,
             }
 
             return category_velocities.get(category, 1.0)

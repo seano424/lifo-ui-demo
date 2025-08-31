@@ -180,7 +180,7 @@ class TestCSVParsingVulnerabilities:
             parsed_data = csv_processor._parse_csv_structure(csv_bomb)
             # System would try to process 10k columns - memory exhaustion
             assert len(parsed_data["headers"]) == 10000
-        except Exception:
+        except Exception:  # noqa: S110
             pass  # Expected to fail due to resource exhaustion
 
         # CSV bomb: excessive rows
@@ -194,7 +194,7 @@ class TestCSVParsingVulnerabilities:
         try:
             parsed_data = csv_processor._parse_csv_structure(csv_bomb_rows)
             assert len(parsed_data["data_rows"]) == 1000000  # Would cause memory issues
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     @pytest.mark.asyncio
@@ -242,10 +242,10 @@ class TestCSVParsingVulnerabilities:
             csv_processor._decode_csv_content(malicious_bytes)
             # Different encoding interpretations possible
         except ValueError:
-            pass  # Expected for invalid UTF-8
+            pass  # Expected for invalid UTF-8  # noqa: S110
 
     @pytest.mark.asyncio
-    async def test_csv_parser_DoS_attack(self):
+    async def test_csv_parser_dos_attack(self):
         """🚨 HIGH: CSV parser denial of service"""
         mock_db = AsyncMock()
         csv_processor = CSVProcessor(mock_db)
@@ -258,7 +258,7 @@ class TestCSVParsingVulnerabilities:
         start_time = time.time()
         try:
             csv_processor._parse_csv_structure(malicious_csv)
-        except Exception:
+        except Exception:  # noqa: S110
             pass
         parse_time = time.time() - start_time
 
@@ -273,7 +273,7 @@ class TestCSVParsingVulnerabilities:
         # Malformed CSV could cause parser to hang or crash
         try:
             csv_processor._parse_csv_structure(malformed_csv)
-        except Exception:
+        except Exception:  # noqa: S110
             pass  # Expected to fail
 
 
@@ -305,7 +305,7 @@ class TestDataValidationVulnerabilities:
                     pytest.fail(
                         f"Validator {field_name} accepts excessive length: {len(result)}"
                     )
-            except Exception:
+            except Exception:  # noqa: S110
                 pass  # Expected to fail validation
 
     @pytest.mark.asyncio
@@ -330,7 +330,7 @@ class TestDataValidationVulnerabilities:
                 # Should handle overflow gracefully
                 if result and abs(float(result)) == float("inf"):
                     pytest.fail(f"Price validator allows infinite values: {result}")
-            except Exception:
+            except Exception:  # noqa: S110
                 pass  # Expected to fail
 
     @pytest.mark.asyncio
@@ -360,7 +360,7 @@ class TestDataValidationVulnerabilities:
                         pytest.fail(
                             f"Date validator preserves malicious content: {date_str}"
                         )
-            except Exception:
+            except Exception:  # noqa: S110
                 pass  # Expected to fail validation
 
     @pytest.mark.asyncio
@@ -389,7 +389,7 @@ class TestDataValidationVulnerabilities:
                         pytest.fail(
                             f"SKU validator preserves dangerous characters: {result}"
                         )
-            except Exception:
+            except Exception:  # noqa: S110
                 pass  # Expected to fail validation
 
 
@@ -446,7 +446,7 @@ class TestCSVImportVulnerabilities:
         try:
             await csv_processor._import_inventory_data(mixed_data, "store123")
             # Database left in inconsistent state
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     @pytest.mark.asyncio

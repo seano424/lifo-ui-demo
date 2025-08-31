@@ -439,12 +439,12 @@ def raise_if_invalid_uuid(uuid_string: str, field_name: str = "id"):
         import uuid
 
         uuid.UUID(uuid_string)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as e:
         raise ValidationException(
             message="Invalid UUID format",
             field=field_name,
             validation_errors=[f"'{uuid_string}' is not a valid UUID"],
-        )
+        ) from e
 
 
 def raise_if_expired_batch(days_to_expiry: int, batch_id: str):

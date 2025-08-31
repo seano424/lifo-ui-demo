@@ -54,12 +54,8 @@ class BatchUpdateRequest(BaseModel):
     """Request to update batch information"""
 
     current_quantity: float | None = Field(None, ge=0, description="New quantity")
-    selling_price: Decimal | None = Field(
-        None, gt=0, description="New selling price"
-    )
-    location_code: str | None = Field(
-        None, max_length=50, description="New location"
-    )
+    selling_price: Decimal | None = Field(None, gt=0, description="New selling price")
+    location_code: str | None = Field(None, max_length=50, description="New location")
     status: BatchStatus | None = None
 
     # Note: quantity validation moved to business logic for OpenAPI compatibility
@@ -71,9 +67,7 @@ class DiscountRequest(BaseModel):
     discount_percent: float = Field(
         ..., ge=0, le=90, description="Discount percentage (0-90)"
     )
-    reason: str | None = Field(
-        None, max_length=255, description="Reason for discount"
-    )
+    reason: str | None = Field(None, max_length=255, description="Reason for discount")
 
     class Config:
         schema_extra = {

@@ -14,9 +14,7 @@ class StoreUpdateRequest(BaseModel):
     """Request to update store information"""
 
     store_name: str | None = Field(None, max_length=255, description="Store name")
-    business_name: str | None = Field(
-        None, max_length=255, description="Business name"
-    )
+    business_name: str | None = Field(None, max_length=255, description="Business name")
     address: str | None = Field(None, description="Store address")
     city: str | None = Field(None, max_length=100, description="City")
     postal_code: str | None = Field(None, max_length=20, description="Postal code")

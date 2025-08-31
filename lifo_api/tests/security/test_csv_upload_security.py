@@ -191,7 +191,6 @@ class TestCSVSanitization:
         validator = CSVSecurityValidator()
 
         # Test quoted fields with commas
-        content = 'sku,description\nTEST-001,"Product with, comma"'
         fields = validator._parse_csv_fields('TEST-001,"Product with, comma"')
 
         assert len(fields) == 2
@@ -441,9 +440,7 @@ TEST-003,Product 3,Email: contact@company.com,1.75"""
         assert "2.50" in sanitized_content
 
         # Should not have made unnecessary changes to legitimate data
-        legitimate_changes = [
-            change for change in changes if "Formula prefix" not in change
-        ]
+        [change for change in changes if "Formula prefix" not in change]
         # Some changes might be acceptable (like quote handling), but should be minimal
 
 
@@ -467,7 +464,7 @@ class TestCSVSecurityPerformance:
         def validate_file():
             try:
                 start_time = time.time()
-                result = validator.validate_file_upload(test_content, "test.csv")
+                validator.validate_file_upload(test_content, "test.csv")
                 end_time = time.time()
                 results.append(end_time - start_time)
             except Exception as e:

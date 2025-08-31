@@ -37,7 +37,6 @@ async def get_security_statistics(
         security_stats = security_monitor.get_security_statistics()
 
         # Get rate limiting statistics
-        client_ip = request.client.host if request.client else "unknown"
         rate_limit_status = rate_limiter.get_rate_limit_status(request)
 
         # Combine statistics
@@ -80,7 +79,7 @@ async def get_security_statistics(
         )
         raise HTTPException(
             status_code=500, detail="Failed to retrieve security statistics"
-        )
+        ) from e
 
 
 @router.get("/security/threats")
@@ -154,7 +153,7 @@ async def get_active_threats(
                 "high_severity_events": len(
                     [e for e in recent_events if e["severity"] == "high"]
                 ),
-                "unique_attacking_ips": len(set(e["client_ip"] for e in recent_events)),
+                "unique_attacking_ips": len({e["client_ip"] for e in recent_events}),
                 "most_common_attack_types": _get_most_common_attack_types(
                     recent_events
                 ),
@@ -177,7 +176,9 @@ async def get_active_threats(
             error=str(e),
             user_id=current_user.get("sub"),
         )
-        raise HTTPException(status_code=500, detail="Failed to retrieve active threats")
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve active threats"
+        ) from e
 
 
 @router.get("/security/ip/{ip_address}")
@@ -251,7 +252,7 @@ async def get_ip_security_profile(
         )
         raise HTTPException(
             status_code=500, detail="Failed to retrieve IP security profile"
-        )
+        ) from e
 
 
 @router.get("/security/health")
@@ -357,7 +358,7 @@ async def get_security_health(
         )
         raise HTTPException(
             status_code=500, detail="Failed to retrieve security health status"
-        )
+        ) from e
 
 
 def _get_most_common_attack_types(events: list[dict]) -> list[dict[str, Any]]:

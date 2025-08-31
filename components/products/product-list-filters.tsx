@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Select,
   SelectContent,
@@ -6,6 +7,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { fetchCategories } from '@/lib/queries/products'
+
+interface Category {
+  category_id: string
+  category_code: string
+  display_name_en: string
+  display_name_fr: string
+  product_count?: number
+}
 
 interface ProductListFiltersProps {
   filters?: {
@@ -22,6 +32,25 @@ export function ProductListFilters({
   count,
   isLoading,
 }: ProductListFiltersProps) {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        setCategoriesLoading(true)
+        const data = await fetchCategories()
+        setCategories(data)
+      } catch (error) {
+        console.error('Failed to load categories:', error)
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+
+    loadCategories()
+  }, [])
+
   if (!onFiltersChange) {
     return null
   }
@@ -36,22 +65,18 @@ export function ProductListFilters({
             category: value === 'all' ? undefined : value,
           })
         }
-        disabled={isLoading}
+        disabled={isLoading || categoriesLoading}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Category filter" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All categories</SelectItem>
-          <SelectItem value="beverages">Beverages</SelectItem>
-          <SelectItem value="bakery">Bakery</SelectItem>
-          <SelectItem value="dairy">Dairy</SelectItem>
-          <SelectItem value="meat">Meat</SelectItem>
-          <SelectItem value="produce">Produce</SelectItem>
-          <SelectItem value="frozen">Frozen</SelectItem>
-          <SelectItem value="pantry">Pantry</SelectItem>
-          <SelectItem value="snacks">Snacks</SelectItem>
-          <SelectItem value="other">Other</SelectItem>
+          {categories.map(category => (
+            <SelectItem key={category.category_code} value={category.category_code}>
+              {category.display_name_en}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

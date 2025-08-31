@@ -33,19 +33,18 @@ const VALID_COLUMN_IDS = [
   'category',
   'brand',
   'total_stock',
-  'base_selling_price',
   'active_batches_count',
   'created_at',
 ]
 
-interface ProductTableProps {
+interface ProductsTableProps {
   data: Product[]
   currentSort: ProductSort
   updateSort: (field: SortField) => void
   isLoading: boolean
 }
 
-export function ProductTable({ data, currentSort, updateSort, isLoading }: ProductTableProps) {
+export function ProductsTable({ data, currentSort, updateSort, isLoading }: ProductsTableProps) {
   const { updateProductPrice, deleteProduct, isUpdating } = useProductActions()
 
   const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useProductColumnSizing()

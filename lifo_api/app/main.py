@@ -32,45 +32,52 @@ if not env_loaded:
     print("No .env file found, using system environment variables only")
 
 # NOW import everything else after environment is loaded
-from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
-from typing import Any
+from collections.abc import AsyncGenerator  # noqa: E402
+from contextlib import asynccontextmanager  # noqa: E402
+from typing import Any  # noqa: E402
 
-import structlog
-import uvicorn
-from fastapi import FastAPI, Request, Response
-from fastapi.encoders import jsonable_encoder
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from slowapi.errors import RateLimitExceeded
+import structlog  # noqa: E402
+import uvicorn  # noqa: E402
+from fastapi import FastAPI, Request, Response  # noqa: E402
+from fastapi.encoders import jsonable_encoder  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from fastapi.middleware.trustedhost import TrustedHostMiddleware  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
+from slowapi.errors import RateLimitExceeded  # noqa: E402
 
-from app.api.v1.router import router as api_v1_router
-from app.core.config import get_monitoring_config, settings
-from app.database.connection import engine, init_database
-from app.middleware.comprehensive_security import ComprehensiveSecurityMiddleware
-from app.middleware.error_handling import (
+from app.api.v1.router import router as api_v1_router  # noqa: E402
+from app.core.config import get_monitoring_config, settings  # noqa: E402
+
+# Import models to register them with SQLAlchemy Base
+from app.database import inventory_models, models  # noqa: E402, F401
+from app.database.connection import engine, init_database  # noqa: E402
+from app.middleware.comprehensive_security import (  # noqa: E402
+    ComprehensiveSecurityMiddleware,
+)
+from app.middleware.error_handling import (  # noqa: E402
     ErrorHandlingMiddleware,
     get_custom_exception_handler,
 )
-from app.middleware.performance_monitoring import PerformanceMonitoringMiddleware
-from app.middleware.rate_limiting import (
+from app.middleware.performance_monitoring import (  # noqa: E402
+    PerformanceMonitoringMiddleware,
+)
+from app.middleware.rate_limiting import (  # noqa: E402
     check_blocked_ip,
     limiter,
     rate_limit_handler,
 )
-from app.middleware.security_headers import (
+from app.middleware.security_headers import (  # noqa: E402
     ProductionSecurityMiddleware,
     SecurityHeadersMiddleware,
 )
-from app.models.base import HealthResponse
-from app.monitoring.alerts import get_alert_manager
-from app.monitoring.metrics import get_metrics_collector
-from app.security.security_monitor import get_security_monitor
-from app.utils.error_handling import get_error_tracker
-from app.utils.exceptions import setup_exception_handlers
-from app.utils.logging import setup_logging
-from app.utils.mvp_exceptions import (
+from app.models.base import HealthResponse  # noqa: E402
+from app.monitoring.alerts import get_alert_manager  # noqa: E402
+from app.monitoring.metrics import get_metrics_collector  # noqa: E402
+from app.security.security_monitor import get_security_monitor  # noqa: E402
+from app.utils.error_handling import get_error_tracker  # noqa: E402
+from app.utils.exceptions import setup_exception_handlers  # noqa: E402
+from app.utils.logging import setup_logging  # noqa: E402
+from app.utils.mvp_exceptions import (  # noqa: E402
     MobilePerformanceException,
     MVPBaseException,
     ValidationException,
@@ -199,7 +206,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
 
         # Initialize comprehensive security monitoring
-        security_monitor = get_security_monitor()
+        get_security_monitor()  # Initialize but don't store reference
         logger.info(
             "Security monitoring system initialized",
             environment=settings.environment,
@@ -383,8 +390,8 @@ async def enhanced_request_logging(request: Request, call_next: Any) -> Response
 setup_exception_handlers(app)
 
 # Add comprehensive error handling exception handlers
-from pydantic import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
+from pydantic import ValidationError  # noqa: E402
+from sqlalchemy.exc import SQLAlchemyError  # noqa: E402
 
 custom_exception_handler = get_custom_exception_handler()
 app.add_exception_handler(
@@ -567,7 +574,7 @@ if __name__ == "__main__":
     # For development
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0",
+        host="0.0.0.0",  # noqa: S104  # Intentional for containerized deployment
         port=8000,
         reload=True,
         log_level=settings.log_level.lower(),
