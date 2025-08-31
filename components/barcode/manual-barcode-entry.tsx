@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
+import { useCategories } from '@/hooks/use-categories'
 import {
   type SupabaseProductSearchResult,
   useProductLookup,
