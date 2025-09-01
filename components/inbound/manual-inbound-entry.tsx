@@ -322,46 +322,44 @@ export default function ManualInboundEntry({
         </div>
 
         {/* Recently Added Items */}
-        {scannedItems.length > 0 && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Your list of products</CardTitle>
-                  <CardDescription>
-                    {scannedItems.length} batch
-                    {scannedItems.length !== 1 ? 'es' : ''} ready to submit
-                  </CardDescription>
-                </div>
-                <Button
-                  onClick={handleFinalSubmission}
-                  disabled={scannedItems.length === 0 || isSubmittingBatch}
-                  variant="secondary"
-                >
-                  <Check className="w-4 h-4 mr-2" />
-                  Submit All ({scannedItems.length})
-                </Button>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Batch items to submit</CardTitle>
+                <CardDescription>
+                  {scannedItems.length} batch
+                  {scannedItems.length !== 1 ? 'es' : ''} ready to submit
+                </CardDescription>
               </div>
-            </CardHeader>
-            <CardContent>
-              <ScannedItemsList
-                items={scannedItems}
-                onItemUpdated={(updatedItem) => {
-                  setScannedItems((prev) =>
-                    prev.map((item) =>
-                      item.id === updatedItem.id ? updatedItem : item
-                    )
+              <Button
+                onClick={handleFinalSubmission}
+                disabled={scannedItems.length === 0 || isSubmittingBatch}
+                variant="secondary"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Submit All ({scannedItems.length})
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ScannedItemsList
+              items={scannedItems}
+              onItemUpdated={(updatedItem) => {
+                setScannedItems((prev) =>
+                  prev.map((item) =>
+                    item.id === updatedItem.id ? updatedItem : item
                   )
-                }}
-                onDeleteItem={(itemId) => {
-                  setScannedItems((prev) =>
-                    prev.filter((item) => item.id !== itemId)
-                  )
-                }}
-              />
-            </CardContent>
-          </Card>
-        )}
+                )
+              }}
+              onDeleteItem={(itemId) => {
+                setScannedItems((prev) =>
+                  prev.filter((item) => item.id !== itemId)
+                )
+              }}
+            />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Empty State */}
