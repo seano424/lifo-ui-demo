@@ -38,6 +38,7 @@ import {
   useScannedItemConverter,
 } from '@/hooks/use-inventory-submission'
 import { useStoreState } from '@/lib/stores/store-context'
+import { Typography } from '@/components/ui/typography'
 
 interface ManualInboundEntryProps {
   storeId?: string
@@ -217,14 +218,14 @@ export default function ManualInboundEntry({
   }
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
-  
+
   // Helper function to format date consistently
   const formatExpiryDate = (dateString: string) => {
     // Ensure we treat the date as local time to avoid timezone shifts
     const date = new Date(dateString + 'T00:00:00')
     return date.toLocaleDateString()
   }
-  
+
   const canAddBatch =
     selectedProduct &&
     inventoryData.expiryDate &&
@@ -234,106 +235,91 @@ export default function ManualInboundEntry({
   return (
     <div className={`space-y-6 ${className}`}>
       <div className="space-y-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Main Entry Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Manual Product Entry</CardTitle>
-            <CardDescription>
-              Add products to your inventory by searching or entering product
-              details manually
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Product Selection Section */}
-            {!selectedProduct ? (
-              <ManualBarcodeEntry
-                onProductSelected={handleProductSelected}
-                mode="inbound"
-                storeId={storeId}
-              />
-            ) : (
-              <Card className="border-primary-200 bg-primary-50/50">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Package className="w-5 h-5 text-primary-600" />
-                        <h3 className="font-semibold text-lg">
-                          Selected Product
-                        </h3>
-                      </div>
-                      <div className="space-y-1 text-sm">
-                        <div>
-                          <span className="font-medium">Name:</span>{' '}
-                          {selectedProduct.productName}
-                        </div>
-                        {selectedProduct.brand && (
-                          <div>
-                            <span className="font-medium">Brand:</span>{' '}
-                            {selectedProduct.brand}
-                          </div>
-                        )}
-                        {selectedProduct.category && (
-                          <div>
-                            <span className="font-medium">Category:</span>{' '}
-                            {selectedProduct.category}
-                          </div>
-                        )}
-                        <div>
-                          <span className="font-medium">Barcode:</span>{' '}
-                          <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
-                            {selectedProduct.barcode}
-                          </code>
-                        </div>
-                      </div>
+        <div className="space-y-6">
+          {/* Product Selection Section */}
+          {!selectedProduct ? (
+            <ManualBarcodeEntry
+              onProductSelected={handleProductSelected}
+              mode="inbound"
+              storeId={storeId}
+            />
+          ) : (
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Package className="w-5 h-5 text-primary-600" />
+                      <Typography variant="h3">Selected Product</Typography>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleClearSelection}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="space-y-1 text-sm">
+                      <Typography variant="p">
+                        <span>Name:</span> {selectedProduct.productName}
+                      </Typography>
+                      {selectedProduct.brand && (
+                        <Typography variant="p">
+                          <span>Brand:</span> {selectedProduct.brand}
+                        </Typography>
+                      )}
+                      {selectedProduct.category && (
+                        <Typography variant="p">
+                          <span>Category:</span> {selectedProduct.category}
+                        </Typography>
+                      )}
+                      <Typography variant="p">
+                        <span>Barcode:</span>{' '}
+                        <code className="bg-gray-100 px-1 py-0.5 rounded">
+                          {selectedProduct.barcode}
+                        </code>
+                      </Typography>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Inventory Details Section - Only show when product is selected */}
-            {selectedProduct && (
-              <>
-                <InventoryForm
-                  data={inventoryData}
-                  onChange={setInventoryData}
-                  showSubmitButton={false}
-                  title="Batch Details"
-                  className="border-2 border-dashed"
-                />
-
-                <div className="flex gap-3">
                   <Button
-                    onClick={handleAddBatch}
-                    disabled={!canAddBatch}
-                    size="lg"
-                    className="flex-1"
-                    variant="secondary"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Add Batch
-                  </Button>
-                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={handleClearSelection}
-                    variant="outline"
-                    size="lg"
+                    className="text-gray-500 hover:text-gray-700"
                   >
-                    Clear
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Inventory Details Section - Only show when product is selected */}
+          {selectedProduct && (
+            <>
+              <InventoryForm
+                data={inventoryData}
+                onChange={setInventoryData}
+                showSubmitButton={false}
+                title="Batch Details"
+                className="border-2 border-dashed"
+              />
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleAddBatch}
+                  disabled={!canAddBatch}
+                  size="lg"
+                  className="flex-1"
+                  variant="secondary"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Add Batch
+                </Button>
+                <Button
+                  onClick={handleClearSelection}
+                  variant="outline"
+                  size="lg"
+                >
+                  Clear
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Recently Added Items */}
         {scannedItems.length > 0 && (
@@ -368,7 +354,7 @@ export default function ManualInboundEntry({
                   )
                 }}
                 onDeleteItem={(itemId) => {
-                  setScannedItems((prev) => 
+                  setScannedItems((prev) =>
                     prev.filter((item) => item.id !== itemId)
                   )
                 }}
@@ -404,10 +390,10 @@ export default function ManualInboundEntry({
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="text-sm text-gray-600">
+            <Typography variant="p">
               You are about to submit {scannedItems.length} batch
               {scannedItems.length !== 1 ? 'es' : ''} to inventory:
-            </div>
+            </Typography>
 
             <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
               {scannedItems.map((item) => {
@@ -418,24 +404,21 @@ export default function ManualInboundEntry({
                     className="flex justify-between items-start p-2 bg-white rounded border text-sm"
                   >
                     <div className="flex-1">
-                      <div className="font-medium">{item.productName}</div>
+                      <Typography variant="p">{item.productName}</Typography>
                       {item.brand && (
-                        <div className="text-xs text-gray-600">
-                          {item.brand}
-                        </div>
+                        <Typography variant="p">{item.brand}</Typography>
                       )}
-                      <div className="text-xs text-gray-500">
-                        Expires:{' '}
-                        {formatExpiryDate(item.expiryDate)}
-                      </div>
+                      <Typography variant="p">
+                        Expires: {formatExpiryDate(item.expiryDate)}
+                      </Typography>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">
+                      <Typography variant="p">
                         {item.quantity}x {formatPrice(item.price)}
-                      </div>
-                      <div className="text-xs text-gray-600">
+                      </Typography>
+                      <Typography variant="p">
                         Total: {formatPrice(totalValue)}
-                      </div>
+                      </Typography>
                     </div>
                   </div>
                 )

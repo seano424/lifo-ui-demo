@@ -75,12 +75,12 @@ export default function InboundPage() {
       </Tabs>
 
       {/* Desktop Tabs for Manual Entry and CSV Import */}
-      <div className="hidden lg:block max-w-5xl mx-auto">
+      <div className="hidden lg:block max-w-6xl mx-auto">
         <Tabs
           defaultValue="manual"
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 max-w-xl mx-auto">
             <TabsTrigger
               value="manual"
               className="flex items-center gap-2"
