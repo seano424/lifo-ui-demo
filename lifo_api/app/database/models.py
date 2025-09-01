@@ -44,8 +44,8 @@ def get_uuid_type():
 
 
 def get_json_type():
-    """Get the correct JSON type based on environment (JSON for SQLite, get_json_type() for PostgreSQL)"""
-    return JSON if os.getenv("ENVIRONMENT") == "testing" else get_json_type()
+    """Get the correct JSON type based on environment (JSON for SQLite, JSON for PostgreSQL)"""
+    return JSON
 
 
 if TYPE_CHECKING:

@@ -35,7 +35,8 @@ def get_auth_users_fk() -> str:
 
 def get_uuid_type():
     """Get the correct UUID type based on environment (String for SQLite, UUID for PostgreSQL)"""
-    return SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else get_uuid_type()
+    from sqlalchemy.dialects.postgresql import UUID
+    return SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else UUID(as_uuid=True)
 
 
 class Category(Base):
