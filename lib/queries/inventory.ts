@@ -146,8 +146,12 @@ async function upsertGlobalProduct(
           updates.brand = productData.brand
         }
         if (productData.category && !existingProduct.category_id) {
-          // TODO: Map legacy category string to category_id using map_legacy_category() function
-          updates.category_id = productData.category
+          const { data: categoryId } = await supabase.rpc('map_legacy_category', {
+            legacy_category: productData.category
+          })
+          if (categoryId) {
+            updates.category_id = categoryId
+          }
         }
         if (productData.openFoodFactsData && !existingProduct.open_food_facts_data) {
           updates.open_food_facts_data = productData.openFoodFactsData as Json
@@ -183,7 +187,9 @@ async function upsertGlobalProduct(
     const newProductData: Database['inventory']['Tables']['products']['Insert'] = {
       name: productData.productName,
       brand: productData.brand || null,
-      category_id: productData.category || null, // TODO: Map legacy category to category_id
+      category_id: productData.category ? 
+        (await supabase.rpc('map_legacy_category', { legacy_category: productData.category })).data || null
+        : null,
       barcode: productData.barcode || null,
       description: null,
       image_url: null,
