@@ -39,9 +39,7 @@ export function BatchListSortControls({
         disabled={isLoading}
       >
         <SelectTrigger className="w-full md:w-[180px]">
-          <div className="flex items-center gap-2">
-            <SelectValue />
-          </div>
+          <SelectValue />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="created_at">

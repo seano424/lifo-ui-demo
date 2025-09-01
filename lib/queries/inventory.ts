@@ -117,12 +117,12 @@ async function upsertGlobalProduct(
   try {
     // First, try to find existing product by barcode
     if (productData.barcode) {
-      const { data: existingProduct } = await supabase
+      const { data: existingProduct, error: lookupError } = await supabase
         .schema('inventory')
         .from('products')
         .select('*')
         .eq('barcode', productData.barcode)
-        .single()
+        .maybeSingle()  // Use maybeSingle() instead of single() to avoid 406 errors
 
       if (existingProduct) {
         console.log(
@@ -146,9 +146,8 @@ async function upsertGlobalProduct(
           updates.brand = productData.brand
         }
         if (productData.category && !existingProduct.category_id) {
-          const { data: categoryId } = await supabase.rpc('map_legacy_category', {
-            legacy_category: productData.category
-          })
+          // Map category to category_id using direct lookup
+          const categoryId = await mapCategoryToId(productData.category, supabase)
           if (categoryId) {
             updates.category_id = categoryId
           }
@@ -188,7 +187,7 @@ async function upsertGlobalProduct(
       name: productData.productName,
       brand: productData.brand || null,
       category_id: productData.category ? 
-        (await supabase.rpc('map_legacy_category', { legacy_category: productData.category })).data || null
+        await mapCategoryToId(productData.category, supabase)
         : null,
       barcode: productData.barcode || null,
       description: null,
@@ -236,13 +235,13 @@ async function upsertStoreProduct(
 
   try {
     // Check if store-product association already exists
-    const { data: existingStoreProduct } = await supabase
+    const { data: existingStoreProduct, error: lookupError } = await supabase
       .schema('inventory')
       .from('store_products')
       .select('*')
       .eq('store_id', productData.storeId)
       .eq('product_id', productId)
-      .single()
+      .maybeSingle()  // Use maybeSingle() instead of single() to avoid 406 errors
 
     if (existingStoreProduct) {
       console.log('[upsertStoreProduct] Store product association already exists')
@@ -398,6 +397,28 @@ async function createProductBatch(
   } catch (error) {
     console.error('[createProductBatch] Unexpected error:', error)
     throw error
+  }
+}
+
+/**
+ * Helper: Map category string to category_id
+ * Replaces the missing map_legacy_category RPC function
+ */
+async function mapCategoryToId(categoryName: string, supabase: any): Promise<string | null> {
+  try {
+    const { data: category } = await supabase
+      .schema('inventory')
+      .from('categories')
+      .select('category_id')
+      .ilike('name', `%${categoryName}%`)
+      .limit(1)
+      .maybeSingle()
+
+    return category?.category_id || null
+  } catch (error) {
+    console.warn('[mapCategoryToId] Category mapping failed:', error)
+    // Return null to use default category or create without category
+    return null
   }
 }
 
