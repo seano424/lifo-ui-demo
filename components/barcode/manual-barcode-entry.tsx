@@ -673,7 +673,7 @@ export default function ManualBarcodeEntry({
                       </CardContent>
                     </Card>
                   ) : (
-                    <Alert variant="destructive">
+                    <Alert variant="primary">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
                         Product not found in database. You can add it manually
