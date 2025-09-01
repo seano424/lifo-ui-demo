@@ -1,5 +1,16 @@
 // hooks/use-product-lookup.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+// Constants
+const LOOKUP_CONFIG = {
+  MIN_BARCODE_LENGTH: 8,
+  MIN_SEARCH_LENGTH: 3,
+  CACHE_STALE_TIME: 24 * 60 * 60 * 1000, // 24 hours
+  CACHE_GC_TIME: 7 * 24 * 60 * 60 * 1000, // 7 days
+  MAX_SEARCH_RESULTS: 20,
+  RETRY_COUNT: 1,
+} as const
+
 import {
   openFoodFactsClient,
   type ProductLookupResult,
@@ -57,10 +68,7 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
             barcode,
             product_name: supabaseProduct.name,
             brand: supabaseProduct.brand || null,
-            category: supabaseProduct.open_food_facts_data.categories
-              ? String(supabaseProduct.open_food_facts_data.categories).split(',')[0]?.trim() ||
-                null
-              : null,
+            category: parseFirstCategory(supabaseProduct.open_food_facts_data.categories),
             image_url: supabaseProduct.image_url || null,
             open_food_facts_data: supabaseProduct.open_food_facts_data,
             is_verified: supabaseProduct.is_verified,
@@ -116,9 +124,7 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
             product_name:
               result.product.product_name || result.product.product_name_en || 'Unknown Product',
             brand: result.product.brands || null,
-            category: result.product.categories
-              ? String(result.product.categories).split(',')[0]?.trim() || null
-              : null,
+            category: parseFirstCategory(result.product.categories),
             image_url: result.product.image_front_url || result.product.image_url || null,
             open_food_facts_data: result.product,
             typical_shelf_life_days: null, // We'll estimate this later
@@ -138,10 +144,10 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
         }
       }
     },
-    enabled: enabled && !!barcode && barcode.length >= 8,
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours
-    gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
-    retry: 1,
+    enabled: enabled && !!barcode && barcode.length >= LOOKUP_CONFIG.MIN_BARCODE_LENGTH,
+    staleTime: LOOKUP_CONFIG.CACHE_STALE_TIME,
+    gcTime: LOOKUP_CONFIG.CACHE_GC_TIME,
+    retry: LOOKUP_CONFIG.RETRY_COUNT,
   })
 }
 
@@ -149,7 +155,7 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
 export function useProductSearch() {
   return useMutation({
     mutationFn: async (query: string) => {
-      if (!query || query.length < 3) {
+      if (!query || query.length < LOOKUP_CONFIG.MIN_SEARCH_LENGTH) {
         return []
       }
       return await openFoodFactsClient.searchProducts(query)
@@ -268,6 +274,33 @@ export function useVerifyProduct() {
   })
 }
 
+// Type guard for category data
+function isValidCategory(obj: unknown): obj is { display_name_en: string } | null {
+  if (obj === null) return true
+  if (typeof obj === 'object' && obj !== null) {
+    return (
+      'display_name_en' in obj &&
+      typeof (obj as Record<string, unknown>).display_name_en === 'string'
+    )
+  }
+  return false
+}
+
+// Safe category parser utility
+function parseFirstCategory(categories: unknown): string | null {
+  if (!categories) return null
+
+  try {
+    const categoryStr = String(categories)
+    if (!categoryStr || categoryStr === 'undefined' || categoryStr === 'null') return null
+
+    const firstCategory = categoryStr.split(',')[0]?.trim()
+    return firstCategory || null
+  } catch {
+    return null
+  }
+}
+
 // Hook to search products by name in Supabase (for outbound/scan-out)
 // For outbound: searches batches with available stock
 // For inbound: searches all products
@@ -287,7 +320,7 @@ export interface SupabaseProductSearchResult {
 export function useSupabaseProductSearch(_storeId?: string) {
   return useMutation({
     mutationFn: async (query: string): Promise<SupabaseProductSearchResult[]> => {
-      if (!query || query.length < 2) {
+      if (!query || query.length < LOOKUP_CONFIG.MIN_SEARCH_LENGTH - 1) {
         return []
       }
 
@@ -309,7 +342,7 @@ export function useSupabaseProductSearch(_storeId?: string) {
           )
         `)
         .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
-        .limit(20)
+        .limit(LOOKUP_CONFIG.MAX_SEARCH_RESULTS)
 
       if (error) {
         console.error('[SupabaseProductSearch] Failed to search products:', error)
@@ -318,7 +351,7 @@ export function useSupabaseProductSearch(_storeId?: string) {
 
       // Transform the results to include category name
       const results = (data || []).map(product => {
-        const categories = product.categories as unknown as { display_name_en: string } | null
+        const categories = isValidCategory(product.categories) ? product.categories : null
         return {
           product_id: product.product_id,
           name: product.name,

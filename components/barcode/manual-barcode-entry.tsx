@@ -2,6 +2,30 @@
 
 import { AlertCircle, ArrowRight, Check, Keyboard, Loader2, Package, Search } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+
+// Constants
+const SEARCH_CONFIG = {
+  DEBOUNCE_DELAY: 300,
+  MIN_BARCODE_LENGTH: 8,
+  MIN_SEARCH_LENGTH: 2,
+  MAX_SEARCH_RESULTS: 5,
+} as const
+
+// Safe category parser utility
+const parseFirstCategory = (categories: unknown): string => {
+  if (!categories) return 'Unknown'
+
+  try {
+    const categoryStr = String(categories)
+    if (!categoryStr || categoryStr === 'undefined' || categoryStr === 'null') return 'Unknown'
+
+    const firstCategory = categoryStr.split(',')[0]?.trim()
+    return firstCategory || 'Unknown'
+  } catch {
+    return 'Unknown'
+  }
+}
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -85,8 +109,15 @@ export default function ManualBarcodeEntry({
     availableQuantity: number
   } | null>(null)
 
+  // Input validation helper
+  const isValidBarcode = (code: string): boolean => {
+    return /^\d{8,}$/.test(code)
+  }
+
   const handleBarcodeSubmit = async () => {
-    if (!barcode || barcode.length < 8) return
+    if (!barcode || barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH || !isValidBarcode(barcode)) {
+      return
+    }
     setBarcodeStockStatus(null) // Reset stock status
   }
 
@@ -140,7 +171,7 @@ export default function ManualBarcodeEntry({
   // Debounced search function
   const debouncedProductNameSearch = useCallback(
     async (query: string) => {
-      if (query.length < 2) {
+      if (query.length < SEARCH_CONFIG.MIN_SEARCH_LENGTH) {
         setShowProductSearchResults(false)
         return
       }
@@ -153,8 +184,19 @@ export default function ManualBarcodeEntry({
           }
           await supabaseSearch.mutateAsync(query)
         } else {
-          // For inbound mode, search both Supabase and Open Food Facts
-          await Promise.all([supabaseSearch.mutateAsync(query), productSearch.mutateAsync(query)])
+          // For inbound mode, search both Supabase and Open Food Facts with better error handling
+          const [supabaseResult, offResult] = await Promise.allSettled([
+            supabaseSearch.mutateAsync(query),
+            productSearch.mutateAsync(query),
+          ])
+
+          // Log any individual failures but don't fail the entire search
+          if (supabaseResult.status === 'rejected') {
+            console.error('Supabase search failed:', supabaseResult.reason)
+          }
+          if (offResult.status === 'rejected') {
+            console.error('Open Food Facts search failed:', offResult.reason)
+          }
         }
         setShowProductSearchResults(true)
       } catch (error) {
@@ -174,7 +216,7 @@ export default function ManualBarcodeEntry({
       }
 
       // If query is too short, hide results immediately
-      if (query.length < 2) {
+      if (query.length < SEARCH_CONFIG.MIN_SEARCH_LENGTH) {
         setShowProductSearchResults(false)
         return
       }
@@ -183,7 +225,7 @@ export default function ManualBarcodeEntry({
       debounceTimeoutRef.current = setTimeout(() => {
         debouncedProductNameSearch(query)
         debounceTimeoutRef.current = null
-      }, 300) // 300ms debounce delay
+      }, SEARCH_CONFIG.DEBOUNCE_DELAY)
     },
     [debouncedProductNameSearch],
   )
@@ -297,7 +339,11 @@ export default function ManualBarcodeEntry({
                       value={barcode}
                       onChange={e => setBarcode(e.target.value)}
                       onKeyDown={e => {
-                        if (e.key === 'Enter' && barcode.length >= 8) {
+                        if (
+                          e.key === 'Enter' &&
+                          barcode.length >= SEARCH_CONFIG.MIN_BARCODE_LENGTH &&
+                          isValidBarcode(barcode)
+                        ) {
                           handleBarcodeSubmit()
                         }
                       }}
@@ -308,7 +354,11 @@ export default function ManualBarcodeEntry({
 
                     <Button
                       onClick={handleBarcodeSubmit}
-                      disabled={barcode.length < 8 || isLookingUp}
+                      disabled={
+                        barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH ||
+                        !isValidBarcode(barcode) ||
+                        isLookingUp
+                      }
                       className="shrink-0"
                     >
                       {isLookingUp ? (
@@ -319,11 +369,14 @@ export default function ManualBarcodeEntry({
                       Lookup
                     </Button>
                   </div>
-                  {barcode && barcode.length < 8 && (
-                    <p className="text-xs text-orange-600">
-                      Barcode must be at least 8 digits long
-                    </p>
-                  )}
+                  {barcode &&
+                    (barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH ||
+                      !isValidBarcode(barcode)) && (
+                      <p className="text-xs text-orange-600">
+                        Barcode must be at least {SEARCH_CONFIG.MIN_BARCODE_LENGTH} digits and
+                        contain only numbers
+                      </p>
+                    )}
                 </div>
 
                 {/* Product Name Search */}
@@ -579,9 +632,7 @@ export default function ManualBarcodeEntry({
                             {lookupResult.product.categories && (
                               <div>
                                 <strong>Category:</strong>{' '}
-                                {lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim()
-                                  : 'Unknown'}
+                                {parseFirstCategory(lookupResult.product.categories)}
                               </div>
                             )}
 
@@ -612,10 +663,10 @@ export default function ManualBarcodeEntry({
                                   lookupResult.product.product_name_en ||
                                   'Unknown Product') as string,
                                 brand: (lookupResult.product.brands || '') as string,
-                                category: (lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim() ||
-                                    ''
-                                  : '') as string,
+                                category:
+                                  parseFirstCategory(lookupResult.product.categories) === 'Unknown'
+                                    ? ''
+                                    : parseFirstCategory(lookupResult.product.categories),
                                 imageUrl: (lookupResult.product.image_front_url ||
                                   lookupResult.product.image_url ||
                                   '') as string,
@@ -790,7 +841,7 @@ export default function ManualBarcodeEntry({
                       {productSearch.data && productSearch.data.length > 0 && (
                         <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
                           {productSearch.data
-                            .slice(0, 5)
+                            .slice(0, SEARCH_CONFIG.MAX_SEARCH_RESULTS)
                             .map((product: OpenFoodFactsSearchResult) => (
                               <Button
                                 key={product.code}
