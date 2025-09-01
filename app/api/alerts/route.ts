@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
 import { createClient } from '@/lib/supabase/server'
+import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 
 interface ScoringData {
   batch_id: string
@@ -103,7 +104,8 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const storeId = searchParams.get('storeId')
-  const threshold = parseFloat(searchParams.get('threshold') || '0.6')
+  // Allow override via URL parameter, otherwise use store settings
+  const thresholdOverride = searchParams.get('threshold')
   const urgencyLevel = searchParams.get('urgency') // critical, high, medium, low
   const category = searchParams.get('category')
   const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500)
@@ -111,7 +113,7 @@ export async function GET(request: NextRequest) {
   console.log('[/api/alerts] Request parameters:', {
     userId: user.id,
     storeId,
-    threshold,
+    thresholdOverride,
     urgencyLevel,
     category,
     limit,
@@ -121,6 +123,11 @@ export async function GET(request: NextRequest) {
     console.log('[/api/alerts] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
+
+  // Get threshold from store settings or URL override
+  const threshold = thresholdOverride 
+    ? parseFloat(thresholdOverride)
+    : await getStoreThreshold(supabase, storeId, 'warning')
 
   // Validate threshold
   if (threshold < 0 || threshold > 1) {

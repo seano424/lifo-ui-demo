@@ -2,8 +2,8 @@
 
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { AlertQuickToggle } from './alert-quick-toggle'
 import { Button } from '@/components/ui/button'
-
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useScoringAlerts } from '@/hooks/use-scoring-analytics'
@@ -11,7 +11,7 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 
 export function UrgentAlerts() {
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useScoringAlerts(activeStoreId, 0.7) // Higher threshold for urgent items
+  const { data, isLoading, error } = useScoringAlerts(activeStoreId) // Now uses store threshold settings
   
   // Debug logging
   console.log('[UrgentAlerts] Debug:', { 
@@ -84,6 +84,7 @@ export function UrgentAlerts() {
           AI {severity} Alerts
         </Typography>
         <Typography variant="p">🤖 {message}</Typography>
+        <AlertQuickToggle storeId={activeStoreId || undefined} size="sm" className="mt-2 self-center lg:self-start" />
       </div>
 
       <Link href="/dashboard/inventory/batches?filter=expiring">

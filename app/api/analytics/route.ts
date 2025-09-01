@@ -5,6 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
+import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 
 // Helper type for batch with store_products join
 type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] & {
@@ -40,20 +41,26 @@ export async function GET(request: NextRequest) {
   const storeId = searchParams.get('storeId')
   const timeframe = searchParams.get('timeframe') || '7d' // 1d, 7d, 30d, 90d
   const metric = searchParams.get('metric') // 'overview', 'waste', 'revenue', 'categories'
-  const threshold = parseFloat(searchParams.get('threshold') || '0.7')
+  // Allow override via URL parameter, otherwise use store settings
+  const thresholdOverride = searchParams.get('threshold')
 
   console.log('[/api/analytics] Request parameters:', {
     userId: user.id,
     storeId,
     timeframe,
     metric,
-    threshold,
+    thresholdOverride,
   })
 
   if (!storeId) {
     console.log('[/api/analytics] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
+
+  // Get threshold from store settings or URL override
+  const threshold = thresholdOverride 
+    ? parseFloat(thresholdOverride)
+    : await getStoreThreshold(supabase, storeId, 'warning')
 
   // Validate threshold
   if (threshold < 0 || threshold > 1) {

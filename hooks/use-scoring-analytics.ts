@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { useScoringThresholds } from './use-scoring-thresholds'
 
 // TypeScript interfaces for existing API responses
 export interface ScoringAlert {
@@ -105,23 +106,30 @@ export interface AnalyticsResponse {
 /**
  * Hook for fetching scoring alerts from /api/alerts route
  * @param storeId - Store ID to fetch alerts for
- * @param threshold - Score threshold (default: 0.6)
+ * @param thresholdOverride - Override threshold (otherwise uses store settings)
  * @param urgencyLevel - Filter by urgency level
  * @param category - Filter by category
  */
 export function useScoringAlerts(
   storeId: string | null,
-  threshold: number = 0.6,
+  thresholdOverride?: number,
   urgencyLevel?: string,
   category?: string,
 ) {
+  // Use store-specific threshold if no override provided
+  const { warningThreshold } = useScoringThresholds(storeId || undefined)
+  const threshold = thresholdOverride ?? warningThreshold
   return useQuery({
     queryKey: ['alerts', 'store', storeId!, threshold],
     queryFn: async (): Promise<AlertsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
-        threshold: threshold.toString(),
       })
+      
+      // Only add threshold parameter if it's an override (let API use store settings otherwise)
+      if (thresholdOverride !== undefined) {
+        params.append('threshold', threshold.toString())
+      }
 
       if (urgencyLevel) params.append('urgency', urgencyLevel)
       if (category) params.append('category', category)
@@ -144,22 +152,29 @@ export function useScoringAlerts(
  * @param storeId - Store ID to fetch analytics for
  * @param timeframe - Time period (1d/7d/30d/90d, default: 7d)
  * @param metric - Specific metric type (optional)
- * @param threshold - Score threshold for urgent items (default: 0.7)
+ * @param thresholdOverride - Override threshold (otherwise uses store settings)
  */
 export function useStoreAnalytics(
   storeId: string | null,
   timeframe: string = '7d',
   metric?: string,
-  threshold: number = 0.7,
+  thresholdOverride?: number,
 ) {
+  // Use store-specific threshold if no override provided
+  const { warningThreshold } = useScoringThresholds(storeId || undefined)
+  const threshold = thresholdOverride ?? warningThreshold
   return useQuery({
     queryKey: ['analytics', 'store', storeId!, timeframe, threshold],
     queryFn: async (): Promise<AnalyticsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
         timeframe,
-        threshold: threshold.toString(),
       })
+      
+      // Only add threshold parameter if it's an override (let API use store settings otherwise)
+      if (thresholdOverride !== undefined) {
+        params.append('threshold', threshold.toString())
+      }
 
       if (metric) params.append('metric', metric)
 
@@ -221,13 +236,17 @@ export async function fetchScoringAlerts(
 export async function fetchStoreAnalytics(
   storeId: string,
   timeframe: string = '7d',
-  threshold: number = 0.7,
+  thresholdOverride?: number,
 ): Promise<AnalyticsResponse> {
   const params = new URLSearchParams({
     storeId,
     timeframe,
-    threshold: threshold.toString(),
   })
+  
+  // Only add threshold parameter if it's an override
+  if (thresholdOverride !== undefined) {
+    params.append('threshold', thresholdOverride.toString())
+  }
 
   const response = await fetch(`/api/analytics?${params}`)
   if (!response.ok) {
