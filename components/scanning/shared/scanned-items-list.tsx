@@ -38,7 +38,7 @@ export default function ScannedItemsList({
   items,
   onEditItem,
   onItemUpdated,
-  title = 'Total items scanned',
+  title = 'Batch items',
   className = '',
 }: ScannedItemsListProps) {
   const [isEditingItem, setIsEditingItem] = useState(false)
@@ -116,18 +116,21 @@ export default function ScannedItemsList({
       </div>
 
       <div className="space-y-2 max-h-80 overflow-y-auto">
-        {items.map(item => (
+        {items.map((item) => (
           <div
             key={item.id}
             className="flex items-center justify-between p-2 border rounded text-sm"
           >
             <div className="flex-1">
               <Typography variant="p">
-                <span className="text-gray-500">Product:</span> {item.productName}
+                <span className="text-gray-500">Product:</span>{' '}
+                {item.productName}
               </Typography>
               <Typography variant="p">
-                <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}x{' '}
-                <span className="font-normal text-gray-500">Price:</span> {formatPrice(item.price)}{' '}
+                <span className="font-normal text-gray-500">Quantity:</span>{' '}
+                {item.quantity}x{' '}
+                <span className="font-normal text-gray-500">Price:</span>{' '}
+                {formatPrice(item.price)}{' '}
                 <span className="font-normal text-gray-500">Expiry:</span>{' '}
                 {new Date(item.expiryDate).toLocaleDateString()}
               </Typography>
@@ -135,7 +138,9 @@ export default function ScannedItemsList({
 
             {(onEditItem || onItemUpdated) && (
               <Button
-                onClick={() => (onEditItem ? onEditItem(item) : handleEditItem(item))}
+                onClick={() =>
+                  onEditItem ? onEditItem(item) : handleEditItem(item)
+                }
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0"
@@ -149,7 +154,10 @@ export default function ScannedItemsList({
 
       {/* Edit Item Dialog */}
       {isEditingItem && editingItem && (
-        <Dialog open={isEditingItem} onOpenChange={setIsEditingItem}>
+        <Dialog
+          open={isEditingItem}
+          onOpenChange={setIsEditingItem}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Item</DialogTitle>
@@ -164,26 +172,37 @@ export default function ScannedItemsList({
               {/* Product Info - Now editable in advanced mode */}
               {!showAdvancedEdit ? (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="text-sm font-medium">{editingItem?.productName}</div>
+                  <div className="text-sm font-medium">
+                    {editingItem?.productName}
+                  </div>
                   {editingItem?.brand && (
-                    <div className="text-xs text-gray-600">{editingItem.brand}</div>
+                    <div className="text-xs text-gray-600">
+                      {editingItem.brand}
+                    </div>
                   )}
-                  <div className="text-xs text-gray-500 font-mono">{editingItem?.barcode}</div>
+                  <div className="text-xs text-gray-500 font-mono">
+                    {editingItem?.barcode}
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-sm font-medium text-blue-800 mb-2">Product Details</div>
+                  <div className="text-sm font-medium text-blue-800 mb-2">
+                    Product Details
+                  </div>
 
                   <div>
-                    <Label htmlFor="edit-product-name" className="text-sm font-medium">
+                    <Label
+                      htmlFor="edit-product-name"
+                      className="text-sm font-medium"
+                    >
                       Product Name
                     </Label>
                     <Input
                       id="edit-product-name"
                       type="text"
                       value={editForm.productName}
-                      onChange={e =>
-                        setEditForm(prev => ({
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
                           ...prev,
                           productName: e.target.value,
                         }))
@@ -195,15 +214,18 @@ export default function ScannedItemsList({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="edit-brand" className="text-sm font-medium">
+                      <Label
+                        htmlFor="edit-brand"
+                        className="text-sm font-medium"
+                      >
                         Brand
                       </Label>
                       <Input
                         id="edit-brand"
                         type="text"
                         value={editForm.brand}
-                        onChange={e =>
-                          setEditForm(prev => ({
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
                             ...prev,
                             brand: e.target.value,
                           }))
@@ -214,15 +236,18 @@ export default function ScannedItemsList({
                     </div>
 
                     <div>
-                      <Label htmlFor="edit-barcode" className="text-sm font-medium">
+                      <Label
+                        htmlFor="edit-barcode"
+                        className="text-sm font-medium"
+                      >
                         Barcode
                       </Label>
                       <Input
                         id="edit-barcode"
                         type="text"
                         value={editForm.barcode}
-                        onChange={e =>
-                          setEditForm(prev => ({
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
                             ...prev,
                             barcode: e.target.value,
                           }))
@@ -262,15 +287,18 @@ export default function ScannedItemsList({
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-expiry" className="text-sm font-medium">
+                  <Label
+                    htmlFor="edit-expiry"
+                    className="text-sm font-medium"
+                  >
                     Expiry Date
                   </Label>
                   <Input
                     id="edit-expiry"
                     type="date"
                     value={editForm.expiryDate}
-                    onChange={e =>
-                      setEditForm(prev => ({
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
                         ...prev,
                         expiryDate: e.target.value,
                       }))
@@ -281,7 +309,10 @@ export default function ScannedItemsList({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="edit-quantity" className="text-sm font-medium">
+                    <Label
+                      htmlFor="edit-quantity"
+                      className="text-sm font-medium"
+                    >
                       Quantity
                     </Label>
                     <Input
@@ -289,8 +320,8 @@ export default function ScannedItemsList({
                       type="number"
                       min="0"
                       value={editForm.quantity}
-                      onChange={e =>
-                        setEditForm(prev => ({
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
                           ...prev,
                           quantity: parseInt(e.target.value, 10) || 1,
                         }))
@@ -300,7 +331,10 @@ export default function ScannedItemsList({
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-price" className="text-sm font-medium">
+                    <Label
+                      htmlFor="edit-price"
+                      className="text-sm font-medium"
+                    >
                       Price (€)
                     </Label>
                     <div className="relative mt-1">
@@ -311,8 +345,8 @@ export default function ScannedItemsList({
                         min="0"
                         step="0.01"
                         value={editForm.price}
-                        onChange={e =>
-                          setEditForm(prev => ({
+                        onChange={(e) =>
+                          setEditForm((prev) => ({
                             ...prev,
                             price: parseFloat(e.target.value) || 0,
                           }))
@@ -326,7 +360,10 @@ export default function ScannedItemsList({
             </div>
 
             <DialogFooter className="mt-6">
-              <Button variant="outline" onClick={handleCancelEdit}>
+              <Button
+                variant="outline"
+                onClick={handleCancelEdit}
+              >
                 Cancel
               </Button>
               <Button
