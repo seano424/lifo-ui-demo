@@ -119,8 +119,14 @@ export function useScoringAlerts(
   // Use store-specific threshold if no override provided
   const { warningThreshold } = useScoringThresholds(storeId || undefined)
   const threshold = thresholdOverride ?? warningThreshold
+  
+  // Only include threshold in query key if it's an override
+  const queryKey = thresholdOverride !== undefined 
+    ? ['alerts', 'store', storeId!, 'threshold', threshold, urgencyLevel, category]
+    : ['alerts', 'store', storeId!, 'default', urgencyLevel, category]
+  
   return useQuery({
-    queryKey: ['alerts', 'store', storeId!, threshold],
+    queryKey,
     queryFn: async (): Promise<AlertsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
@@ -144,6 +150,8 @@ export function useScoringAlerts(
     retry: 1,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 }
 
@@ -163,8 +171,14 @@ export function useStoreAnalytics(
   // Use store-specific threshold if no override provided
   const { warningThreshold } = useScoringThresholds(storeId || undefined)
   const threshold = thresholdOverride ?? warningThreshold
+  
+  // Only include threshold in query key if it's an override
+  const queryKey = thresholdOverride !== undefined 
+    ? ['analytics', 'store', storeId!, timeframe, 'threshold', threshold, metric]
+    : ['analytics', 'store', storeId!, timeframe, 'default', metric]
+  
   return useQuery({
-    queryKey: ['analytics', 'store', storeId!, timeframe, threshold],
+    queryKey,
     queryFn: async (): Promise<AnalyticsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
@@ -188,6 +202,8 @@ export function useStoreAnalytics(
     retry: 1,
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 }
 

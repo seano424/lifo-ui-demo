@@ -143,7 +143,7 @@ export async function updateStoreBasicInfo(
   return data
 }
 
-// Fallback: Direct table access for advanced settings
+// Use RPC function for advanced settings updates with proper security
 export async function updateStoreAdvancedSettings(
   storeId: string,
   updates: Partial<StoreAdvancedSettings>,
@@ -151,48 +151,61 @@ export async function updateStoreAdvancedSettings(
 ): Promise<StoreAdvancedSettings> {
   const supabase = serverClient || createClient()
 
-  // First check if settings record exists
-  const { data: existingSettings } = await supabase
-    .schema('business')
-    .from('store_settings')
-    .select('store_id')
-    .eq('store_id', storeId)
-    .single()
+  // Use the new RPC function for updating advanced settings (public schema)
+  const { data, error } = await supabase.rpc('update_store_advanced_settings', {
+    p_store_id: storeId,
+    p_critical_threshold: updates.critical_threshold || null,
+    p_warning_threshold: updates.warning_threshold || null,
+    p_scoring_weights: updates.scoring_weights || null,
+    p_notification_preferences: updates.notification_preferences || null,
+    p_display_preferences: updates.display_preferences || null,
+    p_backup_preferences: updates.backup_preferences || null,
+    p_opening_hours: updates.opening_hours || null,
+    p_peak_hours: updates.peak_hours || null,
+    p_weather_location_lat: updates.weather_location_lat || null,
+    p_weather_location_lon: updates.weather_location_lon || null,
+    p_currency: updates.currency || null,
+  })
 
-  let result: StoreAdvancedSettings
-  if (existingSettings) {
-    // Update existing settings
-    const { data, error } = await supabase
-      .schema('business')
-      .from('store_settings')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('store_id', storeId)
-      .select()
-      .single()
-
-    if (error) throw new Error(`Failed to update settings: ${error.message}`)
-    result = data
-  } else {
-    // Create new settings record
-    const { data, error } = await supabase
-      .schema('business')
-      .from('store_settings')
-      .insert({
-        store_id: storeId,
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
-
-    if (error) throw new Error(`Failed to create settings: ${error.message}`)
-    result = data
+  if (error) {
+    console.error('Failed to update store advanced settings:', error)
+    throw new Error(`Failed to update settings: ${error.message}`)
   }
 
-  return result
+  if (!data || data.length === 0) {
+    throw new Error('No data returned from update operation')
+  }
+
+  return data[0] // RPC returns an array, get the first result
+}
+
+// Specialized function for threshold updates only
+export async function updateStoreThresholds(
+  storeId: string,
+  thresholds: {
+    critical_threshold: number
+    warning_threshold: number
+  },
+  serverClient?: ServerClient,
+): Promise<StoreAdvancedSettings> {
+  const supabase = serverClient || createClient()
+
+  const { data, error } = await supabase.rpc('update_store_thresholds', {
+    p_store_id: storeId,
+    p_critical_threshold: thresholds.critical_threshold,
+    p_warning_threshold: thresholds.warning_threshold,
+  })
+
+  if (error) {
+    console.error('Failed to update store thresholds:', error)
+    throw new Error(`Failed to update thresholds: ${error.message}`)
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error('No data returned from threshold update operation')
+  }
+
+  return data[0] // RPC returns an array, get the first result
 }
 
 // Debug function to test store access

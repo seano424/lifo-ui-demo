@@ -39,6 +39,9 @@ function useCurrentAuthUser() {
       return user
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
     retry: false,
   })
 }
@@ -64,6 +67,9 @@ export function useUserStores() {
     },
     enabled: !!currentUser?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 
   const userPreferencesResult = useQuery({
@@ -74,6 +80,9 @@ export function useUserStores() {
     },
     enabled: !!currentUser?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 
   // Auto-select store when data loads
@@ -127,11 +136,8 @@ export function useUserStores() {
     userStoresResult.data,
     userPreferencesResult.data,
     activeStore,
-    setActiveStore,
-    setUserStores,
-    setLoadingStores,
     userStoresResult.isLoading,
-  ])
+  ]) // Removed Zustand setters from dependencies since they are stable
 
   return {
     userStores: userStores, // Return the UserStore[] from Zustand
@@ -250,5 +256,9 @@ export function useStore(storeId: string | null) {
       return fetchStoreById(storeId!)
     },
     enabled: !!storeId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: false, // Don't refetch if we have cached data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   })
 }
