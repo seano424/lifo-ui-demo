@@ -56,7 +56,7 @@ export default function ScannedItemsList({
   const [showAdvancedEdit, setShowAdvancedEdit] = useState(false)
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
-  
+
   // Helper function to format date consistently
   const formatExpiryDate = (dateString: string) => {
     // Ensure we treat the date as local time to avoid timezone shifts
@@ -118,7 +118,7 @@ export default function ScannedItemsList({
   return (
     <div className={`p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <Typography variant="h3">{title}</Typography>
+        <Typography variant="p">{title}</Typography>
         <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
           {items.length > 99 ? '99+' : items.length}
         </div>

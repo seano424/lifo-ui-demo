@@ -36,6 +36,7 @@ import type {
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
+import { Label } from '../ui/label'
 
 interface ProductData {
   barcode: string
@@ -312,9 +313,7 @@ export default function ManualBarcodeEntry({
               <div className="space-y-4">
                 {/* Barcode Lookup */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Search by Barcode
-                  </label>
+                  <Label>Search by Barcode</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       type="text"
@@ -352,14 +351,14 @@ export default function ManualBarcodeEntry({
 
                 {/* Product Name Search */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <Label>
                     Or Search by Product Name
                     {mode === 'outbound' && (
                       <span className="text-xs text-gray-500 ml-2">
                         (In-stock items only)
                       </span>
                     )}
-                  </label>
+                  </Label>
                   <div className="relative">
                     <Input
                       type="text"
@@ -696,9 +695,7 @@ export default function ManualBarcodeEntry({
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
-                        <label className="block text-xs font-medium mb-1">
-                          Barcode *
-                        </label>
+                        <Label>Barcode *</Label>
                         <Input
                           value={barcode}
                           onChange={(e) => setBarcode(e.target.value)}
@@ -709,9 +706,7 @@ export default function ManualBarcodeEntry({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium mb-1">
-                          Product Name *
-                        </label>
+                        <Label>Product Name *</Label>
                         <Input
                           value={manualProductData.productName}
                           onChange={(e) =>
@@ -727,9 +722,7 @@ export default function ManualBarcodeEntry({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-xs font-medium mb-1">
-                            Brand
-                          </label>
+                          <Label>Brand</Label>
                           <Input
                             value={manualProductData.brand}
                             onChange={(e) =>
@@ -743,9 +736,7 @@ export default function ManualBarcodeEntry({
                         </div>
 
                         <div>
-                          <label className="block text-xs font-medium mb-1">
-                            Category
-                          </label>
+                          <Label>Category</Label>
                           <Select
                             value={manualProductData.category}
                             onValueChange={(value) =>
