@@ -58,7 +58,7 @@ export interface ProductLookupResult {
   found: boolean
   product?: OpenFoodFactsProduct['product']
   error?: string
-  source: 'open_food_facts' | 'cache'
+  source: 'open_food_facts' | 'cache' | 'supabase'
   cached_at?: string
 }
 

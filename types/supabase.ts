@@ -1049,16 +1049,35 @@ export type Database = {
       batch_expiry_status: {
         Row: {
           batch_id: string | null
-          batch_number: string | null
-          calculated_status: string | null
+          category_code: string | null
+          category_id: string | null
+          category_name: string | null
+          created_at: string | null
           current_quantity: number | null
-          days_past_expiry: number | null
+          days_to_expiry: number | null
           expiry_date: string | null
-          needs_status_update: boolean | null
+          product_id: string | null
           product_name: string | null
           status: string | null
+          store_id: string | null
+          urgency_level: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["store_id", "product_id"]
+          },
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["category_id"]
+          },
+        ]
       }
       batch_status: {
         Row: {
@@ -1132,21 +1151,6 @@ export type Database = {
           supplier?: string | null
           turnover_days?: never
           updated_at?: string | null
-        }
-        Relationships: []
-      }
-      categories_hierarchy: {
-        Row: {
-          category_code: string | null
-          category_id: string | null
-          display_name_en: string | null
-          display_name_fr: string | null
-          level: number | null
-          parent_category_id: string | null
-          path: string[] | null
-          root_category: string | null
-          sort_order: number | null
-          typical_shelf_life_days: number | null
         }
         Relationships: []
       }
@@ -1581,6 +1585,23 @@ export type Database = {
           total_quantity: number | null
           waste_value: number | null
           wasted_quantity: number | null
+        }
+        Relationships: []
+      }
+      inventory_view_for_scoring: {
+        Row: {
+          batch_id: string | null
+          category: string | null
+          category_code: string | null
+          cost_price: number | null
+          current_quantity: number | null
+          days_to_expiry: number | null
+          expiry_date: string | null
+          product_id: string | null
+          selling_price: number | null
+          sku: string | null
+          store_id: string | null
+          typical_shelf_life_days: number | null
         }
         Relationships: []
       }
