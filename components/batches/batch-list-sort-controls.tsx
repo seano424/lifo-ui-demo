@@ -43,52 +43,52 @@ export function BatchListSortControls({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="created_at">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Created Date
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="expiry_date">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
               Expiry Date
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="batch_number">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Batch Number
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="supplier">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Supplier
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="current_quantity">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Stock Level
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="cost_price">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               Cost Price
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="selling_price">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               Selling Price
-            </div>
+            </span>
           </SelectItem>
           <SelectItem value="status">
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Status
-            </div>
+            </span>
           </SelectItem>
         </SelectContent>
       </Select>

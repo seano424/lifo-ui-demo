@@ -38,7 +38,7 @@ export type TypographyProps = {
 
 const Typography = React.forwardRef<HTMLElement, TypographyProps>(
   ({ className, variant, color, asChild = false, as: CompProp, ...props }, ref) => {
-    const Comp = asChild ? Slot : CompProp || 'p'
+    const Comp = asChild ? Slot : CompProp || 'span'
     return (
       <Comp
         className={cn(typographyVariants({ variant, color, className }))}
