@@ -680,9 +680,9 @@ export default function ManualBarcodeEntry({
                             </SelectTrigger>
                             <SelectContent>
                               {categoriesLoading ? (
-                                <SelectItem value="" disabled>
+                                <div className="px-2 py-6 text-sm text-muted-foreground text-center">
                                   Loading categories...
-                                </SelectItem>
+                                </div>
                               ) : (
                                 getCategoriesForDropdown().map(
                                   (category: { value: string; label: string; code: string }) => (
