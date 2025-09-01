@@ -1,9 +1,10 @@
 // lib/queries/query-keys.ts
 /* eslint-disable prettier/prettier */
-import type { ProductFilters } from './products'
-import type { UserFilters } from './users'
+
 import type { BatchFilters } from './batches'
+import type { ProductFilters } from './products'
 import type { StoreUserFilters } from './store-users'
+import type { UserFilters } from './users'
 
 export const queryKeys = {
   // Store-related queries
@@ -186,17 +187,17 @@ export const queryKeys = {
   // FastAPI scoring and analytics queries
   fastapi: {
     all: ['fastapi'] as const,
-    
+
     // Scoring endpoints
     scoring: {
       all: ['fastapi', 'scoring'] as const,
-      alerts: (storeId: string, threshold?: number) => 
+      alerts: (storeId: string, threshold?: number) =>
         [...queryKeys.fastapi.scoring.all, 'alerts', storeId, threshold] as const,
       recommendations: (storeId: string, category?: string) =>
         [...queryKeys.fastapi.scoring.all, 'recommendations', storeId, category] as const,
     },
 
-    // Analytics endpoints  
+    // Analytics endpoints
     analytics: {
       all: ['fastapi', 'analytics'] as const,
       store: (storeId: string, timeframe?: string) =>
@@ -208,8 +209,7 @@ export const queryKeys = {
     // Mobile endpoints
     mobile: {
       all: ['fastapi', 'mobile'] as const,
-      summary: (storeId: string) =>
-        [...queryKeys.fastapi.mobile.all, 'summary', storeId] as const,
+      summary: (storeId: string) => [...queryKeys.fastapi.mobile.all, 'summary', storeId] as const,
     },
   },
 } as const

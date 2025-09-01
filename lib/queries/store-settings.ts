@@ -1,6 +1,6 @@
 // lib/queries/store-settings.ts - RPC VERSION (FINAL FIX)
 import { createClient } from '@/lib/supabase/client'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import type { createClient as createServerClient } from '@/lib/supabase/server'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -78,36 +78,32 @@ export async function fetchStoreSettings(
 ): Promise<StoreSettingsData> {
   const supabase = serverClient || createClient()
 
-  try {
-    // Use the RPC function to get store data
-    const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
-      store_id_param: storeId,
-    })
+  // Use the RPC function to get store data
+  const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
+    store_id_param: storeId,
+  })
 
-    if (storeError) {
-      console.error('❌ Store fetch error:', storeError)
-      throw new Error(`Failed to fetch store: ${storeError.message}`)
-    }
+  if (storeError) {
+    console.error('❌ Store fetch error:', storeError)
+    throw new Error(`Failed to fetch store: ${storeError.message}`)
+  }
 
-    // Still fetch store settings from business.store_settings if needed
-    const { data: settingsData, error: settingsError } = await supabase
-      .schema('business')
-      .from('store_settings')
-      .select('*')
-      .eq('store_id', storeId)
-      .single()
+  // Still fetch store settings from business.store_settings if needed
+  const { data: settingsData, error: settingsError } = await supabase
+    .schema('business')
+    .from('store_settings')
+    .select('*')
+    .eq('store_id', storeId)
+    .single()
 
-    // Settings might not exist yet, that's OK
-    if (settingsError && settingsError.code !== 'PGRST116') {
-      console.warn('⚠️ Failed to fetch store settings:', settingsError.message)
-    }
+  // Settings might not exist yet, that's OK
+  if (settingsError && settingsError.code !== 'PGRST116') {
+    console.warn('⚠️ Failed to fetch store settings:', settingsError.message)
+  }
 
-    return {
-      ...storeData,
-      settings: settingsData || undefined,
-    }
-  } catch (error) {
-    throw error
+  return {
+    ...storeData,
+    settings: settingsData || undefined,
   }
 }
 
@@ -119,36 +115,32 @@ export async function updateStoreBasicInfo(
 ): Promise<StoreBasicInfo> {
   const supabase = serverClient || createClient()
 
-  try {
-    // Use the RPC function to update store data
-    const { data, error } = await supabase.rpc('update_store_settings', {
-      store_id_param: storeId,
-      store_name_param: updates.store_name || null,
-      business_name_param: updates.business_name || null,
-      store_code_param: updates.store_code || null,
-      store_type_param: updates.store_type || null,
-      size_category_param: updates.size_category || null,
-      address_param: updates.address || null,
-      city_param: updates.city || null,
-      postal_code_param: updates.postal_code || null,
-      country_param: updates.country || null,
-      phone_param: updates.phone || null,
-      email_param: updates.email || null,
-      website_url_param: updates.website_url || null,
-      description_param: updates.description || null,
-      default_markup_percent_param: updates.default_markup_percent || null,
-      waste_reduction_target_percent_param: updates.waste_reduction_target_percent || null,
-    })
+  // Use the RPC function to update store data
+  const { data, error } = await supabase.rpc('update_store_settings', {
+    store_id_param: storeId,
+    store_name_param: updates.store_name || null,
+    business_name_param: updates.business_name || null,
+    store_code_param: updates.store_code || null,
+    store_type_param: updates.store_type || null,
+    size_category_param: updates.size_category || null,
+    address_param: updates.address || null,
+    city_param: updates.city || null,
+    postal_code_param: updates.postal_code || null,
+    country_param: updates.country || null,
+    phone_param: updates.phone || null,
+    email_param: updates.email || null,
+    website_url_param: updates.website_url || null,
+    description_param: updates.description || null,
+    default_markup_percent_param: updates.default_markup_percent || null,
+    waste_reduction_target_percent_param: updates.waste_reduction_target_percent || null,
+  })
 
-    if (error) {
-      console.error('❌ Store update error via RPC:', error)
-      throw new Error(`Failed to update store: ${error.message}`)
-    }
-
-    return data
-  } catch (error) {
-    throw error
+  if (error) {
+    console.error('❌ Store update error via RPC:', error)
+    throw new Error(`Failed to update store: ${error.message}`)
   }
+
+  return data
 }
 
 // Fallback: Direct table access for advanced settings
@@ -159,52 +151,48 @@ export async function updateStoreAdvancedSettings(
 ): Promise<StoreAdvancedSettings> {
   const supabase = serverClient || createClient()
 
-  try {
-    // First check if settings record exists
-    const { data: existingSettings } = await supabase
+  // First check if settings record exists
+  const { data: existingSettings } = await supabase
+    .schema('business')
+    .from('store_settings')
+    .select('store_id')
+    .eq('store_id', storeId)
+    .single()
+
+  let result: StoreAdvancedSettings
+  if (existingSettings) {
+    // Update existing settings
+    const { data, error } = await supabase
       .schema('business')
       .from('store_settings')
-      .select('store_id')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
       .eq('store_id', storeId)
+      .select()
       .single()
 
-    let result
-    if (existingSettings) {
-      // Update existing settings
-      const { data, error } = await supabase
-        .schema('business')
-        .from('store_settings')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('store_id', storeId)
-        .select()
-        .single()
+    if (error) throw new Error(`Failed to update settings: ${error.message}`)
+    result = data
+  } else {
+    // Create new settings record
+    const { data, error } = await supabase
+      .schema('business')
+      .from('store_settings')
+      .insert({
+        store_id: storeId,
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+      .single()
 
-      if (error) throw new Error(`Failed to update settings: ${error.message}`)
-      result = data
-    } else {
-      // Create new settings record
-      const { data, error } = await supabase
-        .schema('business')
-        .from('store_settings')
-        .insert({
-          store_id: storeId,
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single()
-
-      if (error) throw new Error(`Failed to create settings: ${error.message}`)
-      result = data
-    }
-
-    return result
-  } catch (error) {
-    throw error
+    if (error) throw new Error(`Failed to create settings: ${error.message}`)
+    result = data
   }
+
+  return result
 }
 
 // Debug function to test store access

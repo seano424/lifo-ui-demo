@@ -3,12 +3,11 @@
  * Connects to Slimane's OCR endpoints for expiration date extraction
  */
 
-import { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
+import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import { createClient } from '@/lib/supabase/client'
 
 // Environment variables
-const FASTAPI_URL =
-  process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8001'
+const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8001'
 
 /**
  * Get authentication headers for FastAPI requests
@@ -73,13 +72,10 @@ export interface OCRError {
 /**
  * Convert canvas to blob for API upload
  */
-export async function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  quality = 0.8
-): Promise<Blob> {
+export async function canvasToBlob(canvas: HTMLCanvasElement, quality = 0.8): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
-      (blob) => {
+      blob => {
         if (blob) {
           resolve(blob)
         } else {
@@ -87,7 +83,7 @@ export async function canvasToBlob(
         }
       },
       'image/jpeg',
-      quality
+      quality,
     )
   })
 }
@@ -101,7 +97,7 @@ export async function extractExpiryDate(
   options?: {
     confidenceThreshold?: number
     maxProcessingTimeMs?: number
-  }
+  },
 ): Promise<ExpiryDateInfo> {
   const startTime = Date.now()
 
@@ -111,34 +107,25 @@ export async function extractExpiryDate(
     formData.append('image', imageBlob, 'expiry-scan.jpg')
 
     if (options?.confidenceThreshold) {
-      formData.append(
-        'confidence_threshold',
-        options.confidenceThreshold.toString()
-      )
+      formData.append('confidence_threshold', options.confidenceThreshold.toString())
     }
 
     if (options?.maxProcessingTimeMs) {
-      formData.append(
-        'max_processing_time_ms',
-        options.maxProcessingTimeMs.toString()
-      )
+      formData.append('max_processing_time_ms', options.maxProcessingTimeMs.toString())
     }
 
     // Get auth headers
     const authHeaders = await getAuthHeaders()
 
     // Make API call
-    const response = await fetch(
-      `${FASTAPI_URL}/api/v1/ocr/scan/ocr-expiry/${storeId}`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...authHeaders,
-          // Don't set Content-Type - let browser set it with boundary for FormData
-        },
-      }
-    )
+    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/ocr-expiry/${storeId}`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...authHeaders,
+        // Don't set Content-Type - let browser set it with boundary for FormData
+      },
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -188,7 +175,7 @@ export async function performFullOCRAnalysis(
   options?: {
     confidenceThreshold?: number
     maxProcessingTimeMs?: number
-  }
+  },
 ): Promise<{
   expiryDateInfo: ExpiryDateInfo
   additionalData: {
@@ -211,33 +198,24 @@ export async function performFullOCRAnalysis(
     formData.append('image', imageBlob, 'full-ocr-scan.jpg')
 
     if (options?.confidenceThreshold) {
-      formData.append(
-        'confidence_threshold',
-        options.confidenceThreshold.toString()
-      )
+      formData.append('confidence_threshold', options.confidenceThreshold.toString())
     }
 
     if (options?.maxProcessingTimeMs) {
-      formData.append(
-        'max_processing_time_ms',
-        options.maxProcessingTimeMs.toString()
-      )
+      formData.append('max_processing_time_ms', options.maxProcessingTimeMs.toString())
     }
 
     // Get auth headers
     const authHeaders = await getAuthHeaders()
 
     // Make API call
-    const response = await fetch(
-      `${FASTAPI_URL}/api/v1/ocr/scan/full-ocr/${storeId}`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...authHeaders,
-        },
-      }
-    )
+    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/full-ocr/${storeId}`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...authHeaders,
+      },
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -296,7 +274,7 @@ export async function performFullOCRAnalysis(
 export async function extractTextOnly(
   imageBlob: Blob,
   storeId: string,
-  confidenceThreshold = 0.6
+  confidenceThreshold = 0.6,
 ): Promise<{
   textBlocks: string[]
   suggestedName?: string
@@ -312,16 +290,13 @@ export async function extractTextOnly(
     // Get auth headers
     const authHeaders = await getAuthHeaders()
 
-    const response = await fetch(
-      `${FASTAPI_URL}/api/v1/ocr/scan/text-extraction/${storeId}`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          ...authHeaders,
-        },
-      }
-    )
+    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/text-extraction/${storeId}`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...authHeaders,
+      },
+    })
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -347,7 +322,7 @@ export async function extractTextOnly(
  */
 export async function captureImageFromVideo(
   videoElement: HTMLVideoElement,
-  quality = 0.8
+  quality = 0.8,
 ): Promise<Blob> {
   // Create canvas with video dimensions
   const canvas = document.createElement('canvas')

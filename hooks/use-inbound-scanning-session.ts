@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
-import { type ScannedItem } from '@/components/scanning/shared'
+import type { ScannedItem } from '@/components/scanning/shared'
 
 interface InboundScanningSession {
   items: ScannedItem[]
@@ -21,11 +21,11 @@ function getStoredSession(): InboundScanningSession | null {
   try {
     const stored = localStorage.getItem(SESSION_KEY)
     if (!stored) return null
-    
+
     const session = JSON.parse(stored)
     // Check if session is less than 24 hours old
     const isValid = Date.now() - session.timestamp < 24 * 60 * 60 * 1000
-    
+
     return isValid ? session : null
   } catch {
     return null
@@ -60,12 +60,12 @@ function clearStoredSession(): void {
 export function useInboundScanningSession(storeId?: string) {
   const [session, setSession] = useState<InboundScanningSession>(() => {
     const stored = getStoredSession()
-    
+
     // If we have a stored session for the same store, use it
     if (stored && (!storeId || stored.storeId === storeId)) {
       return stored
     }
-    
+
     // Otherwise start fresh
     return {
       items: [],
@@ -79,7 +79,7 @@ export function useInboundScanningSession(storeId?: string) {
     if (storeId && session.storeId !== storeId) {
       // Check if there's a stored session for this store
       const stored = getStoredSession()
-      
+
       if (stored && stored.storeId === storeId) {
         setSession(stored)
       } else {
@@ -131,9 +131,7 @@ export function useInboundScanningSession(storeId?: string) {
     setSession(prev => {
       const newSession = {
         ...prev,
-        items: prev.items.map(item => 
-          item.id === updatedItem.id ? updatedItem : item
-        ),
+        items: prev.items.map(item => (item.id === updatedItem.id ? updatedItem : item)),
         timestamp: Date.now(),
       }
       return newSession
@@ -165,18 +163,18 @@ export function useInboundScanningSession(storeId?: string) {
     storeId: session.storeId,
     hasItems: session.items.length > 0,
     itemCount: session.items.length,
-    
+
     // Actions
     addItem,
     removeItem,
     updateItem,
     clearItems,
     clearSession,
-    
+
     // Helper methods
     getItem: (itemId: string) => session.items.find(item => item.id === itemId),
     getTotalQuantity: () => session.items.reduce((sum, item) => sum + item.quantity, 0),
-    getTotalValue: () => session.items.reduce((sum, item) => sum + (item.quantity * item.price), 0),
+    getTotalValue: () => session.items.reduce((sum, item) => sum + item.quantity * item.price, 0),
   }
 }
 
@@ -185,7 +183,7 @@ export function useInboundScanningSession(storeId?: string) {
  */
 export function useInboundScanningSessionObserver(storeId?: string) {
   const session = useInboundScanningSession(storeId)
-  
+
   return {
     items: session.items,
     hasItems: session.hasItems,

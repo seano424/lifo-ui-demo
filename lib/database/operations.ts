@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Database } from '@/types/supabase'
-import { SupabaseClient } from '@supabase/supabase-js'
+
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 type Store = Database['business']['Tables']['stores']['Row']
 type Batch = Database['inventory']['Tables']['batches']['Row']
@@ -37,7 +38,7 @@ export class InventoryOperations {
       if (error) {
         console.error('[InventoryOperations.validateStoreAccess] RPC error:', error)
         console.log('[InventoryOperations.validateStoreAccess] Falling back to direct query...')
-        
+
         // Fallback: Check directly in store_users table
         const { data: storeUsers, error: queryError } = await this.supabase
           .schema('business')
@@ -49,8 +50,11 @@ export class InventoryOperations {
           .single()
 
         if (queryError) {
-          console.error('[InventoryOperations.validateStoreAccess] Fallback query error:', queryError)
-          
+          console.error(
+            '[InventoryOperations.validateStoreAccess] Fallback query error:',
+            queryError,
+          )
+
           // Final fallback: Check if user is store owner
           const { data: store, error: storeError } = await this.supabase
             .schema('business')
@@ -60,7 +64,10 @@ export class InventoryOperations {
             .single()
 
           if (storeError) {
-            console.error('[InventoryOperations.validateStoreAccess] Store owner check error:', storeError)
+            console.error(
+              '[InventoryOperations.validateStoreAccess] Store owner check error:',
+              storeError,
+            )
             return false
           }
 
@@ -68,24 +75,27 @@ export class InventoryOperations {
           console.log('[InventoryOperations.validateStoreAccess] Owner check result:', {
             isOwner,
             storeOwnerId: store?.owner_id,
-            userId
+            userId,
           })
-          
+
           return isOwner
         }
 
         const hasAccess = !!storeUsers
         console.log('[InventoryOperations.validateStoreAccess] Fallback result:', {
           hasAccess,
-          userRole: storeUsers ? (storeUsers as any).role : undefined
+          userRole:
+            storeUsers && typeof storeUsers === 'object' && 'role' in storeUsers
+              ? (storeUsers as { role: unknown }).role
+              : undefined,
         })
-        
+
         return hasAccess
       }
 
       console.log('[InventoryOperations.validateStoreAccess] RPC result:', {
         data,
-        hasAccess: !!data
+        hasAccess: !!data,
       })
 
       return data || false
@@ -119,7 +129,7 @@ export class InventoryOperations {
     }
   }
 
-  async createStore(storeData: Partial<Store>, ownerId: string): Promise<Store> {
+  async createStore(storeData: Partial<Store>, _ownerId: string): Promise<Store> {
     try {
       // Use the database function to create the store
       const { data, error } = await this.supabase.schema('business').rpc('create_store_for_user', {
@@ -342,7 +352,7 @@ export class InventoryOperations {
     return { data: data || [], count: count || 0 }
   }
 
-  async createBatchWithGlobalProduct(batchData: {
+  async createBatchWithGlobalProduct(_batchData: {
     global_product_id: string
     store_id: string
     batch_number: string
@@ -779,8 +789,8 @@ export class InventoryOperations {
         processed: insertResult?.inserted_count || 0,
         errors: [],
         duplicates_skipped: duplicateResults
-          .filter((dup, index) => dup?.is_duplicate)
-          .map((dup, index) => ({
+          .filter((dup, _index) => dup?.is_duplicate)
+          .map((_dup, index) => ({
             sku: csvItems[index]?.SKU || '',
             product_name: csvItems[index]?.Product_Name || '',
             expiry_date: csvItems[index]?.Expiry_Date || '',
@@ -1001,33 +1011,15 @@ export class InventoryOperations {
     return { processed, errors, duplicates_skipped: [] }
   }
 
-  // TODO: Replace with database lookup using inventory.categories table
-  private calculateShelfLifeFromCategory(category?: string): number {
-    const categoryLifeMap: Record<string, number> = {
-      fresh_produce: 7,
-      dairy: 14,
-      bakery: 3,
-      meat: 5,
-      fish: 3,
-      frozen: 90,
-      packaged: 365,
-      beverages: 180,
-      snacks: 180,
-      other: 30,
-    }
-
-    return categoryLifeMap[category?.toLowerCase() || 'other'] || 30
-  }
-
-  async getStoreInventoryAlerts(storeId: string, threshold: number = 0.6): Promise<unknown[]> {
+  async getStoreInventoryAlerts(_storeId: string, _threshold: number = 0.6): Promise<unknown[]> {
     // TODO: Re-enable when scoring system is ready
     console.warn('Inventory alerts functionality temporarily disabled')
     return []
   }
 
   async getStoreInventory(
-    storeId: string,
-    options: {
+    _storeId: string,
+    _options: {
       page?: number
       limit?: number
       category?: string
@@ -1039,35 +1031,20 @@ export class InventoryOperations {
     return { data: [], count: 0 }
   }
 
-  async updateBatchQuantity(batchId: string, newQuantity: number, userId: string): Promise<void> {
+  async updateBatchQuantity(
+    _batchId: string,
+    _newQuantity: number,
+    _userId: string,
+  ): Promise<void> {
     // TODO: Re-enable when inventory system is ready
     console.warn('Inventory functionality temporarily disabled')
     throw new Error('Inventory functionality temporarily disabled')
   }
 
-  async applyDiscount(batchId: string, discountPercent: number, userId: string): Promise<void> {
+  async applyDiscount(_batchId: string, _discountPercent: number, _userId: string): Promise<void> {
     // TODO: Re-enable when inventory system is ready
     console.warn('Inventory functionality temporarily disabled')
     throw new Error('Inventory functionality temporarily disabled')
-  }
-
-  private calculateShelfLife(category: string): number {
-    const shelfLifeMap: Record<string, number> = {
-      fresh_produce: 3,
-      fresh_meat_fish: 2,
-      bakery_fresh: 2,
-      dairy: 7,
-      deli_prepared: 3,
-      frozen: 90,
-      chilled_packaged: 14,
-      pantry_staples: 365,
-      canned_jarred: 730,
-      dry_goods: 180,
-      beverages: 365,
-      spices_condiments: 730,
-    }
-
-    return shelfLifeMap[category] || 30
   }
 
   async getStoreStats(storeId: string): Promise<{
@@ -1115,17 +1092,19 @@ export class InventoryOperations {
       }
 
       // Calculate total value
-      const totalValue = batches?.reduce((sum, batch) => {
-        return sum + (batch.current_quantity || 0) * (batch.selling_price || 0)
-      }, 0) || 0
+      const totalValue =
+        batches?.reduce((sum, batch) => {
+          return sum + (batch.current_quantity || 0) * (batch.selling_price || 0)
+        }, 0) || 0
 
       // Calculate expiring items (expiring within 3 days)
       const threeDaysFromNow = new Date()
       threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
-      const expiringItems = batches?.filter(batch => {
-        const expiryDate = new Date(batch.expiry_date)
-        return expiryDate <= threeDaysFromNow
-      }).length || 0
+      const expiringItems =
+        batches?.filter(batch => {
+          const expiryDate = new Date(batch.expiry_date)
+          return expiryDate <= threeDaysFromNow
+        }).length || 0
 
       // Get high urgency items from scoring schema (for activeAlerts)
       const { data: urgentItems, error: urgentError } = await this.supabase

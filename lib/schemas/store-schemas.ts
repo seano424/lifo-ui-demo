@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase'
 
 // Get the allowed store types from your database schema check constraint
 type StoreType = Database['business']['Enums']['store_type_enum']

@@ -4,11 +4,10 @@
  * Follows established patterns for React Query integration
  */
 
-import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/supabase'
-import { BATCH_SOURCES } from '@/types/inventory'
-import { Json } from '@/types/supabase'
 import { scoreAfterScanInClient } from '@/lib/scoring/client-scoring-integration'
+import { createClient } from '@/lib/supabase/client'
+import { BATCH_SOURCES } from '@/types/inventory'
+import type { Database, Json } from '@/types/supabase'
 
 export interface ScannedProductData {
   barcode: string
@@ -80,8 +79,11 @@ export async function submitScannedProductToInventory(
     console.log('[submitScannedProductToInventory] Batch created:', batch.batch_id)
 
     // Step 4: Automatic scoring integration (if enabled)
-    console.log('[submitScannedProductToInventory] Starting client-side scoring for batch:', batch.batch_id)
-    
+    console.log(
+      '[submitScannedProductToInventory] Starting client-side scoring for batch:',
+      batch.batch_id,
+    )
+
     const scoringInfo = await scoreAfterScanInClient(productData.storeId, batch.batch_id)
 
     return {
@@ -117,12 +119,12 @@ async function upsertGlobalProduct(
   try {
     // First, try to find existing product by barcode
     if (productData.barcode) {
-      const { data: existingProduct, error: lookupError } = await supabase
+      const { data: existingProduct } = await supabase
         .schema('inventory')
         .from('products')
         .select('*')
         .eq('barcode', productData.barcode)
-        .maybeSingle()  // Use maybeSingle() instead of single() to avoid 406 errors
+        .maybeSingle() // Use maybeSingle() instead of single() to avoid 406 errors
 
       if (existingProduct) {
         console.log(
@@ -186,8 +188,8 @@ async function upsertGlobalProduct(
     const newProductData: Database['inventory']['Tables']['products']['Insert'] = {
       name: productData.productName,
       brand: productData.brand || null,
-      category_id: productData.category ? 
-        await mapCategoryToId(productData.category, supabase)
+      category_id: productData.category
+        ? await mapCategoryToId(productData.category, supabase)
         : null,
       barcode: productData.barcode || null,
       description: null,
@@ -235,13 +237,13 @@ async function upsertStoreProduct(
 
   try {
     // Check if store-product association already exists
-    const { data: existingStoreProduct, error: lookupError } = await supabase
+    const { data: existingStoreProduct } = await supabase
       .schema('inventory')
       .from('store_products')
       .select('*')
       .eq('store_id', productData.storeId)
       .eq('product_id', productId)
-      .maybeSingle()  // Use maybeSingle() instead of single() to avoid 406 errors
+      .maybeSingle() // Use maybeSingle() instead of single() to avoid 406 errors
 
     if (existingStoreProduct) {
       console.log('[upsertStoreProduct] Store product association already exists')
@@ -404,7 +406,10 @@ async function createProductBatch(
  * Helper: Map category string to category_id
  * Replaces the missing map_legacy_category RPC function
  */
-async function mapCategoryToId(categoryName: string, supabase: any): Promise<string | null> {
+async function mapCategoryToId(
+  categoryName: string,
+  supabase: ReturnType<typeof createClient>,
+): Promise<string | null> {
   try {
     const { data: category } = await supabase
       .schema('inventory')

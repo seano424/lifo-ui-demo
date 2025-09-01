@@ -1,4 +1,3 @@
-import React from 'react'
 import { Badge } from '@/components/ui/badge'
 
 export const getStatusBadge = (status: string, tStatus: (key: string) => string) => {

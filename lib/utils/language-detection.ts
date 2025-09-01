@@ -1,18 +1,18 @@
 export function detectBrowserLanguage(): string {
   if (typeof window === 'undefined') return 'fr'
-  
+
   const browserLang = navigator.language || navigator.languages?.[0]
-  
+
   // Extract language code (e.g., 'en-US' -> 'en')
   const langCode = browserLang?.split('-')[0] || 'fr'
-  
+
   // Return supported language or default to French
   return ['en', 'fr'].includes(langCode) ? langCode : 'fr'
 }
 
 export function detectTimezone(): string {
   if (typeof window === 'undefined') return 'Europe/Paris'
-  
+
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone
   } catch {
@@ -34,6 +34,6 @@ export function getLanguageFromTimezone(timezone: string): string {
     'Africa/Casablanca': 'fr',
     'America/Montreal': 'fr',
   }
-  
+
   return timezoneToLanguage[timezone] || 'fr'
 }

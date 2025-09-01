@@ -1,30 +1,17 @@
 'use client'
 
-import {
-  AlertCircle,
-  Check,
-  Package,
-  Plus,
-  RefreshCcw,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, Check, Package, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import {
   InventoryForm,
   type InventoryFormData,
-  ScannedItemsList,
   type ScannedItem,
+  ScannedItemsList,
 } from '@/components/scanning/shared'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -33,17 +20,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  useInventoryActions,
-  useScannedItemConverter,
-} from '@/hooks/use-inventory-submission'
-import { useInboundScanningSession } from '@/hooks/use-inbound-scanning-session'
-import { useStoreState } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
+import { useInboundScanningSession } from '@/hooks/use-inbound-scanning-session'
+import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
+import type { InventorySubmissionResult } from '@/lib/queries/inventory'
+import { useStoreState } from '@/lib/stores/store-context'
+
+interface ProductData {
+  barcode: string
+  productName: string
+  brand: string
+  category: string
+  imageUrl: string
+  isManualEntry: boolean
+  lookupResult?: unknown
+  productId?: string
+}
 
 interface ManualInboundEntryProps {
   storeId?: string
-  onBatchSubmitted?: (result: any) => void
+  onBatchSubmitted?: (result: InventorySubmissionResult[]) => void
   className?: string
 }
 
@@ -64,8 +60,7 @@ export default function ManualInboundEntry({
   const storeId = propStoreId || activeStore?.store_id
 
   // Product selection state
-  const [selectedProduct, setSelectedProduct] =
-    useState<SelectedProduct | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<SelectedProduct | null>(null)
 
   // Form data for current item
   const [inventoryData, setInventoryData] = useState<InventoryFormData>({
@@ -96,7 +91,7 @@ export default function ManualInboundEntry({
   const { convertMultipleScannedItems } = useScannedItemConverter()
 
   // Handle product selection from ManualBarcodeEntry
-  const handleProductSelected = (barcode: string, productData: any) => {
+  const handleProductSelected = (barcode: string, productData: ProductData) => {
     setSelectedProduct({
       barcode,
       productName: productData.productName,
@@ -170,25 +165,25 @@ export default function ManualInboundEntry({
     }
 
     const productsToSubmit = convertMultipleScannedItems(
-      scannedItems.map((item) => ({
+      scannedItems.map(item => ({
         barcode: item.barcode,
         productName: item.productName,
         brand: item.brand,
         expiryDate: item.expiryDate,
         quantity: item.quantity,
         price: item.price,
-      }))
+      })),
     )
 
     submitBatch(
-      productsToSubmit.map((product) => ({
+      productsToSubmit.map(product => ({
         ...product,
         storeId: storeId,
         ocrExtractedDate: new Date().toISOString(),
         ocrConfidence: 1,
       })),
       {
-        onSuccess: (result) => {
+        onSuccess: result => {
           setSubmissionResult({
             successCount: result.successCount,
             totalCount: productsToSubmit.length,
@@ -199,12 +194,12 @@ export default function ManualInboundEntry({
           setShowSubmissionDialog(false)
           setShowSuccessDialog(true)
 
-          onBatchSubmitted?.(result)
+          onBatchSubmitted?.(result.results)
         },
-        onError: (error) => {
+        onError: error => {
           console.error('Batch submission failed:', error)
         },
-      }
+      },
     )
   }
 
@@ -213,7 +208,7 @@ export default function ManualInboundEntry({
   // Helper function to format date consistently
   const formatExpiryDate = (dateString: string) => {
     // Ensure we treat the date as local time to avoid timezone shifts
-    const date = new Date(dateString + 'T00:00:00')
+    const date = new Date(`${dateString}T00:00:00`)
     return date.toLocaleDateString()
   }
 
@@ -300,11 +295,7 @@ export default function ManualInboundEntry({
                   <Plus className="w-5 h-5 mr-2" />
                   Add Batch
                 </Button>
-                <Button
-                  onClick={handleClearSelection}
-                  variant="outline"
-                  size="lg"
-                >
+                <Button onClick={handleClearSelection} variant="outline" size="lg">
                   Clear
                 </Button>
               </div>
@@ -348,18 +339,14 @@ export default function ManualInboundEntry({
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Start by searching for a product using the barcode or product name
-            search above. After selecting a product, you'll be able to add
-            expiry date, quantity, and price.
+            Start by searching for a product using the barcode or product name search above. After
+            selecting a product, you'll be able to add expiry date, quantity, and price.
           </AlertDescription>
         </Alert>
       )}
 
       {/* Submission Confirmation Dialog */}
-      <Dialog
-        open={showSubmissionDialog}
-        onOpenChange={setShowSubmissionDialog}
-      >
+      <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Confirm Submission</DialogTitle>
@@ -375,7 +362,7 @@ export default function ManualInboundEntry({
             </Typography>
 
             <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
-              {scannedItems.map((item) => {
+              {scannedItems.map(item => {
                 const totalValue = item.quantity * item.price
                 return (
                   <div
@@ -384,9 +371,7 @@ export default function ManualInboundEntry({
                   >
                     <div className="flex-1">
                       <Typography variant="p">{item.productName}</Typography>
-                      {item.brand && (
-                        <Typography variant="p">{item.brand}</Typography>
-                      )}
+                      {item.brand && <Typography variant="p">{item.brand}</Typography>}
                       <Typography variant="p">
                         Expires: {formatExpiryDate(item.expiryDate)}
                       </Typography>
@@ -395,9 +380,7 @@ export default function ManualInboundEntry({
                       <Typography variant="p">
                         {item.quantity}x {formatPrice(item.price)}
                       </Typography>
-                      <Typography variant="p">
-                        Total: {formatPrice(totalValue)}
-                      </Typography>
+                      <Typography variant="p">Total: {formatPrice(totalValue)}</Typography>
                     </div>
                   </div>
                 )
@@ -407,18 +390,13 @@ export default function ManualInboundEntry({
             <div className="border-t pt-3">
               <div className="flex justify-between items-center font-medium">
                 <span>Total Items:</span>
-                <span>
-                  {scannedItems.reduce((sum, item) => sum + item.quantity, 0)}
-                </span>
+                <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
               </div>
               <div className="flex justify-between items-center font-medium">
                 <span>Total Value:</span>
                 <span>
                   {formatPrice(
-                    scannedItems.reduce(
-                      (sum, item) => sum + item.quantity * item.price,
-                      0
-                    )
+                    scannedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
                   )}
                 </span>
               </div>
@@ -447,10 +425,7 @@ export default function ManualInboundEntry({
 
       {/* Success Dialog */}
       {showSuccessDialog && submissionResult && (
-        <Dialog
-          open={showSuccessDialog}
-          onOpenChange={setShowSuccessDialog}
-        >
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">

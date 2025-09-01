@@ -39,12 +39,7 @@ CardTitle.displayName = 'CardTitle'
 
 const CardDescription = React.forwardRef<HTMLElement, Omit<TypographyProps, 'variant'>>(
   ({ className, ...props }, ref) => (
-    <Typography
-      variant="muted"
-      ref={ref}
-      className={className}
-      {...props}
-    />
+    <Typography variant="muted" ref={ref} className={className} {...props} />
   ),
 )
 CardDescription.displayName = 'CardDescription'
