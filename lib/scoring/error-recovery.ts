@@ -33,7 +33,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 export async function retryWithBackoff<T>(
   operation: () => Promise<T>,
   config: Partial<RetryConfig> = {},
-  context: { storeId: string; operation: string } = { storeId: 'unknown', operation: 'scoring' }
+  context: { storeId: string; operation: string } = { storeId: 'unknown', operation: 'scoring' },
 ): Promise<T> {
   const finalConfig = { ...DEFAULT_RETRY_CONFIG, ...config }
   let lastError: Error | null = null
@@ -41,17 +41,17 @@ export async function retryWithBackoff<T>(
   for (let attempt = 1; attempt <= finalConfig.maxAttempts; attempt++) {
     try {
       const result = await operation()
-      
+
       // Success - reset circuit breaker if it was open
       if (circuitBreakers.has(context.storeId)) {
         circuitBreakers.delete(context.storeId)
         console.log(`[ERROR-RECOVERY] Circuit breaker reset for store ${context.storeId}`)
       }
-      
+
       return result
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error')
-      
+
       console.warn(`[ERROR-RECOVERY] Attempt ${attempt}/${finalConfig.maxAttempts} failed:`, {
         storeId: context.storeId,
         operation: context.operation,
@@ -66,10 +66,10 @@ export async function retryWithBackoff<T>(
 
       // Calculate delay with exponential backoff
       const delay = Math.min(
-        finalConfig.initialDelay * Math.pow(finalConfig.backoffMultiplier, attempt - 1),
-        finalConfig.maxDelay
+        finalConfig.initialDelay * finalConfig.backoffMultiplier ** (attempt - 1),
+        finalConfig.maxDelay,
       )
-      
+
       console.log(`[ERROR-RECOVERY] Retrying in ${delay}ms...`)
       await new Promise(resolve => setTimeout(resolve, delay))
     }
@@ -85,7 +85,7 @@ export async function retryWithBackoff<T>(
  */
 function updateCircuitBreaker(storeId: string, error: Error): void {
   const now = Date.now()
-  let state = circuitBreakers.get(storeId) || {
+  const state = circuitBreakers.get(storeId) || {
     isOpen: false,
     failureCount: 0,
     lastFailureTime: 0,
@@ -98,8 +98,8 @@ function updateCircuitBreaker(storeId: string, error: Error): void {
   // Open circuit breaker after 3 consecutive failures
   if (state.failureCount >= 3) {
     state.isOpen = true
-    state.nextRetryTime = now + (5 * 60 * 1000) // 5 minutes
-    
+    state.nextRetryTime = now + 5 * 60 * 1000 // 5 minutes
+
     console.error(`[ERROR-RECOVERY] Circuit breaker OPENED for store ${storeId}`, {
       failureCount: state.failureCount,
       nextRetryTime: new Date(state.nextRetryTime).toISOString(),
@@ -120,7 +120,7 @@ export function isCircuitBreakerOpen(storeId: string): boolean {
   }
 
   const now = Date.now()
-  
+
   // Try to close circuit breaker after timeout
   if (now >= state.nextRetryTime) {
     console.log(`[ERROR-RECOVERY] Circuit breaker attempting to close for store ${storeId}`)
@@ -138,7 +138,7 @@ export function isCircuitBreakerOpen(storeId: string): boolean {
  */
 export enum ScoringErrorType {
   NETWORK_ERROR = 'network',
-  TIMEOUT = 'timeout', 
+  TIMEOUT = 'timeout',
   AUTHENTICATION = 'auth',
   RATE_LIMIT = 'rate_limit',
   SERVER_ERROR = 'server_error',
@@ -146,41 +146,54 @@ export enum ScoringErrorType {
   UNKNOWN = 'unknown',
 }
 
-export function classifyError(error: any): ScoringErrorType {
-  const message = error?.message?.toLowerCase() || ''
-  const details = error?.details?.toLowerCase() || ''
-  
+export function classifyError(error: unknown): ScoringErrorType {
+  const message =
+    error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+      ? error.message.toLowerCase()
+      : ''
+  const details =
+    error && typeof error === 'object' && 'details' in error && typeof error.details === 'string'
+      ? error.details.toLowerCase()
+      : ''
+
   if (message.includes('timeout') || message.includes('abort')) {
     return ScoringErrorType.TIMEOUT
   }
-  
-  if (message.includes('network') || message.includes('fetch') || message.includes('econnrefused')) {
+
+  if (
+    message.includes('network') ||
+    message.includes('fetch') ||
+    message.includes('econnrefused')
+  ) {
     return ScoringErrorType.NETWORK_ERROR
   }
-  
+
   if (message.includes('auth') || details.includes('unauthorized') || details.includes('401')) {
     return ScoringErrorType.AUTHENTICATION
   }
-  
+
   if (details.includes('429') || message.includes('rate limit')) {
     return ScoringErrorType.RATE_LIMIT
   }
-  
+
   if (details.includes('503') || details.includes('502') || details.includes('504')) {
     return ScoringErrorType.SERVICE_UNAVAILABLE
   }
-  
+
   if (details.includes('500') || details.includes('internal server')) {
     return ScoringErrorType.SERVER_ERROR
   }
-  
+
   return ScoringErrorType.UNKNOWN
 }
 
 /**
  * Determine retry strategy based on error type
  */
-export function getRetryConfig(errorType: ScoringErrorType, operation: 'csv_upload' | 'scan_in'): RetryConfig {
+export function getRetryConfig(
+  errorType: ScoringErrorType,
+  operation: 'csv_upload' | 'scan_in',
+): RetryConfig {
   const baseConfig = {
     csv_upload: {
       maxAttempts: 2, // Less aggressive for bulk operations
@@ -207,26 +220,26 @@ export function getRetryConfig(errorType: ScoringErrorType, operation: 'csv_uplo
         initialDelay: 5000, // Longer delay for rate limits
         maxDelay: 20000,
       }
-      
+
     case ScoringErrorType.TIMEOUT:
       return {
         ...config,
         maxAttempts: 2, // Fewer retries for timeouts
         initialDelay: 3000,
       }
-      
+
     case ScoringErrorType.AUTHENTICATION:
       return {
         ...config,
         maxAttempts: 1, // Don't retry auth errors
       }
-      
+
     case ScoringErrorType.SERVICE_UNAVAILABLE:
       return {
         ...config,
         maxAttempts: 1, // Don't hammer unavailable service
       }
-      
+
     default:
       return config
   }
@@ -235,30 +248,34 @@ export function getRetryConfig(errorType: ScoringErrorType, operation: 'csv_uplo
 /**
  * Generate user-friendly error messages
  */
-export function generateUserMessage(errorType: ScoringErrorType, operation: 'csv_upload' | 'scan_in'): string {
-  const baseMessage = operation === 'csv_upload' 
-    ? 'CSV upload completed successfully.' 
-    : 'Product added successfully.'
+export function generateUserMessage(
+  errorType: ScoringErrorType,
+  operation: 'csv_upload' | 'scan_in',
+): string {
+  const baseMessage =
+    operation === 'csv_upload'
+      ? 'CSV upload completed successfully.'
+      : 'Product added successfully.'
 
   switch (errorType) {
     case ScoringErrorType.TIMEOUT:
       return `${baseMessage} Scoring is taking longer than usual and will complete in the background.`
-      
+
     case ScoringErrorType.RATE_LIMIT:
       return `${baseMessage} Scoring is temporarily rate-limited and will retry automatically.`
-      
+
     case ScoringErrorType.AUTHENTICATION:
       return `${baseMessage} Please refresh the page to re-authenticate for scoring.`
-      
+
     case ScoringErrorType.SERVICE_UNAVAILABLE:
       return `${baseMessage} Scoring service is temporarily unavailable.`
-      
+
     case ScoringErrorType.NETWORK_ERROR:
       return `${baseMessage} Network connectivity affected scoring, will retry automatically.`
-      
+
     case ScoringErrorType.SERVER_ERROR:
       return `${baseMessage} Scoring encountered a server error and will retry automatically.`
-      
+
     default:
       return `${baseMessage} Scoring temporarily unavailable, will be calculated when service is restored.`
   }
@@ -285,7 +302,7 @@ const MAX_METRICS = 1000 // Keep last 1000 operations
 export function recordScoringMetrics(metrics: ScoringMetrics): void {
   metrics.timestamp = new Date().toISOString()
   scoringMetrics.push(metrics)
-  
+
   // Keep only recent metrics
   if (scoringMetrics.length > MAX_METRICS) {
     scoringMetrics.splice(0, scoringMetrics.length - MAX_METRICS)
@@ -323,22 +340,24 @@ export function getScoringHealthMetrics(): {
 } {
   const recent = scoringMetrics.slice(-100) // Last 100 operations
   const successful = recent.filter(m => m.success)
-  
-  const errorsByType: Record<string, number> = {}
-  recent.filter(m => !m.success).forEach(m => {
-    const type = m.errorType || ScoringErrorType.UNKNOWN
-    errorsByType[type] = (errorsByType[type] || 0) + 1
-  })
 
-  const openCircuitBreakers = Array.from(circuitBreakers.values())
-    .filter(state => state.isOpen).length
+  const errorsByType: Record<string, number> = {}
+  recent
+    .filter(m => !m.success)
+    .forEach(m => {
+      const type = m.errorType || ScoringErrorType.UNKNOWN
+      errorsByType[type] = (errorsByType[type] || 0) + 1
+    })
+
+  const openCircuitBreakers = Array.from(circuitBreakers.values()).filter(
+    state => state.isOpen,
+  ).length
 
   return {
     totalOperations: recent.length,
     successRate: recent.length > 0 ? successful.length / recent.length : 0,
-    avgDuration: recent.length > 0 
-      ? recent.reduce((sum, m) => sum + m.totalDuration, 0) / recent.length 
-      : 0,
+    avgDuration:
+      recent.length > 0 ? recent.reduce((sum, m) => sum + m.totalDuration, 0) / recent.length : 0,
     errorsByType,
     circuitBreakersOpen: openCircuitBreakers,
   }

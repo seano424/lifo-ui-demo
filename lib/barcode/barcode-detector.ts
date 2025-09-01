@@ -1,5 +1,5 @@
 // lib/barcode/barcode-detector.ts
-import { BarcodeDetection } from '@/components/barcode/barcode-scanner'
+import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 
 // Define a more flexible type that matches the actual library
 type BarcodeFormat = string

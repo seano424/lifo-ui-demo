@@ -56,7 +56,7 @@ export const getDefaultLanguage = (): SupportedLanguage => 'en'
 export const isValidPhoneNumber = (phone: string): boolean => {
   if (!phone || phone.trim() === '') return true // Allow empty
   // Basic international phone number validation
-  return /^[\+]?[0-9\s\-\(\)\.]+$/.test(phone)
+  return /^[+]?[0-9\s\-().]+$/.test(phone)
 }
 
 export const formatPhoneNumber = (phone: string | null | undefined): string => {

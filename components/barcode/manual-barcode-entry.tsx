@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle, ArrowRight, Check, Loader2, Package, Search } from 'lucide-react'
+import { AlertCircle, ArrowRight, Check, Keyboard, Loader2, Package, Search } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,7 @@ import type { OpenFoodFactsSearchResult, ProductLookupResult } from '@/lib/queri
 import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
+import { Label } from '../ui/label'
 
 interface ProductData {
   barcode: string
@@ -226,8 +227,8 @@ export default function ManualBarcodeEntry({
         <CardHeader>
           <div className="flex justify-between">
             <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
-              {mode === 'outbound' ? 'Manual Product Search' : 'Manual Product Entry'}
+              <Keyboard className="w-5 h-5" />
+              {mode === 'outbound' ? 'Manual Search' : 'Manual Entry'}
             </CardTitle>
           </div>
         </CardHeader>
@@ -288,7 +289,7 @@ export default function ManualBarcodeEntry({
               <div className="space-y-4">
                 {/* Barcode Lookup */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Search by Barcode</label>
+                  <Label>Search by Barcode</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       type="text"
@@ -326,12 +327,12 @@ export default function ManualBarcodeEntry({
 
                 {/* Product Name Search */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <Label>
                     Or Search by Product Name
                     {mode === 'outbound' && (
                       <span className="text-xs text-gray-500 ml-2">(In-stock items only)</span>
                     )}
-                  </label>
+                  </Label>
                   <div className="relative">
                     <Input
                       type="text"
@@ -603,7 +604,7 @@ export default function ManualBarcodeEntry({
                       </CardContent>
                     </Card>
                   ) : (
-                    <Alert variant="destructive">
+                    <Alert variant="primary">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
                         Product not found in database. You can add it manually below.
@@ -624,7 +625,7 @@ export default function ManualBarcodeEntry({
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
-                        <label className="block text-xs font-medium mb-1">Barcode *</label>
+                        <Label>Barcode *</Label>
                         <Input
                           value={barcode}
                           onChange={e => setBarcode(e.target.value)}
@@ -635,7 +636,7 @@ export default function ManualBarcodeEntry({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium mb-1">Product Name *</label>
+                        <Label>Product Name *</Label>
                         <Input
                           value={manualProductData.productName}
                           onChange={e =>
@@ -651,7 +652,7 @@ export default function ManualBarcodeEntry({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-xs font-medium mb-1">Brand</label>
+                          <Label>Brand</Label>
                           <Input
                             value={manualProductData.brand}
                             onChange={e =>
@@ -665,7 +666,7 @@ export default function ManualBarcodeEntry({
                         </div>
 
                         <div>
-                          <label className="block text-xs font-medium mb-1">Category</label>
+                          <Label>Category</Label>
                           <Select
                             value={manualProductData.category}
                             onValueChange={value =>
@@ -680,9 +681,9 @@ export default function ManualBarcodeEntry({
                             </SelectTrigger>
                             <SelectContent>
                               {categoriesLoading ? (
-                                <SelectItem value="" disabled>
+                                <div className="px-2 py-6 text-sm text-muted-foreground text-center">
                                   Loading categories...
-                                </SelectItem>
+                                </div>
                               ) : (
                                 getCategoriesForDropdown().map(
                                   (category: { value: string; label: string; code: string }) => (

@@ -121,7 +121,7 @@ export default function InventoryForm({
                   min="0"
                   type="number"
                   step="0.01"
-                  value={data.price}
+                  value={data.price || ''}
                   onChange={e => handleChange('price')(parseFloat(e.target.value) || 0)}
                   className="pl-10 text-sm"
                   disabled={disabled}
@@ -183,7 +183,7 @@ export default function InventoryForm({
                 type="number"
                 min="0"
                 step="0.01"
-                value={data.price}
+                value={data.price || ''}
                 onChange={e => handleChange('price')(parseFloat(e.target.value) || 0)}
                 className="pl-10"
                 disabled={disabled}

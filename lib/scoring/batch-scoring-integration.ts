@@ -4,20 +4,15 @@
  */
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  retryWithBackoff, 
-  isCircuitBreakerOpen, 
+import {
   classifyError,
-  getRetryConfig,
   generateUserMessage,
+  getRetryConfig,
+  isCircuitBreakerOpen,
   recordScoringMetrics,
-  ScoringErrorType
+  retryWithBackoff,
+  ScoringErrorType,
 } from './error-recovery'
-
-interface ScoringRequest {
-  store_id: string
-  force_recalculate?: boolean
-}
 
 interface ScoringResponse {
   store_id: string
@@ -55,11 +50,11 @@ export async function scoreBatchesAfterCreation(
     batchIds?: string[]
     force_recalculate?: boolean
     timeout?: number
-  } = { operation: 'scan_in' }
+  } = { operation: 'scan_in' },
 ): Promise<ScoringResult> {
   const startTime = Date.now()
   let attemptCount = 0
-  
+
   console.log('[SCORING-INTEGRATION] Starting batch scoring:', {
     storeId,
     operation: options.operation,
@@ -93,9 +88,12 @@ export async function scoreBatchesAfterCreation(
   try {
     // Get authenticated supabase client
     const supabase = await createClient()
-    
+
     // Get current user for FastAPI authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
     if (authError || !user) {
       console.error('[SCORING-INTEGRATION] Authentication failed:', authError?.message)
       const result: ScoringResult = {
@@ -119,7 +117,10 @@ export async function scoreBatchesAfterCreation(
     }
 
     // Get access token for FastAPI
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
     if (sessionError || !session?.access_token) {
       console.error('[SCORING-INTEGRATION] Session token required:', sessionError?.message)
       const result: ScoringResult = {
@@ -146,21 +147,17 @@ export async function scoreBatchesAfterCreation(
     const scoringResult = await retryWithBackoff(
       async () => {
         attemptCount++
-        return await callFastAPIScoring(
-          storeId,
-          session.access_token,
-          {
-            force_recalculate: options.force_recalculate || false,
-            timeout: options.timeout || (options.operation === 'csv_upload' ? 60000 : 30000),
-          }
-        )
+        return await callFastAPIScoring(storeId, session.access_token, {
+          force_recalculate: options.force_recalculate || false,
+          timeout: options.timeout || (options.operation === 'csv_upload' ? 60000 : 30000),
+        })
       },
       getRetryConfig(ScoringErrorType.UNKNOWN, options.operation), // Will be refined based on actual error
-      { storeId, operation: 'fastapi_scoring' }
+      { storeId, operation: 'fastapi_scoring' },
     )
 
     const totalTime = Date.now() - startTime
-    
+
     if (scoringResult.success) {
       console.log('[SCORING-INTEGRATION] Scoring completed successfully:', {
         storeId,
@@ -170,7 +167,7 @@ export async function scoreBatchesAfterCreation(
         total_integration_time_ms: totalTime,
         attempts: attemptCount,
       })
-      
+
       recordScoringMetrics({
         storeId,
         operation: options.operation,
@@ -181,12 +178,15 @@ export async function scoreBatchesAfterCreation(
         batchCount: scoringResult.data.processed,
         timestamp: new Date().toISOString(),
       })
-      
+
       return scoringResult
     } else {
       console.error('[SCORING-INTEGRATION] Scoring failed after retries:', {
         storeId,
-        error: 'success' in scoringResult && !scoringResult.success ? scoringResult.error : 'Unknown error',
+        error:
+          'success' in scoringResult && !scoringResult.success
+            ? scoringResult.error
+            : 'Unknown error',
         total_time_ms: totalTime,
         attempts: attemptCount,
       })
@@ -202,10 +202,9 @@ export async function scoreBatchesAfterCreation(
         batchCount: options.batchIds?.length || 0,
         timestamp: new Date().toISOString(),
       })
-      
+
       return scoringResult
     }
-
   } catch (error) {
     const totalTime = Date.now() - startTime
     console.error('[SCORING-INTEGRATION] Integration error:', {
@@ -247,7 +246,7 @@ async function callFastAPIScoring(
   options: {
     force_recalculate?: boolean
     timeout?: number
-  } = {}
+  } = {},
 ): Promise<ScoringResult> {
   const { force_recalculate = false, timeout = 30000 } = options
 
@@ -261,7 +260,7 @@ async function callFastAPIScoring(
     // Construct FastAPI endpoint URL
     const fastApiBaseUrl = process.env.FASTAPI_BASE_URL || 'http://localhost:8000'
     const endpoint = `${fastApiBaseUrl}/api/v1/scoring/batch/${storeId}`
-    
+
     const url = new URL(endpoint)
     if (force_recalculate) {
       url.searchParams.set('force_recalculate', 'true')
@@ -275,7 +274,7 @@ async function callFastAPIScoring(
       const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -300,7 +299,7 @@ async function callFastAPIScoring(
       }
 
       const data: ScoringResponse = await response.json()
-      
+
       console.log('[SCORING-INTEGRATION] FastAPI scoring response:', {
         storeId,
         processed: data.processed,
@@ -313,11 +312,9 @@ async function callFastAPIScoring(
         data,
         store_id: storeId,
       }
-
     } finally {
       clearTimeout(timeoutId)
     }
-
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('[SCORING-INTEGRATION] FastAPI request timeout:', { storeId, timeout })
@@ -351,7 +348,7 @@ export async function scoreAfterCsvUpload(
   processedCount: number,
   options: {
     force_recalculate?: boolean
-  } = {}
+  } = {},
 ): Promise<ScoringResult> {
   console.log('[SCORING-INTEGRATION] CSV upload scoring requested:', {
     storeId,
@@ -375,7 +372,7 @@ export async function scoreAfterScanIn(
   batchId: string,
   options: {
     force_recalculate?: boolean
-  } = {}
+  } = {},
 ): Promise<ScoringResult> {
   console.log('[SCORING-INTEGRATION] Scan-in scoring requested:', {
     storeId,
@@ -411,11 +408,9 @@ export async function canCallScoringService(): Promise<boolean> {
 
       clearTimeout(timeoutId)
       return response.ok
-
     } finally {
       clearTimeout(timeoutId)
     }
-
   } catch (error) {
     console.warn('[SCORING-INTEGRATION] Scoring service health check failed:', error)
     return false
@@ -427,8 +422,8 @@ export async function canCallScoringService(): Promise<boolean> {
  * Determines if batch creation should continue despite scoring failures
  */
 export function handleScoringError(
-  error: ScoringError, 
-  operation: 'csv_upload' | 'scan_in' = 'scan_in'
+  error: ScoringError,
+  operation: 'csv_upload' | 'scan_in' = 'scan_in',
 ): {
   shouldFailBatchCreation: boolean
   userMessage: string
@@ -438,13 +433,13 @@ export function handleScoringError(
 
   // Scoring failures should never break batch creation
   const shouldFailBatchCreation = false
-  
+
   // Classify the error for better handling
   const errorType = classifyError(error)
-  
+
   // Generate user-friendly message
   const userMessage = generateUserMessage(errorType, operation)
-  
+
   // Generate technical log message
   const logMessage = `Scoring ${errorType} for store ${error.store_id}: ${error.error}`
 

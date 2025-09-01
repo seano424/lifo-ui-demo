@@ -7,13 +7,13 @@ const DEFAULT_WORKFLOW_PROGRESS = {
   isComplete: false,
   hasError: false,
 }
-import { devtools } from 'zustand/middleware'
+
+import { useCallback, useEffect, useState } from 'react'
 import { create } from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
+import { devtools, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import type { ProductLookupResult } from '@/lib/queries/open-food-facts'
-import { useEffect, useState, useCallback } from 'react'
 
 export type ScanningStep =
   | 'barcode' // Scanning barcode or manual entry

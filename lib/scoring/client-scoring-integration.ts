@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client'
  */
 export async function scoreAfterScanInClient(
   storeId: string,
-  batchId: string
+  batchId: string,
 ): Promise<{
   attempted: boolean
   success: boolean
@@ -38,6 +38,19 @@ export async function scoreAfterScanInClient(
     }
   }
 
+  // Skip scoring in development to avoid CORS issues
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[CLIENT-SCORING] Skipping scoring in development to avoid CORS issues')
+    return {
+      attempted: false,
+      success: false,
+      processed: 0,
+      high_priority_count: 0,
+      processing_time_ms: Date.now() - startTime,
+      warning: 'Scoring skipped in development environment',
+    }
+  }
+
   try {
     const supabase = createClient()
 
@@ -54,14 +67,12 @@ export async function scoreAfterScanInClient(
         processed: 0,
         high_priority_count: 0,
         processing_time_ms: Date.now() - startTime,
-        warning:
-          'Authentication required for scoring. Please refresh the page.',
+        warning: 'Authentication required for scoring. Please refresh the page.',
       }
     }
 
     // Call FastAPI scoring endpoint
-    const fastApiBaseUrl =
-      process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+    const fastApiBaseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
     const endpoint = `${fastApiBaseUrl}/api/v1/scoring/batch/${storeId}`
 
     console.log('[CLIENT-SCORING] Calling FastAPI endpoint:', endpoint)

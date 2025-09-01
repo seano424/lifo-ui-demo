@@ -1,10 +1,10 @@
 import { dehydrate } from '@tanstack/react-query'
-import { createQueryClient } from './client'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import { fetchCurrentUser } from '@/lib/queries/users'
-import { fetchUserStores, fetchUserPreferences, selectDefaultStore } from '@/lib/queries/stores'
-import { queryKeys } from '@/lib/queries/query-keys'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchUserPreferences, fetchUserStores, selectDefaultStore } from '@/lib/queries/stores'
+import { fetchCurrentUser } from '@/lib/queries/users'
+import { createClient as createServerClient } from '@/lib/supabase/server'
+import { createQueryClient } from './client'
 
 export async function createPrefetchedQuery() {
   const queryClient = createQueryClient()

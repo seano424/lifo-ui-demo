@@ -1,6 +1,6 @@
+import type { TimeRange } from '@/components/dashboard/TimeSelector'
+import type { TrendDirection } from '@/components/dashboard/TrendIndicator'
 import { createClient } from '@/lib/supabase/client'
-import { TimeRange } from '@/components/dashboard/TimeSelector'
-import { TrendDirection } from '@/components/dashboard/TrendIndicator'
 
 export interface KPITrendData {
   name: string

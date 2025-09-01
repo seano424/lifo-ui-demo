@@ -8,14 +8,14 @@ const typographyVariants = cva('', {
   variants: {
     variant: {
       h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl font-heading',
-      h2: 'scroll-m-20 text-3xl font-semibold tracking-tight font-heading',
-      h3: 'scroll-m-20 text-2xl font-semibold tracking-tight font-heading',
-      h4: 'scroll-m-20 text-xl font-semibold tracking-tight font-heading',
+      h2: 'scroll-m-20 text-3xl font-extrabold tracking-tight font-heading',
+      h3: 'scroll-m-20 text-2xl font-extrabold tracking-tight font-heading',
+      h4: 'scroll-m-20 text-xl font-extrabold tracking-tight font-heading',
       p: 'text-base leading-5 font-sans',
       muted: 'text-sm text-muted-foreground font-sans',
       small: 'text-sm font-sans',
       blockquote: 'mt-6 border-l-2 pl-6 italic font-sans',
-      code: 'rounded bg-muted px-1.5 py-1 font-mono text-sm font-semibold font-sans',
+      code: 'rounded bg-muted px-1.5 py-1 font-mono text-sm font-extrabold font-sans',
     },
     color: {
       default: 'text-foreground',
@@ -38,7 +38,7 @@ export type TypographyProps = {
 
 const Typography = React.forwardRef<HTMLElement, TypographyProps>(
   ({ className, variant, color, asChild = false, as: CompProp, ...props }, ref) => {
-    const Comp = asChild ? Slot : CompProp || 'p'
+    const Comp = asChild ? Slot : CompProp || 'span'
     return (
       <Comp
         className={cn(typographyVariants({ variant, color, className }))}

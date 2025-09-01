@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUp, Edit3, Euro } from 'lucide-react'
+import { ArrowUp, Edit3, Euro, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -30,6 +30,7 @@ export interface ScannedItemsListProps {
   items: ScannedItem[]
   onEditItem?: (item: ScannedItem) => void
   onItemUpdated?: (updatedItem: ScannedItem) => void
+  onDeleteItem?: (itemId: string) => void
   title?: string
   className?: string
 }
@@ -38,7 +39,8 @@ export default function ScannedItemsList({
   items,
   onEditItem,
   onItemUpdated,
-  title = 'Total items scanned',
+  onDeleteItem,
+  title = 'Batch items',
   className = '',
 }: ScannedItemsListProps) {
   const [isEditingItem, setIsEditingItem] = useState(false)
@@ -54,6 +56,13 @@ export default function ScannedItemsList({
   const [showAdvancedEdit, setShowAdvancedEdit] = useState(false)
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+
+  // Helper function to format date consistently
+  const formatExpiryDate = (dateString: string) => {
+    // Ensure we treat the date as local time to avoid timezone shifts
+    const date = new Date(`${dateString}T00:00:00`)
+    return date.toLocaleDateString()
+  }
 
   const handleEditItem = (item: ScannedItem) => {
     setEditingItem(item)
@@ -109,7 +118,7 @@ export default function ScannedItemsList({
   return (
     <div className={`p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <Typography variant="h3">{title}</Typography>
+        <Typography variant="p">{title}</Typography>
         <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
           {items.length > 99 ? '99+' : items.length}
         </div>
@@ -129,20 +138,32 @@ export default function ScannedItemsList({
                 <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}x{' '}
                 <span className="font-normal text-gray-500">Price:</span> {formatPrice(item.price)}{' '}
                 <span className="font-normal text-gray-500">Expiry:</span>{' '}
-                {new Date(item.expiryDate).toLocaleDateString()}
+                {formatExpiryDate(item.expiryDate)}
               </Typography>
             </div>
 
-            {(onEditItem || onItemUpdated) && (
-              <Button
-                onClick={() => (onEditItem ? onEditItem(item) : handleEditItem(item))}
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-              >
-                <Edit3 className="w-4 h-4" />
-              </Button>
-            )}
+            <div className="flex items-center gap-1">
+              {(onEditItem || onItemUpdated) && (
+                <Button
+                  onClick={() => (onEditItem ? onEditItem(item) : handleEditItem(item))}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </Button>
+              )}
+              {onDeleteItem && (
+                <Button
+                  onClick={() => onDeleteItem(item.id)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
         ))}
       </div>

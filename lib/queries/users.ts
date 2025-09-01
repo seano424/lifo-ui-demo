@@ -1,16 +1,16 @@
 // lib/queries/users.ts - Enhanced with phone & language support
 
 import { createClient } from '@/lib/supabase/client'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import type { createClient as createServerClient } from '@/lib/supabase/server'
 import {
-  User,
-  UserUpdate,
-  SupportedLanguage,
-  SUPPORTED_LANGUAGES,
   isValidLanguage,
   isValidPhoneNumber,
-  UpdatePhoneResponse,
-  UpdateLanguageResponse,
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+  type UpdateLanguageResponse,
+  type UpdatePhoneResponse,
+  type User,
+  type UserUpdate,
 } from '@/lib/types/user'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>

@@ -1,7 +1,7 @@
 // lib/auth/pin-auth.ts - PIN authentication utilities
 
-import { createClient } from '@/lib/supabase/client'
 import bcrypt from 'bcryptjs'
+import { createClient } from '@/lib/supabase/client'
 
 export interface PINLoginResult {
   success: boolean

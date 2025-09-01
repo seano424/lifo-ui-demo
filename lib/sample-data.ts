@@ -1,4 +1,4 @@
-import type { Product, ActionLog, BatchPerformance } from '@/types/inventory'
+import type { ActionLog, BatchPerformance, Product } from '@/types/inventory'
 
 export const sampleProducts: Product[] = [
   {

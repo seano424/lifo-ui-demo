@@ -1,15 +1,27 @@
 // lib/queries/batches.ts
 
-import { createClient } from '@/lib/supabase/client'
-import { createClient as createServerClient } from '@/lib/supabase/server'
-import type { Database } from '@/types/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
+import type { createClient as createServerClient } from '@/lib/supabase/server'
+import type { Database } from '@/types/supabase'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
 // Type for a batch row
 export type Batch = Database['inventory']['Tables']['batches']['Row']
+
+// Type for category data that may be attached to products
+type CategoryData = {
+  category_code?: string
+  display_name_en?: string
+  display_name_fr?: string
+}
+
+// Type for product with potential category information
+type ProductWithCategories = Database['inventory']['Tables']['products']['Row'] & {
+  categories?: CategoryData
+}
 
 // Type for batch with product relationship including category info
 export type BatchWithProduct = Batch & {
@@ -133,14 +145,15 @@ async function fetchBatchesWithProducts(
   // Map products to batches, including category information
   return batches.map(batch => {
     const productData = products?.find(p => p.product_id === batch.product_id)
-    
+
     if (!productData) {
       return { ...batch, products: undefined }
     }
 
     // Extract category information
-    const categoryData = (productData as any).categories || null
-    
+    const productWithCategories = productData as ProductWithCategories
+    const categoryData = productWithCategories.categories || null
+
     const productWithCategory = {
       ...productData,
       category_code: categoryData?.category_code,
@@ -436,9 +449,16 @@ export async function fetchBatchById(
       .single()
 
     // Transform product data to include category information
-    let productWithCategory = undefined
+    let productWithCategory:
+      | (Database['inventory']['Tables']['products']['Row'] & {
+          category_code?: string
+          category_display_name?: string
+          category_display_name_fr?: string
+        })
+      | undefined
     if (product) {
-      const categoryData = (product as any).categories || null
+      const productWithCategories = product as ProductWithCategories
+      const categoryData = productWithCategories.categories || null
       productWithCategory = {
         ...product,
         category_code: categoryData?.category_code,
