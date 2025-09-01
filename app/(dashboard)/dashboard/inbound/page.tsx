@@ -75,7 +75,7 @@ export default function InboundPage() {
       </Tabs>
 
       {/* Desktop Tabs for Manual Entry and CSV Import */}
-      <div className="hidden lg:block max-w-2xl mx-auto">
+      <div className="hidden lg:block max-w-5xl mx-auto">
         <Tabs
           defaultValue="manual"
           className="w-full"

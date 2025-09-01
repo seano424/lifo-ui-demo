@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUp, Edit3, Euro } from 'lucide-react'
+import { ArrowUp, Edit3, Euro, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -30,6 +30,7 @@ export interface ScannedItemsListProps {
   items: ScannedItem[]
   onEditItem?: (item: ScannedItem) => void
   onItemUpdated?: (updatedItem: ScannedItem) => void
+  onDeleteItem?: (itemId: string) => void
   title?: string
   className?: string
 }
@@ -38,6 +39,7 @@ export default function ScannedItemsList({
   items,
   onEditItem,
   onItemUpdated,
+  onDeleteItem,
   title = 'Batch items',
   className = '',
 }: ScannedItemsListProps) {
@@ -136,18 +138,30 @@ export default function ScannedItemsList({
               </Typography>
             </div>
 
-            {(onEditItem || onItemUpdated) && (
-              <Button
-                onClick={() =>
-                  onEditItem ? onEditItem(item) : handleEditItem(item)
-                }
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-              >
-                <Edit3 className="w-4 h-4" />
-              </Button>
-            )}
+            <div className="flex items-center gap-1">
+              {(onEditItem || onItemUpdated) && (
+                <Button
+                  onClick={() =>
+                    onEditItem ? onEditItem(item) : handleEditItem(item)
+                  }
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </Button>
+              )}
+              {onDeleteItem && (
+                <Button
+                  onClick={() => onDeleteItem(item.id)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
         ))}
       </div>

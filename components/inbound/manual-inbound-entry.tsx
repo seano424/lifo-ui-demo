@@ -77,7 +77,8 @@ export default function ManualInboundEntry({
   })
 
   // List of items to be submitted - use persisted items if provided
-  const [scannedItems, setScannedItems] = useState<ScannedItem[]>(persistedItems)
+  const [scannedItems, setScannedItems] =
+    useState<ScannedItem[]>(persistedItems)
 
   // Submission state
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -224,143 +225,150 @@ export default function ManualInboundEntry({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Main Entry Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Manual Product Entry</CardTitle>
-          <CardDescription>
-            Add products to your inventory by searching or entering product
-            details manually
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Product Selection Section */}
-          {!selectedProduct ? (
-            <ManualBarcodeEntry
-              onProductSelected={handleProductSelected}
-              mode="inbound"
-              storeId={storeId}
-            />
-          ) : (
-            <Card className="border-primary-200 bg-primary-50/50">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Package className="w-5 h-5 text-primary-600" />
-                      <h3 className="font-semibold text-lg">
-                        Selected Product
-                      </h3>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <div>
-                        <span className="font-medium">Name:</span>{' '}
-                        {selectedProduct.productName}
-                      </div>
-                      {selectedProduct.brand && (
-                        <div>
-                          <span className="font-medium">Brand:</span>{' '}
-                          {selectedProduct.brand}
-                        </div>
-                      )}
-                      {selectedProduct.category && (
-                        <div>
-                          <span className="font-medium">Category:</span>{' '}
-                          {selectedProduct.category}
-                        </div>
-                      )}
-                      <div>
-                        <span className="font-medium">Barcode:</span>{' '}
-                        <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
-                          {selectedProduct.barcode}
-                        </code>
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClearSelection}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Inventory Details Section - Only show when product is selected */}
-          {selectedProduct && (
-            <>
-              <InventoryForm
-                data={inventoryData}
-                onChange={setInventoryData}
-                showSubmitButton={false}
-                title="Batch Details"
-                className="border-2 border-dashed"
-              />
-
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleAddBatch}
-                  disabled={!canAddBatch}
-                  size="lg"
-                  className="flex-1"
-                  variant="secondary"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Add Batch
-                </Button>
-                <Button
-                  onClick={handleClearSelection}
-                  variant="outline"
-                  size="lg"
-                >
-                  Clear
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Recently Added Items */}
-      {scannedItems.length > 0 && (
+      <div className="space-y-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Main Entry Card */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Your list of products</CardTitle>
-                <CardDescription>
-                  {scannedItems.length} batch
-                  {scannedItems.length !== 1 ? 'es' : ''} ready to submit
-                </CardDescription>
-              </div>
-              <Button
-                onClick={handleFinalSubmission}
-                disabled={scannedItems.length === 0 || isSubmittingBatch}
-                variant="secondary"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Submit All ({scannedItems.length})
-              </Button>
-            </div>
+            <CardTitle>Manual Product Entry</CardTitle>
+            <CardDescription>
+              Add products to your inventory by searching or entering product
+              details manually
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ScannedItemsList
-              items={scannedItems}
-              onItemUpdated={(updatedItem) => {
-                setScannedItems((prev) =>
-                  prev.map((item) =>
-                    item.id === updatedItem.id ? updatedItem : item
-                  )
-                )
-              }}
-            />
+          <CardContent className="space-y-6">
+            {/* Product Selection Section */}
+            {!selectedProduct ? (
+              <ManualBarcodeEntry
+                onProductSelected={handleProductSelected}
+                mode="inbound"
+                storeId={storeId}
+              />
+            ) : (
+              <Card className="border-primary-200 bg-primary-50/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Package className="w-5 h-5 text-primary-600" />
+                        <h3 className="font-semibold text-lg">
+                          Selected Product
+                        </h3>
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <div>
+                          <span className="font-medium">Name:</span>{' '}
+                          {selectedProduct.productName}
+                        </div>
+                        {selectedProduct.brand && (
+                          <div>
+                            <span className="font-medium">Brand:</span>{' '}
+                            {selectedProduct.brand}
+                          </div>
+                        )}
+                        {selectedProduct.category && (
+                          <div>
+                            <span className="font-medium">Category:</span>{' '}
+                            {selectedProduct.category}
+                          </div>
+                        )}
+                        <div>
+                          <span className="font-medium">Barcode:</span>{' '}
+                          <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
+                            {selectedProduct.barcode}
+                          </code>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearSelection}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Inventory Details Section - Only show when product is selected */}
+            {selectedProduct && (
+              <>
+                <InventoryForm
+                  data={inventoryData}
+                  onChange={setInventoryData}
+                  showSubmitButton={false}
+                  title="Batch Details"
+                  className="border-2 border-dashed"
+                />
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleAddBatch}
+                    disabled={!canAddBatch}
+                    size="lg"
+                    className="flex-1"
+                    variant="secondary"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Add Batch
+                  </Button>
+                  <Button
+                    onClick={handleClearSelection}
+                    variant="outline"
+                    size="lg"
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
-      )}
+
+        {/* Recently Added Items */}
+        {scannedItems.length > 0 && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Your list of products</CardTitle>
+                  <CardDescription>
+                    {scannedItems.length} batch
+                    {scannedItems.length !== 1 ? 'es' : ''} ready to submit
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={handleFinalSubmission}
+                  disabled={scannedItems.length === 0 || isSubmittingBatch}
+                  variant="secondary"
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  Submit All ({scannedItems.length})
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScannedItemsList
+                items={scannedItems}
+                onItemUpdated={(updatedItem) => {
+                  setScannedItems((prev) =>
+                    prev.map((item) =>
+                      item.id === updatedItem.id ? updatedItem : item
+                    )
+                  )
+                }}
+                onDeleteItem={(itemId) => {
+                  setScannedItems((prev) => 
+                    prev.filter((item) => item.id !== itemId)
+                  )
+                }}
+              />
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Empty State */}
       {scannedItems.length === 0 && !selectedProduct && (
