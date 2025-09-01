@@ -1,3 +1,6 @@
+// app/api/analytics/route.ts
+
+
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'

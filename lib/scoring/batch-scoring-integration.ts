@@ -3,7 +3,7 @@
  * Integrates batch creation flows with automatic scoring
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
 import {
   classifyError,
   generateUserMessage,
@@ -87,7 +87,7 @@ export async function scoreBatchesAfterCreation(
 
   try {
     // Get authenticated supabase client
-    const supabase = await createClient()
+    const supabase = createClient()
 
     // Get current user for FastAPI authentication
     const {
