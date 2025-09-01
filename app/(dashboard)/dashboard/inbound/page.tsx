@@ -14,35 +14,52 @@ import { useStoreState } from '@/lib/stores/store-context'
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
   const { isTablet, isMobile } = useMediaQuery()
-  
+
   // Persist manual entry items across tab switches
   const [manualEntryItems, setManualEntryItems] = useState<ScannedItem[]>([])
 
   return (
     <div className="space-y-6">
       {/* Mobile Tabs */}
-      <Tabs defaultValue="scan" className="w-full lg:hidden">
+      <Tabs
+        defaultValue="scan"
+        className="w-full lg:hidden"
+      >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scan" className="flex items-center gap-2">
+          <TabsTrigger
+            value="scan"
+            className="flex items-center gap-2"
+          >
             <Scan className="w-4 h-4 stroke-2 border-2 rounded-full p-[2px] bg-primary-100" />
             Barcode Scanning
           </TabsTrigger>
-          <TabsTrigger value="csv" className="flex items-center gap-2">
+          <TabsTrigger
+            value="csv"
+            className="flex items-center gap-2"
+          >
             <Upload className="w-4 h-4 stroke-2 border-2  rounded-full p-[2px] bg-primary-100" />
             CSV Bulk Import
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="scan" className="mt-6">
-          <div className="max-w-2xl mx-auto">{(isMobile || isTablet) && <ScanningInterface />}</div>
+        <TabsContent
+          value="scan"
+          className="mt-6"
+        >
+          <div className="max-w-2xl mx-auto">
+            {(isMobile || isTablet) && <ScanningInterface />}
+          </div>
         </TabsContent>
 
-        <TabsContent value="csv" className="mt-6">
+        <TabsContent
+          value="csv"
+          className="mt-6"
+        >
           <div className="max-w-4xl mx-auto">
             {currentStore ? (
               <CSVUploadForm
                 storeId={currentStore.store_id}
-                onUploadComplete={result => {
+                onUploadComplete={(result) => {
                   console.log('Upload completed:', result)
                 }}
               />
@@ -58,27 +75,39 @@ export default function InboundPage() {
       </Tabs>
 
       {/* Desktop Tabs for Manual Entry and CSV Import */}
-      <div className="hidden lg:block">
-        <Tabs defaultValue="manual" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="manual" className="flex items-center gap-2">
+      <div className="hidden lg:block max-w-2xl mx-auto">
+        <Tabs
+          defaultValue="manual"
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger
+              value="manual"
+              className="flex items-center gap-2"
+            >
               <Keyboard className="w-4 h-4" />
               Manual Entry
             </TabsTrigger>
-            <TabsTrigger value="csv" className="flex items-center gap-2">
+            <TabsTrigger
+              value="csv"
+              className="flex items-center gap-2"
+            >
               <Upload className="w-4 h-4" />
               CSV Bulk Import
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="manual" className="mt-6">
+          <TabsContent
+            value="manual"
+            className="mt-6"
+          >
             <div className="max-w-6xl mx-auto">
               {currentStore ? (
                 <ManualInboundEntry
                   storeId={currentStore.store_id}
                   persistedItems={manualEntryItems}
                   onItemsChange={setManualEntryItems}
-                  onBatchSubmitted={result => {
+                  onBatchSubmitted={(result) => {
                     console.log('Batch submitted:', result)
                     // Clear items after successful submission
                     setManualEntryItems([])
@@ -94,12 +123,15 @@ export default function InboundPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="csv" className="mt-6">
+          <TabsContent
+            value="csv"
+            className="mt-6"
+          >
             <div className="max-w-4xl mx-auto">
               {currentStore ? (
                 <CSVUploadForm
                   storeId={currentStore.store_id}
-                  onUploadComplete={result => {
+                  onUploadComplete={(result) => {
                     console.log('Upload completed:', result)
                   }}
                 />
