@@ -56,6 +56,13 @@ export default function ScannedItemsList({
   const [showAdvancedEdit, setShowAdvancedEdit] = useState(false)
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  
+  // Helper function to format date consistently
+  const formatExpiryDate = (dateString: string) => {
+    // Ensure we treat the date as local time to avoid timezone shifts
+    const date = new Date(dateString + 'T00:00:00')
+    return date.toLocaleDateString()
+  }
 
   const handleEditItem = (item: ScannedItem) => {
     setEditingItem(item)
@@ -134,7 +141,7 @@ export default function ScannedItemsList({
                 <span className="font-normal text-gray-500">Price:</span>{' '}
                 {formatPrice(item.price)}{' '}
                 <span className="font-normal text-gray-500">Expiry:</span>{' '}
-                {new Date(item.expiryDate).toLocaleDateString()}
+                {formatExpiryDate(item.expiryDate)}
               </Typography>
             </div>
 

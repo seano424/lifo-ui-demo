@@ -217,6 +217,14 @@ export default function ManualInboundEntry({
   }
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  
+  // Helper function to format date consistently
+  const formatExpiryDate = (dateString: string) => {
+    // Ensure we treat the date as local time to avoid timezone shifts
+    const date = new Date(dateString + 'T00:00:00')
+    return date.toLocaleDateString()
+  }
+  
   const canAddBatch =
     selectedProduct &&
     inventoryData.expiryDate &&
@@ -418,7 +426,7 @@ export default function ManualInboundEntry({
                       )}
                       <div className="text-xs text-gray-500">
                         Expires:{' '}
-                        {new Date(item.expiryDate).toLocaleDateString()}
+                        {formatExpiryDate(item.expiryDate)}
                       </div>
                     </div>
                     <div className="text-right">
