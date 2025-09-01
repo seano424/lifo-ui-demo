@@ -23,8 +23,8 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useActiveDonationRecipients, useDonationAction } from '@/hooks/use-donations'
-import type { ScoringAlert } from '@/hooks/use-fastapi-scoring'
-import { useScoringRecommendations } from '@/hooks/use-fastapi-scoring'
+import type { ScoringAlert } from '@/hooks/use-scoring-analytics'
+import { useScoringRecommendations } from '@/hooks/use-scoring-analytics'
 
 interface ActionableBatchesEnhancedProps {
   storeId: string

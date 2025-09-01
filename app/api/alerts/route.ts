@@ -10,6 +10,7 @@ interface ScoringData {
   composite_score: number
   recommendation: string
   calculated_at: string
+  urgency_level?: string
 }
 
 interface BatchWithProduct {
@@ -49,6 +50,7 @@ interface AlertData {
   composite_score?: number
   recommendation?: string
   calculated_at?: string
+  urgency_level?: string
 }
 
 interface EnhancedAlert {
@@ -142,6 +144,13 @@ export async function GET(request: NextRequest) {
 
     // Get alerts using the existing scoring system
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
+    
+    console.log('[/api/alerts] Raw alerts from getStoreAlerts:', {
+      storeId,
+      threshold,
+      alertCount: alerts.length,
+      firstAlert: alerts[0]
+    })
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
@@ -290,13 +299,7 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
         expiry_date,
         location_code,
         supplier,
-        products:product_id (
-          sku,
-          name,
-          category,
-          brand,
-          unit_type
-        )
+        product_id
       `,
       )
       .eq('store_id', storeId)
@@ -305,39 +308,77 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
 
     if (error) throw error
 
+    console.log('[getStoreAlerts] Batches query result:', {
+      storeId,
+      batchCount: batches?.length || 0,
+      firstBatch: batches?.[0],
+      error
+    })
+
     if (!batches || batches.length === 0) {
       console.log('[getStoreAlerts] No batches found for store:', storeId)
       return []
     }
 
-    // Get batch IDs for scoring lookup
+    // Get batch IDs and product IDs for lookups
     const batchIds = batches.map(batch => batch.batch_id)
+    const productIds = [...new Set(batches.map(batch => batch.product_id).filter(Boolean))]
 
     // Get scoring data separately from scoring schema
     const { data: scoringData, error: scoringError } = await supabase
       .schema('scoring')
       .from('product_scores')
-      .select('batch_id, composite_score, recommendation, calculated_at')
+      .select('batch_id, composite_score, recommendation, calculated_at, urgency_level')
       .eq('store_id', storeId)
       .in('batch_id', batchIds)
+    
+    // Get product data separately
+    const { data: productData, error: productError } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select('product_id, sku, name, brand, unit_type, category_id')
+      .in('product_id', productIds)
+
+    console.log('[getStoreAlerts] Scoring query result:', {
+      storeId,
+      batchIds: batchIds.slice(0, 3), // First 3 for brevity
+      scoringDataCount: scoringData?.length || 0,
+      scoringError,
+      firstScore: scoringData?.[0]
+    })
+
+    console.log('[getStoreAlerts] Product query result:', {
+      productIds: productIds.slice(0, 3),
+      productDataCount: productData?.length || 0,
+      productError,
+      firstProduct: productData?.[0]
+    })
 
     if (scoringError) {
       console.warn('[getStoreAlerts] Error fetching scoring data:', scoringError)
     }
 
-    // Create a map of batch_id to scoring data for quick lookup
+    if (productError) {
+      console.warn('[getStoreAlerts] Error fetching product data:', productError)
+    }
+
+    // Create maps for quick lookup
     const scoringMap = new Map()
     scoringData?.forEach((score: ScoringData) => {
       scoringMap.set(score.batch_id, score)
     })
 
+    const productMap = new Map()
+    productData?.forEach((product: any) => {
+      productMap.set(product.product_id, product)
+    })
+
     // Filter by threshold and format data
     const alerts =
       batches
-        ?.map((batch: BatchWithProduct) => {
+        ?.map((batch: any) => {
           const scoring = scoringMap.get(batch.batch_id)
-          // Handle both single object and array cases from Supabase join
-          const product = Array.isArray(batch.products) ? batch.products[0] : batch.products
+          const product = productMap.get(batch.product_id)
           return {
             batch_id: batch.batch_id,
             batch_number: batch.batch_number,
@@ -347,14 +388,15 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
             expiry_date: batch.expiry_date,
             location_code: batch.location_code,
             supplier: batch.supplier,
-            sku: product?.sku,
-            product_name: product?.name,
-            category: product?.category,
-            brand: product?.brand,
-            unit_type: product?.unit_type,
+            sku: product?.sku || 'Unknown',
+            product_name: product?.name || 'Unknown Product',
+            category: product?.category_id || 'Unknown',
+            brand: product?.brand || '',
+            unit_type: product?.unit_type || 'pcs',
             composite_score: scoring?.composite_score || 0,
             recommendation: scoring?.recommendation,
             calculated_at: scoring?.calculated_at,
+            urgency_level: scoring?.urgency_level,
           }
         })
         .filter((alert: AlertData) => (alert.composite_score || 0) >= threshold) || []

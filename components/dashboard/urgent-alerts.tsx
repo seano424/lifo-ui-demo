@@ -6,12 +6,22 @@ import { Button } from '@/components/ui/button'
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useScoringAlerts } from '@/hooks/use-fastapi-scoring'
+import { useScoringAlerts } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 export function UrgentAlerts() {
   const activeStoreId = useActiveStoreId()
   const { data, isLoading, error } = useScoringAlerts(activeStoreId, 0.7) // Higher threshold for urgent items
+  
+  // Debug logging
+  console.log('[UrgentAlerts] Debug:', { 
+    activeStoreId, 
+    data, 
+    summary: data?.summary,
+    alerts: data?.alerts,
+    isLoading, 
+    error 
+  })
 
   if (isLoading) {
     return (

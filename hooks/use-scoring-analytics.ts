@@ -1,7 +1,6 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from '@/lib/queries/query-keys'
 
 // TypeScript interfaces for existing API responses
 export interface ScoringAlert {
@@ -101,10 +100,10 @@ export interface AnalyticsResponse {
   }
 }
 
-// React Query hooks using existing backend routes
+// React Query hooks for scoring alerts and analytics using Next.js API routes
 
 /**
- * Hook for fetching scoring alerts from existing /api/alerts route
+ * Hook for fetching scoring alerts from /api/alerts route
  * @param storeId - Store ID to fetch alerts for
  * @param threshold - Score threshold (default: 0.6)
  * @param urgencyLevel - Filter by urgency level
@@ -117,7 +116,7 @@ export function useScoringAlerts(
   category?: string,
 ) {
   return useQuery({
-    queryKey: queryKeys.fastapi.scoring.alerts(storeId!, threshold),
+    queryKey: ['alerts', 'store', storeId!, threshold],
     queryFn: async (): Promise<AlertsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
@@ -141,22 +140,25 @@ export function useScoringAlerts(
 }
 
 /**
- * Hook for fetching store analytics from existing /api/analytics route
+ * Hook for fetching store analytics from /api/analytics route
  * @param storeId - Store ID to fetch analytics for
  * @param timeframe - Time period (1d/7d/30d/90d, default: 7d)
  * @param metric - Specific metric type (optional)
+ * @param threshold - Score threshold for urgent items (default: 0.7)
  */
 export function useStoreAnalytics(
   storeId: string | null,
   timeframe: string = '7d',
   metric?: string,
+  threshold: number = 0.7,
 ) {
   return useQuery({
-    queryKey: queryKeys.fastapi.analytics.store(storeId!, timeframe),
+    queryKey: ['analytics', 'store', storeId!, timeframe, threshold],
     queryFn: async (): Promise<AnalyticsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
         timeframe,
+        threshold: threshold.toString(),
       })
 
       if (metric) params.append('metric', metric)
@@ -182,7 +184,7 @@ export function useScoringRecommendations(storeId: string | null, category?: str
 }
 
 /**
- * Hook for fetching dashboard insights (using analytics with overview metric)
+ * Hook for fetching dashboard insights (7-day analytics overview)
  * @param storeId - Store ID to fetch insights for
  */
 export function useDashboardInsights(storeId: string | null) {
@@ -190,7 +192,7 @@ export function useDashboardInsights(storeId: string | null) {
 }
 
 /**
- * Hook for mobile summary (using analytics with overview metric and shorter timeframe)
+ * Hook for mobile summary (1-day analytics overview)
  * @param storeId - Store ID to fetch summary for
  */
 export function useMobileSummary(storeId: string | null) {
@@ -219,10 +221,12 @@ export async function fetchScoringAlerts(
 export async function fetchStoreAnalytics(
   storeId: string,
   timeframe: string = '7d',
+  threshold: number = 0.7,
 ): Promise<AnalyticsResponse> {
   const params = new URLSearchParams({
     storeId,
     timeframe,
+    threshold: threshold.toString(),
   })
 
   const response = await fetch(`/api/analytics?${params}`)
