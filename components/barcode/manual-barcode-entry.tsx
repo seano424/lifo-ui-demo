@@ -2,6 +2,30 @@
 
 import { AlertCircle, ArrowRight, Check, Keyboard, Loader2, Package, Search } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+
+// Constants
+const SEARCH_CONFIG = {
+  DEBOUNCE_DELAY: 300,
+  MIN_BARCODE_LENGTH: 8,
+  MIN_SEARCH_LENGTH: 2,
+  MAX_SEARCH_RESULTS: 5,
+} as const
+
+// Safe category parser utility
+const parseFirstCategory = (categories: unknown): string => {
+  if (!categories) return 'Unknown'
+
+  try {
+    const categoryStr = String(categories)
+    if (!categoryStr || categoryStr === 'undefined' || categoryStr === 'null') return 'Unknown'
+
+    const firstCategory = categoryStr.split(',')[0]?.trim()
+    return firstCategory || 'Unknown'
+  } catch {
+    return 'Unknown'
+  }
+}
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -85,8 +109,15 @@ export default function ManualBarcodeEntry({
     availableQuantity: number
   } | null>(null)
 
+  // Input validation helper
+  const isValidBarcode = (code: string): boolean => {
+    return /^\d{8,}$/.test(code)
+  }
+
   const handleBarcodeSubmit = async () => {
-    if (!barcode || barcode.length < 8) return
+    if (!barcode || barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH || !isValidBarcode(barcode)) {
+      return
+    }
     setBarcodeStockStatus(null) // Reset stock status
   }
 
@@ -140,7 +171,7 @@ export default function ManualBarcodeEntry({
   // Debounced search function
   const debouncedProductNameSearch = useCallback(
     async (query: string) => {
-      if (query.length < 2) {
+      if (query.length < SEARCH_CONFIG.MIN_SEARCH_LENGTH) {
         setShowProductSearchResults(false)
         return
       }
@@ -153,7 +184,19 @@ export default function ManualBarcodeEntry({
           }
           await supabaseSearch.mutateAsync(query)
         } else {
-          await productSearch.mutateAsync(query)
+          // For inbound mode, search both Supabase and Open Food Facts with better error handling
+          const [supabaseResult, offResult] = await Promise.allSettled([
+            supabaseSearch.mutateAsync(query),
+            productSearch.mutateAsync(query),
+          ])
+
+          // Log any individual failures but don't fail the entire search
+          if (supabaseResult.status === 'rejected') {
+            console.error('Supabase search failed:', supabaseResult.reason)
+          }
+          if (offResult.status === 'rejected') {
+            console.error('Open Food Facts search failed:', offResult.reason)
+          }
         }
         setShowProductSearchResults(true)
       } catch (error) {
@@ -173,7 +216,7 @@ export default function ManualBarcodeEntry({
       }
 
       // If query is too short, hide results immediately
-      if (query.length < 2) {
+      if (query.length < SEARCH_CONFIG.MIN_SEARCH_LENGTH) {
         setShowProductSearchResults(false)
         return
       }
@@ -182,7 +225,7 @@ export default function ManualBarcodeEntry({
       debounceTimeoutRef.current = setTimeout(() => {
         debouncedProductNameSearch(query)
         debounceTimeoutRef.current = null
-      }, 300) // 300ms debounce delay
+      }, SEARCH_CONFIG.DEBOUNCE_DELAY)
     },
     [debouncedProductNameSearch],
   )
@@ -296,7 +339,11 @@ export default function ManualBarcodeEntry({
                       value={barcode}
                       onChange={e => setBarcode(e.target.value)}
                       onKeyDown={e => {
-                        if (e.key === 'Enter' && barcode.length >= 8) {
+                        if (
+                          e.key === 'Enter' &&
+                          barcode.length >= SEARCH_CONFIG.MIN_BARCODE_LENGTH &&
+                          isValidBarcode(barcode)
+                        ) {
                           handleBarcodeSubmit()
                         }
                       }}
@@ -307,7 +354,11 @@ export default function ManualBarcodeEntry({
 
                     <Button
                       onClick={handleBarcodeSubmit}
-                      disabled={barcode.length < 8 || isLookingUp}
+                      disabled={
+                        barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH ||
+                        !isValidBarcode(barcode) ||
+                        isLookingUp
+                      }
                       className="shrink-0"
                     >
                       {isLookingUp ? (
@@ -318,11 +369,14 @@ export default function ManualBarcodeEntry({
                       Lookup
                     </Button>
                   </div>
-                  {barcode && barcode.length < 8 && (
-                    <p className="text-xs text-orange-600">
-                      Barcode must be at least 8 digits long
-                    </p>
-                  )}
+                  {barcode &&
+                    (barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH ||
+                      !isValidBarcode(barcode)) && (
+                      <p className="text-xs text-orange-600">
+                        Barcode must be at least {SEARCH_CONFIG.MIN_BARCODE_LENGTH} digits and
+                        contain only numbers
+                      </p>
+                    )}
                 </div>
 
                 {/* Product Name Search */}
@@ -346,7 +400,7 @@ export default function ManualBarcodeEntry({
                           ? 'Search products in inventory...'
                           : 'Search Open Food Facts database...'
                       }
-                      disabled={activeSearch.isPending}
+                      disabled={false}
                     />
                     {activeSearch.isPending && (
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -357,110 +411,165 @@ export default function ManualBarcodeEntry({
 
                   {/* Search Results Dropdown */}
                   {showProductSearchResults &&
-                    activeSearch.data &&
-                    activeSearch.data.length > 0 && (
-                      <div className="border rounded-lg max-h-64 overflow-y-auto bg-white shadow-lg">
-                        {mode === 'outbound'
-                          ? // Supabase results for outbound
-                            (activeSearch.data as SupabaseProductSearchResult[]).map(product => (
-                              <Button
-                                key={product.product_id}
-                                variant="subtleGray"
-                                className={`w-full rounded-none justify-start text-left p-3 ${
-                                  product.isOutOfStock && 'cursor-not-allowed'
-                                }`}
-                                disabled={product.isOutOfStock}
-                                onClick={() => {
-                                  if (product.isOutOfStock) return
+                    ((mode === 'outbound' && activeSearch.data && activeSearch.data.length > 0) ||
+                      (mode === 'inbound' &&
+                        ((supabaseSearch.data && supabaseSearch.data.length > 0) ||
+                          (productSearch.data && productSearch.data.length > 0)))) && (
+                      <div className="border rounded-lg max-h-64 overflow-y-auto bg-white shadow-lg p-2">
+                        {mode === 'outbound' ? (
+                          // Supabase results for outbound
+                          (activeSearch.data as SupabaseProductSearchResult[]).map(product => (
+                            <Button
+                              key={product.product_id}
+                              variant="subtleGray"
+                              className={`w-full rounded-none justify-start text-left p-3 ${
+                                product.isOutOfStock && 'cursor-not-allowed'
+                              }`}
+                              disabled={product.isOutOfStock}
+                              onClick={() => {
+                                if (product.isOutOfStock) return
 
-                                  // For outbound/Supabase results, use the product_id if no barcode exists
-                                  // This ensures we have a unique identifier that won't cause lookup failures
-                                  const effectiveBarcode =
-                                    product.barcode && product.barcode.trim() !== ''
-                                      ? product.barcode
-                                      : `INTERNAL-${product.product_id}`
+                                // For outbound/Supabase results, use the product_id if no barcode exists
+                                // This ensures we have a unique identifier that won't cause lookup failures
+                                const effectiveBarcode =
+                                  product.barcode && product.barcode.trim() !== ''
+                                    ? product.barcode
+                                    : `INTERNAL-${product.product_id}`
 
-                                  const productData = {
-                                    barcode: effectiveBarcode,
-                                    productName: product.name,
-                                    brand: product.brand || '',
-                                    category: product.category || '',
-                                    imageUrl: product.image_url || '',
-                                    isManualEntry: true,
-                                    // Store the actual product_id for outbound operations
-                                    productId: product.product_id,
-                                  }
+                                const productData = {
+                                  barcode: effectiveBarcode,
+                                  productName: product.name,
+                                  brand: product.brand || '',
+                                  category: product.category || '',
+                                  imageUrl: product.image_url || '',
+                                  isManualEntry: true,
+                                  // Store the actual product_id for outbound operations
+                                  productId: product.product_id,
+                                }
 
-                                  setProductSelected(productData)
-                                  onProductSelected?.(effectiveBarcode, productData)
+                                setProductSelected(productData)
+                                onProductSelected?.(effectiveBarcode, productData)
 
-                                  // Reset search
-                                  setProductNameQuery('')
-                                  setShowProductSearchResults(false)
-                                  setBarcode('')
-                                }}
-                              >
-                                <div className="flex-1">
-                                  <Typography variant="p">{product.name}</Typography>
-                                  {product.brand && (
-                                    <Typography variant="p">{product.brand}</Typography>
-                                  )}
-                                  {product.isOutOfStock ? (
-                                    <Typography variant="small" className="text-red-600">
-                                      Out of Stock
-                                    </Typography>
-                                  ) : product.total_available_quantity ? (
-                                    <Typography variant="small" className="text-primary-900">
-                                      {product.total_available_quantity} units available
-                                      {product.batch_count &&
-                                        product.batch_count > 1 &&
-                                        ` (${product.batch_count} batches)`}
-                                    </Typography>
-                                  ) : null}
-                                </div>
-                              </Button>
-                            ))
-                          : // OpenFoodFacts results for inbound
-                            (activeSearch.data as OpenFoodFactsSearchResult[]).map(product => (
-                              <Button
-                                key={product.code}
-                                variant="ghost"
-                                className="w-full justify-start text-left p-3 hover:bg-gray-50"
-                                onClick={() => {
-                                  const productData = {
-                                    barcode: product.code,
-                                    productName: product.product_name || 'Unknown Product',
-                                    brand: product.brands || '',
-                                    category: '',
-                                    imageUrl: product.image_front_small_url || '',
-                                    isManualEntry: true,
-                                  }
+                                // Reset search
+                                setProductNameQuery('')
+                                setShowProductSearchResults(false)
+                                setBarcode('')
+                              }}
+                            >
+                              <div className="flex-1">
+                                <Typography variant="p">{product.name}</Typography>
+                                {product.brand && (
+                                  <Typography variant="p">{product.brand}</Typography>
+                                )}
+                                {product.isOutOfStock ? (
+                                  <Typography variant="small" className="text-red-600">
+                                    Out of Stock
+                                  </Typography>
+                                ) : product.total_available_quantity ? (
+                                  <Typography variant="small" className="text-primary-900">
+                                    {product.total_available_quantity} units available
+                                    {product.batch_count &&
+                                      product.batch_count > 1 &&
+                                      ` (${product.batch_count} batches)`}
+                                  </Typography>
+                                ) : null}
+                              </div>
+                            </Button>
+                          ))
+                        ) : (
+                          // Combined results for inbound mode
+                          <>
+                            {/* Supabase products first (higher priority) */}
+                            {supabaseSearch.data &&
+                              supabaseSearch.data.length > 0 &&
+                              (supabaseSearch.data as SupabaseProductSearchResult[]).map(
+                                product => (
+                                  <Button
+                                    key={`supabase-${product.product_id}`}
+                                    variant="ghost"
+                                    className="w-full justify-start text-left p-3"
+                                    onClick={() => {
+                                      const effectiveBarcode =
+                                        product.barcode && product.barcode.trim() !== ''
+                                          ? product.barcode
+                                          : `INTERNAL-${product.product_id}`
 
-                                  setProductSelected(productData)
-                                  onProductSelected?.(product.code, productData)
+                                      const productData = {
+                                        barcode: effectiveBarcode,
+                                        productName: product.name,
+                                        brand: product.brand || '',
+                                        category: product.category || '',
+                                        imageUrl: product.image_url || '',
+                                        isManualEntry: true,
+                                        productId: product.product_id,
+                                      }
 
-                                  // Reset search
-                                  setProductNameQuery('')
-                                  setShowProductSearchResults(false)
-                                  setBarcode('')
-                                }}
-                              >
-                                <div className="flex-1">
-                                  <div className="font-medium">
-                                    {product.product_name || 'Unknown Product'}
+                                      setProductSelected(productData)
+                                      onProductSelected?.(effectiveBarcode, productData)
+
+                                      // Reset search
+                                      setProductNameQuery('')
+                                      setShowProductSearchResults(false)
+                                      setBarcode('')
+                                    }}
+                                  >
+                                    <div className="flex-1">
+                                      <div className="font-medium">{product.name}</div>
+                                      {product.brand && (
+                                        <div className="text-sm text-gray-500">{product.brand}</div>
+                                      )}
+                                    </div>
+                                  </Button>
+                                ),
+                              )}
+
+                            {/* Open Food Facts results */}
+                            {productSearch.data &&
+                              productSearch.data.length > 0 &&
+                              (productSearch.data as OpenFoodFactsSearchResult[]).map(product => (
+                                <Button
+                                  key={`off-${product.code}`}
+                                  variant="ghost"
+                                  className="w-full justify-start text-left p-3 hover:bg-gray-50"
+                                  onClick={() => {
+                                    const productData = {
+                                      barcode: product.code,
+                                      productName: product.product_name || 'Unknown Product',
+                                      brand: product.brands || '',
+                                      category: '',
+                                      imageUrl: product.image_front_small_url || '',
+                                      isManualEntry: true,
+                                    }
+
+                                    setProductSelected(productData)
+                                    onProductSelected?.(product.code, productData)
+
+                                    // Reset search
+                                    setProductNameQuery('')
+                                    setShowProductSearchResults(false)
+                                    setBarcode('')
+                                  }}
+                                >
+                                  <div className="flex-1">
+                                    <div className="font-medium">
+                                      {product.product_name || 'Unknown Product'}
+                                    </div>
+                                    {product.brands && (
+                                      <div className="text-sm text-gray-500">{product.brands}</div>
+                                    )}
                                   </div>
-                                  {product.brands && (
-                                    <div className="text-sm text-gray-500">{product.brands}</div>
-                                  )}
-                                </div>
-                              </Button>
-                            ))}
+                                </Button>
+                              ))}
+                          </>
+                        )}
                       </div>
                     )}
 
                   {showProductSearchResults &&
-                    activeSearch.data &&
-                    activeSearch.data.length === 0 && (
+                    ((mode === 'outbound' && activeSearch.data && activeSearch.data.length === 0) ||
+                      (mode === 'inbound' &&
+                        (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
+                        (!productSearch.data || productSearch.data.length === 0))) && (
                       <div className="text-sm text-gray-500 p-3 border rounded-lg">
                         No products found matching "{productNameQuery}"
                       </div>
@@ -523,9 +632,7 @@ export default function ManualBarcodeEntry({
                             {lookupResult.product.categories && (
                               <div>
                                 <strong>Category:</strong>{' '}
-                                {lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim()
-                                  : 'Unknown'}
+                                {parseFirstCategory(lookupResult.product.categories)}
                               </div>
                             )}
 
@@ -556,10 +663,10 @@ export default function ManualBarcodeEntry({
                                   lookupResult.product.product_name_en ||
                                   'Unknown Product') as string,
                                 brand: (lookupResult.product.brands || '') as string,
-                                category: (lookupResult.product.categories
-                                  ? String(lookupResult.product.categories).split(',')[0]?.trim() ||
-                                    ''
-                                  : '') as string,
+                                category:
+                                  parseFirstCategory(lookupResult.product.categories) === 'Unknown'
+                                    ? ''
+                                    : parseFirstCategory(lookupResult.product.categories),
                                 imageUrl: (lookupResult.product.image_front_url ||
                                   lookupResult.product.image_url ||
                                   '') as string,
@@ -734,7 +841,7 @@ export default function ManualBarcodeEntry({
                       {productSearch.data && productSearch.data.length > 0 && (
                         <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
                           {productSearch.data
-                            .slice(0, 5)
+                            .slice(0, SEARCH_CONFIG.MAX_SEARCH_RESULTS)
                             .map((product: OpenFoodFactsSearchResult) => (
                               <Button
                                 key={product.code}

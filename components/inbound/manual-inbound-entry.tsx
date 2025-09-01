@@ -238,7 +238,7 @@ export default function ManualInboundEntry({
                       <Package className="w-5 h-5 text-primary-600" />
                       <Typography variant="h3">Selected Product</Typography>
                     </div>
-                    <div className="space-y-1 text-sm">
+                    <div className="space-y-1 text-sm flex flex-col">
                       <Typography variant="p">
                         <span>Name:</span> {selectedProduct.productName}
                       </Typography>
@@ -307,7 +307,7 @@ export default function ManualInboundEntry({
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex flex-col gap-2">
                 <CardTitle>Batch items to submit</CardTitle>
                 <CardDescription>
                   {scannedItems.length} batch

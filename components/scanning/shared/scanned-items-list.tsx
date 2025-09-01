@@ -124,22 +124,27 @@ export default function ScannedItemsList({
         </div>
       </div>
 
-      <div className="space-y-2 max-h-80 overflow-y-auto">
+      <div className="space-y-2">
         {items.map(item => (
           <div
             key={item.id}
-            className="flex items-center justify-between p-2 border rounded text-sm"
+            className="flex items-start justify-between p-3 border rounded-2xl text-sm"
           >
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col gap-2">
               <Typography variant="p">
-                <span className="text-gray-500">Product:</span> {item.productName}
+                <span className="text-gray-500">{item.productName}</span>
               </Typography>
-              <Typography variant="p">
-                <span className="font-normal text-gray-500">Quantity:</span> {item.quantity}x{' '}
-                <span className="font-normal text-gray-500">Price:</span> {formatPrice(item.price)}{' '}
-                <span className="font-normal text-gray-500">Expiry:</span>{' '}
-                {formatExpiryDate(item.expiryDate)}
-              </Typography>
+              <div className="flex flex-col gap-2">
+                <Typography variant="p">
+                  <span className="text-gray-500">Quantity:</span> {item.quantity}
+                </Typography>
+                <Typography variant="p">
+                  <span className="text-gray-500">Price:</span> {formatPrice(item.price)}
+                </Typography>
+                <Typography variant="p">
+                  <span className="text-gray-500">Expiry:</span> {formatExpiryDate(item.expiryDate)}
+                </Typography>
+              </div>
             </div>
 
             <div className="flex items-center gap-1">
