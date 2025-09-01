@@ -8,7 +8,7 @@ import {
   RefreshCcw,
   Trash2,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import {
   InventoryForm,
@@ -37,13 +37,12 @@ import {
   useInventoryActions,
   useScannedItemConverter,
 } from '@/hooks/use-inventory-submission'
+import { useInboundScanningSession } from '@/hooks/use-inbound-scanning-session'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
 
 interface ManualInboundEntryProps {
   storeId?: string
-  persistedItems?: ScannedItem[]
-  onItemsChange?: (items: ScannedItem[]) => void
   onBatchSubmitted?: (result: any) => void
   className?: string
 }
@@ -58,8 +57,6 @@ interface SelectedProduct {
 
 export default function ManualInboundEntry({
   storeId: propStoreId,
-  persistedItems = [],
-  onItemsChange,
   onBatchSubmitted,
   className = '',
 }: ManualInboundEntryProps) {
@@ -77,9 +74,14 @@ export default function ManualInboundEntry({
     price: 0,
   })
 
-  // List of items to be submitted - use persisted items if provided
-  const [scannedItems, setScannedItems] =
-    useState<ScannedItem[]>(persistedItems)
+  // Global scanning session state
+  const {
+    items: scannedItems,
+    addItem,
+    removeItem,
+    updateItem,
+    clearSession,
+  } = useInboundScanningSession(storeId)
 
   // Submission state
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -92,16 +94,6 @@ export default function ManualInboundEntry({
   // Hooks for inventory submission
   const { submitBatch, isSubmittingBatch } = useInventoryActions()
   const { convertMultipleScannedItems } = useScannedItemConverter()
-
-  // Sync with persisted items from parent
-  useEffect(() => {
-    setScannedItems(persistedItems)
-  }, [persistedItems])
-
-  // Update parent whenever items change
-  useEffect(() => {
-    onItemsChange?.(scannedItems)
-  }, [scannedItems, onItemsChange])
 
   // Handle product selection from ManualBarcodeEntry
   const handleProductSelected = (barcode: string, productData: any) => {
@@ -143,7 +135,7 @@ export default function ManualInboundEntry({
       timestamp: new Date(),
     }
 
-    setScannedItems((prev) => [newItem, ...prev])
+    addItem(newItem)
 
     // Clear form and product selection for next entry
     setSelectedProduct(null)
@@ -202,9 +194,8 @@ export default function ManualInboundEntry({
             totalCount: productsToSubmit.length,
           })
 
-          // Clear items through parent state management
-          setScannedItems([])
-          onItemsChange?.([])
+          // Clear items after successful submission
+          clearSession()
           setShowSubmissionDialog(false)
           setShowSuccessDialog(true)
 
@@ -345,18 +336,8 @@ export default function ManualInboundEntry({
           <CardContent>
             <ScannedItemsList
               items={scannedItems}
-              onItemUpdated={(updatedItem) => {
-                setScannedItems((prev) =>
-                  prev.map((item) =>
-                    item.id === updatedItem.id ? updatedItem : item
-                  )
-                )
-              }}
-              onDeleteItem={(itemId) => {
-                setScannedItems((prev) =>
-                  prev.filter((item) => item.id !== itemId)
-                )
-              }}
+              onItemUpdated={updateItem}
+              onDeleteItem={removeItem}
             />
           </CardContent>
         </Card>

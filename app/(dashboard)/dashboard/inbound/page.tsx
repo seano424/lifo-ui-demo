@@ -1,10 +1,8 @@
 'use client'
 
 import { Keyboard, Scan, Upload } from 'lucide-react'
-import { useState } from 'react'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
 import ManualInboundEntry from '@/components/inbound/manual-inbound-entry'
-import type { ScannedItem } from '@/components/scanning/shared'
 import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -14,9 +12,6 @@ import { useStoreState } from '@/lib/stores/store-context'
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
   const { isTablet, isMobile } = useMediaQuery()
-
-  // Persist manual entry items across tab switches
-  const [manualEntryItems, setManualEntryItems] = useState<ScannedItem[]>([])
 
   return (
     <div className="space-y-6">
@@ -105,12 +100,8 @@ export default function InboundPage() {
               {currentStore ? (
                 <ManualInboundEntry
                   storeId={currentStore.store_id}
-                  persistedItems={manualEntryItems}
-                  onItemsChange={setManualEntryItems}
                   onBatchSubmitted={(result) => {
                     console.log('Batch submitted:', result)
-                    // Clear items after successful submission
-                    setManualEntryItems([])
                   }}
                 />
               ) : (
