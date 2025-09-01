@@ -400,7 +400,7 @@ export default function ManualBarcodeEntry({
                           ? 'Search products in inventory...'
                           : 'Search Open Food Facts database...'
                       }
-                      disabled={activeSearch.isPending}
+                      disabled={false}
                     />
                     {activeSearch.isPending && (
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
