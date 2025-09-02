@@ -36,7 +36,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
 
       const supabase = createClient()
 
-      console.log('🔍 Fetching permissions for:', { activeStoreId, userId: currentUser.id })
 
       // Check store_users relationship
       const { data: storeUser, error: storeUserError } = await supabase
@@ -53,7 +52,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
       let isOwner = false
 
       if (storeUserError || !storeUser) {
-        console.log('📋 No store_users record, checking ownership...')
 
         // Check if user is store owner
         const { data: store } = await supabase
@@ -64,7 +62,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
           .single()
 
         if (store?.owner_id === currentUser.id) {
-          console.log('👑 User is store owner')
           isOwner = true
           role = 'owner'
           permissions = {} // Owner has all permissions by default
@@ -72,7 +69,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
           throw new Error('No access to this store')
         }
       } else {
-        console.log('✅ Found store_users record:', storeUser)
         role = storeUser.role_in_store
         permissions = storeUser.permissions || {}
         isOwner = role === 'owner'
@@ -106,7 +102,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
         userId: currentUser.id,
       }
 
-      console.log('🎯 Calculated permissions:', calculatedPermissions)
       return calculatedPermissions
     },
     enabled: enabled && !!activeStoreId && !!currentUser?.id && !userLoading && isHydrated,
@@ -127,7 +122,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
 
   // 🚀 CRITICAL FIX: Return server permissions immediately during hydration
   if (!isHydrated && serverPermissions) {
-    console.log('⚡ Returning server permissions during hydration')
     return {
       ...serverPermissions,
       isLoading: false,
@@ -137,7 +131,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
 
   // Return server permissions if query is still loading and we have them
   if (permissionsQuery.isLoading && serverPermissions) {
-    console.log('⏳ Returning server permissions while query loads')
     return {
       ...serverPermissions,
       isLoading: false, // Don't show loading if we have server permissions

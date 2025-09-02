@@ -70,13 +70,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   // PIN login form handler - with proper Supabase session
   const handlePINLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('🚀 Starting PIN login form submission...')
 
     setIsLoading(true)
     setError(null)
 
     try {
-      console.log('📞 Calling PIN session API...')
 
       // Call the PIN session API to validate and create session
       const response = await fetch('/api/auth/pin-session', {
@@ -88,18 +86,13 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
 
       const result = await response.json()
-      console.log('📬 PIN session API returned:', result)
 
       if (!result.success) {
-        console.log('❌ PIN validation failed:', result.error)
         throw new Error(result.error || 'Invalid credentials')
       }
 
-      console.log('✅ PIN validation succeeded!')
-
       if (result.session) {
         // Set the session in Supabase client if we have session tokens
-        console.log('Setting session with tokens...')
         const supabase = createClient()
         const { error: sessionError } = await supabase.auth.setSession({
           access_token: result.session.access_token,
@@ -110,19 +103,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           console.error('❌ Failed to set session:', sessionError)
           throw new Error('Failed to create session')
         }
-
-        console.log('🎉 Session created successfully!')
       } else if (result.magicLink) {
         // Handle magic link approach
-        console.log('📧 Using magic link for authentication...')
         window.location.href = result.magicLink
         return
       } else if (result.authUser) {
         // Handle manual session setup
-        console.log('🔧 Manual session setup...')
 
         // Try to sign in with the user's email (this might work since PIN is validated)
-        console.log('Attempting sign in for:', result.authUser.email)
         toast.success(`PIN authenticated! Setting up session for ${result.user.username}...`)
 
         // For now, just show success and redirect to dashboard without session
@@ -131,7 +119,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         return
       } else {
         // PIN validation successful but no session tokens yet
-        console.log('📝 PIN validation successful, but session creation needs work')
         toast.success(`PIN authenticated for ${result.user.username}!`)
 
         // For now, show success message and stay on login page
@@ -140,17 +127,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
       toast.success(`Welcome back, ${result.user.full_name}!`)
 
-      console.log('🧭 Attempting to redirect to dashboard...')
       router.push('/dashboard') // Same redirect for all users
-
-      console.log('🎯 Router.push called, waiting for redirect...')
     } catch (error: unknown) {
-      console.log('💥 Error in handlePINLogin:', error)
       const errorMessage = error instanceof Error ? error.message : 'Login failed'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
-      console.log('🏁 Setting isLoading to false...')
       setIsLoading(false)
     }
   }

@@ -51,14 +51,10 @@ export function useCSVUpload() {
 
   // Simple CSV preview (first 10 rows)
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
-    console.log('📄 [USE-CSV-UPLOAD] Starting CSV preview parsing...')
     const startTime = performance.now()
 
     const text = await file.text()
-    console.log(`📄 [USE-CSV-UPLOAD] File content loaded: ${text.length} characters`)
-
     const lines = text.trim().split('\n')
-    console.log(`📄 [USE-CSV-UPLOAD] CSV lines detected: ${lines.length}`)
 
     if (lines.length < 2) {
       console.warn('⚠️ [USE-CSV-UPLOAD] CSV file has no data rows')
@@ -66,7 +62,6 @@ export function useCSVUpload() {
     }
 
     const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-    console.log('📋 [USE-CSV-UPLOAD] CSV headers detected:', headers)
 
     const preview: CsvPreviewItem[] = []
 
@@ -76,18 +71,10 @@ export function useCSVUpload() {
     const qtyIndex = headers.findIndex(h => h.toLowerCase().includes('quantity'))
     const expiryIndex = headers.findIndex(h => h.toLowerCase().includes('expiry'))
 
-    console.log('🎯 [USE-CSV-UPLOAD] Column mapping:', {
-      sku: skuIndex >= 0 ? headers[skuIndex] : 'NOT_FOUND',
-      name: nameIndex >= 0 ? headers[nameIndex] : 'NOT_FOUND',
-      category: categoryIndex >= 0 ? headers[categoryIndex] : 'NOT_FOUND',
-      quantity: qtyIndex >= 0 ? headers[qtyIndex] : 'NOT_FOUND',
-      expiry: expiryIndex >= 0 ? headers[expiryIndex] : 'NOT_FOUND',
-    })
 
     const hasExpiryColumn = expiryIndex >= 0
     let _itemsWithoutExpiry = 0
 
-    console.log(`🔍 [USE-CSV-UPLOAD] Processing all ${lines.length - 1} rows...`)
 
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
@@ -105,17 +92,9 @@ export function useCSVUpload() {
       }
 
       preview.push(previewItem)
-
-      if (i <= 3) {
-        console.log(`📦 [USE-CSV-UPLOAD] Sample row ${i}:`, previewItem)
-      }
     }
 
     const endTime = performance.now()
-    console.log(
-      `✅ [USE-CSV-UPLOAD] Preview parsing completed in ${Math.round(endTime - startTime)}ms`,
-    )
-    console.log(`📊 [USE-CSV-UPLOAD] Preview ready: ${preview.length} items`)
 
     // Count total items without expiry in the entire file (not just preview)
     let totalItemsWithoutExpiry = 0
@@ -132,9 +111,6 @@ export function useCSVUpload() {
       }
     }
 
-    console.log(
-      `📊 [USE-CSV-UPLOAD] Expiry analysis: ${totalItemsWithoutExpiry} items without expiry date`,
-    )
 
     setColumnMapping({ hasExpiryColumn, itemsWithoutExpiry: totalItemsWithoutExpiry })
     setCsvPreview(preview)
@@ -152,7 +128,6 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      console.log('🚀 [USE-CSV-UPLOAD] Mutation started - preparing form data')
       const mutationStartTime = performance.now()
 
       const formData = new FormData()
@@ -166,15 +141,6 @@ export function useCSVUpload() {
         formData.append('storeId', storeId)
       }
 
-      console.log(
-        '📤 [USE-CSV-UPLOAD] Form data prepared, making API call to /api/inventory/upload',
-      )
-      console.log('🎯 [USE-CSV-UPLOAD] Upload parameters:', {
-        fileName: file.name,
-        fileSize: file.size,
-        storeId,
-        timestamp: new Date().toISOString(),
-      })
 
       // Use the main optimized upload route
       const fetchStartTime = performance.now()
@@ -184,10 +150,6 @@ export function useCSVUpload() {
       })
       const fetchEndTime = performance.now()
 
-      console.log(
-        `📡 [USE-CSV-UPLOAD] API response received in ${Math.round(fetchEndTime - fetchStartTime)}ms`,
-      )
-      console.log('📊 [USE-CSV-UPLOAD] Response status:', response.status, response.statusText)
 
       if (!response.ok) {
         console.error('❌ [USE-CSV-UPLOAD] Upload failed with status:', response.status)
@@ -199,26 +161,11 @@ export function useCSVUpload() {
       const result = await response.json()
       const mutationEndTime = performance.now()
 
-      console.log(
-        `✅ [USE-CSV-UPLOAD] Upload mutation completed in ${Math.round(mutationEndTime - mutationStartTime)}ms`,
-      )
-      console.log('🎉 [USE-CSV-UPLOAD] Raw API response:', result)
-
       return result
     },
     onSuccess: (data, { storeId }) => {
-      console.log('🎉 [USE-CSV-UPLOAD] Upload SUCCESS callback triggered')
-      console.log('📊 [USE-CSV-UPLOAD] Success data breakdown:', {
-        processed: data.processed,
-        total_items: data.total_items,
-        processing_time_ms: data.processing_time_ms,
-        performance_metrics: data.performance_metrics,
-        duplicates_skipped_count: data.duplicates_skipped?.length || 0,
-        errors_count: data.errors?.length || 0,
-      })
 
       // Invalidate inventory queries to refresh dashboard
-      console.log('🔄 [USE-CSV-UPLOAD] Invalidating query cache for store:', storeId)
       queryClient.invalidateQueries({ queryKey: ['store-batches', storeId] })
       queryClient.invalidateQueries({ queryKey: ['store-inventory', storeId] })
       queryClient.invalidateQueries({ queryKey: ['expiring-batches', storeId] })
@@ -226,21 +173,12 @@ export function useCSVUpload() {
 
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
-      console.log('💾 [USE-CSV-UPLOAD] Upload results cached for review')
 
       // Enhanced success notification with detailed performance metrics
       const metrics = data.performance_metrics || {}
       const speed = metrics.items_per_second || 0
       const totalTime = data.processing_time_ms || 0
 
-      console.log('⚡ [USE-CSV-UPLOAD] Performance metrics analysis:', {
-        items_per_second: speed,
-        total_time_ms: totalTime,
-        duplicate_detection_ms: metrics.duplicate_detection_ms,
-        product_resolution_ms: metrics.product_resolution_ms,
-        batch_insertion_ms: metrics.batch_insertion_ms,
-        store_products_linked: metrics.store_products_linked,
-      })
 
       // Create performance breakdown
       const performanceDetails = []
@@ -257,7 +195,6 @@ export function useCSVUpload() {
       const performanceSummary =
         performanceDetails.length > 0 ? ` (${performanceDetails.join(', ')})` : ''
 
-      console.log('🎊 [USE-CSV-UPLOAD] Showing success toast with performance summary')
       toast.success(`🚀 Successfully imported ${data.processed} of ${data.total_items} products`, {
         description:
           data.skipped > 0

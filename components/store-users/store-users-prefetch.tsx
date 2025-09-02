@@ -26,7 +26,6 @@ export function StoreUsersPrefetch() {
         const existingData = queryClient.getQueryData(queryKeys.storeUsers.infinite(storeId, {}))
 
         if (!existingData) {
-          console.log('[StoreUsersPrefetch] Prefetching store users for:', activeStore.store_name)
 
           // Prefetch first page of all users
           await queryClient.prefetchInfiniteQuery({
@@ -64,7 +63,6 @@ export function StoreUsersPrefetch() {
             ),
           )
 
-          console.log('[StoreUsersPrefetch] Successfully prefetched store users data')
         }
       } catch (error) {
         console.error('[StoreUsersPrefetch] Error prefetching store users:', error)

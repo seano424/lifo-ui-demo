@@ -50,9 +50,6 @@ export function OnboardingSignUpForm({
     setIsLoading(true)
     setError(null)
 
-    console.log('🚀 Starting handleSignUp')
-    console.log('🌍 ONBOARDING_MODE:', ONBOARDING_MODE)
-    console.log('👤 currentUser:', currentUser)
 
     // Validation
     if (ONBOARDING_MODE === 'production' && password.length < 6) {
@@ -86,7 +83,6 @@ export function OnboardingSignUpForm({
         case 'mock':
           // Mock mode: generate fake user ID
           userId = `mock-user-${Date.now()}`
-          console.log('🎭 Mock mode: Generated user ID:', userId)
           break
 
         case 'test': {
@@ -98,12 +94,10 @@ export function OnboardingSignUpForm({
             return
           }
           userId = currentUserId
-          console.log('🧪 Test mode: Using current user ID:', userId)
           break
         }
         default: {
           // Production mode: create new auth user
-          console.log('🔐 Production mode: Creating new user')
           const supabase = createClient()
 
           const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -122,7 +116,6 @@ export function OnboardingSignUpForm({
           if (!authData.user) throw new Error('No user data returned from Supabase')
 
           userId = authData.user.id
-          console.log('🔐 Production: Created user ID:', userId)
           break
         }
       }
@@ -138,11 +131,6 @@ export function OnboardingSignUpForm({
         business_name: confirmedStoreInsert?.business_name,
       }
 
-      console.log('🚀 Calling API with payload:', {
-        userId,
-        store: storeData,
-        user: { email, fullName },
-      })
 
       // Call API
       const response = await fetch('/api/onboarding', {
@@ -161,7 +149,6 @@ export function OnboardingSignUpForm({
       }
 
       const result = await response.json()
-      console.log('✅ Onboarding result:', result)
 
       // Update onboarding state
       setUserDetails({ email, password, fullName })

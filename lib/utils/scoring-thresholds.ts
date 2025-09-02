@@ -44,7 +44,6 @@ export async function getStoreThreshold(
       return type === 'critical' ? 0.8 : 0.7
     }
 
-    console.log(`[getStoreThreshold] Store ${storeId} ${type} threshold: ${numericThreshold}`)
     return numericThreshold
   } catch (error) {
     console.error('[getStoreThreshold] Unexpected error:', error)

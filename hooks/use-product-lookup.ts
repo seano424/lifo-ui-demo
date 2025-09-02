@@ -47,7 +47,6 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
       }
 
       // If not cached, check our Supabase products database first
-      console.log(`[ProductLookup] Checking Supabase database for barcode: ${barcode}`)
       const { data: supabaseProduct, error: supabaseError } = await supabase
         .schema('inventory')
         .from('products')
@@ -60,7 +59,6 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
       }
 
       if (supabaseProduct) {
-        console.log(`[ProductLookup] Found product in Supabase:`, supabaseProduct.name)
         // If we have Open Food Facts data, use it
         if (supabaseProduct.open_food_facts_data) {
           // Cache the Supabase product for future lookups

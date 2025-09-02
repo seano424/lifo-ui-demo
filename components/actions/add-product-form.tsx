@@ -31,7 +31,6 @@ export function AddProductForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle form submission
-    console.log('Adding product:', formData)
     // Reset form
     setFormData({
       barcode: '',

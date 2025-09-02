@@ -218,7 +218,6 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
       throw new Error(`Failed to update primary store: ${error.message}`)
     }
 
-    console.log('[updateUserPrimaryStore] Success:', { userId, storeId })
   } catch (err) {
     console.error('[updateUserPrimaryStore] Unexpected error:', err)
     throw err

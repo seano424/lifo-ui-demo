@@ -319,7 +319,7 @@ export function ProductsListPresentation({
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              console.log('View batches for product:', product.product_id)
+                              // Add view batches functionality
                             }}
                           >
                             <Package className="mr-2 h-4 w-4" />
@@ -327,7 +327,7 @@ export function ProductsListPresentation({
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              console.log('Edit product:', product.product_id)
+                              // Add edit functionality
                             }}
                           >
                             <Edit className="mr-2 h-4 w-4" />

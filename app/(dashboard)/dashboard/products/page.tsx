@@ -67,7 +67,6 @@ export default async function ProductsPage() {
       pages: 1, // Only prefetch first page
     })
 
-    console.log('[ProductsPage] Prefetched data for store:', storeToUse.store_name)
   } catch (error) {
     console.error('[ProductsPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading

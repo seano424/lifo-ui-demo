@@ -21,14 +21,9 @@ export async function scoreAfterScanInClient(
 }> {
   const startTime = Date.now()
 
-  console.log('[CLIENT-SCORING] Starting scoring for scan-in:', {
-    storeId,
-    batchId,
-  })
 
   // Check if auto-scoring is enabled
   if (process.env.NEXT_PUBLIC_ENABLE_AUTO_SCORING === 'false') {
-    console.log('[CLIENT-SCORING] Auto-scoring disabled')
     return {
       attempted: false,
       success: false,
@@ -40,7 +35,6 @@ export async function scoreAfterScanInClient(
 
   // Skip scoring in development to avoid CORS issues
   if (process.env.NODE_ENV === 'development') {
-    console.log('[CLIENT-SCORING] Skipping scoring in development to avoid CORS issues')
     return {
       attempted: false,
       success: false,
@@ -75,7 +69,6 @@ export async function scoreAfterScanInClient(
     const fastApiBaseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
     const endpoint = `${fastApiBaseUrl}/api/v1/scoring/batch/${storeId}`
 
-    console.log('[CLIENT-SCORING] Calling FastAPI endpoint:', endpoint)
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout for scan-in
@@ -111,11 +104,6 @@ export async function scoreAfterScanInClient(
 
       const data = await response.json()
 
-      console.log('[CLIENT-SCORING] Scoring completed:', {
-        processed: data.processed,
-        high_priority: data.high_priority_count,
-        processing_time: data.processing_time_ms,
-      })
 
       return {
         attempted: true,

@@ -4,17 +4,12 @@ import { handleScoringError, scoreAfterCsvUpload } from '@/lib/scoring/batch-sco
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
-  console.log('🚀 [UPLOAD-API] === CSV BULK UPLOAD API CALLED ===')
   const apiStartTime = Date.now()
-  console.log('⏰ [UPLOAD-API] Request timestamp:', new Date().toISOString())
 
   try {
-    console.log('🔗 [UPLOAD-API] Creating Supabase client...')
     const supabase = await createClient()
-    console.log('✅ [UPLOAD-API] Supabase client created successfully')
 
     // Get authenticated user
-    console.log('🔐 [UPLOAD-API] Checking user authentication...')
     const authStartTime = Date.now()
     const {
       data: { user },
@@ -22,7 +17,6 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     const authEndTime = Date.now()
 
-    console.log(`🔐 [UPLOAD-API] Auth check completed in ${authEndTime - authStartTime}ms`)
 
     if (authError) {
       console.error('❌ [UPLOAD-API] Auth error:', authError)
@@ -34,31 +28,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user authenticated' }, { status: 401 })
     }
 
-    console.log('✅ [UPLOAD-API] User authenticated successfully:', {
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    })
 
-    console.log('📋 [UPLOAD-API] Parsing form data...')
     const formDataStartTime = Date.now()
     const formData = await request.formData()
     const formDataEndTime = Date.now()
-    console.log(`✅ [UPLOAD-API] Form data parsed in ${formDataEndTime - formDataStartTime}ms`)
 
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
     const defaultExpiryDate = formData.get('defaultExpiryDate') as string
 
-    console.log('📁 [UPLOAD-API] File and store info received:', {
-      fileName: file?.name,
-      fileSize: file?.size,
-      fileType: file?.type,
-      storeId,
-      defaultExpiryDate: defaultExpiryDate || 'none',
-      hasFile: !!file,
-      hasStoreId: !!storeId,
-    })
 
     if (!file || !storeId) {
       console.error('❌ [UPLOAD-API] Missing required parameters:', {
@@ -69,7 +47,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file
-    console.log('🔍 [UPLOAD-API] Validating file...')
     if (!file.name.toLowerCase().endsWith('.csv')) {
       console.error('❌ [UPLOAD-API] Invalid file type:', file.name)
       return NextResponse.json({ error: 'Invalid file type' }, { status: 400 })
@@ -81,24 +58,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large' }, { status: 400 })
     }
 
-    console.log('✅ [UPLOAD-API] File validation passed')
 
     // Fast CSV processing - no Python subprocess overhead
-    console.log('📄 [UPLOAD-API] Reading CSV content from file...')
     const csvReadStartTime = Date.now()
     const csvContent = await file.text()
     const csvReadEndTime = Date.now()
-    console.log(
-      `✅ [UPLOAD-API] CSV content read in ${csvReadEndTime - csvReadStartTime}ms, length: ${csvContent.length} characters`,
-    )
 
-    console.log('🔍 [UPLOAD-API] Parsing CSV content...')
     const csvParseStartTime = Date.now()
     const csvData = fastParseCSV(csvContent, defaultExpiryDate)
     const csvParseEndTime = Date.now()
-    console.log(
-      `✅ [UPLOAD-API] CSV parsed in ${csvParseEndTime - csvParseStartTime}ms, items found: ${csvData.length}`,
-    )
 
     if (defaultExpiryDate) {
       const itemsWithDefaultExpiry = csvData.filter(
@@ -108,7 +76,6 @@ export async function POST(request: NextRequest) {
           'Expiry_Date' in item &&
           (item as Record<string, unknown>).Expiry_Date === defaultExpiryDate,
       ).length
-      console.log(`📅 [UPLOAD-API] Applied default expiry date to ${itemsWithDefaultExpiry} items`)
     }
 
     if (csvData.length === 0) {
@@ -117,47 +84,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Log first few items for debugging
-    console.log('📦 [UPLOAD-API] Sample CSV items (first 3):')
-    csvData.slice(0, 3).forEach((item, index) => {
-      console.log(`   Item ${index + 1}:`, item)
-    })
 
     // Use existing proven InventoryOperations.processCsvBatch
-    console.log('🔧 [UPLOAD-API] Creating InventoryOperations instance...')
     const operationsCreateStartTime = Date.now()
     const operations = new InventoryOperations(supabase)
     const operationsCreateEndTime = Date.now()
-    console.log(
-      `✅ [UPLOAD-API] InventoryOperations created in ${operationsCreateEndTime - operationsCreateStartTime}ms`,
-    )
 
-    console.log('⚙️ [UPLOAD-API] === STARTING BULK CSV PROCESSING ===')
-    console.log('🎯 [UPLOAD-API] Processing parameters:', {
-      itemCount: csvData.length,
-      storeId,
-      userId: user.id,
-      bulkOptimizationEnabled: true,
-    })
 
     const processingStartTime = Date.now()
     const result = await operations.processCsvBatch(csvData, storeId, user.id)
     const processingEndTime = Date.now()
 
-    console.log(
-      `⚡ [UPLOAD-API] BULK PROCESSING COMPLETED in ${processingEndTime - processingStartTime}ms`,
-    )
-    console.log('📊 [UPLOAD-API] Processing results summary:', {
-      processed: result.processed,
-      errors_count: result.errors?.length || 0,
-      duplicates_skipped_count: result.duplicates_skipped?.length || 0,
-      performance_metrics: result.performance_metrics,
-    })
 
     const totalTime = Date.now() - apiStartTime
-    console.log('⏱️ [UPLOAD-API] Total API time:', totalTime, 'ms')
 
     // Return enhanced response format with bulk operation metrics
-    console.log('📦 [UPLOAD-API] Preparing response object...')
     const response = {
       success: true,
       processed: result.processed,
@@ -180,23 +121,8 @@ export async function POST(request: NextRequest) {
       },
     }
 
-    console.log('🎉 [UPLOAD-API] === BULK UPLOAD SUCCESSFUL ===')
-    console.log('📊 [UPLOAD-API] Final performance metrics:', {
-      total_api_time_ms: totalTime,
-      items_processed: result.processed,
-      items_per_second: response.performance_metrics.items_per_second,
-      duplicate_detection_ms: response.performance_metrics.duplicate_detection_ms,
-      batch_insertion_ms: response.performance_metrics.batch_insertion_ms,
-      success_rate: `${Math.round((result.processed / csvData.length) * 100)}%`,
-    })
 
     // PHASE 2: Automatic scoring integration after successful batch creation
-    console.log('🧠 [UPLOAD-API] === STARTING AUTOMATIC SCORING ===')
-    console.log('🎯 [UPLOAD-API] Scoring parameters:', {
-      storeId,
-      processedBatches: result.processed,
-      scoringEnabled: process.env.ENABLE_AUTO_SCORING !== 'false',
-    })
 
     let scoringResult = null
     let scoringWarning = null
@@ -212,13 +138,6 @@ export async function POST(request: NextRequest) {
         const scoringTime = Date.now() - scoringStartTime
 
         if (scoringResult.success) {
-          console.log('✅ [UPLOAD-API] Automatic scoring completed:', {
-            storeId,
-            processed: scoringResult.data.processed,
-            high_priority: scoringResult.data.high_priority_count,
-            scoring_time_ms: scoringTime,
-            fastapi_processing_ms: scoringResult.data.processing_time_ms,
-          })
         } else {
           console.warn('⚠️ [UPLOAD-API] Scoring failed (non-critical):', {
             storeId,
@@ -229,7 +148,6 @@ export async function POST(request: NextRequest) {
           // Handle scoring error gracefully
           const errorHandling = handleScoringError(scoringResult, 'csv_upload')
           scoringWarning = errorHandling.userMessage
-          console.log('📝 [UPLOAD-API]', errorHandling.logMessage)
         }
       } catch (scoringError) {
         const scoringTime = Date.now() - scoringStartTime
@@ -242,8 +160,6 @@ export async function POST(request: NextRequest) {
         scoringWarning =
           'Batches created successfully. Scoring will be calculated in the background.'
       }
-    } else {
-      console.log('⏭️ [UPLOAD-API] Automatic scoring disabled or no batches to score')
     }
 
     // Enhanced response with scoring information
@@ -259,7 +175,6 @@ export async function POST(request: NextRequest) {
       },
     }
 
-    console.log('📤 [UPLOAD-API] Sending enhanced response with scoring info to client')
     return NextResponse.json(enhancedResponse)
   } catch (error) {
     const errorTime = Date.now() - apiStartTime
@@ -280,7 +195,6 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     }
 
-    console.log('📤 [UPLOAD-API] Sending error response to client:', errorResponse)
     return NextResponse.json(errorResponse, { status: 500 })
   }
 }

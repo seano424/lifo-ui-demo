@@ -81,7 +81,6 @@ class OpenFoodFactsClient {
       }
 
       const data = await response.json()
-      console.log(`[OpenFoodFacts] API Response for ${barcode}:`, data)
       return data
     } catch (error) {
       console.error(`[OpenFoodFacts] Failed to lookup ${barcode}:`, error)
@@ -116,14 +115,8 @@ export function transformOpenFoodFactsProduct(
   barcode: string,
   offProduct: OpenFoodFactsProduct,
 ): ProductLookupResult {
-  console.log(`[OpenFoodFacts] Transform for ${barcode}:`, {
-    status: offProduct.status,
-    hasProduct: !!offProduct.product,
-    productName: offProduct.product?.product_name,
-  })
 
   if (offProduct.status !== 1 || !offProduct.product) {
-    console.log(`[OpenFoodFacts] Product not found for ${barcode} - status: ${offProduct.status}`)
     return {
       barcode,
       found: false,
@@ -135,9 +128,6 @@ export function transformOpenFoodFactsProduct(
   const productName = offProduct.product.product_name || offProduct.product.product_name_en
 
   if (!productName || productName.trim() === '') {
-    console.log(
-      `[OpenFoodFacts] Product found for ${barcode} but has no meaningful name - treating as not found`,
-    )
     return {
       barcode,
       found: false,
@@ -146,7 +136,6 @@ export function transformOpenFoodFactsProduct(
     }
   }
 
-  console.log(`[OpenFoodFacts] Product found for ${barcode}:`, productName)
   return {
     barcode,
     found: true,

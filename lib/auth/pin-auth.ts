@@ -129,7 +129,6 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
   const supabase = createClient()
 
   try {
-    console.log('[validatePINLogin] Attempting PIN login for username:', data.username)
 
     // Call Supabase RPC function to validate PIN and get user data
     const { data: result, error } = await supabase.rpc('validate_pin_login', {
@@ -171,7 +170,6 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
 
     // Success! For PIN login, we need to create a session using the sign-in method
     // Since the user has been validated server-side, we can use a magic link approach
-    console.log('[validatePINLogin] PIN validated, creating session...')
 
     // Sign in the user using their email (since PIN validation succeeded)
     const { error: authError } = await supabase.auth.signInWithOtp({
@@ -198,7 +196,6 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
       }
     }
 
-    console.log('[validatePINLogin] Success for user:', result.user.username)
 
     return {
       success: true,

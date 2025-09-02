@@ -55,12 +55,6 @@ export async function scoreBatchesAfterCreation(
   const startTime = Date.now()
   let attemptCount = 0
 
-  console.log('[SCORING-INTEGRATION] Starting batch scoring:', {
-    storeId,
-    operation: options.operation,
-    batchCount: options.batchIds?.length || 'all',
-    force_recalculate: options.force_recalculate || false,
-  })
 
   // Check circuit breaker
   if (isCircuitBreakerOpen(storeId)) {
@@ -159,14 +153,6 @@ export async function scoreBatchesAfterCreation(
     const totalTime = Date.now() - startTime
 
     if (scoringResult.success) {
-      console.log('[SCORING-INTEGRATION] Scoring completed successfully:', {
-        storeId,
-        processed: scoringResult.data.processed,
-        high_priority: scoringResult.data.high_priority_count,
-        processing_time_ms: scoringResult.data.processing_time_ms,
-        total_integration_time_ms: totalTime,
-        attempts: attemptCount,
-      })
 
       recordScoringMetrics({
         storeId,
@@ -251,11 +237,6 @@ async function callFastAPIScoring(
   const { force_recalculate = false, timeout = 30000 } = options
 
   try {
-    console.log('[SCORING-INTEGRATION] Calling FastAPI scoring endpoint:', {
-      storeId,
-      force_recalculate,
-      timeout,
-    })
 
     // Construct FastAPI endpoint URL
     const fastApiBaseUrl = process.env.FASTAPI_BASE_URL || 'http://localhost:8000'
@@ -300,12 +281,6 @@ async function callFastAPIScoring(
 
       const data: ScoringResponse = await response.json()
 
-      console.log('[SCORING-INTEGRATION] FastAPI scoring response:', {
-        storeId,
-        processed: data.processed,
-        processing_time_ms: data.processing_time_ms,
-        errors: data.errors.length,
-      })
 
       return {
         success: true,
@@ -350,11 +325,6 @@ export async function scoreAfterCsvUpload(
     force_recalculate?: boolean
   } = {},
 ): Promise<ScoringResult> {
-  console.log('[SCORING-INTEGRATION] CSV upload scoring requested:', {
-    storeId,
-    processedCount,
-    force_recalculate: options.force_recalculate,
-  })
 
   // For CSV uploads, always force recalculation since we just created new batches
   return scoreBatchesAfterCreation(storeId, {
@@ -374,9 +344,6 @@ export async function scoreAfterScanIn(
     force_recalculate?: boolean
   } = {},
 ): Promise<ScoringResult> {
-  console.log('[SCORING-INTEGRATION] Scan-in scoring requested:', {
-    storeId,
-    batchId,
     force_recalculate: options.force_recalculate,
   })
 

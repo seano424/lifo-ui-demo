@@ -46,15 +46,6 @@ export function AuthStatus() {
         queryResult = { data: null, error: 'Query failed' }
       }
 
-      console.log('🔍 Auth Debug Info:', {
-        session: !!session,
-        user: !!user,
-        userId: user?.id,
-        email: user?.email,
-        sessionError,
-        userError,
-        queryResult,
-      })
 
       setAuthInfo({
         hasSession: !!session,

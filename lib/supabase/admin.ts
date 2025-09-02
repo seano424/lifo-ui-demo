@@ -16,7 +16,6 @@ export function createAdminClient() {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
   }
 
-  console.log('🔧 Creating admin client with service role key')
 
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {

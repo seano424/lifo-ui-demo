@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('🔐 PIN login attempt for username:', username)
 
     // Create admin Supabase client for user management
     const supabase = createClient(
@@ -40,7 +39,6 @@ export async function POST(request: NextRequest) {
       username === 'testme' ? 'seanpatrickstudios@gmail.com' : null,
     ].filter(Boolean)
 
-    console.log('🔍 Trying email formats:', possibleEmails)
 
     let signInData: {
       session: { access_token: string; refresh_token: string }
@@ -55,7 +53,6 @@ export async function POST(request: NextRequest) {
 
     // Try each email format until one works
     for (const email of possibleEmails) {
-      console.log('📧 Attempting login with:', email)
 
       const result = await supabase.auth.signInWithPassword({
         email: email!,
@@ -65,11 +62,9 @@ export async function POST(request: NextRequest) {
       if (!result.error && result.data.session) {
         signInData = result.data
         signInError = null
-        console.log('✅ Authentication successful with:', email)
         break
       } else {
         signInError = result.error
-        console.log('❌ Authentication failed with:', email, result.error?.message)
       }
     }
 
@@ -87,7 +82,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: 500 })
     }
 
-    console.log('🎉 PIN authentication successful for:', username)
 
     // Get username from metadata, override for test cases
     let userUsername =

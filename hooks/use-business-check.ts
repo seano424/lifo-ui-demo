@@ -14,11 +14,6 @@ export function useBusinessCheck() {
     setIsLoading(true)
     setError(null)
 
-    console.log('🔍 Starting business check for:', {
-      name: checkData.name,
-      city: checkData.city,
-      country: checkData.country,
-    })
 
     try {
       // Validate the request data
@@ -28,7 +23,6 @@ export function useBusinessCheck() {
         throw new Error('Invalid business data provided')
       }
 
-      console.log('✅ Validation passed, making API request...')
 
       const response = await fetch('/api/business/check', {
         method: 'POST',
@@ -36,7 +30,6 @@ export function useBusinessCheck() {
         body: JSON.stringify(validationResult.data),
       })
 
-      console.log(`📡 API Response: ${response.status} ${response.statusText}`)
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -46,23 +39,6 @@ export function useBusinessCheck() {
 
       const result: BusinessCheckResult = await response.json()
 
-      // Log the result with appropriate emoji and details
-      if (result.exists) {
-        console.log('⚠️ Business already exists!', {
-          message: result.message,
-          storeData: result.storeData
-            ? {
-                store_name: result.storeData.store_name,
-                address: result.storeData.address,
-                city: result.storeData.city,
-              }
-            : null,
-        })
-      } else {
-        console.log('✅ Business check passed - no existing business found', {
-          message: result.message,
-        })
-      }
 
       return result
     } catch (err) {
@@ -80,12 +56,10 @@ export function useBusinessCheck() {
         message: 'Unable to verify business. You can proceed with registration.',
       }
 
-      console.log('🔄 Returning fallback result:', fallbackResult)
 
       return fallbackResult
     } finally {
       setIsLoading(false)
-      console.log('🏁 Business check completed')
     }
   }
 

@@ -570,7 +570,6 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                   <Button
                     onClick={() => {
                       // TODO: Implement PIN reset logic
-                      console.log('Reset PIN for:', selectedUser.user_id)
                       setIsResetDialogOpen(false)
                     }}
                     className="flex items-center gap-2"
@@ -617,7 +616,6 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                   <Button
                     onClick={() => {
                       // TODO: Implement PIN unlock logic
-                      console.log('Unlock PIN for:', selectedUser.user_id)
                       setIsUnlockDialogOpen(false)
                     }}
                     className="flex items-center gap-2"

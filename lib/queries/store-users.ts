@@ -198,7 +198,6 @@ export async function fetchStoreUserById(
     const userRow = data?.find((row: StoreUserRow) => row.user_id === userId)
 
     if (!userRow) {
-      console.log('[fetchStoreUserById] User not found in store:', { storeId, userId })
       return null
     }
 

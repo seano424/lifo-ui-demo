@@ -53,36 +53,20 @@ export async function submitScannedProductToInventory(
   productData: ScannedProductData,
 ): Promise<InventorySubmissionResult> {
   try {
-    console.log('[submitScannedProductToInventory] Starting submission:', {
-      barcode: productData.barcode,
-      storeId: productData.storeId,
-      productName: productData.productName,
-    })
 
     // Step 1: UPSERT to inventory.products table
     const product = await upsertGlobalProduct(productData)
-    console.log('[submitScannedProductToInventory] Product upserted:', product.product_id)
 
     // Step 2: UPSERT to inventory.store_products table
     const { created: storeProductCreated } = await upsertStoreProduct(
       product.product_id,
       productData,
     )
-    console.log('[submitScannedProductToInventory] Store product upserted:', {
-      productId: product.product_id,
-      storeId: productData.storeId,
-      created: storeProductCreated,
-    })
 
     // Step 3: CREATE new batch in inventory.batches table
     const batch = await createProductBatch(product.product_id, productData)
-    console.log('[submitScannedProductToInventory] Batch created:', batch.batch_id)
 
     // Step 4: Automatic scoring integration (if enabled)
-    console.log(
-      '[submitScannedProductToInventory] Starting client-side scoring for batch:',
-      batch.batch_id,
-    )
 
     const scoringInfo = await scoreAfterScanInClient(productData.storeId, batch.batch_id)
 
@@ -127,10 +111,6 @@ async function upsertGlobalProduct(
         .maybeSingle() // Use maybeSingle() instead of single() to avoid 406 errors
 
       if (existingProduct) {
-        console.log(
-          '[upsertGlobalProduct] Found existing product by barcode:',
-          existingProduct.product_id,
-        )
 
         // Update existing product with any new information
         const updates: Partial<Database['inventory']['Tables']['products']['Update']> = {
@@ -183,7 +163,6 @@ async function upsertGlobalProduct(
     }
 
     // Product doesn't exist, create new one
-    console.log('[upsertGlobalProduct] Creating new global product')
 
     const newProductData: Database['inventory']['Tables']['products']['Insert'] = {
       name: productData.productName,
@@ -246,7 +225,6 @@ async function upsertStoreProduct(
       .maybeSingle() // Use maybeSingle() instead of single() to avoid 406 errors
 
     if (existingStoreProduct) {
-      console.log('[upsertStoreProduct] Store product association already exists')
 
       // Update store-specific pricing if different
       const updates: Partial<Database['inventory']['Tables']['store_products']['Update']> = {
@@ -293,7 +271,6 @@ async function upsertStoreProduct(
     }
 
     // Create new store-product association
-    console.log('[upsertStoreProduct] Creating new store product association')
 
     const newStoreProductData: Database['inventory']['Tables']['store_products']['Insert'] = {
       store_id: productData.storeId,
@@ -334,7 +311,6 @@ async function createProductBatch(
   const supabase = createClient()
 
   try {
-    console.log('[createProductBatch] Creating new batch for product:', productId)
 
     // Generate unique batch number
     const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
@@ -372,7 +348,6 @@ async function createProductBatch(
 
       if (error.code === '23505' && error.message.includes('batch_number')) {
         // Batch number collision, retry with different number
-        console.log('[createProductBatch] Batch number collision, retrying...')
         const retryBatchData = {
           ...newBatchData,
           batch_number: `BATCH-${Date.now()}-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
@@ -457,7 +432,6 @@ export async function submitMultipleScannedProducts(products: ScannedProductData
   successCount: number
   failureCount: number
 }> {
-  console.log('[submitMultipleScannedProducts] Submitting batch:', products.length, 'products')
 
   const results: InventorySubmissionResult[] = []
   let successCount = 0
@@ -487,11 +461,6 @@ export async function submitMultipleScannedProducts(products: ScannedProductData
     }
   }
 
-  console.log('[submitMultipleScannedProducts] Batch completed:', {
-    total: products.length,
-    successCount,
-    failureCount,
-  })
 
   return {
     success: successCount > 0,

@@ -133,9 +133,6 @@ export async function fetchProducts(
   serverClient?: ServerClient,
 ): Promise<Product[]> {
   const supabase = serverClient || createClient()
-  console.log('[fetchProducts] Querying store_products with store-specific stock calculations:', {
-    storeId,
-  })
 
   try {
     // First get store products with their base product info
@@ -265,11 +262,6 @@ export async function fetchProducts(
       }
     })
 
-    console.log('[fetchProducts] Success with store-specific stock:', {
-      storeId,
-      count: transformedData.length,
-      totalStock: transformedData.reduce((sum, p) => sum + (p.total_stock || 0), 0),
-    })
     return transformedData as Product[]
   } catch (err) {
     console.error('[fetchProducts] Unexpected error:', err)
@@ -295,10 +287,6 @@ export async function fetchProductsPage(
       throw new Error('Store ID is required for fetching products')
     }
 
-    console.log(
-      '[fetchProductsPage] Fetching with store-specific stock calculations:',
-      filters.storeId,
-    )
 
     // Build the select query with categories join
     let query = supabase
@@ -341,26 +329,19 @@ export async function fetchProductsPage(
 
     // Apply filters using category_code if provided
     if (filters.category) {
-      console.log('[fetchProductsPage] Applying category filter:', filters.category)
       // Filter will be applied post-query to avoid join issues
     }
 
     if (filters.brand) {
-      console.log('[fetchProductsPage] Applying brand filter:', filters.brand)
       query = query.eq('products.brand', filters.brand)
     }
 
     if (filters.expiringOnly) {
       // For expiring products, we need to join with batches
       // For now, we'll skip this complex filter in the main query
-      console.log('[fetchProductsPage] Expiring filter skipped in SQL, will filter in memory')
     }
 
     // ✅ FIXED: Single order clause approach
-    console.log('[fetchProductsPage] Applying sort:', {
-      field: filters.sort?.field,
-      direction: filters.sort?.direction,
-    })
 
     // Handle sorting - special cases for fields that require in-memory sorting
     const isInMemorySort =
@@ -373,13 +354,7 @@ export async function fetchProductsPage(
     if (isInMemorySort) {
       // For in-memory sorting, we need to fetch all products, sort, then paginate
       if (isStockBasedSort) {
-        console.log(
-          '[fetchProductsPage] Stock-based sorting - fetching all products for proper sorting',
-        )
       } else {
-        console.log(
-          '[fetchProductsPage] Category sorting - fetching all products for proper sorting',
-        )
       }
       query = query.order('created_at', { ascending: false }) // Fallback sort for fetching all
       // We'll override pagination below for this case
@@ -391,7 +366,6 @@ export async function fetchProductsPage(
       query = query.order('products(name)', { ascending: filters.sort.direction === 'asc' })
     } else if (filters.sort?.field === 'category') {
       // Category sorting requires in-memory sorting due to PostgREST limitations with deeply nested joins
-      console.log('[fetchProductsPage] Category sorting - will sort in-memory after data fetch')
       // For now, fetch with default order and we'll sort in-memory later
       query = query.order('created_at', { ascending: false })
     } else if (filters.sort?.field === 'brand') {
@@ -411,7 +385,6 @@ export async function fetchProductsPage(
 
     if (isInMemorySort) {
       // For in-memory sorting, fetch ALL products first
-      console.log('[fetchProductsPage] Fetching all products for in-memory sorting')
       const response = await query
       error = response.error
       storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
@@ -420,7 +393,6 @@ export async function fetchProductsPage(
       // Normal pagination
       const rangeFrom = page * pageSize
       const rangeTo = (page + 1) * pageSize - 1
-      console.log('[fetchProductsPage] Pagination:', { page, pageSize, rangeFrom, rangeTo })
       const response = await query.range(rangeFrom, rangeTo)
       error = response.error
       storeProductsData = (response.data as unknown as StoreProductWithProduct[]) || []
@@ -433,10 +405,6 @@ export async function fetchProductsPage(
       throw new Error(`Failed to fetch products page: ${errorMessage}`)
     }
 
-    console.log('[fetchProductsPage] Raw response sample:', {
-      count: totalCount,
-      sampleData: storeProductsData?.slice(0, 2),
-    })
 
     if (!storeProductsData || storeProductsData.length === 0) {
       return {
@@ -460,7 +428,6 @@ export async function fetchProductsPage(
     let filteredStoreProductsData = storeProductsData
 
     if (filters.category) {
-      console.log('[fetchProductsPage] Applying category filter post-query:', filters.category)
 
       // Debug: Check what categories we actually have
       if (storeProductsData.length > 0) {
@@ -472,17 +439,11 @@ export async function fetchProductsPage(
             name: sp.products?.name,
           }))
           .slice(0, 3)
-        console.log('[fetchProductsPage] Sample categories in data:', categoriesFound)
       }
 
       filteredStoreProductsData = filteredStoreProductsData.filter(
         sp => sp.products?.categories?.category_code === filters.category,
       )
-      console.log('[fetchProductsPage] After category filter:', {
-        before: storeProductsData.length,
-        after: filteredStoreProductsData.length,
-        requestedCategory: filters.category,
-      })
     }
 
     // Extract product IDs for batch aggregation (from filtered data)
@@ -578,21 +539,11 @@ export async function fetchProductsPage(
         const bStock = b.total_stock || 0
         return filters.sort!.direction === 'asc' ? aStock - bStock : bStock - aStock
       })
-      console.log('[fetchProductsPage] Applied in-memory total_stock sorting:', {
-        direction: filters.sort.direction,
-        firstItemStock: transformedData[0]?.total_stock,
-        lastItemStock: transformedData[transformedData.length - 1]?.total_stock,
-      })
     } else if (filters.sort?.field === 'active_batches_count') {
       transformedData.sort((a, b) => {
         const aBatches = a.active_batches_count || 0
         const bBatches = b.active_batches_count || 0
         return filters.sort!.direction === 'asc' ? aBatches - bBatches : bBatches - aBatches
-      })
-      console.log('[fetchProductsPage] Applied in-memory active_batches_count sorting:', {
-        direction: filters.sort.direction,
-        firstItemBatches: transformedData[0]?.active_batches_count,
-        lastItemBatches: transformedData[transformedData.length - 1]?.active_batches_count,
       })
     } else if (filters.sort?.field === 'category') {
       transformedData.sort((a, b) => {
@@ -601,14 +552,6 @@ export async function fetchProductsPage(
         return filters.sort!.direction === 'asc'
           ? aCategory.localeCompare(bCategory)
           : bCategory.localeCompare(aCategory)
-      })
-      console.log('[fetchProductsPage] Applied in-memory category sorting:', {
-        direction: filters.sort.direction,
-        firstItemCategory:
-          transformedData[0]?.category_display_name || transformedData[0]?.category_code,
-        lastItemCategory:
-          transformedData[transformedData.length - 1]?.category_display_name ||
-          transformedData[transformedData.length - 1]?.category_code,
       })
     }
 
@@ -624,22 +567,8 @@ export async function fetchProductsPage(
       finalData = transformedData.slice(rangeFrom, rangeTo)
       finalCount = transformedData.length // Total after transformation
 
-      console.log('[fetchProductsPage] Applied post-sort pagination:', {
-        totalProducts: transformedData.length,
-        pageStart: rangeFrom,
-        pageEnd: rangeTo,
-        returnedProducts: finalData.length,
-      })
     }
 
-    console.log('[fetchProductsPage] Success with store-specific stock:', {
-      storeId: filters.storeId,
-      dataCount: finalData.length,
-      totalCount: finalCount,
-      totalStockAcrossProducts: finalData.reduce((sum, p) => sum + (p.total_stock || 0), 0),
-      hasNextPage: finalCount > (page + 1) * pageSize,
-      appliedFilters: { category: filters.category, brand: filters.brand },
-    })
 
     return {
       data: finalData as Product[],
@@ -679,11 +608,6 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
   const supabase = createClient()
 
   try {
-    console.log('[createProduct] Creating product:', {
-      storeId: productData.storeId,
-      sku: productData.sku,
-      name: productData.name,
-    })
 
     // Step 1: Create the global product record
     const globalProductData = {
@@ -755,10 +679,6 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
       supplier_code: storeProduct.supplier_code,
     }
 
-    console.log('[createProduct] Success:', {
-      productId: globalProduct.product_id,
-      storeId: productData.storeId,
-    })
     return combinedProduct as Product
   } catch (err) {
     console.error('[createProduct] Unexpected error:', err)
@@ -793,7 +713,6 @@ export async function updateProduct(
   const supabase = createClient()
 
   try {
-    console.log('[updateProduct] Updating product:', { productId, updates, storeId })
 
     // Split updates into global and store-specific
     const globalUpdates: Record<string, unknown> = {}
@@ -864,7 +783,6 @@ export async function updateProduct(
     // Fetch the complete updated product data
     const updatedProduct = await fetchProductById(productId, storeId)
 
-    console.log('[updateProduct] Success:', { productId, storeId })
     return updatedProduct
   } catch (err) {
     console.error('[updateProduct] Unexpected error:', err)
@@ -876,7 +794,6 @@ export async function deleteProduct(productId: string, storeId: string): Promise
   const supabase = createClient()
 
   try {
-    console.log('[deleteProduct] Deleting product from store:', { productId, storeId })
 
     // Check for related batches first
     const { data: relatedBatches, error: batchError } = await supabase
@@ -909,7 +826,6 @@ export async function deleteProduct(productId: string, storeId: string): Promise
       throw new Error(`Failed to remove product from store: ${storeProductError.message}`)
     }
 
-    console.log('[deleteProduct] Success:', { productId, storeId, globalProductKept: true })
   } catch (err) {
     console.error('[deleteProduct] Unexpected error:', err)
     throw err
@@ -921,7 +837,6 @@ export async function fetchCategories(serverClient?: ServerClient): Promise<Cate
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchCategories] Fetching standardized categories with product counts')
 
     const { data: categories, error } = await supabase
       .schema('inventory')
@@ -932,14 +847,6 @@ export async function fetchCategories(serverClient?: ServerClient): Promise<Cate
       throw new Error(`Failed to fetch categories: ${error.message}`)
     }
 
-    console.log('[fetchCategories] Success:', {
-      count: categories?.length || 0,
-      sampleCategories: categories?.slice(0, 3).map((c: Category) => ({
-        code: c.category_code,
-        name: c.display_name_en,
-        products: c.product_count,
-      })),
-    })
     return categories || []
   } catch (err) {
     console.error('[fetchCategories] Unexpected error:', err)
@@ -955,10 +862,6 @@ export async function fetchProductById(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchProductById] Fetching product with store-specific stock:', {
-      productId,
-      storeId,
-    })
 
     // Get the product through the store_products junction table
     const { data, error } = await supabase
@@ -1065,12 +968,6 @@ export async function fetchProductById(
       avg_days_to_expiry: null, // TODO: Could calculate this if needed
     }
 
-    console.log('[fetchProductById] Success with store-specific stock:', {
-      productId,
-      storeId,
-      total_stock,
-      active_batches_count,
-    })
     return combinedProduct as Product
   } catch (err) {
     console.error('[fetchProductById] Unexpected error:', err)

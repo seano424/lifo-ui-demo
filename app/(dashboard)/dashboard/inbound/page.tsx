@@ -38,7 +38,7 @@ export default function InboundPage() {
               <CSVUploadForm
                 storeId={currentStore.store_id}
                 onUploadComplete={result => {
-                  console.log('Upload completed:', result)
+                  // Upload completed
                 }}
               />
             ) : (
@@ -72,7 +72,7 @@ export default function InboundPage() {
                 <ManualInboundEntry
                   storeId={currentStore.store_id}
                   onBatchSubmitted={result => {
-                    console.log('Batch submitted:', result)
+                    // Batch submitted
                   }}
                 />
               ) : (
@@ -91,7 +91,7 @@ export default function InboundPage() {
                 <CSVUploadForm
                   storeId={currentStore.store_id}
                   onUploadComplete={result => {
-                    console.log('Upload completed:', result)
+                    // Upload completed
                   }}
                 />
               ) : (
