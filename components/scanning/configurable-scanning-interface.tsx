@@ -539,7 +539,6 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
             title={`Total items ${config.workflowType === 'scan-in' ? 'scanned' : 'processed'}`}
             onEditItem={item => {
               // TODO: Implement edit functionality
-              console.log('Edit item:', item)
             }}
           />
 

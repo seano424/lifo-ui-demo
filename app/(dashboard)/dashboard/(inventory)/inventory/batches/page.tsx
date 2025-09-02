@@ -113,12 +113,6 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       })
     }
 
-    console.log(
-      '[InventoryBatchesPage] Prefetched data for store:',
-      storeToUse.store_name,
-      'with filters:',
-      filters,
-    )
   } catch (error) {
     console.error('[InventoryBatchesPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading

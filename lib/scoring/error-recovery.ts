@@ -45,19 +45,12 @@ export async function retryWithBackoff<T>(
       // Success - reset circuit breaker if it was open
       if (circuitBreakers.has(context.storeId)) {
         circuitBreakers.delete(context.storeId)
-        console.log(`[ERROR-RECOVERY] Circuit breaker reset for store ${context.storeId}`)
       }
 
       return result
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error')
 
-      console.warn(`[ERROR-RECOVERY] Attempt ${attempt}/${finalConfig.maxAttempts} failed:`, {
-        storeId: context.storeId,
-        operation: context.operation,
-        error: lastError.message,
-        attempt,
-      })
 
       // Don't retry on final attempt
       if (attempt === finalConfig.maxAttempts) {
@@ -70,7 +63,6 @@ export async function retryWithBackoff<T>(
         finalConfig.maxDelay,
       )
 
-      console.log(`[ERROR-RECOVERY] Retrying in ${delay}ms...`)
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
@@ -100,11 +92,6 @@ function updateCircuitBreaker(storeId: string, error: Error): void {
     state.isOpen = true
     state.nextRetryTime = now + 5 * 60 * 1000 // 5 minutes
 
-    console.error(`[ERROR-RECOVERY] Circuit breaker OPENED for store ${storeId}`, {
-      failureCount: state.failureCount,
-      nextRetryTime: new Date(state.nextRetryTime).toISOString(),
-      lastError: error.message,
-    })
   }
 
   circuitBreakers.set(storeId, state)
@@ -123,7 +110,6 @@ export function isCircuitBreakerOpen(storeId: string): boolean {
 
   // Try to close circuit breaker after timeout
   if (now >= state.nextRetryTime) {
-    console.log(`[ERROR-RECOVERY] Circuit breaker attempting to close for store ${storeId}`)
     state.isOpen = false
     state.failureCount = 0
     circuitBreakers.set(storeId, state)
@@ -309,23 +295,6 @@ export function recordScoringMetrics(metrics: ScoringMetrics): void {
   }
 
   // Log for monitoring
-  if (metrics.success) {
-    console.log('[SCORING-METRICS] Success:', {
-      storeId: metrics.storeId,
-      operation: metrics.operation,
-      duration: metrics.totalDuration,
-      batchCount: metrics.batchCount,
-      attempts: metrics.attemptCount,
-    })
-  } else {
-    console.error('[SCORING-METRICS] Failure:', {
-      storeId: metrics.storeId,
-      operation: metrics.operation,
-      errorType: metrics.errorType,
-      duration: metrics.totalDuration,
-      attempts: metrics.attemptCount,
-    })
-  }
 }
 
 /**

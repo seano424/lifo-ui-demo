@@ -16,11 +16,6 @@ type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] &
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
-  console.log('[/api/analytics] Request received:', {
-    url: request.url,
-    method: request.method,
-    timestamp: new Date().toISOString(),
-  })
 
   const {
     data: { user },
@@ -28,11 +23,6 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   if (error || !user) {
-    console.log('[/api/analytics] Authentication failed:', {
-      error: error?.message,
-      hasUser: !!user,
-      userId: user?.id,
-    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -43,16 +33,8 @@ export async function GET(request: NextRequest) {
   // Allow override via URL parameter, otherwise use store settings
   const thresholdOverride = searchParams.get('threshold')
 
-  console.log('[/api/analytics] Request parameters:', {
-    userId: user.id,
-    storeId,
-    timeframe,
-    metric,
-    thresholdOverride,
-  })
 
   if (!storeId) {
-    console.log('[/api/analytics] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
 
@@ -63,7 +45,6 @@ export async function GET(request: NextRequest) {
 
   // Validate threshold
   if (threshold < 0 || threshold > 1) {
-    console.log('[/api/analytics] Invalid threshold:', threshold)
     return NextResponse.json(
       {
         error: 'Threshold must be between 0 and 1',
@@ -73,10 +54,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('[/api/analytics] Skipping store access validation for read operation...', {
-      storeId,
-      userId: user.id,
-    })
 
     // Calculate date range
     const endDate = new Date()
@@ -167,10 +144,8 @@ async function getOverviewAnalytics(
       console.error('[getOverviewAnalytics] Error fetching batches:', batchError)
     }
 
-    console.log(`[getOverviewAnalytics] Found ${batches?.length || 0} batches`)
 
     if (!batches || batches.length === 0) {
-      console.log('[getOverviewAnalytics] No batches found for store:', storeId)
       return {
         totalProducts: 0,
         totalBatches: 0,
@@ -200,7 +175,6 @@ async function getOverviewAnalytics(
       console.error('[getOverviewAnalytics] Error fetching scoring data:', scoringError)
     }
 
-    console.log(`[getOverviewAnalytics] Found ${scoringData?.length || 0} scoring records`)
 
     // Get total store products count
     const { count: productCount, error: productError } = await supabase

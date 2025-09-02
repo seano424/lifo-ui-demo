@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
     const body: CreateEmployeeRequest = await request.json()
     const { firstName, lastName, email, username, role, languagePreference, storeId, pin } = body
 
-    console.log('🎯 Employee creation request:', { username, storeId, role })
 
     // Validate required fields
     if (!firstName || !lastName || !email || !username || !storeId || !pin) {
@@ -59,7 +58,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ Authenticated user:', user.email, user.id)
 
     // ✅ FIXED: Check permission using the correct business.store_users table structure
     const { data: storeUser, error: permissionError } = await supabase
@@ -71,7 +69,6 @@ export async function POST(request: NextRequest) {
       .eq('is_active', true)
       .single()
 
-    console.log('🔍 Permission check result:', { storeUser, permissionError })
 
     if (permissionError) {
       console.error('❌ Permission query error:', permissionError)
@@ -95,11 +92,6 @@ export async function POST(request: NextRequest) {
       storeUser.role_in_store === 'manager' ||
       storeUser.permissions?.can_manage_users === true
 
-    console.log('🔒 Permission analysis:', {
-      role: storeUser.role_in_store,
-      permissions: storeUser.permissions,
-      canManageUsers,
-    })
 
     if (!canManageUsers) {
       return NextResponse.json(
@@ -108,7 +100,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ Permission check passed - proceeding with user creation')
 
     // ✅ FIXED: Check for duplicate username using admin client
     const { data: isAvailable, error: availabilityError } = await adminSupabase.rpc(
@@ -125,24 +116,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isAvailable) {
-      console.log('❌ Username already taken:', username)
-      return NextResponse.json(
+        return NextResponse.json(
         { success: false, error: 'Username already exists' },
         { status: 409 },
       )
     }
 
-    console.log('✅ Username available:', username)
 
     // Create auth email using the working pattern
     const authEmail = `${username}@seantest.dev`
 
-    console.log('🔧 Creating user with Admin API:', {
-      authEmail,
-      username,
-      pin: `${pin.substring(0, 2)}**`, // Mask PIN in logs
-      storeId,
-    })
 
     // ✅ Create user using Admin API with proper service role permissions
     const { data: newUser, error: createError } = await adminSupabase.auth.admin.createUser({
@@ -172,7 +155,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ User created with Admin API:', newUser.user.id)
 
     // ✅ Add user to store with appropriate permissions
     const employeePermissions = {
@@ -216,7 +198,6 @@ export async function POST(request: NextRequest) {
       // Try to clean up the created user
       try {
         await adminSupabase.auth.admin.deleteUser(newUser.user.id)
-        console.log('🧹 Cleaned up user after store assignment failure')
       } catch (cleanupError) {
         console.error('❌ Failed to cleanup user after store assignment error:', cleanupError)
       }
@@ -231,7 +212,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ User assigned to store successfully')
 
     // Return success with credentials
     return NextResponse.json({

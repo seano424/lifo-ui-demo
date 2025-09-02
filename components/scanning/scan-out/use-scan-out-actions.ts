@@ -68,11 +68,9 @@ export function useScanOutActions() {
     try {
       targetDate = new Date(capturedExpiryDate)
       if (Number.isNaN(targetDate.getTime())) {
-        console.warn('Invalid expiry date format:', capturedExpiryDate)
         return null
       }
     } catch (error) {
-      console.warn('Failed to parse expiry date:', capturedExpiryDate, error)
       return null
     }
 
@@ -129,7 +127,6 @@ export function useScanOutActions() {
         .single()
 
       if (productError || !product) {
-        console.log('Product not found for barcode:', barcode)
         return []
       }
 
@@ -163,7 +160,6 @@ export function useScanOutActions() {
       }
 
       if (!batches || batches.length === 0) {
-        console.log('No active batches found for product:', product.product_id)
         return []
       }
 
@@ -188,7 +184,6 @@ export function useScanOutActions() {
         },
       }))
 
-      console.log(`Found ${transformedBatches.length} available batches for ${barcode}`)
       return transformedBatches
     } catch (error) {
       console.error('Error in findAvailableBatches:', error)
@@ -212,13 +207,6 @@ export function useScanOutActions() {
         data: { user },
         error: authError,
       } = await supabase.auth.getUser()
-      console.log('🔍 Scan-Out Auth Debug:', {
-        userId: user?.id,
-        email: user?.email,
-        authError,
-        timestamp: new Date().toISOString(),
-        itemsToProcess: items.length,
-      })
 
       if (authError || !user) {
         console.error('🚨 Authentication Error:', authError)
@@ -235,12 +223,6 @@ export function useScanOutActions() {
           .eq('user_id', user.id)
           .single()
 
-        console.log('🏪 Store Access Test:', {
-          storeId: items[0].storeId,
-          storeAccess,
-          storeAccessError,
-          hasAccess: !!storeAccess && storeAccess.is_active,
-        })
 
         if (!storeAccess || !storeAccess.is_active) {
           console.error('🔒 Store Access Denied:', { storeId: items[0].storeId, userId: user.id })
@@ -259,12 +241,6 @@ export function useScanOutActions() {
             .eq('batch_id', item.batchId)
             .single()
 
-          console.log('🔍 RLS Test Query for batch:', {
-            batchId: item.batchId,
-            testQuery,
-            testError,
-            canRead: !!testQuery,
-          })
 
           // Start a transaction to ensure data consistency
           const { data: batch, error: fetchError } = await supabase
@@ -305,13 +281,6 @@ export function useScanOutActions() {
           // Update the batch quantity
           const newQuantity = batch.current_quantity - item.quantityRemoved
 
-          console.log('📝 Attempting batch update:', {
-            batchId: item.batchId,
-            currentQuantity: batch.current_quantity,
-            quantityToRemove: item.quantityRemoved,
-            newQuantity,
-            storeId: batch.store_id,
-          })
 
           const { data: updateData, error: updateError } = await supabase
             .schema('inventory')
@@ -350,12 +319,6 @@ export function useScanOutActions() {
             continue
           }
 
-          console.log('✅ Batch updated successfully:', {
-            batchId: item.batchId,
-            updatedData: updateData,
-            previousQuantity: batch.current_quantity,
-            newQuantity,
-          })
 
           // TODO: Log the transaction in a transactions/movements table
           // This would track the removal for audit purposes
@@ -396,7 +359,6 @@ export function useScanOutActions() {
         results,
       }
 
-      console.log('📊 Checkout Summary:', finalResult)
       return finalResult
     },
 

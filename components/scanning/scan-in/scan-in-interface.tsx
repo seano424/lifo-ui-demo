@@ -56,7 +56,6 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
 
   const callbacks: BaseScanningCallbacks = {
     onItemProcessed: item => {
-      console.log('Item processed for scan-in:', item)
       onItemAdded?.(item)
     },
 
@@ -66,20 +65,16 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
     },
 
     onError: error => {
-      console.error('Scan-in error:', error)
     },
 
     onProductFound: product => {
-      console.log('Product found:', product)
     },
 
     onWorkflowComplete: () => {
-      console.log('Scan-in workflow completed')
     },
   }
 
   const handleConfirmSubmission = () => {
-    console.log('Submitting', pendingItems.length, 'items:', pendingItems)
 
     // Convert scanned items to the format expected by the inventory submission
     const productsToSubmit = convertMultipleScannedItems(
@@ -103,7 +98,6 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
       })),
       {
         onSuccess: result => {
-          console.log('Batch submission completed:', result)
 
           // Store the result for the success dialog
           setSubmissionResult({
@@ -119,7 +113,6 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
           setShowSuccessDialog(true)
         },
         onError: error => {
-          console.error('Batch submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
       },

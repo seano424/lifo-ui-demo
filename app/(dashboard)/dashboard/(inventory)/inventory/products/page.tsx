@@ -87,12 +87,6 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
       pages: 1, // Only prefetch first page
     })
 
-    console.log(
-      '[InventoryProductsPage] Prefetched data for store:',
-      storeToUse.store_name,
-      'with filters:',
-      filters,
-    )
   } catch (error) {
     console.error('[InventoryProductsPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading

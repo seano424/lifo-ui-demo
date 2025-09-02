@@ -104,12 +104,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Log successful delivery
-    console.log(`Email sent successfully: ${type} to ${credentials.email}`, {
-      messageId: emailResult.messageId,
-      delivery_id,
-      store_id,
-    })
 
     return NextResponse.json({
       success: true,

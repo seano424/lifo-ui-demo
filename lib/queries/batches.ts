@@ -396,7 +396,6 @@ export async function deleteBatch(batchId: string): Promise<void> {
       throw new Error(`Failed to delete batch: ${error.message}`)
     }
 
-    console.log('[deleteBatch] Success:', { batchId })
   } catch (err) {
     console.error('[deleteBatch] Unexpected error:', err)
     throw err
@@ -411,7 +410,6 @@ export async function fetchBatchById(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchBatchById] Fetching batch:', { batchId })
 
     // Fetch batch first
     const { data: batch, error } = await supabase
@@ -472,7 +470,6 @@ export async function fetchBatchById(
       products: productWithCategory,
     }
 
-    console.log('[fetchBatchById] Success:', { batchId })
     return batchWithProduct
   } catch (err) {
     console.error('[fetchBatchById] Unexpected error:', err)
@@ -492,11 +489,6 @@ export async function fetchExpiringBatches(
     const expiryThreshold = new Date()
     expiryThreshold.setDate(expiryThreshold.getDate() + daysAhead)
 
-    console.log('[fetchExpiringBatches] Fetching batches expiring within days:', {
-      storeId,
-      daysAhead,
-      threshold: expiryThreshold,
-    })
 
     // ✅ SIMPLE: Fetch batches first with single-column ordering
     const { data: batches, error } = await supabase
@@ -517,7 +509,6 @@ export async function fetchExpiringBatches(
     // Add products separately
     const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
 
-    console.log('[fetchExpiringBatches] Success:', { storeId, count: batchesWithProducts.length })
     return batchesWithProducts
   } catch (err) {
     console.error('[fetchExpiringBatches] Unexpected error:', err)
@@ -533,10 +524,6 @@ export async function fetchLowStockBatches(
   const supabase = serverClient || createClient()
 
   try {
-    console.log('[fetchLowStockBatches] Fetching low stock batches:', {
-      storeId,
-      thresholdQuantity,
-    })
 
     // ✅ SIMPLE: Fetch batches first with single-column ordering
     const { data: batches, error } = await supabase
@@ -557,7 +544,6 @@ export async function fetchLowStockBatches(
     // Add products separately
     const batchesWithProducts = await fetchBatchesWithProducts(batches || [], supabase)
 
-    console.log('[fetchLowStockBatches] Success:', { storeId, count: batchesWithProducts.length })
     return batchesWithProducts
   } catch (err) {
     console.error('[fetchLowStockBatches] Unexpected error:', err)

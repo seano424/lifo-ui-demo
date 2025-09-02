@@ -61,11 +61,6 @@ interface EnhancedAlert {
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
-  console.log('[/api/alerts] Request received:', {
-    url: request.url,
-    method: request.method,
-    timestamp: new Date().toISOString(),
-  })
 
   const {
     data: { user },
@@ -73,11 +68,6 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   if (error || !user) {
-    console.log('[/api/alerts] Authentication failed:', {
-      error: error?.message,
-      hasUser: !!user,
-      userId: user?.id,
-    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -89,17 +79,8 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get('category')
   const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500)
 
-  console.log('[/api/alerts] Request parameters:', {
-    userId: user.id,
-    storeId,
-    thresholdOverride,
-    urgencyLevel,
-    category,
-    limit,
-  })
 
   if (!storeId) {
-    console.log('[/api/alerts] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
 
@@ -110,7 +91,6 @@ export async function GET(request: NextRequest) {
 
   // Validate threshold
   if (threshold < 0 || threshold > 1) {
-    console.log('[/api/alerts] Invalid threshold:', threshold)
     return NextResponse.json(
       {
         error: 'Threshold must be between 0 and 1',
@@ -120,20 +100,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('[/api/alerts] Skipping store access validation for read operation...', {
-      storeId,
-      userId: user.id,
-    })
 
     // Get alerts using the existing scoring system
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
 
-    console.log('[/api/alerts] Raw alerts from getStoreAlerts:', {
-      storeId,
-      threshold,
-      alertCount: alerts.length,
-      firstAlert: alerts[0],
-    })
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
@@ -291,15 +261,8 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
 
     if (error) throw error
 
-    console.log('[getStoreAlerts] Batches query result:', {
-      storeId,
-      batchCount: batches?.length || 0,
-      firstBatch: batches?.[0],
-      error,
-    })
 
     if (!batches || batches.length === 0) {
-      console.log('[getStoreAlerts] No batches found for store:', storeId)
       return []
     }
 
@@ -322,20 +285,7 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
       .select('product_id, sku, name, brand, unit_type, category_id')
       .in('product_id', productIds)
 
-    console.log('[getStoreAlerts] Scoring query result:', {
-      storeId,
-      batchIds: batchIds.slice(0, 3), // First 3 for brevity
-      scoringDataCount: scoringData?.length || 0,
-      scoringError,
-      firstScore: scoringData?.[0],
-    })
 
-    console.log('[getStoreAlerts] Product query result:', {
-      productIds: productIds.slice(0, 3),
-      productDataCount: productData?.length || 0,
-      productError,
-      firstProduct: productData?.[0],
-    })
 
     if (scoringError) {
       console.warn('[getStoreAlerts] Error fetching scoring data:', scoringError)

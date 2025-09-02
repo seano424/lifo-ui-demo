@@ -74,30 +74,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleFileSelect = async (file: File) => {
-    console.log('🔍 [CSV-UPLOAD-FORM] File selected:', {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      lastModified: new Date(file.lastModified).toISOString(),
-    })
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      console.warn('❌ [CSV-UPLOAD-FORM] Invalid file type:', file.name)
       toast.error(t('errors.invalidFile'))
       return
     }
 
-    console.log('✅ [CSV-UPLOAD-FORM] Valid CSV file detected, setting selected file')
     setSelectedFile(file)
 
     try {
-      console.log('📄 [CSV-UPLOAD-FORM] Starting file preview analysis...')
       const startTime = performance.now()
       await previewCsvFile(file)
       const endTime = performance.now()
-      console.log(
-        `✅ [CSV-UPLOAD-FORM] File preview completed in ${Math.round(endTime - startTime)}ms`,
-      )
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
       toast.error(t('errors.analysisFailure'))
@@ -105,29 +93,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleUpload = () => {
-    console.log('🚀 [CSV-UPLOAD-FORM] Upload initiated')
 
     if (!selectedFile) {
-      console.warn('❌ [CSV-UPLOAD-FORM] No file selected')
       toast.error(t('errors.noFile'))
       return
     }
 
     if (!storeId) {
-      console.error('❌ [CSV-UPLOAD-FORM] No store ID provided')
       toast.error(t('errors.noStore'))
       return
     }
 
-    console.log('🎯 [CSV-UPLOAD-FORM] Starting upload process:', {
-      fileName: selectedFile.name,
-      fileSize: selectedFile.size,
-      storeId,
-      expectedItems: csvPreview.length,
-      timestamp: new Date().toISOString(),
-    })
 
-    console.log('⚡ [CSV-UPLOAD-FORM] Calling mutation with BULK OPTIMIZATION ENABLED')
 
     try {
       upload({
@@ -136,20 +113,17 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
         csvData: csvPreview, // Send the modified CSV data with individual expiry dates
       })
     } catch (error) {
-      console.error('💥 [CSV-UPLOAD-FORM] Upload initiation error:', error)
       toast.error(t('errors.startFailed'))
     }
   }
 
   const handleReset = () => {
-    console.log('🔄 [CSV-UPLOAD-FORM] Resetting form state')
     setSelectedFile(null)
     setCurrentPage(0)
     resetPreview()
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
-    console.log('✅ [CSV-UPLOAD-FORM] Form reset complete')
   }
 
   // Pagination calculations

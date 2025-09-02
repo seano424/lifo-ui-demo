@@ -8,7 +8,6 @@ export default function OutboundPage() {
   const [removedItems, setRemovedItems] = useState<ScannedItem[]>([])
 
   const handleItemRemoved = (item: ScannedItem) => {
-    console.log('Item removed from inventory:', item)
     setRemovedItems(prev => [item, ...prev])
   }
 

@@ -38,11 +38,6 @@ export function useInventorySubmission() {
 
     onSuccess: (result: InventorySubmissionResult) => {
       if (result.success && activeStoreId) {
-        console.log('[useInventorySubmission] Success - invalidating caches for:', {
-          productId: result.productId,
-          batchId: result.batchId,
-          storeId: activeStoreId,
-        })
 
         // Invalidate product queries - both store-specific and global
         queryClient.invalidateQueries({
@@ -130,11 +125,6 @@ export function useBatchInventorySubmission() {
       toast.dismiss('batch-submission')
 
       if (result.success && activeStoreId) {
-        console.log('[useBatchInventorySubmission] Batch success - invalidating all caches:', {
-          successCount: result.successCount,
-          failureCount: result.failureCount,
-          storeId: activeStoreId,
-        })
 
         // Comprehensive cache invalidation for batch operations
 

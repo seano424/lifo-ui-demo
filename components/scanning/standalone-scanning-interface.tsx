@@ -259,7 +259,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   }
 
   const handleConfirmSubmission = () => {
-    console.log('Submitting', scannedItems.length, 'items:', scannedItems)
 
     // Convert scanned items to the format expected by the inventory submission
     const productsToSubmit = convertMultipleScannedItems(
@@ -283,7 +282,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
       })),
       {
         onSuccess: result => {
-          console.log('Batch submission completed:', result)
 
           // Store the result for the success dialog
           setSubmissionResult({
@@ -299,7 +297,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           setShowSuccessDialog(true)
         },
         onError: error => {
-          console.error('Batch submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
       },

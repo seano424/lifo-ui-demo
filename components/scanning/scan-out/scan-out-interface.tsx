@@ -115,7 +115,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       // Check if this is an internal product ID (from manual search)
       if (barcode.startsWith('INTERNAL-')) {
         const productId = barcode.replace('INTERNAL-', '')
-        console.log('Using internal product ID:', productId)
 
         // Get batches directly by product_id instead of barcode
         const supabase = createClient()
@@ -173,7 +172,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       }
 
       if (batches.length === 0) {
-        console.warn('No inventory found for barcode:', barcode)
         return
       }
 
@@ -185,7 +183,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       setCurrentStep('batch-selection')
       setSelectedBatch(null)
     } catch (error) {
-      console.error('Error finding available batches:', error)
     }
   }
 
@@ -305,7 +302,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         setOcrError(result.error?.message || 'OCR processing failed')
       }
     } catch (error) {
-      console.error('OCR capture failed:', error)
       setOcrError(error instanceof Error ? error.message : 'OCR processing failed')
     }
   }
@@ -315,7 +311,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleConfirmSubmission = () => {
-    console.log('Submitting scan-out for', pendingItems.length, 'items:', pendingItems)
 
     // Submit the checkout/removal to inventory
     submitCheckout(
@@ -328,7 +323,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       })),
       {
         onSuccess: result => {
-          console.log('Checkout submission completed:', result)
 
           // Store the result for the success dialog
           setSubmissionResult({
@@ -349,7 +343,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           setShowSuccessDialog(true)
         },
         onError: error => {
-          console.error('Checkout submission failed:', error)
           // Dialog stays open so user can retry or cancel
         },
       },
@@ -370,7 +363,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <ScanningCamera
             mode="barcode"
             onBarcodeScanned={handleCustomBarcodeScanned}
-            onScanError={error => console.error('Barcode scan error:', error)}
+            onScanError={error => {}}
             showManualEntry={showManualEntry}
             onToggleManualEntry={() => setShowManualEntry(!showManualEntry)}
             onManualProductSelected={(barcode: string) => {

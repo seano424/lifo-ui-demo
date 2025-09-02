@@ -72,7 +72,6 @@ export default getRequestConfig(async () => {
   } catch (error) {
     // Fallback to detected/default locale if Supabase fails
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Failed to get user language preference:', error)
     }
   }
 
@@ -82,7 +81,6 @@ export default getRequestConfig(async () => {
     timeZone: 'Europe/Paris',
     onError(error) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('i18n error:', error.message)
       }
     },
     getMessageFallback({ namespace, key, error }) {
