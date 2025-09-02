@@ -1,11 +1,10 @@
 // app/api/analytics/route.ts
 
-
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import type { Database } from '@/types/supabase'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
+import type { Database } from '@/types/supabase'
 
 // Helper type for batch with store_products join
 type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] & {
@@ -58,7 +57,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Get threshold from store settings or URL override
-  const threshold = thresholdOverride 
+  const threshold = thresholdOverride
     ? parseFloat(thresholdOverride)
     : await getStoreThreshold(supabase, storeId, 'warning')
 
@@ -108,7 +107,13 @@ export async function GET(request: NextRequest) {
 
     if (!metric || metric === 'overview') {
       // Get comprehensive overview
-      analytics.overview = await getOverviewAnalytics(supabase, storeId, startDate, endDate, threshold)
+      analytics.overview = await getOverviewAnalytics(
+        supabase,
+        storeId,
+        startDate,
+        endDate,
+        threshold,
+      )
     }
 
     if (!metric || metric === 'waste') {
@@ -151,7 +156,9 @@ async function getOverviewAnalytics(
     const { data: batches, error: batchError } = await supabase
       .schema('inventory')
       .from('batches')
-      .select('batch_id, batch_number, current_quantity, selling_price, cost_price, expiry_date, location_code, supplier, product_id')
+      .select(
+        'batch_id, batch_number, current_quantity, selling_price, cost_price, expiry_date, location_code, supplier, product_id',
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .order('expiry_date', { ascending: true })
@@ -185,7 +192,7 @@ async function getOverviewAnalytics(
     const { data: scoringData, error: scoringError } = await supabase
       .schema('scoring')
       .from('product_scores')
-      .select('batch_id, composite_score, recommendation, calculated_at, urgency_level')
+      .select('batch_id, composite_score, recommendation, calculated_at')
       .eq('store_id', storeId)
       .in('batch_id', batchIds)
 
@@ -209,31 +216,29 @@ async function getOverviewAnalytics(
 
     // Create scoring map for quick lookup
     const scoringMap = new Map()
-    scoringData?.forEach((score: any) => {
+    scoringData?.forEach(score => {
       scoringMap.set(score.batch_id, score)
     })
 
     // Combine batch and scoring data (same logic as alerts API)
-    const combinedData = batches?.map((batch: any) => {
-      const scoring = scoringMap.get(batch.batch_id)
-      return {
-        ...batch,
-        composite_score: scoring?.composite_score || 0,
-        recommendation: scoring?.recommendation,
-        calculated_at: scoring?.calculated_at,
-        urgency_level: scoring?.urgency_level,
-      }
-    }) || []
+    const combinedData =
+      batches?.map(batch => {
+        const scoring = scoringMap.get(batch.batch_id)
+        return {
+          ...batch,
+          composite_score: scoring?.composite_score || 0,
+          recommendation: scoring?.recommendation,
+          calculated_at: scoring?.calculated_at,
+        }
+      }) || []
 
     // Count urgent items above threshold (same logic as alerts API)
-    const urgentItems = combinedData.filter(item => 
-      (item.composite_score || 0) >= threshold
-    )
+    const urgentItems = combinedData.filter(item => (item.composite_score || 0) >= threshold)
 
     // Calculate totals from combined data
     const totalBatches = combinedData.length
     const totalValue = combinedData.reduce((sum, item) => {
-      return sum + ((item.current_quantity || 0) * (item.selling_price || 0))
+      return sum + (item.current_quantity || 0) * (item.selling_price || 0)
     }, 0)
 
     // Count expiring items (expiring within 3 days)
@@ -278,9 +283,14 @@ async function getOverviewAnalytics(
       actions_taken: actions?.length || 0,
       discount_actions: discountActions.length,
       total_discount_value: Math.round(totalDiscountValue * 100) / 100,
-      avg_composite_score: totalBatches > 0 
-        ? Math.round((combinedData.reduce((sum, item) => sum + (item.composite_score || 0), 0)) / totalBatches * 100) / 100
-        : 0,
+      avg_composite_score:
+        totalBatches > 0
+          ? Math.round(
+              (combinedData.reduce((sum, item) => sum + (item.composite_score || 0), 0) /
+                totalBatches) *
+                100,
+            ) / 100
+          : 0,
     }
   } catch (error) {
     console.error('Error in overview analytics:', error)

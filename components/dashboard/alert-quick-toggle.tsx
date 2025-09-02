@@ -2,12 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
@@ -19,11 +14,11 @@ interface AlertQuickToggleProps {
 
 type QuickLevel = 'urgent' | 'default' | 'all'
 
-// Convert threshold to quick level  
+// Convert threshold to quick level
 function thresholdToQuickLevel(warningThreshold: number): QuickLevel {
   if (warningThreshold >= 0.8) return 'urgent'
   if (warningThreshold >= 0.6) return 'default'
-  return 'all'  // This covers 0.5 and below
+  return 'all' // This covers 0.5 and below
 }
 
 // Convert quick level to threshold
@@ -33,11 +28,11 @@ function quickLevelToThreshold(level: QuickLevel): {
 } {
   switch (level) {
     case 'urgent':
-      return { warning: 0.8, critical: 0.9 }  // Fewest items (2)
+      return { warning: 0.8, critical: 0.9 } // Fewest items (2)
     case 'default':
-      return { warning: 0.7, critical: 0.8 }  // Medium items (3)
+      return { warning: 0.7, critical: 0.8 } // Medium items (3)
     case 'all':
-      return { warning: 0.3, critical: 0.5 }  // Most items (early warnings)
+      return { warning: 0.3, critical: 0.5 } // Most items (early warnings)
   }
 }
 

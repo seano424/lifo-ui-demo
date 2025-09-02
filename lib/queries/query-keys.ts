@@ -195,8 +195,7 @@ export const queryKeys = {
     all: ['analytics'] as const,
     store: (storeId: string, timeframe?: string) =>
       [...queryKeys.analytics.all, 'store', storeId, timeframe] as const,
-    dashboard: (storeId: string) =>
-      [...queryKeys.analytics.all, 'dashboard', storeId] as const,
+    dashboard: (storeId: string) => [...queryKeys.analytics.all, 'dashboard', storeId] as const,
   },
 
   // Keep fastapi namespace for any remaining direct calls (deprecated)

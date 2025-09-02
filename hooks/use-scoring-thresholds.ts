@@ -1,7 +1,7 @@
 // hooks/use-scoring-thresholds.ts
 import { useCallback } from 'react'
-import { useStoreSettings, useUpdateStoreAdvancedSettings } from './use-store-settings'
 import { DEFAULT_THRESHOLDS, type ThresholdType } from '@/lib/utils/scoring-thresholds'
+import { useStoreSettings, useUpdateStoreAdvancedSettings } from './use-store-settings'
 
 /**
  * Hook for managing scoring thresholds in the dashboard
@@ -25,26 +25,26 @@ export function useScoringThresholds(storeId?: string) {
       }
 
       const updateField = type === 'critical' ? 'critical_threshold' : 'warning_threshold'
-      
+
       await updateSettings.mutateAsync({
         [updateField]: value,
       })
     },
-    [updateSettings]
+    [updateSettings],
   )
 
   // Update both thresholds at once
   const updateThresholds = useCallback(
     async (newThresholds: { critical?: number; warning?: number }) => {
-      const updates: any = {}
-      
+      const updates: { critical_threshold?: number; warning_threshold?: number } = {}
+
       if (newThresholds.critical !== undefined) {
         if (newThresholds.critical < 0 || newThresholds.critical > 1) {
           throw new Error('Critical threshold must be between 0 and 1')
         }
         updates.critical_threshold = newThresholds.critical
       }
-      
+
       if (newThresholds.warning !== undefined) {
         if (newThresholds.warning < 0 || newThresholds.warning > 1) {
           throw new Error('Warning threshold must be between 0 and 1')
@@ -58,41 +58,39 @@ export function useScoringThresholds(storeId?: string) {
 
       await updateSettings.mutateAsync(updates)
     },
-    [updateSettings]
+    [updateSettings],
   )
 
   // Reset to default thresholds
-  const resetToDefaults = useCallback(
-    async () => {
-      await updateThresholds({
-        critical: DEFAULT_THRESHOLDS.critical,
-        warning: DEFAULT_THRESHOLDS.warning,
-      })
-    },
-    [updateThresholds]
-  )
+  const resetToDefaults = useCallback(async () => {
+    await updateThresholds({
+      critical: DEFAULT_THRESHOLDS.critical,
+      warning: DEFAULT_THRESHOLDS.warning,
+    })
+  }, [updateThresholds])
 
   return {
     // Current threshold values
     thresholds,
-    
+
     // Loading and error states
     isLoading,
     error,
     isUpdating: updateSettings.isPending,
     updateError: updateSettings.error,
-    
+
     // Update functions
     updateThreshold,
     updateThresholds,
     resetToDefaults,
-    
+
     // Convenience getters
     criticalThreshold: thresholds.critical,
     warningThreshold: thresholds.warning,
-    
+
     // Helper to check if thresholds are at defaults
-    isDefault: thresholds.critical === DEFAULT_THRESHOLDS.critical && 
-               thresholds.warning === DEFAULT_THRESHOLDS.warning,
+    isDefault:
+      thresholds.critical === DEFAULT_THRESHOLDS.critical &&
+      thresholds.warning === DEFAULT_THRESHOLDS.warning,
   }
 }

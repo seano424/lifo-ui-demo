@@ -1,24 +1,10 @@
 'use client'
 
-import {
-  AlertTriangle,
-  HelpCircle,
-  RotateCcw,
-  Settings,
-  Zap,
-} from 'lucide-react'
+import { AlertTriangle, HelpCircle, RotateCcw, Settings, Zap } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-
-import { Typography } from '@/components/ui/typography'
 import {
   Select,
   SelectContent,
@@ -28,12 +14,8 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Typography } from '@/components/ui/typography'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useStorePermissions } from '@/hooks/use-store-settings'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -78,14 +60,8 @@ export function AlertSensitivityControls({
 
   const { canEditAdvancedSettings } = useStorePermissions({ storeId })
 
-  const {
-    thresholds,
-    isLoading,
-    isUpdating,
-    updateThresholds,
-    resetToDefaults,
-    isDefault,
-  } = useScoringThresholds(storeId)
+  const { thresholds, isLoading, isUpdating, updateThresholds, resetToDefaults, isDefault } =
+    useScoringThresholds(storeId)
 
   if (!storeId || !canEditAdvancedSettings) {
     return null
@@ -145,19 +121,14 @@ export function AlertSensitivityControls({
               <TooltipTrigger>
                 <HelpCircle className="h-4 w-4 text-muted-foreground" />
               </TooltipTrigger>
-              <TooltipContent
-                side="left"
-                className="max-w-xs"
-              >
+              <TooltipContent side="left" className="max-w-xs">
                 <p>Control when items appear in your alerts and dashboard.</p>
                 <p className="mt-1">Higher sensitivity = more early warnings</p>
                 <p>Lower sensitivity = only critical items</p>
               </TooltipContent>
             </Tooltip>
           </div>
-          <CardDescription>
-            How sensitive should alerts be to potential waste?
-          </CardDescription>
+          <CardDescription>How sensitive should alerts be to potential waste?</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Current Status */}
@@ -189,9 +160,7 @@ export function AlertSensitivityControls({
 
           {/* Alert Level Selection */}
           <div className="space-y-4">
-            <Label className="text-sm font-medium">
-              Choose your alert preference
-            </Label>
+            <Label className="text-sm font-medium">Choose your alert preference</Label>
 
             <Select
               value={currentAlertLevel}
@@ -206,9 +175,7 @@ export function AlertSensitivityControls({
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-red-500 rounded-full" />
-                      <Typography variant="small">
-                        Conservative - Critical Only
-                      </Typography>
+                      <Typography variant="small">Conservative - Critical Only</Typography>
                     </div>
                     <Typography variant="small">
                       Items expiring today/tomorrow or with high waste risk
@@ -223,10 +190,7 @@ export function AlertSensitivityControls({
                         Balanced - Action Needed (Recommended)
                       </Typography>
                     </div>
-                    <Typography
-                      variant="muted"
-                      className="text-muted-foreground"
-                    >
+                    <Typography variant="muted" className="text-muted-foreground">
                       Items needing attention this week
                     </Typography>
                   </div>
@@ -235,14 +199,9 @@ export function AlertSensitivityControls({
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <Typography variant="small">
-                        Proactive - Early Warnings
-                      </Typography>
+                      <Typography variant="small">Proactive - Early Warnings</Typography>
                     </div>
-                    <Typography
-                      variant="muted"
-                      className="text-muted-foreground"
-                    >
+                    <Typography variant="muted" className="text-muted-foreground">
                       All items that might need attention soon
                     </Typography>
                   </div>
@@ -261,15 +220,8 @@ export function AlertSensitivityControls({
           {/* Advanced Settings Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Switch
-                id="advanced-mode"
-                checked={showAdvanced}
-                onCheckedChange={setShowAdvanced}
-              />
-              <Label
-                htmlFor="advanced-mode"
-                className="text-sm"
-              >
+              <Switch id="advanced-mode" checked={showAdvanced} onCheckedChange={setShowAdvanced} />
+              <Label htmlFor="advanced-mode" className="text-sm">
                 Show technical details
               </Label>
             </div>
@@ -282,23 +234,15 @@ export function AlertSensitivityControls({
                 <p className="font-medium">Technical Thresholds:</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-yellow-700">
-                      Warning Level
-                    </p>
-                    <p className="text-lg font-mono">
-                      {thresholds.warning.toFixed(2)}
-                    </p>
+                    <p className="text-xs font-medium text-yellow-700">Warning Level</p>
+                    <p className="text-lg font-mono">{thresholds.warning.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.warning * 100)}% composite score
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-red-700">
-                      Critical Level
-                    </p>
-                    <p className="text-lg font-mono">
-                      {thresholds.critical.toFixed(2)}
-                    </p>
+                    <p className="text-xs font-medium text-red-700">Critical Level</p>
+                    <p className="text-lg font-mono">{thresholds.critical.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.critical * 100)}% composite score
                     </p>
@@ -309,15 +253,13 @@ export function AlertSensitivityControls({
                   <p className="text-xs font-medium">How scoring works:</p>
                   <ul className="text-xs text-muted-foreground space-y-1">
                     <li>
-                      • <strong>Expiry Score:</strong> How close to expiration
-                      date
+                      • <strong>Expiry Score:</strong> How close to expiration date
                     </li>
                     <li>
                       • <strong>Margin Score:</strong> Profit margin at risk
                     </li>
                     <li>
-                      • <strong>Velocity Score:</strong> How fast the item
-                      usually sells
+                      • <strong>Velocity Score:</strong> How fast the item usually sells
                     </li>
                   </ul>
                 </div>
@@ -339,14 +281,10 @@ export function AlertSensitivityControls({
             </Button>
 
             <div className="flex items-center gap-2">
-              {isUpdating && (
-                <span className="text-sm text-muted-foreground">Saving...</span>
-              )}
+              {isUpdating && <span className="text-sm text-muted-foreground">Saving...</span>}
               <div className="flex items-center gap-1">
                 <Settings className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">
-                  Settings saved automatically
-                </span>
+                <span className="text-xs text-muted-foreground">Settings saved automatically</span>
               </div>
             </div>
           </div>

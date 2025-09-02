@@ -119,19 +119,20 @@ export function useScoringAlerts(
   // Use store-specific threshold if no override provided
   const { warningThreshold } = useScoringThresholds(storeId || undefined)
   const threshold = thresholdOverride ?? warningThreshold
-  
+
   // Only include threshold in query key if it's an override
-  const queryKey = thresholdOverride !== undefined 
-    ? ['alerts', 'store', storeId!, 'threshold', threshold, urgencyLevel, category]
-    : ['alerts', 'store', storeId!, 'default', urgencyLevel, category]
-  
+  const queryKey =
+    thresholdOverride !== undefined
+      ? ['alerts', 'store', storeId!, 'threshold', threshold, urgencyLevel, category]
+      : ['alerts', 'store', storeId!, 'default', urgencyLevel, category]
+
   return useQuery({
     queryKey,
     queryFn: async (): Promise<AlertsResponse> => {
       const params = new URLSearchParams({
         storeId: storeId!,
       })
-      
+
       // Only add threshold parameter if it's an override (let API use store settings otherwise)
       if (thresholdOverride !== undefined) {
         params.append('threshold', threshold.toString())
@@ -171,12 +172,13 @@ export function useStoreAnalytics(
   // Use store-specific threshold if no override provided
   const { warningThreshold } = useScoringThresholds(storeId || undefined)
   const threshold = thresholdOverride ?? warningThreshold
-  
+
   // Only include threshold in query key if it's an override
-  const queryKey = thresholdOverride !== undefined 
-    ? ['analytics', 'store', storeId!, timeframe, 'threshold', threshold, metric]
-    : ['analytics', 'store', storeId!, timeframe, 'default', metric]
-  
+  const queryKey =
+    thresholdOverride !== undefined
+      ? ['analytics', 'store', storeId!, timeframe, 'threshold', threshold, metric]
+      : ['analytics', 'store', storeId!, timeframe, 'default', metric]
+
   return useQuery({
     queryKey,
     queryFn: async (): Promise<AnalyticsResponse> => {
@@ -184,7 +186,7 @@ export function useStoreAnalytics(
         storeId: storeId!,
         timeframe,
       })
-      
+
       // Only add threshold parameter if it's an override (let API use store settings otherwise)
       if (thresholdOverride !== undefined) {
         params.append('threshold', threshold.toString())
@@ -258,7 +260,7 @@ export async function fetchStoreAnalytics(
     storeId,
     timeframe,
   })
-  
+
   // Only add threshold parameter if it's an override
   if (thresholdOverride !== undefined) {
     params.append('threshold', thresholdOverride.toString())

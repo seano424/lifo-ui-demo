@@ -137,6 +137,9 @@ export function useUserStores() {
     userPreferencesResult.data,
     activeStore,
     userStoresResult.isLoading,
+    setActiveStore,
+    setLoadingStores,
+    setUserStores,
   ]) // Removed Zustand setters from dependencies since they are stable
 
   return {

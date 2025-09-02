@@ -2,7 +2,6 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lib/database/operations'
 import { createClient } from '@/lib/supabase/server'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 
@@ -12,26 +11,6 @@ interface ScoringData {
   recommendation: string
   calculated_at: string
   urgency_level?: string
-}
-
-interface BatchWithProduct {
-  batch_id: string
-  batch_number: string
-  current_quantity: number
-  selling_price: number
-  cost_price: number
-  expiry_date: string
-  location_code: string
-  supplier: string
-  products:
-    | {
-        sku: string
-        name: string
-        category: string
-        brand: string
-        unit_type: string
-      }[]
-    | null
 }
 
 interface AlertData {
@@ -125,7 +104,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Get threshold from store settings or URL override
-  const threshold = thresholdOverride 
+  const threshold = thresholdOverride
     ? parseFloat(thresholdOverride)
     : await getStoreThreshold(supabase, storeId, 'warning')
 
@@ -141,9 +120,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('[/api/alerts] Initializing InventoryOperations...')
-    const _operations = new InventoryOperations(supabase)
-
     console.log('[/api/alerts] Skipping store access validation for read operation...', {
       storeId,
       userId: user.id,
@@ -151,12 +127,12 @@ export async function GET(request: NextRequest) {
 
     // Get alerts using the existing scoring system
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
-    
+
     console.log('[/api/alerts] Raw alerts from getStoreAlerts:', {
       storeId,
       threshold,
       alertCount: alerts.length,
-      firstAlert: alerts[0]
+      firstAlert: alerts[0],
     })
 
     // Enhance alerts with calculated fields
@@ -319,7 +295,7 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
       storeId,
       batchCount: batches?.length || 0,
       firstBatch: batches?.[0],
-      error
+      error,
     })
 
     if (!batches || batches.length === 0) {
@@ -338,7 +314,7 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
       .select('batch_id, composite_score, recommendation, calculated_at, urgency_level')
       .eq('store_id', storeId)
       .in('batch_id', batchIds)
-    
+
     // Get product data separately
     const { data: productData, error: productError } = await supabase
       .schema('inventory')
@@ -351,14 +327,14 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
       batchIds: batchIds.slice(0, 3), // First 3 for brevity
       scoringDataCount: scoringData?.length || 0,
       scoringError,
-      firstScore: scoringData?.[0]
+      firstScore: scoringData?.[0],
     })
 
     console.log('[getStoreAlerts] Product query result:', {
       productIds: productIds.slice(0, 3),
       productDataCount: productData?.length || 0,
       productError,
-      firstProduct: productData?.[0]
+      firstProduct: productData?.[0],
     })
 
     if (scoringError) {
@@ -376,36 +352,57 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
     })
 
     const productMap = new Map()
-    productData?.forEach((product: any) => {
-      productMap.set(product.product_id, product)
-    })
+    productData?.forEach(
+      (product: {
+        product_id: string
+        sku?: string
+        name?: string
+        brand?: string
+        unit_type?: string
+        category_id?: string
+      }) => {
+        productMap.set(product.product_id, product)
+      },
+    )
 
     // Filter by threshold and format data
     const alerts =
       batches
-        ?.map((batch: any) => {
-          const scoring = scoringMap.get(batch.batch_id)
-          const product = productMap.get(batch.product_id)
-          return {
-            batch_id: batch.batch_id,
-            batch_number: batch.batch_number,
-            current_quantity: batch.current_quantity,
-            selling_price: batch.selling_price,
-            cost_price: batch.cost_price,
-            expiry_date: batch.expiry_date,
-            location_code: batch.location_code,
-            supplier: batch.supplier,
-            sku: product?.sku || 'Unknown',
-            product_name: product?.name || 'Unknown Product',
-            category: product?.category_id || 'Unknown',
-            brand: product?.brand || '',
-            unit_type: product?.unit_type || 'pcs',
-            composite_score: scoring?.composite_score || 0,
-            recommendation: scoring?.recommendation,
-            calculated_at: scoring?.calculated_at,
-            urgency_level: scoring?.urgency_level,
-          }
-        })
+        ?.map(
+          (batch: {
+            batch_id: string
+            batch_number: string
+            current_quantity: number
+            selling_price: number
+            cost_price: number
+            expiry_date: string
+            location_code: string
+            supplier: string
+            product_id: string
+          }) => {
+            const scoring = scoringMap.get(batch.batch_id)
+            const product = productMap.get(batch.product_id)
+            return {
+              batch_id: batch.batch_id,
+              batch_number: batch.batch_number,
+              current_quantity: batch.current_quantity,
+              selling_price: batch.selling_price,
+              cost_price: batch.cost_price,
+              expiry_date: batch.expiry_date,
+              location_code: batch.location_code,
+              supplier: batch.supplier,
+              sku: product?.sku || 'Unknown',
+              product_name: product?.name || 'Unknown Product',
+              category: product?.category_id || 'Unknown',
+              brand: product?.brand || '',
+              unit_type: product?.unit_type || 'pcs',
+              composite_score: scoring?.composite_score || 0,
+              recommendation: scoring?.recommendation,
+              calculated_at: scoring?.calculated_at,
+              urgency_level: scoring?.urgency_level,
+            }
+          },
+        )
         .filter((alert: AlertData) => (alert.composite_score || 0) >= threshold) || []
 
     return alerts
