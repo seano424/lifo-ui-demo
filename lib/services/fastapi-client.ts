@@ -54,7 +54,8 @@ export class FastAPIClient {
   private maxRetries: number
 
   constructor() {
-    this.baseUrl = process.env.FASTAPI_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+    this.baseUrl =
+      process.env.FASTAPI_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
     // Optimized timeout: 8 seconds for better performance
     this.timeout = 8000
     // Retry mechanism for improved reliability
@@ -86,7 +87,7 @@ export class FastAPIClient {
   private async withRetry<T>(
     operation: () => Promise<T>,
     operationName: string,
-    retries: number = this.maxRetries
+    retries: number = this.maxRetries,
   ): Promise<T> {
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
@@ -95,11 +96,13 @@ export class FastAPIClient {
         if (attempt === retries) {
           throw this.handleFetchError(error, operationName)
         }
-        
+
         // Exponential backoff: wait 200ms, then 400ms
-        const delay = 200 * Math.pow(2, attempt)
+        const delay = 200 * 2 ** attempt
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[FastAPI] ${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
+          console.log(
+            `[FastAPI] ${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms...`,
+          )
         }
         await new Promise(resolve => setTimeout(resolve, delay))
       }
@@ -118,10 +121,10 @@ export class FastAPIClient {
       urgency?: string
       category?: string
       limit?: number
-    } = {}
+    } = {},
   ): Promise<FastAPIAlertsResponse> {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/alerts/${storeId}`)
-    
+
     // Security middleware now supports all parameters
     if (options.threshold) url.searchParams.set('threshold', options.threshold.toString())
     if (options.limit) url.searchParams.set('limit', options.limit.toString())
@@ -140,7 +143,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -160,18 +163,20 @@ export class FastAPIClient {
         } catch {
           errorDetails = await response.text()
         }
-        throw new Error(`FastAPI alerts request failed: ${response.status} ${response.statusText} - ${errorDetails}`)
+        throw new Error(
+          `FastAPI alerts request failed: ${response.status} ${response.statusText} - ${errorDetails}`,
+        )
       }
 
       const data = await response.json()
       return data as FastAPIAlertsResponse
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       throw error instanceof Error ? error : new Error('FastAPI request failed')
     }
   }
@@ -187,10 +192,10 @@ export class FastAPIClient {
       urgency?: string
       category?: string
       limit?: number
-    } = {}
+    } = {},
   ): Promise<FastAPIAlertsResponse> {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/alerts/${storeId}`)
-    
+
     // Full parameter support (security middleware now fixed)
     if (options.threshold) url.searchParams.set('threshold', options.threshold.toString())
     if (options.limit) url.searchParams.set('limit', options.limit.toString())
@@ -210,7 +215,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${userToken}`, // Use Authorization header for user tokens
+          Authorization: `Bearer ${userToken}`, // Use Authorization header for user tokens
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -231,18 +236,20 @@ export class FastAPIClient {
         } catch {
           errorDetails = await response.text()
         }
-        throw new Error(`FastAPI alerts request failed: ${response.status} ${response.statusText} - ${errorDetails}`)
+        throw new Error(
+          `FastAPI alerts request failed: ${response.status} ${response.statusText} - ${errorDetails}`,
+        )
       }
 
       const data = await response.json()
       return data as FastAPIAlertsResponse
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       throw error instanceof Error ? error : new Error('FastAPI request failed')
     }
   }
@@ -258,10 +265,10 @@ export class FastAPIClient {
       urgency?: string
       category?: string
       limit?: number
-    } = {}
+    } = {},
   ): Promise<FastAPIAlertsResponse> {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/alerts/${storeId}`)
-    
+
     // Security middleware now fixed - can use all parameters together!
     if (options.threshold) url.searchParams.set('threshold', options.threshold.toString())
     if (options.limit) url.searchParams.set('limit', options.limit.toString())
@@ -281,7 +288,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'apikey': serviceRoleKey, // Use apikey header for service role
+          apikey: serviceRoleKey, // Use apikey header for service role
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -302,18 +309,20 @@ export class FastAPIClient {
         } catch {
           errorDetails = await response.text()
         }
-        throw new Error(`FastAPI alerts request failed: ${response.status} ${response.statusText} - ${errorDetails}`)
+        throw new Error(
+          `FastAPI alerts request failed: ${response.status} ${response.statusText} - ${errorDetails}`,
+        )
       }
 
       const data = await response.json()
       return data as FastAPIAlertsResponse
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       throw error instanceof Error ? error : new Error('FastAPI request failed')
     }
   }
@@ -324,7 +333,7 @@ export class FastAPIClient {
   async getStoreAnalyticsWithUserToken(
     storeId: string,
     userToken: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<FastAPIAnalyticsResponse> {
     // Use scoring analytics endpoint which is confirmed working
     const url = new URL(`${this.baseUrl}/api/v1/scoring/analytics/${storeId}`)
@@ -337,7 +346,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${userToken}`,
+          Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -346,18 +355,20 @@ export class FastAPIClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`FastAPI analytics request failed: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `FastAPI analytics request failed: ${response.status} ${response.statusText}`,
+        )
       }
 
       const data = await response.json()
       return data as FastAPIAnalyticsResponse
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       throw error instanceof Error ? error : new Error('FastAPI request failed')
     }
   }
@@ -368,7 +379,7 @@ export class FastAPIClient {
   async getStoreAnalyticsWithServiceKey(
     storeId: string,
     serviceRoleKey: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<FastAPIAnalyticsResponse> {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/analytics/${storeId}`)
     url.searchParams.set('days', days.toString())
@@ -380,7 +391,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'apikey': serviceRoleKey, // Use apikey header for service role
+          apikey: serviceRoleKey, // Use apikey header for service role
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -389,7 +400,9 @@ export class FastAPIClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`FastAPI analytics request failed: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `FastAPI analytics request failed: ${response.status} ${response.statusText}`,
+        )
       }
 
       const data = await response.json()
@@ -406,7 +419,7 @@ export class FastAPIClient {
   async getStoreAnalytics(
     storeId: string,
     token: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<FastAPIAnalyticsResponse> {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/analytics/${storeId}`)
     url.searchParams.set('days', days.toString())
@@ -418,7 +431,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -427,18 +440,20 @@ export class FastAPIClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`FastAPI analytics request failed: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `FastAPI analytics request failed: ${response.status} ${response.statusText}`,
+        )
       }
 
       const data = await response.json()
       return data as FastAPIAnalyticsResponse
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       throw error instanceof Error ? error : new Error('FastAPI request failed')
     }
   }
@@ -452,10 +467,10 @@ export class FastAPIClient {
     options: {
       category?: string
       limit?: number
-    } = {}
+    } = {},
   ) {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/recommendations/${storeId}`)
-    
+
     if (options.category) url.searchParams.set('category', options.category)
     if (options.limit) url.searchParams.set('limit', options.limit.toString())
 
@@ -466,7 +481,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${userToken}`,
+          Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -479,17 +494,19 @@ export class FastAPIClient {
         if (response.status === 404 || response.status === 204) {
           return { store_id: storeId, recommendations: [], total_count: 0 }
         }
-        throw new Error(`FastAPI recommendations request failed: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `FastAPI recommendations request failed: ${response.status} ${response.statusText}`,
+        )
       }
 
       return await response.json()
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       // Return empty recommendations instead of throwing for graceful degradation
       console.warn('AI recommendations failed, returning empty:', error)
       return { store_id: storeId, recommendations: [], total_count: 0 }
@@ -505,10 +522,10 @@ export class FastAPIClient {
     options: {
       category?: string
       limit?: number
-    } = {}
+    } = {},
   ) {
     const url = new URL(`${this.baseUrl}/api/v1/scoring/recommendations/${storeId}`)
-    
+
     if (options.category) url.searchParams.set('category', options.category)
     if (options.limit) url.searchParams.set('limit', options.limit.toString())
 
@@ -519,7 +536,7 @@ export class FastAPIClient {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         signal: controller.signal,
@@ -528,17 +545,19 @@ export class FastAPIClient {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`FastAPI recommendations request failed: ${response.status} ${response.statusText}`)
+        throw new Error(
+          `FastAPI recommendations request failed: ${response.status} ${response.statusText}`,
+        )
       }
 
       return await response.json()
     } catch (error) {
       clearTimeout(timeoutId)
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('FastAPI request timeout')
       }
-      
+
       throw error instanceof Error ? error : new Error('FastAPI request failed')
     }
   }
@@ -553,16 +572,16 @@ export class FastAPIClient {
         method: 'GET',
         signal: AbortSignal.timeout(5000), // 5 second timeout for health check
       })
-      
+
       const responseTime = Date.now() - startTime
-      
+
       if (response.ok) {
         return { healthy: true, responseTime }
       } else {
-        return { 
-          healthy: false, 
-          responseTime, 
-          error: `HTTP ${response.status} ${response.statusText}` 
+        return {
+          healthy: false,
+          responseTime,
+          error: `HTTP ${response.status} ${response.statusText}`,
         }
       }
     } catch (error) {
@@ -578,17 +597,17 @@ export class FastAPIClient {
    */
   async withPerformanceMonitoring<T>(
     operation: () => Promise<T>,
-    operationName: string
+    operationName: string,
   ): Promise<T> {
     const startTime = Date.now()
     try {
       const result = await operation()
       const duration = Date.now() - startTime
-      
+
       if (process.env.NODE_ENV === 'development' && duration > 3000) {
         console.warn(`[FastAPI] Slow operation detected: ${operationName} took ${duration}ms`)
       }
-      
+
       return result
     } catch (error) {
       const duration = Date.now() - startTime
@@ -646,7 +665,9 @@ export function mapFastAPIAlertToEnhanced(fastApiAlert: FastAPIAlert): EnhancedA
     quantity: fastApiAlert.quantity,
     unit_type: 'pcs', // Default, will be enhanced in Phase 2
     days_to_expiry: fastApiAlert.days_to_expiry,
-    expiry_date: new Date(Date.now() + fastApiAlert.days_to_expiry * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    expiry_date: new Date(Date.now() + fastApiAlert.days_to_expiry * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split('T')[0],
     current_price: fastApiAlert.potential_loss / fastApiAlert.quantity, // Approximate
     cost_price: 0, // Will be enhanced in Phase 2
     margin_percent: 0, // Will be enhanced in Phase 2
@@ -657,8 +678,15 @@ export function mapFastAPIAlertToEnhanced(fastApiAlert: FastAPIAlert): EnhancedA
     location: '', // Will be enhanced in Phase 2
     supplier: '', // Will be enhanced in Phase 2
     calculated_at: new Date().toISOString(),
-    suggested_actions: generateActionSuggestions(fastApiAlert.days_to_expiry, fastApiAlert.urgency_score),
-    priority_score: calculatePriorityScore(fastApiAlert.days_to_expiry, fastApiAlert.potential_loss, fastApiAlert.urgency_score),
+    suggested_actions: generateActionSuggestions(
+      fastApiAlert.days_to_expiry,
+      fastApiAlert.urgency_score,
+    ),
+    priority_score: calculatePriorityScore(
+      fastApiAlert.days_to_expiry,
+      fastApiAlert.potential_loss,
+      fastApiAlert.urgency_score,
+    ),
   }
 }
 
@@ -705,7 +733,11 @@ function generateActionSuggestions(daysToExpiry: number, urgencyScore: number): 
 /**
  * Calculate priority score for sorting
  */
-function calculatePriorityScore(daysToExpiry: number, potentialLoss: number, urgencyScore: number): number {
+function calculatePriorityScore(
+  daysToExpiry: number,
+  potentialLoss: number,
+  urgencyScore: number,
+): number {
   let score = 0
 
   // Urgency component (0-50 points)
