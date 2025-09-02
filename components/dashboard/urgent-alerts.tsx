@@ -10,23 +10,26 @@ import { useScoringAlerts } from '@/hooks/use-scoring-analytics'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
-// Convert threshold to level name for user-friendly messaging
+// Convert threshold to user-friendly level names
 function thresholdToLevelName(warningThreshold: number): string {
-  if (warningThreshold >= 0.8) return 'Conservative'
-  if (warningThreshold >= 0.6) return 'Balanced'
-  return 'Proactive'
+  if (warningThreshold >= 0.8) return 'Urgent Items Only'        // Most restrictive - fewest items
+  if (warningThreshold >= 0.7) return 'Priority Items'          // Moderately restrictive  
+  if (warningThreshold >= 0.5) return 'All Flagged Items'       // Less restrictive - more items
+  return 'Complete Review'                                       // Least restrictive - most items
 }
 
 export function UrgentAlerts() {
   const activeStoreId = useActiveStoreId()
   const { data, isLoading, isFetching, error } = useScoringAlerts(activeStoreId)
-  const { isUpdating: thresholdsUpdating, warningThreshold } = useScoringThresholds(activeStoreId || undefined)
-  
+  const { isUpdating: thresholdsUpdating, warningThreshold } =
+    useScoringThresholds(activeStoreId || undefined)
+
   // Loading state for initial load
   const isInitialLoading = isLoading
   // Loading state for message text during updates
   const isMessageUpdating = thresholdsUpdating || isFetching
   const currentLevel = thresholdToLevelName(warningThreshold)
+
 
   if (isInitialLoading) {
     return (
@@ -45,14 +48,22 @@ export function UrgentAlerts() {
     return (
       <div className="flex flex-col gap-4 sm:flex-row text-center sm:text-left items-center justify-between">
         <div className="flex flex-col gap-2">
-          <Typography variant="h4" className="font-bold text-red-600">
-            Alert System Error
+          <Typography
+            variant="h4"
+            className="font-bold text-red-600"
+          >
+            Connection Error
           </Typography>
-          <Typography variant="p">⚠️ Unable to load urgent alerts from AI system</Typography>
+          <Typography variant="p">
+            Unable to load inventory alerts. Please try again.
+          </Typography>
         </div>
         <Link href="/dashboard/inventory/batches?filter=expiring">
-          <Button variant="outline" className="gap-2">
-            View all items
+          <Button
+            variant="outline"
+            className="gap-2"
+          >
+            View inventory
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -63,40 +74,36 @@ export function UrgentAlerts() {
   const summary = data?.summary
 
   const getMessage = () => {
-    if (!summary) return 'Loading alert data...'
+    if (!summary) return 'Loading alerts...'
     const totalAlerts = summary.total_alerts
-    
+
     if (totalAlerts === 0) {
-      if (currentLevel === 'Conservative') {
-        return 'No critical items detected - you\'re all caught up!'
-      }
-      if (currentLevel === 'Balanced') {
-        return 'All items are within safe thresholds - you\'re all caught up!'
-      }
-      return 'No early warnings found - everything looks great!'
+      return "No items need attention right now - you're all caught up!"
     }
-    
-    if (summary.critical_count > 0) {
-      const itemText = summary.critical_count === 1 ? 'item' : 'items'
-      if (currentLevel === 'Conservative') {
-        return `${summary.critical_count} ${itemText} expiring today need immediate action`
+
+    // For urgent mode (high threshold), use urgent language
+    if (warningThreshold >= 0.8 && summary.critical_count > 0) {
+      const itemText = summary.critical_count === 1 ? 'item needs' : 'items need'
+      return `${summary.critical_count} ${itemText} immediate action`
+    }
+
+    // For default mode, use moderate language
+    if (warningThreshold >= 0.6) {
+      if (summary.critical_count > 0) {
+        const itemText = summary.critical_count === 1 ? 'item needs' : 'items need'
+        return `${summary.critical_count} ${itemText} immediate action`
       }
-      return `${summary.critical_count} critical ${itemText} need immediate action`
-    }
-    
-    if (summary.high_count > 0) {
-      const itemText = summary.high_count === 1 ? 'item' : 'items'
-      if (currentLevel === 'Balanced') {
-        return `${summary.high_count} ${itemText} need attention this week`
+      if (summary.high_count > 0) {
+        const itemText = summary.high_count === 1 ? 'item may need' : 'items may need'
+        return `${summary.high_count} ${itemText} attention soon`
       }
-      return `${summary.high_count} ${itemText} may need attention soon`
+      const itemText = totalAlerts === 1 ? 'item flagged' : 'items flagged'
+      return `${totalAlerts} ${itemText} for review`
     }
-    
-    const itemText = totalAlerts === 1 ? 'item' : 'items'
-    if (currentLevel === 'Proactive') {
-      return `${totalAlerts} ${itemText} flagged for early review`
-    }
-    return `${totalAlerts} ${itemText} detected for review`
+
+    // For early warnings mode (low threshold), use gentle language
+    const itemText = totalAlerts === 1 ? 'item flagged' : 'items flagged'
+    return `${totalAlerts} ${itemText} for monitoring`
   }
 
   const message = getMessage()
@@ -104,21 +111,35 @@ export function UrgentAlerts() {
   return (
     <div className="flex flex-col gap-4 lg:flex-row text-center lg:text-left items-center justify-between">
       <div className="flex flex-col gap-2">
-        <Typography variant="h4" className="font-bold capitalize">
-          {currentLevel} Alerts
+        <Typography
+          variant="h4"
+          className="font-bold"
+        >
+          {currentLevel}
         </Typography>
         <Typography variant="p">
-          🤖 {isMessageUpdating ? <Skeleton className="inline-block h-4 w-48" /> : message}
+          {isMessageUpdating ? (
+            <div className="flex gap-2 items-center justify-center">
+              <Skeleton className="inline-block h-5 w-10" />
+              <Skeleton className="inline-block h-5 w-32" />
+            </div>
+          ) : (
+            message
+          )}
         </Typography>
-        <AlertQuickToggle storeId={activeStoreId || undefined} size="sm" className="mt-2 self-center lg:self-start" />
+        <AlertQuickToggle
+          storeId={activeStoreId || undefined}
+          size="sm"
+          className="mt-2 self-center lg:self-start"
+        />
       </div>
 
       <Link href="/dashboard/inventory/batches?filter=expiring">
         <Button
-          variant={summary?.critical_count ? 'destructive' : 'subtleSecondary'}
+          variant="subtleSecondary"
           className="gap-2"
         >
-          View urgent items
+          View items
           <ArrowRight className="h-4 w-4" />
         </Button>
       </Link>

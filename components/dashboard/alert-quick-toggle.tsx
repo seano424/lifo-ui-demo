@@ -2,7 +2,12 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
@@ -12,35 +17,38 @@ interface AlertQuickToggleProps {
   size?: 'sm' | 'default' | 'lg'
 }
 
-type QuickLevel = 'urgent' | 'standard' | 'all'
+type QuickLevel = 'urgent' | 'default' | 'all'
 
-// Convert threshold to quick level
+// Convert threshold to quick level  
 function thresholdToQuickLevel(warningThreshold: number): QuickLevel {
   if (warningThreshold >= 0.8) return 'urgent'
-  if (warningThreshold >= 0.6) return 'standard'
-  return 'all'
+  if (warningThreshold >= 0.6) return 'default'
+  return 'all'  // This covers 0.5 and below
 }
 
 // Convert quick level to threshold
-function quickLevelToThreshold(level: QuickLevel): { warning: number; critical: number } {
+function quickLevelToThreshold(level: QuickLevel): {
+  warning: number
+  critical: number
+} {
   switch (level) {
     case 'urgent':
-      return { warning: 0.8, critical: 0.9 }
-    case 'standard':
-      return { warning: 0.7, critical: 0.8 }
+      return { warning: 0.8, critical: 0.9 }  // Fewest items (2)
+    case 'default':
+      return { warning: 0.7, critical: 0.8 }  // Medium items (3)
     case 'all':
-      return { warning: 0.5, critical: 0.7 }
+      return { warning: 0.3, critical: 0.5 }  // Most items (early warnings)
   }
 }
 
-export function AlertQuickToggle({ 
-  storeId: propStoreId, 
+export function AlertQuickToggle({
+  storeId: propStoreId,
   className,
-  size = 'default'
+  size = 'default',
 }: AlertQuickToggleProps) {
   const activeStoreId = useActiveStoreId()
   const storeId = propStoreId || activeStoreId || ''
-  
+
   const [isUpdating, setIsUpdating] = useState(false)
 
   const { thresholds, updateThresholds } = useScoringThresholds(storeId)
@@ -53,7 +61,7 @@ export function AlertQuickToggle({
 
   const handleLevelChange = async (level: QuickLevel) => {
     if (!level || level === currentLevel) return
-    
+
     setIsUpdating(true)
     try {
       const newThresholds = quickLevelToThreshold(level)
@@ -77,13 +85,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <div className="w-2 h-2 bg-red-500 rounded-full" />
               <span className="text-xs">Urgent</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Only show items requiring immediate action</p>
-            <p className="text-xs text-muted-foreground">Items expiring today/tomorrow</p>
+            <p>Only urgent items requiring immediate action</p>
+            <p className="text-xs">Fewest alerts - most restrictive</p>
           </TooltipContent>
         </Tooltip>
 
@@ -91,18 +98,17 @@ export function AlertQuickToggle({
           <TooltipTrigger asChild>
             <Button
               size={size}
-              variant={currentLevel === 'standard' ? 'default' : 'outline'}
-              onClick={() => handleLevelChange('standard')}
+              variant={currentLevel === 'default' ? 'default' : 'outline'}
+              onClick={() => handleLevelChange('default')}
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
-              <span className="text-xs">Standard</span>
+              <span className="text-xs">Default</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Items needing attention this week</p>
-            <p className="text-xs text-muted-foreground">Recommended setting</p>
+            <p>Items needing attention soon</p>
+            <p className="text-xs">Balanced view - recommended</p>
           </TooltipContent>
         </Tooltip>
 
@@ -115,22 +121,15 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
               <span className="text-xs">Early</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Early warnings for all items</p>
-            <p className="text-xs text-muted-foreground">Maximum prevention</p>
+            <p>All flagged items and early warnings</p>
+            <p className="text-xs">Most alerts - maximum prevention</p>
           </TooltipContent>
         </Tooltip>
       </div>
-
-      {isUpdating && (
-        <div className="text-xs text-muted-foreground mt-1">
-          Updating...
-        </div>
-      )}
     </TooltipProvider>
   )
 }
