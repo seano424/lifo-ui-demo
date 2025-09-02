@@ -246,22 +246,22 @@ class SupabaseAPIKeyAuth:
         Raises:
             SupabaseAPIKeyError: If authentication fails
         """
-        # Check for Authorization header
-        authorization = request.headers.get("Authorization")
-        if not authorization:
-            raise SupabaseAPIKeyError("Authorization header required")
-
-        # Check for API key header (for service role operations)
+        # Check for API key header first (for service role operations)
         api_key = request.headers.get("apikey")
 
         if api_key and await self.verify_service_key(api_key):
-            # Service role authentication
+            # Service role authentication - apikey header is sufficient
             return APIKeyUser(
                 user_id="service_role",
                 email="service@lifo.ai",
                 role="service_role",
                 authenticated_at=datetime.now(UTC),
             )
+
+        # Check for Authorization header (for user token authentication)
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            raise SupabaseAPIKeyError("Authorization header or valid apikey required")
 
         # User token authentication
         return await self.verify_user_token(authorization)

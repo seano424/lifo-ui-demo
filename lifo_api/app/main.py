@@ -442,25 +442,30 @@ async def health_check() -> HealthResponse:
     Health check endpoint with detailed service status
     """
     try:
-        # Test database connection
+        # Test database connections
         from app.database.connection import test_connection
         from app.database.supabase_service import supabase_health_check
 
-        db_healthy = await test_connection()
+        # Test legacy SQLAlchemy connection (for compatibility)
+        sqlalchemy_healthy = await test_connection()
 
-        # Check Supabase health
+        # Check Supabase health (primary database method)
         try:
             supabase_result = await supabase_health_check()
             supabase_healthy = supabase_result.get("status") == "healthy"
         except Exception:
             supabase_healthy = False
 
-        # Consider healthy if either connection works (Supabase is sufficient for OCR)
-        overall_healthy = supabase_healthy or db_healthy
+        # Use Supabase as primary database indicator (since we fixed the connectivity)
+        # Overall healthy if Supabase works (SQLAlchemy is optional now)
+        overall_healthy = supabase_healthy
+        
+        # Report Supabase connection as database_connected since that's what we're using
+        primary_db_connected = supabase_healthy
 
         return HealthResponse(
             status="healthy" if overall_healthy else "unhealthy",
-            database_connected=db_healthy,
+            database_connected=primary_db_connected,  # Now reports Supabase status
             version=settings.api_version,
             uptime=None,  # Can be calculated if needed
         )

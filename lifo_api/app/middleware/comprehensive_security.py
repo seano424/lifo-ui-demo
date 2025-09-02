@@ -112,14 +112,9 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             # 4. Input Validation for Query Parameters
             if request.url.query:
                 try:
-                    # Validate query parameters
-                    query_string = str(request.url.query)
-                    security_validator.validate_and_sanitize_input(
-                        query_string,
-                        input_type="general",
-                        max_length=2000,
-                        strict_mode=True,
-                    )
+                    # Validate query parameters with context-aware approach
+                    if not self._validate_query_parameters(request):
+                        raise InputValidationError("Invalid query parameter format or values")
                 except InputValidationError as e:
                     self.security_monitor.record_security_event(
                         SecurityEventType.INPUT_VALIDATION_FAILURE,
@@ -408,6 +403,94 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                 "X-Security-Processed": "true",
             },
         )
+
+    def _validate_query_parameters(self, request: Request) -> bool:
+        """
+        Context-aware validation for query parameters
+        Allows legitimate parameter separators while blocking malicious content
+        """
+        try:
+            import urllib.parse
+            
+            # Parse query parameters properly
+            parsed_params = urllib.parse.parse_qs(str(request.url.query))
+            
+            # Define allowed parameter names for different endpoints
+            allowed_params = {
+                'scoring': ['threshold', 'limit', 'urgency', 'category', 'store_id', 'days'],
+                'analytics': ['store_id', 'days', 'metric', 'timeframe'],
+                'general': ['page', 'limit', 'offset', 'sort', 'order', 'filter']
+            }
+            
+            # Get endpoint type
+            endpoint_type = 'general'
+            if '/scoring/' in request.url.path:
+                endpoint_type = 'scoring'
+            elif '/analytics/' in request.url.path:
+                endpoint_type = 'analytics'
+            
+            # Validate each parameter
+            for param_name, param_values in parsed_params.items():
+                # Check if parameter name is allowed
+                if param_name not in allowed_params[endpoint_type] and param_name not in allowed_params['general']:
+                    logger.warning(f"Unexpected parameter: {param_name} for endpoint type: {endpoint_type}")
+                    return False
+                
+                # Validate each parameter value
+                for value in param_values:
+                    if not self._validate_parameter_value(param_name, value):
+                        return False
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Query parameter validation error: {e}")
+            return False
+    
+    def _validate_parameter_value(self, param_name: str, value: str) -> bool:
+        """Validate individual parameter values based on parameter type"""
+        try:
+            # Length check
+            if len(value) > 100:  # Reasonable limit for URL parameters
+                return False
+            
+            # Type-specific validation
+            if param_name in ['threshold']:
+                # Should be a float between 0 and 1
+                try:
+                    float_val = float(value)
+                    return 0.0 <= float_val <= 1.0
+                except ValueError:
+                    return False
+                    
+            elif param_name in ['limit', 'offset', 'page', 'days']:
+                # Should be positive integers
+                try:
+                    int_val = int(value)
+                    return 0 < int_val <= 1000
+                except ValueError:
+                    return False
+                    
+            elif param_name in ['store_id']:
+                # Should be UUID format
+                import re
+                uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                return bool(re.match(uuid_pattern, value, re.IGNORECASE))
+                
+            elif param_name in ['urgency', 'category', 'metric', 'timeframe', 'sort', 'order', 'filter']:
+                # Should be alphanumeric with limited special characters
+                import re
+                safe_pattern = r'^[a-zA-Z0-9_-]+$'
+                return bool(re.match(safe_pattern, value)) and len(value) <= 50
+            
+            # For any other parameters, do basic safety checks
+            dangerous_patterns = ['<script', 'javascript:', 'vbscript:', 'onload=', 'onerror=', '../', '..\\', ';', '|', '`', '$']
+            value_lower = value.lower()
+            return not any(pattern in value_lower for pattern in dangerous_patterns)
+            
+        except Exception as e:
+            logger.error(f"Parameter value validation error: {e}")
+            return False
 
     def _get_client_ip(self, request: Request) -> str:
         """Extract client IP from request"""

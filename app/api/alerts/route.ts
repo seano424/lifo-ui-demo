@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
+import { fastApiClient, mapFastAPIAlertToEnhanced } from '@/lib/services/fastapi-client'
 
 interface ScoringData {
   batch_id: string
@@ -98,8 +99,173 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Get alerts using the existing scoring system
+    console.log(`[ALERTS] ===== NEW ALERTS REQUEST =====`)
+    console.log(`[ALERTS] Request parameters:`)
+    console.log(`[ALERTS] - storeId: ${storeId}`)
+    console.log(`[ALERTS] - threshold: ${threshold} (original: ${thresholdOverride})`)
+    console.log(`[ALERTS] - urgencyLevel: ${urgencyLevel}`)
+    console.log(`[ALERTS] - category: ${category}`)
+    console.log(`[ALERTS] - limit: ${limit}`)
+    console.log(`[ALERTS] - URL: ${request.url}`)
+    
+    // PHASE 1: Try FastAPI first with fallback to Supabase
+    // Database connectivity has been fixed - re-enabling FastAPI
+    const useFastAPI = process.env.ENABLE_FASTAPI === 'true' || process.env.NODE_ENV === 'development'
+    console.log(`[ALERTS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`)
+    
+    if (useFastAPI) {
+      try {
+        console.log(`[ALERTS] Attempting FastAPI for store ${storeId}`)
+        
+        // Phase 2: Use user JWT token for FastAPI authentication
+        // Get user's session with access token
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.access_token) {
+          // Phase 2 Step 4: Get both alerts and AI recommendations in parallel
+          const [fastApiResponse, aiRecommendations] = await Promise.allSettled([
+            fastApiClient.getStoreAlertsWithUserToken(
+              storeId, 
+              session.access_token,
+              {
+                threshold,
+                urgency: urgencyLevel || undefined,
+                category: category || undefined,
+                limit
+              }
+            ),
+            fastApiClient.getAIRecommendationsWithUserToken(
+              storeId,
+              session.access_token,
+              {
+                category: category || undefined,
+                limit: 10 // Get top 10 AI recommendations
+              }
+            )
+          ])
+
+          // Handle alerts response
+          if (fastApiResponse.status === 'rejected') {
+            throw fastApiResponse.reason
+          }
+          
+          console.log(`[ALERTS] FastAPI success: ${fastApiResponse.value.total_count} alerts`)
+          console.log(`[ALERTS] Raw FastAPI response:`, JSON.stringify(fastApiResponse.value, null, 2))
+          console.log(`[ALERTS] FastAPI alerts array:`, fastApiResponse.value.alerts)
+          console.log(`[ALERTS] FastAPI alerts length:`, fastApiResponse.value.alerts?.length || 0)
+          
+          // Map FastAPI alerts to Next.js format for compatibility
+          const enhancedAlerts = fastApiResponse.value.alerts.map(mapFastAPIAlertToEnhanced)
+          console.log(`[ALERTS] Enhanced alerts after mapping:`, enhancedAlerts.length)
+          console.log(`[ALERTS] First enhanced alert sample:`, enhancedAlerts[0] ? JSON.stringify(enhancedAlerts[0], null, 2) : 'No alerts')
+          
+          // Apply the same filtering logic as the original code
+          let filteredAlerts = enhancedAlerts
+          
+          if (urgencyLevel) {
+            console.log(`[ALERTS] Filtering by urgency level: ${urgencyLevel}`)
+            filteredAlerts = filteredAlerts.filter(alert => alert.urgency_level === urgencyLevel)
+            console.log(`[ALERTS] After urgency filter: ${filteredAlerts.length} alerts`)
+          }
+          
+          if (category) {
+            console.log(`[ALERTS] Filtering by category: ${category}`)
+            filteredAlerts = filteredAlerts.filter(alert =>
+              alert.category.toLowerCase().includes(category.toLowerCase())
+            )
+            console.log(`[ALERTS] After category filter: ${filteredAlerts.length} alerts`)
+          }
+          
+          // Sort by priority score (same as original)
+          filteredAlerts.sort((a, b) => {
+            if (b.priority_score !== a.priority_score) {
+              return b.priority_score - a.priority_score
+            }
+            return a.days_to_expiry - b.days_to_expiry
+          })
+          console.log(`[ALERTS] After sorting: ${filteredAlerts.length} alerts`)
+          
+          // Apply limit
+          const beforeLimit = filteredAlerts.length
+          filteredAlerts = filteredAlerts.slice(0, limit)
+          console.log(`[ALERTS] After limit (${limit}): ${filteredAlerts.length} alerts (was ${beforeLimit})`)
+          
+          // Calculate summary statistics (same format as original)
+          const summary = {
+            total_alerts: filteredAlerts.length,
+            critical_count: filteredAlerts.filter(a => a.urgency_level === 'critical').length,
+            high_count: filteredAlerts.filter(a => a.urgency_level === 'high').length,
+            medium_count: filteredAlerts.filter(a => a.urgency_level === 'medium').length,
+            low_count: filteredAlerts.filter(a => a.urgency_level === 'low').length,
+            total_potential_loss: filteredAlerts.reduce((sum, alert) => sum + alert.potential_loss, 0),
+            categories_affected: [...new Set(filteredAlerts.map(a => a.category))].length,
+            avg_days_to_expiry: filteredAlerts.length > 0
+              ? Math.round(filteredAlerts.reduce((sum, a) => sum + a.days_to_expiry, 0) / filteredAlerts.length)
+              : 0,
+            expired_items: filteredAlerts.filter(a => a.days_to_expiry < 0).length,
+          }
+
+          // Handle AI recommendations (graceful degradation)
+          const recommendations = aiRecommendations.status === 'fulfilled' 
+            ? aiRecommendations.value.recommendations || []
+            : []
+          
+          if (aiRecommendations.status === 'rejected') {
+            console.warn('[ALERTS] AI recommendations failed:', aiRecommendations.reason)
+          }
+          
+          const finalResponse = {
+            alerts: filteredAlerts,
+            summary,
+            filters: {
+              store_id: storeId,
+              threshold,
+              urgency_level: urgencyLevel,
+              category,
+              limit,
+            },
+            source: 'fastapi', // Indicate the source for debugging
+            ai_insights: fastApiResponse.value.ai_insights || undefined,
+            ai_recommendations: recommendations.length > 0 ? recommendations : undefined, // NEW: AI-powered recommendations
+            ai_summary: recommendations.length > 0 ? {
+              total_recommendations: recommendations.length,
+              categories_recommended: [...new Set(recommendations.map((r: any) => r.category).filter(Boolean))].length,
+              priority_actions: recommendations.filter((r: any) => r.priority === 'high').length,
+            } : undefined
+          }
+          
+          console.log(`[ALERTS] Final response being sent to frontend:`)
+          console.log(`[ALERTS] - alerts.length: ${finalResponse.alerts.length}`)
+          console.log(`[ALERTS] - summary.total_alerts: ${finalResponse.summary.total_alerts}`)
+          console.log(`[ALERTS] - summary.critical_count: ${finalResponse.summary.critical_count}`)
+          console.log(`[ALERTS] - summary.high_count: ${finalResponse.summary.high_count}`)
+          console.log(`[ALERTS] - source: ${finalResponse.source}`)
+          console.log(`[ALERTS] - ai_insights available: ${!!finalResponse.ai_insights}`)
+          console.log(`[ALERTS] - ai_recommendations available: ${!!finalResponse.ai_recommendations}`)
+          console.log(`[ALERTS] Complete final response:`, JSON.stringify(finalResponse, null, 2))
+          
+          return NextResponse.json(finalResponse)
+        } else {
+          console.warn('[ALERTS] No user session or access token available for FastAPI')
+        }
+      } catch (fastApiError) {
+        console.warn('[ALERTS] FastAPI with user JWT failed, using Supabase fallback:', fastApiError)
+        // Continue to Supabase fallback below
+      }
+    }
+    
+    // Original Supabase implementation (fallback)
+    console.log(`[ALERTS] Using Supabase fallback for store ${storeId}`)
+    console.log(`[ALERTS] Supabase fallback parameters:`)
+    console.log(`[ALERTS] - storeId: ${storeId}`)
+    console.log(`[ALERTS] - threshold: ${threshold}`)
+    console.log(`[ALERTS] - urgencyLevel: ${urgencyLevel}`)
+    console.log(`[ALERTS] - category: ${category}`)
+    console.log(`[ALERTS] - limit: ${limit}`)
+    
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
+    console.log(`[ALERTS] Raw Supabase alerts received: ${alerts.length} items`)
+    console.log(`[ALERTS] First Supabase alert sample:`, alerts[0] ? JSON.stringify(alerts[0], null, 2) : 'No alerts')
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
@@ -208,7 +374,7 @@ export async function GET(request: NextRequest) {
       expired_items: filteredAlerts.filter((a: EnhancedAlert) => a.days_to_expiry < 0).length,
     }
 
-    return NextResponse.json({
+    const supabaseFinalResponse = {
       alerts: filteredAlerts,
       summary,
       filters: {
@@ -218,7 +384,18 @@ export async function GET(request: NextRequest) {
         category,
         limit,
       },
-    })
+      source: 'supabase', // Indicate the source for debugging
+    }
+    
+    console.log(`[ALERTS] Supabase fallback final response:`)
+    console.log(`[ALERTS] - alerts.length: ${supabaseFinalResponse.alerts.length}`)
+    console.log(`[ALERTS] - summary.total_alerts: ${supabaseFinalResponse.summary.total_alerts}`)
+    console.log(`[ALERTS] - summary.critical_count: ${supabaseFinalResponse.summary.critical_count}`)
+    console.log(`[ALERTS] - summary.high_count: ${supabaseFinalResponse.summary.high_count}`)
+    console.log(`[ALERTS] - source: ${supabaseFinalResponse.source}`)
+    console.log(`[ALERTS] Complete Supabase final response:`, JSON.stringify(supabaseFinalResponse, null, 2))
+    
+    return NextResponse.json(supabaseFinalResponse)
   } catch (error) {
     console.error('Error fetching alerts:', error)
     return NextResponse.json(
