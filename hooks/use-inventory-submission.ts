@@ -38,7 +38,6 @@ export function useInventorySubmission() {
 
     onSuccess: (result: InventorySubmissionResult) => {
       if (result.success && activeStoreId) {
-
         // Invalidate product queries - both store-specific and global
         queryClient.invalidateQueries({
           queryKey: queryKeys.products.byStore(activeStoreId),
@@ -125,7 +124,6 @@ export function useBatchInventorySubmission() {
       toast.dismiss('batch-submission')
 
       if (result.success && activeStoreId) {
-
         // Comprehensive cache invalidation for batch operations
 
         // Invalidate all store-specific product and batch queries

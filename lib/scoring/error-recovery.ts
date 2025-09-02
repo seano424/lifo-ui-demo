@@ -51,7 +51,6 @@ export async function retryWithBackoff<T>(
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error')
 
-
       // Don't retry on final attempt
       if (attempt === finalConfig.maxAttempts) {
         break
@@ -91,7 +90,6 @@ function updateCircuitBreaker(storeId: string, error: Error): void {
   if (state.failureCount >= 3) {
     state.isOpen = true
     state.nextRetryTime = now + 5 * 60 * 1000 // 5 minutes
-
   }
 
   circuitBreakers.set(storeId, state)

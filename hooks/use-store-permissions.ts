@@ -36,7 +36,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
 
       const supabase = createClient()
 
-
       // Check store_users relationship
       const { data: storeUser, error: storeUserError } = await supabase
         .schema('business')
@@ -52,7 +51,6 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
       let isOwner = false
 
       if (storeUserError || !storeUser) {
-
         // Check if user is store owner
         const { data: store } = await supabase
           .schema('business')

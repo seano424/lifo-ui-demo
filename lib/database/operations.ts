@@ -22,7 +22,6 @@ export class InventoryOperations {
     userId: string,
     requiredRole: string = 'staff',
   ): Promise<boolean> {
-
     try {
       // First try the RPC function
       const { data, error } = await this.supabase.rpc('user_has_store_access', {
@@ -74,7 +73,6 @@ export class InventoryOperations {
 
         return hasAccess
       }
-
 
       return data || false
     } catch (error) {
@@ -132,7 +130,6 @@ export class InventoryOperations {
       if (!data) {
         throw new Error('Store creation failed: No data returned')
       }
-
 
       return data
     } catch (error) {
@@ -353,7 +350,6 @@ export class InventoryOperations {
 
   // Test if bulk RPC functions are available
   async testBulkFunctionAvailability(): Promise<{ available: string[]; missing: string[] }> {
-
     const available: string[] = []
     const missing: string[] = []
 
@@ -415,9 +411,7 @@ export class InventoryOperations {
       is_duplicate: boolean
     }>
   > {
-
     const duplicateCheckStart = performance.now()
-
 
     // Fixed parameter order: barcodes, expiry_dates, store_id
     const { data, error } = await (
@@ -449,7 +443,6 @@ export class InventoryOperations {
     }
 
     const duplicateCount = Array.isArray(data) ? data.length : 0
-
 
     return Array.isArray(data) ? data : []
   }
@@ -536,10 +529,7 @@ export class InventoryOperations {
     batch_ids: string[]
     processing_time_ms: number
   }> {
-
     const insertStartTime = performance.now()
-
-
 
     // Use the enhanced function that handles complete product lifecycle
     const { data, error } = await (
@@ -686,7 +676,6 @@ export class InventoryOperations {
       const batchInsertTime = Date.now() - batchInsertStart
       const totalTime = Date.now() - processingStartTime
 
-
       return {
         processed: insertResult?.inserted_count || 0,
         errors: [],
@@ -752,7 +741,6 @@ export class InventoryOperations {
   }> {
     const errors: string[] = []
     let processed = 0
-
 
     for (const item of csvData) {
       try {
@@ -950,7 +938,6 @@ export class InventoryOperations {
     expiringItems: number
   }> {
     try {
-
       // Get total store products
       const { count: productCount, error: productError } = await this.supabase
         .schema('inventory')

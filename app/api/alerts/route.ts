@@ -61,7 +61,6 @@ interface EnhancedAlert {
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
-
   const {
     data: { user },
     error,
@@ -78,7 +77,6 @@ export async function GET(request: NextRequest) {
   const urgencyLevel = searchParams.get('urgency') // critical, high, medium, low
   const category = searchParams.get('category')
   const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500)
-
 
   if (!storeId) {
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
@@ -100,10 +98,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-
     // Get alerts using the existing scoring system
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
-
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
@@ -261,7 +257,6 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
 
     if (error) throw error
 
-
     if (!batches || batches.length === 0) {
       return []
     }
@@ -284,8 +279,6 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
       .from('products')
       .select('product_id, sku, name, brand, unit_type, category_id')
       .in('product_id', productIds)
-
-
 
     if (scoringError) {
       console.warn('[getStoreAlerts] Error fetching scoring data:', scoringError)

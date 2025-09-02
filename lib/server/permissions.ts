@@ -101,7 +101,6 @@ export async function checkUserStorePermissions(
     const isManager = role === 'manager'
     const isEmployee = role === 'employee' || role === 'staff'
 
-
     // Calculate permissions based on role and explicit permissions
     const userPermissions: UserStorePermissions = {
       // Settings permissions

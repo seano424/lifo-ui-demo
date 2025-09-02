@@ -46,7 +46,6 @@ export function AuthStatus() {
         queryResult = { data: null, error: 'Query failed' }
       }
 
-
       setAuthInfo({
         hasSession: !!session,
         hasUser: !!user,

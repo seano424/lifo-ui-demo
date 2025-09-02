@@ -74,7 +74,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleFileSelect = async (file: File) => {
-
     if (!file.name.toLowerCase().endsWith('.csv')) {
       toast.error(t('errors.invalidFile'))
       return
@@ -93,7 +92,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleUpload = () => {
-
     if (!selectedFile) {
       toast.error(t('errors.noFile'))
       return
@@ -103,8 +101,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       toast.error(t('errors.noStore'))
       return
     }
-
-
 
     try {
       upload({

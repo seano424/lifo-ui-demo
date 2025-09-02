@@ -84,7 +84,6 @@ export function useUserStores() {
         typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
       const primaryStoreId = userPreferencesResult.data?.primary_store_id
 
-
       // Use smart selection logic
       const storeToSelect = selectDefaultStore(
         userStoresResult.data,

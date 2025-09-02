@@ -64,18 +64,14 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
       setShowSubmissionDialog(true)
     },
 
-    onError: error => {
-    },
+    onError: error => {},
 
-    onProductFound: product => {
-    },
+    onProductFound: product => {},
 
-    onWorkflowComplete: () => {
-    },
+    onWorkflowComplete: () => {},
   }
 
   const handleConfirmSubmission = () => {
-
     // Convert scanned items to the format expected by the inventory submission
     const productsToSubmit = convertMultipleScannedItems(
       pendingItems.map(item => ({
@@ -98,7 +94,6 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
       })),
       {
         onSuccess: result => {
-
           // Store the result for the success dialog
           setSubmissionResult({
             successCount: result.successCount,

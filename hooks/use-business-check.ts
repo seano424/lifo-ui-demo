@@ -14,7 +14,6 @@ export function useBusinessCheck() {
     setIsLoading(true)
     setError(null)
 
-
     try {
       // Validate the request data
       const validationResult = businessCheckSchema.safeParse(checkData)
@@ -23,13 +22,11 @@ export function useBusinessCheck() {
         throw new Error('Invalid business data provided')
       }
 
-
       const response = await fetch('/api/business/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validationResult.data),
       })
-
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -38,7 +35,6 @@ export function useBusinessCheck() {
       }
 
       const result: BusinessCheckResult = await response.json()
-
 
       return result
     } catch (err) {
@@ -55,7 +51,6 @@ export function useBusinessCheck() {
         exists: false,
         message: 'Unable to verify business. You can proceed with registration.',
       }
-
 
       return fallbackResult
     } finally {

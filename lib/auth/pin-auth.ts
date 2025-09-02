@@ -129,7 +129,6 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
   const supabase = createClient()
 
   try {
-
     // Call Supabase RPC function to validate PIN and get user data
     const { data: result, error } = await supabase.rpc('validate_pin_login', {
       p_username: data.username,
@@ -195,7 +194,6 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
         }
       }
     }
-
 
     return {
       success: true,

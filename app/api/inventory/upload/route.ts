@@ -17,7 +17,6 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     const authEndTime = Date.now()
 
-
     if (authError) {
       console.error('❌ [UPLOAD-API] Auth error:', authError)
       return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
@@ -28,7 +27,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user authenticated' }, { status: 401 })
     }
 
-
     const formDataStartTime = Date.now()
     const formData = await request.formData()
     const formDataEndTime = Date.now()
@@ -36,7 +34,6 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
     const defaultExpiryDate = formData.get('defaultExpiryDate') as string
-
 
     if (!file || !storeId) {
       console.error('❌ [UPLOAD-API] Missing required parameters:', {
@@ -57,7 +54,6 @@ export async function POST(request: NextRequest) {
       console.error('❌ [UPLOAD-API] File too large:', { size: file.size, maxSize: maxFileSize })
       return NextResponse.json({ error: 'File too large' }, { status: 400 })
     }
-
 
     // Fast CSV processing - no Python subprocess overhead
     const csvReadStartTime = Date.now()
@@ -90,11 +86,9 @@ export async function POST(request: NextRequest) {
     const operations = new InventoryOperations(supabase)
     const operationsCreateEndTime = Date.now()
 
-
     const processingStartTime = Date.now()
     const result = await operations.processCsvBatch(csvData, storeId, user.id)
     const processingEndTime = Date.now()
-
 
     const totalTime = Date.now() - apiStartTime
 
@@ -120,7 +114,6 @@ export async function POST(request: NextRequest) {
         database_processing_time_ms: result.performance_metrics?.database_processing_time_ms || 0,
       },
     }
-
 
     // PHASE 2: Automatic scoring integration after successful batch creation
 

@@ -55,7 +55,6 @@ export async function scoreBatchesAfterCreation(
   const startTime = Date.now()
   let attemptCount = 0
 
-
   // Check circuit breaker
   if (isCircuitBreakerOpen(storeId)) {
     console.warn('[SCORING-INTEGRATION] Circuit breaker open, skipping scoring:', storeId)
@@ -153,7 +152,6 @@ export async function scoreBatchesAfterCreation(
     const totalTime = Date.now() - startTime
 
     if (scoringResult.success) {
-
       recordScoringMetrics({
         storeId,
         operation: options.operation,
@@ -237,7 +235,6 @@ async function callFastAPIScoring(
   const { force_recalculate = false, timeout = 30000 } = options
 
   try {
-
     // Construct FastAPI endpoint URL
     const fastApiBaseUrl = process.env.FASTAPI_BASE_URL || 'http://localhost:8000'
     const endpoint = `${fastApiBaseUrl}/api/v1/scoring/batch/${storeId}`
@@ -280,7 +277,6 @@ async function callFastAPIScoring(
       }
 
       const data: ScoringResponse = await response.json()
-
 
       return {
         success: true,
@@ -325,7 +321,6 @@ export async function scoreAfterCsvUpload(
     force_recalculate?: boolean
   } = {},
 ): Promise<ScoringResult> {
-
   // For CSV uploads, always force recalculation since we just created new batches
   return scoreBatchesAfterCreation(storeId, {
     operation: 'csv_upload',
@@ -344,9 +339,6 @@ export async function scoreAfterScanIn(
     force_recalculate?: boolean
   } = {},
 ): Promise<ScoringResult> {
-    force_recalculate: options.force_recalculate,
-  })
-
   return scoreBatchesAfterCreation(storeId, {
     operation: 'scan_in',
     batchIds: [batchId],

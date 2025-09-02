@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-
     // Create admin Supabase client for user management
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
       username === 'testme' ? 'seanpatrickstudios@gmail.com' : null,
     ].filter(Boolean)
 
-
     let signInData: {
       session: { access_token: string; refresh_token: string }
       user: {
@@ -53,7 +51,6 @@ export async function POST(request: NextRequest) {
 
     // Try each email format until one works
     for (const email of possibleEmails) {
-
       const result = await supabase.auth.signInWithPassword({
         email: email!,
         password: pin,
@@ -81,7 +78,6 @@ export async function POST(request: NextRequest) {
       console.error('❓ No user returned from authentication')
       return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: 500 })
     }
-
 
     // Get username from metadata, override for test cases
     let userUsername =

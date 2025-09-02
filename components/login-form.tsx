@@ -75,7 +75,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
-
       // Call the PIN session API to validate and create session
       const response = await fetch('/api/auth/pin-session', {
         method: 'POST',

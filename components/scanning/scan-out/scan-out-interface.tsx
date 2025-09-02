@@ -182,8 +182,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       })
       setCurrentStep('batch-selection')
       setSelectedBatch(null)
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   const handleBatchSelected = useCallback(
@@ -311,7 +310,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleConfirmSubmission = () => {
-
     // Submit the checkout/removal to inventory
     submitCheckout(
       pendingItems.map(item => ({
@@ -323,7 +321,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       })),
       {
         onSuccess: result => {
-
           // Store the result for the success dialog
           setSubmissionResult({
             successCount: result.successCount || pendingItems.length,

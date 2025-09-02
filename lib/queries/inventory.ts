@@ -53,7 +53,6 @@ export async function submitScannedProductToInventory(
   productData: ScannedProductData,
 ): Promise<InventorySubmissionResult> {
   try {
-
     // Step 1: UPSERT to inventory.products table
     const product = await upsertGlobalProduct(productData)
 
@@ -111,7 +110,6 @@ async function upsertGlobalProduct(
         .maybeSingle() // Use maybeSingle() instead of single() to avoid 406 errors
 
       if (existingProduct) {
-
         // Update existing product with any new information
         const updates: Partial<Database['inventory']['Tables']['products']['Update']> = {
           updated_at: new Date().toISOString(),
@@ -225,7 +223,6 @@ async function upsertStoreProduct(
       .maybeSingle() // Use maybeSingle() instead of single() to avoid 406 errors
 
     if (existingStoreProduct) {
-
       // Update store-specific pricing if different
       const updates: Partial<Database['inventory']['Tables']['store_products']['Update']> = {
         updated_at: new Date().toISOString(),
@@ -311,7 +308,6 @@ async function createProductBatch(
   const supabase = createClient()
 
   try {
-
     // Generate unique batch number
     const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
 
@@ -432,7 +428,6 @@ export async function submitMultipleScannedProducts(products: ScannedProductData
   successCount: number
   failureCount: number
 }> {
-
   const results: InventorySubmissionResult[] = []
   let successCount = 0
   let failureCount = 0
@@ -460,7 +455,6 @@ export async function submitMultipleScannedProducts(products: ScannedProductData
       failureCount++
     }
   }
-
 
   return {
     success: successCount > 0,

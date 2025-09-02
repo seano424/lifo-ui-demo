@@ -287,7 +287,6 @@ export async function fetchProductsPage(
       throw new Error('Store ID is required for fetching products')
     }
 
-
     // Build the select query with categories join
     let query = supabase
       .schema('inventory')
@@ -405,7 +404,6 @@ export async function fetchProductsPage(
       throw new Error(`Failed to fetch products page: ${errorMessage}`)
     }
 
-
     if (!storeProductsData || storeProductsData.length === 0) {
       return {
         data: [],
@@ -428,7 +426,6 @@ export async function fetchProductsPage(
     let filteredStoreProductsData = storeProductsData
 
     if (filters.category) {
-
       // Debug: Check what categories we actually have
       if (storeProductsData.length > 0) {
         const categoriesFound = storeProductsData
@@ -566,9 +563,7 @@ export async function fetchProductsPage(
       const rangeTo = (page + 1) * pageSize
       finalData = transformedData.slice(rangeFrom, rangeTo)
       finalCount = transformedData.length // Total after transformation
-
     }
-
 
     return {
       data: finalData as Product[],
@@ -608,7 +603,6 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
   const supabase = createClient()
 
   try {
-
     // Step 1: Create the global product record
     const globalProductData = {
       name: productData.name,
@@ -713,7 +707,6 @@ export async function updateProduct(
   const supabase = createClient()
 
   try {
-
     // Split updates into global and store-specific
     const globalUpdates: Record<string, unknown> = {}
     const storeUpdates: Record<string, unknown> = {}
@@ -794,7 +787,6 @@ export async function deleteProduct(productId: string, storeId: string): Promise
   const supabase = createClient()
 
   try {
-
     // Check for related batches first
     const { data: relatedBatches, error: batchError } = await supabase
       .schema('inventory')
@@ -825,7 +817,6 @@ export async function deleteProduct(productId: string, storeId: string): Promise
       console.error('[deleteProduct] Error deleting store-product association:', storeProductError)
       throw new Error(`Failed to remove product from store: ${storeProductError.message}`)
     }
-
   } catch (err) {
     console.error('[deleteProduct] Unexpected error:', err)
     throw err
@@ -837,7 +828,6 @@ export async function fetchCategories(serverClient?: ServerClient): Promise<Cate
   const supabase = serverClient || createClient()
 
   try {
-
     const { data: categories, error } = await supabase
       .schema('inventory')
       .rpc('get_categories_for_dropdown')
@@ -862,7 +852,6 @@ export async function fetchProductById(
   const supabase = serverClient || createClient()
 
   try {
-
     // Get the product through the store_products junction table
     const { data, error } = await supabase
       .schema('inventory')

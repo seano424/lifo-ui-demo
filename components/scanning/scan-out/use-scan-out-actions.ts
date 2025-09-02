@@ -223,7 +223,6 @@ export function useScanOutActions() {
           .eq('user_id', user.id)
           .single()
 
-
         if (!storeAccess || !storeAccess.is_active) {
           console.error('🔒 Store Access Denied:', { storeId: items[0].storeId, userId: user.id })
           throw new Error('You do not have active access to this store')
@@ -240,7 +239,6 @@ export function useScanOutActions() {
             .select('batch_id, store_id, current_quantity')
             .eq('batch_id', item.batchId)
             .single()
-
 
           // Start a transaction to ensure data consistency
           const { data: batch, error: fetchError } = await supabase
@@ -281,7 +279,6 @@ export function useScanOutActions() {
           // Update the batch quantity
           const newQuantity = batch.current_quantity - item.quantityRemoved
 
-
           const { data: updateData, error: updateError } = await supabase
             .schema('inventory')
             .from('batches')
@@ -318,7 +315,6 @@ export function useScanOutActions() {
             failureCount++
             continue
           }
-
 
           // TODO: Log the transaction in a transactions/movements table
           // This would track the removal for audit purposes

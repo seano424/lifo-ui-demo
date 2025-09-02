@@ -35,11 +35,9 @@ function createServiceRoleClient() {
 }
 
 export async function POST(request: NextRequest) {
-
   try {
     const body: OnboardingRequest = await request.json()
     const { userId, store, user } = body
-
 
     // Validate required fields (always required)
     if (!userId || !store || !user) {
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
-
 
     // Simple switch based on mode
     switch (ONBOARDING_MODE) {
@@ -90,9 +87,7 @@ export async function POST(request: NextRequest) {
 
 // Mock mode - no dependencies, just returns fake success
 function handleMockOnboarding(userId: string, store: StoreFormData) {
-
   const mockStoreCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
-
 
   const response = {
     success: true,
@@ -110,7 +105,6 @@ function handleMockOnboarding(userId: string, store: StoreFormData) {
 
 // Test mode - requires logged in user, creates real database records
 async function handleTestOnboarding(userId: string, store: StoreFormData) {
-
   // Use service role client to bypass RLS
   const supabase = createServiceRoleClient()
 
@@ -133,7 +127,6 @@ async function handleTestOnboarding(userId: string, store: StoreFormData) {
       userId,
     )
 
-
     // Create store record
     const { data: storeData, error: storeError } = await supabase
       .schema('business')
@@ -147,7 +140,6 @@ async function handleTestOnboarding(userId: string, store: StoreFormData) {
       console.error('❌ Full error details:', JSON.stringify(storeError, null, 2))
       throw new Error(`Failed to create store: ${storeError.message}`)
     }
-
 
     // Create store-user relationship
     const storeUserData = {
@@ -164,7 +156,6 @@ async function handleTestOnboarding(userId: string, store: StoreFormData) {
       assigned_by: userId,
     }
 
-
     const { error: storeUserError } = await supabase
       .schema('business')
       .from('store_users')
@@ -175,7 +166,6 @@ async function handleTestOnboarding(userId: string, store: StoreFormData) {
       console.error('❌ Full error details:', JSON.stringify(storeUserError, null, 2))
       throw new Error(`Failed to create store-user relationship: ${storeUserError.message}`)
     }
-
 
     // Create default store settings
 
@@ -212,7 +202,6 @@ async function handleTestOnboarding(userId: string, store: StoreFormData) {
 
 // Production mode - creates new auth user + store
 async function handleProductionOnboarding(userId: string, store: StoreFormData) {
-
   // Use service role client for production too (for onboarding)
   const supabase = createServiceRoleClient()
   const storeCode = `${store.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
@@ -247,7 +236,6 @@ async function handleProductionOnboarding(userId: string, store: StoreFormData) 
       throw new Error(`Failed to create store: ${storeError.message}`)
     }
 
-
     // Create store-user relationship
     const { error: storeUserError } = await supabase
       .schema('business')
@@ -270,7 +258,6 @@ async function handleProductionOnboarding(userId: string, store: StoreFormData) 
       console.error('Store-user relationship error:', storeUserError)
       throw new Error(`Failed to create store-user relationship: ${storeUserError.message}`)
     }
-
 
     // Create default store settings
     const { error: settingsError } = await supabase

@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
     const body: CreateEmployeeRequest = await request.json()
     const { firstName, lastName, email, username, role, languagePreference, storeId, pin } = body
 
-
     // Validate required fields
     if (!firstName || !lastName || !email || !username || !storeId || !pin) {
       return NextResponse.json(
@@ -58,7 +57,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-
     // ✅ FIXED: Check permission using the correct business.store_users table structure
     const { data: storeUser, error: permissionError } = await supabase
       .schema('business')
@@ -68,7 +66,6 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .eq('is_active', true)
       .single()
-
 
     if (permissionError) {
       console.error('❌ Permission query error:', permissionError)
@@ -92,14 +89,12 @@ export async function POST(request: NextRequest) {
       storeUser.role_in_store === 'manager' ||
       storeUser.permissions?.can_manage_users === true
 
-
     if (!canManageUsers) {
       return NextResponse.json(
         { success: false, error: 'Permission denied: You cannot create users in this store' },
         { status: 403 },
       )
     }
-
 
     // ✅ FIXED: Check for duplicate username using admin client
     const { data: isAvailable, error: availabilityError } = await adminSupabase.rpc(
@@ -116,16 +111,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (!isAvailable) {
-        return NextResponse.json(
+      return NextResponse.json(
         { success: false, error: 'Username already exists' },
         { status: 409 },
       )
     }
 
-
     // Create auth email using the working pattern
     const authEmail = `${username}@seantest.dev`
-
 
     // ✅ Create user using Admin API with proper service role permissions
     const { data: newUser, error: createError } = await adminSupabase.auth.admin.createUser({
@@ -154,7 +147,6 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       )
     }
-
 
     // ✅ Add user to store with appropriate permissions
     const employeePermissions = {
@@ -211,7 +203,6 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       )
     }
-
 
     // Return success with credentials
     return NextResponse.json({

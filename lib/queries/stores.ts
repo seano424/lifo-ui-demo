@@ -217,7 +217,6 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
       console.error('[updateUserPrimaryStore] Supabase error:', error)
       throw new Error(`Failed to update primary store: ${error.message}`)
     }
-
   } catch (err) {
     console.error('[updateUserPrimaryStore] Unexpected error:', err)
     throw err

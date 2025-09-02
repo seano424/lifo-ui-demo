@@ -50,7 +50,6 @@ export function OnboardingSignUpForm({
     setIsLoading(true)
     setError(null)
 
-
     // Validation
     if (ONBOARDING_MODE === 'production' && password.length < 6) {
       setError('Password must be at least 6 characters')
@@ -130,7 +129,6 @@ export function OnboardingSignUpForm({
         store_type: confirmedStoreInsert?.store_type,
         business_name: confirmedStoreInsert?.business_name,
       }
-
 
       // Call API
       const response = await fetch('/api/onboarding', {

@@ -127,7 +127,6 @@ export function AddEmployeeDialog({
       try {
         const supabase = createClient()
 
-
         // ✅ Use RPC function instead of direct auth.users query
         const { data, error } = await supabase.rpc('check_username_availability', {
           p_username: username,
@@ -142,7 +141,6 @@ export function AddEmployeeDialog({
 
         // data is boolean: true = available, false = taken
         setUsernameAvailable(data)
-
       } catch (error) {
         console.error('❌ Username availability check failed:', error)
         setUsernameAvailable(null)
@@ -273,7 +271,6 @@ export function AddEmployeeDialog({
     queryClient.invalidateQueries({
       queryKey: queryKeys.storeUsers.managers(storeId),
     })
-
   }
 
   // ✅ FIXED: Handle form submission using server-side Admin API
@@ -300,7 +297,6 @@ export function AddEmployeeDialog({
     try {
       const pin = generateSecurePIN()
 
-
       // Call server-side API that uses Admin API with proper permissions
       const response = await fetch('/api/employees/create', {
         method: 'POST',
@@ -325,7 +321,6 @@ export function AddEmployeeDialog({
         console.error('❌ Server API error:', result.error)
         throw new Error(result.error || 'Failed to create employee')
       }
-
 
       // Store credentials for display and email
       const credentials: CreatedCredentials = {

@@ -112,7 +112,6 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
           fetchExpiringBatches(storeToUse.store_id, filters.expiringInDays, serverClient),
       })
     }
-
   } catch (error) {
     console.error('[InventoryBatchesPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading

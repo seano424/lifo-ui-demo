@@ -71,10 +71,8 @@ export function useCSVUpload() {
     const qtyIndex = headers.findIndex(h => h.toLowerCase().includes('quantity'))
     const expiryIndex = headers.findIndex(h => h.toLowerCase().includes('expiry'))
 
-
     const hasExpiryColumn = expiryIndex >= 0
     let _itemsWithoutExpiry = 0
-
 
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
@@ -111,7 +109,6 @@ export function useCSVUpload() {
       }
     }
 
-
     setColumnMapping({ hasExpiryColumn, itemsWithoutExpiry: totalItemsWithoutExpiry })
     setCsvPreview(preview)
     setIsPreviewReady(true)
@@ -141,7 +138,6 @@ export function useCSVUpload() {
         formData.append('storeId', storeId)
       }
 
-
       // Use the main optimized upload route
       const fetchStartTime = performance.now()
       const response = await fetch('/api/inventory/upload', {
@@ -149,7 +145,6 @@ export function useCSVUpload() {
         body: formData,
       })
       const fetchEndTime = performance.now()
-
 
       if (!response.ok) {
         console.error('❌ [USE-CSV-UPLOAD] Upload failed with status:', response.status)
@@ -164,7 +159,6 @@ export function useCSVUpload() {
       return result
     },
     onSuccess: (data, { storeId }) => {
-
       // Invalidate inventory queries to refresh dashboard
       queryClient.invalidateQueries({ queryKey: ['store-batches', storeId] })
       queryClient.invalidateQueries({ queryKey: ['store-inventory', storeId] })
@@ -178,7 +172,6 @@ export function useCSVUpload() {
       const metrics = data.performance_metrics || {}
       const speed = metrics.items_per_second || 0
       const totalTime = data.processing_time_ms || 0
-
 
       // Create performance breakdown
       const performanceDetails = []

@@ -259,7 +259,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   }
 
   const handleConfirmSubmission = () => {
-
     // Convert scanned items to the format expected by the inventory submission
     const productsToSubmit = convertMultipleScannedItems(
       scannedItems.map(item => ({
@@ -282,7 +281,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
       })),
       {
         onSuccess: result => {
-
           // Store the result for the success dialog
           setSubmissionResult({
             successCount: result.successCount,

@@ -16,7 +16,6 @@ export function createAdminClient() {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
   }
 
-
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,

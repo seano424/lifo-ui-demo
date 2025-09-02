@@ -165,7 +165,6 @@ export default function PlaygroundPage() {
   const analyticsQuery = useStoreAnalytics(activeStoreId, '7d')
   const dashboardQuery = useDashboardInsights(activeStoreId)
 
-
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="mb-8">

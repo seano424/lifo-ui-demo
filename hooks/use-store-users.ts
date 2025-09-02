@@ -38,7 +38,6 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
   // Flatten pages into single array
   const data = result.data?.pages.flatMap(page => page.data) ?? []
 
-
   return {
     data,
     count: result.data?.pages[0]?.count ?? 0,

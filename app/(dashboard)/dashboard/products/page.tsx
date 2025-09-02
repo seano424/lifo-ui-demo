@@ -66,7 +66,6 @@ export default async function ProductsPage() {
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page
     })
-
   } catch (error) {
     console.error('[ProductsPage] Error prefetching data:', error)
     // Continue without prefetch - client will handle loading

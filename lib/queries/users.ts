@@ -191,7 +191,6 @@ export async function fetchUsersPage(
 
     // Handle role filtering (unchanged)
     if (filters.role) {
-
       const { data: roleData, error: roleError } = await supabase
         .schema('user_mgmt')
         .from('user_roles')

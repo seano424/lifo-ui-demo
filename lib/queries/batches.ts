@@ -395,7 +395,6 @@ export async function deleteBatch(batchId: string): Promise<void> {
       console.error('[deleteBatch] Supabase error:', error)
       throw new Error(`Failed to delete batch: ${error.message}`)
     }
-
   } catch (err) {
     console.error('[deleteBatch] Unexpected error:', err)
     throw err
@@ -410,7 +409,6 @@ export async function fetchBatchById(
   const supabase = serverClient || createClient()
 
   try {
-
     // Fetch batch first
     const { data: batch, error } = await supabase
       .schema('inventory')
@@ -489,7 +487,6 @@ export async function fetchExpiringBatches(
     const expiryThreshold = new Date()
     expiryThreshold.setDate(expiryThreshold.getDate() + daysAhead)
 
-
     // ✅ SIMPLE: Fetch batches first with single-column ordering
     const { data: batches, error } = await supabase
       .schema('inventory')
@@ -524,7 +521,6 @@ export async function fetchLowStockBatches(
   const supabase = serverClient || createClient()
 
   try {
-
     // ✅ SIMPLE: Fetch batches first with single-column ordering
     const { data: batches, error } = await supabase
       .schema('inventory')

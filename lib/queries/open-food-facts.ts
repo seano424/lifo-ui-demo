@@ -115,7 +115,6 @@ export function transformOpenFoodFactsProduct(
   barcode: string,
   offProduct: OpenFoodFactsProduct,
 ): ProductLookupResult {
-
   if (offProduct.status !== 1 || !offProduct.product) {
     return {
       barcode,

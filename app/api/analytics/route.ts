@@ -16,7 +16,6 @@ type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] &
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
 
-
   const {
     data: { user },
     error,
@@ -32,7 +31,6 @@ export async function GET(request: NextRequest) {
   const metric = searchParams.get('metric') // 'overview', 'waste', 'revenue', 'categories'
   // Allow override via URL parameter, otherwise use store settings
   const thresholdOverride = searchParams.get('threshold')
-
 
   if (!storeId) {
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
@@ -54,7 +52,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-
     // Calculate date range
     const endDate = new Date()
     const startDate = new Date()
@@ -144,7 +141,6 @@ async function getOverviewAnalytics(
       console.error('[getOverviewAnalytics] Error fetching batches:', batchError)
     }
 
-
     if (!batches || batches.length === 0) {
       return {
         totalProducts: 0,
@@ -174,7 +170,6 @@ async function getOverviewAnalytics(
     if (scoringError) {
       console.error('[getOverviewAnalytics] Error fetching scoring data:', scoringError)
     }
-
 
     // Get total store products count
     const { count: productCount, error: productError } = await supabase
