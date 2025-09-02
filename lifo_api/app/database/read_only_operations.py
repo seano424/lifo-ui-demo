@@ -34,10 +34,10 @@ class SecureReadOnlyOperations:
         try:
             # Import Supabase service (fallback to direct client usage)
             from app.database.supabase_service import get_supabase_service
-            
+
             supabase_service = get_supabase_service()
             admin_client = supabase_service.get_admin_client()
-            
+
             # Use same approach as Next.js alerts endpoint
             result = (
                 admin_client.schema("inventory")
@@ -59,44 +59,56 @@ class SecureReadOnlyOperations:
                 .order("expiry_date", desc=False)
                 .execute()
             )
-            
+
             if not result.data:
                 self.logger.info("No active batches found", store_id=store_id)
                 return []
-            
+
             # Calculate days_to_expiry for each batch
             inventory_data = []
             for row in result.data:
                 try:
-                    expiry_date = datetime.fromisoformat(row["expiry_date"].replace("Z", "+00:00"))
+                    expiry_date = datetime.fromisoformat(
+                        row["expiry_date"].replace("Z", "+00:00")
+                    )
                     days_to_expiry = (expiry_date.date() - date.today()).days
-                    
-                    inventory_data.append({
-                        "batch_id": str(row["batch_id"]),
-                        "product_id": str(row["product_id"]) if row["product_id"] else "",
-                        "sku": row.get("batch_number", "Unknown"),  # Use batch_number as SKU fallback
-                        "category": "Unknown",  # Will be enriched with product data
-                        "current_quantity": float(row["current_quantity"]),
-                        "expiry_date": row["expiry_date"],
-                        "selling_price": float(row["selling_price"]) if row["selling_price"] else 0.0,
-                        "cost_price": float(row["cost_price"]) if row["cost_price"] else 0.0,
-                        "days_to_expiry": days_to_expiry,
-                        "typical_shelf_life_days": 30,  # Default value
-                    })
+
+                    inventory_data.append(
+                        {
+                            "batch_id": str(row["batch_id"]),
+                            "product_id": str(row["product_id"])
+                            if row["product_id"]
+                            else "",
+                            "sku": row.get(
+                                "batch_number", "Unknown"
+                            ),  # Use batch_number as SKU fallback
+                            "category": "Unknown",  # Will be enriched with product data
+                            "current_quantity": float(row["current_quantity"]),
+                            "expiry_date": row["expiry_date"],
+                            "selling_price": float(row["selling_price"])
+                            if row["selling_price"]
+                            else 0.0,
+                            "cost_price": float(row["cost_price"])
+                            if row["cost_price"]
+                            else 0.0,
+                            "days_to_expiry": days_to_expiry,
+                            "typical_shelf_life_days": 30,  # Default value
+                        }
+                    )
                 except Exception as row_error:
                     self.logger.warning(
-                        "Error processing batch row", 
+                        "Error processing batch row",
                         batch_id=row.get("batch_id"),
-                        error=str(row_error)
+                        error=str(row_error),
                     )
                     continue
-            
+
             self.logger.info(
                 "Inventory data retrieved via Supabase",
                 store_id=store_id,
                 items_count=len(inventory_data),
             )
-            
+
             return inventory_data
 
         except Exception as e:
@@ -374,10 +386,10 @@ class SecureReadOnlyOperations:
         try:
             # Import Supabase service
             from app.database.supabase_service import get_supabase_service
-            
+
             supabase_service = get_supabase_service()
             admin_client = supabase_service.get_admin_client()
-            
+
             # Get batches data using Supabase client (same as Next.js)
             result = (
                 admin_client.schema("inventory")
@@ -387,7 +399,7 @@ class SecureReadOnlyOperations:
                 .eq("status", "active")
                 .execute()
             )
-            
+
             if not result.data:
                 # Return empty analytics if no data
                 return {
@@ -407,27 +419,32 @@ class SecureReadOnlyOperations:
                     "category_breakdown": [],
                     "recent_actions": [],
                 }
-            
+
             # Process batches data
             total_batches = len(result.data)
-            total_quantity = sum(float(batch.get("current_quantity", 0)) for batch in result.data)
+            total_quantity = sum(
+                float(batch.get("current_quantity", 0)) for batch in result.data
+            )
             total_value = sum(
-                float(batch.get("current_quantity", 0)) * float(batch.get("selling_price", 0))
+                float(batch.get("current_quantity", 0))
+                * float(batch.get("selling_price", 0))
                 for batch in result.data
             )
-            
+
             # Calculate urgency distribution
             urgency_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
             expired_count = 0
             expiring_soon_count = 0
-            
+
             today = date.today()
-            
+
             for batch in result.data:
                 try:
-                    expiry_date = datetime.fromisoformat(batch["expiry_date"].replace("Z", "+00:00")).date()
+                    expiry_date = datetime.fromisoformat(
+                        batch["expiry_date"].replace("Z", "+00:00")
+                    ).date()
                     days_to_expiry = (expiry_date - today).days
-                    
+
                     if days_to_expiry < 0:
                         expired_count += 1
                         urgency_counts["critical"] += 1
@@ -443,11 +460,13 @@ class SecureReadOnlyOperations:
                         expiring_soon_count += 1
                     else:
                         urgency_counts["low"] += 1
-                        
+
                 except (ValueError, KeyError) as e:
-                    self.logger.warning("Error processing batch expiry date", error=str(e))
+                    self.logger.warning(
+                        "Error processing batch expiry date", error=str(e)
+                    )
                     continue
-            
+
             analytics_data = {
                 "inventory_summary": {
                     "total_batches": total_batches,
@@ -460,13 +479,13 @@ class SecureReadOnlyOperations:
                 "category_breakdown": [],  # Would need product data to populate
                 "recent_actions": [],  # Would need actions/logs data to populate
             }
-            
+
             self.logger.info(
                 "Analytics data retrieved via Supabase",
                 store_id=store_id,
                 total_batches=total_batches,
             )
-            
+
             return analytics_data
 
         except Exception as e:
@@ -491,12 +510,6 @@ class SecureReadOnlyOperations:
                 "category_breakdown": [],
                 "recent_actions": [],
             }
-
-        except Exception as e:
-            self.logger.error(
-                "Failed to get analytics data", store_id=store_id, error=str(e)
-            )
-            return {}
 
 
 # Factory function for dependency injection

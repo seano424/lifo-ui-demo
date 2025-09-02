@@ -447,7 +447,9 @@ async def health_check() -> HealthResponse:
         from app.database.supabase_service import supabase_health_check
 
         # Test legacy SQLAlchemy connection (for compatibility)
-        sqlalchemy_healthy = await test_connection()
+        _sqlalchemy_healthy = (
+            await test_connection()
+        )  # Keep for compatibility but don't use
 
         # Check Supabase health (primary database method)
         try:
@@ -459,7 +461,7 @@ async def health_check() -> HealthResponse:
         # Use Supabase as primary database indicator (since we fixed the connectivity)
         # Overall healthy if Supabase works (SQLAlchemy is optional now)
         overall_healthy = supabase_healthy
-        
+
         # Report Supabase connection as database_connected since that's what we're using
         primary_db_connected = supabase_healthy
 
