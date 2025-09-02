@@ -1,3 +1,4 @@
+import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
@@ -17,6 +18,9 @@ export default function Page() {
       </div>
       <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
         <QuickActionCards />
+      </div>
+      <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+        <AlertSensitivityControls />
       </div>
     </div>
   )

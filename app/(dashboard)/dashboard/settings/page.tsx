@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import UserAccountInformation from '@/components/account/user-account-information'
+import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 // Import existing components - preserve all functionality
 import StoreInformation from '@/components/settings/store-information'
@@ -164,8 +165,9 @@ export default function UnifiedSettingsPage() {
         ) : (
           <>
             {/* Store Settings Tab */}
-            <TabsContent value="store" className="mt-6">
+            <TabsContent value="store" className="mt-6 space-y-6">
               <StoreInformation />
+              <AlertSensitivityControls storeId={storeId || undefined} />
             </TabsContent>
 
             {/* Account Settings Tab */}

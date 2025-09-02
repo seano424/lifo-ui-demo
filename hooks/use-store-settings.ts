@@ -290,6 +290,15 @@ export function useUpdateStoreAdvancedSettings() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.stores.detail(activeStoreId),
         })
+
+        // Invalidate threshold-dependent queries that need to refresh with new settings
+        queryClient.invalidateQueries({
+          queryKey: ['alerts', 'store', activeStoreId], // Urgent alerts
+        })
+        queryClient.invalidateQueries({
+          queryKey: ['analytics', 'store', activeStoreId], // Store analytics/insights
+        })
+
         // Invalidate user stores to refresh team switcher
         if (currentUser?.id) {
           queryClient.invalidateQueries({

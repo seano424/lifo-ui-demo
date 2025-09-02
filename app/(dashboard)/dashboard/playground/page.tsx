@@ -14,7 +14,7 @@ import {
   useScoringAlerts,
   useScoringRecommendations,
   useStoreAnalytics,
-} from '@/hooks/use-fastapi-scoring'
+} from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
 

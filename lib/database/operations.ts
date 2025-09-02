@@ -1047,7 +1047,10 @@ export class InventoryOperations {
     throw new Error('Inventory functionality temporarily disabled')
   }
 
-  async getStoreStats(storeId: string): Promise<{
+  async getStoreStats(
+    storeId: string,
+    threshold: number = 0.7,
+  ): Promise<{
     totalProducts: number
     totalBatches: number
     activeAlerts: number
@@ -1055,7 +1058,9 @@ export class InventoryOperations {
     expiringItems: number
   }> {
     try {
-      console.log(`[InventoryOperations.getStoreStats] Calculating stats for store: ${storeId}`)
+      console.log(
+        `[InventoryOperations.getStoreStats] Calculating stats for store: ${storeId}, threshold: ${threshold}`,
+      )
 
       // Get total store products
       const { count: productCount, error: productError } = await this.supabase
@@ -1087,8 +1092,25 @@ export class InventoryOperations {
         .eq('store_id', storeId)
         .eq('status', 'active')
 
+      console.log(`[getStoreStats] Batch query result: ${batches?.length || 0} batches found`)
       if (batchError) {
         console.error('[getStoreStats] Error fetching batches:', batchError)
+        console.log('[getStoreStats] Trying alternative query without JOIN...')
+
+        // Alternative query without JOIN to debug
+        const { data: simpleBatches, error: simpleError } = await this.supabase
+          .schema('inventory')
+          .from('batches')
+          .select('current_quantity, selling_price, expiry_date')
+          .eq('store_id', storeId)
+          .eq('status', 'active')
+
+        console.log(
+          `[getStoreStats] Simple query result: ${simpleBatches?.length || 0} batches found`,
+        )
+        if (simpleError) {
+          console.error('[getStoreStats] Simple query also failed:', simpleError)
+        }
       }
 
       // Calculate total value
@@ -1112,7 +1134,7 @@ export class InventoryOperations {
         .from('product_scores')
         .select('*', { count: 'exact' })
         .eq('store_id', storeId)
-        .gte('composite_score', 0.6)
+        .gte('composite_score', threshold)
 
       if (urgentError) {
         console.error('[getStoreStats] Error fetching urgent items:', urgentError)

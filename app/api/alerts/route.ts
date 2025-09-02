@@ -2,34 +2,15 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
-import { InventoryOperations } from '@/lib/database/operations'
 import { createClient } from '@/lib/supabase/server'
+import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 
 interface ScoringData {
   batch_id: string
   composite_score: number
   recommendation: string
   calculated_at: string
-}
-
-interface BatchWithProduct {
-  batch_id: string
-  batch_number: string
-  current_quantity: number
-  selling_price: number
-  cost_price: number
-  expiry_date: string
-  location_code: string
-  supplier: string
-  products:
-    | {
-        sku: string
-        name: string
-        category: string
-        brand: string
-        unit_type: string
-      }[]
-    | null
+  urgency_level?: string
 }
 
 interface AlertData {
@@ -49,6 +30,7 @@ interface AlertData {
   composite_score?: number
   recommendation?: string
   calculated_at?: string
+  urgency_level?: string
 }
 
 interface EnhancedAlert {
@@ -101,7 +83,8 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const storeId = searchParams.get('storeId')
-  const threshold = parseFloat(searchParams.get('threshold') || '0.6')
+  // Allow override via URL parameter, otherwise use store settings
+  const thresholdOverride = searchParams.get('threshold')
   const urgencyLevel = searchParams.get('urgency') // critical, high, medium, low
   const category = searchParams.get('category')
   const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500)
@@ -109,7 +92,7 @@ export async function GET(request: NextRequest) {
   console.log('[/api/alerts] Request parameters:', {
     userId: user.id,
     storeId,
-    threshold,
+    thresholdOverride,
     urgencyLevel,
     category,
     limit,
@@ -119,6 +102,11 @@ export async function GET(request: NextRequest) {
     console.log('[/api/alerts] Missing storeId parameter')
     return NextResponse.json({ error: 'Store ID required' }, { status: 400 })
   }
+
+  // Get threshold from store settings or URL override
+  const threshold = thresholdOverride
+    ? parseFloat(thresholdOverride)
+    : await getStoreThreshold(supabase, storeId, 'warning')
 
   // Validate threshold
   if (threshold < 0 || threshold > 1) {
@@ -132,9 +120,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('[/api/alerts] Initializing InventoryOperations...')
-    const _operations = new InventoryOperations(supabase)
-
     console.log('[/api/alerts] Skipping store access validation for read operation...', {
       storeId,
       userId: user.id,
@@ -142,6 +127,13 @@ export async function GET(request: NextRequest) {
 
     // Get alerts using the existing scoring system
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
+
+    console.log('[/api/alerts] Raw alerts from getStoreAlerts:', {
+      storeId,
+      threshold,
+      alertCount: alerts.length,
+      firstAlert: alerts[0],
+    })
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
@@ -290,13 +282,7 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
         expiry_date,
         location_code,
         supplier,
-        products:product_id (
-          sku,
-          name,
-          category,
-          brand,
-          unit_type
-        )
+        product_id
       `,
       )
       .eq('store_id', storeId)
@@ -305,58 +291,118 @@ async function getStoreAlerts(supabase: SupabaseClient, storeId: string, thresho
 
     if (error) throw error
 
+    console.log('[getStoreAlerts] Batches query result:', {
+      storeId,
+      batchCount: batches?.length || 0,
+      firstBatch: batches?.[0],
+      error,
+    })
+
     if (!batches || batches.length === 0) {
       console.log('[getStoreAlerts] No batches found for store:', storeId)
       return []
     }
 
-    // Get batch IDs for scoring lookup
+    // Get batch IDs and product IDs for lookups
     const batchIds = batches.map(batch => batch.batch_id)
+    const productIds = [...new Set(batches.map(batch => batch.product_id).filter(Boolean))]
 
     // Get scoring data separately from scoring schema
     const { data: scoringData, error: scoringError } = await supabase
       .schema('scoring')
       .from('product_scores')
-      .select('batch_id, composite_score, recommendation, calculated_at')
+      .select('batch_id, composite_score, recommendation, calculated_at, urgency_level')
       .eq('store_id', storeId)
       .in('batch_id', batchIds)
+
+    // Get product data separately
+    const { data: productData, error: productError } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select('product_id, sku, name, brand, unit_type, category_id')
+      .in('product_id', productIds)
+
+    console.log('[getStoreAlerts] Scoring query result:', {
+      storeId,
+      batchIds: batchIds.slice(0, 3), // First 3 for brevity
+      scoringDataCount: scoringData?.length || 0,
+      scoringError,
+      firstScore: scoringData?.[0],
+    })
+
+    console.log('[getStoreAlerts] Product query result:', {
+      productIds: productIds.slice(0, 3),
+      productDataCount: productData?.length || 0,
+      productError,
+      firstProduct: productData?.[0],
+    })
 
     if (scoringError) {
       console.warn('[getStoreAlerts] Error fetching scoring data:', scoringError)
     }
 
-    // Create a map of batch_id to scoring data for quick lookup
+    if (productError) {
+      console.warn('[getStoreAlerts] Error fetching product data:', productError)
+    }
+
+    // Create maps for quick lookup
     const scoringMap = new Map()
     scoringData?.forEach((score: ScoringData) => {
       scoringMap.set(score.batch_id, score)
     })
 
+    const productMap = new Map()
+    productData?.forEach(
+      (product: {
+        product_id: string
+        sku?: string
+        name?: string
+        brand?: string
+        unit_type?: string
+        category_id?: string
+      }) => {
+        productMap.set(product.product_id, product)
+      },
+    )
+
     // Filter by threshold and format data
     const alerts =
       batches
-        ?.map((batch: BatchWithProduct) => {
-          const scoring = scoringMap.get(batch.batch_id)
-          // Handle both single object and array cases from Supabase join
-          const product = Array.isArray(batch.products) ? batch.products[0] : batch.products
-          return {
-            batch_id: batch.batch_id,
-            batch_number: batch.batch_number,
-            current_quantity: batch.current_quantity,
-            selling_price: batch.selling_price,
-            cost_price: batch.cost_price,
-            expiry_date: batch.expiry_date,
-            location_code: batch.location_code,
-            supplier: batch.supplier,
-            sku: product?.sku,
-            product_name: product?.name,
-            category: product?.category,
-            brand: product?.brand,
-            unit_type: product?.unit_type,
-            composite_score: scoring?.composite_score || 0,
-            recommendation: scoring?.recommendation,
-            calculated_at: scoring?.calculated_at,
-          }
-        })
+        ?.map(
+          (batch: {
+            batch_id: string
+            batch_number: string
+            current_quantity: number
+            selling_price: number
+            cost_price: number
+            expiry_date: string
+            location_code: string
+            supplier: string
+            product_id: string
+          }) => {
+            const scoring = scoringMap.get(batch.batch_id)
+            const product = productMap.get(batch.product_id)
+            return {
+              batch_id: batch.batch_id,
+              batch_number: batch.batch_number,
+              current_quantity: batch.current_quantity,
+              selling_price: batch.selling_price,
+              cost_price: batch.cost_price,
+              expiry_date: batch.expiry_date,
+              location_code: batch.location_code,
+              supplier: batch.supplier,
+              sku: product?.sku || 'Unknown',
+              product_name: product?.name || 'Unknown Product',
+              category: product?.category_id || 'Unknown',
+              brand: product?.brand || '',
+              unit_type: product?.unit_type || 'pcs',
+              composite_score: scoring?.composite_score || 0,
+              recommendation: scoring?.recommendation,
+              calculated_at: scoring?.calculated_at,
+              urgency_level: scoring?.urgency_level,
+            }
+          },
+        )
         .filter((alert: AlertData) => (alert.composite_score || 0) >= threshold) || []
 
     return alerts

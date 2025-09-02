@@ -184,11 +184,25 @@ export const queryKeys = {
     analytics: (storeId: string) => [...queryKeys.donations.all, 'analytics', storeId] as const,
   },
 
-  // FastAPI scoring and analytics queries
+  // Scoring and analytics queries (served by Next.js API routes)
+  alerts: {
+    all: ['alerts'] as const,
+    store: (storeId: string, threshold?: number) =>
+      [...queryKeys.alerts.all, 'store', storeId, threshold] as const,
+  },
+
+  analytics: {
+    all: ['analytics'] as const,
+    store: (storeId: string, timeframe?: string) =>
+      [...queryKeys.analytics.all, 'store', storeId, timeframe] as const,
+    dashboard: (storeId: string) => [...queryKeys.analytics.all, 'dashboard', storeId] as const,
+  },
+
+  // Keep fastapi namespace for any remaining direct calls (deprecated)
   fastapi: {
     all: ['fastapi'] as const,
 
-    // Scoring endpoints
+    // Scoring endpoints (deprecated - use queryKeys.alerts instead)
     scoring: {
       all: ['fastapi', 'scoring'] as const,
       alerts: (storeId: string, threshold?: number) =>
@@ -197,7 +211,7 @@ export const queryKeys = {
         [...queryKeys.fastapi.scoring.all, 'recommendations', storeId, category] as const,
     },
 
-    // Analytics endpoints
+    // Analytics endpoints (deprecated - use queryKeys.analytics instead)
     analytics: {
       all: ['fastapi', 'analytics'] as const,
       store: (storeId: string, timeframe?: string) =>
