@@ -1,11 +1,22 @@
 'use client'
 
-import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowRightFromLine,
+  Loader2,
+  TrendingUp,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { useDashboardInsights } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -15,7 +26,9 @@ interface StoreInsightsDashboardProps {
   storeId?: string
 }
 
-export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDashboardProps) {
+export function StoreInsightsDashboard({
+  storeId: propStoreId,
+}: StoreInsightsDashboardProps) {
   const activeStoreId = useActiveStoreId()
   const storeId = propStoreId || activeStoreId || ''
 
@@ -26,6 +39,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     isLoading: insightsLoading,
     error: insightsError,
   } = useDashboardInsights(storeId)
+
+  console.log('data from store insights', insights)
 
   if (!storeId) {
     return null
@@ -53,9 +68,12 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Failed to load store insights: {insightsError?.message || 'Unknown error'}
+              Failed to load store insights:{' '}
+              {insightsError?.message || 'Unknown error'}
               <br />
-              <small className="text-muted-foreground mt-2 block">Store ID: {storeId}</small>
+              <small className="text-muted-foreground mt-2 block">
+                Store ID: {storeId}
+              </small>
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -75,20 +93,33 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-col sm:flex-row gap-4 text-center sm:text-left">
         <div className="flex flex-col gap-2">
-          <Typography variant="h4" className="font-bold">
+          <Typography
+            variant="h4"
+            className="font-bold"
+          >
             Today&apos;s priority actions
           </Typography>
-          <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
+          <Typography
+            variant="p"
+            className="text-muted-foreground dark:text-secondary-50"
+          >
             Review and take action on the most urgent items.
           </Typography>
         </div>
 
-        <Button className="flex dark:hidden" asChild>
+        <Button
+          className="flex dark:hidden"
+          asChild
+        >
           <Link href="/dashboard/actionable-batches">
             Take Action <ArrowRightFromLine className="w-4 h-4" />
           </Link>
         </Button>
-        <Button className="hidden dark:flex" variant="black" asChild>
+        <Button
+          className="hidden dark:flex"
+          variant="black"
+          asChild
+        >
           <Link href="/dashboard/actionable-batches">
             Take Action <ArrowRightFromLine className="w-4 h-4" />
           </Link>
@@ -128,7 +159,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
               Store Overview & Analytics
             </CardTitle>
             <CardDescription className="text-center sm:text-left">
-              {totalActions} actions taken • {urgentBatches} urgent items tracked
+              {totalActions} actions taken • {urgentBatches} urgent items
+              tracked
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -137,8 +169,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Scoring Alert:</strong> {urgentBatches} urgent batches need immediate
-                    attention to prevent losses.
+                    <strong>Scoring Alert:</strong> {urgentBatches} urgent
+                    batches need immediate attention to prevent losses.
                   </AlertDescription>
                 </Alert>
               )}
@@ -153,15 +185,17 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                   </div>
                   <div className="p-3 bg-green-50 rounded">
                     <p className="font-medium">Discounts Applied</p>
-                    <p className="text-green-600">€{discountValue.toFixed(0)} saved</p>
+                    <p className="text-green-600">
+                      €{discountValue.toFixed(0)} saved
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground">
-                  Average Score: {(avgScore * 100).toFixed(1)}% • €{discountValue.toFixed(0)}{' '}
-                  discounts applied
+                  Average Score: {(avgScore * 100).toFixed(1)}% • €
+                  {discountValue.toFixed(0)} discounts applied
                 </p>
                 <Button
                   variant="outline"

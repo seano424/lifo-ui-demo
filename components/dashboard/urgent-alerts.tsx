@@ -1,7 +1,7 @@
 'use client'
 
-import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
@@ -20,15 +20,12 @@ function thresholdToLevelName(warningThreshold: number): string {
 
 export function UrgentAlerts() {
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, isFetching, error } = useScoringAlerts(activeStoreId)
-  const { isUpdating: thresholdsUpdating, warningThreshold } = useScoringThresholds(
-    activeStoreId || undefined,
-  )
+  const { data, isLoading, error } = useScoringAlerts(activeStoreId)
+  const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
 
-  // Loading state for initial load
+  console.log('data from urgent alerts', data)
+
   const isInitialLoading = isLoading
-  // Loading state for message text during updates
-  const isMessageUpdating = thresholdsUpdating || isFetching
   const currentLevel = thresholdToLevelName(warningThreshold)
 
   if (isInitialLoading) {
@@ -48,13 +45,21 @@ export function UrgentAlerts() {
     return (
       <div className="flex flex-col gap-4 sm:flex-row text-center sm:text-left items-center justify-between">
         <div className="flex flex-col gap-2">
-          <Typography variant="h4" className="font-bold text-red-600">
+          <Typography
+            variant="h4"
+            className="font-bold text-red-600"
+          >
             Connection Error
           </Typography>
-          <Typography variant="p">Unable to load inventory alerts. Please try again.</Typography>
+          <Typography variant="p">
+            Unable to load inventory alerts. Please try again.
+          </Typography>
         </div>
         <Link href="/dashboard/inventory/batches?filter=expiring">
-          <Button variant="outline" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+          >
             View inventory
             <ArrowRight className="h-4 w-4" />
           </Button>
@@ -75,18 +80,21 @@ export function UrgentAlerts() {
 
     // For urgent mode (high threshold), use urgent language
     if (warningThreshold >= 0.8 && summary.critical_count > 0) {
-      const itemText = summary.critical_count === 1 ? 'item needs' : 'items need'
+      const itemText =
+        summary.critical_count === 1 ? 'item needs' : 'items need'
       return `${summary.critical_count} ${itemText} immediate action`
     }
 
     // For default mode, use moderate language
     if (warningThreshold >= 0.6) {
       if (summary.critical_count > 0) {
-        const itemText = summary.critical_count === 1 ? 'item needs' : 'items need'
+        const itemText =
+          summary.critical_count === 1 ? 'item needs' : 'items need'
         return `${summary.critical_count} ${itemText} immediate action`
       }
       if (summary.high_count > 0) {
-        const itemText = summary.high_count === 1 ? 'item may need' : 'items may need'
+        const itemText =
+          summary.high_count === 1 ? 'item may need' : 'items may need'
         return `${summary.high_count} ${itemText} attention soon`
       }
       const itemText = totalAlerts === 1 ? 'item flagged' : 'items flagged'
@@ -103,19 +111,13 @@ export function UrgentAlerts() {
   return (
     <div className="flex flex-col gap-4 lg:flex-row text-center lg:text-left items-center justify-between">
       <div className="flex flex-col gap-2">
-        <Typography variant="h4" className="font-bold">
+        <Typography
+          variant="h4"
+          className="font-bold"
+        >
           {currentLevel}
         </Typography>
-        <Typography variant="p">
-          {isMessageUpdating ? (
-            <div className="flex gap-2 items-center justify-center">
-              <Skeleton className="inline-block h-5 w-10" />
-              <Skeleton className="inline-block h-5 w-32" />
-            </div>
-          ) : (
-            message
-          )}
-        </Typography>
+        <Typography variant="p">{message}</Typography>
         <AlertQuickToggle
           storeId={activeStoreId || undefined}
           size="sm"
@@ -124,7 +126,10 @@ export function UrgentAlerts() {
       </div>
 
       <Link href="/dashboard/inventory/batches?filter=expiring">
-        <Button variant="subtleSecondary" className="gap-2">
+        <Button
+          variant="subtleSecondary"
+          className="gap-2"
+        >
           View items
           <ArrowRight className="h-4 w-4" />
         </Button>
