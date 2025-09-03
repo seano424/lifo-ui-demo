@@ -8,6 +8,11 @@ import { AddStoreSearchStep } from '@/components/settings/add-store-search-step'
 import { AddStoreSuccess } from '@/components/settings/add-store-success'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import {
+  DEFAULT_STORE_VALUES,
+  STORE_FLOW_STEPS,
+  STORE_FLOW_STEPS_NO_GOOGLE_PLACES,
+} from '@/lib/constants/store-flow'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { type StoreFormData, useAddStoreStore } from '@/lib/stores/add-store-store'
 import { cn } from '@/lib/utils'
@@ -37,7 +42,7 @@ export function AddStoreFlow() {
     initializeForGooglePlaces(googlePlacesEnabled)
   }, [googlePlacesEnabled, initializeForGooglePlaces])
 
-  const canGoBack = currentStep > 1 && !isCreating && googlePlacesEnabled
+  const canGoBack = currentStep > STORE_FLOW_STEPS.SEARCH && !isCreating && googlePlacesEnabled
 
   const handleCreateStore = async (storeData: StoreFormData) => {
     if (!storeData.store_type) {
@@ -49,8 +54,13 @@ export function AddStoreFlow() {
     setError(undefined)
 
     try {
-      // Generate a temporary store code
-      const tempStoreCode = `${storeData.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
+      // Generate a unique store code
+      const generateUniqueStoreCode = () => {
+        const prefix = storeData.store_name.substring(0, 3).toUpperCase().padEnd(3, 'X')
+        const random = Math.random().toString(36).substring(2, 8).toUpperCase()
+        return `${prefix}${random}`
+      }
+      const tempStoreCode = generateUniqueStoreCode()
 
       // Prepare data for API (matching the expected format)
       const storeCreateData = {
@@ -59,7 +69,7 @@ export function AddStoreFlow() {
         store_type: storeData.store_type,
         address: storeData.address,
         city: storeData.city,
-        country: storeData.country || 'France',
+        country: storeData.country || DEFAULT_STORE_VALUES.COUNTRY,
         business_name: storeData.business_name || storeData.store_name,
         postal_code: storeData.postal_code,
         phone: storeData.phone,
@@ -81,21 +91,28 @@ export function AddStoreFlow() {
       }
 
       // Invalidate queries to refresh store lists and preferences
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.stores.all,
-      })
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.userPreferences.all,
-      })
-      await queryClient.invalidateQueries({
-        queryKey: ['currentAuthUser'],
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.stores.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.userPreferences.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ['currentAuthUser'],
+        }),
+      ])
 
       // Mark as complete and move to success step
       setIsComplete(true)
-      setCurrentStep(googlePlacesEnabled ? 3 : 2)
+      setCurrentStep(
+        googlePlacesEnabled ? STORE_FLOW_STEPS.SUCCESS : STORE_FLOW_STEPS_NO_GOOGLE_PLACES.SUCCESS,
+      )
     } catch (error) {
-      console.error('Error creating store:', error)
+      // Only log errors in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating store:', error)
+      }
       setError(error instanceof Error ? error.message : 'Failed to create store. Please try again.')
     } finally {
       setIsCreating(false)
@@ -127,22 +144,22 @@ export function AddStoreFlow() {
       <div className="min-h-[500px]">
         {googlePlacesEnabled ? (
           <>
-            {currentStep === 1 && <AddStoreSearchStep />}
-            {currentStep === 2 && (
+            {currentStep === STORE_FLOW_STEPS.SEARCH && <AddStoreSearchStep />}
+            {currentStep === STORE_FLOW_STEPS.DETAILS && (
               <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
             )}
-            {currentStep === 3 && isComplete && selectedStoreForm && (
+            {currentStep === STORE_FLOW_STEPS.SUCCESS && isComplete && selectedStoreForm && (
               <AddStoreSuccess storeName={selectedStoreForm.store_name} />
             )}
           </>
         ) : (
           <>
-            {currentStep === 1 && (
+            {currentStep === STORE_FLOW_STEPS_NO_GOOGLE_PLACES.DETAILS && (
               <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
             )}
-            {currentStep === 2 && isComplete && selectedStoreForm && (
-              <AddStoreSuccess storeName={selectedStoreForm.store_name} />
-            )}
+            {currentStep === STORE_FLOW_STEPS_NO_GOOGLE_PLACES.SUCCESS &&
+              isComplete &&
+              selectedStoreForm && <AddStoreSuccess storeName={selectedStoreForm.store_name} />}
           </>
         )}
       </div>

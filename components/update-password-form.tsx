@@ -56,7 +56,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
         <CardContent>
           <form onSubmit={handleForgotPassword}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="password">New password</Label>
                 <Input
                   id="password"
