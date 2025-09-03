@@ -1,111 +1,151 @@
 'use client'
 
-import { ArrowLeftIcon } from 'lucide-react'
+import { useEffect, useMemo } from 'react'
 import { ConfirmDetailsStep } from '@/components/onboarding/confirm-details-step'
 import { OnboardingSignUpForm } from '@/components/onboarding/onboarding-signup-form'
+import { OnboardingSuccess } from '@/components/onboarding/onboarding-success'
 import { StoreSearchStep } from '@/components/onboarding/store-search-step'
 import { StoreTypeStep } from '@/components/onboarding/store-type-step'
-import { Button } from '@/components/ui/button'
+import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { cn } from '@/lib/utils'
+import { FORM_CONSTANTS } from '@/lib/utils/form-helpers'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
+import { getAvailableSteps, getSuccessStepIndex, STEP_IDS } from '@/lib/utils/onboarding-steps'
+import { Typography } from '../ui/typography'
 
 export function OnboardingFlow() {
-  const { currentStep, setCurrentStep, businessCheckResult } = useOnboardingStore()
+  const {
+    currentStep,
+    setCurrentStep,
+    businessCheckResult,
+    setManualEntry,
+    isEmailSent,
+    selectedStoreForm,
+  } = useOnboardingStore()
 
-  // Define step labels and determine if a step should be accessible
-  const steps = [
-    { label: 'Store Lookup', accessible: true },
-    { label: 'Store Details', accessible: currentStep >= 2 },
-    { label: 'Review & Verify', accessible: currentStep >= 3 },
-    { label: 'Create Account', accessible: currentStep >= 4 && !businessCheckResult?.exists },
-  ]
+  // Memoize Google Places status to avoid recalculation on every render
+  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
 
-  const canGoBack = currentStep > 1
+  // Get available steps based on Google Places availability
+  const availableSteps = useMemo(
+    () => getAvailableSteps(googlePlacesEnabled),
+    [googlePlacesEnabled],
+  )
+
+  // Initialize manual entry when Google Places is disabled
+  useEffect(() => {
+    if (!googlePlacesEnabled) {
+      setManualEntry(true)
+    }
+  }, [googlePlacesEnabled, setManualEntry])
+
+  // Create step configuration with accessibility
+  const steps = useMemo(
+    () =>
+      availableSteps.map((step, index) => ({
+        ...step,
+        accessible:
+          index + 1 <= currentStep &&
+          (step.id !== STEP_IDS.CREATE_ACCOUNT || !businessCheckResult?.exists),
+      })),
+    [availableSteps, currentStep, businessCheckResult?.exists],
+  )
+
+  // Show success step when account creation is complete
+  const successStepIndex = getSuccessStepIndex(googlePlacesEnabled)
+  const showSuccessStep = isEmailSent && currentStep === successStepIndex
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="flex justify-between text-sm">
-          {steps.map((step, index) => {
-            const stepNumber = index + 1
-            const isCurrentStep = stepNumber === currentStep
-            const isCompleted = stepNumber < currentStep
-            const isAccessible = step.accessible
+      {/* Progress indicator - hide on success */}
+      {!showSuccessStep && (
+        <>
+          <div className="flex justify-between text-sm">
+            {steps.map((step, index) => {
+              const stepNumber = index + 1
+              const isCurrentStep = stepNumber === currentStep
+              const isCompleted = stepNumber < currentStep
+              const isAccessible = step.accessible
 
-            return (
-              <button
-                type="button"
-                onClick={() => isAccessible && setCurrentStep(stepNumber)}
-                key={step.label}
-                disabled={!isAccessible}
-                className={cn(
-                  'text-center transition-colors',
-                  isAccessible
-                    ? 'cursor-pointer hover:text-primary'
-                    : 'cursor-not-allowed opacity-50',
-                  isCurrentStep || isCompleted
-                    ? 'text-primary font-medium dark:text-gray-300'
-                    : 'text-muted-foreground',
-                )}
-              >
-                <div
+              return (
+                <button
+                  type="button"
+                  onClick={() => isAccessible && setCurrentStep(stepNumber)}
+                  key={step.label}
+                  disabled={!isAccessible}
                   className={cn(
-                    'w-8 h-8 rounded-full border-2 mx-auto mb-1 flex items-center justify-center transition-colors',
+                    'text-center transition-colors',
+                    isAccessible
+                      ? 'cursor-pointer hover:text-primary'
+                      : 'cursor-not-allowed opacity-50',
                     isCurrentStep || isCompleted
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : isAccessible
-                        ? 'border-muted-foreground hover:border-primary'
-                        : 'border-muted-foreground/50',
+                      ? 'text-primary font-medium dark:text-gray-300'
+                      : 'text-muted-foreground',
                   )}
                 >
-                  {stepNumber}
-                </div>
-                <div className="text-xs">{step.label}</div>
-              </button>
-            )
-          })}
-        </div>
-        <div className="mt-4 bg-muted rounded-full h-2">
-          <div
-            className="bg-primary h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(Math.min(currentStep, 4) / 4) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Back button */}
-      <Button
-        variant="ghost"
-        className={cn('rounded-full border-none h-10 w-10 mb-2', !canGoBack && '!opacity-0')}
-        onClick={() => canGoBack && setCurrentStep(currentStep - 1)}
-        disabled={!canGoBack}
-      >
-        <ArrowLeftIcon className="w-4 h-4" />
-      </Button>
+                  <Typography
+                    className={cn(
+                      'text-sm',
+                      isAccessible
+                        ? 'cursor-pointer hover:text-primary'
+                        : 'cursor-not-allowed opacity-50',
+                      isCurrentStep || isCompleted
+                        ? 'text-primary dark:text-gray-300'
+                        : 'text-muted-foreground',
+                    )}
+                  >
+                    {step.label}
+                  </Typography>
+                </button>
+              )
+            })}
+          </div>
+          <div className="mt-4 bg-muted rounded-full h-2">
+            <div
+              className="bg-primary h-2 rounded-full transition-all duration-300"
+              style={{
+                width: `${(Math.min(currentStep, steps.length) / steps.length) * FORM_CONSTANTS.PROGRESS_STEP_MULTIPLIER}%`,
+              }}
+            />
+          </div>
+        </>
+      )}
 
       {/* Step content */}
-      <div className="min-h-[500px]">
-        {currentStep === 1 && <StoreSearchStep />}
-        {currentStep === 2 && <StoreTypeStep />}
-        {currentStep === 3 && <ConfirmDetailsStep />}
-        {currentStep === 4 && <OnboardingSignUpForm />}
+      <div className="mt-6" style={{ minHeight: `${FORM_CONSTANTS.MIN_HEIGHT}px` }}>
+        {showSuccessStep && selectedStoreForm ? (
+          <ErrorBoundary>
+            <OnboardingSuccess storeName={selectedStoreForm.store_name} />
+          </ErrorBoundary>
+        ) : (
+          <ErrorBoundary>
+            {googlePlacesEnabled && currentStep === 1 && <StoreSearchStep />}
+            {googlePlacesEnabled && currentStep === 2 && <StoreTypeStep />}
+            {googlePlacesEnabled && currentStep === 3 && <ConfirmDetailsStep />}
+            {googlePlacesEnabled && currentStep === 4 && <OnboardingSignUpForm />}
+            {!googlePlacesEnabled && currentStep === 1 && <StoreTypeStep />}
+            {!googlePlacesEnabled && currentStep === 2 && <ConfirmDetailsStep />}
+            {!googlePlacesEnabled && currentStep === 3 && <OnboardingSignUpForm />}
+          </ErrorBoundary>
+        )}
       </div>
 
       {/* Helper text for business verification */}
-      {businessCheckResult?.exists && currentStep >= 3 && (
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Need help with business verification?{' '}
-            <a
-              href="mailto:support@lifo.ai?subject=Business Already Registered"
-              className="text-primary hover:underline"
-            >
-              Contact Support
-            </a>
-          </p>
-        </div>
-      )}
+      {businessCheckResult?.exists &&
+        currentStep >= availableSteps.findIndex(s => s.id === STEP_IDS.CONFIRM_DETAILS) + 1 && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Need help with business verification?{' '}
+              <a
+                href="mailto:support@lifo.ai?subject=Business Already Registered"
+                className="text-primary hover:underline"
+              >
+                Contact Support
+              </a>
+            </p>
+          </div>
+        )}
     </div>
   )
 }

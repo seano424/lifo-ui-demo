@@ -12,6 +12,7 @@ import { useGooglePlaces } from '@/hooks/use-google-places'
 import type { PlaceAutocompleteResult } from '@/lib/services/google-places'
 import type { StoreFormData } from '@/lib/stores/onboarding-store'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 'error'
 
@@ -27,9 +28,25 @@ export function StoreSearchStep() {
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [localSearchState, setLocalSearchState] = useState<SearchState>('idle')
 
-  // Google Places integration
+  // Check if Google Places is enabled
+  const googlePlacesEnabled = isGooglePlacesEnabled()
+
+  // Google Places integration (only if enabled)
   const { searchResults, searchState, isLoading, error, searchPlaces, selectPlace, clearResults } =
     useGooglePlaces()
+
+  // Define manual entry handler first
+  const handleManualEntry = () => {
+    setManualEntry(true)
+    setCurrentStep(2)
+  }
+
+  // If Google Places is disabled, redirect to manual entry immediately
+  useEffect(() => {
+    if (!googlePlacesEnabled) {
+      handleManualEntry()
+    }
+  }, [googlePlacesEnabled, handleManualEntry])
 
   // Debounce the search value
   const debouncedSearchValue = useDebouncedValue(searchValue, 300)
@@ -91,11 +108,6 @@ export function StoreSearchStep() {
     // Error handling is done in the hook and displayed via the error state
   }
 
-  const handleManualEntry = () => {
-    setManualEntry(true)
-    setCurrentStep(2)
-  }
-
   // Determine what to show based on single state
   const showLoading = localSearchState === 'typing' || localSearchState === 'searching'
   const showResults = localSearchState === 'results'
@@ -103,8 +115,8 @@ export function StoreSearchStep() {
   const showError = localSearchState === 'error'
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-2">
+    <div className="mx-auto space-y-6">
+      <div className="text-center space-y-2 flex flex-col items-center">
         <Typography variant="h1">Find Your Store</Typography>
         <Typography variant="p" color="muted">
           Search for your business or add it manually
