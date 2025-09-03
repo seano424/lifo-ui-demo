@@ -1,14 +1,18 @@
 'use client'
 
 import { AlertTriangle, CheckCircle, Phone } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useErrorHandler } from '@/components/ui/error-boundary'
+import { ConfirmNavigation } from '@/components/ui/form-navigation'
+import { StepHeader } from '@/components/ui/step-header'
 import { Typography } from '@/components/ui/typography'
 import { useBusinessCheck } from '@/hooks/use-business-check'
 import { convertFormDataToStoreInsert, STORE_TYPE_LABELS } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { generateTempStoreCode } from '@/lib/utils/form-helpers'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 export function ConfirmDetailsStep() {
@@ -20,13 +24,16 @@ export function ConfirmDetailsStep() {
     setCurrentStep,
     setBusinessCheckResult,
     setIsCheckingBusiness,
+    goToNextStep,
+    goToPreviousStep,
   } = useOnboardingStore()
 
   const { checkBusiness } = useBusinessCheck()
   const [hasCheckedBusiness, setHasCheckedBusiness] = useState(false)
+  const handleError = useErrorHandler()
 
-  // Check if Google Places is enabled to determine correct step navigation
-  const googlePlacesEnabled = isGooglePlacesEnabled()
+  // Memoize Google Places status to avoid recalculation
+  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
 
   const handleCheckBusiness = async () => {
     if (!selectedStoreForm) return
@@ -48,6 +55,13 @@ export function ConfirmDetailsStep() {
       }
     } catch (error) {
       console.error('Error checking business:', error)
+      // For critical errors, use error boundary
+      if (error instanceof TypeError || error instanceof ReferenceError) {
+        handleError(error as Error)
+        return
+      }
+
+      // For network/API errors, show graceful fallback
       setBusinessCheckResult({
         exists: false,
         message: 'Unable to verify business. You can proceed with registration.',
@@ -58,11 +72,8 @@ export function ConfirmDetailsStep() {
   }
 
   const handleConfirm = () => {
-    if (
-      selectedStoreForm?.store_type // Ensure store_type is not null
-    ) {
-      const tempStoreCode = `${selectedStoreForm.store_name.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
-      // Patch: cast store_type to correct type for insert
+    if (selectedStoreForm?.store_type) {
+      const tempStoreCode = generateTempStoreCode(selectedStoreForm.store_name)
       const storeInsert = convertFormDataToStoreInsert(
         {
           ...selectedStoreForm,
@@ -74,16 +85,16 @@ export function ConfirmDetailsStep() {
         tempStoreCode,
       )
       setConfirmedStoreInsert(storeInsert)
-      setCurrentStep(googlePlacesEnabled ? 4 : 3)
+      goToNextStep(googlePlacesEnabled)
     }
   }
 
   const handleBack = () => {
-    setCurrentStep(googlePlacesEnabled ? 2 : 1)
+    goToPreviousStep(googlePlacesEnabled)
   }
 
   const handleEdit = () => {
-    setCurrentStep(googlePlacesEnabled ? 2 : 1)
+    goToPreviousStep(googlePlacesEnabled)
   }
 
   const handleContactSupport = () => {
@@ -107,12 +118,10 @@ export function ConfirmDetailsStep() {
 
   return (
     <div className="mx-auto space-y-6">
-      <div className="text-center space-y-2 flex flex-col items-center">
-        <Typography variant="h1">Review Your Store Details</Typography>
-        <Typography variant="p" color="muted">
-          We&#39;ll verify this business isn&#39;t already registered before creating your account
-        </Typography>
-      </div>
+      <StepHeader
+        title="Review Your Store Details"
+        subtitle="We'll verify this business isn't already registered before creating your account"
+      />
 
       <Card>
         <CardHeader>
@@ -241,17 +250,12 @@ export function ConfirmDetailsStep() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={handleBack} className="w-full">
-              Back
-            </Button>
-            <Button variant="outline" onClick={handleEdit} className="w-full">
-              Edit
-            </Button>
-            <Button onClick={handleConfirm} className="w-full" disabled={!canProceed}>
-              {hasCheckedBusiness ? 'Create Account' : 'Verify First'}
-            </Button>
-          </div>
+          <ConfirmNavigation
+            onBack={handleBack}
+            onEdit={handleEdit}
+            onConfirm={handleConfirm}
+            isDisabled={!canProceed}
+          />
         </CardContent>
       </Card>
     </div>

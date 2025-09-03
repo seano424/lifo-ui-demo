@@ -28,13 +28,15 @@ export function isGooglePlacesEnabled(): boolean {
     return false
   }
 
-  // Google Places API keys always start with AIza and are 39 characters long
-  const isValidFormat = trimmedKey.startsWith('AIza') && trimmedKey.length === 39
+  // Google API keys can have different prefixes (AIza for Maps JS, AIza for Places, etc.)
+  // and are typically 39 characters long, but can vary slightly
+  const isValidLength = trimmedKey.length >= 35 && trimmedKey.length <= 45
 
-  // Additional check for only alphanumeric characters and specific symbols
-  const validKeyPattern = /^AIza[a-zA-Z0-9_-]+$/
+  // Google API keys are alphanumeric with some allowed symbols
+  const validKeyPattern = /^[A-Za-z0-9_-]+$/
 
-  return isValidFormat && validKeyPattern.test(trimmedKey)
+  // Basic format validation - must be reasonable length and contain only valid characters
+  return isValidLength && validKeyPattern.test(trimmedKey)
 }
 
 export function getGooglePlacesApiKey(): string | undefined {

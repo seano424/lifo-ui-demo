@@ -1,14 +1,17 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { ConfirmDetailsStep } from '@/components/onboarding/confirm-details-step'
 import { OnboardingSignUpForm } from '@/components/onboarding/onboarding-signup-form'
 import { OnboardingSuccess } from '@/components/onboarding/onboarding-success'
 import { StoreSearchStep } from '@/components/onboarding/store-search-step'
 import { StoreTypeStep } from '@/components/onboarding/store-type-step'
+import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { cn } from '@/lib/utils'
+import { FORM_CONSTANTS } from '@/lib/utils/form-helpers'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
+import { getAvailableSteps, getSuccessStepIndex, STEP_IDS } from '@/lib/utils/onboarding-steps'
 import { Typography } from '../ui/typography'
 
 export function OnboardingFlow() {
@@ -21,8 +24,14 @@ export function OnboardingFlow() {
     selectedStoreForm,
   } = useOnboardingStore()
 
-  // Check if Google Places is enabled to determine available steps
-  const googlePlacesEnabled = isGooglePlacesEnabled()
+  // Memoize Google Places status to avoid recalculation on every render
+  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
+
+  // Get available steps based on Google Places availability
+  const availableSteps = useMemo(
+    () => getAvailableSteps(googlePlacesEnabled),
+    [googlePlacesEnabled],
+  )
 
   // Initialize manual entry when Google Places is disabled
   useEffect(() => {
@@ -31,28 +40,21 @@ export function OnboardingFlow() {
     }
   }, [googlePlacesEnabled, setManualEntry])
 
-  // Define step labels and determine if a step should be accessible based on Google Places availability
-  const steps = googlePlacesEnabled
-    ? [
-        { label: 'Store Lookup', accessible: true },
-        { label: 'Add Store Details', accessible: currentStep >= 2 },
-        { label: 'Review & Verify', accessible: currentStep >= 3 },
-        {
-          label: 'Create Account',
-          accessible: currentStep >= 4 && !businessCheckResult?.exists,
-        },
-      ]
-    : [
-        { label: 'Add Store Details', accessible: true },
-        { label: 'Review & Verify', accessible: currentStep >= 2 },
-        {
-          label: 'Create Account',
-          accessible: currentStep >= 3 && !businessCheckResult?.exists,
-        },
-      ]
+  // Create step configuration with accessibility
+  const steps = useMemo(
+    () =>
+      availableSteps.map((step, index) => ({
+        ...step,
+        accessible:
+          index + 1 <= currentStep &&
+          (step.id !== STEP_IDS.CREATE_ACCOUNT || !businessCheckResult?.exists),
+      })),
+    [availableSteps, currentStep, businessCheckResult?.exists],
+  )
 
   // Show success step when account creation is complete
-  const showSuccessStep = isEmailSent && currentStep === (googlePlacesEnabled ? 5 : 4)
+  const successStepIndex = getSuccessStepIndex(googlePlacesEnabled)
+  const showSuccessStep = isEmailSent && currentStep === successStepIndex
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -103,7 +105,7 @@ export function OnboardingFlow() {
             <div
               className="bg-primary h-2 rounded-full transition-all duration-300"
               style={{
-                width: `${(Math.min(currentStep, steps.length) / steps.length) * 100}%`,
+                width: `${(Math.min(currentStep, steps.length) / steps.length) * FORM_CONSTANTS.PROGRESS_STEP_MULTIPLIER}%`,
               }}
             />
           </div>
@@ -111,39 +113,39 @@ export function OnboardingFlow() {
       )}
 
       {/* Step content */}
-      <div className="min-h-[500px] mt-6">
+      <div className="mt-6" style={{ minHeight: `${FORM_CONSTANTS.MIN_HEIGHT}px` }}>
         {showSuccessStep && selectedStoreForm ? (
-          <OnboardingSuccess storeName={selectedStoreForm.store_name} />
-        ) : googlePlacesEnabled ? (
-          <>
-            {currentStep === 1 && <StoreSearchStep />}
-            {currentStep === 2 && <StoreTypeStep />}
-            {currentStep === 3 && <ConfirmDetailsStep />}
-            {currentStep === 4 && <OnboardingSignUpForm />}
-          </>
+          <ErrorBoundary>
+            <OnboardingSuccess storeName={selectedStoreForm.store_name} />
+          </ErrorBoundary>
         ) : (
-          <>
-            {currentStep === 1 && <StoreTypeStep />}
-            {currentStep === 2 && <ConfirmDetailsStep />}
-            {currentStep === 3 && <OnboardingSignUpForm />}
-          </>
+          <ErrorBoundary>
+            {googlePlacesEnabled && currentStep === 1 && <StoreSearchStep />}
+            {googlePlacesEnabled && currentStep === 2 && <StoreTypeStep />}
+            {googlePlacesEnabled && currentStep === 3 && <ConfirmDetailsStep />}
+            {googlePlacesEnabled && currentStep === 4 && <OnboardingSignUpForm />}
+            {!googlePlacesEnabled && currentStep === 1 && <StoreTypeStep />}
+            {!googlePlacesEnabled && currentStep === 2 && <ConfirmDetailsStep />}
+            {!googlePlacesEnabled && currentStep === 3 && <OnboardingSignUpForm />}
+          </ErrorBoundary>
         )}
       </div>
 
       {/* Helper text for business verification */}
-      {businessCheckResult?.exists && currentStep >= (googlePlacesEnabled ? 3 : 2) && (
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Need help with business verification?{' '}
-            <a
-              href="mailto:support@lifo.ai?subject=Business Already Registered"
-              className="text-primary hover:underline"
-            >
-              Contact Support
-            </a>
-          </p>
-        </div>
-      )}
+      {businessCheckResult?.exists &&
+        currentStep >= availableSteps.findIndex(s => s.id === STEP_IDS.CONFIRM_DETAILS) + 1 && (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Need help with business verification?{' '}
+              <a
+                href="mailto:support@lifo.ai?subject=Business Already Registered"
+                className="text-primary hover:underline"
+              >
+                Contact Support
+              </a>
+            </p>
+          </div>
+        )}
     </div>
   )
 }
