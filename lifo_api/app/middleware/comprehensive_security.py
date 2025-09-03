@@ -488,7 +488,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             elif param_name in ["store_id"]:
                 # Should be UUID format
                 import uuid as uuid_lib
-                
+
                 try:
                     uuid_lib.UUID(value)
                     return True

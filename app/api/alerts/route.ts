@@ -164,7 +164,10 @@ export async function GET(request: NextRequest) {
               JSON.stringify(fastApiResponse.value, null, 2),
             )
             console.log(`[ALERTS] FastAPI alerts array:`, fastApiResponse.value.alerts)
-            console.log(`[ALERTS] FastAPI alerts length:`, fastApiResponse.value.alerts?.length || 0)
+            console.log(
+              `[ALERTS] FastAPI alerts length:`,
+              fastApiResponse.value.alerts?.length || 0,
+            )
           }
 
           // Map FastAPI alerts to Next.js format for compatibility
@@ -287,7 +290,9 @@ export async function GET(request: NextRequest) {
             console.log(`[ALERTS] Final response being sent to frontend:`)
             console.log(`[ALERTS] - alerts.length: ${finalResponse.alerts.length}`)
             console.log(`[ALERTS] - summary.total_alerts: ${finalResponse.summary.total_alerts}`)
-            console.log(`[ALERTS] - summary.critical_count: ${finalResponse.summary.critical_count}`)
+            console.log(
+              `[ALERTS] - summary.critical_count: ${finalResponse.summary.critical_count}`,
+            )
             console.log(`[ALERTS] - summary.high_count: ${finalResponse.summary.high_count}`)
             console.log(`[ALERTS] - source: ${finalResponse.source}`)
             console.log(`[ALERTS] - ai_insights available: ${!!finalResponse.ai_insights}`)
