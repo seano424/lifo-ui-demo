@@ -815,5 +815,34 @@
       },
       "footer": "🚀 Optimisé pour une vitesse maximale tout en maintenant l'intégrité des données"
     }
+  },
+  "store": {
+    "creation": {
+      "success": {
+        "title": "Magasin créé avec succès !",
+        "description": "Votre magasin \"{storeName}\" a été créé et est prêt à être utilisé.",
+        "whatsNext": {
+          "title": "Et maintenant ?",
+          "steps": {
+            "configure": {
+              "title": "Configurez les paramètres de votre magasin",
+              "description": "Configurez les notifications, intégrations et permissions d'équipe."
+            },
+            "inventory": {
+              "title": "Ajoutez vos premiers produits",
+              "description": "Téléchargez votre inventaire via CSV ou scannez les produits manuellement."
+            },
+            "team": {
+              "title": "Invitez des membres de l'équipe",
+              "description": "Ajoutez des collègues pour vous aider à gérer l'inventaire de votre magasin."
+            }
+          }
+        },
+        "actions": {
+          "goToSettings": "Aller aux paramètres du magasin",
+          "goToDashboard": "Aller au tableau de bord"
+        }
+      }
+    }
   }
 }

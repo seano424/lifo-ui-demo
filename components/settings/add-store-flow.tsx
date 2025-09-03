@@ -1,13 +1,17 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, ArrowLeftIcon } from 'lucide-react'
+import { useEffect } from 'react'
 import { AddStoreDetailsStep } from '@/components/settings/add-store-details-step'
 import { AddStoreSearchStep } from '@/components/settings/add-store-search-step'
 import { AddStoreSuccess } from '@/components/settings/add-store-success'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { type StoreFormData, useAddStoreStore } from '@/lib/stores/add-store-store'
 import { cn } from '@/lib/utils'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 export function AddStoreFlow() {
   const {
@@ -20,16 +24,20 @@ export function AddStoreFlow() {
     error,
     setError,
     selectedStoreForm,
+    initializeForGooglePlaces,
   } = useAddStoreStore()
 
-  // Define step labels and determine if a step should be accessible
-  const steps = [
-    { label: 'Store Search', accessible: true },
-    { label: 'Store Details', accessible: currentStep >= 2 },
-    { label: 'Complete', accessible: currentStep >= 3 },
-  ]
+  const queryClient = useQueryClient()
 
-  const canGoBack = currentStep > 1 && !isCreating
+  // Check if Google Places is enabled to determine available steps
+  const googlePlacesEnabled = isGooglePlacesEnabled()
+
+  // Initialize the store based on Google Places availability
+  useEffect(() => {
+    initializeForGooglePlaces(googlePlacesEnabled)
+  }, [googlePlacesEnabled, initializeForGooglePlaces])
+
+  const canGoBack = currentStep > 1 && !isCreating && googlePlacesEnabled
 
   const handleCreateStore = async (storeData: StoreFormData) => {
     if (!storeData.store_type) {
@@ -72,9 +80,20 @@ export function AddStoreFlow() {
         throw new Error(errorData.error || 'Failed to create store')
       }
 
+      // Invalidate queries to refresh store lists and preferences
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.stores.all,
+      })
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.userPreferences.all,
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['currentAuthUser'],
+      })
+
       // Mark as complete and move to success step
       setIsComplete(true)
-      setCurrentStep(3)
+      setCurrentStep(googlePlacesEnabled ? 3 : 2)
     } catch (error) {
       console.error('Error creating store:', error)
       setError(error instanceof Error ? error.message : 'Failed to create store. Please try again.')
@@ -85,65 +104,16 @@ export function AddStoreFlow() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="flex justify-between text-sm">
-          {steps.map((step, index) => {
-            const stepNumber = index + 1
-            const isCurrentStep = stepNumber === currentStep
-            const isCompleted = stepNumber < currentStep || (stepNumber === 3 && isComplete)
-            const isAccessible = step.accessible
-
-            return (
-              <button
-                type="button"
-                onClick={() => isAccessible && !isCreating && setCurrentStep(stepNumber)}
-                key={step.label}
-                disabled={!isAccessible || isCreating}
-                className={cn(
-                  'text-center transition-colors',
-                  isAccessible && !isCreating
-                    ? 'cursor-pointer hover:text-primary'
-                    : 'cursor-not-allowed opacity-50',
-                  isCurrentStep || isCompleted
-                    ? 'text-primary font-medium dark:text-gray-300'
-                    : 'text-muted-foreground',
-                )}
-              >
-                <div
-                  className={cn(
-                    'w-8 h-8 rounded-full border-2 mx-auto mb-1 flex items-center justify-center transition-colors',
-                    isCurrentStep || isCompleted
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : isAccessible
-                        ? 'border-muted-foreground hover:border-primary'
-                        : 'border-muted-foreground/50',
-                  )}
-                >
-                  {stepNumber}
-                </div>
-                <div className="text-xs">{step.label}</div>
-              </button>
-            )
-          })}
-        </div>
-        <div className="mt-4 bg-muted rounded-full h-2">
-          <div
-            className="bg-primary h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(Math.min(currentStep, 3) / 3) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Back button */}
-      <Button
-        variant="ghost"
-        className={cn('rounded-full border-none h-10 w-10 mb-2', !canGoBack && '!opacity-0')}
-        onClick={() => canGoBack && setCurrentStep(currentStep - 1)}
-        disabled={!canGoBack}
-      >
-        <ArrowLeftIcon className="w-4 h-4" />
-      </Button>
+      {googlePlacesEnabled && (
+        <Button
+          variant="ghost"
+          className={cn('rounded-full border-none h-10 w-10 mb-2', !canGoBack && '!opacity-0')}
+          onClick={() => canGoBack && setCurrentStep(currentStep - 1)}
+          disabled={!canGoBack}
+        >
+          <ArrowLeftIcon className="w-4 h-4" />
+        </Button>
+      )}
 
       {/* Error Alert */}
       {error && (
@@ -155,12 +125,25 @@ export function AddStoreFlow() {
 
       {/* Step content */}
       <div className="min-h-[500px]">
-        {currentStep === 1 && <AddStoreSearchStep />}
-        {currentStep === 2 && (
-          <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
-        )}
-        {currentStep === 3 && isComplete && selectedStoreForm && (
-          <AddStoreSuccess storeName={selectedStoreForm.store_name} />
+        {googlePlacesEnabled ? (
+          <>
+            {currentStep === 1 && <AddStoreSearchStep />}
+            {currentStep === 2 && (
+              <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
+            )}
+            {currentStep === 3 && isComplete && selectedStoreForm && (
+              <AddStoreSuccess storeName={selectedStoreForm.store_name} />
+            )}
+          </>
+        ) : (
+          <>
+            {currentStep === 1 && (
+              <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
+            )}
+            {currentStep === 2 && isComplete && selectedStoreForm && (
+              <AddStoreSuccess storeName={selectedStoreForm.store_name} />
+            )}
+          </>
         )}
       </div>
     </div>

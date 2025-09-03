@@ -97,7 +97,7 @@ export function AddStoreSearchStep() {
 
   return (
     <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 flex flex-col items-center justify-center">
         <Typography variant="h1">Add Your Store</Typography>
         <Typography variant="p" color="muted">
           Search for your business or add it manually

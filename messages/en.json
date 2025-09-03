@@ -815,5 +815,34 @@
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service"
     }
+  },
+  "store": {
+    "creation": {
+      "success": {
+        "title": "Store Created Successfully!",
+        "description": "Your store \"{storeName}\" has been created and is ready to use.",
+        "whatsNext": {
+          "title": "What's Next?",
+          "steps": {
+            "configure": {
+              "title": "Configure your store settings",
+              "description": "Set up notifications, integrations, and team permissions."
+            },
+            "inventory": {
+              "title": "Add your first products",
+              "description": "Upload your inventory via CSV or scan products manually."
+            },
+            "team": {
+              "title": "Invite team members",
+              "description": "Add colleagues to help manage your store inventory."
+            }
+          }
+        },
+        "actions": {
+          "goToSettings": "Go to Store Settings",
+          "goToDashboard": "Go to Dashboard"
+        }
+      }
+    }
   }
 }
