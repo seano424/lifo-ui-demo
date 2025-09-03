@@ -369,8 +369,8 @@ export default function StoreInformation({
               {t('storeInformation.sections.storeDetails')}
             </Typography>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="store_name">{t('storeInformation.fields.storeName')}</Label>
                 {isEditing ? (
                   <Input
@@ -384,34 +384,33 @@ export default function StoreInformation({
                   </Typography>
                 )}
                 {form.formState.errors.store_name && (
-                  <Typography variant="small" className="text-destructive">
+                  <Typography variant="p" className="text-destructive">
                     {form.formState.errors.store_name.message}
                   </Typography>
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="store_code">{t('storeInformation.fields.storeCode')}</Label>
                 {isEditing ? (
                   <Input
                     id="store_code"
                     {...form.register('store_code')}
                     placeholder={t('storeInformation.placeholders.storeCode')}
-                    className="font-mono"
                   />
                 ) : (
-                  <Typography variant="p" className="font-mono">
+                  <Typography variant="p">
                     {storeData?.store_code || t('storeInformation.messages.notSet')}
                   </Typography>
                 )}
                 {form.formState.errors.store_code && (
-                  <Typography variant="small" className="text-destructive">
+                  <Typography variant="p" className="text-destructive">
                     {form.formState.errors.store_code.message}
                   </Typography>
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="store_type">{t('storeInformation.fields.storeType')}</Label>
                 {isEditing ? (
                   <Select
@@ -443,7 +442,7 @@ export default function StoreInformation({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="size_category">{t('storeInformation.fields.sizeCategory')}</Label>
                 {isEditing ? (
                   <Select
@@ -483,7 +482,7 @@ export default function StoreInformation({
             </Typography>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2 space-y-2">
+              <div className="md:col-span-2 flex flex-col gap-2">
                 <Label htmlFor="address">{t('storeInformation.fields.address')}</Label>
                 {isEditing ? (
                   <Input
@@ -498,7 +497,7 @@ export default function StoreInformation({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="city">{t('storeInformation.fields.city')}</Label>
                 {isEditing ? (
                   <Input
@@ -513,7 +512,7 @@ export default function StoreInformation({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="postal_code">{t('storeInformation.fields.postalCode')}</Label>
                 {isEditing ? (
                   <Input
@@ -528,7 +527,7 @@ export default function StoreInformation({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="country">{t('storeInformation.fields.country')}</Label>
                 {isEditing ? (
                   <Select
@@ -565,7 +564,7 @@ export default function StoreInformation({
             </Typography>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="phone">{t('storeInformation.fields.phone')}</Label>
                 {isEditing ? (
                   <Input
@@ -580,7 +579,7 @@ export default function StoreInformation({
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="email">{t('storeInformation.fields.email')}</Label>
                 {isEditing ? (
                   <Input
@@ -595,13 +594,13 @@ export default function StoreInformation({
                   </Typography>
                 )}
                 {form.formState.errors.email && (
-                  <Typography variant="small" className="text-destructive">
+                  <Typography variant="p" className="text-destructive">
                     {form.formState.errors.email.message}
                   </Typography>
                 )}
               </div>
 
-              <div className="md:col-span-2 space-y-2">
+              <div className="md:col-span-2 flex flex-col gap-2">
                 <Label htmlFor="website_url">{t('storeInformation.fields.website')}</Label>
                 {isEditing ? (
                   <Input
@@ -627,7 +626,7 @@ export default function StoreInformation({
                   </Typography>
                 )}
                 {form.formState.errors.website_url && (
-                  <Typography variant="small" className="text-destructive">
+                  <Typography variant="p" className="text-destructive">
                     {form.formState.errors.website_url.message}
                   </Typography>
                 )}
@@ -640,7 +639,7 @@ export default function StoreInformation({
               {t('storeInformation.sections.storeDescription')}
             </Typography>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="description">{t('storeInformation.fields.description')}</Label>
               {isEditing ? (
                 <Textarea
@@ -655,7 +654,7 @@ export default function StoreInformation({
                 </Typography>
               )}
               {form.formState.errors.description && (
-                <Typography variant="small" className="text-destructive">
+                <Typography variant="p" className="text-destructive">
                   {form.formState.errors.description.message}
                 </Typography>
               )}
@@ -669,7 +668,7 @@ export default function StoreInformation({
               </Typography>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="default_markup_percent">
                     {t('storeInformation.fields.defaultMarkup')}
                   </Label>
@@ -693,7 +692,7 @@ export default function StoreInformation({
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="waste_reduction_target_percent">
                     {t('storeInformation.fields.wasteReductionTarget')}
                   </Label>
@@ -753,7 +752,7 @@ export default function StoreInformation({
                 {t('storeInformation.actions.cancel')}
               </Button>
               {hasUnsavedChanges && (
-                <Typography variant="small" className="text-muted-foreground ml-2">
+                <Typography variant="p" className="text-muted-foreground ml-2">
                   {t('storeInformation.actions.unsavedChanges')}
                 </Typography>
               )}
@@ -763,7 +762,7 @@ export default function StoreInformation({
 
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <Typography variant="small" className="font-medium text-yellow-800 mb-2">
+            <Typography variant="p" className="font-medium text-yellow-800 mb-2">
               Debug: Store Information: Only visible in development mode
             </Typography>
             <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
