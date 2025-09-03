@@ -27,6 +27,14 @@ import { useCurrentUser } from '@/hooks/use-users'
 import { DEFAULT_STORE_VALUES } from '@/lib/constants/store-flow'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { reportError } from '@/lib/utils/error-reporting'
+import {
+  createEmailValidator,
+  createPhoneValidator,
+  createPostalCodeValidator,
+  createStoreNameValidator,
+  createWebsiteValidator,
+} from '@/lib/utils/validation-utils'
 import { AddStoreFlow } from './add-store-flow'
 
 interface StoreInformationProps {
@@ -37,13 +45,12 @@ interface StoreInformationProps {
 // Type for translation function
 type TranslationFunction = (key: string) => string
 
-// Validation schema matching your database structure
-const createStoreInfoSchema = (t: TranslationFunction) =>
+// Enhanced validation schema with country-specific validation
+const createStoreInfoSchema = (t: TranslationFunction, country?: string | null) =>
   z.object({
-    store_name: z
-      .string()
-      .min(1, t('storeInformation.validation.storeNameRequired'))
-      .max(100, t('storeInformation.validation.storeNameTooLong')),
+    store_name: createStoreNameValidator()
+      .refine(val => val.length >= 1, t('storeInformation.validation.storeNameRequired'))
+      .refine(val => val.length <= 100, t('storeInformation.validation.storeNameTooLong')),
     business_name: z
       .string()
       .max(100, t('storeInformation.validation.businessNameTooLong'))
@@ -64,29 +71,23 @@ const createStoreInfoSchema = (t: TranslationFunction) =>
       .optional()
       .nullable(),
     city: z.string().max(100, t('storeInformation.validation.cityTooLong')).optional().nullable(),
-    postal_code: z
-      .string()
-      .max(20, t('storeInformation.validation.postalCodeTooLong'))
-      .optional()
-      .nullable(),
+    postal_code: country
+      ? createPostalCodeValidator(country).optional().nullable().or(z.literal(''))
+      : z
+          .string()
+          .max(20, t('storeInformation.validation.postalCodeTooLong'))
+          .optional()
+          .nullable(),
     country: z
       .string()
       .max(100, t('storeInformation.validation.countryTooLong'))
       .optional()
       .nullable(),
-    phone: z.string().max(20, t('storeInformation.validation.phoneTooLong')).optional().nullable(),
-    email: z
-      .string()
-      .email(t('storeInformation.validation.invalidEmail'))
-      .optional()
-      .nullable()
-      .or(z.literal('')),
-    website_url: z
-      .string()
-      .url(t('storeInformation.validation.invalidWebsite'))
-      .optional()
-      .nullable()
-      .or(z.literal('')),
+    phone: country
+      ? createPhoneValidator(country).optional().nullable().or(z.literal(''))
+      : z.string().max(20, t('storeInformation.validation.phoneTooLong')).optional().nullable(),
+    email: createEmailValidator().optional().nullable().or(z.literal('')),
+    website_url: createWebsiteValidator().optional().nullable().or(z.literal('')),
     description: z
       .string()
       .max(500, t('storeInformation.validation.descriptionTooLong'))
@@ -161,7 +162,7 @@ export default function StoreInformation({
   const [isEditing, setIsEditing] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  const storeInfoSchema = createStoreInfoSchema(t)
+  const storeInfoSchema = createStoreInfoSchema(t, storeData?.country)
   const STORE_TYPES = createStoreTypes(t)
   const SIZE_CATEGORIES = createSizeCategories(t)
   const COUNTRIES = createCountries(t)
@@ -187,40 +188,8 @@ export default function StoreInformation({
     },
   })
 
-  useEffect(() => {
-    if (storeData) {
-      resetFormToStoreData()
-      setHasUnsavedChanges(false)
-    }
-  }, [storeData])
-
-  useEffect(() => {
-    if (!isEditing) return
-
-    const subscription = form.watch(() => {
-      setHasUnsavedChanges(true)
-    })
-    return () => subscription.unsubscribe()
-  }, [form, isEditing])
-
-  const handleSave = async (data: StoreInfoFormData) => {
-    try {
-      const cleanedData = Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [key, value === '' ? null : value]),
-      )
-
-      await updateBasicInfo(cleanedData)
-      setIsEditing(false)
-      setHasUnsavedChanges(false)
-    } catch (error) {
-      // Only log errors in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Failed to save store information:', error)
-      }
-    }
-  }
-
-  const resetFormToStoreData = () => {
+  // Helper function to reset form with store data and clear unsaved changes
+  const resetFormAndState = (clearUnsavedChanges: boolean = true) => {
     if (!storeData) return
 
     form.reset({
@@ -242,12 +211,58 @@ export default function StoreInformation({
       waste_reduction_target_percent:
         storeData.waste_reduction_target_percent || DEFAULT_STORE_VALUES.WASTE_REDUCTION_TARGET,
     })
+
+    if (clearUnsavedChanges) {
+      setHasUnsavedChanges(false)
+    }
+  }
+
+  useEffect(() => {
+    if (storeData) {
+      resetFormAndState()
+    }
+  }, [storeData])
+
+  // Optimize form watching to only track when editing starts
+  useEffect(() => {
+    if (!isEditing) return
+
+    // Only set hasUnsavedChanges to true once when any field changes
+    let hasSetUnsavedChanges = false
+    const subscription = form.watch(() => {
+      if (!hasSetUnsavedChanges) {
+        setHasUnsavedChanges(true)
+        hasSetUnsavedChanges = true
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [isEditing]) // Removed form from dependencies as it's stable
+
+  const handleSave = async (data: StoreInfoFormData) => {
+    try {
+      const cleanedData = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, value === '' ? null : value]),
+      )
+
+      await updateBasicInfo(cleanedData)
+      setIsEditing(false)
+      setHasUnsavedChanges(false)
+    } catch (error) {
+      // Report error with context
+      reportError(error instanceof Error ? error : new Error('Failed to save store information'), {
+        context: {
+          action: 'updateStoreInfo',
+          storeId: effectiveStoreId,
+          changedFields: Object.keys(data),
+        },
+        severity: 'medium',
+      })
+    }
   }
 
   const handleCancel = () => {
-    resetFormToStoreData()
+    resetFormAndState()
     setIsEditing(false)
-    setHasUnsavedChanges(false)
   }
 
   const createSkeletonKeys = (count: number, prefix: string) =>

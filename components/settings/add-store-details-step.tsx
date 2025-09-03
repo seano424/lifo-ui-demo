@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
+import { STORE_FLOW_STEPS } from '@/lib/constants/store-flow'
 import {
   STORE_TYPE_LABELS,
   STORE_TYPES,
@@ -27,6 +28,7 @@ import {
   storeFormSchema,
 } from '@/lib/schemas/store-schemas'
 import { useAddStoreStore } from '@/lib/stores/add-store-store'
+import { coerceToString } from '@/lib/utils/form-utils'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 // Type guard for store_type
@@ -80,7 +82,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
   }
 
   const handleBack = () => {
-    setCurrentStep(1)
+    setCurrentStep(STORE_FLOW_STEPS.SEARCH)
   }
 
   return (
@@ -109,11 +111,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                     <Input
                       placeholder="Your Store Name"
                       {...field}
-                      value={
-                        typeof field.value === 'string' || typeof field.value === 'number'
-                          ? field.value
-                          : ''
-                      }
+                      value={coerceToString(field.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -131,11 +129,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                     <Input
                       placeholder="If different from store name"
                       {...field}
-                      value={
-                        typeof field.value === 'string' || typeof field.value === 'number'
-                          ? field.value
-                          : ''
-                      }
+                      value={coerceToString(field.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -153,11 +147,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                     <Input
                       placeholder="123 Rue de la Paix"
                       {...field}
-                      value={
-                        typeof field.value === 'string' || typeof field.value === 'number'
-                          ? field.value
-                          : ''
-                      }
+                      value={coerceToString(field.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -173,15 +163,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Paris"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
+                      <Input placeholder="Paris" {...field} value={coerceToString(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -195,15 +177,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                   <FormItem>
                     <FormLabel>Postal Code</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="75001"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
+                      <Input placeholder="75001" {...field} value={coerceToString(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -219,15 +193,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="France"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
+                      <Input placeholder="France" {...field} value={coerceToString(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -243,11 +209,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                       <Input
                         placeholder="01 23 45 67 89"
                         {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
+                        value={coerceToString(field.value)}
                       />
                     </FormControl>
                     <FormMessage />

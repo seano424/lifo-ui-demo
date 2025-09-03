@@ -16,7 +16,9 @@ import {
 import { queryKeys } from '@/lib/queries/query-keys'
 import { type StoreFormData, useAddStoreStore } from '@/lib/stores/add-store-store'
 import { cn } from '@/lib/utils'
+import { reportError } from '@/lib/utils/error-reporting'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
+import { generateUniqueStoreCode } from '@/lib/utils/store-utils'
 
 export function AddStoreFlow() {
   const {
@@ -55,12 +57,7 @@ export function AddStoreFlow() {
 
     try {
       // Generate a unique store code
-      const generateUniqueStoreCode = () => {
-        const prefix = storeData.store_name.substring(0, 3).toUpperCase().padEnd(3, 'X')
-        const random = Math.random().toString(36).substring(2, 8).toUpperCase()
-        return `${prefix}${random}`
-      }
-      const tempStoreCode = generateUniqueStoreCode()
+      const tempStoreCode = generateUniqueStoreCode(storeData.store_name)
 
       // Prepare data for API (matching the expected format)
       const storeCreateData = {
@@ -90,18 +87,17 @@ export function AddStoreFlow() {
         throw new Error(errorData.error || 'Failed to create store')
       }
 
-      // Invalidate queries to refresh store lists and preferences
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.stores.all,
-        }),
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.userPreferences.all,
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ['currentAuthUser'],
-        }),
-      ])
+      // Batch invalidate related queries for better performance
+      await queryClient.invalidateQueries({
+        predicate: query => {
+          const queryKey = query.queryKey
+          return (
+            queryKey.includes('stores') ||
+            queryKey.includes('userPreferences') ||
+            queryKey.includes('currentAuthUser')
+          )
+        },
+      })
 
       // Mark as complete and move to success step
       setIsComplete(true)
@@ -109,11 +105,24 @@ export function AddStoreFlow() {
         googlePlacesEnabled ? STORE_FLOW_STEPS.SUCCESS : STORE_FLOW_STEPS_NO_GOOGLE_PLACES.SUCCESS,
       )
     } catch (error) {
-      // Only log errors in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error creating store:', error)
-      }
-      setError(error instanceof Error ? error.message : 'Failed to create store. Please try again.')
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to create store. Please try again.'
+
+      // Report error with context
+      reportError(error instanceof Error ? error : new Error(errorMessage), {
+        context: {
+          action: 'createStore',
+          storeData: {
+            store_name: storeData.store_name,
+            store_type: storeData.store_type,
+            country: storeData.country,
+          },
+        },
+        storeName: storeData.store_name,
+        severity: 'high',
+      })
+
+      setError(errorMessage)
     } finally {
       setIsCreating(false)
     }
