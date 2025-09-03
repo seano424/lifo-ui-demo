@@ -28,6 +28,7 @@ import {
   storeFormSchema,
 } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 // Type guard for store_type
 function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {
@@ -38,6 +39,8 @@ function isStoreType(value: string | null | undefined): value is StoreFormData['
 export function StoreTypeStep() {
   const { selectedStoreForm, isManualEntry, setSelectedStoreForm, setCurrentStep } =
     useOnboardingStore()
+
+  const googlePlacesEnabled = isGooglePlacesEnabled()
 
   const form = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -71,24 +74,30 @@ export function StoreTypeStep() {
     }
 
     setSelectedStoreForm(storeFormData)
-    setCurrentStep(3)
+    // Navigate to the correct next step based on Google Places availability
+    setCurrentStep(googlePlacesEnabled ? 3 : 2)
   }
 
   const handleBack = () => {
     setCurrentStep(1)
   }
 
+  const canGoBack = googlePlacesEnabled
+
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-2">
+    <div className="mx-auto space-y-4">
+      <div className="text-center space-y-2 flex flex-col items-center">
         <Typography variant="h1">
           {isManualEntry ? 'Add Store Details' : 'Complete Store Information'}
         </Typography>
-        <Typography variant="p" color="muted">
+        {/* <Typography
+          variant="p"
+          color="muted"
+        >
           {isManualEntry
             ? 'Enter your store information'
             : 'Select your store type and verify details'}
-        </Typography>
+        </Typography> */}
       </div>
 
       <Card>
@@ -102,7 +111,7 @@ export function StoreTypeStep() {
                 control={form.control}
                 name="store_name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel>Store Name</FormLabel>
                     <FormControl>
                       <Input
@@ -124,7 +133,7 @@ export function StoreTypeStep() {
                 control={form.control}
                 name="store_type"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel>Store Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -152,7 +161,7 @@ export function StoreTypeStep() {
                 control={form.control}
                 name="business_name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel>Business Name (Optional)</FormLabel>
                     <FormControl>
                       <Input
@@ -174,7 +183,7 @@ export function StoreTypeStep() {
                 control={form.control}
                 name="address"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel>Address</FormLabel>
                     <FormControl>
                       <Input
@@ -197,7 +206,7 @@ export function StoreTypeStep() {
                   control={form.control}
                   name="city"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col gap-2">
                       <FormLabel>City</FormLabel>
                       <FormControl>
                         <Input
@@ -219,7 +228,7 @@ export function StoreTypeStep() {
                   control={form.control}
                   name="postal_code"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col gap-2">
                       <FormLabel>Postal Code</FormLabel>
                       <FormControl>
                         <Input
@@ -238,53 +247,57 @@ export function StoreTypeStep() {
                 />
               </div>
 
-              <FormField<StoreFormData>
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="France"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField<StoreFormData>
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col gap-2">
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="France"
+                          {...field}
+                          value={
+                            typeof field.value === 'string' || typeof field.value === 'number'
+                              ? field.value
+                              : ''
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField<StoreFormData>
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="01 23 45 67 89"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField<StoreFormData>
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col gap-2">
+                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="01 23 45 67 89"
+                          {...field}
+                          value={
+                            typeof field.value === 'string' || typeof field.value === 'number'
+                              ? field.value
+                              : ''
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={handleBack} className="w-full">
-                  Back
-                </Button>
+                {canGoBack && (
+                  <Button type="button" variant="outline" onClick={handleBack} className="w-full">
+                    Back
+                  </Button>
+                )}
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? 'Validating...' : 'Continue'}
                 </Button>

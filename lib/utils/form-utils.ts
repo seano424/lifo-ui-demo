@@ -34,7 +34,9 @@ export function safeNumberValue(value: unknown): number | undefined {
  * @param value The form field value
  * @returns A safely coerced string value
  */
-export function coerceToString(value: string | number | null | undefined): string {
+export function coerceToString(
+  value: string | number | null | undefined | { lat: number; lng: number },
+): string {
   return safeStringValue(value)
 }
 

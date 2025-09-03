@@ -9,6 +9,7 @@ import { Typography } from '@/components/ui/typography'
 import { useBusinessCheck } from '@/hooks/use-business-check'
 import { convertFormDataToStoreInsert, STORE_TYPE_LABELS } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 export function ConfirmDetailsStep() {
   const {
@@ -23,6 +24,9 @@ export function ConfirmDetailsStep() {
 
   const { checkBusiness } = useBusinessCheck()
   const [hasCheckedBusiness, setHasCheckedBusiness] = useState(false)
+
+  // Check if Google Places is enabled to determine correct step navigation
+  const googlePlacesEnabled = isGooglePlacesEnabled()
 
   const handleCheckBusiness = async () => {
     if (!selectedStoreForm) return
@@ -70,16 +74,16 @@ export function ConfirmDetailsStep() {
         tempStoreCode,
       )
       setConfirmedStoreInsert(storeInsert)
-      setCurrentStep(4)
+      setCurrentStep(googlePlacesEnabled ? 4 : 3)
     }
   }
 
   const handleBack = () => {
-    setCurrentStep(2)
+    setCurrentStep(googlePlacesEnabled ? 2 : 1)
   }
 
   const handleEdit = () => {
-    setCurrentStep(2)
+    setCurrentStep(googlePlacesEnabled ? 2 : 1)
   }
 
   const handleContactSupport = () => {
@@ -102,8 +106,8 @@ export function ConfirmDetailsStep() {
   const canProceed = hasCheckedBusiness && (!businessCheckResult?.exists || false)
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-2">
+    <div className="mx-auto space-y-6">
+      <div className="text-center space-y-2 flex flex-col items-center">
         <Typography variant="h1">Review Your Store Details</Typography>
         <Typography variant="p" color="muted">
           We&#39;ll verify this business isn&#39;t already registered before creating your account
@@ -169,7 +173,7 @@ export function ConfirmDetailsStep() {
                 <Button
                   onClick={handleCheckBusiness}
                   disabled={isCheckingBusiness}
-                  className="w-full"
+                  className="w-full mt-4"
                 >
                   {isCheckingBusiness ? 'Checking...' : 'Verify Business'}
                 </Button>
