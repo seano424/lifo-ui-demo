@@ -18,9 +18,9 @@ const Label = React.forwardRef<
   LabelProps & VariantProps<typeof labelVariants>
 >(({ className, required, ...props }, ref) => (
   <LabelPrimitive.Root ref={ref} className={cn(labelVariants(), className)} {...props}>
-    <Typography variant="small">
+    <Typography variant="p" color="muted">
       {props.children}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && <span className="text-red-500">*</span>}
     </Typography>
   </LabelPrimitive.Root>
 ))
