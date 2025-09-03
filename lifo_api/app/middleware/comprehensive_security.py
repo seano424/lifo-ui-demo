@@ -487,12 +487,13 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
 
             elif param_name in ["store_id"]:
                 # Should be UUID format
-                import re
-
-                uuid_pattern = (
-                    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-                )
-                return bool(re.match(uuid_pattern, value, re.IGNORECASE))
+                import uuid as uuid_lib
+                
+                try:
+                    uuid_lib.UUID(value)
+                    return True
+                except ValueError:
+                    return False
 
             elif param_name in [
                 "urgency",

@@ -54,8 +54,17 @@ export class FastAPIClient {
   private maxRetries: number
 
   constructor() {
-    this.baseUrl =
-      process.env.FASTAPI_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+    const baseUrl = process.env.FASTAPI_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+    
+    // Enforce HTTPS in production environments (but allow localhost for development/builds)
+    if (process.env.NODE_ENV === 'production' && 
+        baseUrl.startsWith('http://') && 
+        !baseUrl.startsWith('http://localhost') && 
+        !baseUrl.startsWith('http://127.0.0.1')) {
+      throw new Error('FastAPI client requires HTTPS in production environment')
+    }
+    
+    this.baseUrl = baseUrl
     // Optimized timeout: 8 seconds for better performance
     this.timeout = 8000
     // Retry mechanism for improved reliability
@@ -105,10 +114,12 @@ export class FastAPIClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
-    // Debug logging
-    console.log(`[FastAPI] Request URL: ${url.toString()}`)
-    console.log(`[FastAPI] Token length: ${token.length}`)
-    console.log(`[FastAPI] Store ID: ${storeId}`)
+    // Debug logging (development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[FastAPI] Request URL: ${url.toString()}`)
+      console.log(`[FastAPI] Token length: ${token.length}`)
+      console.log(`[FastAPI] Store ID: ${storeId}`)
+    }
 
     try {
       const response = await fetch(url.toString(), {
@@ -120,8 +131,10 @@ export class FastAPIClient {
         signal: controller.signal,
       })
 
-      console.log(`[FastAPI] Response status: ${response.status}`)
-      console.log(`[FastAPI] Response headers:`, Object.fromEntries(response.headers.entries()))
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[FastAPI] Response status: ${response.status}`)
+        console.log(`[FastAPI] Response headers:`, Object.fromEntries(response.headers.entries()))
+      }
 
       clearTimeout(timeoutId)
 
@@ -479,7 +492,9 @@ export class FastAPIClient {
       }
 
       // Return empty recommendations instead of throwing for graceful degradation
-      console.warn('AI recommendations failed, returning empty:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('AI recommendations failed, returning empty:', error)
+      }
       return { store_id: storeId, recommendations: [], total_count: 0 }
     }
   }

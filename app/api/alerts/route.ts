@@ -104,26 +104,32 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log(`[ALERTS] ===== NEW ALERTS REQUEST =====`)
-    console.log(`[ALERTS] Request parameters:`)
-    console.log(`[ALERTS] - storeId: ${storeId}`)
-    console.log(`[ALERTS] - threshold: ${threshold} (original: ${thresholdOverride})`)
-    console.log(`[ALERTS] - urgencyLevel: ${urgencyLevel}`)
-    console.log(`[ALERTS] - category: ${category}`)
-    console.log(`[ALERTS] - limit: ${limit}`)
-    console.log(`[ALERTS] - URL: ${request.url}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[ALERTS] ===== NEW ALERTS REQUEST =====`)
+      console.log(`[ALERTS] Request parameters:`)
+      console.log(`[ALERTS] - storeId: ${storeId}`)
+      console.log(`[ALERTS] - threshold: ${threshold} (original: ${thresholdOverride})`)
+      console.log(`[ALERTS] - urgencyLevel: ${urgencyLevel}`)
+      console.log(`[ALERTS] - category: ${category}`)
+      console.log(`[ALERTS] - limit: ${limit}`)
+      console.log(`[ALERTS] - URL: ${request.url}`)
+    }
 
     // PHASE 1: Try FastAPI first with fallback to Supabase
     // Database connectivity has been fixed - re-enabling FastAPI
     const useFastAPI =
       process.env.ENABLE_FASTAPI === 'true' || process.env.NODE_ENV === 'development'
-    console.log(
-      `[ALERTS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`,
-    )
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `[ALERTS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`,
+      )
+    }
 
     if (useFastAPI) {
       try {
-        console.log(`[ALERTS] Attempting FastAPI for store ${storeId}`)
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[ALERTS] Attempting FastAPI for store ${storeId}`)
+        }
 
         // Phase 2: Use user JWT token for FastAPI authentication
         // Get user's session with access token
@@ -151,37 +157,49 @@ export async function GET(request: NextRequest) {
             throw fastApiResponse.reason
           }
 
-          console.log(`[ALERTS] FastAPI success: ${fastApiResponse.value.total_count} alerts`)
-          console.log(
-            `[ALERTS] Raw FastAPI response:`,
-            JSON.stringify(fastApiResponse.value, null, 2),
-          )
-          console.log(`[ALERTS] FastAPI alerts array:`, fastApiResponse.value.alerts)
-          console.log(`[ALERTS] FastAPI alerts length:`, fastApiResponse.value.alerts?.length || 0)
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[ALERTS] FastAPI success: ${fastApiResponse.value.total_count} alerts`)
+            console.log(
+              `[ALERTS] Raw FastAPI response:`,
+              JSON.stringify(fastApiResponse.value, null, 2),
+            )
+            console.log(`[ALERTS] FastAPI alerts array:`, fastApiResponse.value.alerts)
+            console.log(`[ALERTS] FastAPI alerts length:`, fastApiResponse.value.alerts?.length || 0)
+          }
 
           // Map FastAPI alerts to Next.js format for compatibility
           const enhancedAlerts = fastApiResponse.value.alerts.map(mapFastAPIAlertToEnhanced)
-          console.log(`[ALERTS] Enhanced alerts after mapping:`, enhancedAlerts.length)
-          console.log(
-            `[ALERTS] First enhanced alert sample:`,
-            enhancedAlerts[0] ? JSON.stringify(enhancedAlerts[0], null, 2) : 'No alerts',
-          )
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[ALERTS] Enhanced alerts after mapping:`, enhancedAlerts.length)
+            console.log(
+              `[ALERTS] First enhanced alert sample:`,
+              enhancedAlerts[0] ? JSON.stringify(enhancedAlerts[0], null, 2) : 'No alerts',
+            )
+          }
 
           // Apply the same filtering logic as the original code
           let filteredAlerts = enhancedAlerts
 
           if (urgencyLevel) {
-            console.log(`[ALERTS] Filtering by urgency level: ${urgencyLevel}`)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[ALERTS] Filtering by urgency level: ${urgencyLevel}`)
+            }
             filteredAlerts = filteredAlerts.filter(alert => alert.urgency_level === urgencyLevel)
-            console.log(`[ALERTS] After urgency filter: ${filteredAlerts.length} alerts`)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[ALERTS] After urgency filter: ${filteredAlerts.length} alerts`)
+            }
           }
 
           if (category) {
-            console.log(`[ALERTS] Filtering by category: ${category}`)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[ALERTS] Filtering by category: ${category}`)
+            }
             filteredAlerts = filteredAlerts.filter(alert =>
               alert.category.toLowerCase().includes(category.toLowerCase()),
             )
-            console.log(`[ALERTS] After category filter: ${filteredAlerts.length} alerts`)
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[ALERTS] After category filter: ${filteredAlerts.length} alerts`)
+            }
           }
 
           // Sort by priority score (same as original)
@@ -191,14 +209,18 @@ export async function GET(request: NextRequest) {
             }
             return a.days_to_expiry - b.days_to_expiry
           })
-          console.log(`[ALERTS] After sorting: ${filteredAlerts.length} alerts`)
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[ALERTS] After sorting: ${filteredAlerts.length} alerts`)
+          }
 
           // Apply limit
           const beforeLimit = filteredAlerts.length
           filteredAlerts = filteredAlerts.slice(0, limit)
-          console.log(
-            `[ALERTS] After limit (${limit}): ${filteredAlerts.length} alerts (was ${beforeLimit})`,
-          )
+          if (process.env.NODE_ENV === 'development') {
+            console.log(
+              `[ALERTS] After limit (${limit}): ${filteredAlerts.length} alerts (was ${beforeLimit})`,
+            )
+          }
 
           // Calculate summary statistics (same format as original)
           const summary = {
@@ -261,17 +283,21 @@ export async function GET(request: NextRequest) {
                 : undefined,
           }
 
-          console.log(`[ALERTS] Final response being sent to frontend:`)
-          console.log(`[ALERTS] - alerts.length: ${finalResponse.alerts.length}`)
-          console.log(`[ALERTS] - summary.total_alerts: ${finalResponse.summary.total_alerts}`)
-          console.log(`[ALERTS] - summary.critical_count: ${finalResponse.summary.critical_count}`)
-          console.log(`[ALERTS] - summary.high_count: ${finalResponse.summary.high_count}`)
-          console.log(`[ALERTS] - source: ${finalResponse.source}`)
-          console.log(`[ALERTS] - ai_insights available: ${!!finalResponse.ai_insights}`)
-          console.log(
-            `[ALERTS] - ai_recommendations available: ${!!finalResponse.ai_recommendations}`,
-          )
-          console.log(`[ALERTS] Complete final response:`, JSON.stringify(finalResponse, null, 2))
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[ALERTS] Final response being sent to frontend:`)
+            console.log(`[ALERTS] - alerts.length: ${finalResponse.alerts.length}`)
+            console.log(`[ALERTS] - summary.total_alerts: ${finalResponse.summary.total_alerts}`)
+            console.log(`[ALERTS] - summary.critical_count: ${finalResponse.summary.critical_count}`)
+            console.log(`[ALERTS] - summary.high_count: ${finalResponse.summary.high_count}`)
+            console.log(`[ALERTS] - source: ${finalResponse.source}`)
+            console.log(`[ALERTS] - ai_insights available: ${!!finalResponse.ai_insights}`)
+            console.log(
+              `[ALERTS] - ai_recommendations available: ${!!finalResponse.ai_recommendations}`,
+            )
+          }
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[ALERTS] Complete final response:`, JSON.stringify(finalResponse, null, 2))
+          }
 
           return NextResponse.json(finalResponse)
         } else {
@@ -287,20 +313,24 @@ export async function GET(request: NextRequest) {
     }
 
     // Original Supabase implementation (fallback)
-    console.log(`[ALERTS] Using Supabase fallback for store ${storeId}`)
-    console.log(`[ALERTS] Supabase fallback parameters:`)
-    console.log(`[ALERTS] - storeId: ${storeId}`)
-    console.log(`[ALERTS] - threshold: ${threshold}`)
-    console.log(`[ALERTS] - urgencyLevel: ${urgencyLevel}`)
-    console.log(`[ALERTS] - category: ${category}`)
-    console.log(`[ALERTS] - limit: ${limit}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[ALERTS] Using Supabase fallback for store ${storeId}`)
+      console.log(`[ALERTS] Supabase fallback parameters:`)
+      console.log(`[ALERTS] - storeId: ${storeId}`)
+      console.log(`[ALERTS] - threshold: ${threshold}`)
+      console.log(`[ALERTS] - urgencyLevel: ${urgencyLevel}`)
+      console.log(`[ALERTS] - category: ${category}`)
+      console.log(`[ALERTS] - limit: ${limit}`)
+    }
 
     const alerts = await getStoreAlerts(supabase, storeId, threshold)
-    console.log(`[ALERTS] Raw Supabase alerts received: ${alerts.length} items`)
-    console.log(
-      `[ALERTS] First Supabase alert sample:`,
-      alerts[0] ? JSON.stringify(alerts[0], null, 2) : 'No alerts',
-    )
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[ALERTS] Raw Supabase alerts received: ${alerts.length} items`)
+      console.log(
+        `[ALERTS] First Supabase alert sample:`,
+        alerts[0] ? JSON.stringify(alerts[0], null, 2) : 'No alerts',
+      )
+    }
 
     // Enhance alerts with calculated fields
     const enhancedAlerts = alerts.map((alert: AlertData) => {
@@ -422,18 +452,20 @@ export async function GET(request: NextRequest) {
       source: 'supabase', // Indicate the source for debugging
     }
 
-    console.log(`[ALERTS] Supabase fallback final response:`)
-    console.log(`[ALERTS] - alerts.length: ${supabaseFinalResponse.alerts.length}`)
-    console.log(`[ALERTS] - summary.total_alerts: ${supabaseFinalResponse.summary.total_alerts}`)
-    console.log(
-      `[ALERTS] - summary.critical_count: ${supabaseFinalResponse.summary.critical_count}`,
-    )
-    console.log(`[ALERTS] - summary.high_count: ${supabaseFinalResponse.summary.high_count}`)
-    console.log(`[ALERTS] - source: ${supabaseFinalResponse.source}`)
-    console.log(
-      `[ALERTS] Complete Supabase final response:`,
-      JSON.stringify(supabaseFinalResponse, null, 2),
-    )
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[ALERTS] Supabase fallback final response:`)
+      console.log(`[ALERTS] - alerts.length: ${supabaseFinalResponse.alerts.length}`)
+      console.log(`[ALERTS] - summary.total_alerts: ${supabaseFinalResponse.summary.total_alerts}`)
+      console.log(
+        `[ALERTS] - summary.critical_count: ${supabaseFinalResponse.summary.critical_count}`,
+      )
+      console.log(`[ALERTS] - summary.high_count: ${supabaseFinalResponse.summary.high_count}`)
+      console.log(`[ALERTS] - source: ${supabaseFinalResponse.source}`)
+      console.log(
+        `[ALERTS] Complete Supabase final response:`,
+        JSON.stringify(supabaseFinalResponse, null, 2),
+      )
+    }
 
     return NextResponse.json(supabaseFinalResponse)
   } catch (error) {
