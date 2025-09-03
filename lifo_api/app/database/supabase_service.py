@@ -41,7 +41,7 @@ class SupabaseService:
         try:
             # Create a minimal session object with just the access token
             # The refresh_token can be None for server-side JWT-only scenarios
-            client.auth.set_session(access_token=user_token, refresh_token=None)
+            client.auth.set_session(access_token=user_token, refresh_token="")
         except Exception as e:
             logger.warning("Failed to set session with token", error=str(e))
             # Fallback: manually update client headers (Method 2)

@@ -71,7 +71,7 @@ export function StoreUsersPrefetch() {
     const timeoutId = setTimeout(prefetchStoreUsers, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [activeStore?.store_id, queryClient, activeStore?.store_name])
+  }, [activeStore?.store_id, queryClient])
 
   // Also invalidate old store data when switching to keep cache clean
   useEffect(() => {

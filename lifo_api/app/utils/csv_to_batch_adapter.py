@@ -248,8 +248,8 @@ class CSVToBatchAdapter:
             }
 
         # Calculate statistics
-        categories = {}
-        brands = {}
+        categories: dict[str, int] = {}
+        brands: dict[str, int] = {}
         total_quantity = 0.0
         prices = []
         expiry_dates = []

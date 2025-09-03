@@ -537,7 +537,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
           <ScannedItemsList
             items={logic.state.processedItems}
             title={`Total items ${config.workflowType === 'scan-in' ? 'scanned' : 'processed'}`}
-            onEditItem={item => {
+            onEditItem={_item => {
               // TODO: Implement edit functionality
             }}
           />

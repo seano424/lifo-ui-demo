@@ -74,7 +74,7 @@ export async function retryWithBackoff<T>(
 /**
  * Circuit breaker implementation to prevent cascading failures
  */
-function updateCircuitBreaker(storeId: string, error: Error): void {
+function updateCircuitBreaker(storeId: string, _error: Error): void {
   const now = Date.now()
   const state = circuitBreakers.get(storeId) || {
     isOpen: false,

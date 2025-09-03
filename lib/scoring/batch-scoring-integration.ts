@@ -317,7 +317,7 @@ async function callFastAPIScoring(
 export async function scoreAfterCsvUpload(
   storeId: string,
   processedCount: number,
-  options: {
+  _options: {
     force_recalculate?: boolean
   } = {},
 ): Promise<ScoringResult> {

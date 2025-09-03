@@ -175,10 +175,10 @@ class BatchCreationService:
             if batch_data.openfoodfacts_data:
                 # Note: The Product model may not have open_food_facts_data field
                 # This can be stored separately or in a JSONB field if needed
-                existing_product.last_scanned_at = datetime.utcnow()
+                existing_product.last_scanned_at = datetime.utcnow()  # type: ignore[assignment]
                 was_updated = True
 
-            return existing_product.product_id, False, was_updated
+            return existing_product.product_id, False, was_updated  # type: ignore[return-value]
 
         # Create new product
         new_product = Product(
@@ -213,7 +213,7 @@ class BatchCreationService:
         )
         session.add(store_product)
 
-        return new_product.product_id, True, False
+        return new_product.product_id, True, False  # type: ignore[return-value]
 
     async def _generate_batch_number(self, session: AsyncSession, store_id: str) -> str:
         """Generate unique batch number for the store"""
@@ -271,7 +271,7 @@ class BatchCreationService:
         session.add(batch)
         await session.flush()
 
-        return batch.batch_id
+        return batch.batch_id  # type: ignore[return-value]
 
     async def get_recent_batches_from_scans(
         self, store_id: str, user_id: str, limit: int = 20
@@ -598,4 +598,4 @@ class BatchCreationService:
         session.add(batch)
         await session.flush()
 
-        return batch.batch_id
+        return batch.batch_id  # type: ignore[return-value]

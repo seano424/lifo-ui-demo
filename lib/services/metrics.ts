@@ -268,7 +268,20 @@ class MetricsService {
   }
 
   getMetricsSummary() {
-    const summary: Record<string, any> = {}
+    const summary: Record<
+      string,
+      {
+        totalRequests: number
+        successRate: string
+        errorRate: string
+        avgResponseTime: string
+        p95ResponseTime: string
+        p99ResponseTime: string
+        circuitState: string
+        consecutiveFailures: number
+        lastUpdated: string
+      }
+    > = {}
 
     this.metrics.forEach((metrics, endpoint) => {
       summary[endpoint] = {
@@ -279,6 +292,7 @@ class MetricsService {
         p95ResponseTime: `${metrics.p95ResponseTime.toFixed(0)}ms`,
         p99ResponseTime: `${metrics.p99ResponseTime.toFixed(0)}ms`,
         circuitState: metrics.circuitState,
+        consecutiveFailures: metrics.consecutiveFailures,
         lastUpdated: new Date(metrics.lastUpdated).toISOString(),
       }
     })

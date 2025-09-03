@@ -70,7 +70,7 @@ export function useScanOutActions() {
       if (Number.isNaN(targetDate.getTime())) {
         return null
       }
-    } catch (error) {
+    } catch (_error) {
       return null
     }
 
@@ -215,7 +215,7 @@ export function useScanOutActions() {
 
       // 🔍 DEBUG: Test store access for the user
       if (items.length > 0 && items[0].storeId) {
-        const { data: storeAccess, error: storeAccessError } = await supabase
+        const { data: storeAccess, error: _storeAccessError } = await supabase
           .schema('business')
           .from('store_users')
           .select('user_id, role_in_store, is_active')
@@ -233,7 +233,7 @@ export function useScanOutActions() {
       for (const item of items) {
         try {
           // 🔍 DEBUG: Test RLS policy with a SELECT first
-          const { data: testQuery, error: testError } = await supabase
+          const { data: _testQuery, error: _testError } = await supabase
             .schema('inventory')
             .from('batches')
             .select('batch_id, store_id, current_quantity')
@@ -279,7 +279,7 @@ export function useScanOutActions() {
           // Update the batch quantity
           const newQuantity = batch.current_quantity - item.quantityRemoved
 
-          const { data: updateData, error: updateError } = await supabase
+          const { data: _updateData, error: updateError } = await supabase
             .schema('inventory')
             .from('batches')
             .update({

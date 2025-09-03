@@ -10,12 +10,12 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
 
     // Get authenticated user
-    const authStartTime = Date.now()
+    const _authStartTime = Date.now()
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    const authEndTime = Date.now()
+    const _authEndTime = Date.now()
 
     if (authError) {
       console.error('❌ [UPLOAD-API] Auth error:', authError)
@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user authenticated' }, { status: 401 })
     }
 
-    const formDataStartTime = Date.now()
+    const _formDataStartTime = Date.now()
     const formData = await request.formData()
-    const formDataEndTime = Date.now()
+    const _formDataEndTime = Date.now()
 
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
@@ -56,16 +56,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Fast CSV processing - no Python subprocess overhead
-    const csvReadStartTime = Date.now()
+    const _csvReadStartTime = Date.now()
     const csvContent = await file.text()
-    const csvReadEndTime = Date.now()
+    const _csvReadEndTime = Date.now()
 
-    const csvParseStartTime = Date.now()
+    const _csvParseStartTime = Date.now()
     const csvData = fastParseCSV(csvContent, defaultExpiryDate)
-    const csvParseEndTime = Date.now()
+    const _csvParseEndTime = Date.now()
 
     if (defaultExpiryDate) {
-      const itemsWithDefaultExpiry = csvData.filter(
+      const _itemsWithDefaultExpiry = csvData.filter(
         item =>
           typeof item === 'object' &&
           item !== null &&
@@ -82,13 +82,13 @@ export async function POST(request: NextRequest) {
     // Log first few items for debugging
 
     // Use existing proven InventoryOperations.processCsvBatch
-    const operationsCreateStartTime = Date.now()
+    const _operationsCreateStartTime = Date.now()
     const operations = new InventoryOperations(supabase)
-    const operationsCreateEndTime = Date.now()
+    const _operationsCreateEndTime = Date.now()
 
-    const processingStartTime = Date.now()
+    const _processingStartTime = Date.now()
     const result = await operations.processCsvBatch(csvData, storeId, user.id)
-    const processingEndTime = Date.now()
+    const _processingEndTime = Date.now()
 
     const totalTime = Date.now() - apiStartTime
 

@@ -51,7 +51,7 @@ export function useCSVUpload() {
 
   // Simple CSV preview (first 10 rows)
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
-    const startTime = performance.now()
+    const _startTime = performance.now()
 
     const text = await file.text()
     const lines = text.trim().split('\n')
@@ -92,7 +92,7 @@ export function useCSVUpload() {
       preview.push(previewItem)
     }
 
-    const endTime = performance.now()
+    const _endTime = performance.now()
 
     // Count total items without expiry in the entire file (not just preview)
     let totalItemsWithoutExpiry = 0
@@ -125,7 +125,7 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      const mutationStartTime = performance.now()
+      const _mutationStartTime = performance.now()
 
       const formData = new FormData()
 
@@ -139,12 +139,12 @@ export function useCSVUpload() {
       }
 
       // Use the main optimized upload route
-      const fetchStartTime = performance.now()
+      const _fetchStartTime = performance.now()
       const response = await fetch('/api/inventory/upload', {
         method: 'POST',
         body: formData,
       })
-      const fetchEndTime = performance.now()
+      const _fetchEndTime = performance.now()
 
       if (!response.ok) {
         console.error('❌ [USE-CSV-UPLOAD] Upload failed with status:', response.status)
@@ -154,7 +154,7 @@ export function useCSVUpload() {
       }
 
       const result = await response.json()
-      const mutationEndTime = performance.now()
+      const _mutationEndTime = performance.now()
 
       return result
     },

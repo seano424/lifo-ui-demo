@@ -125,8 +125,12 @@ class Product(Base):
     )  # For expiry urgency calculation
 
     # Required pricing fields from Supabase schema
-    base_cost_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
-    base_selling_price = Column(DECIMAL(12, 4), nullable=False, default=0.0000)
+    base_cost_price: Column[DECIMAL] = Column(
+        DECIMAL(12, 4), nullable=False, default=0.0000
+    )
+    base_selling_price: Column[DECIMAL] = Column(
+        DECIMAL(12, 4), nullable=False, default=0.0000
+    )
 
     # Barcode verification tracking
     is_verified = Column(Boolean, default=False)
@@ -183,8 +187,8 @@ class StoreProduct(Base):
     )
 
     # Store-specific pricing (needed for margin calculations in AI scoring)
-    cost_price = Column(DECIMAL(12, 4))  # For margin_impact scoring
-    selling_price = Column(DECIMAL(12, 4))  # For revenue calculations
+    cost_price: Column[DECIMAL] = Column(DECIMAL(12, 4))  # For margin_impact scoring
+    selling_price: Column[DECIMAL] = Column(DECIMAL(12, 4))  # For revenue calculations
 
     # Store-specific settings
     is_active = Column(Boolean, default=True)
@@ -273,13 +277,13 @@ class Batch(Base):
     received_date = Column(Date, default=lambda: datetime.now(UTC).date())
 
     # Quantities for tracking
-    initial_quantity = Column(DECIMAL(12, 4), nullable=False)
-    current_quantity = Column(DECIMAL(12, 4), nullable=False)
-    reserved_quantity = Column(DECIMAL(12, 4), default=0)
+    initial_quantity: Column[DECIMAL] = Column(DECIMAL(12, 4), nullable=False)
+    current_quantity: Column[DECIMAL] = Column(DECIMAL(12, 4), nullable=False)
+    reserved_quantity: Column[DECIMAL] = Column(DECIMAL(12, 4), default=0)
 
     # Pricing (can override store defaults)
-    cost_price = Column(DECIMAL(12, 4))
-    selling_price = Column(DECIMAL(12, 4))
+    cost_price: Column[DECIMAL] = Column(DECIMAL(12, 4))
+    selling_price: Column[DECIMAL] = Column(DECIMAL(12, 4))
 
     # Storage and status
     location_code = Column(String(50))
@@ -288,7 +292,9 @@ class Batch(Base):
     # LIFO.AI barcode workflow support
     batch_source = Column(String(50), default="manual")  # BatchSource enum values
     scanned_barcode = Column(String(50))  # Barcode that created this batch
-    scan_confidence = Column(DECIMAL(3, 2))  # Confidence score (0.00-1.00)
+    scan_confidence: Column[DECIMAL] = Column(
+        DECIMAL(3, 2)
+    )  # Confidence score (0.00-1.00)
     verification_status = Column(
         String(20), default="verified"
     )  # VerificationStatus enum values
@@ -371,20 +377,20 @@ class BatchAction(Base):
     )
 
     # What was recommended vs what was done
-    recommended_action = Column(SQLEnum(ActionType), nullable=False)
-    actual_action = Column(SQLEnum(ActionType), nullable=False)
-    ai_score = Column(
+    recommended_action: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=False)
+    actual_action: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=False)
+    ai_score: Column[DECIMAL] = Column(
         DECIMAL(3, 2)
     )  # AI score that triggered recommendation (0.00-1.00)
 
     # Tracking details
     action_date = Column(DateTime, default=lambda: datetime.now(UTC))
-    quantity_affected = Column(DECIMAL(12, 4))
+    quantity_affected: Column[DECIMAL] = Column(DECIMAL(12, 4))
     notes = Column(Text)  # User notes (e.g., "donated to local food bank")
 
     # Financial tracking (for ROI calculations)
-    original_value = Column(DECIMAL(10, 2))  # Value before action
-    recovered_value = Column(DECIMAL(10, 2))  # Value after action
+    original_value: Column[DECIMAL] = Column(DECIMAL(10, 2))  # Value before action
+    recovered_value: Column[DECIMAL] = Column(DECIMAL(10, 2))  # Value after action
 
     # User and donation tracking
     performed_by = Column(
@@ -426,7 +432,9 @@ class DonationRecipient(Base):
     name = Column(String(255), nullable=False)
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
-    recipient_type = Column(SQLEnum(DonationRecipientType), nullable=False)
+    recipient_type: Column[SQLEnum] = Column(
+        SQLEnum(DonationRecipientType), nullable=False
+    )
 
     # Minimal compliance fields
     is_certified = Column(Boolean, default=False)

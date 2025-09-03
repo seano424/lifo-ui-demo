@@ -40,7 +40,7 @@ async def get_current_user(
         )
 
     try:
-        user = supabase_auth.verify_token(credentials.credentials)
+        user = await supabase_auth.verify_token(credentials.credentials)
         return user
     except SupabaseAuthError as e:
         raise HTTPException(
@@ -67,7 +67,7 @@ async def get_current_user_optional(
         return None
 
     try:
-        user = supabase_auth.verify_token(credentials.credentials)
+        user = await supabase_auth.verify_token(credentials.credentials)
         return user
     except SupabaseAuthError:
         return None
@@ -156,7 +156,7 @@ async def validate_store_access(
         # Check role hierarchy
         role_hierarchy = {"employee": 1, "staff": 2, "manager": 3, "owner": 4}
 
-        user_role_level = role_hierarchy.get(store_user.role_in_store, 0)
+        user_role_level = role_hierarchy.get(str(store_user.role_in_store), 0)
         required_role_level = role_hierarchy.get(required_role, 2)
 
         if user_role_level < required_role_level:

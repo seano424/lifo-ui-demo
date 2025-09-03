@@ -27,7 +27,7 @@ async def health_check() -> dict[str, Any]:
     """
     start_time = asyncio.get_event_loop().time()
 
-    health_status = {
+    health_status: dict[str, Any] = {
         "status": "healthy",
         "timestamp": asyncio.get_event_loop().time(),
         "services": {},
@@ -260,7 +260,7 @@ async def mobile_performance_health(
             "/batch-list-mobile/": {"target_ms": 300, "critical": False},
         }
 
-        mobile_health = {
+        mobile_health: dict[str, Any] = {
             "timestamp": datetime.utcnow(),
             "mobile_targets_status": "optimal",
             "endpoint_performance": {},

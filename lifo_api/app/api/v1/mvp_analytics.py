@@ -378,8 +378,8 @@ async def _generate_batch_insights(
         return BatchInsights()
 
     # Category performance analysis
-    category_performance = {}
-    category_stats = {}
+    category_performance: dict[str, dict[str, float]] = {}
+    category_stats: dict[str, dict[str, Any]] = {}
 
     for item in inventory_data:
         category = item["category"]

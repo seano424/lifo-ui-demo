@@ -5,6 +5,7 @@ Multi-layer protection with input validation, rate limiting, and threat detectio
 
 import time
 from collections.abc import Callable
+from typing import Any
 
 import structlog
 from fastapi import HTTPException, Request, Response
@@ -232,7 +233,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
 
     def _validate_request_headers(self, request: Request) -> dict:
         """Validate request headers for security issues"""
-        validation_result = {"valid": True, "details": {}}
+        validation_result: dict[str, Any] = {"valid": True, "details": {}}
 
         # Check for required headers on certain endpoints
         if request.method in ["POST", "PUT", "PATCH"]:
@@ -488,7 +489,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             elif param_name in ["store_id"]:
                 # Should be UUID format
                 import uuid as uuid_lib
-                
+
                 try:
                     uuid_lib.UUID(value)
                     return True

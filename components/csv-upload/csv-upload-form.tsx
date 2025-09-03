@@ -82,9 +82,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     setSelectedFile(file)
 
     try {
-      const startTime = performance.now()
+      const _startTime = performance.now()
       await previewCsvFile(file)
-      const endTime = performance.now()
+      const _endTime = performance.now()
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
       toast.error(t('errors.analysisFailure'))
@@ -108,7 +108,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
         storeId,
         csvData: csvPreview, // Send the modified CSV data with individual expiry dates
       })
-    } catch (error) {
+    } catch (_error) {
       toast.error(t('errors.startFailed'))
     }
   }

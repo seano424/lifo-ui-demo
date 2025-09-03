@@ -497,7 +497,7 @@ class MetricsCollector:
     def _get_alerts_summary(self) -> dict[str, Any]:
         """Get summary of recent alerts"""
         recent_alerts = []
-        alert_counts = defaultdict(int)
+        alert_counts: dict[str, int] = defaultdict(int)
 
         cutoff_time = datetime.now(UTC) - timedelta(hours=24)
 

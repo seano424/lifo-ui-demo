@@ -82,7 +82,7 @@ async def get_current_user(
 
     except jwt.ExpiredSignatureError as e:
         raise AuthError("Token has expired") from e
-    except jwt.JWTError as e:
+    except (jwt.PyJWTError, jwt.InvalidTokenError) as e:
         raise AuthError(f"Token validation failed: {e!s}") from e
     except Exception as e:
         logger.error("Authentication error", error=str(e))
@@ -151,7 +151,7 @@ async def validate_store_access(
         # Role hierarchy: owner > manager > staff > viewer
         role_hierarchy = {"owner": 4, "manager": 3, "staff": 2, "viewer": 1}
 
-        user_role_level = role_hierarchy.get(store_user.role_in_store, 0)
+        user_role_level = role_hierarchy.get(str(store_user.role_in_store), 0)
         required_role_level = role_hierarchy.get(required_role, 0)
 
         return user_role_level >= required_role_level

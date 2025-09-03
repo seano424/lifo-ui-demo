@@ -135,7 +135,7 @@ async def get_active_threats(
             ]
 
             # Sort by risk score
-            high_risk_ips.sort(key=lambda x: x["risk_score"], reverse=True)
+            high_risk_ips.sort(key=lambda x: float(x["risk_score"]), reverse=True)  # type: ignore[arg-type]
 
         threat_data = {
             "timestamp": datetime.utcnow(),
@@ -363,7 +363,7 @@ async def get_security_health(
 
 def _get_most_common_attack_types(events: list[dict]) -> list[dict[str, Any]]:
     """Get most common attack types from events"""
-    attack_counts = {}
+    attack_counts: dict[str, int] = {}
     for event in events:
         event_type = event.get("event_type", "unknown")
         attack_counts[event_type] = attack_counts.get(event_type, 0) + 1

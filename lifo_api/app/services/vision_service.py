@@ -177,7 +177,7 @@ class GoogleVisionService:
         """
         try:
             # Load image with PIL for preprocessing
-            image = Image.open(io.BytesIO(image_data))
+            image: Image.Image = Image.open(io.BytesIO(image_data))
 
             # Convert to RGB if needed (handle RGBA, grayscale, etc.)
             if image.mode != "RGB":
@@ -248,6 +248,9 @@ class GoogleVisionService:
             )
 
             # Execute request in thread pool to avoid blocking
+            if not self.client:
+                raise RuntimeError("Google Vision client not initialized")
+            
             response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: self.client.annotate_image(request)
             )
@@ -326,7 +329,7 @@ class GoogleVisionService:
         self, image: vision.Image
     ) -> list[BarcodeResult]:
         """Use Google Vision's actual barcode detection capabilities"""
-        barcodes = []
+        barcodes: list[BarcodeResult] = []
 
         try:
             # First attempt: Use Google's built-in barcode detection (if available in your Vision API version)
@@ -344,6 +347,9 @@ class GoogleVisionService:
                 ],
             )
 
+            if not self.client:
+                raise RuntimeError("Google Vision client not initialized")
+                
             response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: self.client.annotate_image(barcode_request)
             )
@@ -378,6 +384,13 @@ class GoogleVisionService:
     async def _detect_barcodes(self, image: vision.Image) -> list[BarcodeResult]:
         """Detect barcodes in image using Google Vision API"""
         try:
+            # Check if client is available
+            if not self.client:
+                logger.warning(
+                    "Vision client not available, returning empty barcode results"
+                )
+                return []
+
             # Run in thread pool to avoid blocking
             response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: self.client.text_detection(image=image)
@@ -422,6 +435,13 @@ class GoogleVisionService:
     async def _extract_text(self, image: vision.Image) -> list[OCRResult]:
         """Extract text from image using Google Vision OCR"""
         try:
+            # Check if client is available
+            if not self.client:
+                logger.warning(
+                    "Vision client not available, returning empty OCR results"
+                )
+                return []
+
             # Run OCR in thread pool
             response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: self.client.text_detection(image=image)
@@ -706,10 +726,10 @@ class GoogleVisionService:
 
         # Check individual blocks first (highest priority)
         for block in all_numeric_blocks:
-            clean_text = block["text"]
+            clean_text = str(block["text"])
             if len(clean_text) in [8, 12, 13, 14]:
                 barcode_info = self._validate_barcode(
-                    clean_text, block["original"], block["annotation"]
+                    clean_text, str(block["original"]), block["annotation"]
                 )
                 if barcode_info:
                     barcode_info["source"] = "single_block"
@@ -717,12 +737,12 @@ class GoogleVisionService:
 
         # Check for 11-digit numbers that might need a leading zero (common with UPC)
         for block in all_numeric_blocks:
-            clean_text = block["text"]
+            clean_text = str(block["text"])
             if len(clean_text) == 11:
                 # Try adding leading zero for UPC-A
                 padded = "0" + clean_text
                 barcode_info = self._validate_barcode(
-                    padded, block["original"], block["annotation"]
+                    padded, str(block["original"]), block["annotation"]
                 )
                 if barcode_info:
                     barcode_info["source"] = "zero_padded"

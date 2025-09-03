@@ -245,7 +245,7 @@ class DonationKPITracker:
             unique_recipients = len({d.recipient_type for d in donations_data})
 
             # Category breakdown
-            category_breakdown = {}
+            category_breakdown: dict[str, int] = {}
             for donation in donations_data:
                 category_breakdown[donation.category] = (
                     category_breakdown.get(donation.category, 0) + 1

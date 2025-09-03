@@ -429,7 +429,7 @@ export class InventoryOperations {
     })
 
     const duplicateCheckEnd = performance.now()
-    const duplicateCheckTime = duplicateCheckEnd - duplicateCheckStart
+    const _duplicateCheckTime = duplicateCheckEnd - duplicateCheckStart
 
     if (error) {
       console.error('❌ [DB-OPS] Bulk duplicate check RPC failed:', error)
@@ -442,7 +442,7 @@ export class InventoryOperations {
       throw new Error(`Bulk duplicate check failed: ${error.message}`)
     }
 
-    const duplicateCount = Array.isArray(data) ? data.length : 0
+    const _duplicateCount = Array.isArray(data) ? data.length : 0
 
     return Array.isArray(data) ? data : []
   }
@@ -547,7 +547,7 @@ export class InventoryOperations {
     })
 
     const insertEndTime = performance.now()
-    const insertTime = insertEndTime - insertStartTime
+    const _insertTime = insertEndTime - insertStartTime
 
     if (error) {
       console.error('❌ [DB-OPS] Enhanced bulk insert RPC failed:', error)
@@ -601,7 +601,7 @@ export class InventoryOperations {
       } else {
       }
       // Prepare CSV items
-      const prepStartTime = performance.now()
+      const _prepStartTime = performance.now()
 
       const csvItems = csvData.map(item => {
         const csvItem = item as {
@@ -621,7 +621,7 @@ export class InventoryOperations {
         return csvItem
       })
 
-      const prepEndTime = performance.now()
+      const _prepEndTime = performance.now()
 
       // Step 1: Bulk duplicate check (FIXED parameter order)
       const duplicateCheckStart = Date.now()
@@ -634,17 +634,17 @@ export class InventoryOperations {
       const duplicateCheckTime = Date.now() - duplicateCheckStart
 
       // Step 2: Filter non-duplicates
-      const filterStartTime = performance.now()
+      const _filterStartTime = performance.now()
 
       const nonDuplicates = csvItems.filter((_, index) => {
         const dupResult = duplicateResults[index]
         return !dupResult?.is_duplicate
       })
 
-      const filterEndTime = performance.now()
+      const _filterEndTime = performance.now()
 
       // Step 3: Prepare batch data for bulk insert
-      const batchPrepStart = performance.now()
+      const _batchPrepStart = performance.now()
 
       const batchData = nonDuplicates.map((csvItem, index) => ({
         sku: csvItem.SKU || `AUTO-${Date.now()}-${index}`,
@@ -662,7 +662,7 @@ export class InventoryOperations {
         typical_shelf_life_days: 30, // Will be determined from database category mapping
       }))
 
-      const batchPrepEnd = performance.now()
+      const _batchPrepEnd = performance.now()
 
       // Step 4: Bulk insert (handles store product linking automatically)
       const batchInsertStart = Date.now()
@@ -854,7 +854,7 @@ export class InventoryOperations {
         }
 
         // Create batch (either no duplicate or ADD_ANYWAY action)
-        const { data: batch, error: batchError } = await this.supabase
+        const { data: _batch, error: batchError } = await this.supabase
           .schema('inventory')
           .from('batches')
           .insert({
@@ -972,7 +972,7 @@ export class InventoryOperations {
         console.error('[getStoreStats] Error fetching batches:', batchError)
 
         // Alternative query without JOIN to debug
-        const { data: simpleBatches, error: simpleError } = await this.supabase
+        const { data: _simpleBatches, error: simpleError } = await this.supabase
           .schema('inventory')
           .from('batches')
           .select('current_quantity, selling_price, expiry_date')

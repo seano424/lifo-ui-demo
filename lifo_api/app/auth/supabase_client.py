@@ -147,10 +147,10 @@ class SupabaseClient:
             token = self.get_service_role_token()
             auth_header = f"Bearer {token}"
         else:
-            token = await self.get_valid_access_token()
-            if not token:
+            maybe_token = await self.get_valid_access_token()
+            if not maybe_token:
                 raise ValueError("No valid access token available")
-            auth_header = f"Bearer {token}"
+            auth_header = f"Bearer {maybe_token}"
 
         return httpx.AsyncClient(
             headers={

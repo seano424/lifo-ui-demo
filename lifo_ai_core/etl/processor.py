@@ -17,7 +17,7 @@ except ImportError:
         from lifo_ai_core.database.operations import InventoryOperations
     except ImportError:
         # Fallback if database operations not available
-        InventoryOperations = None
+        InventoryOperations = None  # type: ignore
 
 
 class CSVProcessor:
@@ -398,9 +398,9 @@ class CSVProcessor:
         # Generate batch numbers if not provided
         if "Batch_Number" not in df.columns or df["Batch_Number"].isna().all():
             df["Batch_Number"] = (
-                df["SKU"]
+                df["SKU"].astype(str)
                 + "-"
-                + df["Expiry_Date"].str.replace("-", "")
+                + df["Expiry_Date"].astype(str).str.replace("-", "")
                 + "-"
                 + pd.Series(range(len(df))).astype(str).str.zfill(3)
             )
@@ -413,9 +413,9 @@ class CSVProcessor:
                 | (df["Batch_Number"] == "nan")
             )
             df.loc[empty_batch, "Batch_Number"] = (
-                df.loc[empty_batch, "SKU"]
+                df.loc[empty_batch, "SKU"].astype(str)
                 + "-"
-                + df.loc[empty_batch, "Expiry_Date"].str.replace("-", "")
+                + df.loc[empty_batch, "Expiry_Date"].astype(str).str.replace("-", "")
                 + "-AUTO"
             )
 
@@ -699,13 +699,13 @@ class CSVProcessor:
                     "Brand": data["brand"],
                     "Quantity": 5 + (i % 20),
                     "Expiry_Date": (
-                        datetime.now() + timedelta(days=data["days_offset"])
+                        datetime.now() + timedelta(days=int(data["days_offset"]))  # type: ignore[call-overload]
                     ).strftime("%Y-%m-%d"),
                     "Manufacture_Date": (datetime.now() - timedelta(days=2)).strftime(
                         "%Y-%m-%d"
                     ),
-                    "Cost_Price": round(data["cost"], 2),
-                    "Selling_Price": round(data["selling"], 2),
+                    "Cost_Price": round(float(data["cost"]), 2),  # type: ignore[arg-type]
+                    "Selling_Price": round(float(data["selling"]), 2),  # type: ignore[arg-type]
                     "Location": f"SHELF-{chr(65 + (i % 5))}{i % 3 + 1}",
                     "Unit_Type": data["unit"],
                     "Supplier": f"Supplier {chr(65 + (i % 3))}",
@@ -767,7 +767,9 @@ class CSVProcessor:
             if sku:
                 if sku not in sku_groups:
                     sku_groups[sku] = []
-                sku_groups[sku].append(item.get("Expiry_Date"))
+                expiry_date = item.get("Expiry_Date")
+                if expiry_date is not None:
+                    sku_groups[sku].append(str(expiry_date))
 
         multi_batch_skus = {
             sku: dates for sku, dates in sku_groups.items() if len(set(dates)) > 1

@@ -76,7 +76,7 @@ class CSVSecurityValidator:
         Raises:
             CSVSecurityError: If validation fails
         """
-        validation_result = {
+        validation_result: dict[str, Any] = {
             "valid": True,
             "warnings": [],
             "security_issues": [],

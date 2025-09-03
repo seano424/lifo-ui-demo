@@ -159,7 +159,7 @@ class InventoryScorer:
         return 0.1  # Low urgency for long shelf life items
 
     def _calculate_disposal_urgency(
-        self, days_to_expiry: int, category: str = None
+        self, days_to_expiry: int, category: str | None = None
     ) -> float:
         """
         Calculate disposal urgency for expired products based on category and days past expiry
@@ -181,7 +181,7 @@ class InventoryScorer:
 
         # Get category profile or use default
         profile = category_disposal_profiles.get(
-            category, {"immediate": -7, "urgent": -30, "moderate": -90}
+            category or "general", {"immediate": -7, "urgent": -30, "moderate": -90}
         )
 
         # Calculate urgency based on how long the product has been expired
@@ -195,7 +195,7 @@ class InventoryScorer:
             return 0.4  # Lower disposal urgency but still expired
 
     def _calculate_expired_margin_score(
-        self, margin_percent: float, days_to_expiry: int, category: str = None
+        self, margin_percent: float, days_to_expiry: int, category: str | None = None
     ) -> float:
         """
         Calculate margin score for expired products
@@ -216,7 +216,7 @@ class InventoryScorer:
             "spices_condiments": 0.8,  # High recovery potential
         }
 
-        base_recovery = category_recovery_potential.get(category, 0.5)
+        base_recovery = category_recovery_potential.get(category or "general", 0.5)
 
         # Reduce recovery potential based on how long expired
         if days_to_expiry <= -30:
@@ -237,7 +237,7 @@ class InventoryScorer:
         self,
         days_to_expiry: int,
         current_margin_percent: float,
-        current_quantity: float = None,
+        current_quantity: float | None = None,
     ) -> dict[str, Any]:
         """
         Generate EU-compliant recommendations for expired products
@@ -256,7 +256,7 @@ class InventoryScorer:
         current_quantity: float,
         avg_daily_sales: float,
         days_to_expiry: int,
-        category: str = None,
+        category: str | None = None,
     ) -> float:
         """
         Enhanced velocity score calculation with improved algorithms
@@ -300,7 +300,7 @@ class InventoryScorer:
         cost_price: float,
         selling_price: float,
         days_to_expiry: int,
-        category: str = None,
+        category: str | None = None,
     ) -> float:
         """
         Enhanced margin score with urgency-based adjustments
@@ -382,7 +382,7 @@ class InventoryScorer:
         composite_score: float,
         days_to_expiry: int,
         current_margin_percent: float,
-        current_quantity: float = None,
+        current_quantity: float | None = None,
     ) -> dict[str, Any]:
         """
         Generate enhanced AI-powered action recommendations
@@ -512,7 +512,7 @@ class ScoringService:
         return delta.days
 
     async def estimate_daily_sales(
-        self, product_id: str, category: str, store_id: str, batch_id: str = None
+        self, product_id: str, category: str, store_id: str, batch_id: str | None = None
     ) -> float:
         """
         Enhanced daily sales estimation with proper product relationship queries
@@ -520,8 +520,8 @@ class ScoringService:
         """
         try:
             # Import models here to avoid circular imports
-            from app.database.inventory_models import Category, Product
-            from app.database.models import Batch, SalesEvent
+            from app.database.inventory_models import Batch, Category, Product
+            from app.database.models import SalesEvent
 
             # Try to get actual sales data for this specific batch
             if batch_id:
@@ -609,7 +609,7 @@ class ScoringService:
     async def score_batch(
         self,
         batch_id: str,
-        category_weights: dict[str, float] = None,
+        category_weights: dict[str, float] | None = None,
         track_recommendation: bool = True,
     ) -> ScoringResult | None:
         """Score a single batch with enhanced error handling - SECURE READ-ONLY VERSION"""
@@ -686,6 +686,7 @@ class ScoringService:
 
             # Create result
             result = ScoringResult(
+                store_id=batch_data["store_id"],
                 batch_id=batch_data["batch_id"],
                 sku=batch_data["sku"],
                 product_name=batch_data.get("product_name", "Unknown"),

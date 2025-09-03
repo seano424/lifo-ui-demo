@@ -34,7 +34,7 @@ interface FastAPIAlertsResponse {
 interface FastAPIAnalyticsResponse {
   store_id: string
   period_days: number
-  analytics: Record<string, any>
+  analytics: Record<string, unknown>
   ai_insights: Array<{
     type: string
     message: string
@@ -51,24 +51,24 @@ interface FastAPIAnalyticsResponse {
 export class FastAPIClient {
   private baseUrl: string
   private timeout: number
-  private maxRetries: number
 
   constructor() {
-    const baseUrl = process.env.FASTAPI_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-    
+    const baseUrl =
+      process.env.FASTAPI_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+
     // Enforce HTTPS in production environments (but allow localhost for development/builds)
-    if (process.env.NODE_ENV === 'production' && 
-        baseUrl.startsWith('http://') && 
-        !baseUrl.startsWith('http://localhost') && 
-        !baseUrl.startsWith('http://127.0.0.1')) {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      baseUrl.startsWith('http://') &&
+      !baseUrl.startsWith('http://localhost') &&
+      !baseUrl.startsWith('http://127.0.0.1')
+    ) {
       throw new Error('FastAPI client requires HTTPS in production environment')
     }
-    
+
     this.baseUrl = baseUrl
     // Optimized timeout: 8 seconds for better performance
     this.timeout = 8000
-    // Retry mechanism for improved reliability
-    this.maxRetries = 2
   }
 
   /**
