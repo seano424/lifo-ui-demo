@@ -265,7 +265,7 @@ export function OnboardingSignUpForm({
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input
                   id="fullName"
@@ -277,7 +277,7 @@ export function OnboardingSignUpForm({
                 />
               </div>
 
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -292,7 +292,7 @@ export function OnboardingSignUpForm({
               {/* Only show password fields in production mode */}
               {ONBOARDING_MODE === 'production' && (
                 <>
-                  <div className="grid gap-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
@@ -308,7 +308,7 @@ export function OnboardingSignUpForm({
                     </Typography>
                   </div>
 
-                  <div className="grid gap-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="confirm-password">Confirm Password</Label>
                     <Input
                       id="confirm-password"

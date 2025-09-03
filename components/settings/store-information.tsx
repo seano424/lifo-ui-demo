@@ -2,12 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Check, Edit, Globe, X } from 'lucide-react'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -24,10 +24,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Typography } from '@/components/ui/typography'
 import { useStoreActions, useStorePermissions, useStoreSettings } from '@/hooks/use-store-settings'
 import { useCurrentUser } from '@/hooks/use-users'
+import { DEFAULT_STORE_VALUES } from '@/lib/constants/store-flow'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { reportError } from '@/lib/utils/error-reporting'
+import {
+  createEmailValidator,
+  createPhoneValidator,
+  createPostalCodeValidator,
+  createStoreNameValidator,
+  createWebsiteValidator,
+} from '@/lib/utils/validation-utils'
+import { AddStoreFlow } from './add-store-flow'
 
-// Interface for server permissions prop
 interface StoreInformationProps {
   serverPermissions?: UserStorePermissions // Server-computed permissions
   storeId?: string // 🚀 NEW: Optional store ID override from server
@@ -36,13 +45,12 @@ interface StoreInformationProps {
 // Type for translation function
 type TranslationFunction = (key: string) => string
 
-// Validation schema matching your database structure
-const createStoreInfoSchema = (t: TranslationFunction) =>
+// Enhanced validation schema with country-specific validation
+const createStoreInfoSchema = (t: TranslationFunction, country?: string | null) =>
   z.object({
-    store_name: z
-      .string()
-      .min(1, t('storeInformation.validation.storeNameRequired'))
-      .max(100, t('storeInformation.validation.storeNameTooLong')),
+    store_name: createStoreNameValidator()
+      .refine(val => val.length >= 1, t('storeInformation.validation.storeNameRequired'))
+      .refine(val => val.length <= 100, t('storeInformation.validation.storeNameTooLong')),
     business_name: z
       .string()
       .max(100, t('storeInformation.validation.businessNameTooLong'))
@@ -63,29 +71,23 @@ const createStoreInfoSchema = (t: TranslationFunction) =>
       .optional()
       .nullable(),
     city: z.string().max(100, t('storeInformation.validation.cityTooLong')).optional().nullable(),
-    postal_code: z
-      .string()
-      .max(20, t('storeInformation.validation.postalCodeTooLong'))
-      .optional()
-      .nullable(),
+    postal_code: country
+      ? createPostalCodeValidator(country).optional().nullable().or(z.literal(''))
+      : z
+          .string()
+          .max(20, t('storeInformation.validation.postalCodeTooLong'))
+          .optional()
+          .nullable(),
     country: z
       .string()
       .max(100, t('storeInformation.validation.countryTooLong'))
       .optional()
       .nullable(),
-    phone: z.string().max(20, t('storeInformation.validation.phoneTooLong')).optional().nullable(),
-    email: z
-      .string()
-      .email(t('storeInformation.validation.invalidEmail'))
-      .optional()
-      .nullable()
-      .or(z.literal('')),
-    website_url: z
-      .string()
-      .url(t('storeInformation.validation.invalidWebsite'))
-      .optional()
-      .nullable()
-      .or(z.literal('')),
+    phone: country
+      ? createPhoneValidator(country).optional().nullable().or(z.literal(''))
+      : z.string().max(20, t('storeInformation.validation.phoneTooLong')).optional().nullable(),
+    email: createEmailValidator().optional().nullable().or(z.literal('')),
+    website_url: createWebsiteValidator().optional().nullable().or(z.literal('')),
     description: z
       .string()
       .max(500, t('storeInformation.validation.descriptionTooLong'))
@@ -144,25 +146,23 @@ export default function StoreInformation({
 }: StoreInformationProps) {
   const t = useTranslations('settings')
 
-  // 🚀 CRITICAL FIX: Use prop storeId if available, fallback to context
   const contextStoreId = useActiveStoreId()
   const effectiveStoreId = propStoreId || contextStoreId
 
-  // 🚀 CRITICAL: Pass the effective storeId directly to the hooks
   const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId || undefined)
   const { updateBasicInfo, isUpdating } = useStoreActions()
   const { data: userData } = useCurrentUser()
 
-  // 🚀 Use hybrid permissions hook with server permissions as fallback
   const permissions = useStorePermissions({
     serverPermissions,
     storeId: effectiveStoreId || undefined,
   })
 
+  const [isAddStoreOpen, setIsAddStoreOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  const storeInfoSchema = createStoreInfoSchema(t)
+  const storeInfoSchema = createStoreInfoSchema(t, storeData?.country)
   const STORE_TYPES = createStoreTypes(t)
   const SIZE_CATEGORIES = createSizeCategories(t)
   const COUNTRIES = createCountries(t)
@@ -178,53 +178,68 @@ export default function StoreInformation({
       address: '',
       city: '',
       postal_code: '',
-      country: 'France',
+      country: DEFAULT_STORE_VALUES.COUNTRY,
       phone: '',
       email: '',
       website_url: '',
       description: '',
-      default_markup_percent: 30,
-      waste_reduction_target_percent: 25,
+      default_markup_percent: DEFAULT_STORE_VALUES.MARKUP_PERCENT,
+      waste_reduction_target_percent: DEFAULT_STORE_VALUES.WASTE_REDUCTION_TARGET,
     },
   })
 
-  // Update form when store data loads
-  useEffect(() => {
-    if (storeData) {
-      form.reset({
-        store_name: storeData.store_name || '',
-        business_name: storeData.business_name || '',
-        store_code: storeData.store_code || '',
-        store_type: storeData.store_type || null,
-        size_category: storeData.size_category || null,
-        address: storeData.address || '',
-        city: storeData.city || '',
-        postal_code: storeData.postal_code || '',
-        country: storeData.country || 'France',
-        phone: storeData.phone || '',
-        email: storeData.email || '',
-        website_url: storeData.website_url || '',
-        description: storeData.description || '',
-        default_markup_percent: storeData.default_markup_percent || 30,
-        waste_reduction_target_percent: storeData.waste_reduction_target_percent || 25,
-      })
+  // Helper function to reset form with store data and clear unsaved changes
+  const resetFormAndState = (clearUnsavedChanges: boolean = true) => {
+    if (!storeData) return
+
+    form.reset({
+      store_name: storeData.store_name || '',
+      business_name: storeData.business_name || '',
+      store_code: storeData.store_code || '',
+      store_type: storeData.store_type || null,
+      size_category: storeData.size_category || null,
+      address: storeData.address || '',
+      city: storeData.city || '',
+      postal_code: storeData.postal_code || '',
+      country: storeData.country || DEFAULT_STORE_VALUES.COUNTRY,
+      phone: storeData.phone || '',
+      email: storeData.email || '',
+      website_url: storeData.website_url || '',
+      description: storeData.description || '',
+      default_markup_percent:
+        storeData.default_markup_percent || DEFAULT_STORE_VALUES.MARKUP_PERCENT,
+      waste_reduction_target_percent:
+        storeData.waste_reduction_target_percent || DEFAULT_STORE_VALUES.WASTE_REDUCTION_TARGET,
+    })
+
+    if (clearUnsavedChanges) {
       setHasUnsavedChanges(false)
     }
-  }, [storeData, form])
+  }
 
-  // Watch for form changes
+  useEffect(() => {
+    if (storeData) {
+      resetFormAndState()
+    }
+  }, [storeData])
+
+  // Optimize form watching to only track when editing starts
   useEffect(() => {
     if (!isEditing) return
 
+    // Only set hasUnsavedChanges to true once when any field changes
+    let hasSetUnsavedChanges = false
     const subscription = form.watch(() => {
-      setHasUnsavedChanges(true)
+      if (!hasSetUnsavedChanges) {
+        setHasUnsavedChanges(true)
+        hasSetUnsavedChanges = true
+      }
     })
     return () => subscription.unsubscribe()
-  }, [form, isEditing])
+  }, [isEditing]) // Removed form from dependencies as it's stable
 
   const handleSave = async (data: StoreInfoFormData) => {
     try {
-      // Clean up empty strings and convert to null for database
       const cleanedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [key, value === '' ? null : value]),
       )
@@ -233,32 +248,21 @@ export default function StoreInformation({
       setIsEditing(false)
       setHasUnsavedChanges(false)
     } catch (error) {
-      console.error('Failed to save store information:', error)
+      // Report error with context
+      reportError(error instanceof Error ? error : new Error('Failed to save store information'), {
+        context: {
+          action: 'updateStoreInfo',
+          storeId: effectiveStoreId,
+          changedFields: Object.keys(data),
+        },
+        severity: 'medium',
+      })
     }
   }
 
   const handleCancel = () => {
-    if (storeData) {
-      form.reset({
-        store_name: storeData.store_name || '',
-        business_name: storeData.business_name || '',
-        store_code: storeData.store_code || '',
-        store_type: storeData.store_type || null,
-        size_category: storeData.size_category || null,
-        address: storeData.address || '',
-        city: storeData.city || '',
-        postal_code: storeData.postal_code || '',
-        country: storeData.country || 'France',
-        phone: storeData.phone || '',
-        email: storeData.email || '',
-        website_url: storeData.website_url || '',
-        description: storeData.description || '',
-        default_markup_percent: storeData.default_markup_percent || 30,
-        waste_reduction_target_percent: storeData.waste_reduction_target_percent || 25,
-      })
-    }
+    resetFormAndState()
     setIsEditing(false)
-    setHasUnsavedChanges(false)
   }
 
   const createSkeletonKeys = (count: number, prefix: string) =>
@@ -266,7 +270,6 @@ export default function StoreInformation({
 
   const skeletonCards = createSkeletonKeys(8, 'field')
 
-  // Only show loading when we don't have an effective storeId OR data is loading
   if (isLoading) {
     return (
       <Card>
@@ -293,7 +296,6 @@ export default function StoreInformation({
     )
   }
 
-  // Show error if data fetch failed
   if (error) {
     return (
       <Card>
@@ -307,31 +309,40 @@ export default function StoreInformation({
     )
   }
 
-  // If no store data is found we need to ask the user to create a store
   if (!storeData) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          {userData?.requires_pin && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Store data not found. Please contact your administrator to create a store.
-              </AlertDescription>
-            </Alert>
-          )}
-          {!userData?.requires_pin && (
-            <div className="flex flex-col items-center gap-2 justify-center">
-              <Typography variant="p" className="text-center">
-                You don&apos;t have a store yet.
-              </Typography>
-              <Button variant="subtleSecondary">
-                <Link href="/dashboard/settings/add-store">{t('storeInformation.addStore')}</Link>
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <>
+        <Card>
+          <CardContent className="p-6">
+            {userData?.requires_pin && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Store data not found. Please contact your administrator to create a store.
+                </AlertDescription>
+              </Alert>
+            )}
+            {!userData?.requires_pin && (
+              <div className="flex flex-col items-center gap-2 justify-center">
+                <Typography variant="p" className="text-center">
+                  You don&apos;t have a store yet.
+                </Typography>
+                <Button variant="subtleSecondary" onClick={() => setIsAddStoreOpen(true)}>
+                  {t('storeInformation.addStore')}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <BottomSheet
+          isOpen={isAddStoreOpen}
+          variant="fullHeight"
+          onClose={() => setIsAddStoreOpen(false)}
+          title={t('storeInformation.addStore')}
+        >
+          <AddStoreFlow />
+        </BottomSheet>
+      </>
     )
   }
 

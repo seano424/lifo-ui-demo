@@ -815,5 +815,34 @@
       },
       "footer": "🚀 Geoptimaliseerd voor maximale snelheid met behoud van data-integriteit"
     }
+  },
+  "store": {
+    "creation": {
+      "success": {
+        "title": "Winkel succesvol aangemaakt!",
+        "description": "Uw winkel \"{storeName}\" is aangemaakt en klaar voor gebruik.",
+        "whatsNext": {
+          "title": "Wat nu?",
+          "steps": {
+            "configure": {
+              "title": "Configureer uw winkelinstellingen",
+              "description": "Stel meldingen, integraties en teamrechten in."
+            },
+            "inventory": {
+              "title": "Voeg uw eerste producten toe",
+              "description": "Upload uw inventaris via CSV of scan producten handmatig."
+            },
+            "team": {
+              "title": "Nodig teamleden uit",
+              "description": "Voeg collega's toe om te helpen bij het beheren van uw winkelinventaris."
+            }
+          }
+        },
+        "actions": {
+          "goToSettings": "Ga naar winkelinstellingen",
+          "goToDashboard": "Ga naar dashboard"
+        }
+      }
+    }
   }
 }

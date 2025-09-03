@@ -42,10 +42,7 @@ export function TeamSwitcher() {
           <SidebarMenuItem>
             <SidebarMenuButton
               disabled
-              className={cn(
-                'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 rounded-lg border',
-                'group-data-[state=collapsed]:border-none',
-              )}
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 rounded-lg border group-data-[state=collapsed]:border-none"
             >
               <div className="flex flex-col gap-1">
                 <Skeleton className="h-5 w-32 rounded bg-muted" />
@@ -64,10 +61,7 @@ export function TeamSwitcher() {
           <SidebarMenuItem>
             <SidebarMenuButton
               disabled
-              className={cn(
-                'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 py-8 px-4 rounded-lg border',
-                'group-data-[state=collapsed]:border-none',
-              )}
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 py-2 rounded-lg border group-data-[state=collapsed]:border-none"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted" />

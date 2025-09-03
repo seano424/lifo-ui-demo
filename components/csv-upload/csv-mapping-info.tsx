@@ -148,7 +148,7 @@ export function CSVMappingInfo() {
             Category-Based Shelf Life ({CATEGORY_DEFAULTS.length} categories)
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               {CATEGORY_DEFAULTS.map(item => (
                 <div
                   key={item.category}

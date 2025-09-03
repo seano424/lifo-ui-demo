@@ -53,6 +53,7 @@ export type AddStoreStore = AddStoreData & {
   // Current step
   currentStep: number
   setCurrentStep: (step: number) => void
+  initializeForGooglePlaces: (hasGooglePlaces: boolean) => void
 
   // Helper methods
   convertFormDataToInsert: (formData: StoreFormData, storeCode: string) => StoreInsert
@@ -83,6 +84,12 @@ export const useAddStoreStore = create<AddStoreStore>()(
       setError: error => set({ error }),
       setCurrentStep: step => set({ currentStep: step }),
       reset: () => set({ ...initialState, currentStep: 1 }),
+      initializeForGooglePlaces: (hasGooglePlaces: boolean) =>
+        set({
+          ...initialState,
+          currentStep: 1,
+          isManualEntry: !hasGooglePlaces,
+        }),
 
       // Helper method to convert form data to database insert format
       convertFormDataToInsert: (formData: StoreFormData, storeCode: string): StoreInsert => ({

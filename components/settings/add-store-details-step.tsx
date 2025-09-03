@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -21,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
+import { STORE_FLOW_STEPS } from '@/lib/constants/store-flow'
 import {
   STORE_TYPE_LABELS,
   STORE_TYPES,
@@ -28,6 +28,8 @@ import {
   storeFormSchema,
 } from '@/lib/schemas/store-schemas'
 import { useAddStoreStore } from '@/lib/stores/add-store-store'
+import { coerceToString } from '@/lib/utils/form-utils'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 // Type guard for store_type
 function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {
@@ -80,12 +82,12 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
   }
 
   const handleBack = () => {
-    setCurrentStep(1)
+    setCurrentStep(STORE_FLOW_STEPS.SEARCH)
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-2">
+    <div className="mx-auto">
+      <div className="flex flex-col gap-2 mb-6">
         <Typography variant="h1">
           {isManualEntry ? 'Add Store Details' : 'Complete Store Information'}
         </Typography>
@@ -96,29 +98,72 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
         </Typography>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Store Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField<StoreFormData>
+              control={form.control}
+              name="store_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Store Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Your Store Name"
+                      {...field}
+                      value={coerceToString(field.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField<StoreFormData>
+              control={form.control}
+              name="business_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Name (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="If different from store name"
+                      {...field}
+                      value={coerceToString(field.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField<StoreFormData>
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="123 Rue de la Paix"
+                      {...field}
+                      value={coerceToString(field.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
               <FormField<StoreFormData>
                 control={form.control}
-                name="store_name"
+                name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Store Name</FormLabel>
+                    <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Your Store Name"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
+                      <Input placeholder="Paris" {...field} value={coerceToString(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -127,122 +172,20 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
 
               <FormField<StoreFormData>
                 control={form.control}
-                name="store_type"
+                name="postal_code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Store Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={typeof field.value === 'string' ? field.value : undefined}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select store type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(STORE_TYPE_LABELS).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField<StoreFormData>
-                control={form.control}
-                name="business_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Name (Optional)</FormLabel>
+                    <FormLabel>Postal Code</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="If different from store name"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
+                      <Input placeholder="75001" {...field} value={coerceToString(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
 
-              <FormField<StoreFormData>
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="123 Rue de la Paix"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField<StoreFormData>
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>City</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Paris"
-                          {...field}
-                          value={
-                            typeof field.value === 'string' || typeof field.value === 'number'
-                              ? field.value
-                              : ''
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField<StoreFormData>
-                  control={form.control}
-                  name="postal_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Postal Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="75001"
-                          {...field}
-                          value={
-                            typeof field.value === 'string' || typeof field.value === 'number'
-                              ? field.value
-                              : ''
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
+            <div className="grid grid-cols-2 gap-4">
               <FormField<StoreFormData>
                 control={form.control}
                 name="country"
@@ -250,15 +193,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="France"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
+                      <Input placeholder="France" {...field} value={coerceToString(field.value)} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -274,30 +209,56 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                       <Input
                         placeholder="01 23 45 67 89"
                         {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
+                        value={coerceToString(field.value)}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
 
-              <div className="flex gap-3 pt-4">
+            <FormField<StoreFormData>
+              control={form.control}
+              name="store_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Store Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={typeof field.value === 'string' ? field.value : undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select store type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(STORE_TYPE_LABELS).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex gap-3 pt-4">
+              {isGooglePlacesEnabled() && (
                 <Button type="button" variant="outline" onClick={handleBack} className="w-full">
                   Back
                 </Button>
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? 'Creating Store...' : 'Create Store'}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+              )}
+              <Button type="submit" className="w-full mx-auto font-bold" disabled={isSubmitting}>
+                {isSubmitting ? 'Creating Store...' : 'Create Store'}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     </div>
   )
 }

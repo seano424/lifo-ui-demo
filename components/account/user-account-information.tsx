@@ -363,39 +363,45 @@ export default function UserAccountInformation() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex gap-2">
+              <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.accountStatus')}</Typography>
-                <Typography variant="p">
-                  {user.is_active ? t('status.active') : t('status.inactive')}
-                </Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p">
+                    {user.is_active ? t('status.active') : t('status.inactive')}
+                  </Typography>
+                  <div
+                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}
+                  />
+                </div>
               </div>
-              <div
-                className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}
-              />
             </div>
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex gap-2">
+              <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.emailVerified')}</Typography>
-                <Typography variant="p">
-                  {user.email_verified ? t('status.verified') : t('status.unverified')}
-                </Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p">
+                    {user.email_verified ? t('status.verified') : t('status.unverified')}
+                  </Typography>
+                  <div
+                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                  />
+                </div>
               </div>
-              <div
-                className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
-              />
             </div>
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex gap-2">
+              <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.phoneVerified')}</Typography>
-                <Typography variant="p">
-                  {user.phone_verified ? t('status.verified') : t('status.unverified')}
-                </Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p">
+                    {user.phone_verified ? t('status.verified') : t('status.unverified')}
+                  </Typography>
+                  <div
+                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                  />
+                </div>
               </div>
-              <div
-                className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
-              />
             </div>
           </div>
         </div>
