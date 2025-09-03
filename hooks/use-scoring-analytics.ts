@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { getMetricsService } from '@/lib/services/metrics'
 import { useScoringThresholds } from './use-scoring-thresholds'
 
 // TypeScript interfaces for existing API responses
@@ -141,14 +142,56 @@ export function useScoringAlerts(
       if (urgencyLevel) params.append('urgency', urgencyLevel)
       if (category) params.append('category', category)
 
-      const response = await fetch(`/api/alerts?${params}`)
-      if (!response.ok) {
-        throw new Error(`Failed to fetch alerts: ${response.statusText}`)
+      const metrics = getMetricsService()
+      const endpoint = `alerts_${storeId}_${urgencyLevel || 'all'}_${category || 'all'}`
+
+      // Check circuit breaker
+      if (!metrics.shouldAllowRequest(endpoint)) {
+        throw new Error(`Circuit breaker open for alerts endpoint`)
       }
-      return response.json()
+
+      const startTime = Date.now()
+
+      try {
+        const response = await fetch(`/api/alerts?${params}`)
+        const duration = Date.now() - startTime
+
+        if (!response.ok) {
+          metrics.recordRequest(endpoint, duration, 'error', response.status)
+          throw new Error(`Failed to fetch alerts: ${response.statusText}`)
+        }
+
+        metrics.recordRequest(endpoint, duration, 'success', response.status)
+        const data = await response.json()
+        return data
+      } catch (error) {
+        const duration = Date.now() - startTime
+        const isTimeout = duration >= 10000
+
+        metrics.recordRequest(
+          endpoint,
+          duration,
+          isTimeout ? 'timeout' : 'error',
+          undefined,
+          error instanceof Error ? error.message : 'Unknown error',
+        )
+
+        throw error
+      }
     },
     enabled: !!storeId,
-    retry: 1,
+    retry: (failureCount, error) => {
+      const metrics = getMetricsService()
+      const endpoint = `alerts_${storeId}_${urgencyLevel || 'all'}_${category || 'all'}`
+
+      // Don't retry if circuit breaker is open
+      if (!metrics.shouldAllowRequest(endpoint)) {
+        return false
+      }
+
+      // Only retry once for non-timeout errors
+      return failureCount < 1 && !(error instanceof Error && error.message.includes('timeout'))
+    },
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: false, // Don't refetch if we have cached data
@@ -194,14 +237,56 @@ export function useStoreAnalytics(
 
       if (metric) params.append('metric', metric)
 
-      const response = await fetch(`/api/analytics?${params}`)
-      if (!response.ok) {
-        throw new Error(`Failed to fetch analytics: ${response.statusText}`)
+      const metrics = getMetricsService()
+      const endpoint = `analytics_${storeId}_${timeframe}_${metric || 'all'}`
+
+      // Check circuit breaker
+      if (!metrics.shouldAllowRequest(endpoint)) {
+        throw new Error(`Circuit breaker open for analytics endpoint`)
       }
-      return response.json()
+
+      const startTime = Date.now()
+
+      try {
+        const response = await fetch(`/api/analytics?${params}`)
+        const duration = Date.now() - startTime
+
+        if (!response.ok) {
+          metrics.recordRequest(endpoint, duration, 'error', response.status)
+          throw new Error(`Failed to fetch analytics: ${response.statusText}`)
+        }
+
+        metrics.recordRequest(endpoint, duration, 'success', response.status)
+        const data = await response.json()
+        return data
+      } catch (error) {
+        const duration = Date.now() - startTime
+        const isTimeout = duration >= 10000
+
+        metrics.recordRequest(
+          endpoint,
+          duration,
+          isTimeout ? 'timeout' : 'error',
+          undefined,
+          error instanceof Error ? error.message : 'Unknown error',
+        )
+
+        throw error
+      }
     },
     enabled: !!storeId,
-    retry: 1,
+    retry: (failureCount, error) => {
+      const metrics = getMetricsService()
+      const endpoint = `analytics_${storeId}_${timeframe}_${metric || 'all'}`
+
+      // Don't retry if circuit breaker is open
+      if (!metrics.shouldAllowRequest(endpoint)) {
+        return false
+      }
+
+      // Only retry once for non-timeout errors
+      return failureCount < 1 && !(error instanceof Error && error.message.includes('timeout'))
+    },
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnMount: false, // Don't refetch if we have cached data
@@ -242,13 +327,41 @@ export async function fetchScoringAlerts(
     threshold: threshold.toString(),
   })
 
-  const response = await fetch(`/api/alerts?${params}`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch alerts: ${response.statusText}`)
+  const metrics = getMetricsService()
+  const endpoint = `alerts_${storeId}_direct`
+
+  if (!metrics.shouldAllowRequest(endpoint)) {
+    throw new Error(`Circuit breaker open for alerts endpoint`)
   }
 
-  const data = await response.json()
-  return data.alerts
+  const startTime = Date.now()
+
+  try {
+    const response = await fetch(`/api/alerts?${params}`)
+    const duration = Date.now() - startTime
+
+    if (!response.ok) {
+      metrics.recordRequest(endpoint, duration, 'error', response.status)
+      throw new Error(`Failed to fetch alerts: ${response.statusText}`)
+    }
+
+    metrics.recordRequest(endpoint, duration, 'success', response.status)
+    const data = await response.json()
+    return data.alerts
+  } catch (error) {
+    const duration = Date.now() - startTime
+    const isTimeout = duration >= 10000
+
+    metrics.recordRequest(
+      endpoint,
+      duration,
+      isTimeout ? 'timeout' : 'error',
+      undefined,
+      error instanceof Error ? error.message : 'Unknown error',
+    )
+
+    throw error
+  }
 }
 
 export async function fetchStoreAnalytics(
@@ -266,10 +379,38 @@ export async function fetchStoreAnalytics(
     params.append('threshold', thresholdOverride.toString())
   }
 
-  const response = await fetch(`/api/analytics?${params}`)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch analytics: ${response.statusText}`)
+  const metrics = getMetricsService()
+  const endpoint = `analytics_${storeId}_${timeframe}_direct`
+
+  if (!metrics.shouldAllowRequest(endpoint)) {
+    throw new Error(`Circuit breaker open for analytics endpoint`)
   }
 
-  return response.json()
+  const startTime = Date.now()
+
+  try {
+    const response = await fetch(`/api/analytics?${params}`)
+    const duration = Date.now() - startTime
+
+    if (!response.ok) {
+      metrics.recordRequest(endpoint, duration, 'error', response.status)
+      throw new Error(`Failed to fetch analytics: ${response.statusText}`)
+    }
+
+    metrics.recordRequest(endpoint, duration, 'success', response.status)
+    return response.json()
+  } catch (error) {
+    const duration = Date.now() - startTime
+    const isTimeout = duration >= 10000
+
+    metrics.recordRequest(
+      endpoint,
+      duration,
+      isTimeout ? 'timeout' : 'error',
+      undefined,
+      error instanceof Error ? error.message : 'Unknown error',
+    )
+
+    throw error
+  }
 }

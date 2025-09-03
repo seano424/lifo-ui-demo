@@ -82,35 +82,6 @@ export class FastAPIClient {
   }
 
   /**
-   * Retry mechanism for critical operations
-   */
-  private async withRetry<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    retries: number = this.maxRetries,
-  ): Promise<T> {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        return await operation()
-      } catch (error) {
-        if (attempt === retries) {
-          throw this.handleFetchError(error, operationName)
-        }
-
-        // Exponential backoff: wait 200ms, then 400ms
-        const delay = 200 * 2 ** attempt
-        if (process.env.NODE_ENV === 'development') {
-          console.log(
-            `[FastAPI] ${operationName} attempt ${attempt + 1} failed, retrying in ${delay}ms...`,
-          )
-        }
-        await new Promise(resolve => setTimeout(resolve, delay))
-      }
-    }
-    throw new Error(`${operationName} failed after ${retries + 1} attempts`)
-  }
-
-  /**
    * Get store alerts from FastAPI backend
    */
   async getStoreAlerts(

@@ -14,6 +14,11 @@ interface ScoringData {
   urgency_level?: string
 }
 
+interface AIRecommendation {
+  category?: string
+  priority?: string
+}
+
 interface AlertData {
   batch_id: string
   batch_number: string
@@ -245,10 +250,13 @@ export async function GET(request: NextRequest) {
                 ? {
                     total_recommendations: recommendations.length,
                     categories_recommended: [
-                      ...new Set(recommendations.map((r: any) => r.category).filter(Boolean)),
+                      ...new Set(
+                        recommendations.map((r: AIRecommendation) => r.category).filter(Boolean),
+                      ),
                     ].length,
-                    priority_actions: recommendations.filter((r: any) => r.priority === 'high')
-                      .length,
+                    priority_actions: recommendations.filter(
+                      (r: AIRecommendation) => r.priority === 'high',
+                    ).length,
                   }
                 : undefined,
           }
