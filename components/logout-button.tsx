@@ -1,8 +1,8 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 
@@ -33,10 +33,10 @@ export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps)
   const logout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    
+
     // Clear all cached query data to prevent data leakage between users
     queryClient.clear()
-    
+
     router.push('/auth/login')
   }
 
