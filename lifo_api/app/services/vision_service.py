@@ -250,7 +250,7 @@ class GoogleVisionService:
             # Execute request in thread pool to avoid blocking
             if not self.client:
                 raise RuntimeError("Google Vision client not initialized")
-            
+
             response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: self.client.annotate_image(request)
             )
@@ -349,7 +349,7 @@ class GoogleVisionService:
 
             if not self.client:
                 raise RuntimeError("Google Vision client not initialized")
-                
+
             response = await asyncio.get_event_loop().run_in_executor(
                 None, lambda: self.client.annotate_image(barcode_request)
             )

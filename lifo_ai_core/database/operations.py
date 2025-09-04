@@ -67,31 +67,31 @@ except ImportError:
     class FallbackLogger:
         def __init__(self, name: str):
             self._logger = logging.getLogger(name)
-        
+
         def debug(self, msg: str, **kwargs: Any) -> None:
-            if hasattr(self._logger, 'debug'):
+            if hasattr(self._logger, "debug"):
                 self._logger.debug(msg)
             else:
                 print(f"DEBUG: {msg}")
-        
+
         def info(self, msg: str, **kwargs: Any) -> None:
-            if hasattr(self._logger, 'info'):
+            if hasattr(self._logger, "info"):
                 self._logger.info(msg)
             else:
                 print(f"INFO: {msg}")
-        
+
         def warning(self, msg: str, **kwargs: Any) -> None:
-            if hasattr(self._logger, 'warning'):
+            if hasattr(self._logger, "warning"):
                 self._logger.warning(msg)
             else:
                 print(f"WARNING: {msg}")
-        
+
         def error(self, msg: str, **kwargs: Any) -> None:
-            if hasattr(self._logger, 'error'):
+            if hasattr(self._logger, "error"):
                 self._logger.error(msg)
             else:
                 print(f"ERROR: {msg}")
-    
+
     logger = FallbackLogger("lifo_ai_core.database")  # type: ignore
 
 # Type aliases for better readability
@@ -1153,7 +1153,7 @@ class InventoryOperations:
 
             result = await self.session.execute(query, value_params)
 
-            updated_count = result.rowcount if hasattr(result, 'rowcount') else 0
+            updated_count = result.rowcount if hasattr(result, "rowcount") else 0
 
             self.logger.info(
                 "Batch quantity update completed (SECURE)",

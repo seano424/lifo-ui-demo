@@ -386,7 +386,8 @@ class ErrorTracker:
         """Get error summary for the last N hours"""
         cutoff = datetime.utcnow() - timedelta(hours=hours)
         recent_errors = [
-            e for e in self.error_history 
+            e
+            for e in self.error_history
             if datetime.fromisoformat(e["timestamp"]) > cutoff
         ]
 

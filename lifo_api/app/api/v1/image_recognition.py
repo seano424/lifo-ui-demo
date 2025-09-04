@@ -301,7 +301,6 @@ async def _analyze_with_vision_api(
     confidence_threshold: float,
 ) -> dict[str, Any]:
     """Analyze image using real Google Vision API"""
-    import asyncio
     import time
 
     start_time = time.time()

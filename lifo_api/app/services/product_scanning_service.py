@@ -994,7 +994,12 @@ class ProductScanningService:
                 )
 
         # Sort by relevance score
-        candidates.sort(key=lambda x: float(x["score"]) if isinstance(x["score"], (int, float, str)) else 0.0, reverse=True)
+        candidates.sort(
+            key=lambda x: float(x["score"])
+            if isinstance(x["score"], int | float | str)
+            else 0.0,
+            reverse=True,
+        )
         return candidates
 
     def _calculate_name_relevance_score(self, block: str) -> float:
