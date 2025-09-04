@@ -82,9 +82,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     setSelectedFile(file)
 
     try {
-      const _startTime = performance.now()
       await previewCsvFile(file)
-      const _endTime = performance.now()
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
       toast.error(t('errors.analysisFailure'))
@@ -106,11 +104,39 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       upload({
         file: selectedFile,
         storeId,
-        csvData: csvPreview, // Send the modified CSV data with individual expiry dates
+        csvData: csvPreview,
       })
     } catch (error) {
       console.error('CSV upload failed:', error)
-      toast.error(t('errors.startFailed'))
+
+      // Provide more specific error feedback to user
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+      if (
+        errorMessage.toLowerCase().includes('network') ||
+        errorMessage.toLowerCase().includes('fetch')
+      ) {
+        toast.error(t('errors.analysisFailure')) // Reuse existing key
+      } else if (errorMessage.toLowerCase().includes('timeout')) {
+        toast.error(`${t('errors.startFailed')}: Request timeout`)
+      } else if (
+        errorMessage.toLowerCase().includes('invalid') ||
+        errorMessage.toLowerCase().includes('malformed')
+      ) {
+        toast.error(t('errors.invalidFile')) // Reuse existing key
+      } else if (
+        errorMessage.toLowerCase().includes('too large') ||
+        errorMessage.toLowerCase().includes('size')
+      ) {
+        toast.error(t('errors.invalidFile')) // Reuse existing key
+      } else {
+        // For development, show specific error; for production, be more generic
+        const userMessage =
+          process.env.NODE_ENV === 'development'
+            ? `${t('errors.startFailed')}: ${errorMessage}`
+            : t('errors.startFailed')
+        toast.error(userMessage)
+      }
     }
   }
 
