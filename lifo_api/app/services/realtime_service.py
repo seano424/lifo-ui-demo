@@ -110,7 +110,7 @@ class RealtimeService:
                 "batch_id": update.batch_id,
                 "data": update.data,
                 "priority": update.priority,
-                "timestamp": update.timestamp.isoformat(),
+                "timestamp": update.timestamp,
             }
 
             # In actual implementation, this would use Supabase client
@@ -258,7 +258,7 @@ class RealtimeService:
         self.update_queue = self.update_queue[max_batch_size:]
 
         # Group by store for efficient processing
-        store_updates = {}
+        store_updates: dict[str, list] = {}
         for update in batch:
             store_id = update.store_id
             if store_id not in store_updates:

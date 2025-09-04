@@ -92,11 +92,11 @@ class SecurityMonitor:
 
         # IP-based tracking
         self.ip_events = defaultdict(lambda: deque(maxlen=100))  # Events per IP
-        self.ip_risk_scores = defaultdict(int)  # Risk score per IP
+        self.ip_risk_scores: dict[str, int] = defaultdict(int)  # Risk score per IP
         self.ip_first_seen = {}  # First time seeing each IP
 
         # Pattern detection
-        self.attack_patterns = defaultdict(int)  # Attack pattern counts
+        self.attack_patterns: dict[str, int] = defaultdict(int)  # Attack pattern counts
         self.endpoint_access_patterns = defaultdict(
             lambda: defaultdict(int)
         )  # IP -> endpoint -> count
@@ -432,15 +432,15 @@ class SecurityMonitor:
             ]
 
             # Event type breakdown
-            event_type_counts = defaultdict(int)
-            severity_counts = defaultdict(int)
+            event_type_counts: dict[str, int] = defaultdict(int)
+            severity_counts: dict[str, int] = defaultdict(int)
 
             for event in last_24h:
                 event_type_counts[event.event_type] += 1
                 severity_counts[event.severity] += 1
 
             # Top attacking IPs
-            ip_event_counts = defaultdict(int)
+            ip_event_counts: dict[str, int] = defaultdict(int)
             for event in last_24h:
                 ip_event_counts[event.client_ip] += 1
 
@@ -476,8 +476,8 @@ class SecurityMonitor:
             first_seen = self.ip_first_seen.get(client_ip)
 
             # Event breakdown
-            event_types = defaultdict(int)
-            severities = defaultdict(int)
+            event_types: dict[str, int] = defaultdict(int)
+            severities: dict[str, int] = defaultdict(int)
 
             for event in ip_events:
                 event_types[event.event_type] += 1

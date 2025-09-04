@@ -38,7 +38,7 @@ class TestResult:
     """Container for test results"""
 
     def __init__(
-        self, name: str, passed: bool, message: str = "", details: dict = None
+        self, name: str, passed: bool, message: str = "", details: dict | None = None
     ):
         self.name = name
         self.passed = passed
@@ -56,10 +56,10 @@ class CSVTestSuite:
         self.headers = {"Authorization": f"Bearer {jwt_token}"}
         self.session = requests.Session()
         self.session.headers.update(self.headers)
-        self.results = []
+        self.results: list[TestResult] = []
 
     def log_test(
-        self, name: str, passed: bool, message: str = "", details: dict = None
+        self, name: str, passed: bool, message: str = "", details: dict | None = None
     ):
         """Log test result"""
         result = TestResult(name, passed, message, details)

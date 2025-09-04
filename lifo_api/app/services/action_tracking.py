@@ -72,20 +72,20 @@ class ActionTrackingService:
             raise ValueError(f"Action record not found: {action_id}")
 
         # Update with actual action taken
-        action_record.actual_action = actual_action
-        action_record.performed_by = uuid.UUID(user_id)
-        action_record.action_date = datetime.utcnow()
+        action_record.actual_action = actual_action  # type: ignore
+        action_record.performed_by = uuid.UUID(user_id)  # type: ignore
+        action_record.action_date = datetime.utcnow()  # type: ignore
 
         if quantity_affected is not None:
-            action_record.quantity_affected = Decimal(str(quantity_affected))
+            action_record.quantity_affected = Decimal(str(quantity_affected))  # type: ignore
         if original_value is not None:
-            action_record.original_value = Decimal(str(original_value))
+            action_record.original_value = Decimal(str(original_value))  # type: ignore
         if recovered_value is not None:
-            action_record.recovered_value = Decimal(str(recovered_value))
+            action_record.recovered_value = Decimal(str(recovered_value))  # type: ignore
         if notes:
-            action_record.notes = notes
+            action_record.notes = notes  # type: ignore
         if donation_recipient_id:
-            action_record.donation_recipient_id = uuid.UUID(donation_recipient_id)
+            action_record.donation_recipient_id = uuid.UUID(donation_recipient_id)  # type: ignore
 
         await self.db.commit()
         await self.db.refresh(action_record)

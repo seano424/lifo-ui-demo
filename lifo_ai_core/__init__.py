@@ -22,13 +22,13 @@ from .etl.processor import CSVProcessor
 try:
     from .etl.unified_csv_processor import UnifiedCSVProcessor
 except ImportError:
-    UnifiedCSVProcessor = None
+    UnifiedCSVProcessor = None  # type: ignore
 
 try:
     from .database.operations import InventoryOperations, create_inventory_operations
 except ImportError:
-    InventoryOperations = None
-    create_inventory_operations = None
+    InventoryOperations = None  # type: ignore
+    create_inventory_operations = None  # type: ignore
 
 try:
     from .utils.logger import StructuredLogger, get_logger
@@ -36,10 +36,10 @@ except ImportError:
     # Fallback logger
     import logging
 
-    def get_logger(name: str = __name__):
-        return logging.getLogger(name)
+    def get_logger(service_name: str = "lifo_ai_core", log_level: str = "INFO"):  # type: ignore[misc]
+        return logging.getLogger(service_name)
 
-    StructuredLogger = None
+    StructuredLogger = None  # type: ignore
 
 __all__ = [
     "CSVProcessor",
@@ -49,9 +49,9 @@ __all__ = [
 ]
 
 # Add optional exports if available
-if UnifiedCSVProcessor:
+if UnifiedCSVProcessor is not None:
     __all__.append("UnifiedCSVProcessor")
-if InventoryOperations:
+if InventoryOperations is not None:
     __all__.extend(["InventoryOperations", "create_inventory_operations"])
-if StructuredLogger:
+if StructuredLogger is not None:
     __all__.append("StructuredLogger")

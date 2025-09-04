@@ -294,9 +294,7 @@ async def get_scan_batch_stats(
     try:
         from sqlalchemy import text
 
-        from app.core.database import get_database
-
-        db = get_database()
+        from app.core.database import get_database_session
 
         query = text("""
             SELECT
@@ -324,7 +322,8 @@ async def get_scan_batch_stats(
             AND b.created_at >= NOW() - INTERVAL '30 days'
         """)
 
-        async with db.get_session() as session:
+        session = await get_database_session()
+        try:
             result = await session.execute(
                 query, {"store_id": store_id, "user_id": current_user.user_id}
             )
@@ -377,6 +376,8 @@ async def get_scan_batch_stats(
                 else None,
                 "generated_at": __import__("datetime").datetime.utcnow().isoformat(),
             }
+        finally:
+            await session.close()
 
     except HTTPException:
         raise

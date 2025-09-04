@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Check, Edit, Globe, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -189,39 +189,42 @@ export default function StoreInformation({
   })
 
   // Helper function to reset form with store data and clear unsaved changes
-  const resetFormAndState = (clearUnsavedChanges: boolean = true) => {
-    if (!storeData) return
+  const resetFormAndState = useCallback(
+    (clearUnsavedChanges: boolean = true) => {
+      if (!storeData) return
 
-    form.reset({
-      store_name: storeData.store_name || '',
-      business_name: storeData.business_name || '',
-      store_code: storeData.store_code || '',
-      store_type: storeData.store_type || null,
-      size_category: storeData.size_category || null,
-      address: storeData.address || '',
-      city: storeData.city || '',
-      postal_code: storeData.postal_code || '',
-      country: storeData.country || DEFAULT_STORE_VALUES.COUNTRY,
-      phone: storeData.phone || '',
-      email: storeData.email || '',
-      website_url: storeData.website_url || '',
-      description: storeData.description || '',
-      default_markup_percent:
-        storeData.default_markup_percent || DEFAULT_STORE_VALUES.MARKUP_PERCENT,
-      waste_reduction_target_percent:
-        storeData.waste_reduction_target_percent || DEFAULT_STORE_VALUES.WASTE_REDUCTION_TARGET,
-    })
+      form.reset({
+        store_name: storeData.store_name || '',
+        business_name: storeData.business_name || '',
+        store_code: storeData.store_code || '',
+        store_type: storeData.store_type || null,
+        size_category: storeData.size_category || null,
+        address: storeData.address || '',
+        city: storeData.city || '',
+        postal_code: storeData.postal_code || '',
+        country: storeData.country || DEFAULT_STORE_VALUES.COUNTRY,
+        phone: storeData.phone || '',
+        email: storeData.email || '',
+        website_url: storeData.website_url || '',
+        description: storeData.description || '',
+        default_markup_percent:
+          storeData.default_markup_percent || DEFAULT_STORE_VALUES.MARKUP_PERCENT,
+        waste_reduction_target_percent:
+          storeData.waste_reduction_target_percent || DEFAULT_STORE_VALUES.WASTE_REDUCTION_TARGET,
+      })
 
-    if (clearUnsavedChanges) {
-      setHasUnsavedChanges(false)
-    }
-  }
+      if (clearUnsavedChanges) {
+        setHasUnsavedChanges(false)
+      }
+    },
+    [storeData, form],
+  )
 
   useEffect(() => {
     if (storeData) {
       resetFormAndState()
     }
-  }, [storeData])
+  }, [storeData, resetFormAndState])
 
   // Optimize form watching to only track when editing starts
   useEffect(() => {
@@ -236,7 +239,7 @@ export default function StoreInformation({
       }
     })
     return () => subscription.unsubscribe()
-  }, [isEditing]) // Removed form from dependencies as it's stable
+  }, [isEditing, form.watch]) // Removed form from dependencies as it's stable
 
   const handleSave = async (data: StoreInfoFormData) => {
     try {

@@ -3,7 +3,6 @@ import { devtools } from 'zustand/middleware'
 import type { STORE_TYPES } from '@/lib/schemas/store-schemas'
 import {
   getAvailableSteps,
-  getStepIdByIndex,
   getStepIndexById,
   STEP_IDS,
   type StepId,

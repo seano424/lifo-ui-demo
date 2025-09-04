@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client'
  */
 export async function scoreAfterScanInClient(
   storeId: string,
-  batchId: string,
+  _batchId: string,
 ): Promise<{
   attempted: boolean
   success: boolean

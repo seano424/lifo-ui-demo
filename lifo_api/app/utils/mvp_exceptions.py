@@ -25,7 +25,7 @@ class MVPBaseException(Exception):
         message: str,
         error_code: str = "MVP_ERROR",
         status_code: int = 400,
-        user_message: str = None,
+        user_message: str | None = None,
         retry_allowed: bool = True,
         retry_after_seconds: int | None = None,
     ):
@@ -47,7 +47,7 @@ class ScanWorkflowException(MVPBaseException):
         workflow: str,
         error_code: str = "SCAN_ERROR",
         status_code: int = 400,
-        user_message: str = None,
+        user_message: str | None = None,
     ):
         self.workflow = workflow
         user_msg = user_message or f"Scan workflow error: {message}"
@@ -79,7 +79,10 @@ class ValidationException(MVPBaseException):
     """Exception for data validation errors"""
 
     def __init__(
-        self, message: str, field: str = None, validation_errors: list[str] = None
+        self,
+        message: str,
+        field: str | None = None,
+        validation_errors: list[str] | None = None,
     ):
         self.field = field
         self.validation_errors = validation_errors or []
@@ -169,7 +172,7 @@ class DatabaseException(MVPBaseException):
 class ScoringException(MVPBaseException):
     """Exception for AI scoring related errors"""
 
-    def __init__(self, message: str, batch_id: str = None):
+    def __init__(self, message: str, batch_id: str | None = None):
         self.batch_id = batch_id
         super().__init__(
             message=f"Scoring error: {message}",
@@ -184,7 +187,9 @@ class ScoringException(MVPBaseException):
 class CSVProcessingException(MVPBaseException):
     """Exception for CSV processing errors"""
 
-    def __init__(self, message: str, row_number: int = None, field: str = None):
+    def __init__(
+        self, message: str, row_number: int | None = None, field: str | None = None
+    ):
         self.row_number = row_number
         self.field = field
 
@@ -205,7 +210,9 @@ class CSVProcessingException(MVPBaseException):
 
 # Error response formatters
 def create_mobile_error_response(
-    exception: MVPBaseException, request: Request = None, include_debug: bool = False
+    exception: MVPBaseException,
+    request: Request | None = None,
+    include_debug: bool = False,
 ) -> MobileOptimizedError:
     """Create mobile-optimized error response"""
 
@@ -244,7 +251,7 @@ def create_standard_error_response(
     status_code: int,
     message: str,
     error_code: str = "UNKNOWN_ERROR",
-    user_message: str = None,
+    user_message: str | None = None,
 ) -> dict[str, Any]:
     """Create standard error response for non-MVP exceptions"""
 
@@ -353,11 +360,11 @@ class ErrorTracker:
     """Track and monitor errors for MVP analytics"""
 
     def __init__(self):
-        self.error_counts = {}
-        self.error_history = []
+        self.error_counts: dict[str, int] = {}
+        self.error_history: list[dict[str, str]] = []
         self.max_history = 1000
 
-    def record_error(self, error_code: str, endpoint: str, user_id: str = None):
+    def record_error(self, error_code: str, endpoint: str, user_id: str | None = None):
         """Record an error occurrence"""
         key = f"{error_code}:{endpoint}"
         self.error_counts[key] = self.error_counts.get(key, 0) + 1
@@ -366,7 +373,7 @@ class ErrorTracker:
             {
                 "error_code": error_code,
                 "endpoint": endpoint,
-                "user_id": user_id,
+                "user_id": user_id or "",
                 "timestamp": datetime.utcnow().isoformat(),
             }
         )
@@ -378,11 +385,15 @@ class ErrorTracker:
     def get_error_summary(self, hours: int = 24) -> dict[str, Any]:
         """Get error summary for the last N hours"""
         cutoff = datetime.utcnow() - timedelta(hours=hours)
-        recent_errors = [e for e in self.error_history if e["timestamp"] > cutoff]
+        recent_errors = [
+            e
+            for e in self.error_history
+            if datetime.fromisoformat(e["timestamp"]) > cutoff
+        ]
 
         # Count by error code
-        error_counts = {}
-        endpoint_errors = {}
+        error_counts: dict[str, int] = {}
+        endpoint_errors: dict[str, int] = {}
 
         for error in recent_errors:
             error_code = error["error_code"]

@@ -428,7 +428,7 @@ export async function fetchProductsPage(
     if (filters.category) {
       // Debug: Check what categories we actually have
       if (storeProductsData.length > 0) {
-        const categoriesFound = storeProductsData
+        const _categoriesFound = storeProductsData
           .map(sp => ({
             product_id: sp.product_id,
             category_code: sp.products?.categories?.category_code,

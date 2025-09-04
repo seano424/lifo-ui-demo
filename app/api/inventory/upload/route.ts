@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { CSV_PROCESSING } from '@/lib/constants/file-upload'
 import { InventoryOperations } from '@/lib/database/operations'
 import { handleScoringError, scoreAfterCsvUpload } from '@/lib/scoring/batch-scoring-integration'
 import { createClient } from '@/lib/supabase/server'
+import { validateUploadFile } from '@/lib/utils/file-validation'
 
 export async function POST(request: NextRequest) {
   const apiStartTime = Date.now()
@@ -10,12 +12,10 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
 
     // Get authenticated user
-    const authStartTime = Date.now()
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    const authEndTime = Date.now()
 
     if (authError) {
       console.error('❌ [UPLOAD-API] Auth error:', authError)
@@ -27,9 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user authenticated' }, { status: 401 })
     }
 
-    const formDataStartTime = Date.now()
     const formData = await request.formData()
-    const formDataEndTime = Date.now()
 
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
@@ -43,36 +41,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File and store ID required' }, { status: 400 })
     }
 
-    // Validate file
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-      console.error('❌ [UPLOAD-API] Invalid file type:', file.name)
-      return NextResponse.json({ error: 'Invalid file type' }, { status: 400 })
-    }
-
-    const maxFileSize = 10 * 1024 * 1024 // 10MB
-    if (file.size > maxFileSize) {
-      console.error('❌ [UPLOAD-API] File too large:', { size: file.size, maxSize: maxFileSize })
-      return NextResponse.json({ error: 'File too large' }, { status: 400 })
+    // Comprehensive file validation
+    const validation = validateUploadFile(file)
+    if (!validation.isValid) {
+      console.error('❌ [UPLOAD-API] File validation failed:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        error: validation.error,
+      })
+      return NextResponse.json({ error: validation.error }, { status: 400 })
     }
 
     // Fast CSV processing - no Python subprocess overhead
-    const csvReadStartTime = Date.now()
     const csvContent = await file.text()
-    const csvReadEndTime = Date.now()
-
-    const csvParseStartTime = Date.now()
     const csvData = fastParseCSV(csvContent, defaultExpiryDate)
-    const csvParseEndTime = Date.now()
-
-    if (defaultExpiryDate) {
-      const itemsWithDefaultExpiry = csvData.filter(
-        item =>
-          typeof item === 'object' &&
-          item !== null &&
-          'Expiry_Date' in item &&
-          (item as Record<string, unknown>).Expiry_Date === defaultExpiryDate,
-      ).length
-    }
 
     if (csvData.length === 0) {
       console.error('❌ [UPLOAD-API] No valid data found in CSV file')
@@ -82,13 +65,8 @@ export async function POST(request: NextRequest) {
     // Log first few items for debugging
 
     // Use existing proven InventoryOperations.processCsvBatch
-    const operationsCreateStartTime = Date.now()
     const operations = new InventoryOperations(supabase)
-    const operationsCreateEndTime = Date.now()
-
-    const processingStartTime = Date.now()
     const result = await operations.processCsvBatch(csvData, storeId, user.id)
-    const processingEndTime = Date.now()
 
     const totalTime = Date.now() - apiStartTime
 
@@ -235,14 +213,14 @@ function fastParseCSV(csvContent: string, defaultExpiryDate?: string) {
       const item = {
         SKU: values[skuIndex] || `AUTO-${Date.now()}-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
-        Category: values[categoryIndex] || 'dry_goods', // Will be mapped using database function
+        Category: values[categoryIndex] || CSV_PROCESSING.DEFAULT_CATEGORY,
         Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
         Expiry_Date: finalExpiryDate,
         Brand: values[brandIndex] || 'Unknown',
         Cost_Price: parseFloat(values[costIndex] || '0') || 0,
         Selling_Price: parseFloat(values[priceIndex] || '0') || 0,
-        Location: values[locationIndex] || 'MAIN',
-        Unit_Type: values[unitIndex] || 'units',
+        Location: values[locationIndex] || CSV_PROCESSING.DEFAULT_LOCATION,
+        Unit_Type: values[unitIndex] || CSV_PROCESSING.DEFAULT_UNIT_TYPE,
       }
 
       if (item.Product_Name && item.Expiry_Date) {

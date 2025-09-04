@@ -75,7 +75,9 @@ class ProductScanningService:
         self.default_workflow = ScanningWorkflow()
 
         # Date metadata storage
-        self._last_selected_date_metadata = None
+        self._last_selected_date_metadata: (
+            dict[str, dict[str, Any] | int | str] | None
+        ) = None
         self._last_dual_dates = {"expiry_date": None, "manufacture_date": None}
 
     async def scan_product_image(
@@ -727,7 +729,7 @@ class ProductScanningService:
         import re
         from datetime import datetime
 
-        candidate_dates = []
+        candidate_dates: list[dict[str, Any]] = []
 
         if not text_blocks:
             return candidate_dates
@@ -992,7 +994,12 @@ class ProductScanningService:
                 )
 
         # Sort by relevance score
-        candidates.sort(key=lambda x: x["score"], reverse=True)
+        candidates.sort(
+            key=lambda x: float(x["score"])
+            if isinstance(x["score"], int | float | str)
+            else 0.0,
+            reverse=True,
+        )
         return candidates
 
     def _calculate_name_relevance_score(self, block: str) -> float:
@@ -1212,8 +1219,8 @@ class ProductScanningService:
 
         # Take top 8 candidates and try to form a meaningful sequence
         top_candidates = candidates[:8]
-        best_sequence = []
-        current_sequence = []
+        best_sequence: list[str] = []
+        current_sequence: list[str] = []
 
         for candidate in top_candidates:
             if candidate["score"] >= 0.4:  # Only high-confidence blocks
@@ -1267,7 +1274,7 @@ class ProductScanningService:
         return self._last_dual_dates or {
             "expiry_date": None,
             "manufacture_date": None,
-            "metadata": {},
+            "metadata": None,
         }
 
     def _generate_text_suggestions(

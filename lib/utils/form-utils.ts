@@ -24,7 +24,7 @@ export function safeNumberValue(value: unknown): number | undefined {
   if (typeof value === 'number') return value
   if (typeof value === 'string') {
     const parsed = parseFloat(value)
-    return isNaN(parsed) ? undefined : parsed
+    return Number.isNaN(parsed) ? undefined : parsed
   }
   return undefined
 }

@@ -22,6 +22,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { cn } from '@/lib/utils'
+import { validateUploadFile } from '@/lib/utils/file-validation'
 import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
@@ -74,17 +75,17 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleFileSelect = async (file: File) => {
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-      toast.error(t('errors.invalidFile'))
+    // Comprehensive file validation
+    const validation = validateUploadFile(file)
+    if (!validation.isValid) {
+      toast.error(validation.error || t('errors.invalidFile'))
       return
     }
 
     setSelectedFile(file)
 
     try {
-      const startTime = performance.now()
       await previewCsvFile(file)
-      const endTime = performance.now()
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
       toast.error(t('errors.analysisFailure'))
@@ -106,10 +107,45 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       upload({
         file: selectedFile,
         storeId,
-        csvData: csvPreview, // Send the modified CSV data with individual expiry dates
+        csvData: csvPreview,
       })
     } catch (error) {
-      toast.error(t('errors.startFailed'))
+      console.error('CSV upload failed:', error)
+
+      // Error mapping for better user feedback
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const lowerMessage = errorMessage.toLowerCase()
+
+      const errorMappings = [
+        {
+          keywords: ['network', 'fetch'],
+          message: t('errors.analysisFailure'),
+        },
+        {
+          keywords: ['timeout'],
+          message: `${t('errors.startFailed')}: Request timeout`,
+        },
+        {
+          keywords: ['invalid', 'malformed'],
+          message: t('errors.invalidFile'),
+        },
+        {
+          keywords: ['too large', 'size'],
+          message: t('errors.invalidFile'),
+        },
+      ]
+
+      const matchedError = errorMappings.find(mapping =>
+        mapping.keywords.some(keyword => lowerMessage.includes(keyword)),
+      )
+
+      const userMessage =
+        matchedError?.message ||
+        (process.env.NODE_ENV === 'development'
+          ? `${t('errors.startFailed')}: ${errorMessage}`
+          : t('errors.startFailed'))
+
+      toast.error(userMessage)
     }
   }
 

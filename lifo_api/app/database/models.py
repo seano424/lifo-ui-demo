@@ -168,8 +168,10 @@ class Store(Base):
     size_category = Column(String(20))
 
     # Configuration
-    default_markup_percent = Column(NUMERIC(5, 2), default=30.00)
-    waste_reduction_target_percent = Column(NUMERIC(5, 2), default=25.00)
+    default_markup_percent: Column[NUMERIC] = Column(NUMERIC(5, 2), default=30.00)
+    waste_reduction_target_percent: Column[NUMERIC] = Column(
+        NUMERIC(5, 2), default=25.00
+    )
 
     # Ownership & Access
     owner_id = Column(get_uuid_type())
@@ -239,16 +241,16 @@ class StoreSettings(Base):
     scoring_weights = Column(
         get_json_type(), default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
     )
-    critical_threshold = Column(NUMERIC(3, 2), default=0.80)
-    warning_threshold = Column(NUMERIC(3, 2), default=0.60)
+    critical_threshold: Column[NUMERIC] = Column(NUMERIC(3, 2), default=0.80)
+    warning_threshold: Column[NUMERIC] = Column(NUMERIC(3, 2), default=0.60)
     opening_hours = Column(
         get_json_type(), default={"monday": {"open": "08:00", "close": "20:00"}}
     )
     peak_hours = Column(
         get_json_type(), default={"morning": "08:00-10:00", "evening": "17:00-19:00"}
     )
-    weather_location_lat = Column(NUMERIC(10, 8))
-    weather_location_lon = Column(NUMERIC(11, 8))
+    weather_location_lat: Column[NUMERIC] = Column(NUMERIC(10, 8))
+    weather_location_lon: Column[NUMERIC] = Column(NUMERIC(11, 8))
     currency = Column(String(3), default="EUR")
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -285,9 +287,9 @@ class CategoryWeight(Base):
     )
 
     category = Column(String(100), primary_key=True)
-    spoilage_risk_weight = Column(NUMERIC(3, 2), nullable=False)
-    value_impact_weight = Column(NUMERIC(3, 2), nullable=False)
-    turnover_speed_weight = Column(NUMERIC(3, 2), nullable=False)
+    spoilage_risk_weight: Column[NUMERIC] = Column(NUMERIC(3, 2), nullable=False)
+    value_impact_weight: Column[NUMERIC] = Column(NUMERIC(3, 2), nullable=False)
+    turnover_speed_weight: Column[NUMERIC] = Column(NUMERIC(3, 2), nullable=False)
     description = Column(Text)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.now())
@@ -342,10 +344,10 @@ class ProductScore(Base):
     )
 
     # Component scores
-    expiry_score = Column(NUMERIC(3, 2))
-    velocity_score = Column(NUMERIC(3, 2))
-    margin_score = Column(NUMERIC(3, 2))
-    composite_score = Column(NUMERIC(3, 2))
+    expiry_score: Column[NUMERIC] = Column(NUMERIC(3, 2))
+    velocity_score: Column[NUMERIC] = Column(NUMERIC(3, 2))
+    margin_score: Column[NUMERIC] = Column(NUMERIC(3, 2))
+    composite_score: Column[NUMERIC] = Column(NUMERIC(3, 2))
 
     # Recommendations
     recommendation = Column(String(50))
@@ -355,7 +357,7 @@ class ProductScore(Base):
 
     # ML enhancement
     ml_enhanced = Column(Boolean, default=False)
-    confidence_level = Column(NUMERIC(3, 2))
+    confidence_level: Column[NUMERIC] = Column(NUMERIC(3, 2))
 
     # Audit
     calculated_at = Column(DateTime, default=func.now())
@@ -394,17 +396,17 @@ class Action(Base):
         ),
     )
     action_type = Column(String(50))
-    original_price = Column(NUMERIC(12, 4))
-    new_price = Column(NUMERIC(12, 4))
-    discount_percent = Column(NUMERIC(5, 2))
+    original_price: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    new_price: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    discount_percent: Column[NUMERIC] = Column(NUMERIC(5, 2))
     executed_at = Column(DateTime, default=func.now())
     executed_by = Column(get_uuid_type())
 
     # Results tracking (updated later)
-    quantity_sold_24h = Column(NUMERIC(12, 4))
-    quantity_sold_48h = Column(NUMERIC(12, 4))
-    revenue_recovered = Column(NUMERIC(12, 4))
-    effectiveness_score = Column(NUMERIC(3, 2))
+    quantity_sold_24h: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    quantity_sold_48h: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    revenue_recovered: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    effectiveness_score: Column[NUMERIC] = Column(NUMERIC(3, 2))
 
 
 class InventorySnapshot(Base):
@@ -433,14 +435,14 @@ class InventorySnapshot(Base):
         ),
     )
     sku = Column(String(100))
-    quantity = Column(NUMERIC(12, 4))
-    price = Column(NUMERIC(12, 4))
+    quantity: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    price: Column[NUMERIC] = Column(NUMERIC(12, 4))
     days_to_expiry = Column(Integer)
     snapshot_timestamp = Column(DateTime, default=func.now())
     day_of_week = Column(Integer)
     hour_of_day = Column(Integer)
     is_weekend = Column(Boolean)
-    temperature = Column(NUMERIC(5, 2))
+    temperature: Column[NUMERIC] = Column(NUMERIC(5, 2))
     is_holiday = Column(Boolean)
 
 
@@ -470,8 +472,8 @@ class SalesEvent(Base):
         ),
     )
     sku = Column(String(100))
-    quantity_sold = Column(NUMERIC(12, 4))
-    sale_price = Column(NUMERIC(12, 4))
+    quantity_sold: Column[NUMERIC] = Column(NUMERIC(12, 4))
+    sale_price: Column[NUMERIC] = Column(NUMERIC(12, 4))
     sale_timestamp = Column(DateTime, default=func.now())
     channel = Column(String(50), default="in_store")
     customer_type = Column(String(50), default="regular")
@@ -495,8 +497,8 @@ class ExternalFactor(Base):
         ),
     )
     recorded_at = Column(DateTime, default=func.now())
-    temperature = Column(NUMERIC(5, 2))
-    humidity = Column(NUMERIC(5, 2))
+    temperature: Column[NUMERIC] = Column(NUMERIC(5, 2))
+    humidity: Column[NUMERIC] = Column(NUMERIC(5, 2))
     is_rainy = Column(Boolean, default=False)
     is_holiday = Column(Boolean, default=False)
     local_events = Column(JSON)  # Array of events

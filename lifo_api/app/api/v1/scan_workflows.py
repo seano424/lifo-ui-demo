@@ -401,7 +401,7 @@ async def process_scanned_batch(
         expiry_confidence = scan_data.confidence_score
         warnings = []
 
-        if expiry_confidence < 0.8:
+        if expiry_confidence is not None and expiry_confidence < 0.8:
             warnings.append(
                 f"Low confidence on expiry date ({expiry_confidence:.2f}) - please verify"
             )
@@ -440,13 +440,13 @@ async def process_scanned_batch(
             "confidence_score": expiry_confidence,
             "warnings": warnings,
             "processing_time_ms": processing_time_ms,
-            "scan_timestamp": scan_data.scan_timestamp.isoformat(),
+            "scan_timestamp": scan_data.scan_timestamp,
             "next_steps": [
                 "Verify product information"
                 if product_info.get("needs_creation")
                 else "Confirm batch details",
                 "Review expiry date accuracy"
-                if expiry_confidence < 0.8
+                if expiry_confidence is not None and expiry_confidence < 0.8
                 else "Proceed with scan-in",
             ],
         }

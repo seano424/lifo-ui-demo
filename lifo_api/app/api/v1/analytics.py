@@ -135,9 +135,7 @@ async def get_performance_metrics(
     """
     try:
         # Validate store access
-        if not await validate_store_access(
-            store_id, current_user["sub"], "manager", db
-        ):
+        if not await validate_store_access(store_id, current_user):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get analytics data
@@ -215,9 +213,7 @@ async def get_trend_analysis(
     """
     try:
         # Validate store access
-        if not await validate_store_access(
-            store_id, current_user["sub"], "manager", db
-        ):
+        if not await validate_store_access(store_id, current_user):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get analytics data
@@ -278,9 +274,7 @@ async def get_export_data(
     """
     try:
         # Validate store access
-        if not await validate_store_access(
-            store_id, current_user["sub"], "manager", db
-        ):
+        if not await validate_store_access(store_id, current_user):
             raise HTTPException(status_code=403, detail="Manager access required")
 
         # Get the requested data

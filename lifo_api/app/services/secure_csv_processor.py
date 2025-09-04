@@ -508,7 +508,7 @@ class SecureCSVProcessor:
                 quantity = float(row_data["quantity"])
                 if quantity < 0 or quantity > 100000:
                     raise ValueError("Invalid quantity: must be 0-100000")
-                validated_row["quantity"] = quantity
+                validated_row["quantity"] = str(quantity)
             except ValueError as e:
                 raise ValueError(
                     f"Invalid quantity format: {row_data['quantity']}"
@@ -521,7 +521,7 @@ class SecureCSVProcessor:
                     price = Decimal(row_data[price_field])
                     if price < 0 or price > Decimal("10000"):
                         raise ValueError(f"Invalid {price_field}: must be 0-10000")
-                    validated_row[price_field] = price
+                    validated_row[price_field] = str(price)
                 except (ValueError, InvalidOperation) as e:
                     raise ValueError(
                         f"Invalid {price_field} format: {row_data[price_field]}"
@@ -607,7 +607,7 @@ class SecureCSVProcessor:
         self, row_data: dict[str, Any], store_id: str, row_number: int
     ) -> dict[str, list]:
         """Validate business rules without database queries"""
-        errors = []
+        errors: list[dict[str, str]] = []
         warnings = []
 
         # Price logic validation
@@ -653,12 +653,12 @@ class SecureCSVProcessor:
         if not valid_rows:
             return {"suggestions": [], "insights": {}}
 
-        suggestions = []
-        insights = {
+        suggestions: list[dict[str, str]] = []
+        insights: dict[str, Any] = {
             "total_items": len(valid_rows),
             "categories": {},
             "urgency_alerts": [],
-            "pricing_insights": [],
+            "pricing_insights": {},
         }
 
         # Category analysis

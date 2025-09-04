@@ -21,16 +21,20 @@ try:
     StoreOperations = InventoryOperations
 except ImportError:
     # Fallback for testing - create mock classes
-    class InventoryOperations:
+    class MockInventoryOperations:
         def __init__(self, db):
             self.db = db
 
-    class StoreOperations:
+    class StoreOperationsMock:
         def __init__(self, db):
             self.db = db
 
         async def get_user_stores(self, user_id):
             return []
+
+    # Aliases for consistency - using proper type aliases
+    InventoryOperationsAlias = MockInventoryOperations
+    StoreOperationsAlias = StoreOperationsMock
 
 
 class TestDatabaseVulnerabilities:

@@ -146,7 +146,7 @@ export function OnboardingSignUpForm({
         throw new Error(errorData.error || 'Failed to create store and user records')
       }
 
-      const result = await response.json()
+      const _result = await response.json()
 
       // Update onboarding state
       setUserDetails({ email, password, fullName })

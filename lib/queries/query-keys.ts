@@ -1,6 +1,3 @@
-// lib/queries/query-keys.ts
-/* eslint-disable prettier/prettier */
-
 import type { BatchFilters } from './batches'
 import type { ProductFilters } from './products'
 import type { StoreUserFilters } from './store-users'

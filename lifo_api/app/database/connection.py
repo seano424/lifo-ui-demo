@@ -200,7 +200,7 @@ class DatabaseManager:
         self.session_factory = async_session()
         self.logger = structlog.get_logger().bind(component="db_manager")
 
-    async def execute_safe_query(self, query: str, params: dict = None):
+    async def execute_safe_query(self, query: str, params: dict | None = None):
         """
         Execute parameterized SQL query with security validation
 

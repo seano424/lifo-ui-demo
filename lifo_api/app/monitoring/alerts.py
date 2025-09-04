@@ -66,7 +66,9 @@ class AlertManager:
 
         # Alert suppression tracking
         self.suppression_rules = {}  # rule_pattern -> suppression_config
-        self.alert_counts = defaultdict(int)  # alert_type -> count in time window
+        self.alert_counts: dict[str, int] = defaultdict(
+            int
+        )  # alert_type -> count in time window
 
         # Initialize default alert rules
         self._initialize_default_rules()

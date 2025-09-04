@@ -146,7 +146,7 @@ async def upload_csv(
             )
 
         # Prepare response
-        response_data = {
+        response_data: dict[str, Any] = {
             "success": True,
             "message": f"Successfully processed {result['processed_count']} items",
             "data": {

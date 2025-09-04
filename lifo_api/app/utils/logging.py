@@ -58,7 +58,7 @@ def setup_logging():
     )
 
 
-def get_logger(name: str = None):
+def get_logger(name: str | None = None):
     """
     Get a structured logger instance
     """

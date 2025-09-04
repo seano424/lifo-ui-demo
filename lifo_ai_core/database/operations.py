@@ -18,7 +18,7 @@ Key Features:
 import uuid
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Optional
 
 # Conditional imports to handle missing dependencies gracefully
 try:
@@ -29,17 +29,20 @@ try:
     SQLALCHEMY_AVAILABLE = True
 except ImportError:
     # Mock classes for when SQLAlchemy is not available
-    class AsyncSession:
+    class MockAsyncSession:
         pass
 
-    class SQLAlchemyError(Exception):
+    class MockSQLAlchemyError(Exception):
         pass
 
-    class IntegrityError(SQLAlchemyError):
+    class IntegrityError(MockSQLAlchemyError):
         pass
 
     def text(query_string):
         return query_string
+
+    AsyncSession = MockAsyncSession  # type: ignore
+    SQLAlchemyError = MockSQLAlchemyError  # type: ignore
 
     SQLALCHEMY_AVAILABLE = False
 
@@ -59,18 +62,37 @@ try:
 except ImportError:
     # Fallback for when dependencies are not available
     import logging
+    from typing import Any
 
-    logger = logging.getLogger("lifo_ai_core.database")
+    class FallbackLogger:
+        def __init__(self, name: str):
+            self._logger = logging.getLogger(name)
 
-    # Add missing logger methods for compatibility
-    if not hasattr(logger, "debug"):
-        logger.debug = logger.debug if hasattr(logger, "debug") else logger.info
-    if not hasattr(logger, "info"):
-        logger.info = logger.info if hasattr(logger, "info") else print
-    if not hasattr(logger, "warning"):
-        logger.warning = logger.warning if hasattr(logger, "warning") else print
-    if not hasattr(logger, "error"):
-        logger.error = logger.error if hasattr(logger, "error") else print
+        def debug(self, msg: str, **kwargs: Any) -> None:
+            if hasattr(self._logger, "debug"):
+                self._logger.debug(msg)
+            else:
+                print(f"DEBUG: {msg}")
+
+        def info(self, msg: str, **kwargs: Any) -> None:
+            if hasattr(self._logger, "info"):
+                self._logger.info(msg)
+            else:
+                print(f"INFO: {msg}")
+
+        def warning(self, msg: str, **kwargs: Any) -> None:
+            if hasattr(self._logger, "warning"):
+                self._logger.warning(msg)
+            else:
+                print(f"WARNING: {msg}")
+
+        def error(self, msg: str, **kwargs: Any) -> None:
+            if hasattr(self._logger, "error"):
+                self._logger.error(msg)
+            else:
+                print(f"ERROR: {msg}")
+
+    logger = FallbackLogger("lifo_ai_core.database")  # type: ignore
 
 # Type aliases for better readability
 ProductDict = dict[str, Any]
@@ -373,6 +395,8 @@ class InventoryOperations:
 
             result = await self.session.execute(query, params)
             row = result.first()
+            if not row:
+                raise Exception("Failed to retrieve created product")
 
             created_product = {
                 "product_id": str(row.product_id),
@@ -588,6 +612,8 @@ class InventoryOperations:
 
             result = await self.session.execute(query, params)
             row = result.first()
+            if not row:
+                raise Exception("Failed to retrieve created batch")
 
             created_batch = {
                 "batch_id": str(row.batch_id),
@@ -640,7 +666,7 @@ class InventoryOperations:
         try:
             # Build dynamic query based on filters
             where_conditions = ["ib.is_active = true"]
-            params = {"batch_size": batch_size}
+            params: dict[str, Any] = {"batch_size": batch_size}
 
             if store_id:
                 where_conditions.append("ib.store_id = :store_id")
@@ -663,7 +689,7 @@ class InventoryOperations:
 
             # Get total count for logging
             count_result = await self.session.execute(count_query, params)
-            total_count = count_result.scalar()
+            total_count = count_result.scalar() or 0
 
             self.logger.info(
                 "Starting ETL batch processing",
@@ -823,7 +849,35 @@ class InventoryOperations:
 
             row = result.first()
 
-            metrics = {
+            if not row:
+                # Return empty metrics if no data found
+                return {
+                    "store_id": store_id,
+                    "analysis_period": {
+                        "start_date": start_date.isoformat(),
+                        "end_date": end_date.isoformat(),
+                    },
+                    "inventory_summary": {
+                        "total_batches": 0,
+                        "unique_products": 0,
+                        "total_quantity": 0.0,
+                        "total_cost_value": 0.0,
+                        "total_selling_value": 0.0,
+                        "potential_profit": 0.0,
+                    },
+                    "expiry_analysis": {
+                        "expiring_soon_count": 0,
+                        "expired_count": 0,
+                        "avg_days_to_expiry": 0.0,
+                    },
+                    "stock_analysis": {
+                        "low_stock_count": 0,
+                        "avg_batch_quantity": 0.0,
+                    },
+                    "generated_at": datetime.utcnow().isoformat(),
+                }
+
+            metrics: dict[str, Any] = {
                 "store_id": store_id,
                 "analysis_period": {
                     "start_date": start_date.isoformat(),
@@ -874,7 +928,7 @@ class InventoryOperations:
     # ML Feature Preparation Operations
 
     async def prepareMLFeatures(
-        self, store_id: str, feature_types: list[str] = None
+        self, store_id: str, feature_types: Optional[list[str]] = None
     ) -> dict[str, Any]:
         """
         Prepare features for machine learning models
@@ -1099,7 +1153,7 @@ class InventoryOperations:
 
             result = await self.session.execute(query, value_params)
 
-            updated_count = result.rowcount
+            updated_count = result.rowcount if hasattr(result, "rowcount") else 0
 
             self.logger.info(
                 "Batch quantity update completed (SECURE)",
@@ -1150,15 +1204,27 @@ class InventoryOperations:
             end_time = datetime.utcnow()
             response_time = (end_time - start_time).total_seconds() * 1000
 
-            health_status = {
-                "status": "healthy",
-                "response_time_ms": round(response_time, 2),
-                "database_stats": {
-                    "active_batches": int(row.active_batches),
-                    "active_products": int(row.active_products),
-                },
-                "checked_at": end_time.isoformat(),
-            }
+            if not row:
+                health_status: dict[str, Any] = {
+                    "status": "warning",
+                    "response_time_ms": round(response_time, 2),
+                    "database_stats": {
+                        "active_batches": 0,
+                        "active_products": 0,
+                    },
+                    "checked_at": end_time.isoformat(),
+                    "warning": "No data returned from database",
+                }
+            else:
+                health_status = {
+                    "status": "healthy",
+                    "response_time_ms": round(response_time, 2),
+                    "database_stats": {
+                        "active_batches": int(row.active_batches),
+                        "active_products": int(row.active_products),
+                    },
+                    "checked_at": end_time.isoformat(),
+                }
 
             self.logger.debug(
                 "Database health check completed",

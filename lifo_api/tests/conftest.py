@@ -28,8 +28,7 @@ from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
 # Get the directory containing this conftest.py file
@@ -134,7 +133,7 @@ async def test_engine():
 @pytest.fixture
 async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """Create test database session."""
-    async_session = sessionmaker(
+    async_session = async_sessionmaker(
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
 
@@ -297,7 +296,7 @@ def performance_timer():
                 return (self.end_time - self.start_time) * 1000
             return None
 
-        def assert_under_ms(self, threshold_ms: float, message: str = None):
+        def assert_under_ms(self, threshold_ms: float, message: str | None = None):
             elapsed = self.elapsed_ms
             assert elapsed is not None, "Timer not properly started/stopped"
             if message:
@@ -432,7 +431,7 @@ class PerformanceAssertion:
 
     @staticmethod
     def assert_response_time(
-        response_time_ms: float, threshold_ms: float, endpoint: str = None
+        response_time_ms: float, threshold_ms: float, endpoint: str | None = None
     ):
         """Assert response time is under threshold."""
         endpoint_info = f" for {endpoint}" if endpoint else ""
@@ -442,7 +441,7 @@ class PerformanceAssertion:
         )
 
     @staticmethod
-    def assert_mobile_performance(response_time_ms: float, endpoint: str = None):
+    def assert_mobile_performance(response_time_ms: float, endpoint: str | None = None):
         """Assert mobile performance standards (300ms for most, 200ms for scoring)."""
         if endpoint and "score" in endpoint:
             threshold = 200
@@ -504,7 +503,7 @@ def test_data_factory():
     class TestDataFactory:
         @staticmethod
         def create_inventory_batch(
-            batch_id: str = None, days_to_expiry: int = 5, **kwargs
+            batch_id: str | None = None, days_to_expiry: int = 5, **kwargs
         ):
             """Create test inventory batch data."""
             batch_id = batch_id or f"test-batch-{int(time.time())}"

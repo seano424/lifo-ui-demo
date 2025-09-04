@@ -342,10 +342,10 @@ async def get_mobile_store_health(
             risk_ratio = (critical_items + expiring_soon) / total_items
             overall_score = max(0.0, 1.0 - risk_ratio * 1.5)
 
-        # Simplified trends for mobile
-        trends = {
-            "waste_trend": "stable",  # Would calculate from historical data
-            "efficiency_trend": "improving",
+        # Simplified trends for mobile (numeric values for mobile display)
+        trends: dict[str, float] = {
+            "waste_reduction_score": 0.8,  # Numeric score 0-1 instead of string
+            "efficiency_score": 0.85,
             "action_rate": 0.7,
         }
 

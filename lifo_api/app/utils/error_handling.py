@@ -127,7 +127,7 @@ class ErrorTracker:
         self.user_errors = defaultdict(lambda: deque(maxlen=50))  # User -> error events
 
         # Error pattern detection
-        self.error_patterns = defaultdict(int)  # Pattern -> count
+        self.error_patterns: dict[str, int] = defaultdict(int)  # Pattern -> count
         self.cascade_errors = []  # Errors that might be related
 
         # Recovery statistics
@@ -217,9 +217,9 @@ class ErrorTracker:
             ]
 
             # Category breakdown
-            category_counts = defaultdict(int)
-            severity_counts = defaultdict(int)
-            error_type_counts = defaultdict(int)
+            category_counts: dict[str, int] = defaultdict(int)
+            severity_counts: dict[str, int] = defaultdict(int)
+            error_type_counts: dict[str, int] = defaultdict(int)
 
             for event in last_24h:
                 category_counts[event.category] += 1
@@ -227,7 +227,7 @@ class ErrorTracker:
                 error_type_counts[event.error_type] += 1
 
             # Top error endpoints
-            endpoint_error_counts = defaultdict(int)
+            endpoint_error_counts: dict[str, int] = defaultdict(int)
             for endpoint, errors in self.endpoint_errors.items():
                 recent_errors = [
                     e for e in errors if e.timestamp > now - timedelta(hours=24)
@@ -283,8 +283,8 @@ class ErrorTracker:
             ]
 
             # Error type breakdown
-            error_types = defaultdict(int)
-            severities = defaultdict(int)
+            error_types: dict[str, int] = defaultdict(int)
+            severities: dict[str, int] = defaultdict(int)
 
             for event in recent_errors:
                 error_types[event.error_type] += 1

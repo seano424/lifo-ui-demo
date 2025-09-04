@@ -118,7 +118,7 @@ class SimplifiedDonationEngine:
             current_quantity = float(batch_data.get("current_quantity", 0))
 
             # Calculate days to expiry
-            days_to_expiry = (expiry_date - date.today()).days
+            days_to_expiry = (expiry_date - date.today()).days if expiry_date else 0
 
             # Calculate financial metrics
             margin_percent = (

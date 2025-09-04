@@ -229,6 +229,7 @@ class MobileOptimizedError(ConfigurableModel):
     retry_allowed: bool = True
     retry_after_seconds: int | None = None
     timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    debug_info: dict[str, str] | None = None
 
 
 # Response schemas for mobile optimization

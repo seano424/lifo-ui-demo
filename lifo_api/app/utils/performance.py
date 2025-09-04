@@ -438,7 +438,7 @@ def compress_for_mobile(data: Any, compression_level: str = "standard") -> Any:
                 if isinstance(v, float):
                     compressed[k] = round(v, 2)
                 elif isinstance(v, str) and len(v) > 100:
-                    compressed[k] = v[:97] + "..."
+                    compressed[k] = v[:97] + "..."  # type: ignore
                 else:
                     compressed[k] = v
             return compressed

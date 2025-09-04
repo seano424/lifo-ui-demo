@@ -123,7 +123,7 @@ class DeploymentAuthManager:
         logger.error("No staging authentication method available")
         return None
 
-    async def create_authenticated_client(self, use_service_role: bool = None):
+    async def create_authenticated_client(self, use_service_role: bool | None = None):
         """
         Create an authenticated HTTP client for the current environment
         """

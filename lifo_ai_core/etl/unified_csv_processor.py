@@ -330,7 +330,7 @@ class UnifiedCSVProcessor:
             for col in df.columns:
                 for idx, value in df[col].items():
                     if pd.notna(value) and isinstance(value, str):
-                        row_num = int(idx) + 1
+                        row_num = int(idx) + 1 if isinstance(idx, (int, str)) else 1
                         if len(value) > self.MAX_CELL_LENGTH:
                             raise SecurityViolation(
                                 f"Cell content exceeds maximum length at row {row_num}, column '{col}'"
@@ -406,14 +406,14 @@ class UnifiedCSVProcessor:
                 if row.isnull().all():
                     continue
 
-                row_num = int(idx) + 1
+                row_num = int(idx) + 1 if isinstance(idx, (int, str)) else 1
                 processed_row = await self._process_single_row(row, row_num)
                 if processed_row:
                     processed_rows.append(processed_row)
                     self.processed_count += 1
 
             except Exception as e:
-                row_num = int(idx) + 1
+                row_num = int(idx) + 1 if isinstance(idx, (int, str)) else 1
                 self.errors.append(f"Row {row_num}: {e}")
                 continue
 
@@ -523,7 +523,7 @@ class UnifiedCSVProcessor:
     ) -> dict[str, Any] | None:
         """Process a single CSV row with comprehensive validation"""
 
-        processed = {}
+        processed: dict[str, Any] = {}
 
         # Required fields
         processed["sku"] = self._validate_sku(row.get("sku"), row_num)
@@ -552,14 +552,14 @@ class UnifiedCSVProcessor:
                 else:
                     processed[field] = str(row[field]).strip()
             else:
-                processed[field] = default
+                processed[field] = default if default is not None else ""
 
         # Global product workflow fields
         for field, default in self.GLOBAL_PRODUCT_COLUMNS.items():
             if field in row and pd.notna(row[field]):
                 processed[field] = str(row[field]).strip()
             else:
-                processed[field] = default
+                processed[field] = default if default is not None else ""
 
         # Estimate manufacture date if not provided
         if not processed.get("manufacture_date"):

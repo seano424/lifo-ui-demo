@@ -182,7 +182,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       })
       setCurrentStep('batch-selection')
       setSelectedBatch(null)
-    } catch (error) {}
+    } catch (error) {
+      console.error('Failed to find available batches:', error)
+    }
   }
 
   const handleBatchSelected = useCallback(
@@ -339,7 +341,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: error => {
+        onError: _error => {
           // Dialog stays open so user can retry or cancel
         },
       },
@@ -360,7 +362,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <ScanningCamera
             mode="barcode"
             onBarcodeScanned={handleCustomBarcodeScanned}
-            onScanError={error => {}}
+            onScanError={_error => {}}
             showManualEntry={showManualEntry}
             onToggleManualEntry={() => setShowManualEntry(!showManualEntry)}
             onManualProductSelected={(barcode: string) => {

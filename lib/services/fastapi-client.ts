@@ -34,7 +34,7 @@ interface FastAPIAlertsResponse {
 interface FastAPIAnalyticsResponse {
   store_id: string
   period_days: number
-  analytics: Record<string, any>
+  analytics: Record<string, unknown>
   ai_insights: Array<{
     type: string
     message: string
@@ -51,7 +51,6 @@ interface FastAPIAnalyticsResponse {
 export class FastAPIClient {
   private baseUrl: string
   private timeout: number
-  private maxRetries: number
 
   constructor() {
     const baseUrl =
@@ -70,8 +69,6 @@ export class FastAPIClient {
     this.baseUrl = baseUrl
     // Optimized timeout: 8 seconds for better performance
     this.timeout = 8000
-    // Retry mechanism for improved reliability
-    this.maxRetries = 2
   }
 
   /**

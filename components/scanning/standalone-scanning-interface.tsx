@@ -294,7 +294,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: error => {
+        onError: _error => {
           // Dialog stays open so user can retry or cancel
         },
       },

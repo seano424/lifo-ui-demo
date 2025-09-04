@@ -18,7 +18,9 @@ logger = structlog.get_logger()
 class LifoAPIException(Exception):
     """Base exception class for LIFO API"""
 
-    def __init__(self, message: str, status_code: int = 500, details: str = None):
+    def __init__(
+        self, message: str, status_code: int = 500, details: str | None = None
+    ):
         self.message = message
         self.status_code = status_code
         self.details = details
@@ -28,35 +30,39 @@ class LifoAPIException(Exception):
 class ScoringException(LifoAPIException):
     """Exception for scoring-related errors"""
 
-    def __init__(self, message: str, details: str = None):
+    def __init__(self, message: str, details: str | None = None):
         super().__init__(message, 422, details)
 
 
 class AuthenticationException(LifoAPIException):
     """Exception for authentication-related errors"""
 
-    def __init__(self, message: str = "Authentication failed", details: str = None):
+    def __init__(
+        self, message: str = "Authentication failed", details: str | None = None
+    ):
         super().__init__(message, 401, details)
 
 
 class AuthorizationException(LifoAPIException):
     """Exception for authorization-related errors"""
 
-    def __init__(self, message: str = "Access denied", details: str = None):
+    def __init__(self, message: str = "Access denied", details: str | None = None):
         super().__init__(message, 403, details)
 
 
 class DatabaseException(LifoAPIException):
     """Exception for database-related errors"""
 
-    def __init__(self, message: str = "Database operation failed", details: str = None):
+    def __init__(
+        self, message: str = "Database operation failed", details: str | None = None
+    ):
         super().__init__(message, 500, details)
 
 
 class ValidationException(LifoAPIException):
     """Exception for validation errors"""
 
-    def __init__(self, message: str, details: str = None):
+    def __init__(self, message: str, details: str | None = None):
         super().__init__(message, 400, details)
 
 

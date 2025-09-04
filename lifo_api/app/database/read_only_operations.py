@@ -185,7 +185,7 @@ class SecureReadOnlyOperations:
             return None
 
     async def get_sales_velocity_data(
-        self, store_id: str, product_id: str = None, days: int = 30
+        self, store_id: str, product_id: str | None = None, days: int = 30
     ) -> dict[str, float]:
         """
         Get sales velocity data for scoring calculations

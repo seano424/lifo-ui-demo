@@ -64,9 +64,9 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
       setShowSubmissionDialog(true)
     },
 
-    onError: error => {},
+    onError: _error => {},
 
-    onProductFound: product => {},
+    onProductFound: _product => {},
 
     onWorkflowComplete: () => {},
   }
@@ -107,7 +107,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
           // Show success dialog
           setShowSuccessDialog(true)
         },
-        onError: error => {
+        onError: _error => {
           // Dialog stays open so user can retry or cancel
         },
       },
