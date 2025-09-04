@@ -49,7 +49,7 @@ export function createPostalCodeValidator(country?: string | null) {
 
         return pattern.test(value.trim())
       },
-      val => ({
+      _val => ({
         message: `Invalid postal code format for ${country}`,
       }),
     )
@@ -75,7 +75,7 @@ export function createPhoneValidator(country?: string | null) {
 
         return pattern.test(value.replace(/\s/g, ''))
       },
-      val => ({
+      _val => ({
         message: `Invalid phone number format for ${country}`,
       }),
     )

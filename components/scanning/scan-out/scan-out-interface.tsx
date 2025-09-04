@@ -182,7 +182,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       })
       setCurrentStep('batch-selection')
       setSelectedBatch(null)
-    } catch (_error) {}
+    } catch (error) {
+      console.error('Failed to find available batches:', error)
+    }
   }
 
   const handleBatchSelected = useCallback(

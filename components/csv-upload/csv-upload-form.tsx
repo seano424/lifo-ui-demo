@@ -108,7 +108,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
         storeId,
         csvData: csvPreview, // Send the modified CSV data with individual expiry dates
       })
-    } catch (_error) {
+    } catch (error) {
+      console.error('CSV upload failed:', error)
       toast.error(t('errors.startFailed'))
     }
   }

@@ -856,13 +856,11 @@ export function EnhancedAddEmployeeDialog({
                     <AlertDescription>{t('success.emailSending')}</AlertDescription>
                   </>
                 ) : emailStatus.sent ? (
-                  <>
-                    <AlertDescription>
-                      {t('success.emailSent', {
-                        email: createdCredentials?.email || '',
-                      })}
-                    </AlertDescription>
-                  </>
+                  <AlertDescription>
+                    {t('success.emailSent', {
+                      email: createdCredentials?.email || '',
+                    })}
+                  </AlertDescription>
                 ) : emailStatus.error ? (
                   <>
                     <AlertTriangle className="h-4 w-4" />

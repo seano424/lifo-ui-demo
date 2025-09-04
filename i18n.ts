@@ -69,9 +69,10 @@ export default getRequestConfig(async () => {
         locale = userLang
       }
     }
-  } catch (_error) {
+  } catch (error) {
     // Fallback to detected/default locale if Supabase fails
     if (process.env.NODE_ENV === 'development') {
+      console.warn('Failed to get user language preference:', error)
     }
   }
 

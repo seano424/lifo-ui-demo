@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prettier/prettier */
-
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
@@ -411,7 +408,7 @@ export class InventoryOperations {
       is_duplicate: boolean
     }>
   > {
-    const duplicateCheckStart = performance.now()
+    const _duplicateCheckStart = performance.now()
 
     // Fixed parameter order: barcodes, expiry_dates, store_id
     const { data, error } = await (
@@ -428,8 +425,7 @@ export class InventoryOperations {
       p_store_id: storeId, // Move store_id to last parameter
     })
 
-    const duplicateCheckEnd = performance.now()
-    const _duplicateCheckTime = duplicateCheckEnd - duplicateCheckStart
+    const _duplicateCheckEnd = performance.now()
 
     if (error) {
       console.error('❌ [DB-OPS] Bulk duplicate check RPC failed:', error)
@@ -441,8 +437,6 @@ export class InventoryOperations {
       })
       throw new Error(`Bulk duplicate check failed: ${error.message}`)
     }
-
-    const _duplicateCount = Array.isArray(data) ? data.length : 0
 
     return Array.isArray(data) ? data : []
   }
@@ -529,7 +523,7 @@ export class InventoryOperations {
     batch_ids: string[]
     processing_time_ms: number
   }> {
-    const insertStartTime = performance.now()
+    const _insertStartTime = performance.now()
 
     // Use the enhanced function that handles complete product lifecycle
     const { data, error } = await (
@@ -546,8 +540,7 @@ export class InventoryOperations {
       p_data: batchData,
     })
 
-    const insertEndTime = performance.now()
-    const _insertTime = insertEndTime - insertStartTime
+    const _insertEndTime = performance.now()
 
     if (error) {
       console.error('❌ [DB-OPS] Enhanced bulk insert RPC failed:', error)
@@ -601,7 +594,6 @@ export class InventoryOperations {
       } else {
       }
       // Prepare CSV items
-      const _prepStartTime = performance.now()
 
       const csvItems = csvData.map(item => {
         const csvItem = item as {
@@ -621,8 +613,6 @@ export class InventoryOperations {
         return csvItem
       })
 
-      const _prepEndTime = performance.now()
-
       // Step 1: Bulk duplicate check (FIXED parameter order)
       const duplicateCheckStart = Date.now()
 
@@ -634,17 +624,13 @@ export class InventoryOperations {
       const duplicateCheckTime = Date.now() - duplicateCheckStart
 
       // Step 2: Filter non-duplicates
-      const _filterStartTime = performance.now()
 
       const nonDuplicates = csvItems.filter((_, index) => {
         const dupResult = duplicateResults[index]
         return !dupResult?.is_duplicate
       })
 
-      const _filterEndTime = performance.now()
-
       // Step 3: Prepare batch data for bulk insert
-      const _batchPrepStart = performance.now()
 
       const batchData = nonDuplicates.map((csvItem, index) => ({
         sku: csvItem.SKU || `AUTO-${Date.now()}-${index}`,
@@ -661,8 +647,6 @@ export class InventoryOperations {
         batch_number: csvItem.Batch_Number || `CSV-${Date.now()}-${index}`,
         typical_shelf_life_days: 30, // Will be determined from database category mapping
       }))
-
-      const _batchPrepEnd = performance.now()
 
       // Step 4: Bulk insert (handles store product linking automatically)
       const batchInsertStart = Date.now()

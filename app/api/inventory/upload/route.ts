@@ -10,12 +10,10 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
 
     // Get authenticated user
-    const _authStartTime = Date.now()
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    const _authEndTime = Date.now()
 
     if (authError) {
       console.error('❌ [UPLOAD-API] Auth error:', authError)
@@ -27,9 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user authenticated' }, { status: 401 })
     }
 
-    const _formDataStartTime = Date.now()
     const formData = await request.formData()
-    const _formDataEndTime = Date.now()
 
     const file = formData.get('file') as File
     const storeId = formData.get('storeId') as string
@@ -56,23 +52,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Fast CSV processing - no Python subprocess overhead
-    const _csvReadStartTime = Date.now()
     const csvContent = await file.text()
-    const _csvReadEndTime = Date.now()
-
-    const _csvParseStartTime = Date.now()
     const csvData = fastParseCSV(csvContent, defaultExpiryDate)
-    const _csvParseEndTime = Date.now()
-
-    if (defaultExpiryDate) {
-      const _itemsWithDefaultExpiry = csvData.filter(
-        item =>
-          typeof item === 'object' &&
-          item !== null &&
-          'Expiry_Date' in item &&
-          (item as Record<string, unknown>).Expiry_Date === defaultExpiryDate,
-      ).length
-    }
 
     if (csvData.length === 0) {
       console.error('❌ [UPLOAD-API] No valid data found in CSV file')
@@ -82,13 +63,8 @@ export async function POST(request: NextRequest) {
     // Log first few items for debugging
 
     // Use existing proven InventoryOperations.processCsvBatch
-    const _operationsCreateStartTime = Date.now()
     const operations = new InventoryOperations(supabase)
-    const _operationsCreateEndTime = Date.now()
-
-    const _processingStartTime = Date.now()
     const result = await operations.processCsvBatch(csvData, storeId, user.id)
-    const _processingEndTime = Date.now()
 
     const totalTime = Date.now() - apiStartTime
 

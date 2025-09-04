@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
@@ -36,10 +36,10 @@ export function StoreSearchStep() {
     useGooglePlaces()
 
   // Define manual entry handler first
-  const handleManualEntry = () => {
+  const handleManualEntry = useCallback(() => {
     setManualEntry(true)
     setCurrentStep(2)
-  }
+  }, [setManualEntry, setCurrentStep])
 
   // If Google Places is disabled, redirect to manual entry immediately
   useEffect(() => {
