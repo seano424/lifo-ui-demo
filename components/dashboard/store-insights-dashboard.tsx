@@ -27,6 +27,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     error: insightsError,
   } = useDashboardInsights(storeId)
 
+  console.log('data from store insights', insights)
+
   if (!storeId) {
     return null
   }

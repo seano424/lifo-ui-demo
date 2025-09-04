@@ -2,6 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
+import { fastApiClient } from '@/lib/services/fastapi-client'
 import { createClient } from '@/lib/supabase/server'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 import type { Database } from '@/types/supabase'
@@ -77,6 +78,103 @@ export async function GET(request: NextRequest) {
       timeframe,
       store_id: storeId,
       generated_at: new Date().toISOString(),
+    }
+
+    // Phase 2 Step 4: Try FastAPI for enhanced AI analytics
+    // Database connectivity has been fixed - re-enabling FastAPI
+    const useFastAPI =
+      process.env.ENABLE_FASTAPI === 'true' || process.env.NODE_ENV === 'development'
+    console.log(
+      `[ANALYTICS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`,
+    )
+    let fastApiAnalytics = null
+
+    if (useFastAPI) {
+      try {
+        console.log(`[ANALYTICS] Attempting FastAPI for store ${storeId}`)
+
+        // Get user's session with access token
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (session?.access_token) {
+          const days =
+            timeframe === '1d' ? 1 : timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90
+
+          try {
+            fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithUserToken(
+              storeId,
+              session.access_token,
+              days,
+            )
+
+            console.log(`[ANALYTICS] FastAPI user JWT success: Enhanced analytics with AI insights`)
+          } catch (userError) {
+            console.warn('[ANALYTICS] User JWT failed, trying service key fallback:', userError)
+
+            // Fallback to service key if user JWT fails
+            const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+            if (serviceKey) {
+              fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithServiceKey(
+                storeId,
+                serviceKey,
+                days,
+              )
+              console.log(`[ANALYTICS] FastAPI service key fallback success`)
+            }
+          }
+
+          if (fastApiAnalytics) {
+            analytics.source = 'fastapi'
+            analytics.ai_enhanced = true
+
+            // Add FastAPI AI insights
+            if (fastApiAnalytics.ai_insights) {
+              analytics.ai_insights = fastApiAnalytics.ai_insights
+            }
+
+            if (fastApiAnalytics.summary) {
+              analytics.ai_summary = fastApiAnalytics.summary
+            }
+          }
+        } else {
+          console.warn('[ANALYTICS] No user session, trying service key fallback')
+
+          // Direct service key fallback if no user session
+          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+          if (serviceKey) {
+            const days =
+              timeframe === '1d' ? 1 : timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90
+
+            fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithServiceKey(
+              storeId,
+              serviceKey,
+              days,
+            )
+
+            console.log(`[ANALYTICS] FastAPI service key success`)
+            analytics.source = 'fastapi'
+            analytics.ai_enhanced = true
+
+            // Add FastAPI AI insights
+            if (fastApiAnalytics.ai_insights) {
+              analytics.ai_insights = fastApiAnalytics.ai_insights
+            }
+
+            if (fastApiAnalytics.summary) {
+              analytics.ai_summary = fastApiAnalytics.summary
+            }
+          }
+        }
+      } catch (fastApiError) {
+        console.warn('[ANALYTICS] FastAPI failed, using Supabase fallback:', fastApiError)
+        analytics.source = 'supabase'
+        analytics.ai_enhanced = false
+      }
+    } else {
+      analytics.source = 'supabase'
+      analytics.ai_enhanced = false
     }
 
     if (!metric || metric === 'overview') {

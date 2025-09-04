@@ -20,15 +20,12 @@ function thresholdToLevelName(warningThreshold: number): string {
 
 export function UrgentAlerts() {
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, isFetching, error } = useScoringAlerts(activeStoreId)
-  const { isUpdating: thresholdsUpdating, warningThreshold } = useScoringThresholds(
-    activeStoreId || undefined,
-  )
+  const { data, isLoading, error } = useScoringAlerts(activeStoreId)
+  const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
 
-  // Loading state for initial load
+  console.log('data from urgent alerts', data)
+
   const isInitialLoading = isLoading
-  // Loading state for message text during updates
-  const isMessageUpdating = thresholdsUpdating || isFetching
   const currentLevel = thresholdToLevelName(warningThreshold)
 
   if (isInitialLoading) {
@@ -106,16 +103,7 @@ export function UrgentAlerts() {
         <Typography variant="h4" className="font-bold">
           {currentLevel}
         </Typography>
-        <Typography variant="p">
-          {isMessageUpdating ? (
-            <div className="flex gap-2 items-center justify-center">
-              <Skeleton className="inline-block h-5 w-10" />
-              <Skeleton className="inline-block h-5 w-32" />
-            </div>
-          ) : (
-            message
-          )}
-        </Typography>
+        <Typography variant="p">{message}</Typography>
         <AlertQuickToggle
           storeId={activeStoreId || undefined}
           size="sm"

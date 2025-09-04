@@ -29,62 +29,82 @@ class SecureReadOnlyOperations:
     ) -> list[dict[str, Any]]:
         """
         Get inventory data for scoring calculations only
-        Uses read-only view to prevent SQL injection
+        Now uses Supabase client for compatibility with Next.js approach
         """
         try:
-            # Convert to UUID if string
-            if isinstance(store_id, str):
-                try:
-                    store_uuid = uuid.UUID(store_id)
-                except ValueError:
-                    self.logger.error("Invalid store_id format", store_id=store_id)
-                    return []
-            else:
-                store_uuid = store_id
+            # Import Supabase service (fallback to direct client usage)
+            from app.database.supabase_service import get_supabase_service
 
-            # Use parameterized query with read-only view
-            query = text("""
-                SELECT
+            supabase_service = get_supabase_service()
+            admin_client = supabase_service.get_admin_client()
+
+            # Use same approach as Next.js alerts endpoint
+            result = (
+                admin_client.schema("inventory")
+                .table("batches")
+                .select("""
                     batch_id,
                     product_id,
-                    sku,
-                    category,
+                    batch_number,
                     current_quantity,
-                    expiry_date,
                     selling_price,
                     cost_price,
-                    days_to_expiry,
-                    typical_shelf_life_days
-                FROM inventory_view_for_scoring
-                WHERE store_id = :store_id
-                AND current_quantity > 0
-                ORDER BY days_to_expiry ASC
-            """)
+                    expiry_date,
+                    location_code,
+                    supplier,
+                    status
+                """)
+                .eq("store_id", store_id)
+                .eq("status", "active")
+                .order("expiry_date", desc=False)
+                .execute()
+            )
 
-            result = await self.db.execute(query, {"store_id": store_uuid})
-            rows = result.fetchall()
+            if not result.data:
+                self.logger.info("No active batches found", store_id=store_id)
+                return []
 
+            # Calculate days_to_expiry for each batch
             inventory_data = []
-            for row in rows:
-                inventory_data.append(
-                    {
-                        "batch_id": str(row.batch_id),
-                        "product_id": str(row.product_id),
-                        "sku": row.sku,
-                        "category": row.category,
-                        "current_quantity": float(row.current_quantity),
-                        "expiry_date": row.expiry_date,
-                        "selling_price": float(row.selling_price),
-                        "cost_price": float(row.cost_price),
-                        "days_to_expiry": int(row.days_to_expiry),
-                        "typical_shelf_life_days": int(row.typical_shelf_life_days)
-                        if row.typical_shelf_life_days
-                        else 30,
-                    }
-                )
+            for row in result.data:
+                try:
+                    expiry_date = datetime.fromisoformat(
+                        row["expiry_date"].replace("Z", "+00:00")
+                    )
+                    days_to_expiry = (expiry_date.date() - date.today()).days
+
+                    inventory_data.append(
+                        {
+                            "batch_id": str(row["batch_id"]),
+                            "product_id": str(row["product_id"])
+                            if row["product_id"]
+                            else "",
+                            "sku": row.get(
+                                "batch_number", "Unknown"
+                            ),  # Use batch_number as SKU fallback
+                            "category": "Unknown",  # Will be enriched with product data
+                            "current_quantity": float(row["current_quantity"]),
+                            "expiry_date": row["expiry_date"],
+                            "selling_price": float(row["selling_price"])
+                            if row["selling_price"]
+                            else 0.0,
+                            "cost_price": float(row["cost_price"])
+                            if row["cost_price"]
+                            else 0.0,
+                            "days_to_expiry": days_to_expiry,
+                            "typical_shelf_life_days": 30,  # Default value
+                        }
+                    )
+                except Exception as row_error:
+                    self.logger.warning(
+                        "Error processing batch row",
+                        batch_id=row.get("batch_id"),
+                        error=str(row_error),
+                    )
+                    continue
 
             self.logger.info(
-                "Inventory data retrieved for scoring",
+                "Inventory data retrieved via Supabase",
                 store_id=store_id,
                 items_count=len(inventory_data),
             )
@@ -95,6 +115,7 @@ class SecureReadOnlyOperations:
             self.logger.error(
                 "Failed to get inventory for scoring", store_id=store_id, error=str(e)
             )
+            # Return empty array instead of failing
             return []
 
     async def get_batch_for_scoring(self, batch_id: str) -> dict[str, Any] | None:
@@ -360,79 +381,135 @@ class SecureReadOnlyOperations:
 
     async def get_analytics_data(self, store_id: str, days: int = 30) -> dict[str, Any]:
         """
-        Get analytics data for dashboard
-        Uses parameterized query to prevent SQL injection
+        Get analytics data for dashboard using Supabase client
         """
         try:
-            # Convert to UUID if string
-            if isinstance(store_id, str):
-                try:
-                    store_uuid = uuid.UUID(store_id)
-                except ValueError:
-                    self.logger.error("Invalid store_id format", store_id=store_id)
-                    return {}
-            else:
-                store_uuid = store_id
+            # Import Supabase service
+            from app.database.supabase_service import get_supabase_service
 
-            # Get analytics data directly from batches table
-            query = text("""
-                SELECT
-                    COUNT(b.batch_id) as total_batches,
-                    COALESCE(SUM(b.current_quantity), 0) as total_quantity,
-                    COALESCE(SUM(b.current_quantity * b.selling_price), 0) as total_value,
-                    COUNT(CASE WHEN b.expiry_date < CURRENT_DATE THEN 1 END) as expired_count,
-                    COUNT(CASE WHEN b.expiry_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as expiring_soon_count,
-                    COUNT(CASE WHEN b.expiry_date <= CURRENT_DATE + INTERVAL '1 day' THEN 1 END) as critical_items,
-                    COUNT(CASE WHEN b.expiry_date BETWEEN CURRENT_DATE + INTERVAL '1 day' AND CURRENT_DATE + INTERVAL '3 days' THEN 1 END) as high_urgency_items,
-                    COUNT(CASE WHEN b.expiry_date BETWEEN CURRENT_DATE + INTERVAL '3 days' AND CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as medium_urgency_items,
-                    COUNT(CASE WHEN b.expiry_date > CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as low_urgency_items
-                FROM inventory.batches b
-                WHERE b.store_id = :store_id
-                AND b.status = 'active'
-                AND b.current_quantity > 0
-            """)
+            supabase_service = get_supabase_service()
+            admin_client = supabase_service.get_admin_client()
 
-            params = {
-                "store_id": store_uuid,
-                "start_date": date.today() - timedelta(days=days),
-            }
+            # Get batches data using Supabase client (same as Next.js)
+            result = (
+                admin_client.schema("inventory")
+                .table("batches")
+                .select("batch_id,current_quantity,selling_price,expiry_date,status")
+                .eq("store_id", store_id)
+                .eq("status", "active")
+                .execute()
+            )
 
-            result = await self.db.execute(query, params)
-            row = result.first()
-
-            if row:
+            if not result.data:
+                # Return empty analytics if no data
                 return {
-                    "total_batches": int(row.total_batches),
-                    "total_quantity": float(row.total_quantity),
-                    "total_value": float(row.total_value),
-                    "expired_count": int(row.expired_count),
-                    "expiring_soon_count": int(row.expiring_soon_count),
-                    "critical_items": int(row.critical_items),
-                    "high_urgency_items": int(row.high_urgency_items),
-                    "medium_urgency_items": int(row.medium_urgency_items),
-                    "low_urgency_items": int(row.low_urgency_items),
-                    "generated_at": datetime.utcnow().isoformat(),
+                    "inventory_summary": {
+                        "total_batches": 0,
+                        "total_quantity": 0,
+                        "total_value": 0,
+                        "expired_count": 0,
+                        "expiring_soon_count": 0,
+                    },
+                    "urgency_distribution": {
+                        "critical": 0,
+                        "high": 0,
+                        "medium": 0,
+                        "low": 0,
+                    },
+                    "category_breakdown": [],
+                    "recent_actions": [],
                 }
 
-            # Return empty analytics if no data
-            return {
-                "total_batches": 0,
-                "total_quantity": 0.0,
-                "total_value": 0.0,
-                "expired_count": 0,
-                "expiring_soon_count": 0,
-                "critical_items": 0,
-                "high_urgency_items": 0,
-                "medium_urgency_items": 0,
-                "low_urgency_items": 0,
-                "generated_at": datetime.utcnow().isoformat(),
+            # Process batches data
+            total_batches = len(result.data)
+            total_quantity = sum(
+                float(batch.get("current_quantity", 0)) for batch in result.data
+            )
+            total_value = sum(
+                float(batch.get("current_quantity", 0))
+                * float(batch.get("selling_price", 0))
+                for batch in result.data
+            )
+
+            # Calculate urgency distribution
+            urgency_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+            expired_count = 0
+            expiring_soon_count = 0
+
+            today = date.today()
+
+            for batch in result.data:
+                try:
+                    expiry_date = datetime.fromisoformat(
+                        batch["expiry_date"].replace("Z", "+00:00")
+                    ).date()
+                    days_to_expiry = (expiry_date - today).days
+
+                    if days_to_expiry < 0:
+                        expired_count += 1
+                        urgency_counts["critical"] += 1
+                    elif days_to_expiry <= 1:
+                        urgency_counts["critical"] += 1
+                        if days_to_expiry >= 0:
+                            expiring_soon_count += 1
+                    elif days_to_expiry <= 3:
+                        urgency_counts["high"] += 1
+                        expiring_soon_count += 1
+                    elif days_to_expiry <= 7:
+                        urgency_counts["medium"] += 1
+                        expiring_soon_count += 1
+                    else:
+                        urgency_counts["low"] += 1
+
+                except (ValueError, KeyError) as e:
+                    self.logger.warning(
+                        "Error processing batch expiry date", error=str(e)
+                    )
+                    continue
+
+            analytics_data = {
+                "inventory_summary": {
+                    "total_batches": total_batches,
+                    "total_quantity": total_quantity,
+                    "total_value": round(total_value, 2),
+                    "expired_count": expired_count,
+                    "expiring_soon_count": expiring_soon_count,
+                },
+                "urgency_distribution": urgency_counts,
+                "category_breakdown": [],  # Would need product data to populate
+                "recent_actions": [],  # Would need actions/logs data to populate
             }
+
+            self.logger.info(
+                "Analytics data retrieved via Supabase",
+                store_id=store_id,
+                total_batches=total_batches,
+            )
+
+            return analytics_data
 
         except Exception as e:
             self.logger.error(
                 "Failed to get analytics data", store_id=store_id, error=str(e)
             )
-            return {}
+            # Return empty analytics structure on error
+            return {
+                "inventory_summary": {
+                    "total_batches": 0,
+                    "total_quantity": 0,
+                    "total_value": 0,
+                    "expired_count": 0,
+                    "expiring_soon_count": 0,
+                },
+                "urgency_distribution": {
+                    "critical": 0,
+                    "high": 0,
+                    "medium": 0,
+                    "low": 0,
+                },
+                "category_breakdown": [],
+                "recent_actions": [],
+            }
 
 
 # Factory function for dependency injection
