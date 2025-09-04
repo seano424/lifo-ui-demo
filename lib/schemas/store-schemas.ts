@@ -1,4 +1,11 @@
 import { z } from 'zod'
+import {
+  createEmailValidator,
+  createPhoneValidator,
+  createPostalCodeValidator,
+  createStoreNameValidator,
+  createWebsiteValidator,
+} from '@/lib/utils/validation-utils'
 import type { Database } from '@/types/supabase'
 
 // Get the allowed store types from your database schema check constraint
@@ -14,9 +21,9 @@ export const STORE_TYPES = [
   'organic',
 ] as const satisfies readonly StoreType[]
 
-// Zod schema for the onboarding form
+// Basic schema for forms where country is not yet known
 export const storeFormSchema = z.object({
-  store_name: z.string().min(2, 'Store name must be at least 2 characters'),
+  store_name: createStoreNameValidator(),
   store_type: z.enum(STORE_TYPES, {
     required_error: 'Please select a store type',
   }),
@@ -24,12 +31,17 @@ export const storeFormSchema = z.object({
   city: z.string().min(2, 'City is required').nullable(),
   postal_code: z
     .string()
-    .min(4, 'Valid postal code required')
-    .max(10, 'Postal code too long')
+    .min(1, 'Postal code is required')
+    .max(20, 'Postal code too long')
     .nullable(),
   country: z.string().min(2, 'Country is required').nullable(),
-  business_name: z.string().optional().nullable(),
-  phone: z.string().min(10, 'Valid phone number required').optional().or(z.literal('')),
+  business_name: z.string().max(100, 'Business name too long').optional().nullable(),
+  phone: z
+    .string()
+    .min(1, 'Phone number is required')
+    .max(20, 'Phone number too long')
+    .optional()
+    .or(z.literal('')),
 
   // Google Places specific (optional)
   coordinates: z
@@ -40,6 +52,37 @@ export const storeFormSchema = z.object({
     .optional(),
   googlePlaceId: z.string().optional(),
 })
+
+// Enhanced schema factory for dynamic validation based on country
+export function createEnhancedStoreFormSchema(country?: string | null) {
+  return z.object({
+    store_name: createStoreNameValidator(),
+    store_type: z.enum(STORE_TYPES, {
+      required_error: 'Please select a store type',
+    }),
+    address: z.string().min(5, 'Address must be at least 5 characters').nullable(),
+    city: z.string().min(2, 'City is required').nullable(),
+    postal_code: country ? createPostalCodeValidator(country).nullable() : z.string().nullable(),
+    country: z.string().min(2, 'Country is required').nullable(),
+    business_name: z.string().max(100, 'Business name too long').optional().nullable(),
+    phone: country
+      ? createPhoneValidator(country).optional().or(z.literal(''))
+      : z.string().optional().or(z.literal('')),
+
+    // Additional fields for enhanced validation
+    email: createEmailValidator().optional().or(z.literal('')),
+    website_url: createWebsiteValidator().optional().or(z.literal('')),
+
+    // Google Places specific (optional)
+    coordinates: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+      })
+      .optional(),
+    googlePlaceId: z.string().optional(),
+  })
+}
 
 export type StoreFormData = z.infer<typeof storeFormSchema>
 

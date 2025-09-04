@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, CheckCircle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -186,7 +186,7 @@ export function OnboardingSignUpForm({
 
   if (businessCheckResult?.exists) {
     return (
-      <div className="text-center max-w-md mx-auto">
+      <div className="text-center mx-auto">
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
@@ -217,32 +217,7 @@ export function OnboardingSignUpForm({
     selectedStoreForm?.store_name || confirmedStoreInsert?.store_name || 'your store'
 
   return (
-    <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
-      {/* Mode indicator for development */}
-      {process.env.NODE_ENV === 'development' && (
-        <Alert>
-          <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>🧪 {ONBOARDING_MODE.toUpperCase()} MODE</strong>
-            {ONBOARDING_MODE === 'mock' && ' - No database changes, returns fake success'}
-            {ONBOARDING_MODE === 'test' &&
-              currentUser?.id &&
-              ` - Using your account (${currentUser.id.slice(0, 8)}...)`}
-            {ONBOARDING_MODE === 'production' && ' - Full signup with new user account'}
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Business verification status */}
-      {businessCheckResult && !businessCheckResult.exists && (
-        <Alert>
-          <CheckCircle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Business Verified!</strong> This store is available for registration.
-          </AlertDescription>
-        </Alert>
-      )}
-
+    <div className={cn('flex flex-col gap-6 mx-auto', className)} {...props}>
       {/* Auth requirement warning */}
       {showAuthWarning && (
         <Alert variant="destructive">
@@ -265,7 +240,7 @@ export function OnboardingSignUpForm({
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input
                   id="fullName"
@@ -277,7 +252,7 @@ export function OnboardingSignUpForm({
                 />
               </div>
 
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -292,7 +267,7 @@ export function OnboardingSignUpForm({
               {/* Only show password fields in production mode */}
               {ONBOARDING_MODE === 'production' && (
                 <>
-                  <div className="grid gap-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
@@ -308,7 +283,7 @@ export function OnboardingSignUpForm({
                     </Typography>
                   </div>
 
-                  <div className="grid gap-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="confirm-password">Confirm Password</Label>
                     <Input
                       id="confirm-password"

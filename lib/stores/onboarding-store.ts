@@ -1,6 +1,13 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { STORE_TYPES } from '@/lib/schemas/store-schemas'
+import {
+  getAvailableSteps,
+  getStepIdByIndex,
+  getStepIndexById,
+  STEP_IDS,
+  type StepId,
+} from '@/lib/utils/onboarding-steps'
 import type { Database } from '@/types/supabase'
 
 // Database types
@@ -69,9 +76,15 @@ export type OnboardingStore = OnboardingData & {
   setIsCheckingBusiness: (checking: boolean) => void
   reset: () => void
 
-  // Current step
+  // Current step (supports both step numbers and IDs)
   currentStep: number
+  currentStepId: StepId
   setCurrentStep: (step: number) => void
+  setCurrentStepById: (stepId: StepId, isGooglePlacesEnabled: boolean) => void
+
+  // Navigation helpers
+  goToNextStep: (isGooglePlacesEnabled: boolean) => void
+  goToPreviousStep: (isGooglePlacesEnabled: boolean) => void
 
   // Helper methods
   convertFormDataToInsert: (formData: StoreFormData, storeCode: string) => StoreInsert
@@ -95,9 +108,10 @@ const initialState: OnboardingData = {
 
 export const useOnboardingStore = create<OnboardingStore>()(
   devtools(
-    set => ({
+    (set, get) => ({
       ...initialState,
       currentStep: 1,
+      currentStepId: STEP_IDS.STORE_SEARCH, // Default to first step
 
       setSearchQuery: query => set({ searchQuery: query }),
       setSelectedStoreForm: store => set({ selectedStoreForm: store, isManualEntry: false }),
@@ -108,8 +122,50 @@ export const useOnboardingStore = create<OnboardingStore>()(
       setConfirmed: confirmed => set({ isConfirmed: confirmed }),
       setBusinessCheckResult: result => set({ businessCheckResult: result }),
       setIsCheckingBusiness: checking => set({ isCheckingBusiness: checking }),
-      setCurrentStep: step => set({ currentStep: step }),
-      reset: () => set({ ...initialState, currentStep: 1 }),
+
+      setCurrentStep: step => {
+        set({ currentStep: step })
+      },
+
+      setCurrentStepById: (stepId: StepId, isGooglePlacesEnabled: boolean) => {
+        const stepIndex = getStepIndexById(stepId, isGooglePlacesEnabled)
+        set({ currentStep: stepIndex, currentStepId: stepId })
+      },
+
+      goToNextStep: (isGooglePlacesEnabled: boolean) => {
+        const { currentStepId } = get()
+        const availableSteps = getAvailableSteps(isGooglePlacesEnabled)
+        const currentIndex = availableSteps.findIndex(step => step.id === currentStepId)
+
+        if (currentIndex < availableSteps.length - 1) {
+          const nextStep = availableSteps[currentIndex + 1]
+          set({
+            currentStep: currentIndex + 2, // +2 because of 1-based indexing
+            currentStepId: nextStep.id,
+          })
+        }
+      },
+
+      goToPreviousStep: (isGooglePlacesEnabled: boolean) => {
+        const { currentStepId } = get()
+        const availableSteps = getAvailableSteps(isGooglePlacesEnabled)
+        const currentIndex = availableSteps.findIndex(step => step.id === currentStepId)
+
+        if (currentIndex > 0) {
+          const previousStep = availableSteps[currentIndex - 1]
+          set({
+            currentStep: currentIndex, // currentIndex is already 1-based when going backwards
+            currentStepId: previousStep.id,
+          })
+        }
+      },
+
+      reset: () =>
+        set({
+          ...initialState,
+          currentStep: 1,
+          currentStepId: STEP_IDS.STORE_SEARCH,
+        }),
 
       // Helper method to convert form data to database insert format
       convertFormDataToInsert: (formData: StoreFormData, storeCode: string): StoreInsert => ({

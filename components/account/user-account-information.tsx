@@ -199,7 +199,7 @@ export default function UserAccountInformation() {
                       placeholder={t('profile.placeholders.fullName')}
                     />
                     {profileForm.formState.errors.full_name && (
-                      <Typography variant="small" className="text-destructive">
+                      <Typography variant="p" className="text-destructive">
                         {profileForm.formState.errors.full_name.message}
                       </Typography>
                     )}
@@ -211,10 +211,9 @@ export default function UserAccountInformation() {
                       id="username"
                       {...profileForm.register('username')}
                       placeholder={t('profile.placeholders.username')}
-                      className="font-mono"
                     />
                     {profileForm.formState.errors.username && (
-                      <Typography variant="small" className="text-destructive">
+                      <Typography variant="p" className="text-destructive">
                         {profileForm.formState.errors.username.message}
                       </Typography>
                     )}
@@ -246,28 +245,20 @@ export default function UserAccountInformation() {
             </form>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  {t('profile.fullName')}
-                </Typography>
+              <div className="flex flex-col gap-2">
+                <Typography variant="p">{t('profile.fullName')}</Typography>
                 <Typography variant="p">{user.full_name || t('profile.noName')}</Typography>
               </div>
 
-              <div>
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  {t('profile.username')}
-                </Typography>
-                <Typography variant="p" className="font-mono">
-                  {user.username || t('profile.noUsername')}
-                </Typography>
+              <div className="flex flex-col gap-2">
+                <Typography variant="p">{t('profile.username')}</Typography>
+                <Typography variant="p">{user.username || t('profile.noUsername')}</Typography>
               </div>
 
-              <div>
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  {t('profile.email')}
-                </Typography>
+              <div className="flex flex-col gap-2">
+                <Typography variant="p">{t('profile.email')}</Typography>
                 <Typography variant="p">{user.email}</Typography>
-                <Typography variant="small" className="text-muted-foreground mt-1">
+                <Typography className="mt-1 text-primary-900" variant="p">
                   {t('profile.emailNotice')}
                 </Typography>
               </div>
@@ -310,9 +301,7 @@ export default function UserAccountInformation() {
                   onChange={e => setPhoneForm(e.target.value)}
                   placeholder={t('phone.placeholder')}
                 />
-                <Typography variant="small" className="text-muted-foreground">
-                  {t('phone.description')}
-                </Typography>
+                <Typography variant="p">{t('phone.description')}</Typography>
               </div>
 
               <div className="flex items-center gap-2">
@@ -335,7 +324,7 @@ export default function UserAccountInformation() {
               </div>
             </div>
           ) : (
-            <div>
+            <div className="flex flex-col gap-2">
               <Typography variant="p" className="flex items-center gap-2">
                 {user.phone ? formatPhoneNumber(user.phone) : t('phone.noPhone')}
                 {user.phone_verified && (
@@ -343,7 +332,7 @@ export default function UserAccountInformation() {
                 )}
               </Typography>
               {!user.phone && (
-                <Typography variant="small" className="text-muted-foreground mt-1">
+                <Typography variant="p" className="text-muted-foreground mt-1">
                   {t('phone.addNotice')}
                 </Typography>
               )}
@@ -356,10 +345,10 @@ export default function UserAccountInformation() {
             {t('language.title')}
           </Typography>
 
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex flex-col gap-2">
               <Typography variant="p">{t('language.description')}</Typography>
-              <Typography variant="small" className="text-muted-foreground mt-1">
+              <Typography variant="p">
                 {t('language.currentLanguage')}: {user.language_preference?.toUpperCase() || 'EN'}
               </Typography>
             </div>
@@ -372,47 +361,47 @@ export default function UserAccountInformation() {
             {t('status.title')}
           </Typography>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  {t('status.accountStatus')}
-                </Typography>
-                <Typography variant="p">
-                  {user.is_active ? t('status.active') : t('status.inactive')}
-                </Typography>
+              <div className="flex items-center justify-between w-full gap-2">
+                <Typography variant="p">{t('status.accountStatus')}</Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p">
+                    {user.is_active ? t('status.active') : t('status.inactive')}
+                  </Typography>
+                  <div
+                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}
+                  />
+                </div>
               </div>
-              <div
-                className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}
-              />
             </div>
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  {t('status.emailVerified')}
-                </Typography>
-                <Typography variant="p">
-                  {user.email_verified ? t('status.verified') : t('status.unverified')}
-                </Typography>
+              <div className="flex items-center justify-between w-full gap-2">
+                <Typography variant="p">{t('status.emailVerified')}</Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p">
+                    {user.email_verified ? t('status.verified') : t('status.unverified')}
+                  </Typography>
+                  <div
+                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                  />
+                </div>
               </div>
-              <div
-                className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
-              />
             </div>
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <Typography variant="small" className="font-medium text-muted-foreground">
-                  {t('status.phoneVerified')}
-                </Typography>
-                <Typography variant="p">
-                  {user.phone_verified ? t('status.verified') : t('status.unverified')}
-                </Typography>
+              <div className="flex items-center justify-between w-full gap-2">
+                <Typography variant="p">{t('status.phoneVerified')}</Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p">
+                    {user.phone_verified ? t('status.verified') : t('status.unverified')}
+                  </Typography>
+                  <div
+                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                  />
+                </div>
               </div>
-              <div
-                className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
-              />
             </div>
           </div>
         </div>
@@ -423,23 +412,11 @@ export default function UserAccountInformation() {
           </Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Typography variant="small" className="font-medium text-muted-foreground">
+            <div className="flex flex-col gap-2 mt-2">
+              <Typography variant="p">
                 {t('activity.memberSince', {
                   date: new Date(user.created_at).toLocaleDateString(),
                 })}
-              </Typography>
-              <Typography variant="p">{new Date(user.created_at).toLocaleDateString()}</Typography>
-            </div>
-
-            <div>
-              <Typography variant="small" className="font-medium text-muted-foreground">
-                {t('activity.lastLogin', { date: new Date(user.last_login).toLocaleDateString() })}
-              </Typography>
-              <Typography variant="p">
-                {user.last_login
-                  ? new Date(user.last_login).toLocaleDateString()
-                  : t('activity.neverLoggedIn')}
               </Typography>
             </div>
           </div>

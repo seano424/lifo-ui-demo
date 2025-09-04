@@ -3,11 +3,18 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { Typography, type TypographyProps } from './typography'
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+type CardProps = React.HTMLAttributes<HTMLDivElement> & {
+  shadow?: 'none' | 'primary' | 'secondary'
+}
+
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & CardProps>(
+  ({ className, shadow = 'none', ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('rounded-3xl border bg-card text-card-foreground shadow-sm', className)}
+      className={cn('rounded-3xl border bg-card text-card-foreground shadow-sm', className, {
+        'shadow-primary-300 shadow-xl border-t-0': shadow === 'primary',
+        'shadow-secondary-300 shadow-xl border-t-0': shadow === 'secondary',
+      })}
       {...props}
     />
   ),

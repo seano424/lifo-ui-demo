@@ -32,7 +32,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push('/protected')
+      router.push('/dashboard')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -56,7 +56,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
         <CardContent>
           <form onSubmit={handleForgotPassword}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="password">New password</Label>
                 <Input
                   id="password"

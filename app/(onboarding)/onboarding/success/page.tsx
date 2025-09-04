@@ -1,42 +1,36 @@
-// app/(onboarding)/onboarding/success/page.tsx
-
-import { ArrowRight, CheckCircle, Mail } from 'lucide-react'
-import Link from 'next/link'
+import { Check, Mail } from 'lucide-react'
 import { Suspense } from 'react'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 
 function SuccessContent() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="max-w-md mx-auto space-y-6">
         {/* Success Icon */}
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
+        <div className="text-center flex flex-col items-center gap-2">
+          <Check className="w-10 h-10 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
           <Typography variant="h1">Account Created Successfully!</Typography>
         </div>
 
-        <Card>
+        <Card shadow="primary" className="flex flex-col gap-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5" />
               Check Your Email
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <Typography variant="p" color="muted">
               We&#39;ve sent you a confirmation email. Please check your inbox and click the
               verification link to activate your account.
             </Typography>
 
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <Typography variant="p" className="text-sm">
+            <div>
+              <Typography variant="p">
                 <strong>What&#39;s next?</strong>
               </Typography>
-              <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+              <ul className="mt-2 space-y-1">
                 <li>1. Check your email for verification link</li>
                 <li>2. Click the link to verify your account</li>
                 <li>3. Access your store dashboard</li>
@@ -44,27 +38,7 @@ function SuccessContent() {
               </ul>
             </div>
 
-            <div className="space-y-3">
-              <Link href="/dashboard" className="block">
-                <Button className="w-full">
-                  Go to Dashboard
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-
-              <Link href="/auth/signin" className="block">
-                <Button variant="outline" className="w-full">
-                  Sign In Later
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Support Information */}
-        <Card className="bg-muted/50">
-          <CardContent className="pt-4">
-            <Typography variant="p" color="muted" className="text-center text-sm">
+            <Typography>
               Didn&#39;t receive the email? Check your spam folder or{' '}
               <a
                 href="mailto:support@lifo.ai?subject=Email Verification Issue"

@@ -70,11 +70,8 @@ import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '../ui/card'
 
-// Import the new components
-
 import { EnhancedAddEmployeeDialog } from './enhanced-add-employee-dialog'
 
-// 🚀 NEW: Interface for component props
 interface StoreUsersListProps {
   storeId?: string // Server-provided store ID
   serverPermissions?: UserStorePermissions // Server-computed permissions
@@ -206,7 +203,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                 <TableHead>{t('email')}</TableHead>
                 <TableHead>{t('role')}</TableHead>
                 <TableHead>{t('status')}</TableHead>
-                {canManageUsers && <TableHead>{t('pinStatus')}</TableHead>}
+                {/* {canManageUsers && <TableHead>{t('pinStatus')}</TableHead>} */}
                 {canManageUsers && <TableHead>{t('actions')}</TableHead>}
               </TableRow>
             </TableHeader>
@@ -229,7 +226,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                         {storeUser.is_active ? t('active') : t('inactive')}
                       </span>
                     </TableCell>
-                    {canManageUsers && (
+                    {/* {canManageUsers && (
                       <TableCell>
                         {hasPINAuth(storeUser) ? (
                           isPINLocked(storeUser) ? (
@@ -247,7 +244,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                           <span className="text-sm">{t('noPin')}</span>
                         )}
                       </TableCell>
-                    )}
+                    )} */}
 
                     {canManageUsers && (
                       <TableCell>
@@ -528,7 +525,9 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <RefreshCw className="w-5 h-5" />
-                  {t('dialogs.resetPin.title', { name: selectedUser.full_name || '' })}
+                  {t('dialogs.resetPin.title', {
+                    name: selectedUser.full_name || '',
+                  })}
                 </DialogTitle>
                 <DialogDescription>{t('dialogs.resetPin.description')}</DialogDescription>
               </DialogHeader>
@@ -588,7 +587,9 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Unlock className="w-5 h-5" />
-                  {t('dialogs.unlockPin.title', { name: selectedUser.full_name || '' })}
+                  {t('dialogs.unlockPin.title', {
+                    name: selectedUser.full_name || '',
+                  })}
                 </DialogTitle>
                 <DialogDescription>{t('dialogs.unlockPin.description')}</DialogDescription>
               </DialogHeader>

@@ -1,8 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Form,
@@ -12,7 +12,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+import { FormFieldWrapper, OptionalFormFieldWrapper } from '@/components/ui/form-field-wrapper'
+import { FormNavigation } from '@/components/ui/form-navigation'
 import {
   Select,
   SelectContent,
@@ -20,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Typography } from '@/components/ui/typography'
+import { StepHeader } from '@/components/ui/step-header'
 import {
   STORE_TYPE_LABELS,
   STORE_TYPES,
@@ -28,6 +29,7 @@ import {
   storeFormSchema,
 } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 // Type guard for store_type
 function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {
@@ -36,8 +38,11 @@ function isStoreType(value: string | null | undefined): value is StoreFormData['
 }
 
 export function StoreTypeStep() {
-  const { selectedStoreForm, isManualEntry, setSelectedStoreForm, setCurrentStep } =
+  const { selectedStoreForm, isManualEntry, setSelectedStoreForm, goToNextStep, goToPreviousStep } =
     useOnboardingStore()
+
+  // Memoize Google Places status to avoid recalculation
+  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
 
   const form = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -71,25 +76,19 @@ export function StoreTypeStep() {
     }
 
     setSelectedStoreForm(storeFormData)
-    setCurrentStep(3)
+    // Navigate to the next step using the centralized navigation
+    goToNextStep(googlePlacesEnabled)
   }
 
   const handleBack = () => {
-    setCurrentStep(1)
+    goToPreviousStep(googlePlacesEnabled)
   }
 
+  const canGoBack = googlePlacesEnabled
+
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-2">
-        <Typography variant="h1">
-          {isManualEntry ? 'Add Store Details' : 'Complete Store Information'}
-        </Typography>
-        <Typography variant="p" color="muted">
-          {isManualEntry
-            ? 'Enter your store information'
-            : 'Select your store type and verify details'}
-        </Typography>
-      </div>
+    <div className="mx-auto space-y-4">
+      <StepHeader title={isManualEntry ? 'Add Store Details' : 'Complete Store Information'} />
 
       <Card>
         <CardHeader>
@@ -98,33 +97,19 @@ export function StoreTypeStep() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField<StoreFormData>
+              <FormFieldWrapper
                 control={form.control}
                 name="store_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Store Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Your Store Name"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Store Name"
+                placeholder="Your Store Name"
+                required
               />
 
               <FormField<StoreFormData>
                 control={form.control}
                 name="store_type"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel>Store Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -148,147 +133,65 @@ export function StoreTypeStep() {
                 )}
               />
 
-              <FormField<StoreFormData>
+              <OptionalFormFieldWrapper
                 control={form.control}
                 name="business_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Name (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="If different from store name"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Business Name"
+                placeholder="If different from store name"
               />
 
-              <FormField<StoreFormData>
+              <FormFieldWrapper
                 control={form.control}
                 name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="123 Rue de la Paix"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Address"
+                placeholder="123 Rue de la Paix"
+                required
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormField<StoreFormData>
+                <FormFieldWrapper
                   control={form.control}
                   name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>City</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Paris"
-                          {...field}
-                          value={
-                            typeof field.value === 'string' || typeof field.value === 'number'
-                              ? field.value
-                              : ''
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="City"
+                  placeholder="Paris"
+                  required
                 />
 
-                <FormField<StoreFormData>
+                <FormFieldWrapper
                   control={form.control}
                   name="postal_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Postal Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="75001"
-                          {...field}
-                          value={
-                            typeof field.value === 'string' || typeof field.value === 'number'
-                              ? field.value
-                              : ''
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Postal Code"
+                  placeholder="75001"
+                  required
                 />
               </div>
 
-              <FormField<StoreFormData>
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="France"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormFieldWrapper
+                  control={form.control}
+                  name="country"
+                  label="Country"
+                  placeholder="France"
+                  required
+                />
 
-              <FormField<StoreFormData>
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="01 23 45 67 89"
-                        {...field}
-                        value={
-                          typeof field.value === 'string' || typeof field.value === 'number'
-                            ? field.value
-                            : ''
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={handleBack} className="w-full">
-                  Back
-                </Button>
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? 'Validating...' : 'Continue'}
-                </Button>
+                <OptionalFormFieldWrapper
+                  control={form.control}
+                  name="phone"
+                  label="Phone Number"
+                  placeholder="01 23 45 67 89"
+                  type="tel"
+                />
               </div>
+
+              <FormNavigation
+                onBack={canGoBack ? handleBack : undefined}
+                onNext={() => {}} // Form submission is handled by onSubmit
+                nextLabel="Continue"
+                isSubmitting={form.formState.isSubmitting}
+                showBack={canGoBack}
+                nextType="submit"
+              />
             </form>
           </Form>
         </CardContent>

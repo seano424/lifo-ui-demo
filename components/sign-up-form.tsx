@@ -42,7 +42,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       })
       if (error) throw error
@@ -70,7 +70,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -81,7 +81,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                   onChange={e => setEmail(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
@@ -95,7 +95,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                   onChange={e => setPassword(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="repeat-password">Repeat Password</Label>
                 </div>
