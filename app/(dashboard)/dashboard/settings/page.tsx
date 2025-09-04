@@ -44,7 +44,9 @@ export default function UnifiedSettingsPage() {
     // Update URL without causing navigation
     const newSearchParams = new URLSearchParams(searchParams.toString())
     newSearchParams.set('tab', newTab)
-    router.push(`/dashboard/settings?${newSearchParams.toString()}`, { scroll: false })
+    router.push(`/dashboard/settings?${newSearchParams.toString()}`, {
+      scroll: false,
+    })
   }
 
   // Determine which tabs to show based on permissions (single loading state!)
@@ -75,8 +77,8 @@ export default function UnifiedSettingsPage() {
   // Show error state
   if (error) {
     return (
-      <div className="xl:w-[768px] mx-auto space-y-6 w-full">
-        <DashboardInsetHeader title={t('title')} description={t('description')} className="py-4" />
+      <div className="flex flex-col gap-6">
+        <DashboardInsetHeader title={t('title')} description={t('description')} />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{t('errors.loadingFailed')}</AlertDescription>
@@ -88,8 +90,8 @@ export default function UnifiedSettingsPage() {
   // Show loading state while permissions load (now much faster with single query!)
   if (isLoadingPermissions) {
     return (
-      <div className="xl:w-[768px] mx-auto space-y-6 w-full">
-        <DashboardInsetHeader title={t('title')} description={t('description')} className="py-4" />
+      <div className="flex flex-col gap-6">
+        <DashboardInsetHeader title={t('title')} description={t('description')} />
         <div className="space-y-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-32 w-full" />
@@ -100,8 +102,8 @@ export default function UnifiedSettingsPage() {
   }
 
   return (
-    <div className="xl:w-[768px] mx-auto space-y-6 w-full">
-      <DashboardInsetHeader title={t('title')} description={t('description')} className="py-4" />
+    <div className="flex flex-col gap-6">
+      <DashboardInsetHeader title={t('title')} description={t('description')} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {/* Show skeleton loader for tabs while permissions are loading */}
@@ -114,7 +116,9 @@ export default function UnifiedSettingsPage() {
         ) : (
           <TabsList
             className="grid w-full"
-            style={{ gridTemplateColumns: `repeat(${visibleTabs()?.length}, 1fr)` }}
+            style={{
+              gridTemplateColumns: `repeat(${visibleTabs()?.length}, 1fr)`,
+            }}
           >
             {visibleTabs()?.includes('store') && (
               <TabsTrigger value="store" className="flex items-center gap-2">

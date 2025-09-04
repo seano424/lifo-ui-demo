@@ -13,7 +13,7 @@ export default function Page() {
   const hasBatches = batches && batches.length > 0
 
   return (
-    <div className="flex flex-col gap-8 px-2 md:px-10 mb-40">
+    <div className="flex flex-col gap-6">
       <DashboardInsetHeader title="Dashboard Overview" />
       {hasBatches && <UrgentAlerts />}
       {hasBatches && (

@@ -47,20 +47,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Button size="icon" className="border rounded-full">
                 <BellIcon className="w-4 h-4" />
               </Button>
-              {/* <Button
-                size="default"
-                className="border hidden md:flex"
-              >
-                <BellIcon className="w-4 h-4" />
-                Notifications
-              </Button> */}
+
               <div className="hidden md:block">
                 <TeamSwitcher />
               </div>
               <UserButton />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto">{children}</div>
+          <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto items-center">
+            <div className="w-full max-w-5xl">{children}</div>
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </HydrationBoundary>
