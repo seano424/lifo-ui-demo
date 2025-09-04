@@ -117,12 +117,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create auth email using the working pattern
-    const authEmail = `${username}@seantest.dev`
-
     // ✅ Create user using Admin API with proper service role permissions
     const { data: newUser, error: createError } = await adminSupabase.auth.admin.createUser({
-      email: authEmail,
+      email: email, // Use the actual email provided by the user
       password: pin, // PIN becomes password
       email_confirm: true,
       user_metadata: {
@@ -131,7 +128,6 @@ export async function POST(request: NextRequest) {
         role: 'employee',
         language_preference: languagePreference,
         created_by_admin: true,
-        contact_email: email, // Store real email for notifications
         store_id: storeId, // Store the store context
       },
     })
@@ -209,8 +205,7 @@ export async function POST(request: NextRequest) {
       success: true,
       user_id: newUser.user.id,
       username,
-      email, // Return contact email for display
-      auth_email: authEmail, // Return auth email for technical reference
+      email, // Return the actual user email
       pin,
       role,
       message: 'Employee created successfully using Admin API',

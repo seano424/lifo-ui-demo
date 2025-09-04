@@ -101,152 +101,123 @@ function generateWelcomeEmailHTML(
 ): string {
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to LIFO</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8fafc;
-        }
-        .email-container {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .logo {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 12px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 24px;
-        }
-        .credentials-box {
-            background: #f1f5f9;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
-        }
-        .credential-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .credential-item:last-child {
-            border-bottom: none;
-        }
-        .credential-label {
-            font-weight: 600;
-            color: #475569;
-        }
-        .credential-value {
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            font-size: 16px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .pin-value {
-            font-size: 20px;
-            color: #3b82f6;
-            letter-spacing: 2px;
-        }
-        .instructions {
-            background: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            padding: 16px;
-            margin: 24px 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .instructions h3 {
-            margin: 0 0 12px 0;
-            color: #1e40af;
-        }
-        .steps {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .steps li {
-            margin: 8px 0;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
-            font-size: 14px;
-        }
-    </style>
+    <title>Welcome to ${storeName} - Your Login Credentials</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="email-container">
-        <div class="header">
-            <div class="logo">L</div>
-            <h1 style="margin: 0; color: #1e293b;">Welcome to ${storeName}</h1>
-            <p style="margin: 8px 0 0 0; color: #64748b;">Your employee account has been successfully created</p>
-        </div>
-
-        <p>Hello <strong>${credentials.full_name}</strong>,</p>
-        
-        <p>Welcome to the team! Your LIFO account has been created and you can now access the inventory management system.</p>
-
-        <div class="credentials-box">
-            <h3 style="margin: 0 0 16px 0; color: #1e293b;">Your Login Credentials:</h3>
-            
-            <div class="credential-item">
-                <span class="credential-label">Username:</span>
-                <span class="credential-value">${credentials.username}</span>
-            </div>
-            
-            <div class="credential-item">
-                <span class="credential-label">PIN Code:</span>
-                <span class="credential-value pin-value">${credentials.pin}</span>
-            </div>
-            
-            <div class="credential-item">
-                <span class="credential-label">Email:</span>
-                <span class="credential-value">${credentials.email}</span>
-            </div>
-        </div>
-
-        <div class="instructions">
-            <h3>How to Log In:</h3>
-            <ol class="steps">
-                <li>Open the LIFO app on the store tablet</li>
-                <li>Select the <strong>"Employee"</strong> tab</li>
-                <li>Enter your username and PIN code</li>
-                <li>Start scanning products and managing inventory</li>
-            </ol>
-        </div>
-
-        <p><strong>Important:</strong> Keep your credentials secure and don't share them with anyone. Your PIN code can be reset at any time by your manager.</p>
-
-        <div class="footer">
-            <p>Need help? Contact your manager</p>
-            <p style="margin: 8px 0 0 0;">© 2025 LIFO - Intelligent Food Waste Reduction</p>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(9, 13, 26, 0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 20px 40px; text-align: center;">
+                            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/logo-white-bg.png" alt="LIFO.AI" style="height: 80px;">
+                          
+                            <h1 style="color: hsl(225 42% 8%); font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px; font-family: 'Raleway', sans-serif;">
+                                Welcome to LIFO!
+                            </h1>
+                            <p style="color: hsl(225 42% 8%); font-size: 18px; font-weight: 600; line-height: 24px; margin: 8px 0 0 0;">
+                                Join your team, ${storeName}!
+                            </p>
+                            <p style="color: hsl(220 8% 46%); font-size: 14px; line-height: 20px; margin: 8px 0 0 0;">
+                                Your employee account has been successfully created
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 0 40px 40px 40px;">
+                            <p style="color: #374151; font-size: 16px; line-height: 24px; margin: 0 0 24px 0;">
+                                Hello <strong>${credentials.full_name}</strong>,
+                            </p>
+                            
+                            <p style="color: #374151; font-size: 16px; line-height: 24px; margin: 0 0 24px 0;">
+                                Welcome to the team! Your LIFO account has been created and you can now access the inventory management system. 🚀
+                            </p>
+                            
+                            <!-- Credentials Box -->
+                            <div style="background: linear-gradient(135deg, hsl(252 100% 98%) 0%, hsl(227 100% 98%) 100%); border-radius: 8px; padding: 24px; margin: 0 0 24px 0;">
+                                <p style="color: hsl(252 100% 30%); font-size: 16px; font-weight: 600; margin: 0 0 16px 0;">
+                                    Your Login Credentials:
+                                </p>
+                                
+                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: hsl(252 100% 45%); font-weight: 500; width: 30%;">
+                                            Username:
+                                        </td>
+                                        <td style="padding: 8px 0; color: hsl(225 42% 8%); font-family: monospace; font-weight: 600; font-size: 16px;">
+                                            ${credentials.username}
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: hsl(252 100% 45%); font-weight: 500; width: 30%;">
+                                            PIN Code:
+                                        </td>
+                                        <td style="padding: 8px 0; color: hsl(252 100% 57%); font-family: monospace; font-weight: 700; font-size: 20px; letter-spacing: 2px;">
+                                            ${credentials.pin}
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: hsl(252 100% 45%); font-weight: 500; width: 30%;">
+                                            Email:
+                                        </td>
+                                        <td style="padding: 8px 0; color: hsl(225 42% 8%); font-family: monospace; font-weight: 600; font-size: 16px;">
+                                            ${credentials.email}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <!-- Instructions -->
+                            <div style="background: linear-gradient(135deg, hsl(227 100% 98%) 0%, hsl(227 100% 95%) 100%); border-radius: 8px; padding: 24px; margin: 0 0 24px 0;">
+                                <p style="color: hsl(227 100% 40%); font-size: 16px; font-weight: 600; margin: 0 0 12px 0;">
+                                    How to Log In:
+                                </p>
+                                <ol style="color: hsl(227 100% 35%); font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
+                                    <li>Open the LIFO app on the store tablet</li>
+                                    <li>Select the <strong>"Employee"</strong> tab</li>
+                                    <li>Enter your username and PIN code</li>
+                                    <li>Start scanning products and managing inventory</li>
+                                </ol>
+                            </div>
+                            
+                            <!-- Security Notice -->
+                            <div style="background-color: hsl(252 100% 100%); border-radius: 8px; padding: 16px; margin: 0 0 24px 0;">
+                                <p style="color: hsl(227 100% 58%); font-size: 14px; line-height: 20px; margin: 0;">
+                                    <strong>Important:</strong> Keep your credentials secure and don't share them with anyone. Your PIN code can be reset at any time by your manager.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 40px; background: linear-gradient(135deg, hsl(225 42% 8%) 0%, hsl(225 42% 12%) 100%); border-radius: 0 0 12px 12px; text-align: center;">
+                            <p style="color: hsl(220 8% 65%); font-size: 14px; margin: 0 0 8px 0;">
+                                Need help? Contact your manager
+                            </p>
+                            <p style="color: hsl(220 8% 46%); font-size: 12px; margin: 0;">
+                                © 2025 LIFO - Smart Food Surplus Management
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
   `

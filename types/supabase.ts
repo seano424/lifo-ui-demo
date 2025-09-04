@@ -1416,6 +1416,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      calculate_batch_score_manual: {
+        Args: { batch_row: Database["inventory"]["Tables"]["batches"]["Row"] }
+        Returns: undefined
+      }
       daily_batch_expiry_cleanup: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -1792,6 +1796,63 @@ export type Database = {
           previous_value: number
         }[]
       }
+      get_store_alerts_optimized: {
+        Args: { p_store_id: string }
+        Returns: {
+          batch_id: string
+          batch_number: string
+          brand: string
+          calculated_at: string
+          category: string
+          composite_score: number
+          cost_price: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          location_code: string
+          margin_percent: number
+          potential_loss: number
+          product_name: string
+          recommendation: string
+          selling_price: number
+          sku: string
+          supplier: string
+          unit_type: string
+          urgency_level: string
+          urgency_level_calculated: string
+        }[]
+      }
+      get_store_analytics_overview: {
+        Args: {
+          p_end_date: string
+          p_start_date: string
+          p_store_id: string
+          p_threshold?: number
+        }
+        Returns: {
+          actions_taken: number
+          active_alerts: number
+          avg_composite_score: number
+          discount_actions: number
+          expiring_items: number
+          total_batches: number
+          total_discount_value: number
+          total_products: number
+          total_value: number
+          urgent_items: number
+        }[]
+      }
+      get_store_category_analytics: {
+        Args: { p_store_id: string }
+        Returns: {
+          avg_score: number
+          category: string
+          expiring_3days: number
+          high_urgency: number
+          total_items: number
+          total_value: number
+        }[]
+      }
       get_store_insights: {
         Args: { target_store_id: string }
         Returns: Json
@@ -1799,6 +1860,13 @@ export type Database = {
       get_store_settings: {
         Args: { store_id_param: string }
         Returns: Json
+      }
+      get_store_thresholds: {
+        Args: { p_store_id: string }
+        Returns: {
+          critical_threshold: number
+          warning_threshold: number
+        }[]
       }
       get_store_users: {
         Args: { input_store_id: string }
@@ -1843,6 +1911,16 @@ export type Database = {
           total_count: number
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_store_waste_analytics: {
+        Args: { p_end_date: string; p_start_date: string; p_store_id: string }
+        Returns: {
+          expired_items: number
+          expiring_soon: number
+          prevention_potential: number
+          waste_by_category: Json
+          waste_value: number
         }[]
       }
       get_stores_with_batch_counts: {
@@ -1985,6 +2063,37 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      update_store_advanced_settings: {
+        Args: {
+          p_backup_preferences?: Json
+          p_critical_threshold?: number
+          p_currency?: string
+          p_display_preferences?: Json
+          p_notification_preferences?: Json
+          p_opening_hours?: Json
+          p_peak_hours?: Json
+          p_scoring_weights?: Json
+          p_store_id: string
+          p_warning_threshold?: number
+          p_weather_location_lat?: number
+          p_weather_location_lon?: number
+        }
+        Returns: {
+          backup_preferences: Json
+          critical_threshold: number
+          currency: string
+          display_preferences: Json
+          notification_preferences: Json
+          opening_hours: Json
+          peak_hours: Json
+          scoring_weights: Json
+          store_id: string
+          updated_at: string
+          warning_threshold: number
+          weather_location_lat: number
+          weather_location_lon: number
+        }[]
+      }
       update_store_settings: {
         Args: {
           address_param?: string
@@ -2005,6 +2114,19 @@ export type Database = {
           website_url_param?: string
         }
         Returns: Json
+      }
+      update_store_thresholds: {
+        Args: {
+          p_critical_threshold: number
+          p_store_id: string
+          p_warning_threshold: number
+        }
+        Returns: {
+          critical_threshold: number
+          store_id: string
+          updated_at: string
+          warning_threshold: number
+        }[]
       }
       update_store_user_safe: {
         Args: {
@@ -2124,40 +2246,64 @@ export type Database = {
         Row: {
           batch_id: string | null
           calculated_at: string | null
+          category_risk_score: number | null
           composite_score: number | null
           confidence_level: number | null
+          days_to_expiry: number | null
           expiry_score: number | null
+          financial_impact_score: number | null
+          margin_percent: number | null
           margin_score: number | null
           ml_enhanced: boolean | null
+          potential_loss: number | null
+          quantity_risk_score: number | null
           recommendation: string | null
           score_id: string
           store_id: string | null
+          turnover_score: number | null
+          urgency_level: string | null
           velocity_score: number | null
         }
         Insert: {
           batch_id?: string | null
           calculated_at?: string | null
+          category_risk_score?: number | null
           composite_score?: number | null
           confidence_level?: number | null
+          days_to_expiry?: number | null
           expiry_score?: number | null
+          financial_impact_score?: number | null
+          margin_percent?: number | null
           margin_score?: number | null
           ml_enhanced?: boolean | null
+          potential_loss?: number | null
+          quantity_risk_score?: number | null
           recommendation?: string | null
           score_id?: string
           store_id?: string | null
+          turnover_score?: number | null
+          urgency_level?: string | null
           velocity_score?: number | null
         }
         Update: {
           batch_id?: string | null
           calculated_at?: string | null
+          category_risk_score?: number | null
           composite_score?: number | null
           confidence_level?: number | null
+          days_to_expiry?: number | null
           expiry_score?: number | null
+          financial_impact_score?: number | null
+          margin_percent?: number | null
           margin_score?: number | null
           ml_enhanced?: boolean | null
+          potential_loss?: number | null
+          quantity_risk_score?: number | null
           recommendation?: string | null
           score_id?: string
           store_id?: string | null
+          turnover_score?: number | null
+          urgency_level?: string | null
           velocity_score?: number | null
         }
         Relationships: []
@@ -2167,7 +2313,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      recalculate_store_scores: {
+        Args: { p_store_id: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

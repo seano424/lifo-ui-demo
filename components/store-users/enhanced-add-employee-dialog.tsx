@@ -1,11 +1,9 @@
-// Enhanced Add Employee Dialog that handles both new users and existing user invitations
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
 import {
   AlertTriangle,
   Check,
-  Copy,
   Crown,
   Key,
   Mail,
@@ -42,6 +40,7 @@ import { Separator } from '@/components/ui/separator'
 import { type EmailSendResult, getEmailErrorMessage, sendWelcomeEmail } from '@/lib/email/client'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import { Typography } from '../ui/typography'
 
 interface EnhancedAddEmployeeDialogProps {
   isOpen: boolean
@@ -120,7 +119,7 @@ export function EnhancedAddEmployeeDialog({
   })
 
   const [createdCredentials, setCreatedCredentials] = useState<CreatedCredentials | null>(null)
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+  // const [copiedField, setCopiedField] = useState<string | null>(null)
 
   const queryClient = useQueryClient()
 
@@ -493,16 +492,16 @@ export function EnhancedAddEmployeeDialog({
   }
 
   // Copy to clipboard
-  const copyToClipboard = async (text: string, field: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopiedField(field)
-      toast.success(t('toast.copied', { field }))
-      setTimeout(() => setCopiedField(null), 2000)
-    } catch {
-      toast.error(t('errors.copyFailed'))
-    }
-  }
+  // const copyToClipboard = async (text: string, field: string) => {
+  //   try {
+  //     await navigator.clipboard.writeText(text)
+  // setCopiedField(field)
+  //     toast.success(t('toast.copied', { field }))
+  // setTimeout(() => setCopiedField(null), 2000)
+  //   } catch {
+  //     toast.error(t('errors.copyFailed'))
+  //   }
+  // }
 
   // Reset form
   const resetForm = () => {
@@ -518,7 +517,7 @@ export function EnhancedAddEmployeeDialog({
     setExistingUser(null)
     setFlowType('create_new')
     setCreatedCredentials(null)
-    setCopiedField(null)
+    // setCopiedField(null)
     setUsernameAvailable(null)
     setEmailStatus({ sent: false, sending: false })
   }
@@ -693,7 +692,7 @@ export function EnhancedAddEmployeeDialog({
                       disabled={isLoading}
                       className={`pr-10 ${
                         usernameAvailable === true
-                          ? 'border-green-500'
+                          ? 'border-primary-500'
                           : usernameAvailable === false
                             ? 'border-red-500'
                             : ''
@@ -703,7 +702,7 @@ export function EnhancedAddEmployeeDialog({
                       {isCheckingUsername ? (
                         <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin" />
                       ) : usernameAvailable === true ? (
-                        <Check className="w-4 h-4 text-green-500" />
+                        <Check className="w-4 h-4 text-primary-500" />
                       ) : usernameAvailable === false ? (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
                       ) : null}
@@ -713,7 +712,7 @@ export function EnhancedAddEmployeeDialog({
                     {usernameAvailable === false ? (
                       <span className="text-red-600">{t('form.usernameTaken')}</span>
                     ) : usernameAvailable === true ? (
-                      <span className="text-green-600">{t('form.usernameAvailable')}</span>
+                      <span className="text-primary-600">{t('form.usernameAvailable')}</span>
                     ) : (
                       t('form.usernameNote')
                     )}
@@ -835,16 +834,20 @@ export function EnhancedAddEmployeeDialog({
         ) : step === 'credentials' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-green-600">
-                <Check className="w-5 h-5" />
-                {t('success.title')}
+              <DialogTitle className="flex items-center gap-2 text-primary-600">
+                <div className="text-center flex flex-col items-center gap-2">
+                  <Check className="w-10 h-10 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                  <Typography variant="h1">{t('success.title')}</Typography>
+                </div>
               </DialogTitle>
-              <DialogDescription>
-                {t('success.description', { name: createdCredentials?.full_name || '' })}
-              </DialogDescription>
+              {/* <DialogDescription>
+                {t('success.description', {
+                  name: createdCredentials?.full_name || '',
+                })}
+              </DialogDescription> */}
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="space-y-4 text-primary-600 text-center">
               {/* Email Status Alert */}
               <Alert>
                 {emailStatus.sending ? (
@@ -854,38 +857,49 @@ export function EnhancedAddEmployeeDialog({
                   </>
                 ) : emailStatus.sent ? (
                   <>
-                    <Check className="h-4 w-4" />
                     <AlertDescription>
-                      {t('success.emailSent', { email: createdCredentials?.email || '' })}
+                      {t('success.emailSent', {
+                        email: createdCredentials?.email || '',
+                      })}
                     </AlertDescription>
                   </>
                 ) : emailStatus.error ? (
                   <>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      {t('success.emailStatus', { error: emailStatus.error || '' })}
+                      {t('success.emailStatus', {
+                        error: emailStatus.error || '',
+                      })}
                     </AlertDescription>
                   </>
                 ) : (
                   <>
                     <Mail className="h-4 w-4" />
                     <AlertDescription>
-                      {t('success.emailPreparing', { email: createdCredentials?.email || '' })}
+                      {t('success.emailPreparing', {
+                        email: createdCredentials?.email || '',
+                      })}
                     </AlertDescription>
                   </>
                 )}
               </Alert>
 
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">{t('credentials.email')}</Label>
-                    <div className="font-mono text-sm">{createdCredentials?.email}</div>
+                    <Label className="text-sm font-medium">
+                      {t('credentials.email')}
+                    </Label>
+                    <div className="font-mono text-sm">
+                      {createdCredentials?.email}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(createdCredentials?.email || '', 'Email')}
+                    onClick={() =>
+                      copyToClipboard(createdCredentials?.email || '', 'Email')
+                    }
                   >
                     {copiedField === 'Email' ? (
                       <Check className="w-4 h-4" />
@@ -897,13 +911,22 @@ export function EnhancedAddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">{t('credentials.username')}</Label>
-                    <div className="font-mono text-sm">{createdCredentials?.username}</div>
+                    <Label className="text-sm font-medium">
+                      {t('credentials.username')}
+                    </Label>
+                    <div className="font-mono text-sm">
+                      {createdCredentials?.username}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(createdCredentials?.username || '', 'Username')}
+                    onClick={() =>
+                      copyToClipboard(
+                        createdCredentials?.username || '',
+                        'Username'
+                      )
+                    }
                   >
                     {copiedField === 'Username' ? (
                       <Check className="w-4 h-4" />
@@ -915,13 +938,19 @@ export function EnhancedAddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div>
-                    <Label className="text-sm font-medium">{t('credentials.pin')}</Label>
-                    <div className="font-mono text-lg font-bold">{createdCredentials?.pin}</div>
+                    <Label className="text-sm font-medium">
+                      {t('credentials.pin')}
+                    </Label>
+                    <div className="font-mono text-lg font-bold">
+                      {createdCredentials?.pin}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(createdCredentials?.pin || '', 'PIN')}
+                    onClick={() =>
+                      copyToClipboard(createdCredentials?.pin || '', 'PIN')
+                    }
                   >
                     {copiedField === 'PIN' ? (
                       <Check className="w-4 h-4" />
@@ -930,12 +959,14 @@ export function EnhancedAddEmployeeDialog({
                     )}
                   </Button>
                 </div>
-              </div>
+              </div> */}
 
               <Separator />
 
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">{t('nextSteps.title')}</h4>
+              {/* <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium text-blue-900 mb-2">
+                  {t('nextSteps.title')}
+                </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>{t('nextSteps.loginTab')}</li>
                   <li>
@@ -947,7 +978,7 @@ export function EnhancedAddEmployeeDialog({
                   <li>{t('nextSteps.resetPin')}</li>
                   <li>{t('nextSteps.permissions')}</li>
                 </ul>
-              </div>
+              </div> */}
             </div>
 
             <DialogFooter>
@@ -959,7 +990,7 @@ export function EnhancedAddEmployeeDialog({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-green-600">
+              <DialogTitle className="flex items-center gap-2 text-primary-600">
                 <Check className="w-5 h-5" />
                 Invitation Sent Successfully
               </DialogTitle>
