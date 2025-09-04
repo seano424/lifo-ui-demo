@@ -16,6 +16,7 @@ const typographyVariants = cva('', {
       small: 'text-sm font-sans',
       blockquote: 'mt-6 border-l-2 pl-6 italic font-sans',
       code: 'rounded bg-muted px-1.5 py-1 font-mono text-sm font-extrabold font-sans',
+      extraSmall: 'text-xs font-sans',
     },
     color: {
       default: 'text-foreground',

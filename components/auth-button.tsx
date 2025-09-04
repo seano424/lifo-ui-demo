@@ -18,8 +18,8 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
   if (isLoading) {
     return (
       <div className="flex items-center gap-4">
-        <div className="w-20 h-8 bg-gray-200 animate-pulse rounded" />
-        <div className="w-24 h-8 bg-gray-200 animate-pulse rounded" />
+        <div className="w-28 h-10 bg-gray-200 animate-pulse rounded-2xl" />
+        <div className="w-24 h-10 bg-gray-200 animate-pulse rounded-2xl" />
       </div>
     )
   }
@@ -31,6 +31,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
       <Button asChild size="default" variant={'secondary'} className={cn(isMobile && 'w-full')}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
+
       <LogoutButton variant="gray" className={cn(isMobile && 'w-full')} />
     </div>
   ) : (

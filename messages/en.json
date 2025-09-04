@@ -2,6 +2,7 @@
   "navigation": {
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
+    "operations": "Operations",
     "inventory": "Inventory",
     "inbound": "Inbound",
     "outbound": "Outbound",
