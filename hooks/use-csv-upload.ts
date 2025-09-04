@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { CSV_PROCESSING, TOAST_DURATIONS } from '@/lib/constants/file-upload'
 
 interface CSVUploadResponse {
   success: boolean
@@ -51,8 +52,6 @@ export function useCSVUpload() {
 
   // Simple CSV preview (first 10 rows)
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
-    const _startTime = performance.now()
-
     const text = await file.text()
     const lines = text.trim().split('\n')
 
@@ -84,15 +83,13 @@ export function useCSVUpload() {
       const previewItem = {
         SKU: values[skuIndex] || `AUTO-${i}`,
         Product_Name: values[nameIndex] || 'Unknown Product',
-        Category: values[categoryIndex] || 'dry_goods', // Will be mapped using database function
+        Category: values[categoryIndex] || CSV_PROCESSING.DEFAULT_CATEGORY,
         Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
         Expiry_Date: expiryValue,
       }
 
       preview.push(previewItem)
     }
-
-    const _endTime = performance.now()
 
     // Count total items without expiry in the entire file (not just preview)
     let totalItemsWithoutExpiry = 0
@@ -125,8 +122,6 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      const _mutationStartTime = performance.now()
-
       const formData = new FormData()
 
       // If we have modified CSV data, send it as JSON instead of the original file
@@ -139,12 +134,10 @@ export function useCSVUpload() {
       }
 
       // Use the main optimized upload route
-      const _fetchStartTime = performance.now()
       const response = await fetch('/api/inventory/upload', {
         method: 'POST',
         body: formData,
       })
-      const _fetchEndTime = performance.now()
 
       if (!response.ok) {
         console.error('❌ [USE-CSV-UPLOAD] Upload failed with status:', response.status)
@@ -154,7 +147,6 @@ export function useCSVUpload() {
       }
 
       const result = await response.json()
-      const _mutationEndTime = performance.now()
 
       return result
     },
@@ -193,7 +185,7 @@ export function useCSVUpload() {
           data.skipped > 0
             ? `${data.skipped} duplicates auto-skipped • ${speed} items/sec • ${totalTime}ms total${performanceSummary}`
             : `Ultra-fast processing: ${speed} items/sec • ${totalTime}ms total${performanceSummary}`,
-        duration: 7000,
+        duration: TOAST_DURATIONS.SUCCESS,
       })
     },
     onError: (error: Error) => {
@@ -207,7 +199,7 @@ export function useCSVUpload() {
 
       toast.error(`Upload failed: ${error.message}`, {
         description: 'Please check your CSV format and try again',
-        duration: 5000,
+        duration: TOAST_DURATIONS.ERROR,
       })
     },
   })

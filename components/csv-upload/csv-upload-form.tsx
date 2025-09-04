@@ -22,6 +22,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { cn } from '@/lib/utils'
+import { validateUploadFile } from '@/lib/utils/file-validation'
 import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
@@ -74,8 +75,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleFileSelect = async (file: File) => {
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-      toast.error(t('errors.invalidFile'))
+    // Comprehensive file validation
+    const validation = validateUploadFile(file)
+    if (!validation.isValid) {
+      toast.error(validation.error || t('errors.invalidFile'))
       return
     }
 
@@ -109,34 +112,40 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     } catch (error) {
       console.error('CSV upload failed:', error)
 
-      // Provide more specific error feedback to user
+      // Error mapping for better user feedback
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const lowerMessage = errorMessage.toLowerCase()
 
-      if (
-        errorMessage.toLowerCase().includes('network') ||
-        errorMessage.toLowerCase().includes('fetch')
-      ) {
-        toast.error(t('errors.analysisFailure')) // Reuse existing key
-      } else if (errorMessage.toLowerCase().includes('timeout')) {
-        toast.error(`${t('errors.startFailed')}: Request timeout`)
-      } else if (
-        errorMessage.toLowerCase().includes('invalid') ||
-        errorMessage.toLowerCase().includes('malformed')
-      ) {
-        toast.error(t('errors.invalidFile')) // Reuse existing key
-      } else if (
-        errorMessage.toLowerCase().includes('too large') ||
-        errorMessage.toLowerCase().includes('size')
-      ) {
-        toast.error(t('errors.invalidFile')) // Reuse existing key
-      } else {
-        // For development, show specific error; for production, be more generic
-        const userMessage =
-          process.env.NODE_ENV === 'development'
-            ? `${t('errors.startFailed')}: ${errorMessage}`
-            : t('errors.startFailed')
-        toast.error(userMessage)
-      }
+      const errorMappings = [
+        {
+          keywords: ['network', 'fetch'],
+          message: t('errors.analysisFailure'),
+        },
+        {
+          keywords: ['timeout'],
+          message: `${t('errors.startFailed')}: Request timeout`,
+        },
+        {
+          keywords: ['invalid', 'malformed'],
+          message: t('errors.invalidFile'),
+        },
+        {
+          keywords: ['too large', 'size'],
+          message: t('errors.invalidFile'),
+        },
+      ]
+
+      const matchedError = errorMappings.find(mapping =>
+        mapping.keywords.some(keyword => lowerMessage.includes(keyword)),
+      )
+
+      const userMessage =
+        matchedError?.message ||
+        (process.env.NODE_ENV === 'development'
+          ? `${t('errors.startFailed')}: ${errorMessage}`
+          : t('errors.startFailed'))
+
+      toast.error(userMessage)
     }
   }
 
