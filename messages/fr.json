@@ -2,6 +2,7 @@
   "navigation": {
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
+    "operations": "Opérations",
     "inventory": "Inventaire",
     "inbound": "Entrées",
     "outbound": "Sorties",

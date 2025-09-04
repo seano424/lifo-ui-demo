@@ -2,6 +2,7 @@
   "navigation": {
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
+    "operations": "Operaties",
     "inventory": "Voorraad",
     "inbound": "Inkomend",
     "outbound": "Uitgaand",
