@@ -149,8 +149,6 @@ export function OnboardingSignUpForm({
         throw new Error(errorData.error || 'Failed to create store and user records')
       }
 
-      const _result = await response.json()
-
       // Update onboarding state
       setUserDetails({ email, password, fullName })
       setEmailSent(true)
@@ -312,7 +310,9 @@ export function OnboardingSignUpForm({
 
               {ONBOARDING_MODE !== 'production' && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
-                  {t('form.testModePrefix', { mode: ONBOARDING_MODE.toUpperCase() })}
+                  {t('form.testModePrefix', {
+                    mode: ONBOARDING_MODE.toUpperCase(),
+                  })}
                   {ONBOARDING_MODE === 'mock' ? t('noChanges') : t('realChanges')}
                 </Typography>
               )}

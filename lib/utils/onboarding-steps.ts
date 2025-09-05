@@ -11,11 +11,6 @@ export const setOnboardingTranslations = (t: TranslationFunction) => {
   translateFunction = t
 }
 
-// Helper to get translated text with fallback
-const t = (key: string, fallback: string): string => {
-  return translateFunction ? translateFunction(key) : fallback
-}
-
 export const STEP_IDS = {
   STORE_SEARCH: 'store_search',
   STORE_TYPE: 'store_type',
@@ -28,6 +23,14 @@ export type StepId = (typeof STEP_IDS)[keyof typeof STEP_IDS]
 
 export interface StepConfig {
   id: StepId
+  labelKey: string
+  labelFallback: string
+  component: string
+  requiresGooglePlaces: boolean
+}
+
+export interface StepConfigWithLabel {
+  id: StepId
   label: string
   component: string
   requiresGooglePlaces: boolean
@@ -36,42 +39,61 @@ export interface StepConfig {
 export const ALL_STEPS: StepConfig[] = [
   {
     id: STEP_IDS.STORE_SEARCH,
-    label: t('onboarding.stepLabels.storeLookup', 'Store Lookup'),
+    labelKey: 'stepLabels.storeLookup',
+    labelFallback: 'Store Lookup',
     component: 'StoreSearchStep',
     requiresGooglePlaces: true,
   },
   {
     id: STEP_IDS.STORE_TYPE,
-    label: t('onboarding.stepLabels.addStoreDetails', 'Add Store Details'),
+    labelKey: 'stepLabels.addStoreDetails',
+    labelFallback: 'Add Store Details',
     component: 'StoreTypeStep',
     requiresGooglePlaces: false,
   },
   {
     id: STEP_IDS.CONFIRM_DETAILS,
-    label: t('onboarding.stepLabels.reviewVerify', 'Review & Verify'),
+    labelKey: 'stepLabels.reviewVerify',
+    labelFallback: 'Review & Verify',
     component: 'ConfirmDetailsStep',
     requiresGooglePlaces: false,
   },
   {
     id: STEP_IDS.CREATE_ACCOUNT,
-    label: t('onboarding.stepLabels.createAccount', 'Create Account'),
+    labelKey: 'stepLabels.createAccount',
+    labelFallback: 'Create Account',
     component: 'OnboardingSignUpForm',
     requiresGooglePlaces: false,
   },
 ]
 
 /**
+ * Convert step configs to include translated labels
+ */
+function getStepsWithLabels(steps: StepConfig[]): StepConfigWithLabel[] {
+  return steps.map(step => ({
+    ...step,
+    label: translateFunction ? translateFunction(step.labelKey) : step.labelFallback,
+  }))
+}
+
+/**
  * Get the available steps based on Google Places availability
  */
-export function getAvailableSteps(isGooglePlacesEnabled: boolean): StepConfig[] {
-  return ALL_STEPS.filter(step => !step.requiresGooglePlaces || isGooglePlacesEnabled)
+export function getAvailableSteps(isGooglePlacesEnabled: boolean): StepConfigWithLabel[] {
+  const filteredSteps = ALL_STEPS.filter(
+    step => !step.requiresGooglePlaces || isGooglePlacesEnabled,
+  )
+  return getStepsWithLabels(filteredSteps)
 }
 
 /**
  * Get step configuration by ID
  */
-export function getStepById(stepId: StepId): StepConfig | undefined {
-  return ALL_STEPS.find(step => step.id === stepId)
+export function getStepById(stepId: StepId): StepConfigWithLabel | undefined {
+  const step = ALL_STEPS.find(step => step.id === stepId)
+  if (!step) return undefined
+  return getStepsWithLabels([step])[0]
 }
 
 /**

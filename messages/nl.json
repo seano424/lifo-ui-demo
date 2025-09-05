@@ -1828,5 +1828,57 @@
       "selectStore": "Selecteer een winkel om voorraadgegevens te uploaden.",
       "selectStoreInventory": "Selecteer een winkel om voorraad toe te voegen."
     }
+  },
+  "onboarding": {
+    "stepLabels": {
+      "storeLookup": "Winkel zoeken",
+      "addStoreDetails": "Winkeldetails toevoegen",
+      "reviewVerify": "Controleren en verifiëren",
+      "createAccount": "Account aanmaken"
+    },
+    "storeSearch": {
+      "title": "Vind uw winkel",
+      "subtitle": "Zoek naar uw bedrijf of voeg handmatig toe",
+      "placeholder": "Voer uw winkelnaam of adres in...",
+      "searchingText": "Zoeken naar winkels...",
+      "noResultsFound": "Geen winkels gevonden voor \"{query}\"",
+      "tryDifferentTerm": "Probeer een andere zoekterm of voeg uw winkel handmatig toe",
+      "addManuallyButton": "Winkelgegevens handmatig toevoegen",
+      "helpText": "Kunt u uw winkel niet vinden? U kunt alle gegevens handmatig toevoegen in de volgende stap.",
+      "searchError": "Er ging iets mis tijdens het zoeken. Probeer het opnieuw."
+    },
+    "storeType": {
+      "addStoreDetailsTitle": "Winkeldetails toevoegen",
+      "completeStoreInformationTitle": "Winkelinformatie voltooien",
+      "storeInformationCardTitle": "Winkelinformatie", 
+      "storeNameLabel": "Winkelnaam",
+      "storeTypeLabel": "Winkeltype",
+      "businessNameLabel": "Bedrijfsnaam",
+      "addressLabel": "Adres", 
+      "cityLabel": "Stad",
+      "postalCodeLabel": "Postcode",
+      "countryLabel": "Land",
+      "phoneLabel": "Telefoonnummer",
+      "continueButton": "Doorgaan",
+      "storeNamePlaceholder": "Naam van uw winkel",
+      "selectStoreType": "Selecteer winkeltype",
+      "businessNamePlaceholder": "Indien anders dan winkelnaam",
+      "addressPlaceholder": "123 Hoofdstraat",
+      "cityPlaceholder": "Amsterdam", 
+      "postalCodePlaceholder": "1012 AB",
+      "countryPlaceholder": "Nederland",
+      "phonePlaceholder": "020 123 4567"
+    },
+    "addStoreSearch": {
+      "title": "Voeg uw winkel toe",
+      "subtitle": "Zoek naar uw bedrijf of voeg handmatig toe",
+      "placeholder": "Voer uw winkelnaam of adres in...",
+      "searchingText": "Zoeken naar winkels...",
+      "noResultsFound": "Geen winkels gevonden voor \"{query}\"",
+      "tryDifferentTerm": "Probeer een andere zoekterm of voeg uw winkel handmatig toe",
+      "addManuallyButton": "Winkelgegevens handmatig toevoegen",
+      "helpText": "Kunt u uw winkel niet vinden? U kunt alle gegevens handmatig toevoegen in de volgende stap.",
+      "searchError": "Er ging iets mis tijdens het zoeken. Probeer het opnieuw."
+    }
   }
 }
