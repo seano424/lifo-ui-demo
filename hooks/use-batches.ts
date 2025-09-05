@@ -1,5 +1,3 @@
-// hooks/use-batches.ts
-
 import {
   type InfiniteData,
   useInfiniteQuery,
@@ -8,13 +6,11 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-// Type for Supabase/PostgREST errors that have additional properties
 type SupabaseError = Error & {
   status?: number
   code?: string
 }
 
-// Type guard for infinite data
 function isInfiniteData(
   data: unknown,
 ): data is InfiniteData<{ data: Batch[]; nextPage?: number; count?: number }, number> {
@@ -48,11 +44,9 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { Database } from '@/types/supabase'
 
-// ✅ READING DATA - Store-aware infinite scroll batches list with sorting
 export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
 
-  // Don't fetch if no active store
   const result = useInfiniteQuery({
     queryKey: queryKeys.batches.infinite(activeStoreId || '', filters),
     queryFn: ({ pageParam = 0 }) =>
@@ -63,14 +57,12 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
       ),
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
-    enabled: !!activeStoreId, // Only fetch when we have a store
+    enabled: !!activeStoreId,
     retry: (failureCount, error: SupabaseError) => {
-      // ✅ FIXED: Don't retry on PostgREST ordering errors
       if (error?.message?.includes('failed to parse order')) {
         console.error('[useBatches] PostgREST ordering error - not retrying:', error)
         return false
       }
-      // Don't retry on 4xx errors except 408 (timeout)
       if (error?.status && error.status >= 400 && error.status < 500 && error.status !== 408) {
         return false
       }
@@ -78,7 +70,6 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
     },
   })
 
-  // Flatten pages into single array (just like products)
   const data = result.data?.pages.flatMap(page => page.data) ?? []
 
   return {
@@ -94,7 +85,6 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   }
 }
 
-// ✅ ENHANCED: Batches hook with built-in sorting state management (store-aware)
 export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 20) {
   const [currentSort, setCurrentSort] = useState<BatchSort>(
     initialSort || { field: 'expiry_date', direction: 'asc' },
@@ -106,7 +96,6 @@ export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 2
 
   const result = useBatches(filters, pageSize)
 
-  // Helper function to update sort
   const updateSort = useCallback((field: BatchSortField) => {
     setCurrentSort(prev => ({
       field,
@@ -130,14 +119,12 @@ export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 2
   }
 }
 
-// ✅ READING DATA - Single batch by ID (store-aware)
 export function useBatch(batchId: string) {
   return useQuery({
     queryKey: queryKeys.batches.detail(batchId),
     queryFn: () => fetchBatchById(batchId),
-    enabled: !!batchId, // Only fetch if batchId exists
+    enabled: !!batchId,
     retry: (failureCount, error: SupabaseError) => {
-      // ✅ FIXED: Handle PostgREST errors properly
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
@@ -149,7 +136,6 @@ export function useBatch(batchId: string) {
   })
 }
 
-// ✅ READING DATA - Batches for a specific product (store-aware)
 export function useBatchesForProduct(
   productId: string,
   filters: Omit<BatchFilters, 'product_id'> = {},
@@ -169,7 +155,6 @@ export function useBatchesForProduct(
     initialPageParam: 0,
     enabled: !!productId && !!activeStoreId,
     retry: (failureCount, error: SupabaseError) => {
-      // ✅ FIXED: Handle PostgREST errors properly
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
@@ -195,7 +180,6 @@ export function useBatchesForProduct(
   }
 }
 
-// ✅ CONVENIENCE HOOKS - Store-aware common filter patterns
 export function useExpiringBatches(daysAhead: number = 7) {
   const activeStoreId = useActiveStoreId()
 
@@ -203,11 +187,9 @@ export function useExpiringBatches(daysAhead: number = 7) {
     queryKey: [...queryKeys.batches.byStore(activeStoreId || ''), 'expiring', { daysAhead }],
     queryFn: () => fetchExpiringBatches(activeStoreId!, daysAhead),
     enabled: !!activeStoreId,
-    // Refetch more frequently for critical data
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
     retry: (failureCount, error: SupabaseError) => {
-      // ✅ FIXED: Handle PostgREST errors properly
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
@@ -230,9 +212,8 @@ export function useLowStockBatches(thresholdQuantity: number = 10) {
     ],
     queryFn: () => fetchLowStockBatches(activeStoreId!, thresholdQuantity),
     enabled: !!activeStoreId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     retry: (failureCount, error: SupabaseError) => {
-      // ✅ FIXED: Handle PostgREST errors properly
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
@@ -260,14 +241,12 @@ export function useBatchesBySupplier(supplier: string) {
   return useBatches({ supplier, status: 'active' })
 }
 
-// ✅ WRITING DATA - Batch CRUD actions with proper cache invalidation (store-aware)
 export function useBatchActions() {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
 
   const createMutation = useMutation({
     mutationFn: (batchData: Database['inventory']['Tables']['batches']['Insert']) => {
-      // ✅ STORE-AWARE: Automatically add store_id to batch data
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }
@@ -279,22 +258,18 @@ export function useBatchActions() {
       return createBatch(batchWithStore)
     },
     onSuccess: newBatch => {
-      // Invalidate store-specific batch lists
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
         })
       }
 
-      // Invalidate product-specific batch lists
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.byProduct(activeStoreId || '', newBatch.product_id),
       })
 
-      // Add the new batch to the detail cache
       queryClient.setQueryData(queryKeys.batches.detail(newBatch.batch_id), newBatch)
 
-      // Update product batch count if cached
       queryClient.invalidateQueries({
         queryKey: queryKeys.products.detail(newBatch.product_id),
       })
@@ -304,7 +279,6 @@ export function useBatchActions() {
     onError: (error: SupabaseError) => {
       console.error('Failed to create batch:', error)
 
-      // ✅ ENHANCED: Specific error messages for store validation
       if (error?.message?.includes('not available in this store')) {
         toast.error('Product is not available in the current store')
       } else if (error?.message?.includes('already exists')) {
@@ -325,22 +299,18 @@ export function useBatchActions() {
     }) => updateBatch(batchId, updates),
 
     onMutate: async ({ batchId, updates }) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({
         queryKey: queryKeys.batches.detail(batchId),
       })
 
-      // Snapshot previous value
       const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId))
 
-      // Optimistically update
       queryClient.setQueryData(
         queryKeys.batches.detail(batchId),
         (old: BatchWithProduct | undefined) =>
           old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined,
       )
 
-      // Also update in store-specific infinite query caches
       if (activeStoreId) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.batches.byStore(activeStoreId) },
@@ -374,7 +344,6 @@ export function useBatchActions() {
     },
 
     onError: (err, _variables, context) => {
-      // Revert on error
       if (context?.previousBatch) {
         queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
       }
@@ -383,7 +352,6 @@ export function useBatchActions() {
     },
 
     onSettled: (data, _error, { batchId }) => {
-      // Always refetch after mutation
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.detail(batchId),
       })
@@ -393,7 +361,6 @@ export function useBatchActions() {
         })
       }
 
-      // Invalidate related product queries
       if (data) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byProduct(activeStoreId || '', data.product_id),
@@ -410,20 +377,16 @@ export function useBatchActions() {
     mutationFn: (batchId: string) => deleteBatch(batchId),
 
     onMutate: async batchId => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({
         queryKey: queryKeys.batches.detail(batchId),
       })
 
-      // Snapshot previous value
       const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId)) as
         | BatchWithProduct
         | undefined
 
-      // Optimistically remove from detail cache
       queryClient.removeQueries({ queryKey: queryKeys.batches.detail(batchId) })
 
-      // Optimistically remove from store-specific infinite query caches
       if (activeStoreId) {
         queryClient.setQueriesData(
           { queryKey: queryKeys.batches.byStore(activeStoreId) },
@@ -450,7 +413,6 @@ export function useBatchActions() {
     },
 
     onError: (err, _batchId, context) => {
-      // Restore the batch if deletion failed
       if (context?.previousBatch) {
         queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
       }
@@ -459,14 +421,12 @@ export function useBatchActions() {
     },
 
     onSettled: (_data, _error, _batchId, context) => {
-      // Refetch to ensure consistency
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
         })
       }
 
-      // Invalidate related product queries
       if (context?.previousBatch) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byProduct(
@@ -485,7 +445,6 @@ export function useBatchActions() {
     },
   })
 
-  // ✅ CONVENIENCE METHODS - Business logic helpers
   const updateBatchQuantity = useCallback(
     (batchId: string, newQuantity: number) =>
       updateMutation.mutate({
@@ -555,7 +514,6 @@ export function useBatchActions() {
     [updateMutation],
   )
 
-  // ✅ ADVANCED: Batch operations for multiple batches
   const processSale = useCallback(
     (batchId: string, soldQuantity: number) => {
       const currentBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId)) as
@@ -614,7 +572,6 @@ export function useBatchActions() {
   }
 }
 
-// ✅ HELPER HOOKS for business scenarios (store-aware)
 export function useBatchSummary(productId?: string) {
   const filters = productId ? { product_id: productId } : {}
   const { data: allBatches } = useBatches(filters)
@@ -642,7 +599,6 @@ export function useBatchAlerts() {
   }
 }
 
-// ✅ CONVENIENCE HOOKS for common filters (store-aware)
 export function useBatchesByCategory(_category: string) {
   // Note: Category filtering would need to be done via product join
   // For now, this returns all batches (would need backend enhancement)

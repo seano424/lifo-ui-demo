@@ -386,8 +386,6 @@ export function BatchList({
   )
 }
 
-// ✅ CONVENIENCE COMPONENTS for specific use cases
-
 export function ExpiringBatchesList({ maxItems = 6 }: { maxItems?: number }) {
   const t = useTranslations('batchList.convenience')
 

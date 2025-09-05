@@ -33,7 +33,6 @@ import { Typography } from '@/components/ui/typography'
 import { useProductActions, useProductsWithSort } from '@/hooks/use-products'
 import type { SortField } from '@/lib/queries/products'
 
-// ✅ Sortable Table Header Component
 interface SortableHeaderProps {
   field: SortField
   children: React.ReactNode

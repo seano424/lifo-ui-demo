@@ -18,21 +18,20 @@ import {
 } from '@/lib/queries/store-users'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
-// ✅ READING DATA - Store-aware infinite scroll users list
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
 
   const result = useInfiniteQuery({
-    queryKey: queryKeys.storeUsers.infinite(activeStoreId || '', filters), // ✅ Centralized keys
+    queryKey: queryKeys.storeUsers.infinite(activeStoreId || '', filters),
     queryFn: ({ pageParam = 0 }) => {
       if (!activeStoreId) {
-        throw new Error('Store ID is required for fetching store users') // ✅ Same validation as products
+        throw new Error('Store ID is required for fetching store users')
       }
       return fetchStoreUsersPage(activeStoreId, { page: pageParam, pageSize }, filters)
     },
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
-    enabled: !!activeStoreId, // ✅ Only fetch when we have a store
+    enabled: !!activeStoreId,
   })
 
   // Flatten pages into single array
@@ -52,12 +51,11 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
   }
 }
 
-// ✅ READING DATA - Single store user by ID (store-aware)
 export function useStoreUser(userId: string) {
   const activeStoreId = useActiveStoreId()
 
   return useQuery({
-    queryKey: queryKeys.storeUsers.detail(activeStoreId || '', userId), // ✅ Centralized keys
+    queryKey: queryKeys.storeUsers.detail(activeStoreId || '', userId),
     queryFn: () => {
       if (!activeStoreId) {
         throw new Error('Store ID is required for fetching store user')
@@ -68,7 +66,6 @@ export function useStoreUser(userId: string) {
   })
 }
 
-// ✅ Convenience hooks for different user roles (same as before)
 export function useStoreOwners() {
   return useStoreUsers({ role_in_store: 'owner' })
 }
@@ -93,10 +90,9 @@ export function usePinEnabledUsers() {
   return useStoreUsers({ can_use_pin_auth: true })
 }
 
-// ✅ WRITING DATA - Store user CRUD actions with proper cache invalidation
 export function useStoreUserActions() {
   const queryClient = useQueryClient()
-  const activeStoreId = useActiveStoreId() // ✅ Same pattern as products
+  const activeStoreId = useActiveStoreId()
 
   // Update store user mutation
   const updateMutation = useMutation({
@@ -115,7 +111,7 @@ export function useStoreUserActions() {
       }
     }) => {
       if (!activeStoreId) {
-        throw new Error('Store ID is required for updating store user') // ✅ Validation
+        throw new Error('Store ID is required for updating store user')
       }
       return updateStoreUser(activeStoreId, userId, updates)
     },
@@ -125,23 +121,22 @@ export function useStoreUserActions() {
 
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: queryKeys.storeUsers.detail(activeStoreId, userId), // ✅ Centralized keys
+        queryKey: queryKeys.storeUsers.detail(activeStoreId, userId),
       })
 
       // Snapshot previous value
       const previousStoreUser = queryClient.getQueryData(
-        queryKeys.storeUsers.detail(activeStoreId, userId), // ✅ Centralized keys
+        queryKeys.storeUsers.detail(activeStoreId, userId),
       )
 
       // Optimistically update
       queryClient.setQueryData(
-        queryKeys.storeUsers.detail(activeStoreId, userId), // ✅ Centralized keys
+        queryKeys.storeUsers.detail(activeStoreId, userId),
         (old: StoreUser | undefined) => (old ? { ...old, ...updates } : undefined),
       )
 
-      // ✅ Also update in store-specific infinite query caches (same as products)
       queryClient.setQueriesData(
-        { queryKey: queryKeys.storeUsers.byStore(activeStoreId) }, // ✅ Centralized keys
+        { queryKey: queryKeys.storeUsers.byStore(activeStoreId) },
         (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
           if (!oldData) return oldData
 
@@ -164,7 +159,7 @@ export function useStoreUserActions() {
       // Revert on error
       if (context?.previousStoreUser && context?.activeStoreId && context?.userId) {
         queryClient.setQueryData(
-          queryKeys.storeUsers.detail(context.activeStoreId, context.userId), // ✅ Centralized keys
+          queryKeys.storeUsers.detail(context.activeStoreId, context.userId),
           context.previousStoreUser,
         )
       }
@@ -177,10 +172,10 @@ export function useStoreUserActions() {
 
       // Always refetch after mutation
       queryClient.invalidateQueries({
-        queryKey: queryKeys.storeUsers.detail(activeStoreId, userId), // ✅ Centralized keys
+        queryKey: queryKeys.storeUsers.detail(activeStoreId, userId),
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.storeUsers.byStore(activeStoreId), // ✅ Centralized keys
+        queryKey: queryKeys.storeUsers.byStore(activeStoreId),
       })
     },
 
@@ -200,7 +195,7 @@ export function useStoreUserActions() {
     onSuccess: () => {
       if (activeStoreId) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.storeUsers.byStore(activeStoreId), // ✅ Centralized keys
+          queryKey: queryKeys.storeUsers.byStore(activeStoreId),
         })
       }
       toast.success('User removed from store')
@@ -231,7 +226,7 @@ export function useStoreUserActions() {
     onSuccess: () => {
       if (activeStoreId) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.storeUsers.byStore(activeStoreId), // ✅ Centralized keys
+          queryKey: queryKeys.storeUsers.byStore(activeStoreId),
         })
       }
       toast.success('User added to store successfully')
@@ -242,7 +237,6 @@ export function useStoreUserActions() {
     },
   })
 
-  // ✅ Convenience methods for common actions (same as products pattern)
   const changeUserRole = (userId: string, role: 'owner' | 'manager' | 'employee' | 'staff') =>
     updateMutation.mutate({
       userId,
