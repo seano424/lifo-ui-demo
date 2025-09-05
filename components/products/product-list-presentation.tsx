@@ -52,7 +52,6 @@ const getCategoryBadgeColor = (category: string) => {
   return colors[category?.toLowerCase() as keyof typeof colors] || colors.other
 }
 
-// ✅ Sortable Table Header Component
 interface SortableHeaderProps {
   field: SortField
   children: React.ReactNode
@@ -92,7 +91,6 @@ function SortableHeader({ field, children, currentSort, onSort, className }: Sor
   )
 }
 
-// ✅ Pure presentation component that receives data as props
 interface ProductsListPresentationProps {
   data: Product[]
   count: number

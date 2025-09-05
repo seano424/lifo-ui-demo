@@ -20,7 +20,6 @@ import {
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
-// ✅ FIXED: Store-aware infinite scroll products list with simplified sorting
 export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
 
@@ -66,7 +65,6 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
   }
 }
 
-// ✅ FIXED: Products hook with built-in sorting state management (store-aware)
 export function useProductsWithSort(initialSort?: ProductSort, pageSize: number = 20) {
   const [currentSort, setCurrentSort] = useState<ProductSort>(
     initialSort || { field: 'created_at', direction: 'desc' },
@@ -102,7 +100,6 @@ export function useProductsWithSort(initialSort?: ProductSort, pageSize: number 
   }
 }
 
-// ✅ READING DATA - Single product by ID (store-aware)
 export function useProduct(productId: string) {
   const activeStoreId = useActiveStoreId()
 
@@ -118,7 +115,6 @@ export function useProduct(productId: string) {
   })
 }
 
-// ✅ WRITING DATA - Product CRUD actions with proper cache invalidation (store-aware)
 export function useProductActions() {
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
@@ -164,7 +160,9 @@ export function useProductActions() {
 
     onMutate: async ({ productId, updates }) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(productId) })
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.products.detail(productId),
+      })
 
       // Snapshot previous value
       const previousProduct = queryClient.getQueryData(queryKeys.products.detail(productId))
@@ -187,7 +185,11 @@ export function useProductActions() {
                 ...page,
                 data: page.data.map((product: Product) =>
                   product.product_id === productId
-                    ? { ...product, ...updates, updated_at: new Date().toISOString() }
+                    ? {
+                        ...product,
+                        ...updates,
+                        updated_at: new Date().toISOString(),
+                      }
                     : product,
                 ),
               })),
@@ -213,9 +215,13 @@ export function useProductActions() {
 
     onSettled: (_data, _error, { productId }) => {
       // Always refetch after mutation
-      queryClient.invalidateQueries({ queryKey: queryKeys.products.detail(productId) })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.products.detail(productId),
+      })
       if (activeStoreId) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.products.byStore(activeStoreId) })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
+        })
       }
     },
 
@@ -234,13 +240,17 @@ export function useProductActions() {
 
     onMutate: async productId => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: queryKeys.products.detail(productId) })
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.products.detail(productId),
+      })
 
       // Snapshot previous value
       const previousProduct = queryClient.getQueryData(queryKeys.products.detail(productId))
 
       // Optimistically remove from detail cache
-      queryClient.removeQueries({ queryKey: queryKeys.products.detail(productId) })
+      queryClient.removeQueries({
+        queryKey: queryKeys.products.detail(productId),
+      })
 
       // Optimistically remove from store-specific infinite query caches
       if (activeStoreId) {
@@ -279,7 +289,9 @@ export function useProductActions() {
     onSettled: () => {
       // Refetch to ensure consistency
       if (activeStoreId) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.products.byStore(activeStoreId) })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
+        })
       }
     },
 
@@ -288,7 +300,6 @@ export function useProductActions() {
     },
   })
 
-  // ✅ CONVENIENCE METHODS - Business logic helpers
   const updateProductPrice = useCallback(
     (productId: string, newPrice: number) =>
       updateMutation.mutate({
@@ -349,7 +360,6 @@ export function useProductActions() {
   }
 }
 
-// ✅ Convenience hooks for common filters (store-aware)
 export function useExpiringProducts() {
   return useProducts({ expiringOnly: true })
 }

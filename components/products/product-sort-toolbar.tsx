@@ -186,7 +186,6 @@ export function ProductsSortToolbar({
   )
 }
 
-// ✅ BONUS: Quick Sort Buttons Component
 interface QuickSortButtonsProps {
   onSortChange: (sort: ProductSort) => void
   currentSort: ProductSort
@@ -197,11 +196,20 @@ export function QuickSortButtons({ onSortChange, currentSort, isLoading }: Quick
   const t = useTranslations('productSort.quickSort')
 
   const quickSorts: Array<{ label: string; sort: ProductSort }> = [
-    { label: t('newestFirst'), sort: { field: 'created_at', direction: 'desc' } },
+    {
+      label: t('newestFirst'),
+      sort: { field: 'created_at', direction: 'desc' },
+    },
     { label: t('aToZ'), sort: { field: 'name', direction: 'asc' } },
     { label: t('lowStock'), sort: { field: 'total_stock', direction: 'asc' } },
-    { label: t('highestPrice'), sort: { field: 'base_selling_price', direction: 'desc' } },
-    { label: t('mostBatches'), sort: { field: 'active_batches_count', direction: 'desc' } },
+    {
+      label: t('highestPrice'),
+      sort: { field: 'base_selling_price', direction: 'desc' },
+    },
+    {
+      label: t('mostBatches'),
+      sort: { field: 'active_batches_count', direction: 'desc' },
+    },
   ]
 
   return (

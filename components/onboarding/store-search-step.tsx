@@ -20,13 +20,8 @@ type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 
 export function StoreSearchStep() {
   const t = useTranslations('onboarding.storeSearch')
 
-  const {
-    searchQuery,
-    setSearchQuery,
-    setSelectedStoreForm, // ✅ Updated method name
-    setManualEntry,
-    setCurrentStep,
-  } = useOnboardingStore()
+  const { searchQuery, setSearchQuery, setSelectedStoreForm, setManualEntry, setCurrentStep } =
+    useOnboardingStore()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [localSearchState, setLocalSearchState] = useState<SearchState>('idle')
@@ -105,7 +100,7 @@ export function StoreSearchStep() {
         googlePlaceId: place.place_id,
       }
 
-      setSelectedStoreForm(storeFormData) // ✅ Using correct method and data format
+      setSelectedStoreForm(storeFormData)
       setCurrentStep(2)
     }
     // Error handling is done in the hook and displayed via the error state
@@ -120,9 +115,9 @@ export function StoreSearchStep() {
   return (
     <div className="mx-auto space-y-6">
       <div className="text-center space-y-2 flex flex-col items-center">
-        <Typography variant="h1">Find Your Store</Typography>
+        <Typography variant="h1">{t('title')}</Typography>
         <Typography variant="p" color="muted">
-          Search for your business or add it manually
+          {t('subtitle')}
         </Typography>
       </div>
 
@@ -138,15 +133,13 @@ export function StoreSearchStep() {
         {showError && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error || 'Something went wrong while searching. Please try again.'}
-            </AlertDescription>
+            <AlertDescription>{error || t('searchError')}</AlertDescription>
           </Alert>
         )}
 
         {/* Loading indicator */}
         {showLoading && (
-          <div className="text-center text-sm text-muted-foreground">Searching for stores...</div>
+          <div className="text-center text-sm text-muted-foreground">{t('searchingText')}</div>
         )}
 
         {/* Search Results */}
@@ -195,10 +188,10 @@ export function StoreSearchStep() {
         {showNoResults && (
           <div className="text-center space-y-2">
             <Typography variant="p" color="muted">
-              No stores found matching &quot;{debouncedSearchValue}&quot;
+              {t('noResultsFound', { query: debouncedSearchValue })}
             </Typography>
             <Typography variant="p" color="muted">
-              Try a different search term or add your store manually
+              {t('tryDifferentTerm')}
             </Typography>
           </div>
         )}
@@ -206,14 +199,14 @@ export function StoreSearchStep() {
         {/* Manual entry button */}
         <div className="text-center">
           <Button variant="outline" onClick={handleManualEntry} disabled={isLoading}>
-            Add store details manually
+            {t('addManuallyButton')}
           </Button>
         </div>
 
         {/* Help text */}
         <div className="text-center">
           <Typography variant="p" color="muted">
-            Can&apos;t find your store? You can add all details manually in the next step.
+            {t('helpText')}
           </Typography>
         </div>
       </div>

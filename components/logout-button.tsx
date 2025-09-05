@@ -37,7 +37,7 @@ export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps)
     // Clear all cached query data to prevent data leakage between users
     queryClient.clear()
 
-    router.push('/auth/login')
+    router.push('/dashboard')
   }
 
   return (

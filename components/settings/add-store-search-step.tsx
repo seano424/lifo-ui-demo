@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,8 @@ import { useAddStoreStore } from '@/lib/stores/add-store-store'
 type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 'error'
 
 export function AddStoreSearchStep() {
+  const t = useTranslations('settings.addStoreSearch')
+
   const { searchQuery, setSearchQuery, setSelectedStoreForm, setManualEntry, setCurrentStep } =
     useAddStoreStore()
 
@@ -98,15 +101,15 @@ export function AddStoreSearchStep() {
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-2 flex flex-col items-center justify-center">
-        <Typography variant="h1">Add Your Store</Typography>
+        <Typography variant="h1">{t('title')}</Typography>
         <Typography variant="p" color="muted">
-          Search for your business or add it manually
+          {t('subtitle')}
         </Typography>
       </div>
 
       <div className="space-y-4 relative">
         <Input
-          placeholder="Enter your store name or address..."
+          placeholder={t('placeholder')}
           value={searchValue}
           onChange={e => setSearchValue(e.target.value)}
           className="w-full"
@@ -116,15 +119,13 @@ export function AddStoreSearchStep() {
         {showError && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error || 'Something went wrong while searching. Please try again.'}
-            </AlertDescription>
+            <AlertDescription>{error || t('searchError')}</AlertDescription>
           </Alert>
         )}
 
         {/* Loading indicator */}
         {showLoading && (
-          <div className="text-center text-sm text-muted-foreground">Searching for stores...</div>
+          <div className="text-center text-sm text-muted-foreground">{t('searchingText')}</div>
         )}
 
         {/* Search Results */}
@@ -173,10 +174,10 @@ export function AddStoreSearchStep() {
         {showNoResults && (
           <div className="text-center space-y-2">
             <Typography variant="p" color="muted">
-              No stores found matching &quot;{debouncedSearchValue}&quot;
+              {t('noResultsFound', { query: debouncedSearchValue })}
             </Typography>
             <Typography variant="p" color="muted">
-              Try a different search term or add your store manually
+              {t('tryDifferentTerm')}
             </Typography>
           </div>
         )}
@@ -184,14 +185,14 @@ export function AddStoreSearchStep() {
         {/* Manual entry button */}
         <div className="text-center">
           <Button variant="outline" onClick={handleManualEntry} disabled={isLoading}>
-            Add store details manually
+            {t('addManuallyButton')}
           </Button>
         </div>
 
         {/* Help text */}
         <div className="text-center">
           <Typography variant="p" color="muted">
-            Can&apos;t find your store? You can add all details manually in the next step.
+            {t('helpText')}
           </Typography>
         </div>
       </div>

@@ -1,6 +1,3 @@
-// app/api/employees/create/route.ts
-// FIXED SERVER-SIDE EMPLOYEE CREATION - Corrected Permission Logic
-
 import { type NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
@@ -21,7 +18,6 @@ export async function POST(request: NextRequest) {
     const body: CreateEmployeeRequest = await request.json()
     const { firstName, lastName, email, username, role, languagePreference, storeId, pin } = body
 
-    // Validate required fields
     if (!firstName || !lastName || !email || !username || !storeId || !pin) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
@@ -29,7 +25,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate PIN format
     if (!/^[0-9]{6}$/.test(pin)) {
       return NextResponse.json(
         { success: false, error: 'PIN must be exactly 6 digits' },
@@ -37,11 +32,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create server client (for permission checks using user context)
     const supabase = await createClient()
 
     // Create admin client (for admin operations like creating users)
-    const adminSupabase = createAdminClient() // ✅ FIXED: Use admin client
+    const adminSupabase = createAdminClient()
 
     // Get the authenticated user
     const {
@@ -57,7 +51,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ✅ FIXED: Check permission using the correct business.store_users table structure
     const { data: storeUser, error: permissionError } = await supabase
       .schema('business')
       .from('store_users')
@@ -83,7 +76,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ✅ FIXED: Check if user has permission to create employees
     const canManageUsers =
       storeUser.role_in_store === 'owner' ||
       storeUser.role_in_store === 'manager' ||
@@ -91,15 +83,19 @@ export async function POST(request: NextRequest) {
 
     if (!canManageUsers) {
       return NextResponse.json(
-        { success: false, error: 'Permission denied: You cannot create users in this store' },
+        {
+          success: false,
+          error: 'Permission denied: You cannot create users in this store',
+        },
         { status: 403 },
       )
     }
 
-    // ✅ FIXED: Check for duplicate username using admin client
     const { data: isAvailable, error: availabilityError } = await adminSupabase.rpc(
       'check_username_availability',
-      { p_username: username },
+      {
+        p_username: username,
+      },
     )
 
     if (availabilityError) {
@@ -117,7 +113,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ✅ Create user using Admin API with proper service role permissions
     const { data: newUser, error: createError } = await adminSupabase.auth.admin.createUser({
       email: email, // Use the actual email provided by the user
       password: pin, // PIN becomes password
@@ -144,7 +139,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ✅ Add user to store with appropriate permissions
     const employeePermissions = {
       can_scan_products: true,
       can_scan_in: true,
@@ -183,7 +177,6 @@ export async function POST(request: NextRequest) {
     if (storeError) {
       console.error('❌ Store assignment error:', storeError)
 
-      // Try to clean up the created user
       try {
         await adminSupabase.auth.admin.deleteUser(newUser.user.id)
       } catch (cleanupError) {
@@ -200,12 +193,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Return success with credentials
     return NextResponse.json({
       success: true,
       user_id: newUser.user.id,
       username,
-      email, // Return the actual user email
+      email,
       pin,
       role,
       message: 'Employee created successfully using Admin API',

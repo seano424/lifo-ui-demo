@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo } from 'react'
 import { ConfirmDetailsStep } from '@/components/onboarding/confirm-details-step'
 import { OnboardingSignUpForm } from '@/components/onboarding/onboarding-signup-form'
@@ -11,10 +12,17 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { cn } from '@/lib/utils'
 import { FORM_CONSTANTS } from '@/lib/utils/form-helpers'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
-import { getAvailableSteps, getSuccessStepIndex, STEP_IDS } from '@/lib/utils/onboarding-steps'
+import {
+  getAvailableSteps,
+  getSuccessStepIndex,
+  STEP_IDS,
+  setOnboardingTranslations,
+} from '@/lib/utils/onboarding-steps'
 import { Typography } from '../ui/typography'
 
 export function OnboardingFlow() {
+  const t = useTranslations('onboarding')
+
   const {
     currentStep,
     setCurrentStep,
@@ -26,6 +34,11 @@ export function OnboardingFlow() {
 
   // Memoize Google Places status to avoid recalculation on every render
   const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
+
+  // Set up translations for onboarding steps
+  useEffect(() => {
+    setOnboardingTranslations((key: string) => t(key))
+  }, [t])
 
   // Get available steps based on Google Places availability
   const availableSteps = useMemo(

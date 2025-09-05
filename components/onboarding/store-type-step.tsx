@@ -91,11 +91,13 @@ export function StoreTypeStep() {
 
   return (
     <div className="mx-auto space-y-4">
-      <StepHeader title={isManualEntry ? 'Add Store Details' : 'Complete Store Information'} />
+      <StepHeader
+        title={isManualEntry ? t('addStoreDetailsTitle') : t('completeStoreInformationTitle')}
+      />
 
       <Card>
         <CardHeader>
-          <CardTitle>Store Information</CardTitle>
+          <CardTitle>{t('storeInformationCardTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -103,7 +105,7 @@ export function StoreTypeStep() {
               <FormFieldWrapper
                 control={form.control}
                 name="store_name"
-                label="Store Name"
+                label={t('storeNameLabel')}
                 placeholder={t('storeNamePlaceholder')}
                 required
               />
@@ -113,7 +115,7 @@ export function StoreTypeStep() {
                 name="store_type"
                 render={({ field }) => (
                   <FormItem className="flex flex-col gap-2">
-                    <FormLabel>Store Type</FormLabel>
+                    <FormLabel>{t('storeTypeLabel')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={typeof field.value === 'string' ? field.value : undefined}
@@ -139,14 +141,14 @@ export function StoreTypeStep() {
               <OptionalFormFieldWrapper
                 control={form.control}
                 name="business_name"
-                label="Business Name"
+                label={t('businessNameLabel')}
                 placeholder={t('businessNamePlaceholder')}
               />
 
               <FormFieldWrapper
                 control={form.control}
                 name="address"
-                label="Address"
+                label={t('addressLabel')}
                 placeholder={t('addressPlaceholder')}
                 required
               />
@@ -155,7 +157,7 @@ export function StoreTypeStep() {
                 <FormFieldWrapper
                   control={form.control}
                   name="city"
-                  label="City"
+                  label={t('cityLabel')}
                   placeholder={t('cityPlaceholder')}
                   required
                 />
@@ -163,7 +165,7 @@ export function StoreTypeStep() {
                 <FormFieldWrapper
                   control={form.control}
                   name="postal_code"
-                  label="Postal Code"
+                  label={t('postalCodeLabel')}
                   placeholder={t('postalCodePlaceholder')}
                   required
                 />
@@ -173,7 +175,7 @@ export function StoreTypeStep() {
                 <FormFieldWrapper
                   control={form.control}
                   name="country"
-                  label="Country"
+                  label={t('countryLabel')}
                   placeholder={t('countryPlaceholder')}
                   required
                 />
@@ -181,7 +183,7 @@ export function StoreTypeStep() {
                 <OptionalFormFieldWrapper
                   control={form.control}
                   name="phone"
-                  label="Phone Number"
+                  label={t('phoneLabel')}
                   placeholder={t('phonePlaceholder')}
                   type="tel"
                 />
@@ -190,7 +192,7 @@ export function StoreTypeStep() {
               <FormNavigation
                 onBack={canGoBack ? handleBack : undefined}
                 onNext={() => {}} // Form submission is handled by onSubmit
-                nextLabel="Continue"
+                nextLabel={t('continueButton')}
                 isSubmitting={form.formState.isSubmitting}
                 showBack={canGoBack}
                 nextType="submit"
