@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle, Clock, Heart, Loader2, Percent } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -31,6 +32,7 @@ interface ActionableBatchesEnhancedProps {
 }
 
 export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhancedProps) {
+  const t = useTranslations('actionableBatches')
   const { data: alertsData, isLoading, error } = useScoringRecommendations(storeId)
   const { recipients } = useActiveDonationRecipients(storeId)
   const donationMutation = useDonationAction()
@@ -45,7 +47,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
       <Card>
         <CardContent className="flex items-center justify-center p-6">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <span>Loading actionable batches...</span>
+          <span>{t('loading')}</span>
         </CardContent>
       </Card>
     )
@@ -55,9 +57,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load scoring recommendations. Please try again.
-        </AlertDescription>
+        <AlertDescription>{t('error')}</AlertDescription>
       </Alert>
     )
   }
@@ -69,12 +69,10 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Actionable Batches</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground py-8">
-            No immediate actions required! All batches are within safe scoring thresholds.
-          </p>
+          <p className="text-center text-muted-foreground py-8">{t('noActions')}</p>
         </CardContent>
       </Card>
     )
@@ -132,13 +130,21 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
       <Card>
         <CardHeader>
           <CardTitle>
-            Scoring-Based Recommendations ({summary?.total_alerts || batches.length})
+            {t('title')} ({summary?.total_alerts || batches.length})
           </CardTitle>
           <div className="flex gap-4 text-sm text-muted-foreground">
-            <span>Critical: {summary?.critical_count || 0}</span>
-            <span>High: {summary?.high_count || 0}</span>
-            <span>Medium: {summary?.medium_count || 0}</span>
-            <span>Low: {summary?.low_count || 0}</span>
+            <span>
+              {t('summaryLabels.critical')}: {summary?.critical_count || 0}
+            </span>
+            <span>
+              {t('summaryLabels.high')}: {summary?.high_count || 0}
+            </span>
+            <span>
+              {t('summaryLabels.medium')}: {summary?.medium_count || 0}
+            </span>
+            <span>
+              {t('summaryLabels.low')}: {summary?.low_count || 0}
+            </span>
           </div>
         </CardHeader>
         <CardContent>
@@ -158,15 +164,23 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                       </Badge>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>Qty: {batch.quantity}</span>
-                      <span>{batch.days_to_expiry} days to expiry</span>
-                      <span>Loss Risk: €{batch.potential_loss.toFixed(0)}</span>
-                      <span>Score: {Math.round(batch.priority_score)}</span>
+                      <span>
+                        {t('batchDetails.qty')}: {batch.quantity}
+                      </span>
+                      <span>
+                        {batch.days_to_expiry} {t('batchDetails.daysToExpiry')}
+                      </span>
+                      <span>
+                        {t('batchDetails.lossRisk')}: €{batch.potential_loss.toFixed(0)}
+                      </span>
+                      <span>
+                        {t('batchDetails.score')}: {Math.round(batch.priority_score)}
+                      </span>
                     </div>
                   </div>
 
                   <Badge variant="secondary">
-                    Score: {Math.round(batch.composite_score * 100)}%
+                    {t('batchDetails.score')}: {Math.round(batch.composite_score * 100)}%
                   </Badge>
                 </div>
 
@@ -186,7 +200,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                       disabled={recipients.length === 0}
                     >
                       <Heart className="h-4 w-4" />
-                      Execute Donation
+                      {t('buttons.executeDonation')}
                     </Button>
                   )}
 
@@ -203,7 +217,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                         disabled={recipients.length === 0}
                       >
                         <Heart className="h-4 w-4" />
-                        Donate Instead
+                        {t('buttons.donateInstead')}
                       </Button>
                     )}
                 </div>
@@ -212,10 +226,11 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription className="text-xs">
-                    <strong>Scoring Recommendation:</strong> {batch.recommendation}
+                    <strong>{t('scoringRecommendation.label')}:</strong> {batch.recommendation}
                     <span className="ml-2 text-muted-foreground">
-                      • Urgency: {batch.urgency_level} • Score:{' '}
-                      {(batch.composite_score * 100).toFixed(0)}%
+                      • {t('scoringRecommendation.urgency')}: {batch.urgency_level} •{' '}
+                      {t('scoringRecommendation.score')}: {(batch.composite_score * 100).toFixed(0)}
+                      %
                     </span>
                   </AlertDescription>
                 </Alert>
@@ -229,9 +244,9 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Donate Batch</DialogTitle>
+            <DialogTitle>{t('donationDialog.title')}</DialogTitle>
             <DialogDescription>
-              Select a recipient for {selectedBatch?.product_name}
+              {t('donationDialog.description', { productName: selectedBatch?.product_name || '' })}
             </DialogDescription>
           </DialogHeader>
 
@@ -241,7 +256,8 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
               <div className="bg-muted p-3 rounded-lg">
                 <h4 className="font-medium">{selectedBatch.product_name}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Quantity: {selectedBatch.quantity} • Expires:{' '}
+                  {t('donationDialog.quantity')}: {selectedBatch.quantity} •{' '}
+                  {t('donationDialog.expires')}:{' '}
                   {new Date(selectedBatch.expiry_date).toLocaleDateString()}
                 </p>
               </div>
@@ -249,10 +265,10 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
 
             {/* Recipient selection */}
             <div className="space-y-2">
-              <Label>Select Donation Recipient</Label>
+              <Label>{t('donationDialog.selectRecipient')}</Label>
               <Select value={selectedRecipient} onValueChange={setSelectedRecipient}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a recipient..." />
+                  <SelectValue placeholder={t('donationDialog.chooseRecipient')} />
                 </SelectTrigger>
                 <SelectContent>
                   {recipients.map(recipient => (
@@ -261,7 +277,9 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                         <div className="font-medium">{recipient.name}</div>
                         <div className="text-sm text-muted-foreground">
                           {recipient.recipient_type} •{' '}
-                          {recipient.is_certified ? 'Certified' : 'Not certified'}
+                          {recipient.is_certified
+                            ? t('donationDialog.certified')
+                            : t('donationDialog.notCertified')}
                         </div>
                       </div>
                     </SelectItem>
@@ -272,11 +290,11 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
 
             {/* Notes */}
             <div className="space-y-2">
-              <Label>Notes (optional)</Label>
+              <Label>{t('donationDialog.notesLabel')}</Label>
               <Textarea
                 value={donationNotes}
                 onChange={e => setDonationNotes(e.target.value)}
-                placeholder="Add any notes about this donation..."
+                placeholder={t('donationDialog.notesPlaceholder')}
                 rows={3}
               />
             </div>
@@ -284,14 +302,14 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
             {/* Action buttons */}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                {t('buttons.cancel')}
               </Button>
               <Button
                 onClick={handleExecuteDonation}
                 disabled={!selectedRecipient || donationMutation.isPending}
               >
                 {donationMutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                Confirm Donation
+                {t('buttons.confirmDonation')}
               </Button>
             </div>
           </div>

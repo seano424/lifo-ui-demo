@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, ArrowRight, BarChart3, Check, RefreshCcw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 // Import existing hooks and utilities
@@ -46,6 +47,8 @@ interface ScanningProps {
 type UIStep = 'camera-barcode' | 'product-success' | 'camera-expiry' | 'batch-success'
 
 export default function ScanningInterface({ onItemAdded, className }: ScanningProps) {
+  const t = useTranslations('scanningInterface')
+
   // Existing workflow state
   const currentStep = useScanningStep()
   const scannedProduct = useScannedProduct()
@@ -314,7 +317,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               {/* Camera Interface */}
               <ScanningCamera
                 mode="barcode"
-                title={scannedProduct ? 'Scan Different Product' : 'Scan Product'}
+                title={scannedProduct ? t('camera.scanDifferentProduct') : t('camera.scanProduct')}
                 onBarcodeScanned={handleScan}
                 onScanError={handleError}
                 showManualEntry={showManualBarcode}
@@ -352,7 +355,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               {lookupError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>Lookup failed: {lookupError.message}</AlertDescription>
+                  <AlertDescription>
+                    {t('lookupErrors.lookupFailed', { error: lookupError.message })}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -369,24 +374,18 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   {scannedProduct.lookupResult.found ? (
                     <Alert>
                       <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                      <AlertDescription>
-                        Product found! Ready to proceed to expiry date scanning.
-                      </AlertDescription>
+                      <AlertDescription>{t('product.productFound')}</AlertDescription>
                     </Alert>
                   ) : (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Product not found in database. You may need to add it manually.
-                      </AlertDescription>
+                      <AlertDescription>{t('product.productNotFound')}</AlertDescription>
                     </Alert>
                   )}
 
                   <Alert>
                     <ArrowRight className="h-4 w-4 text-blue-600" />
-                    <AlertDescription>
-                      Automatically proceeding to expiry date scanning...
-                    </AlertDescription>
+                    <AlertDescription>{t('product.autoProceeding')}</AlertDescription>
                   </Alert>
                 </>
               )}
@@ -431,10 +430,10 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   onSubmit={handleInventoryFormSubmit}
                   title={
                     ocrError || isBackendHealthy === false
-                      ? '📝 Manual Entry (OCR unavailable)'
-                      : 'Or enter manually'
+                      ? t('expiry.manualEntryFallback')
+                      : t('expiry.orEnterManually')
                   }
-                  submitButtonText="Confirm Date"
+                  submitButtonText={t('expiry.confirmDate')}
                 />
               )}
 
@@ -451,7 +450,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     onClick={handleAddToInventory}
                     variant="secondary"
                   >
-                    Add to Inventory • {inventoryData.quantity}x €{inventoryData.price.toFixed(2)}
+                    {t('inventory.addToInventory')} • {inventoryData.quantity}x €
+                    {inventoryData.price.toFixed(2)}
                   </Button>
                 </div>
               )}
@@ -462,7 +462,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
             <Alert className="font-mono flex items-center justify-center border-none">
               <AlertDescription>
-                Added {scannedItems[0].productName} to your list! Scan the next product.
+                {t('inventory.addedToList', { productName: scannedItems[0].productName })}
               </AlertDescription>
             </Alert>
           )}
@@ -481,10 +481,14 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           <ScanningControls
             canGoBack={canGoBack}
             onGoBack={handleGoBack}
-            backButtonText={previousStepName ? `Back to ${previousStepName}` : 'Go Back'}
+            backButtonText={
+              previousStepName
+                ? t('navigation.backTo', { stepName: previousStepName })
+                : t('navigation.goBack')
+            }
             showPrimaryAction={scannedItems.length > 0}
             onPrimaryAction={handleFinalSubmission}
-            primaryActionText={`Finish and submit ${scannedItems.length} item${scannedItems.length > 1 ? 's' : ''}`}
+            primaryActionText={t('inventory.finishAndSubmit', { count: scannedItems.length })}
           />
         </div>
       </div>
@@ -494,16 +498,13 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
         <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>Confirm Submission</DialogTitle>
-              <DialogDescription>
-                Review the items below before submitting them to your inventory.
-              </DialogDescription>
+              <DialogTitle>{t('submission.title')}</DialogTitle>
+              <DialogDescription>{t('submission.description')}</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="text-sm text-gray-600">
-                You are about to submit {scannedItems.length} item
-                {scannedItems.length > 1 ? 's' : ''} to inventory:
+                {t('submission.submitText', { count: scannedItems.length })}
               </div>
 
               {/* Summary List */}
@@ -519,7 +520,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                         <div className="font-medium">{item.productName}</div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
-                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                          {t('submission.totals.expires')}{' '}
+                          {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
@@ -538,11 +540,11 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               {/* Total Summary */}
               <div className="border-t pt-3">
                 <div className="flex justify-between items-center font-medium">
-                  <span>Total Items:</span>
+                  <span>{t('submission.totals.totalItems')}</span>
                   <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
-                  <span>Total Value:</span>
+                  <span>{t('submission.totals.totalValue')}</span>
                   <span>
                     {formatPrice(
                       scannedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
@@ -558,7 +560,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 onClick={() => setShowSubmissionDialog(false)}
                 disabled={isSubmittingBatch}
               >
-                Cancel
+                {t('submission.buttons.cancel')}
               </Button>
               <Button
                 variant="secondary"
@@ -566,7 +568,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 disabled={isSubmittingBatch}
               >
                 <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                {isSubmittingBatch ? 'Submitting...' : 'Submit to Inventory'}
+                {isSubmittingBatch
+                  ? t('submission.buttons.submitting')
+                  : t('submission.buttons.submitToInventory')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -580,12 +584,15 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                Inventory Updated Successfully!
+                {t('success.title')}
               </DialogTitle>
               <DialogDescription>
                 {submissionResult.successCount === submissionResult.totalCount
-                  ? `Successfully added ${submissionResult.successCount} item${submissionResult.successCount > 1 ? 's' : ''} to your inventory.`
-                  : `Added ${submissionResult.successCount} of ${submissionResult.totalCount} items to inventory.`}
+                  ? t('success.description.allSuccess', { count: submissionResult.successCount })
+                  : t('success.description.partialSuccess', {
+                      successCount: submissionResult.successCount,
+                      totalCount: submissionResult.totalCount,
+                    })}
               </DialogDescription>
             </DialogHeader>
 
@@ -599,7 +606,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 className="w-full"
               >
                 <RefreshCcw className="w-4 h-4 mr-2" />
-                Keep Scanning
+                {t('success.buttons.keepScanning')}
               </Button>
 
               <Button
@@ -612,7 +619,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 className="w-full"
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
-                View in Dashboard
+                {t('success.buttons.viewInDashboard')}
               </Button>
             </div>
           </DialogContent>

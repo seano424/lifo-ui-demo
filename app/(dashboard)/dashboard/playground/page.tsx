@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, CheckCircle, Loader2, Mail, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -265,6 +266,8 @@ function TestResults({
 }
 
 export default function PlaygroundPage() {
+  const _t = useTranslations('playground')
+
   // FastAPI Testing State
   const [alertThreshold, setAlertThreshold] = useState(0.6)
   const [recommendationCategory, setRecommendationCategory] = useState('')

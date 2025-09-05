@@ -8,6 +8,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
 import {
@@ -45,6 +46,10 @@ interface ProductsTableProps {
 }
 
 export function ProductsTable({ data, currentSort, updateSort, isLoading }: ProductsTableProps) {
+  const t = useTranslations('products')
+  const tButtons = useTranslations('buttons')
+  const tTable = useTranslations('productTable')
+
   const { updateProductPrice, deleteProduct, isUpdating } = useProductActions()
 
   const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useProductColumnSizing()
@@ -82,6 +87,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
     deleteProduct,
     isUpdating,
     DEFAULT_COLUMN_WIDTHS,
+    t: tTable,
   })
 
   const table = useReactTable({
@@ -113,11 +119,11 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
       <Card className="border-0 border-t rounded-t-none shadow-none">
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-lg mb-2">No products found</CardTitle>
+          <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
           <CardDescription className="text-center max-w-md">
-            Get started by adding your first product to this store
+            {t('empty.storeDescription')}
           </CardDescription>
-          <Button className="mt-4">Add Product</Button>
+          <Button className="mt-4">{tButtons('addProduct')}</Button>
         </CardContent>
       </Card>
     )

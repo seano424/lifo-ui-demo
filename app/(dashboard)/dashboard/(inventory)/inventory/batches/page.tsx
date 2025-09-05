@@ -118,16 +118,11 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
   }
 
   // Determine the header title and description based on filters
-  const isExpiringFilter = params.filter === 'expiring'
-  const pageTitle = isExpiringFilter ? 'Expiring Items' : 'Inventory Batches'
-  const pageDescription = isExpiringFilter
-    ? `Items expiring within ${params.expiringDays || '7'} days`
-    : "View and manage your store's inventory batches"
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col gap-6">
-        <BatchesHeader title={pageTitle} description={pageDescription} />
+        <BatchesHeader />
 
         <BatchesFilteredList
           initialFilters={{

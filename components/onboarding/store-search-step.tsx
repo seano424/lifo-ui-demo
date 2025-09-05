@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,8 @@ import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 'error'
 
 export function StoreSearchStep() {
+  const t = useTranslations('onboarding.storeSearch')
+
   const {
     searchQuery,
     setSearchQuery,
@@ -125,7 +128,7 @@ export function StoreSearchStep() {
 
       <div className="space-y-4 relative">
         <Input
-          placeholder="Enter your store name or address..."
+          placeholder={t('placeholder')}
           value={searchValue}
           onChange={e => setSearchValue(e.target.value)}
           className="w-full"

@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
+import { getLocalizedCategoryName } from '@/lib/category-translations'
 import { type Category, fetchCategories } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 
@@ -7,6 +9,8 @@ import { queryKeys } from '@/lib/queries/query-keys'
  * Used across product forms, CSV upload, and other category selection components
  */
 export function useCategories() {
+  const locale = useLocale()
+
   const result = useQuery({
     queryKey: queryKeys.categories.list,
     queryFn: () => fetchCategories(),
@@ -30,12 +34,15 @@ export function useCategories() {
     getDefaultCategory: () =>
       result.data?.find((cat: Category) => cat.category_code === 'dry_goods') || result.data?.[0],
 
-    // For dropdown/select components
+    // For dropdown/select components - now localized
     getCategoriesForDropdown: () =>
       result.data?.map((cat: Category) => ({
         value: cat.category_id,
-        label: cat.display_name_en,
+        label: getLocalizedCategoryName(cat, locale),
         code: cat.category_code,
       })) || [],
+
+    // Get localized display name for a category
+    getLocalizedName: (category: Category) => getLocalizedCategoryName(category, locale),
   }
 }

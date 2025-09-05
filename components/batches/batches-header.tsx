@@ -2,30 +2,32 @@
 
 import { Download, Plus } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { Button } from '@/components/ui/button'
 
-export default function BatchesHeader({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
+export default function BatchesHeader() {
+  const t = useTranslations('dashboardNav.pages')
+  const tDesc = useTranslations('dashboardNav.descriptions')
+  const tButtons = useTranslations('buttons')
+
+  const pageTitle = t('batches')
+  const pageDescription = tDesc('batches')
+
   return (
     <DashboardInsetHeader
-      title={title}
-      description={description}
+      title={pageTitle}
+      description={pageDescription}
       rightContent={
         <div className="flex gap-2">
           <Button onClick={() => alert('Todo: Export batches')} variant="outline">
             <Download className="mr-2 h-4 w-4" />
-            Export
+            {tButtons('export')}
           </Button>
           <Link href="/dashboard/inbound">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add Batch
+              {tButtons('addBatch')}
             </Button>
           </Link>
         </div>

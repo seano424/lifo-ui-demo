@@ -2,6 +2,7 @@
 
 import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,8 @@ interface StoreInsightsDashboardProps {
 }
 
 export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDashboardProps) {
+  const t = useTranslations('storeInsights')
+
   const activeStoreId = useActiveStoreId()
   const storeId = propStoreId || activeStoreId || ''
 
@@ -38,7 +41,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
       <Card>
         <CardContent className="flex items-center justify-center p-6">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <span>Loading store insights...</span>
+          <span>{t('loadingInsights')}</span>
         </CardContent>
       </Card>
     )
@@ -48,16 +51,18 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Store Insights Dashboard</CardTitle>
-          <CardDescription>Unable to load insights</CardDescription>
+          <CardTitle>{t('dashboardTitle')}</CardTitle>
+          <CardDescription>{t('unableToLoad')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Failed to load store insights: {insightsError?.message || 'Unknown error'}
+              {t('failedToLoad')} {insightsError?.message || t('unknownError')}
               <br />
-              <small className="text-muted-foreground mt-2 block">Store ID: {storeId}</small>
+              <small className="text-muted-foreground mt-2 block">
+                {t('storeId')} {storeId}
+              </small>
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -78,47 +83,47 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
       <div className="flex items-center justify-between flex-col sm:flex-row gap-4 text-center sm:text-left">
         <div className="flex flex-col gap-2">
           <Typography variant="h4" className="font-bold">
-            Today&apos;s priority actions
+            {t('title')}
           </Typography>
           <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
-            Review and take action on the most urgent items.
+            {t('description')}
           </Typography>
         </div>
 
         <Button className="flex dark:hidden" asChild>
           <Link href="/dashboard/actionable-batches">
-            Take Action <ArrowRightFromLine className="w-4 h-4" />
+            {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
           </Link>
         </Button>
         <Button className="hidden dark:flex" variant="black" asChild>
           <Link href="/dashboard/actionable-batches">
-            Take Action <ArrowRightFromLine className="w-4 h-4" />
+            {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
           </Link>
         </Button>
       </div>
       <div className="space-y-6">
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5 text-center sm:text-left">
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Urgent Items</Typography>
-            <Typography variant="p">High urgency batches</Typography>
+            <Typography variant="h4">{t('metrics.urgentItems')}</Typography>
+            <Typography variant="p">{t('metrics.urgentItemsDesc')}</Typography>
             <Typography variant="p">{urgentBatches}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Actions Taken</Typography>
-            <Typography variant="p">Total actions this period</Typography>
+            <Typography variant="h4">{t('metrics.actionsTaken')}</Typography>
+            <Typography variant="p">{t('metrics.actionsTakenDesc')}</Typography>
             <Typography variant="p">{totalActions}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Discount Value</Typography>
-            <Typography variant="p">Total discounts applied</Typography>
+            <Typography variant="h4">{t('metrics.discountValue')}</Typography>
+            <Typography variant="p">{t('metrics.discountValueDesc')}</Typography>
             <Typography variant="p">€{discountValue.toFixed(0)}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
-            <Typography variant="h4">Avg Score</Typography>
-            <Typography variant="p">Average urgency score</Typography>
+            <Typography variant="h4">{t('metrics.avgScore')}</Typography>
+            <Typography variant="p">{t('metrics.avgScoreDesc')}</Typography>
             <Typography variant="p">{(avgScore * 100).toFixed(1)}%</Typography>
           </div>
         </div>
@@ -127,10 +132,10 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           <CardHeader>
             <CardTitle className="flex text-center sm:text-left justify-center sm:justify-start items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Store Overview & Analytics
+              {t('overview.title')}
             </CardTitle>
             <CardDescription className="text-center sm:text-left">
-              {totalActions} actions taken • {urgentBatches} urgent items tracked
+              {t('overview.description', { actionsTaken: totalActions, urgentBatches })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -139,38 +144,44 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Scoring Alert:</strong> {urgentBatches} urgent batches need immediate
-                    attention to prevent losses.
+                    <strong>{t('overview.scoringAlert')}</strong>{' '}
+                    {t('overview.urgentBatchesAlert', { urgentBatches })}
                   </AlertDescription>
                 </Alert>
               )}
 
               {/* Analytics Summary */}
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Recent Activity</h4>
+                <h4 className="font-semibold text-sm">{t('overview.recentActivity')}</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="p-3 bg-blue-50 rounded">
-                    <p className="font-medium">Actions Taken</p>
-                    <p className="text-blue-600">{totalActions} this period</p>
+                    <p className="font-medium">{t('overview.actionsTaken')}</p>
+                    <p className="text-blue-600">
+                      {t('overview.actionsTakenPeriod', { totalActions })}
+                    </p>
                   </div>
                   <div className="p-3 bg-green-50 rounded">
-                    <p className="font-medium">Discounts Applied</p>
-                    <p className="text-green-600">€{discountValue.toFixed(0)} saved</p>
+                    <p className="font-medium">{t('overview.discountsApplied')}</p>
+                    <p className="text-green-600">
+                      {t('overview.saved', { discountValue: discountValue.toFixed(0) })}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground">
-                  Average Score: {(avgScore * 100).toFixed(1)}% • €{discountValue.toFixed(0)}{' '}
-                  discounts applied
+                  {t('overview.averageScore', {
+                    avgScore: (avgScore * 100).toFixed(1),
+                    discountValue: discountValue.toFixed(0),
+                  })}
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowDetailedView(!showDetailedView)}
                 >
-                  {showDetailedView ? 'Hide Details' : 'Show Details'}
+                  {showDetailedView ? t('overview.hideDetails') : t('overview.showDetails')}
                 </Button>
               </div>
             </div>

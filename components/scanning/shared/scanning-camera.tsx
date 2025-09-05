@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, Camera, Keyboard } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -59,14 +60,16 @@ export default function ScanningCamera({
   isBackendHealthy,
   autoStart = true,
 }: ScanningCameraProps) {
+  const t = useTranslations('scanningCamera')
+
   // Get appropriate title based on mode
-  const cameraTitle = title || (mode === 'barcode' ? 'Scan Product' : 'Scan Expiry Date')
+  const cameraTitle =
+    title || (mode === 'barcode' ? t('titles.scanProduct') : t('titles.scanExpiryDate'))
   const cameraSubtitle =
-    subtitle || (mode === 'barcode' ? 'Point camera at barcode' : 'Point camera at expiry date')
+    subtitle ||
+    (mode === 'barcode' ? t('subtitles.pointAtBarcode') : t('subtitles.pointAtExpiryDate'))
   const permissionMessage =
-    mode === 'barcode'
-      ? 'Camera access is required for barcode scanning.'
-      : 'Camera access is required for capturing expiry dates.'
+    mode === 'barcode' ? t('permissions.barcodeRequired') : t('permissions.expiryRequired')
 
   return (
     <div className={cn(className, 'space-y-4')}>
@@ -89,9 +92,7 @@ export default function ScanningCamera({
           {isBackendHealthy === false && !ocrError && (
             <Alert variant="default" className="border-none flex justify-center">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Sorry, this service is currently unavailable. Please use manual date entry.
-              </AlertDescription>
+              <AlertDescription>{t('alerts.serviceUnavailable')}</AlertDescription>
             </Alert>
           )}
 
@@ -100,11 +101,9 @@ export default function ScanningCamera({
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                OCR Error: {ocrError}
+                {t('alerts.ocrError', { error: ocrError })}
                 {isBackendHealthy === false && (
-                  <span className="block mt-1 text-xs">
-                    FastAPI backend is not available. Please use manual entry.
-                  </span>
+                  <span className="block mt-1 text-xs">{t('alerts.backendUnavailable')}</span>
                 )}
               </AlertDescription>
             </Alert>
@@ -115,11 +114,11 @@ export default function ScanningCamera({
             <div className="flex gap-2">
               <Button onClick={onOCRCapture} className="flex-1 " disabled={isOCRProcessing}>
                 <Camera className="w-4 h-4 mr-2" />
-                {isOCRProcessing ? 'Processing OCR...' : 'Capture Expiry Date'}
+                {isOCRProcessing ? t('buttons.processingOCR') : t('buttons.captureExpiryDate')}
               </Button>
               {ocrError && onClearOCRError && (
                 <Button onClick={onClearOCRError} variant="outline" size="sm">
-                  Clear Error
+                  {t('buttons.clearError')}
                 </Button>
               )}
             </div>
@@ -145,7 +144,7 @@ export default function ScanningCamera({
             <div className="flex gap-2">
               <Button variant="outline" onClick={onToggleManualEntry} className="flex-1">
                 <Keyboard className="w-4 h-4 mr-2" />
-                Manual Entry
+                {t('buttons.manualEntry')}
               </Button>
             </div>
           )}
@@ -158,10 +157,7 @@ export default function ScanningCamera({
           <div>
             <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 flex-shrink-0 h-8 w-8" />
           </div>
-          <AlertDescription>
-            Point your camera at any product barcode. The scanner will automatically detect
-            supported formats and look up product information from Open Food Facts.
-          </AlertDescription>
+          <AlertDescription>{t('alerts.scanInstructions')}</AlertDescription>
         </Alert>
       )}
     </div>

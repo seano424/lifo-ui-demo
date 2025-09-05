@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +13,9 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const t = useTranslations('auth.signUpForm')
+  const tErrors = useTranslations('auth.errors')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
@@ -26,13 +30,13 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     setError(null)
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError(tErrors('passwordTooShort'))
       setIsLoading(false)
       return
     }
 
     if (password !== repeatPassword) {
-      setError('Passwords do not match')
+      setError(tErrors('passwordsNoMatch'))
       setIsLoading(false)
       return
     }
@@ -48,7 +52,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       if (error) throw error
       router.push('/auth/sign-up-success')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : tErrors('genericError'))
     } finally {
       setIsLoading(false)
     }
@@ -59,11 +63,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       <Card>
         <CardHeader>
           <CardTitle>
-            <Typography variant="h1">Sign up</Typography>
+            <Typography variant="h1">{t('title')}</Typography>
           </CardTitle>
           <CardDescription>
             <Typography variant="p" color="muted">
-              Create a new account
+              {t('description')}
             </Typography>
           </CardDescription>
         </CardHeader>
@@ -71,11 +75,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder={t('emailPlaceholder')}
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -83,7 +87,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('password')}</Label>
                 </div>
                 <Input
                   id="password"
@@ -97,7 +101,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
+                  <Label htmlFor="repeat-password">{t('repeatPassword')}</Label>
                 </div>
                 <Input
                   id="repeat-password"
@@ -114,13 +118,13 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 </Typography>
               )}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating an account...' : 'Sign up'}
+                {isLoading ? t('creatingAccount') : t('signUpButton')}
               </Button>
             </div>
             <div className="mt-4 text-center">
-              Already have an account?{' '}
+              {t('alreadyHaveAccount')}{' '}
               <Link href="/auth/login" className="underline underline-offset-4">
-                Login
+                {t('loginLink')}
               </Link>
             </div>
           </form>

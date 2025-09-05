@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowRight, Package } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
@@ -32,6 +33,7 @@ export default function ProductCard({
   onProceed,
   className = '',
 }: ProductCardProps) {
+  const t = useTranslations('productCard')
   return (
     <Card className={`border-primary-50 shadow-primary-100 ${className}`}>
       <CardContent className="p-3">
@@ -50,7 +52,7 @@ export default function ProductCard({
           {/* Product Information */}
           <div className="flex flex-col gap-2 justify-center items-center flex-1">
             <Typography className="text-secondary-900 font-black" variant="p">
-              {mode === 'selected' ? 'Selected Product' : 'Product Information'}
+              {mode === 'selected' ? t('titles.selectedProduct') : t('titles.productInformation')}
             </Typography>
             <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
               <Package className="w-4 h-4 text-gray-500" />
@@ -62,7 +64,9 @@ export default function ProductCard({
                 </>
               )}
 
-              <Typography variant="p">{product.productName || 'Unknown Product'}</Typography>
+              <Typography variant="p">
+                {product.productName || t('fallbacks.unknownProduct')}
+              </Typography>
 
               <Typography variant="p">•</Typography>
               <Typography variant="p" className="font-mono text-xs">

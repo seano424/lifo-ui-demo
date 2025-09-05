@@ -1,10 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { type ScannedItem, ScanOutInterface } from '@/components/scanning'
 import { Typography } from '@/components/ui/typography'
 
 export default function OutboundPage() {
+  const t = useTranslations('scanOut')
   const [removedItems, setRemovedItems] = useState<ScannedItem[]>([])
 
   const handleItemRemoved = (item: ScannedItem) => {
@@ -19,7 +21,7 @@ export default function OutboundPage() {
         {removedItems.length > 0 && (
           <div className="mt-8 space-y-2">
             <Typography variant="h3" className="text-center font-black text-primary-900">
-              Recently Removed ({removedItems.length} items)
+              {t('recentlyRemoved', { count: removedItems.length })}
             </Typography>
             <div className="space-y-2">
               {removedItems.slice(0, 5).map((item, index) => (
@@ -31,13 +33,17 @@ export default function OutboundPage() {
                     {item.productName}
                   </Typography>
                   <Typography variant="p" className="text-sm text-white">
-                    Removed {item.quantity}x • Expires:{' '}
-                    {new Date(item.expiryDate).toLocaleDateString()}
+                    {t('removedQuantityExpires', {
+                      quantity: item.quantity,
+                      date: new Date(item.expiryDate).toLocaleDateString(),
+                    })}
                   </Typography>
                 </div>
               ))}
               {removedItems.length > 5 && (
-                <Typography variant="p">... and {removedItems.length - 5} more items</Typography>
+                <Typography variant="p">
+                  {t('andMoreItems', { count: removedItems.length - 5 })}
+                </Typography>
               )}
             </div>
           </div>

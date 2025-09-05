@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, ArrowRight, Check, Keyboard, Loader2, Package, Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 // Constants
@@ -75,6 +76,11 @@ export default function ManualBarcodeEntry({
   mode = 'inbound', // Default to inbound for backward compatibility
   storeId,
 }: ManualBarcodeEntryProps) {
+  const t = useTranslations('products.manualEntry')
+  const tButtons = useTranslations('buttons')
+  const tFields = useTranslations('products.fields')
+  const tPlaceholders = useTranslations('products.placeholders')
+
   const { getCategoriesForDropdown, isLoading: categoriesLoading } = useCategories()
 
   const [barcode, setBarcode] = useState('')
@@ -271,7 +277,7 @@ export default function ManualBarcodeEntry({
           <div className="flex justify-between">
             <CardTitle className="flex items-center gap-2">
               <Keyboard className="w-5 h-5" />
-              {mode === 'outbound' ? 'Manual Search' : 'Manual Entry'}
+              {mode === 'outbound' ? t('manualSearch') : t('title')}
             </CardTitle>
           </div>
         </CardHeader>
@@ -282,23 +288,23 @@ export default function ManualBarcodeEntry({
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
-                    <Typography variant="h3">Product Selected</Typography>
+                    <Typography variant="h3">{t('productSelected')}</Typography>
                     <div className="text-sm mt-1 space-y-1">
                       <div>
-                        <strong>Name:</strong> {selectedProduct.productName}
+                        <strong>{tFields('name')}:</strong> {selectedProduct.productName}
                       </div>
                       {selectedProduct.brand && (
                         <div>
-                          <strong>Brand:</strong> {selectedProduct.brand}
+                          <strong>{tFields('brand')}:</strong> {selectedProduct.brand}
                         </div>
                       )}
                       {selectedProduct.category && (
                         <div>
-                          <strong>Category:</strong> {selectedProduct.category}
+                          <strong>{tFields('category')}:</strong> {selectedProduct.category}
                         </div>
                       )}
                       <div>
-                        <strong>Barcode:</strong>{' '}
+                        <strong>{tFields('barcode')}:</strong>{' '}
                         <code className="text-xs">{selectedProduct.barcode}</code>
                       </div>
                     </div>
@@ -310,17 +316,17 @@ export default function ManualBarcodeEntry({
                     onClick={handleConfirmAndProceed}
                     className="flex-1 bg-primary-600 hover:bg-primary-700"
                   >
-                    Select Product
+                    {tButtons('selectProduct')}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                   <Button variant="outline" onClick={() => setSelectedProduct(null)}>
-                    Change
+                    {tButtons('change')}
                   </Button>
                 </div>
                 <Alert className="mt-3">
                   <ArrowRight className="h-4 w-4 text-blue-600" />
                   <AlertDescription className="text-xs">
-                    Will automatically proceed to expiry date scanning after selection
+                    {t('autoProceedException')}
                   </AlertDescription>
                 </Alert>
               </CardContent>
@@ -332,7 +338,7 @@ export default function ManualBarcodeEntry({
               <div className="space-y-4">
                 {/* Barcode Lookup */}
                 <div className="space-y-2">
-                  <Label>Search by Barcode</Label>
+                  <Label>{t('searchByBarcode')}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       type="text"
@@ -347,7 +353,7 @@ export default function ManualBarcodeEntry({
                           handleBarcodeSubmit()
                         }
                       }}
-                      placeholder="Barcode number (8+ digits)..."
+                      placeholder={t('barcodePlaceholder')}
                       className="font-mono"
                       disabled={isLookingUp}
                     />
@@ -366,25 +372,22 @@ export default function ManualBarcodeEntry({
                       ) : (
                         <Search className="w-4 h-4" />
                       )}
-                      Lookup
+                      {tButtons('lookup')}
                     </Button>
                   </div>
                   {barcode &&
                     (barcode.length < SEARCH_CONFIG.MIN_BARCODE_LENGTH ||
                       !isValidBarcode(barcode)) && (
-                      <p className="text-xs text-orange-600">
-                        Barcode must be at least {SEARCH_CONFIG.MIN_BARCODE_LENGTH} digits and
-                        contain only numbers
-                      </p>
+                      <p className="text-xs text-orange-600">{t('barcodeValidation')}</p>
                     )}
                 </div>
 
                 {/* Product Name Search */}
                 <div className="space-y-2">
                   <Label>
-                    Or Search by Product Name
+                    {t('searchByProductName')}
                     {mode === 'outbound' && (
-                      <span className="text-xs text-gray-500 ml-2">(In-stock items only)</span>
+                      <span className="text-xs text-gray-500 ml-2">{t('inStockItemsOnly')}</span>
                     )}
                   </Label>
                   <div className="relative">
@@ -397,8 +400,8 @@ export default function ManualBarcodeEntry({
                       }}
                       placeholder={
                         mode === 'outbound'
-                          ? 'Search products in inventory...'
-                          : 'Search Open Food Facts database...'
+                          ? t('inventorySearchPlaceholder')
+                          : t('searchPlaceholder')
                       }
                       disabled={false}
                     />
@@ -463,14 +466,14 @@ export default function ManualBarcodeEntry({
                                 )}
                                 {product.isOutOfStock ? (
                                   <Typography variant="small" className="text-red-600">
-                                    Out of Stock
+                                    {t('outOfStock')}
                                   </Typography>
                                 ) : product.total_available_quantity ? (
                                   <Typography variant="small" className="text-primary-900">
-                                    {product.total_available_quantity} units available
+                                    {product.total_available_quantity} {t('unitsAvailable')}
                                     {product.batch_count &&
                                       product.batch_count > 1 &&
-                                      ` (${product.batch_count} batches)`}
+                                      ` (${product.batch_count} ${t('batchCount')})`}
                                   </Typography>
                                 ) : null}
                               </div>
@@ -571,7 +574,7 @@ export default function ManualBarcodeEntry({
                         (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
                         (!productSearch.data || productSearch.data.length === 0))) && (
                       <div className="text-sm text-gray-500 p-3 border rounded-lg">
-                        No products found matching "{productNameQuery}"
+                        {t('noProductsFound')} "{productNameQuery}"
                       </div>
                     )}
                 </div>
@@ -597,14 +600,14 @@ export default function ManualBarcodeEntry({
                             <div className="flex justify-center items-center gap-2">
                               <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                               <Typography variant="h3" className="text-primary-800 font-black">
-                                Product Found!
+                                {t('productFound')}
                               </Typography>
                             </div>
                           ) : (
                             <div className="flex justify-center items-center gap-2">
                               <AlertCircle className="w-6 h-6 text-red-600" />
                               <Typography variant="h3" className="text-red-600 font-black">
-                                Out of Stock
+                                {t('outOfStock')}
                               </Typography>
                             </div>
                           )
@@ -612,7 +615,7 @@ export default function ManualBarcodeEntry({
                           <div className="flex justify-center items-center gap-2">
                             <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                             <Typography variant="h3" className="text-primary-800 font-black">
-                              Product Found!
+                              {t('productFound')}
                             </Typography>
                           </div>
                         )}
@@ -620,18 +623,18 @@ export default function ManualBarcodeEntry({
                         {lookupResult.product && (
                           <div className="text-sm space-y-2">
                             <div>
-                              <strong>Name:</strong>{' '}
+                              <strong>{tFields('name')}:</strong>{' '}
                               {lookupResult.product.product_name ||
                                 lookupResult.product.product_name_en}
                             </div>
                             {lookupResult.product.brands && (
                               <div>
-                                <strong>Brand:</strong> {lookupResult.product.brands}
+                                <strong>{tFields('brand')}:</strong> {lookupResult.product.brands}
                               </div>
                             )}
                             {lookupResult.product.categories && (
                               <div>
-                                <strong>Category:</strong>{' '}
+                                <strong>{tFields('category')}:</strong>{' '}
                                 {parseFirstCategory(lookupResult.product.categories)}
                               </div>
                             )}
@@ -642,12 +645,10 @@ export default function ManualBarcodeEntry({
                                 <strong>Stock:</strong>{' '}
                                 {barcodeStockStatus.hasStock ? (
                                   <span className="text-primary-600">
-                                    {barcodeStockStatus.availableQuantity} units available
+                                    {barcodeStockStatus.availableQuantity} {t('unitsAvailable')}
                                   </span>
                                 ) : (
-                                  <span className="text-red-600">
-                                    No stock available in this store
-                                  </span>
+                                  <span className="text-red-600">{t('noStockAvailable')}</span>
                                 )}
                               </div>
                             )}
@@ -705,17 +706,15 @@ export default function ManualBarcodeEntry({
                           {mode === 'outbound' &&
                           barcodeStockStatus !== null &&
                           !barcodeStockStatus.hasStock
-                            ? 'Out of Stock - Cannot Select'
-                            : 'Select This Product'}
+                            ? t('outOfStockCannotSelect')
+                            : t('selectThisProduct')}
                         </Button>
                       </CardContent>
                     </Card>
                   ) : (
                     <Alert variant="primary">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        Product not found in database. You can add it manually below.
-                      </AlertDescription>
+                      <AlertDescription>{t('productNotFound')}</AlertDescription>
                     </Alert>
                   )}
                 </div>
@@ -726,24 +725,24 @@ export default function ManualBarcodeEntry({
                   <div className="pb-3">
                     <div className="text-sm flex items-center gap-2">
                       <Package className="w-4 h-4" />
-                      Add Product Manually
+                      {t('addProductManually')}
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
-                        <Label>Barcode *</Label>
+                        <Label>{tFields('barcode')} *</Label>
                         <Input
                           value={barcode}
                           onChange={e => setBarcode(e.target.value)}
-                          placeholder="e.g., 078000113464"
+                          placeholder={tPlaceholders('barcode')}
                           className="font-mono"
                           required
                         />
                       </div>
 
                       <div>
-                        <Label>Product Name *</Label>
+                        <Label>{tFields('productName')} *</Label>
                         <Input
                           value={manualProductData.productName}
                           onChange={e =>
@@ -752,14 +751,14 @@ export default function ManualBarcodeEntry({
                               productName: e.target.value,
                             }))
                           }
-                          placeholder="e.g., Organic Whole Milk"
+                          placeholder={tPlaceholders('productName')}
                           required
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <Label>Brand</Label>
+                          <Label>{tFields('brand')}</Label>
                           <Input
                             value={manualProductData.brand}
                             onChange={e =>
@@ -768,12 +767,12 @@ export default function ManualBarcodeEntry({
                                 brand: e.target.value,
                               }))
                             }
-                            placeholder="e.g., Danone"
+                            placeholder={tPlaceholders('brand')}
                           />
                         </div>
 
                         <div>
-                          <Label>Category</Label>
+                          <Label>{tFields('category')}</Label>
                           <Select
                             value={manualProductData.category}
                             onValueChange={value =>
@@ -784,7 +783,7 @@ export default function ManualBarcodeEntry({
                             }
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
+                              <SelectValue placeholder={tPlaceholders('selectCategory')} />
                             </SelectTrigger>
                             <SelectContent>
                               {categoriesLoading ? (
@@ -917,7 +916,7 @@ export default function ManualBarcodeEntry({
                       className="w-full"
                     >
                       <Package className="w-4 h-4 mr-2" />
-                      Select This Product
+                      {t('selectThisProduct')}
                     </Button>
                   </div>
                 </div>

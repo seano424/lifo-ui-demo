@@ -1,6 +1,7 @@
 'use client'
 
 import { Filter, Search, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -21,6 +22,8 @@ interface StoreUserFiltersProps {
 }
 
 export function StoreUserFilters({ filters, onFiltersChange }: StoreUserFiltersProps) {
+  const t = useTranslations('users')
+
   const updateFilter = (key: keyof StoreUserFiltersType, value: unknown) => {
     onFiltersChange({
       ...filters,
@@ -96,10 +99,10 @@ export function StoreUserFilters({ filters, onFiltersChange }: StoreUserFiltersP
                 <SelectValue placeholder="All roles" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="owner">Owner</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
-                <SelectItem value="employee">Employee</SelectItem>
-                <SelectItem value="staff">Staff</SelectItem>
+                <SelectItem value="owner">{t('roles.owner')}</SelectItem>
+                <SelectItem value="manager">{t('roles.manager')}</SelectItem>
+                <SelectItem value="employee">{t('roles.employee')}</SelectItem>
+                <SelectItem value="staff">{t('roles.staff')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

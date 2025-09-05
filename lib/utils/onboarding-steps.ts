@@ -2,6 +2,20 @@
  * Onboarding step configuration and navigation utilities
  */
 
+// Translation function type - will be set by components using the utilities
+type TranslationFunction = (key: string) => string
+let translateFunction: TranslationFunction | null = null
+
+// Function to set the translation function from components
+export const setOnboardingTranslations = (t: TranslationFunction) => {
+  translateFunction = t
+}
+
+// Helper to get translated text with fallback
+const t = (key: string, fallback: string): string => {
+  return translateFunction ? translateFunction(key) : fallback
+}
+
 export const STEP_IDS = {
   STORE_SEARCH: 'store_search',
   STORE_TYPE: 'store_type',
@@ -22,25 +36,25 @@ export interface StepConfig {
 export const ALL_STEPS: StepConfig[] = [
   {
     id: STEP_IDS.STORE_SEARCH,
-    label: 'Store Lookup',
+    label: t('onboarding.stepLabels.storeLookup', 'Store Lookup'),
     component: 'StoreSearchStep',
     requiresGooglePlaces: true,
   },
   {
     id: STEP_IDS.STORE_TYPE,
-    label: 'Add Store Details',
+    label: t('onboarding.stepLabels.addStoreDetails', 'Add Store Details'),
     component: 'StoreTypeStep',
     requiresGooglePlaces: false,
   },
   {
     id: STEP_IDS.CONFIRM_DETAILS,
-    label: 'Review & Verify',
+    label: t('onboarding.stepLabels.reviewVerify', 'Review & Verify'),
     component: 'ConfirmDetailsStep',
     requiresGooglePlaces: false,
   },
   {
     id: STEP_IDS.CREATE_ACCOUNT,
-    label: 'Create Account',
+    label: t('onboarding.stepLabels.createAccount', 'Create Account'),
     component: 'OnboardingSignUpForm',
     requiresGooglePlaces: false,
   },

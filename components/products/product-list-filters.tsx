@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import {
   Select,
@@ -7,15 +8,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { fetchCategories } from '@/lib/queries/products'
-
-interface Category {
-  category_id: string
-  category_code: string
-  display_name_en: string
-  display_name_fr: string
-  product_count?: number
-}
+import { getLocalizedCategoryName } from '@/lib/category-translations'
+import { type Category, fetchCategories } from '@/lib/queries/products'
 
 interface ProductListFiltersProps {
   filters?: {
@@ -32,8 +26,14 @@ export function ProductListFilters({
   count,
   isLoading,
 }: ProductListFiltersProps) {
+  const t = useTranslations('productFilters')
+  const locale = useLocale()
   const [categories, setCategories] = useState<Category[]>([])
   const [categoriesLoading, setCategoriesLoading] = useState(true)
+
+  const getCategoryDisplayName = (category: Category) => {
+    return getLocalizedCategoryName(category, locale)
+  }
 
   useEffect(() => {
     async function loadCategories() {
@@ -68,13 +68,13 @@ export function ProductListFilters({
         disabled={isLoading || categoriesLoading}
       >
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Category filter" />
+          <SelectValue placeholder={t('categoryFilter')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All categories</SelectItem>
+          <SelectItem value="all">{t('allCategories')}</SelectItem>
           {categories.map(category => (
             <SelectItem key={category.category_code} value={category.category_code}>
-              {category.display_name_en}
+              {getCategoryDisplayName(category)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -88,7 +88,7 @@ export function ProductListFilters({
       )}
       {!isLoading && count > 0 && (
         <span className="text-sm flex items-center text-muted-foreground px-2">
-          {count} products
+          {t('productCount', { count })}
         </span>
       )}
     </div>

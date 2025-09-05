@@ -12,6 +12,7 @@ import {
   SortAsc,
   Tag,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,62 +33,64 @@ interface ProductsSortToolbarProps {
   isLoading?: boolean
 }
 
-const sortOptions: Array<{
-  field: SortField
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-  description: string
-}> = [
-  {
-    field: 'name',
-    label: 'Product Name',
-    icon: Package,
-    description: 'Sort alphabetically by product name',
-  },
-  {
-    field: 'category',
-    label: 'Category',
-    icon: Tag,
-    description: 'Group by product category',
-  },
-  {
-    field: 'brand',
-    label: 'Brand',
-    icon: Building,
-    description: 'Sort alphabetically by brand',
-  },
-  {
-    field: 'total_stock',
-    label: 'Stock Level',
-    icon: Boxes,
-    description: 'Sort by current inventory quantity',
-  },
-  {
-    field: 'base_selling_price',
-    label: 'Selling Price',
-    icon: DollarSign,
-    description: 'Sort by product selling price',
-  },
-  {
-    field: 'active_batches_count',
-    label: 'Active Batches',
-    icon: Boxes,
-    description: 'Sort by number of active batches',
-  },
-  {
-    field: 'created_at',
-    label: 'Date Added',
-    icon: Calendar,
-    description: 'Sort by when product was added',
-  },
-]
-
 export function ProductsSortToolbar({
   currentSort,
   onSortChange,
   totalCount,
   isLoading,
 }: ProductsSortToolbarProps) {
+  const t = useTranslations('productSort')
+
+  const sortOptions: Array<{
+    field: SortField
+    label: string
+    icon: React.ComponentType<{ className?: string }>
+    description: string
+  }> = [
+    {
+      field: 'name',
+      label: t('productName'),
+      icon: Package,
+      description: t('productNameDesc'),
+    },
+    {
+      field: 'category',
+      label: t('category'),
+      icon: Tag,
+      description: t('categoryDesc'),
+    },
+    {
+      field: 'brand',
+      label: t('brand'),
+      icon: Building,
+      description: t('brandDesc'),
+    },
+    {
+      field: 'total_stock',
+      label: t('stockLevel'),
+      icon: Boxes,
+      description: t('stockLevelDesc'),
+    },
+    {
+      field: 'base_selling_price',
+      label: t('sellingPrice'),
+      icon: DollarSign,
+      description: t('sellingPriceDesc'),
+    },
+    {
+      field: 'active_batches_count',
+      label: t('activeBatches'),
+      icon: Boxes,
+      description: t('activeBatchesDesc'),
+    },
+    {
+      field: 'created_at',
+      label: t('dateAdded'),
+      icon: Calendar,
+      description: t('dateAddedDesc'),
+    },
+  ]
+
   const currentOption = sortOptions.find(option => option.field === currentSort.field)
 
   const handleSortChange = (field: SortField) => {
@@ -112,11 +115,11 @@ export function ProductsSortToolbar({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" disabled={isLoading}>
               <SortAsc className="mr-2 h-4 w-4" />
-              Sort by: {currentOption?.label || 'Unknown'}
+              {t('sortBy')}: {currentOption?.label || t('unknown')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>Sort Products By</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('sortProductsBy')}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {sortOptions.map(option => {
               const Icon = option.icon
@@ -134,7 +137,7 @@ export function ProductsSortToolbar({
                       <span className="font-medium">{option.label}</span>
                       {isSelected && (
                         <Badge variant="secondary" className="text-xs">
-                          Current
+                          {t('current')}
                         </Badge>
                       )}
                     </div>
@@ -159,12 +162,12 @@ export function ProductsSortToolbar({
           {currentSort.direction === 'asc' ? (
             <>
               <ArrowUp className="h-4 w-4" />
-              Ascending
+              {t('ascending')}
             </>
           ) : (
             <>
               <ArrowDown className="h-4 w-4" />
-              Descending
+              {t('descending')}
             </>
           )}
         </Button>
@@ -172,11 +175,7 @@ export function ProductsSortToolbar({
 
       {/* Sort Info */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        {totalCount !== undefined && (
-          <span>
-            {totalCount} product{totalCount !== 1 ? 's' : ''}
-          </span>
-        )}
+        {totalCount !== undefined && <span>{t('productCount', { count: totalCount })}</span>}
         {currentOption && (
           <Badge variant="outline" className="text-xs">
             {currentOption.label} ({currentSort.direction === 'asc' ? '↑' : '↓'})
@@ -195,12 +194,14 @@ interface QuickSortButtonsProps {
 }
 
 export function QuickSortButtons({ onSortChange, currentSort, isLoading }: QuickSortButtonsProps) {
+  const t = useTranslations('productSort.quickSort')
+
   const quickSorts: Array<{ label: string; sort: ProductSort }> = [
-    { label: 'Newest First', sort: { field: 'created_at', direction: 'desc' } },
-    { label: 'A-Z', sort: { field: 'name', direction: 'asc' } },
-    { label: 'Low Stock', sort: { field: 'total_stock', direction: 'asc' } },
-    { label: 'Highest Price', sort: { field: 'base_selling_price', direction: 'desc' } },
-    { label: 'Most Batches', sort: { field: 'active_batches_count', direction: 'desc' } },
+    { label: t('newestFirst'), sort: { field: 'created_at', direction: 'desc' } },
+    { label: t('aToZ'), sort: { field: 'name', direction: 'asc' } },
+    { label: t('lowStock'), sort: { field: 'total_stock', direction: 'asc' } },
+    { label: t('highestPrice'), sort: { field: 'base_selling_price', direction: 'desc' } },
+    { label: t('mostBatches'), sort: { field: 'active_batches_count', direction: 'desc' } },
   ]
 
   return (

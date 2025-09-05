@@ -15,7 +15,8 @@ export interface Category {
   category_id: string
   category_code: string
   display_name_en: string
-  display_name_fr: string
+  display_name_fr: string | null
+  display_name_nl?: string | null // Future support for Dutch
   product_count?: number
 }
 

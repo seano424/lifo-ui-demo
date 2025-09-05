@@ -91,13 +91,10 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
     // Continue without prefetch - client will handle loading
   }
 
-  const pageTitle = 'Inventory Products'
-  const pageDescription = "View and manage your store's product inventory"
-
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="space-y-6">
-        <ProductsHeader title={pageTitle} description={pageDescription} />
+        <ProductsHeader />
 
         {/* Client-side filtered product list */}
         <ProductsFilteredList

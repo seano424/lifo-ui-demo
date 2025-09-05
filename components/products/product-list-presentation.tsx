@@ -10,6 +10,7 @@ import {
   Package,
   Trash2,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useCallback, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -115,6 +116,9 @@ export function ProductsListPresentation({
   currentSort,
   updateSort,
 }: ProductsListPresentationProps) {
+  const t = useTranslations('products')
+  const tButtons = useTranslations('buttons')
+
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
   const products = useMemo(() => {
@@ -138,23 +142,23 @@ export function ProductsListPresentation({
 
   const handleDeleteProduct = useCallback(
     (productId: string) => {
-      if (confirm('Are you sure you want to delete this product?')) {
+      if (confirm(t('confirmations.deleteProduct'))) {
         deleteProduct(productId)
       }
     },
-    [deleteProduct],
+    [deleteProduct, t],
   )
 
   const handleUpdatePrice = useCallback(
     (productId: string) => {
       const product = products.find(p => p.product_id === productId)
       const currentPrice = product?.base_selling_price || 0
-      const newPrice = prompt('Enter new price:', currentPrice.toString())
+      const newPrice = prompt(t('confirmations.enterNewPrice'), currentPrice.toString())
       if (newPrice && !Number.isNaN(Number(newPrice))) {
         updateProductPrice(productId, Number(newPrice))
       }
     },
-    [updateProductPrice, products],
+    [updateProductPrice, products, t],
   )
 
   if (error) {
@@ -162,11 +166,11 @@ export function ProductsListPresentation({
       <div className="flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-destructive">Error Loading Products</CardTitle>
+            <CardTitle className="text-destructive">{t('errors.loadingError')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Typography variant="p" color="muted">
-              {error instanceof Error ? error.message : 'An unexpected error occurred'}
+              {error instanceof Error ? error.message : t('errors.unexpectedError')}
             </Typography>
           </CardContent>
         </Card>
@@ -205,9 +209,9 @@ export function ProductsListPresentation({
             <div className="flex items-center justify-center p-12">
               <div className="text-center">
                 <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <Typography variant="h3">No products found</Typography>
+                <Typography variant="h3">{t('empty.title')}</Typography>
                 <Typography variant="p" color="muted" className="mt-2">
-                  Get started by adding your first product
+                  {t('empty.description')}
                 </Typography>
               </div>
             </div>
@@ -216,16 +220,16 @@ export function ProductsListPresentation({
               <TableHeader>
                 <TableRow>
                   <SortableHeader field="name" currentSort={currentSort} onSort={updateSort}>
-                    Product Details
+                    {t('table.productDetails')}
                   </SortableHeader>
                   <SortableHeader field="category" currentSort={currentSort} onSort={updateSort}>
-                    Category
+                    {t('table.category')}
                   </SortableHeader>
                   <SortableHeader field="brand" currentSort={currentSort} onSort={updateSort}>
-                    Brand
+                    {t('table.brand')}
                   </SortableHeader>
                   <SortableHeader field="total_stock" currentSort={currentSort} onSort={updateSort}>
-                    Stock
+                    {t('table.stock')}
                   </SortableHeader>
                   <SortableHeader
                     field="base_selling_price"
@@ -233,16 +237,16 @@ export function ProductsListPresentation({
                     onSort={updateSort}
                     className="text-right"
                   >
-                    Pricing
+                    {t('table.pricing')}
                   </SortableHeader>
                   <SortableHeader
                     field="active_batches_count"
                     currentSort={currentSort}
                     onSort={updateSort}
                   >
-                    Active Batches
+                    {t('table.activeBatches')}
                   </SortableHeader>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">{t('table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -250,7 +254,9 @@ export function ProductsListPresentation({
                   <TableRow key={product.product_id}>
                     <TableCell className="font-medium">
                       <div>
-                        <div className="font-semibold">{product.name || 'Unnamed Product'}</div>
+                        <div className="font-semibold">
+                          {product.name || t('table.unnamedProduct')}
+                        </div>
                         <div className="text-sm text-muted-foreground font-mono">
                           SKU: {product.sku || 'N/A'}
                         </div>
@@ -265,7 +271,9 @@ export function ProductsListPresentation({
                           {product.category_display_name || product.category}
                         </Badge>
                       ) : (
-                        <span className="text-muted-foreground text-sm">Uncategorized</span>
+                        <span className="text-muted-foreground text-sm">
+                          {t('table.uncategorized')}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -275,7 +283,7 @@ export function ProductsListPresentation({
                       <div className="text-sm">
                         <span className="font-medium">{product.total_stock || 0}</span>
                         <span className="text-muted-foreground ml-1">
-                          {product.unit_type || 'units'}
+                          {product.unit_type || t('table.units')}
                         </span>
                       </div>
                     </TableCell>
@@ -285,7 +293,7 @@ export function ProductsListPresentation({
                           €{product.base_selling_price?.toFixed(2) || '0.00'}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Cost: €{product.base_cost_price?.toFixed(2) || '0.00'}
+                          {t('table.cost')}: €{product.base_cost_price?.toFixed(2) || '0.00'}
                         </div>
                       </div>
                     </TableCell>
@@ -293,8 +301,9 @@ export function ProductsListPresentation({
                       <div className="text-sm">
                         <span className="font-medium">{product.active_batches_count || 0}</span>
                         <span className="text-muted-foreground ml-1">
-                          batch
-                          {(product.active_batches_count || 0) !== 1 ? 'es' : ''}
+                          {(product.active_batches_count || 0) === 1
+                            ? t('table.batch')
+                            : t('table.batches')}
                         </span>
                       </div>
                     </TableCell>
@@ -315,7 +324,7 @@ export function ProductsListPresentation({
                             disabled={isUpdating}
                           >
                             <Euro className="mr-2 h-4 w-4" />
-                            Update Price
+                            {tButtons('updatePrice')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
@@ -323,7 +332,7 @@ export function ProductsListPresentation({
                             }}
                           >
                             <Package className="mr-2 h-4 w-4" />
-                            View Batches
+                            {tButtons('viewBatches')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
@@ -331,7 +340,7 @@ export function ProductsListPresentation({
                             }}
                           >
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit Product
+                            {tButtons('editProduct')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDeleteProduct(product.product_id)}
@@ -339,7 +348,7 @@ export function ProductsListPresentation({
                             className="text-destructive focus:text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Product
+                            {tButtons('deleteProduct')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -361,7 +370,7 @@ export function ProductsListPresentation({
             variant="outline"
             size="lg"
           >
-            {isFetchingNextPage ? 'Loading more...' : 'Load More Products'}
+            {isFetchingNextPage ? t('loading.loadingMore') : tButtons('loadMore')}
           </Button>
         </div>
       )}
@@ -370,7 +379,8 @@ export function ProductsListPresentation({
       {products.length > 0 && (
         <div className="flex justify-center">
           <Badge variant="secondary" className="text-sm">
-            Showing {products.length} of {count} products
+            {t('loading.showing')} {products.length} {t('loading.of')} {count}{' '}
+            {t('loading.products')}
           </Badge>
         </div>
       )}
