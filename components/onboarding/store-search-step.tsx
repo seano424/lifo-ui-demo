@@ -20,13 +20,8 @@ type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 
 export function StoreSearchStep() {
   const t = useTranslations('onboarding.storeSearch')
 
-  const {
-    searchQuery,
-    setSearchQuery,
-    setSelectedStoreForm, // ✅ Updated method name
-    setManualEntry,
-    setCurrentStep,
-  } = useOnboardingStore()
+  const { searchQuery, setSearchQuery, setSelectedStoreForm, setManualEntry, setCurrentStep } =
+    useOnboardingStore()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
   const [localSearchState, setLocalSearchState] = useState<SearchState>('idle')
@@ -105,7 +100,7 @@ export function StoreSearchStep() {
         googlePlaceId: place.place_id,
       }
 
-      setSelectedStoreForm(storeFormData) // ✅ Using correct method and data format
+      setSelectedStoreForm(storeFormData)
       setCurrentStep(2)
     }
     // Error handling is done in the hook and displayed via the error state
