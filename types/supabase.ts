@@ -1939,6 +1939,13 @@ export type Database = {
           waste_reduction_target_percent: number
         }[]
       }
+      get_user_by_username: {
+        Args: { p_username: string }
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       get_user_complete_profile: {
         Args: { p_store_id?: string; p_user_id: string }
         Returns: Json

@@ -289,6 +289,34 @@ export async function updateUserLanguagePreference(
   }
 }
 
+// 🆕 NEW: Optimized username lookup function
+export async function getUserByUsername(
+  username: string,
+  serverClient?: ServerClient,
+): Promise<{ user_id: string; email: string } | null> {
+  const supabase = serverClient || createClient()
+
+  try {
+    const { data, error } = await supabase.rpc('get_user_by_username', {
+      p_username: username,
+    })
+
+    if (error) {
+      console.error('[getUserByUsername] RPC error:', error)
+      throw new Error(`Failed to lookup user by username: ${error.message}`)
+    }
+
+    if (!data || data.length === 0) {
+      return null
+    }
+
+    return data[0]
+  } catch (err) {
+    console.error('[getUserByUsername] Unexpected error:', err)
+    throw err
+  }
+}
+
 // Enhanced updateUser function (includes phone and language)
 export async function updateUser(userId: string, updates: UserUpdate): Promise<User> {
   const supabase = createClient()

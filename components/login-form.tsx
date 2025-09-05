@@ -53,27 +53,21 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
       // If the input doesn't contain @, treat it as a username and look up the email
       if (!email.includes('@')) {
-        // Look up user by username to get their email
-        const { data: users, error: usersError } = await supabase.rpc('get_users_with_metadata')
+        // Look up user by username using optimized function
+        const { data: userResult, error: userError } = await supabase.rpc('get_user_by_username', {
+          p_username: email,
+        })
 
-        if (usersError) {
-          console.error('Failed to fetch users:', usersError)
+        if (userError) {
+          console.error('Failed to lookup user by username:', userError)
           throw new Error('Authentication service error')
         }
 
-        const user = users?.find(
-          (u: {
-            raw_user_meta_data?: { username?: string }
-            user_metadata?: { username?: string }
-            email: string
-          }) => u.raw_user_meta_data?.username === email || u.user_metadata?.username === email,
-        )
-
-        if (!user) {
+        if (!userResult || userResult.length === 0 || !userResult[0].email) {
           throw new Error('Invalid username or password')
         }
 
-        loginEmail = user.email
+        loginEmail = userResult[0].email
       }
 
       const { error } = await supabase.auth.signInWithPassword({
@@ -129,26 +123,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           console.error('❌ Failed to set session:', sessionError)
           throw new Error('Failed to create session')
         }
-      } else if (result.magicLink) {
-        // Handle magic link approach
-        window.location.href = result.magicLink
-        return
-      } else if (result.authUser) {
-        // Handle manual session setup
-
-        // Try to sign in with the user's email (this might work since PIN is validated)
-        toast.success(`PIN authenticated! Setting up session for ${result.user.username}...`)
-
-        // For now, just show success and redirect to dashboard without session
-        // The user might already be logged in from previous sessions
-        router.push('/dashboard')
-        return
       } else {
-        // PIN validation successful but no session tokens yet
-        toast.success(`PIN authenticated for ${result.user.username}!`)
-
-        // For now, show success message and stay on login page
-        return
+        throw new Error('No session returned from authentication')
       }
 
       toast.success(`Welcome back, ${result.user.full_name}!`)

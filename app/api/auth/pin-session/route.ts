@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit } from '@/lib/rate-limiter'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,25 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Username and PIN are required' },
         { status: 400 },
       )
+    }
+
+    // Check rate limiting before processing authentication
+    const rateLimit = checkRateLimit(request, username)
+    if (!rateLimit.allowed) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: 'Too many authentication attempts. Please try again later.',
+        },
+        { status: 429 },
+      )
+
+      // Add rate limit headers
+      Object.entries(rateLimit.headers).forEach(([key, value]) => {
+        response.headers.set(key, value)
+      })
+
+      return response
     }
 
     // Create admin Supabase client for user management
@@ -34,41 +54,24 @@ export async function POST(request: NextRequest) {
     if (username.includes('@')) {
       userEmail = username
     } else {
-      // Look up user by username in the database
-      const { data: users, error: usersError } = await supabase.rpc('get_users_with_metadata')
+      // Look up user by username using optimized function
+      const { data: userResult, error: userError } = await supabase.rpc('get_user_by_username', {
+        p_username: username,
+      })
 
-      if (usersError) {
-        console.error('🚫 Failed to fetch users:', usersError)
+      if (userError) {
+        console.error('🚫 Failed to lookup user by username:', userError)
         return NextResponse.json(
           { success: false, error: 'Authentication service error' },
           { status: 500 },
         )
       }
 
-      // Find user by username in raw_user_meta_data
-      const user = users?.find(
-        (u: {
-          raw_user_meta_data?: { username?: string }
-          user_metadata?: { username?: string }
-        }) => u.raw_user_meta_data?.username === username || u.user_metadata?.username === username,
-      )
-
-      if (user) {
-        userEmail = user.email
+      if (userResult && userResult.length > 0 && userResult[0].email) {
+        userEmail = userResult[0].email
         console.log(`✅ Found user by username ${username}: ${userEmail}`)
       } else {
         console.log(`❌ No user found with username: ${username}`)
-        console.log(
-          'Available usernames:',
-          users
-            ?.map(
-              (u: {
-                raw_user_meta_data?: { username?: string }
-                user_metadata?: { username?: string }
-              }) => u.raw_user_meta_data?.username || u.user_metadata?.username,
-            )
-            .filter(Boolean),
-        )
       }
     }
 
@@ -110,7 +113,7 @@ export async function POST(request: NextRequest) {
     const fullName = rawMetadata.full_name || userMetadata.full_name || userUsername
 
     // Return success with session tokens
-    return NextResponse.json({
+    const successResponse = NextResponse.json({
       success: true,
       user: {
         id: signInData.user.id,
@@ -124,6 +127,13 @@ export async function POST(request: NextRequest) {
         refresh_token: signInData.session.refresh_token,
       },
     })
+
+    // Add rate limit headers to successful responses too
+    Object.entries(rateLimit.headers).forEach(([key, value]) => {
+      successResponse.headers.set(key, value)
+    })
+
+    return successResponse
   } catch (error: unknown) {
     console.error('💥 PIN authentication error:', error)
     return NextResponse.json(
