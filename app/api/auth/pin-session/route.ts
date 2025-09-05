@@ -27,76 +27,87 @@ export async function POST(request: NextRequest) {
       },
     )
 
-    // Try multiple email formats for backward compatibility
-    const possibleEmails = [
-      `${username}@lifo-test.com`, // Current test format
-      `${username}@seantest.dev`, // New working test format
-      `${username}@lifo-employee.internal`, // Future employee format
-      username.includes('@') ? username : null, // Direct email if provided
-      // Special case for testing: map common test usernames to working email
-      username === 'test.employee2' || username === 'john.smith' ? 'soreilly424@gmail.com' : null,
-      username === 'testme' ? 'seanpatrickstudios@gmail.com' : null,
-    ].filter(Boolean)
+    // First, look up the user by username to get their actual email
+    let userEmail: string | null = null
 
-    let signInData: {
-      session: { access_token: string; refresh_token: string }
-      user: {
-        id: string
-        email?: string
-        user_metadata?: { username?: string; full_name?: string }
-        raw_user_meta_data?: { username?: string; full_name?: string }
+    // If the username contains @, treat it as an email
+    if (username.includes('@')) {
+      userEmail = username
+    } else {
+      // Look up user by username in the database
+      const { data: users, error: usersError } = await supabase.rpc('get_users_with_metadata')
+
+      if (usersError) {
+        console.error('🚫 Failed to fetch users:', usersError)
+        return NextResponse.json(
+          { success: false, error: 'Authentication service error' },
+          { status: 500 },
+        )
       }
-    } | null = null
-    let signInError: Error | null = null
 
-    // Try each email format until one works
-    for (const email of possibleEmails) {
-      const result = await supabase.auth.signInWithPassword({
-        email: email!,
-        password: pin,
-      })
+      // Find user by username in raw_user_meta_data
+      const user = users?.find(
+        (u: {
+          raw_user_meta_data?: { username?: string }
+          user_metadata?: { username?: string }
+        }) => u.raw_user_meta_data?.username === username || u.user_metadata?.username === username,
+      )
 
-      if (!result.error && result.data.session) {
-        signInData = result.data
-        signInError = null
-        break
+      if (user) {
+        userEmail = user.email
+        console.log(`✅ Found user by username ${username}: ${userEmail}`)
       } else {
-        signInError = result.error
+        console.log(`❌ No user found with username: ${username}`)
+        console.log(
+          'Available usernames:',
+          users
+            ?.map(
+              (u: {
+                raw_user_meta_data?: { username?: string }
+                user_metadata?: { username?: string }
+              }) => u.raw_user_meta_data?.username || u.user_metadata?.username,
+            )
+            .filter(Boolean),
+        )
       }
     }
 
-    // Check if any authentication succeeded
-    if (signInError || !signInData?.session) {
-      console.error('🚫 All authentication attempts failed')
+    if (!userEmail) {
       return NextResponse.json(
         { success: false, error: 'Invalid username or PIN' },
         { status: 401 },
       )
     }
 
+    // Now authenticate with the found email and PIN
+    const result = await supabase.auth.signInWithPassword({
+      email: userEmail,
+      password: pin,
+    })
+
+    if (result.error || !result.data.session) {
+      console.error('🚫 Authentication failed for', userEmail, ':', result.error?.message)
+      return NextResponse.json(
+        { success: false, error: 'Invalid username or PIN' },
+        { status: 401 },
+      )
+    }
+
+    const signInData = result.data
+
     if (!signInData.user) {
       console.error('❓ No user returned from authentication')
       return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: 500 })
     }
 
-    // Get username from metadata, override for test cases
-    let userUsername =
-      signInData.user.user_metadata?.username ||
-      (signInData.user as { raw_user_meta_data?: { username?: string } }).raw_user_meta_data
-        ?.username ||
-      username
+    // Get username and full name from metadata
+    const rawMetadata =
+      (signInData.user as { raw_user_meta_data?: Record<string, unknown> }).raw_user_meta_data || {}
+    const userMetadata = signInData.user.user_metadata || {}
 
-    let fullName =
-      signInData.user.user_metadata?.full_name ||
-      (signInData.user as { raw_user_meta_data?: { full_name?: string } }).raw_user_meta_data
-        ?.full_name ||
-      userUsername
+    const userUsername = rawMetadata.username || userMetadata.username || username
 
-    // Override for john.smith test user
-    if (username === 'john.smith') {
-      userUsername = 'john.smith'
-      fullName = 'John Smith'
-    }
+    const fullName = rawMetadata.full_name || userMetadata.full_name || userUsername
 
     // Return success with session tokens
     return NextResponse.json({

@@ -41,7 +41,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setPin('')
   }
 
-  // Email/Password login (existing functionality)
+  // Email/Password login with username support
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const supabase = createClient()
@@ -49,15 +49,42 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
+      let loginEmail = email
+
+      // If the input doesn't contain @, treat it as a username and look up the email
+      if (!email.includes('@')) {
+        // Look up user by username to get their email
+        const { data: users, error: usersError } = await supabase.rpc('get_users_with_metadata')
+
+        if (usersError) {
+          console.error('Failed to fetch users:', usersError)
+          throw new Error('Authentication service error')
+        }
+
+        const user = users?.find(
+          (u: {
+            raw_user_meta_data?: { username?: string }
+            user_metadata?: { username?: string }
+            email: string
+          }) => u.raw_user_meta_data?.username === email || u.user_metadata?.username === email,
+        )
+
+        if (!user) {
+          throw new Error('Invalid username or password')
+        }
+
+        loginEmail = user.email
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: loginEmail,
         password,
       })
 
       if (error) throw error
 
       toast.success('Welcome back!')
-      router.push('/dashboard') // Updated redirect path
+      router.push('/dashboard')
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed'
       setError(errorMessage)
@@ -228,15 +255,15 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             <TabsContent value="admin" className="space-y-4">
               <form onSubmit={handleEmailLogin} className="space-y-4 font-mono uppercase">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Username or Email</Label>
                   <Input
                     id="email"
-                    type="email"
-                    placeholder="manager@store.com"
+                    type="text"
+                    placeholder="manager@store.com or admin.user"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
-                    autoComplete="email"
+                    autoComplete="username"
                     disabled={isLoading}
                   />
                 </div>

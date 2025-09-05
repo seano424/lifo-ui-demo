@@ -1696,10 +1696,6 @@ export type Database = {
           is_duplicate: boolean
         }[]
       }
-      check_pin_lock_status: {
-        Args: { p_user_id: string } | { p_username: string }
-        Returns: Json
-      }
       check_security_warnings: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1745,10 +1741,6 @@ export type Database = {
           expiry_date: string
           sku: string
         }[]
-      }
-      generate_pin_hash: {
-        Args: { pin_text: string }
-        Returns: string
       }
       get_actionable_batches: {
         Args: { input_store_id: string }
@@ -1976,17 +1968,9 @@ export type Database = {
           is_active: boolean
           language_preference: string
           last_login: string
-          migrated_from_user_mgmt: boolean
           phone: string
           phone_verified: boolean
-          pin_attempts: number
-          pin_delivery_method: string
-          pin_expires_at: string
-          pin_hash: string
-          pin_locked_until: string
-          pin_set_at: string
           raw_user_meta_data: Json
-          requires_pin: boolean
           updated_at: string
           username: string
         }[]
@@ -1998,14 +1982,6 @@ export type Database = {
           p_store_id: string
           p_user_email: string
         }
-        Returns: Json
-      }
-      reset_pin_attempts: {
-        Args: { p_user_id: string }
-        Returns: Json
-      }
-      reset_user_pin: {
-        Args: { p_new_pin: string; p_user_id: string } | { p_user_id: string }
         Returns: Json
       }
       resolve_bulk_products: {
@@ -2058,10 +2034,6 @@ export type Database = {
           items_per_second: number
           operation_type: string
         }[]
-      }
-      unlock_user_pin: {
-        Args: { p_user_id: string }
-        Returns: Json
       }
       update_store_advanced_settings: {
         Args: {
@@ -2172,10 +2144,6 @@ export type Database = {
         Args: { new_phone: string; target_user_id: string }
         Returns: Json
       }
-      update_user_pin: {
-        Args: { p_new_pin: string; p_user_id: string }
-        Returns: Json
-      }
       user_has_pin_access: {
         Args: { target_store_id: string }
         Returns: boolean
@@ -2183,10 +2151,6 @@ export type Database = {
       user_has_store_access: {
         Args: { required_role?: string; target_store_id: string }
         Returns: boolean
-      }
-      validate_pin_login: {
-        Args: { p_pin: string; p_username: string }
-        Returns: Json
       }
     }
     Enums: {
@@ -2469,72 +2433,6 @@ export type Database = {
   }
   user_mgmt: {
     Tables: {
-      pin_deliveries: {
-        Row: {
-          created_at: string | null
-          delivered_by: string | null
-          delivery_address: string | null
-          delivery_confirmed_at: string | null
-          delivery_id: string
-          delivery_method: string
-          delivery_requested_at: string | null
-          delivery_sent_at: string | null
-          delivery_status: string | null
-          expires_at: string | null
-          external_message_id: string | null
-          max_attempts: number | null
-          notes: string | null
-          pin_format: string | null
-          pin_length: number | null
-          pin_reference: string | null
-          store_id: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          delivered_by?: string | null
-          delivery_address?: string | null
-          delivery_confirmed_at?: string | null
-          delivery_id?: string
-          delivery_method: string
-          delivery_requested_at?: string | null
-          delivery_sent_at?: string | null
-          delivery_status?: string | null
-          expires_at?: string | null
-          external_message_id?: string | null
-          max_attempts?: number | null
-          notes?: string | null
-          pin_format?: string | null
-          pin_length?: number | null
-          pin_reference?: string | null
-          store_id?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          delivered_by?: string | null
-          delivery_address?: string | null
-          delivery_confirmed_at?: string | null
-          delivery_id?: string
-          delivery_method?: string
-          delivery_requested_at?: string | null
-          delivery_sent_at?: string | null
-          delivery_status?: string | null
-          expires_at?: string | null
-          external_message_id?: string | null
-          max_attempts?: number | null
-          notes?: string | null
-          pin_format?: string | null
-          pin_length?: number | null
-          pin_reference?: string | null
-          store_id?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       roles: {
         Row: {
           created_at: string | null
