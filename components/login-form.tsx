@@ -41,7 +41,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setPin('')
   }
 
-  // Email/Password login (existing functionality)
+  // Email/Password login with username support
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const supabase = createClient()
@@ -49,15 +49,36 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
+      let loginEmail = email
+
+      // If the input doesn't contain @, treat it as a username and look up the email
+      if (!email.includes('@')) {
+        // Look up user by username using optimized function
+        const { data: userResult, error: userError } = await supabase.rpc('get_user_by_username', {
+          p_username: email,
+        })
+
+        if (userError) {
+          console.error('Failed to lookup user by username:', userError)
+          throw new Error('Authentication service error')
+        }
+
+        if (!userResult || userResult.length === 0 || !userResult[0].email) {
+          throw new Error('Invalid username or password')
+        }
+
+        loginEmail = userResult[0].email
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: loginEmail,
         password,
       })
 
       if (error) throw error
 
       toast.success('Welcome back!')
-      router.push('/dashboard') // Updated redirect path
+      router.push('/dashboard')
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed'
       setError(errorMessage)
@@ -102,26 +123,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           console.error('❌ Failed to set session:', sessionError)
           throw new Error('Failed to create session')
         }
-      } else if (result.magicLink) {
-        // Handle magic link approach
-        window.location.href = result.magicLink
-        return
-      } else if (result.authUser) {
-        // Handle manual session setup
-
-        // Try to sign in with the user's email (this might work since PIN is validated)
-        toast.success(`PIN authenticated! Setting up session for ${result.user.username}...`)
-
-        // For now, just show success and redirect to dashboard without session
-        // The user might already be logged in from previous sessions
-        router.push('/dashboard')
-        return
       } else {
-        // PIN validation successful but no session tokens yet
-        toast.success(`PIN authenticated for ${result.user.username}!`)
-
-        // For now, show success message and stay on login page
-        return
+        throw new Error('No session returned from authentication')
       }
 
       toast.success(`Welcome back, ${result.user.full_name}!`)
@@ -228,15 +231,15 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             <TabsContent value="admin" className="space-y-4">
               <form onSubmit={handleEmailLogin} className="space-y-4 font-mono uppercase">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Username or Email</Label>
                   <Input
                     id="email"
-                    type="email"
-                    placeholder="manager@store.com"
+                    type="text"
+                    placeholder="manager@store.com or admin.user"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
-                    autoComplete="email"
+                    autoComplete="username"
                     disabled={isLoading}
                   />
                 </div>

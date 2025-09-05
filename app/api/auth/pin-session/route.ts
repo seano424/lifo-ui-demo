@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit } from '@/lib/rate-limiter'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,25 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Username and PIN are required' },
         { status: 400 },
       )
+    }
+
+    // Check rate limiting before processing authentication
+    const rateLimit = checkRateLimit(request, username)
+    if (!rateLimit.allowed) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: 'Too many authentication attempts. Please try again later.',
+        },
+        { status: 429 },
+      )
+
+      // Add rate limit headers
+      Object.entries(rateLimit.headers).forEach(([key, value]) => {
+        response.headers.set(key, value)
+      })
+
+      return response
     }
 
     // Create admin Supabase client for user management
@@ -27,79 +47,73 @@ export async function POST(request: NextRequest) {
       },
     )
 
-    // Try multiple email formats for backward compatibility
-    const possibleEmails = [
-      `${username}@lifo-test.com`, // Current test format
-      `${username}@seantest.dev`, // New working test format
-      `${username}@lifo-employee.internal`, // Future employee format
-      username.includes('@') ? username : null, // Direct email if provided
-      // Special case for testing: map common test usernames to working email
-      username === 'test.employee2' || username === 'john.smith' ? 'soreilly424@gmail.com' : null,
-      username === 'testme' ? 'seanpatrickstudios@gmail.com' : null,
-    ].filter(Boolean)
+    // First, look up the user by username to get their actual email
+    let userEmail: string | null = null
 
-    let signInData: {
-      session: { access_token: string; refresh_token: string }
-      user: {
-        id: string
-        email?: string
-        user_metadata?: { username?: string; full_name?: string }
-        raw_user_meta_data?: { username?: string; full_name?: string }
-      }
-    } | null = null
-    let signInError: Error | null = null
-
-    // Try each email format until one works
-    for (const email of possibleEmails) {
-      const result = await supabase.auth.signInWithPassword({
-        email: email!,
-        password: pin,
+    // If the username contains @, treat it as an email
+    if (username.includes('@')) {
+      userEmail = username
+    } else {
+      // Look up user by username using optimized function
+      const { data: userResult, error: userError } = await supabase.rpc('get_user_by_username', {
+        p_username: username,
       })
 
-      if (!result.error && result.data.session) {
-        signInData = result.data
-        signInError = null
-        break
+      if (userError) {
+        console.error('🚫 Failed to lookup user by username:', userError)
+        return NextResponse.json(
+          { success: false, error: 'Authentication service error' },
+          { status: 500 },
+        )
+      }
+
+      if (userResult && userResult.length > 0 && userResult[0].email) {
+        userEmail = userResult[0].email
+        console.log(`✅ Found user by username ${username}: ${userEmail}`)
       } else {
-        signInError = result.error
+        console.log(`❌ No user found with username: ${username}`)
       }
     }
 
-    // Check if any authentication succeeded
-    if (signInError || !signInData?.session) {
-      console.error('🚫 All authentication attempts failed')
+    if (!userEmail) {
       return NextResponse.json(
         { success: false, error: 'Invalid username or PIN' },
         { status: 401 },
       )
     }
 
+    // Now authenticate with the found email and PIN
+    const result = await supabase.auth.signInWithPassword({
+      email: userEmail,
+      password: pin,
+    })
+
+    if (result.error || !result.data.session) {
+      console.error('🚫 Authentication failed for', userEmail, ':', result.error?.message)
+      return NextResponse.json(
+        { success: false, error: 'Invalid username or PIN' },
+        { status: 401 },
+      )
+    }
+
+    const signInData = result.data
+
     if (!signInData.user) {
       console.error('❓ No user returned from authentication')
       return NextResponse.json({ success: false, error: 'Authentication failed' }, { status: 500 })
     }
 
-    // Get username from metadata, override for test cases
-    let userUsername =
-      signInData.user.user_metadata?.username ||
-      (signInData.user as { raw_user_meta_data?: { username?: string } }).raw_user_meta_data
-        ?.username ||
-      username
+    // Get username and full name from metadata
+    const rawMetadata =
+      (signInData.user as { raw_user_meta_data?: Record<string, unknown> }).raw_user_meta_data || {}
+    const userMetadata = signInData.user.user_metadata || {}
 
-    let fullName =
-      signInData.user.user_metadata?.full_name ||
-      (signInData.user as { raw_user_meta_data?: { full_name?: string } }).raw_user_meta_data
-        ?.full_name ||
-      userUsername
+    const userUsername = rawMetadata.username || userMetadata.username || username
 
-    // Override for john.smith test user
-    if (username === 'john.smith') {
-      userUsername = 'john.smith'
-      fullName = 'John Smith'
-    }
+    const fullName = rawMetadata.full_name || userMetadata.full_name || userUsername
 
     // Return success with session tokens
-    return NextResponse.json({
+    const successResponse = NextResponse.json({
       success: true,
       user: {
         id: signInData.user.id,
@@ -113,6 +127,13 @@ export async function POST(request: NextRequest) {
         refresh_token: signInData.session.refresh_token,
       },
     })
+
+    // Add rate limit headers to successful responses too
+    Object.entries(rateLimit.headers).forEach(([key, value]) => {
+      successResponse.headers.set(key, value)
+    })
+
+    return successResponse
   } catch (error: unknown) {
     console.error('💥 PIN authentication error:', error)
     return NextResponse.json(
