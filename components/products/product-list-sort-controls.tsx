@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ export function ProductListSortControls({
   updateSort,
   isLoading,
 }: ProductListSortControlsProps) {
+  const t = useTranslations('productListSort')
   const getSortIcon = (field: SortField) => {
     if (currentSort.field === field) {
       return currentSort.direction === 'asc' ? (
@@ -32,14 +34,14 @@ export function ProductListSortControls({
 
   const getSortLabel = (field: SortField) => {
     const labels = {
-      name: 'Name',
-      category: 'Category',
-      brand: 'Brand',
-      total_stock: 'Stock',
-      base_selling_price: 'Price',
-      active_batches_count: 'Active Batches',
-      created_at: 'Date Added',
-      updated_at: 'Last Updated',
+      name: t('name'),
+      category: t('category'),
+      brand: t('brand'),
+      total_stock: t('stock'),
+      base_selling_price: t('price'),
+      active_batches_count: t('activeBatches'),
+      created_at: t('dateAdded'),
+      updated_at: t('lastUpdated'),
     }
     return labels[field] || field
   }
@@ -60,37 +62,37 @@ export function ProductListSortControls({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem onClick={() => updateSort('name')} className="justify-between">
-          Name
+          {t('name')}
           {getSortIcon('name')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => updateSort('category')} className="justify-between">
-          Category
+          {t('category')}
           {getSortIcon('category')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => updateSort('brand')} className="justify-between">
-          Brand
+          {t('brand')}
           {getSortIcon('brand')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => updateSort('total_stock')} className="justify-between">
-          Stock
+          {t('stock')}
           {getSortIcon('total_stock')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => updateSort('base_selling_price')}
           className="justify-between"
         >
-          Price
+          {t('price')}
           {getSortIcon('base_selling_price')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => updateSort('active_batches_count')}
           className="justify-between"
         >
-          Active Batches
+          {t('activeBatches')}
           {getSortIcon('active_batches_count')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => updateSort('created_at')} className="justify-between">
-          Date Added
+          {t('dateAdded')}
           {getSortIcon('created_at')}
         </DropdownMenuItem>
       </DropdownMenuContent>

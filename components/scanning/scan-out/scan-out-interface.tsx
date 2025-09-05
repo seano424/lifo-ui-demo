@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, BarChart3, Check, Minus, Plus, RefreshCcw, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -74,6 +75,7 @@ interface ScanOutInterfaceProps {
 }
 
 export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProps) {
+  const t = useTranslations('scanOut')
   const { activeStore } = useStoreState()
   const { submitCheckout, isSubmittingCheckout, findAvailableBatches, matchBatchByExpiry } =
     useScanOutActions()
@@ -105,7 +107,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   // Custom barcode scan handler for scan-out
   const handleCustomBarcodeScanned = async (barcode: string, _productData?: unknown) => {
     if (!activeStore) {
-      console.error('No active store selected')
+      console.error(t('noActiveStore'))
       return
     }
 
@@ -161,8 +163,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           batchesData?.map(batch => ({
             ...batch,
             products: {
-              product_name: (batch.products as unknown as ProductData)?.name || 'Unknown Product',
-              brand_name: (batch.products as unknown as ProductData)?.brand || 'Unknown Brand',
+              product_name: (batch.products as unknown as ProductData)?.name || t('unknownProduct'),
+              brand_name: (batch.products as unknown as ProductData)?.brand || t('unknownBrand'),
               barcode: (batch.products as unknown as ProductData)?.barcode || '',
             },
           })) || []
@@ -178,7 +180,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       setAvailableBatches(batches)
       setCurrentProduct({
         barcode,
-        productName: batches[0]?.products.product_name || 'Unknown Product',
+        productName: batches[0]?.products.product_name || t('unknownProduct'),
       })
       setCurrentStep('batch-selection')
       setSelectedBatch(null)
@@ -268,7 +270,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
   const handleOCRExpiryCapture = async () => {
     if (!activeStore) {
-      setOcrError('No active store selected')
+      setOcrError(t('noActiveStore'))
       return
     }
 
@@ -277,7 +279,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
       const videoElement = document.querySelector('video') as HTMLVideoElement
       if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
-        throw new Error('Camera not ready')
+        throw new Error(t('cameraNotReady'))
       }
 
       const imageBlob = await captureImageFromVideo(videoElement)
@@ -297,13 +299,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           handleBatchSelected(matchedBatch)
         } else {
           // No matching batch found
-          setOcrError(`No batch found with expiry date: ${result.expiryDateInfo.extractedDate}`)
+          setOcrError(t('noBatchFoundWithExpiry', { date: result.expiryDateInfo.extractedDate }))
         }
       } else {
-        setOcrError(result.error?.message || 'OCR processing failed')
+        setOcrError(result.error?.message || t('ocrProcessingFailed'))
       }
     } catch (error) {
-      setOcrError(error instanceof Error ? error.message : 'OCR processing failed')
+      setOcrError(error instanceof Error ? error.message : t('ocrProcessingFailed'))
     }
   }
 
@@ -319,7 +321,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         quantityRemoved: item.quantity,
         reason: 'scan-out',
         storeId: activeStore?.store_id || '',
-        notes: `Batch removal: ${item.productName} x${item.quantity}`,
+        notes: t('batchRemovalNote', { productName: item.productName, quantity: item.quantity }),
       })),
       {
         onSuccess: result => {
@@ -372,8 +374,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             onCloseManualEntry={() => setShowManualEntry(false)}
             manualEntryMode="outbound"
             storeId={activeStore?.store_id}
-            title="Scan Product to Remove"
-            subtitle="Point camera at product barcode"
+            title={t('scanProductToRemove')}
+            subtitle={t('pointCameraAtBarcode')}
           />
         </div>
       )}
@@ -389,8 +391,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             ocrError={ocrError}
             onClearOCRError={clearOCRError}
             isBackendHealthy={isBackendHealthy}
-            title="Capture Expiry Date"
-            subtitle="Point camera at expiry date"
+            title={t('captureExpiryDate')}
+            subtitle={t('pointCameraAtExpiry')}
             autoStart={true}
           />
 
@@ -406,7 +408,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               onClick={handleBackToScanning}
               className="flex items-center gap-2"
             >
-              ← Back to Change Product
+              ← {t('backToChangeProduct')}
             </Button>
           </div>
         </>
@@ -416,8 +418,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         <Card className="mt-6">
           <CardHeader className="pb-3">
             <CardTitle className="flex justify-between items-center">
-              <span>Items to Remove ({totalItems})</span>
-              <span className="text-sm font-normal">Total: {formatPrice(totalValue)}</span>
+              <span>{t('itemsToRemove', { count: totalItems })}</span>
+              <span className="text-sm font-normal">
+                {t('total')}: {formatPrice(totalValue)}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -429,7 +433,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 <div className="flex-1">
                   <div className="font-medium">{item.productName}</div>
                   <div className="text-sm text-gray-500">
-                    {item.brand} • Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                    {item.brand} • {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
                   </div>
                   <div className="text-sm text-gray-600">
                     {formatPrice(item.price)} × {item.quantity} ={' '}
@@ -477,13 +481,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
             <div className="flex gap-2 pt-3">
               <Button variant="outline" onClick={() => setPendingItems([])} className="flex-1">
-                Clear All
+                {t('clearAll')}
               </Button>
               <Button
                 onClick={handleSubmitAll}
                 className="flex-1 bg-primary-900 hover:bg-primary-700 text-white"
               >
-                Submit All ({totalItems} items)
+                {t('submitAll', { count: totalItems })}
               </Button>
             </div>
           </CardContent>
@@ -494,16 +498,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>Confirm Checkout</DialogTitle>
-              <DialogDescription>
-                Review the items below before removing them from inventory.
-              </DialogDescription>
+              <DialogTitle>{t('confirmCheckout')}</DialogTitle>
+              <DialogDescription>{t('reviewItemsBeforeRemoval')}</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="text-sm text-gray-600">
-                You are about to remove {pendingItems.length} item
-                {pendingItems.length > 1 ? 's' : ''} from inventory:
+                {t('aboutToRemoveItems', { count: pendingItems.length })}
               </div>
 
               {/* Summary List */}
@@ -519,14 +520,16 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                         <div className="font-medium">{item.productName}</div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
-                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                          {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="font-medium text-red-600">
                           -{item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-red-500">Remove: {formatPrice(itemTotal)}</div>
+                        <div className="text-xs text-red-500">
+                          {t('remove')}: {formatPrice(itemTotal)}
+                        </div>
                       </div>
                     </div>
                   )
@@ -536,13 +539,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               {/* Total Summary */}
               <div className="border-t pt-3">
                 <div className="flex justify-between items-center font-medium">
-                  <span>Total Items Removed:</span>
+                  <span>{t('totalItemsRemoved')}:</span>
                   <span className="text-red-600">
                     -{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
-                  <span>Total Value Removed:</span>
+                  <span>{t('totalValueRemoved')}:</span>
                   <span className="text-red-600">
                     -
                     {formatPrice(
@@ -559,7 +562,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 onClick={() => setShowSubmissionDialog(false)}
                 disabled={isSubmittingCheckout}
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 variant="destructive"
@@ -567,7 +570,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 disabled={isSubmittingCheckout}
               >
                 <Check className="w-4 h-4 mr-2" />
-                {isSubmittingCheckout ? 'Processing...' : 'Confirm Removal'}
+                {isSubmittingCheckout ? t('processing') : t('confirmRemoval')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -580,12 +583,15 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Check className="w-6 h-6 text-green-600 stroke-5 border-2 border-green-600 rounded-full p-[3px] bg-green-100" />
-                Inventory Updated Successfully!
+                {t('inventoryUpdatedSuccessfully')}
               </DialogTitle>
               <DialogDescription>
                 {submissionResult.successCount === submissionResult.totalCount
-                  ? `Successfully removed ${submissionResult.successCount} item${submissionResult.successCount > 1 ? 's' : ''} from inventory.`
-                  : `Removed ${submissionResult.successCount} of ${submissionResult.totalCount} items from inventory.`}
+                  ? t('successfullyRemoved', { count: submissionResult.successCount })
+                  : t('partiallyRemoved', {
+                      success: submissionResult.successCount,
+                      total: submissionResult.totalCount,
+                    })}
               </DialogDescription>
             </DialogHeader>
 
@@ -598,7 +604,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 className="w-full"
               >
                 <RefreshCcw className="w-4 h-4 mr-2" />
-                Continue Scanning
+                {t('continueScanning')}
               </Button>
 
               <Button
@@ -611,7 +617,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 className="w-full"
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
-                View in Dashboard
+                {t('viewInDashboard')}
               </Button>
             </div>
           </DialogContent>
@@ -621,9 +627,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       {!availableBatches.length && currentProduct && (
         <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            No inventory available for this product in the current store.
-          </AlertDescription>
+          <AlertDescription>{t('noInventoryAvailable')}</AlertDescription>
         </Alert>
       )}
     </div>

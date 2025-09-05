@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import {
   Select,
   SelectContent,
@@ -23,6 +24,8 @@ export function BatchListFilters({
   count,
   isLoading,
 }: BatchListFiltersProps) {
+  const t = useTranslations('batchFilters')
+
   if (!onFiltersChange) {
     return null
   }
@@ -41,14 +44,14 @@ export function BatchListFilters({
           disabled={isLoading}
         >
           <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Expiry filter" />
+            <SelectValue placeholder={t('expiryFilter')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All items </SelectItem>
-            <SelectItem value="3">Expiring in 3 days</SelectItem>
-            <SelectItem value="7">Expiring in 7 days</SelectItem>
-            <SelectItem value="14">Expiring in 14 days</SelectItem>
-            <SelectItem value="30">Expiring in 30 days</SelectItem>
+            <SelectItem value="all">{t('allItems')}</SelectItem>
+            <SelectItem value="3">{t('expiringInDays', { days: 3 })}</SelectItem>
+            <SelectItem value="7">{t('expiringInDays', { days: 7 })}</SelectItem>
+            <SelectItem value="14">{t('expiringInDays', { days: 14 })}</SelectItem>
+            <SelectItem value="30">{t('expiringInDays', { days: 30 })}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -63,15 +66,15 @@ export function BatchListFilters({
           disabled={isLoading}
         >
           <SelectTrigger className="w-full md:w-[140px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="expired">Expired</SelectItem>
-            <SelectItem value="damaged">Damaged</SelectItem>
-            <SelectItem value="sold_out">Sold Out</SelectItem>
-            <SelectItem value="reserved">Reserved</SelectItem>
+            <SelectItem value="all">{t('allStatuses')}</SelectItem>
+            <SelectItem value="active">{t('active')}</SelectItem>
+            <SelectItem value="expired">{t('expired')}</SelectItem>
+            <SelectItem value="damaged">{t('damaged')}</SelectItem>
+            <SelectItem value="sold_out">{t('soldOut')}</SelectItem>
+            <SelectItem value="reserved">{t('reserved')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -84,7 +87,7 @@ export function BatchListFilters({
       )}
       {!isLoading && count > 0 && (
         <span className="text-sm text-nowrap flex items-center text-muted-foreground px-2">
-          {count} items
+          {t('itemCount', { count })}
         </span>
       )}
     </div>

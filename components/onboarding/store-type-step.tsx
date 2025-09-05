@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,6 +39,8 @@ function isStoreType(value: string | null | undefined): value is StoreFormData['
 }
 
 export function StoreTypeStep() {
+  const t = useTranslations('onboarding.storeType')
+
   const { selectedStoreForm, isManualEntry, setSelectedStoreForm, goToNextStep, goToPreviousStep } =
     useOnboardingStore()
 
@@ -101,7 +104,7 @@ export function StoreTypeStep() {
                 control={form.control}
                 name="store_name"
                 label="Store Name"
-                placeholder="Your Store Name"
+                placeholder={t('storeNamePlaceholder')}
                 required
               />
 
@@ -117,7 +120,7 @@ export function StoreTypeStep() {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select store type" />
+                          <SelectValue placeholder={t('selectStoreType')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -137,14 +140,14 @@ export function StoreTypeStep() {
                 control={form.control}
                 name="business_name"
                 label="Business Name"
-                placeholder="If different from store name"
+                placeholder={t('businessNamePlaceholder')}
               />
 
               <FormFieldWrapper
                 control={form.control}
                 name="address"
                 label="Address"
-                placeholder="123 Rue de la Paix"
+                placeholder={t('addressPlaceholder')}
                 required
               />
 
@@ -153,7 +156,7 @@ export function StoreTypeStep() {
                   control={form.control}
                   name="city"
                   label="City"
-                  placeholder="Paris"
+                  placeholder={t('cityPlaceholder')}
                   required
                 />
 
@@ -161,7 +164,7 @@ export function StoreTypeStep() {
                   control={form.control}
                   name="postal_code"
                   label="Postal Code"
-                  placeholder="75001"
+                  placeholder={t('postalCodePlaceholder')}
                   required
                 />
               </div>
@@ -171,7 +174,7 @@ export function StoreTypeStep() {
                   control={form.control}
                   name="country"
                   label="Country"
-                  placeholder="France"
+                  placeholder={t('countryPlaceholder')}
                   required
                 />
 
@@ -179,7 +182,7 @@ export function StoreTypeStep() {
                   control={form.control}
                   name="phone"
                   label="Phone Number"
-                  placeholder="01 23 45 67 89"
+                  placeholder={t('phonePlaceholder')}
                   type="tel"
                 />
               </div>

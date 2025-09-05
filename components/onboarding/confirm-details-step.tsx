@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle, CheckCircle, Phone } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,8 @@ import { generateTempStoreCode } from '@/lib/utils/form-helpers'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 export function ConfirmDetailsStep() {
+  const t = useTranslations('marketing.onboarding.confirmDetails')
+
   const {
     selectedStoreForm,
     businessCheckResult,
@@ -105,10 +108,10 @@ export function ConfirmDetailsStep() {
     return (
       <div className="text-center">
         <Typography variant="p" color="muted">
-          No store information found. Please go back and complete the previous steps.
+          {t('errors.noStoreInfo')}
         </Typography>
         <Button onClick={() => setCurrentStep(1)} className="mt-4">
-          Start Over
+          {t('errors.startOver')}
         </Button>
       </div>
     )
@@ -118,10 +121,7 @@ export function ConfirmDetailsStep() {
 
   return (
     <div className="mx-auto space-y-6">
-      <StepHeader
-        title="Review Your Store Details"
-        subtitle="We'll verify this business isn't already registered before creating your account"
-      />
+      <StepHeader title={t('title')} subtitle={t('subtitle')} />
 
       <Card>
         <CardHeader>
@@ -130,19 +130,19 @@ export function ConfirmDetailsStep() {
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Type</div>
+              <div className="text-sm font-medium text-muted-foreground">{t('fields.type')}</div>
               <div>
                 {selectedStoreForm.store_type
                   ? STORE_TYPE_LABELS[
                       selectedStoreForm.store_type as keyof typeof STORE_TYPE_LABELS
                     ] || selectedStoreForm.store_type
-                  : 'Not specified'}
+                  : t('values.notSpecified')}
               </div>
             </div>
 
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Address</div>
-              <div>{selectedStoreForm.address || 'Not provided'}</div>
+              <div className="text-sm font-medium text-muted-foreground">{t('fields.address')}</div>
+              <div>{selectedStoreForm.address || t('values.notProvided')}</div>
               {selectedStoreForm.city && selectedStoreForm.postal_code && (
                 <div className="text-sm text-muted-foreground">
                   {selectedStoreForm.city}, {selectedStoreForm.postal_code}
@@ -152,20 +152,22 @@ export function ConfirmDetailsStep() {
 
             {selectedStoreForm.phone && (
               <div>
-                <div className="text-sm font-medium text-muted-foreground">Phone</div>
+                <div className="text-sm font-medium text-muted-foreground">{t('fields.phone')}</div>
                 <div>{selectedStoreForm.phone}</div>
               </div>
             )}
 
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Country</div>
-              <div>{selectedStoreForm.country || 'Not specified'}</div>
+              <div className="text-sm font-medium text-muted-foreground">{t('fields.country')}</div>
+              <div>{selectedStoreForm.country || t('values.notSpecified')}</div>
             </div>
 
             {selectedStoreForm.business_name &&
               selectedStoreForm.business_name !== selectedStoreForm.store_name && (
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Business Name</div>
+                  <div className="text-sm font-medium text-muted-foreground">
+                    {t('fields.businessName')}
+                  </div>
                   <div>{selectedStoreForm.business_name}</div>
                 </div>
               )}
@@ -176,15 +178,16 @@ export function ConfirmDetailsStep() {
             {!hasCheckedBusiness && (
               <div className="space-y-3">
                 <Typography variant="p" color="muted">
-                  Before creating your account, we need to verify this business isn&#39;t already
-                  registered.
+                  {t('businessCheck.verifyPrompt')}
                 </Typography>
                 <Button
                   onClick={handleCheckBusiness}
                   disabled={isCheckingBusiness}
                   className="w-full mt-4"
                 >
-                  {isCheckingBusiness ? 'Checking...' : 'Verify Business'}
+                  {isCheckingBusiness
+                    ? t('businessCheck.checking')
+                    : t('businessCheck.verifyButton')}
                 </Button>
               </div>
             )}
@@ -197,21 +200,19 @@ export function ConfirmDetailsStep() {
                     <AlertDescription>
                       <div className="space-y-2">
                         <p>
-                          <strong>This business is already registered.</strong>
+                          <strong>{t('businessCheck.alreadyRegistered')}</strong>
                         </p>
-                        <p>
-                          The store you selected already has an account. Log in or contact us for
-                          help.
-                        </p>
+                        <p>{t('businessCheck.alreadyRegisteredDesc')}</p>
 
                         {businessCheckResult.storeData && (
                           <div className="text-xs bg-destructive/10 p-2 rounded mt-2">
                             <p>
-                              <strong>Existing Store:</strong>&#39;{' '}
+                              <strong>{t('businessCheck.existingStore')}</strong>{' '}
                               {businessCheckResult.storeData.store_name}
                             </p>
                             <p>
-                              <strong>Address:</strong> {businessCheckResult.storeData.address}
+                              <strong>{t('fields.address')}:</strong>{' '}
+                              {businessCheckResult.storeData.address}
                             </p>
                             <p>
                               <strong>City:</strong> {businessCheckResult.storeData.city}
@@ -227,10 +228,10 @@ export function ConfirmDetailsStep() {
                             className="flex items-center gap-2"
                           >
                             <Phone className="h-4 w-4" />
-                            Contact Support
+                            {t('businessCheck.contactSupport')}
                           </Button>
                           <Button variant="outline" size="sm" onClick={() => setCurrentStep(1)}>
-                            Try Different Store
+                            {t('businessCheck.tryDifferentStore')}
                           </Button>
                         </div>
                       </div>
@@ -240,8 +241,8 @@ export function ConfirmDetailsStep() {
                   <Alert>
                     <CheckCircle className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Business verified!</strong> This store is not yet registered. You can
-                      proceed with creating your account.
+                      <strong>{t('businessCheck.businessVerified')}</strong>{' '}
+                      {t('businessCheck.businessVerifiedDesc')}
                     </AlertDescription>
                   </Alert>
                 )}

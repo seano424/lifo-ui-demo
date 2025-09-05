@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -41,6 +42,7 @@ export function AlertQuickToggle({
   className,
   size = 'default',
 }: AlertQuickToggleProps) {
+  const t = useTranslations('store.alertQuickToggle')
   const activeStoreId = useActiveStoreId()
   const storeId = propStoreId || activeStoreId || ''
 
@@ -80,12 +82,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">Urgent</span>
+              <span className="text-xs">{t('levels.urgent')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Only urgent items requiring immediate action</p>
-            <p className="text-xs">Fewest alerts - most restrictive</p>
+            <p>{t('tooltips.urgentTitle')}</p>
+            <p className="text-xs">{t('tooltips.urgentSubtitle')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -98,12 +100,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">Default</span>
+              <span className="text-xs">{t('levels.default')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Items needing attention soon</p>
-            <p className="text-xs">Balanced view - recommended</p>
+            <p>{t('tooltips.defaultTitle')}</p>
+            <p className="text-xs">{t('tooltips.defaultSubtitle')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -116,12 +118,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">Early</span>
+              <span className="text-xs">{t('levels.early')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>All flagged items and early warnings</p>
-            <p className="text-xs">Most alerts - maximum prevention</p>
+            <p>{t('tooltips.earlyTitle')}</p>
+            <p className="text-xs">{t('tooltips.earlySubtitle')}</p>
           </TooltipContent>
         </Tooltip>
       </div>

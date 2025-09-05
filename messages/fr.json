@@ -16,6 +16,352 @@
     "batches": "Lots",
     "products": "Produits"
   },
+  "navUser": {
+    "upgradeToPro": "Passer à Pro",
+    "account": "Compte",
+    "billing": "Facturation",
+    "notifications": "Notifications",
+    "language": "Langue"
+  },
+  "batchFilters": {
+    "expiryFilter": "Filtre d'expiration",
+    "allItems": "Tous les articles",
+    "expiringInDays": "Expire dans {days} jours",
+    "status": "Statut",
+    "allStatuses": "Tous les statuts",
+    "active": "Actif",
+    "expired": "Expiré",
+    "damaged": "Endommagé",
+    "soldOut": "Épuisé",
+    "reserved": "Réservé",
+    "itemCount": "{count} articles"
+  },
+  "batchList": {
+    "errorLoadingBatches": "Erreur lors du chargement des lots",
+    "unexpectedError": "Une erreur inattendue s'est produite",
+    "currentBatches": "{count} lots actuels",
+    "filters": "Filtres",
+    "search": "Rechercher",
+    "searchBatches": "Rechercher des lots...",
+    "status": "Statut",
+    "allStatuses": "Tous les statuts",
+    "active": "Actif",
+    "expired": "Expiré",
+    "damaged": "Endommagé",
+    "soldOut": "Épuisé",
+    "reserved": "Réservé",
+    "expiringSoon": "Expire bientôt",
+    "allDates": "Toutes les dates",
+    "expiringInDays": "Expire dans {days} jours",
+    "location": "Emplacement",
+    "locationCode": "Code d'emplacement...",
+    "stockStatus": "État du stock",
+    "allStockLevels": "Tous les niveaux de stock",
+    "inStock": "En stock",
+    "outOfStock": "Rupture de stock",
+    "supplier": "Fournisseur",
+    "supplierName": "Nom du fournisseur...",
+    "clear": "Effacer",
+    "clearFilters": "Effacer les filtres",
+    "loadingMore": "Chargement en cours...",
+    "loadMoreBatches": "Charger plus de lots",
+    "showingBatches": "Affichage de {count} lots",
+    "filteredFrom": "(filtré sur {total})",
+    "noBatchesFound": "Aucun lot trouvé",
+    "noBatchesYet": "Aucun lot pour le moment",
+    "tryAdjustingFilters": "Essayez d'ajuster votre recherche ou vos filtres",
+    "productNoBatches": "Ce produit n'a pas encore de lots",
+    "getStartedFirstBatch": "Commencez par ajouter votre premier lot",
+    "convenience": {
+      "expiringSoon": "Expire bientôt",
+      "noBatchesExpiringSoon": "Aucun lot n'expire bientôt",
+      "productBatches": "Lots de produits",
+      "productNoBatches": "Ce produit n'a pas encore de lots",
+      "lowStockAlert": "Alerte stock faible",
+      "allBatchesSufficientStock": "Tous les lots ont un stock suffisant"
+    }
+  },
+  "batchSort": {
+    "sortBy": "Trier par",
+    "createdDate": "Date de création",
+    "expiryDate": "Date d'expiration",
+    "batchNumber": "Numéro de lot",
+    "supplier": "Fournisseur",
+    "stockLevel": "Niveau de stock",
+    "costPrice": "Prix de revient",
+    "sellingPrice": "Prix de vente",
+    "status": "Statut",
+    "asc": "ASC",
+    "desc": "DESC"
+  },
+  "productSort": {
+    "sortBy": "Trier par",
+    "unknown": "Inconnu",
+    "sortProductsBy": "Trier les produits par",
+    "current": "Actuel",
+    "ascending": "Croissant",
+    "descending": "Décroissant",
+    "productCount": "{count} produits",
+    "productName": "Nom du produit",
+    "productNameDesc": "Trier alphabétiquement par nom de produit",
+    "category": "Catégorie",
+    "categoryDesc": "Regrouper par catégorie de produit",
+    "brand": "Marque",
+    "brandDesc": "Trier alphabétiquement par marque",
+    "stockLevel": "Niveau de stock",
+    "stockLevelDesc": "Trier par quantité d'inventaire actuelle",
+    "sellingPrice": "Prix de vente",
+    "sellingPriceDesc": "Trier par prix de vente du produit",
+    "activeBatches": "Lots actifs",
+    "activeBatchesDesc": "Trier par nombre de lots actifs",
+    "dateAdded": "Date d'ajout",
+    "dateAddedDesc": "Trier par date d'ajout du produit",
+    "quickSort": {
+      "newestFirst": "Plus récent d'abord",
+      "aToZ": "A-Z",
+      "lowStock": "Stock faible",
+      "highestPrice": "Prix le plus élevé",
+      "mostBatches": "Plus de lots"
+    }
+  },
+  "productFilters": {
+    "categoryFilter": "Filtre de catégorie",
+    "allCategories": "Toutes les catégories",
+    "productCount": "{count} produits"
+  },
+  "productListSort": {
+    "name": "Nom",
+    "category": "Catégorie",
+    "brand": "Marque", 
+    "stock": "Stock",
+    "price": "Prix",
+    "activeBatches": "Lots actifs",
+    "dateAdded": "Date d'ajout",
+    "lastUpdated": "Dernière mise à jour"
+  },
+  "productTable": {
+    "product": "Produit",
+    "unnamedProduct": "Produit sans nom",
+    "notAvailable": "N/D",
+    "category": "Catégorie", 
+    "uncategorized": "Non catégorisé",
+    "brand": "Marque",
+    "totalStock": "Stock total",
+    "activeBatches": "Lots actifs",
+    "dateAdded": "Date d'ajout",
+    "openMenu": "Ouvrir le menu",
+    "actions": "Actions",
+    "viewDetails": "Voir les détails",
+    "viewBatches": "Voir les lots",
+    "editProduct": "Modifier le produit", 
+    "updatePrice": "Mettre à jour le prix",
+    "enterNewPrice": "Entrez le nouveau prix (€) :",
+    "deleteProduct": "Supprimer le produit",
+    "confirmDeleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?"
+  },
+  "buttons": {
+    "export": "Exporter",
+    "addBatch": "Ajouter un lot",
+    "addProduct": "Ajouter un produit",
+    "lookup": "Rechercher",
+    "selectProduct": "Sélectionner le produit",
+    "change": "Changer",
+    "loadMore": "Charger plus de produits",
+    "updatePrice": "Mettre à jour le prix",
+    "viewBatches": "Voir les lots",
+    "editProduct": "Modifier le produit",
+    "deleteProduct": "Supprimer le produit"
+  },
+  "dashboardNav": {
+    "projects": "Projets",
+    "more": "Plus",
+    "viewProject": "Voir le projet",
+    "shareProject": "Partager le projet", 
+    "deleteProject": "Supprimer le projet",
+    "kpiCard": {
+      "failedToLoad": "Échec du chargement des données",
+      "viewDetails": "Voir les détails"
+    },
+    "pages": {
+      "dashboard": "Vue d'ensemble du tableau de bord",
+      "notifications": "Bientôt disponible : Notifications",
+      "todos": "Todos : Suggestions pour vous",
+      "products": "Produits",
+      "batches": "Lots d'inventaire",
+      "users": "Gestion d'équipe",
+      "account": "Paramètres du compte"
+    },
+    "descriptions": {
+      "batches": "Visualisez et gérez les lots d'inventaire de votre magasin",
+      "products": "Visualisez et gérez l'inventaire des produits de votre magasin"
+    }
+  },
+  "products": {
+    "manualEntry": {
+      "title": "Saisie manuelle",
+      "manualSearch": "Recherche manuelle",
+      "productSelected": "Produit sélectionné",
+      "searchByBarcode": "Rechercher par code-barres",
+      "searchByProductName": "Ou rechercher par nom de produit",
+      "inStockItemsOnly": "(Articles en stock uniquement)",
+      "barcodePlaceholder": "Numéro de code-barres (8+ chiffres)...",
+      "searchPlaceholder": "Rechercher dans la base Open Food Facts...",
+      "inventorySearchPlaceholder": "Rechercher des produits en inventaire...",
+      "productFound": "Produit trouvé !",
+      "outOfStock": "Rupture de stock",
+      "noStockAvailable": "Aucun stock disponible dans ce magasin",
+      "unitsAvailable": "unités disponibles",
+      "outOfStockCannotSelect": "Rupture de stock - Impossible de sélectionner",
+      "selectThisProduct": "Sélectionner ce produit",
+      "productNotFound": "Produit non trouvé dans la base de données. Vous pouvez l'ajouter manuellement ci-dessous.",
+      "addProductManually": "Ajouter un produit manuellement",
+      "noProductsFound": "Aucun produit trouvé correspondant à",
+      "autoProceedException": "Procédera automatiquement au scan de la date d'expiration après sélection",
+      "barcodeValidation": "Le code-barres doit contenir au moins 8 chiffres et uniquement des nombres",
+      "batchCount": "lots"
+    },
+    "table": {
+      "productDetails": "Détails du produit",
+      "category": "Catégorie",
+      "brand": "Marque",
+      "stock": "Stock",
+      "pricing": "Prix",
+      "activeBatches": "Lots actifs",
+      "actions": "Actions",
+      "unnamedProduct": "Produit sans nom",
+      "uncategorized": "Non catégorisé",
+      "cost": "Coût",
+      "batch": "lot",
+      "batches": "lots",
+      "units": "unités"
+    },
+    "catalog": {
+      "title": "Catalogue des produits",
+      "description": "Gérez votre catalogue de produits et votre inventaire",
+      "clickToSort": "Cliquez sur les en-têtes de colonne pour trier",
+      "sortedBy": "Trié par",
+      "ascending": "↑",
+      "descending": "↓"
+    },
+    "empty": {
+      "title": "Aucun produit trouvé",
+      "description": "Commencez par ajouter votre premier produit",
+      "storeDescription": "Commencez par ajouter votre premier produit à ce magasin"
+    },
+    "loading": {
+      "loadingMore": "Chargement en cours...",
+      "showing": "Affichage de",
+      "of": "sur",
+      "products": "produits"
+    },
+    "errors": {
+      "loadingError": "Erreur de chargement des produits",
+      "unexpectedError": "Une erreur inattendue s'est produite"
+    },
+    "fields": {
+      "name": "Nom",
+      "productName": "Nom du produit",
+      "barcode": "Code-barres",
+      "brand": "Marque",
+      "category": "Catégorie",
+      "sku": "SKU"
+    },
+    "placeholders": {
+      "productName": "par ex., Lait entier bio",
+      "brand": "par ex., Danone",
+      "barcode": "par ex., 078000113464",
+      "selectCategory": "Sélectionner une catégorie"
+    },
+    "confirmations": {
+      "deleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?",
+      "enterNewPrice": "Entrez le nouveau prix :"
+    }
+  },
+  "alerts": {
+    "sensitivity": {
+      "title": "Sensibilité des alertes",
+      "description": "À quel point les alertes doivent-elles être sensibles au gaspillage potentiel ?",
+      "helpText": "Contrôlez quand les éléments apparaissent dans vos alertes et tableau de bord.",
+      "helpTextLine2": "Sensibilité élevée = plus d'avertissements précoces",
+      "helpTextLine3": "Sensibilité faible = uniquement les éléments critiques",
+      "currentPreference": "Choisissez votre préférence d'alerte",
+      "levels": {
+        "conservative": "Conservateur",
+        "balanced": "Équilibré", 
+        "proactive": "Proactif",
+        "conservativeTitle": "Conservateur - Critique uniquement",
+        "balancedTitle": "Équilibré - Action nécessaire (Recommandé)",
+        "proactiveTitle": "Proactif - Avertissements précoces"
+      },
+      "descriptions": {
+        "conservative": "Afficher uniquement les éléments critiques nécessitant une action immédiate",
+        "balanced": "Afficher les éléments nécessitant une attention prochaine (recommandé)",
+        "proactive": "Avertissements précoces pour tous les éléments qui pourraient nécessiter une attention"
+      },
+      "expectedCounts": {
+        "conservative": "Moins d'alertes, urgence plus élevée",
+        "balanced": "Alertes modérées, bon équilibre", 
+        "proactive": "Plus d'alertes, prévention précoce"
+      },
+      "selectDescriptions": {
+        "conservative": "Éléments expirant aujourd'hui/demain ou avec un risque de gaspillage élevé",
+        "balanced": "Éléments nécessitant une attention cette semaine",
+        "proactive": "Tous les éléments qui pourraient bientôt nécessiter une attention"
+      },
+      "technical": {
+        "showDetails": "Afficher les détails techniques",
+        "thresholds": "Seuils techniques :",
+        "warningLevel": "Niveau d'avertissement",
+        "criticalLevel": "Niveau critique",
+        "compositeScore": "score composite",
+        "howScoringWorks": "Comment fonctionne la notation :",
+        "expiryScore": "Score d'expiration : À quelle distance de la date d'expiration",
+        "marginScore": "Score de marge : Marge bénéficiaire à risque",
+        "velocityScore": "Score de vélocité : Vitesse de vente habituelle de l'article"
+      },
+      "actions": {
+        "resetToDefaults": "Restaurer les valeurs par défaut",
+        "saving": "Enregistrement...",
+        "settingsSavedAuto": "Paramètres enregistrés automatiquement"
+      }
+    }
+  },
+  "storeInsights": {
+    "title": "Actions prioritaires d'aujourd'hui",
+    "description": "Examinez et agissez sur les éléments les plus urgents.",
+    "takeAction": "Passer à l'action",
+    "loadingInsights": "Chargement des informations du magasin...",
+    "dashboardTitle": "Tableau de bord des insights du magasin",
+    "unableToLoad": "Impossible de charger les informations",
+    "failedToLoad": "Échec du chargement des informations du magasin :",
+    "unknownError": "Erreur inconnue",
+    "storeId": "ID du magasin :",
+    "metrics": {
+      "urgentItems": "Articles urgents",
+      "urgentItemsDesc": "Lots à urgence élevée",
+      "actionsTaken": "Actions prises", 
+      "actionsTakenDesc": "Total des actions cette période",
+      "discountValue": "Valeur de remise",
+      "discountValueDesc": "Total des remises appliquées",
+      "avgScore": "Score moyen",
+      "avgScoreDesc": "Score d'urgence moyen"
+    },
+    "overview": {
+      "title": "Aperçu et analyses du magasin",
+      "description": "{actionsTaken} actions prises • {urgentBatches} articles urgents suivis",
+      "scoringAlert": "Alerte de notation :",
+      "urgentBatchesAlert": "{urgentBatches} lots urgents nécessitent une attention immédiate pour éviter les pertes.",
+      "recentActivity": "Activité récente",
+      "actionsTaken": "Actions prises",
+      "actionsTakenPeriod": "{totalActions} cette période",
+      "discountsApplied": "Remises appliquées", 
+      "saved": "€{discountValue} économisé",
+      "averageScore": "Score moyen : {avgScore}% • €{discountValue} remises appliquées",
+      "discountsAppliedText": "remises appliquées",
+      "showDetails": "Afficher les détails",
+      "hideDetails": "Masquer les détails"
+    }
+  },
   "dashboard": {
     "quickActions": {
       "title": "Actions Rapides",
@@ -551,9 +897,135 @@
     },
     "auth": {
       "login": "Connexion",
-      "signup": "Inscription entreprise",
+      "signup": "Inscription entreprise", 
       "logout": "Déconnexion",
-      "goToDashboard": "Tableau de bord"
+      "goToDashboard": "Tableau de bord",
+      "signUpForm": {
+        "title": "S'inscrire",
+        "description": "Créer un nouveau compte",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "password": "Mot de passe",
+        "repeatPassword": "Répéter le mot de passe",
+        "creatingAccount": "Création du compte...",
+        "signUpButton": "S'inscrire",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Se connecter"
+      },
+      "forgotPassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Saisissez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "sending": "Envoi en cours...",
+        "sendResetEmail": "Envoyer l'email de réinitialisation",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Se connecter",
+        "checkEmailTitle": "Vérifiez votre email",
+        "checkEmailDescription": "Instructions de réinitialisation du mot de passe envoyées",
+        "emailInstructions": "Si vous vous êtes inscrit avec votre email et mot de passe, vous recevrez un email de réinitialisation."
+      },
+      "updatePassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Veuillez saisir votre nouveau mot de passe ci-dessous.",
+        "newPassword": "Nouveau mot de passe",
+        "newPasswordPlaceholder": "Nouveau mot de passe (min 6 caractères)",
+        "saving": "Enregistrement...",
+        "savePassword": "Enregistrer le nouveau mot de passe"
+      },
+      "errors": {
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+        "genericError": "Une erreur s'est produite"
+      }
+    },
+    "onboarding": {
+      "stepLabels": {
+        "storeLookup": "Recherche de magasin",
+        "addStoreDetails": "Ajouter détails du magasin",
+        "reviewVerify": "Réviser et vérifier",
+        "createAccount": "Créer un compte"
+      },
+      "storeSearch": {
+        "placeholder": "Saisissez le nom ou l'adresse de votre magasin..."
+      },
+      "confirmDetails": {
+        "title": "Vérifiez les détails de votre magasin",
+        "subtitle": "Nous vérifierons que cette entreprise n'est pas déjà enregistrée avant de créer votre compte",
+        "fields": {
+          "type": "Type",
+          "address": "Adresse",
+          "phone": "Téléphone",
+          "country": "Pays",
+          "businessName": "Nom de l'entreprise"
+        },
+        "values": {
+          "notSpecified": "Non spécifié",
+          "notProvided": "Non fourni"
+        },
+        "businessCheck": {
+          "verifyPrompt": "Avant de créer votre compte, nous devons vérifier que cette entreprise n'est pas déjà enregistrée.",
+          "verifyButton": "Vérifier l'entreprise",
+          "checking": "Vérification...",
+          "alreadyRegistered": "Cette entreprise est déjà enregistrée.",
+          "alreadyRegisteredDesc": "Le magasin que vous avez sélectionné a déjà un compte. Connectez-vous ou contactez-nous pour obtenir de l'aide.",
+          "existingStore": "Magasin existant :",
+          "contactSupport": "Contacter le support",
+          "tryDifferentStore": "Essayer un autre magasin",
+          "businessVerified": "Entreprise vérifiée !",
+          "businessVerifiedDesc": "Ce magasin n'est pas encore enregistré. Vous pouvez procéder à la création de votre compte."
+        },
+        "errors": {
+          "noStoreInfo": "Aucune information de magasin trouvée. Veuillez retourner et compléter les étapes précédentes.",
+          "startOver": "Recommencer"
+        }
+      },
+      "storeType": {
+        "storeNamePlaceholder": "Nom de votre magasin",
+        "selectStoreType": "Sélectionner le type de magasin",
+        "businessNamePlaceholder": "Si différent du nom du magasin",
+        "addressPlaceholder": "123 Rue de la Paix",
+        "cityPlaceholder": "Paris",
+        "postalCodePlaceholder": "75001",
+        "countryPlaceholder": "France",
+        "phonePlaceholder": "01 23 45 67 89"
+      },
+      "signupForm": {
+        "businessRegistered": "Entreprise déjà enregistrée",
+        "businessRegisteredDesc": "Cette entreprise est déjà dans notre système. Veuillez contacter le support ou essayer un autre magasin.",
+        "backButton": "Retour",
+        "tryDifferentStore": "Essayer un autre magasin",
+        "signInRequired": "Connexion requise :",
+        "testModeWarning": "Le mode test nécessite que vous soyez connecté d'abord. Passez en mode MOCK si vous voulez tester sans authentification.",
+        "createAccount": "Créez votre compte",
+        "createAccountDesc": "Presque terminé ! Créez votre compte pour accéder au tableau de bord de {storeName}.",
+        "fullName": "Nom complet",
+        "fullNamePlaceholder": "Votre nom complet",
+        "email": "Email",
+        "emailPlaceholder": "gerant@votremagas​in.com",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "creatingAccount": "Création du compte",
+        "createAccountButton": "Créer le compte",
+        "noChanges": "Aucune modification réelle ne sera effectuée",
+        "realChanges": "Modifications réelles de la base de données avec votre compte"
+      },
+      "errors": {
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+        "storeInfoMissing": "Informations du magasin manquantes. Veuillez revenir en arrière et compléter la configuration du magasin.",
+        "businessAlreadyRegistered": "Cette entreprise est déjà enregistrée. Veuillez contacter le support.",
+        "testModeSignInRequired": "Le mode test nécessite d'être connecté au préalable.",
+        "signupError": "Une erreur s'est produite lors de l'inscription",
+        "noStoreInfo": "Aucune information de magasin trouvée. Veuillez revenir en arrière et compléter les étapes précédentes.",
+        "startOver": "Recommencer"
+      },
+      "form": {
+        "passwordRequirement": "Doit contenir au moins 6 caractères",
+        "testingButton": "Test en cours",
+        "termsAndPrivacy": "En créant un compte, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité. Vous recevrez un e-mail de confirmation pour vérifier votre compte.",
+        "testModePrefix": "🧪 Mode {mode} : "
+      }
     }
   },
   "errors": {
@@ -562,7 +1034,57 @@
     "backToHome": "Retour à l'accueil",
     "goBack": "Retour",
     "needHelp": "Besoin d'aide ?",
-    "contactSupport": "Contactez notre équipe de support"
+    "contactSupport": "Contactez notre équipe de support",
+    "common": {
+      "genericError": "Une erreur s'est produite",
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+      "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+      "unauthorized": "Vous n'avez pas l'autorisation d'accéder à cette ressource.",
+      "notFound": "La ressource demandée n'a pas été trouvée.",
+      "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
+      "timeoutError": "Délai d'attente dépassé. Veuillez réessayer.",
+      "unknownError": "Une erreur inconnue s'est produite"
+    },
+    "forms": {
+      "required": "Ce champ est obligatoire",
+      "invalidEmail": "Veuillez saisir une adresse email valide",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+      "invalidPhone": "Veuillez saisir un numéro de téléphone valide",
+      "invalidUrl": "Veuillez saisir une URL valide",
+      "nameTooLong": "Le nom est trop long",
+      "emailTaken": "Cette adresse email est déjà utilisée",
+      "usernameTaken": "Ce nom d'utilisateur est déjà pris",
+      "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores"
+    },
+    "api": {
+      "createFailed": "Échec de la création de l'élément",
+      "updateFailed": "Échec de la mise à jour de l'élément",
+      "deleteFailed": "Échec de la suppression de l'élément",
+      "loadFailed": "Échec du chargement des données",
+      "saveFailed": "Échec de l'enregistrement des modifications",
+      "uploadFailed": "Échec du téléchargement du fichier",
+      "connectionFailed": "Échec de la connexion",
+      "authFailed": "Échec de l'authentification"
+    },
+    "emptyStates": {
+      "noResults": "Aucun résultat trouvé",
+      "noData": "Aucune donnée disponible",
+      "noBatches": "Aucun lot trouvé",
+      "noProducts": "Aucun produit trouvé",
+      "noUsers": "Aucun utilisateur trouvé",
+      "emptySearch": "Aucun résultat ne correspond à votre recherche",
+      "tryDifferentSearch": "Essayez d'ajuster vos critères de recherche"
+    },
+    "loading": {
+      "loading": "Chargement...",
+      "processing": "Traitement...",
+      "saving": "Enregistrement...",
+      "uploading": "Téléchargement...",
+      "searching": "Recherche...",
+      "deleting": "Suppression...",
+      "updating": "Mise à jour..."
+    }
   },
   "landingpage": {
     "hero": {
@@ -844,6 +1366,467 @@
           "goToDashboard": "Aller au tableau de bord"
         }
       }
+    },
+    "urgentAlerts": {
+      "levels": {
+        "urgentOnly": "Articles urgents uniquement",
+        "priority": "Articles prioritaires", 
+        "allFlagged": "Tous les articles signalés",
+        "completeReview": "Révision complète"
+      },
+      "errors": {
+        "connectionError": "Erreur de connexion",
+        "unableToLoad": "Impossible de charger les alertes d'inventaire. Veuillez réessayer.",
+        "loadingAlerts": "Chargement des alertes..."
+      },
+      "messages": {
+        "nothingToShow": "Aucun article ne nécessite d'attention pour le moment - tout est en ordre !",
+        "itemNeedsAction": "{count, plural, one {article nécessite} other {articles nécessitent}} une action immédiate",
+        "itemMayNeedAction": "{count, plural, one {article pourrait nécessiter} other {articles pourraient nécessiter}} de l'attention bientôt", 
+        "itemsFlagged": "{count, plural, one {article signalé} other {articles signalés}} pour révision",
+        "itemsMonitoring": "{count, plural, one {article signalé} other {articles signalés}} pour surveillance"
+      },
+      "buttons": {
+        "viewInventory": "Voir l'inventaire",
+        "viewItems": "Voir les articles"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "urgent": "Urgent",
+        "default": "Défaut", 
+        "early": "Précoce"
+      },
+      "tooltips": {
+        "urgentTitle": "Seuls les éléments urgents nécessitant une action immédiate",
+        "urgentSubtitle": "Moins d'alertes - plus restrictif",
+        "defaultTitle": "Éléments nécessitant une attention prochainement",
+        "defaultSubtitle": "Vue équilibrée - recommandé",
+        "earlyTitle": "Tous les éléments signalés et alertes précoces",
+        "earlySubtitle": "Plus d'alertes - prévention maximale"
+      }
+    },
+    "actionableBatches": {
+      "title": "Recommandations basées sur le score",
+      "loading": "Chargement des lots exploitables...",
+      "error": "Impossible de charger les recommandations de score. Veuillez réessayer.",
+      "noActions": "Aucune action immédiate requise ! Tous les lots sont dans les seuils de sécurité.",
+      "urgencyLevels": {
+        "critical": "Critique",
+        "high": "Élevé", 
+        "medium": "Moyen",
+        "low": "Faible"
+      },
+      "summaryLabels": {
+        "critical": "Critique",
+        "high": "Élevé",
+        "medium": "Moyen", 
+        "low": "Faible"
+      },
+      "batchDetails": {
+        "qty": "Qté",
+        "daysToExpiry": "jours avant expiration",
+        "lossRisk": "Risque de perte",
+        "score": "Score"
+      },
+      "buttons": {
+        "executeDonation": "Exécuter la donation",
+        "donateInstead": "Donner plutôt",
+        "cancel": "Annuler",
+        "confirmDonation": "Confirmer la donation"
+      },
+      "scoringRecommendation": {
+        "label": "Recommandation de score",
+        "urgency": "Urgence",
+        "score": "Score"
+      },
+      "donationDialog": {
+        "title": "Donner le lot",
+        "description": "Sélectionnez un destinataire pour {productName}",
+        "quantity": "Quantité",
+        "expires": "Expire",
+        "selectRecipient": "Sélectionner le destinataire de la donation",
+        "chooseRecipient": "Choisir un destinataire...",
+        "certified": "Certifié",
+        "notCertified": "Non certifié",
+        "notesLabel": "Notes (optionnel)",
+        "notesPlaceholder": "Ajoutez des notes sur cette donation..."
+      }
+    }
+  },
+  "manualInbound": {
+    "selectedProduct": {
+      "title": "Produit sélectionné",
+      "fields": {
+        "name": "Nom :",
+        "brand": "Marque :",
+        "category": "Catégorie :",
+        "barcode": "Code-barres :"
+      }
+    },
+    "batchDetails": {
+      "title": "Détails du lot"
+    },
+    "buttons": {
+      "addBatch": "Ajouter lot",
+      "clear": "Effacer",
+      "submitAll": "Soumettre tout",
+      "cancel": "Annuler",
+      "submitting": "Soumission...",
+      "submitToInventory": "Soumettre à l'inventaire",
+      "addMoreProducts": "Ajouter plus de produits",
+      "viewInInventory": "Voir dans l'inventaire"
+    },
+    "batchItems": {
+      "title": "Articles de lot à soumettre",
+      "description": "{count, plural, one {# lot prêt à soumettre} other {# lots prêts à soumettre}}"
+    },
+    "confirmation": {
+      "title": "Confirmer la soumission",
+      "description": "Vérifiez les articles ci-dessous avant de les soumettre à votre inventaire.",
+      "submitText": "Vous êtes sur le point de soumettre {count, plural, one {# lot} other {# lots}} à l'inventaire :",
+      "totals": {
+        "totalItems": "Total d'articles :",
+        "totalValue": "Valeur totale :"
+      },
+      "itemDetails": {
+        "expires": "Expire :",
+        "total": "Total :"
+      }
+    },
+    "success": {
+      "title": "Inventaire mis à jour avec succès !",
+      "description": {
+        "allSuccess": "Ajouté avec succès {count, plural, one {# lot} other {# lots}} à votre inventaire.",
+        "partialSuccess": "Ajouté {successCount} sur {totalCount} lots à l'inventaire."
+      }
+    },
+    "alerts": {
+      "gettingStarted": "Commencez par rechercher un produit en utilisant le code-barres ou la recherche par nom de produit ci-dessus. Après avoir sélectionné un produit, vous pourrez ajouter la date d'expiration, la quantité et le prix."
+    }
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Scanner le produit",
+      "scanExpiryDate": "Scanner la date d'expiration"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Pointez la caméra sur le code-barres",
+      "pointAtExpiryDate": "Pointez la caméra sur la date d'expiration"
+    },
+    "permissions": {
+      "barcodeRequired": "L'accès à la caméra est requis pour scanner les codes-barres.",
+      "expiryRequired": "L'accès à la caméra est requis pour capturer les dates d'expiration."
+    },
+    "alerts": {
+      "serviceUnavailable": "Désolé, ce service est actuellement indisponible. Veuillez utiliser la saisie manuelle de date.",
+      "ocrError": "Erreur OCR : {error}",
+      "backendUnavailable": "Le backend FastAPI n'est pas disponible. Veuillez utiliser la saisie manuelle.",
+      "scanInstructions": "Pointez votre caméra sur n'importe quel code-barres de produit. Le scanner détectera automatiquement les formats pris en charge et recherchera les informations du produit dans Open Food Facts."
+    },
+    "buttons": {
+      "captureExpiryDate": "Capturer la date d'expiration",
+      "processingOCR": "Traitement OCR...",
+      "clearError": "Effacer l'erreur",
+      "manualEntry": "Saisie manuelle"
+    }
+  },
+  "scanningWorkflow": {
+    "steps": {
+      "scanBarcode": "Scanner code-barres",
+      "changeProduct": "Changer produit", 
+      "scanExpiryDate": "Scanner date d'expiration",
+      "reviewDetails": "Réviser détails",
+      "previousStep": "Étape précédente"
+    }
+  },
+  "scanningInterface": {
+    "camera": {
+      "scanProduct": "Scanner le produit",
+      "scanDifferentProduct": "Scanner un autre produit"
+    },
+    "product": {
+      "productFound": "Produit trouvé ! Prêt à procéder au scan de la date d'expiration.",
+      "productNotFound": "Produit non trouvé dans la base de données. Vous devrez peut-être l'ajouter manuellement.",
+      "autoProceeding": "Passage automatique au scan de la date d'expiration..."
+    },
+    "expiry": {
+      "manualEntryFallback": "📝 Saisie manuelle (OCR indisponible)",
+      "orEnterManually": "Ou saisir manuellement",
+      "confirmDate": "Confirmer la date"
+    },
+    "inventory": {
+      "addToInventory": "Ajouter à l'inventaire",
+      "addedToList": "{productName} ajouté à votre liste ! Scannez le produit suivant.",
+      "finishAndSubmit": "Terminer et soumettre {count, plural, one {# article} other {# articles}}"
+    },
+    "submission": {
+      "title": "Confirmer la soumission",
+      "description": "Vérifiez les articles ci-dessous avant de les soumettre à votre inventaire.",
+      "submitText": "Vous êtes sur le point de soumettre {count, plural, one {# article} other {# articles}} à l'inventaire :",
+      "totals": {
+        "totalItems": "Total d'articles :",
+        "totalValue": "Valeur totale :",
+        "expires": "Expire :"
+      },
+      "buttons": {
+        "cancel": "Annuler",
+        "submitting": "Soumission...",
+        "submitToInventory": "Soumettre à l'inventaire"
+      }
+    },
+    "success": {
+      "title": "Inventaire mis à jour avec succès !",
+      "description": {
+        "allSuccess": "Ajouté avec succès {count, plural, one {# article} other {# articles}} à votre inventaire.",
+        "partialSuccess": "Ajouté {successCount} sur {totalCount} articles à l'inventaire."
+      },
+      "buttons": {
+        "keepScanning": "Continuer le scan",
+        "viewInDashboard": "Voir dans le tableau de bord"
+      }
+    },
+    "navigation": {
+      "backTo": "Retour à {stepName}",
+      "goBack": "Retour"
+    },
+    "lookupErrors": {
+      "lookupFailed": "Échec de la recherche : {error}"
+    }
+  },
+  "inventoryForm": {
+    "titles": {
+      "productDetails": "Détails du produit",
+      "detailsCaptured": "Détails capturés avec succès",
+      "reviewAndSubmit": "Réviser et soumettre à l'inventaire"
+    },
+    "labels": {
+      "expiryDate": "Date d'expiration",
+      "quantity": "Quantité",
+      "pricePerUnit": "Prix par unité (€)",
+      "editableNote": "(modifiable)"
+    },
+    "buttons": {
+      "confirm": "Confirmer"
+    }
+  },
+  "productCard": {
+    "titles": {
+      "selectedProduct": "Produit sélectionné",
+      "productInformation": "Informations produit"
+    },
+    "fallbacks": {
+      "unknownProduct": "Produit inconnu"
+    }
+  },
+  "scannedItemsList": {
+    "title": "Articles de lot",
+    "itemLabels": {
+      "quantity": "Quantité :",
+      "price": "Prix :",
+      "expiry": "Expiration :"
+    },
+    "editDialog": {
+      "title": "Modifier l'article",
+      "descriptions": {
+        "quickEdit": "Modification rapide de la date d'expiration, quantité et prix. Cliquez sur \"Modifier les détails\" pour plus d'options.",
+        "fullEdit": "Modifier tous les détails du produit incluant nom, marque, code-barres et informations d'inventaire."
+      },
+      "sections": {
+        "productDetails": "Détails du produit",
+        "inventoryDetails": "Détails d'inventaire",
+        "quickEdit": "Modification rapide"
+      },
+      "formLabels": {
+        "productName": "Nom du produit",
+        "brand": "Marque",
+        "barcode": "Code-barres",
+        "expiryDate": "Date d'expiration",
+        "quantity": "Quantité",
+        "price": "Prix (€)"
+      },
+      "placeholders": {
+        "productName": "Saisissez le nom du produit",
+        "brand": "Nom de marque",
+        "barcode": "Numéro de code-barres"
+      },
+      "buttons": {
+        "editDetails": "Modifier les détails",
+        "hideDetails": "Masquer les détails",
+        "cancel": "Annuler",
+        "saveChanges": "Sauvegarder les modifications"
+      }
+    }
+  },
+  "timeSelector": {
+    "periods": {
+      "thisWeek": "Cette semaine",
+      "lastWeek": "Semaine dernière", 
+      "thisMonth": "Ce mois",
+      "lastMonth": "Mois dernier",
+      "last7Days": "7 derniers jours",
+      "last30Days": "30 derniers jours",
+      "allTime": "Toutes périodes"
+    },
+    "compareLabels": {
+      "lastWeek": "Semaine dernière",
+      "previousWeek": "Semaine précédente",
+      "lastMonth": "Mois dernier", 
+      "previousMonth": "Mois précédent",
+      "previous7Days": "7 jours précédents",
+      "previous30Days": "30 jours précédents",
+      "previousYear": "Année précédente"
+    }
+  },
+  "todos": {
+    "pageDescription": "Suggestions personnalisées pour optimiser votre inventaire et réduire les déchets"
+  },
+  "scanOut": {
+    "unknownProduct": "Produit inconnu",
+    "unknownBrand": "Marque inconnue",
+    "scanProductToRemove": "Scanner le produit à retirer",
+    "pointCameraAtBarcode": "Pointez la caméra vers le code-barres du produit",
+    "title": "Scanner pour sortir",
+    "description": "Scanner les articles lors de leur sortie d'inventaire",
+    "scanning": {
+      "scanNextProduct": "Scanner le produit suivant",
+      "scanProductBarcode": "Scanner le code-barres du produit",
+      "pointAtBarcode": "Pointez vers le code-barres",
+      "productFound": "Produit trouvé !",
+      "notFoundInInventory": "Produit non trouvé dans l'inventaire",
+      "addToRemovalList": "Ajouter à la liste de retrait"
+    },
+    "productDetails": {
+      "title": "Détails du produit",
+      "brand": "Marque",
+      "category": "Catégorie",
+      "barcode": "Code-barres",
+      "availableStock": "Stock disponible",
+      "units": "unités",
+      "noBrand": "Aucune marque",
+      "uncategorized": "Non catégorisé",
+      "noBarcode": "Aucun code-barres"
+    },
+    "batchSelection": {
+      "title": "Sélectionner le lot",
+      "selectBatch": "Sélectionner un lot à retirer",
+      "expires": "Expire le",
+      "expired": "Expiré",
+      "available": "disponible",
+      "selectThisBatch": "Sélectionner ce lot"
+    },
+    "quantityInput": {
+      "title": "Quantité à retirer",
+      "quantity": "Quantité",
+      "maxAvailable": "Maximum disponible : {max} unités",
+      "enterQuantity": "Entrez la quantité à retirer"
+    },
+    "reasonSelection": {
+      "title": "Raison du retrait",
+      "selectReason": "Sélectionnez une raison pour ce retrait",
+      "reasons": {
+        "sale": "Vente",
+        "donation": "Don",
+        "waste": "Déchet",
+        "damaged": "Endommagé",
+        "expired": "Expiré",
+        "other": "Autre"
+      }
+    },
+    "itemsList": {
+      "title": "Articles à retirer",
+      "noItems": "Aucun article ajouté encore",
+      "itemCount": "{count, plural, one {# article} other {# articles}} à retirer",
+      "quantity": "Qté",
+      "reason": "Raison",
+      "remove": "Retirer"
+    },
+    "confirmation": {
+      "title": "Confirmer le retrait",
+      "description": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
+      "submitText": "Vous êtes sur le point de retirer {count, plural, one {# article} other {# articles}} de l'inventaire :",
+      "itemDetails": {
+        "expires": "Expire :",
+        "reason": "Raison :",
+        "quantity": "Quantité :"
+      }
+    },
+    "success": {
+      "title": "Articles retirés avec succès !",
+      "description": "Retiré avec succès {count, plural, one {# article} other {# articles}} de votre inventaire.",
+      "summary": {
+        "totalItems": "Total des articles retirés :",
+        "byReason": "Par raison :",
+        "sales": "Ventes",
+        "donations": "Dons",
+        "waste": "Déchets"
+      }
+    },
+    "buttons": {
+      "scanProduct": "Scanner le produit",
+      "selectBatch": "Sélectionner le lot",
+      "addToList": "Ajouter à la liste",
+      "removeFromInventory": "Retirer de l'inventaire",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "back": "Retour",
+      "continue": "Continuer",
+      "finish": "Terminer",
+      "scanNext": "Scanner le suivant",
+      "viewDashboard": "Voir le tableau de bord",
+      "submitting": "Soumission..."
+    },
+    "alerts": {
+      "maxQuantityExceeded": "La quantité ne peut pas dépasser le stock disponible",
+      "quantityRequired": "Veuillez entrer une quantité valide",
+      "reasonRequired": "Veuillez sélectionner une raison",
+      "noItemsToRemove": "Aucun article à retirer",
+      "scanError": "Erreur de scan : {error}",
+      "submissionError": "Erreur lors de la soumission : {error}"
+    },
+    "recentlyRemoved": "Récemment retiré ({count} articles)",
+    "removedQuantityExpires": "Retiré {quantity}x • Expire: {date}",
+    "andMoreItems": "... et {count} articles de plus",
+    "captureExpiryDate": "Capturer la date d'expiration",
+    "pointCameraAtExpiry": "Pointez la caméra vers la date d'expiration",
+    "backToChangeProduct": "Retour pour changer de produit",
+    "itemsToRemove": "Articles à retirer ({count})",
+    "total": "Total",
+    "expires": "Expire",
+    "remove": "Retirer",
+    "clearAll": "Tout effacer",
+    "submitAll": "Soumettre tout ({count} articles)",
+    "confirmCheckout": "Confirmer la sortie",
+    "reviewItemsBeforeRemoval": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
+    "aboutToRemoveItems": "Vous êtes sur le point de retirer {count} articles de l'inventaire :",
+    "totalItemsRemoved": "Total des articles retirés",
+    "totalValueRemoved": "Valeur totale retirée",
+    "processing": "Traitement en cours...",
+    "confirmRemoval": "Confirmer le retrait",
+    "inventoryUpdatedSuccessfully": "Inventaire mis à jour avec succès !",
+    "successfullyRemoved": "Retiré avec succès {count} articles de l'inventaire.",
+    "partiallyRemoved": "Retiré {success} sur {total} articles de l'inventaire.",
+    "continueScanning": "Continuer le scan",
+    "viewInDashboard": "Voir dans le tableau de bord",
+    "noActiveStore": "Aucun magasin actif sélectionné",
+    "cameraNotReady": "Caméra non prête",
+    "noBatchFoundWithExpiry": "Aucun lot trouvé avec la date d'expiration : {date}",
+    "noInventoryAvailable": "Aucun inventaire disponible pour ce produit dans le magasin actuel.",
+    "ocrProcessingFailed": "Le traitement OCR a échoué",
+    "batchRemovalNote": "Retrait de lot : {productName} x{quantity}"
+  },
+  "inbound": {
+    "mobile": {
+      "barcodeScanning": "Scan de codes-barres",
+      "csvBulkImport": "Import CSV en masse"
+    },
+    "desktop": {
+      "manualEntry": "Saisie manuelle",
+      "csvBulkImport": "Import CSV en masse"
+    },
+    "messages": {
+      "selectStore": "Veuillez sélectionner un magasin pour télécharger les données d'inventaire.",
+      "selectStoreInventory": "Veuillez sélectionner un magasin pour ajouter de l'inventaire."
     }
   }
 }

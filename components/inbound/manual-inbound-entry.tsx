@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, Check, Package, Plus, RefreshCcw, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import {
@@ -56,6 +57,7 @@ export default function ManualInboundEntry({
   onBatchSubmitted,
   className = '',
 }: ManualInboundEntryProps) {
+  const t = useTranslations('manualInbound')
   const { activeStore } = useStoreState()
   const storeId = propStoreId || activeStore?.store_id
 
@@ -236,24 +238,26 @@ export default function ManualInboundEntry({
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <Package className="w-5 h-5 text-primary-600" />
-                      <Typography variant="h3">Selected Product</Typography>
+                      <Typography variant="h3">{t('selectedProduct.title')}</Typography>
                     </div>
                     <div className="space-y-1 text-sm flex flex-col">
                       <Typography variant="p">
-                        <span>Name:</span> {selectedProduct.productName}
+                        <span>{t('selectedProduct.fields.name')}</span>{' '}
+                        {selectedProduct.productName}
                       </Typography>
                       {selectedProduct.brand && (
                         <Typography variant="p">
-                          <span>Brand:</span> {selectedProduct.brand}
+                          <span>{t('selectedProduct.fields.brand')}</span> {selectedProduct.brand}
                         </Typography>
                       )}
                       {selectedProduct.category && (
                         <Typography variant="p">
-                          <span>Category:</span> {selectedProduct.category}
+                          <span>{t('selectedProduct.fields.category')}</span>{' '}
+                          {selectedProduct.category}
                         </Typography>
                       )}
                       <Typography variant="p">
-                        <span>Barcode:</span>{' '}
+                        <span>{t('selectedProduct.fields.barcode')}</span>{' '}
                         <code className="bg-gray-100 px-1 py-0.5 rounded">
                           {selectedProduct.barcode}
                         </code>
@@ -280,7 +284,7 @@ export default function ManualInboundEntry({
                 data={inventoryData}
                 onChange={setInventoryData}
                 showSubmitButton={false}
-                title="Batch Details"
+                title={t('batchDetails.title')}
                 className="border-2 border-dashed"
               />
 
@@ -293,10 +297,10 @@ export default function ManualInboundEntry({
                   variant="secondary"
                 >
                   <Plus className="w-5 h-5 mr-2" />
-                  Add Batch
+                  {t('buttons.addBatch')}
                 </Button>
                 <Button onClick={handleClearSelection} variant="outline" size="lg">
-                  Clear
+                  {t('buttons.clear')}
                 </Button>
               </div>
             </>
@@ -308,10 +312,9 @@ export default function ManualInboundEntry({
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-2">
-                <CardTitle>Batch items to submit</CardTitle>
+                <CardTitle>{t('batchItems.title')}</CardTitle>
                 <CardDescription>
-                  {scannedItems.length} batch
-                  {scannedItems.length !== 1 ? 'es' : ''} ready to submit
+                  {t('batchItems.description', { count: scannedItems.length })}
                 </CardDescription>
               </div>
               <Button
@@ -320,7 +323,7 @@ export default function ManualInboundEntry({
                 variant="secondary"
               >
                 <Check className="w-4 h-4 mr-2" />
-                Submit All ({scannedItems.length})
+                {t('buttons.submitAll')} ({scannedItems.length})
               </Button>
             </div>
           </CardHeader>
@@ -338,10 +341,7 @@ export default function ManualInboundEntry({
       {scannedItems.length === 0 && !selectedProduct && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Start by searching for a product using the barcode or product name search above. After
-            selecting a product, you'll be able to add expiry date, quantity, and price.
-          </AlertDescription>
+          <AlertDescription>{t('alerts.gettingStarted')}</AlertDescription>
         </Alert>
       )}
 
@@ -349,16 +349,13 @@ export default function ManualInboundEntry({
       <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Confirm Submission</DialogTitle>
-            <DialogDescription>
-              Review the items below before submitting them to your inventory.
-            </DialogDescription>
+            <DialogTitle>{t('confirmation.title')}</DialogTitle>
+            <DialogDescription>{t('confirmation.description')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <Typography variant="p">
-              You are about to submit {scannedItems.length} batch
-              {scannedItems.length !== 1 ? 'es' : ''} to inventory:
+              {t('confirmation.submitText', { count: scannedItems.length })}
             </Typography>
 
             <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
@@ -373,14 +370,16 @@ export default function ManualInboundEntry({
                       <Typography variant="p">{item.productName}</Typography>
                       {item.brand && <Typography variant="p">{item.brand}</Typography>}
                       <Typography variant="p">
-                        Expires: {formatExpiryDate(item.expiryDate)}
+                        {t('confirmation.itemDetails.expires')} {formatExpiryDate(item.expiryDate)}
                       </Typography>
                     </div>
                     <div className="text-right">
                       <Typography variant="p">
                         {item.quantity}x {formatPrice(item.price)}
                       </Typography>
-                      <Typography variant="p">Total: {formatPrice(totalValue)}</Typography>
+                      <Typography variant="p">
+                        {t('confirmation.itemDetails.total')} {formatPrice(totalValue)}
+                      </Typography>
                     </div>
                   </div>
                 )
@@ -389,11 +388,11 @@ export default function ManualInboundEntry({
 
             <div className="border-t pt-3">
               <div className="flex justify-between items-center font-medium">
-                <span>Total Items:</span>
+                <span>{t('confirmation.totals.totalItems')}</span>
                 <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
               </div>
               <div className="flex justify-between items-center font-medium">
-                <span>Total Value:</span>
+                <span>{t('confirmation.totals.totalValue')}</span>
                 <span>
                   {formatPrice(
                     scannedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
@@ -409,7 +408,7 @@ export default function ManualInboundEntry({
               onClick={() => setShowSubmissionDialog(false)}
               disabled={isSubmittingBatch}
             >
-              Cancel
+              {t('buttons.cancel')}
             </Button>
             <Button
               variant="secondary"
@@ -417,7 +416,7 @@ export default function ManualInboundEntry({
               disabled={isSubmittingBatch}
             >
               <Check className="w-4 h-4 mr-2" />
-              {isSubmittingBatch ? 'Submitting...' : 'Submit to Inventory'}
+              {isSubmittingBatch ? t('buttons.submitting') : t('buttons.submitToInventory')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -430,12 +429,15 @@ export default function ManualInboundEntry({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-600" />
-                Inventory Updated Successfully!
+                {t('success.title')}
               </DialogTitle>
               <DialogDescription>
                 {submissionResult.successCount === submissionResult.totalCount
-                  ? `Successfully added ${submissionResult.successCount} batch${submissionResult.successCount !== 1 ? 'es' : ''} to your inventory.`
-                  : `Added ${submissionResult.successCount} of ${submissionResult.totalCount} batches to inventory.`}
+                  ? t('success.description.allSuccess', { count: submissionResult.successCount })
+                  : t('success.description.partialSuccess', {
+                      successCount: submissionResult.successCount,
+                      totalCount: submissionResult.totalCount,
+                    })}
               </DialogDescription>
             </DialogHeader>
 
@@ -448,7 +450,7 @@ export default function ManualInboundEntry({
                 className="w-full"
               >
                 <RefreshCcw className="w-4 h-4 mr-2" />
-                Add More Products
+                {t('buttons.addMoreProducts')}
               </Button>
 
               <Button
@@ -459,7 +461,7 @@ export default function ManualInboundEntry({
                 }}
                 className="w-full"
               >
-                View in Inventory
+                {t('buttons.viewInInventory')}
               </Button>
             </div>
           </DialogContent>

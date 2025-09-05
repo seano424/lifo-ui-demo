@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle, Calendar, Filter, MapPin, Package, Search, Truck } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { BatchCard } from '@/components/batches/batch-card'
 import { Badge } from '@/components/ui/badge'
@@ -35,6 +36,7 @@ export function BatchList({
   emptyMessage,
   maxItems,
 }: BatchListProps) {
+  const t = useTranslations('batchList')
   const [filters, setFilters] = useState<BatchFilters>({})
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -99,12 +101,12 @@ export function BatchList({
           <CardHeader>
             <CardTitle className="text-destructive flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
-              Error Loading Batches
+              {t('errorLoadingBatches')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Typography variant="p" color="muted">
-              {error instanceof Error ? error.message : 'An unexpected error occurred'}
+              {error instanceof Error ? error.message : t('unexpectedError')}
             </Typography>
           </CardContent>
         </Card>
@@ -148,7 +150,7 @@ export function BatchList({
           </Typography>
           {data && data.length > 0 && (
             <Badge variant="ghost" className="text-sm">
-              {filteredData.length} current batch{filteredData.length !== 1 ? 'es' : ''}
+              {t('currentBatches', { count: filteredData.length })}
             </Badge>
           )}
         </div>
@@ -160,18 +162,18 @@ export function BatchList({
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Filter className="h-5 w-5" />
-              Filters
+              {t('filters')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {/* Search */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Search</label>
+                <label className="text-sm font-medium">{t('search')}</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search batches..."
+                    placeholder={t('searchBatches')}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     className="pl-9"
@@ -181,21 +183,21 @@ export function BatchList({
 
               {/* Status Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Status</label>
+                <label className="text-sm font-medium">{t('status')}</label>
                 <Select
                   value={filters.status || 'all'}
                   onValueChange={(value: string) => updateFilter('status', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All statuses" />
+                    <SelectValue placeholder={t('allStatuses')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="damaged">Damaged</SelectItem>
-                    <SelectItem value="sold_out">Sold Out</SelectItem>
-                    <SelectItem value="reserved">Reserved</SelectItem>
+                    <SelectItem value="all">{t('allStatuses')}</SelectItem>
+                    <SelectItem value="active">{t('active')}</SelectItem>
+                    <SelectItem value="expired">{t('expired')}</SelectItem>
+                    <SelectItem value="damaged">{t('damaged')}</SelectItem>
+                    <SelectItem value="sold_out">{t('soldOut')}</SelectItem>
+                    <SelectItem value="reserved">{t('reserved')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -204,7 +206,7 @@ export function BatchList({
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  Expiring Soon
+                  {t('expiringSoon')}
                 </label>
                 <Select
                   value={filters.expiringInDays?.toString() || 'all'}
@@ -213,15 +215,15 @@ export function BatchList({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All dates" />
+                    <SelectValue placeholder={t('allDates')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Dates</SelectItem>
-                    <SelectItem value="1">Expiring in 1 day</SelectItem>
-                    <SelectItem value="3">Expiring in 3 days</SelectItem>
-                    <SelectItem value="7">Expiring in 7 days</SelectItem>
-                    <SelectItem value="14">Expiring in 14 days</SelectItem>
-                    <SelectItem value="30">Expiring in 30 days</SelectItem>
+                    <SelectItem value="all">{t('allDates')}</SelectItem>
+                    <SelectItem value="1">{t('expiringInDays', { days: 1 })}</SelectItem>
+                    <SelectItem value="3">{t('expiringInDays', { days: 3 })}</SelectItem>
+                    <SelectItem value="7">{t('expiringInDays', { days: 7 })}</SelectItem>
+                    <SelectItem value="14">{t('expiringInDays', { days: 14 })}</SelectItem>
+                    <SelectItem value="30">{t('expiringInDays', { days: 30 })}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -230,10 +232,10 @@ export function BatchList({
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  Location
+                  {t('location')}
                 </label>
                 <Input
-                  placeholder="Location code..."
+                  placeholder={t('locationCode')}
                   value={filters.location_code || ''}
                   onChange={e => updateFilter('location_code', e.target.value || undefined)}
                 />
@@ -241,7 +243,7 @@ export function BatchList({
 
               {/* Stock Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Stock Status</label>
+                <label className="text-sm font-medium">{t('stockStatus')}</label>
                 <Select
                   value={
                     filters.hasStock === undefined
@@ -257,12 +259,12 @@ export function BatchList({
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All stock levels" />
+                    <SelectValue placeholder={t('allStockLevels')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Stock Levels</SelectItem>
-                    <SelectItem value="in_stock">In Stock</SelectItem>
-                    <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                    <SelectItem value="all">{t('allStockLevels')}</SelectItem>
+                    <SelectItem value="in_stock">{t('inStock')}</SelectItem>
+                    <SelectItem value="out_of_stock">{t('outOfStock')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -271,10 +273,10 @@ export function BatchList({
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-1">
                   <Truck className="h-4 w-4" />
-                  Supplier
+                  {t('supplier')}
                 </label>
                 <Input
-                  placeholder="Supplier name..."
+                  placeholder={t('supplierName')}
                   value={filters.supplier || ''}
                   onChange={e => updateFilter('supplier', e.target.value || undefined)}
                 />
@@ -282,7 +284,7 @@ export function BatchList({
 
               {/* Clear Filters */}
               <div className="space-y-2">
-                <label className="text-sm font-medium opacity-0">Clear</label>
+                <label className="text-sm font-medium opacity-0">{t('clear')}</label>
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -291,7 +293,7 @@ export function BatchList({
                   }}
                   className="w-full"
                 >
-                  Clear Filters
+                  {t('clearFilters')}
                 </Button>
               </div>
             </div>
@@ -330,7 +332,7 @@ export function BatchList({
             variant="outline"
             size="lg"
           >
-            {isFetchingNextPage ? 'Loading more...' : 'Load More Batches'}
+            {isFetchingNextPage ? t('loadingMore') : t('loadMoreBatches')}
           </Button>
         </div>
       )}
@@ -339,9 +341,9 @@ export function BatchList({
       {filteredData && filteredData.length > 0 && !maxItems && (
         <div className="flex justify-center">
           <Badge variant="secondary" className="text-sm">
-            Showing {filteredData.length} batch{filteredData.length !== 1 ? 'es' : ''}
+            {t('showingBatches', { count: filteredData.length })}
             {data && data.length !== filteredData.length && (
-              <span> (filtered from {data.length})</span>
+              <span> {t('filteredFrom', { total: data.length })}</span>
             )}
           </Badge>
         </div>
@@ -354,16 +356,16 @@ export function BatchList({
             <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <Typography variant="h3">
               {searchTerm || Object.keys(filters).length > 0
-                ? 'No batches found'
-                : 'No batches yet'}
+                ? t('noBatchesFound')
+                : t('noBatchesYet')}
             </Typography>
             <Typography variant="p" color="muted" className="mt-2">
               {emptyMessage ||
                 (searchTerm || Object.keys(filters).length > 0
-                  ? 'Try adjusting your search or filters'
+                  ? t('tryAdjustingFilters')
                   : productId
-                    ? 'This product has no batches yet'
-                    : 'Get started by adding your first batch')}
+                    ? t('productNoBatches')
+                    : t('getStartedFirstBatch'))}
             </Typography>
             {(searchTerm || Object.keys(filters).length > 0) && (
               <Button
@@ -374,7 +376,7 @@ export function BatchList({
                 }}
                 className="mt-4"
               >
-                Clear Filters
+                {t('clearFilters')}
               </Button>
             )}
           </div>
@@ -387,33 +389,39 @@ export function BatchList({
 // ✅ CONVENIENCE COMPONENTS for specific use cases
 
 export function ExpiringBatchesList({ maxItems = 6 }: { maxItems?: number }) {
+  const t = useTranslations('batchList.convenience')
+
   return (
     <BatchList
       showFilters={false}
-      title="Expiring Soon"
-      emptyMessage="No batches expiring soon"
+      title={t('expiringSoon')}
+      emptyMessage={t('noBatchesExpiringSoon')}
       maxItems={maxItems}
     />
   )
 }
 
 export function ProductBatchesList({ productId }: { productId: string }) {
+  const t = useTranslations('batchList.convenience')
+
   return (
     <BatchList
       productId={productId}
       showProductInfo={false}
-      title="Product Batches"
-      emptyMessage="This product has no batches yet"
+      title={t('productBatches')}
+      emptyMessage={t('productNoBatches')}
     />
   )
 }
 
 export function LowStockBatchesList({ maxItems = 6 }: { maxItems?: number }) {
+  const t = useTranslations('batchList.convenience')
+
   return (
     <BatchList
       showFilters={false}
-      title="Low Stock Alert"
-      emptyMessage="All batches have sufficient stock"
+      title={t('lowStockAlert')}
+      emptyMessage={t('allBatchesSufficientStock')}
       maxItems={maxItems}
     />
   )

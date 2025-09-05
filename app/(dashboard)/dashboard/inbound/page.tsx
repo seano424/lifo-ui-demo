@@ -1,6 +1,7 @@
 'use client'
 
 import { Keyboard, Scan, Upload } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
 import ManualInboundEntry from '@/components/inbound/manual-inbound-entry'
 import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
@@ -12,6 +13,7 @@ import { useStoreState } from '@/lib/stores/store-context'
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
   const { isTablet, isMobile } = useMediaQuery()
+  const t = useTranslations('inbound')
 
   return (
     <div className="space-y-6">
@@ -20,11 +22,11 @@ export default function InboundPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="scan" className="flex items-center gap-2">
             <Scan className="w-4 h-4 stroke-2 border-2 rounded-full p-[2px] bg-primary-100" />
-            Barcode Scanning
+            {t('mobile.barcodeScanning')}
           </TabsTrigger>
           <TabsTrigger value="csv" className="flex items-center gap-2">
             <Upload className="w-4 h-4 stroke-2 border-2  rounded-full p-[2px] bg-primary-100" />
-            CSV Bulk Import
+            {t('mobile.csvBulkImport')}
           </TabsTrigger>
         </TabsList>
 
@@ -43,9 +45,7 @@ export default function InboundPage() {
               />
             ) : (
               <Card className="p-6">
-                <div className="text-center text-muted-foreground">
-                  Please select a store to upload inventory data.
-                </div>
+                <div className="text-center text-muted-foreground">{t('messages.selectStore')}</div>
               </Card>
             )}
           </div>
@@ -58,11 +58,11 @@ export default function InboundPage() {
           <TabsList className="grid w-full grid-cols-2 max-w-xl mx-auto">
             <TabsTrigger value="manual" className="flex items-center gap-2">
               <Keyboard className="w-4 h-4" />
-              Manual Entry
+              {t('desktop.manualEntry')}
             </TabsTrigger>
             <TabsTrigger value="csv" className="flex items-center gap-2">
               <Upload className="w-4 h-4" />
-              CSV Bulk Import
+              {t('desktop.csvBulkImport')}
             </TabsTrigger>
           </TabsList>
 
@@ -78,7 +78,7 @@ export default function InboundPage() {
               ) : (
                 <Card className="p-6">
                   <div className="text-center text-muted-foreground">
-                    Please select a store to add inventory.
+                    {t('messages.selectStoreInventory')}
                   </div>
                 </Card>
               )}
@@ -97,7 +97,7 @@ export default function InboundPage() {
               ) : (
                 <Card className="p-6">
                   <div className="text-center text-muted-foreground">
-                    Please select a store to upload inventory data.
+                    {t('messages.selectStore')}
                   </div>
                 </Card>
               )}

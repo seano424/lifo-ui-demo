@@ -1,6 +1,7 @@
 'use client'
 
 import { CalendarDays } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import {
   Select,
   SelectContent,
@@ -32,7 +33,10 @@ interface TimeSelectorProps {
   onChange: (period: TimePeriod) => void
 }
 
-export function getTimeRange(period: TimePeriod): TimeRange {
+export function getTimeRange(
+  period: TimePeriod,
+  t?: ReturnType<typeof useTranslations>,
+): TimeRange {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
@@ -54,8 +58,8 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end: endOfWeek,
         compareStart,
         compareEnd,
-        label: 'This Week',
-        compareLabel: 'Last Week',
+        label: t ? t('periods.thisWeek') : 'This Week',
+        compareLabel: t ? t('compareLabels.lastWeek') : 'Last Week',
       }
     }
 
@@ -76,8 +80,8 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end: endOfLastWeek,
         compareStart,
         compareEnd,
-        label: 'Last Week',
-        compareLabel: 'Previous Week',
+        label: t ? t('periods.lastWeek') : 'Last Week',
+        compareLabel: t ? t('compareLabels.previousWeek') : 'Previous Week',
       }
     }
 
@@ -95,8 +99,8 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end: endOfMonth,
         compareStart,
         compareEnd,
-        label: 'This Month',
-        compareLabel: 'Last Month',
+        label: t ? t('periods.thisMonth') : 'This Month',
+        compareLabel: t ? t('compareLabels.lastMonth') : 'Last Month',
       }
     }
 
@@ -114,8 +118,8 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end: endOfLastMonth,
         compareStart,
         compareEnd,
-        label: 'Last Month',
-        compareLabel: 'Previous Month',
+        label: t ? t('periods.lastMonth') : 'Last Month',
+        compareLabel: t ? t('compareLabels.previousMonth') : 'Previous Month',
       }
     }
 
@@ -136,8 +140,8 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end,
         compareStart,
         compareEnd,
-        label: 'Last 7 Days',
-        compareLabel: 'Previous 7 Days',
+        label: t ? t('periods.last7Days') : 'Last 7 Days',
+        compareLabel: t ? t('compareLabels.previous7Days') : 'Previous 7 Days',
       }
     }
 
@@ -158,8 +162,8 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end,
         compareStart,
         compareEnd,
-        label: 'Last 30 Days',
-        compareLabel: 'Previous 30 Days',
+        label: t ? t('periods.last30Days') : 'Last 30 Days',
+        compareLabel: t ? t('compareLabels.previous30Days') : 'Previous 30 Days',
       }
     }
 
@@ -175,24 +179,29 @@ export function getTimeRange(period: TimePeriod): TimeRange {
         end: endOfYear,
         compareStart: compareStartOfYear,
         compareEnd: compareEndOfYear,
-        label: 'All Time',
-        compareLabel: 'Previous Year',
+        label: t ? t('periods.allTime') : 'All Time',
+        compareLabel: t ? t('compareLabels.previousYear') : 'Previous Year',
       }
     }
   }
 }
 
-const periodOptions: { value: TimePeriod; label: string }[] = [
-  { value: 'this_week', label: 'This Week' },
-  { value: 'last_week', label: 'Last Week' },
-  { value: 'this_month', label: 'This Month' },
-  { value: 'last_month', label: 'Last Month' },
-  { value: 'last_7_days', label: 'Last 7 Days' },
-  { value: 'last_30_days', label: 'Last 30 Days' },
-  { value: 'all_time', label: 'All Time' },
+const getPeriodOptions = (
+  t: ReturnType<typeof useTranslations>,
+): { value: TimePeriod; label: string }[] => [
+  { value: 'this_week', label: t('periods.thisWeek') },
+  { value: 'last_week', label: t('periods.lastWeek') },
+  { value: 'this_month', label: t('periods.thisMonth') },
+  { value: 'last_month', label: t('periods.lastMonth') },
+  { value: 'last_7_days', label: t('periods.last7Days') },
+  { value: 'last_30_days', label: t('periods.last30Days') },
+  { value: 'all_time', label: t('periods.allTime') },
 ]
 
 export function TimeSelector({ value, onChange }: TimeSelectorProps) {
+  const t = useTranslations('timeSelector')
+  const periodOptions = getPeriodOptions(t)
+
   return (
     <Select value={value} onValueChange={val => onChange(val as TimePeriod)}>
       <SelectTrigger className="w-full sm:w-[200px] bg-white border transition-colors">

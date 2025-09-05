@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowUp, Edit3, Euro, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -40,9 +41,13 @@ export default function ScannedItemsList({
   onEditItem,
   onItemUpdated,
   onDeleteItem,
-  title = 'Batch items',
+  title,
   className = '',
 }: ScannedItemsListProps) {
+  const t = useTranslations('scannedItemsList')
+
+  // Use translation as default if no title provided
+  const finalTitle = title || t('title')
   const [isEditingItem, setIsEditingItem] = useState(false)
   const [editingItem, setEditingItem] = useState<ScannedItem | null>(null)
   const [editForm, setEditForm] = useState({
@@ -118,7 +123,7 @@ export default function ScannedItemsList({
   return (
     <div className={`p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <Typography variant="p">{title}</Typography>
+        <Typography variant="p">{finalTitle}</Typography>
         <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
           {items.length > 99 ? '99+' : items.length}
         </div>
@@ -136,13 +141,15 @@ export default function ScannedItemsList({
               </Typography>
               <div className="flex flex-col gap-2">
                 <Typography variant="p">
-                  <span className="text-gray-500">Quantity:</span> {item.quantity}
+                  <span className="text-gray-500">{t('itemLabels.quantity')}</span> {item.quantity}
                 </Typography>
                 <Typography variant="p">
-                  <span className="text-gray-500">Price:</span> {formatPrice(item.price)}
+                  <span className="text-gray-500">{t('itemLabels.price')}</span>{' '}
+                  {formatPrice(item.price)}
                 </Typography>
                 <Typography variant="p">
-                  <span className="text-gray-500">Expiry:</span> {formatExpiryDate(item.expiryDate)}
+                  <span className="text-gray-500">{t('itemLabels.expiry')}</span>{' '}
+                  {formatExpiryDate(item.expiryDate)}
                 </Typography>
               </div>
             </div>
@@ -178,11 +185,11 @@ export default function ScannedItemsList({
         <Dialog open={isEditingItem} onOpenChange={setIsEditingItem}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Edit Item</DialogTitle>
+              <DialogTitle>{t('editDialog.title')}</DialogTitle>
               <DialogDescription>
                 {showAdvancedEdit
-                  ? 'Edit all product details including name, brand, barcode, and inventory information.'
-                  : 'Quick edit expiry date, quantity, and price. Click "Edit Details" for more options.'}
+                  ? t('editDialog.descriptions.fullEdit')
+                  : t('editDialog.descriptions.quickEdit')}
               </DialogDescription>
             </DialogHeader>
 
@@ -198,11 +205,13 @@ export default function ScannedItemsList({
                 </div>
               ) : (
                 <div className="space-y-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-sm font-medium text-blue-800 mb-2">Product Details</div>
+                  <div className="text-sm font-medium text-blue-800 mb-2">
+                    {t('editDialog.sections.productDetails')}
+                  </div>
 
                   <div>
                     <Label htmlFor="edit-product-name" className="text-sm font-medium">
-                      Product Name
+                      {t('editDialog.formLabels.productName')}
                     </Label>
                     <Input
                       id="edit-product-name"
@@ -215,14 +224,14 @@ export default function ScannedItemsList({
                         }))
                       }
                       className="mt-1"
-                      placeholder="Enter product name"
+                      placeholder={t('editDialog.placeholders.productName')}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label htmlFor="edit-brand" className="text-sm font-medium">
-                        Brand
+                        {t('editDialog.formLabels.brand')}
                       </Label>
                       <Input
                         id="edit-brand"
@@ -235,13 +244,13 @@ export default function ScannedItemsList({
                           }))
                         }
                         className="mt-1"
-                        placeholder="Brand name"
+                        placeholder={t('editDialog.placeholders.brand')}
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="edit-barcode" className="text-sm font-medium">
-                        Barcode
+                        {t('editDialog.formLabels.barcode')}
                       </Label>
                       <Input
                         id="edit-barcode"
@@ -254,7 +263,7 @@ export default function ScannedItemsList({
                           }))
                         }
                         className="mt-1 font-mono text-sm"
-                        placeholder="Barcode number"
+                        placeholder={t('editDialog.placeholders.barcode')}
                       />
                     </div>
                   </div>
@@ -265,7 +274,9 @@ export default function ScannedItemsList({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-medium">
-                    {showAdvancedEdit ? 'Inventory Details' : 'Quick Edit'}
+                    {showAdvancedEdit
+                      ? t('editDialog.sections.inventoryDetails')
+                      : t('editDialog.sections.quickEdit')}
                   </h4>
                   <Button
                     variant="ghost"
@@ -276,12 +287,12 @@ export default function ScannedItemsList({
                     {showAdvancedEdit ? (
                       <>
                         <ArrowUp className="w-3 h-3 mr-1" />
-                        Hide Details
+                        {t('editDialog.buttons.hideDetails')}
                       </>
                     ) : (
                       <>
                         <Edit3 className="w-3 h-3 mr-1" />
-                        Edit Details
+                        {t('editDialog.buttons.editDetails')}
                       </>
                     )}
                   </Button>
@@ -289,7 +300,7 @@ export default function ScannedItemsList({
 
                 <div>
                   <Label htmlFor="edit-expiry" className="text-sm font-medium">
-                    Expiry Date
+                    {t('editDialog.formLabels.expiryDate')}
                   </Label>
                   <Input
                     id="edit-expiry"
@@ -308,7 +319,7 @@ export default function ScannedItemsList({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor="edit-quantity" className="text-sm font-medium">
-                      Quantity
+                      {t('editDialog.formLabels.quantity')}
                     </Label>
                     <Input
                       id="edit-quantity"
@@ -327,7 +338,7 @@ export default function ScannedItemsList({
 
                   <div>
                     <Label htmlFor="edit-price" className="text-sm font-medium">
-                      Price (€)
+                      {t('editDialog.formLabels.price')}
                     </Label>
                     <div className="relative mt-1">
                       <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -353,7 +364,7 @@ export default function ScannedItemsList({
 
             <DialogFooter className="mt-6">
               <Button variant="outline" onClick={handleCancelEdit}>
-                Cancel
+                {t('editDialog.buttons.cancel')}
               </Button>
               <Button
                 variant="secondary"
@@ -366,7 +377,7 @@ export default function ScannedItemsList({
                   !editForm.barcode.trim()
                 }
               >
-                Save Changes
+                {t('editDialog.buttons.saveChanges')}
               </Button>
             </DialogFooter>
           </DialogContent>

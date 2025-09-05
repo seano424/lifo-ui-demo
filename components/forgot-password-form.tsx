@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +12,9 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const t = useTranslations('auth.forgotPassword')
+  const tErrors = useTranslations('auth.errors')
+
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -30,7 +34,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       if (error) throw error
       setSuccess(true)
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : tErrors('genericError'))
     } finally {
       setIsLoading(false)
     }
@@ -42,18 +46,17 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         <Card>
           <CardHeader>
             <CardTitle>
-              <Typography variant="h1">Check Your Email</Typography>
+              <Typography variant="h1">{t('checkEmailTitle')}</Typography>
             </CardTitle>
             <CardDescription>
               <Typography variant="p" color="muted">
-                Password reset instructions sent
+                {t('checkEmailDescription')}
               </Typography>
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Typography variant="p" color="muted">
-              If you registered using your email and password, you will receive a password reset
-              email.
+              {t('emailInstructions')}
             </Typography>
           </CardContent>
         </Card>
@@ -61,11 +64,11 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         <Card>
           <CardHeader>
             <CardTitle>
-              <Typography variant="h1">Reset Your Password</Typography>
+              <Typography variant="h1">{t('title')}</Typography>
             </CardTitle>
             <CardDescription>
               <Typography variant="p" color="muted">
-                Type in your email and we&apos;ll send you a link to reset your password
+                {t('description')}
               </Typography>
             </CardDescription>
           </CardHeader>
@@ -73,11 +76,11 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             <form onSubmit={handleForgotPassword}>
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('email')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="m@example.com"
+                    placeholder={t('emailPlaceholder')}
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -89,14 +92,14 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                   </Typography>
                 )}
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Sending...' : 'Send reset email'}
+                  {isLoading ? t('sending') : t('sendResetEmail')}
                 </Button>
               </div>
               <div className="mt-4 text-center">
                 <Typography variant="p" color="muted">
-                  Already have an account?{' '}
+                  {t('alreadyHaveAccount')}{' '}
                   <Link href="/auth/login" className="underline underline-offset-4">
-                    Login
+                    {t('loginLink')}
                   </Link>
                 </Typography>
               </div>

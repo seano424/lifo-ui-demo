@@ -2,6 +2,7 @@
 
 import { AlertTriangle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,8 @@ export function OnboardingSignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
+  const t = useTranslations('onboarding.signupForm')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -52,25 +55,25 @@ export function OnboardingSignUpForm({
 
     // Validation
     if (ONBOARDING_MODE === 'production' && password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError(t('errors.passwordTooShort'))
       setIsLoading(false)
       return
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
+      setError(t('errors.passwordsNoMatch'))
       setIsLoading(false)
       return
     }
 
     if (!confirmedStoreInsert && !selectedStoreForm) {
-      setError('Store information is missing. Please go back and complete store setup.')
+      setError(t('errors.storeInfoMissing'))
       setIsLoading(false)
       return
     }
 
     if (businessCheckResult?.exists) {
-      setError('This business is already registered. Please contact support.')
+      setError(t('errors.businessAlreadyRegistered'))
       setIsLoading(false)
       return
     }
@@ -88,7 +91,7 @@ export function OnboardingSignUpForm({
           // Test mode: use current logged-in user
           const currentUserId = currentUser?.id
           if (!currentUserId) {
-            setError('Test mode requires you to be signed in first.')
+            setError(t('errors.testModeSignInRequired'))
             setIsLoading(false)
             return
           }
@@ -161,7 +164,7 @@ export function OnboardingSignUpForm({
       router.push(redirectPath)
     } catch (error: unknown) {
       console.error('💥 Signup error:', error)
-      setError(error instanceof Error ? error.message : 'An error occurred during signup')
+      setError(error instanceof Error ? error.message : t('errors.signupError'))
     } finally {
       setIsLoading(false)
     }
@@ -173,12 +176,10 @@ export function OnboardingSignUpForm({
       <div className="text-center max-w-md mx-auto">
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            No store information found. Please go back and complete the previous steps.
-          </AlertDescription>
+          <AlertDescription>{t('errors.noStoreInfo')}</AlertDescription>
         </Alert>
         <Button onClick={() => setCurrentStep(1)} className="mt-4">
-          Start Over
+          {t('errors.startOver')}
         </Button>
       </div>
     )
@@ -192,21 +193,18 @@ export function OnboardingSignUpForm({
           <AlertDescription>
             <div className="space-y-2">
               <p>
-                <strong>Business Already Registered</strong>
+                <strong>{t('businessRegistered')}</strong>
               </p>
-              <p>
-                This business is already in our system. Please contact support or try a different
-                store.
-              </p>
+              <p>{t('businessRegisteredDesc')}</p>
             </div>
           </AlertDescription>
         </Alert>
         <div className="flex gap-2 mt-4">
           <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
-            Back
+            {t('backButton')}
           </Button>
           <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
-            Try Different Store
+            {t('tryDifferentStore')}
           </Button>
         </div>
       </div>
@@ -223,29 +221,25 @@ export function OnboardingSignUpForm({
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Sign in required:</strong> Test mode requires you to be signed in first.
-            <br />
-            <small>Switch to MOCK mode if you want to test without authentication.</small>
+            <strong>{t('signInRequired')}</strong> {t('testModeWarning')}
           </AlertDescription>
         </Alert>
       )}
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Create Your Account</CardTitle>
-          <CardDescription>
-            Almost done! Create your account to access your {storeName} dashboard.
-          </CardDescription>
+          <CardTitle className="text-2xl">{t('createAccount')}</CardTitle>
+          <CardDescription>{t('createAccountDesc', { storeName })}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">{t('fullName')}</Label>
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="Your full name"
+                  placeholder={t('fullNamePlaceholder')}
                   required
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
@@ -253,11 +247,11 @@ export function OnboardingSignUpForm({
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="manager@yourstore.com"
+                  placeholder={t('emailPlaceholder')}
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -268,7 +262,7 @@ export function OnboardingSignUpForm({
               {ONBOARDING_MODE === 'production' && (
                 <>
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('password')}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -279,12 +273,12 @@ export function OnboardingSignUpForm({
                       onChange={e => setPassword(e.target.value)}
                     />
                     <Typography variant="p" color="muted">
-                      Must be at least 6 characters
+                      {t('form.passwordRequirement')}
                     </Typography>
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Label htmlFor="confirm-password">{t('confirmPassword')}</Label>
                     <Input
                       id="confirm-password"
                       type="password"
@@ -306,23 +300,20 @@ export function OnboardingSignUpForm({
 
               <Button type="submit" className="w-full" disabled={isLoading || !isAuthReady}>
                 {isLoading
-                  ? `${ONBOARDING_MODE === 'production' ? 'Creating Account' : 'Testing'}...`
-                  : `${ONBOARDING_MODE === 'production' ? 'Create Account' : `🧪 Test ${ONBOARDING_MODE.toUpperCase()}`}`}
+                  ? `${ONBOARDING_MODE === 'production' ? t('creatingAccount') : t('form.testingButton')}...`
+                  : `${ONBOARDING_MODE === 'production' ? t('createAccountButton') : `🧪 Test ${ONBOARDING_MODE.toUpperCase()}`}`}
               </Button>
 
               {ONBOARDING_MODE === 'production' && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
-                  By creating an account, you agree to our Terms of Service and Privacy Policy.
-                  You&#39;ll receive a confirmation email to verify your account.
+                  {t('form.termsAndPrivacy')}
                 </Typography>
               )}
 
               {ONBOARDING_MODE !== 'production' && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
-                  🧪 {ONBOARDING_MODE} mode:{' '}
-                  {ONBOARDING_MODE === 'mock'
-                    ? 'No real changes will be made'
-                    : 'Real database changes with your account'}
+                  {t('form.testModePrefix', { mode: ONBOARDING_MODE.toUpperCase() })}
+                  {ONBOARDING_MODE === 'mock' ? t('noChanges') : t('realChanges')}
                 </Typography>
               )}
             </div>

@@ -2,6 +2,7 @@
 
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Globe, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { LogoutButton } from '@/components/logout-button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -24,6 +25,7 @@ import type { User } from '@/lib/types/user'
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()
+  const t = useTranslations('navUser')
 
   return (
     <SidebarMenu>
@@ -77,7 +79,7 @@ export function NavUser({ user }: { user: User }) {
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/upgrade">
                   <Sparkles />
-                  Upgrade to Pro
+                  {t('upgradeToPro')}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -86,19 +88,19 @@ export function NavUser({ user }: { user: User }) {
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings?tab=account">
                   <BadgeCheck />
-                  Account
+                  {t('account')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings?tab=billing">
                   <CreditCard />
-                  Billing
+                  {t('billing')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings?tab=notifications">
                   <Bell />
-                  Notifications
+                  {t('notifications')}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -107,7 +109,7 @@ export function NavUser({ user }: { user: User }) {
               <DropdownMenuItem className="flex-col items-start p-0 cursor-default hover:!bg-transparent">
                 <div className="flex items-center gap-2 px-2 py-1.5 w-full hover:text-black group-hover:text-black">
                   <Globe className="h-4 w-4" />
-                  <span className="text-sm">Language</span>
+                  <span className="text-sm">{t('language')}</span>
                 </div>
                 <div className="px-2 pb-2">
                   <LanguageButtonGroup />

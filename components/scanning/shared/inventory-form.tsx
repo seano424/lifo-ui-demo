@@ -1,6 +1,7 @@
 'use client'
 
 import { Check, Euro } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -51,14 +52,22 @@ export default function InventoryForm({
   showQuantity = true,
   showPrice = true,
   showSubmitButton = true,
-  title = 'Product Details',
-  submitButtonText = 'Confirm',
-  expiryDateLabel = 'Expiry Date',
-  quantityLabel = 'Quantity',
-  priceLabel = 'Price per unit (€)',
+  title,
+  submitButtonText,
+  expiryDateLabel,
+  quantityLabel,
+  priceLabel,
   mode = 'edit',
   className = '',
 }: InventoryFormProps) {
+  const t = useTranslations('inventoryForm')
+
+  // Use translations as defaults if not provided
+  const finalTitle = title || t('titles.productDetails')
+  const finalSubmitButtonText = submitButtonText || t('buttons.confirm')
+  const finalExpiryDateLabel = expiryDateLabel || t('labels.expiryDate')
+  const finalQuantityLabel = quantityLabel || t('labels.quantity')
+  const finalPriceLabel = priceLabel || t('labels.pricePerUnit')
   const handleChange = (field: keyof InventoryFormData) => (value: string | number) => {
     onChange({
       ...data,
@@ -76,18 +85,20 @@ export default function InventoryForm({
             <div className="flex items-center gap-2">
               <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
               <Typography variant="h3" className="text-primary-800 font-black">
-                Details captured successfully
+                {t('titles.detailsCaptured')}
               </Typography>
             </div>
             <Typography variant="h3" className="text-primary-700 font-black">
-              Review and submit to inventory
+              {t('titles.reviewAndSubmit')}
             </Typography>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {showExpiryDate && (
               <div>
-                <Label className="text-xs">{expiryDateLabel} (editable)</Label>
+                <Label className="text-xs">
+                  {finalExpiryDateLabel} {t('labels.editableNote')}
+                </Label>
                 <Input
                   type="date"
                   value={data.expiryDate}
@@ -99,7 +110,7 @@ export default function InventoryForm({
             )}
             {showQuantity && (
               <div>
-                <Label className="text-xs">{quantityLabel}</Label>
+                <Label className="text-xs">{finalQuantityLabel}</Label>
                 <Input
                   type="number"
                   value={data.quantity}
@@ -114,7 +125,7 @@ export default function InventoryForm({
 
           {showPrice && (
             <div className="mt-3">
-              <Label className="text-xs">{priceLabel}</Label>
+              <Label className="text-xs">{finalPriceLabel}</Label>
               <div className="relative">
                 <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
@@ -137,13 +148,13 @@ export default function InventoryForm({
   return (
     <Card className={className}>
       <CardContent className="p-4 space-y-3">
-        <Label className="font-medium">{title}</Label>
+        <Label className="font-medium">{finalTitle}</Label>
 
         <div className="grid grid-cols-2 gap-2">
           {showExpiryDate && (
             <div>
               <Label htmlFor="expiry" className="text-xs">
-                {expiryDateLabel}
+                {finalExpiryDateLabel}
               </Label>
               <Input
                 id="expiry"
@@ -157,7 +168,7 @@ export default function InventoryForm({
           {showQuantity && (
             <div>
               <Label htmlFor="quantity" className="text-xs">
-                {quantityLabel}
+                {finalQuantityLabel}
               </Label>
               <Input
                 id="quantity"
@@ -174,7 +185,7 @@ export default function InventoryForm({
         {showPrice && (
           <div>
             <Label htmlFor="price" className="text-xs">
-              {priceLabel}
+              {finalPriceLabel}
             </Label>
             <div className="relative">
               <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -199,7 +210,7 @@ export default function InventoryForm({
               className="flex-1 bg-purple-600 hover:bg-purple-700"
               disabled={!canSubmit || submitDisabled || disabled}
             >
-              {submitButtonText}
+              {finalSubmitButtonText}
             </Button>
           </div>
         )}

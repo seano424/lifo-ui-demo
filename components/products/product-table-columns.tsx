@@ -2,6 +2,7 @@
 
 import type { ColumnDef, Header } from '@tanstack/react-table'
 import { Building2, Edit, Euro, Eye, MoreHorizontal, Package, Tag, Trash2 } from 'lucide-react'
+import type { useTranslations } from 'next-intl'
 import { SortableHeader } from '@/components/products/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -71,6 +72,7 @@ export function createProductTableColumns({
   deleteProduct,
   isUpdating,
   DEFAULT_COLUMN_WIDTHS,
+  t,
 }: {
   data: Product[]
   currentSort: ProductSort
@@ -79,6 +81,7 @@ export function createProductTableColumns({
   deleteProduct: (id: string) => void
   isUpdating: boolean
   DEFAULT_COLUMN_WIDTHS: Record<string, number>
+  t: ReturnType<typeof useTranslations>
 }): ColumnDef<Product>[] {
   return [
     {
@@ -86,19 +89,19 @@ export function createProductTableColumns({
       accessorKey: 'name',
       header: () => (
         <SortableHeader field="name" currentSort={currentSort} updateSort={updateSort}>
-          Product
+          {t('product')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div>
           <div className="font-medium truncate" title={row.original.name}>
-            {row.original.name || 'Unnamed Product'}
+            {row.original.name || t('unnamedProduct')}
           </div>
           <div
             className="text-sm text-muted-foreground truncate font-mono"
             title={row.original.sku}
           >
-            SKU: {row.original.sku || 'N/A'}
+            SKU: {row.original.sku || t('notAvailable')}
           </div>
         </div>
       ),
@@ -112,7 +115,7 @@ export function createProductTableColumns({
       accessorKey: 'category',
       header: () => (
         <SortableHeader field="category" currentSort={currentSort} updateSort={updateSort}>
-          Category
+          {t('category')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -126,7 +129,7 @@ export function createProductTableColumns({
               {row.original.category_display_name}
             </Badge>
           ) : (
-            <span className="text-muted-foreground text-sm">Uncategorized</span>
+            <span className="text-muted-foreground text-sm">{t('uncategorized')}</span>
           )}
         </div>
       ),
@@ -140,14 +143,14 @@ export function createProductTableColumns({
       accessorKey: 'brand',
       header: () => (
         <SortableHeader field="brand" currentSort={currentSort} updateSort={updateSort}>
-          Brand
+          {t('brand')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="truncate" title={row.original.brand || 'N/A'}>
-            {row.original.brand || 'N/A'}
+          <span className="truncate" title={row.original.brand || t('notAvailable')}>
+            {row.original.brand || t('notAvailable')}
           </span>
         </div>
       ),
@@ -166,7 +169,7 @@ export function createProductTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          Total Stock
+          {t('totalStock')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -221,7 +224,7 @@ export function createProductTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          Active Batches
+          {t('activeBatches')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -239,12 +242,14 @@ export function createProductTableColumns({
       accessorKey: 'created_at',
       header: () => (
         <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
-          Date Added
+          {t('dateAdded')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground">
-          {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : 'N/A'}
+          {row.original.created_at
+            ? new Date(row.original.created_at).toLocaleDateString()
+            : t('notAvailable')}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.created_at || 100,
@@ -260,47 +265,47 @@ export function createProductTableColumns({
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" disabled={isUpdating}>
               <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">{t('openMenu')}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
             <DropdownMenuItem>
               <Eye className="mr-2 h-4 w-4" />
-              View Details
+              {t('viewDetails')}
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Package className="mr-2 h-4 w-4" />
-              View Batches
+              {t('viewBatches')}
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Edit className="mr-2 h-4 w-4" />
-              Edit Product
+              {t('editProduct')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
                 const currentPrice = row.original.base_selling_price || 0
-                const newPrice = prompt('Enter new price (€):', currentPrice.toString())
+                const newPrice = prompt(t('enterNewPrice'), currentPrice.toString())
                 if (newPrice && !Number.isNaN(Number(newPrice))) {
                   updateProductPrice(row.original.product_id, Number(newPrice))
                 }
               }}
             >
               <Euro className="mr-2 h-4 w-4" />
-              Update Price
+              {t('updatePrice')}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                if (confirm('Are you sure you want to delete this product?')) {
+                if (confirm(t('confirmDeleteProduct'))) {
                   deleteProduct(row.original.product_id)
                 }
               }}
               className="text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete Product
+              {t('deleteProduct')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

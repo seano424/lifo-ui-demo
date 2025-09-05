@@ -2,6 +2,7 @@
 
 import { Euro, GiftIcon, type LucideIcon, Trash2, ZapIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import type { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
@@ -50,6 +51,8 @@ export function KPICard({
   trendData,
   showTrends = false,
 }: KPICardProps) {
+  const t = useTranslations('dashboardNav.kpiCard')
+
   const formatValue = (val: number) => {
     if (isCurrency) {
       return new Intl.NumberFormat('en-EU', {
@@ -86,7 +89,7 @@ export function KPICard({
           className,
         )}
       >
-        <Typography className="text-secondary-600">Failed to load data</Typography>
+        <Typography className="text-secondary-600">{t('failedToLoad')}</Typography>
       </div>
     )
   }
@@ -119,7 +122,7 @@ export function KPICard({
           )}
         </div>
 
-        <Button variant="subtleSecondary">View details</Button>
+        <Button variant="subtleSecondary">{t('viewDetails')}</Button>
       </div>
     </div>
   )

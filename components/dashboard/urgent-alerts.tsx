@@ -2,6 +2,7 @@
 
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
@@ -11,22 +12,24 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 import { AlertQuickToggle } from './alert-quick-toggle'
 
 // Convert threshold to user-friendly level names
-function thresholdToLevelName(warningThreshold: number): string {
-  if (warningThreshold >= 0.8) return 'Urgent Items Only' // Most restrictive - fewest items
-  if (warningThreshold >= 0.7) return 'Priority Items' // Moderately restrictive
-  if (warningThreshold >= 0.5) return 'All Flagged Items' // Less restrictive - more items
-  return 'Complete Review' // Least restrictive - most items
+function thresholdToLevelName(
+  warningThreshold: number,
+  t: ReturnType<typeof useTranslations>,
+): string {
+  if (warningThreshold >= 0.8) return t('levels.urgentOnly') // Most restrictive - fewest items
+  if (warningThreshold >= 0.7) return t('levels.priority') // Moderately restrictive
+  if (warningThreshold >= 0.5) return t('levels.allFlagged') // Less restrictive - more items
+  return t('levels.completeReview') // Least restrictive - most items
 }
 
 export function UrgentAlerts() {
+  const t = useTranslations('store.urgentAlerts')
   const activeStoreId = useActiveStoreId()
   const { data, isLoading, error } = useScoringAlerts(activeStoreId)
   const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
 
-  console.log('data from urgent alerts', data)
-
   const isInitialLoading = isLoading
-  const currentLevel = thresholdToLevelName(warningThreshold)
+  const currentLevel = thresholdToLevelName(warningThreshold, t)
 
   if (isInitialLoading) {
     return (
@@ -46,13 +49,13 @@ export function UrgentAlerts() {
       <div className="flex flex-col gap-4 sm:flex-row text-center sm:text-left items-center justify-between">
         <div className="flex flex-col gap-2">
           <Typography variant="h4" className="font-bold text-red-600">
-            Connection Error
+            {t('errors.connectionError')}
           </Typography>
-          <Typography variant="p">Unable to load inventory alerts. Please try again.</Typography>
+          <Typography variant="p">{t('errors.unableToLoad')}</Typography>
         </div>
         <Link href="/dashboard/inventory/batches?filter=expiring">
           <Button variant="outline" className="gap-2">
-            View inventory
+            {t('buttons.viewInventory')}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -63,36 +66,31 @@ export function UrgentAlerts() {
   const summary = data?.summary
 
   const getMessage = () => {
-    if (!summary) return 'Loading alerts...'
+    if (!summary) return t('errors.loadingAlerts')
     const totalAlerts = summary.total_alerts
 
     if (totalAlerts === 0) {
-      return "No items need attention right now - you're all caught up!"
+      return t('messages.nothingToShow')
     }
 
     // For urgent mode (high threshold), use urgent language
     if (warningThreshold >= 0.8 && summary.critical_count > 0) {
-      const itemText = summary.critical_count === 1 ? 'item needs' : 'items need'
-      return `${summary.critical_count} ${itemText} immediate action`
+      return t('messages.itemNeedsAction', { count: summary.critical_count })
     }
 
     // For default mode, use moderate language
     if (warningThreshold >= 0.6) {
       if (summary.critical_count > 0) {
-        const itemText = summary.critical_count === 1 ? 'item needs' : 'items need'
-        return `${summary.critical_count} ${itemText} immediate action`
+        return t('messages.itemNeedsAction', { count: summary.critical_count })
       }
       if (summary.high_count > 0) {
-        const itemText = summary.high_count === 1 ? 'item may need' : 'items may need'
-        return `${summary.high_count} ${itemText} attention soon`
+        return t('messages.itemMayNeedAction', { count: summary.high_count })
       }
-      const itemText = totalAlerts === 1 ? 'item flagged' : 'items flagged'
-      return `${totalAlerts} ${itemText} for review`
+      return t('messages.itemsFlagged', { count: totalAlerts })
     }
 
     // For early warnings mode (low threshold), use gentle language
-    const itemText = totalAlerts === 1 ? 'item flagged' : 'items flagged'
-    return `${totalAlerts} ${itemText} for monitoring`
+    return t('messages.itemsMonitoring', { count: totalAlerts })
   }
 
   const message = getMessage()
@@ -113,7 +111,7 @@ export function UrgentAlerts() {
 
       <Link href="/dashboard/inventory/batches?filter=expiring">
         <Button variant="subtleSecondary" className="gap-2">
-          View items
+          {t('buttons.viewItems')}
           <ArrowRight className="h-4 w-4" />
         </Button>
       </Link>

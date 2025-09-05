@@ -8,6 +8,7 @@ import {
   Package,
   TrendingUp,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -29,9 +30,13 @@ export function BatchListSortControls({
   updateSort,
   isLoading,
 }: BatchListSortControlsProps) {
+  const t = useTranslations('batchSort')
+
   return (
     <div className="flex items-center gap-2">
-      <span className="hidden md:block text-sm font-medium text-muted-foreground">Sort by:</span>
+      <span className="hidden md:block text-sm font-medium text-muted-foreground">
+        {t('sortBy')}:
+      </span>
 
       <Select
         value={currentSort.field}
@@ -45,49 +50,49 @@ export function BatchListSortControls({
           <SelectItem value="created_at">
             <span className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Created Date
+              {t('createdDate')}
             </span>
           </SelectItem>
           <SelectItem value="expiry_date">
             <span className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
-              Expiry Date
+              {t('expiryDate')}
             </span>
           </SelectItem>
           <SelectItem value="batch_number">
             <span className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Batch Number
+              {t('batchNumber')}
             </span>
           </SelectItem>
           <SelectItem value="supplier">
             <span className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Supplier
+              {t('supplier')}
             </span>
           </SelectItem>
           <SelectItem value="current_quantity">
             <span className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              Stock Level
+              {t('stockLevel')}
             </span>
           </SelectItem>
           <SelectItem value="cost_price">
             <span className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Cost Price
+              {t('costPrice')}
             </span>
           </SelectItem>
           <SelectItem value="selling_price">
             <span className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Selling Price
+              {t('sellingPrice')}
             </span>
           </SelectItem>
           <SelectItem value="status">
             <span className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Status
+              {t('status')}
             </span>
           </SelectItem>
         </SelectContent>
@@ -105,7 +110,7 @@ export function BatchListSortControls({
         ) : (
           <ArrowDown className="h-4 w-4 opacity-50" />
         )}
-        {currentSort.direction === 'asc' ? 'ASC' : 'DESC'}
+        {currentSort.direction === 'asc' ? t('asc') : t('desc')}
       </Button>
     </div>
   )

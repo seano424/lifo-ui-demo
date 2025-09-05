@@ -15,6 +15,20 @@ import { immer } from 'zustand/middleware/immer'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import type { ProductLookupResult } from '@/lib/queries/open-food-facts'
 
+// Translation function type - will be set by components using the store
+type TranslationFunction = (key: string) => string
+let translateFunction: TranslationFunction | null = null
+
+// Function to set the translation function from components
+export const setScanningWorkflowTranslations = (t: TranslationFunction) => {
+  translateFunction = t
+}
+
+// Helper to get translated text with fallback
+const t = (key: string, fallback: string): string => {
+  return translateFunction ? translateFunction(key) : fallback
+}
+
 export type ScanningStep =
   | 'barcode' // Scanning barcode or manual entry
   | 'product' // Showing product details, confirming/editing
@@ -439,15 +453,17 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
           const state = get()
           switch (state.currentStep) {
             case 'product':
-              return 'Scan Barcode'
+              return t('scanningWorkflow.steps.scanBarcode', 'Scan Barcode')
             case 'ocr':
-              return state.scannedProduct ? 'Change Product' : 'Scan Barcode'
+              return state.scannedProduct
+                ? t('scanningWorkflow.steps.changeProduct', 'Change Product')
+                : t('scanningWorkflow.steps.scanBarcode', 'Scan Barcode')
             case 'confirmation':
-              return 'Scan Expiry Date'
+              return t('scanningWorkflow.steps.scanExpiryDate', 'Scan Expiry Date')
             case 'complete':
-              return 'Review Details'
+              return t('scanningWorkflow.steps.reviewDetails', 'Review Details')
             case 'error':
-              return 'Previous Step'
+              return t('scanningWorkflow.steps.previousStep', 'Previous Step')
             default:
               return null
           }
