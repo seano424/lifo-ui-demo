@@ -1111,7 +1111,8 @@
         "loginLink": "Login",
         "checkEmailTitle": "Check Your Email",
         "checkEmailDescription": "Password reset instructions sent",
-        "emailInstructions": "If you registered using your email and password, you will receive a password reset email."
+        "emailInstructions": "If you registered using your email and password, you will receive a password reset email.",
+        "backToLogin": "Back to login"
       },
       "updatePassword": {
         "title": "Reset Your Password",

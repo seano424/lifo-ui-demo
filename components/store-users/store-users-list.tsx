@@ -70,7 +70,7 @@ import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '../ui/card'
 
-import { EnhancedAddEmployeeDialog } from './enhanced-add-employee-dialog'
+import { AddEmployeeDialog } from './add-employee-dialog'
 
 interface StoreUsersListProps {
   storeId?: string // Server-provided store ID
@@ -420,7 +420,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
       {/* Add Employee Dialog */}
       {effectiveStoreId && (
-        <EnhancedAddEmployeeDialog
+        <AddEmployeeDialog
           isOpen={isAddUserDialogOpen}
           onOpenChange={setIsAddUserDialogOpen}
           storeId={effectiveStoreId}

@@ -130,7 +130,7 @@
     "productCount": "{count} producten"
   },
   "productListSort": {
-    "name": "Naam", 
+    "name": "Naam",
     "category": "Categorie",
     "brand": "Merk",
     "stock": "Voorraad",
@@ -144,7 +144,7 @@
     "unnamedProduct": "Naamloos product",
     "notAvailable": "N.v.t.",
     "category": "Categorie",
-    "uncategorized": "Niet gecategoriseerd", 
+    "uncategorized": "Niet gecategoriseerd",
     "brand": "Merk",
     "totalStock": "Totale voorraad",
     "activeBatches": "Actieve batches",
@@ -154,7 +154,7 @@
     "viewDetails": "Details bekijken",
     "viewBatches": "Batches bekijken",
     "editProduct": "Product bewerken",
-    "updatePrice": "Prijs bijwerken", 
+    "updatePrice": "Prijs bijwerken",
     "enterNewPrice": "Voer nieuwe prijs in (€):",
     "deleteProduct": "Product verwijderen",
     "confirmDeleteProduct": "Weet u zeker dat u dit product wilt verwijderen?"
@@ -176,7 +176,7 @@
     "projects": "Projecten",
     "more": "Meer",
     "viewProject": "Project bekijken",
-    "shareProject": "Project delen", 
+    "shareProject": "Project delen",
     "deleteProject": "Project verwijderen",
     "kpiCard": {
       "failedToLoad": "Gegevens laden mislukt",
@@ -287,7 +287,7 @@
       "currentPreference": "Kies uw waarschuwingsvoorkeur",
       "levels": {
         "conservative": "Conservatief",
-        "balanced": "Gebalanceerd", 
+        "balanced": "Gebalanceerd",
         "proactive": "Proactief",
         "conservativeTitle": "Conservatief - Alleen kritisch",
         "balancedTitle": "Gebalanceerd - Actie nodig (Aanbevolen)",
@@ -300,7 +300,7 @@
       },
       "expectedCounts": {
         "conservative": "Minder waarschuwingen, hogere urgentie",
-        "balanced": "Gematigde waarschuwingen, goede balans", 
+        "balanced": "Gematigde waarschuwingen, goede balans",
         "proactive": "Meer waarschuwingen, vroege preventie"
       },
       "selectDescriptions": {
@@ -339,7 +339,7 @@
     "metrics": {
       "urgentItems": "Urgente Items",
       "urgentItemsDesc": "Hoge urgentie batches",
-      "actionsTaken": "Acties Ondernomen", 
+      "actionsTaken": "Acties Ondernomen",
       "actionsTakenDesc": "Totaal acties deze periode",
       "discountValue": "Kortingswaarde",
       "discountValueDesc": "Totaal toegepaste kortingen",
@@ -354,7 +354,7 @@
       "recentActivity": "Recente Activiteit",
       "actionsTaken": "Acties Ondernomen",
       "actionsTakenPeriod": "{totalActions} deze periode",
-      "discountsApplied": "Kortingen Toegepast", 
+      "discountsApplied": "Kortingen Toegepast",
       "saved": "€{discountValue} bespaard",
       "averageScore": "Gemiddelde Score: {avgScore}% • €{discountValue} kortingen toegepast",
       "discountsAppliedText": "kortingen toegepast",
@@ -923,7 +923,8 @@
         "loginLink": "Inloggen",
         "checkEmailTitle": "Controleer je e-mail",
         "checkEmailDescription": "Wachtwoord reset instructies verzonden",
-        "emailInstructions": "Als je geregistreerd bent met je e-mail en wachtwoord, ontvang je een wachtwoord reset e-mail."
+        "emailInstructions": "Als je geregistreerd bent met je e-mail en wachtwoord, ontvang je een wachtwoord reset e-mail.",
+        "backToLogin": "Terug naar inloggen"
       },
       "updatePassword": {
         "title": "Reset je wachtwoord",
@@ -1370,7 +1371,7 @@
     "urgentAlerts": {
       "levels": {
         "urgentOnly": "Alleen urgente items",
-        "priority": "Prioriteitsitems", 
+        "priority": "Prioriteitsitems",
         "allFlagged": "Alle gemarkeerde items",
         "completeReview": "Volledige beoordeling"
       },
@@ -1382,7 +1383,7 @@
       "messages": {
         "nothingToShow": "Geen items hebben nu aandacht nodig - je bent helemaal bij!",
         "itemNeedsAction": "{count, plural, one {item heeft} other {items hebben}} onmiddellijke actie nodig",
-        "itemMayNeedAction": "{count, plural, one {item heeft mogelijk} other {items hebben mogelijk}} binnenkort aandacht nodig", 
+        "itemMayNeedAction": "{count, plural, one {item heeft mogelijk} other {items hebben mogelijk}} binnenkort aandacht nodig",
         "itemsFlagged": "{count, plural, one {item gemarkeerd} other {items gemarkeerd}} voor beoordeling",
         "itemsMonitoring": "{count, plural, one {item gemarkeerd} other {items gemarkeerd}} voor monitoring"
       },
@@ -1394,7 +1395,7 @@
     "alertQuickToggle": {
       "levels": {
         "urgent": "Urgent",
-        "default": "Standaard", 
+        "default": "Standaard",
         "early": "Vroeg"
       },
       "tooltips": {
@@ -1413,14 +1414,14 @@
       "noActions": "Geen onmiddellijke acties vereist! Alle batches vallen binnen veilige score-drempels.",
       "urgencyLevels": {
         "critical": "Kritiek",
-        "high": "Hoog", 
+        "high": "Hoog",
         "medium": "Gemiddeld",
         "low": "Laag"
       },
       "summaryLabels": {
         "critical": "Kritiek",
         "high": "Hoog",
-        "medium": "Gemiddeld", 
+        "medium": "Gemiddeld",
         "low": "Laag"
       },
       "batchDetails": {
@@ -1534,7 +1535,7 @@
   "scanningWorkflow": {
     "steps": {
       "scanBarcode": "Barcode scannen",
-      "changeProduct": "Product wijzigen", 
+      "changeProduct": "Product wijzigen",
       "scanExpiryDate": "Vervaldatum scannen",
       "reviewDetails": "Details controleren",
       "previousStep": "Vorige stap"
@@ -1661,7 +1662,7 @@
   "timeSelector": {
     "periods": {
       "thisWeek": "Deze week",
-      "lastWeek": "Vorige week", 
+      "lastWeek": "Vorige week",
       "thisMonth": "Deze maand",
       "lastMonth": "Vorige maand",
       "last7Days": "Laatste 7 dagen",
@@ -1671,7 +1672,7 @@
     "compareLabels": {
       "lastWeek": "Vorige week",
       "previousWeek": "Voorgaande week",
-      "lastMonth": "Vorige maand", 
+      "lastMonth": "Vorige maand",
       "previousMonth": "Voorgaande maand",
       "previous7Days": "Voorgaande 7 dagen",
       "previous30Days": "Voorgaande 30 dagen",
@@ -1850,11 +1851,11 @@
     "storeType": {
       "addStoreDetailsTitle": "Winkeldetails toevoegen",
       "completeStoreInformationTitle": "Winkelinformatie voltooien",
-      "storeInformationCardTitle": "Winkelinformatie", 
+      "storeInformationCardTitle": "Winkelinformatie",
       "storeNameLabel": "Winkelnaam",
       "storeTypeLabel": "Winkeltype",
       "businessNameLabel": "Bedrijfsnaam",
-      "addressLabel": "Adres", 
+      "addressLabel": "Adres",
       "cityLabel": "Stad",
       "postalCodeLabel": "Postcode",
       "countryLabel": "Land",
@@ -1864,7 +1865,7 @@
       "selectStoreType": "Selecteer winkeltype",
       "businessNamePlaceholder": "Indien anders dan winkelnaam",
       "addressPlaceholder": "123 Hoofdstraat",
-      "cityPlaceholder": "Amsterdam", 
+      "cityPlaceholder": "Amsterdam",
       "postalCodePlaceholder": "1012 AB",
       "countryPlaceholder": "Nederland",
       "phonePlaceholder": "020 123 4567"

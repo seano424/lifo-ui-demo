@@ -42,7 +42,7 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 import { Typography } from '../ui/typography'
 
-interface EnhancedAddEmployeeDialogProps {
+interface AddEmployeeDialogProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   storeId: string
@@ -90,12 +90,12 @@ const LANGUAGE_OPTIONS = {
   nl: 'Nederlands',
 } as const
 
-export function EnhancedAddEmployeeDialog({
+export function AddEmployeeDialog({
   isOpen,
   onOpenChange,
   storeId,
   onEmployeeCreated,
-}: EnhancedAddEmployeeDialogProps) {
+}: AddEmployeeDialogProps) {
   const t = useTranslations('addEmployee')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
