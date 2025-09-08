@@ -1,3 +1,5 @@
+// hooks/use-scoring-analytics.ts
+
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
@@ -115,7 +117,7 @@ export function useScoringAlerts(
   storeId: string | null,
   thresholdOverride?: number,
   urgencyLevel?: string,
-  category?: string,
+  category?: string
 ) {
   // Use store-specific threshold if no override provided
   const { warningThreshold } = useScoringThresholds(storeId || undefined)
@@ -124,7 +126,15 @@ export function useScoringAlerts(
   // Only include threshold in query key if it's an override
   const queryKey =
     thresholdOverride !== undefined
-      ? ['alerts', 'store', storeId!, 'threshold', threshold, urgencyLevel, category]
+      ? [
+          'alerts',
+          'store',
+          storeId!,
+          'threshold',
+          threshold,
+          urgencyLevel,
+          category,
+        ]
       : ['alerts', 'store', storeId!, 'default', urgencyLevel, category]
 
   return useQuery({
@@ -173,7 +183,7 @@ export function useScoringAlerts(
           duration,
           isTimeout ? 'timeout' : 'error',
           undefined,
-          error instanceof Error ? error.message : 'Unknown error',
+          error instanceof Error ? error.message : 'Unknown error'
         )
 
         throw error
@@ -190,7 +200,10 @@ export function useScoringAlerts(
       }
 
       // Only retry once for non-timeout errors
-      return failureCount < 1 && !(error instanceof Error && error.message.includes('timeout'))
+      return (
+        failureCount < 1 &&
+        !(error instanceof Error && error.message.includes('timeout'))
+      )
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
@@ -210,7 +223,7 @@ export function useStoreAnalytics(
   storeId: string | null,
   timeframe: string = '7d',
   metric?: string,
-  thresholdOverride?: number,
+  thresholdOverride?: number
 ) {
   // Use store-specific threshold if no override provided
   const { warningThreshold } = useScoringThresholds(storeId || undefined)
@@ -219,7 +232,15 @@ export function useStoreAnalytics(
   // Only include threshold in query key if it's an override
   const queryKey =
     thresholdOverride !== undefined
-      ? ['analytics', 'store', storeId!, timeframe, 'threshold', threshold, metric]
+      ? [
+          'analytics',
+          'store',
+          storeId!,
+          timeframe,
+          'threshold',
+          threshold,
+          metric,
+        ]
       : ['analytics', 'store', storeId!, timeframe, 'default', metric]
 
   return useQuery({
@@ -268,7 +289,7 @@ export function useStoreAnalytics(
           duration,
           isTimeout ? 'timeout' : 'error',
           undefined,
-          error instanceof Error ? error.message : 'Unknown error',
+          error instanceof Error ? error.message : 'Unknown error'
         )
 
         throw error
@@ -285,7 +306,10 @@ export function useStoreAnalytics(
       }
 
       // Only retry once for non-timeout errors
-      return failureCount < 1 && !(error instanceof Error && error.message.includes('timeout'))
+      return (
+        failureCount < 1 &&
+        !(error instanceof Error && error.message.includes('timeout'))
+      )
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
@@ -297,7 +321,10 @@ export function useStoreAnalytics(
 /**
  * Alias for scoring alerts (for backward compatibility)
  */
-export function useScoringRecommendations(storeId: string | null, category?: string) {
+export function useScoringRecommendations(
+  storeId: string | null,
+  category?: string
+) {
   return useScoringAlerts(storeId, 0.5, undefined, category)
 }
 
@@ -320,7 +347,7 @@ export function useMobileSummary(storeId: string | null) {
 // Direct fetch functions (for compatibility with existing code)
 export async function fetchScoringAlerts(
   storeId: string,
-  threshold: number = 0.6,
+  threshold: number = 0.6
 ): Promise<ScoringAlert[]> {
   const params = new URLSearchParams({
     storeId,
@@ -357,7 +384,7 @@ export async function fetchScoringAlerts(
       duration,
       isTimeout ? 'timeout' : 'error',
       undefined,
-      error instanceof Error ? error.message : 'Unknown error',
+      error instanceof Error ? error.message : 'Unknown error'
     )
 
     throw error
@@ -367,7 +394,7 @@ export async function fetchScoringAlerts(
 export async function fetchStoreAnalytics(
   storeId: string,
   timeframe: string = '7d',
-  thresholdOverride?: number,
+  thresholdOverride?: number
 ): Promise<AnalyticsResponse> {
   const params = new URLSearchParams({
     storeId,
@@ -408,7 +435,7 @@ export async function fetchStoreAnalytics(
       duration,
       isTimeout ? 'timeout' : 'error',
       undefined,
-      error instanceof Error ? error.message : 'Unknown error',
+      error instanceof Error ? error.message : 'Unknown error'
     )
 
     throw error

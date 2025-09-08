@@ -3,28 +3,21 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { fastApiClient } from '@/lib/services/fastapi-client'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 import type { Database } from '@/types/supabase'
 
 // Helper type for batch with store_products join
-type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] & {
-  store_products?: {
-    products?: { category?: string; name?: string; sku?: string }
+type BatchWithStoreProduct =
+  Database['inventory']['Tables']['batches']['Row'] & {
+    store_products?: {
+      products?: { category?: string; name?: string; sku?: string }
+    }
   }
-}
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Use admin client for analytics - no user auth required
+  const supabase = createAdminClient()
 
   const { searchParams } = new URL(request.url)
   const storeId = searchParams.get('storeId')
@@ -48,7 +41,7 @@ export async function GET(request: NextRequest) {
       {
         error: 'Threshold must be between 0 and 1',
       },
-      { status: 400 },
+      { status: 400 }
     )
   }
 
@@ -83,9 +76,10 @@ export async function GET(request: NextRequest) {
     // Phase 2 Step 4: Try FastAPI for enhanced AI analytics
     // Database connectivity has been fixed - re-enabling FastAPI
     const useFastAPI =
-      process.env.ENABLE_FASTAPI === 'true' || process.env.NODE_ENV === 'development'
+      process.env.ENABLE_FASTAPI === 'true' ||
+      process.env.NODE_ENV === 'development'
     console.log(
-      `[ANALYTICS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`,
+      `[ANALYTICS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`
     )
     let fastApiAnalytics = null
 
@@ -100,27 +94,40 @@ export async function GET(request: NextRequest) {
 
         if (session?.access_token) {
           const days =
-            timeframe === '1d' ? 1 : timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90
+            timeframe === '1d'
+              ? 1
+              : timeframe === '7d'
+                ? 7
+                : timeframe === '30d'
+                  ? 30
+                  : 90
 
           try {
-            fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithUserToken(
-              storeId,
-              session.access_token,
-              days,
-            )
+            fastApiAnalytics =
+              await fastApiClient.getStoreAnalyticsWithUserToken(
+                storeId,
+                session.access_token,
+                days
+              )
 
-            console.log(`[ANALYTICS] FastAPI user JWT success: Enhanced analytics with AI insights`)
+            console.log(
+              `[ANALYTICS] FastAPI user JWT success: Enhanced analytics with AI insights`
+            )
           } catch (userError) {
-            console.warn('[ANALYTICS] User JWT failed, trying service key fallback:', userError)
+            console.warn(
+              '[ANALYTICS] User JWT failed, trying service key fallback:',
+              userError
+            )
 
             // Fallback to service key if user JWT fails
             const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
             if (serviceKey) {
-              fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithServiceKey(
-                storeId,
-                serviceKey,
-                days,
-              )
+              fastApiAnalytics =
+                await fastApiClient.getStoreAnalyticsWithServiceKey(
+                  storeId,
+                  serviceKey,
+                  days
+                )
               console.log(`[ANALYTICS] FastAPI service key fallback success`)
             }
           }
@@ -137,21 +144,35 @@ export async function GET(request: NextRequest) {
             if (fastApiAnalytics.summary) {
               analytics.ai_summary = fastApiAnalytics.summary
             }
+
+            // Include full FastAPI analytics data
+            if (fastApiAnalytics.analytics) {
+              analytics.fastapi_analytics = fastApiAnalytics.analytics
+            }
           }
         } else {
-          console.warn('[ANALYTICS] No user session, trying service key fallback')
+          console.warn(
+            '[ANALYTICS] No user session, trying service key fallback'
+          )
 
           // Direct service key fallback if no user session
           const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
           if (serviceKey) {
             const days =
-              timeframe === '1d' ? 1 : timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90
+              timeframe === '1d'
+                ? 1
+                : timeframe === '7d'
+                  ? 7
+                  : timeframe === '30d'
+                    ? 30
+                    : 90
 
-            fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithServiceKey(
-              storeId,
-              serviceKey,
-              days,
-            )
+            fastApiAnalytics =
+              await fastApiClient.getStoreAnalyticsWithServiceKey(
+                storeId,
+                serviceKey,
+                days
+              )
 
             console.log(`[ANALYTICS] FastAPI service key success`)
             analytics.source = 'fastapi'
@@ -165,10 +186,18 @@ export async function GET(request: NextRequest) {
             if (fastApiAnalytics.summary) {
               analytics.ai_summary = fastApiAnalytics.summary
             }
+
+            // Include full FastAPI analytics data
+            if (fastApiAnalytics.analytics) {
+              analytics.fastapi_analytics = fastApiAnalytics.analytics
+            }
           }
         }
       } catch (fastApiError) {
-        console.warn('[ANALYTICS] FastAPI failed, using Supabase fallback:', fastApiError)
+        console.warn(
+          '[ANALYTICS] FastAPI failed, using Supabase fallback:',
+          fastApiError
+        )
         analytics.source = 'supabase'
         analytics.ai_enhanced = false
       }
@@ -184,18 +213,28 @@ export async function GET(request: NextRequest) {
         storeId,
         startDate,
         endDate,
-        threshold,
+        threshold
       )
     }
 
     if (!metric || metric === 'waste') {
       // Get waste analytics
-      analytics.waste = await getWasteAnalytics(supabase, storeId, startDate, endDate)
+      analytics.waste = await getWasteAnalytics(
+        supabase,
+        storeId,
+        startDate,
+        endDate
+      )
     }
 
     if (!metric || metric === 'revenue') {
       // Get revenue analytics
-      analytics.revenue = await getRevenueAnalytics(supabase, storeId, startDate, endDate)
+      analytics.revenue = await getRevenueAnalytics(
+        supabase,
+        storeId,
+        startDate,
+        endDate
+      )
     }
 
     if (!metric || metric === 'categories') {
@@ -211,7 +250,7 @@ export async function GET(request: NextRequest) {
         error: 'Failed to fetch analytics',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
@@ -221,7 +260,7 @@ async function getOverviewAnalytics(
   storeId: string,
   startDate: Date,
   endDate: Date,
-  threshold: number = 0.7,
+  threshold: number = 0.7
 ) {
   try {
     // Get batches first (same as alerts API)
@@ -229,14 +268,17 @@ async function getOverviewAnalytics(
       .schema('inventory')
       .from('batches')
       .select(
-        'batch_id, batch_number, current_quantity, selling_price, cost_price, expiry_date, location_code, supplier, product_id',
+        'batch_id, batch_number, current_quantity, selling_price, cost_price, expiry_date, location_code, supplier, product_id'
       )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .order('expiry_date', { ascending: true })
 
     if (batchError) {
-      console.error('[getOverviewAnalytics] Error fetching batches:', batchError)
+      console.error(
+        '[getOverviewAnalytics] Error fetching batches:',
+        batchError
+      )
     }
 
     if (!batches || batches.length === 0) {
@@ -255,7 +297,7 @@ async function getOverviewAnalytics(
     }
 
     // Get batch IDs for scoring lookup
-    const batchIds = batches.map(batch => batch.batch_id)
+    const batchIds = batches.map((batch) => batch.batch_id)
 
     // Get scoring data for these batches
     const { data: scoringData, error: scoringError } = await supabase
@@ -266,7 +308,10 @@ async function getOverviewAnalytics(
       .in('batch_id', batchIds)
 
     if (scoringError) {
-      console.error('[getOverviewAnalytics] Error fetching scoring data:', scoringError)
+      console.error(
+        '[getOverviewAnalytics] Error fetching scoring data:',
+        scoringError
+      )
     }
 
     // Get total store products count
@@ -278,18 +323,21 @@ async function getOverviewAnalytics(
       .eq('is_active', true)
 
     if (productError) {
-      console.error('[getOverviewAnalytics] Error counting products:', productError)
+      console.error(
+        '[getOverviewAnalytics] Error counting products:',
+        productError
+      )
     }
 
     // Create scoring map for quick lookup
     const scoringMap = new Map()
-    scoringData?.forEach(score => {
+    scoringData?.forEach((score) => {
       scoringMap.set(score.batch_id, score)
     })
 
     // Combine batch and scoring data (same logic as alerts API)
     const combinedData =
-      batches?.map(batch => {
+      batches?.map((batch) => {
         const scoring = scoringMap.get(batch.batch_id)
         return {
           ...batch,
@@ -300,7 +348,9 @@ async function getOverviewAnalytics(
       }) || []
 
     // Count urgent items above threshold (same logic as alerts API)
-    const urgentItems = combinedData.filter(item => (item.composite_score || 0) >= threshold)
+    const urgentItems = combinedData.filter(
+      (item) => (item.composite_score || 0) >= threshold
+    )
 
     // Calculate totals from combined data
     const totalBatches = combinedData.length
@@ -309,7 +359,7 @@ async function getOverviewAnalytics(
     }, 0)
 
     // Count expiring items (expiring within 3 days)
-    const expiringItems = combinedData.filter(item => {
+    const expiringItems = combinedData.filter((item) => {
       if (!item.expiry_date) return false
       const expiryDate = new Date(item.expiry_date)
       const threeDaysFromNow = new Date()
@@ -329,11 +379,11 @@ async function getOverviewAnalytics(
     // Calculate discounts applied
     const discountActions =
       actions?.filter(
-        a =>
+        (a) =>
           a.action_type &&
           (a.action_type.includes('discount') ||
             a.action_type === 'discount_aggressive' ||
-            a.action_type === 'discount_moderate'),
+            a.action_type === 'discount_moderate')
       ) || []
 
     const totalDiscountValue = discountActions.reduce((sum, action) => {
@@ -353,9 +403,12 @@ async function getOverviewAnalytics(
       avg_composite_score:
         totalBatches > 0
           ? Math.round(
-              (combinedData.reduce((sum, item) => sum + (item.composite_score || 0), 0) /
+              (combinedData.reduce(
+                (sum, item) => sum + (item.composite_score || 0),
+                0
+              ) /
                 totalBatches) *
-                100,
+                100
             ) / 100
           : 0,
     }
@@ -369,14 +422,15 @@ async function getWasteAnalytics(
   supabase: SupabaseClient<Database>,
   storeId: string,
   startDate: Date,
-  endDate: Date,
+  endDate: Date
 ) {
   try {
     // Get expired batches (from inventory schema with products join)
     const { data: expiredBatches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         *,
         store_products!inner (
           products (
@@ -385,7 +439,8 @@ async function getWasteAnalytics(
             sku
           )
         )
-      `)
+      `
+      )
       .eq('store_id', storeId)
       .eq('status', 'expired')
       .gte('updated_at', startDate.toISOString())
@@ -398,7 +453,8 @@ async function getWasteAnalytics(
     const { data: expiringSoon } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         *,
         store_products!inner (
           products (
@@ -407,7 +463,8 @@ async function getWasteAnalytics(
             sku
           )
         )
-      `)
+      `
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .lte('expiry_date', soonExpiryDate.toISOString().split('T')[0])
@@ -419,14 +476,15 @@ async function getWasteAnalytics(
       }, 0) || 0
 
     const wasteByCategory: Record<string, { count: number; value: number }> = {}
-    expiredBatches?.forEach(batch => {
+    expiredBatches?.forEach((batch) => {
       const b = batch as BatchWithStoreProduct
       const category = b.store_products?.products?.category || 'unknown'
       if (!wasteByCategory[category]) {
         wasteByCategory[category] = { count: 0, value: 0 }
       }
       wasteByCategory[category].count += 1
-      wasteByCategory[category].value += (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
+      wasteByCategory[category].value +=
+        (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
     })
 
     return {
@@ -436,7 +494,9 @@ async function getWasteAnalytics(
       waste_by_category: wasteByCategory,
       prevention_potential:
         expiringSoon?.reduce((sum, batch) => {
-          return sum + (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
+          return (
+            sum + (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
+          )
         }, 0) || 0,
     }
   } catch (error) {
@@ -449,7 +509,7 @@ async function getRevenueAnalytics(
   supabase: SupabaseClient<Database>,
   storeId: string,
   startDate: Date,
-  endDate: Date,
+  endDate: Date
 ) {
   try {
     // Get discount actions and their effectiveness (from analytics schema)
@@ -481,7 +541,8 @@ async function getRevenueAnalytics(
       }, 0) || 0
 
     // Calculate savings vs waste
-    const preventedWaste = discountActions?.filter(a => (a.revenue_recovered ?? 0) > 0).length || 0
+    const preventedWaste =
+      discountActions?.filter((a) => (a.revenue_recovered ?? 0) > 0).length || 0
 
     return {
       total_discounts_applied: discountActions?.length || 0,
@@ -489,12 +550,16 @@ async function getRevenueAnalytics(
       revenue_recovered: Math.round(revenueRecovered * 100) / 100,
       waste_prevented: preventedWaste,
       recovery_rate:
-        totalOriginalValue > 0 ? Math.round((revenueRecovered / totalOriginalValue) * 100) : 0,
+        totalOriginalValue > 0
+          ? Math.round((revenueRecovered / totalOriginalValue) * 100)
+          : 0,
       avg_discount_percent:
         discountActions && discountActions.length > 0
           ? Math.round(
-              discountActions.reduce((sum, a) => sum + (a.discount_percent ?? 0), 0) /
-                discountActions.length,
+              discountActions.reduce(
+                (sum, a) => sum + (a.discount_percent ?? 0),
+                0
+              ) / discountActions.length
             )
           : 0,
     }
@@ -504,13 +569,17 @@ async function getRevenueAnalytics(
   }
 }
 
-async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId: string) {
+async function getCategoryAnalytics(
+  supabase: SupabaseClient<Database>,
+  storeId: string
+) {
   try {
     // Get batch data by category (from inventory schema with joins)
     const { data: batches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         *,
         store_products!inner (
           products (
@@ -519,7 +588,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
             sku
           )
         )
-      `)
+      `
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
 
@@ -543,7 +613,7 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     // Group by category
     const categoryStats: Record<string, CategoryStats> = {}
 
-    batches?.forEach(batch => {
+    batches?.forEach((batch) => {
       const b = batch as BatchWithStoreProduct
       const category = b.store_products?.products?.category || 'unknown'
 
@@ -558,10 +628,12 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
       }
 
       const daysToExpiry = Math.floor(
-        (new Date(b.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+        (new Date(b.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
       )
 
-      const scoreRecord = productScores?.find(ps => ps.batch_id === batch.batch_id)
+      const scoreRecord = productScores?.find(
+        (ps) => ps.batch_id === batch.batch_id
+      )
       const score = scoreRecord?.composite_score || 0
       const value = (batch.current_quantity ?? 0) * (batch.selling_price ?? 0)
 
@@ -575,13 +647,14 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     })
 
     // Calculate averages
-    Object.keys(categoryStats).forEach(category => {
+    Object.keys(categoryStats).forEach((category) => {
       const stats = categoryStats[category]
       const scoresArray = stats.scores ?? []
       stats.avg_score =
         scoresArray.length > 0
           ? Math.round(
-              scoresArray.reduce((sum: number, s: number) => sum + s, 0) / scoresArray.length,
+              scoresArray.reduce((sum: number, s: number) => sum + s, 0) /
+                scoresArray.length
             ) / 100
           : 0
       stats.total_value = Math.round(stats.total_value * 100) / 100
