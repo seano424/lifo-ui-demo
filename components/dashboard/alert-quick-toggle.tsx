@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -27,6 +28,7 @@ export function AlertQuickToggle({
   className,
   size = 'default',
 }: AlertQuickToggleProps) {
+  const t = useTranslations('storeInsights.alertQuickToggle')
   const activeStoreId = useActiveStoreId()
   const storeId = propStoreId || activeStoreId || ''
 
@@ -77,12 +79,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">Critical</span>
+              <span className="text-xs">{t('levels.critical')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Critical Items Only</p>
-            <p className="text-xs">Expired or expiring within 24 hours</p>
+            <p>{t('tooltips.critical')}</p>
+            <p className="text-xs">{t('tooltips.criticalDesc')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -95,12 +97,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">High</span>
+              <span className="text-xs">{t('levels.high')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Critical + High Priority</p>
-            <p className="text-xs">Items expiring within 2-3 days</p>
+            <p>{t('tooltips.high')}</p>
+            <p className="text-xs">{t('tooltips.highDesc')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -113,12 +115,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">Medium</span>
+              <span className="text-xs">{t('levels.medium')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Up to Medium Priority</p>
-            <p className="text-xs">Items expiring within a week</p>
+            <p>{t('tooltips.medium')}</p>
+            <p className="text-xs">{t('tooltips.mediumDesc')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -131,12 +133,12 @@ export function AlertQuickToggle({
               disabled={isUpdating}
               className="flex items-center gap-1 h-auto py-1 px-2"
             >
-              <span className="text-xs">All</span>
+              <span className="text-xs">{t('levels.all')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>All Priority Levels</p>
-            <p className="text-xs">Complete inventory review</p>
+            <p>{t('tooltips.all')}</p>
+            <p className="text-xs">{t('tooltips.allDesc')}</p>
           </TooltipContent>
         </Tooltip>
       </div>

@@ -360,6 +360,49 @@
       "discountsAppliedText": "remises appliquées",
       "showDetails": "Afficher les détails",
       "hideDetails": "Masquer les détails"
+    },
+    "urgentAlerts": {
+      "errors": {
+        "connectionError": "Erreur de connexion",
+        "unableToLoad": "Impossible de charger les alertes urgentes",
+        "loadingAlerts": "Chargement des alertes..."
+      },
+      "buttons": {
+        "viewInventory": "Voir l'inventaire",
+        "viewItems": "Voir les articles"
+      },
+      "levels": {
+        "urgentOnly": "Critique uniquement",
+        "priority": "Priorité élevée",
+        "allFlagged": "Priorité moyenne",
+        "completeReview": "Examen complet"
+      },
+      "messages": {
+        "nothingToShow": "Aucun article urgent pour le moment",
+        "criticalItemsAction": "{count} articles critiques nécessitent une action immédiate (expirés ou expirant dans les 24 heures)",
+        "highPriorityItems": "{count} articles prioritaires expirant dans 2-3 jours",
+        "criticalItems": "{count} articles critiques (expirés ou expirant dans les 24 heures)",
+        "mediumPriorityItems": "{count} articles de priorité moyenne (expirant dans une semaine)",
+        "lowPriorityItems": "{count} articles de faible priorité (expirant dans 2 semaines)"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "critical": "Critique",
+        "high": "Élevé",
+        "medium": "Moyen",
+        "all": "Tous"
+      },
+      "tooltips": {
+        "critical": "Articles critiques uniquement",
+        "criticalDesc": "Expirés ou expirant dans les 24 heures",
+        "high": "Critique + Priorité élevée",
+        "highDesc": "Articles expirant dans 2-3 jours",
+        "medium": "Jusqu'à priorité moyenne",
+        "mediumDesc": "Articles expirant dans une semaine",
+        "all": "Tous les niveaux de priorité",
+        "allDesc": "Examen complet de l'inventaire"
+      }
     }
   },
   "dashboard": {

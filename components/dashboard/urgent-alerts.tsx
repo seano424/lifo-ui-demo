@@ -23,7 +23,7 @@ function thresholdToLevelName(
 }
 
 export function UrgentAlerts() {
-  const t = useTranslations('store.urgentAlerts')
+  const t = useTranslations('storeInsights.urgentAlerts')
   const activeStoreId = useActiveStoreId()
   const { data, isLoading, error } = useStoreAnalytics(activeStoreId, '7d')
   const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
@@ -83,39 +83,39 @@ export function UrgentAlerts() {
 
     // Always include critical if present
     if (criticalCount > 0) {
-      messageParts.push(`${criticalCount} critical items (expired or expiring within 24 hours)`)
+      messageParts.push(t('messages.criticalItems', { count: criticalCount }))
     }
 
     // Include high priority based on threshold
     if (highCount > 0 && warningThreshold <= 0.6) {
-      messageParts.push(`${highCount} high priority items (expiring within 2-3 days)`)
+      messageParts.push(t('messages.highPriorityItems', { count: highCount }))
     }
 
     // Include medium priority only if threshold allows
     if (mediumCount > 0 && warningThreshold <= 0.4) {
-      messageParts.push(`${mediumCount} medium priority items (expiring within a week)`)
+      messageParts.push(t('messages.mediumPriorityItems', { count: mediumCount }))
     }
 
     // Include low priority only if threshold allows
     if (lowCount > 0 && warningThreshold <= 0.2) {
-      messageParts.push(`${lowCount} low priority items (expiring within 2 weeks)`)
+      messageParts.push(t('messages.lowPriorityItems', { count: lowCount }))
     }
 
     // Critical only mode (threshold 0.8)
     if (warningThreshold >= 0.8) {
       if (criticalCount > 0) {
-        return `${criticalCount} critical items need immediate action (expired or expiring within 24 hours)`
+        return t('messages.criticalItemsAction', { count: criticalCount })
       }
       if (highCount > 0) {
-        return `${highCount} high priority items expiring within 2-3 days`
+        return t('messages.highPriorityItems', { count: highCount })
       }
-      return 'No critical items at this time'
+      return t('messages.nothingToShow')
     }
 
     // High priority mode (threshold 0.6)
     if (warningThreshold >= 0.6) {
       if (messageParts.length === 0) {
-        return 'No urgent items at this level'
+        return t('messages.nothingToShow')
       }
       if (messageParts.length === 1) {
         return messageParts[0]
@@ -126,7 +126,7 @@ export function UrgentAlerts() {
     // Medium priority mode (threshold 0.4)
     if (warningThreshold >= 0.4) {
       if (messageParts.length === 0) {
-        return 'No items requiring attention at this level'
+        return t('messages.nothingToShow')
       }
       if (messageParts.length === 1) {
         return messageParts[0]
@@ -136,7 +136,7 @@ export function UrgentAlerts() {
 
     // All priority levels (threshold 0.2)
     if (messageParts.length === 0) {
-      return 'All items are in good condition'
+      return t('messages.nothingToShow')
     }
     if (messageParts.length === 1) {
       return messageParts[0]
