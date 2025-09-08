@@ -77,10 +77,7 @@ interface StoreUsersListProps {
   serverPermissions?: UserStorePermissions // Server-computed permissions
 }
 
-export function StoreUsersList({
-  storeId: propStoreId,
-  serverPermissions,
-}: StoreUsersListProps) {
+export function StoreUsersList({ storeId: propStoreId, serverPermissions }: StoreUsersListProps) {
   const t = useTranslations('users')
 
   // 🚀 CRITICAL FIX: Use prop storeId if available, fallback to context
@@ -88,38 +85,26 @@ export function StoreUsersList({
   const effectiveStoreId = propStoreId || contextStoreId
 
   // 🚀 CRITICAL: The hook handles store ID internally via context
-  const {
-    data,
-    isLoading,
-    error,
-    hasMore,
-    fetchNextPage,
-    isFetchingNextPage,
-    count,
-  } = useStoreUsers()
+  const { data, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage, count } =
+    useStoreUsers()
 
   const [selectedUser, setSelectedUser] = useState<StoreUser | null>(null)
   const [showRemoveDialog, setShowRemoveDialog] = useState(false)
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
-  const [isEditUserRoleDialogOpen, setIsEditUserRoleDialogOpen] =
-    useState(false)
+  const [isEditUserRoleDialogOpen, setIsEditUserRoleDialogOpen] = useState(false)
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false)
   const [isUnlockDialogOpen, setIsUnlockDialogOpen] = useState(false)
-  const [formRole, setFormRole] =
-    useState<StoreUser['role_in_store']>('employee')
+  const [formRole, setFormRole] = useState<StoreUser['role_in_store']>('employee')
 
-  const { changeUserRole, toggleUserActiveStatus, removeUser, refetch } =
-    useStoreUserActions()
+  const { changeUserRole, toggleUserActiveStatus, removeUser, refetch } = useStoreUserActions()
 
   // 🚀 Use server permissions if available, fallback to client permissions
   const clientPermissions = usePermissions()
   const { isOwner, isManager } = useUserRole()
   const { activeStore } = useStoreState()
 
-  const canManageUsers =
-    serverPermissions?.canManageTeam ?? clientPermissions.canManageUsers
-  const isMoreThanOneOwner =
-    data.filter((user) => user.role_in_store === 'owner').length > 1
+  const canManageUsers = serverPermissions?.canManageTeam ?? clientPermissions.canManageUsers
+  const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
 
   // Helper function to safely get translated role
   const getRoleTranslation = (role: string) => {
@@ -156,13 +141,8 @@ export function StoreUsersList({
   if (error) {
     return (
       <div className="text-center py-12 border border-red-100 rounded-2xl p-4">
-        <div className="text-red-600 mb-4">
-          Error loading store users: {error.message}
-        </div>
-        <Button
-          variant="outline"
-          onClick={() => window.location.reload()}
-        >
+        <div className="text-red-600 mb-4">Error loading store users: {error.message}</div>
+        <Button variant="outline" onClick={() => window.location.reload()}>
           Retry
         </Button>
       </div>
@@ -193,10 +173,7 @@ export function StoreUsersList({
       <Card className="shadow-primary-300 border-t-0">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <Typography
-              variant="h3"
-              className="font-black"
-            >
+            <Typography variant="h3" className="font-black">
               {t('title')}
             </Typography>
 
@@ -214,30 +191,17 @@ export function StoreUsersList({
         </CardHeader>
 
         <CardContent>
-          <Typography
-            variant="p"
-            color="muted"
-          >
-            {count > 0
-              ? t('showing', { current: data.length, total: count })
-              : t('noUsersFound')}
+          <Typography variant="p" color="muted">
+            {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
           </Typography>
 
           {/* Role-based permissions info - only show for owners and managers */}
           {(isOwner || isManager) && canManageUsers && (
             <div className="mb-6 mt-4 p-4 bg-secondary-50 border border-secondary-200 rounded-lg flex flex-col">
-              <Typography
-                variant="small"
-                className="font-medium text-blue-800 mb-2"
-              >
-                {isOwner
-                  ? t('permissions.ownerInfo.title')
-                  : t('permissions.managerInfo.title')}
+              <Typography variant="small" className="font-medium text-blue-800 mb-2">
+                {isOwner ? t('permissions.ownerInfo.title') : t('permissions.managerInfo.title')}
               </Typography>
-              <Typography
-                variant="small"
-                className="text-blue-700"
-              >
+              <Typography variant="small" className="text-blue-700">
                 {isOwner
                   ? t('permissions.ownerInfo.description')
                   : t('permissions.managerInfo.description')}
@@ -258,27 +222,18 @@ export function StoreUsersList({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((storeUser) => {
+              {data.map(storeUser => {
                 return (
-                  <TableRow
-                    key={storeUser.user_id}
-                    className="hover:bg-opacity-0"
-                  >
+                  <TableRow key={storeUser.user_id} className="hover:bg-opacity-0">
                     <TableCell className="font-medium">
                       <div>
                         <div>{storeUser.full_name}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {storeUser.username}
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {storeUser.email}
-                    </TableCell>
+                    <TableCell className="font-mono text-sm">{storeUser.username}</TableCell>
+                    <TableCell className="font-mono text-sm">{storeUser.email}</TableCell>
                     <TableCell>
-                      <span className="text-sm">
-                        {getRoleTranslation(storeUser.role_in_store)}
-                      </span>
+                      <span className="text-sm">{getRoleTranslation(storeUser.role_in_store)}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
@@ -312,61 +267,53 @@ export function StoreUsersList({
                         !(storeUser.role_in_store === 'manager' && !isOwner) ? (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                className="h-8 w-8 p-0"
-                              >
+                              <Button variant="ghost" className="h-8 w-8 p-0">
                                 <span className="sr-only">Open menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>
-                                {t('dropdown.userActions')}
-                              </DropdownMenuLabel>
+                              <DropdownMenuLabel>{t('dropdown.userActions')}</DropdownMenuLabel>
 
                               {/* Role Changes */}
-                              {isOwner &&
-                                storeUser.role_in_store !== 'employee' && (
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setIsEditUserRoleDialogOpen(true)
-                                      setSelectedUser(storeUser)
-                                      setFormRole('employee')
-                                    }}
-                                  >
-                                    <User className="mr-2 h-4 w-4" />
-                                    {t('dropdown.makeEmployee')}
-                                  </DropdownMenuItem>
-                                )}
+                              {isOwner && storeUser.role_in_store !== 'employee' && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setIsEditUserRoleDialogOpen(true)
+                                    setSelectedUser(storeUser)
+                                    setFormRole('employee')
+                                  }}
+                                >
+                                  <User className="mr-2 h-4 w-4" />
+                                  {t('dropdown.makeEmployee')}
+                                </DropdownMenuItem>
+                              )}
 
-                              {isOwner &&
-                                storeUser.role_in_store !== 'manager' && (
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setIsEditUserRoleDialogOpen(true)
-                                      setSelectedUser(storeUser)
-                                      setFormRole('manager')
-                                    }}
-                                  >
-                                    <UserCheck className="mr-2 h-4 w-4" />
-                                    {t('dropdown.makeManager')}
-                                  </DropdownMenuItem>
-                                )}
+                              {isOwner && storeUser.role_in_store !== 'manager' && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setIsEditUserRoleDialogOpen(true)
+                                    setSelectedUser(storeUser)
+                                    setFormRole('manager')
+                                  }}
+                                >
+                                  <UserCheck className="mr-2 h-4 w-4" />
+                                  {t('dropdown.makeManager')}
+                                </DropdownMenuItem>
+                              )}
 
-                              {isOwner &&
-                                storeUser.role_in_store !== 'owner' && (
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setIsEditUserRoleDialogOpen(true)
-                                      setSelectedUser(storeUser)
-                                      setFormRole('owner')
-                                    }}
-                                  >
-                                    <Crown className="mr-2 h-4 w-4" />
-                                    {t('dropdown.makeOwner')}
-                                  </DropdownMenuItem>
-                                )}
+                              {isOwner && storeUser.role_in_store !== 'owner' && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setIsEditUserRoleDialogOpen(true)
+                                    setSelectedUser(storeUser)
+                                    setFormRole('owner')
+                                  }}
+                                >
+                                  <Crown className="mr-2 h-4 w-4" />
+                                  {t('dropdown.makeOwner')}
+                                </DropdownMenuItem>
+                              )}
 
                               {/* PIN Management Actions */}
                               {hasPINAuth(storeUser) && (
@@ -413,7 +360,7 @@ export function StoreUsersList({
                                     onClick={() =>
                                       toggleUserActiveStatus(
                                         storeUser.user_id,
-                                        !storeUser.is_active
+                                        !storeUser.is_active,
                                       )
                                     }
                                   >
@@ -463,11 +410,7 @@ export function StoreUsersList({
                 <Users className="w-full h-full" />
               </div>
               <Typography variant="h3">{t('noUsersFound')}</Typography>
-              <Typography
-                variant="p"
-                color="muted"
-                className="mb-4"
-              >
+              <Typography variant="p" color="muted" className="mb-4">
                 {t('noUsersMessage')}
               </Typography>
             </div>
@@ -509,7 +452,7 @@ export function StoreUsersList({
       {/* Edit User Role Dialog */}
       <Dialog
         open={isEditUserRoleDialogOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setIsEditUserRoleDialogOpen(open)
           if (!open) {
             setSelectedUser(null)
@@ -520,13 +463,12 @@ export function StoreUsersList({
           <DialogHeader>
             <DialogTitle>{t('dialogs.editRole.title')}</DialogTitle>
             <DialogDescription>
-              {!isMoreThanOneOwner &&
-                selectedUser?.role_in_store === 'owner' && (
-                  <>
-                    {t('errors.mustHaveOwner')}
-                    <br />
-                  </>
-                )}
+              {!isMoreThanOneOwner && selectedUser?.role_in_store === 'owner' && (
+                <>
+                  {t('errors.mustHaveOwner')}
+                  <br />
+                </>
+              )}
               {t('dialogs.editRole.description', {
                 name: selectedUser?.full_name || 'this user',
                 role: selectedUser?.role_in_store
@@ -537,27 +479,19 @@ export function StoreUsersList({
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label htmlFor="edit-role">
-                {t('dialogs.editRole.roleLabel')}
-              </Label>
+              <Label htmlFor="edit-role">{t('dialogs.editRole.roleLabel')}</Label>
               <Select
                 name="role"
                 value={formRole}
-                onValueChange={(value) =>
-                  setFormRole(value as StoreUser['role_in_store'])
-                }
+                onValueChange={value => setFormRole(value as StoreUser['role_in_store'])}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue
-                    placeholder={t('dialogs.editRole.selectPlaceholder')}
-                  />
+                  <SelectValue placeholder={t('dialogs.editRole.selectPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="owner">{t('roles.owner')}</SelectItem>
                   <SelectItem value="manager">{t('roles.manager')}</SelectItem>
-                  <SelectItem value="employee">
-                    {t('roles.employee')}
-                  </SelectItem>
+                  <SelectItem value="employee">{t('roles.employee')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -567,15 +501,13 @@ export function StoreUsersList({
               <Button variant="outline">{t('dialogs.editRole.cancel')}</Button>
             </DialogClose>
             <Button
-              disabled={
-                !isMoreThanOneOwner && selectedUser?.role_in_store === 'owner'
-              }
+              disabled={!isMoreThanOneOwner && selectedUser?.role_in_store === 'owner'}
               onClick={() => handleEditUserRoleSubmit(formRole)}
               className={cn(
                 'bg-blue-600 hover:bg-blue-700',
                 !isMoreThanOneOwner &&
                   selectedUser?.role_in_store === 'owner' &&
-                  'bg-gray-400 hover:bg-gray-400'
+                  'bg-gray-400 hover:bg-gray-400',
               )}
             >
               {t('dialogs.editRole.save')}
@@ -585,10 +517,7 @@ export function StoreUsersList({
       </Dialog>
 
       {/* Remove Confirmation Dialog */}
-      <AlertDialog
-        open={showRemoveDialog}
-        onOpenChange={setShowRemoveDialog}
-      >
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('dialogs.removeUser.title')}</AlertDialogTitle>
@@ -600,9 +529,7 @@ export function StoreUsersList({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t('dialogs.removeUser.cancel')}
-            </AlertDialogCancel>
+            <AlertDialogCancel>{t('dialogs.removeUser.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (selectedUser) {
@@ -622,10 +549,7 @@ export function StoreUsersList({
       {selectedUser && (
         <>
           {/* Reset PIN Dialog */}
-          <Dialog
-            open={isResetDialogOpen}
-            onOpenChange={setIsResetDialogOpen}
-          >
+          <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
@@ -634,25 +558,21 @@ export function StoreUsersList({
                     name: selectedUser.full_name || '',
                   })}
                 </DialogTitle>
-                <DialogDescription>
-                  {t('dialogs.resetPin.description')}
-                </DialogDescription>
+                <DialogDescription>{t('dialogs.resetPin.description')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
                 <div className="p-4 bg-muted rounded-lg">
                   <div className="space-y-2">
                     <div>
-                      <strong>{t('dialogs.resetPin.employee')}:</strong>{' '}
-                      {selectedUser.full_name}
+                      <strong>{t('dialogs.resetPin.employee')}:</strong> {selectedUser.full_name}
                     </div>
                     <div>
                       <strong>{t('dialogs.resetPin.username')}:</strong>{' '}
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>{t('dialogs.resetPin.email')}:</strong>{' '}
-                      {selectedUser.email}
+                      <strong>{t('dialogs.resetPin.email')}:</strong> {selectedUser.email}
                     </div>
                     <div>
                       <strong>{t('dialogs.resetPin.currentStatus')}:</strong>
@@ -672,10 +592,7 @@ export function StoreUsersList({
                 </div>
 
                 <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsResetDialogOpen(false)}
-                  >
+                  <Button variant="outline" onClick={() => setIsResetDialogOpen(false)}>
                     {t('dialogs.resetPin.cancel')}
                   </Button>
                   <Button
@@ -694,10 +611,7 @@ export function StoreUsersList({
           </Dialog>
 
           {/* Unlock PIN Dialog */}
-          <Dialog
-            open={isUnlockDialogOpen}
-            onOpenChange={setIsUnlockDialogOpen}
-          >
+          <Dialog open={isUnlockDialogOpen} onOpenChange={setIsUnlockDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
@@ -706,34 +620,27 @@ export function StoreUsersList({
                     name: selectedUser.full_name || '',
                   })}
                 </DialogTitle>
-                <DialogDescription>
-                  {t('dialogs.unlockPin.description')}
-                </DialogDescription>
+                <DialogDescription>{t('dialogs.unlockPin.description')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
                 <div className="p-4 bg-muted rounded-lg">
                   <div className="space-y-1">
                     <div>
-                      <strong>{t('dialogs.unlockPin.employee')}:</strong>{' '}
-                      {selectedUser.full_name}
+                      <strong>{t('dialogs.unlockPin.employee')}:</strong> {selectedUser.full_name}
                     </div>
                     <div>
                       <strong>{t('dialogs.unlockPin.username')}:</strong>{' '}
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>Status:</strong>{' '}
-                      {t('dialogs.unlockPin.lockedMessage')}
+                      <strong>Status:</strong> {t('dialogs.unlockPin.lockedMessage')}
                     </div>
                   </div>
                 </div>
 
                 <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsUnlockDialogOpen(false)}
-                  >
+                  <Button variant="outline" onClick={() => setIsUnlockDialogOpen(false)}>
                     {t('dialogs.unlockPin.cancel')}
                   </Button>
                   <Button
@@ -755,10 +662,7 @@ export function StoreUsersList({
 
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <Typography
-            variant="small"
-            className="font-medium text-yellow-800 mb-2"
-          >
+          <Typography variant="small" className="font-medium text-yellow-800 mb-2">
             Debug: Store Users List: Only visible in development mode
           </Typography>
           <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
@@ -774,7 +678,7 @@ export function StoreUsersList({
                 canManageUsers,
               },
               null,
-              2
+              2,
             )}
           </pre>
         </div>
