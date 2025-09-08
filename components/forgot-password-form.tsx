@@ -2,27 +2,17 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
-export function ForgotPasswordForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
+export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const t = useTranslations('auth.forgotPassword')
-  const tErrors = useTranslations('auth.errors')
 
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -43,7 +33,7 @@ export function ForgotPasswordForm({
     try {
       // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
       })
       if (error) throw error
       setSuccess(true)
@@ -59,9 +49,7 @@ export function ForgotPasswordForm({
     try {
       const title = t('title')
       // If we get a translation that's not the raw key, we're good
-      return (
-        title && !title.startsWith('auth.forgotPassword.') && title.length > 0
-      )
+      return title && !title.startsWith('auth.forgotPassword.') && title.length > 0
     } catch {
       return false
     }
@@ -70,10 +58,7 @@ export function ForgotPasswordForm({
   // Wait for hydration AND translations to be available
   if (!isHydrated || !hasValidTranslations()) {
     return (
-      <div
-        className={cn('flex flex-col gap-6', className)}
-        {...props}
-      >
+      <div className={cn('flex flex-col gap-6', className)} {...props}>
         {success ? (
           <Card>
             <CardHeader>
@@ -81,26 +66,17 @@ export function ForgotPasswordForm({
                 <Typography variant="h1">Check Your Email</Typography>
               </CardTitle>
               <CardDescription>
-                <Typography
-                  variant="p"
-                  color="muted"
-                >
+                <Typography variant="p" color="muted">
                   Password reset instructions sent
                 </Typography>
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              <Typography
-                variant="p"
-                color="muted"
-              >
-                If you registered using your email and password, you will
-                receive a password reset email.
+              <Typography variant="p" color="muted">
+                If you registered using your email and password, you will receive a password reset
+                email.
               </Typography>
-              <Link
-                href="/auth/login"
-                className="underline underline-offset-4"
-              >
+              <Link href="/auth/login" className="underline underline-offset-4">
                 Back to login
               </Link>
             </CardContent>
@@ -112,12 +88,8 @@ export function ForgotPasswordForm({
                 <Typography variant="h1">Reset Your Password</Typography>
               </CardTitle>
               <CardDescription>
-                <Typography
-                  variant="p"
-                  color="muted"
-                >
-                  Type in your email and we'll send you a link to reset your
-                  password
+                <Typography variant="p" color="muted">
+                  Type in your email and we'll send you a link to reset your password
                 </Typography>
               </CardDescription>
             </CardHeader>
@@ -132,35 +104,22 @@ export function ForgotPasswordForm({
                       placeholder="m@example.com"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                     />
                   </div>
                   {error && (
-                    <Typography
-                      variant="p"
-                      color="destructive"
-                    >
+                    <Typography variant="p" color="destructive">
                       {error}
                     </Typography>
                   )}
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
+                  <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Sending...' : 'Send reset email'}
                   </Button>
                 </div>
                 <div className="mt-4 text-center">
-                  <Typography
-                    variant="p"
-                    color="muted"
-                  >
+                  <Typography variant="p" color="muted">
                     Already have an account?{' '}
-                    <Link
-                      href="/auth/login"
-                      className="underline underline-offset-4"
-                    >
+                    <Link href="/auth/login" className="underline underline-offset-4">
                       Login
                     </Link>
                   </Typography>
@@ -174,10 +133,7 @@ export function ForgotPasswordForm({
   }
 
   return (
-    <div
-      className={cn('flex flex-col gap-6', className)}
-      {...props}
-    >
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       {success ? (
         <Card>
           <CardHeader>
@@ -185,25 +141,16 @@ export function ForgotPasswordForm({
               <Typography variant="h1">{t('checkEmailTitle')}</Typography>
             </CardTitle>
             <CardDescription>
-              <Typography
-                variant="p"
-                color="muted"
-              >
+              <Typography variant="p" color="muted">
                 {t('checkEmailDescription')}
               </Typography>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Typography
-              variant="p"
-              color="muted"
-            >
+            <Typography variant="p" color="muted">
               {t('emailInstructions')}
             </Typography>
-            <Link
-              href="/auth/login"
-              className="underline underline-offset-4"
-            >
+            <Link href="/auth/login" className="underline underline-offset-4">
               {t('backToLogin')}
             </Link>
           </CardContent>
@@ -215,10 +162,7 @@ export function ForgotPasswordForm({
               <Typography variant="h1">{t('title')}</Typography>
             </CardTitle>
             <CardDescription>
-              <Typography
-                variant="p"
-                color="muted"
-              >
+              <Typography variant="p" color="muted">
                 {t('description')}
               </Typography>
             </CardDescription>
@@ -234,35 +178,22 @@ export function ForgotPasswordForm({
                     placeholder={t('emailPlaceholder')}
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                   />
                 </div>
                 {error && (
-                  <Typography
-                    variant="p"
-                    color="destructive"
-                  >
+                  <Typography variant="p" color="destructive">
                     {error}
                   </Typography>
                 )}
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? t('sending') : t('sendResetEmail')}
                 </Button>
               </div>
               <div className="mt-4 text-center">
-                <Typography
-                  variant="p"
-                  color="muted"
-                >
+                <Typography variant="p" color="muted">
                   {t('alreadyHaveAccount')}{' '}
-                  <Link
-                    href="/auth/login"
-                    className="underline underline-offset-4"
-                  >
+                  <Link href="/auth/login" className="underline underline-offset-4">
                     {t('loginLink')}
                   </Link>
                 </Typography>

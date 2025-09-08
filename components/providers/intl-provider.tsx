@@ -19,41 +19,38 @@ export function IntlProvider({
   const [messages, setMessages] = useState<Messages>(initialMessages)
   const [isHydrated, setIsHydrated] = useState(false)
 
-  const loadMessages = useCallback(
-    async (language: string) => {
-      try {
-        let newMessages: { default: Record<string, unknown> }
-        switch (language) {
-          case 'en':
-            newMessages = await import(`../../messages/en.json`)
-            break
-          case 'nl':
-            newMessages = await import(`../../messages/nl.json`)
-            break
-          default:
-            newMessages = await import(`../../messages/fr.json`)
-            break
-        }
-        // Only update messages if we successfully loaded them and they contain data
-        if (newMessages.default && Object.keys(newMessages.default).length > 0) {
-          setMessages(newMessages.default)
-        }
-      } catch (error) {
-        console.error(`Failed to load messages for ${language}:`, error)
-        // Fallback to French
-        try {
-          const fallbackMessages = await import(`../../messages/fr.json`)
-          if (fallbackMessages.default && Object.keys(fallbackMessages.default).length > 0) {
-            setMessages(fallbackMessages.default)
-          }
-        } catch (fallbackError) {
-          console.error('Failed to load fallback messages:', fallbackError)
-          // Keep existing messages instead of overriding with potentially empty initialMessages
-        }
+  const loadMessages = useCallback(async (language: string) => {
+    try {
+      let newMessages: { default: Record<string, unknown> }
+      switch (language) {
+        case 'en':
+          newMessages = await import(`../../messages/en.json`)
+          break
+        case 'nl':
+          newMessages = await import(`../../messages/nl.json`)
+          break
+        default:
+          newMessages = await import(`../../messages/fr.json`)
+          break
       }
-    },
-    [initialMessages],
-  )
+      // Only update messages if we successfully loaded them and they contain data
+      if (newMessages.default && Object.keys(newMessages.default).length > 0) {
+        setMessages(newMessages.default)
+      }
+    } catch (error) {
+      console.error(`Failed to load messages for ${language}:`, error)
+      // Fallback to French
+      try {
+        const fallbackMessages = await import(`../../messages/fr.json`)
+        if (fallbackMessages.default && Object.keys(fallbackMessages.default).length > 0) {
+          setMessages(fallbackMessages.default)
+        }
+      } catch (fallbackError) {
+        console.error('Failed to load fallback messages:', fallbackError)
+        // Keep existing messages instead of overriding with potentially empty initialMessages
+      }
+    }
+  }, [])
 
   // Handle hydration mismatch by detecting visitor language preference on client
   useEffect(() => {
