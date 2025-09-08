@@ -994,6 +994,51 @@
       "support": "Support",
       "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
     },
+    "auth": {
+      "login": "Connexion",
+      "signup": "Inscription entreprise", 
+      "logout": "Déconnexion",
+      "goToDashboard": "Tableau de bord",
+      "signUpForm": {
+        "title": "S'inscrire",
+        "description": "Créer un nouveau compte",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "password": "Mot de passe",
+        "repeatPassword": "Répéter le mot de passe",
+        "creatingAccount": "Création d'un compte...",
+        "signUpButton": "S'inscrire",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Connexion"
+      },
+      "forgotPassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Saisissez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "sending": "Envoi en cours...",
+        "sendResetEmail": "Envoyer l'email de réinitialisation",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Connexion",
+        "checkEmailTitle": "Vérifiez votre email",
+        "checkEmailDescription": "Instructions de réinitialisation du mot de passe envoyées",
+        "emailInstructions": "Si vous vous êtes inscrit avec votre email et mot de passe, vous recevrez un email de réinitialisation.",
+        "backToLogin": "Retour à la connexion"
+      },
+      "updatePassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Veuillez saisir votre nouveau mot de passe ci-dessous.",
+        "newPassword": "Nouveau mot de passe",
+        "newPasswordPlaceholder": "Nouveau mot de passe (min 6 caractères)",
+        "saving": "Enregistrement...",
+        "savePassword": "Enregistrer le nouveau mot de passe"
+      },
+      "errors": {
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+        "genericError": "Une erreur s'est produite"
+      }
+    },
     "onboarding": {
       "stepLabels": {
         "storeLookup": "Recherche de magasin",
