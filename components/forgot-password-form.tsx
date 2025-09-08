@@ -101,7 +101,7 @@ export function ForgotPasswordForm({
                 href="/auth/login"
                 className="underline underline-offset-4"
               >
-                {t('backToLogin')}
+                Back to login
               </Link>
             </CardContent>
           </Card>
