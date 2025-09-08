@@ -70,13 +70,36 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     )
   }
 
-  // Transform analytics data to match component interface
-  const overview = insights?.analytics?.overview
-  const isValidOverview = overview && !('error' in overview)
-  const urgentBatches = isValidOverview ? overview.urgent_items : 0
-  const totalActions = isValidOverview ? overview.actions_taken : 0
-  const discountValue = isValidOverview ? overview.total_discount_value : 0
-  const avgScore = isValidOverview ? overview.avg_composite_score : 0
+  // Transform analytics data from FastAPI to match component interface
+  const fastApiData = insights?.analytics?.fastapi_analytics
+  const inventorySummary = fastApiData?.inventory_summary
+  const urgencyDistribution = fastApiData?.urgency_distribution
+  const recentActions = fastApiData?.recent_actions || []
+
+  // Calculate metrics using FastAPI data
+  const urgentBatches = urgencyDistribution
+    ? urgencyDistribution.critical + urgencyDistribution.high
+    : 0
+  const totalActions = recentActions.length
+
+  // Calculate discount value from recent actions
+  const discountValue = recentActions.reduce((sum, action) => {
+    if (action.action_type?.includes('discount') && action.original_price && action.new_price) {
+      return sum + (action.original_price - action.new_price)
+    }
+    return sum
+  }, 0)
+
+  // Calculate average score from urgency distribution
+  const totalBatches = inventorySummary?.total_batches || 0
+  const avgScore =
+    totalBatches > 0
+      ? ((urgencyDistribution?.critical || 0) * 0.9 +
+          (urgencyDistribution?.high || 0) * 0.7 +
+          (urgencyDistribution?.medium || 0) * 0.5 +
+          (urgencyDistribution?.low || 0) * 0.3) /
+        totalBatches
+      : 0
 
   return (
     <div className="flex flex-col gap-6">

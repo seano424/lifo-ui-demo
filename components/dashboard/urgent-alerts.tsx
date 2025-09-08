@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useScoringAlerts } from '@/hooks/use-scoring-analytics'
+import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { AlertQuickToggle } from './alert-quick-toggle'
@@ -25,7 +25,7 @@ function thresholdToLevelName(
 export function UrgentAlerts() {
   const t = useTranslations('store.urgentAlerts')
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useScoringAlerts(activeStoreId)
+  const { data, isLoading, error } = useStoreAnalytics(activeStoreId, '7d')
   const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
 
   const isInitialLoading = isLoading
@@ -63,34 +63,85 @@ export function UrgentAlerts() {
     )
   }
 
-  const summary = data?.summary
+  const urgencyDistribution = data?.analytics?.fastapi_analytics?.urgency_distribution
 
   const getMessage = () => {
-    if (!summary) return t('errors.loadingAlerts')
-    const totalAlerts = summary.total_alerts
+    if (!urgencyDistribution) return t('errors.loadingAlerts')
+
+    const criticalCount = urgencyDistribution.critical || 0
+    const highCount = urgencyDistribution.high || 0
+    const mediumCount = urgencyDistribution.medium || 0
+    const lowCount = urgencyDistribution.low || 0
+    const totalAlerts = criticalCount + highCount + mediumCount + lowCount
 
     if (totalAlerts === 0) {
       return t('messages.nothingToShow')
     }
 
-    // For urgent mode (high threshold), use urgent language
-    if (warningThreshold >= 0.8 && summary.critical_count > 0) {
-      return t('messages.itemNeedsAction', { count: summary.critical_count })
+    // Build message based on selected urgency level
+    const messageParts = []
+
+    // Always include critical if present
+    if (criticalCount > 0) {
+      messageParts.push(`${criticalCount} critical items (expired or expiring within 24 hours)`)
     }
 
-    // For default mode, use moderate language
+    // Include high priority based on threshold
+    if (highCount > 0 && warningThreshold <= 0.6) {
+      messageParts.push(`${highCount} high priority items (expiring within 2-3 days)`)
+    }
+
+    // Include medium priority only if threshold allows
+    if (mediumCount > 0 && warningThreshold <= 0.4) {
+      messageParts.push(`${mediumCount} medium priority items (expiring within a week)`)
+    }
+
+    // Include low priority only if threshold allows
+    if (lowCount > 0 && warningThreshold <= 0.2) {
+      messageParts.push(`${lowCount} low priority items (expiring within 2 weeks)`)
+    }
+
+    // Critical only mode (threshold 0.8)
+    if (warningThreshold >= 0.8) {
+      if (criticalCount > 0) {
+        return `${criticalCount} critical items need immediate action (expired or expiring within 24 hours)`
+      }
+      if (highCount > 0) {
+        return `${highCount} high priority items expiring within 2-3 days`
+      }
+      return 'No critical items at this time'
+    }
+
+    // High priority mode (threshold 0.6)
     if (warningThreshold >= 0.6) {
-      if (summary.critical_count > 0) {
-        return t('messages.itemNeedsAction', { count: summary.critical_count })
+      if (messageParts.length === 0) {
+        return 'No urgent items at this level'
       }
-      if (summary.high_count > 0) {
-        return t('messages.itemMayNeedAction', { count: summary.high_count })
+      if (messageParts.length === 1) {
+        return messageParts[0]
       }
-      return t('messages.itemsFlagged', { count: totalAlerts })
+      return messageParts.join(' and ')
     }
 
-    // For early warnings mode (low threshold), use gentle language
-    return t('messages.itemsMonitoring', { count: totalAlerts })
+    // Medium priority mode (threshold 0.4)
+    if (warningThreshold >= 0.4) {
+      if (messageParts.length === 0) {
+        return 'No items requiring attention at this level'
+      }
+      if (messageParts.length === 1) {
+        return messageParts[0]
+      }
+      return messageParts.join(', ')
+    }
+
+    // All priority levels (threshold 0.2)
+    if (messageParts.length === 0) {
+      return 'All items are in good condition'
+    }
+    if (messageParts.length === 1) {
+      return messageParts[0]
+    }
+    return messageParts.join(', ')
   }
 
   const message = getMessage()
