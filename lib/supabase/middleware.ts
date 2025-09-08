@@ -45,9 +45,13 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Allow requests with auth codes to pass through (for password reset, etc.)
+  const hasAuthCode = request.nextUrl.searchParams.get('code')
+
   if (
     request.nextUrl.pathname !== '/' &&
     !user &&
+    !hasAuthCode &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/onboarding/create-account') &&
