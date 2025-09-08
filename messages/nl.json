@@ -645,6 +645,16 @@
     "loadMoreUsers": "Meer gebruikers laden",
     "loadingMore": "Laden...",
     "noUsersMessage": "Deze winkel heeft nog geen gebruikers.",
+    "permissions": {
+      "ownerInfo": {
+        "title": "Eigenaar Machtigingen",
+        "description": "Als eigenaar kunt u alle teamleden beheren, rollen wijzigen (inclusief andere eigenaren benoemen), en toegang tot alle winkelfuncties. U kunt eigenaren, managers en medewerkers beheren."
+      },
+      "managerInfo": {
+        "title": "Manager Machtigingen", 
+        "description": "Als manager kunt u medewerkers beheren (activeren/deactiveren, uit winkel verwijderen), maar kunt u geen eigenaren of andere managers wijzigen. Alleen eigenaren kunnen rollen wijzigen."
+      }
+    },
     "errors": {
       "mustHaveOwner": "Er moet altijd minstens één eigenaar zijn."
     },

@@ -792,6 +792,16 @@
     "loadMoreUsers": "Load More Users",
     "loadingMore": "Loading more...",
     "noUsersMessage": "This store doesn't have any users yet.",
+    "permissions": {
+      "ownerInfo": {
+        "title": "Owner Permissions",
+        "description": "As an owner, you can manage all team members, change roles (including making other owners), and access all store functions. You can manage owners, managers, and employees."
+      },
+      "managerInfo": {
+        "title": "Manager Permissions", 
+        "description": "As a manager, you can manage employees (activate/deactivate, remove from store), but cannot modify owners or other managers. Only owners can change roles."
+      }
+    },
     "errors": {
       "mustHaveOwner": "There must always be at least one owner."
     },

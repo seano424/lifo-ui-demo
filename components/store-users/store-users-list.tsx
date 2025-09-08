@@ -100,7 +100,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
   // 🚀 Use server permissions if available, fallback to client permissions
   const clientPermissions = usePermissions()
-  const { isOwner } = useUserRole()
+  const { isOwner, isManager } = useUserRole()
   const { activeStore } = useStoreState()
 
   const canManageUsers = serverPermissions?.canManageTeam ?? clientPermissions.canManageUsers
@@ -195,6 +195,20 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
             {count > 0 ? t('showing', { current: data.length, total: count }) : t('noUsersFound')}
           </Typography>
 
+          {/* Role-based permissions info - only show for owners and managers */}
+          {(isOwner || isManager) && canManageUsers && (
+            <div className="mb-6 mt-4 p-4 bg-secondary-50 border border-secondary-200 rounded-lg flex flex-col">
+              <Typography variant="small" className="font-medium text-blue-800 mb-2">
+                {isOwner ? t('permissions.ownerInfo.title') : t('permissions.managerInfo.title')}
+              </Typography>
+              <Typography variant="small" className="text-blue-700">
+                {isOwner
+                  ? t('permissions.ownerInfo.description')
+                  : t('permissions.managerInfo.description')}
+              </Typography>
+            </div>
+          )}
+
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-opacity-0">
@@ -248,132 +262,139 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
                     {canManageUsers && (
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t('dropdown.userActions')}</DropdownMenuLabel>
+                        {/* Hide dropdown for owners when current user is not owner, and for managers when current user is manager */}
+                        {!(storeUser.role_in_store === 'owner' && !isOwner) &&
+                        !(storeUser.role_in_store === 'manager' && !isOwner) ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>{t('dropdown.userActions')}</DropdownMenuLabel>
 
-                            {/* Role Changes */}
-                            {storeUser.role_in_store !== 'employee' && (
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setIsEditUserRoleDialogOpen(true)
-                                  setSelectedUser(storeUser)
-                                  setFormRole('employee')
-                                }}
-                              >
-                                <User className="mr-2 h-4 w-4" />
-                                {t('dropdown.makeEmployee')}
-                              </DropdownMenuItem>
-                            )}
-
-                            {isOwner && storeUser.role_in_store !== 'manager' && (
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setIsEditUserRoleDialogOpen(true)
-                                  setSelectedUser(storeUser)
-                                  setFormRole('manager')
-                                }}
-                              >
-                                <UserCheck className="mr-2 h-4 w-4" />
-                                {t('dropdown.makeManager')}
-                              </DropdownMenuItem>
-                            )}
-
-                            {isOwner && storeUser.role_in_store !== 'owner' && (
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setIsEditUserRoleDialogOpen(true)
-                                  setSelectedUser(storeUser)
-                                  setFormRole('owner')
-                                }}
-                              >
-                                <Crown className="mr-2 h-4 w-4" />
-                                {t('dropdown.makeOwner')}
-                              </DropdownMenuItem>
-                            )}
-
-                            {/* PIN Management Actions */}
-                            {hasPINAuth(storeUser) && (
-                              <>
-                                <DropdownMenuSeparator />
-
-                                {/* Reset PIN */}
+                              {/* Role Changes */}
+                              {isOwner && storeUser.role_in_store !== 'employee' && (
                                 <DropdownMenuItem
                                   onClick={() => {
+                                    setIsEditUserRoleDialogOpen(true)
                                     setSelectedUser(storeUser)
-                                    setTimeout(() => {
-                                      setIsResetDialogOpen(true)
-                                    }, 100)
+                                    setFormRole('employee')
                                   }}
-                                  className="flex items-center gap-2"
                                 >
-                                  <RefreshCw className="w-4 h-4" />
-                                  {t('dropdown.resetPin')}
+                                  <User className="mr-2 h-4 w-4" />
+                                  {t('dropdown.makeEmployee')}
                                 </DropdownMenuItem>
+                              )}
 
-                                {/* Unlock PIN (only if locked) */}
-                                {isPINLocked(storeUser) && (
+                              {isOwner && storeUser.role_in_store !== 'manager' && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setIsEditUserRoleDialogOpen(true)
+                                    setSelectedUser(storeUser)
+                                    setFormRole('manager')
+                                  }}
+                                >
+                                  <UserCheck className="mr-2 h-4 w-4" />
+                                  {t('dropdown.makeManager')}
+                                </DropdownMenuItem>
+                              )}
+
+                              {isOwner && storeUser.role_in_store !== 'owner' && (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setIsEditUserRoleDialogOpen(true)
+                                    setSelectedUser(storeUser)
+                                    setFormRole('owner')
+                                  }}
+                                >
+                                  <Crown className="mr-2 h-4 w-4" />
+                                  {t('dropdown.makeOwner')}
+                                </DropdownMenuItem>
+                              )}
+
+                              {/* PIN Management Actions */}
+                              {hasPINAuth(storeUser) && (
+                                <>
+                                  <DropdownMenuSeparator />
+
+                                  {/* Reset PIN */}
                                   <DropdownMenuItem
                                     onClick={() => {
                                       setSelectedUser(storeUser)
                                       setTimeout(() => {
-                                        setIsUnlockDialogOpen(true)
+                                        setIsResetDialogOpen(true)
                                       }, 100)
                                     }}
                                     className="flex items-center gap-2"
                                   >
-                                    <Unlock className="w-4 h-4" />
-                                    {t('dropdown.unlockPin')}
+                                    <RefreshCw className="w-4 h-4" />
+                                    {t('dropdown.resetPin')}
                                   </DropdownMenuItem>
-                                )}
-                              </>
-                            )}
 
-                            {/* Active Status Toggle */}
-                            {canManageUsers && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    toggleUserActiveStatus(storeUser.user_id, !storeUser.is_active)
-                                  }
-                                >
-                                  {storeUser.is_active ? (
-                                    <>
-                                      <UserMinus className="mr-2 h-4 w-4" />
-                                      {t('dropdown.deactivateUser')}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <UserCheck className="mr-2 h-4 w-4" />
-                                      {t('dropdown.reactivateUser')}
-                                    </>
+                                  {/* Unlock PIN (only if locked) */}
+                                  {isPINLocked(storeUser) && (
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setSelectedUser(storeUser)
+                                        setTimeout(() => {
+                                          setIsUnlockDialogOpen(true)
+                                        }, 100)
+                                      }}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Unlock className="w-4 h-4" />
+                                      {t('dropdown.unlockPin')}
+                                    </DropdownMenuItem>
                                   )}
-                                </DropdownMenuItem>
-                              </>
-                            )}
+                                </>
+                              )}
 
-                            <DropdownMenuSeparator />
+                              {/* Active Status Toggle */}
+                              {canManageUsers && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      toggleUserActiveStatus(
+                                        storeUser.user_id,
+                                        !storeUser.is_active,
+                                      )
+                                    }
+                                  >
+                                    {storeUser.is_active ? (
+                                      <>
+                                        <UserMinus className="mr-2 h-4 w-4" />
+                                        {t('dropdown.deactivateUser')}
+                                      </>
+                                    ) : (
+                                      <>
+                                        <UserCheck className="mr-2 h-4 w-4" />
+                                        {t('dropdown.reactivateUser')}
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
 
-                            {/* Remove from Store */}
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedUser(storeUser)
-                                setShowRemoveDialog(true)
-                              }}
-                              className="text-red-600 focus:text-red-600"
-                            >
-                              <UserMinus className="mr-2 h-4 w-4" />
-                              {t('dropdown.removeFromStore')}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <DropdownMenuSeparator />
+
+                              {/* Remove from Store */}
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedUser(storeUser)
+                                  setShowRemoveDialog(true)
+                                }}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <UserMinus className="mr-2 h-4 w-4" />
+                                {t('dropdown.removeFromStore')}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : null}
                       </TableCell>
                     )}
                   </TableRow>
@@ -429,7 +450,15 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
       )}
 
       {/* Edit User Role Dialog */}
-      <Dialog open={isEditUserRoleDialogOpen} onOpenChange={setIsEditUserRoleDialogOpen}>
+      <Dialog
+        open={isEditUserRoleDialogOpen}
+        onOpenChange={open => {
+          setIsEditUserRoleDialogOpen(open)
+          if (!open) {
+            setSelectedUser(null)
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{t('dialogs.editRole.title')}</DialogTitle>
