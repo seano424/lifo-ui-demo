@@ -37,12 +37,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { type EmailSendResult, getEmailErrorMessage, sendWelcomeEmail } from '@/lib/email/client'
+import {
+  type EmailSendResult,
+  getEmailErrorMessage,
+  sendWelcomeEmail,
+} from '@/lib/email/client'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 import { Typography } from '../ui/typography'
 
-interface EnhancedAddEmployeeDialogProps {
+interface AddEmployeeDialogProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   storeId: string
@@ -90,20 +94,26 @@ const LANGUAGE_OPTIONS = {
   nl: 'Nederlands',
 } as const
 
-export function EnhancedAddEmployeeDialog({
+export function AddEmployeeDialog({
   isOpen,
   onOpenChange,
   storeId,
   onEmployeeCreated,
-}: EnhancedAddEmployeeDialogProps) {
+}: AddEmployeeDialogProps) {
   const t = useTranslations('addEmployee')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
   const [isCheckingUsername, setIsCheckingUsername] = useState(false)
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
-  const [existingUser, setExistingUser] = useState<ExistingUserInfo | null>(null)
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null
+  )
+  const [existingUser, setExistingUser] = useState<ExistingUserInfo | null>(
+    null
+  )
   const [flowType, setFlowType] = useState<FlowType>('create_new')
-  const [step, setStep] = useState<'form' | 'credentials' | 'invitation_sent'>('form')
+  const [step, setStep] = useState<'form' | 'credentials' | 'invitation_sent'>(
+    'form'
+  )
   const [emailStatus, setEmailStatus] = useState<EmailStatus>({
     sent: false,
     sending: false,
@@ -118,7 +128,8 @@ export function EnhancedAddEmployeeDialog({
     languagePreference: 'en',
   })
 
-  const [createdCredentials, setCreatedCredentials] = useState<CreatedCredentials | null>(null)
+  const [createdCredentials, setCreatedCredentials] =
+    useState<CreatedCredentials | null>(null)
   // const [copiedField, setCopiedField] = useState<string | null>(null)
 
   const queryClient = useQueryClient()
@@ -152,7 +163,7 @@ export function EnhancedAddEmployeeDialog({
     // Also invalidate all user store queries to handle any edge cases
     queryClient.invalidateQueries({
       queryKey: queryKeys.stores.all,
-      predicate: query => query.queryKey.includes('userStores'),
+      predicate: (query) => query.queryKey.includes('userStores'),
     })
   }
 
@@ -186,7 +197,7 @@ export function EnhancedAddEmployeeDialog({
         // Pre-fill name fields if we have the data
         if (data.full_name) {
           const [first, ...lastParts] = data.full_name.split(' ')
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             firstName: first || '',
             lastName: lastParts.join(' ') || '',
@@ -217,19 +228,25 @@ export function EnhancedAddEmployeeDialog({
   }, [formData.email, checkUserExists])
 
   // Generate suggested username (first.last pattern)
-  const generateSuggestedUsername = useCallback((firstName: string, lastName: string): string => {
-    if (!firstName || !lastName) return ''
-    const cleanFirst = firstName.toLowerCase().replace(/[^a-z]/g, '')
-    const cleanLast = lastName.toLowerCase().replace(/[^a-z]/g, '')
-    return `${cleanFirst}.${cleanLast}`
-  }, [])
+  const generateSuggestedUsername = useCallback(
+    (firstName: string, lastName: string): string => {
+      if (!firstName || !lastName) return ''
+      const cleanFirst = firstName.toLowerCase().replace(/[^a-z]/g, '')
+      const cleanLast = lastName.toLowerCase().replace(/[^a-z]/g, '')
+      return `${cleanFirst}.${cleanLast}`
+    },
+    []
+  )
 
   // Auto-update username when first/last name changes (only for new users)
   useEffect(() => {
     if (flowType === 'create_new' && formData.firstName && formData.lastName) {
-      const suggested = generateSuggestedUsername(formData.firstName, formData.lastName)
+      const suggested = generateSuggestedUsername(
+        formData.firstName,
+        formData.lastName
+      )
       if (!formData.username || formData.username === suggested) {
-        setFormData(prev => ({ ...prev, username: suggested }))
+        setFormData((prev) => ({ ...prev, username: suggested }))
       }
     }
   }, [
@@ -251,9 +268,12 @@ export function EnhancedAddEmployeeDialog({
       setIsCheckingUsername(true)
       try {
         const supabase = createClient()
-        const { data, error } = await supabase.rpc('check_username_availability', {
-          p_username: username,
-        })
+        const { data, error } = await supabase.rpc(
+          'check_username_availability',
+          {
+            p_username: username,
+          }
+        )
 
         if (error) {
           console.error('Username availability check error:', error)
@@ -269,7 +289,7 @@ export function EnhancedAddEmployeeDialog({
         setIsCheckingUsername(false)
       }
     },
-    [flowType],
+    [flowType]
   )
 
   // Debounced username check
@@ -318,7 +338,9 @@ export function EnhancedAddEmployeeDialog({
   }
 
   // Send welcome email
-  const sendEmployeeWelcomeEmail = async (credentials: CreatedCredentials): Promise<void> => {
+  const sendEmployeeWelcomeEmail = async (
+    credentials: CreatedCredentials
+  ): Promise<void> => {
     setEmailStatus({ sent: false, sending: true })
 
     try {
@@ -340,7 +362,9 @@ export function EnhancedAddEmployeeDialog({
         })
         toast.success(t('toast.emailSent'))
       } else {
-        const errorMessage = getEmailErrorMessage(result.error || 'Unknown error')
+        const errorMessage = getEmailErrorMessage(
+          result.error || 'Unknown error'
+        )
         setEmailStatus({
           sent: false,
           sending: false,
@@ -350,7 +374,7 @@ export function EnhancedAddEmployeeDialog({
       }
     } catch (error: unknown) {
       const errorMessage = getEmailErrorMessage(
-        error instanceof Error ? error.message : 'Unknown error',
+        error instanceof Error ? error.message : 'Unknown error'
       )
       setEmailStatus({
         sent: false,
@@ -365,7 +389,12 @@ export function EnhancedAddEmployeeDialog({
   const handleCreateNewEmployee = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.username) {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.username
+    ) {
       toast.error(t('errors.fillFields'))
       return
     }
@@ -436,7 +465,9 @@ export function EnhancedAddEmployeeDialog({
       }
     } catch (error: unknown) {
       console.error('Error creating employee:', error)
-      toast.error(error instanceof Error ? error.message : t('errors.createFailed'))
+      toast.error(
+        error instanceof Error ? error.message : t('errors.createFailed')
+      )
     } finally {
       setIsLoading(false)
     }
@@ -477,7 +508,7 @@ export function EnhancedAddEmployeeDialog({
 
       setStep('invitation_sent')
       toast.success(
-        `${existingUser.full_name || existingUser.email} has been invited to your store!`,
+        `${existingUser.full_name || existingUser.email} has been invited to your store!`
       )
 
       // Invalidate queries to refresh the UI
@@ -485,7 +516,9 @@ export function EnhancedAddEmployeeDialog({
       onEmployeeCreated()
     } catch (error: unknown) {
       console.error('Error inviting user:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to invite user')
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to invite user'
+      )
     } finally {
       setIsLoading(false)
     }
@@ -534,7 +567,10 @@ export function EnhancedAddEmployeeDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={handleClose}
+    >
       <DialogContent className="sm:max-w-[500px]">
         {step === 'form' ? (
           <>
@@ -554,20 +590,26 @@ export function EnhancedAddEmployeeDialog({
               </DialogTitle>
               <DialogDescription>
                 {flowType === 'invite_existing'
-                  ? t('description') || 'Invite an existing LIFO user to join your store'
+                  ? t('description') ||
+                    'Invite an existing LIFO user to join your store'
                   : t('description')}
               </DialogDescription>
             </DialogHeader>
 
             <form
               onSubmit={
-                flowType === 'invite_existing' ? handleInviteExistingUser : handleCreateNewEmployee
+                flowType === 'invite_existing'
+                  ? handleInviteExistingUser
+                  : handleCreateNewEmployee
               }
               className="space-y-4"
             >
               {/* Email Field - Always shown first */}
               <div>
-                <Label htmlFor="email" required>
+                <Label
+                  htmlFor="email"
+                  required
+                >
                   {t('form.email')}
                 </Label>
                 <div className="relative">
@@ -575,7 +617,9 @@ export function EnhancedAddEmployeeDialog({
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     placeholder={t('form.emailPlaceholder')}
                     required
                     disabled={isLoading}
@@ -606,11 +650,14 @@ export function EnhancedAddEmployeeDialog({
                       {existingUser.username && (
                         <div className="text-sm">
                           <strong>Username:</strong>{' '}
-                          <code className="bg-muted px-1 rounded">{existingUser.username}</code>
+                          <code className="bg-muted px-1 rounded">
+                            {existingUser.username}
+                          </code>
                         </div>
                       )}
                       <div className="text-sm text-muted-foreground">
-                        This user will be invited to join your store with the selected role.
+                        This user will be invited to join your store with the
+                        selected role.
                       </div>
                     </div>
                   </AlertDescription>
@@ -621,26 +668,36 @@ export function EnhancedAddEmployeeDialog({
               {(flowType === 'create_new' || !existingUser?.full_name) && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName" required={flowType === 'create_new'}>
+                    <Label
+                      htmlFor="firstName"
+                      required={flowType === 'create_new'}
+                    >
                       {t('form.firstName')}
                     </Label>
                     <Input
                       id="firstName"
                       value={formData.firstName}
-                      onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, firstName: e.target.value })
+                      }
                       placeholder={t('form.firstNamePlaceholder')}
                       required={flowType === 'create_new'}
                       disabled={isLoading}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName" required={flowType === 'create_new'}>
+                    <Label
+                      htmlFor="lastName"
+                      required={flowType === 'create_new'}
+                    >
                       {t('form.lastName')}
                     </Label>
                     <Input
                       id="lastName"
                       value={formData.lastName}
-                      onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, lastName: e.target.value })
+                      }
                       placeholder={t('form.lastNamePlaceholder')}
                       required={flowType === 'create_new'}
                       disabled={isLoading}
@@ -653,7 +710,10 @@ export function EnhancedAddEmployeeDialog({
               {flowType === 'create_new' && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="username" required>
+                    <Label
+                      htmlFor="username"
+                      required
+                    >
                       {t('form.username')}
                     </Label>
                     {formData.firstName && formData.lastName && (
@@ -666,7 +726,7 @@ export function EnhancedAddEmployeeDialog({
                             ...formData,
                             username: generateSuggestedUsername(
                               formData.firstName,
-                              formData.lastName,
+                              formData.lastName
                             ),
                           })
                         }
@@ -681,10 +741,12 @@ export function EnhancedAddEmployeeDialog({
                     <Input
                       id="username"
                       value={formData.username}
-                      onChange={e =>
+                      onChange={(e) =>
                         setFormData({
                           ...formData,
-                          username: e.target.value.toLowerCase().replace(/[^a-z.]/g, ''),
+                          username: e.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z.]/g, ''),
                         })
                       }
                       placeholder={t('form.usernamePlaceholder')}
@@ -710,9 +772,13 @@ export function EnhancedAddEmployeeDialog({
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {usernameAvailable === false ? (
-                      <span className="text-red-600">{t('form.usernameTaken')}</span>
+                      <span className="text-red-600">
+                        {t('form.usernameTaken')}
+                      </span>
                     ) : usernameAvailable === true ? (
-                      <span className="text-primary-600">{t('form.usernameAvailable')}</span>
+                      <span className="text-primary-600">
+                        {t('form.usernameAvailable')}
+                      </span>
                     ) : (
                       t('form.usernameNote')
                     )}
@@ -767,7 +833,10 @@ export function EnhancedAddEmployeeDialog({
                       </SelectTrigger>
                       <SelectContent>
                         {Object.entries(LANGUAGE_OPTIONS).map(([code]) => (
-                          <SelectItem key={code} value={code}>
+                          <SelectItem
+                            key={code}
+                            value={code}
+                          >
                             {t(`languages.${code}`)}
                           </SelectItem>
                         ))}
@@ -785,10 +854,13 @@ export function EnhancedAddEmployeeDialog({
                     <div className="space-y-1">
                       <div>
                         <strong>{t('preview.username')}</strong>{' '}
-                        <code className="bg-muted px-1 rounded">{formData.username}</code>
+                        <code className="bg-muted px-1 rounded">
+                          {formData.username}
+                        </code>
                       </div>
                       <div>
-                        <strong>{t('preview.pin')}</strong> {t('preview.pinNote')}
+                        <strong>{t('preview.pin')}</strong>{' '}
+                        {t('preview.pinNote')}
                       </div>
                       <div className="text-xs text-muted-foreground mt-2">
                         {t('preview.loginNote')}
@@ -799,7 +871,12 @@ export function EnhancedAddEmployeeDialog({
               )}
 
               <DialogFooter className="pt-6">
-                <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={isLoading}
+                >
                   {t('buttons.cancel')}
                 </Button>
                 <Button
@@ -814,7 +891,9 @@ export function EnhancedAddEmployeeDialog({
                   {isLoading ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      {flowType === 'invite_existing' ? 'Inviting...' : t('buttons.creating')}
+                      {flowType === 'invite_existing'
+                        ? 'Inviting...'
+                        : t('buttons.creating')}
                     </>
                   ) : flowType === 'invite_existing' ? (
                     <>
@@ -853,7 +932,9 @@ export function EnhancedAddEmployeeDialog({
                 {emailStatus.sending ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    <AlertDescription>{t('success.emailSending')}</AlertDescription>
+                    <AlertDescription>
+                      {t('success.emailSending')}
+                    </AlertDescription>
                   </>
                 ) : emailStatus.sent ? (
                   <AlertDescription>
@@ -980,7 +1061,10 @@ export function EnhancedAddEmployeeDialog({
             </div>
 
             <DialogFooter>
-              <Button onClick={handleClose} className="w-full">
+              <Button
+                onClick={handleClose}
+                className="w-full"
+              >
                 {t('buttons.done')}
               </Button>
             </DialogFooter>
@@ -993,7 +1077,8 @@ export function EnhancedAddEmployeeDialog({
                 Invitation Sent Successfully
               </DialogTitle>
               <DialogDescription>
-                {existingUser?.full_name || formData.email} has been invited to join your store
+                {existingUser?.full_name || formData.email} has been invited to
+                join your store
               </DialogDescription>
             </DialogHeader>
 
@@ -1003,32 +1088,44 @@ export function EnhancedAddEmployeeDialog({
                 <AlertDescription>
                   <div className="space-y-2">
                     <div>
-                      <strong>User invited:</strong> {existingUser?.full_name || formData.email}
+                      <strong>User invited:</strong>{' '}
+                      {existingUser?.full_name || formData.email}
                     </div>
                     <div>
-                      <strong>Role:</strong> <Badge variant="secondary">{formData.role}</Badge>
+                      <strong>Role:</strong>{' '}
+                      <Badge variant="secondary">{formData.role}</Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      They will receive an email notification and can access your store immediately
-                      using their existing login credentials.
+                      They will receive an email notification and can access
+                      your store immediately using their existing login
+                      credentials.
                     </div>
                   </div>
                 </AlertDescription>
               </Alert>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                <h4 className="font-medium text-blue-900 mb-2">
+                  What happens next?
+                </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• User receives an email notification about the invitation</li>
+                  <li>
+                    • User receives an email notification about the invitation
+                  </li>
                   <li>• They can login with their existing LIFO credentials</li>
-                  <li>• They&apos;ll see your store in their store selection menu</li>
+                  <li>
+                    • They&apos;ll see your store in their store selection menu
+                  </li>
                   <li>• You can manage their permissions from the team page</li>
                 </ul>
               </div>
             </div>
 
             <DialogFooter>
-              <Button onClick={handleClose} className="w-full">
+              <Button
+                onClick={handleClose}
+                className="w-full"
+              >
                 Done
               </Button>
             </DialogFooter>

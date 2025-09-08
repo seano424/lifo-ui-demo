@@ -34,17 +34,21 @@ export function IntlProvider({
             newMessages = await import(`../../messages/fr.json`)
             break
         }
-        setMessages(newMessages.default)
+        // Only update messages if we successfully loaded them and they contain data
+        if (newMessages.default && Object.keys(newMessages.default).length > 0) {
+          setMessages(newMessages.default)
+        }
       } catch (error) {
         console.error(`Failed to load messages for ${language}:`, error)
         // Fallback to French
         try {
           const fallbackMessages = await import(`../../messages/fr.json`)
-          setMessages(fallbackMessages.default)
+          if (fallbackMessages.default && Object.keys(fallbackMessages.default).length > 0) {
+            setMessages(fallbackMessages.default)
+          }
         } catch (fallbackError) {
           console.error('Failed to load fallback messages:', fallbackError)
-          // Use the initial messages as last resort
-          setMessages(initialMessages)
+          // Keep existing messages instead of overriding with potentially empty initialMessages
         }
       }
     },
@@ -79,10 +83,13 @@ export function IntlProvider({
     loadMessages(currentLanguage)
   }, [currentLanguage, isHydrated, loadMessages])
 
+  // Ensure we always have valid messages before rendering
+  const validMessages = messages && Object.keys(messages).length > 0 ? messages : initialMessages
+
   return (
     <NextIntlClientProvider
       locale={currentLanguage}
-      messages={messages}
+      messages={validMessages}
       timeZone="Europe/Paris"
       onError={error => {
         console.warn('Client i18n error:', error.message)

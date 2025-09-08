@@ -132,7 +132,7 @@
   "productListSort": {
     "name": "Nom",
     "category": "Catégorie",
-    "brand": "Marque", 
+    "brand": "Marque",
     "stock": "Stock",
     "price": "Prix",
     "activeBatches": "Lots actifs",
@@ -143,7 +143,7 @@
     "product": "Produit",
     "unnamedProduct": "Produit sans nom",
     "notAvailable": "N/D",
-    "category": "Catégorie", 
+    "category": "Catégorie",
     "uncategorized": "Non catégorisé",
     "brand": "Marque",
     "totalStock": "Stock total",
@@ -153,7 +153,7 @@
     "actions": "Actions",
     "viewDetails": "Voir les détails",
     "viewBatches": "Voir les lots",
-    "editProduct": "Modifier le produit", 
+    "editProduct": "Modifier le produit",
     "updatePrice": "Mettre à jour le prix",
     "enterNewPrice": "Entrez le nouveau prix (€) :",
     "deleteProduct": "Supprimer le produit",
@@ -176,7 +176,7 @@
     "projects": "Projets",
     "more": "Plus",
     "viewProject": "Voir le projet",
-    "shareProject": "Partager le projet", 
+    "shareProject": "Partager le projet",
     "deleteProject": "Supprimer le projet",
     "kpiCard": {
       "failedToLoad": "Échec du chargement des données",
@@ -287,7 +287,7 @@
       "currentPreference": "Choisissez votre préférence d'alerte",
       "levels": {
         "conservative": "Conservateur",
-        "balanced": "Équilibré", 
+        "balanced": "Équilibré",
         "proactive": "Proactif",
         "conservativeTitle": "Conservateur - Critique uniquement",
         "balancedTitle": "Équilibré - Action nécessaire (Recommandé)",
@@ -300,7 +300,7 @@
       },
       "expectedCounts": {
         "conservative": "Moins d'alertes, urgence plus élevée",
-        "balanced": "Alertes modérées, bon équilibre", 
+        "balanced": "Alertes modérées, bon équilibre",
         "proactive": "Plus d'alertes, prévention précoce"
       },
       "selectDescriptions": {
@@ -339,7 +339,7 @@
     "metrics": {
       "urgentItems": "Articles urgents",
       "urgentItemsDesc": "Lots à urgence élevée",
-      "actionsTaken": "Actions prises", 
+      "actionsTaken": "Actions prises",
       "actionsTakenDesc": "Total des actions cette période",
       "discountValue": "Valeur de remise",
       "discountValueDesc": "Total des remises appliquées",
@@ -354,7 +354,7 @@
       "recentActivity": "Activité récente",
       "actionsTaken": "Actions prises",
       "actionsTakenPeriod": "{totalActions} cette période",
-      "discountsApplied": "Remises appliquées", 
+      "discountsApplied": "Remises appliquées",
       "saved": "€{discountValue} économisé",
       "averageScore": "Score moyen : {avgScore}% • €{discountValue} remises appliquées",
       "discountsAppliedText": "remises appliquées",
@@ -882,6 +882,51 @@
       "copied": "{field} copié dans le presse-papiers"
     }
   },
+  "auth": {
+    "login": "Connexion",
+    "signup": "Inscription entreprise",
+    "logout": "Déconnexion",
+    "goToDashboard": "Tableau de bord",
+    "signUpForm": {
+      "title": "S'inscrire",
+      "description": "Créer un nouveau compte",
+      "email": "Email",
+      "emailPlaceholder": "m@exemple.com",
+      "password": "Mot de passe",
+      "repeatPassword": "Répéter le mot de passe",
+      "creatingAccount": "Création du compte...",
+      "signUpButton": "S'inscrire",
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "loginLink": "Se connecter"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "description": "Saisissez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+      "email": "Email",
+      "emailPlaceholder": "m@exemple.com",
+      "sending": "Envoi en cours...",
+      "sendResetEmail": "Envoyer l'email de réinitialisation",
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "loginLink": "Se connecter",
+      "checkEmailTitle": "Vérifiez votre email",
+      "checkEmailDescription": "Instructions de réinitialisation du mot de passe envoyées",
+      "emailInstructions": "Si vous vous êtes inscrit avec votre email et mot de passe, vous recevrez un email de réinitialisation.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "updatePassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "description": "Veuillez saisir votre nouveau mot de passe ci-dessous.",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Nouveau mot de passe (min 6 caractères)",
+      "saving": "Enregistrement...",
+      "savePassword": "Enregistrer le nouveau mot de passe"
+    },
+    "errors": {
+      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+      "genericError": "Une erreur s'est produite"
+    }
+  },
   "marketing": {
     "nav": {
       "about": "À propos",
@@ -905,50 +950,6 @@
       "careersDesc": "Parcourez les offres d'emploi et découvrez notre espace de travail",
       "support": "Support",
       "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
-    },
-    "auth": {
-      "login": "Connexion",
-      "signup": "Inscription entreprise", 
-      "logout": "Déconnexion",
-      "goToDashboard": "Tableau de bord",
-      "signUpForm": {
-        "title": "S'inscrire",
-        "description": "Créer un nouveau compte",
-        "email": "Email",
-        "emailPlaceholder": "m@exemple.com",
-        "password": "Mot de passe",
-        "repeatPassword": "Répéter le mot de passe",
-        "creatingAccount": "Création du compte...",
-        "signUpButton": "S'inscrire",
-        "alreadyHaveAccount": "Vous avez déjà un compte ?",
-        "loginLink": "Se connecter"
-      },
-      "forgotPassword": {
-        "title": "Réinitialiser votre mot de passe",
-        "description": "Saisissez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
-        "email": "Email",
-        "emailPlaceholder": "m@exemple.com",
-        "sending": "Envoi en cours...",
-        "sendResetEmail": "Envoyer l'email de réinitialisation",
-        "alreadyHaveAccount": "Vous avez déjà un compte ?",
-        "loginLink": "Se connecter",
-        "checkEmailTitle": "Vérifiez votre email",
-        "checkEmailDescription": "Instructions de réinitialisation du mot de passe envoyées",
-        "emailInstructions": "Si vous vous êtes inscrit avec votre email et mot de passe, vous recevrez un email de réinitialisation."
-      },
-      "updatePassword": {
-        "title": "Réinitialiser votre mot de passe",
-        "description": "Veuillez saisir votre nouveau mot de passe ci-dessous.",
-        "newPassword": "Nouveau mot de passe",
-        "newPasswordPlaceholder": "Nouveau mot de passe (min 6 caractères)",
-        "saving": "Enregistrement...",
-        "savePassword": "Enregistrer le nouveau mot de passe"
-      },
-      "errors": {
-        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
-        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
-        "genericError": "Une erreur s'est produite"
-      }
     },
     "onboarding": {
       "stepLabels": {
@@ -1043,7 +1044,7 @@
     "stepLabels": {
       "storeLookup": "Recherche de magasin",
       "addStoreDetails": "Ajouter détails du magasin",
-      "reviewVerify": "Réviser et vérifier", 
+      "reviewVerify": "Réviser et vérifier",
       "createAccount": "Créer un compte"
     },
     "storeSearch": {
@@ -1060,11 +1061,11 @@
     "storeType": {
       "addStoreDetailsTitle": "Ajouter détails du magasin",
       "completeStoreInformationTitle": "Compléter les informations du magasin",
-      "storeInformationCardTitle": "Informations du magasin", 
+      "storeInformationCardTitle": "Informations du magasin",
       "storeNameLabel": "Nom du magasin",
       "storeTypeLabel": "Type de magasin",
       "businessNameLabel": "Nom de l'entreprise",
-      "addressLabel": "Adresse", 
+      "addressLabel": "Adresse",
       "cityLabel": "Ville",
       "postalCodeLabel": "Code postal",
       "countryLabel": "Pays",
@@ -1072,10 +1073,10 @@
       "continueButton": "Continuer",
       "storeNamePlaceholder": "Nom de votre magasin",
       "selectStoreType": "Sélectionner le type de magasin",
-      "businessNamePlaceholder": "Si différent du nom du magasin", 
+      "businessNamePlaceholder": "Si différent du nom du magasin",
       "addressPlaceholder": "123 Rue de la Paix",
       "cityPlaceholder": "Paris",
-      "postalCodePlaceholder": "75001", 
+      "postalCodePlaceholder": "75001",
       "countryPlaceholder": "France",
       "phonePlaceholder": "01 23 45 67 89"
     }
@@ -1422,7 +1423,7 @@
     "urgentAlerts": {
       "levels": {
         "urgentOnly": "Articles urgents uniquement",
-        "priority": "Articles prioritaires", 
+        "priority": "Articles prioritaires",
         "allFlagged": "Tous les articles signalés",
         "completeReview": "Révision complète"
       },
@@ -1434,7 +1435,7 @@
       "messages": {
         "nothingToShow": "Aucun article ne nécessite d'attention pour le moment - tout est en ordre !",
         "itemNeedsAction": "{count, plural, one {article nécessite} other {articles nécessitent}} une action immédiate",
-        "itemMayNeedAction": "{count, plural, one {article pourrait nécessiter} other {articles pourraient nécessiter}} de l'attention bientôt", 
+        "itemMayNeedAction": "{count, plural, one {article pourrait nécessiter} other {articles pourraient nécessiter}} de l'attention bientôt",
         "itemsFlagged": "{count, plural, one {article signalé} other {articles signalés}} pour révision",
         "itemsMonitoring": "{count, plural, one {article signalé} other {articles signalés}} pour surveillance"
       },
@@ -1446,7 +1447,7 @@
     "alertQuickToggle": {
       "levels": {
         "urgent": "Urgent",
-        "default": "Défaut", 
+        "default": "Défaut",
         "early": "Précoce"
       },
       "tooltips": {
@@ -1465,14 +1466,14 @@
       "noActions": "Aucune action immédiate requise ! Tous les lots sont dans les seuils de sécurité.",
       "urgencyLevels": {
         "critical": "Critique",
-        "high": "Élevé", 
+        "high": "Élevé",
         "medium": "Moyen",
         "low": "Faible"
       },
       "summaryLabels": {
         "critical": "Critique",
         "high": "Élevé",
-        "medium": "Moyen", 
+        "medium": "Moyen",
         "low": "Faible"
       },
       "batchDetails": {
@@ -1586,7 +1587,7 @@
   "scanningWorkflow": {
     "steps": {
       "scanBarcode": "Scanner code-barres",
-      "changeProduct": "Changer produit", 
+      "changeProduct": "Changer produit",
       "scanExpiryDate": "Scanner date d'expiration",
       "reviewDetails": "Réviser détails",
       "previousStep": "Étape précédente"
@@ -1713,7 +1714,7 @@
   "timeSelector": {
     "periods": {
       "thisWeek": "Cette semaine",
-      "lastWeek": "Semaine dernière", 
+      "lastWeek": "Semaine dernière",
       "thisMonth": "Ce mois",
       "lastMonth": "Mois dernier",
       "last7Days": "7 derniers jours",
@@ -1723,7 +1724,7 @@
     "compareLabels": {
       "lastWeek": "Semaine dernière",
       "previousWeek": "Semaine précédente",
-      "lastMonth": "Mois dernier", 
+      "lastMonth": "Mois dernier",
       "previousMonth": "Mois précédent",
       "previous7Days": "7 jours précédents",
       "previous30Days": "30 jours précédents",
