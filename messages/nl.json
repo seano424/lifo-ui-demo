@@ -380,7 +380,7 @@
       "messages": {
         "nothingToShow": "Geen urgente items op dit moment",
         "criticalItemsAction": "{count} kritieke items hebben onmiddellijke actie nodig (verlopen of verlopen binnen 24 uur)",
-        "highPriorityItems": "{count} hoge prioriteit items verlopen binnen 2-3 dagen",
+        "highPriorityItems": "{count} hoge prioriteit items (verlopen binnen 2-3 dagen)",
         "criticalItems": "{count} kritieke items (verlopen of verlopen binnen 24 uur)",
         "mediumPriorityItems": "{count} gemiddelde prioriteit items (verlopen binnen een week)",
         "lowPriorityItems": "{count} lage prioriteit items (verlopen binnen 2 weken)"

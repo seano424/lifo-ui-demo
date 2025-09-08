@@ -380,7 +380,7 @@
       "messages": {
         "nothingToShow": "Aucun article urgent pour le moment",
         "criticalItemsAction": "{count} articles critiques nécessitent une action immédiate (expirés ou expirant dans les 24 heures)",
-        "highPriorityItems": "{count} articles prioritaires expirant dans 2-3 jours",
+        "highPriorityItems": "{count} articles prioritaires (expirant dans 2-3 jours)",
         "criticalItems": "{count} articles critiques (expirés ou expirant dans les 24 heures)",
         "mediumPriorityItems": "{count} articles de priorité moyenne (expirant dans une semaine)",
         "lowPriorityItems": "{count} articles de faible priorité (expirant dans 2 semaines)"

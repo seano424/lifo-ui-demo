@@ -517,7 +517,7 @@
       "messages": {
         "nothingToShow": "No urgent items at this time",
         "criticalItemsAction": "{count} critical items need immediate action (expired or expiring within 24 hours)",
-        "highPriorityItems": "{count} high priority items expiring within 2-3 days",
+        "highPriorityItems": "{count} high priority items (expiring within 2-3 days)",
         "criticalItems": "{count} critical items (expired or expiring within 24 hours)",
         "mediumPriorityItems": "{count} medium priority items (expiring within a week)",
         "lowPriorityItems": "{count} low priority items (expiring within 2 weeks)"

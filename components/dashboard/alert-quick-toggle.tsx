@@ -69,7 +69,7 @@ export function AlertQuickToggle({
 
   return (
     <TooltipProvider>
-      <div className={`flex gap-1 ${className}`}>
+      <div className={`flex gap-2 ${className}`}>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -77,7 +77,7 @@ export function AlertQuickToggle({
               variant={currentLevel === 'critical' ? 'default' : 'outline'}
               onClick={() => handleLevelChange('critical')}
               disabled={isUpdating}
-              className="flex items-center gap-1 h-auto py-1 px-2"
+              className="flex items-center gap-1 h-auto px-3"
             >
               <span className="text-xs">{t('levels.critical')}</span>
             </Button>
@@ -95,7 +95,7 @@ export function AlertQuickToggle({
               variant={currentLevel === 'high' ? 'default' : 'outline'}
               onClick={() => handleLevelChange('high')}
               disabled={isUpdating}
-              className="flex items-center gap-1 h-auto py-1 px-2"
+              className="flex items-center gap-1 h-auto px-3"
             >
               <span className="text-xs">{t('levels.high')}</span>
             </Button>
@@ -113,9 +113,9 @@ export function AlertQuickToggle({
               variant={currentLevel === 'medium' ? 'default' : 'outline'}
               onClick={() => handleLevelChange('medium')}
               disabled={isUpdating}
-              className="flex items-center gap-1 h-auto py-1 px-2"
+              className="flex items-center gap-1 h-auto px-3"
             >
-              <span className="text-xs">{t('levels.medium')}</span>
+              {t('levels.medium')}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -131,9 +131,9 @@ export function AlertQuickToggle({
               variant={currentLevel === 'low' ? 'default' : 'outline'}
               onClick={() => handleLevelChange('low')}
               disabled={isUpdating}
-              className="flex items-center gap-1 h-auto py-1 px-2"
+              className="flex items-center gap-1 h-auto px-3"
             >
-              <span className="text-xs">{t('levels.all')}</span>
+              {t('levels.all')}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
