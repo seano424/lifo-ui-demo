@@ -993,6 +993,12 @@
       "careersDesc": "Parcourez les offres d'emploi et découvrez notre espace de travail",
       "support": "Support",
       "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
+    },
+    "auth": {
+      "login": "Connexion",
+      "signup": "Inscription entreprise",
+      "logout": "Déconnexion",
+      "goToDashboard": "Tableau de bord"
     }
   },
   "onboarding": {

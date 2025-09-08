@@ -1,24 +1,24 @@
 import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { createClient } from '@/lib/supabase/server'
-import { NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const { searchParams, pathname } = new URL(request.url)
   const code = searchParams.get('code')
-  
+
   // Handle auth code exchange for password resets and other auth flows
   if (code && pathname === '/') {
     const supabase = await createClient()
-    
+
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
-      
+
       if (!error) {
         // Code exchange successful - redirect to appropriate page
         const type = searchParams.get('type')
         const next = searchParams.get('next')
-        
+
         if (type === 'recovery') {
           // Password reset - redirect to update password page
           const redirectUrl = new URL('/auth/update-password', request.url)
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(errorUrl)
     }
   }
-  
+
   return await updateSession(request)
 }
 
