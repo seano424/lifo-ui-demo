@@ -113,7 +113,7 @@ export function StoreUsersList({
 
   // 🚀 Use server permissions if available, fallback to client permissions
   const clientPermissions = usePermissions()
-  const { isOwner } = useUserRole()
+  const { isOwner, isManager } = useUserRole()
   const { activeStore } = useStoreState()
 
   const canManageUsers =
@@ -224,7 +224,7 @@ export function StoreUsersList({
           </Typography>
 
           {/* Role-based permissions info - only show for owners and managers */}
-          {canManageUsers && (
+          {(isOwner || isManager) && canManageUsers && (
             <div className="mb-6 mt-4 p-4 bg-secondary-50 border border-secondary-200 rounded-lg flex flex-col">
               <Typography
                 variant="small"
@@ -509,7 +509,12 @@ export function StoreUsersList({
       {/* Edit User Role Dialog */}
       <Dialog
         open={isEditUserRoleDialogOpen}
-        onOpenChange={setIsEditUserRoleDialogOpen}
+        onOpenChange={(open) => {
+          setIsEditUserRoleDialogOpen(open)
+          if (!open) {
+            setSelectedUser(null)
+          }
+        }}
       >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
