@@ -3,7 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { fastApiClient } from '@/lib/services/fastapi-client'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 import type { Database } from '@/types/supabase'
 
@@ -15,16 +15,8 @@ type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] &
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Use admin client for analytics - no user auth required
+  const supabase = createAdminClient()
 
   const { searchParams } = new URL(request.url)
   const storeId = searchParams.get('storeId')
@@ -137,6 +129,11 @@ export async function GET(request: NextRequest) {
             if (fastApiAnalytics.summary) {
               analytics.ai_summary = fastApiAnalytics.summary
             }
+
+            // Include full FastAPI analytics data
+            if (fastApiAnalytics.analytics) {
+              analytics.fastapi_analytics = fastApiAnalytics.analytics
+            }
           }
         } else {
           console.warn('[ANALYTICS] No user session, trying service key fallback')
@@ -165,6 +162,11 @@ export async function GET(request: NextRequest) {
             if (fastApiAnalytics.summary) {
               analytics.ai_summary = fastApiAnalytics.summary
             }
+
+            // Include full FastAPI analytics data
+            if (fastApiAnalytics.analytics) {
+              analytics.fastapi_analytics = fastApiAnalytics.analytics
+            }
           }
         }
       } catch (fastApiError) {
@@ -175,17 +177,6 @@ export async function GET(request: NextRequest) {
     } else {
       analytics.source = 'supabase'
       analytics.ai_enhanced = false
-    }
-
-    if (!metric || metric === 'overview') {
-      // Get comprehensive overview
-      analytics.overview = await getOverviewAnalytics(
-        supabase,
-        storeId,
-        startDate,
-        endDate,
-        threshold,
-      )
     }
 
     if (!metric || metric === 'waste') {
@@ -216,155 +207,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getOverviewAnalytics(
-  supabase: SupabaseClient<Database>,
-  storeId: string,
-  startDate: Date,
-  endDate: Date,
-  threshold: number = 0.7,
-) {
-  try {
-    // Get batches first (same as alerts API)
-    const { data: batches, error: batchError } = await supabase
-      .schema('inventory')
-      .from('batches')
-      .select(
-        'batch_id, batch_number, current_quantity, selling_price, cost_price, expiry_date, location_code, supplier, product_id',
-      )
-      .eq('store_id', storeId)
-      .eq('status', 'active')
-      .order('expiry_date', { ascending: true })
-
-    if (batchError) {
-      console.error('[getOverviewAnalytics] Error fetching batches:', batchError)
-    }
-
-    if (!batches || batches.length === 0) {
-      return {
-        totalProducts: 0,
-        totalBatches: 0,
-        activeAlerts: 0,
-        totalValue: 0,
-        expiringItems: 0,
-        urgent_items: 0,
-        actions_taken: 0,
-        discount_actions: 0,
-        total_discount_value: 0,
-        avg_composite_score: 0,
-      }
-    }
-
-    // Get batch IDs for scoring lookup
-    const batchIds = batches.map(batch => batch.batch_id)
-
-    // Get scoring data for these batches
-    const { data: scoringData, error: scoringError } = await supabase
-      .schema('scoring')
-      .from('product_scores')
-      .select('batch_id, composite_score, recommendation, calculated_at')
-      .eq('store_id', storeId)
-      .in('batch_id', batchIds)
-
-    if (scoringError) {
-      console.error('[getOverviewAnalytics] Error fetching scoring data:', scoringError)
-    }
-
-    // Get total store products count
-    const { count: productCount, error: productError } = await supabase
-      .schema('inventory')
-      .from('store_products')
-      .select('*', { count: 'exact', head: true })
-      .eq('store_id', storeId)
-      .eq('is_active', true)
-
-    if (productError) {
-      console.error('[getOverviewAnalytics] Error counting products:', productError)
-    }
-
-    // Create scoring map for quick lookup
-    const scoringMap = new Map()
-    scoringData?.forEach(score => {
-      scoringMap.set(score.batch_id, score)
-    })
-
-    // Combine batch and scoring data (same logic as alerts API)
-    const combinedData =
-      batches?.map(batch => {
-        const scoring = scoringMap.get(batch.batch_id)
-        return {
-          ...batch,
-          composite_score: scoring?.composite_score || 0,
-          recommendation: scoring?.recommendation,
-          calculated_at: scoring?.calculated_at,
-        }
-      }) || []
-
-    // Count urgent items above threshold (same logic as alerts API)
-    const urgentItems = combinedData.filter(item => (item.composite_score || 0) >= threshold)
-
-    // Calculate totals from combined data
-    const totalBatches = combinedData.length
-    const totalValue = combinedData.reduce((sum, item) => {
-      return sum + (item.current_quantity || 0) * (item.selling_price || 0)
-    }, 0)
-
-    // Count expiring items (expiring within 3 days)
-    const expiringItems = combinedData.filter(item => {
-      if (!item.expiry_date) return false
-      const expiryDate = new Date(item.expiry_date)
-      const threeDaysFromNow = new Date()
-      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
-      return expiryDate <= threeDaysFromNow
-    }).length
-
-    // Get actions taken in timeframe (from analytics schema)
-    const { data: actions } = await supabase
-      .schema('analytics')
-      .from('actions')
-      .select('*')
-      .eq('store_id', storeId)
-      .gte('executed_at', startDate.toISOString())
-      .lte('executed_at', endDate.toISOString())
-
-    // Calculate discounts applied
-    const discountActions =
-      actions?.filter(
-        a =>
-          a.action_type &&
-          (a.action_type.includes('discount') ||
-            a.action_type === 'discount_aggressive' ||
-            a.action_type === 'discount_moderate'),
-      ) || []
-
-    const totalDiscountValue = discountActions.reduce((sum, action) => {
-      return sum + ((action.original_price ?? 0) - (action.new_price ?? 0))
-    }, 0)
-
-    return {
-      totalProducts: productCount || 0,
-      totalBatches,
-      activeAlerts: urgentItems.length,
-      totalValue: Math.round(totalValue * 100) / 100,
-      expiringItems,
-      urgent_items: urgentItems.length,
-      actions_taken: actions?.length || 0,
-      discount_actions: discountActions.length,
-      total_discount_value: Math.round(totalDiscountValue * 100) / 100,
-      avg_composite_score:
-        totalBatches > 0
-          ? Math.round(
-              (combinedData.reduce((sum, item) => sum + (item.composite_score || 0), 0) /
-                totalBatches) *
-                100,
-            ) / 100
-          : 0,
-    }
-  } catch (error) {
-    console.error('Error in overview analytics:', error)
-    return { error: error instanceof Error ? error.message : 'Unknown error' }
-  }
-}
-
 async function getWasteAnalytics(
   supabase: SupabaseClient<Database>,
   storeId: string,
@@ -376,7 +218,8 @@ async function getWasteAnalytics(
     const { data: expiredBatches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         *,
         store_products!inner (
           products (
@@ -385,7 +228,8 @@ async function getWasteAnalytics(
             sku
           )
         )
-      `)
+      `,
+      )
       .eq('store_id', storeId)
       .eq('status', 'expired')
       .gte('updated_at', startDate.toISOString())
@@ -398,7 +242,8 @@ async function getWasteAnalytics(
     const { data: expiringSoon } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         *,
         store_products!inner (
           products (
@@ -407,7 +252,8 @@ async function getWasteAnalytics(
             sku
           )
         )
-      `)
+      `,
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .lte('expiry_date', soonExpiryDate.toISOString().split('T')[0])
@@ -510,7 +356,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
     const { data: batches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         *,
         store_products!inner (
           products (
@@ -519,7 +366,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
             sku
           )
         )
-      `)
+      `,
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
 

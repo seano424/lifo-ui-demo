@@ -497,6 +497,49 @@
       "discountsAppliedText": "discounts applied",
       "showDetails": "Show Details",
       "hideDetails": "Hide Details"
+    },
+    "urgentAlerts": {
+      "errors": {
+        "connectionError": "Connection Error",
+        "unableToLoad": "Unable to load urgent alerts",
+        "loadingAlerts": "Loading alerts..."
+      },
+      "buttons": {
+        "viewInventory": "View Inventory",
+        "viewItems": "View Items"
+      },
+      "levels": {
+        "urgentOnly": "Critical Only",
+        "priority": "High Priority",
+        "allFlagged": "Medium Priority",
+        "completeReview": "Complete Review"
+      },
+      "messages": {
+        "nothingToShow": "No urgent items at this time",
+        "criticalItemsAction": "{count} critical items need immediate action (expired or expiring within 24 hours)",
+        "highPriorityItems": "{count} high priority items (expiring within 2-3 days)",
+        "criticalItems": "{count} critical items (expired or expiring within 24 hours)",
+        "mediumPriorityItems": "{count} medium priority items (expiring within a week)",
+        "lowPriorityItems": "{count} low priority items (expiring within 2 weeks)"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "critical": "Critical",
+        "high": "High", 
+        "medium": "Medium",
+        "all": "All"
+      },
+      "tooltips": {
+        "critical": "Critical Items Only",
+        "criticalDesc": "Expired or expiring within 24 hours",
+        "high": "Critical + High Priority",
+        "highDesc": "Items expiring within 2-3 days",
+        "medium": "Up to Medium Priority", 
+        "mediumDesc": "Items expiring within a week",
+        "all": "All Priority Levels",
+        "allDesc": "Complete inventory review"
+      }
     }
   },
   "dashboard": {

@@ -360,6 +360,49 @@
       "discountsAppliedText": "kortingen toegepast",
       "showDetails": "Details Tonen",
       "hideDetails": "Details Verbergen"
+    },
+    "urgentAlerts": {
+      "errors": {
+        "connectionError": "Verbindingsfout",
+        "unableToLoad": "Kan urgente meldingen niet laden",
+        "loadingAlerts": "Meldingen laden..."
+      },
+      "buttons": {
+        "viewInventory": "Voorraad bekijken",
+        "viewItems": "Items bekijken"
+      },
+      "levels": {
+        "urgentOnly": "Alleen kritiek",
+        "priority": "Hoge prioriteit",
+        "allFlagged": "Gemiddelde prioriteit",
+        "completeReview": "Volledige beoordeling"
+      },
+      "messages": {
+        "nothingToShow": "Geen urgente items op dit moment",
+        "criticalItemsAction": "{count} kritieke items hebben onmiddellijke actie nodig (verlopen of verlopen binnen 24 uur)",
+        "highPriorityItems": "{count} hoge prioriteit items (verlopen binnen 2-3 dagen)",
+        "criticalItems": "{count} kritieke items (verlopen of verlopen binnen 24 uur)",
+        "mediumPriorityItems": "{count} gemiddelde prioriteit items (verlopen binnen een week)",
+        "lowPriorityItems": "{count} lage prioriteit items (verlopen binnen 2 weken)"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "critical": "Kritiek",
+        "high": "Hoog",
+        "medium": "Medium",
+        "all": "Alle"
+      },
+      "tooltips": {
+        "critical": "Alleen kritieke items",
+        "criticalDesc": "Verlopen of verlopen binnen 24 uur",
+        "high": "Kritiek + Hoge prioriteit",
+        "highDesc": "Items die binnen 2-3 dagen verlopen",
+        "medium": "Tot gemiddelde prioriteit",
+        "mediumDesc": "Items die binnen een week verlopen",
+        "all": "Alle prioriteitsniveaus",
+        "allDesc": "Volledige voorraadcontrole"
+      }
     }
   },
   "dashboard": {

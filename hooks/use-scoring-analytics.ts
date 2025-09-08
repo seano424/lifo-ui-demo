@@ -1,3 +1,5 @@
+// hooks/use-scoring-analytics.ts
+
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
@@ -54,15 +56,6 @@ export interface AlertsResponse {
   }
 }
 
-interface OverviewAnalytics {
-  urgent_items: number
-  actions_taken: number
-  discount_actions: number
-  total_discount_value: number
-  avg_composite_score: number
-  [key: string]: number | string | undefined // For other store stats
-}
-
 interface WasteAnalytics {
   expired_items: number
   expiring_soon: number
@@ -90,12 +83,44 @@ interface CategoryAnalytics {
   }
 }
 
+interface FastAPIInventorySummary {
+  total_batches: number
+  total_value: number
+  expired_count: number
+  expiring_soon_count: number
+}
+
+interface FastAPIUrgencyDistribution {
+  critical: number
+  high: number
+  medium: number
+  low: number
+}
+
+interface FastAPIRecentAction {
+  action_type: string
+  batch_id: string
+  original_price?: number
+  new_price?: number
+  executed_at: string
+}
+
+interface FastAPIAnalytics {
+  inventory_summary: FastAPIInventorySummary
+  urgency_distribution: FastAPIUrgencyDistribution
+  recent_actions: FastAPIRecentAction[]
+}
+
 export interface AnalyticsResponse {
   analytics: {
     timeframe: string
     store_id: string
     generated_at: string
-    overview?: OverviewAnalytics | { error: string }
+    source?: string
+    ai_enhanced?: boolean
+    ai_insights?: unknown
+    ai_summary?: string
+    fastapi_analytics?: FastAPIAnalytics
     waste?: WasteAnalytics | { error: string }
     revenue?: RevenueAnalytics | { error: string }
     categories?: CategoryAnalytics | { error: string }
@@ -302,19 +327,19 @@ export function useScoringRecommendations(storeId: string | null, category?: str
 }
 
 /**
- * Hook for fetching dashboard insights (7-day analytics overview)
+ * Hook for fetching dashboard insights (7-day analytics)
  * @param storeId - Store ID to fetch insights for
  */
 export function useDashboardInsights(storeId: string | null) {
-  return useStoreAnalytics(storeId, '7d', 'overview')
+  return useStoreAnalytics(storeId, '7d')
 }
 
 /**
- * Hook for mobile summary (1-day analytics overview)
+ * Hook for mobile summary (1-day analytics)
  * @param storeId - Store ID to fetch summary for
  */
 export function useMobileSummary(storeId: string | null) {
-  return useStoreAnalytics(storeId, '1d', 'overview')
+  return useStoreAnalytics(storeId, '1d')
 }
 
 // Direct fetch functions (for compatibility with existing code)

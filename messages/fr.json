@@ -360,6 +360,49 @@
       "discountsAppliedText": "remises appliquées",
       "showDetails": "Afficher les détails",
       "hideDetails": "Masquer les détails"
+    },
+    "urgentAlerts": {
+      "errors": {
+        "connectionError": "Erreur de connexion",
+        "unableToLoad": "Impossible de charger les alertes urgentes",
+        "loadingAlerts": "Chargement des alertes..."
+      },
+      "buttons": {
+        "viewInventory": "Voir l'inventaire",
+        "viewItems": "Voir les articles"
+      },
+      "levels": {
+        "urgentOnly": "Critique uniquement",
+        "priority": "Priorité élevée",
+        "allFlagged": "Priorité moyenne",
+        "completeReview": "Examen complet"
+      },
+      "messages": {
+        "nothingToShow": "Aucun article urgent pour le moment",
+        "criticalItemsAction": "{count} articles critiques nécessitent une action immédiate (expirés ou expirant dans les 24 heures)",
+        "highPriorityItems": "{count} articles prioritaires (expirant dans 2-3 jours)",
+        "criticalItems": "{count} articles critiques (expirés ou expirant dans les 24 heures)",
+        "mediumPriorityItems": "{count} articles de priorité moyenne (expirant dans une semaine)",
+        "lowPriorityItems": "{count} articles de faible priorité (expirant dans 2 semaines)"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "critical": "Critique",
+        "high": "Élevé",
+        "medium": "Moyen",
+        "all": "Tous"
+      },
+      "tooltips": {
+        "critical": "Articles critiques uniquement",
+        "criticalDesc": "Expirés ou expirant dans les 24 heures",
+        "high": "Critique + Priorité élevée",
+        "highDesc": "Articles expirant dans 2-3 jours",
+        "medium": "Jusqu'à priorité moyenne",
+        "mediumDesc": "Articles expirant dans une semaine",
+        "all": "Tous les niveaux de priorité",
+        "allDesc": "Examen complet de l'inventaire"
+      }
     }
   },
   "dashboard": {
@@ -950,6 +993,51 @@
       "careersDesc": "Parcourez les offres d'emploi et découvrez notre espace de travail",
       "support": "Support",
       "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
+    },
+    "auth": {
+      "login": "Connexion",
+      "signup": "Inscription entreprise", 
+      "logout": "Déconnexion",
+      "goToDashboard": "Tableau de bord",
+      "signUpForm": {
+        "title": "S'inscrire",
+        "description": "Créer un nouveau compte",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "password": "Mot de passe",
+        "repeatPassword": "Répéter le mot de passe",
+        "creatingAccount": "Création d'un compte...",
+        "signUpButton": "S'inscrire",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Connexion"
+      },
+      "forgotPassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Saisissez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "sending": "Envoi en cours...",
+        "sendResetEmail": "Envoyer l'email de réinitialisation",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Connexion",
+        "checkEmailTitle": "Vérifiez votre email",
+        "checkEmailDescription": "Instructions de réinitialisation du mot de passe envoyées",
+        "emailInstructions": "Si vous vous êtes inscrit avec votre email et mot de passe, vous recevrez un email de réinitialisation.",
+        "backToLogin": "Retour à la connexion"
+      },
+      "updatePassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Veuillez saisir votre nouveau mot de passe ci-dessous.",
+        "newPassword": "Nouveau mot de passe",
+        "newPasswordPlaceholder": "Nouveau mot de passe (min 6 caractères)",
+        "saving": "Enregistrement...",
+        "savePassword": "Enregistrer le nouveau mot de passe"
+      },
+      "errors": {
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+        "genericError": "Une erreur s'est produite"
+      }
     },
     "onboarding": {
       "stepLabels": {
