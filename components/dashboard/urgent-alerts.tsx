@@ -65,6 +65,7 @@ export function UrgentAlerts() {
   }
 
   const urgencyDistribution = data?.analytics?.fastapi_analytics?.urgency_distribution
+  const supabaseInsights = data?.analytics?.insights
 
   const formatMessageWithBold = (message: string) => {
     // Match patterns like "8 critical items" at the beginning
@@ -82,14 +83,38 @@ export function UrgentAlerts() {
   }
 
   const getMessage = () => {
-    if (!urgencyDistribution) return t('errors.loadingAlerts')
+    // Prefer urgency_distribution when available (works for both FastAPI and Supabase fallback now)
+    if (urgencyDistribution) {
+      const criticalCount = urgencyDistribution.critical || 0
+      const highCount = urgencyDistribution.high || 0
+      const mediumCount = urgencyDistribution.medium || 0
+      const lowCount = urgencyDistribution.low || 0
+      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
 
-    const criticalCount = urgencyDistribution.critical || 0
-    const highCount = urgencyDistribution.high || 0
-    const mediumCount = urgencyDistribution.medium || 0
-    const lowCount = urgencyDistribution.low || 0
-    const totalAlerts = criticalCount + highCount + mediumCount + lowCount
+      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
+    }
 
+    // Fallback to Supabase insights format if urgency_distribution is not available
+    if (supabaseInsights) {
+      const criticalCount = supabaseInsights.high_urgency?.count || 0
+      const highCount = Math.max(0, (supabaseInsights.expiring_soon?.count || 0) - criticalCount)
+      const mediumCount = supabaseInsights.ready_for_discount?.count || 0
+      const lowCount = 0 // This fallback doesn't have low priority classification
+      const totalAlerts = criticalCount + highCount + mediumCount
+
+      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
+    }
+
+    return t('errors.loadingAlerts')
+  }
+
+  const getUrgencyMessage = (
+    criticalCount: number,
+    highCount: number,
+    mediumCount: number,
+    lowCount: number,
+    totalAlerts: number,
+  ) => {
     if (totalAlerts === 0) {
       return t('messages.nothingToShow')
     }

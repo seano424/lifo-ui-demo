@@ -173,10 +173,16 @@ export async function GET(request: NextRequest) {
         console.warn('[ANALYTICS] FastAPI failed, using Supabase fallback:', fastApiError)
         analytics.source = 'supabase'
         analytics.ai_enhanced = false
+
+        // Add comprehensive Supabase insights as fallback
+        await addSupabaseInsightsFallback(supabase, storeId, analytics)
       }
     } else {
       analytics.source = 'supabase'
       analytics.ai_enhanced = false
+
+      // Add comprehensive Supabase insights when FastAPI is disabled
+      await addSupabaseInsightsFallback(supabase, storeId, analytics)
     }
 
     if (!metric || metric === 'waste') {
@@ -440,5 +446,170 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
   } catch (error) {
     console.error('Error in category analytics:', error)
     return { error: error instanceof Error ? error.message : 'Unknown error' }
+  }
+}
+
+// Helper function to add comprehensive Supabase insights as fallback
+async function addSupabaseInsightsFallback(
+  supabase: SupabaseClient<Database>,
+  storeId: string,
+  analytics: Record<string, unknown>,
+) {
+  try {
+    console.log('[ANALYTICS] Adding Supabase insights fallback')
+
+    // Since the RPC might not return the expected format, let's build the insights manually
+    // from the data we can query directly - similar to what the existing analytics functions do
+
+    // Get batches by different expiry windows to match FastAPI-style classification
+    const today = new Date()
+
+    // Critical: expiring today or tomorrow (0-1 days)
+    const criticalDate = new Date(today)
+    criticalDate.setDate(today.getDate() + 1)
+
+    const { data: criticalBatches } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('batch_id, expiry_date')
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+      .lte('expiry_date', criticalDate.toISOString().split('T')[0])
+
+    // High: expiring in 2-3 days
+    const highDate = new Date(today)
+    highDate.setDate(today.getDate() + 3)
+
+    const { data: highBatches } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('batch_id, expiry_date')
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+      .gt('expiry_date', criticalDate.toISOString().split('T')[0])
+      .lte('expiry_date', highDate.toISOString().split('T')[0])
+
+    // Medium: expiring in 4-7 days
+    const mediumDate = new Date(today)
+    mediumDate.setDate(today.getDate() + 7)
+
+    const { data: mediumBatches } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('batch_id, expiry_date')
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+      .gt('expiry_date', highDate.toISOString().split('T')[0])
+      .lte('expiry_date', mediumDate.toISOString().split('T')[0])
+
+    // Get all active batches for totals and calculate low priority
+    const { data: allActiveBatches } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('batch_id')
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+
+    // Calculate counts
+    const criticalCount = criticalBatches?.length || 0
+    const highCount = highBatches?.length || 0
+    const mediumCount = mediumBatches?.length || 0
+    const totalActiveBatches = allActiveBatches?.length || 0
+    const lowCount = Math.max(0, totalActiveBatches - criticalCount - highCount - mediumCount) // Everything else
+
+    // Calculate actionable items (critical + high + medium)
+    const expiringSoonCount = criticalCount + highCount // Items expiring within 3 days
+    const readyForDiscountCount = highCount + mediumCount // Items suitable for discount
+    const perfectForDonationCount = Math.floor(mediumCount * 0.5) // ~50% of medium priority suitable for donation
+    const totalActionableItems = criticalCount + highCount + mediumCount
+
+    const actionRequiredPercentage =
+      totalActiveBatches > 0 ? Math.round((totalActionableItems / totalActiveBatches) * 100) : 0
+
+    const insights = {
+      expiring_soon: {
+        count: expiringSoonCount,
+        description: `${expiringSoonCount} items expiring within 3 days`,
+      },
+      ready_for_discount: {
+        count: readyForDiscountCount,
+        description: `${readyForDiscountCount} items ready for discount pricing`,
+      },
+      perfect_for_donation: {
+        count: perfectForDonationCount,
+        description: `${perfectForDonationCount} items suitable for donation`,
+      },
+      high_urgency: {
+        count: criticalCount,
+        description: `${criticalCount} items requiring immediate attention`,
+      },
+      summary: {
+        total_active_batches: totalActiveBatches,
+        total_actionable_items: totalActionableItems,
+        action_required_percentage: actionRequiredPercentage,
+      },
+    }
+
+    // Also add FastAPI-compatible urgency distribution for consistency
+    const urgencyDistribution = {
+      critical: criticalCount,
+      high: highCount,
+      medium: mediumCount,
+      low: lowCount,
+    }
+
+    // Add insights in the format expected by the frontend hooks
+    analytics.insights = insights
+    analytics.store_insights = {
+      store_id: storeId,
+      store_name: 'Store', // We don't have the name readily available
+      insights: insights,
+    }
+
+    // Add FastAPI-compatible structure for components that expect it
+    analytics.fastapi_analytics = {
+      inventory_summary: {
+        total_batches: totalActiveBatches,
+        total_quantity: 0, // Not calculated in fallback
+        total_value: 0, // Not calculated in fallback
+        expired_count: 0, // Not calculated in fallback
+        expiring_soon_count: expiringSoonCount,
+      },
+      urgency_distribution: urgencyDistribution,
+      category_breakdown: [],
+      recent_actions: [],
+    }
+
+    console.log('[ANALYTICS] Successfully added Supabase insights fallback with manual calculation')
+
+    // Try to get actionable batches using RPC, but don't fail if it doesn't work
+    try {
+      const { data: actionableBatches, error: batchesError } = await supabase.rpc(
+        'get_actionable_batches',
+        {
+          input_store_id: storeId,
+        },
+      )
+
+      if (!batchesError && actionableBatches) {
+        const batchesData = actionableBatches as {
+          actionable_batches: unknown[]
+          summary: {
+            total_actionable_batches: number
+            urgent_count: number
+            discount_count: number
+            donation_count: number
+          }
+        }
+        analytics.actionable_batches = batchesData.actionable_batches
+        analytics.actionable_summary = batchesData.summary
+        console.log('[ANALYTICS] Successfully added actionable batches from RPC')
+      }
+    } catch (rpcError) {
+      console.warn('[ANALYTICS] RPC actionable_batches failed, continuing without it:', rpcError)
+    }
+  } catch (error) {
+    console.error('[ANALYTICS] Error adding Supabase insights fallback:', error)
+    // Don't throw - this is a fallback, we want to continue with other analytics
   }
 }
