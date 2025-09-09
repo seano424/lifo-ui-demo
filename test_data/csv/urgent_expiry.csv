@@ -1,0 +1,5 @@
+sku,product_name,category,quantity,expiry_date,cost_price,selling_price,batch_number
+EXP001,About to Expire Milk,Dairy,5,2025-09-04,1.20,2.50,BATCH-URGENT-001
+EXP002,Day Old Bread,Bakery,8,2025-09-05,0.80,1.80,BATCH-URGENT-002
+EXP003,Soft Bananas,Produce,12,2025-09-06,0.30,0.80,BATCH-URGENT-003
+EXP004,Fresh Fish Fillet,Meat,3,2025-09-07,6.00,12.00,BATCH-URGENT-004

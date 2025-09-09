@@ -11,6 +11,8 @@ from typing import Any
 import structlog
 from fastapi import HTTPException, Request
 
+from app.auth.error_responses import StandardAuthErrors, map_supabase_error
+from app.auth.monitoring import record_login_success, record_login_failure, AuthEventType
 from app.auth.supabase_api_key_auth import (
     SupabaseAPIKeyError,
     get_api_key_auth,
@@ -39,14 +41,31 @@ async def get_current_user(
     Raises:
         AuthenticationException: If authentication fails
     """
+    import time
+    start_time = time.time()
+    client_ip = getattr(request.client, 'host', None) if hasattr(request, 'client') else None
+    
     try:
         # Use the new API key authentication system
         auth = get_api_key_auth()
         user = await auth.validate_api_request(request)
 
+        # Calculate response time
+        response_time_ms = (time.time() - start_time) * 1000
+
+        # Record successful authentication
+        record_login_success(
+            user_id=user.user_id,
+            ip_address=client_ip,
+            response_time_ms=response_time_ms
+        )
+
         # Log successful authentication (without sensitive data)
         logger.info(
-            "User authenticated successfully", user_id=user.user_id, role=user.role
+            "User authenticated successfully", 
+            user_id=user.user_id, 
+            role=user.role,
+            response_time_ms=response_time_ms
         )
 
         return {
@@ -60,10 +79,25 @@ async def get_current_user(
 
     except SupabaseAPIKeyError as e:
         logger.warning("Supabase API key authentication failed", error=str(e))
-        raise AuthenticationException("Invalid authentication token") from e
+        
+        # Record authentication failure
+        record_login_failure(
+            ip_address=client_ip,
+            error_code=getattr(e, 'status_code', 401)
+        )
+        
+        # Map to standardized error response
+        raise map_supabase_error(e) from e
     except Exception as e:
         logger.error("Authentication error", error=str(e))
-        raise AuthenticationException("Authentication failed") from e
+        
+        # Record authentication failure
+        record_login_failure(
+            ip_address=client_ip,
+            error_code="AUTH_009"
+        )
+        
+        raise StandardAuthErrors.auth_configuration_error() from e
 
 
 async def get_optional_user(
@@ -74,8 +108,8 @@ async def get_optional_user(
     Used for endpoints that work with or without authentication
     """
     try:
-        # Check if Authorization header exists
-        authorization = request.headers.get("Authorization")
+        # Check if Authorization header exists (case-insensitive)
+        authorization = request.headers.get("Authorization") or request.headers.get("authorization")
         if not authorization:
             return None
 
@@ -111,17 +145,17 @@ async def require_service_role(
             logger.warning(
                 "Service role required but user has different role", role=user.role
             )
-            raise AuthorizationException("Service role required")
+            raise StandardAuthErrors.insufficient_permissions("service_role")
 
         logger.info("Service role authenticated")
         return {"role": "service_role", "authenticated": True, "user_id": user.user_id}
 
     except SupabaseAPIKeyError as e:
         logger.error("Service role authentication error", error=str(e))
-        raise AuthorizationException("Service role authentication failed") from e
+        raise StandardAuthErrors.invalid_service_key() from e
     except Exception as e:
         logger.error("Service role authentication error", error=str(e))
-        raise AuthorizationException("Service role authentication failed") from e
+        raise StandardAuthErrors.auth_configuration_error() from e
 
 
 # Input Validation Functions
@@ -395,8 +429,13 @@ def rate_limit_key_func(request: Request) -> str:
     Generate rate limiting key based on user or IP
     """
     try:
-        # Try to get user ID from JWT token
-        auth_header = request.headers.get("authorization", "")
+        # Try to get user ID from JWT token (case-insensitive)
+        auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
+        
+        # Ensure header is a string (handle potential bytes issues)
+        if isinstance(auth_header, bytes):
+            auth_header = auth_header.decode('utf-8')
+            
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
             # For rate limiting, we'll decode without verification for speed

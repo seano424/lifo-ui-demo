@@ -1,0 +1,9 @@
+sku,product_name,category,quantity,expiry_date,cost_price,selling_price,batch_number
+MILK001,Fresh Milk 1L,Dairy,24,2025-10-15,1.20,2.50,BATCH-2025-09-001
+BREAD001,Whole Wheat Bread,Bakery,15,2025-09-08,0.80,1.80,BATCH-2025-09-002
+APPLE001,Red Apples,Produce,30,2025-09-25,0.50,1.20,BATCH-2025-09-003
+CHICKEN001,Fresh Chicken Breast,Meat,12,2025-09-12,4.00,8.50,BATCH-2025-09-004
+PIZZA001,Frozen Pizza,Frozen Foods,8,2025-12-01,3.00,6.00,BATCH-2025-09-005
+YOGURT001,Greek Yogurt,Dairy,20,2025-09-20,1.50,3.00,BATCH-2025-09-006
+BANANA001,Ripe Bananas,Produce,45,2025-09-10,0.30,0.80,BATCH-2025-09-007
+PASTA001,Spaghetti Pasta,Pantry,50,2026-06-01,0.75,1.50,BATCH-2025-09-008

@@ -623,14 +623,20 @@ class SecureCSVProcessor:
 
         # Expiry date validation
         if "expiry_date" in row_data:
-            if row_data["expiry_date"] < datetime.now().date():
-                warnings.append(
-                    {
-                        "row": row_number,
-                        "field": "expiry_date",
-                        "warning": "Product has already expired",
-                    }
-                )
+            try:
+                # Parse the ISO date string to compare with current date
+                expiry_date = datetime.fromisoformat(row_data["expiry_date"]).date()
+                if expiry_date < datetime.now().date():
+                    warnings.append(
+                        {
+                            "row": row_number,
+                            "field": "expiry_date",
+                            "warning": "Product has already expired",
+                        }
+                    )
+            except (ValueError, TypeError):
+                # If date parsing fails, skip this validation
+                pass
 
         # Quantity validation
         if "quantity" in row_data:
@@ -671,7 +677,13 @@ class SecureCSVProcessor:
         # Urgency analysis
         for row in valid_rows:
             if "expiry_date" in row:
-                days_to_expiry = (row["expiry_date"] - datetime.now().date()).days
+                try:
+                    # Parse the ISO date string to calculate days to expiry
+                    expiry_date = datetime.fromisoformat(row["expiry_date"]).date()
+                    days_to_expiry = (expiry_date - datetime.now().date()).days
+                except (ValueError, TypeError):
+                    # Skip if date parsing fails
+                    continue
                 if days_to_expiry <= 3:
                     insights["urgency_alerts"].append(
                         {

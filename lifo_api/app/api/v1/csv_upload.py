@@ -18,7 +18,7 @@ from app.database.connection import get_db
 from app.security.csv_security import CSVSecurityError, validate_and_sanitize_csv
 
 # Import the unified processor (now properly installed)
-from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
+from app.core.etl.unified_csv_processor import UnifiedCSVProcessor
 
 router = APIRouter()
 logger = structlog.get_logger()

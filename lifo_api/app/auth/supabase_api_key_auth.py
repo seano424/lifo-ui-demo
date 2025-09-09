@@ -73,6 +73,14 @@ class SupabaseAPIKeyAuth:
             SupabaseAPIKeyError: If authentication fails
         """
         try:
+            # Ensure access_token is a string (handle potential bytes issues)
+            if isinstance(access_token, bytes):
+                try:
+                    access_token = access_token.decode('utf-8')
+                except UnicodeDecodeError as e:
+                    self.logger.error("Failed to decode access token", error=str(e))
+                    raise SupabaseAPIKeyError("Invalid access token encoding") from e
+            
             # Remove Bearer prefix if present
             if access_token.startswith("Bearer "):
                 access_token = access_token[7:]
@@ -246,7 +254,20 @@ class SupabaseAPIKeyAuth:
         Raises:
             SupabaseAPIKeyError: If authentication fails
         """
-        # Check for API key header first (for service role operations)
+        # Check for Authorization header (case-insensitive)
+        authorization = request.headers.get("Authorization") or request.headers.get("authorization")
+        if not authorization:
+            raise SupabaseAPIKeyError("Authorization header required")
+        
+        # Ensure authorization header is a string (handle potential bytes issues)
+        if isinstance(authorization, bytes):
+            try:
+                authorization = authorization.decode('utf-8')
+            except UnicodeDecodeError as e:
+                self.logger.error("Failed to decode authorization header", error=str(e))
+                raise SupabaseAPIKeyError("Invalid authorization header encoding") from e
+
+        # Check for API key header (for service role operations)
         api_key = request.headers.get("apikey")
 
         if api_key and await self.verify_service_key(api_key):

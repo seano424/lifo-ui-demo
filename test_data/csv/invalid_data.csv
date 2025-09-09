@@ -1,0 +1,6 @@
+sku,product_name,category,quantity,expiry_date,cost_price,selling_price,batch_number
+INVALID001,Missing Price Item,Dairy,10,2025-10-01,,2.50,BATCH-TEST-001
+INVALID002,Bad Date Format,Bakery,5,not-a-date,1.00,2.00,BATCH-TEST-002
+,Empty SKU Product,Produce,15,2025-10-15,0.50,1.00,BATCH-TEST-003
+INVALID003,Negative Quantity,Meat,-5,2025-10-20,3.00,6.00,BATCH-TEST-004
+INVALID004,Future Expiry,Unknown Category,20,2030-01-01,1.00,2.00,BATCH-TEST-005

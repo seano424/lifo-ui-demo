@@ -7,6 +7,7 @@ import os
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
+from typing import TYPE_CHECKING, ForwardRef
 
 from sqlalchemy import (
     DECIMAL,
@@ -26,6 +27,10 @@ from sqlalchemy import String as SQLString
 from sqlalchemy.orm import relationship
 
 from app.database.connection import Base
+
+# Import Store model to resolve the relationship
+if TYPE_CHECKING:
+    from app.database.models import Store, ProductScore
 
 
 def get_auth_users_fk() -> str:
@@ -211,8 +216,8 @@ class StoreProduct(Base):
 
     # Relationships
     product = relationship("Product", back_populates="store_products")
-    # Store relationship - using module path to avoid circular imports
-    # store = relationship("Store", back_populates="store_products")
+    # Use string reference to avoid circular import - Store is in app.database.models
+    store = relationship("app.database.models.Store", back_populates="store_products")
 
 
 class BatchSource(Enum):
@@ -312,9 +317,9 @@ class Batch(Base):
     # Relationships
     product = relationship("Product", back_populates="batches")
     actions = relationship("BatchAction", back_populates="batch")
-    # Store relationship - using module path to avoid circular imports
-    # store = relationship("Store", back_populates="batches")
-    # scores = relationship("ProductScore", back_populates="batch")  # ProductScore is in models.py
+    # Use string reference to avoid circular import - Store is in app.database.models
+    store = relationship("app.database.models.Store", back_populates="batches")
+    scores = relationship("ProductScore", back_populates="batch")
 
 
 class ActionType(Enum):

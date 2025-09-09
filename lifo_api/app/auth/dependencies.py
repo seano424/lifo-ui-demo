@@ -1,7 +1,15 @@
 """
-FastAPI authentication dependencies for LIFO AI Engine
+DEPRECATED: Legacy FastAPI authentication dependencies for LIFO AI Engine
+This module is deprecated. Use app.auth.secure_dependencies instead.
 Provides dependency injection for authentication and authorization
 """
+
+import warnings
+warnings.warn(
+    "app.auth.dependencies is deprecated. Use app.auth.secure_dependencies instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 import structlog
 from fastapi import Depends, HTTPException, Security, status

@@ -27,11 +27,14 @@ async def score_store_batch(
     force_recalculate: bool = Query(
         False, description="Force recalculation of all scores"
     ),
+    save_to_database: bool = Query(
+        True, description="Save calculated scores to database"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """
-    Calculate AI scoring for store inventory - SECURE READ-ONLY VERSION
+    Calculate AI scoring for store inventory - NOW WITH DATABASE WRITES
     """
     try:
         # Initialize secure scoring service
@@ -42,11 +45,30 @@ async def score_store_batch(
             store_id, recalculate_all=force_recalculate
         )
 
+        # NEW: Save scores to database if requested
+        if save_to_database and results.get("scores"):
+            read_ops = get_read_only_operations(db)
+            success = await read_ops.store_score_results(results["scores"])
+            results["database_saved"] = success
+            
+            if success:
+                logger.info(
+                    "Scores saved to database successfully",
+                    store_id=store_id,
+                    scores_saved=len(results["scores"])
+                )
+            else:
+                logger.warning(
+                    "Failed to save scores to database",
+                    store_id=store_id
+                )
+
         logger.info(
-            "Store inventory scored securely",
+            "Store inventory scored with database writes enabled",
             store_id=store_id,
             batches_processed=results.get("processed", 0),
             high_priority=results.get("high_priority_count", 0),
+            database_writes_enabled=save_to_database,
             user_id=current_user["sub"],
         )
 
