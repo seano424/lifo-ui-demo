@@ -12,6 +12,16 @@ import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { AlertQuickToggle } from './alert-quick-toggle'
 
+interface ActionableBatch {
+  urgency: 'critical' | 'high' | 'medium' | 'low'
+}
+
+interface AnalyticsData {
+  analytics?: {
+    actionable_batches?: ActionableBatch[]
+  }
+}
+
 // Convert threshold to user-friendly level names
 function thresholdToLevelName(
   warningThreshold: number,
@@ -84,12 +94,22 @@ export function UrgentAlerts() {
   }
 
   const getMessage = () => {
-    // Prefer urgency_distribution when available (works for both FastAPI and Supabase fallback now)
-    if (urgencyDistribution) {
-      const criticalCount = urgencyDistribution.critical || 0
-      const highCount = urgencyDistribution.high || 0
-      const mediumCount = urgencyDistribution.medium || 0
-      const lowCount = urgencyDistribution.low || 0
+    // Priority 1: Use FastAPI actionable_batches to get accurate urgency counts
+    // This is the most accurate since it uses actual AI scoring data
+    const actionableBatches = (data?.analytics as AnalyticsData['analytics'])?.actionable_batches
+    if (actionableBatches && Array.isArray(actionableBatches)) {
+      const criticalCount = actionableBatches.filter(
+        (batch: ActionableBatch) => batch.urgency === 'critical',
+      ).length
+      const highCount = actionableBatches.filter(
+        (batch: ActionableBatch) => batch.urgency === 'high',
+      ).length
+      const mediumCount = actionableBatches.filter(
+        (batch: ActionableBatch) => batch.urgency === 'medium',
+      ).length
+      const lowCount = actionableBatches.filter(
+        (batch: ActionableBatch) => batch.urgency === 'low',
+      ).length
       const totalAlerts = criticalCount + highCount + mediumCount + lowCount
 
       return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)

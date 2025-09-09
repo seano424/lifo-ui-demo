@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
                 storeId,
                 serviceKey,
               )
-              console.log(`[ANALYTICS] FastAPI dashboard service key fallback success`)
+              console.log(`[ANALYTICS] FastAPI service key fallback success`)
               console.log(
                 `[ANALYTICS] Actionable batches count: ${fastApiDashboard.actionable_batches?.length || 0}`,
               )
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
           }
 
           if (fastApiDashboard) {
-            analytics.source = 'fastapi_dashboard'
+            analytics.source = 'fastapi'
             analytics.ai_enhanced = true
 
             // Include full FastAPI dashboard data with actionable batches
@@ -144,11 +144,11 @@ export async function GET(request: NextRequest) {
               serviceKey,
             )
 
-            console.log(`[ANALYTICS] FastAPI dashboard service key success`)
+            console.log(`[ANALYTICS] FastAPI service key success`)
             console.log(
               `[ANALYTICS] Actionable batches count: ${fastApiDashboard.actionable_batches?.length || 0}`,
             )
-            analytics.source = 'fastapi_dashboard'
+            analytics.source = 'fastapi'
             analytics.ai_enhanced = true
 
             // Include full FastAPI dashboard data with actionable batches
@@ -546,7 +546,8 @@ async function addSupabaseInsightsFallback(
     const { data: detailedBatches } = await supabase
       .schema('inventory')
       .from('batches')
-      .select(`
+      .select(
+        `
         batch_id,
         current_quantity,
         selling_price,
@@ -557,7 +558,8 @@ async function addSupabaseInsightsFallback(
             name
           )
         )
-      `)
+      `,
+      )
       .eq('store_id', storeId)
       .eq('status', 'active')
       .lte('expiry_date', mediumDate.toISOString().split('T')[0])
