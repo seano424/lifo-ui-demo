@@ -373,6 +373,46 @@ export function useMobileSummary(storeId: string | null) {
   return useStoreAnalytics(storeId, '1d')
 }
 
+/**
+ * Hook for fetching actionable batches with individual recommendations
+ * ENHANCED: Uses FastAPI dashboard endpoint that triggers scoring internally
+ * @param storeId - Store ID to fetch actionable batches for
+ */
+export function useActionableBatches(storeId: string | null) {
+  return useQuery({
+    queryKey: ['actionable_batches', storeId],
+    queryFn: async () => {
+      if (!storeId) throw new Error('Store ID required')
+
+      const params = new URLSearchParams({
+        storeId,
+        timeframe: '7d', // 7-day dashboard data
+      })
+
+      const response = await fetch(`/api/analytics?${params}`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch actionable batches: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+
+      // Extract actionable batches from the enhanced analytics response
+      return {
+        actionable_batches: data.analytics?.actionable_batches || [],
+        dashboard_summary: data.analytics?.dashboard_summary || {},
+        dashboard_alerts: data.analytics?.dashboard_alerts || {},
+        ai_enhanced: data.analytics?.ai_enhanced || false,
+        source: data.analytics?.source || 'unknown',
+      }
+    },
+    enabled: !!storeId,
+    staleTime: 1 * 60 * 1000, // 1 minute - actionable items change quickly
+    gcTime: 3 * 60 * 1000, // 3 minutes
+    refetchOnWindowFocus: true,
+    refetchInterval: 2 * 60 * 1000, // Auto-refetch every 2 minutes
+  })
+}
+
 // Direct fetch functions (for compatibility with existing code)
 export async function fetchScoringAlerts(
   storeId: string,
@@ -417,6 +457,50 @@ export async function fetchScoringAlerts(
     )
 
     throw error
+  }
+}
+
+/**
+ * Fetch actionable batches directly from enhanced analytics endpoint
+ * @param storeId - Store ID to fetch actionable batches for
+ */
+export async function fetchActionableBatches(storeId: string): Promise<{
+  actionable_batches: Array<{
+    batch_id: string
+    product_name: string
+    expiry_date: string
+    urgency: 'critical' | 'high' | 'medium' | 'low'
+    recommendation: string
+    discount_percent: number
+    reason: string
+    location_code: string
+    current_quantity: number
+    potential_loss: number
+    composite_score: number
+  }>
+  dashboard_summary: Record<string, unknown>
+  dashboard_alerts: Record<string, unknown>
+  ai_enhanced: boolean
+  source: string
+}> {
+  const params = new URLSearchParams({
+    storeId,
+    timeframe: '7d',
+  })
+
+  const response = await fetch(`/api/analytics?${params}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch actionable batches: ${response.statusText}`)
+  }
+
+  const data = await response.json()
+
+  return {
+    actionable_batches: data.analytics?.actionable_batches || [],
+    dashboard_summary: data.analytics?.dashboard_summary || {},
+    dashboard_alerts: data.analytics?.dashboard_alerts || {},
+    ai_enhanced: data.analytics?.ai_enhanced || false,
+    source: data.analytics?.source || 'unknown',
   }
 }
 

@@ -64,6 +64,7 @@ export function UrgentAlerts() {
     )
   }
 
+  // Updated to use new FastAPI dashboard structure
   const urgencyDistribution = data?.analytics?.fastapi_analytics?.urgency_distribution
   const supabaseInsights = data?.analytics?.insights
 
@@ -94,13 +95,38 @@ export function UrgentAlerts() {
       return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
     }
 
-    // Fallback to Supabase insights format if urgency_distribution is not available
-    if (supabaseInsights) {
-      const criticalCount = supabaseInsights.high_urgency?.count || 0
-      const highCount = Math.max(0, (supabaseInsights.expiring_soon?.count || 0) - criticalCount)
-      const mediumCount = supabaseInsights.ready_for_discount?.count || 0
+    // Priority 2: Use FastAPI urgency distribution if available
+    if (
+      urgencyDistribution &&
+      typeof urgencyDistribution === 'object' &&
+      urgencyDistribution !== null
+    ) {
+      const dist = urgencyDistribution as {
+        critical?: number
+        high?: number
+        medium?: number
+        low?: number
+      }
+      const criticalCount = dist.critical || 0
+      const highCount = dist.high || 0
+      const mediumCount = dist.medium || 0
+      const lowCount = dist.low || 0
+      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
+
+      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
+    }
+
+    // Fallback: Use Supabase insights structure (less accurate)
+    if (
+      supabaseInsights?.high_urgency &&
+      supabaseInsights?.expiring_soon &&
+      supabaseInsights?.ready_for_discount
+    ) {
+      const criticalCount = supabaseInsights.high_urgency.count || 0
+      const highCount = Math.max(0, (supabaseInsights.expiring_soon.count || 0) - criticalCount)
+      const mediumCount = supabaseInsights.ready_for_discount.count || 0
       const lowCount = 0 // This fallback doesn't have low priority classification
-      const totalAlerts = criticalCount + highCount + mediumCount
+      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
 
       return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
     }

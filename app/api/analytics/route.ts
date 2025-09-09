@@ -72,18 +72,18 @@ export async function GET(request: NextRequest) {
       generated_at: new Date().toISOString(),
     }
 
-    // Phase 2 Step 4: Try FastAPI for enhanced AI analytics
-    // Database connectivity has been fixed - re-enabling FastAPI
+    // ENHANCED: Try FastAPI dashboard endpoint for actionable batches
+    // This now triggers scoring internally and returns individual batch recommendations
     const useFastAPI =
       process.env.ENABLE_FASTAPI === 'true' || process.env.NODE_ENV === 'development'
     console.log(
       `[ANALYTICS] FastAPI enabled: ${useFastAPI} (ENABLE_FASTAPI=${process.env.ENABLE_FASTAPI}, NODE_ENV=${process.env.NODE_ENV})`,
     )
-    let fastApiAnalytics = null
+    let fastApiDashboard = null
 
     if (useFastAPI) {
       try {
-        console.log(`[ANALYTICS] Attempting FastAPI for store ${storeId}`)
+        console.log(`[ANALYTICS] Attempting enhanced FastAPI dashboard for store ${storeId}`)
 
         // Get user's session with access token
         const {
@@ -91,49 +91,47 @@ export async function GET(request: NextRequest) {
         } = await supabase.auth.getSession()
 
         if (session?.access_token) {
-          const days =
-            timeframe === '1d' ? 1 : timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90
-
           try {
-            fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithUserToken(
+            fastApiDashboard = await fastApiClient.getDashboardDataWithUserToken(
               storeId,
               session.access_token,
-              days,
             )
 
-            console.log(`[ANALYTICS] FastAPI user JWT success: Enhanced analytics with AI insights`)
+            console.log(
+              `[ANALYTICS] FastAPI dashboard user JWT success: Enhanced analytics with actionable batches`,
+            )
+            console.log(
+              `[ANALYTICS] Actionable batches count: ${fastApiDashboard.actionable_batches?.length || 0}`,
+            )
           } catch (userError) {
-            console.warn('[ANALYTICS] User JWT failed, trying service key fallback:', userError)
+            console.warn(
+              '[ANALYTICS] Dashboard user JWT failed, trying service key fallback:',
+              userError,
+            )
 
             // Fallback to service key if user JWT fails
             const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
             if (serviceKey) {
-              fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithServiceKey(
+              fastApiDashboard = await fastApiClient.getDashboardDataWithServiceKey(
                 storeId,
                 serviceKey,
-                days,
               )
-              console.log(`[ANALYTICS] FastAPI service key fallback success`)
+              console.log(`[ANALYTICS] FastAPI dashboard service key fallback success`)
+              console.log(
+                `[ANALYTICS] Actionable batches count: ${fastApiDashboard.actionable_batches?.length || 0}`,
+              )
             }
           }
 
-          if (fastApiAnalytics) {
-            analytics.source = 'fastapi'
+          if (fastApiDashboard) {
+            analytics.source = 'fastapi_dashboard'
             analytics.ai_enhanced = true
 
-            // Add FastAPI AI insights
-            if (fastApiAnalytics.ai_insights) {
-              analytics.ai_insights = fastApiAnalytics.ai_insights
-            }
-
-            if (fastApiAnalytics.summary) {
-              analytics.ai_summary = fastApiAnalytics.summary
-            }
-
-            // Include full FastAPI analytics data
-            if (fastApiAnalytics.analytics) {
-              analytics.fastapi_analytics = fastApiAnalytics.analytics
-            }
+            // Include full FastAPI dashboard data with actionable batches
+            analytics.dashboard = fastApiDashboard
+            analytics.actionable_batches = fastApiDashboard.actionable_batches || []
+            analytics.dashboard_summary = fastApiDashboard.summary || {}
+            analytics.dashboard_alerts = fastApiDashboard.alerts || {}
           }
         } else {
           console.warn('[ANALYTICS] No user session, trying service key fallback')
@@ -141,36 +139,27 @@ export async function GET(request: NextRequest) {
           // Direct service key fallback if no user session
           const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
           if (serviceKey) {
-            const days =
-              timeframe === '1d' ? 1 : timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90
-
-            fastApiAnalytics = await fastApiClient.getStoreAnalyticsWithServiceKey(
+            fastApiDashboard = await fastApiClient.getDashboardDataWithServiceKey(
               storeId,
               serviceKey,
-              days,
             )
 
-            console.log(`[ANALYTICS] FastAPI service key success`)
-            analytics.source = 'fastapi'
+            console.log(`[ANALYTICS] FastAPI dashboard service key success`)
+            console.log(
+              `[ANALYTICS] Actionable batches count: ${fastApiDashboard.actionable_batches?.length || 0}`,
+            )
+            analytics.source = 'fastapi_dashboard'
             analytics.ai_enhanced = true
 
-            // Add FastAPI AI insights
-            if (fastApiAnalytics.ai_insights) {
-              analytics.ai_insights = fastApiAnalytics.ai_insights
-            }
-
-            if (fastApiAnalytics.summary) {
-              analytics.ai_summary = fastApiAnalytics.summary
-            }
-
-            // Include full FastAPI analytics data
-            if (fastApiAnalytics.analytics) {
-              analytics.fastapi_analytics = fastApiAnalytics.analytics
-            }
+            // Include full FastAPI dashboard data with actionable batches
+            analytics.dashboard = fastApiDashboard
+            analytics.actionable_batches = fastApiDashboard.actionable_batches || []
+            analytics.dashboard_summary = fastApiDashboard.summary || {}
+            analytics.dashboard_alerts = fastApiDashboard.alerts || {}
           }
         }
       } catch (fastApiError) {
-        console.warn('[ANALYTICS] FastAPI failed, using Supabase fallback:', fastApiError)
+        console.warn('[ANALYTICS] FastAPI dashboard failed, using Supabase fallback:', fastApiError)
         analytics.source = 'supabase'
         analytics.ai_enhanced = false
 
@@ -550,6 +539,94 @@ async function addSupabaseInsightsFallback(
       },
     }
 
+    // ENHANCED: Build actionable batches array from actual data
+    const actionableBatches = []
+
+    // Get detailed batch info with product names
+    const { data: detailedBatches } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select(`
+        batch_id,
+        current_quantity,
+        selling_price,
+        expiry_date,
+        location_code,
+        store_products!inner (
+          products (
+            name
+          )
+        )
+      `)
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+      .lte('expiry_date', mediumDate.toISOString().split('T')[0])
+      .order('expiry_date', { ascending: true })
+      .limit(20) // Top 20 most urgent
+
+    if (detailedBatches) {
+      for (const batch of detailedBatches) {
+        const expiryDate = new Date(batch.expiry_date)
+        const daysToExpiry = Math.ceil(
+          (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+        )
+
+        let urgency: 'critical' | 'high' | 'medium' | 'low'
+        let recommendation: string
+        let discount_percent: number
+        let reason: string
+
+        if (daysToExpiry <= 1) {
+          urgency = 'critical'
+          recommendation = 'discount_aggressive'
+          discount_percent = 40
+          reason =
+            daysToExpiry <= 0
+              ? 'Item has expired - immediate removal required'
+              : 'Critical: Expires today - apply 40% discount'
+        } else if (daysToExpiry <= 3) {
+          urgency = 'high'
+          recommendation = 'discount_moderate'
+          discount_percent = 25
+          reason = `High priority: Expires in ${daysToExpiry} days - discount recommended`
+        } else if (daysToExpiry <= 7) {
+          urgency = 'medium'
+          recommendation = 'discount_light'
+          discount_percent = 15
+          reason = `Medium priority: Expires in ${daysToExpiry} days - monitor closely`
+        } else {
+          urgency = 'low'
+          recommendation = 'monitor'
+          discount_percent = 0
+          reason = 'Low priority - monitor for changes'
+        }
+
+        const productName = batch.store_products?.products?.name || 'Unknown Product'
+        const potentialLoss = (batch.current_quantity || 0) * (batch.selling_price || 0)
+
+        actionableBatches.push({
+          batch_id: batch.batch_id,
+          product_name: productName,
+          expiry_date: batch.expiry_date,
+          urgency,
+          recommendation,
+          discount_percent,
+          reason,
+          location_code: batch.location_code || '',
+          current_quantity: batch.current_quantity || 0,
+          potential_loss: Math.round(potentialLoss * 100) / 100,
+          composite_score:
+            urgency === 'critical'
+              ? 0.9
+              : urgency === 'high'
+                ? 0.7
+                : urgency === 'medium'
+                  ? 0.5
+                  : 0.3,
+        })
+      }
+    }
+
     // Also add FastAPI-compatible urgency distribution for consistency
     const urgencyDistribution = {
       critical: criticalCount,
@@ -580,34 +657,16 @@ async function addSupabaseInsightsFallback(
       recent_actions: [],
     }
 
-    console.log('[ANALYTICS] Successfully added Supabase insights fallback with manual calculation')
+    // CRITICAL: Add the actionable batches to the analytics response
+    analytics.actionable_batches = actionableBatches
 
-    // Try to get actionable batches using RPC, but don't fail if it doesn't work
-    try {
-      const { data: actionableBatches, error: batchesError } = await supabase.rpc(
-        'get_actionable_batches',
-        {
-          input_store_id: storeId,
-        },
-      )
+    console.log(
+      `[ANALYTICS] Successfully added Supabase insights fallback with ${actionableBatches.length} actionable batches`,
+    )
 
-      if (!batchesError && actionableBatches) {
-        const batchesData = actionableBatches as {
-          actionable_batches: unknown[]
-          summary: {
-            total_actionable_batches: number
-            urgent_count: number
-            discount_count: number
-            donation_count: number
-          }
-        }
-        analytics.actionable_batches = batchesData.actionable_batches
-        analytics.actionable_summary = batchesData.summary
-        console.log('[ANALYTICS] Successfully added actionable batches from RPC')
-      }
-    } catch (rpcError) {
-      console.warn('[ANALYTICS] RPC actionable_batches failed, continuing without it:', rpcError)
-    }
+    // Skip RPC call - we're using our enhanced actionable batches implementation above
+    // which provides better individual batch recommendations with discount percentages and reasons
+    console.log('[ANALYTICS] Using enhanced actionable batches implementation instead of RPC')
   } catch (error) {
     console.error('[ANALYTICS] Error adding Supabase insights fallback:', error)
     // Don't throw - this is a fallback, we want to continue with other analytics
