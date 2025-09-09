@@ -146,8 +146,8 @@ async def trigger_background_scoring(
         logger.info("Starting background scoring", store_id=store_id)
         start_time = datetime.now()
 
-        # Run full scoring with all batch lookups
-        scoring_results = await scoring_service.score_store_inventory(
+        # PERFORMANCE OPTIMIZATION: Use bulk scoring for <1s performance
+        scoring_results = await scoring_service.score_store_inventory_bulk(
             store_id, recalculate_all=True
         )
 

@@ -682,6 +682,214 @@ class SecureReadOnlyOperations:
                 "actionable_batches": [],
             }
 
+    async def get_bulk_sales_velocity_data(
+        self, store_id: str, product_ids: list[str], days: int = 30
+    ) -> dict[str, dict[str, Any]]:
+        """
+        BULK OPTIMIZATION: Get sales velocity data for multiple products in single query
+        Returns: {product_id: {avg_daily_sales: float, total_sales: int, ...}}
+        """
+        try:
+            if not product_ids:
+                return {}
+
+            # Import Supabase service
+            from app.database.supabase_service import get_supabase_service
+
+            supabase_service = get_supabase_service()
+            admin_client = supabase_service.get_admin_client()
+
+            # Calculate date range
+            from datetime import datetime, timedelta
+
+            start_date = (datetime.now() - timedelta(days=days)).date().isoformat()
+
+            # Get sales data for all products in single query
+            result = (
+                admin_client.schema("sales")
+                .table("transactions")
+                .select("product_id, quantity_sold, sale_date")
+                .eq("store_id", store_id)
+                .in_("product_id", product_ids)
+                .gte("sale_date", start_date)
+                .execute()
+            )
+
+            # Process results into velocity data per product
+            velocity_data = {}
+            for product_id in product_ids:
+                product_sales = [
+                    sale
+                    for sale in (result.data or [])
+                    if sale["product_id"] == product_id
+                ]
+
+                total_quantity = sum(
+                    sale.get("quantity_sold", 0) for sale in product_sales
+                )
+                avg_daily_sales = total_quantity / days if days > 0 else 0
+
+                velocity_data[product_id] = {
+                    "avg_daily_sales": max(avg_daily_sales, 1.0),  # Ensure minimum of 1
+                    "total_sales": len(product_sales),
+                    "total_quantity": total_quantity,
+                }
+
+            self.logger.info(
+                "Bulk velocity data retrieved",
+                store_id=store_id,
+                products_count=len(product_ids),
+                days=days,
+            )
+
+            return velocity_data
+
+        except Exception as e:
+            self.logger.error(
+                "Failed to get bulk sales velocity data",
+                store_id=store_id,
+                error=str(e),
+            )
+            # Return default values for all products
+            return {
+                product_id: {
+                    "avg_daily_sales": 1.0,
+                    "total_sales": 0,
+                    "total_quantity": 0,
+                }
+                for product_id in product_ids
+            }
+
+    async def get_bulk_category_weights(
+        self, categories: list[str]
+    ) -> dict[str, dict[str, float]]:
+        """
+        BULK OPTIMIZATION: Get category weights for multiple categories
+        Returns: {category: {expiry: float, velocity: float, margin: float}}
+        """
+        try:
+            # Use the same standardized weights as the single operation
+            standardized_weights = {
+                "fresh_produce": {"expiry": 0.6, "velocity": 0.3, "margin": 0.1},
+                "fresh_meat_fish": {"expiry": 0.7, "velocity": 0.2, "margin": 0.1},
+                "dairy_eggs": {"expiry": 0.55, "velocity": 0.3, "margin": 0.15},
+                "bakery_fresh": {"expiry": 0.5, "velocity": 0.35, "margin": 0.15},
+                "deli_prepared": {"expiry": 0.6, "velocity": 0.25, "margin": 0.15},
+                "frozen_foods": {"expiry": 0.3, "velocity": 0.4, "margin": 0.3},
+                "canned_jarred": {"expiry": 0.1, "velocity": 0.6, "margin": 0.3},
+                "dry_goods": {"expiry": 0.15, "velocity": 0.55, "margin": 0.3},
+                "beverages": {"expiry": 0.25, "velocity": 0.45, "margin": 0.3},
+                "spices_condiments": {"expiry": 0.1, "velocity": 0.6, "margin": 0.3},
+                "pantry_staples": {"expiry": 0.15, "velocity": 0.55, "margin": 0.3},
+                "household_other": {"expiry": 0.3, "velocity": 0.4, "margin": 0.3},
+                "specialty_items": {"expiry": 0.4, "velocity": 0.3, "margin": 0.3},
+                "bulk_items": {"expiry": 0.2, "velocity": 0.5, "margin": 0.3},
+            }
+
+            # Legacy category mapping
+            legacy_mapping = {
+                "dairy": "dairy_eggs",
+                "frozen": "frozen_foods",
+                "bakery": "bakery_fresh",
+                "produce": "fresh_produce",
+                "meat": "fresh_meat_fish",
+                "general": "household_other",
+            }
+
+            # Build bulk response
+            bulk_weights = {}
+            for category in categories:
+                if not category:
+                    continue
+
+                # Try standardized weights first
+                if category in standardized_weights:
+                    bulk_weights[category] = standardized_weights[category]
+                    continue
+
+                # Try legacy mapping
+                mapped_category = legacy_mapping.get(category.lower())
+                if mapped_category and mapped_category in standardized_weights:
+                    bulk_weights[category] = standardized_weights[mapped_category]
+                    continue
+
+                # Default weights
+                bulk_weights[category] = {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
+
+            self.logger.info(
+                "Bulk category weights retrieved", categories_count=len(categories)
+            )
+            return bulk_weights
+
+        except Exception as e:
+            self.logger.error("Failed to get bulk category weights", error=str(e))
+            # Return default weights for all categories
+            return {
+                category: {"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
+                for category in categories
+                if category
+            }
+
+    async def bulk_store_score_results(self, scores: list[dict[str, Any]]) -> bool:
+        """
+        BULK OPTIMIZATION: Store multiple scoring results in single upsert operation
+        """
+        try:
+            if not scores:
+                return True
+
+            # Import Supabase service
+            from app.database.supabase_service import get_supabase_service
+
+            supabase_service = get_supabase_service()
+            admin_client = supabase_service.get_admin_client()
+
+            # Prepare data for bulk upsert
+            upsert_data = []
+            for score in scores:
+                upsert_data.append(
+                    {
+                        "batch_id": score["batch_id"],
+                        "store_id": score["store_id"],
+                        "expiry_score": float(score["expiry_score"]),
+                        "velocity_score": float(score["velocity_score"]),
+                        "margin_score": float(score["margin_score"]),
+                        "composite_score": float(score["composite_score"]),
+                        "recommendation": score["recommendation"],
+                        "urgency_level": score["urgency_level"],
+                        "discount_percent": int(score["discount_percent"]),
+                        "reason": score["reason"],
+                        "ml_enhanced": bool(score["ml_enhanced"]),
+                        "confidence_level": float(score["confidence_level"]),
+                        "calculated_at": score["calculated_at"],
+                    }
+                )
+
+            # Perform bulk upsert operation
+            result = (
+                admin_client.schema("analytics")
+                .table("batch_scores")
+                .upsert(upsert_data, on_conflict="batch_id,store_id")
+                .execute()
+            )
+
+            if result.data:
+                self.logger.info(
+                    "Bulk score results stored successfully", scores_count=len(scores)
+                )
+                return True
+            else:
+                self.logger.warning("No data returned from bulk upsert operation")
+                return False
+
+        except Exception as e:
+            self.logger.error(
+                "Failed to bulk store score results",
+                scores_count=len(scores),
+                error=str(e),
+            )
+            return False
+
 
 # Factory function for dependency injection
 def get_read_only_operations(db: AsyncSession) -> SecureReadOnlyOperations:

@@ -735,6 +735,217 @@ class ScoringService:
         else:
             return "none"
 
+    async def score_store_inventory_bulk(
+        self, store_id: str, recalculate_all: bool = False
+    ) -> dict[str, Any]:
+        """OPTIMIZED: Score all active batches for a store with bulk operations for <1s performance"""
+        start_time = datetime.utcnow()
+
+        try:
+            # Import secure read-only operations
+            from app.database.read_only_operations import get_read_only_operations
+
+            # Get read-only operations instance
+            read_ops = get_read_only_operations(self.db)
+
+            # BULK OPERATION 1: Get all inventory data in single query
+            inventory_data = await read_ops.get_store_inventory_for_scoring(store_id)
+
+            if not inventory_data:
+                self.logger.warning(
+                    "No inventory data found for store", store_id=store_id
+                )
+                return {
+                    "store_id": store_id,
+                    "total_items": 0,
+                    "processed": 0,
+                    "high_priority_count": 0,
+                    "results": [],
+                    "errors": [],
+                    "processing_time_ms": 0,
+                }
+
+            # BULK OPERATION 2: Get sales velocity data for all products in single query
+            product_ids = list({item["product_id"] for item in inventory_data})
+            velocity_data_bulk = await read_ops.get_bulk_sales_velocity_data(
+                store_id, product_ids, days=30
+            )
+
+            # BULK OPERATION 3: Get all category weights in single query
+            categories = list(
+                {
+                    item.get("category")
+                    for item in inventory_data
+                    if item.get("category")
+                }
+            )
+            category_weights_bulk = await read_ops.get_bulk_category_weights(categories)
+
+            # BULK OPERATION 4: In-memory scoring for all batches (no DB calls)
+            results = []
+            errors = []
+            high_priority_count = 0
+
+            for batch_data in inventory_data:
+                try:
+                    # Get pre-fetched data
+                    daily_sales = velocity_data_bulk.get(
+                        batch_data["product_id"], {}
+                    ).get("avg_daily_sales", 1.0)
+                    category_weights = category_weights_bulk.get(
+                        batch_data.get("category"), {}
+                    )
+
+                    # Create scorer with category-specific weights
+                    scorer = InventoryScorer(category=batch_data.get("category"))
+
+                    # Calculate all scores in memory (no DB calls)
+                    days_to_expiry = batch_data["days_to_expiry"]
+
+                    expiry_score = scorer.calculate_expiry_score(
+                        days_to_expiry, batch_data.get("typical_shelf_life_days", 30)
+                    )
+
+                    velocity_score = scorer.calculate_velocity_score(
+                        batch_data["current_quantity"],
+                        daily_sales,
+                        days_to_expiry,
+                        batch_data.get("category"),
+                    )
+
+                    margin_percent = 0
+                    if batch_data["selling_price"] > 0:
+                        margin_percent = (
+                            (batch_data["selling_price"] - batch_data["cost_price"])
+                            / batch_data["selling_price"]
+                        ) * 100
+
+                    margin_score = scorer.calculate_margin_score(
+                        batch_data["cost_price"],
+                        batch_data["selling_price"],
+                        days_to_expiry,
+                        batch_data.get("category"),
+                    )
+
+                    # Calculate composite score
+                    composite_score = scorer.calculate_composite_score(
+                        expiry_score, velocity_score, margin_score, category_weights
+                    )
+
+                    # Generate recommendation
+                    recommendation = scorer.generate_recommendation(
+                        composite_score,
+                        days_to_expiry,
+                        margin_percent,
+                        batch_data["current_quantity"],
+                    )
+
+                    # Create scoring result
+                    score_result = ScoringResult(
+                        store_id=store_id,
+                        batch_id=batch_data["batch_id"],
+                        sku=batch_data.get("batch_number", batch_data["batch_id"]),
+                        product_name=batch_data.get("product_name", "Unknown Product"),
+                        category=batch_data.get("category", "general"),
+                        expiry_score=expiry_score,
+                        velocity_score=velocity_score,
+                        margin_score=margin_score,
+                        composite_score=composite_score,
+                        recommendation=str(recommendation),
+                        urgency_level=recommendation.get("urgency", "low"),
+                        discount_percent=recommendation.get("discount_percent", 0),
+                        reason=recommendation.get("reason", "standard pricing"),
+                        confidence_level=0.85,
+                        ml_enhanced=True,
+                        calculated_at=datetime.utcnow(),
+                        days_to_expiry=days_to_expiry,
+                        current_quantity=batch_data["current_quantity"],
+                    )
+
+                    results.append(score_result)
+                    if score_result.composite_score >= 0.6:
+                        high_priority_count += 1
+
+                except Exception as e:
+                    self.logger.error(
+                        "Failed to score batch in bulk operation",
+                        batch_id=batch_data.get("batch_id"),
+                        error=str(e),
+                    )
+                    errors.append(
+                        f"Failed to score batch {batch_data.get('batch_id')}: {str(e)}"
+                    )
+
+            # BULK OPERATION 5: Single bulk upsert for all score results
+            if results:
+                scores_data = []
+                for result in results:
+                    scores_data.append(
+                        {
+                            "batch_id": result.batch_id,
+                            "store_id": store_id,
+                            "expiry_score": result.expiry_score,
+                            "velocity_score": result.velocity_score,
+                            "margin_score": result.margin_score,
+                            "composite_score": result.composite_score,
+                            "recommendation": result.recommendation,
+                            "urgency_level": result.urgency_level,
+                            "discount_percent": result.discount_percent,
+                            "reason": result.reason,
+                            "ml_enhanced": result.ml_enhanced,
+                            "confidence_level": result.confidence_level,
+                            "calculated_at": result.calculated_at,
+                        }
+                    )
+
+                # Use secure bulk write operation for all scores in single transaction
+                await read_ops.bulk_store_score_results(scores_data)
+
+            # Calculate processing time
+            end_time = datetime.utcnow()
+            processing_time_ms = int((end_time - start_time).total_seconds() * 1000)
+
+            self.logger.info(
+                "Bulk scoring completed",
+                store_id=store_id,
+                total_batches=len(inventory_data),
+                processed=len(results),
+                high_priority_count=high_priority_count,
+                errors_count=len(errors),
+                processing_time_ms=processing_time_ms,
+            )
+
+            return {
+                "store_id": store_id,
+                "total_items": len(inventory_data),
+                "processed": len(results),
+                "high_priority_count": high_priority_count,
+                "results": results,
+                "errors": errors,
+                "processing_time_ms": processing_time_ms,
+            }
+
+        except Exception as e:
+            import traceback
+
+            self.logger.error(
+                "Bulk scoring failed",
+                store_id=store_id,
+                error=str(e),
+                traceback=traceback.format_exc(),
+            )
+            return {
+                "store_id": store_id,
+                "total_items": 0,
+                "processed": 0,
+                "high_priority_count": 0,
+                "results": [],
+                "errors": [f"Bulk scoring failed: {str(e)}"],
+                "processing_time_ms": int(
+                    (datetime.utcnow() - start_time).total_seconds() * 1000
+                ),
+            }
+
     async def score_store_inventory(
         self, store_id: str, recalculate_all: bool = False
     ) -> dict[str, Any]:

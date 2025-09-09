@@ -19,6 +19,59 @@ router = APIRouter()
 logger = structlog.get_logger()
 
 
+@router.post("/batch/{store_id}/bulk")
+@scoring_rate_limit("10/minute")
+async def score_store_batch_bulk(
+    store_id: str,
+    request: Request,
+    force_recalculate: bool = Query(
+        False, description="Force recalculation of all scores"
+    ),
+    db: AsyncSession = Depends(get_db),
+    current_user: dict[str, Any] = Depends(get_current_user),
+):
+    """
+    OPTIMIZED: Calculate AI scoring for store inventory with bulk operations for <1s performance
+    """
+    try:
+        # Initialize secure scoring service
+        scoring_service = create_scoring_service(db)
+
+        # Score store inventory using optimized bulk operations
+        results = await scoring_service.score_store_inventory_bulk(
+            store_id, recalculate_all=force_recalculate
+        )
+
+        logger.info(
+            "Store inventory scored with bulk optimization",
+            store_id=store_id,
+            batches_processed=results.get("processed", 0),
+            high_priority=results.get("high_priority_count", 0),
+            processing_time_ms=results.get("processing_time_ms", 0),
+            user_id=current_user["sub"],
+        )
+
+        return {
+            "store_id": store_id,
+            "total_items": results.get("total_items", 0),
+            "processed": results.get("processed", 0),
+            "high_priority_count": results.get("high_priority_count", 0),
+            "processing_time_ms": results.get("processing_time_ms", 0),
+            "errors": results.get("errors", []),
+            "performance": "bulk_optimized",
+            "message": f"Bulk scored {results.get('processed', 0)} batches in {results.get('processing_time_ms', 0)}ms",
+        }
+
+    except Exception as e:
+        logger.error(
+            "Failed to bulk score store inventory",
+            store_id=store_id,
+            error=str(e),
+            user_id=current_user["sub"],
+        )
+        raise HTTPException(status_code=500, detail="Bulk scoring failed") from e
+
+
 @router.post("/batch/{store_id}")
 @scoring_rate_limit("20/minute")
 async def score_store_batch(
