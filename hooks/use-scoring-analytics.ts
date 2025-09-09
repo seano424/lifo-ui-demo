@@ -111,6 +111,31 @@ interface FastAPIAnalytics {
   recent_actions: FastAPIRecentAction[]
 }
 
+// Interface for Supabase fallback insights
+interface SupabaseInsights {
+  expiring_soon: {
+    count: number
+    description: string
+  }
+  ready_for_discount: {
+    count: number
+    description: string
+  }
+  perfect_for_donation: {
+    count: number
+    description: string
+  }
+  high_urgency: {
+    count: number
+    description: string
+  }
+  summary: {
+    total_active_batches: number
+    total_actionable_items: number
+    action_required_percentage: number
+  }
+}
+
 export interface AnalyticsResponse {
   analytics: {
     timeframe: string
@@ -120,7 +145,13 @@ export interface AnalyticsResponse {
     ai_enhanced?: boolean
     ai_insights?: unknown
     ai_summary?: string
-    fastapi_analytics?: FastAPIAnalytics
+    fastapi_analytics?: FastAPIAnalytics // Available in both FastAPI and Supabase fallback for consistency
+    insights?: SupabaseInsights // Added for Supabase fallback
+    store_insights?: {
+      store_id: string
+      store_name: string
+      insights: SupabaseInsights
+    }
     waste?: WasteAnalytics | { error: string }
     revenue?: RevenueAnalytics | { error: string }
     categories?: CategoryAnalytics | { error: string }
