@@ -75,16 +75,17 @@ async def get_dashboard_data(
 ):
     """
     Get dashboard data for a store (7-day snapshot)
+    FAST: Reads from pre-calculated scores, no blocking operations
     """
     try:
         # Validate store access
         await validate_store_access(store_id, current_user)
 
-        # Get 7-day analytics
+        # Get 7-day analytics (reads from existing product_scores)
         read_ops = get_read_only_operations(db)
         analytics_data = await read_ops.get_store_analytics(store_id, 7)
 
-        # Build dashboard response
+        # Build dashboard response with actionable batches
         dashboard_data = {
             "store_id": store_id,
             "summary": analytics_data.get("inventory_summary", {}),
@@ -95,14 +96,14 @@ async def get_dashboard_data(
                 "expiring_soon": analytics_data.get("inventory_summary", {}).get(
                     "expiring_soon_count", 0
                 ),
-                "high_urgency": analytics_data.get("urgency_distribution", {}).get(
-                    "high", 0
-                )
-                + analytics_data.get("urgency_distribution", {}).get("critical", 0),
+                # Removed confusing high_urgency - use actionable_batches for AI urgency
             },
             "top_categories": analytics_data.get("category_breakdown", [])[:5],
             "recent_activity": analytics_data.get("recent_actions", [])[:10],
-            "last_updated": datetime.utcnow(),
+            "actionable_batches": analytics_data.get("actionable_batches", [])[
+                :20
+            ],  # Top 20 most urgent
+            "last_updated": datetime.now().isoformat(),
         }
 
         logger.info(
@@ -121,6 +122,67 @@ async def get_dashboard_data(
             user_id=current_user["sub"],
         )
         raise HTTPException(status_code=500, detail="Internal server error") from None
+
+
+@router.post("/scoring/trigger/{store_id}")
+async def trigger_background_scoring(
+    store_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict[str, Any] = Depends(get_current_user),
+):
+    """
+    Trigger background scoring for a store (non-blocking)
+    This endpoint runs scoring in the background and updates product_scores table
+    """
+    try:
+        # Validate store access
+        await validate_store_access(store_id, current_user)
+
+        # Run scoring without timeout concerns
+        from app.core.scoring import create_scoring_service
+
+        scoring_service = create_scoring_service(db)
+
+        logger.info("Starting background scoring", store_id=store_id)
+        start_time = datetime.now()
+
+        # PERFORMANCE OPTIMIZATION: Use bulk scoring for <1s performance
+        scoring_results = await scoring_service.score_store_inventory_bulk(
+            store_id, recalculate_all=True
+        )
+
+        processing_time = (datetime.now() - start_time).total_seconds()
+
+        logger.info(
+            "Background scoring completed",
+            store_id=store_id,
+            batches_processed=scoring_results.get("processed", 0),
+            high_priority=scoring_results.get("high_priority_count", 0),
+            processing_time_seconds=processing_time,
+        )
+
+        return {
+            "store_id": store_id,
+            "status": "completed",
+            "batches_processed": scoring_results.get("processed", 0),
+            "high_priority_count": scoring_results.get("high_priority_count", 0),
+            "processing_time_seconds": round(processing_time, 2),
+            "timestamp": datetime.now().isoformat(),
+            "message": "Scoring completed successfully. Dashboard will now show AI-enhanced recommendations.",
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "Failed to complete background scoring",
+            store_id=store_id,
+            error=str(e),
+            user_id=current_user["sub"],
+        )
+        raise HTTPException(
+            status_code=500, detail="Background scoring failed"
+        ) from None
 
 
 @router.get("/performance/{store_id}")

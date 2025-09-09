@@ -714,24 +714,6 @@ export type Database = {
           },
         ]
       }
-      category_migration_completion_log: {
-        Row: {
-          completed_at: string | null
-          migration_step: string | null
-          products_affected: number | null
-        }
-        Insert: {
-          completed_at?: string | null
-          migration_step?: string | null
-          products_affected?: number | null
-        }
-        Update: {
-          completed_at?: string | null
-          migration_step?: string | null
-          products_affected?: number | null
-        }
-        Relationships: []
-      }
       donation_recipients: {
         Row: {
           accepts_pickups: boolean | null
@@ -2221,6 +2203,7 @@ export type Database = {
           composite_score: number | null
           confidence_level: number | null
           days_to_expiry: number | null
+          discount_percent: number | null
           expiry_score: number | null
           financial_impact_score: number | null
           margin_percent: number | null
@@ -2228,6 +2211,7 @@ export type Database = {
           ml_enhanced: boolean | null
           potential_loss: number | null
           quantity_risk_score: number | null
+          reason: string | null
           recommendation: string | null
           score_id: string
           store_id: string | null
@@ -2242,6 +2226,7 @@ export type Database = {
           composite_score?: number | null
           confidence_level?: number | null
           days_to_expiry?: number | null
+          discount_percent?: number | null
           expiry_score?: number | null
           financial_impact_score?: number | null
           margin_percent?: number | null
@@ -2249,6 +2234,7 @@ export type Database = {
           ml_enhanced?: boolean | null
           potential_loss?: number | null
           quantity_risk_score?: number | null
+          reason?: string | null
           recommendation?: string | null
           score_id?: string
           store_id?: string | null
@@ -2263,6 +2249,7 @@ export type Database = {
           composite_score?: number | null
           confidence_level?: number | null
           days_to_expiry?: number | null
+          discount_percent?: number | null
           expiry_score?: number | null
           financial_impact_score?: number | null
           margin_percent?: number | null
@@ -2270,6 +2257,7 @@ export type Database = {
           ml_enhanced?: boolean | null
           potential_loss?: number | null
           quantity_risk_score?: number | null
+          reason?: string | null
           recommendation?: string | null
           score_id?: string
           store_id?: string | null
@@ -2540,72 +2528,6 @@ export type Database = {
           is_active?: boolean | null
           password_hash?: string | null
           user_id?: string
-          username?: string | null
-        }
-        Relationships: []
-      }
-      users_backup_before_cleanup: {
-        Row: {
-          avatar_url: string | null
-          backup_created_at: string | null
-          backup_reason: string | null
-          created_at: string | null
-          email: string | null
-          full_name: string | null
-          is_active: boolean | null
-          last_login: string | null
-          password_hash: string | null
-          pin_attempts: number | null
-          pin_delivery_method: string | null
-          pin_expires_at: string | null
-          pin_hash: string | null
-          pin_locked_until: string | null
-          pin_set_at: string | null
-          requires_pin: boolean | null
-          updated_at: string | null
-          user_id: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          backup_created_at?: string | null
-          backup_reason?: string | null
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          is_active?: boolean | null
-          last_login?: string | null
-          password_hash?: string | null
-          pin_attempts?: number | null
-          pin_delivery_method?: string | null
-          pin_expires_at?: string | null
-          pin_hash?: string | null
-          pin_locked_until?: string | null
-          pin_set_at?: string | null
-          requires_pin?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          backup_created_at?: string | null
-          backup_reason?: string | null
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          is_active?: boolean | null
-          last_login?: string | null
-          password_hash?: string | null
-          pin_attempts?: number | null
-          pin_delivery_method?: string | null
-          pin_expires_at?: string | null
-          pin_hash?: string | null
-          pin_locked_until?: string | null
-          pin_set_at?: string | null
-          requires_pin?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
           username?: string | null
         }
         Relationships: []

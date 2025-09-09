@@ -48,6 +48,20 @@ interface FastAPIAnalyticsResponse {
   }
 }
 
+interface ActionableBatch {
+  batch_id: string
+  product_name: string
+  expiry_date: string
+  urgency: 'critical' | 'high' | 'medium' | 'low'
+  recommendation: string
+  discount_percent: number
+  reason: string
+  location_code: string
+  current_quantity: number
+  potential_loss: number
+  composite_score: number
+}
+
 export class FastAPIClient {
   private baseUrl: string
   private timeout: number
@@ -68,7 +82,7 @@ export class FastAPIClient {
 
     this.baseUrl = baseUrl
     // Optimized timeout: 8 seconds for better performance
-    this.timeout = 8000
+    this.timeout = 10000 // Increased to 10s now that scoring is decoupled
   }
 
   /**
@@ -431,6 +445,110 @@ export class FastAPIClient {
 
       const data = await response.json()
       return data as FastAPIAnalyticsResponse
+    } catch (error) {
+      clearTimeout(timeoutId)
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('FastAPI request timeout')
+      }
+
+      throw error instanceof Error ? error : new Error('FastAPI request failed')
+    }
+  }
+
+  /**
+   * Get dashboard data with actionable batches using user JWT token
+   * ENHANCED: Now includes individual batch recommendations from scoring
+   */
+  async getDashboardDataWithUserToken(
+    storeId: string,
+    userToken: string,
+  ): Promise<{
+    store_id: string
+    summary: Record<string, unknown>
+    alerts: Record<string, unknown>
+    top_categories: Record<string, unknown>[]
+    recent_activity: Record<string, unknown>[]
+    actionable_batches: ActionableBatch[]
+    last_updated: string
+  }> {
+    const url = new URL(`${this.baseUrl}/api/v1/analytics/dashboard/${storeId}`)
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        throw new Error(
+          `FastAPI dashboard request failed: ${response.status} ${response.statusText}`,
+        )
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      clearTimeout(timeoutId)
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('FastAPI request timeout')
+      }
+
+      throw error instanceof Error ? error : new Error('FastAPI request failed')
+    }
+  }
+
+  /**
+   * Get dashboard data with actionable batches using service key
+   * ENHANCED: Now includes individual batch recommendations from scoring
+   */
+  async getDashboardDataWithServiceKey(
+    storeId: string,
+    serviceRoleKey: string,
+  ): Promise<{
+    store_id: string
+    summary: Record<string, unknown>
+    alerts: Record<string, unknown>
+    top_categories: Record<string, unknown>[]
+    recent_activity: Record<string, unknown>[]
+    actionable_batches: ActionableBatch[]
+    last_updated: string
+  }> {
+    const url = new URL(`${this.baseUrl}/api/v1/analytics/dashboard/${storeId}`)
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          apikey: serviceRoleKey, // Use apikey header for service role
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        throw new Error(
+          `FastAPI dashboard request failed: ${response.status} ${response.statusText}`,
+        )
+      }
+
+      const data = await response.json()
+      return data
     } catch (error) {
       clearTimeout(timeoutId)
 
