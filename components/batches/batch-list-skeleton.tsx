@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl'
+import { ArrowUpDown } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -18,46 +19,81 @@ export function BatchListSkeleton() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('headers.batchNumber')}</TableHead>
+            <TableHead>
+              <div className="flex items-center gap-1">
+                {t('headers.batchNumber')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
             <TableHead>{t('headers.product')}</TableHead>
-            <TableHead>{t('headers.supplier')}</TableHead>
-            <TableHead>{t('headers.expiryDate')}</TableHead>
-            <TableHead className="text-right">{t('headers.stock')}</TableHead>
-            <TableHead className="text-right">{t('headers.costPrice')}</TableHead>
-            <TableHead className="text-right">{t('headers.sellPrice')}</TableHead>
-            <TableHead>{t('headers.status')}</TableHead>
+            <TableHead>
+              <div className="flex items-center gap-1">
+                {t('headers.supplier')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="flex items-center gap-1">
+                {t('headers.expiryDate')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
+            <TableHead className="text-right">
+              <div className="flex items-center justify-end gap-1">
+                {t('headers.stock')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
+            <TableHead className="text-right">
+              <div className="flex items-center justify-end gap-1">
+                {t('headers.costPrice')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
+            <TableHead className="text-right">
+              <div className="flex items-center justify-end gap-1">
+                {t('headers.sellPrice')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="flex items-center gap-1">
+                {t('headers.status')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {Array.from({ length: 10 }).map((_, i) => (
             <TableRow key={`skeleton-${i + 1}`}>
-              <TableCell>
-                <Skeleton className="h-4 w-20" />
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
+              </TableCell>
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
+              </TableCell>
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
+              </TableCell>
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
+              </TableCell>
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
               <TableCell>
-                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24" />
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-20" />
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-8" />
+              <TableCell className="border-r border-border/50">
+                <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
             </TableRow>
           ))}

@@ -16,7 +16,12 @@ import {
   createProductTableColumns,
 } from '@/components/products/product-table-columns'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -45,14 +50,20 @@ interface ProductsTableProps {
   isLoading: boolean
 }
 
-export function ProductsTable({ data, currentSort, updateSort, isLoading }: ProductsTableProps) {
+export function ProductsTable({
+  data,
+  currentSort,
+  updateSort,
+  isLoading,
+}: ProductsTableProps) {
   const t = useTranslations('products')
   const tButtons = useTranslations('buttons')
   const tTable = useTranslations('productTable')
 
   const { updateProductPrice, deleteProduct, isUpdating } = useProductActions()
 
-  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useProductColumnSizing()
+  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } =
+    useProductColumnSizing()
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
@@ -132,9 +143,9 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
   return (
     <Table className="w-full table-fixed border-0 border-t rounded-t-none shadow-none">
       <TableHeader>
-        {table.getHeaderGroups().map(headerGroup => (
+        {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map(header => (
+            {headerGroup.headers.map((header) => (
               <TableHead
                 key={header.id}
                 className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
@@ -145,17 +156,22 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
               >
                 {header.isPlaceholder
                   ? null
-                  : flexRender(header.column.columnDef.header, header.getContext())}
-                {header.column.getCanResize() && <ColumnResizer header={header} />}
+                  : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                {header.column.getCanResize() && (
+                  <ColumnResizer header={header} />
+                )}
               </TableHead>
             ))}
           </TableRow>
         ))}
       </TableHeader>
       <TableBody>
-        {table.getRowModel().rows.map(row => (
+        {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
-            {row.getVisibleCells().map(cell => (
+            {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
                 style={{
