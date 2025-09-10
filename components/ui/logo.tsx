@@ -31,26 +31,24 @@ const sizeMapHorizontal = {
   xl: 'h-16',
 }
 
-export function Logo({
-  variant = 'vertical',
-  size = 'md',
-  className,
-  darkMode,
-  href = '/',
-}: LogoProps) {
+export function Logo({ variant = 'vertical', size = 'md', className, darkMode, href }: LogoProps) {
   const { theme } = useTheme()
 
   // Determine which logo to show based on theme
   const isDark = darkMode ?? theme === 'dark'
 
   if (variant === 'text') {
-    return (
-      <Link href={href}>
-        <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
-          LIFO.ai
-        </Typography>
-      </Link>
+    const textElement = (
+      <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
+        LIFO.ai
+      </Typography>
     )
+
+    if (href) {
+      return <Link href={href}>{textElement}</Link>
+    }
+
+    return textElement
   }
 
   const getLogoPath = () => {
@@ -76,7 +74,7 @@ export function Logo({
       alt="LIFO"
       className={cn(
         variant === 'vertical' ? sizeMapVertical[size] : sizeMapHorizontal[size],
-        'w-auto transition-opacity duration-200 hover:opacity-80',
+        'w-auto transition-opacity duration-200',
         className,
       )}
       priority
