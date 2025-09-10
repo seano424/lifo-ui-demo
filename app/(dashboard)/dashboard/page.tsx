@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
+import { BatchStatusSummary } from '@/components/dashboard/batch-status-summary'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
@@ -15,29 +16,27 @@ export default function Page() {
   const hasBatches = batches && batches.length > 0
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <DashboardInsetHeader title={t('dashboard')} />
-      {hasBatches && <UrgentAlerts />}
+
+      {hasBatches && <BatchStatusSummary />}
+
       {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+        <div className="border p-5 rounded-lg">
           <DashboardKPICards />
         </div>
       )}
       {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+        <div className="bg-muted/50 rounded-lg border-0 p-5 dark:bg-brand-dark">
           <StoreInsightsDashboard />
         </div>
       )}
       {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+        <div className="bg-muted/50 rounded-lg border-0 p-5 dark:bg-brand-dark">
           <QuickActionCards />
         </div>
       )}
-      {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
-          <AlertSensitivityControls />
-        </div>
-      )}
+      {hasBatches && <AlertSensitivityControls />}
     </div>
   )
 }

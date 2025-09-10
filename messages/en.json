@@ -540,6 +540,22 @@
         "all": "All Priority Levels",
         "allDesc": "Complete inventory review"
       }
+    },
+    "batchStatus": {
+      "needsAttention": "Needs attention",
+      "urgency": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "status": {
+        "ok": "OK",
+        "allGood": "All batches are in good condition"
+      },
+      "errors": {
+        "loadingError": "Unable to load batch status"
+      }
     }
   },
   "dashboard": {
