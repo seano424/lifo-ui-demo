@@ -315,11 +315,11 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             if "/admin" in request.url.path:
                 # Require additional authentication headers (case-insensitive)
                 auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
-                
+
                 # Ensure header is a string (handle potential bytes issues)
                 if isinstance(auth_header, bytes):
                     auth_header = auth_header.decode('utf-8')
-                    
+
                 if not auth_header.startswith("Bearer "):
                     return False
 

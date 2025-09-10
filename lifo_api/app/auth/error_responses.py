@@ -3,7 +3,7 @@ Standardized authentication error responses for LIFO AI Engine
 Provides consistent error messages and HTTP status codes across all endpoints
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import HTTPException, status
 
@@ -53,12 +53,12 @@ class StandardAuthErrors:
         )
 
     @staticmethod
-    def insufficient_permissions(required_permission: str = None) -> HTTPException:
+    def insufficient_permissions(required_permission: str | None = None) -> HTTPException:
         """User lacks required permissions"""
         message = "Insufficient permissions to access this resource"
         if required_permission:
             message += f". Required permission: {required_permission}"
-        
+
         return HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
@@ -94,12 +94,12 @@ class StandardAuthErrors:
         )
 
     @staticmethod
-    def rate_limit_exceeded(retry_after: int = None) -> HTTPException:
+    def rate_limit_exceeded(retry_after: int | None = None) -> HTTPException:
         """Rate limit exceeded for authentication requests"""
         headers = {}
         if retry_after:
             headers["Retry-After"] = str(retry_after)
-            
+
         return HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail={
@@ -140,15 +140,15 @@ class StandardAuthErrors:
 def map_supabase_error(error: Exception) -> HTTPException:
     """
     Map Supabase authentication errors to standardized responses
-    
+
     Args:
         error: The original Supabase error
-        
+
     Returns:
         HTTPException: Standardized error response
     """
     error_str = str(error).lower()
-    
+
     if "expired" in error_str:
         return StandardAuthErrors.expired_token()
     elif "invalid" in error_str or "malformed" in error_str:
@@ -163,20 +163,20 @@ def map_supabase_error(error: Exception) -> HTTPException:
 
 
 def create_auth_error_response(
-    error_type: str, 
-    message: str = None, 
+    error_type: str,
+    message: str | None = None,
     status_code: int = 401,
     **kwargs
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Create a standardized authentication error response
-    
+
     Args:
         error_type: Type of error (e.g., 'invalid_token', 'expired_token')
         message: Custom error message (optional)
         status_code: HTTP status code
         **kwargs: Additional fields to include in response
-        
+
     Returns:
         Dict containing standardized error response
     """
@@ -186,7 +186,7 @@ def create_auth_error_response(
         "timestamp": "2025-01-15T10:00:00Z",  # Would be actual timestamp in production
         **kwargs
     }
-    
+
     return response
 
 

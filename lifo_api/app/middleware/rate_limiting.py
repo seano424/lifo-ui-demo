@@ -95,11 +95,11 @@ def get_user_rate_limit_key(request: Request) -> str:
     # Try to get user ID from JWT token (case-insensitive)
     try:
         auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
-        
+
         # Ensure header is a string (handle potential bytes issues)
         if isinstance(auth_header, bytes):
             auth_header = auth_header.decode('utf-8')
-            
+
         if auth_header.startswith("Bearer "):
             # In production, would decode JWT to get user ID
             # For now, use IP + user agent combination

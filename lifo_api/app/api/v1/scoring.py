@@ -50,7 +50,7 @@ async def score_store_batch(
             read_ops = get_read_only_operations(db)
             success = await read_ops.store_score_results(results["scores"])
             results["database_saved"] = success
-            
+
             if success:
                 logger.info(
                     "Scores saved to database successfully",

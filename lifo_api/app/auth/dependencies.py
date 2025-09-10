@@ -5,6 +5,7 @@ Provides dependency injection for authentication and authorization
 """
 
 import warnings
+
 warnings.warn(
     "app.auth.dependencies is deprecated. Use app.auth.secure_dependencies instead.",
     DeprecationWarning,

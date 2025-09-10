@@ -11,14 +11,17 @@ from typing import Any
 import structlog
 from fastapi import HTTPException, Request
 
-from app.auth.error_responses import StandardAuthErrors, map_supabase_error
-from app.auth.monitoring import record_login_success, record_login_failure, AuthEventType
-from app.auth.supabase_api_key_auth import (
+from lifo_api.app.auth.error_responses import StandardAuthErrors, map_supabase_error
+from lifo_api.app.auth.monitoring import (
+    record_login_failure,
+    record_login_success,
+)
+from lifo_api.app.auth.supabase_api_key_auth import (
     SupabaseAPIKeyError,
     get_api_key_auth,
 )
-from app.core.config import settings
-from app.utils.mvp_exceptions import AuthenticationException, AuthorizationException
+from lifo_api.app.core.config import settings
+from lifo_api.app.utils.mvp_exceptions import AuthorizationException
 
 logger = structlog.get_logger()
 
@@ -44,7 +47,7 @@ async def get_current_user(
     import time
     start_time = time.time()
     client_ip = getattr(request.client, 'host', None) if hasattr(request, 'client') else None
-    
+
     try:
         # Use the new API key authentication system
         auth = get_api_key_auth()
@@ -62,8 +65,8 @@ async def get_current_user(
 
         # Log successful authentication (without sensitive data)
         logger.info(
-            "User authenticated successfully", 
-            user_id=user.user_id, 
+            "User authenticated successfully",
+            user_id=user.user_id,
             role=user.role,
             response_time_ms=response_time_ms
         )
@@ -79,24 +82,24 @@ async def get_current_user(
 
     except SupabaseAPIKeyError as e:
         logger.warning("Supabase API key authentication failed", error=str(e))
-        
+
         # Record authentication failure
         record_login_failure(
             ip_address=client_ip,
-            error_code=getattr(e, 'status_code', 401)
+            error_code=str(getattr(e, 'status_code', 401))
         )
-        
+
         # Map to standardized error response
         raise map_supabase_error(e) from e
     except Exception as e:
         logger.error("Authentication error", error=str(e))
-        
+
         # Record authentication failure
         record_login_failure(
             ip_address=client_ip,
             error_code="AUTH_009"
         )
-        
+
         raise StandardAuthErrors.auth_configuration_error() from e
 
 
@@ -431,11 +434,11 @@ def rate_limit_key_func(request: Request) -> str:
     try:
         # Try to get user ID from JWT token (case-insensitive)
         auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
-        
+
         # Ensure header is a string (handle potential bytes issues)
         if isinstance(auth_header, bytes):
             auth_header = auth_header.decode('utf-8')
-            
+
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
             # For rate limiting, we'll decode without verification for speed

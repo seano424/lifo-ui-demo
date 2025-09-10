@@ -49,15 +49,15 @@ class Settings(BaseSettings):
 
     # Supabase Authentication
     supabase_url: str = Field(
-        default="", 
+        default="",
         description="Supabase project URL for authentication and database"
     )
     supabase_anon_key: str = Field(
-        default="", 
+        default="",
         description="Supabase anonymous key for public operations"
     )
     supabase_service_role_key: str = Field(
-        default="", 
+        default="",
         description="Supabase service role key for admin operations"
     )
 

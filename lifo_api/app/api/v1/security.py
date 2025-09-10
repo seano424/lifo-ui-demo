@@ -9,7 +9,7 @@ from typing import Any
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from app.auth.monitoring import get_auth_monitor, get_auth_health
+from app.auth.monitoring import get_auth_health, get_auth_monitor
 from app.auth.secure_dependencies import get_current_user
 from app.core.config import settings
 from app.security.input_validation import sanitize_for_logging
@@ -92,16 +92,16 @@ async def get_authentication_health(
     """
     try:
         health_status = get_auth_health()
-        
+
         logger.info(
             "Authentication health requested",
             user_id=current_user.get("sub"),
             status=health_status.get("status"),
             health_score=health_status.get("health_score")
         )
-        
+
         return health_status
-        
+
     except Exception as e:
         logger.error(
             "Failed to get authentication health",
@@ -124,14 +124,14 @@ async def get_authentication_metrics(
     try:
         auth_monitor = get_auth_monitor()
         metrics = auth_monitor.get_metrics_summary(hours=hours)
-        
+
         logger.info(
             "Authentication metrics requested",
             user_id=current_user.get("sub"),
             hours=hours,
             total_requests=metrics.total_requests
         )
-        
+
         return {
             "time_period_hours": hours,
             "metrics": {
@@ -139,7 +139,7 @@ async def get_authentication_metrics(
                 "successful_auths": metrics.successful_auths,
                 "failed_auths": metrics.failed_auths,
                 "success_rate_percent": (
-                    (metrics.successful_auths / metrics.total_requests * 100) 
+                    (metrics.successful_auths / metrics.total_requests * 100)
                     if metrics.total_requests > 0 else 0
                 ),
                 "avg_response_time_ms": metrics.avg_response_time_ms,
@@ -150,7 +150,7 @@ async def get_authentication_metrics(
             },
             "timestamp": datetime.utcnow()
         }
-        
+
     except Exception as e:
         logger.error(
             "Failed to get authentication metrics",
@@ -173,16 +173,16 @@ async def get_auth_security_report(
     try:
         auth_monitor = get_auth_monitor()
         security_report = auth_monitor.get_security_report(hours=hours)
-        
+
         logger.info(
             "Authentication security report requested",
             user_id=current_user.get("sub"),
             hours=hours,
             total_incidents=security_report.get("total_incidents", 0)
         )
-        
+
         return security_report
-        
+
     except Exception as e:
         logger.error(
             "Failed to get authentication security report",
