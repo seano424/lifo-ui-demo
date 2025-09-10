@@ -36,7 +36,7 @@ export function Logo({
   size = 'md',
   className,
   darkMode,
-  href = '/',
+  href,
 }: LogoProps) {
   const { theme } = useTheme()
 
@@ -44,13 +44,20 @@ export function Logo({
   const isDark = darkMode ?? theme === 'dark'
 
   if (variant === 'text') {
-    return (
-      <Link href={href}>
-        <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
-          LIFO.ai
-        </Typography>
-      </Link>
+    const textElement = (
+      <Typography
+        className="font-black font-heading lowercase text-3xl lg:text-4xl"
+        variant="h2"
+      >
+        LIFO.ai
+      </Typography>
     )
+
+    if (href) {
+      return <Link href={href}>{textElement}</Link>
+    }
+
+    return textElement
   }
 
   const getLogoPath = () => {
@@ -60,7 +67,9 @@ export function Logo({
       case 'icon-dark':
         return '/logos/lifo-logo-icon-white.svg'
       case 'vertical':
-        return isDark ? '/logos/lifo-logo-vertical-dark.svg' : '/logos/lifo-logo-vertical-light.svg'
+        return isDark
+          ? '/logos/lifo-logo-vertical-dark.svg'
+          : '/logos/lifo-logo-vertical-light.svg'
       case 'horizontal':
         return isDark
           ? '/logos/lifo-logo-horizontal-dark.svg'
@@ -75,9 +84,11 @@ export function Logo({
       src={getLogoPath()}
       alt="LIFO"
       className={cn(
-        variant === 'vertical' ? sizeMapVertical[size] : sizeMapHorizontal[size],
-        'w-auto transition-opacity duration-200 hover:opacity-80',
-        className,
+        variant === 'vertical'
+          ? sizeMapVertical[size]
+          : sizeMapHorizontal[size],
+        'w-auto transition-opacity duration-200',
+        className
       )}
       priority
       width={100}
@@ -87,7 +98,10 @@ export function Logo({
 
   if (href) {
     return (
-      <Link href={href} className="inline-block">
+      <Link
+        href={href}
+        className="inline-block"
+      >
         {logoElement}
       </Link>
     )
@@ -106,18 +120,55 @@ export function NavbarLogo({
   size?: LogoSize
   variant?: LogoVariant
 }) {
-  return <Logo variant={variant} size={size} className={className} />
+  return (
+    <Logo
+      variant={variant}
+      size={size}
+      className={className}
+    />
+  )
 }
 
-export function AppIcon({ className, size = 'sm' }: { className?: string; size?: LogoSize }) {
-  return <Logo variant="icon" size={size} className={className} />
+export function AppIcon({
+  className,
+  size = 'sm',
+}: {
+  className?: string
+  size?: LogoSize
+}) {
+  return (
+    <Logo
+      variant="icon"
+      size={size}
+      className={className}
+    />
+  )
 }
 
-export function HeroLogo({ className, size = 'xl' }: { className?: string; size?: LogoSize }) {
-  return <Logo variant="vertical" size={size} className={className} />
+export function HeroLogo({
+  className,
+  size = 'xl',
+}: {
+  className?: string
+  size?: LogoSize
+}) {
+  return (
+    <Logo
+      variant="vertical"
+      size={size}
+      className={className}
+    />
+  )
 }
 
 // For loading states or when you need a placeholder
 export function LogoSkeleton({ size = 'md' }: { size?: LogoSize }) {
-  return <div className={cn(sizeMapVertical[size], 'w-32 bg-muted animate-pulse rounded')} />
+  return (
+    <div
+      className={cn(
+        sizeMapVertical[size],
+        'w-32 bg-muted animate-pulse rounded'
+      )}
+    />
+  )
 }
