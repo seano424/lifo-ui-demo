@@ -154,13 +154,13 @@ export function ContactForm() {
       </div>
 
       {status.error && (
-        <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+        <div className="bg-destructive/10 text-destructive p-3 rounded-2xl text-sm">
           {status.error}
         </div>
       )}
 
       {status.success && (
-        <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 p-3 rounded-md text-sm">
+        <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 p-3 rounded-2xl text-sm">
           {t('success')}
         </div>
       )}

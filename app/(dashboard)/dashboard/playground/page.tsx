@@ -238,7 +238,7 @@ function TestResults({
         )}
 
         {error && (
-          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-2xl">
             <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
               <p className="font-medium text-red-900">Request Failed</p>
@@ -253,7 +253,7 @@ function TestResults({
               <CheckCircle className="h-4 w-4" />
               <span className="text-sm font-medium">Success</span>
             </div>
-            <div className="bg-gray-50 p-3 rounded-md">
+            <div className="bg-gray-50 p-3 rounded-2xl">
               <pre className="text-xs overflow-auto max-h-64">
                 {JSON.stringify(data as Record<string, unknown>, null, 2)}
               </pre>
@@ -320,7 +320,7 @@ export default function PlaygroundPage() {
           Test components and API endpoints. Current store: {activeStoreId || 'None selected'}
         </p>
         {!isAuthenticated && (
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-2xl">
             <div className="flex items-center gap-2 text-yellow-800">
               <AlertTriangle className="h-4 w-4" />
               <span className="text-sm">
@@ -517,7 +517,7 @@ export default function PlaygroundPage() {
                   id="category"
                   value={recommendationCategory}
                   onChange={e => setRecommendationCategory(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border rounded-md"
+                  className="w-full mt-1 px-3 py-2 border rounded-2xl"
                 >
                   <option value="">All Categories</option>
                   <option value="fresh_produce">Fresh Produce</option>

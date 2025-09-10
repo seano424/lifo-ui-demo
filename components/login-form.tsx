@@ -214,7 +214,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 </div>
 
                 {error && authMode === 'employee' && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
                     <Typography variant="p" color="destructive" className="text-sm">
                       {error}
                     </Typography>
@@ -268,7 +268,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 </div>
 
                 {error && authMode === 'admin' && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
                     <Typography variant="p" color="destructive" className="text-sm">
                       {error}
                     </Typography>

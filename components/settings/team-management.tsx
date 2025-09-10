@@ -111,7 +111,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
               </Typography>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-muted text-muted-foreground text-xs">
                 <Shield className="h-3 w-3" />
                 {permissions.isOwner ? 'Owner' : permissions.isManager ? 'Manager' : 'Employee'}
               </div>

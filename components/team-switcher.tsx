@@ -146,7 +146,7 @@ export function TeamSwitcher() {
                   className="gap-2 p-2"
                   disabled={isChangingStore}
                 >
-                  <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                  <div className="flex size-6 items-center justify-center rounded-2xl border bg-transparent">
                     <Settings className="size-4" />
                   </div>
                   <div className="font-medium text-muted-foreground">Set as Primary Store</div>
