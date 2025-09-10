@@ -442,7 +442,9 @@ class SecureReadOnlyOperations:
                     )
                 """)
                 .eq("store_id", store_id)
-                .in_("status", ["active", "expired"])  # Include expired batches for expired count
+                .in_(
+                    "status", ["active", "expired"]
+                )  # Include expired batches for expired count
                 .gt("current_quantity", 0)
                 .execute()
             )
@@ -452,8 +454,10 @@ class SecureReadOnlyOperations:
                 "FastAPI: Raw batches from Supabase",
                 store_id=store_id,
                 total_batches=len(result.data) if result.data else 0,
-                batch_ids=[batch["batch_id"] for batch in result.data[:5]] if result.data else [],
-                first_batch_sample=result.data[0] if result.data else None
+                batch_ids=[batch["batch_id"] for batch in result.data[:5]]
+                if result.data
+                else [],
+                first_batch_sample=result.data[0] if result.data else None,
             )
 
             # Get scoring data for actionable batches
@@ -481,9 +485,15 @@ class SecureReadOnlyOperations:
                 "FastAPI: Scoring data from product_scores",
                 store_id=store_id,
                 total_scores=len(scoring_result.data) if scoring_result.data else 0,
-                scoring_batch_ids=[score["batch_id"] for score in scoring_result.data[:5]] if scoring_result.data else [],
+                scoring_batch_ids=[
+                    score["batch_id"] for score in scoring_result.data[:5]
+                ]
+                if scoring_result.data
+                else [],
                 score_threshold=0.4,
-                first_score_sample=scoring_result.data[0] if scoring_result.data else None
+                first_score_sample=scoring_result.data[0]
+                if scoring_result.data
+                else None,
             )
 
             if not result.data:
@@ -565,7 +575,9 @@ class SecureReadOnlyOperations:
                 today_date=today.isoformat(),
                 total_batches_from_inventory=len(result.data) if result.data else 0,
                 total_scoring_records=len(scoring_data),
-                scoring_batch_ids=[s["batch_id"] for s in scoring_data[:3]] if scoring_data else []
+                scoring_batch_ids=[s["batch_id"] for s in scoring_data[:3]]
+                if scoring_data
+                else [],
             )
 
             # Create a lookup dict for scoring data
@@ -589,8 +601,10 @@ class SecureReadOnlyOperations:
                     self.logger.info(
                         "FastAPI: Batch has no scoring data - using fallback urgency calculation",
                         batch_id=batch["batch_id"],
-                        product_name=batch.get("store_products", {}).get("products", {}).get("name", "Unknown"),
-                        expiry_date=batch["expiry_date"]
+                        product_name=batch.get("store_products", {})
+                        .get("products", {})
+                        .get("name", "Unknown"),
+                        expiry_date=batch["expiry_date"],
                     )
                     # Create fallback score_info for unscored batches
                     # Calculate days to expiry for urgency
@@ -624,7 +638,7 @@ class SecureReadOnlyOperations:
                             "recommendation": "monitor",
                             "urgency_level": urgency,
                             "reason": "Fallback urgency calculation",
-                            "discount_percent": 0
+                            "discount_percent": 0,
                         }
 
                         self.logger.info(
@@ -632,14 +646,14 @@ class SecureReadOnlyOperations:
                             batch_id=batch["batch_id"],
                             days_to_expiry=days_to_expiry,
                             fallback_urgency=urgency,
-                            fallback_score=composite_score
+                            fallback_score=composite_score,
                         )
 
                     except (ValueError, KeyError) as e:
                         self.logger.warning(
                             "FastAPI: Failed to create fallback scoring",
                             batch_id=batch["batch_id"],
-                            error=str(e)
+                            error=str(e),
                         )
                         continue
 
@@ -702,23 +716,23 @@ class SecureReadOnlyOperations:
                                 expiry_date=batch["expiry_date"],
                                 days_to_expiry=days_to_expiry,
                                 urgency=urgency,
-                                composite_score=score_info.get("composite_score", 0)
+                                composite_score=score_info.get("composite_score", 0),
                             )
                             actionable_batches.append(
                                 {
                                     "batch_id": batch["batch_id"],
                                     "product_name": product_name,
                                     "expiry_date": batch["expiry_date"],
-                                "urgency": urgency,
-                                "recommendation": score_info.get(
-                                    "recommendation", "monitor"
-                                ),
-                                "discount_percent": discount_percent,
-                                "reason": reason,
-                                "location_code": batch.get("location_code", ""),
-                                "current_quantity": float(
-                                    batch.get("current_quantity", 0)
-                                ),
+                                    "urgency": urgency,
+                                    "recommendation": score_info.get(
+                                        "recommendation", "monitor"
+                                    ),
+                                    "discount_percent": discount_percent,
+                                    "reason": reason,
+                                    "location_code": batch.get("location_code", ""),
+                                    "current_quantity": float(
+                                        batch.get("current_quantity", 0)
+                                    ),
                                     "potential_loss": round(potential_loss, 2),
                                     "composite_score": float(
                                         score_info.get("composite_score", 0)
@@ -733,7 +747,7 @@ class SecureReadOnlyOperations:
                                 product_name=product_name,
                                 expiry_date=batch["expiry_date"],
                                 days_to_expiry=days_to_expiry,
-                                composite_score=score_info.get("composite_score", 0)
+                                composite_score=score_info.get("composite_score", 0),
                             )
 
                     except (ValueError, KeyError) as e:
@@ -764,7 +778,7 @@ class SecureReadOnlyOperations:
                 batches_without_scores=batches_without_scores,
                 batches_filtered_expired=batches_filtered_expired,
                 batches_added_to_actionable=batches_added_to_actionable,
-                final_actionable_count=len(actionable_batches)
+                final_actionable_count=len(actionable_batches),
             )
 
             analytics_data = {

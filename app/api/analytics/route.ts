@@ -568,7 +568,7 @@ async function addSupabaseInsightsFallback(
       .eq('status', 'active') // Only active batches for batch status summary
       .gt('current_quantity', 0)
       .order('expiry_date', { ascending: true })
-      // No limit - need ALL active batches for accurate batch status summary
+    // No limit - need ALL active batches for accurate batch status summary
 
     if (detailedBatches) {
       for (const batch of detailedBatches) {
@@ -612,7 +612,7 @@ async function addSupabaseInsightsFallback(
         const productName = batch.store_products?.products?.name || 'Unknown Product'
         const potentialLoss = (batch.current_quantity || 0) * (batch.selling_price || 0)
 
-        // Only include non-expired batches in actionable_batches 
+        // Only include non-expired batches in actionable_batches
         // Expired batches should be handled by ExpiredItemsSummary component
         if (daysToExpiry >= 0) {
           actionableBatches.push({

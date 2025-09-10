@@ -56,51 +56,49 @@ export function ExpiredItemsSummary() {
   const actionableBatches =
     (data?.analytics as AnalyticsData['analytics'])?.actionable_batches || []
 
-  // Filter to only include expired batches
+  // Filter to only include expired batches - use UTC to match expiry date format
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const todayUTC = new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
 
-  const expiredBatches = actionableBatches.filter((batch) => {
-    const expiryDate = new Date(batch.expiry_date)
-    return expiryDate < today
+  const expiredBatches = actionableBatches.filter(batch => {
+    // Parse expiry date as UTC to match the data format
+    const expiryDate = new Date(`${batch.expiry_date}T00:00:00Z`)
+    const isExpired = expiryDate <= todayUTC // Compare UTC to UTC
+    return isExpired
   })
 
   // Categorize expired batches by how long they've been expired
   const categorizeExpired = (expiredBatches: ActionableBatch[]) => {
-    const recentlyExpired = expiredBatches.filter((batch) => {
-      const expiryDate = new Date(batch.expiry_date)
+    const recentlyExpired = expiredBatches.filter(batch => {
+      const expiryDate = new Date(`${batch.expiry_date}T00:00:00Z`)
       const daysExpired = Math.floor(
-        (today.getTime() - expiryDate.getTime()) / (1000 * 60 * 60 * 24)
+        (todayUTC.getTime() - expiryDate.getTime()) / (1000 * 60 * 60 * 24),
       )
       return daysExpired <= 3
     })
 
-    const weekOld = expiredBatches.filter((batch) => {
-      const expiryDate = new Date(batch.expiry_date)
+    const weekOld = expiredBatches.filter(batch => {
+      const expiryDate = new Date(`${batch.expiry_date}T00:00:00Z`)
       const daysExpired = Math.floor(
-        (today.getTime() - expiryDate.getTime()) / (1000 * 60 * 60 * 24)
+        (todayUTC.getTime() - expiryDate.getTime()) / (1000 * 60 * 60 * 24),
       )
       return daysExpired > 3 && daysExpired <= 7
     })
 
-    const older = expiredBatches.filter((batch) => {
-      const expiryDate = new Date(batch.expiry_date)
+    const older = expiredBatches.filter(batch => {
+      const expiryDate = new Date(`${batch.expiry_date}T00:00:00Z`)
       const daysExpired = Math.floor(
-        (today.getTime() - expiryDate.getTime()) / (1000 * 60 * 60 * 24)
+        (todayUTC.getTime() - expiryDate.getTime()) / (1000 * 60 * 60 * 24),
       )
       return daysExpired > 7
     })
 
-    const totalValue = expiredBatches.reduce(
-      (sum, batch) => sum + batch.potential_loss,
-      0
-    )
+    const totalValue = expiredBatches.reduce((sum, batch) => sum + batch.potential_loss, 0)
 
     return { recentlyExpired, weekOld, older, totalValue }
   }
 
-  const { recentlyExpired, weekOld, older, totalValue } =
-    categorizeExpired(expiredBatches)
+  const { recentlyExpired, weekOld, older, totalValue } = categorizeExpired(expiredBatches)
 
   const getUrgencyIcon = (category: string) => {
     switch (category) {
@@ -122,18 +120,13 @@ export function ExpiredItemsSummary() {
         <div className="flex justify-between items-center gap-2">
           <div className="text-gray-500 dark:text-brand-white flex flex-col gap-1">
             <Typography variant="h4">{t('title')}</Typography>
-            <Typography
-              variant="small"
-              className="text-gray-500 dark:text-brand-white"
-            >
+            <Typography variant="small" className="text-gray-500 dark:text-brand-white">
               {t('subtitle')}
             </Typography>
           </div>
           <div className="text-right text-gray-500 dark:text-brand-white flex items-center gap-1">
             <Typography variant="h2">{expiredBatches.length}</Typography>
-            <Typography variant="p">
-              €{Math.round(totalValue).toLocaleString()}
-            </Typography>
+            <Typography variant="p">€{Math.round(totalValue).toLocaleString()}</Typography>
           </div>
         </div>
       </div>
@@ -145,10 +138,7 @@ export function ExpiredItemsSummary() {
             <div className="h-8 w-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
               <div className="h-2 w-2 bg-white rounded-full" />
             </div>
-            <Typography
-              variant="p"
-              className=""
-            >
+            <Typography variant="p" className="">
               {t('noExpiredItems')}
             </Typography>
           </div>
@@ -159,10 +149,7 @@ export function ExpiredItemsSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('recent')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700 dark:text-brand-white"
-                  >
+                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
                     {t('recentlyExpired')} (≤3 {t('days')})
                   </Typography>
                 </div>
@@ -175,10 +162,7 @@ export function ExpiredItemsSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('week')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700 dark:text-brand-white"
-                  >
+                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
                     {t('weekOld')} (4-7 {t('days')})
                   </Typography>
                 </div>
@@ -191,10 +175,7 @@ export function ExpiredItemsSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('older')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700 dark:text-brand-white"
-                  >
+                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
                     {t('older')} ({'>'}7 {t('days')})
                   </Typography>
                 </div>
@@ -213,21 +194,15 @@ export function ExpiredItemsSummary() {
               <div className="space-y-2 text-sm text-gray-600 dark:text-brand-white">
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-1 bg-gray-400 rounded-full" />
-                  <Typography variant="small">
-                    {t('reviewDiscounts')}
-                  </Typography>
+                  <Typography variant="small">{t('reviewDiscounts')}</Typography>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-1 bg-gray-400 rounded-full" />
-                  <Typography variant="small">
-                    {t('scheduleDonation')}
-                  </Typography>
+                  <Typography variant="small">{t('scheduleDonation')}</Typography>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-1 bg-gray-400 rounded-full" />
-                  <Typography variant="small">
-                    {t('removeFromShelves')}
-                  </Typography>
+                  <Typography variant="small">{t('removeFromShelves')}</Typography>
                 </div>
               </div>
             </div>
