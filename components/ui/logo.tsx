@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { Typography } from './typography'
 
-type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text'
+type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text' | 'icon-dark'
 type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
 
 interface LogoProps {
@@ -57,6 +57,8 @@ export function Logo({
     switch (variant) {
       case 'icon':
         return '/logos/lifo-logo-icon.svg'
+      case 'icon-dark':
+        return '/logos/lifo-logo-icon-white.svg'
       case 'vertical':
         return isDark ? '/logos/lifo-logo-vertical-dark.svg' : '/logos/lifo-logo-vertical-light.svg'
       case 'horizontal':
