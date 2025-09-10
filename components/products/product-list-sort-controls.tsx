@@ -64,10 +64,7 @@ export function ProductListSortControls({
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="w-[200px]"
-      >
+      <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem
           onClick={() => updateSort('name')}
           className="justify-between text-nowrap"

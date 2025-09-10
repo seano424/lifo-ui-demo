@@ -59,7 +59,7 @@ export function ProductListFilters({
     <div className="flex flex-col-reverse items-center md:flex-row justify-end gap-2">
       <Select
         value={filters?.category || 'all'}
-        onValueChange={(value) =>
+        onValueChange={value =>
           onFiltersChange({
             ...filters,
             category: value === 'all' ? undefined : value,
@@ -72,11 +72,8 @@ export function ProductListFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{t('allCategories')}</SelectItem>
-          {categories.map((category) => (
-            <SelectItem
-              key={category.category_code}
-              value={category.category_code}
-            >
+          {categories.map(category => (
+            <SelectItem key={category.category_code} value={category.category_code}>
               {getCategoryDisplayName(category)}
             </SelectItem>
           ))}
