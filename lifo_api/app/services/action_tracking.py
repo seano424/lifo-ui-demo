@@ -190,14 +190,30 @@ class ActionTrackingService:
     def map_scoring_action_to_enum(self, scoring_action: str) -> str:
         """
         Map scoring system action names to database enum values
+        Handles both legacy and FastAPI recommendation formats
         """
+        from app.utils.recommendation_migration import RecommendationMigrator
+
+        # First migrate legacy recommendation to standard format
+        standard_recommendation = RecommendationMigrator.migrate_recommendation(scoring_action)
+
+        # Map standard recommendations to database enums
         action_mapping = {
+            # FastAPI Standard Recommendations
             "discount_aggressive": ActionType.DISCOUNT.value,
             "discount_moderate": ActionType.DISCOUNT.value,
+            "alert": ActionType.MAINTAIN.value,  # Alert means monitor closely
             "monitor": ActionType.MAINTAIN.value,
             "maintain": ActionType.MAINTAIN.value,
             "dispose": ActionType.DISPOSE.value,
             "donate": ActionType.DONATE.value,
+
+            # Legacy support (in case migration missed something)
+            "immediate_action": ActionType.DISCOUNT.value,
+            "high_priority": ActionType.DISCOUNT.value,
+            "medium_priority": ActionType.DISCOUNT.value,
+            "discount_heavily": ActionType.DISCOUNT.value,
+            "normal": ActionType.MAINTAIN.value,
         }
 
-        return action_mapping.get(scoring_action, ActionType.MAINTAIN.value)
+        return action_mapping.get(standard_recommendation, ActionType.MAINTAIN.value)

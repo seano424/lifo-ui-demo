@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { fastApiClient, mapFastAPIAlertToEnhanced } from '@/lib/services/fastapi-client'
 import { createClient } from '@/lib/supabase/server'
+import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
 
 interface ScoringData {
@@ -370,7 +371,7 @@ export async function GET(request: NextRequest) {
         cost_price: parseFloat(alert.cost_price.toString()),
         margin_percent: Math.round(marginPercent * 100) / 100,
         composite_score: alert.composite_score || 0,
-        recommendation: alert.recommendation || 'unknown',
+        recommendation: migrateRecommendation(alert.recommendation) || 'maintain',
         urgency_level: urgencyLevel,
         potential_loss: Math.round(potentialLoss * 100) / 100,
         location: alert.location_code || 'Unknown',

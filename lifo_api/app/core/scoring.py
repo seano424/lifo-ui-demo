@@ -698,7 +698,7 @@ class ScoringService:
                 recommendation=recommendation["action"],
                 urgency_level=urgency_level,
                 discount_percent=recommendation.get("discount_percent", 0),
-                reason=recommendation["reason"],
+                reason=recommendation.get("reason", f"Scored {composite_score:.2f} based on {urgency_level} urgency"),
                 confidence_level=1.0,  # Rule-based scoring has high confidence
                 ml_enhanced=False,
                 calculated_at=datetime.utcnow(),
@@ -840,6 +840,9 @@ class ScoringService:
                         batch_data["current_quantity"],
                     )
 
+                    # Determine urgency level for bulk scoring
+                    urgency_level = self._get_urgency_level(days_to_expiry, composite_score)
+
                     # Create scoring result
                     score_result = ScoringResult(
                         store_id=store_id,
@@ -851,15 +854,17 @@ class ScoringService:
                         velocity_score=velocity_score,
                         margin_score=margin_score,
                         composite_score=composite_score,
-                        recommendation=str(recommendation),
-                        urgency_level=recommendation.get("urgency", "low"),
+                        recommendation=recommendation.get("action", "maintain"),
+                        urgency_level=urgency_level,
                         discount_percent=recommendation.get("discount_percent", 0),
-                        reason=recommendation.get("reason", "standard pricing"),
+                        reason=recommendation.get("reason", f"Bulk scored {composite_score:.2f} based on {urgency_level} urgency"),
                         confidence_level=0.85,
                         ml_enhanced=True,
                         calculated_at=datetime.utcnow(),
                         days_to_expiry=days_to_expiry,
                         current_quantity=batch_data["current_quantity"],
+                        potential_loss=batch_data["current_quantity"] * batch_data.get("selling_price", 0),
+                        margin_percent=margin_percent,
                     )
 
                     results.append(score_result)
@@ -1081,6 +1086,9 @@ class ScoringService:
                 ml_enhanced=result.ml_enhanced,
                 confidence_level=Decimal(str(result.confidence_level)),
                 calculated_at=result.calculated_at,
+                days_to_expiry=result.days_to_expiry,
+                potential_loss=Decimal(str(result.potential_loss)) if result.potential_loss else None,
+                margin_percent=Decimal(str(result.margin_percent)) if result.margin_percent else None,
             )
 
             self.db.add(score)

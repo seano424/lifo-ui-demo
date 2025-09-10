@@ -76,7 +76,7 @@ export function useCSVUpload() {
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
       const expiryValue = values[expiryIndex] || ''
-      if (!expiryValue) {
+      if (!expiryValue || expiryValue.trim() === '') {
         _itemsWithoutExpiry++
       }
 
@@ -100,7 +100,7 @@ export function useCSVUpload() {
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
         const expiryValue = values[expiryIndex] || ''
-        if (!expiryValue) {
+        if (!expiryValue || expiryValue.trim() === '') {
           totalItemsWithoutExpiry++
         }
       }
@@ -223,7 +223,9 @@ export function useCSVUpload() {
 
         // Update the count of items without expiry based on the full CSV data
         // Note: this only updates the preview, the full count would need recalculation
-        const itemsWithoutExpiry = newPreview.filter(item => !item.Expiry_Date).length
+        const itemsWithoutExpiry = newPreview.filter(
+          item => !item.Expiry_Date || item.Expiry_Date.trim() === '',
+        ).length
         setColumnMapping(prevMapping => ({ ...prevMapping, itemsWithoutExpiry }))
 
         return newPreview

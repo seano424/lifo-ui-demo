@@ -636,7 +636,7 @@ export class InventoryOperations {
         sku: csvItem.SKU || `AUTO-${Date.now()}-${index}`,
         product_name: csvItem.Product_Name,
         brand: csvItem.Brand,
-        category: csvItem.Category, // Will be mapped to standardized category in database function
+        // Note: category field removed - new schema uses category_id with foreign keys
         quantity: csvItem.Quantity,
         expiry_date: csvItem.Expiry_Date,
         cost_price: csvItem.Cost_Price || 0,
@@ -784,7 +784,7 @@ export class InventoryOperations {
               sku: csvItem.SKU || `AUTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
               name: csvItem.Product_Name,
               brand: csvItem.Brand,
-              category: csvItem.Category,
+              // Note: category field removed - new schema uses category_id with foreign keys
               unit_type: csvItem.Unit_Type || 'units',
               typical_shelf_life_days: 30, // Will be determined from database category mapping
               base_cost_price: csvItem.Cost_Price || 0,
