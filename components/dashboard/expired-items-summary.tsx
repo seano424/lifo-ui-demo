@@ -161,7 +161,7 @@ export function ExpiredItemsSummary() {
                   {getUrgencyIcon('recent')}
                   <Typography
                     variant="p"
-                    className="text-gray-700"
+                    className="text-gray-700 dark:text-brand-white"
                   >
                     {t('recentlyExpired')} (≤3 {t('days')})
                   </Typography>
@@ -177,7 +177,7 @@ export function ExpiredItemsSummary() {
                   {getUrgencyIcon('week')}
                   <Typography
                     variant="p"
-                    className="text-gray-700"
+                    className="text-gray-700 dark:text-brand-white"
                   >
                     {t('weekOld')} (4-7 {t('days')})
                   </Typography>
@@ -193,7 +193,7 @@ export function ExpiredItemsSummary() {
                   {getUrgencyIcon('older')}
                   <Typography
                     variant="p"
-                    className="text-gray-700"
+                    className="text-gray-700 dark:text-brand-white"
                   >
                     {t('older')} ({'>'}7 {t('days')})
                   </Typography>
@@ -206,11 +206,11 @@ export function ExpiredItemsSummary() {
             <div className="border-t pt-4 mt-4">
               <Typography
                 variant="p"
-                className="font-medium text-gray-900 mb-3"
+                className="font-medium text-gray-900 dark:text-brand-white mb-3"
               >
                 {t('actionsNeeded')}:
               </Typography>
-              <div className="space-y-2 text-sm text-gray-600">
+              <div className="space-y-2 text-sm text-gray-600 dark:text-brand-white">
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-1 bg-gray-400 rounded-full" />
                   <Typography variant="small">

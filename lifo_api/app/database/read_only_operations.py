@@ -442,7 +442,7 @@ class SecureReadOnlyOperations:
                     )
                 """)
                 .eq("store_id", store_id)
-                .eq("status", "active")  # Only active batches for actionable_batches
+                .in_("status", ["active", "expired"])  # Include expired batches for expired count
                 .gt("current_quantity", 0)
                 .execute()
             )
@@ -532,13 +532,12 @@ class SecureReadOnlyOperations:
                     ).date()
                     days_to_expiry = (expiry_date - today).days
 
-                    if days_to_expiry < 0:
+                    if days_to_expiry <= 0:  # Include items expiring today
                         expired_count += 1
                         urgency_counts["critical"] += 1
                     elif days_to_expiry <= 1:
                         urgency_counts["critical"] += 1
-                        if days_to_expiry >= 0:
-                            expiring_soon_count += 1
+                        expiring_soon_count += 1
                     elif days_to_expiry <= 3:
                         urgency_counts["high"] += 1
                         expiring_soon_count += 1
