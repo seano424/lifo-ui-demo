@@ -371,7 +371,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               {currentItems.map((item, index) => {
                 const actualIndex = startIndex + index
                 return (
-                  <div key={actualIndex} className="border border-gray-200 rounded-2xl p-3 bg-white">
+                  <div
+                    key={actualIndex}
+                    className="border border-gray-200 rounded-2xl p-3 bg-white"
+                  >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-mono text-xs text-gray-500">{item.SKU}</span>

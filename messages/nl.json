@@ -403,6 +403,23 @@
         "all": "Alle prioriteitsniveaus",
         "allDesc": "Volledige voorraadcontrole"
       }
+    },
+    "batchStatus": {
+      "needsAttention": "Heeft aandacht nodig",
+      "activeBatchesCount": "{needsAttention} van {total} actieve batches",
+      "urgency": {
+        "critical": "Kritiek",
+        "high": "Hoge prioriteit (verloopt binnen 2-3 dagen)",
+        "medium": "Gemiddelde prioriteit (verloopt binnen een week)",
+        "low": "Lage prioriteit (verloopt binnen 2 weken)"
+      },
+      "status": {
+        "ok": "OK",
+        "allGood": "Alle batches zijn in goede staat"
+      },
+      "errors": {
+        "loadingError": "Kan batch status niet laden"
+      }
     }
   },
   "dashboard": {
@@ -651,7 +668,7 @@
         "description": "Als eigenaar kunt u alle teamleden beheren, rollen wijzigen (inclusief andere eigenaren benoemen), en toegang tot alle winkelfuncties. U kunt eigenaren, managers en medewerkers beheren."
       },
       "managerInfo": {
-        "title": "Manager Machtigingen", 
+        "title": "Manager Machtigingen",
         "description": "Als manager kunt u medewerkers beheren (activeren/deactiveren, uit winkel verwijderen), maar kunt u geen eigenaren of andere managers wijzigen. Alleen eigenaren kunnen rollen wijzigen."
       }
     },
@@ -1467,15 +1484,15 @@
       "noActions": "Geen onmiddellijke acties vereist! Alle batches vallen binnen veilige score-drempels.",
       "urgencyLevels": {
         "critical": "Kritiek",
-        "high": "Hoog",
-        "medium": "Gemiddeld",
-        "low": "Laag"
+        "high": "Hoog Prioriteit",
+        "medium": "Gemiddeld Prioriteit",
+        "low": "Laag Prioriteit"
       },
       "summaryLabels": {
         "critical": "Kritiek",
-        "high": "Hoog",
-        "medium": "Gemiddeld",
-        "low": "Laag"
+        "high": "Hoog Prioriteit",
+        "medium": "Gemiddeld Prioriteit",
+        "low": "Laag Prioriteit"
       },
       "batchDetails": {
         "qty": "Aantal",

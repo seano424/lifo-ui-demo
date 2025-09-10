@@ -7,7 +7,7 @@ import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
 import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
-import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
+// import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
 import { useBatches } from '@/hooks/use-batches'
 
 export default function Page() {
@@ -20,6 +20,7 @@ export default function Page() {
       <DashboardInsetHeader title={t('dashboard')} />
 
       {hasBatches && <BatchStatusSummary />}
+      {/* {hasBatches && <UrgentAlerts />} */}
 
       {hasBatches && (
         <div className="border p-5 rounded-2xl">

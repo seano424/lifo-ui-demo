@@ -1,22 +1,10 @@
 'use client'
 
-import {
-  AlertTriangle,
-  HelpCircle,
-  RotateCcw,
-  Settings,
-  Zap,
-} from 'lucide-react'
+import { AlertTriangle, HelpCircle, RotateCcw, Settings, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -27,12 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Typography } from '@/components/ui/typography'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useStorePermissions } from '@/hooks/use-store-settings'
@@ -80,14 +63,8 @@ export function AlertSensitivityControls({
 
   const { canEditAdvancedSettings } = useStorePermissions({ storeId })
 
-  const {
-    thresholds,
-    isLoading,
-    isUpdating,
-    updateThresholds,
-    resetToDefaults,
-    isDefault,
-  } = useScoringThresholds(storeId)
+  const { thresholds, isLoading, isUpdating, updateThresholds, resetToDefaults, isDefault } =
+    useScoringThresholds(storeId)
 
   if (!storeId || !canEditAdvancedSettings) {
     return null
@@ -147,10 +124,7 @@ export function AlertSensitivityControls({
               <TooltipTrigger>
                 <HelpCircle className="h-4 w-4 text-muted-foreground" />
               </TooltipTrigger>
-              <TooltipContent
-                side="left"
-                className="max-w-xs"
-              >
+              <TooltipContent side="left" className="max-w-xs">
                 <p>{t('helpText')}</p>
                 <p className="mt-1">{t('helpTextLine2')}</p>
                 <p>{t('helpTextLine3')}</p>
@@ -166,9 +140,7 @@ export function AlertSensitivityControls({
               {currentAlertLevel === 'conservative' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full" />
-                  <span className="font-medium">
-                    {t('levels.conservative')}
-                  </span>
+                  <span className="font-medium">{t('levels.conservative')}</span>
                 </div>
               )}
               {currentAlertLevel === 'balanced' && (
@@ -191,9 +163,7 @@ export function AlertSensitivityControls({
 
           {/* Alert Level Selection */}
           <div className="space-y-4">
-            <Label className="text-sm font-medium">
-              {t('currentPreference')}
-            </Label>
+            <Label className="text-sm font-medium">{t('currentPreference')}</Label>
 
             <Select
               value={currentAlertLevel}
@@ -208,27 +178,18 @@ export function AlertSensitivityControls({
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-red-500 rounded-full" />
-                      <Typography variant="small">
-                        {t('levels.conservativeTitle')}
-                      </Typography>
+                      <Typography variant="small">{t('levels.conservativeTitle')}</Typography>
                     </div>
-                    <Typography variant="small">
-                      {t('selectDescriptions.conservative')}
-                    </Typography>
+                    <Typography variant="small">{t('selectDescriptions.conservative')}</Typography>
                   </div>
                 </SelectItem>
                 <SelectItem value="balanced">
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-yellow-500 rounded-full" />
-                      <Typography variant="small">
-                        {t('levels.balancedTitle')}
-                      </Typography>
+                      <Typography variant="small">{t('levels.balancedTitle')}</Typography>
                     </div>
-                    <Typography
-                      variant="muted"
-                      className="text-muted-foreground"
-                    >
+                    <Typography variant="muted" className="text-muted-foreground">
                       {t('selectDescriptions.balanced')}
                     </Typography>
                   </div>
@@ -237,14 +198,9 @@ export function AlertSensitivityControls({
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full" />
-                      <Typography variant="small">
-                        {t('levels.proactiveTitle')}
-                      </Typography>
+                      <Typography variant="small">{t('levels.proactiveTitle')}</Typography>
                     </div>
-                    <Typography
-                      variant="muted"
-                      className="text-muted-foreground"
-                    >
+                    <Typography variant="muted" className="text-muted-foreground">
                       {t('selectDescriptions.proactive')}
                     </Typography>
                   </div>
@@ -263,15 +219,8 @@ export function AlertSensitivityControls({
           {/* Advanced Settings Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Switch
-                id="advanced-mode"
-                checked={showAdvanced}
-                onCheckedChange={setShowAdvanced}
-              />
-              <Label
-                htmlFor="advanced-mode"
-                className="text-sm"
-              >
+              <Switch id="advanced-mode" checked={showAdvanced} onCheckedChange={setShowAdvanced} />
+              <Label htmlFor="advanced-mode" className="text-sm">
                 {t('technical.showDetails')}
               </Label>
             </div>
@@ -287,32 +236,24 @@ export function AlertSensitivityControls({
                     <p className="text-xs font-medium text-yellow-700">
                       {t('technical.warningLevel')}
                     </p>
-                    <p className="text-lg font-mono">
-                      {thresholds.warning.toFixed(2)}
-                    </p>
+                    <p className="text-lg font-mono">{thresholds.warning.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
-                      {Math.round(thresholds.warning * 100)}%{' '}
-                      {t('technical.compositeScore')}
+                      {Math.round(thresholds.warning * 100)}% {t('technical.compositeScore')}
                     </p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-red-700">
                       {t('technical.criticalLevel')}
                     </p>
-                    <p className="text-lg font-mono">
-                      {thresholds.critical.toFixed(2)}
-                    </p>
+                    <p className="text-lg font-mono">{thresholds.critical.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
-                      {Math.round(thresholds.critical * 100)}%{' '}
-                      {t('technical.compositeScore')}
+                      {Math.round(thresholds.critical * 100)}% {t('technical.compositeScore')}
                     </p>
                   </div>
                 </div>
                 <Separator />
                 <div className="space-y-1">
-                  <p className="text-xs font-medium">
-                    {t('technical.howScoringWorks')}
-                  </p>
+                  <p className="text-xs font-medium">{t('technical.howScoringWorks')}</p>
                   <ul className="text-xs text-muted-foreground space-y-1">
                     <li>• {t('technical.expiryScore')}</li>
                     <li>• {t('technical.marginScore')}</li>
@@ -338,9 +279,7 @@ export function AlertSensitivityControls({
 
             <div className="flex items-center gap-2">
               {isUpdating && (
-                <span className="text-sm text-muted-foreground">
-                  {t('actions.saving')}
-                </span>
+                <span className="text-sm text-muted-foreground">{t('actions.saving')}</span>
               )}
               <div className="flex items-center gap-1">
                 <Settings className="h-3 w-3 text-muted-foreground" />

@@ -178,7 +178,9 @@ export function StoreUserStats() {
             <span>
               {activeStore.city}, {activeStore.country}
             </span>
-            <code className="bg-gray-100 px-2 py-1 rounded-2xl text-xs">{activeStore.store_code}</code>
+            <code className="bg-gray-100 px-2 py-1 rounded-2xl text-xs">
+              {activeStore.store_code}
+            </code>
           </div>
         </CardContent>
       </Card>

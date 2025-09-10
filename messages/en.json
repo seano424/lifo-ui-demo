@@ -126,12 +126,12 @@
   },
   "productFilters": {
     "categoryFilter": "Category filter",
-    "allCategories": "All categories", 
+    "allCategories": "All categories",
     "productCount": "{count} products"
   },
   "productListSort": {
     "name": "Name",
-    "category": "Category", 
+    "category": "Category",
     "brand": "Brand",
     "stock": "Stock",
     "price": "Price",
@@ -142,7 +142,7 @@
   "productTable": {
     "product": "Product",
     "unnamedProduct": "Unnamed Product",
-    "notAvailable": "N/A", 
+    "notAvailable": "N/A",
     "category": "Category",
     "uncategorized": "Uncategorized",
     "brand": "Brand",
@@ -313,7 +313,7 @@
     "projects": "Projects",
     "more": "More",
     "viewProject": "View Project",
-    "shareProject": "Share Project", 
+    "shareProject": "Share Project",
     "deleteProject": "Delete Project",
     "kpiCard": {
       "failedToLoad": "Failed to load data",
@@ -424,7 +424,7 @@
       "currentPreference": "Choose your alert preference",
       "levels": {
         "conservative": "Conservative",
-        "balanced": "Balanced", 
+        "balanced": "Balanced",
         "proactive": "Proactive",
         "conservativeTitle": "Conservative - Critical Only",
         "balancedTitle": "Balanced - Action Needed (Recommended)",
@@ -437,7 +437,7 @@
       },
       "expectedCounts": {
         "conservative": "Fewer alerts, higher urgency",
-        "balanced": "Moderate alerts, good balance", 
+        "balanced": "Moderate alerts, good balance",
         "proactive": "More alerts, early prevention"
       },
       "selectDescriptions": {
@@ -476,7 +476,7 @@
     "metrics": {
       "urgentItems": "Urgent Items",
       "urgentItemsDesc": "High urgency batches",
-      "actionsTaken": "Actions Taken", 
+      "actionsTaken": "Actions Taken",
       "actionsTakenDesc": "Total actions this period",
       "discountValue": "Discount Value",
       "discountValueDesc": "Total discounts applied",
@@ -491,7 +491,7 @@
       "recentActivity": "Recent Activity",
       "actionsTaken": "Actions Taken",
       "actionsTakenPeriod": "{totalActions} this period",
-      "discountsApplied": "Discounts Applied", 
+      "discountsApplied": "Discounts Applied",
       "saved": "€{discountValue} saved",
       "averageScore": "Average Score: {avgScore}% • €{discountValue} discounts applied",
       "discountsAppliedText": "discounts applied",
@@ -526,16 +526,16 @@
     "alertQuickToggle": {
       "levels": {
         "critical": "Critical",
-        "high": "High", 
-        "medium": "Medium",
-        "all": "All"
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "all": "All Priority Levels"
       },
       "tooltips": {
         "critical": "Critical Items Only",
         "criticalDesc": "Expired or expiring within 24 hours",
         "high": "Critical + High Priority",
         "highDesc": "Items expiring within 2-3 days",
-        "medium": "Up to Medium Priority", 
+        "medium": "Medium Priority (expiring within a week)",
         "mediumDesc": "Items expiring within a week",
         "all": "All Priority Levels",
         "allDesc": "Complete inventory review"
@@ -543,11 +543,12 @@
     },
     "batchStatus": {
       "needsAttention": "Needs attention",
+      "activeBatchesCount": "{needsAttention} of {total} active batches",
       "urgency": {
         "critical": "Critical",
-        "high": "High",
-        "medium": "Medium",
-        "low": "Low"
+        "high": "High Priority (expiring within 2-3 days)",
+        "medium": "Medium Priority (expiring within a week)",
+        "low": "Low Priority (expiring within 2 weeks)"
       },
       "status": {
         "ok": "OK",
@@ -814,7 +815,7 @@
         "description": "As an owner, you can manage all team members, change roles (including making other owners), and access all store functions. You can manage owners, managers, and employees."
       },
       "managerInfo": {
-        "title": "Manager Permissions", 
+        "title": "Manager Permissions",
         "description": "As a manager, you can manage employees (activate/deactivate, remove from store), but cannot modify owners or other managers. Only owners can change roles."
       }
     },
@@ -1154,7 +1155,7 @@
     },
     "auth": {
       "login": "Login",
-      "signup": "Business Signup", 
+      "signup": "Business Signup",
       "logout": "Logout",
       "goToDashboard": "Dashboard",
       "signUpForm": {
@@ -1289,7 +1290,7 @@
   "onboarding": {
     "stepLabels": {
       "storeLookup": "Store Lookup",
-      "addStoreDetails": "Add Store Details", 
+      "addStoreDetails": "Add Store Details",
       "reviewVerify": "Review & Verify",
       "createAccount": "Create Account"
     },
@@ -1307,21 +1308,21 @@
     "storeType": {
       "addStoreDetailsTitle": "Add Store Details",
       "completeStoreInformationTitle": "Complete Store Information",
-      "storeInformationCardTitle": "Store Information", 
+      "storeInformationCardTitle": "Store Information",
       "storeNameLabel": "Store Name",
       "storeTypeLabel": "Store Type",
       "businessNameLabel": "Business Name",
-      "addressLabel": "Address", 
+      "addressLabel": "Address",
       "cityLabel": "City",
       "postalCodeLabel": "Postal Code",
       "countryLabel": "Country",
       "phoneLabel": "Phone Number",
       "continueButton": "Continue",
       "storeNamePlaceholder": "Your Store Name",
-      "selectStoreType": "Select store type", 
+      "selectStoreType": "Select store type",
       "businessNamePlaceholder": "If different from store name",
       "addressPlaceholder": "123 Main Street",
-      "cityPlaceholder": "Paris", 
+      "cityPlaceholder": "Paris",
       "postalCodePlaceholder": "75001",
       "countryPlaceholder": "France",
       "phonePlaceholder": "01 23 45 67 89"
@@ -1358,7 +1359,7 @@
     },
     "api": {
       "createFailed": "Failed to create item",
-      "updateFailed": "Failed to update item", 
+      "updateFailed": "Failed to update item",
       "deleteFailed": "Failed to delete item",
       "loadFailed": "Failed to load data",
       "saveFailed": "Failed to save changes",
@@ -1465,7 +1466,7 @@
   "scanningWorkflow": {
     "steps": {
       "scanBarcode": "Scan Barcode",
-      "changeProduct": "Change Product", 
+      "changeProduct": "Change Product",
       "scanExpiryDate": "Scan Expiry Date",
       "reviewDetails": "Review Details",
       "previousStep": "Previous Step"
@@ -1833,7 +1834,7 @@
     "urgentAlerts": {
       "levels": {
         "urgentOnly": "Urgent Items Only",
-        "priority": "Priority Items", 
+        "priority": "Priority Items",
         "allFlagged": "All Flagged Items",
         "completeReview": "Complete Review"
       },
@@ -1845,7 +1846,7 @@
       "messages": {
         "nothingToShow": "No items need attention right now - you're all caught up!",
         "itemNeedsAction": "{count, plural, one {item needs} other {items need}} immediate action",
-        "itemMayNeedAction": "{count, plural, one {item may need} other {items may need}} attention soon", 
+        "itemMayNeedAction": "{count, plural, one {item may need} other {items may need}} attention soon",
         "itemsFlagged": "{count, plural, one {item flagged} other {items flagged}} for review",
         "itemsMonitoring": "{count, plural, one {item flagged} other {items flagged}} for monitoring"
       },
@@ -1857,7 +1858,7 @@
     "alertQuickToggle": {
       "levels": {
         "urgent": "Urgent",
-        "default": "Default", 
+        "default": "Default",
         "early": "Early"
       },
       "tooltips": {
@@ -1876,15 +1877,15 @@
       "noActions": "No immediate actions required! All batches are within safe scoring thresholds.",
       "urgencyLevels": {
         "critical": "Critical",
-        "high": "High", 
-        "medium": "Medium",
-        "low": "Low"
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "low": "Low Priority"
       },
       "summaryLabels": {
         "critical": "Critical",
-        "high": "High",
-        "medium": "Medium", 
-        "low": "Low"
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "low": "Low Priority"
       },
       "batchDetails": {
         "qty": "Qty",
@@ -1920,7 +1921,7 @@
   "timeSelector": {
     "periods": {
       "thisWeek": "This Week",
-      "lastWeek": "Last Week", 
+      "lastWeek": "Last Week",
       "thisMonth": "This Month",
       "lastMonth": "Last Month",
       "last7Days": "Last 7 Days",
@@ -1930,7 +1931,7 @@
     "compareLabels": {
       "lastWeek": "Last Week",
       "previousWeek": "Previous Week",
-      "lastMonth": "Last Month", 
+      "lastMonth": "Last Month",
       "previousMonth": "Previous Month",
       "previous7Days": "Previous 7 Days",
       "previous30Days": "Previous 30 Days",

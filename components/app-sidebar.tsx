@@ -74,7 +74,7 @@ function useNavigationData() {
             },
             {
               title: t('batches'),
-              url: '/dashboard/inventory/batches',
+              url: '/dashboard/inventory/batches?sort=expiry_date&direction=asc&status=active',
               icon: Layers,
             },
           ],
@@ -91,7 +91,7 @@ function useNavigationData() {
         },
       ],
     }),
-    [t],
+    [t]
   )
 }
 
@@ -104,11 +104,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   if (!user) return <div>Not logged in</div>
 
   return (
-    <Sidebar collapsible="icon" className="bg-secondary-100/10 dark:bg-primary-900" {...props}>
+    <Sidebar
+      collapsible="icon"
+      className="bg-secondary-100/10 dark:bg-primary-900"
+      {...props}
+    >
       <SidebarHeader className="flex flex-col gap-2 justify-center items-center h-16 border-b">
         <div className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2">
-          <NavbarLogo variant="icon" size="sm" />
-          <Typography variant="h2" className="lowercase font-black">
+          <NavbarLogo
+            variant="icon"
+            size="sm"
+          />
+          <Typography
+            variant="h2"
+            className="lowercase font-black"
+          >
             LIFO
           </Typography>
         </div>
