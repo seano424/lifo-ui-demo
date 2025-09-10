@@ -13,7 +13,7 @@ import structlog
 from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict
 
-from app.core.config import settings
+from lifo_api.app.core.config import settings
 
 logger = structlog.get_logger()
 
@@ -80,7 +80,7 @@ class SupabaseAPIKeyAuth:
                 except UnicodeDecodeError as e:
                     self.logger.error("Failed to decode access token", error=str(e))
                     raise SupabaseAPIKeyError("Invalid access token encoding") from e
-            
+
             # Remove Bearer prefix if present
             if access_token.startswith("Bearer "):
                 access_token = access_token[7:]
@@ -258,7 +258,7 @@ class SupabaseAPIKeyAuth:
         authorization = request.headers.get("Authorization") or request.headers.get("authorization")
         if not authorization:
             raise SupabaseAPIKeyError("Authorization header required")
-        
+
         # Ensure authorization header is a string (handle potential bytes issues)
         if isinstance(authorization, bytes):
             try:

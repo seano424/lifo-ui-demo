@@ -7,7 +7,7 @@ import os
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
-from typing import TYPE_CHECKING, ForwardRef
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DECIMAL,
@@ -26,11 +26,11 @@ from sqlalchemy import (
 from sqlalchemy import String as SQLString
 from sqlalchemy.orm import relationship
 
-from app.database.connection import Base
+from lifo_api.app.database.connection import Base
 
 # Import Store model to resolve the relationship
 if TYPE_CHECKING:
-    from app.database.models import Store, ProductScore
+    pass
 
 
 def get_auth_users_fk() -> str:

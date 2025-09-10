@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import get_scoring_weights
+from lifo_api.app.core.config import get_scoring_weights
 
 logger = structlog.get_logger()
 

@@ -11,12 +11,10 @@ import asyncpg
 import structlog
 from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
-from sqlalchemy.engine.url import make_url
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 
-from app.core.config import get_database_url, settings
+from lifo_api.app.core.config import get_database_url, settings
 
 logger = structlog.get_logger()
 
@@ -35,18 +33,18 @@ def create_sync_asyncpg_connection():
     """
     import asyncio
     import urllib.parse
-    
+
     # Get the database URL and parse it
     database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
     parsed = urllib.parse.urlparse(database_url)
-    
+
     # Create an event loop if none exists (for sync context)
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-    
+
     # Create connection with statement_cache_size=0 for pgbouncer
     async def create_conn():
         conn = await asyncpg.connect(
@@ -61,13 +59,13 @@ def create_sync_asyncpg_connection():
         )
         logger.info("Created direct asyncpg connection with statement_cache_size=0 for pgbouncer")
         return conn
-    
+
     return loop.run_until_complete(create_conn())
 
 
 def _setup_engine_events(engine):
     """Setup engine events to ensure pgbouncer compatibility"""
-    
+
     @event.listens_for(engine.sync_engine, "do_connect")
     def _set_connection_params(dialect, conn_rec, cargs, cparams):
         """Configure connection parameters before connection is created"""
@@ -76,16 +74,16 @@ def _setup_engine_events(engine):
         cparams['statement_cache_size'] = 0
         cparams['prepared_statement_cache_size'] = 0  # Also set this for good measure
         cparams['prepared_statement_name_func'] = None
-        
-        logger.debug("Forcing connection parameters for pgbouncer compatibility", 
+
+        logger.debug("Forcing connection parameters for pgbouncer compatibility",
                     statement_cache_size=cparams.get('statement_cache_size'),
                     prepared_statement_cache_size=cparams.get('prepared_statement_cache_size'))
-    
+
     @event.listens_for(engine.sync_engine, "connect")
     def _on_connect(dbapi_conn, connection_record):
         """Handle connection setup after connection is established"""
         logger.debug("Connection established with pgbouncer settings")
-        
+
     return engine
 
 
@@ -199,7 +197,7 @@ async def init_database():
     """
     try:
         logger.info("Initializing database connection...")
-        
+
         # For pgbouncer transaction pooling, skip connection test during startup
         # The connection will be tested on first actual use
         logger.info("Skipping database connection test for pgbouncer compatibility")
@@ -243,7 +241,7 @@ async def test_connection() -> bool:
                 import urllib.parse
                 database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
                 parsed = urllib.parse.urlparse(database_url)
-                
+
                 conn = await asyncpg.connect(
                     host=parsed.hostname,
                     port=parsed.port or 5432,
@@ -253,17 +251,17 @@ async def test_connection() -> bool:
                     ssl='require',
                     statement_cache_size=0
                 )
-                
+
                 result = await conn.fetchval("SELECT 1")
                 await conn.close()
-                
+
                 if result == 1:
                     logger.debug("Direct asyncpg connection test successful")
                     return True
                 else:
                     logger.error("Direct asyncpg connection test failed - unexpected result")
                     return False
-                    
+
             except Exception as direct_error:
                 logger.error("Direct asyncpg connection test also failed", error=str(direct_error))
                 return False
