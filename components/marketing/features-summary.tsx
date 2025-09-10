@@ -45,7 +45,7 @@ export function FeaturesSummary() {
           {t('title')}
         </Typography>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-xl bg-gradient-to-b from-white via-white to-blue-50/30 border border-blue-100 shadow-lg overflow-hidden h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-gradient-to-b from-white via-white to-blue-50/30 border border-blue-100 shadow-lg overflow-hidden h-full">
           <Feature
             icon={<Calendar size={28} className="text-blue-600" strokeWidth={1.5} />}
             title={t('expiryTracking.title')}

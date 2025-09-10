@@ -74,7 +74,7 @@ export function CtaSection() {
           </div>
 
           {/* Right column - CTA card */}
-          <div className="flex flex-col rounded-xl bg-white border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
+          <div className="flex flex-col rounded-2xl bg-white border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
             <div>
               <Typography variant="h3" className="text-2xl font-bold text-blue-800 mb-4">
                 {t('card.title')}

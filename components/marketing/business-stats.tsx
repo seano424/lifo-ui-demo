@@ -10,7 +10,7 @@ interface StatProps {
 
 function Stat({ label, description, subtext }: StatProps) {
   return (
-    <div className="flex flex-col rounded-xl bg-gradient-to-b from-white via-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl overflow-hidden transform hover:-translate-y-1 transition-all duration-300 h-full">
+    <div className="flex flex-col rounded-2xl bg-gradient-to-b from-white via-white to-blue-50/30 border border-blue-100 shadow-lg hover:shadow-xl overflow-hidden transform hover:-translate-y-1 transition-all duration-300 h-full">
       {/* Header with plan name */}
       <div className="px-8 pt-6 pb-3 bg-gradient-to-br from-white to-blue-50/10 relative">
         {/* Subtle gradient overlay */}

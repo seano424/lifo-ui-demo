@@ -22,7 +22,7 @@ export default async function ProtectedPage() {
       </div>
       <div className="flex flex-col gap-2 items-start">
         <Typography variant="h2">Your user details</Typography>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
+        <pre className="text-xs font-mono p-3 rounded-2xl border max-h-32 overflow-auto">
           {JSON.stringify(data.user, null, 2)}
         </pre>
       </div>

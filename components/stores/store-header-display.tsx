@@ -61,8 +61,8 @@ export function StoreHeaderDisplay({
               <Store className="size-5 text-muted-foreground" />
             </div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 w-32 animate-pulse rounded bg-muted"></div>
-              <div className="h-3 w-24 animate-pulse rounded bg-muted"></div>
+              <div className="h-4 w-32 animate-pulse rounded-2xl bg-muted"></div>
+              <div className="h-3 w-24 animate-pulse rounded-2xl bg-muted"></div>
             </div>
           </div>
         </CardContent>
@@ -119,7 +119,7 @@ export function StoreHeaderDisplay({
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           <div
-            className={`flex size-12 items-center justify-center rounded-xl ${storeConfig.color}`}
+            className={`flex size-12 items-center justify-center rounded-2xl ${storeConfig.color}`}
           >
             <Store className="size-6" />
           </div>

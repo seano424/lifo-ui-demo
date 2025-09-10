@@ -128,7 +128,7 @@ export function CSVMappingInfo() {
                     </div>
                   </div>
                   <p className="text-sm text-gray-700 mb-2">{rule.description}</p>
-                  <div className="text-xs text-gray-600 font-mono bg-white p-2 rounded border">
+                  <div className="text-xs text-gray-600 font-mono bg-white p-2 rounded-2xl border">
                     Example: {rule.example}
                   </div>
                 </div>

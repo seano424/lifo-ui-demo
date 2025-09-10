@@ -104,12 +104,12 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span>Active filters:</span>
             {filters.is_active !== undefined && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-2xl text-xs">
                 Status: {filters.is_active ? 'Active' : 'Inactive'}
               </span>
             )}
             {filters.email && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-2xl text-xs">
                 Email: {filters.email}
               </span>
             )}

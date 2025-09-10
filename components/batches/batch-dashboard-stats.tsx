@@ -102,12 +102,12 @@ export function BatchDashboardStats() {
         {[...Array(6)].map((_, i) => (
           <Card key={`skeleton-${i + 1}`} className="animate-pulse">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 bg-muted rounded w-20"></div>
+              <div className="h-4 bg-muted rounded-2xl w-20"></div>
               <div className="h-4 w-4 bg-muted rounded"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-muted rounded w-16 mb-1"></div>
-              <div className="h-3 bg-muted rounded w-24"></div>
+              <div className="h-8 bg-muted rounded-2xl w-16 mb-1"></div>
+              <div className="h-3 bg-muted rounded-2xl w-24"></div>
             </CardContent>
           </Card>
         ))}

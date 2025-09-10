@@ -478,7 +478,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             </div>
 
             {/* Success Summary */}
-            <div className="text-center p-3 bg-white rounded border border-green-300">
+            <div className="text-center p-3 bg-white rounded-2xl border border-green-300">
               <p className="text-green-800 font-medium">
                 {(uploadResult.processed || 0) > 0
                   ? t('results.successSummary', {
@@ -606,7 +606,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
             {/* Duplicate Details */}
             {uploadResult.duplicates_skipped?.length > 0 && (
-              <details className="bg-white rounded p-4 border">
+              <details className="bg-white rounded-2xl p-4 border">
                 <summary className="cursor-pointer font-semibold text-gray-700 flex items-center gap-2">
                   <SkipForward className="h-4 w-4" />
                   {t('results.duplicates.viewSkipped', {
@@ -626,7 +626,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     ) => (
                       <div
                         key={`duplicate-${dup.sku || index}`}
-                        className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
+                        className="text-sm p-2 bg-gray-50 rounded-2xl border-l-4 border-yellow-400"
                       >
                         <div className="font-semibold">
                           {dup.sku} - {dup.product_name}

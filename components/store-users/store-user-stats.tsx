@@ -60,12 +60,12 @@ export function StoreUserStats() {
         {skeletonCards.map((skeleton: { id: string }) => (
           <Card key={skeleton.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-              <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded-2xl w-20 animate-pulse" />
+              <div className="h-4 w-4 bg-gray-200 rounded-2xl animate-pulse" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-gray-200 rounded w-12 mb-1 animate-pulse" />
-              <div className="h-3 bg-gray-200 rounded w-24 animate-pulse" />
+              <div className="h-8 bg-gray-200 rounded-2xl w-12 mb-1 animate-pulse" />
+              <div className="h-3 bg-gray-200 rounded-2xl w-24 animate-pulse" />
             </CardContent>
           </Card>
         ))}
@@ -178,7 +178,7 @@ export function StoreUserStats() {
             <span>
               {activeStore.city}, {activeStore.country}
             </span>
-            <code className="bg-gray-100 px-2 py-1 rounded text-xs">{activeStore.store_code}</code>
+            <code className="bg-gray-100 px-2 py-1 rounded-2xl text-xs">{activeStore.store_code}</code>
           </div>
         </CardContent>
       </Card>

@@ -304,7 +304,7 @@ class TestMobileEndpointFunctionality:
             assert response.status_code == 200
             data = response.json()
 
-            # Check that store health score is rounded for mobile
+            # Check that store health score is rounded-2xl for mobile
             assert isinstance(data["store_health_score"], float)
             assert (
                 len(str(data["store_health_score"]).split(".")[-1]) <= 2

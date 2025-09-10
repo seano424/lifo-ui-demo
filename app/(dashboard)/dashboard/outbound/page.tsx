@@ -27,7 +27,7 @@ export default function OutboundPage() {
               {removedItems.slice(0, 5).map((item, index) => (
                 <div
                   key={`${item.id}-${index}-${item.expiryDate}`}
-                  className="py-4 px-8 bg-primary-900 text-white rounded-3xl border border-primary-200 w-max mx-auto"
+                  className="py-4 px-8 bg-primary-900 text-white rounded-2xl border border-primary-200 w-max mx-auto"
                 >
                   <Typography variant="p" className="font-bold text-white">
                     {item.productName}

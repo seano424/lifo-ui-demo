@@ -479,7 +479,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
             <Typography variant="small" className="font-medium text-yellow-800 mb-2">
               Debug: Server Permissions
             </Typography>
-            <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
+            <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">
               {JSON.stringify(serverPermissions, null, 2)}
             </pre>
           </CardContent>

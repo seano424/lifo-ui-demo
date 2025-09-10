@@ -514,7 +514,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   return (
                     <div
                       key={item.id}
-                      className="flex justify-between items-start p-2 bg-white rounded border text-sm"
+                      className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
                         <div className="font-medium">{item.productName}</div>

@@ -45,7 +45,7 @@ export function TeamSwitcher() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
               <div className="flex flex-col gap-1">
-                <Skeleton className="h-5 w-32 rounded bg-muted" />
+                <Skeleton className="h-5 w-32 rounded-2xl bg-muted" />
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

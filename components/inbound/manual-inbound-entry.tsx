@@ -364,7 +364,7 @@ export default function ManualInboundEntry({
                 return (
                   <div
                     key={item.id}
-                    className="flex justify-between items-start p-2 bg-white rounded border text-sm"
+                    className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                   >
                     <div className="flex-1">
                       <Typography variant="p">{item.productName}</Typography>

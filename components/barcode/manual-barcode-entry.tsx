@@ -721,7 +721,7 @@ export default function ManualBarcodeEntry({
               )}
 
               {!lookupResult?.found && mode === 'inbound' && (
-                <div className="border-dashed border-2 p-4 rounded-xl">
+                <div className="border-dashed border-2 p-4 rounded-2xl">
                   <div className="pb-3">
                     <div className="text-sm flex items-center gap-2">
                       <Package className="w-4 h-4" />
