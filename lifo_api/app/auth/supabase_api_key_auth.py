@@ -258,13 +258,29 @@ class SupabaseAPIKeyAuth:
                 authenticated_at=datetime.now(UTC),
             )
 
-        # Check for Authorization header (for user token authentication)
+        # Check for Authorization header
         authorization = request.headers.get("Authorization")
         if not authorization:
             raise SupabaseAPIKeyError("Authorization header or valid apikey required")
 
-        # User token authentication
-        return await self.verify_user_token(authorization)
+        # Extract token from Authorization header
+        if authorization.startswith("Bearer "):
+            token = authorization[7:]
+            
+            # Check if this is a service role key sent as Bearer token
+            if await self.verify_service_key(token):
+                # Service role authentication via Authorization Bearer header
+                return APIKeyUser(
+                    user_id="service_role",
+                    email="service@lifo.ai", 
+                    role="service_role",
+                    authenticated_at=datetime.now(UTC),
+                )
+            
+            # Otherwise, treat as user access token
+            return await self.verify_user_token(authorization)
+        else:
+            raise SupabaseAPIKeyError("Authorization header must use Bearer format")
 
     def get_user_permissions(self, user: APIKeyUser) -> list[str]:
         """

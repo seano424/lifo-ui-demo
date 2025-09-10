@@ -14,6 +14,7 @@ interface ActionableBatch {
   urgency: 'critical' | 'high' | 'medium' | 'low'
   current_quantity: number
   potential_loss: number
+  status?: string // Add optional status field
 }
 
 interface AnalyticsData {
@@ -59,21 +60,49 @@ export function BatchStatusSummary() {
 
   const actionableBatches =
     (data?.analytics as AnalyticsData['analytics'])?.actionable_batches || []
-  
-  // Filter to only include active batches (not expired)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  
-  const activeBatchesFromActionable = actionableBatches.filter(batch => {
-    const expiryDate = new Date(batch.expiry_date)
-    return expiryDate >= today
-  })
 
-  // Count active batches by urgency
-  const criticalCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'critical').length
-  const highCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'high').length
-  const mediumCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'medium').length
-  const lowCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'low').length
+  // Calculate client-side urgency to override stale API data
+  // Use current date for urgency calculations
+  const today = new Date()
+  const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()))
+
+  // Function to calculate correct urgency based on current date
+  const calculateClientUrgency = (expiryDate: string): 'critical' | 'high' | 'medium' | 'low' => {
+    // Parse YYYY-MM-DD format as UTC to avoid timezone issues
+    const expiryUTC = new Date(`${expiryDate}T00:00:00Z`)
+    const daysToExpiry = Math.floor(
+      (expiryUTC.getTime() - todayUTC.getTime()) / (1000 * 60 * 60 * 24),
+    )
+
+    if (daysToExpiry < 0) {
+      return 'critical' // Already expired
+    } else if (daysToExpiry === 0) {
+      return 'critical' // Expires today
+    } else if (daysToExpiry <= 1) {
+      return 'high' // Expires tomorrow
+    } else if (daysToExpiry <= 7) {
+      return 'medium' // Expires within a week
+    } else {
+      return 'low' // Expires later
+    }
+  }
+
+  // Use all actionable batches since API now only returns active batches
+  const activeBatchesFromActionable = actionableBatches
+
+  // Count active batches by CLIENT-CALCULATED urgency (ignoring stale API urgency)
+  const criticalCount = activeBatchesFromActionable.filter(
+    batch => calculateClientUrgency(batch.expiry_date) === 'critical',
+  ).length
+  const highCount = activeBatchesFromActionable.filter(
+    batch => calculateClientUrgency(batch.expiry_date) === 'high',
+  ).length
+  const mediumCount = activeBatchesFromActionable.filter(
+    batch => calculateClientUrgency(batch.expiry_date) === 'medium',
+  ).length
+  const lowCount = activeBatchesFromActionable.filter(
+    batch => calculateClientUrgency(batch.expiry_date) === 'low',
+  ).length
 
   const totalNeedsAttention = criticalCount + highCount + mediumCount + lowCount
   const totalActiveBatches = activeBatchesFromActionable.length
@@ -111,6 +140,33 @@ export function BatchStatusSummary() {
     }
   }
 
+  console.log('Batch Status Summary', {
+    totalNeedsAttention,
+    criticalCount,
+    highCount,
+    mediumCount,
+    lowCount,
+    okCount,
+    attentionPercentage,
+    totalActiveBatches,
+    activeBatchesFromActionable,
+    actionableBatches,
+    today: todayUTC,
+    todayString: todayUTC.toDateString(),
+    todayISO: todayUTC.toISOString(),
+    filteredOutBatches: actionableBatches
+      .filter(batch => {
+        const expiryUTC = new Date(`${batch.expiry_date}T00:00:00Z`)
+        return expiryUTC < todayUTC
+      })
+      .map(batch => ({
+        product_name: batch.product_name,
+        expiry_date: batch.expiry_date,
+        expiryParsed: new Date(`${batch.expiry_date}T00:00:00Z`).toDateString(),
+        isBeforeToday: new Date(`${batch.expiry_date}T00:00:00Z`) < todayUTC,
+      })),
+  })
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="bg-white rounded-2xl border lg:w-1/2">
@@ -119,7 +175,9 @@ export function BatchStatusSummary() {
           <div className="flex justify-between items-center gap-2">
             <div>
               <Typography variant="h4">{t('needsAttention')}</Typography>
-              <Typography variant="small" className="text-gray-500">{t('activeInventory')}</Typography>
+              <Typography variant="small" className="text-gray-500">
+                {t('activeInventory')}
+              </Typography>
             </div>
             <Typography variant="h2" className="text-3xl font-bold text-gray-900 mt-1">
               {totalNeedsAttention}

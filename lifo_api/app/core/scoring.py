@@ -507,7 +507,7 @@ class ScoringService:
         elif isinstance(expiry_date, datetime):
             expiry_date = expiry_date.date()
 
-        today = datetime.utcnow().date()
+        today = date.today()
         delta = expiry_date - today
         return delta.days
 
