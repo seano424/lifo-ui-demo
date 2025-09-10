@@ -250,7 +250,8 @@ async function getWasteAnalytics(
       `,
       )
       .eq('store_id', storeId)
-      .eq('status', 'active')
+      .in('status', ['active', 'expired'])
+      .gt('current_quantity', 0)
       .lte('expiry_date', soonExpiryDate.toISOString().split('T')[0])
 
     // Calculate waste metrics
@@ -364,7 +365,8 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
       `,
       )
       .eq('store_id', storeId)
-      .eq('status', 'active')
+      .in('status', ['active', 'expired'])
+      .gt('current_quantity', 0)
 
     // Get product scores separately to avoid cross-schema JOIN issues
     const { data: productScores } = await supabase
@@ -491,20 +493,21 @@ async function addSupabaseInsightsFallback(
       .gt('expiry_date', highDate.toISOString().split('T')[0])
       .lte('expiry_date', mediumDate.toISOString().split('T')[0])
 
-    // Get all active batches for totals and calculate low priority
-    const { data: allActiveBatches } = await supabase
+    // Get all actionable batches for totals and calculate low priority
+    const { data: allActionableBatches } = await supabase
       .schema('inventory')
       .from('batches')
       .select('batch_id')
       .eq('store_id', storeId)
-      .eq('status', 'active')
+      .in('status', ['active', 'expired'])
+      .gt('current_quantity', 0)
 
     // Calculate counts
     const criticalCount = criticalBatches?.length || 0
     const highCount = highBatches?.length || 0
     const mediumCount = mediumBatches?.length || 0
-    const totalActiveBatches = allActiveBatches?.length || 0
-    const lowCount = Math.max(0, totalActiveBatches - criticalCount - highCount - mediumCount) // Everything else
+    const totalActionableBatches = allActionableBatches?.length || 0
+    const lowCount = Math.max(0, totalActionableBatches - criticalCount - highCount - mediumCount) // Everything else
 
     // Calculate actionable items (critical + high + medium)
     const expiringSoonCount = criticalCount + highCount // Items expiring within 3 days
@@ -513,7 +516,9 @@ async function addSupabaseInsightsFallback(
     const totalActionableItems = criticalCount + highCount + mediumCount
 
     const actionRequiredPercentage =
-      totalActiveBatches > 0 ? Math.round((totalActionableItems / totalActiveBatches) * 100) : 0
+      totalActionableBatches > 0
+        ? Math.round((totalActionableItems / totalActionableBatches) * 100)
+        : 0
 
     const insights = {
       expiring_soon: {
@@ -533,7 +538,7 @@ async function addSupabaseInsightsFallback(
         description: `${criticalCount} items requiring immediate attention`,
       },
       summary: {
-        total_active_batches: totalActiveBatches,
+        total_active_batches: totalActionableBatches,
         total_actionable_items: totalActionableItems,
         action_required_percentage: actionRequiredPercentage,
       },
@@ -561,7 +566,8 @@ async function addSupabaseInsightsFallback(
       `,
       )
       .eq('store_id', storeId)
-      .eq('status', 'active')
+      .in('status', ['active', 'expired'])
+      .gt('current_quantity', 0)
       .lte('expiry_date', mediumDate.toISOString().split('T')[0])
       .order('expiry_date', { ascending: true })
       .limit(20) // Top 20 most urgent
@@ -648,7 +654,7 @@ async function addSupabaseInsightsFallback(
     // Add FastAPI-compatible structure for components that expect it
     analytics.fastapi_analytics = {
       inventory_summary: {
-        total_batches: totalActiveBatches,
+        total_batches: totalActionableBatches,
         total_quantity: 0, // Not calculated in fallback
         total_value: 0, // Not calculated in fallback
         expired_count: 0, // Not calculated in fallback

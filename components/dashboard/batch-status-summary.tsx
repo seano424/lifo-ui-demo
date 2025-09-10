@@ -54,32 +54,21 @@ export function BatchStatusSummary() {
 
   const actionableBatches =
     (data?.analytics as AnalyticsData['analytics'])?.actionable_batches || []
-  const dashboardSummary = (data?.analytics as AnalyticsData['analytics'])
-    ?.dashboard_summary
+  const dashboardSummary = (data?.analytics as AnalyticsData['analytics'])?.dashboard_summary
   const totalBatches = dashboardSummary?.total_batches || 0
   const expiredCount = dashboardSummary?.expired_count || 0
   const activeBatches = totalBatches - expiredCount
 
   // Count batches by urgency
-  const criticalCount = actionableBatches.filter(
-    (batch) => batch.urgency === 'critical'
-  ).length
-  const highCount = actionableBatches.filter(
-    (batch) => batch.urgency === 'high'
-  ).length
-  const mediumCount = actionableBatches.filter(
-    (batch) => batch.urgency === 'medium'
-  ).length
-  const lowCount = actionableBatches.filter(
-    (batch) => batch.urgency === 'low'
-  ).length
+  const criticalCount = actionableBatches.filter(batch => batch.urgency === 'critical').length
+  const highCount = actionableBatches.filter(batch => batch.urgency === 'high').length
+  const mediumCount = actionableBatches.filter(batch => batch.urgency === 'medium').length
+  const lowCount = actionableBatches.filter(batch => batch.urgency === 'low').length
 
   const totalNeedsAttention = criticalCount + highCount + mediumCount + lowCount
   const okCount = activeBatches - totalNeedsAttention
   const attentionPercentage =
-    activeBatches > 0
-      ? Math.round((totalNeedsAttention / activeBatches) * 100)
-      : 0
+    activeBatches > 0 ? Math.round((totalNeedsAttention / activeBatches) * 100) : 0
 
   const getUrgencyIcon = (urgency: string) => {
     switch (urgency) {
@@ -118,10 +107,7 @@ export function BatchStatusSummary() {
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
             <Typography variant="h4">{t('needsAttention')}</Typography>
-            <Typography
-              variant="h2"
-              className="text-3xl font-bold text-gray-900 mt-1"
-            >
+            <Typography variant="h2" className="text-3xl font-bold text-gray-900 mt-1">
               {totalNeedsAttention}
             </Typography>
           </div>
@@ -135,10 +121,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('critical')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700"
-                  >
+                  <Typography variant="p" className="text-gray-700">
                     {getUrgencyLabel('critical')}
                   </Typography>
                 </div>
@@ -151,10 +134,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('high')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700"
-                  >
+                  <Typography variant="p" className="text-gray-700">
                     {getUrgencyLabel('high')}
                   </Typography>
                 </div>
@@ -167,10 +147,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('medium')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700"
-                  >
+                  <Typography variant="p" className="text-gray-700">
                     {getUrgencyLabel('medium')}
                   </Typography>
                 </div>
@@ -183,10 +160,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('low')}
-                  <Typography
-                    variant="p"
-                    className="text-gray-700"
-                  >
+                  <Typography variant="p" className="text-gray-700">
                     {getUrgencyLabel('low')}
                   </Typography>
                 </div>
@@ -199,10 +173,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2 border-t pt-4 mt-4">
                 <div className="flex items-center gap-3">
                   <div className="h-4 w-4 bg-green-500 rounded-full" />
-                  <Typography
-                    variant="p"
-                    className="text-gray-700"
-                  >
+                  <Typography variant="p" className="text-gray-700">
                     {t('status.ok')}
                   </Typography>
                 </div>
@@ -216,10 +187,7 @@ export function BatchStatusSummary() {
                 <div className="h-8 w-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                   <div className="h-2 w-2 bg-white rounded-full" />
                 </div>
-                <Typography
-                  variant="p"
-                  className=""
-                >
+                <Typography variant="p" className="">
                   {t('status.allGood')}
                 </Typography>
               </div>
@@ -231,19 +199,13 @@ export function BatchStatusSummary() {
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
             <Typography variant="h4">{t('status.ok')}</Typography>
-            <Typography
-              variant="h2"
-              className="text-3xl font-bold text-gray-900 mt-1"
-            >
+            <Typography variant="h2" className="text-3xl font-bold text-gray-900 mt-1">
               {okCount}
             </Typography>
           </div>
         </div>
         <div className="p-6 flex flex-col gap-2 flex-1 justify-end text-right">
-          <Typography
-            variant="h4"
-            className="lowercase text-primary-900"
-          >
+          <Typography variant="h4" className="lowercase text-primary-900">
             {attentionPercentage}% {t('needsAttention')}
           </Typography>
           <div className="h-2 bg-gray-200 rounded-full mt-2">
@@ -253,16 +215,10 @@ export function BatchStatusSummary() {
             />
           </div>
           <div className="mt-2 flex justify-between items-center">
-            <Typography
-              variant="small"
-              className=" mt-1"
-            >
+            <Typography variant="small" className=" mt-1">
               {okCount} {t('status.ok')}
             </Typography>
-            <Typography
-              variant="small"
-              className=" mt-1"
-            >
+            <Typography variant="small" className=" mt-1">
               {t('activeBatchesCount', {
                 needsAttention: totalNeedsAttention,
                 total: activeBatches,

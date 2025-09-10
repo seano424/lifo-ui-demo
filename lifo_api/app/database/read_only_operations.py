@@ -55,7 +55,8 @@ class SecureReadOnlyOperations:
                     status
                 """)
                 .eq("store_id", store_id)
-                .eq("status", "active")
+                .in_("status", ["active", "expired"])
+                .gt("current_quantity", 0)
                 .order("expiry_date", desc=False)
                 .execute()
             )
@@ -147,7 +148,8 @@ class SecureReadOnlyOperations:
                     status
                 """)
                 .eq("batch_id", batch_id)
-                .eq("status", "active")
+                .in_("status", ["active", "expired"])
+                .gt("current_quantity", 0)
                 .single()
                 .execute()
             )
@@ -440,7 +442,8 @@ class SecureReadOnlyOperations:
                     )
                 """)
                 .eq("store_id", store_id)
-                .eq("status", "active")
+                .in_("status", ["active", "expired"])
+                .gt("current_quantity", 0)
                 .execute()
             )
 
