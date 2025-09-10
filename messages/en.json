@@ -543,6 +543,7 @@
     },
     "batchStatus": {
       "needsAttention": "Needs attention",
+      "activeInventory": "Active inventory status",
       "activeBatchesCount": "{needsAttention} of {total} active batches",
       "urgency": {
         "critical": "Critical",
@@ -556,6 +557,22 @@
       },
       "errors": {
         "loadingError": "Unable to load batch status"
+      }
+    },
+    "expiredItems": {
+      "title": "Expired Items",
+      "subtitle": "Inventory requiring waste management actions",
+      "recentlyExpired": "Recently Expired",
+      "weekOld": "Week Old",
+      "older": "Older",
+      "days": "days",
+      "actionsNeeded": "Actions Needed",
+      "reviewDiscounts": "Review for heavy discounts",
+      "scheduleDonation": "Schedule donation pickup",
+      "removeFromShelves": "Remove from shelves",
+      "noExpiredItems": "No expired items found",
+      "errors": {
+        "loadingError": "Unable to load expired items"
       }
     }
   },

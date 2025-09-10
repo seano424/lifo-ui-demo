@@ -8,7 +8,12 @@ import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface ActionableBatch {
+  batch_id: string
+  product_name: string
+  expiry_date: string
   urgency: 'critical' | 'high' | 'medium' | 'low'
+  current_quantity: number
+  potential_loss: number
 }
 
 interface AnalyticsData {
@@ -54,21 +59,27 @@ export function BatchStatusSummary() {
 
   const actionableBatches =
     (data?.analytics as AnalyticsData['analytics'])?.actionable_batches || []
-  const dashboardSummary = (data?.analytics as AnalyticsData['analytics'])?.dashboard_summary
-  const totalBatches = dashboardSummary?.total_batches || 0
-  const expiredCount = dashboardSummary?.expired_count || 0
-  const activeBatches = totalBatches - expiredCount
+  
+  // Filter to only include active batches (not expired)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  const activeBatchesFromActionable = actionableBatches.filter(batch => {
+    const expiryDate = new Date(batch.expiry_date)
+    return expiryDate >= today
+  })
 
-  // Count batches by urgency
-  const criticalCount = actionableBatches.filter(batch => batch.urgency === 'critical').length
-  const highCount = actionableBatches.filter(batch => batch.urgency === 'high').length
-  const mediumCount = actionableBatches.filter(batch => batch.urgency === 'medium').length
-  const lowCount = actionableBatches.filter(batch => batch.urgency === 'low').length
+  // Count active batches by urgency
+  const criticalCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'critical').length
+  const highCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'high').length
+  const mediumCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'medium').length
+  const lowCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'low').length
 
   const totalNeedsAttention = criticalCount + highCount + mediumCount + lowCount
-  const okCount = activeBatches - totalNeedsAttention
+  const totalActiveBatches = activeBatchesFromActionable.length
+  const okCount = totalActiveBatches - totalNeedsAttention
   const attentionPercentage =
-    activeBatches > 0 ? Math.round((totalNeedsAttention / activeBatches) * 100) : 0
+    totalActiveBatches > 0 ? Math.round((totalNeedsAttention / totalActiveBatches) * 100) : 0
 
   const getUrgencyIcon = (urgency: string) => {
     switch (urgency) {
@@ -106,7 +117,10 @@ export function BatchStatusSummary() {
         {/* Header - Needs Attention */}
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
-            <Typography variant="h4">{t('needsAttention')}</Typography>
+            <div>
+              <Typography variant="h4">{t('needsAttention')}</Typography>
+              <Typography variant="small" className="text-gray-500">{t('activeInventory')}</Typography>
+            </div>
             <Typography variant="h2" className="text-3xl font-bold text-gray-900 mt-1">
               {totalNeedsAttention}
             </Typography>
@@ -221,7 +235,7 @@ export function BatchStatusSummary() {
             <Typography variant="small" className=" mt-1">
               {t('activeBatchesCount', {
                 needsAttention: totalNeedsAttention,
-                total: activeBatches,
+                total: totalActiveBatches,
               })}
             </Typography>
           </div>

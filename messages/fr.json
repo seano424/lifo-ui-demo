@@ -406,6 +406,7 @@
     },
     "batchStatus": {
       "needsAttention": "Nécessite une attention",
+      "activeInventory": "Statut de l'inventaire actif",
       "activeBatchesCount": "{needsAttention} sur {total} lots actifs",
       "urgency": {
         "critical": "Critique",
@@ -419,6 +420,22 @@
       },
       "errors": {
         "loadingError": "Impossible de charger le statut des lots"
+      }
+    },
+    "expiredItems": {
+      "title": "Articles expirés",
+      "subtitle": "Inventaire nécessitant des actions de gestion des déchets",
+      "recentlyExpired": "Récemment expirés",
+      "weekOld": "Vieux d'une semaine",
+      "older": "Plus anciens",
+      "days": "jours",
+      "actionsNeeded": "Actions nécessaires",
+      "reviewDiscounts": "Examiner pour des remises importantes",
+      "scheduleDonation": "Planifier la collecte de dons",
+      "removeFromShelves": "Retirer des étagères",
+      "noExpiredItems": "Aucun article expiré trouvé",
+      "errors": {
+        "loadingError": "Impossible de charger les articles expirés"
       }
     }
   },

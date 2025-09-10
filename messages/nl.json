@@ -406,6 +406,7 @@
     },
     "batchStatus": {
       "needsAttention": "Heeft aandacht nodig",
+      "activeInventory": "Actieve voorraad status",
       "activeBatchesCount": "{needsAttention} van {total} actieve batches",
       "urgency": {
         "critical": "Kritiek",
@@ -419,6 +420,22 @@
       },
       "errors": {
         "loadingError": "Kan batch status niet laden"
+      }
+    },
+    "expiredItems": {
+      "title": "Verlopen artikelen",
+      "subtitle": "Voorraad die afvalbeheer acties vereist",
+      "recentlyExpired": "Recent verlopen",
+      "weekOld": "Week oud",
+      "older": "Ouder",
+      "days": "dagen",
+      "actionsNeeded": "Acties nodig",
+      "reviewDiscounts": "Beoordeel voor hoge kortingen",
+      "scheduleDonation": "Plan donatie ophaling",
+      "removeFromShelves": "Van rekken verwijderen",
+      "noExpiredItems": "Geen verlopen artikelen gevonden",
+      "errors": {
+        "loadingError": "Kan verlopen artikelen niet laden"
       }
     }
   },
