@@ -428,7 +428,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             {pendingItems.map(item => (
               <div
                 key={item.batchId}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border"
               >
                 <div className="flex-1">
                   <div className="font-medium">{item.productName}</div>
@@ -508,7 +508,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               </div>
 
               {/* Summary List */}
-              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
+              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
                 {pendingItems.map(item => {
                   const itemTotal = item.quantity * item.price
                   return (

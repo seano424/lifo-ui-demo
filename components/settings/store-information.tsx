@@ -775,7 +775,7 @@ export default function StoreInformation({
         </form>
 
         {process.env.NODE_ENV === 'development' && (
-          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
             <Typography variant="p" className="font-medium text-yellow-800 mb-2">
               Debug: Store Information: Only visible in development mode
             </Typography>

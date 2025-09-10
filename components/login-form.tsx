@@ -143,7 +143,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
       <Card>
         <CardHeader className="text-center space-y-4 mb-4">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary" />
           </div>
           <div className="space-y-1.5 flex flex-col">

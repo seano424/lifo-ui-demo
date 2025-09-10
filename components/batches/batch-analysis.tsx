@@ -22,7 +22,7 @@ export function BatchAnalytics() {
       <CardContent>
         <div className="space-y-6">
           {sampleBatchPerformance.map(batch => (
-            <div key={batch.batchId} className="border rounded-lg p-4">
+            <div key={batch.batchId} className="border rounded-2xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <Typography variant="h3">{batch.productName}</Typography>

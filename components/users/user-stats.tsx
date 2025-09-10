@@ -88,7 +88,7 @@ export function UserStats() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map(stat => (
-        <div key={stat.name} className="bg-white border border-gray-200 rounded-lg p-6">
+        <div key={stat.name} className="bg-white border border-gray-200 rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <div>
               <Typography variant="p" color="muted">
@@ -101,7 +101,7 @@ export function UserStats() {
                 {stat.description}
               </Typography>
             </div>
-            <div className={`p-3 rounded-lg border ${getColorClasses(stat.color)}`}>
+            <div className={`p-3 rounded-2xl border ${getColorClasses(stat.color)}`}>
               {stat.icon}
             </div>
           </div>

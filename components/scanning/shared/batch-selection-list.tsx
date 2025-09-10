@@ -79,7 +79,7 @@ export default function BatchSelectionList({
             <div
               key={batch.batch_id}
               className={`
-                relative p-3 border rounded-lg cursor-pointer transition-all duration-200
+                relative p-3 border rounded-2xl cursor-pointer transition-all duration-200
                 ${
                   isSelected
                     ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'

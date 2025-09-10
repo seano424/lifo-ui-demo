@@ -22,17 +22,17 @@ export default function Page() {
       {hasBatches && <BatchStatusSummary />}
 
       {hasBatches && (
-        <div className="border p-5 rounded-lg">
+        <div className="border p-5 rounded-2xl">
           <DashboardKPICards />
         </div>
       )}
       {hasBatches && (
-        <div className="bg-muted/50 rounded-lg border-0 p-5 dark:bg-brand-dark">
+        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
           <StoreInsightsDashboard />
         </div>
       )}
       {hasBatches && (
-        <div className="bg-muted/50 rounded-lg border-0 p-5 dark:bg-brand-dark">
+        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
           <QuickActionCards />
         </div>
       )}

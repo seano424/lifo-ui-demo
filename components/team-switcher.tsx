@@ -42,7 +42,7 @@ export function TeamSwitcher() {
           <SidebarMenuItem>
             <SidebarMenuButton
               disabled
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 rounded-lg border group-data-[state=collapsed]:border-none"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
               <div className="flex flex-col gap-1">
                 <Skeleton className="h-5 w-32 rounded bg-muted" />
@@ -61,10 +61,10 @@ export function TeamSwitcher() {
           <SidebarMenuItem>
             <SidebarMenuButton
               disabled
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 py-2 rounded-lg border group-data-[state=collapsed]:border-none"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 py-2 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-2xl bg-muted">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-2xl bg-muted" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="text-muted-foreground">No stores available</span>
@@ -87,7 +87,7 @@ export function TeamSwitcher() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl"
               align="start"
               side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}

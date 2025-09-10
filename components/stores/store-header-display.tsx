@@ -57,7 +57,7 @@ export function StoreHeaderDisplay({
       <Card className={`border-0 bg-muted/50 ${className}`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 animate-pulse items-center justify-center rounded-lg bg-muted">
+            <div className="flex size-10 animate-pulse items-center justify-center rounded-2xl bg-muted">
               <Store className="size-5 text-muted-foreground" />
             </div>
             <div className="flex-1 space-y-2">
@@ -75,7 +75,7 @@ export function StoreHeaderDisplay({
       <Card className={`border-0 bg-muted/50 ${className}`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-3 text-muted-foreground">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+            <div className="flex size-10 items-center justify-center rounded-2xl bg-muted">
               <Store className="size-5" />
             </div>
             <div>
@@ -95,7 +95,7 @@ export function StoreHeaderDisplay({
   if (variant === 'compact') {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        <div className={`flex size-8 items-center justify-center rounded-lg ${storeConfig.color}`}>
+        <div className={`flex size-8 items-center justify-center rounded-2xl ${storeConfig.color}`}>
           <Store className="size-4" />
         </div>
         <div className="min-w-0 flex-1">

@@ -358,7 +358,7 @@ export default function ManualInboundEntry({
               {t('confirmation.submitText', { count: scannedItems.length })}
             </Typography>
 
-            <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
+            <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
               {scannedItems.map(item => {
                 const totalValue = item.quantity * item.price
                 return (

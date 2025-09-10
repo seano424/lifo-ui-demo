@@ -883,7 +883,7 @@ export function AddEmployeeDialog({
               </Alert>
 
               {/* <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
                     <Label className="text-sm font-medium">
                       {t('credentials.email')}
@@ -907,7 +907,7 @@ export function AddEmployeeDialog({
                   </Button>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
                     <Label className="text-sm font-medium">
                       {t('credentials.username')}
@@ -934,7 +934,7 @@ export function AddEmployeeDialog({
                   </Button>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
                     <Label className="text-sm font-medium">
                       {t('credentials.pin')}
@@ -961,7 +961,7 @@ export function AddEmployeeDialog({
 
               <Separator />
 
-              {/* <div className="bg-blue-50 p-4 rounded-lg">
+              {/* <div className="bg-blue-50 p-4 rounded-2xl">
                 <h4 className="font-medium text-blue-900 mb-2">
                   {t('nextSteps.title')}
                 </h4>
@@ -1016,7 +1016,7 @@ export function AddEmployeeDialog({
                 </AlertDescription>
               </Alert>
 
-              <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="bg-blue-50 p-4 rounded-2xl">
                 <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• User receives an email notification about the invitation</li>

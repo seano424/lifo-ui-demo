@@ -196,7 +196,7 @@ export default function ScannedItemsList({
             <div className="space-y-4">
               {/* Product Info - Now editable in advanced mode */}
               {!showAdvancedEdit ? (
-                <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="p-3 bg-gray-50 rounded-2xl">
                   <div className="text-sm font-medium">{editingItem?.productName}</div>
                   {editingItem?.brand && (
                     <div className="text-xs text-gray-600">{editingItem.brand}</div>
@@ -204,7 +204,7 @@ export default function ScannedItemsList({
                   <div className="text-xs text-gray-500 font-mono">{editingItem?.barcode}</div>
                 </div>
               ) : (
-                <div className="space-y-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="space-y-3 p-3 bg-blue-50 rounded-2xl border border-blue-200">
                   <div className="text-sm font-medium text-blue-800 mb-2">
                     {t('editDialog.sections.productDetails')}
                   </div>

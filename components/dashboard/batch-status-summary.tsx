@@ -28,7 +28,7 @@ export function BatchStatusSummary() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-white rounded-2xl border p-6">
         <div className="space-y-4">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-8 w-24" />
@@ -44,7 +44,7 @@ export function BatchStatusSummary() {
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-white rounded-2xl border p-6">
         <div className="text-center text-gray-500">
           <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
@@ -113,7 +113,7 @@ export function BatchStatusSummary() {
 
   return (
     <div className="flex flex-col lg:flex-row-reverse gap-6">
-      <div className="bg-white rounded-lg border lg:w-1/2">
+      <div className="bg-white rounded-2xl border lg:w-1/2">
         {/* Header - Needs Attention */}
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
@@ -257,7 +257,7 @@ export function BatchStatusSummary() {
           </div>
         </div>
       </div>
-      <div className="bg-white rounded-lg border lg:w-1/2">
+      <div className="bg-white rounded-2xl border lg:w-1/2">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
             <Typography

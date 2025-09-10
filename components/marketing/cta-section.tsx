@@ -13,7 +13,7 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+      <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
         {icon}
       </div>
       <div>
@@ -113,7 +113,7 @@ export function CtaSection() {
 
             <Button
               size="lg"
-              className="w-full py-4 text-lg font-medium rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+              className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >
               {t('card.button')} <ArrowRight size={18} />
             </Button>

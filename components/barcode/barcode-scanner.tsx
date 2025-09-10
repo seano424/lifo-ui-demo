@@ -354,7 +354,7 @@ export default function BarcodeScanner({
               {/* Scanning overlay */}
               {isScanning && isInitialized && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-2 border-green-400 w-64 h-32 rounded-lg relative">
+                  <div className="border-2 border-green-400 w-64 h-32 rounded-2xl relative">
                     <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
                     {detectedBarcode && (
                       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm">

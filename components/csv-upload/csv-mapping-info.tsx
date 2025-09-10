@@ -104,7 +104,7 @@ export function CSVMappingInfo() {
           <CollapsibleContent className="mt-3">
             <div className="space-y-3">
               {CSV_MAPPING_RULES.map(rule => (
-                <div key={rule.field} className="border rounded-lg p-3 bg-gray-50">
+                <div key={rule.field} className="border rounded-2xl p-3 bg-gray-50">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <code className="text-sm font-mono bg-white px-2 py-1 rounded">
@@ -168,7 +168,7 @@ export function CSVMappingInfo() {
         </Collapsible>
 
         {/* Processing Guarantees */}
-        <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+        <div className="mt-4 p-3 bg-green-50 rounded-2xl border border-green-200">
           <div className="flex items-start gap-2">
             <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
             <div className="text-sm">
@@ -184,7 +184,7 @@ export function CSVMappingInfo() {
         </div>
 
         {/* Error Prevention */}
-        <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="mt-2 p-3 bg-blue-50 rounded-2xl border border-blue-200">
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
             <div className="text-sm">

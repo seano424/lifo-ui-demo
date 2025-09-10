@@ -13,7 +13,7 @@ interface FeatureProps {
 function Feature({ icon, title, description }: FeatureProps) {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start group">
-      <div className="text-blue-600 bg-blue-100/70 p-3 rounded-lg border border-blue-200/50 shadow-sm group-hover:shadow-md group-hover:shadow-blue-500/10 transition-all duration-300">
+      <div className="text-blue-600 bg-blue-100/70 p-3 rounded-2xl border border-blue-200/50 shadow-sm group-hover:shadow-md group-hover:shadow-blue-500/10 transition-all duration-300">
         {icon}
       </div>
       <div>
@@ -74,7 +74,7 @@ export function FeaturesSummary() {
         <div className="flex flex-col items-center justify-center mt-16">
           <Button
             size="lg"
-            className="px-8 py-3 text-lg font-medium rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
+            className="px-8 py-3 text-lg font-medium rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
           >
             {t('discoverButton')}
           </Button>

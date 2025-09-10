@@ -343,7 +343,7 @@ export function PINManagementActions({ user, onUserUpdated }: PINManagementActio
               </Alert>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
                     <div className="text-sm font-medium">New PIN</div>
                     <div className="font-mono text-lg font-bold">{resetResult.newPin}</div>

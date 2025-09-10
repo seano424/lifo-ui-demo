@@ -62,7 +62,7 @@ export default function Contact() {
                   <div className="space-y-8">
                     <div className="space-y-6">
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
                           <MessageSquare size={22} strokeWidth={1.5} />
                         </div>
                         <div>
@@ -76,7 +76,7 @@ export default function Contact() {
                       </div>
 
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
                           <Users size={22} strokeWidth={1.5} />
                         </div>
                         <div>
@@ -90,7 +90,7 @@ export default function Contact() {
                       </div>
 
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
                           <Mail size={22} strokeWidth={1.5} />
                         </div>
                         <div>

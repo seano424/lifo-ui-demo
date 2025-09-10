@@ -420,7 +420,7 @@ export default function PlaygroundPage() {
               <CardTitle>Email Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border rounded-2xl overflow-hidden">
                 <iframe
                   srcDoc={generateWelcomeEmailHTML(
                     {

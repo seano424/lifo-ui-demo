@@ -184,7 +184,7 @@ export function ProductsListPresentation({
             {[...Array(8)].map((_, i) => (
               <div
                 key={`skeleton-${i + 1}`}
-                className="flex items-center space-x-4 p-4 border rounded-lg animate-pulse"
+                className="flex items-center space-x-4 p-4 border rounded-2xl animate-pulse"
               >
                 <div className="h-4 bg-muted rounded w-1/4"></div>
                 <div className="h-4 bg-muted rounded w-1/6"></div>
