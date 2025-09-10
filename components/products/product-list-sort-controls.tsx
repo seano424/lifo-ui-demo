@@ -55,43 +55,65 @@ export function ProductListSortControls({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={isLoading} className="min-w-[120px] justify-between">
+        <Button
+          variant="outline"
+          disabled={isLoading}
+          className="min-w-[120px] justify-between text-nowrap"
+        >
           {getCurrentSortLabel()}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px]">
-        <DropdownMenuItem onClick={() => updateSort('name')} className="justify-between">
+      <DropdownMenuContent
+        align="end"
+        className="w-[200px]"
+      >
+        <DropdownMenuItem
+          onClick={() => updateSort('name')}
+          className="justify-between text-nowrap"
+        >
           {t('name')}
           {getSortIcon('name')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateSort('category')} className="justify-between">
+        <DropdownMenuItem
+          onClick={() => updateSort('category')}
+          className="justify-between text-nowrap"
+        >
           {t('category')}
           {getSortIcon('category')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateSort('brand')} className="justify-between">
+        <DropdownMenuItem
+          onClick={() => updateSort('brand')}
+          className="justify-between text-nowrap"
+        >
           {t('brand')}
           {getSortIcon('brand')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateSort('total_stock')} className="justify-between">
+        <DropdownMenuItem
+          onClick={() => updateSort('total_stock')}
+          className="justify-between text-nowrap"
+        >
           {t('stock')}
           {getSortIcon('total_stock')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => updateSort('base_selling_price')}
-          className="justify-between"
+          className="justify-between text-nowrap"
         >
           {t('price')}
           {getSortIcon('base_selling_price')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => updateSort('active_batches_count')}
-          className="justify-between"
+          className="justify-between text-nowrap"
         >
           {t('activeBatches')}
           {getSortIcon('active_batches_count')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => updateSort('created_at')} className="justify-between">
+        <DropdownMenuItem
+          onClick={() => updateSort('created_at')}
+          className="justify-between text-nowrap"
+        >
           {t('dateAdded')}
           {getSortIcon('created_at')}
         </DropdownMenuItem>

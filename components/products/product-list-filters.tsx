@@ -59,7 +59,7 @@ export function ProductListFilters({
     <div className="flex flex-col-reverse items-center md:flex-row justify-end gap-2">
       <Select
         value={filters?.category || 'all'}
-        onValueChange={value =>
+        onValueChange={(value) =>
           onFiltersChange({
             ...filters,
             category: value === 'all' ? undefined : value,
@@ -67,13 +67,16 @@ export function ProductListFilters({
         }
         disabled={isLoading || categoriesLoading}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="lg:w-[180px] text-nowrap">
           <SelectValue placeholder={t('categoryFilter')} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{t('allCategories')}</SelectItem>
-          {categories.map(category => (
-            <SelectItem key={category.category_code} value={category.category_code}>
+          {categories.map((category) => (
+            <SelectItem
+              key={category.category_code}
+              value={category.category_code}
+            >
               {getCategoryDisplayName(category)}
             </SelectItem>
           ))}
@@ -81,13 +84,13 @@ export function ProductListFilters({
       </Select>
 
       {isLoading && (
-        <Skeleton className="flex justify-between gap-1">
+        <Skeleton className="justify-between gap-1 hidden md:flex">
           <Skeleton className="h-5 w-6 bg-muted-foreground/10" />
           <Skeleton className="h-5 w-16 bg-muted-foreground/10" />
         </Skeleton>
       )}
       {!isLoading && count > 0 && (
-        <span className="text-sm flex items-center text-muted-foreground px-2">
+        <span className="text-sm items-center text-muted-foreground px-2 hidden md:flex">
           {t('productCount', { count })}
         </span>
       )}
