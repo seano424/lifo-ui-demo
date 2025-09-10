@@ -50,7 +50,7 @@ export function LanguageButtonGroup() {
   const { currentLanguage, setLanguage, isLoading } = useLanguageStore()
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border p-1">
+    <div className="flex items-center gap-1 rounded-2xl border p-1">
       {Object.entries(LIFO_LANGUAGES).map(([code]) => (
         <Button
           key={code}

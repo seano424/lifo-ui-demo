@@ -57,12 +57,12 @@ export function StoreHeaderDisplay({
       <Card className={`border-0 bg-muted/50 ${className}`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 animate-pulse items-center justify-center rounded-lg bg-muted">
+            <div className="flex size-10 animate-pulse items-center justify-center rounded-2xl bg-muted">
               <Store className="size-5 text-muted-foreground" />
             </div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 w-32 animate-pulse rounded bg-muted"></div>
-              <div className="h-3 w-24 animate-pulse rounded bg-muted"></div>
+              <div className="h-4 w-32 animate-pulse rounded-2xl bg-muted"></div>
+              <div className="h-3 w-24 animate-pulse rounded-2xl bg-muted"></div>
             </div>
           </div>
         </CardContent>
@@ -75,7 +75,7 @@ export function StoreHeaderDisplay({
       <Card className={`border-0 bg-muted/50 ${className}`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-3 text-muted-foreground">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+            <div className="flex size-10 items-center justify-center rounded-2xl bg-muted">
               <Store className="size-5" />
             </div>
             <div>
@@ -95,7 +95,7 @@ export function StoreHeaderDisplay({
   if (variant === 'compact') {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        <div className={`flex size-8 items-center justify-center rounded-lg ${storeConfig.color}`}>
+        <div className={`flex size-8 items-center justify-center rounded-2xl ${storeConfig.color}`}>
           <Store className="size-4" />
         </div>
         <div className="min-w-0 flex-1">
@@ -119,7 +119,7 @@ export function StoreHeaderDisplay({
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           <div
-            className={`flex size-12 items-center justify-center rounded-xl ${storeConfig.color}`}
+            className={`flex size-12 items-center justify-center rounded-2xl ${storeConfig.color}`}
           >
             <Store className="size-6" />
           </div>

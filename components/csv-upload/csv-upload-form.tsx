@@ -195,7 +195,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       <Card className="p-6">
         <div
           className={cn(
-            'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
+            'border-2 border-dashed rounded-2xl p-8 text-center transition-colors',
             dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300',
             !selectedFile && 'hover:border-gray-400',
           )}
@@ -371,7 +371,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               {currentItems.map((item, index) => {
                 const actualIndex = startIndex + index
                 return (
-                  <div key={actualIndex} className="border border-gray-200 rounded-lg p-3 bg-white">
+                  <div
+                    key={actualIndex}
+                    className="border border-gray-200 rounded-2xl p-3 bg-white"
+                  >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
@@ -478,7 +481,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             </div>
 
             {/* Success Summary */}
-            <div className="text-center p-3 bg-white rounded border border-green-300">
+            <div className="text-center p-3 bg-white rounded-2xl border border-green-300">
               <p className="text-green-800 font-medium">
                 {(uploadResult.processed || 0) > 0
                   ? t('results.successSummary', {
@@ -532,7 +535,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
             {/* Detailed Performance Breakdown */}
             {uploadResult.performance_metrics && (
-              <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
+              <div className="mt-4 p-4 bg-white rounded-2xl border border-green-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <Zap className="h-4 w-4 text-blue-500" />
                   {t('results.performance.title')}
@@ -606,7 +609,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
             {/* Duplicate Details */}
             {uploadResult.duplicates_skipped?.length > 0 && (
-              <details className="bg-white rounded p-4 border">
+              <details className="bg-white rounded-2xl p-4 border">
                 <summary className="cursor-pointer font-semibold text-gray-700 flex items-center gap-2">
                   <SkipForward className="h-4 w-4" />
                   {t('results.duplicates.viewSkipped', {
@@ -626,7 +629,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     ) => (
                       <div
                         key={`duplicate-${dup.sku || index}`}
-                        className="text-sm p-2 bg-gray-50 rounded border-l-4 border-yellow-400"
+                        className="text-sm p-2 bg-gray-50 rounded-2xl border-l-4 border-yellow-400"
                       >
                         <div className="font-semibold">
                           {dup.sku} - {dup.product_name}

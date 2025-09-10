@@ -150,7 +150,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
         <CardContent>
           <div className="space-y-4">
             {batches.map(batch => (
-              <div key={batch.batch_id} className="border rounded-lg p-4 space-y-3">
+              <div key={batch.batch_id} className="border rounded-2xl p-4 space-y-3">
                 {/* Batch header */}
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -253,7 +253,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
           <div className="space-y-4">
             {/* Batch details */}
             {selectedBatch && (
-              <div className="bg-muted p-3 rounded-lg">
+              <div className="bg-muted p-3 rounded-2xl">
                 <h4 className="font-medium">{selectedBatch.product_name}</h4>
                 <p className="text-sm text-muted-foreground">
                   {t('donationDialog.quantity')}: {selectedBatch.quantity} •{' '}

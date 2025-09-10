@@ -130,7 +130,7 @@ export function AddStoreSearchStep() {
 
         {/* Search Results */}
         {showResults && (
-          <div className="max-h-[300px] overflow-y-auto border shadow-lg divide-y divide-border rounded-lg bg-background">
+          <div className="max-h-[300px] overflow-y-auto border shadow-lg divide-y divide-border rounded-2xl bg-background">
             {searchResults.map(place => (
               <button
                 type="button"

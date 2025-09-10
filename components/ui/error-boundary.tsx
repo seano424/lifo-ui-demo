@@ -68,7 +68,7 @@ function DefaultErrorFallback({ error, retry }: ErrorBoundaryFallbackProps) {
           </Typography>
 
           {process.env.NODE_ENV === 'development' && (
-            <div className="bg-muted p-3 rounded text-sm">
+            <div className="bg-muted p-3 rounded-2xl text-sm">
               <Typography variant="p" className="font-mono text-xs">
                 {error.message}
               </Typography>

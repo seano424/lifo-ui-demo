@@ -28,7 +28,7 @@ export function UsersList() {
         </Typography>
 
         {/* View Toggle */}
-        <div className="flex rounded-lg border border-gray-200">
+        <div className="flex rounded-2xl border border-gray-200">
           <button type="button" className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-l-lg">
             Grid
           </button>
@@ -75,7 +75,7 @@ export function UsersList() {
           </Typography>
           <button
             type="button"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
           >
             Add First User
           </button>
@@ -89,7 +89,7 @@ export function UsersList() {
             type="button"
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 border border-gray-300 rounded-2xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isFetchingNextPage ? (
               <div className="flex items-center gap-2">

@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import (
     get_current_user,
+    require_service_role,
     validate_store_access,
 )
 from app.database.connection import get_db
@@ -128,15 +129,14 @@ async def get_dashboard_data(
 async def trigger_background_scoring(
     store_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: dict[str, Any] = Depends(get_current_user),
+    service_user: dict[str, Any] = Depends(require_service_role),
 ):
     """
     Trigger background scoring for a store (non-blocking)
     This endpoint runs scoring in the background and updates product_scores table
     """
     try:
-        # Validate store access
-        await validate_store_access(store_id, current_user)
+        # Skip store access validation for service role - they have access to all stores
 
         # Run scoring without timeout concerns
         from app.core.scoring import create_scoring_service
@@ -178,7 +178,7 @@ async def trigger_background_scoring(
             "Failed to complete background scoring",
             store_id=store_id,
             error=str(e),
-            user_id=current_user["sub"],
+            user_id=service_user["user_id"],
         )
         raise HTTPException(
             status_code=500, detail="Background scoring failed"

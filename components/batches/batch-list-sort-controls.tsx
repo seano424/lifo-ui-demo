@@ -103,7 +103,7 @@ export function BatchListSortControls({
         size="sm"
         onClick={() => updateSort(currentSort.field)}
         disabled={isLoading}
-        className="h-9 px-3 rounded-md text-sm font-normal w-full md:w-auto"
+        className="h-9 px-3 rounded-2xl text-sm font-normal w-full md:w-auto"
       >
         {currentSort.direction === 'asc' ? (
           <ArrowUp className="h-4 w-4 opacity-50" />

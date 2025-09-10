@@ -45,7 +45,7 @@ export default function Contact() {
               <div className="max-w-7xl mx-auto relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
                   {/* Left column - Contact Form */}
-                  <div className="flex flex-col rounded-xl bg-white border border-blue-100 shadow-xl p-8 space-y-6">
+                  <div className="flex flex-col rounded-2xl bg-white border border-blue-100 shadow-xl p-8 space-y-6">
                     <div>
                       <Typography variant="h3" className="text-2xl font-bold text-blue-800 mb-4">
                         {t('form.title')}
@@ -62,7 +62,7 @@ export default function Contact() {
                   <div className="space-y-8">
                     <div className="space-y-6">
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
                           <MessageSquare size={22} strokeWidth={1.5} />
                         </div>
                         <div>
@@ -76,7 +76,7 @@ export default function Contact() {
                       </div>
 
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
                           <Users size={22} strokeWidth={1.5} />
                         </div>
                         <div>
@@ -90,7 +90,7 @@ export default function Contact() {
                       </div>
 
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-lg border border-blue-200/50 shadow-sm">
+                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
                           <Mail size={22} strokeWidth={1.5} />
                         </div>
                         <div>

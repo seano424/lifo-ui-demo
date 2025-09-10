@@ -189,7 +189,7 @@ export default function UserAccountInformation() {
 
           {isEditingProfile ? (
             <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)} className="space-y-4">
-              <div className="space-y-4 p-4 border rounded-lg">
+              <div className="space-y-4 p-4 border rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="full_name">{t('profile.fullName')}</Label>
@@ -284,7 +284,7 @@ export default function UserAccountInformation() {
           </div>
 
           {isEditingPhone ? (
-            <div className="space-y-4 p-4 border rounded-lg">
+            <div className="space-y-4 p-4 border rounded-2xl">
               {phoneError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -362,7 +362,7 @@ export default function UserAccountInformation() {
           </Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between p-3 border rounded-2xl">
               <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.accountStatus')}</Typography>
                 <div className="flex items-center gap-2">
@@ -376,7 +376,7 @@ export default function UserAccountInformation() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between p-3 border rounded-2xl">
               <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.emailVerified')}</Typography>
                 <div className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export default function UserAccountInformation() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between p-3 border rounded-2xl">
               <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.phoneVerified')}</Typography>
                 <div className="flex items-center gap-2">

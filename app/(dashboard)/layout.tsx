@@ -54,7 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <UserButton />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto items-center">
+          <div className="flex flex-1 flex-col gap-4 px-4 py-8 overflow-auto items-center">
             <div className="w-full max-w-5xl">{children}</div>
           </div>
         </SidebarInset>

@@ -147,20 +147,20 @@ export function ContactForm() {
           disabled={status.loading}
           loading={status.loading}
           loadingText={t('sending')}
-          className="w-full md:w-auto py-3 text-lg font-medium rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
+          className="w-full md:w-auto py-3 text-lg font-medium rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
         >
           {t('submit')}
         </Button>
       </div>
 
       {status.error && (
-        <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+        <div className="bg-destructive/10 text-destructive p-3 rounded-2xl text-sm">
           {status.error}
         </div>
       )}
 
       {status.success && (
-        <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 p-3 rounded-md text-sm">
+        <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 p-3 rounded-2xl text-sm">
           {t('success')}
         </div>
       )}

@@ -122,7 +122,7 @@ export function DuplicateResolutionModal({
               </div>
 
               {/* Quantity Comparison */}
-              <div className="bg-muted/30 p-4 rounded-lg mb-4">
+              <div className="bg-muted/30 p-4 rounded-2xl mb-4">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <p className="font-medium text-sm text-blue-700">📦 Current Inventory</p>
@@ -146,7 +146,7 @@ export function DuplicateResolutionModal({
                 onValueChange={(value: DuplicateAction) => updateAction(index, value)}
                 className="space-y-3"
               >
-                <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
+                <div className="flex items-start space-x-3 p-3 rounded-2xl hover:bg-muted/30 transition-colors">
                   <RadioGroupItem value="MERGE" id={`merge-${index}`} className="mt-1" />
                   <div className="flex-1">
                     <Label htmlFor={`merge-${index}`} className="cursor-pointer">
@@ -164,7 +164,7 @@ export function DuplicateResolutionModal({
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
+                <div className="flex items-start space-x-3 p-3 rounded-2xl hover:bg-muted/30 transition-colors">
                   <RadioGroupItem value="ADD_ANYWAY" id={`add-${index}`} className="mt-1" />
                   <div className="flex-1">
                     <Label htmlFor={`add-${index}`} className="cursor-pointer">
@@ -182,7 +182,7 @@ export function DuplicateResolutionModal({
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
+                <div className="flex items-start space-x-3 p-3 rounded-2xl hover:bg-muted/30 transition-colors">
                   <RadioGroupItem value="SKIP" id={`skip-${index}`} className="mt-1" />
                   <div className="flex-1">
                     <Label htmlFor={`skip-${index}`} className="cursor-pointer">
