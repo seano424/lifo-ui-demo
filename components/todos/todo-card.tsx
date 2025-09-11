@@ -16,7 +16,7 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   const handleCardClick = () => {
     // TODO: Open bottom sheet with todo details and actions
-    console.log('Open bottom sheet for batch:', todo.batch_id)
+    // Placeholder for future bottom sheet integration
   }
 
   // Format expiry date

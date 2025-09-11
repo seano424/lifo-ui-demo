@@ -14,6 +14,7 @@ import {
   useTodosInfinite,
 } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { isSortDirection, isSortField, validateSortConfig } from '@/lib/utils/todo-sorting'
 
 // Todo item type based on actionable_batches structure
 export type TodoItem = {
@@ -39,7 +40,14 @@ export type TodoFilters = {
   tab?: 'recommendations' | 'recently_expired' | 'all_active' | 'action_history'
   urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
   sort?: {
-    field: 'expiry_date' | 'urgency' | 'current_quantity' | 'potential_loss'
+    field:
+      | 'expiry_date'
+      | 'urgency'
+      | 'current_quantity'
+      | 'potential_loss'
+      | 'alphabetical'
+      | 'action_date'
+      | 'effectiveness'
     direction: 'asc' | 'desc'
   }
 }
@@ -67,18 +75,24 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       tab: (initialFilters?.tab as TodoFilters['tab']) || 'recommendations',
     }
 
+    // Validate urgency filter with runtime check
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
-      baseFilters.urgency = initialFilters.urgency as TodoFilters['urgency']
+      const validUrgencyLevels = ['critical', 'high', 'medium', 'low', 'maintain']
+      if (validUrgencyLevels.includes(initialFilters.urgency)) {
+        baseFilters.urgency = initialFilters.urgency as TodoFilters['urgency']
+      }
     }
 
+    // Validate sort configuration with runtime checks
     if (initialFilters?.sort) {
-      baseFilters.sort = {
-        field: initialFilters.sort as
-          | 'urgency'
-          | 'expiry_date'
-          | 'current_quantity'
-          | 'potential_loss',
-        direction: (initialFilters.direction || 'asc') as 'asc' | 'desc',
+      const field = initialFilters.sort
+      const direction = initialFilters.direction || 'asc'
+
+      if (isSortField(field) && isSortDirection(direction)) {
+        baseFilters.sort = { field, direction }
+      } else {
+        // Use validated sort config as fallback
+        baseFilters.sort = validateSortConfig({ field, direction })
       }
     } else {
       // Default sorting based on tab

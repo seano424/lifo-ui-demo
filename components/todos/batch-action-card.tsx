@@ -16,7 +16,7 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
 
   const handleCardClick = () => {
     // TODO: Open bottom sheet with action details
-    console.log('Open action details for:', action.action_id)
+    // Placeholder for future bottom sheet integration
   }
 
   // Format action date

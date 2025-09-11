@@ -1,16 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BatchActionCard } from '@/components/todos/batch-action-card'
 import { TodoCard } from '@/components/todos/todo-card'
 import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
+import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import {
   type ActionableBatch,
   useBatchActionsInfinite,
   useStoreAnalytics,
 } from '@/hooks/use-scoring-analytics'
+import { DEFAULT_PAGE_SIZE, DEFAULT_ROOT_MARGIN, SKELETON_ITEM_COUNT } from '@/lib/constants/todos'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { createTodoSorter, validateSortConfig } from '@/lib/utils/todo-sorting'
+import { memoizedBatchToTodo } from '@/lib/utils/todo-transformers'
 
 interface TodosCardListProps {
   tab: string
@@ -48,13 +52,13 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     error: _batchActionsError,
   } = useBatchActionsInfinite(
     tab === 'action_history' ? activeStoreId || null : null,
-    pageSize || 20,
+    pageSize || DEFAULT_PAGE_SIZE,
   )
 
   // Intersection observer for auto-loading more items (handles both todos and batch actions)
   const { targetRef, isIntersecting } = useIntersectionObserver({
     enabled: hasMore && !infiniteData?.isFetchingNextPage && !isFetchingBatchActionsNextPage,
-    rootMargin: '100px', // Start loading 100px before the sentinel comes into view
+    rootMargin: DEFAULT_ROOT_MARGIN,
   })
 
   // Auto-fetch next page when sentinel comes into view
@@ -83,226 +87,67 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     isFetchingBatchActionsNextPage,
   ])
 
-  useEffect(() => {
+  // Memoized data processing to avoid expensive recalculations
+  const processedTodos = useMemo(() => {
     if (tab === 'recommendations') {
-      // Use infinite data if provided, otherwise fallback to analytics response
-      const batches = infiniteData?.data || analyticsResponse?.analytics?.actionable_batches || []
-
-      // Transform actionable_batches to TodoItem format
-      const actionableTodos: TodoItem[] = batches.map((batch: ActionableBatch) => ({
-        batch_id: batch.batch_id,
-        product_name: batch.product_name,
-        expiry_date: batch.expiry_date,
-        urgency: batch.urgency as TodoItem['urgency'],
-        recommendation: batch.recommendation,
-        reason: batch.reason,
-        location_code: batch.location_code,
-        current_quantity: batch.current_quantity,
-        potential_loss: batch.potential_loss,
-        composite_score: batch.composite_score,
-        discount_percent: batch.discount_percent,
-      }))
-
-      // Apply urgency filter if set
-      let filteredTodos = actionableTodos
-      if (filters.urgency && filters.urgency !== 'all') {
-        filteredTodos = actionableTodos.filter(todo => todo.urgency === filters.urgency)
+      // Use infinite data for consistency - avoid mixing data sources
+      if (infiniteData) {
+        const batches = infiniteData.data || []
+        const actionableTodos = memoizedBatchToTodo(batches)
+        return applyFiltersAndSorting(actionableTodos, filters)
       }
-
-      // Apply sorting
-      if (filters.sort) {
-        filteredTodos.sort((a, b) => {
-          const { field, direction } = filters.sort!
-          let aVal: number | string, bVal: number | string
-
-          switch (field) {
-            case 'urgency': {
-              const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1, maintain: 0 }
-              aVal = urgencyOrder[a.urgency] || 0
-              bVal = urgencyOrder[b.urgency] || 0
-              break
-            }
-            case 'expiry_date':
-              aVal = new Date(a.expiry_date).getTime()
-              bVal = new Date(b.expiry_date).getTime()
-              break
-            case 'current_quantity':
-              aVal = a.current_quantity
-              bVal = b.current_quantity
-              break
-            case 'potential_loss':
-              aVal = a.potential_loss || 0
-              bVal = b.potential_loss || 0
-              break
-            default:
-              return 0
-          }
-
-          if (direction === 'asc') {
-            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0
-          } else {
-            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0
-          }
-        })
+      // Fallback to analytics data only if infinite data is not available
+      else if (analyticsResponse?.analytics?.actionable_batches) {
+        const batches = analyticsResponse.analytics.actionable_batches
+        const actionableTodos = memoizedBatchToTodo(batches)
+        return applyFiltersAndSorting(actionableTodos, filters)
       }
+    } else if (tab === 'recently_expired' && analyticsResponse?.analytics?.actionable_batches) {
+      const criticalBatches = analyticsResponse.analytics.actionable_batches.filter(
+        (batch: ActionableBatch) => batch.urgency === 'critical',
+      )
 
-      setTodos(filteredTodos)
+      const criticalTodos = memoizedBatchToTodo(criticalBatches)
+      return applySorting(criticalTodos, filters, { field: 'expiry_date', direction: 'asc' })
+    } else if (tab === 'all_active' && analyticsResponse?.analytics?.actionable_batches) {
+      const activeBatches = analyticsResponse.analytics.actionable_batches.filter(
+        (batch: ActionableBatch) => batch.urgency !== 'critical',
+      )
+
+      const activeTodos = memoizedBatchToTodo(activeBatches)
+      const filteredTodos = applyUrgencyFilter(activeTodos, filters)
+      return applySorting(filteredTodos, filters, { field: 'urgency', direction: 'desc' })
+    }
+
+    return []
+  }, [tab, filters, infiniteData, analyticsResponse?.analytics?.actionable_batches])
+
+  // Update state when processed data changes
+  useEffect(() => {
+    if (tab !== 'action_history') {
+      setTodos(processedTodos)
       setHasMore(infiniteData?.hasNextPage || false)
       setIsLoading(infiniteData?.isLoading || analyticsLoading)
-    } else if (tab === 'recently_expired' && analyticsResponse?.analytics?.actionable_batches) {
-      // Show critical items (expired items) from actionable batches
-      const criticalTodos: TodoItem[] = analyticsResponse.analytics.actionable_batches
-        .filter((batch: ActionableBatch) => batch.urgency === 'critical')
-        .map((batch: ActionableBatch) => ({
-          batch_id: batch.batch_id,
-          product_name: batch.product_name,
-          expiry_date: batch.expiry_date,
-          urgency: batch.urgency as TodoItem['urgency'],
-          recommendation: batch.recommendation,
-          reason: batch.reason,
-          location_code: batch.location_code,
-          current_quantity: batch.current_quantity,
-          potential_loss: batch.potential_loss,
-          composite_score: batch.composite_score,
-          discount_percent: batch.discount_percent,
-        }))
-
-      // Apply sorting (default to expiry date for recently expired)
-      const sortedTodos = criticalTodos
-      if (filters.sort) {
-        sortedTodos.sort((a, b) => {
-          const { field, direction } = filters.sort!
-          let aVal: number | string, bVal: number | string
-
-          switch (field) {
-            case 'urgency': {
-              const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1, maintain: 0 }
-              aVal = urgencyOrder[a.urgency] || 0
-              bVal = urgencyOrder[b.urgency] || 0
-              break
-            }
-            case 'expiry_date':
-              aVal = new Date(a.expiry_date).getTime()
-              bVal = new Date(b.expiry_date).getTime()
-              break
-            case 'current_quantity':
-              aVal = a.current_quantity
-              bVal = b.current_quantity
-              break
-            case 'potential_loss':
-              aVal = a.potential_loss || 0
-              bVal = b.potential_loss || 0
-              break
-            default:
-              return 0
-          }
-
-          if (direction === 'asc') {
-            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0
-          } else {
-            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0
-          }
-        })
-      } else {
-        // Default sort by expiry date (oldest first) for recently expired
-        sortedTodos.sort(
-          (a, b) => new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime(),
-        )
-      }
-
-      setTodos(sortedTodos)
-      setHasMore(false)
-      setIsLoading(false)
-    } else if (tab === 'all_active' && analyticsResponse?.analytics?.actionable_batches) {
-      // Show non-critical items (active, non-expired items) from actionable batches
-      const activeTodos: TodoItem[] = analyticsResponse.analytics.actionable_batches
-        .filter((batch: ActionableBatch) => batch.urgency !== 'critical')
-        .map((batch: ActionableBatch) => ({
-          batch_id: batch.batch_id,
-          product_name: batch.product_name,
-          expiry_date: batch.expiry_date,
-          urgency: batch.urgency as TodoItem['urgency'],
-          recommendation: batch.recommendation,
-          reason: batch.reason,
-          location_code: batch.location_code,
-          current_quantity: batch.current_quantity,
-          potential_loss: batch.potential_loss,
-          composite_score: batch.composite_score,
-          discount_percent: batch.discount_percent,
-        }))
-
-      // Apply urgency filter if set
-      let filteredTodos = activeTodos
-      if (filters.urgency && filters.urgency !== 'all') {
-        filteredTodos = activeTodos.filter(todo => todo.urgency === filters.urgency)
-      }
-
-      // Apply sorting
-      if (filters.sort) {
-        filteredTodos.sort((a, b) => {
-          const { field, direction } = filters.sort!
-          let aVal: number | string, bVal: number | string
-
-          switch (field) {
-            case 'urgency': {
-              const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1, maintain: 0 }
-              aVal = urgencyOrder[a.urgency] || 0
-              bVal = urgencyOrder[b.urgency] || 0
-              break
-            }
-            case 'expiry_date':
-              aVal = new Date(a.expiry_date).getTime()
-              bVal = new Date(b.expiry_date).getTime()
-              break
-            case 'current_quantity':
-              aVal = a.current_quantity
-              bVal = b.current_quantity
-              break
-            case 'potential_loss':
-              aVal = a.potential_loss || 0
-              bVal = b.potential_loss || 0
-              break
-            default:
-              return 0
-          }
-
-          if (direction === 'asc') {
-            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0
-          } else {
-            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0
-          }
-        })
-      } else {
-        // Default sort by urgency (highest first) for all active
-        filteredTodos.sort((a, b) => {
-          const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1, maintain: 0 }
-          return (urgencyOrder[b.urgency] || 0) - (urgencyOrder[a.urgency] || 0)
-        })
-      }
-
-      setTodos(filteredTodos)
-      setHasMore(false)
-      setIsLoading(false)
-    } else if (tab === 'action_history') {
-      // Handle batch actions data separately (no transformation needed)
-      setTodos([]) // Clear todos as we'll render batch actions instead
+    } else {
+      // Handle action history separately
+      setTodos([])
       setHasMore(hasBatchActionsNextPage || false)
       setIsLoading(isBatchActionsLoading)
     }
   }, [
+    processedTodos,
     tab,
-    filters,
-    analyticsResponse,
-    infiniteData,
+    infiniteData?.hasNextPage,
+    infiniteData?.isLoading,
     analyticsLoading,
-    isBatchActionsLoading,
     hasBatchActionsNextPage,
+    isBatchActionsLoading,
   ])
 
   if (isLoading || analyticsLoading || (tab === 'action_history' && isBatchActionsLoading)) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }, () => (
+        {Array.from({ length: SKELETON_ITEM_COUNT }, () => (
           <div key={crypto.randomUUID()} className="h-32 bg-muted animate-pulse rounded-lg" />
         ))}
       </div>
@@ -330,32 +175,64 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tab === 'action_history'
-          ? batchActionsDataFlat.map(action => (
-              <BatchActionCard key={action.action_id} action={action} />
-            ))
-          : todos.map(todo => <TodoCard key={todo.batch_id} todo={todo} />)}
-      </div>
-
-      {hasMore && (
-        <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
-          {infiniteData?.isFetchingNextPage || isFetchingBatchActionsNextPage ? (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm">
-                Loading more {tab === 'action_history' ? 'actions' : 'todos'}...
-              </span>
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground opacity-60">
-              Scroll to load more (
-              {tab === 'action_history' ? batchActionsDataFlat.length : todos.length} loaded)
-            </div>
-          )}
+    <InfiniteScrollErrorBoundary>
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tab === 'action_history'
+            ? batchActionsDataFlat.map(action => (
+                <BatchActionCard key={action.action_id} action={action} />
+              ))
+            : todos.map(todo => <TodoCard key={todo.batch_id} todo={todo} />)}
         </div>
-      )}
-    </div>
+
+        {hasMore && (
+          <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
+            {infiniteData?.isFetchingNextPage || isFetchingBatchActionsNextPage ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm">
+                  Loading more {tab === 'action_history' ? 'actions' : 'todos'}...
+                </span>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground opacity-60">
+                Scroll to load more (
+                {tab === 'action_history' ? batchActionsDataFlat.length : todos.length} loaded)
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </InfiniteScrollErrorBoundary>
   )
+}
+
+// Helper functions for data processing
+function applyFiltersAndSorting(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
+  const filtered = applyUrgencyFilter(todos, filters)
+  return applySorting(filtered, filters)
+}
+
+function applyUrgencyFilter(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
+  if (filters.urgency && filters.urgency !== 'all') {
+    return todos.filter(todo => todo.urgency === filters.urgency)
+  }
+  return todos
+}
+
+function applySorting(
+  todos: TodoItem[],
+  filters: TodoFilters,
+  defaultSort?: Partial<{ field: string; direction: string }>,
+): TodoItem[] {
+  if (filters.sort) {
+    const validatedSort = validateSortConfig(filters.sort)
+    const sorter = createTodoSorter(validatedSort)
+    return [...todos].sort(sorter)
+  } else if (defaultSort) {
+    const validatedSort = validateSortConfig(defaultSort)
+    const sorter = createTodoSorter(validatedSort)
+    return [...todos].sort(sorter)
+  }
+  return todos
 }
