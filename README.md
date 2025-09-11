@@ -11,18 +11,15 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 - **📱 Mobile-Optimized**: Sub-300ms response times for mobile scanning interfaces
 - **📊 Real-time Analytics**: Comprehensive store performance metrics
 - **📁 Bulk Processing**: CSV upload with validation and error handling
-- **🔐 Enterprise Security**: JWT authentication with store-level authorization
-- **🎯 Donation Engine**: Coordinated food rescue management workflows
+- **🔐 Modern Security**: Supabase API key authentication with Row Level Security
+- **🎯 European Pilot**: Advanced donation management with bulk quantity awareness
 
 ## 📚 Documentation
 
-**👉 [Complete FastAPI Microservice Documentation](./docs/COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)** - The definitive guide covering setup, API routes, deployment, and usage examples.
+**Essential Documentation:**
 
-### Quick Links
-
-- **[📖 Documentation Hub](./docs/README.md)** - All documentation organized by topic
-- **[⚡ Quick Setup Guide](./docs/COMPLETE_SETUP_TESTING_GUIDE.md)** - Get running in 15 minutes
-- **[🔌 API Reference](./docs/API_DOCUMENTATION.md)** - Complete endpoint documentation
+- **[⚡ Setup Guide](./docs/SETUP.md)** - Get running quickly with current architecture
+- **[🔌 API Reference](./lifo_api/API_REFERENCE.md)** - Complete endpoint documentation (65+ endpoints)
 - **[🚀 Deployment Guide](./docs/DEPLOYMENT.md)** - Production deployment instructions
 
 ## 🏗️ Architecture Overview
@@ -31,7 +28,7 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 lifo-app/
 ├── app/                      # Next.js 15 Frontend & API Routes
 ├── lifo_api/                # FastAPI Backend Application
-├── lifo_ai_core/            # Python Data Processing Core
+├── lifo_api/app/core/       # Python Data Processing & API Core
 ├── components/              # React UI Components
 ├── supabase/migrations/     # Database schema & migrations
 └── docs/                    # Comprehensive Documentation
@@ -54,25 +51,25 @@ cd lifo-app
 # Install frontend dependencies
 npm install
 
-# Set up unified Python environment (new!)
-./scripts/setup-python-env.sh
+# Backend setup
+cd lifo_api
+pip install -r requirements.txt
+# Configure .env with Supabase credentials
+uvicorn app.main:app --reload
 
-# Set up unified environment (new!)
-cp .env.example .env.local
-# Add your Supabase and API credentials to .env.local
-
-# Run the application
+# Frontend setup (separate terminal)
+npm install
 npm run dev
 ```
 
-**📚 New: [Unified Python Setup Guide](./docs/UNIFIED_PYTHON_SETUP_GUIDE.md)** - Single environment for both API and core
-**📚 Complete setup: [Full Setup Guide](./docs/COMPLETE_SETUP_TESTING_GUIDE.md)**
+**API Documentation**: http://localhost:8000/docs  
+**Detailed Setup**: [Setup Guide](./docs/SETUP.md)
 
 ## 🏃‍♂️ Getting Started
 
-1. **[📖 Read the Complete Documentation](./docs/COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)** - Everything you need to know
-2. **[⚡ Follow the Setup Guide](./docs/COMPLETE_SETUP_TESTING_GUIDE.md)** - Get running in 15 minutes
-3. **[🔌 Explore the API](./docs/API_DOCUMENTATION.md)** - Complete endpoint reference
+1. **[⚡ Setup Guide](./docs/SETUP.md)** - Get running quickly
+2. **[🏗️ Architecture Guide](./docs/ARCHITECTURE.md)** - Technical overview  
+3. **[🔌 API Reference](./lifo_api/API_REFERENCE.md)** - Complete endpoint documentation
 4. **[🚀 Deploy to Production](./docs/DEPLOYMENT.md)** - Production deployment guide
 
 ## 🤝 Contributing

@@ -76,7 +76,7 @@ export function UrgentAlerts() {
 
   // Updated to use new FastAPI dashboard structure
   const urgencyDistribution = data?.analytics?.fastapi_analytics?.urgency_distribution
-  const supabaseInsights = data?.analytics?.insights
+  const supabaseInsights = data?.analytics?.ai_insights
 
   const formatMessageWithBold = (message: string) => {
     // Match patterns like "8 critical items" at the beginning
@@ -138,17 +138,24 @@ export function UrgentAlerts() {
 
     // Fallback: Use Supabase insights structure (less accurate)
     if (
-      supabaseInsights?.high_urgency &&
-      supabaseInsights?.expiring_soon &&
-      supabaseInsights?.ready_for_discount
+      supabaseInsights &&
+      typeof supabaseInsights === 'object' &&
+      supabaseInsights !== null
     ) {
-      const criticalCount = supabaseInsights.high_urgency.count || 0
-      const highCount = Math.max(0, (supabaseInsights.expiring_soon.count || 0) - criticalCount)
-      const mediumCount = supabaseInsights.ready_for_discount.count || 0
-      const lowCount = 0 // This fallback doesn't have low priority classification
-      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
+      const insights = supabaseInsights as any
+      if (
+        insights.high_urgency &&
+        insights.expiring_soon &&
+        insights.ready_for_discount
+      ) {
+        const criticalCount = insights.high_urgency.count || 0
+        const highCount = Math.max(0, (insights.expiring_soon.count || 0) - criticalCount)
+        const mediumCount = insights.ready_for_discount.count || 0
+        const lowCount = 0 // This fallback doesn't have low priority classification
+        const totalAlerts = criticalCount + highCount + mediumCount + lowCount
 
-      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
+        return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
+      }
     }
 
     return t('errors.loadingAlerts')

@@ -432,6 +432,13 @@ export type Database = {
             foreignKeyName: "batch_action_entries_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
+            referencedRelation: "automation_preview"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
             referencedRelation: "batch_expiry_status"
             referencedColumns: ["batch_id"]
           },
@@ -447,6 +454,13 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches_needing_action"
             referencedColumns: ["batch_id"]
           },
           {
@@ -512,6 +526,13 @@ export type Database = {
             foreignKeyName: "batch_actions_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
+            referencedRelation: "automation_preview"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
             referencedRelation: "batch_expiry_status"
             referencedColumns: ["batch_id"]
           },
@@ -527,6 +548,13 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches_needing_action"
             referencedColumns: ["batch_id"]
           },
           {
@@ -713,24 +741,6 @@ export type Database = {
             referencedColumns: ["category_id"]
           },
         ]
-      }
-      category_migration_completion_log: {
-        Row: {
-          completed_at: string | null
-          migration_step: string | null
-          products_affected: number | null
-        }
-        Insert: {
-          completed_at?: string | null
-          migration_step?: string | null
-          products_affected?: number | null
-        }
-        Update: {
-          completed_at?: string | null
-          migration_step?: string | null
-          products_affected?: number | null
-        }
-        Relationships: []
       }
       donation_recipients: {
         Row: {
@@ -1033,6 +1043,21 @@ export type Database = {
       }
     }
     Views: {
+      automation_preview: {
+        Row: {
+          batch_id: string | null
+          brand: string | null
+          current_quantity: number | null
+          current_status: string | null
+          days_past_expiry: number | null
+          expiry_date: string | null
+          potential_loss_value: number | null
+          product_name: string | null
+          store_name: string | null
+          would_become_status: string | null
+        }
+        Relationships: []
+      }
       barcode_scan_summary: {
         Row: {
           avg_confidence: number | null
@@ -1153,6 +1178,31 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      batches_needing_action: {
+        Row: {
+          batch_id: string | null
+          brand: string | null
+          current_quantity: number | null
+          expiry_date: string | null
+          product_id: string | null
+          product_name: string | null
+          recommendation: string | null
+          selling_price: number | null
+          status: string | null
+          store_id: string | null
+          store_name: string | null
+          total_value: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["store_id", "product_id"]
+          },
+        ]
       }
       donation_impact: {
         Row: {
@@ -1391,6 +1441,13 @@ export type Database = {
             foreignKeyName: "sales_events_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
+            referencedRelation: "automation_preview"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
             referencedRelation: "batch_expiry_status"
             referencedColumns: ["batch_id"]
           },
@@ -1406,6 +1463,13 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches_needing_action"
             referencedColumns: ["batch_id"]
           },
         ]
@@ -1673,16 +1737,6 @@ export type Database = {
           store_products_linked: number
         }[]
       }
-      bulk_insert_csv_batches_with_store_link_v2: {
-        Args: { p_created_by: string; p_data: Json; p_store_id: string }
-        Returns: {
-          batch_ids: string[]
-          inserted_count: number
-          processing_time_ms: number
-          products_created: number
-          store_products_linked: number
-        }[]
-      }
       check_bulk_duplicates: {
         Args: {
           p_barcodes: string[]
@@ -1728,6 +1782,14 @@ export type Database = {
         }
         Returns: Json
       }
+      disable_batch_automation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      enable_batch_automation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       fast_csv_import_skip_duplicates: {
         Args: { p_csv_data: Json; p_store_id: string; p_user_id: string }
         Returns: Json
@@ -1745,6 +1807,16 @@ export type Database = {
       get_actionable_batches: {
         Args: { input_store_id: string }
         Returns: Json
+      }
+      get_automation_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active: boolean
+          command: string
+          job_id: number
+          job_name: string
+          schedule: string
+        }[]
       }
       get_csv_upload_stats: {
         Args: { p_days_back?: number; p_store_id: string }
@@ -1991,6 +2063,15 @@ export type Database = {
         }
         Returns: Json
       }
+      override_batch_status: {
+        Args: {
+          p_batch_id: string
+          p_new_status: string
+          p_notes?: string
+          p_user_id?: string
+        }
+        Returns: boolean
+      }
       resolve_bulk_products: {
         Args: { p_barcodes: string[]; p_names: string[]; p_skus: string[] }
         Returns: {
@@ -2040,6 +2121,25 @@ export type Database = {
           item_count: number
           items_per_second: number
           operation_type: string
+        }[]
+      }
+      trigger_batch_automation: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          expired_count: number
+          message: string
+          next_scheduled_run: string
+          sold_out_count: number
+          updated_count: number
+        }[]
+      }
+      update_expired_batch_statuses: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          details: Json
+          expired_count: number
+          sold_out_count: number
+          updated_count: number
         }[]
       }
       update_store_advanced_settings: {
@@ -2221,6 +2321,7 @@ export type Database = {
           composite_score: number | null
           confidence_level: number | null
           days_to_expiry: number | null
+          discount_percent: number | null
           expiry_score: number | null
           financial_impact_score: number | null
           margin_percent: number | null
@@ -2228,6 +2329,7 @@ export type Database = {
           ml_enhanced: boolean | null
           potential_loss: number | null
           quantity_risk_score: number | null
+          reason: string | null
           recommendation: string | null
           score_id: string
           store_id: string | null
@@ -2242,6 +2344,7 @@ export type Database = {
           composite_score?: number | null
           confidence_level?: number | null
           days_to_expiry?: number | null
+          discount_percent?: number | null
           expiry_score?: number | null
           financial_impact_score?: number | null
           margin_percent?: number | null
@@ -2249,6 +2352,7 @@ export type Database = {
           ml_enhanced?: boolean | null
           potential_loss?: number | null
           quantity_risk_score?: number | null
+          reason?: string | null
           recommendation?: string | null
           score_id?: string
           store_id?: string | null
@@ -2263,6 +2367,7 @@ export type Database = {
           composite_score?: number | null
           confidence_level?: number | null
           days_to_expiry?: number | null
+          discount_percent?: number | null
           expiry_score?: number | null
           financial_impact_score?: number | null
           margin_percent?: number | null
@@ -2270,6 +2375,7 @@ export type Database = {
           ml_enhanced?: boolean | null
           potential_loss?: number | null
           quantity_risk_score?: number | null
+          reason?: string | null
           recommendation?: string | null
           score_id?: string
           store_id?: string | null
@@ -2540,72 +2646,6 @@ export type Database = {
           is_active?: boolean | null
           password_hash?: string | null
           user_id?: string
-          username?: string | null
-        }
-        Relationships: []
-      }
-      users_backup_before_cleanup: {
-        Row: {
-          avatar_url: string | null
-          backup_created_at: string | null
-          backup_reason: string | null
-          created_at: string | null
-          email: string | null
-          full_name: string | null
-          is_active: boolean | null
-          last_login: string | null
-          password_hash: string | null
-          pin_attempts: number | null
-          pin_delivery_method: string | null
-          pin_expires_at: string | null
-          pin_hash: string | null
-          pin_locked_until: string | null
-          pin_set_at: string | null
-          requires_pin: boolean | null
-          updated_at: string | null
-          user_id: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          backup_created_at?: string | null
-          backup_reason?: string | null
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          is_active?: boolean | null
-          last_login?: string | null
-          password_hash?: string | null
-          pin_attempts?: number | null
-          pin_delivery_method?: string | null
-          pin_expires_at?: string | null
-          pin_hash?: string | null
-          pin_locked_until?: string | null
-          pin_set_at?: string | null
-          requires_pin?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          backup_created_at?: string | null
-          backup_reason?: string | null
-          created_at?: string | null
-          email?: string | null
-          full_name?: string | null
-          is_active?: boolean | null
-          last_login?: string | null
-          password_hash?: string | null
-          pin_attempts?: number | null
-          pin_delivery_method?: string | null
-          pin_expires_at?: string | null
-          pin_hash?: string | null
-          pin_locked_until?: string | null
-          pin_set_at?: string | null
-          requires_pin?: boolean | null
-          updated_at?: string | null
-          user_id?: string | null
           username?: string | null
         }
         Relationships: []
