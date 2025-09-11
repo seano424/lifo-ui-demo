@@ -21,8 +21,13 @@ import chardet
 import magic
 import pandas as pd
 
-# InventoryOperations is imported from lifo_api when needed
-# from database.operations import InventoryOperations
+# Import database operations for category resolution
+try:
+    from app.database.connection import get_db_sync
+    from sqlalchemy import text
+except ImportError:
+    # Fallback for testing or standalone usage
+    get_db_sync = None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -192,6 +197,7 @@ class UnifiedCSVProcessor:
         self.warnings: list[str] = []
         self.errors: list[str] = []
         self.processed_count = 0
+        self._category_cache: dict[str, str] = {}  # category_code -> category_id cache
 
     async def process_csv_file(
         self, file_path: str, file_content: bytes | None = None
@@ -459,9 +465,9 @@ class UnifiedCSVProcessor:
                             "name": item["product_name"],
                             "brand": item.get("brand", "Unknown"),
                             "barcode": item.get("barcode"),
-                            "primary_category": item["category"],
+                            "category_id": item["category_id"],  # Use resolved UUID
                             "typical_shelf_life_days": self.SHELF_LIFE_MAPPING.get(
-                                item["category"], 30
+                                item["category_code"], 30
                             ),
                             "unit_type": item.get("unit_type", "pcs"),
                             "created_by": self.user_id,
@@ -530,7 +536,11 @@ class UnifiedCSVProcessor:
         processed["product_name"] = self._validate_product_name(
             row.get("product_name"), row_num
         )
-        processed["category"] = self._normalize_category(row.get("category"), row_num)
+        # Resolve category to UUID and store category_code for shelf life calculations
+        category_raw = row.get("category")
+        category_code = self._get_category_code_for_shelf_life(category_raw)
+        processed["category_id"] = await self._resolve_category_to_uuid(category_raw, row_num)
+        processed["category_code"] = category_code  # Store for shelf life calculations
         processed["quantity"] = self._validate_quantity(row.get("quantity"), row_num)
         processed["expiry_date"] = self._validate_expiry_date(
             row.get("expiry_date"), row_num
@@ -564,7 +574,7 @@ class UnifiedCSVProcessor:
         # Estimate manufacture date if not provided
         if not processed.get("manufacture_date"):
             processed["manufacture_date"] = self._estimate_manufacture_date(
-                processed["expiry_date"], processed["category"]
+                processed["expiry_date"], processed["category_code"]
             )
 
         # Add metadata
@@ -608,26 +618,76 @@ class UnifiedCSVProcessor:
 
         return name_str
 
-    def _normalize_category(self, category: Any, row_num: int) -> str:
-        """Normalize and validate category"""
+    async def _resolve_category_to_uuid(self, category: Any, row_num: int) -> str:
+        """Resolve category string to category UUID from database"""
         if pd.isna(category):
             self.warnings.append(
-                f"Row {row_num}: No category provided, using 'household_other'"
+                f"Row {row_num}: No category provided, using 'dry_goods'"
             )
-            return "household_other"
-
+            return await self._get_category_uuid("dry_goods")
+        
         category_str = str(category).lower().strip()
-
-        # Try to map to standard categories
+        
+        # First, try to map CSV category to standard category code
+        category_code = None
         for key, value in self.CATEGORY_MAPPING.items():
             if key in category_str or category_str in key:
-                return value
-
-        # If no mapping found, default to household_other
-        self.warnings.append(
-            f"Row {row_num}: Unknown category '{category}', using 'household_other'"
-        )
-        return "household_other"
+                category_code = value
+                break
+        
+        # If no mapping found, default to dry_goods
+        if not category_code:
+            self.warnings.append(
+                f"Row {row_num}: Unknown category '{category}', using 'dry_goods'"
+            )
+            category_code = "dry_goods"
+        
+        # Resolve category code to UUID
+        return await self._get_category_uuid(category_code)
+    
+    async def _get_category_uuid(self, category_code: str) -> str:
+        """Get category UUID from database by category code"""
+        # Check cache first
+        if category_code in self._category_cache:
+            return self._category_cache[category_code]
+        
+        try:
+            if get_db_sync is None:
+                # Fallback: return category_code if no database access
+                logger.warning(f"No database access available, using category_code: {category_code}")
+                return category_code
+            
+            # Query database for category UUID
+            with get_db_sync() as db:
+                result = db.execute(
+                    text("SELECT category_id FROM inventory.categories WHERE category_code = :code LIMIT 1"),
+                    {"code": category_code}
+                ).fetchone()
+                
+                if result:
+                    category_uuid = str(result[0])
+                    self._category_cache[category_code] = category_uuid
+                    return category_uuid
+                else:
+                    # Fallback to dry_goods if category not found
+                    logger.warning(f"Category code '{category_code}' not found in database, falling back to dry_goods")
+                    fallback_result = db.execute(
+                        text("SELECT category_id FROM inventory.categories WHERE category_code = 'dry_goods' LIMIT 1")
+                    ).fetchone()
+                    
+                    if fallback_result:
+                        fallback_uuid = str(fallback_result[0])
+                        self._category_cache["dry_goods"] = fallback_uuid
+                        return fallback_uuid
+                    else:
+                        # Ultimate fallback: return the category_code
+                        logger.error("No categories found in database, using category_code as fallback")
+                        return category_code
+        
+        except Exception as e:
+            logger.error(f"Error resolving category '{category_code}': {e}")
+            # Fallback: return category_code if database query fails
+            return category_code
 
     def _validate_quantity(self, quantity: Any, row_num: int) -> float:
         """Validate quantity field"""
@@ -790,6 +850,21 @@ class UnifiedCSVProcessor:
                 "processed_by": self.user_id,
             },
         }
+    
+    def _get_category_code_for_shelf_life(self, category: Any) -> str:
+        """Get category code for shelf life calculations (without database lookup)"""
+        if pd.isna(category):
+            return "dry_goods"
+        
+        category_str = str(category).lower().strip()
+        
+        # Map CSV category to standard category code
+        for key, value in self.CATEGORY_MAPPING.items():
+            if key in category_str or category_str in key:
+                return value
+        
+        # Default fallback
+        return "dry_goods"
 
 
 # CLI interface for standalone usage

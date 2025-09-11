@@ -33,7 +33,10 @@ export async function scoreAfterScanInClient(
   }
 
   // Skip scoring in development only if explicitly disabled
-  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DISABLE_DEV_SCORING === 'true') {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    process.env.NEXT_PUBLIC_DISABLE_DEV_SCORING === 'true'
+  ) {
     return {
       attempted: false,
       success: false,
@@ -66,7 +69,12 @@ export async function scoreAfterScanInClient(
 
     // Call FastAPI scoring endpoint
     const fastApiBaseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-    console.log('[CLIENT-SCORING] Attempting to score batch for store:', storeId, 'using FastAPI:', fastApiBaseUrl)
+    console.log(
+      '[CLIENT-SCORING] Attempting to score batch for store:',
+      storeId,
+      'using FastAPI:',
+      fastApiBaseUrl,
+    )
     const endpoint = `${fastApiBaseUrl}/api/v1/scoring/batch/${storeId}`
 
     const controller = new AbortController()

@@ -184,7 +184,9 @@ class BatchCreationService:
         new_product = Product(
             sku=f"SCAN-{batch_data.barcode}",
             name=batch_data.product_name,
-            category=batch_data.category or "Scanned Products",
+            category_id=await self._resolve_category_to_uuid(
+                                session, batch_data.category, "dry_goods"
+                            ),  # Use resolved UUID
             brand=batch_data.brand,
             unit_type="pcs",
             typical_shelf_life_days=30,  # Default
@@ -599,3 +601,64 @@ class BatchCreationService:
         await session.flush()
 
         return batch.batch_id  # type: ignore[return-value]
+
+    async def _resolve_category_to_uuid(
+        self, session: AsyncSession, category_str: str | None, fallback: str = "dry_goods"
+    ) -> uuid.UUID:
+        """Resolve category string to category UUID from database"""
+        from app.database.inventory_models import Category
+
+        if not category_str:
+            category_str = fallback
+        
+        category_str = category_str.lower().strip()
+        
+        # Simple category mapping for common variations
+        category_mapping = {
+            "produce": "fresh_produce",
+            "fruits": "fresh_produce", 
+            "vegetables": "fresh_produce",
+            "meat": "fresh_meat_fish",
+            "fish": "fresh_meat_fish",
+            "dairy": "dairy_eggs",
+            "milk": "dairy_eggs",
+            "cheese": "dairy_eggs",
+            "bakery": "bakery_fresh",
+            "bread": "bakery_fresh",
+            "frozen": "frozen_foods",
+            "beverages": "beverages",
+            "drinks": "beverages",
+            "canned": "canned_jarred",
+            "jarred": "canned_jarred",
+        }
+        
+        # Map to standard category code
+        category_code = category_mapping.get(category_str, category_str)
+        
+        # Try exact match first
+        result = await session.execute(
+            select(Category.category_id).where(Category.category_code == category_code)
+        )
+        category = result.scalar_one_or_none()
+        
+        if category:
+            return category
+        
+        # Fallback to default category
+        result = await session.execute(
+            select(Category.category_id).where(Category.category_code == fallback)
+        )
+        fallback_category = result.scalar_one_or_none()
+        
+        if fallback_category:
+            return fallback_category
+        
+        # Ultimate fallback - return first available category
+        result = await session.execute(select(Category.category_id).limit(1))
+        first_category = result.scalar_one_or_none()
+        
+        if first_category:
+            return first_category
+        
+        # This should never happen if categories table is populated
+        raise ValueError("No categories found in database")

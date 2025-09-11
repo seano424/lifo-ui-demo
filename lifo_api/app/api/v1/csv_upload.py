@@ -145,26 +145,41 @@ async def upload_csv(
                 },
             )
 
-        # Prepare response
+        # Debug logging to understand the result structure
+        print(f"[DEBUG] CSV processor result keys: {list(result.keys())}")
+        print(f"[DEBUG] CSV processor result: {result}")
+        
+        # Prepare response to match frontend CSVUploadResponse interface
+        processed_count = result["processed_count"]
+        total_items = len(result["data"]) if result.get("data") else 0
+        
         response_data: dict[str, Any] = {
             "success": True,
-            "message": f"Successfully processed {result['processed_count']} items",
-            "data": {
-                "processed_count": result["processed_count"],
-                "total_items": len(result["data"]),
+            "processed": processed_count,
+            "skipped": 0,  # TODO: Add skipped count from processor
+            "errors": result.get("errors", []),
+            "total_items": total_items,
+            "processing_time_ms": result.get("metadata", {}).get("processing_time_ms", 0),
+            "duplicates_skipped": [],  # TODO: Add from processor if available
+            "performance_metrics": {
+                "items_per_second": processed_count / (result.get("metadata", {}).get("processing_time_ms", 1) / 1000) if result.get("metadata", {}).get("processing_time_ms", 0) > 0 else 0,
+                "duplicate_detection_ms": 0,  # TODO: Add from processor
+                "product_resolution_ms": 0,   # TODO: Add from processor  
+                "batch_insertion_ms": 0,      # TODO: Add from processor
+                "database_operations_ms": result.get("metadata", {}).get("processing_time_ms", 0),
+            },
+            "message": f"Successfully processed {processed_count} items",
+            # Keep additional data for debugging/extended info AND pass processed data
+            "_internal": {
                 "status": result["status"],
+                "data": result.get("data", []),  # Include the processed data here
                 "warnings": result.get("warnings", []),
-                "errors": result.get("errors", []),
                 "store_id": store_id,
                 "metadata": result.get("metadata", {}),
                 "security": {
                     "status": security_result["security_status"],
-                    "sanitization_applied": len(security_result["sanitization_changes"])
-                    > 0,
-                    "security_issues_detected": len(
-                        security_result["validation"]["security_issues"]
-                    )
-                    > 0,
+                    "sanitization_applied": len(security_result["sanitization_changes"]) > 0,
+                    "security_issues_detected": len(security_result["validation"]["security_issues"]) > 0,
                     "file_size_original": security_result["original_size"],
                     "file_size_processed": security_result["sanitized_size"],
                 },
@@ -173,7 +188,7 @@ async def upload_csv(
 
         # Add warnings to response if present
         if result.get("warnings"):
-            response_data["data"]["has_warnings"] = True
+            response_data["_internal"]["has_warnings"] = True
             response_data["message"] += f" with {len(result['warnings'])} warnings"
 
         return response_data
