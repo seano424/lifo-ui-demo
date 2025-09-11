@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { getMetricsService } from '@/lib/services/metrics'
 import { useScoringThresholds } from './use-scoring-thresholds'
 
@@ -192,6 +192,13 @@ export interface AnalyticsResponse {
     revenue?: RevenueAnalytics | { error: string }
     categories?: CategoryAnalytics | { error: string }
   }
+}
+
+// Interface for todos infinite query pagination
+export interface TodosInfiniteData {
+  data: ActionableBatch[]
+  nextPage: number | undefined
+  count: number
 }
 
 // React Query hooks for scoring alerts and analytics using Next.js API routes
@@ -589,4 +596,45 @@ export async function fetchStoreAnalytics(
 
     throw error
   }
+}
+
+/**
+ * Hook for infinite query pagination of todos (actionable batches)
+ * This provides client-side pagination for better UX and mutation support
+ * @param storeId - Store ID to fetch todos for
+ * @param pageSize - Number of items per page (default: 20)
+ * @param timeframe - Analytics timeframe (default: '7d')
+ * @param thresholdOverride - Optional threshold override
+ */
+export function useTodosInfinite(
+  storeId: string | null,
+  pageSize: number = 20,
+  timeframe: string = '7d',
+  thresholdOverride?: number,
+) {
+  // Get the full analytics data first
+  const {
+    data: allAnalytics,
+    isLoading: isLoadingAnalytics,
+    error: analyticsError,
+  } = useStoreAnalytics(storeId, timeframe, undefined, thresholdOverride)
+
+  return useInfiniteQuery({
+    queryKey: ['todos', 'infinite', storeId, pageSize, timeframe, thresholdOverride],
+    queryFn: ({ pageParam = 0 }): TodosInfiniteData => {
+      const batches = allAnalytics?.analytics?.actionable_batches || []
+      const start = pageParam * pageSize
+      const end = start + pageSize
+
+      return {
+        data: batches.slice(start, end),
+        nextPage: end < batches.length ? pageParam + 1 : undefined,
+        count: batches.length,
+      }
+    },
+    enabled: !!allAnalytics && !isLoadingAnalytics && !analyticsError,
+    initialPageParam: 0,
+    getNextPageParam: lastPage => lastPage.nextPage,
+    staleTime: 10 * 60 * 1000, // 10 minutes - same as base analytics
+  })
 }

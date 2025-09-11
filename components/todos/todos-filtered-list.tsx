@@ -8,7 +8,7 @@ import { TodosCardList } from '@/components/todos/todos-card-list'
 import { TodosFilters } from '@/components/todos/todos-filters'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
+import { useStoreAnalytics, useTodosInfinite } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 // Todo item type based on actionable_batches structure
@@ -142,9 +142,22 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   // Get real counts from analytics data
   const { data: analyticsResponse } = useStoreAnalytics(activeStoreId || '')
 
+  // Get infinite query data for recommendations tab
+  const {
+    data: infiniteData,
+    isLoading: isLoadingInfinite,
+    error: infiniteError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useTodosInfinite(activeStoreId || '', pageSize || 20)
+
   const counts = {
     recommendations: analyticsResponse?.analytics?.actionable_batches?.length || 0,
-    recently_expired: analyticsResponse?.analytics?.actionable_batches?.filter(batch => batch.urgency === 'critical')?.length || 0,
+    recently_expired:
+      analyticsResponse?.analytics?.actionable_batches?.filter(
+        batch => batch.urgency === 'critical',
+      )?.length || 0,
     all_active: analyticsResponse?.analytics?.dashboard_summary?.total_batches || 0,
     action_history: 0, // TODO: implement action history hook
   }
@@ -205,7 +218,19 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           )}
 
           <TabsContent value="recommendations" className="p-4">
-            <TodosCardList tab="recommendations" filters={filters} pageSize={pageSize} />
+            <TodosCardList
+              tab="recommendations"
+              filters={filters}
+              pageSize={pageSize}
+              infiniteData={{
+                data: infiniteData?.pages?.flatMap(page => page.data) || [],
+                hasNextPage,
+                fetchNextPage,
+                isFetchingNextPage,
+                isLoading: isLoadingInfinite,
+                error: infiniteError,
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="recently_expired" className="p-4">
