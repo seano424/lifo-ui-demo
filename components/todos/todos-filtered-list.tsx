@@ -158,7 +158,10 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       analyticsResponse?.analytics?.actionable_batches?.filter(
         batch => batch.urgency === 'critical',
       )?.length || 0,
-    all_active: analyticsResponse?.analytics?.dashboard_summary?.total_batches || 0,
+    all_active:
+      analyticsResponse?.analytics?.actionable_batches?.filter(
+        batch => batch.urgency !== 'critical',
+      )?.length || 0,
     action_history: 0, // TODO: implement action history hook
   }
 
