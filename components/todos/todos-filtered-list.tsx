@@ -144,7 +144,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   const counts = {
     recommendations: analyticsResponse?.analytics?.actionable_batches?.length || 0,
-    recently_expired: 0, // TODO: implement recently expired hook
+    recently_expired: analyticsResponse?.analytics?.actionable_batches?.filter(batch => batch.urgency === 'critical')?.length || 0,
     all_active: analyticsResponse?.analytics?.dashboard_summary?.total_batches || 0,
     action_history: 0, // TODO: implement action history hook
   }

@@ -89,9 +89,66 @@ export function TodosCardList({ tab, filters }: TodosCardListProps) {
       setTodos(filteredTodos)
       setHasMore(false) // For now, no pagination on actionable batches
       setIsLoading(false)
-    } else if (tab === 'recently_expired') {
-      // Mock data for recently expired - replace with real hook later
-      setTodos([])
+    } else if (tab === 'recently_expired' && analyticsResponse?.analytics?.actionable_batches) {
+      // Show critical items (expired items) from actionable batches
+      const criticalTodos: TodoItem[] = analyticsResponse.analytics.actionable_batches
+        .filter((batch: ActionableBatch) => batch.urgency === 'critical')
+        .map((batch: ActionableBatch) => ({
+          batch_id: batch.batch_id,
+          product_name: batch.product_name,
+          expiry_date: batch.expiry_date,
+          urgency: batch.urgency as TodoItem['urgency'],
+          recommendation: batch.recommendation,
+          reason: batch.reason,
+          location_code: batch.location_code,
+          current_quantity: batch.current_quantity,
+          potential_loss: batch.potential_loss,
+          composite_score: batch.composite_score,
+          discount_percent: batch.discount_percent,
+        }))
+
+      // Apply sorting (default to expiry date for recently expired)
+      let sortedTodos = criticalTodos
+      if (filters.sort) {
+        sortedTodos.sort((a, b) => {
+          const { field, direction } = filters.sort!
+          let aVal: number | string, bVal: number | string
+
+          switch (field) {
+            case 'urgency': {
+              const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1, maintain: 0 }
+              aVal = urgencyOrder[a.urgency] || 0
+              bVal = urgencyOrder[b.urgency] || 0
+              break
+            }
+            case 'expiry_date':
+              aVal = new Date(a.expiry_date).getTime()
+              bVal = new Date(b.expiry_date).getTime()
+              break
+            case 'current_quantity':
+              aVal = a.current_quantity
+              bVal = b.current_quantity
+              break
+            case 'potential_loss':
+              aVal = a.potential_loss || 0
+              bVal = b.potential_loss || 0
+              break
+            default:
+              return 0
+          }
+
+          if (direction === 'asc') {
+            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0
+          } else {
+            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0
+          }
+        })
+      } else {
+        // Default sort by expiry date (oldest first) for recently expired
+        sortedTodos.sort((a, b) => new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime())
+      }
+
+      setTodos(sortedTodos)
       setHasMore(false)
       setIsLoading(false)
     } else if (tab === 'all_active') {

@@ -24,7 +24,11 @@ interface TodosFiltersProps {
   isLoading: boolean
 }
 
-export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFiltersProps) {
+export function TodosFilters({
+  filters,
+  onFiltersChange,
+  isLoading,
+}: TodosFiltersProps) {
   const _t = useTranslations('todos.filters')
 
   if (!onFiltersChange) {
@@ -38,7 +42,10 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
       ...filters,
       sort: {
         field,
-        direction: currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc',
+        direction:
+          currentSort.field === field && currentSort.direction === 'asc'
+            ? 'desc'
+            : 'asc',
       },
     })
   }
@@ -57,10 +64,12 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
     <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
       {/* Urgency Filter */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Urgency:</span>
+        <span className="text-sm font-medium text-muted-foreground">
+          Urgency:
+        </span>
         <Select
           value={filters?.urgency || 'all'}
-          onValueChange={value =>
+          onValueChange={(value) =>
             onFiltersChange({
               ...filters,
               urgency: value === 'all' ? undefined : value,
@@ -77,14 +86,15 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
             <SelectItem value="high">High</SelectItem>
             <SelectItem value="medium">Medium</SelectItem>
             <SelectItem value="low">Low</SelectItem>
-            <SelectItem value="maintain">Maintain</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Sort Controls */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
+        <span className="text-sm font-medium text-muted-foreground">
+          Sort by:
+        </span>
         <Select
           value={currentSort.field}
           onValueChange={handleSortFieldChange}
