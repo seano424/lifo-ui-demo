@@ -70,20 +70,17 @@ export function BatchStatusSummary() {
   const criticalCount = activeBatchesFromActionable.filter(
     batch => batch.urgency === 'critical',
   ).length
-  const highCount = activeBatchesFromActionable.filter(
-    batch => batch.urgency === 'high',
-  ).length
-  const mediumCount = activeBatchesFromActionable.filter(
-    batch => batch.urgency === 'medium',
-  ).length
-  const lowCount = activeBatchesFromActionable.filter(
-    batch => batch.urgency === 'low',
-  ).length
+  const highCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'high').length
+  const mediumCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'medium').length
+  const lowCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'low').length
 
   // Only Critical and High priority items need immediate attention
   const totalNeedsAttention = criticalCount + highCount
   // Medium and Low priority items are considered OK (have time to plan)
-  const okCount = mediumCount + lowCount + (totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount))
+  const okCount =
+    mediumCount +
+    lowCount +
+    (totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount))
   const attentionPercentage =
     totalActiveBatchesCount > 0
       ? Math.round((totalNeedsAttention / totalActiveBatchesCount) * 100)
@@ -223,7 +220,7 @@ export function BatchStatusSummary() {
             )}
 
             {/* Other OK items */}
-            {(totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount)) > 0 && (
+            {totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount) > 0 && (
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   <div className="h-4 w-4 bg-primary-500 rounded-full" />
@@ -231,7 +228,9 @@ export function BatchStatusSummary() {
                     {t('status.ok')}
                   </Typography>
                 </div>
-                <Typography variant="p">{totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount)}</Typography>
+                <Typography variant="p">
+                  {totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount)}
+                </Typography>
               </div>
             )}
           </div>

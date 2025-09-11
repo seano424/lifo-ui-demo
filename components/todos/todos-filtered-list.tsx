@@ -69,7 +69,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
     if (initialFilters?.sort) {
       baseFilters.sort = {
-        field: initialFilters.sort as 'urgency' | 'expiry_date' | 'current_quantity' | 'potential_loss',
+        field: initialFilters.sort as
+          | 'urgency'
+          | 'expiry_date'
+          | 'current_quantity'
+          | 'potential_loss',
         direction: (initialFilters.direction || 'asc') as 'asc' | 'desc',
       }
     } else {
