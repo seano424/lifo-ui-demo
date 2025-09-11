@@ -147,9 +147,11 @@ async def trigger_background_scoring(
         start_time = datetime.now()
 
         # PERFORMANCE OPTIMIZATION: Use bulk scoring for <1s performance
+        logger.info("🔄 DEBUG: About to call scoring_service.score_store_inventory_bulk", store_id=store_id)
         scoring_results = await scoring_service.score_store_inventory_bulk(
             store_id, recalculate_all=True
         )
+        logger.info("🔄 DEBUG: Scoring service returned", store_id=store_id, scoring_keys=list(scoring_results.keys()) if scoring_results else None)
 
         processing_time = (datetime.now() - start_time).total_seconds()
 
@@ -161,6 +163,25 @@ async def trigger_background_scoring(
             processing_time_seconds=processing_time,
         )
 
+        # 🔍 DEBUG: Log what scoring_results actually contains
+        logger.info("🔍 DEBUG scoring_results keys", keys=list(scoring_results.keys()))
+        logger.info("🔍 DEBUG scoring_results.results length", results_len=len(scoring_results.get("results", [])))
+        if scoring_results.get("results"):
+            logger.info("🔍 DEBUG first result type", first_result_type=type(scoring_results["results"][0]).__name__)
+
+        # Serialize scoring results to JSON-compatible format
+        serialized_results = []
+        for result in scoring_results.get("results", []):
+            if hasattr(result, '__dict__'):
+                # Convert Pydantic model to dict
+                result_dict = result.dict() if hasattr(result, 'dict') else result.__dict__
+                # Convert datetime objects to ISO strings
+                if 'calculated_at' in result_dict and hasattr(result_dict['calculated_at'], 'isoformat'):
+                    result_dict['calculated_at'] = result_dict['calculated_at'].isoformat()
+                serialized_results.append(result_dict)
+            else:
+                serialized_results.append(result)
+
         return {
             "store_id": store_id,
             "status": "completed",
@@ -169,6 +190,7 @@ async def trigger_background_scoring(
             "processing_time_seconds": round(processing_time, 2),
             "timestamp": datetime.now().isoformat(),
             "message": "Scoring completed successfully. Dashboard will now show AI-enhanced recommendations.",
+            "results": serialized_results,  # Include serialized scoring results for JS to save
         }
 
     except HTTPException:

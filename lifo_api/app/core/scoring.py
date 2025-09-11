@@ -13,6 +13,7 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_scoring_weights
+from app.utils.recommendation_migration import migrate_recommendation
 
 logger = structlog.get_logger()
 
@@ -695,7 +696,7 @@ class ScoringService:
                 velocity_score=velocity_score,
                 margin_score=margin_score,
                 composite_score=composite_score,
-                recommendation=recommendation["action"],
+                recommendation=migrate_recommendation(recommendation["action"]),
                 urgency_level=urgency_level,
                 discount_percent=recommendation.get("discount_percent", 0),
                 reason=recommendation.get("reason", f"Scored {composite_score:.2f} based on {urgency_level} urgency"),
@@ -854,10 +855,10 @@ class ScoringService:
                         velocity_score=velocity_score,
                         margin_score=margin_score,
                         composite_score=composite_score,
-                        recommendation=recommendation.get("action", "maintain"),
+                        recommendation=migrate_recommendation(recommendation.get("action", "maintain")),
                         urgency_level=urgency_level,
                         discount_percent=recommendation.get("discount_percent", 0),
-                        reason=recommendation.get("reason", f"Bulk scored {composite_score:.2f} based on {urgency_level} urgency"),
+                        reason=recommendation.get("reason", f"Score: {composite_score:.2f}. Automated scoring based on expiry, velocity, and margin factors."),
                         confidence_level=0.85,
                         ml_enhanced=True,
                         calculated_at=datetime.utcnow(),
@@ -903,8 +904,9 @@ class ScoringService:
                         }
                     )
 
-                # Use secure bulk write operation for all scores in single transaction
-                await read_ops.bulk_store_score_results(scores_data)
+                # DISABLED: Let Next.js handle database writes instead
+                # await read_ops.bulk_store_score_results(scores_data)
+                self.logger.info("Skipping database write - Next.js will handle storage")
 
             # Calculate processing time
             end_time = datetime.utcnow()
@@ -920,12 +922,25 @@ class ScoringService:
                 processing_time_ms=processing_time_ms,
             )
 
+            # Serialize results to JSON-compatible format before returning
+            serialized_results = []
+            for result in results:
+                if hasattr(result, '__dict__'):
+                    # Convert Pydantic model to dict
+                    result_dict = result.dict() if hasattr(result, 'dict') else result.__dict__
+                    # Convert datetime objects to ISO strings
+                    if 'calculated_at' in result_dict and hasattr(result_dict['calculated_at'], 'isoformat'):
+                        result_dict['calculated_at'] = result_dict['calculated_at'].isoformat()
+                    serialized_results.append(result_dict)
+                else:
+                    serialized_results.append(result)
+
             return {
                 "store_id": store_id,
                 "total_items": len(inventory_data),
                 "processed": len(results),
                 "high_priority_count": high_priority_count,
-                "results": results,
+                "results": serialized_results,  # Use serialized results instead of raw Pydantic objects
                 "errors": errors,
                 "processing_time_ms": processing_time_ms,
             }

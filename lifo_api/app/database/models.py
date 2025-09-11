@@ -319,7 +319,7 @@ class ProductScore(Base):
             name="chk_confidence_level",
         ),
         CheckConstraint(
-            "recommendation IN ('hold', 'discount_light', 'discount_moderate', 'discount_aggressive', 'remove')",
+            "recommendation IN ('dispose', 'discount_aggressive', 'discount_moderate', 'alert', 'monitor', 'maintain')",
             name="chk_recommendation",
         ),
         {"schema": "scoring"} if os.getenv("ENVIRONMENT") != "testing" else {},

@@ -1012,9 +1012,9 @@ class SecureReadOnlyOperations:
 
             # Perform bulk upsert operation
             result = (
-                admin_client.schema("analytics")
-                .table("batch_scores")
-                .upsert(upsert_data, on_conflict="batch_id,store_id")
+                admin_client.schema("scoring")
+                .table("product_scores")
+                .upsert(upsert_data, on_conflict="batch_id")
                 .execute()
             )
 

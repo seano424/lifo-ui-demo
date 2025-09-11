@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp } from 'lucide-react'
+import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -23,6 +23,56 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
   const storeId = propStoreId || activeStoreId || ''
 
   const [showDetailedView, setShowDetailedView] = useState(false)
+  const [isRescoring, setIsRescoring] = useState(false)
+  const [scoringLogs, setScoringLogs] = useState<string[]>([])
+
+  const triggerScoring = async () => {
+    if (!storeId) return
+    
+    setIsRescoring(true)
+    setScoringLogs(['🎯 Starting manual scoring trigger...'])
+    
+    try {
+      setScoringLogs(prev => [...prev, '📡 Calling scoring API...'])
+      
+      const response = await fetch('/api/scoring/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          storeId, 
+          triggeredBy: 'manual-debug',
+          debug: true 
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Scoring failed: ${response.status}`)
+      }
+      
+      const result = await response.json()
+      setScoringLogs(prev => [
+        ...prev, 
+        `✅ Scoring completed successfully!`,
+        `📊 Processed: ${result.result?.batches_processed || 0} batches`,
+        `⚡ High priority: ${result.result?.high_priority_count || 0} items`,
+        `⏱️ Processing time: ${result.result?.processing_time_seconds || 0}s`,
+        `🔄 Please refresh the page to see updated results`
+      ])
+      
+      // Auto-refresh insights after 2 seconds
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
+      
+    } catch (error) {
+      setScoringLogs(prev => [
+        ...prev, 
+        `❌ Scoring failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      ])
+    } finally {
+      setIsRescoring(false)
+    }
+  }
 
   const {
     data: insights,
@@ -113,16 +163,32 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           </Typography>
         </div>
 
-        <Button className="flex dark:hidden" asChild>
-          <Link href="/dashboard/actionable-batches">
-            {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
-          </Link>
-        </Button>
-        <Button className="hidden dark:flex" variant="black" asChild>
-          <Link href="/dashboard/actionable-batches">
-            {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={triggerScoring}
+            disabled={isRescoring}
+            variant="outline"
+            size="sm"
+          >
+            {isRescoring ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            {isRescoring ? 'Scoring...' : 'Re-Score'}
+          </Button>
+          
+          <Button className="flex dark:hidden" asChild>
+            <Link href="/dashboard/actionable-batches">
+              {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
+            </Link>
+          </Button>
+          <Button className="hidden dark:flex" variant="black" asChild>
+            <Link href="/dashboard/actionable-batches">
+              {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
       <div className="space-y-6">
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5 text-center sm:text-left">
@@ -213,6 +279,35 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
         {/* Detailed Actionable Batches */}
         {showDetailedView && <ActionableBatchesEnhanced storeId={storeId} />}
+
+        {/* Scoring Debug Logs */}
+        {scoringLogs.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>🔍 Scoring Debug Logs</CardTitle>
+              <CardDescription>
+                Real-time logs from the latest scoring operation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-1 font-mono text-sm bg-muted p-4 rounded-lg max-h-60 overflow-y-auto">
+                {scoringLogs.map((log, index) => (
+                  <div key={index} className="text-foreground">
+                    {log}
+                  </div>
+                ))}
+              </div>
+              <Button 
+                onClick={() => setScoringLogs([])} 
+                variant="outline" 
+                size="sm" 
+                className="mt-3"
+              >
+                Clear Logs
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   )
