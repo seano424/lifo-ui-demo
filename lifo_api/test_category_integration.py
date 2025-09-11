@@ -23,7 +23,7 @@ async def test_category_mapping():
     print("🧪 Testing category mapping...")
 
     # Test the unified CSV processor
-    from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
+    from lifo_api.app.core.etl.unified_csv_processor import UnifiedCSVProcessor
 
     processor = UnifiedCSVProcessor("test-store-id", "test-user-id")
 
@@ -86,7 +86,7 @@ async def test_csv_processing():
         temp_csv_path = f.name
 
     try:
-        from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
+        from lifo_api.app.core.etl.unified_csv_processor import UnifiedCSVProcessor
 
         processor = UnifiedCSVProcessor("test-store-id", "test-user-id")
 
