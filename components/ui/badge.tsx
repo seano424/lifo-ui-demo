@@ -17,7 +17,7 @@ const badgeVariants = cva(
         cyan: 'bg-cyan-100 text-cyan-800 border-cyan-200',
         gray: 'bg-gray-100 text-gray-800 border-gray-200',
         blue: 'bg-blue-100 text-blue-800 border-blue-200',
-        green: 'bg-green-100 text-green-800 border-green-200',
+        green: 'bg-primary-100 text-primary-800 border-primary-200',
       },
     },
     defaultVariants: {

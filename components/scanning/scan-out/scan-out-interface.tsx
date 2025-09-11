@@ -582,7 +582,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Check className="w-6 h-6 text-green-600 stroke-5 border-2 border-green-600 rounded-full p-[3px] bg-green-100" />
+                <Check className="w-6 h-6 text-primary-600 stroke-5 border-2 border-primary-600 rounded-full p-[3px] bg-primary-100" />
                 {t('inventoryUpdatedSuccessfully')}
               </DialogTitle>
               <DialogDescription>

@@ -243,9 +243,9 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                       {t('overview.actionsTakenPeriod', { totalActions })}
                     </p>
                   </div>
-                  <div className="p-3 bg-green-50 rounded">
+                  <div className="p-3 bg-primary-50 rounded">
                     <p className="font-medium">{t('overview.discountsApplied')}</p>
-                    <p className="text-green-600">
+                    <p className="text-primary-600">
                       {t('overview.saved', { discountValue: discountValue.toFixed(0) })}
                     </p>
                   </div>

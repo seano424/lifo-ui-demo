@@ -35,7 +35,7 @@ import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
-    fresh_produce: 'bg-green-100 text-green-800 border-green-200',
+    fresh_produce: 'bg-primary-100 text-primary-800 border-primary-200',
     fresh_meat_fish: 'bg-red-100 text-red-800 border-red-200',
     bakery_fresh: 'bg-orange-100 text-orange-800 border-orange-200',
     dairy: 'bg-yellow-100 text-yellow-800 border-yellow-200',

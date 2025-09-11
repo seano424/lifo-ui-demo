@@ -428,7 +428,7 @@ export default function ManualInboundEntry({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-600" />
+                <Check className="w-5 h-5 text-primary-600" />
                 {t('success.title')}
               </DialogTitle>
               <DialogDescription>

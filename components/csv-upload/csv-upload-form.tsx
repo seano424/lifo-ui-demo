@@ -1,14 +1,13 @@
 'use client'
 
 import {
-  CheckCircle,
+  Check,
   ChevronLeft,
   ChevronRight,
   Clock,
   FileCheck,
   Minus,
   Plus,
-  SkipForward,
   Upload,
   Zap,
 } from 'lucide-react'
@@ -217,7 +216,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
           {selectedFile ? (
             <div className="space-y-4">
-              <FileCheck className="h-12 w-12 text-green-500 mx-auto" />
+              <FileCheck className="h-12 w-12 text-primary-500 mx-auto" />
               <div>
                 <h3 className="font-semibold text-lg">{selectedFile.name}</h3>
                 <p className="text-gray-600">{(selectedFile.size / 1024).toFixed(1)} KB</p>
@@ -239,7 +238,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       </Card>
 
       {/* Simple Preview */}
-      {isPreviewReady && csvPreview.length > 0 && (
+      {!uploadResult && isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -473,16 +472,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
       {/* Results Display */}
       {uploadResult && (
-        <Card className="p-6 bg-green-50 border-green-200">
+        <Card className="p-6 bg-primary-50 border-none">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-6 w-6 text-green-600" />
-              <h3 className="font-semibold text-green-800 text-lg">{t('results.title')}</h3>
+            <div className="flex items-center gap-2 justify-center">
+              <div className="text-center flex items-center gap-2">
+                <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                <Typography variant="h4">{uploadResult.processed || 0} items imported!</Typography>
+              </div>
             </div>
 
             {/* Success Summary */}
-            <div className="text-center p-3 bg-white rounded-2xl border border-green-300">
-              <p className="text-green-800 font-medium">
+            <div className="text-center p-3 bg-white rounded-2xl space-y-2">
+              <Typography variant="p" color="primary">
                 {(uploadResult.processed || 0) > 0
                   ? t('results.successSummary', {
                       processed: uploadResult.processed || 0,
@@ -492,65 +493,76 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   t('results.duplicatesSkipped', {
                     skipped: uploadResult.skipped,
                   })}
-              </p>
-              {uploadResult.processing_time_ms && (
-                <p className="text-sm text-green-600 mt-1">
-                  {t('results.completedIn', {
-                    time: uploadResult.processing_time_ms,
-                  })}
-                </p>
-              )}
+              </Typography>
             </div>
 
             {/* Performance Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-2xl font-bold text-primary-600">
                   {uploadResult.processed || 0}
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.processed')}</div>
+                <Typography variant="p" color="muted">
+                  {t('results.metrics.processed')}
+                </Typography>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-600">
                   {uploadResult.skipped || 0}
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.skipped')}</div>
+                <Typography variant="p" color="muted">
+                  {t('results.metrics.skipped')}
+                </Typography>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
                   {uploadResult.performance_metrics?.items_per_second || 0}
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.itemsPerSec')}</div>
+                <Typography variant="p" color="muted">
+                  {t('results.metrics.itemsPerSec')}
+                </Typography>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {uploadResult.processing_time_ms || 0}ms
                 </div>
-                <div className="text-sm text-gray-600">{t('results.metrics.totalTime')}</div>
+                <Typography variant="p" color="muted">
+                  {t('results.metrics.totalTime')}
+                </Typography>
               </div>
             </div>
 
             {/* Detailed Performance Breakdown */}
-            {uploadResult.performance_metrics && (
-              <div className="mt-4 p-4 bg-white rounded-2xl border border-green-200">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            {/* {uploadResult.performance_metrics && (
+              <div className="mt-4 p-4 bg-white rounded-2xl border border-primary-200 space-y-2 flex flex-col">
+                <Typography
+                  variant="h4"
+                  className="flex items-center gap-2"
+                >
                   <Zap className="h-4 w-4 text-blue-500" />
                   {t('results.performance.title')}
-                </h4>
+                </Typography>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                  {uploadResult.performance_metrics.duplicate_detection_ms > 0 && (
+                  {uploadResult.performance_metrics.duplicate_detection_ms >
+                    0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-orange-600">
-                        {uploadResult.performance_metrics.duplicate_detection_ms}
+                        {
+                          uploadResult.performance_metrics
+                            .duplicate_detection_ms
+                        }
                         ms
                       </div>
-                      <div className="text-gray-600">{t('results.performance.duplicateCheck')}</div>
+                      <div className="text-gray-600">
+                        {t('results.performance.duplicateCheck')}
+                      </div>
                     </div>
                   )}
-                  {uploadResult.performance_metrics.product_resolution_ms > 0 && (
+                  {uploadResult.performance_metrics.product_resolution_ms >
+                    0 && (
                     <div className="text-center p-2 bg-gray-50 rounded">
                       <div className="font-bold text-cyan-600">
                         {uploadResult.performance_metrics.product_resolution_ms}
@@ -566,7 +578,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       <div className="font-bold text-indigo-600">
                         {uploadResult.performance_metrics.batch_insertion_ms}ms
                       </div>
-                      <div className="text-gray-600">{t('results.performance.batchInsertion')}</div>
+                      <div className="text-gray-600">
+                        {t('results.performance.batchInsertion')}
+                      </div>
                     </div>
                   )}
                   {uploadResult.performance_metrics.products_created &&
@@ -580,14 +594,21 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         </div>
                       </div>
                     )}
-                  {uploadResult.performance_metrics.database_processing_time_ms &&
-                    uploadResult.performance_metrics.database_processing_time_ms > 0 && (
+                  {uploadResult.performance_metrics
+                    .database_processing_time_ms &&
+                    uploadResult.performance_metrics
+                      .database_processing_time_ms > 0 && (
                       <div className="text-center p-2 bg-gray-50 rounded">
                         <div className="font-bold text-purple-600">
-                          {uploadResult.performance_metrics.database_processing_time_ms}
+                          {
+                            uploadResult.performance_metrics
+                              .database_processing_time_ms
+                          }
                           ms
                         </div>
-                        <div className="text-gray-600">{t('results.performance.dbProcessing')}</div>
+                        <div className="text-gray-600">
+                          {t('results.performance.dbProcessing')}
+                        </div>
                       </div>
                     )}
                 </div>
@@ -599,16 +620,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         (1 -
                           (uploadResult.processing_time_ms || 0) /
                             (uploadResult.total_items * 50)) *
-                          100,
-                      ),
+                          100
+                      )
                     ),
                   })}
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Duplicate Details */}
-            {uploadResult.duplicates_skipped?.length > 0 && (
+            {/* {uploadResult.duplicates_skipped?.length > 0 && (
               <details className="bg-white rounded-2xl p-4 border">
                 <summary className="cursor-pointer font-semibold text-gray-700 flex items-center gap-2">
                   <SkipForward className="h-4 w-4" />
@@ -625,7 +646,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         expiry_date: string
                         reason: string
                       },
-                      index: number,
+                      index: number
                     ) => (
                       <div
                         key={`duplicate-${dup.sku || index}`}
@@ -635,17 +656,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           {dup.sku} - {dup.product_name}
                         </div>
                         <div className="text-gray-600">
-                          {t('results.duplicates.expiry')}: {dup.expiry_date} • {dup.reason}
+                          {t('results.duplicates.expiry')}: {dup.expiry_date} •{' '}
+                          {dup.reason}
                         </div>
                       </div>
-                    ),
+                    )
                   )}
                 </div>
               </details>
-            )}
+            )} */}
 
             {/* Action Button */}
-            <Button onClick={handleReset} className="w-full">
+            <Button size="lg" onClick={handleReset} className="w-full mt-4">
               {t('buttons.uploadAnother')}
             </Button>
           </div>

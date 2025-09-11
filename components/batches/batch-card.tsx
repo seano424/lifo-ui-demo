@@ -78,7 +78,7 @@ export function BatchCard({
     switch (batch.status) {
       case 'active':
         return (
-          <Badge variant="default" className="bg-green-100 text-green-800">
+          <Badge variant="default" className="bg-primary-100 text-primary-800">
             Active
           </Badge>
         )
@@ -132,7 +132,7 @@ export function BatchCard({
       )
     }
     return (
-      <Badge variant="outline" className="bg-green-100 text-green-800 flex items-center gap-1">
+      <Badge variant="outline" className="bg-primary-100 text-primary-800 flex items-center gap-1">
         <CheckCircle className="h-3 w-3" />
         Fresh
       </Badge>
@@ -358,7 +358,7 @@ export function BatchCard({
                 <CheckCircle className="h-3 w-3" />
                 Available
               </div>
-              <div className="text-lg font-semibold text-green-600">
+              <div className="text-lg font-semibold text-primary-600">
                 {batch.available_quantity} {batch.products?.unit_type}
               </div>
             </div>
@@ -379,7 +379,7 @@ export function BatchCard({
                       ? 'text-red-500'
                       : isExpiringWarning
                         ? 'text-yellow-600'
-                        : 'text-green-600'
+                        : 'text-primary-600'
                 }`}
               >
                 {new Date(batch.expiry_date).toLocaleDateString()}
@@ -395,7 +395,7 @@ export function BatchCard({
                       ? 'text-red-500'
                       : isExpiringWarning
                         ? 'text-yellow-600'
-                        : 'text-green-600'
+                        : 'text-primary-600'
                 }`}
               >
                 {isExpired ? 'Expired' : formatDistanceToNow(expiryDate)}

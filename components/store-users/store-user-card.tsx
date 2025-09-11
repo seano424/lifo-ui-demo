@@ -86,7 +86,7 @@ export function StoreUserCard({
       case 'employee':
         return {
           icon: User,
-          color: 'bg-green-100 text-green-800',
+          color: 'bg-primary-100 text-primary-800',
           label: getRoleTranslation('employee'),
         }
       case 'staff':
@@ -118,7 +118,7 @@ export function StoreUserCard({
       return { icon: Clock, color: 'text-orange-500', label: t('card.pinStatus.pending') }
     }
 
-    return { icon: Shield, color: 'text-green-500', label: t('card.pinStatus.active') }
+    return { icon: Shield, color: 'text-primary-500', label: t('card.pinStatus.active') }
   }
 
   const roleInfo = getRoleInfo(storeUser.role_in_store)

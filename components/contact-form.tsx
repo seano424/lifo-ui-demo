@@ -160,7 +160,7 @@ export function ContactForm() {
       )}
 
       {status.success && (
-        <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 p-3 rounded-2xl text-sm">
+        <div className="bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-300 p-3 rounded-2xl text-sm">
           {t('success')}
         </div>
       )}

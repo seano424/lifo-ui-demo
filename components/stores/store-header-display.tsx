@@ -13,9 +13,9 @@ const storeTypeConfig = {
     badge: 'bg-blue-100 text-blue-800',
   },
   convenience: {
-    color: 'bg-green-500 text-green-50',
+    color: 'bg-primary-500 text-primary-50',
     label: 'Convenience Store',
-    badge: 'bg-green-100 text-green-800',
+    badge: 'bg-primary-100 text-primary-800',
   },
   restaurant: {
     color: 'bg-orange-500 text-orange-50',

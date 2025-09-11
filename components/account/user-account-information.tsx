@@ -328,7 +328,7 @@ export default function UserAccountInformation() {
               <Typography variant="p" className="flex items-center gap-2">
                 {user.phone ? formatPhoneNumber(user.phone) : t('phone.noPhone')}
                 {user.phone_verified && (
-                  <span className="text-green-600 text-sm">✓ {t('phone.verified')}</span>
+                  <span className="text-primary-600 text-sm">✓ {t('phone.verified')}</span>
                 )}
               </Typography>
               {!user.phone && (
@@ -370,7 +370,7 @@ export default function UserAccountInformation() {
                     {user.is_active ? t('status.active') : t('status.inactive')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-primary-500' : 'bg-red-500'}`}
                   />
                 </div>
               </div>
@@ -384,7 +384,7 @@ export default function UserAccountInformation() {
                     {user.email_verified ? t('status.verified') : t('status.unverified')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-primary-500' : 'bg-yellow-500'}`}
                   />
                 </div>
               </div>
@@ -398,7 +398,7 @@ export default function UserAccountInformation() {
                     {user.phone_verified ? t('status.verified') : t('status.unverified')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-primary-500' : 'bg-yellow-500'}`}
                   />
                 </div>
               </div>

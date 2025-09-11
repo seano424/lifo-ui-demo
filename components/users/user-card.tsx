@@ -48,7 +48,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
   }
 
   const getStatusColor = (isActive: boolean) => {
-    return isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+    return isActive ? 'bg-primary-100 text-primary-800' : 'bg-red-100 text-red-800'
   }
 
   const displayName = getDisplayName(user)
@@ -167,7 +167,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
             type="button"
             onClick={onActivate}
             disabled={isUpdating}
-            className="px-3 py-2 text-sm text-green-600 border border-green-300 rounded-2xl hover:bg-green-50 disabled:opacity-50"
+            className="px-3 py-2 text-sm text-primary-600 border border-primary-300 rounded-2xl hover:bg-primary-50 disabled:opacity-50"
           >
             {isUpdating ? '...' : 'Activate'}
           </button>

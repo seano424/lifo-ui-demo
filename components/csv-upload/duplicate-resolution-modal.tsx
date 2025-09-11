@@ -64,7 +64,7 @@ export function DuplicateResolutionModal({
       case 'MERGE':
         return 'bg-blue-100 text-blue-800 border-blue-300'
       case 'ADD_ANYWAY':
-        return 'bg-green-100 text-green-800 border-green-300'
+        return 'bg-primary-100 text-primary-800 border-primary-300'
       case 'SKIP':
         return 'bg-gray-100 text-gray-800 border-gray-300'
     }
@@ -133,8 +133,8 @@ export function DuplicateResolutionModal({
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="font-medium text-sm text-green-700">📄 CSV Upload</p>
-                    <p className="text-2xl font-bold text-green-800">+{duplicate.newQuantity}</p>
+                    <p className="font-medium text-sm text-primary-700">📄 CSV Upload</p>
+                    <p className="text-2xl font-bold text-primary-800">+{duplicate.newQuantity}</p>
                     <p className="text-xs text-muted-foreground">New batch from CSV</p>
                   </div>
                 </div>
@@ -169,9 +169,9 @@ export function DuplicateResolutionModal({
                   <div className="flex-1">
                     <Label htmlFor={`add-${index}`} className="cursor-pointer">
                       <div className="flex items-center gap-2 mb-1">
-                        <Plus className="w-4 h-4 text-green-600" />
+                        <Plus className="w-4 h-4 text-primary-600" />
                         <span className="font-medium">Add as separate batch</span>
-                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700">
+                        <Badge variant="outline" className="text-xs bg-primary-50 text-primary-700">
                           New batch
                         </Badge>
                       </div>

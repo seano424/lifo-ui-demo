@@ -86,7 +86,7 @@ export function CtaSection() {
 
             <div className="space-y-3 py-4">
               <div className="flex items-center gap-2">
-                <div className="text-green-500">
+                <div className="text-primary-500">
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
@@ -94,7 +94,7 @@ export function CtaSection() {
                 </Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-green-500">
+                <div className="text-primary-500">
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
@@ -102,7 +102,7 @@ export function CtaSection() {
                 </Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-green-500">
+                <div className="text-primary-500">
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">

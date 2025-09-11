@@ -76,7 +76,7 @@ export function BatchDashboardStats() {
     if (alert) return 'text-red-600'
     switch (trend) {
       case 'positive':
-        return 'text-green-600'
+        return 'text-primary-600'
       case 'negative':
         return 'text-red-600'
       default:
@@ -88,7 +88,7 @@ export function BatchDashboardStats() {
     if (alert) return 'bg-red-50 border-red-200'
     switch (trend) {
       case 'positive':
-        return 'bg-green-50 border-green-200'
+        return 'bg-primary-50 border-primary-200'
       case 'negative':
         return 'bg-red-50 border-red-200'
       default:

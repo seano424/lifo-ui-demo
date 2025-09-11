@@ -78,7 +78,7 @@ export function UserStats() {
   const getColorClasses = (color: string) => {
     const colors = {
       blue: 'bg-blue-50 text-blue-600 border-blue-200',
-      green: 'bg-green-50 text-green-600 border-green-200',
+      green: 'bg-primary-50 text-primary-600 border-primary-200',
       red: 'bg-red-50 text-red-600 border-red-200',
       purple: 'bg-purple-50 text-purple-600 border-purple-200',
     }

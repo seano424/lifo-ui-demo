@@ -168,12 +168,12 @@ export function CSVMappingInfo() {
         </Collapsible>
 
         {/* Processing Guarantees */}
-        <div className="mt-4 p-3 bg-green-50 rounded-2xl border border-green-200">
+        <div className="mt-4 p-3 bg-primary-50 rounded-2xl border border-primary-200">
           <div className="flex items-start gap-2">
-            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+            <CheckCircle className="h-4 w-4 text-primary-600 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-green-800">Processing Guarantees</p>
-              <ul className="text-green-700 mt-1 space-y-1 text-xs">
+              <p className="font-medium text-primary-800">Processing Guarantees</p>
+              <ul className="text-primary-700 mt-1 space-y-1 text-xs">
                 <li>• Missing SKUs are auto-generated with unique identifiers</li>
                 <li>• Expiration dates calculated based on category rules</li>
                 <li>• Prices default to $0.00 for manual entry later</li>

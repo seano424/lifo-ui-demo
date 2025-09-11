@@ -151,7 +151,7 @@ export function AlertSensitivityControls({
               )}
               {currentAlertLevel === 'proactive' && (
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  <div className="w-3 h-3 bg-primary-500 rounded-full" />
                   <span className="font-medium">{t('levels.proactive')}</span>
                 </div>
               )}
@@ -197,7 +197,7 @@ export function AlertSensitivityControls({
                 <SelectItem value="proactive">
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+                      <div className="w-2 h-2 bg-primary-500 rounded-full" />
                       <Typography variant="small">{t('levels.proactiveTitle')}</Typography>
                     </div>
                     <Typography variant="muted" className="text-muted-foreground">

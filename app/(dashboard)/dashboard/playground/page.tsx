@@ -249,7 +249,7 @@ function TestResults({
 
         {data !== null && data !== undefined && !error && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-green-700">
+            <div className="flex items-center gap-2 text-primary-700">
               <CheckCircle className="h-4 w-4" />
               <span className="text-sm font-medium">Success</span>
             </div>

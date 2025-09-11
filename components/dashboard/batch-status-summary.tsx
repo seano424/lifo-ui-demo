@@ -221,7 +221,7 @@ export function BatchStatusSummary() {
             {okCount > 0 && (
               <div className="flex items-center justify-between py-2 border-t pt-4 mt-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-4 w-4 bg-green-500 rounded-full" />
+                  <div className="h-4 w-4 bg-primary-500 rounded-full" />
                   <Typography variant="p" className="text-gray-700 dark:text-brand-white">
                     {t('status.ok')}
                   </Typography>
@@ -233,7 +233,7 @@ export function BatchStatusSummary() {
             {/* No items need attention */}
             {totalNeedsAttention === 0 && (
               <div className="text-center py-4">
-                <div className="h-8 w-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <div className="h-8 w-8 bg-primary-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                   <div className="h-2 w-2 bg-white rounded-full" />
                 </div>
                 <Typography variant="p" className="">

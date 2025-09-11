@@ -165,11 +165,11 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                     <Typography variant="small" className="text-muted-foreground">
                       {t('stats.activeMembers')}
                     </Typography>
-                    <Typography variant="h3" className="text-2xl font-bold text-green-600">
+                    <Typography variant="h3" className="text-2xl font-bold text-primary-600">
                       {activeCount}
                     </Typography>
                   </div>
-                  <UserCheck className="h-8 w-8 text-green-500" />
+                  <UserCheck className="h-8 w-8 text-primary-500" />
                 </div>
               </CardContent>
             </Card>
@@ -249,7 +249,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
 
                 <div className="flex items-center justify-between p-4 border rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-green-500" />
+                    <User className="h-5 w-5 text-primary-500" />
                     <div>
                       <Typography variant="p" className="font-medium">
                         {t('roles.employees')}
@@ -349,7 +349,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       </div>
                       <Badge
                         variant={owner.is_active ? 'default' : 'secondary'}
-                        className={owner.is_active ? 'bg-green-100 text-green-800' : ''}
+                        className={owner.is_active ? 'bg-primary-100 text-primary-800' : ''}
                       >
                         {owner.is_active ? t('status.active') : t('status.inactive')}
                       </Badge>
@@ -391,7 +391,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       </div>
                       <Badge
                         variant={manager.is_active ? 'default' : 'secondary'}
-                        className={manager.is_active ? 'bg-green-100 text-green-800' : ''}
+                        className={manager.is_active ? 'bg-primary-100 text-primary-800' : ''}
                       >
                         {manager.is_active ? t('status.active') : t('status.inactive')}
                       </Badge>
@@ -405,7 +405,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <Typography variant="h3" className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-green-500" />
+                    <User className="h-5 w-5 text-primary-500" />
                     {t('roles.employees')} ({employeeCount})
                   </Typography>
                   {permissions.isEmployee && <Badge variant="outline">{t('roles.yourRole')}</Badge>}
@@ -419,7 +419,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       className="flex items-center justify-between p-3 border rounded-2xl"
                     >
                       <div className="flex items-center gap-3">
-                        <User className="h-4 w-4 text-green-500" />
+                        <User className="h-4 w-4 text-primary-500" />
                         <div>
                           <Typography variant="p" className="font-medium">
                             {employee.full_name}
@@ -431,7 +431,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       </div>
                       <Badge
                         variant={employee.is_active ? 'default' : 'secondary'}
-                        className={employee.is_active ? 'bg-green-100 text-green-800' : ''}
+                        className={employee.is_active ? 'bg-primary-100 text-primary-800' : ''}
                       >
                         {employee.is_active ? t('status.active') : t('status.inactive')}
                       </Badge>
