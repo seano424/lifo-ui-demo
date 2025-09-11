@@ -1,7 +1,7 @@
-"""
-Simplified Donation Decision Engine
-Integrates with simple action tracking system (migration 017)
-Provides basic donation recommendations based on expiry and scoring
+"""Simplified Donation Decision Engine.
+
+Integrates with simple action tracking system (migration 017).
+Provides basic donation recommendations based on expiry and scoring.
 """
 
 from datetime import date, datetime, timedelta
@@ -9,37 +9,62 @@ from enum import Enum
 from typing import Any
 
 import structlog
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from app.database.inventory_models import ActionType, DonationRecipientType
+from lifo_api.app.database.inventory_models import (
+    ActionType,
+    DonationRecipientType,
+)
 
 logger = structlog.get_logger()
 
 
 class DonationPriority(Enum):
-    """Priority levels for donation decisions"""
+    """Priority levels for donation decisions.
 
-    CRITICAL = "critical"  # Must act within 24 hours
-    HIGH = "high"  # Should act within 48 hours
-    MEDIUM = "medium"  # Can act within 1 week
-    LOW = "low"  # Optional action
+    Attributes:
+        CRITICAL: Must act within 24 hours
+        HIGH: Should act within 48 hours
+        MEDIUM: Can act within 1 week
+        LOW: Optional action
+    """
+
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
 
 
 class SimpleActionRecommendation(BaseModel):
-    """Simplified action recommendation matching migration 017 schema"""
+    """Simplified action recommendation matching migration 017 schema.
+
+    Attributes:
+        batch_id: Unique identifier for the batch
+        recommended_action: The recommended action to take
+        priority: Priority level for the action
+        ai_score: 0.0-1.0 score that triggered the recommendation
+        quantity_affected: Amount of product affected
+        notes: Simple reasoning for the recommendation
+        original_value: Original monetary value of the batch
+        estimated_recovered_value: Expected value after action
+        recommended_action_by: Deadline for taking action
+        suggested_recipient_types: Suitable donation recipients
+        decision_factors: List of factors that influenced the decision
+        urgency_reason: Explanation for the urgency level
+    """
 
     batch_id: str
     recommended_action: ActionType
     priority: DonationPriority
-    ai_score: float  # 0.0-1.0 score that triggered the recommendation
+    ai_score: float = Field(ge=0.0, le=1.0, description="AI score 0.0-1.0")
 
     # Simple tracking details
-    quantity_affected: float
-    notes: str  # Simple reasoning for the recommendation
+    quantity_affected: float = Field(ge=0.0)
+    notes: str = Field(description="Simple reasoning for the recommendation")
 
     # Financial tracking (for ROI calculations)
-    original_value: float
-    estimated_recovered_value: float  # Expected value after action
+    original_value: float = Field(ge=0.0)
+    estimated_recovered_value: float
 
     # Timing
     recommended_action_by: datetime
@@ -53,12 +78,14 @@ class SimpleActionRecommendation(BaseModel):
 
 
 class SimplifiedDonationEngine:
-    """
-    Simplified donation decision engine matching migration 017 implementation
-    Focuses on basic action recommendations without complex EU compliance
+    """Simplified donation decision engine for migration 017 implementation.
+
+    Focuses on basic action recommendations without complex EU compliance.
+    Provides donation-first logic with European pilot adjustments.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize the simplified donation engine."""
         self.logger = structlog.get_logger().bind(
             component="simplified_donation_engine"
         )
@@ -79,6 +106,7 @@ class SimplifiedDonationEngine:
             "canned_jarred",
             "beverages",
             "spices_condiments",
+            "dairy",  # Added dairy - suitable for donation with proper handling
         }
 
         # Categories requiring special handling
@@ -93,16 +121,21 @@ class SimplifiedDonationEngine:
         self,
         batch_data: dict[str, Any],
         ai_score: float,
+        store_donation_config: dict[str, Any] | None = None,
     ) -> SimpleActionRecommendation:
-        """
-        Evaluate action recommendation based on simplified criteria
+        """Evaluate action recommendation based on simplified criteria.
 
         Args:
             batch_data: Batch information including expiry, pricing, quantity
             ai_score: LIFO AI score that triggered the evaluation (0.0-1.0)
+            store_donation_config: Optional store donation configuration
 
         Returns:
             Simple action recommendation matching migration 017 schema
+
+        Raises:
+            ValueError: If batch_data is missing required fields
+            TypeError: If ai_score is not a valid float
         """
         try:
             # Extract key data
@@ -128,13 +161,14 @@ class SimplifiedDonationEngine:
             )
             original_value = current_quantity * selling_price
 
-            # Make simple action decision
+            # Make simple action decision with store preferences
             action_analysis = self._determine_simple_action(
                 category=category,
                 days_to_expiry=days_to_expiry,
                 margin_percent=margin_percent,
                 ai_score=ai_score,
                 current_quantity=current_quantity,
+                store_donation_config=store_donation_config,
             )
 
             # Calculate estimated recovered value
@@ -188,7 +222,9 @@ class SimplifiedDonationEngine:
             )
 
             # Return safe fallback recommendation
-            return self._create_simple_fallback_recommendation(batch_data, str(e))
+            return self._create_simple_fallback_recommendation(
+                batch_data, str(e)
+            )
 
     def _determine_simple_action(
         self,
@@ -197,73 +233,237 @@ class SimplifiedDonationEngine:
         margin_percent: float,
         ai_score: float,
         current_quantity: float,
+        store_donation_config: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Determine simple action based on basic business rules"""
+        """Determine action using donation-first approach with store preferences.
 
-        factors = []
+        Args:
+            category: Product category code
+            days_to_expiry: Days until product expires
+            margin_percent: Profit margin as percentage
+            ai_score: AI urgency score (0.0-1.0)
+            current_quantity: Current stock quantity
+            store_donation_config: Optional store donation configuration
 
-        # Primary decision logic based on expiry and business factors
+        Returns:
+            Dictionary containing action, reasoning, and decision factors
+        """
+
+        factors: list[str] = []
+
+        # Extract store donation preferences with defaults
+        donation_config = store_donation_config or {}
+        strategy = donation_config.get("strategy", "balanced")
+        # Get threshold for donation decisions (currently unused but may be needed)
+        _donation_first_threshold = donation_config.get(
+            "donation_first_threshold", 0.6
+        )
+        force_donation_categories = donation_config.get(
+            "force_donation_categories", []
+        )
+        min_margin_for_discount = donation_config.get(
+            "min_margin_for_discount", 5.0
+        )
+
+        # CRITICAL: Check for bulk quantity vs velocity mismatch
+        # More realistic daily sales estimation based on quantity ranges
+        if current_quantity <= 20:
+            # Small quantities - good turnover expected
+            estimated_daily_sales = max(1.0, current_quantity * 0.15)
+        elif current_quantity <= 50:
+            # Medium quantities - moderate turnover, category-dependent
+            if category in ["specialty_items"]:
+                # Specialty items sell much slower
+                estimated_daily_sales = max(0.3, current_quantity * 0.02)
+            else:
+                estimated_daily_sales = max(0.8, current_quantity * 0.08)
+        elif current_quantity <= 100:
+            # Large quantities - slower turnover
+            estimated_daily_sales = max(0.5, current_quantity * 0.05)
+        else:
+            # Bulk quantities - very slow turnover, especially for specialty
+            if category in ["specialty_items", "dry_goods"]:
+                # Even slower for specialty/bulk items
+                estimated_daily_sales = max(0.5, current_quantity * 0.005)
+            else:
+                # General bulk items
+                estimated_daily_sales = max(1.0, current_quantity * 0.01)
+
+        sellout_days = current_quantity / estimated_daily_sales
+
+        # BULK QUANTITY OVERRIDE - If sellout time > expiry time, act
+        # Focus on bulk quantities (20+) or medium with severe time pressure
+        is_bulk_quantity = (
+            current_quantity >= 20 or (
+                current_quantity >= 15
+                and days_to_expiry <= 2
+                and sellout_days > days_to_expiry * 2
+            )
+        )
+        if sellout_days > days_to_expiry and is_bulk_quantity:
+            if category in self.donation_suitable_categories:
+                reasoning = (
+                    f"Bulk quantity ({current_quantity:.0f} units) will "
+                    f"expire before sellout ({sellout_days:.0f} days needed "
+                    f"vs {days_to_expiry} available) - donation recommended"
+                )
+                return {
+                    "action": ActionType.DONATE,
+                    "reasoning": reasoning,
+                    "factors": [
+                        "Bulk quantity mismatch",
+                        f"Sellout time: {sellout_days:.0f} days",
+                        f"Expiry time: {days_to_expiry} days"
+                    ]
+                }
+            elif margin_percent > 30:  # European threshold
+                reasoning = (
+                    f"Bulk quantity with good margin ({margin_percent:.1f}%) - "
+                    f"discount to accelerate sales before expiry"
+                )
+                return {
+                    "action": ActionType.DISCOUNT,
+                    "reasoning": reasoning,
+                    "factors": [
+                        "Bulk quantity with decent margin",
+                        "Accelerated clearance needed"
+                    ]
+                }
+            else:
+                reasoning = (
+                    "Bulk quantity with low margin - donation avoids disposal "
+                    "costs and provides tax benefit"
+                )
+                return {
+                    "action": ActionType.DONATE,
+                    "reasoning": reasoning,
+                    "factors": [
+                        "Bulk quantity with low margin",
+                        "Disposal cost avoidance"
+                    ]
+                }
+
+        # Store preference thresholds for donation recommendation (European pilot adjusted)
+        donation_thresholds = {
+            "donation_first": 0.4,    # Aggressive donation preference
+            "balanced": 0.6,          # Standard threshold
+            "discount_first": 0.8     # Conservative donation approach
+        }
+
+        donation_threshold = donation_thresholds.get(strategy, 0.6)
+
+        # European pilot adjustment - lower tax benefits but higher disposal costs
+        # Donation becomes viable at higher margins due to disposal cost avoidance
+        european_disposal_threshold = 35.0  # Donate if margin ≤35% (vs US 20%)
+
+        # Primary decision logic with donation-first approach
         if days_to_expiry <= 0:
             action = ActionType.DISPOSE
-            reasoning = "Product has expired and must be disposed of"
-            factors.append("Expired product")
+            reasoning = "Product has expired and must be disposed of (EU compliance)"
+            factors.append("Expired product - legal requirement")
 
         elif days_to_expiry <= self.action_thresholds["critical_days_threshold"]:
-            # Very urgent - need immediate action
-            if margin_percent > self.action_thresholds["discount_margin_threshold"]:
-                action = ActionType.DISCOUNT
-                reasoning = (
-                    "High margin product expiring soon - try discount to recover value"
-                )
-                factors.append(f"High margin ({margin_percent:.1f}%)")
-            elif category in self.donation_suitable_categories:
+            # Critical timing (1 day) - donation-first logic
+
+            if category in force_donation_categories:
                 action = ActionType.DONATE
-                reasoning = "Low margin product expiring soon - donation provides tax benefit and social value"
-                factors.append("Donation suitable category")
+                reasoning = "Store policy: forced donation for this category"
+                factors.append("Force donation category")
+            elif ai_score >= donation_threshold and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = f"Donation-first approach: AI score {ai_score:.2f} exceeds threshold for {strategy} strategy"
+                factors.append(f"Donation suitable (threshold: {donation_threshold})")
+            elif margin_percent > 40.0:  # European threshold - higher margin needed for discount
+                action = ActionType.DISCOUNT
+                reasoning = f"High margin ({margin_percent:.1f}%) allows profitable discounting (European threshold)"
+                factors.append("High margin enables discount")
+            elif margin_percent <= european_disposal_threshold and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = f"Margin {margin_percent:.1f}% ≤ {european_disposal_threshold}% - donation avoids European disposal costs"
+                factors.append("European disposal cost avoidance")
             else:
                 action = ActionType.DISCOUNT
-                reasoning = "Special handling category - try discount before disposal"
-                factors.append("Special handling required")
+                reasoning = "Special handling category - discount before disposal"
+                factors.append("Special handling - discount fallback")
 
-            factors.append(f"Expires in {days_to_expiry} days - critical timing")
+            factors.append(f"Critical timing: expires in {days_to_expiry} day(s)")
 
         elif days_to_expiry <= self.action_thresholds["high_priority_days_threshold"]:
-            # Moderately urgent
-            if ai_score >= 0.8:
-                # High AI score suggests urgent action needed
-                if margin_percent > self.action_thresholds["discount_margin_threshold"]:
-                    action = ActionType.DISCOUNT
-                    reasoning = "High AI score and good margin - apply discount to move inventory"
-                    factors.append(f"High AI urgency score ({ai_score:.2f})")
-                elif category in self.donation_suitable_categories:
-                    action = ActionType.DONATE
-                    reasoning = "High AI score but low margin - donation recommended"
-                    factors.append("Low margin favors donation")
-                else:
-                    action = ActionType.DISCOUNT
-                    reasoning = "High AI score - discount recommended for special handling category"
-                    factors.append("Special handling category")
+            # High priority (2-3 days) - donation planning window
+
+            if category in force_donation_categories:
+                action = ActionType.DONATE
+                reasoning = "Store policy: forced donation for this category"
+                factors.append("Force donation category")
+            elif margin_percent > 40.0:  # Check margin FIRST for European thresholds
+                action = ActionType.DISCOUNT
+                reasoning = f"High margin ({margin_percent:.1f}%) enables profitable discounting (European threshold)"
+                factors.append("European high margin discount opportunity")
+            elif ai_score >= donation_threshold and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = f"Good donation timing with {strategy} strategy (score: {ai_score:.2f})"
+                factors.append("Perfect donation planning window")
+            elif margin_percent <= european_disposal_threshold and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = f"Margin {margin_percent:.1f}% ≤ {european_disposal_threshold}% - donation preferred over unprofitable discount"
+                factors.append("European disposal cost threshold")
+            elif ai_score >= 0.6 and margin_percent > 35.0:  # European adjusted
+                action = ActionType.DISCOUNT
+                reasoning = "High AI score with good margin - discount recommended (European threshold)"
+                factors.append(f"High urgency score ({ai_score:.2f})")
+            elif ai_score >= 0.5 and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = f"Moderate AI score ({ai_score:.2f}) with donation-suitable category"
+                factors.append("Donation suitable category with moderate urgency")
             else:
                 action = ActionType.MAINTAIN
-                reasoning = "Monitor closely but no immediate action needed"
-                factors.append(f"Moderate AI score ({ai_score:.2f})")
+                reasoning = "Monitor closely - prepare for action"
+                factors.append(f"Moderate urgency (score: {ai_score:.2f})")
 
-            factors.append(f"Expires in {days_to_expiry} days")
+            factors.append(f"High priority: expires in {days_to_expiry} days")
+
+        elif days_to_expiry <= 7:
+            # Medium priority (4-7 days) - donation preparation phase
+
+            if strategy == "donation_first" and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = "Donation-first store: prepare donation pickup"
+                factors.append("Advance donation planning")
+            elif ai_score >= donation_threshold and category in self.donation_suitable_categories:
+                action = ActionType.DONATE
+                reasoning = f"AI score ({ai_score:.2f}) exceeds {strategy} threshold with donation-suitable category"
+                factors.append("Good donation opportunity")
+            elif ai_score >= 0.6 and margin_percent > 15.0:
+                action = ActionType.DISCOUNT
+                reasoning = "Medium urgency with decent margin"
+                factors.append(f"Medium urgency (score: {ai_score:.2f})")
+            elif margin_percent <= min_margin_for_discount and ai_score >= 0.4:
+                action = ActionType.DONATE
+                reasoning = f"Low margin ({margin_percent:.1f}%) with moderate urgency - donation preferred"
+                factors.append("Low margin favors donation")
+            else:
+                action = ActionType.MAINTAIN
+                reasoning = "Monitor product - no immediate action needed"
+                factors.append("Low urgency")
+
+            factors.append(f"Medium priority: expires in {days_to_expiry} days")
 
         else:
-            # Not urgent - based on AI score and business factors
-            if ai_score >= 0.7:
+            # Long-term (8+ days) - minimal urgency
+            if strategy == "donation_first" and ai_score >= 0.4:
+                action = ActionType.MAINTAIN
+                reasoning = "Donation-first store: monitor for donation opportunities"
+                factors.append("Future donation planning")
+            elif ai_score >= 0.7:
                 action = ActionType.DISCOUNT
-                reasoning = "AI suggests proactive discounting"
+                reasoning = "AI suggests proactive discounting despite long shelf life"
                 factors.append(f"Elevated AI score ({ai_score:.2f})")
             else:
                 action = ActionType.MAINTAIN
                 reasoning = "No immediate action needed - continue normal sales"
                 factors.append("Normal sales conditions")
 
-            factors.append(
-                f"Expires in {days_to_expiry} days - planning time available"
-            )
+            factors.append(f"Low urgency: expires in {days_to_expiry} days")
 
         # Quantity considerations
         if (
@@ -286,7 +486,16 @@ class SimplifiedDonationEngine:
         action: ActionType,
         margin_percent: float,
     ) -> float:
-        """Calculate estimated recovered value based on action"""
+        """Calculate estimated recovered value based on action.
+
+        Args:
+            original_value: Original monetary value of the product
+            action: The recommended action type
+            margin_percent: Profit margin as percentage
+
+        Returns:
+            Estimated recovered value after taking the action
+        """
 
         if action == ActionType.DISCOUNT:
             # Assume discount will recover 60-80% of value depending on margin
@@ -315,7 +524,15 @@ class SimplifiedDonationEngine:
         days_to_expiry: int,
         action: ActionType,
     ) -> dict[str, Any]:
-        """Determine timing and priority for simple actions"""
+        """Determine timing and priority for simple actions.
+
+        Args:
+            days_to_expiry: Days until product expires
+            action: The recommended action type
+
+        Returns:
+            Dictionary with priority, action_by datetime, and urgency reason
+        """
 
         now = datetime.now()
 
@@ -355,8 +572,17 @@ class SimplifiedDonationEngine:
             "urgency_reason": urgency_reason,
         }
 
-    def _get_suitable_recipients(self, category: str) -> list[DonationRecipientType]:
-        """Get suitable recipient types for a product category"""
+    def _get_suitable_recipients(
+        self, category: str
+    ) -> list[DonationRecipientType]:
+        """Get suitable recipient types for a product category.
+
+        Args:
+            category: Product category code
+
+        Returns:
+            List of suitable donation recipient types
+        """
 
         # Base recipients suitable for most categories
         base_recipients = [
@@ -388,9 +614,19 @@ class SimplifiedDonationEngine:
         return base_recipients
 
     def _create_simple_fallback_recommendation(
-        self, batch_data: dict[str, Any], error: str
+        self,
+        batch_data: dict[str, Any],
+        error: str
     ) -> SimpleActionRecommendation:
-        """Create safe fallback recommendation when evaluation fails"""
+        """Create safe fallback recommendation when evaluation fails.
+
+        Args:
+            batch_data: Original batch data that caused the error
+            error: Error message describing what went wrong
+
+        Returns:
+            Safe fallback recommendation for manual review
+        """
 
         return SimpleActionRecommendation(
             batch_id=batch_data.get("batch_id", "unknown"),
@@ -408,7 +644,10 @@ class SimplifiedDonationEngine:
         )
 
 
-# Factory function for easy instantiation
 def create_simplified_donation_engine() -> SimplifiedDonationEngine:
-    """Create simplified donation decision engine instance"""
+    """Create simplified donation decision engine instance.
+
+    Returns:
+        Configured SimplifiedDonationEngine instance
+    """
     return SimplifiedDonationEngine()

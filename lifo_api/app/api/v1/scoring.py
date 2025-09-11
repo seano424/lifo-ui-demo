@@ -1,6 +1,7 @@
-"""
-Secure Scoring API endpoints for AI features only
-Part of hybrid architecture security remediation
+"""Secure Scoring API endpoints for AI features only.
+
+Part of hybrid architecture security remediation.
+Provides read-only scoring operations with enhanced security.
 """
 
 from typing import Any
@@ -9,11 +10,14 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.secure_dependencies import get_current_user
-from app.core.scoring import create_scoring_service
-from app.database.connection import get_db
-from app.database.read_only_operations import get_read_only_operations
-from app.middleware.rate_limiting import ai_endpoint_rate_limit, scoring_rate_limit
+from lifo_api.app.auth.secure_dependencies import get_current_user
+from lifo_api.app.core.scoring import create_scoring_service
+from lifo_api.app.database.connection import get_db
+from lifo_api.app.database.read_only_operations import get_read_only_operations
+from lifo_api.app.middleware.rate_limiting import (
+    ai_endpoint_rate_limit,
+    scoring_rate_limit,
+)
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -30,19 +34,56 @@ async def score_store_batch(
     save_to_database: bool = Query(
         True, description="Save calculated scores to database"
     ),
+    include_donation_rationale: bool = Query(
+        True, description="Include donation vs discount rationale in results"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
-):
-    """
-    Calculate AI scoring for store inventory - NOW WITH DATABASE WRITES
+) -> dict[str, Any]:
+    """Calculate AI scoring for store inventory with donation-first enhancement.
+
+    Args:
+        store_id: Store identifier for batch scoring
+        request: FastAPI request object
+        force_recalculate: Whether to recalculate all scores
+        save_to_database: Whether to persist results to database
+        include_donation_rationale: Whether to include donation insights
+        db: Database session
+        current_user: Authenticated user information
+
+    Returns:
+        Dictionary with scoring results and statistics
+
+    Raises:
+        HTTPException: If scoring operation fails
     """
     try:
         # Initialize secure scoring service
         scoring_service = create_scoring_service(db)
 
+        # Get store donation preferences if rationale requested
+        store_donation_config: dict[str, Any] | None = None
+        if include_donation_rationale:
+            from sqlalchemy import select
+
+            from lifo_api.app.database.inventory_models import StoreSettings
+
+            result = await db.execute(
+                select(StoreSettings).where(StoreSettings.store_id == store_id)
+            )
+            store_settings = result.scalar_one_or_none()
+            if (store_settings
+                and store_settings.donation_preference_config):
+                store_donation_config = (
+                    store_settings.donation_preference_config
+                )
+
         # Score store inventory using secure read-only operations
         results = await scoring_service.score_store_inventory(
-            store_id, recalculate_all=force_recalculate
+            store_id,
+            recalculate_all=force_recalculate,
+            store_donation_config=store_donation_config,
+            include_donation_rationale=include_donation_rationale
         )
 
         # NEW: Save scores to database if requested
@@ -72,7 +113,7 @@ async def score_store_batch(
             user_id=current_user["sub"],
         )
 
-        return {
+        response_data = {
             "store_id": store_id,
             "total_items": results.get("total_items", 0),
             "processed": results.get("processed", 0),
@@ -81,6 +122,23 @@ async def score_store_batch(
             "errors": results.get("errors", []),
             "message": f"Scored {results.get('processed', 0)} batches successfully",
         }
+
+        # Include donation rationale if requested
+        if include_donation_rationale and results.get("donation_insights"):
+            strategy = "balanced"
+            if store_donation_config:
+                strategy = store_donation_config.get("strategy", "balanced")
+
+            response_data.update({
+                "donation_insights": results.get("donation_insights"),
+                "store_donation_strategy": strategy,
+                "donation_suitable_categories": results.get(
+                    "donation_suitable_categories", []
+                ),
+                "rationale_included": True
+            })
+
+        return response_data
 
     except Exception as e:
         logger.error(
@@ -100,12 +158,25 @@ async def get_urgency_alerts(
     threshold: float = Query(
         0.6, ge=0.0, le=1.0, description="Urgency threshold (0.0-1.0)"
     ),
-    limit: int = Query(50, ge=1, le=100, description="Maximum alerts to return"),
+    limit: int = Query(50, ge=1, le=100, description="Maximum alerts"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
-):
-    """
-    Get AI urgency alerts for inventory items - READ-ONLY
+) -> dict[str, Any]:
+    """Get AI urgency alerts for inventory items - READ-ONLY.
+
+    Args:
+        store_id: Store identifier
+        request: FastAPI request object
+        threshold: Urgency threshold for filtering alerts
+        limit: Maximum number of alerts to return
+        db: Database session
+        current_user: Authenticated user information
+
+    Returns:
+        Dictionary with urgency alerts and metadata
+
+    Raises:
+        HTTPException: If operation fails
     """
     try:
         # Get read-only operations
@@ -152,8 +223,9 @@ async def get_urgency_alerts(
                         "days_to_expiry": days_to_expiry,
                         "urgency_score": urgency_score,
                         "urgency_level": "critical" if urgency_score >= 0.8 else "high",
-                        "potential_loss": item["current_quantity"]
-                        * item["selling_price"],
+                        "potential_loss": (
+                            item["current_quantity"] * item["selling_price"]
+                        ),
                         "recommendation": "Immediate action required"
                         if urgency_score >= 0.8
                         else "Action needed soon",
@@ -199,9 +271,22 @@ async def get_ai_recommendations(
     limit: int = Query(20, ge=1, le=50, description="Maximum recommendations"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
-):
-    """
-    Get AI-powered recommendations for inventory management
+) -> dict[str, Any]:
+    """Get AI-powered recommendations for inventory management.
+
+    Args:
+        store_id: Store identifier
+        request: FastAPI request object
+        category: Optional category filter
+        limit: Maximum number of recommendations
+        db: Database session
+        current_user: Authenticated user information
+
+    Returns:
+        Dictionary with AI recommendations and insights
+
+    Raises:
+        HTTPException: If operation fails
     """
     try:
         # Get read-only operations
@@ -241,9 +326,11 @@ async def get_ai_recommendations(
                         "suggested_discount": min(
                             50, max(20, int(margin_percent * 0.6))
                         ),
-                        "potential_savings": item["current_quantity"]
-                        * item["selling_price"]
-                        * 0.8,
+                        "potential_savings": (
+                            item["current_quantity"]
+                            * item["selling_price"]
+                            * 0.8
+                        ),
                     }
                 )
             elif days_to_expiry <= 3:
@@ -259,9 +346,11 @@ async def get_ai_recommendations(
                         "suggested_discount": min(
                             25, max(10, int(margin_percent * 0.4))
                         ),
-                        "potential_savings": item["current_quantity"]
-                        * item["selling_price"]
-                        * 0.6,
+                        "potential_savings": (
+                            item["current_quantity"]
+                            * item["selling_price"]
+                            * 0.6
+                        ),
                     }
                 )
             elif item["current_quantity"] > 50:  # High quantity
@@ -272,18 +361,25 @@ async def get_ai_recommendations(
                         "product_name": item.get("product_name", "Unknown"),
                         "recommendation_type": "bulk_promotion",
                         "action": "Create bulk promotion or bundle",
-                        "reason": f"High quantity ({item['current_quantity']}) may not sell in time",
+                        "reason": (
+                            f"High quantity ({item['current_quantity']}) "
+                            f"may not sell in time"
+                        ),
                         "priority": "medium",
                         "suggested_discount": 10,
-                        "potential_savings": item["current_quantity"]
-                        * item["selling_price"]
-                        * 0.3,
+                        "potential_savings": (
+                            item["current_quantity"]
+                            * item["selling_price"]
+                            * 0.3
+                        ),
                     }
                 )
 
         # Sort by priority and limit
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-        recommendations.sort(key=lambda x: priority_order.get(x["priority"], 4))
+        recommendations.sort(
+            key=lambda x: priority_order.get(x["priority"], 4)
+        )
         recommendations = recommendations[:limit]
 
         logger.info(
@@ -329,12 +425,24 @@ async def get_ai_recommendations(
 async def get_scoring_analytics(
     store_id: str,
     request: Request,
-    days: int = Query(30, ge=1, le=90, description="Analysis period in days"),
+    days: int = Query(30, ge=1, le=90, description="Analysis period"),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
-):
-    """
-    Get scoring analytics and insights for a store
+) -> dict[str, Any]:
+    """Get scoring analytics and insights for a store.
+
+    Args:
+        store_id: Store identifier
+        request: FastAPI request object
+        days: Analysis period in days
+        db: Database session
+        current_user: Authenticated user information
+
+    Returns:
+        Dictionary with analytics data and AI insights
+
+    Raises:
+        HTTPException: If operation fails
     """
     try:
         # Get read-only operations
@@ -374,11 +482,14 @@ async def get_scoring_analytics(
 
         total_value = analytics_data.get("total_value", 0)
         if total_value > 0:
-            at_risk_value = (
+            at_risk_items = (
                 analytics_data.get("critical_items", 0)
                 + analytics_data.get("high_urgency_items", 0)
-            ) * (total_value / analytics_data.get("total_batches", 1))
-            if at_risk_value > total_value * 0.1:  # More than 10% of value at risk
+            )
+            total_batches = analytics_data.get("total_batches", 1)
+            at_risk_value = at_risk_items * (total_value / total_batches)
+            # More than 10% of value at risk
+            if at_risk_value > total_value * 0.1:
                 insights.append(
                     {
                         "type": "financial_risk",
