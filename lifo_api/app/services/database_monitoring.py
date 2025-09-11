@@ -10,7 +10,7 @@ from typing import Any
 import structlog
 from sqlalchemy import text
 
-from lifo_api.app.database.connection import get_db_manager
+from app.database.connection import get_db_manager
 
 logger = structlog.get_logger()
 

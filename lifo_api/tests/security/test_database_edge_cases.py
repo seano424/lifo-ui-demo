@@ -15,7 +15,7 @@ from app.database.connection import DatabaseManager, get_database, test_connecti
 
 # Import operations classes for testing
 try:
-    from lifo_api.app.core.database.operations import InventoryOperations
+    from app.core.database.operations import InventoryOperations
 
     # Create alias for store operations (same class handles both)
     StoreOperations = InventoryOperations

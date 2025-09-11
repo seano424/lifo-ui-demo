@@ -124,6 +124,28 @@ def record_suspicious_activity(
     )
 
 
+# Global performance monitor instance
+_performance_monitor = None
+
+def get_auth_health():
+    """Get authentication system health status"""
+    global _performance_monitor
+    if not _performance_monitor:
+        _performance_monitor = AuthPerformanceMonitor()
+    
+    return {
+        "status": "healthy",
+        "metrics": _performance_monitor.get_metrics(),
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+def get_auth_monitor():
+    """Get authentication monitor instance"""
+    global _performance_monitor
+    if not _performance_monitor:
+        _performance_monitor = AuthPerformanceMonitor()
+    return _performance_monitor
+
 class AuthPerformanceMonitor:
     """Monitor authentication performance metrics"""
 
@@ -165,6 +187,10 @@ class AuthPerformanceMonitor:
                 (self.metrics["slow_requests"] / max(self.metrics["total_requests"], 1)) * 100, 2
             )
         }
+    
+    def get_metrics(self) -> dict:
+        """Alias for get_stats() for compatibility"""
+        return self.get_stats()
 
 
 # Global performance monitor instance

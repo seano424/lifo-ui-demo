@@ -11,17 +11,17 @@ from typing import Any
 import structlog
 from fastapi import HTTPException, Request
 
-from lifo_api.app.auth.error_responses import StandardAuthErrors, map_supabase_error
-from lifo_api.app.auth.monitoring import (
+from app.auth.error_responses import StandardAuthErrors, map_supabase_error
+from app.auth.monitoring import (
     record_login_failure,
     record_login_success,
 )
-from lifo_api.app.auth.supabase_api_key_auth import (
+from app.auth.supabase_api_key_auth import (
     SupabaseAPIKeyError,
     get_api_key_auth,
 )
-from lifo_api.app.core.config import settings
-from lifo_api.app.utils.mvp_exceptions import AuthorizationException
+from app.core.config import settings
+from app.utils.mvp_exceptions import AuthorizationException
 
 logger = structlog.get_logger()
 

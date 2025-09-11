@@ -14,7 +14,7 @@ try:
 except ImportError:
     try:
         # Fallback for when running as script
-        from lifo_api.app.core.database.operations import InventoryOperations
+        from app.core.database.operations import InventoryOperations
     except ImportError:
         # Fallback if database operations not available
         InventoryOperations = None  # type: ignore

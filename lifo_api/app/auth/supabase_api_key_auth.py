@@ -13,7 +13,7 @@ import structlog
 from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict
 
-from lifo_api.app.core.config import settings
+from app.core.config import settings
 
 logger = structlog.get_logger()
 

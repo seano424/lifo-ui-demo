@@ -12,12 +12,12 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lifo_api.app.auth.secure_dependencies import (
+from app.auth.secure_dependencies import (
     get_current_user,
     validate_store_access,
 )
-from lifo_api.app.database.connection import get_db
-from lifo_api.app.database.models import StoreSettings, User
+from app.database.connection import get_db
+from app.database.models import StoreSettings, User
 
 logger = structlog.get_logger()
 router = APIRouter()

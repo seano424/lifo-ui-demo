@@ -10,11 +10,11 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lifo_api.app.auth.secure_dependencies import get_current_user
-from lifo_api.app.core.scoring import create_scoring_service
-from lifo_api.app.database.connection import get_db
-from lifo_api.app.database.read_only_operations import get_read_only_operations
-from lifo_api.app.middleware.rate_limiting import (
+from app.auth.secure_dependencies import get_current_user
+from app.core.scoring import create_scoring_service
+from app.database.connection import get_db
+from app.database.read_only_operations import get_read_only_operations
+from app.middleware.rate_limiting import (
     ai_endpoint_rate_limit,
     scoring_rate_limit,
 )
@@ -66,7 +66,7 @@ async def score_store_batch(
         if include_donation_rationale:
             from sqlalchemy import select
 
-            from lifo_api.app.database.inventory_models import StoreSettings
+            from app.database.inventory_models import StoreSettings
 
             result = await db.execute(
                 select(StoreSettings).where(StoreSettings.store_id == store_id)

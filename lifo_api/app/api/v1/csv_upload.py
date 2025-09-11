@@ -13,15 +13,15 @@ import structlog
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lifo_api.app.auth.secure_dependencies import (
+from app.auth.secure_dependencies import (
     get_current_user,
     validate_store_access,
 )
 
 # Import the unified processor from consolidated core
-from lifo_api.app.core.etl.unified_csv_processor import UnifiedCSVProcessor
-from lifo_api.app.database.connection import get_db
-from lifo_api.app.security.csv_security import (
+from app.core.etl.unified_csv_processor import UnifiedCSVProcessor
+from app.database.connection import get_db
+from app.security.csv_security import (
     CSVSecurityError,
     validate_and_sanitize_csv,
 )

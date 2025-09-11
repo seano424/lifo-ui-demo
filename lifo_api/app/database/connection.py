@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 
-from lifo_api.app.core.config import get_database_url, settings
+from app.core.config import get_database_url, settings
 
 logger = structlog.get_logger()
 

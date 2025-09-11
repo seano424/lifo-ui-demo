@@ -11,7 +11,7 @@ from typing import Any
 import structlog
 from pydantic import BaseModel, Field
 
-from lifo_api.app.database.inventory_models import (
+from app.database.inventory_models import (
     ActionType,
     DonationRecipientType,
 )
