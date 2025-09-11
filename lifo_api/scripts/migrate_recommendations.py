@@ -12,15 +12,14 @@ import sys
 from sqlalchemy.ext.asyncio import create_async_engine
 
 # Add parent directory to Python path to import app modules
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.core.config import Settings
 from app.utils.recommendation_migration import RecommendationMigrator
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -38,10 +37,10 @@ class RecommendationMigration:
             # Get all unique recommendations with counts
             result = await conn.execute(
                 """
-                SELECT recommendation, COUNT(*) as count 
-                FROM scoring.product_scores 
-                WHERE recommendation IS NOT NULL 
-                GROUP BY recommendation 
+                SELECT recommendation, COUNT(*) as count
+                FROM scoring.product_scores
+                WHERE recommendation IS NOT NULL
+                GROUP BY recommendation
                 ORDER BY count DESC
                 """
             )
@@ -59,10 +58,7 @@ class RecommendationMigration:
                 percentage = (count / total_count) * 100 if total_count > 0 else 0
                 logger.info(f"  {rec}: {count} ({percentage:.1f}%)")
 
-            return {
-                'recommendations': recommendations,
-                'total_count': total_count
-            }
+            return {"recommendations": recommendations, "total_count": total_count}
 
     async def preview_migration(self) -> list[tuple[str, str]]:
         """Preview what the migration will change"""
@@ -70,9 +66,9 @@ class RecommendationMigration:
             # Get unique recommendations that will change
             result = await conn.execute(
                 """
-                SELECT DISTINCT recommendation 
-                FROM scoring.product_scores 
-                WHERE recommendation IS NOT NULL 
+                SELECT DISTINCT recommendation
+                FROM scoring.product_scores
+                WHERE recommendation IS NOT NULL
                 ORDER BY recommendation
                 """
             )
@@ -93,19 +89,14 @@ class RecommendationMigration:
         """Perform the actual migration"""
         logger.info(f"Starting migration (dry_run={dry_run})")
 
-        migration_stats = {
-            'processed': 0,
-            'updated': 0,
-            'errors': 0,
-            'unchanged': 0
-        }
+        migration_stats = {"processed": 0, "updated": 0, "errors": 0, "unchanged": 0}
 
         async with self.engine.begin() as conn:
             # Get all records that need potential migration
             result = await conn.execute(
                 """
-                SELECT score_id, recommendation 
-                FROM scoring.product_scores 
+                SELECT score_id, recommendation
+                FROM scoring.product_scores
                 WHERE recommendation IS NOT NULL
                 ORDER BY calculated_at DESC
                 """
@@ -114,24 +105,28 @@ class RecommendationMigration:
             batch_updates = []
 
             for score_id, recommendation in result.fetchall():
-                migration_stats['processed'] += 1
+                migration_stats["processed"] += 1
 
                 try:
-                    migrated_recommendation = self.migrator.migrate_recommendation(recommendation)
+                    migrated_recommendation = self.migrator.migrate_recommendation(
+                        recommendation
+                    )
 
                     if recommendation != migrated_recommendation:
-                        batch_updates.append({
-                            'score_id': score_id,
-                            'old_recommendation': recommendation,
-                            'new_recommendation': migrated_recommendation
-                        })
-                        migration_stats['updated'] += 1
+                        batch_updates.append(
+                            {
+                                "score_id": score_id,
+                                "old_recommendation": recommendation,
+                                "new_recommendation": migrated_recommendation,
+                            }
+                        )
+                        migration_stats["updated"] += 1
                     else:
-                        migration_stats['unchanged'] += 1
+                        migration_stats["unchanged"] += 1
 
                 except Exception as e:
                     logger.error(f"Error migrating score_id {score_id}: {e}")
-                    migration_stats['errors'] += 1
+                    migration_stats["errors"] += 1
 
             logger.info(f"Prepared {len(batch_updates)} updates")
 
@@ -140,13 +135,13 @@ class RecommendationMigration:
                 for batch in batch_updates:
                     await conn.execute(
                         """
-                        UPDATE scoring.product_scores 
-                        SET recommendation = $1, 
+                        UPDATE scoring.product_scores
+                        SET recommendation = $1,
                             calculated_at = COALESCE(calculated_at, NOW())
                         WHERE score_id = $2
                         """,
-                        batch['new_recommendation'],
-                        batch['score_id']
+                        batch["new_recommendation"],
+                        batch["score_id"],
                     )
 
                 logger.info("Migration completed successfully!")
@@ -162,9 +157,9 @@ class RecommendationMigration:
             result = await conn.execute(
                 """
                 SELECT recommendation, COUNT(*) as count
-                FROM scoring.product_scores 
+                FROM scoring.product_scores
                 WHERE recommendation IN (
-                    'immediate_action', 'high_priority', 'medium_priority', 
+                    'immediate_action', 'high_priority', 'medium_priority',
                     'discount_heavily', 'normal'
                 )
                 GROUP BY recommendation
@@ -179,7 +174,9 @@ class RecommendationMigration:
                     logger.warning(f"  {rec}: {count} records")
                 return False
             else:
-                logger.info("✅ No legacy recommendations found - migration successful!")
+                logger.info(
+                    "✅ No legacy recommendations found - migration successful!"
+                )
                 return True
 
     async def close(self):
@@ -191,11 +188,13 @@ async def main():
     """Main migration function"""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Migrate recommendation formats')
-    parser.add_argument('--dry-run', action='store_true',
-                       help='Preview changes without making them')
-    parser.add_argument('--skip-analysis', action='store_true',
-                       help='Skip initial data analysis')
+    parser = argparse.ArgumentParser(description="Migrate recommendation formats")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Preview changes without making them"
+    )
+    parser.add_argument(
+        "--skip-analysis", action="store_true", help="Skip initial data analysis"
+    )
     args = parser.parse_args()
 
     # Get database URL
@@ -211,7 +210,7 @@ async def main():
         # Step 1: Analyze current data
         if not args.skip_analysis:
             logger.info("=== ANALYZING CURRENT DATA ===")
-            current_data = await migration.analyze_current_data()
+            await migration.analyze_current_data()
 
             # Step 2: Preview migration
             logger.info("\n=== MIGRATION PREVIEW ===")

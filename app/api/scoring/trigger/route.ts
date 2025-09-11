@@ -1,6 +1,7 @@
 // app/api/scoring/trigger/route.ts
-import { type NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
           Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
         },
         signal: AbortSignal.timeout(30000), // Allow 30 seconds for background scoring
-      }
+      },
     )
 
     if (!result.ok) {
@@ -51,28 +52,44 @@ export async function POST(request: NextRequest) {
               autoRefreshToken: false,
               persistSession: false,
             },
-          }
+          },
         )
 
         // Prepare data for upsert
-        const upsertData = scoringResult.results.map((result: any) => ({
-          batch_id: result.batch_id,
-          store_id: result.store_id,
-          expiry_score: parseFloat(result.expiry_score),
-          velocity_score: parseFloat(result.velocity_score),
-          margin_score: parseFloat(result.margin_score),
-          composite_score: parseFloat(result.composite_score),
-          recommendation: result.recommendation,
-          urgency_level: result.urgency_level,
-          discount_percent: parseInt(result.discount_percent),
-          reason: result.reason,
-          ml_enhanced: Boolean(result.ml_enhanced),
-          confidence_level: parseFloat(result.confidence_level),
-          calculated_at: result.calculated_at || new Date().toISOString(),
-        }))
+        const upsertData = scoringResult.results.map(
+          (result: {
+            batch_id: string
+            store_id: string
+            expiry_score: string
+            velocity_score: string
+            margin_score: string
+            composite_score: string
+            recommendation: string
+            urgency_level: string
+            discount_percent: string
+            reason: string
+            ml_enhanced: string
+            confidence_level: string
+            calculated_at?: string
+          }) => ({
+            batch_id: result.batch_id,
+            store_id: result.store_id,
+            expiry_score: parseFloat(result.expiry_score),
+            velocity_score: parseFloat(result.velocity_score),
+            margin_score: parseFloat(result.margin_score),
+            composite_score: parseFloat(result.composite_score),
+            recommendation: result.recommendation,
+            urgency_level: result.urgency_level,
+            discount_percent: parseInt(result.discount_percent, 10),
+            reason: result.reason,
+            ml_enhanced: Boolean(result.ml_enhanced),
+            confidence_level: parseFloat(result.confidence_level),
+            calculated_at: result.calculated_at || new Date().toISOString(),
+          }),
+        )
 
         // Perform bulk upsert
-        const { data, error } = await supabase
+        const { error } = await supabase
           .schema('scoring')
           .from('product_scores')
           .upsert(upsertData, {
@@ -83,7 +100,7 @@ export async function POST(request: NextRequest) {
         if (error) {
           throw new Error(`Supabase upsert failed: ${error.message}`)
         }
-      } catch (supabaseError) {
+      } catch (_supabaseError) {
         // Don't fail the entire operation, just log the error
       }
     }
@@ -104,7 +121,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to trigger scoring',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

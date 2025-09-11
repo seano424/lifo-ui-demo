@@ -101,7 +101,12 @@ class CSVToBatchAdapter:
 
             # Extract optional fields with defaults
             brand = row.get("brand", "").strip() or None
-            # Handle both old and new category formats for backward compatibility\n            category = row.get(\"category_code\", \"\").strip() or row.get(\"category\", \"\").strip() or None
+            # Handle both old and new category formats for backward compatibility
+            category = (
+                row.get("category_code", "").strip()
+                or row.get("category", "").strip()
+                or None
+            )
 
             # Parse prices
             cost_price = CSVToBatchAdapter._parse_float(

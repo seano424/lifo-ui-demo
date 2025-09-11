@@ -215,7 +215,7 @@ export class InventoryOperations {
   }): Promise<GlobalProduct> {
     // Resolve category to UUID first
     const category_id = await this.resolveCategoryToUuid(productData.primary_category)
-    
+
     const { data, error } = await this.supabase
       .schema('inventory')
       .from('products')
@@ -507,70 +507,70 @@ export class InventoryOperations {
       // Map common category names to your actual database categories
       const categoryMapping: Record<string, string> = {
         // Dairy & Eggs
-        'dairy': 'dairy_eggs',
-        'eggs': 'eggs',
-        'milk': 'milk',
-        'cheese': 'cheese',
-        'yogurt': 'yogurt',
-        'butter': 'butter_spreads',
-        'spreads': 'butter_spreads',
-        
+        dairy: 'dairy_eggs',
+        eggs: 'eggs',
+        milk: 'milk',
+        cheese: 'cheese',
+        yogurt: 'yogurt',
+        butter: 'butter_spreads',
+        spreads: 'butter_spreads',
+
         // Meat & Seafood
-        'meat': 'fresh_meat',
-        'beef': 'fresh_meat',
-        'pork': 'fresh_meat',
-        'lamb': 'fresh_meat',
-        'poultry': 'fresh_poultry',
-        'chicken': 'fresh_poultry',
-        'turkey': 'fresh_poultry',
-        'fish': 'fresh_fish_seafood',
-        'seafood': 'fresh_fish_seafood',
-        'salmon': 'fresh_fish_seafood',
-        'processed_meat': 'processed_meat',
-        'sausage': 'processed_meat',
-        'deli': 'deli_prepared',
-        
+        meat: 'fresh_meat',
+        beef: 'fresh_meat',
+        pork: 'fresh_meat',
+        lamb: 'fresh_meat',
+        poultry: 'fresh_poultry',
+        chicken: 'fresh_poultry',
+        turkey: 'fresh_poultry',
+        fish: 'fresh_fish_seafood',
+        seafood: 'fresh_fish_seafood',
+        salmon: 'fresh_fish_seafood',
+        processed_meat: 'processed_meat',
+        sausage: 'processed_meat',
+        deli: 'deli_prepared',
+
         // Fresh Produce
-        'vegetables': 'vegetables',
-        'fruits': 'fruits',
-        'produce': 'fresh_produce',
-        'fresh': 'fresh_produce',
-        'herbs': 'herbs_aromatics',
-        'aromatics': 'herbs_aromatics',
-        
+        vegetables: 'vegetables',
+        fruits: 'fruits',
+        produce: 'fresh_produce',
+        fresh: 'fresh_produce',
+        herbs: 'herbs_aromatics',
+        aromatics: 'herbs_aromatics',
+
         // Bakery
-        'bread': 'bakery_fresh',
-        'bakery': 'bakery_fresh',
-        'baked': 'bakery_fresh',
-        
+        bread: 'bakery_fresh',
+        bakery: 'bakery_fresh',
+        baked: 'bakery_fresh',
+
         // Pantry & Dry Goods
-        'pasta': 'dry_goods',
-        'rice': 'dry_goods',
-        'grains': 'dry_goods',
-        'flour': 'dry_goods',
-        'canned': 'canned_jarred',
-        'jarred': 'canned_jarred',
-        'dry': 'dry_goods',
-        'pantry': 'pantry_staples',
-        'staples': 'pantry_staples',
-        
+        pasta: 'dry_goods',
+        rice: 'dry_goods',
+        grains: 'dry_goods',
+        flour: 'dry_goods',
+        canned: 'canned_jarred',
+        jarred: 'canned_jarred',
+        dry: 'dry_goods',
+        pantry: 'pantry_staples',
+        staples: 'pantry_staples',
+
         // Other Categories
-        'frozen': 'frozen_foods',
-        'beverage': 'beverages',
-        'beverages': 'beverages',
-        'drinks': 'beverages',
-        'snacks': 'snacks_confectionery',
-        'candy': 'snacks_confectionery',
-        'confectionery': 'snacks_confectionery',
-        'health': 'health_beauty',
-        'beauty': 'health_beauty',
-        'household': 'household_other',
-        'cleaning': 'household_other',
-        'other': 'household_other',
-        'spices': 'spices_condiments',
-        'condiments': 'spices_condiments',
-        'chilled': 'chilled_packaged',
-        'packaged': 'chilled_packaged'
+        frozen: 'frozen_foods',
+        beverage: 'beverages',
+        beverages: 'beverages',
+        drinks: 'beverages',
+        snacks: 'snacks_confectionery',
+        candy: 'snacks_confectionery',
+        confectionery: 'snacks_confectionery',
+        health: 'health_beauty',
+        beauty: 'health_beauty',
+        household: 'household_other',
+        cleaning: 'household_other',
+        other: 'household_other',
+        spices: 'spices_condiments',
+        condiments: 'spices_condiments',
+        chilled: 'chilled_packaged',
+        packaged: 'chilled_packaged',
       }
 
       const normalizedCategory = categoryName.toLowerCase().trim()
@@ -586,7 +586,7 @@ export class InventoryOperations {
 
       if (error || !data) {
         console.warn(`Category '${categoryName}' not found, falling back to dry_goods`)
-        
+
         // Fallback to dry_goods category
         const { data: fallbackData, error: fallbackError } = await this.supabase
           .schema('inventory')
@@ -605,7 +605,9 @@ export class InventoryOperations {
       return data.category_id
     } catch (error) {
       console.error(`Error resolving category '${categoryName}':`, error)
-      throw new Error(`Category resolution failed: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Category resolution failed: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
@@ -637,17 +639,17 @@ export class InventoryOperations {
     const _insertStartTime = performance.now()
 
     // STEP 1: Resolve categories to UUIDs for new database schema
-        const enrichedBatchData = await Promise.all(
-          batchData.map(async (item) => {
-            const category_id = await this.resolveCategoryToUuid(item.category || 'dry_goods')
-            return {
-              ...item,
-              category_id, // Add UUID for new schema
-            }
-          })
-        )
-    
-        // Use the enhanced function that handles complete product lifecycle
+    const enrichedBatchData = await Promise.all(
+      batchData.map(async item => {
+        const category_id = await this.resolveCategoryToUuid(item.category || 'dry_goods')
+        return {
+          ...item,
+          category_id, // Add UUID for new schema
+        }
+      }),
+    )
+
+    // Use the enhanced function that handles complete product lifecycle
     const { data, error } = await (
       this.supabase.rpc as unknown as (
         name: string,
@@ -750,6 +752,16 @@ export class InventoryOperations {
       expiry_date: string
       reason: string
     }>
+    performance_metrics: {
+      items_per_second: number
+      duplicate_detection_ms: number
+      product_resolution_ms: number
+      batch_insertion_ms: number
+      total_time_ms: number
+      store_products_linked: number
+      products_created: number
+      database_processing_time_ms: number
+    }
   }> {
     const errors: string[] = []
     let processed = 0
@@ -808,7 +820,7 @@ export class InventoryOperations {
         } else {
           // Create new global product with proper category_id
           const category_id = await this.resolveCategoryToUuid(csvItem.Category || 'dry_goods')
-          
+
           const { data: newProduct, error: createProductError } = await this.supabase
             .schema('inventory')
             .from('products')
@@ -904,11 +916,13 @@ export class InventoryOperations {
       }
     }
 
-    console.log(`✅ [DB-OPS] Individual processing completed: ${processed} items processed, ${errors.length} errors`)
-    
-    return { 
-      processed, 
-      errors, 
+    console.log(
+      `✅ [DB-OPS] Individual processing completed: ${processed} items processed, ${errors.length} errors`,
+    )
+
+    return {
+      processed,
+      errors,
       duplicates_skipped: [],
       performance_metrics: {
         items_per_second: processed > 0 ? Math.round((processed / 1000) * 1000) : 0,
@@ -919,7 +933,7 @@ export class InventoryOperations {
         store_products_linked: processed,
         products_created: processed,
         database_processing_time_ms: 0,
-      }
+      },
     }
   }
 

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { InventoryOperations } from '@/lib/database/operations'
+import { createClient } from '@/lib/supabase/server'
 
 interface ProcessedCsvItem {
   sku: string
@@ -35,24 +35,14 @@ export async function POST(request: NextRequest) {
       hasMetadata: !!metadata,
     })
 
-    if (
-      !processedData ||
-      !Array.isArray(processedData) ||
-      processedData.length === 0
-    ) {
+    if (!processedData || !Array.isArray(processedData) || processedData.length === 0) {
       console.error('❌ [SAVE-CSV-BATCHES] No valid data provided')
-      return NextResponse.json(
-        { error: 'No valid data provided' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'No valid data provided' }, { status: 400 })
     }
 
     if (!storeId) {
       console.error('❌ [SAVE-CSV-BATCHES] No store ID provided')
-      return NextResponse.json(
-        { error: 'Store ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Store ID is required' }, { status: 400 })
     }
 
     // Get Supabase client
@@ -65,10 +55,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (userError || !user) {
       console.error('❌ [SAVE-CSV-BATCHES] Authentication failed:', userError)
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
     console.log('✅ [SAVE-CSV-BATCHES] User authenticated:', user.id)
@@ -78,46 +65,37 @@ export async function POST(request: NextRequest) {
 
     // Validate store access
     // TODO: Fix store access validation - temporarily bypassed for CSV upload testing
-    console.log(
-      '⚠️ [SAVE-CSV-BATCHES] Store access validation temporarily bypassed'
-    )
+    console.log('⚠️ [SAVE-CSV-BATCHES] Store access validation temporarily bypassed')
     const hasAccess = true // await inventoryOps.validateStoreAccess(storeId, user.id)
     if (!hasAccess) {
       console.error('❌ [SAVE-CSV-BATCHES] Store access denied')
-      return NextResponse.json(
-        { error: 'Access denied to store' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Access denied to store' }, { status: 403 })
     }
 
     console.log('✅ [SAVE-CSV-BATCHES] Store access validated')
 
     // Use the existing insertBatchesBulk method from InventoryOperations
-    console.log(
-      '🔄 [SAVE-CSV-BATCHES] Starting batch creation with InventoryOperations...'
-    )
+    console.log('🔄 [SAVE-CSV-BATCHES] Starting batch creation with InventoryOperations...')
 
     // Convert processed data to the format expected by insertBatchesBulk
-    const csvDataForBulkInsert = processedData.map(
-      (item: ProcessedCsvItem) => ({
-        sku: item.sku,
-        product_name: item.product_name,
-        category: item.category_code, // Keep as category_code, RPC function will map it
-        quantity: item.quantity,
-        expiry_date: item.expiry_date,
-        brand: item.brand || '',
-        cost_price: item.cost_price || 0,
-        selling_price: item.selling_price || 0,
-        manufacture_date: item.manufacture_date || '',
-        location: item.location_code || '', // Note: changed to 'location' to match RPC function
-        unit_type: item.unit_type || 'pcs',
-        barcode: item.barcode || '', // Empty strings will be converted to NULL by RPC function
-        supplier_code: item.supplier_code || '',
-      })
-    )
+    const csvDataForBulkInsert = processedData.map((item: ProcessedCsvItem) => ({
+      sku: item.sku,
+      product_name: item.product_name,
+      category: item.category_code, // Keep as category_code, RPC function will map it
+      quantity: item.quantity,
+      expiry_date: item.expiry_date,
+      brand: item.brand || '',
+      cost_price: item.cost_price || 0,
+      selling_price: item.selling_price || 0,
+      manufacture_date: item.manufacture_date || '',
+      location: item.location_code || '', // Note: changed to 'location' to match RPC function
+      unit_type: item.unit_type || 'pcs',
+      barcode: item.barcode || '', // Empty strings will be converted to NULL by RPC function
+      supplier_code: item.supplier_code || '',
+    }))
 
     console.log(
-      `📦 [SAVE-CSV-BATCHES] Converted ${csvDataForBulkInsert.length} items for bulk insert`
+      `📦 [SAVE-CSV-BATCHES] Converted ${csvDataForBulkInsert.length} items for bulk insert`,
     )
 
     try {
@@ -125,7 +103,7 @@ export async function POST(request: NextRequest) {
       const bulkResult = await inventoryOps.insertBatchesBulk(
         storeId,
         user.id,
-        csvDataForBulkInsert
+        csvDataForBulkInsert,
       )
 
       console.log('✅ [SAVE-CSV-BATCHES] Bulk insert completed:', {
@@ -143,8 +121,12 @@ export async function POST(request: NextRequest) {
       const scoringUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/scoring/trigger`
       console.log('🎯 [SAVE-CSV-BATCHES] Triggering automatic scoring calculations...')
       console.log('🔗 [SAVE-CSV-BATCHES] Scoring URL:', scoringUrl)
-      console.log('📦 [SAVE-CSV-BATCHES] Scoring request data:', { storeId, savedCount, triggeredBy: 'csv-import' })
-      
+      console.log('📦 [SAVE-CSV-BATCHES] Scoring request data:', {
+        storeId,
+        savedCount,
+        triggeredBy: 'csv-import',
+      })
+
       try {
         const scoringStartTime = Date.now()
         const scoringResponse = await fetch(scoringUrl, {
@@ -152,19 +134,23 @@ export async function POST(request: NextRequest) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             storeId,
             metadata: {
               triggeredBy: 'csv-import',
               itemsImported: savedCount,
-              timestamp: new Date().toISOString()
-            }
-          })
+              timestamp: new Date().toISOString(),
+            },
+          }),
         })
 
         const scoringResponseTime = Date.now() - scoringStartTime
         console.log(`⏱️ [SAVE-CSV-BATCHES] Scoring request completed in ${scoringResponseTime}ms`)
-        console.log('📊 [SAVE-CSV-BATCHES] Scoring response status:', scoringResponse.status, scoringResponse.statusText)
+        console.log(
+          '📊 [SAVE-CSV-BATCHES] Scoring response status:',
+          scoringResponse.status,
+          scoringResponse.statusText,
+        )
 
         if (scoringResponse.ok) {
           try {
@@ -173,29 +159,38 @@ export async function POST(request: NextRequest) {
               message: scoringResult.message,
               storeId: scoringResult.storeId,
               timestamp: scoringResult.timestamp,
-              responseTime: scoringResponseTime + 'ms'
+              responseTime: `${scoringResponseTime}ms`,
             })
           } catch (jsonError) {
-            console.warn('⚠️ [SAVE-CSV-BATCHES] Scoring response OK but JSON parse failed:', jsonError)
+            console.warn(
+              '⚠️ [SAVE-CSV-BATCHES] Scoring response OK but JSON parse failed:',
+              jsonError,
+            )
           }
         } else {
           // Get error details from response
-          let errorDetails = 'Unknown error'
+          let _errorDetails = 'Unknown error'
           try {
             const errorResponse = await scoringResponse.text()
-            errorDetails = errorResponse || `HTTP ${scoringResponse.status}: ${scoringResponse.statusText}`
+            _errorDetails =
+              errorResponse || `HTTP ${scoringResponse.status}: ${scoringResponse.statusText}`
             console.error('❌ [SAVE-CSV-BATCHES] Scoring trigger failed:', {
               status: scoringResponse.status,
               statusText: scoringResponse.statusText,
               url: scoringUrl,
               responseBody: errorResponse,
               storeId,
-              responseTime: scoringResponseTime + 'ms'
+              responseTime: `${scoringResponseTime}ms`,
             })
           } catch (textError) {
-            console.error('❌ [SAVE-CSV-BATCHES] Scoring trigger failed and could not read error response:', textError)
+            console.error(
+              '❌ [SAVE-CSV-BATCHES] Scoring trigger failed and could not read error response:',
+              textError,
+            )
           }
-          console.warn('⚠️ [SAVE-CSV-BATCHES] Scoring trigger failed but continuing with CSV import success')
+          console.warn(
+            '⚠️ [SAVE-CSV-BATCHES] Scoring trigger failed but continuing with CSV import success',
+          )
         }
       } catch (scoringError) {
         console.error('💥 [SAVE-CSV-BATCHES] Scoring trigger network/request error:', {
@@ -204,7 +199,7 @@ export async function POST(request: NextRequest) {
           stack: scoringError instanceof Error ? scoringError.stack : 'No stack',
           url: scoringUrl,
           storeId,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         })
         // Don't fail the entire operation if scoring fails
       }
@@ -217,9 +212,7 @@ export async function POST(request: NextRequest) {
         message: `Successfully saved ${savedCount} inventory batches`,
         performance_metrics: {
           items_per_second:
-            savedCount > 0
-              ? Math.round(savedCount / (bulkResult.processing_time_ms / 1000))
-              : 0,
+            savedCount > 0 ? Math.round(savedCount / (bulkResult.processing_time_ms / 1000)) : 0,
           processing_time_ms: bulkResult.processing_time_ms,
           store_products_linked: bulkResult.store_products_linked,
           products_created: bulkResult.products_created,
@@ -235,16 +228,14 @@ export async function POST(request: NextRequest) {
       console.error('💥 [SAVE-CSV-BATCHES] Bulk insert failed:', bulkError)
 
       // If the bulk insert fails, try the individual processing fallback
-      console.log(
-        '🔄 [SAVE-CSV-BATCHES] Falling back to individual processing...'
-      )
+      console.log('🔄 [SAVE-CSV-BATCHES] Falling back to individual processing...')
 
       try {
         // Use processCsvBatch which returns the old format with errors array
         const fallbackResult = await inventoryOps.processCsvBatch(
           csvDataForBulkInsert,
           storeId,
-          user.id
+          user.id,
         )
 
         console.log('✅ [SAVE-CSV-BATCHES] Fallback processing completed:', {
@@ -257,13 +248,13 @@ export async function POST(request: NextRequest) {
           const fallbackScoringUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/scoring/trigger`
           console.log('🎯 [SAVE-CSV-BATCHES] Triggering scoring for fallback processing...')
           console.log('🔗 [SAVE-CSV-BATCHES] Fallback scoring URL:', fallbackScoringUrl)
-          console.log('📦 [SAVE-CSV-BATCHES] Fallback scoring request data:', { 
-            storeId, 
-            processedCount: fallbackResult.processed, 
+          console.log('📦 [SAVE-CSV-BATCHES] Fallback scoring request data:', {
+            storeId,
+            processedCount: fallbackResult.processed,
             errorsCount: fallbackResult.errors.length,
-            triggeredBy: 'csv-import-fallback' 
+            triggeredBy: 'csv-import-fallback',
           })
-          
+
           try {
             const fallbackScoringStartTime = Date.now()
             const scoringResponse = await fetch(fallbackScoringUrl, {
@@ -271,20 +262,26 @@ export async function POST(request: NextRequest) {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ 
+              body: JSON.stringify({
                 storeId,
                 metadata: {
                   triggeredBy: 'csv-import-fallback',
                   itemsProcessed: fallbackResult.processed,
                   errorsCount: fallbackResult.errors.length,
-                  timestamp: new Date().toISOString()
-                }
-              })
+                  timestamp: new Date().toISOString(),
+                },
+              }),
             })
 
             const fallbackScoringResponseTime = Date.now() - fallbackScoringStartTime
-            console.log(`⏱️ [SAVE-CSV-BATCHES] Fallback scoring request completed in ${fallbackScoringResponseTime}ms`)
-            console.log('📊 [SAVE-CSV-BATCHES] Fallback scoring response status:', scoringResponse.status, scoringResponse.statusText)
+            console.log(
+              `⏱️ [SAVE-CSV-BATCHES] Fallback scoring request completed in ${fallbackScoringResponseTime}ms`,
+            )
+            console.log(
+              '📊 [SAVE-CSV-BATCHES] Fallback scoring response status:',
+              scoringResponse.status,
+              scoringResponse.statusText,
+            )
 
             if (scoringResponse.ok) {
               try {
@@ -293,11 +290,14 @@ export async function POST(request: NextRequest) {
                   message: scoringResult.message,
                   storeId: scoringResult.storeId,
                   timestamp: scoringResult.timestamp,
-                  responseTime: fallbackScoringResponseTime + 'ms',
-                  method: 'fallback'
+                  responseTime: `${fallbackScoringResponseTime}ms`,
+                  method: 'fallback',
                 })
               } catch (jsonError) {
-                console.warn('⚠️ [SAVE-CSV-BATCHES] Fallback scoring response OK but JSON parse failed:', jsonError)
+                console.warn(
+                  '⚠️ [SAVE-CSV-BATCHES] Fallback scoring response OK but JSON parse failed:',
+                  jsonError,
+                )
               }
             } else {
               try {
@@ -308,11 +308,14 @@ export async function POST(request: NextRequest) {
                   url: fallbackScoringUrl,
                   responseBody: errorResponse,
                   storeId,
-                  responseTime: fallbackScoringResponseTime + 'ms',
-                  method: 'fallback'
+                  responseTime: `${fallbackScoringResponseTime}ms`,
+                  method: 'fallback',
                 })
               } catch (textError) {
-                console.error('❌ [SAVE-CSV-BATCHES] Fallback scoring trigger failed and could not read error response:', textError)
+                console.error(
+                  '❌ [SAVE-CSV-BATCHES] Fallback scoring trigger failed and could not read error response:',
+                  textError,
+                )
               }
             }
           } catch (scoringError) {
@@ -323,11 +326,13 @@ export async function POST(request: NextRequest) {
               url: fallbackScoringUrl,
               storeId,
               method: 'fallback',
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             })
           }
         } else {
-          console.log('⏭️ [SAVE-CSV-BATCHES] Skipping fallback scoring trigger - no items were processed')
+          console.log(
+            '⏭️ [SAVE-CSV-BATCHES] Skipping fallback scoring trigger - no items were processed',
+          )
         }
 
         return NextResponse.json({
@@ -352,7 +357,7 @@ export async function POST(request: NextRequest) {
       } catch (fallbackError) {
         console.error(
           '💥 [SAVE-CSV-BATCHES] Both bulk and fallback processing failed:',
-          fallbackError
+          fallbackError,
         )
 
         return NextResponse.json(
@@ -366,7 +371,7 @@ export async function POST(request: NextRequest) {
             ],
             message: 'All processing methods failed',
           },
-          { status: 500 }
+          { status: 500 },
         )
       }
     }
@@ -377,7 +382,7 @@ export async function POST(request: NextRequest) {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

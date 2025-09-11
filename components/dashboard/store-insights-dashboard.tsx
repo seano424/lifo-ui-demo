@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, ArrowRightFromLine, Loader2, TrendingUp, RefreshCw } from 'lucide-react'
+import { AlertTriangle, ArrowRightFromLine, Loader2, RefreshCw, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -28,46 +28,45 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
   const triggerScoring = async () => {
     if (!storeId) return
-    
+
     setIsRescoring(true)
     setScoringLogs(['🎯 Starting manual scoring trigger...'])
-    
+
     try {
       setScoringLogs(prev => [...prev, '📡 Calling scoring API...'])
-      
+
       const response = await fetch('/api/scoring/trigger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          storeId, 
+        body: JSON.stringify({
+          storeId,
           triggeredBy: 'manual-debug',
-          debug: true 
-        })
+          debug: true,
+        }),
       })
-      
+
       if (!response.ok) {
         throw new Error(`Scoring failed: ${response.status}`)
       }
-      
+
       const result = await response.json()
       setScoringLogs(prev => [
-        ...prev, 
+        ...prev,
         `✅ Scoring completed successfully!`,
         `📊 Processed: ${result.result?.batches_processed || 0} batches`,
         `⚡ High priority: ${result.result?.high_priority_count || 0} items`,
         `⏱️ Processing time: ${result.result?.processing_time_seconds || 0}s`,
-        `🔄 Please refresh the page to see updated results`
+        `🔄 Please refresh the page to see updated results`,
       ])
-      
+
       // Auto-refresh insights after 2 seconds
       setTimeout(() => {
         window.location.reload()
       }, 2000)
-      
     } catch (error) {
       setScoringLogs(prev => [
-        ...prev, 
-        `❌ Scoring failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        ...prev,
+        `❌ Scoring failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       ])
     } finally {
       setIsRescoring(false)
@@ -164,12 +163,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
         </div>
 
         <div className="flex gap-2">
-          <Button 
-            onClick={triggerScoring}
-            disabled={isRescoring}
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={triggerScoring} disabled={isRescoring} variant="outline" size="sm">
             {isRescoring ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
             ) : (
@@ -177,7 +171,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
             )}
             {isRescoring ? 'Scoring...' : 'Re-Score'}
           </Button>
-          
+
           <Button className="flex dark:hidden" asChild>
             <Link href="/dashboard/actionable-batches">
               {t('takeAction')} <ArrowRightFromLine className="w-4 h-4" />
@@ -285,22 +279,20 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           <Card>
             <CardHeader>
               <CardTitle>🔍 Scoring Debug Logs</CardTitle>
-              <CardDescription>
-                Real-time logs from the latest scoring operation
-              </CardDescription>
+              <CardDescription>Real-time logs from the latest scoring operation</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-1 font-mono text-sm bg-muted p-4 rounded-lg max-h-60 overflow-y-auto">
                 {scoringLogs.map((log, index) => (
-                  <div key={index} className="text-foreground">
+                  <div key={`log-${index}-${log.slice(0, 10)}`} className="text-foreground">
                     {log}
                   </div>
                 ))}
               </div>
-              <Button 
-                onClick={() => setScoringLogs([])} 
-                variant="outline" 
-                size="sm" 
+              <Button
+                onClick={() => setScoringLogs([])}
+                variant="outline"
+                size="sm"
                 className="mt-3"
               >
                 Clear Logs

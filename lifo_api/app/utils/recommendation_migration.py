@@ -4,7 +4,6 @@ Handles migration from legacy recommendation formats to standardized FastAPI for
 """
 
 
-
 class RecommendationMigrator:
     """Handles mapping between legacy and FastAPI recommendation formats"""
 
@@ -16,7 +15,6 @@ class RecommendationMigrator:
         "medium_priority": "discount_moderate",
         "discount_heavily": "discount_aggressive",
         "normal": "maintain",
-
         # Keep existing FastAPI standards as-is
         "dispose": "dispose",
         "discount_aggressive": "discount_aggressive",
@@ -50,10 +48,10 @@ class RecommendationMigrator:
     def migrate_recommendation(cls, legacy_recommendation: str) -> str:
         """
         Migrate a legacy recommendation to FastAPI standard format
-        
+
         Args:
             legacy_recommendation: The legacy recommendation value
-            
+
         Returns:
             str: Standardized FastAPI recommendation
         """
@@ -94,10 +92,10 @@ class RecommendationMigrator:
     def get_display_text(cls, recommendation: str) -> str:
         """
         Get user-friendly display text for a recommendation
-        
+
         Args:
             recommendation: FastAPI standard recommendation
-            
+
         Returns:
             str: Human-readable display text
         """
@@ -105,18 +103,17 @@ class RecommendationMigrator:
         standard_recommendation = cls.migrate_recommendation(recommendation)
 
         return cls.FASTAPI_TO_DISPLAY_MAP.get(
-            standard_recommendation,
-            recommendation.replace("_", " ").title()
+            standard_recommendation, recommendation.replace("_", " ").title()
         )
 
     @classmethod
     def get_priority_score(cls, recommendation: str) -> int:
         """
         Get priority score for sorting (lower = higher priority)
-        
+
         Args:
             recommendation: Recommendation to score
-            
+
         Returns:
             int: Priority score (1 = highest priority)
         """
@@ -129,10 +126,10 @@ class RecommendationMigrator:
     def get_action_category(cls, recommendation: str) -> str:
         """
         Categorize recommendation into action type
-        
+
         Args:
             recommendation: Recommendation to categorize
-            
+
         Returns:
             str: Action category (critical, action_needed, monitor, normal)
         """
@@ -151,10 +148,10 @@ class RecommendationMigrator:
     def should_show_discount_suggestion(cls, recommendation: str) -> bool:
         """
         Check if recommendation should show discount suggestions
-        
+
         Args:
             recommendation: Recommendation to check
-            
+
         Returns:
             bool: True if discount suggestions should be shown
         """
@@ -162,14 +159,16 @@ class RecommendationMigrator:
         return standard_recommendation in ["discount_aggressive", "discount_moderate"]
 
     @classmethod
-    def get_suggested_discount_range(cls, recommendation: str, margin_percent: float) -> dict[str, int] | None:
+    def get_suggested_discount_range(
+        cls, recommendation: str, margin_percent: float
+    ) -> dict[str, int] | None:
         """
         Get suggested discount range based on recommendation and margin
-        
+
         Args:
             recommendation: FastAPI recommendation
             margin_percent: Product margin percentage
-            
+
         Returns:
             Optional[Dict[str, int]]: Dict with 'min' and 'max' discount percentages
         """
@@ -179,18 +178,14 @@ class RecommendationMigrator:
             return None
 
         # Calculate safe discount range based on margin
-        max_safe_discount = min(int(margin_percent * 0.8), 60)  # Don't go below 20% margin
+        max_safe_discount = min(
+            int(margin_percent * 0.8), 60
+        )  # Don't go below 20% margin
 
         if standard_recommendation == "discount_aggressive":
-            return {
-                "min": min(20, max_safe_discount),
-                "max": max_safe_discount
-            }
+            return {"min": min(20, max_safe_discount), "max": max_safe_discount}
         elif standard_recommendation == "discount_moderate":
-            return {
-                "min": 5,
-                "max": min(25, max_safe_discount)
-            }
+            return {"min": 5, "max": min(25, max_safe_discount)}
 
         return None
 

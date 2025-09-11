@@ -699,7 +699,10 @@ class ScoringService:
                 recommendation=migrate_recommendation(recommendation["action"]),
                 urgency_level=urgency_level,
                 discount_percent=recommendation.get("discount_percent", 0),
-                reason=recommendation.get("reason", f"Scored {composite_score:.2f} based on {urgency_level} urgency"),
+                reason=recommendation.get(
+                    "reason",
+                    f"Scored {composite_score:.2f} based on {urgency_level} urgency",
+                ),
                 confidence_level=1.0,  # Rule-based scoring has high confidence
                 ml_enhanced=False,
                 calculated_at=datetime.utcnow(),
@@ -842,7 +845,9 @@ class ScoringService:
                     )
 
                     # Determine urgency level for bulk scoring
-                    urgency_level = self._get_urgency_level(days_to_expiry, composite_score)
+                    urgency_level = self._get_urgency_level(
+                        days_to_expiry, composite_score
+                    )
 
                     # Create scoring result
                     score_result = ScoringResult(
@@ -855,16 +860,22 @@ class ScoringService:
                         velocity_score=velocity_score,
                         margin_score=margin_score,
                         composite_score=composite_score,
-                        recommendation=migrate_recommendation(recommendation.get("action", "maintain")),
+                        recommendation=migrate_recommendation(
+                            recommendation.get("action", "maintain")
+                        ),
                         urgency_level=urgency_level,
                         discount_percent=recommendation.get("discount_percent", 0),
-                        reason=recommendation.get("reason", f"Score: {composite_score:.2f}. Automated scoring based on expiry, velocity, and margin factors."),
+                        reason=recommendation.get(
+                            "reason",
+                            f"Score: {composite_score:.2f}. Automated scoring based on expiry, velocity, and margin factors.",
+                        ),
                         confidence_level=0.85,
                         ml_enhanced=True,
                         calculated_at=datetime.utcnow(),
                         days_to_expiry=days_to_expiry,
                         current_quantity=batch_data["current_quantity"],
-                        potential_loss=batch_data["current_quantity"] * batch_data.get("selling_price", 0),
+                        potential_loss=batch_data["current_quantity"]
+                        * batch_data.get("selling_price", 0),
                         margin_percent=margin_percent,
                     )
 
@@ -906,7 +917,9 @@ class ScoringService:
 
                 # DISABLED: Let Next.js handle database writes instead
                 # await read_ops.bulk_store_score_results(scores_data)
-                self.logger.info("Skipping database write - Next.js will handle storage")
+                self.logger.info(
+                    "Skipping database write - Next.js will handle storage"
+                )
 
             # Calculate processing time
             end_time = datetime.utcnow()
@@ -925,12 +938,18 @@ class ScoringService:
             # Serialize results to JSON-compatible format before returning
             serialized_results = []
             for result in results:
-                if hasattr(result, '__dict__'):
+                if hasattr(result, "__dict__"):
                     # Convert Pydantic model to dict
-                    result_dict = result.dict() if hasattr(result, 'dict') else result.__dict__
+                    result_dict = (
+                        result.dict() if hasattr(result, "dict") else result.__dict__
+                    )
                     # Convert datetime objects to ISO strings
-                    if 'calculated_at' in result_dict and hasattr(result_dict['calculated_at'], 'isoformat'):
-                        result_dict['calculated_at'] = result_dict['calculated_at'].isoformat()
+                    if "calculated_at" in result_dict and hasattr(
+                        result_dict["calculated_at"], "isoformat"
+                    ):
+                        result_dict["calculated_at"] = result_dict[
+                            "calculated_at"
+                        ].isoformat()
                     serialized_results.append(result_dict)
                 else:
                     serialized_results.append(result)
@@ -1102,8 +1121,12 @@ class ScoringService:
                 confidence_level=Decimal(str(result.confidence_level)),
                 calculated_at=result.calculated_at,
                 days_to_expiry=result.days_to_expiry,
-                potential_loss=Decimal(str(result.potential_loss)) if result.potential_loss else None,
-                margin_percent=Decimal(str(result.margin_percent)) if result.margin_percent else None,
+                potential_loss=Decimal(str(result.potential_loss))
+                if result.potential_loss
+                else None,
+                margin_percent=Decimal(str(result.margin_percent))
+                if result.margin_percent
+                else None,
             )
 
             self.db.add(score)

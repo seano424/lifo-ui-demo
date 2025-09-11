@@ -195,7 +195,9 @@ class ActionTrackingService:
         from app.utils.recommendation_migration import RecommendationMigrator
 
         # First migrate legacy recommendation to standard format
-        standard_recommendation = RecommendationMigrator.migrate_recommendation(scoring_action)
+        standard_recommendation = RecommendationMigrator.migrate_recommendation(
+            scoring_action
+        )
 
         # Map standard recommendations to database enums
         action_mapping = {
@@ -207,7 +209,6 @@ class ActionTrackingService:
             "maintain": ActionType.MAINTAIN.value,
             "dispose": ActionType.DISPOSE.value,
             "donate": ActionType.DONATE.value,
-
             # Legacy support (in case migration missed something)
             "immediate_action": ActionType.DISCOUNT.value,
             "high_priority": ActionType.DISCOUNT.value,

@@ -539,7 +539,9 @@ class UnifiedCSVProcessor:
         # Resolve category to UUID and store category_code for shelf life calculations
         category_raw = row.get("category")
         category_code = self._get_category_code_for_shelf_life(category_raw)
-        processed["category_id"] = await self._resolve_category_to_uuid(category_raw, row_num)
+        processed["category_id"] = await self._resolve_category_to_uuid(
+            category_raw, row_num
+        )
         processed["category_code"] = category_code  # Store for shelf life calculations
         processed["quantity"] = self._validate_quantity(row.get("quantity"), row_num)
         processed["expiry_date"] = self._validate_expiry_date(
@@ -625,65 +627,75 @@ class UnifiedCSVProcessor:
                 f"Row {row_num}: No category provided, using 'dry_goods'"
             )
             return await self._get_category_uuid("dry_goods")
-        
+
         category_str = str(category).lower().strip()
-        
+
         # First, try to map CSV category to standard category code
         category_code = None
         for key, value in self.CATEGORY_MAPPING.items():
             if key in category_str or category_str in key:
                 category_code = value
                 break
-        
+
         # If no mapping found, default to dry_goods
         if not category_code:
             self.warnings.append(
                 f"Row {row_num}: Unknown category '{category}', using 'dry_goods'"
             )
             category_code = "dry_goods"
-        
+
         # Resolve category code to UUID
         return await self._get_category_uuid(category_code)
-    
+
     async def _get_category_uuid(self, category_code: str) -> str:
         """Get category UUID from database by category code"""
         # Check cache first
         if category_code in self._category_cache:
             return self._category_cache[category_code]
-        
+
         try:
             if get_db_sync is None:
                 # Fallback: return category_code if no database access
-                logger.warning(f"No database access available, using category_code: {category_code}")
+                logger.warning(
+                    f"No database access available, using category_code: {category_code}"
+                )
                 return category_code
-            
+
             # Query database for category UUID
             with get_db_sync() as db:
                 result = db.execute(
-                    text("SELECT category_id FROM inventory.categories WHERE category_code = :code LIMIT 1"),
-                    {"code": category_code}
+                    text(
+                        "SELECT category_id FROM inventory.categories WHERE category_code = :code LIMIT 1"
+                    ),
+                    {"code": category_code},
                 ).fetchone()
-                
+
                 if result:
                     category_uuid = str(result[0])
                     self._category_cache[category_code] = category_uuid
                     return category_uuid
                 else:
                     # Fallback to dry_goods if category not found
-                    logger.warning(f"Category code '{category_code}' not found in database, falling back to dry_goods")
+                    logger.warning(
+                        f"Category code '{category_code}' not found in database, falling back to dry_goods"
+                    )
                     fallback_result = db.execute(
-                        text("SELECT category_id FROM inventory.categories WHERE category_code = 'dry_goods' LIMIT 1")
+                        text(
+                            "SELECT category_id FROM inventory.categories WHERE category_code = 'dry_goods' LIMIT 1"
+                        )
                     ).fetchone()
-                    
+
                     if fallback_result:
                         fallback_uuid = str(fallback_result[0])
                         self._category_cache["dry_goods"] = fallback_uuid
                         return fallback_uuid
                     else:
                         # Ultimate fallback: return the category_code
-                        logger.error("No categories found in database, using category_code as fallback")
+                        logger.error(
+                            "No categories found in database, using category_code as fallback"
+                        )
                         return category_code
-        
+
         except Exception as e:
             logger.error(f"Error resolving category '{category_code}': {e}")
             # Fallback: return category_code if database query fails
@@ -850,19 +862,19 @@ class UnifiedCSVProcessor:
                 "processed_by": self.user_id,
             },
         }
-    
+
     def _get_category_code_for_shelf_life(self, category: Any) -> str:
         """Get category code for shelf life calculations (without database lookup)"""
         if pd.isna(category):
             return "dry_goods"
-        
+
         category_str = str(category).lower().strip()
-        
+
         # Map CSV category to standard category code
         for key, value in self.CATEGORY_MAPPING.items():
             if key in category_str or category_str in key:
                 return value
-        
+
         # Default fallback
         return "dry_goods"
 
