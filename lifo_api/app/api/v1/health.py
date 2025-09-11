@@ -20,7 +20,7 @@ router = APIRouter()
 logger = structlog.get_logger()
 
 
-@router.get("/health")
+@router.get("/")
 async def health_check() -> dict[str, Any]:
     """
     Comprehensive health check for all services
@@ -92,7 +92,7 @@ async def health_check() -> dict[str, Any]:
     return health_status
 
 
-@router.get("/health/supabase")
+@router.get("/supabase")
 async def supabase_health() -> dict[str, Any]:
     """
     Supabase-specific health check
@@ -107,7 +107,7 @@ async def supabase_health() -> dict[str, Any]:
         ) from e
 
 
-@router.get("/health/database")
+@router.get("/database")
 async def database_health() -> dict[str, Any]:
     """
     Database connectivity health check
@@ -123,7 +123,7 @@ async def database_health() -> dict[str, Any]:
         ) from e
 
 
-@router.get("/health/ready")
+@router.get("/ready")
 async def readiness_check() -> dict[str, Any]:
     """
     Kubernetes-style readiness check
@@ -153,7 +153,7 @@ async def readiness_check() -> dict[str, Any]:
         ) from e
 
 
-@router.get("/health/live")
+@router.get("/live")
 async def liveness_check() -> dict[str, Any]:
     """
     Kubernetes-style liveness check
@@ -166,7 +166,7 @@ async def liveness_check() -> dict[str, Any]:
     }
 
 
-@router.get("/health/performance")
+@router.get("/performance")
 async def performance_health_check(
     current_user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
@@ -240,7 +240,7 @@ async def performance_health_check(
         ) from e
 
 
-@router.get("/health/mobile-performance")
+@router.get("/mobile-performance")
 async def mobile_performance_health(
     current_user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
