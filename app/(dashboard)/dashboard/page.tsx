@@ -2,11 +2,13 @@
 
 import { useTranslations } from 'next-intl'
 import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
+import { BatchStatusSummary } from '@/components/dashboard/batch-status-summary'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
+// import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
+import { ExpiredItemsSummary } from '@/components/dashboard/expired-items-summary'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
 import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
-import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
 import { useBatches } from '@/hooks/use-batches'
 
 export default function Page() {
@@ -15,11 +17,15 @@ export default function Page() {
   const hasBatches = batches && batches.length > 0
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <DashboardInsetHeader title={t('dashboard')} />
-      {hasBatches && <UrgentAlerts />}
+
+      {hasBatches && <BatchStatusSummary />}
+      {hasBatches && <ExpiredItemsSummary />}
+      {/* {hasBatches && <UrgentAlerts />} */}
+
       {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+        <div className="border p-5 rounded-2xl">
           <DashboardKPICards />
         </div>
       )}
@@ -33,11 +39,7 @@ export default function Page() {
           <QuickActionCards />
         </div>
       )}
-      {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
-          <AlertSensitivityControls />
-        </div>
-      )}
+      {hasBatches && <AlertSensitivityControls />}
     </div>
   )
 }

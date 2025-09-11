@@ -428,7 +428,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             {pendingItems.map(item => (
               <div
                 key={item.batchId}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border"
               >
                 <div className="flex-1">
                   <div className="font-medium">{item.productName}</div>
@@ -455,7 +455,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                     onChange={e =>
                       updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
                     }
-                    className="w-12 text-center border rounded px-1 py-1 text-sm"
+                    className="w-12 text-center border rounded-2xl px-1 py-1 text-sm"
                     min="1"
                     max={item.maxQuantity}
                   />
@@ -508,13 +508,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               </div>
 
               {/* Summary List */}
-              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
+              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
                 {pendingItems.map(item => {
                   const itemTotal = item.quantity * item.price
                   return (
                     <div
                       key={item.batchId}
-                      className="flex justify-between items-start p-2 bg-white rounded border text-sm"
+                      className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
                         <div className="font-medium">{item.productName}</div>
@@ -582,7 +582,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Check className="w-6 h-6 text-green-600 stroke-5 border-2 border-green-600 rounded-full p-[3px] bg-green-100" />
+                <Check className="w-6 h-6 text-primary-600 stroke-5 border-2 border-primary-600 rounded-full p-[3px] bg-primary-100" />
                 {t('inventoryUpdatedSuccessfully')}
               </DialogTitle>
               <DialogDescription>

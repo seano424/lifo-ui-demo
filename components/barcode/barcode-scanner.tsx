@@ -315,10 +315,10 @@ export default function BarcodeScanner({
         )}
 
         {/* Camera container - fixed size matching camera's native 638×358 */}
-        <div className="relative w-full aspect-[638/358] border border-black rounded-3xl bg-gray-100 dark:bg-brand-dark">
+        <div className="relative w-full aspect-[638/358] border border-black rounded-2xl bg-gray-100 dark:bg-brand-dark">
           {/* Camera Permission Request */}
           {(hasPermission === false || hasPermission === null) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-3xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-2xl">
               <div className="text-center space-y-4">
                 <Alert className="border-none bg-transparent shadow-none">
                   <Camera className="h-4 w-4" />
@@ -340,7 +340,7 @@ export default function BarcodeScanner({
             <>
               <video
                 ref={videoRef}
-                className="w-full h-full aspect-[638/358] rounded-3xl object-cover"
+                className="w-full h-full aspect-[638/358] rounded-2xl object-cover"
                 playsInline
                 muted
               />
@@ -354,10 +354,10 @@ export default function BarcodeScanner({
               {/* Scanning overlay */}
               {isScanning && isInitialized && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="border-2 border-green-400 w-64 h-32 rounded-lg relative">
+                  <div className="border-2 border-primary-400 w-64 h-32 rounded-2xl relative">
                     <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
                     {detectedBarcode && (
-                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm">
+                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-2 py-1 rounded-2xl text-sm">
                         <CheckCircle className="w-3 h-3 inline mr-1" />
                         Detected: {detectedBarcode}
                       </div>
@@ -401,7 +401,7 @@ export default function BarcodeScanner({
               {scanningHistory.map((barcode, index) => (
                 <div
                   key={`scan-${barcode}-${Date.now()}-${index}`}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                  className="flex items-center justify-between p-2 bg-gray-50 rounded-2xl text-sm"
                 >
                   <span className="font-mono">{barcode}</span>
                   <Button

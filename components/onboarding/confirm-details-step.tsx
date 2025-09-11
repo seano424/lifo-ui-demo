@@ -205,7 +205,7 @@ export function ConfirmDetailsStep() {
                         <p>{t('businessCheck.alreadyRegisteredDesc')}</p>
 
                         {businessCheckResult.storeData && (
-                          <div className="text-xs bg-destructive/10 p-2 rounded mt-2">
+                          <div className="text-xs bg-destructive/10 p-2 rounded-2xl mt-2">
                             <p>
                               <strong>{t('businessCheck.existingStore')}</strong>{' '}
                               {businessCheckResult.storeData.store_name}

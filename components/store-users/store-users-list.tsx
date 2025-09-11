@@ -197,7 +197,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
           {/* Role-based permissions info - only show for owners and managers */}
           {(isOwner || isManager) && canManageUsers && (
-            <div className="mb-6 mt-4 p-4 bg-secondary-50 border border-secondary-200 rounded-lg flex flex-col">
+            <div className="mb-6 mt-4 p-4 bg-secondary-50 border border-secondary-200 rounded-2xl flex flex-col">
               <Typography variant="small" className="font-medium text-blue-800 mb-2">
                 {isOwner ? t('permissions.ownerInfo.title') : t('permissions.managerInfo.title')}
               </Typography>
@@ -562,7 +562,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               </DialogHeader>
 
               <div className="space-y-4">
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-4 bg-muted rounded-2xl">
                   <div className="space-y-2">
                     <div>
                       <strong>{t('dialogs.resetPin.employee')}:</strong> {selectedUser.full_name}
@@ -582,7 +582,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                           {t('dialogs.resetPin.statusLocked')}
                         </span>
                       ) : (
-                        <span className="ml-2 text-green-600 flex items-center gap-1">
+                        <span className="ml-2 text-primary-600 flex items-center gap-1">
                           <Key className="w-3 h-3" />
                           {t('dialogs.resetPin.statusActive')}
                         </span>
@@ -624,7 +624,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               </DialogHeader>
 
               <div className="space-y-4">
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-4 bg-muted rounded-2xl">
                   <div className="space-y-1">
                     <div>
                       <strong>{t('dialogs.unlockPin.employee')}:</strong> {selectedUser.full_name}
@@ -661,11 +661,11 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
       )}
 
       {process.env.NODE_ENV === 'development' && (
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
           <Typography variant="small" className="font-medium text-yellow-800 mb-2">
             Debug: Store Users List: Only visible in development mode
           </Typography>
-          <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
+          <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">
             {JSON.stringify(
               {
                 propStoreId,

@@ -104,7 +104,7 @@ export function CSVMappingInfo() {
           <CollapsibleContent className="mt-3">
             <div className="space-y-3">
               {CSV_MAPPING_RULES.map(rule => (
-                <div key={rule.field} className="border rounded-lg p-3 bg-gray-50">
+                <div key={rule.field} className="border rounded-2xl p-3 bg-gray-50">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <code className="text-sm font-mono bg-white px-2 py-1 rounded">
@@ -128,7 +128,7 @@ export function CSVMappingInfo() {
                     </div>
                   </div>
                   <p className="text-sm text-gray-700 mb-2">{rule.description}</p>
-                  <div className="text-xs text-gray-600 font-mono bg-white p-2 rounded border">
+                  <div className="text-xs text-gray-600 font-mono bg-white p-2 rounded-2xl border">
                     Example: {rule.example}
                   </div>
                 </div>
@@ -168,12 +168,12 @@ export function CSVMappingInfo() {
         </Collapsible>
 
         {/* Processing Guarantees */}
-        <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+        <div className="mt-4 p-3 bg-primary-50 rounded-2xl border border-primary-200">
           <div className="flex items-start gap-2">
-            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+            <CheckCircle className="h-4 w-4 text-primary-600 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-green-800">Processing Guarantees</p>
-              <ul className="text-green-700 mt-1 space-y-1 text-xs">
+              <p className="font-medium text-primary-800">Processing Guarantees</p>
+              <ul className="text-primary-700 mt-1 space-y-1 text-xs">
                 <li>• Missing SKUs are auto-generated with unique identifiers</li>
                 <li>• Expiration dates calculated based on category rules</li>
                 <li>• Prices default to $0.00 for manual entry later</li>
@@ -184,7 +184,7 @@ export function CSVMappingInfo() {
         </div>
 
         {/* Error Prevention */}
-        <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="mt-2 p-3 bg-blue-50 rounded-2xl border border-blue-200">
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
             <div className="text-sm">

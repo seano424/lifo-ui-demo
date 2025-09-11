@@ -189,7 +189,7 @@ export default function UserAccountInformation() {
 
           {isEditingProfile ? (
             <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)} className="space-y-4">
-              <div className="space-y-4 p-4 border rounded-lg">
+              <div className="space-y-4 p-4 border rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="full_name">{t('profile.fullName')}</Label>
@@ -284,7 +284,7 @@ export default function UserAccountInformation() {
           </div>
 
           {isEditingPhone ? (
-            <div className="space-y-4 p-4 border rounded-lg">
+            <div className="space-y-4 p-4 border rounded-2xl">
               {phoneError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -328,7 +328,7 @@ export default function UserAccountInformation() {
               <Typography variant="p" className="flex items-center gap-2">
                 {user.phone ? formatPhoneNumber(user.phone) : t('phone.noPhone')}
                 {user.phone_verified && (
-                  <span className="text-green-600 text-sm">✓ {t('phone.verified')}</span>
+                  <span className="text-primary-600 text-sm">✓ {t('phone.verified')}</span>
                 )}
               </Typography>
               {!user.phone && (
@@ -362,7 +362,7 @@ export default function UserAccountInformation() {
           </Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between p-3 border rounded-2xl">
               <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.accountStatus')}</Typography>
                 <div className="flex items-center gap-2">
@@ -370,13 +370,13 @@ export default function UserAccountInformation() {
                     {user.is_active ? t('status.active') : t('status.inactive')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-primary-500' : 'bg-red-500'}`}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between p-3 border rounded-2xl">
               <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.emailVerified')}</Typography>
                 <div className="flex items-center gap-2">
@@ -384,13 +384,13 @@ export default function UserAccountInformation() {
                     {user.email_verified ? t('status.verified') : t('status.unverified')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-primary-500' : 'bg-yellow-500'}`}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between p-3 border rounded-2xl">
               <div className="flex items-center justify-between w-full gap-2">
                 <Typography variant="p">{t('status.phoneVerified')}</Typography>
                 <div className="flex items-center gap-2">
@@ -398,7 +398,7 @@ export default function UserAccountInformation() {
                     {user.phone_verified ? t('status.verified') : t('status.unverified')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-green-500' : 'bg-yellow-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-primary-500' : 'bg-yellow-500'}`}
                   />
                 </div>
               </div>

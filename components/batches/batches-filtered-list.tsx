@@ -134,31 +134,29 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
     <div className="space-y-4">
       <Card className="overflow-x-auto">
         <div className="p-4 border-b">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 lg:flex-row sm:items-center sm:justify-between">
-              <BatchListFilters
-                filters={{
-                  expiringInDays: filters.expiringInDays,
-                  status: filters.status,
-                }}
-                onFiltersChange={handleFiltersChange}
-                count={count}
-                isLoading={isLoading}
-              />
-              <BatchListSortControls
-                currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-                updateSort={field => {
-                  const currentSort = filters.sort || {
-                    field: 'created_at',
-                    direction: 'desc',
-                  }
-                  const newDirection =
-                    currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-                  handleSortChange({ field, direction: newDirection })
-                }}
-                isLoading={isLoading}
-              />
-            </div>
+          <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
+            <BatchListFilters
+              filters={{
+                expiringInDays: filters.expiringInDays,
+                status: filters.status,
+              }}
+              onFiltersChange={handleFiltersChange}
+              count={count}
+              isLoading={isLoading}
+            />
+            <BatchListSortControls
+              currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+              updateSort={field => {
+                const currentSort = filters.sort || {
+                  field: 'created_at',
+                  direction: 'desc',
+                }
+                const newDirection =
+                  currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+                handleSortChange({ field, direction: newDirection })
+              }}
+              isLoading={isLoading}
+            />
           </div>
         </div>
 

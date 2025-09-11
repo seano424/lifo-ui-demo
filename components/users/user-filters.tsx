@@ -46,7 +46,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
   const activeFiltersCount = Object.keys(filters).length
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
+    <div className="bg-white border border-gray-200 rounded-2xl p-4">
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search by Email */}
         <div className="flex-1">
@@ -58,12 +58,12 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
               value={localEmail}
               onChange={e => setLocalEmail(e.target.value)}
               onKeyPress={handleEmailKeyPress}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <button
               type="button"
               onClick={handleEmailSearch}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
             >
               Search
             </button>
@@ -78,7 +78,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
               filters.is_active === undefined ? 'all' : filters.is_active ? 'active' : 'inactive'
             }
             onChange={e => handleStatusChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="all">All Users</option>
             <option value="active">Active Only</option>
@@ -91,7 +91,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
           <select
             disabled
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-2xl bg-gray-50 text-gray-500"
           >
             <option>All Roles (Coming Soon)</option>
           </select>
@@ -104,12 +104,12 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span>Active filters:</span>
             {filters.is_active !== undefined && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-2xl text-xs">
                 Status: {filters.is_active ? 'Active' : 'Inactive'}
               </span>
             )}
             {filters.email && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-2xl text-xs">
                 Email: {filters.email}
               </span>
             )}

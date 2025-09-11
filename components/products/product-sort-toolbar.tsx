@@ -108,7 +108,7 @@ export function ProductsSortToolbar({
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 p-4 bg-muted/50 rounded-lg">
+    <div className="flex items-center justify-between gap-4 p-4 bg-muted/50 rounded-2xl">
       <div className="flex items-center gap-4">
         {/* Sort Field Selector */}
         <DropdownMenu>

@@ -9,6 +9,7 @@ import {
   ScanSearch,
   SettingsIcon,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import * as React from 'react'
 
@@ -74,7 +75,7 @@ function useNavigationData() {
             },
             {
               title: t('batches'),
-              url: '/dashboard/inventory/batches',
+              url: '/dashboard/inventory/batches?sort=expiry_date&direction=asc&status=active',
               icon: Layers,
             },
           ],
@@ -104,14 +105,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   if (!user) return <div>Not logged in</div>
 
   return (
-    <Sidebar collapsible="icon" className="bg-secondary-100/10 dark:bg-primary-900" {...props}>
-      <SidebarHeader className="flex flex-col gap-2 justify-center items-center h-16 border-b">
-        <div className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2">
-          <NavbarLogo variant="icon" size="sm" />
+    <Sidebar
+      collapsible="icon"
+      className="bg-secondary-100/10 dark:bg-brand-dark border-l-none"
+      {...props}
+    >
+      <SidebarHeader className="flex flex-col gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
+        <Link
+          href="/"
+          className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out"
+        >
+          <NavbarLogo variant="icon" size="sm" className="dark:hidden" />
+          <NavbarLogo variant="icon-dark" size="sm" className="dark:block hidden" />
           <Typography variant="h2" className="lowercase font-black">
             LIFO
           </Typography>
-        </div>
+        </Link>
         <NavbarLogo
           variant="vertical"
           size="md"

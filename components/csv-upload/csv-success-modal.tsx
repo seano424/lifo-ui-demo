@@ -58,8 +58,8 @@ export function CSVSuccessModal({ open, onOpenChange, result, storeId }: CSVSucc
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="h-6 w-6 text-green-600" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
+            <CheckCircle className="h-6 w-6 text-primary-600" />
           </div>
           <DialogTitle className="text-xl font-semibold">
             {result.processed} items imported!
@@ -71,7 +71,7 @@ export function CSVSuccessModal({ open, onOpenChange, result, storeId }: CSVSucc
 
         <div className="space-y-4">
           {/* Import Breakdown */}
-          <div className="rounded-lg bg-gray-50 p-4 space-y-3">
+          <div className="rounded-2xl bg-gray-50 p-4 space-y-3">
             <h4 className="font-medium text-sm text-gray-900">Import Summary</h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
               {breakdown.new_products && breakdown.new_products > 0 && (
@@ -88,7 +88,7 @@ export function CSVSuccessModal({ open, onOpenChange, result, storeId }: CSVSucc
               )}
               {breakdown.new_batches && breakdown.new_batches > 0 && (
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <CheckCircle className="h-4 w-4 text-primary-500" />
                   <span>{breakdown.new_batches} inventory batches</span>
                 </div>
               )}

@@ -418,7 +418,7 @@ export default function ManualBarcodeEntry({
                       (mode === 'inbound' &&
                         ((supabaseSearch.data && supabaseSearch.data.length > 0) ||
                           (productSearch.data && productSearch.data.length > 0)))) && (
-                      <div className="border rounded-lg max-h-64 overflow-y-auto bg-white shadow-lg p-2">
+                      <div className="border rounded-2xl max-h-64 overflow-y-auto bg-white shadow-lg p-2">
                         {mode === 'outbound' ? (
                           // Supabase results for outbound
                           (activeSearch.data as SupabaseProductSearchResult[]).map(product => (
@@ -573,7 +573,7 @@ export default function ManualBarcodeEntry({
                       (mode === 'inbound' &&
                         (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
                         (!productSearch.data || productSearch.data.length === 0))) && (
-                      <div className="text-sm text-gray-500 p-3 border rounded-lg">
+                      <div className="text-sm text-gray-500 p-3 border rounded-2xl">
                         {t('noProductsFound')} "{productNameQuery}"
                       </div>
                     )}
@@ -721,7 +721,7 @@ export default function ManualBarcodeEntry({
               )}
 
               {!lookupResult?.found && mode === 'inbound' && (
-                <div className="border-dashed border-2 p-4 rounded-xl">
+                <div className="border-dashed border-2 p-4 rounded-2xl">
                   <div className="pb-3">
                     <div className="text-sm flex items-center gap-2">
                       <Package className="w-4 h-4" />

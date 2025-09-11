@@ -76,7 +76,7 @@ export function BatchDashboardStats() {
     if (alert) return 'text-red-600'
     switch (trend) {
       case 'positive':
-        return 'text-green-600'
+        return 'text-primary-600'
       case 'negative':
         return 'text-red-600'
       default:
@@ -88,7 +88,7 @@ export function BatchDashboardStats() {
     if (alert) return 'bg-red-50 border-red-200'
     switch (trend) {
       case 'positive':
-        return 'bg-green-50 border-green-200'
+        return 'bg-primary-50 border-primary-200'
       case 'negative':
         return 'bg-red-50 border-red-200'
       default:
@@ -102,12 +102,12 @@ export function BatchDashboardStats() {
         {[...Array(6)].map((_, i) => (
           <Card key={`skeleton-${i + 1}`} className="animate-pulse">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 bg-muted rounded w-20"></div>
+              <div className="h-4 bg-muted rounded-2xl w-20"></div>
               <div className="h-4 w-4 bg-muted rounded"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-muted rounded w-16 mb-1"></div>
-              <div className="h-3 bg-muted rounded w-24"></div>
+              <div className="h-8 bg-muted rounded-2xl w-16 mb-1"></div>
+              <div className="h-3 bg-muted rounded-2xl w-24"></div>
             </CardContent>
           </Card>
         ))}

@@ -181,7 +181,7 @@ export function ProductCard({
       </CardFooter>
 
       {(isDeleting || isUpdating) && (
-        <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-lg">
+        <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-2xl">
           <div className="text-sm font-medium">{isDeleting ? 'Deleting...' : 'Updating...'}</div>
         </div>
       )}

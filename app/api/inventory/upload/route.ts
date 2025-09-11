@@ -30,35 +30,83 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
 
     const file = formData.get('file') as File
+    const csvData = formData.get('csvData') as string
     const storeId = formData.get('storeId') as string
     const defaultExpiryDate = formData.get('defaultExpiryDate') as string
 
-    if (!file || !storeId) {
+    if ((!file && !csvData) || !storeId) {
       console.error('❌ [UPLOAD-API] Missing required parameters:', {
         hasFile: !!file,
+        hasCsvData: !!csvData,
         hasStoreId: !!storeId,
       })
       return NextResponse.json({ error: 'File and store ID required' }, { status: 400 })
     }
 
-    // Comprehensive file validation
-    const validation = validateUploadFile(file)
-    if (!validation.isValid) {
-      console.error('❌ [UPLOAD-API] File validation failed:', {
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        error: validation.error,
-      })
-      return NextResponse.json({ error: validation.error }, { status: 400 })
+    let processedCsvData: unknown[]
+
+    if (csvData) {
+      // Handle JSON CSV data sent from the frontend
+      try {
+        const parsedCsvData = JSON.parse(csvData)
+        if (!Array.isArray(parsedCsvData) || parsedCsvData.length === 0) {
+          console.error('❌ [UPLOAD-API] Invalid CSV data provided')
+          return NextResponse.json({ error: 'Invalid CSV data provided' }, { status: 400 })
+        }
+
+        // Apply the same validation logic as fastParseCSV but be more permissive
+        // The frontend should ensure all items have expiry dates before sending
+        const validItems = parsedCsvData.filter(item => {
+          // Item must have a product name
+          if (!item.Product_Name || item.Product_Name.trim() === '') return false
+
+          // For JSON data from frontend, all items should have expiry dates since upload button is disabled otherwise
+          // But let's be defensive and apply default if provided
+          if (!item.Expiry_Date || item.Expiry_Date.trim() === '') {
+            if (defaultExpiryDate && defaultExpiryDate.trim() !== '') {
+              item.Expiry_Date = defaultExpiryDate
+              return true
+            }
+            console.warn('❌ [UPLOAD-API] Item missing expiry date:', item.Product_Name)
+            return false
+          }
+
+          return true
+        })
+
+        processedCsvData = validItems
+        console.log('📊 [UPLOAD-API] Filtered CSV data:', {
+          originalCount: parsedCsvData.length,
+          validCount: validItems.length,
+          hasDefaultExpiry: !!defaultExpiryDate,
+        })
+      } catch (error) {
+        console.error('❌ [UPLOAD-API] Failed to parse CSV data:', error)
+        return NextResponse.json({ error: 'Invalid CSV data format' }, { status: 400 })
+      }
+    } else if (file) {
+      // Handle file upload
+      // Comprehensive file validation
+      const validation = validateUploadFile(file)
+      if (!validation.isValid) {
+        console.error('❌ [UPLOAD-API] File validation failed:', {
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          error: validation.error,
+        })
+        return NextResponse.json({ error: validation.error }, { status: 400 })
+      }
+
+      // Fast CSV processing - no Python subprocess overhead
+      const csvContent = await file.text()
+      processedCsvData = fastParseCSV(csvContent, defaultExpiryDate)
+    } else {
+      return NextResponse.json({ error: 'No file or CSV data provided' }, { status: 400 })
     }
 
-    // Fast CSV processing - no Python subprocess overhead
-    const csvContent = await file.text()
-    const csvData = fastParseCSV(csvContent, defaultExpiryDate)
-
-    if (csvData.length === 0) {
-      console.error('❌ [UPLOAD-API] No valid data found in CSV file')
+    if (processedCsvData.length === 0) {
+      console.error('❌ [UPLOAD-API] No valid data found in CSV')
       return NextResponse.json({ error: 'No valid data found' }, { status: 400 })
     }
 
@@ -66,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     // Use existing proven InventoryOperations.processCsvBatch
     const operations = new InventoryOperations(supabase)
-    const result = await operations.processCsvBatch(csvData, storeId, user.id)
+    const result = await operations.processCsvBatch(processedCsvData, storeId, user.id)
 
     const totalTime = Date.now() - apiStartTime
 
@@ -76,7 +124,7 @@ export async function POST(request: NextRequest) {
       processed: result.processed,
       skipped: result.duplicates_skipped?.length || 0,
       errors: result.errors || [],
-      total_items: csvData.length,
+      total_items: processedCsvData.length,
       processing_time_ms: totalTime,
       duplicates_skipped: result.duplicates_skipped || [],
       performance_metrics: {

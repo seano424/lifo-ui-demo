@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import { Typography } from './typography'
 
-type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text'
+type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text' | 'icon-dark'
 type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
 
 interface LogoProps {
@@ -31,32 +31,32 @@ const sizeMapHorizontal = {
   xl: 'h-16',
 }
 
-export function Logo({
-  variant = 'vertical',
-  size = 'md',
-  className,
-  darkMode,
-  href = '/',
-}: LogoProps) {
+export function Logo({ variant = 'vertical', size = 'md', className, darkMode, href }: LogoProps) {
   const { theme } = useTheme()
 
   // Determine which logo to show based on theme
   const isDark = darkMode ?? theme === 'dark'
 
   if (variant === 'text') {
-    return (
-      <Link href={href}>
-        <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
-          LIFO.ai
-        </Typography>
-      </Link>
+    const textElement = (
+      <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
+        LIFO.ai
+      </Typography>
     )
+
+    if (href) {
+      return <Link href={href}>{textElement}</Link>
+    }
+
+    return textElement
   }
 
   const getLogoPath = () => {
     switch (variant) {
       case 'icon':
         return '/logos/lifo-logo-icon.svg'
+      case 'icon-dark':
+        return '/logos/lifo-logo-icon-white.svg'
       case 'vertical':
         return isDark ? '/logos/lifo-logo-vertical-dark.svg' : '/logos/lifo-logo-vertical-light.svg'
       case 'horizontal':
@@ -74,7 +74,7 @@ export function Logo({
       alt="LIFO"
       className={cn(
         variant === 'vertical' ? sizeMapVertical[size] : sizeMapHorizontal[size],
-        'w-auto transition-opacity duration-200 hover:opacity-80',
+        'w-auto transition-opacity duration-200',
         className,
       )}
       priority

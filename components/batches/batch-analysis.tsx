@@ -22,7 +22,7 @@ export function BatchAnalytics() {
       <CardContent>
         <div className="space-y-6">
           {sampleBatchPerformance.map(batch => (
-            <div key={batch.batchId} className="border rounded-lg p-4">
+            <div key={batch.batchId} className="border rounded-2xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <Typography variant="h3">{batch.productName}</Typography>
@@ -35,7 +35,7 @@ export function BatchAnalytics() {
                   <Badge
                     className={`${
                       batch.wasteReduction >= 70
-                        ? 'bg-green-100 text-green-800 border-green-200'
+                        ? 'bg-primary-100 text-primary-800 border-primary-200'
                         : batch.wasteReduction >= 50
                           ? 'bg-orange-100 text-orange-800 border-orange-200'
                           : 'bg-red-100 text-red-800 border-red-200'
@@ -55,7 +55,7 @@ export function BatchAnalytics() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{batch.soldQuantity}</div>
+                  <div className="text-2xl font-bold text-primary-600">{batch.soldQuantity}</div>
                   <div className="text-xs text-muted-foreground">Sold</div>
                 </div>
                 <div className="text-center">

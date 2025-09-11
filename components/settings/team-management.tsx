@@ -111,7 +111,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
               </Typography>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-muted text-muted-foreground text-xs">
                 <Shield className="h-3 w-3" />
                 {permissions.isOwner ? 'Owner' : permissions.isManager ? 'Manager' : 'Employee'}
               </div>
@@ -165,11 +165,11 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                     <Typography variant="small" className="text-muted-foreground">
                       {t('stats.activeMembers')}
                     </Typography>
-                    <Typography variant="h3" className="text-2xl font-bold text-green-600">
+                    <Typography variant="h3" className="text-2xl font-bold text-primary-600">
                       {activeCount}
                     </Typography>
                   </div>
-                  <UserCheck className="h-8 w-8 text-green-500" />
+                  <UserCheck className="h-8 w-8 text-primary-500" />
                 </div>
               </CardContent>
             </Card>
@@ -213,7 +213,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border rounded-2xl">
                   <div className="flex items-center gap-3">
                     <Crown className="h-5 w-5 text-yellow-500" />
                     <div>
@@ -230,7 +230,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   </Badge>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border rounded-2xl">
                   <div className="flex items-center gap-3">
                     <UserCheck className="h-5 w-5 text-blue-500" />
                     <div>
@@ -247,9 +247,9 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   </Badge>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center justify-between p-4 border rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-green-500" />
+                    <User className="h-5 w-5 text-primary-500" />
                     <div>
                       <Typography variant="p" className="font-medium">
                         {t('roles.employees')}
@@ -334,7 +334,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   {owners.map(owner => (
                     <div
                       key={owner.user_id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex items-center justify-between p-3 border rounded-2xl"
                     >
                       <div className="flex items-center gap-3">
                         <Crown className="h-4 w-4 text-yellow-500" />
@@ -349,7 +349,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       </div>
                       <Badge
                         variant={owner.is_active ? 'default' : 'secondary'}
-                        className={owner.is_active ? 'bg-green-100 text-green-800' : ''}
+                        className={owner.is_active ? 'bg-primary-100 text-primary-800' : ''}
                       >
                         {owner.is_active ? t('status.active') : t('status.inactive')}
                       </Badge>
@@ -376,7 +376,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   {managers.map(manager => (
                     <div
                       key={manager.user_id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex items-center justify-between p-3 border rounded-2xl"
                     >
                       <div className="flex items-center gap-3">
                         <UserCheck className="h-4 w-4 text-blue-500" />
@@ -391,7 +391,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       </div>
                       <Badge
                         variant={manager.is_active ? 'default' : 'secondary'}
-                        className={manager.is_active ? 'bg-green-100 text-green-800' : ''}
+                        className={manager.is_active ? 'bg-primary-100 text-primary-800' : ''}
                       >
                         {manager.is_active ? t('status.active') : t('status.inactive')}
                       </Badge>
@@ -405,7 +405,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <Typography variant="h3" className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-green-500" />
+                    <User className="h-5 w-5 text-primary-500" />
                     {t('roles.employees')} ({employeeCount})
                   </Typography>
                   {permissions.isEmployee && <Badge variant="outline">{t('roles.yourRole')}</Badge>}
@@ -416,10 +416,10 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   {employees.slice(0, 5).map(employee => (
                     <div
                       key={employee.user_id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex items-center justify-between p-3 border rounded-2xl"
                     >
                       <div className="flex items-center gap-3">
-                        <User className="h-4 w-4 text-green-500" />
+                        <User className="h-4 w-4 text-primary-500" />
                         <div>
                           <Typography variant="p" className="font-medium">
                             {employee.full_name}
@@ -431,7 +431,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       </div>
                       <Badge
                         variant={employee.is_active ? 'default' : 'secondary'}
-                        className={employee.is_active ? 'bg-green-100 text-green-800' : ''}
+                        className={employee.is_active ? 'bg-primary-100 text-primary-800' : ''}
                       >
                         {employee.is_active ? t('status.active') : t('status.inactive')}
                       </Badge>
@@ -479,7 +479,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
             <Typography variant="small" className="font-medium text-yellow-800 mb-2">
               Debug: Server Permissions
             </Typography>
-            <pre className="text-xs bg-white p-2 rounded border overflow-auto max-h-32">
+            <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">
               {JSON.stringify(serverPermissions, null, 2)}
             </pre>
           </CardContent>

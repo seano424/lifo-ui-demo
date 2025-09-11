@@ -86,7 +86,7 @@ export function StoreUserCard({
       case 'employee':
         return {
           icon: User,
-          color: 'bg-green-100 text-green-800',
+          color: 'bg-primary-100 text-primary-800',
           label: getRoleTranslation('employee'),
         }
       case 'staff':
@@ -118,7 +118,7 @@ export function StoreUserCard({
       return { icon: Clock, color: 'text-orange-500', label: t('card.pinStatus.pending') }
     }
 
-    return { icon: Shield, color: 'text-green-500', label: t('card.pinStatus.active') }
+    return { icon: Shield, color: 'text-primary-500', label: t('card.pinStatus.active') }
   }
 
   const roleInfo = getRoleInfo(storeUser.role_in_store)
@@ -251,7 +251,9 @@ export function StoreUserCard({
           {storeUser.username && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <span className="font-medium">{t('card.username')}:</span>
-              <code className="bg-gray-100 px-2 py-1 rounded text-xs">{storeUser.username}</code>
+              <code className="bg-gray-100 px-2 py-1 rounded-2xl text-xs">
+                {storeUser.username}
+              </code>
             </div>
           )}
 

@@ -129,7 +129,7 @@ export function NavMain({
                     className={cn(
                       'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-medium',
                       isPathActive(item.url) &&
-                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 font-bold',
+                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold',
                     )}
                     asChild
                     tooltip={item.title}

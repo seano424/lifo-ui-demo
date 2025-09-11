@@ -358,13 +358,13 @@ export default function ManualInboundEntry({
               {t('confirmation.submitText', { count: scannedItems.length })}
             </Typography>
 
-            <div className="max-h-60 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
+            <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
               {scannedItems.map(item => {
                 const totalValue = item.quantity * item.price
                 return (
                   <div
                     key={item.id}
-                    className="flex justify-between items-start p-2 bg-white rounded border text-sm"
+                    className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                   >
                     <div className="flex-1">
                       <Typography variant="p">{item.productName}</Typography>
@@ -428,7 +428,7 @@ export default function ManualInboundEntry({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-600" />
+                <Check className="w-5 h-5 text-primary-600" />
                 {t('success.title')}
               </DialogTitle>
               <DialogDescription>
