@@ -16,11 +16,14 @@ LIFO.AI helps retailers minimize food waste by providing intelligent scoring, de
 
 ## 📚 Documentation
 
-**Essential Documentation:**
-
-- **[⚡ Setup Guide](./docs/SETUP.md)** - Get running quickly with current architecture
-- **[🔌 API Reference](./lifo_api/API_REFERENCE.md)** - Complete endpoint documentation (65+ endpoints)
-- **[🚀 Deployment Guide](./docs/DEPLOYMENT.md)** - Production deployment instructions
+**📖 [Complete Documentation](./DOCUMENTATION.md)** - Everything you need in one place:
+- Quick Start & Setup
+- System Architecture  
+- API Reference (65+ endpoints)
+- Authentication Guide
+- European Pilot System
+- Production Deployment
+- Troubleshooting
 
 ## 🏗️ Architecture Overview
 
@@ -63,22 +66,22 @@ npm run dev
 ```
 
 **API Documentation**: http://localhost:8000/docs  
-**Detailed Setup**: [Setup Guide](./docs/SETUP.md)
+**Complete Guide**: [Full Documentation](./DOCUMENTATION.md)
 
 ## 🏃‍♂️ Getting Started
 
-1. **[⚡ Setup Guide](./docs/SETUP.md)** - Get running quickly
-2. **[🏗️ Architecture Guide](./docs/ARCHITECTURE.md)** - Technical overview  
-3. **[🔌 API Reference](./lifo_api/API_REFERENCE.md)** - Complete endpoint documentation
-4. **[🚀 Deploy to Production](./docs/DEPLOYMENT.md)** - Production deployment guide
+**👉 [Read the Complete Documentation](./DOCUMENTATION.md)** - Everything in one place:
+
+1. **Quick Start** - Get running in 5 minutes
+2. **Architecture** - Technical overview and system design
+3. **API Reference** - All 65+ endpoints with examples  
+4. **Authentication** - Supabase API key setup
+5. **European Pilot** - Advanced donation system
+6. **Production** - Deployment and monitoring
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Documentation Hub](./docs/README.md) for:
-
-- Development setup instructions
-- API documentation and examples
-- Architecture guides and best practices
+We welcome contributions! Please see our [Complete Documentation](./DOCUMENTATION.md) for setup and architecture details.
 - Deployment and production guidelines
 
 ## 📄 License
