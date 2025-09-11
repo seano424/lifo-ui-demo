@@ -1,10 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { BatchActionCard } from '@/components/todos/batch-action-card'
 import { TodoCard } from '@/components/todos/todo-card'
 import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
-import { type ActionableBatch, useStoreAnalytics } from '@/hooks/use-scoring-analytics'
+import {
+  type ActionableBatch,
+  useBatchActionsInfinite,
+  useStoreAnalytics,
+} from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface TodosCardListProps {
@@ -22,7 +27,7 @@ interface TodosCardListProps {
   }
 }
 
-export function TodosCardList({ tab, filters, infiniteData }: TodosCardListProps) {
+export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCardListProps) {
   const activeStoreId = useActiveStoreId()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [hasMore, setHasMore] = useState(false)
@@ -33,23 +38,50 @@ export function TodosCardList({ tab, filters, infiniteData }: TodosCardListProps
     activeStoreId || '',
   )
 
-  // Intersection observer for auto-loading more items
+  // Get batch actions for history tab using infinite query
+  const {
+    data: batchActionsData,
+    isLoading: isBatchActionsLoading,
+    hasNextPage: hasBatchActionsNextPage,
+    fetchNextPage: fetchBatchActionsNextPage,
+    isFetchingNextPage: isFetchingBatchActionsNextPage,
+    error: _batchActionsError,
+  } = useBatchActionsInfinite(
+    tab === 'action_history' ? activeStoreId || null : null,
+    pageSize || 20,
+  )
+
+  // Intersection observer for auto-loading more items (handles both todos and batch actions)
   const { targetRef, isIntersecting } = useIntersectionObserver({
-    enabled: hasMore && !infiniteData?.isFetchingNextPage,
+    enabled: hasMore && !infiniteData?.isFetchingNextPage && !isFetchingBatchActionsNextPage,
     rootMargin: '100px', // Start loading 100px before the sentinel comes into view
   })
 
   // Auto-fetch next page when sentinel comes into view
   useEffect(() => {
-    if (
-      isIntersecting &&
-      hasMore &&
-      infiniteData?.fetchNextPage &&
-      !infiniteData.isFetchingNextPage
-    ) {
-      infiniteData.fetchNextPage()
+    if (isIntersecting && hasMore) {
+      // For recommendations tab with infinite data
+      if (infiniteData?.fetchNextPage && !infiniteData.isFetchingNextPage) {
+        infiniteData.fetchNextPage()
+      }
+      // For history tab with batch actions
+      else if (
+        tab === 'action_history' &&
+        hasBatchActionsNextPage &&
+        !isFetchingBatchActionsNextPage
+      ) {
+        fetchBatchActionsNextPage()
+      }
     }
-  }, [isIntersecting, hasMore, infiniteData])
+  }, [
+    isIntersecting,
+    hasMore,
+    infiniteData,
+    tab,
+    hasBatchActionsNextPage,
+    fetchBatchActionsNextPage,
+    isFetchingBatchActionsNextPage,
+  ])
 
   useEffect(() => {
     if (tab === 'recommendations') {
@@ -252,14 +284,22 @@ export function TodosCardList({ tab, filters, infiniteData }: TodosCardListProps
       setHasMore(false)
       setIsLoading(false)
     } else if (tab === 'action_history') {
-      // Mock data for action history - replace with real hook later
-      setTodos([])
-      setHasMore(false)
-      setIsLoading(false)
+      // Handle batch actions data separately (no transformation needed)
+      setTodos([]) // Clear todos as we'll render batch actions instead
+      setHasMore(hasBatchActionsNextPage || false)
+      setIsLoading(isBatchActionsLoading)
     }
-  }, [tab, filters, analyticsResponse, infiniteData, analyticsLoading])
+  }, [
+    tab,
+    filters,
+    analyticsResponse,
+    infiniteData,
+    analyticsLoading,
+    isBatchActionsLoading,
+    hasBatchActionsNextPage,
+  ])
 
-  if (isLoading || analyticsLoading) {
+  if (isLoading || analyticsLoading || (tab === 'action_history' && isBatchActionsLoading)) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 6 }, () => (
@@ -269,14 +309,21 @@ export function TodosCardList({ tab, filters, infiniteData }: TodosCardListProps
     )
   }
 
-  if (todos.length === 0) {
+  // Check if we have no data to display
+  const batchActionsDataFlat = batchActionsData?.pages?.flatMap(page => page.data) || []
+  const hasNoData =
+    tab === 'action_history'
+      ? batchActionsDataFlat.length === 0 && !isBatchActionsLoading
+      : todos.length === 0
+
+  if (hasNoData) {
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">
           {tab === 'recommendations' && 'No recommendations available'}
           {tab === 'recently_expired' && 'No recently expired batches'}
           {tab === 'all_active' && 'No active batches'}
-          {tab === 'action_history' && 'No action history'}
+          {tab === 'action_history' && 'No action history available'}
         </p>
       </div>
     )
@@ -285,21 +332,26 @@ export function TodosCardList({ tab, filters, infiniteData }: TodosCardListProps
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {todos.map(todo => (
-          <TodoCard key={todo.batch_id} todo={todo} />
-        ))}
+        {tab === 'action_history'
+          ? batchActionsDataFlat.map(action => (
+              <BatchActionCard key={action.action_id} action={action} />
+            ))
+          : todos.map(todo => <TodoCard key={todo.batch_id} todo={todo} />)}
       </div>
 
       {hasMore && (
         <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
-          {infiniteData?.isFetchingNextPage ? (
+          {infiniteData?.isFetchingNextPage || isFetchingBatchActionsNextPage ? (
             <div className="flex items-center gap-2 text-muted-foreground">
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm">Loading more todos...</span>
+              <span className="text-sm">
+                Loading more {tab === 'action_history' ? 'actions' : 'todos'}...
+              </span>
             </div>
           ) : (
             <div className="text-sm text-muted-foreground opacity-60">
-              Scroll to load more ({todos.length} loaded)
+              Scroll to load more (
+              {tab === 'action_history' ? batchActionsDataFlat.length : todos.length} loaded)
             </div>
           )}
         </div>
