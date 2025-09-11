@@ -1,98 +1,83 @@
-# LIFO.AI Documentation
+# LIFO Documentation
 
-Welcome to the LIFO.AI documentation hub. This directory contains all the documentation you need to understand, develop, deploy, and maintain the LIFO application.
+Essential documentation for the LIFO AI food waste management platform.
 
-## 🚀 Quick Start
+## Quick Start
 
-**New to LIFO.AI?** Start here:
+New to LIFO? Start here:
 
-- **[Complete Setup & Testing Guide](./COMPLETE_SETUP_TESTING_GUIDE.md)** - Get LIFO running locally in 15 minutes
-- **[Unified Python Setup Guide](./UNIFIED_PYTHON_SETUP_GUIDE.md)** - Single environment setup for API and core
-- **[Quick Auth Test](./QUICK_AUTH_TEST.md)** - Verify your setup works
+1. **[Setup Guide](./SETUP.md)** - Get running quickly with current architecture
+2. **[Architecture Guide](./ARCHITECTURE.md)** - Technical overview and system design
+3. **[API Reference](../lifo_api/API_REFERENCE.md)** - Complete endpoint documentation (65+ endpoints)
 
-## 📚 Core Documentation
+## Documentation Structure
 
-### 🔧 **[Comprehensive FastAPI Microservice Documentation](./COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)**
+### Core Documentation
 
-**The complete guide to the LIFO AI Engine** - covers everything from setup to deployment with examples and troubleshooting.
+- **[SETUP.md](./SETUP.md)** - Development environment setup
+  - Environment configuration
+  - Supabase API key setup
+  - Quick verification tests
+  - Troubleshooting
 
-## 📖 Documentation Categories
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture
+  - System overview and components
+  - API design patterns
+  - European pilot system details
+  - Performance optimizations
+  - Security considerations
 
-### Getting Started
+### Production
 
-- **[Unified Python Setup Guide](./UNIFIED_PYTHON_SETUP_GUIDE.md)** - 🆕 Single environment for API and core
-- **[Quick Setup Guide](./COMPLETE_SETUP_TESTING_GUIDE.md)** - Get LIFO running locally in 15 minutes
-- **[Python Development Setup](./PYTHON_DEVELOPMENT.md)** - Modern Python toolchain (uv + ruff + mypy)
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Production deployment guide
+  - Production environment setup
+  - Deployment procedures
+  - Monitoring and maintenance
 
-### API & Integration
+- **[PRODUCTION_READINESS_CHECKLIST.md](./PRODUCTION_READINESS_CHECKLIST.md)** - Pre-deployment checklist
+  - Security verification
+  - Performance validation
+  - Operational readiness
 
-- **[API Documentation](./API_DOCUMENTATION.md)** - Detailed endpoint reference
-- **[Frontend Integration](./FRONTEND_SCANNING_API_SPEC.md)** - Frontend-backend integration guide
-- **[MVP Implementation](./MVP_IMPLEMENTATION_SUMMARY.md)** - Feature implementation status
+### API Documentation
 
-### Architecture & Design
+- **[API Reference](../lifo_api/API_REFERENCE.md)** - Complete API documentation
+  - All 65+ endpoints organized by function
+  - Authentication requirements
+  - Request/response examples
+  - Error handling
 
-- **[Technical Architecture](./technical-architecture.md)** - System architecture overview
-- **[Data Fetching Guide](./data-fetching-guide.md)** - Data layer patterns
-- **[LIFO AI Core](./LIFO_AI_CORE_README.md)** - Core module documentation
+## System Overview
 
-### Features
+The LIFO application uses a consolidated architecture:
 
-- **[CSV Processing Guide](./CSV_PROCESSING_GUIDE.md)** - Complete CSV upload and processing guide
-- **[CSV Column Mapping Demo](../lifo_api/test_csv_data/CSV_COLUMN_MAPPING_DEMO.md)** - Flexible column mapping examples
-- **[Backend Capabilities](./BACKEND_CAPABILITIES_DEMO.md)** - Backend feature demonstration
+```
+lifo-app/
+├── lifo_api/app/core/    # Consolidated Python backend core
+├── lifo_api/api/v1/      # 65+ API endpoints  
+├── app/                  # Next.js frontend
+└── docs/                 # Essential documentation (this folder)
+```
 
-### Deployment & Operations
+## Key Features
 
-- **[Deployment Guide](./DEPLOYMENT.md)** - Production deployment on Digital Ocean
-- **[Production Readiness](./PRODUCTION_READINESS_CHECKLIST.md)** - Pre-deployment checklist
-- **[Security Guide](./LIFO_API_SECURITY_GUIDE.md)** - Security implementation and best practices
+- **Supabase Authentication**: Modern API key-based authentication
+- **European Pilot System**: Advanced donation management with bulk quantity awareness
+- **Mobile Optimized**: Sub-300ms response times for mobile scanning
+- **AI Scoring**: Multi-factor inventory analysis
+- **65+ API Endpoints**: Comprehensive inventory and analytics APIs
 
-### Development
+## Getting Help
 
-- **[Development Onboarding](./dev-onboarding.md)** - Developer onboarding guide
-- **[Achievements & Status](./Achievements.md)** - Project milestones and MVP status
-- **[Frontend Migration](./FRONTEND_MIGRATION_GUIDE.md)** - Frontend transition guide
+- **Setup Issues**: See troubleshooting section in [SETUP.md](./SETUP.md)
+- **API Questions**: Check [API Reference](../lifo_api/API_REFERENCE.md)
+- **Architecture Questions**: See [ARCHITECTURE.md](./ARCHITECTURE.md)
+- **Production Issues**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-## 🗄️ Archive
+## Archive
 
-Historical documentation and development sessions are archived in:
-
-- **[Development Sessions Archive](./archive/development-sessions/)** - Historical development notes
-- **[Migration Documents Archive](./archive/)** - Database and architecture migration documents
-
-## 🎯 Quick Navigation
-
-### I want to...
-
-- **🏃‍♂️ Get started quickly** → [Comprehensive FastAPI Documentation](./COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md)
-- **⚙️ Set up Python environment** → [Unified Python Setup Guide](./UNIFIED_PYTHON_SETUP_GUIDE.md) 🆕
-- **🛠️ Set up full development environment** → [Complete Setup Guide](./COMPLETE_SETUP_TESTING_GUIDE.md)
-- **🔌 Integrate with the API** → [API Documentation](./API_DOCUMENTATION.md)
-- **🚀 Deploy to production** → [Deployment Guide](./DEPLOYMENT.md)
-- **🔒 Understand security** → [Security Guide](./LIFO_API_SECURITY_GUIDE.md)
-- **📱 Build mobile features** → [Frontend Integration](./FRONTEND_SCANNING_API_SPEC.md)
-
-## 📋 Documentation Standards
-
-All documentation follows these standards:
-
-- **Markdown format** with consistent styling
-- **Code examples** with proper syntax highlighting
-- **Clear headings** and table of contents
-- **Cross-references** between related documents
-- **Version information** where applicable
-
-## 🤝 Contributing to Documentation
-
-When updating documentation:
-
-1. Keep the [Comprehensive FastAPI Documentation](./COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md) as the single source of truth
-2. Update related files for consistency
-3. Use clear, actionable language
-4. Include code examples and expected outputs
-5. Test all installation and setup instructions
+Historical documentation is preserved in the `archive/` directory for reference but is not maintained.
 
 ---
 
-For questions about documentation or to report issues, please refer to the troubleshooting sections in the relevant guides.
+*This documentation reflects the current consolidated architecture with backend consolidated into `lifo_api/app/core` and Supabase API key authentication.*
