@@ -136,6 +136,34 @@ interface SupabaseInsights {
   }
 }
 
+// Actionable batch type from the JSON structure you provided
+export interface ActionableBatch {
+  batch_id: string
+  product_name: string
+  expiry_date: string
+  urgency: 'critical' | 'high' | 'medium' | 'low'
+  recommendation: string
+  discount_percent: number
+  reason: string
+  location_code: string
+  current_quantity: number
+  potential_loss: number
+  composite_score: number
+}
+
+export interface DashboardSummary {
+  total_batches: number
+  total_quantity: number
+  total_value: number
+  expired_count: number
+  expiring_soon_count: number
+}
+
+export interface DashboardAlerts {
+  expired_items: number
+  expiring_soon: number
+}
+
 export interface AnalyticsResponse {
   analytics: {
     timeframe: string
@@ -152,6 +180,14 @@ export interface AnalyticsResponse {
       store_name: string
       insights: SupabaseInsights
     }
+    // New fields from your JSON structure
+    actionable_batches?: ActionableBatch[]
+    dashboard?: {
+      summary?: DashboardSummary
+      alerts?: DashboardAlerts
+    }
+    dashboard_summary?: DashboardSummary
+    dashboard_alerts?: DashboardAlerts
     waste?: WasteAnalytics | { error: string }
     revenue?: RevenueAnalytics | { error: string }
     categories?: CategoryAnalytics | { error: string }

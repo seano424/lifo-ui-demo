@@ -546,10 +546,10 @@
       "activeInventory": "Active inventory status",
       "activeBatchesCount": "{needsAttention} of {total} active batches",
       "urgency": {
-        "critical": "Critical",
-        "high": "High Priority (expiring within 2-3 days)",
-        "medium": "Medium Priority (expiring within a week)",
-        "low": "Low Priority (expiring within 2 weeks)"
+        "critical": "Critical (Immediate Action Required)",
+        "high": "High Priority (expires tomorrow)",
+        "medium": "Medium Priority (expires within 2-7 days)",
+        "low": "Low Priority (longer shelf life)"
       },
       "status": {
         "ok": "OK",

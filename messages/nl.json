@@ -409,10 +409,10 @@
       "activeInventory": "Actieve voorraad status",
       "activeBatchesCount": "{needsAttention} van {total} actieve batches",
       "urgency": {
-        "critical": "Kritiek",
-        "high": "Hoge prioriteit (verloopt binnen 2-3 dagen)",
-        "medium": "Gemiddelde prioriteit (verloopt binnen een week)",
-        "low": "Lage prioriteit (verloopt binnen 2 weken)"
+        "critical": "Kritiek (Onmiddellijke Actie Vereist)",
+        "high": "Hoge Prioriteit (verloopt morgen)",
+        "medium": "Gemiddelde Prioriteit (verloopt binnen 2-7 dagen)",
+        "low": "Lage Prioriteit (langere houdbaarheid)"
       },
       "status": {
         "ok": "OK",
