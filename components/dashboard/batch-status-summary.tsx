@@ -4,6 +4,7 @@ import { AlertTriangle, Calendar, Clock } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
+import { useActiveBatches } from '@/hooks/use-batches'
 import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
@@ -31,8 +32,9 @@ export function BatchStatusSummary() {
   const t = useTranslations('storeInsights.batchStatus')
   const activeStoreId = useActiveStoreId()
   const { data, isLoading, error } = useStoreAnalytics(activeStoreId, '7d')
+  const { count: totalActiveBatchesCount, isLoading: isLoadingActiveBatches } = useActiveBatches()
 
-  if (isLoading) {
+  if (isLoading || isLoadingActiveBatches) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
         <div className="space-y-4">
@@ -105,10 +107,11 @@ export function BatchStatusSummary() {
   ).length
 
   const totalNeedsAttention = criticalCount + highCount + mediumCount + lowCount
-  const totalActiveBatches = activeBatchesFromActionable.length
-  const okCount = totalActiveBatches - totalNeedsAttention
+  const okCount = totalActiveBatchesCount - totalNeedsAttention
   const attentionPercentage =
-    totalActiveBatches > 0 ? Math.round((totalNeedsAttention / totalActiveBatches) * 100) : 0
+    totalActiveBatchesCount > 0
+      ? Math.round((totalNeedsAttention / totalActiveBatchesCount) * 100)
+      : 0
 
   const getUrgencyIcon = (urgency: string) => {
     switch (urgency) {
@@ -270,7 +273,7 @@ export function BatchStatusSummary() {
             <Typography variant="small" className=" mt-1">
               {t('activeBatchesCount', {
                 needsAttention: totalNeedsAttention,
-                total: totalActiveBatches,
+                total: totalActiveBatchesCount,
               })}
             </Typography>
           </div>
