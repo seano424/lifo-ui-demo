@@ -131,13 +131,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           size="sm"
           className="group-data-[collapsible=icon]:block hidden"
         />
-
-        <div className="group-data-[collapsible=icon]:hidden sm:hidden">
-          <TeamSwitcher />
-        </div>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />
+        <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
+          <TeamSwitcher />
+        </div>
       </SidebarContent>
       <SidebarFooter className="py-4">
         <NavUser user={user} />
