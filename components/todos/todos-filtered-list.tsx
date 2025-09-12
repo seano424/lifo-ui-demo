@@ -1,25 +1,21 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { TodosCardList } from '@/components/todos/todos-card-list'
 import { TodosFilters } from '@/components/todos/todos-filters'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
+  type ActionableBatch,
   useBatchActionsInfinite,
   useStoreAnalytics,
   useTodosInfinite,
 } from '@/hooks/use-scoring-analytics'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import {
-  isSortDirection,
-  isSortField,
-  validateSortConfig,
-} from '@/lib/utils/todo-sorting'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { isSortDirection, isSortField, validateSortConfig } from '@/lib/utils/todo-sorting'
 
 export type TodoItem = {
   batch_id: string
@@ -65,21 +61,14 @@ interface TodosFilteredListProps {
   pageSize?: number
 }
 
-export function TodosFilteredList({
-  initialFilters,
-  pageSize = 20,
-}: TodosFilteredListProps) {
+export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
 
-  const [activeTab, setActiveTab] = useState<string>(
-    initialFilters?.tab || 'recommendations'
-  )
+  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'recommendations')
 
-  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>(
-    []
-  )
+  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
   const [filters, setFilters] = useState<TodoFilters>(() => {
@@ -89,13 +78,7 @@ export function TodosFilteredList({
     }
 
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
-      const validUrgencyLevels = [
-        'critical',
-        'high',
-        'medium',
-        'low',
-        'maintain',
-      ]
+      const validUrgencyLevels = ['critical', 'high', 'medium', 'low', 'maintain']
       if (validUrgencyLevels.includes(initialFilters.urgency)) {
         baseFilters.urgency = initialFilters.urgency as TodoFilters['urgency']
       }
@@ -121,17 +104,12 @@ export function TodosFilteredList({
   })
 
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, storeId: activeStoreId || undefined }))
+    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
   useEffect(() => {
     const updateIndicator = () => {
-      const tabs = [
-        'recommendations',
-        'recently_expired',
-        'all_active',
-        'action_history',
-      ]
+      const tabs = ['recommendations', 'recently_expired', 'all_active', 'action_history']
       const activeIndex = tabs.indexOf(activeTab)
       const activeButton = buttonRefs.current[activeIndex]
 
@@ -204,12 +182,9 @@ export function TodosFilteredList({
     isFetchingNextPage,
   } = useTodosInfinite(activeStoreId || '', pageSize || 20)
 
-  const { data: batchActionsData } = useBatchActionsInfinite(
-    activeStoreId || '',
-    1
-  )
+  const { data: batchActionsData } = useBatchActionsInfinite(activeStoreId || '', 1)
 
-  const getFilteredCount = (batches: any[], tab: string) => {
+  const getFilteredCount = (batches: ActionableBatch[], tab: string) => {
     if (!batches) return 0
 
     // Apply urgency filter if on recommendations or all_active tabs
@@ -218,7 +193,7 @@ export function TodosFilteredList({
       filters.urgency &&
       filters.urgency !== 'all'
     ) {
-      return batches.filter((batch) => batch.urgency === filters.urgency).length
+      return batches.filter(batch => batch.urgency === filters.urgency).length
     }
 
     return batches.length
@@ -226,28 +201,26 @@ export function TodosFilteredList({
 
   const counts = {
     recommendations:
-      activeTab === 'recommendations' &&
-      filters.urgency &&
-      filters.urgency !== 'all'
+      activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
         ? getFilteredCount(
             analyticsResponse?.analytics?.actionable_batches || [],
-            'recommendations'
+            'recommendations',
           )
         : analyticsResponse?.analytics?.actionable_batches?.length || 0,
     recently_expired:
       analyticsResponse?.analytics?.actionable_batches?.filter(
-        (batch) => new Date(batch.expiry_date) < new Date()
+        batch => new Date(batch.expiry_date) < new Date(),
       )?.length || 0,
     all_active:
       activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
         ? getFilteredCount(
             analyticsResponse?.analytics?.actionable_batches?.filter(
-              (batch) => new Date(batch.expiry_date) >= new Date()
+              batch => new Date(batch.expiry_date) >= new Date(),
             ) || [],
-            'all_active'
+            'all_active',
           )
         : analyticsResponse?.analytics?.actionable_batches?.filter(
-            (batch) => new Date(batch.expiry_date) >= new Date()
+            batch => new Date(batch.expiry_date) >= new Date(),
           )?.length || 0,
     action_history: batchActionsData?.pages?.[0]?.count || 0,
   }
@@ -255,7 +228,7 @@ export function TodosFilteredList({
   return (
     <>
       <div className="relative">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between sm:justify-start gap-4">
           {[
             { label: 'Recommendations', value: 'recommendations' },
             { label: 'Recently Expired', value: 'recently_expired' },
@@ -264,7 +237,7 @@ export function TodosFilteredList({
           ].map((tab, index) => (
             <Button
               key={tab.value}
-              ref={(el) => {
+              ref={el => {
                 buttonRefs.current[index] = el
               }}
               variant="ghost"
@@ -278,7 +251,9 @@ export function TodosFilteredList({
               className={cn(
                 'rounded-none px-4 relative flex items-center gap-2 pb-4',
                 'hover:bg-transparent group/tab',
-                activeTab === tab.value && 'text-primary'
+                activeTab === tab.value && 'text-primary',
+                tab.value === 'recently_expired' && 'hidden lg:flex',
+                tab.value === 'all_active' && 'hidden lg:flex',
               )}
             >
               {tab.label}
@@ -293,9 +268,7 @@ export function TodosFilteredList({
               {tab.value === 'recently_expired' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={
-                    activeTab === 'recently_expired' ? 'primary' : 'gray'
-                  }
+                  variant={activeTab === 'recently_expired' ? 'primary' : 'gray'}
                 >
                   {counts.recently_expired}
                 </Badge>
@@ -328,11 +301,7 @@ export function TodosFilteredList({
           }}
         />
       </div>
-      <Tabs
-        value={activeTab}
-        onValueChange={handleTabChange}
-        className="w-full"
-      >
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {(activeTab === 'recommendations' || activeTab === 'all_active') && (
           <div className="p-4 border-b pb-8 mb-4">
             <TodosFilters
@@ -346,16 +315,13 @@ export function TodosFilteredList({
           </div>
         )}
 
-        <TabsContent
-          value="recommendations"
-          className="p-4"
-        >
+        <TabsContent value="recommendations" className="p-4">
           <TodosCardList
             tab="recommendations"
             filters={filters}
             pageSize={pageSize}
             infiniteData={{
-              data: infiniteData?.pages?.flatMap((page) => page.data) || [],
+              data: infiniteData?.pages?.flatMap(page => page.data) || [],
               hasNextPage,
               fetchNextPage,
               isFetchingNextPage,
@@ -365,37 +331,16 @@ export function TodosFilteredList({
           />
         </TabsContent>
 
-        <TabsContent
-          value="recently_expired"
-          className="p-4"
-        >
-          <TodosCardList
-            tab="recently_expired"
-            filters={filters}
-            pageSize={pageSize}
-          />
+        <TabsContent value="recently_expired" className="p-4">
+          <TodosCardList tab="recently_expired" filters={filters} pageSize={pageSize} />
         </TabsContent>
 
-        <TabsContent
-          value="all_active"
-          className="p-4"
-        >
-          <TodosCardList
-            tab="all_active"
-            filters={filters}
-            pageSize={pageSize}
-          />
+        <TabsContent value="all_active" className="p-4">
+          <TodosCardList tab="all_active" filters={filters} pageSize={pageSize} />
         </TabsContent>
 
-        <TabsContent
-          value="action_history"
-          className="p-4"
-        >
-          <TodosCardList
-            tab="action_history"
-            filters={filters}
-            pageSize={pageSize}
-          />
+        <TabsContent value="action_history" className="p-4">
+          <TodosCardList tab="action_history" filters={filters} pageSize={pageSize} />
         </TabsContent>
       </Tabs>
     </>
