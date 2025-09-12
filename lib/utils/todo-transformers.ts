@@ -54,6 +54,11 @@ export function createMemoizedTransformer<T, R>(
   }
 }
 
+// String formatting utilities
+export function formatRecommendation(recommendation: string): string {
+  return recommendation.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+}
+
 // Pre-configured memoized transformers
 export const memoizedBatchToTodo = createMemoizedTransformer(
   transformActionableBatchToTodo,

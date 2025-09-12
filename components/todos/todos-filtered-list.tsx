@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TodosCardList } from '@/components/todos/todos-card-list'
 import { TodosFilters } from '@/components/todos/todos-filters'
 import { Badge } from '@/components/ui/badge'
@@ -186,49 +186,61 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   const { data: batchActionsData } = useBatchActionsInfinite(activeStoreId || '', 1)
 
-  const getFilteredCount = (batches: ActionableBatch[], tab: string) => {
-    if (!batches) return 0
+  const getFilteredCount = useCallback(
+    (batches: ActionableBatch[], tab: string) => {
+      if (!batches) return 0
 
-    // Apply urgency filter if on recommendations or all_active tabs
-    if (
-      (tab === 'recommendations' || tab === 'all_active') &&
-      filters.urgency &&
-      filters.urgency !== 'all'
-    ) {
-      return batches.filter(batch => batch.urgency === filters.urgency).length
-    }
+      // Apply urgency filter if on recommendations or all_active tabs
+      if (
+        (tab === 'recommendations' || tab === 'all_active') &&
+        filters.urgency &&
+        filters.urgency !== 'all'
+      ) {
+        return batches.filter(batch => batch.urgency === filters.urgency).length
+      }
 
-    return batches.length
-  }
+      return batches.length
+    },
+    [filters.urgency],
+  )
 
-  const counts = {
-    recommendations:
-      // Use filtered count from infinite data if available, otherwise use analytics data
-      activeTab === 'recommendations' && infiniteData?.pages?.[0]?.count !== undefined
-        ? infiniteData.pages[0].count
-        : activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
+  const counts = useMemo(() => {
+    return {
+      recommendations:
+        // Use filtered count from infinite data if available, otherwise use analytics data
+        activeTab === 'recommendations' && infiniteData?.pages?.[0]?.count !== undefined
+          ? infiniteData.pages[0].count
+          : activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
+            ? getFilteredCount(
+                analyticsResponse?.analytics?.actionable_batches || [],
+                'recommendations',
+              )
+            : analyticsResponse?.analytics?.actionable_batches?.length || 0,
+      recently_expired:
+        analyticsResponse?.analytics?.actionable_batches?.filter(
+          batch => new Date(batch.expiry_date) < new Date(),
+        )?.length || 0,
+      all_active:
+        activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
           ? getFilteredCount(
-              analyticsResponse?.analytics?.actionable_batches || [],
-              'recommendations',
+              analyticsResponse?.analytics?.actionable_batches?.filter(
+                batch => new Date(batch.expiry_date) >= new Date(),
+              ) || [],
+              'all_active',
             )
-          : analyticsResponse?.analytics?.actionable_batches?.length || 0,
-    recently_expired:
-      analyticsResponse?.analytics?.actionable_batches?.filter(
-        batch => new Date(batch.expiry_date) < new Date(),
-      )?.length || 0,
-    all_active:
-      activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
-        ? getFilteredCount(
-            analyticsResponse?.analytics?.actionable_batches?.filter(
+          : analyticsResponse?.analytics?.actionable_batches?.filter(
               batch => new Date(batch.expiry_date) >= new Date(),
-            ) || [],
-            'all_active',
-          )
-        : analyticsResponse?.analytics?.actionable_batches?.filter(
-            batch => new Date(batch.expiry_date) >= new Date(),
-          )?.length || 0,
-    action_history: batchActionsData?.pages?.[0]?.count || 0,
-  }
+            )?.length || 0,
+      action_history: batchActionsData?.pages?.[0]?.count || 0,
+    }
+  }, [
+    activeTab,
+    infiniteData?.pages,
+    filters.urgency,
+    analyticsResponse?.analytics?.actionable_batches,
+    batchActionsData?.pages,
+    getFilteredCount,
+  ])
 
   return (
     <>
@@ -265,7 +277,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'recommendations' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'recommendations' ? 'primary' : 'gray'}
+                  variant={activeTab === 'recommendations' ? 'primary' : 'secondary'}
                 >
                   {counts.recommendations}
                 </Badge>
@@ -273,7 +285,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'recently_expired' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'recently_expired' ? 'primary' : 'gray'}
+                  variant={activeTab === 'recently_expired' ? 'primary' : 'secondary'}
                 >
                   {counts.recently_expired}
                 </Badge>
@@ -281,7 +293,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'all_active' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'all_active' ? 'primary' : 'gray'}
+                  variant={activeTab === 'all_active' ? 'primary' : 'secondary'}
                 >
                   {counts.all_active}
                 </Badge>
@@ -289,7 +301,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'action_history' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'action_history' ? 'primary' : 'gray'}
+                  variant={activeTab === 'action_history' ? 'primary' : 'secondary'}
                 >
                   {counts.action_history}
                 </Badge>

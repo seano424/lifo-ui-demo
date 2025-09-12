@@ -5,6 +5,7 @@ import type { TodoItem } from '@/components/todos/todos-filtered-list'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
+import { formatRecommendation } from '@/lib/utils/todo-transformers'
 
 interface TodoCardProps {
   todo: TodoItem
@@ -18,9 +19,29 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   // Format expiry date
   const expiryDate = new Date(todo.expiry_date)
+  const today = new Date()
   const isExpiringSoon = expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
-  const isExpired = expiryDate < new Date()
-  const isExpiringToday = expiryDate.toDateString() === new Date().toDateString()
+  const isExpired = expiryDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const isExpiringToday = expiryDate.toDateString() === today.toDateString()
+
+  // Calculate days since expiry for expired items
+  const getExpiredText = () => {
+    if (!isExpired) return ''
+
+    // Use date-only comparison to avoid timezone issues
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const expiryDateOnly = new Date(
+      expiryDate.getFullYear(),
+      expiryDate.getMonth(),
+      expiryDate.getDate(),
+    )
+
+    const diffTime = todayDate.getTime() - expiryDateOnly.getTime()
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 1) return 'expired yesterday'
+    return `expired ${diffDays} days ago`
+  }
 
   // Get urgency colors and icons
   const getUrgencyConfig = (urgency: TodoItem['urgency']) => {
@@ -78,11 +99,6 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   const urgencyConfig = getUrgencyConfig(todo.urgency)
 
-  // Format recommendation for display
-  const formatRecommendation = (recommendation: string) => {
-    return recommendation.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-  }
-
   return (
     <div
       className={cn('cursor-pointer transition-all duration-1000', 'border-b')}
@@ -132,15 +148,14 @@ export function TodoCard({ todo }: TodoCardProps) {
                 </Badge>
               )}
 
-              {todo.discount_percent == null ||
-                (todo.discount_percent === 0 && (
-                  <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
-                ))}
+              {(todo.discount_percent == null || todo.discount_percent === 0) && (
+                <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
+              )}
 
               {isExpiringToday ? (
                 <Badge variant="destructive">expires today</Badge>
               ) : isExpired ? (
-                <Badge variant="destructive">expired</Badge>
+                <Badge variant="destructive">{getExpiredText()}</Badge>
               ) : isExpiringSoon ? (
                 <Badge variant="primary">expiring soon</Badge>
               ) : (
