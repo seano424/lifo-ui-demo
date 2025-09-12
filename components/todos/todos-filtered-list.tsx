@@ -41,7 +41,7 @@ export type TodoItem = {
 
 export type TodoFilters = {
   storeId?: string
-  tab?: 'recommendations' | 'recently_expired' | 'all_active' | 'action_history'
+  tab?: 'suggestions' | 'recently_expired' | 'all_active' | 'action_history'
   urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
   sort?: {
     field:
@@ -71,7 +71,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
 
-  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'recommendations')
+  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'suggestions')
 
   const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
@@ -84,7 +84,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const [filters, setFilters] = useState<TodoFilters>(() => {
     const baseFilters: TodoFilters = {
       storeId: activeStoreId || undefined,
-      tab: (initialFilters?.tab as TodoFilters['tab']) || 'recommendations',
+      tab: (initialFilters?.tab as TodoFilters['tab']) || 'suggestions',
     }
 
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
@@ -105,7 +105,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       }
     } else {
       baseFilters.sort =
-        baseFilters.tab === 'recommendations'
+        baseFilters.tab === 'suggestions'
           ? { field: 'urgency', direction: 'desc' }
           : { field: 'expiry_date', direction: 'asc' }
     }
@@ -119,7 +119,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   useEffect(() => {
     const updateIndicator = () => {
-      const tabs = ['recommendations', 'recently_expired', 'all_active', 'action_history']
+      const tabs = ['suggestions', 'recently_expired', 'all_active', 'action_history']
       const activeIndex = tabs.indexOf(activeTab)
       const activeButton = buttonRefs.current[activeIndex]
 
@@ -140,7 +140,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
     const params = new URLSearchParams(searchParams.toString())
 
-    if (updatedFilters.tab && updatedFilters.tab !== 'recommendations') {
+    if (updatedFilters.tab && updatedFilters.tab !== 'suggestions') {
       params.set('tab', updatedFilters.tab)
     } else {
       params.delete('tab')
@@ -258,9 +258,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     (batches: ActionableBatch[], tab: string) => {
       if (!batches) return 0
 
-      // Apply urgency filter if on recommendations or all_active tabs
+      // Apply urgency filter if on suggestions or all_active tabs
       if (
-        (tab === 'recommendations' || tab === 'all_active') &&
+        (tab === 'suggestions' || tab === 'all_active') &&
         filters.urgency &&
         filters.urgency !== 'all'
       ) {
@@ -289,14 +289,14 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   const counts = useMemo(() => {
     return {
-      recommendations:
+      suggestions:
         // Use filtered count from infinite data if available, otherwise use analytics data
-        activeTab === 'recommendations' && infiniteData?.pages?.[0]?.count !== undefined
+        activeTab === 'suggestions' && infiniteData?.pages?.[0]?.count !== undefined
           ? infiniteData.pages[0].count
-          : activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
+          : activeTab === 'suggestions' && filters.urgency && filters.urgency !== 'all'
             ? getFilteredCount(
                 analyticsResponse?.analytics?.actionable_batches || [],
-                'recommendations',
+                'suggestions',
               )
             : analyticsResponse?.analytics?.actionable_batches?.length || 0,
       recently_expired:
@@ -335,7 +335,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       <div className="relative">
         <div className="flex items-center justify-between sm:justify-start gap-4">
           {[
-            { label: 'Recommendations', value: 'recommendations' },
+            { label: 'Suggestions', value: 'suggestions' },
             { label: 'Recently Expired', value: 'recently_expired' },
             { label: 'All Active', value: 'all_active' },
             { label: 'Action History', value: 'action_history' },
@@ -363,12 +363,12 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               )}
             >
               {tab.label}
-              {tab.value === 'recommendations' && (
+              {tab.value === 'suggestions' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'recommendations' ? 'primary' : 'gray'}
+                  variant={activeTab === 'suggestions' ? 'primary' : 'gray'}
                 >
-                  {counts.recommendations}
+                  {counts.suggestions}
                 </Badge>
               )}
               {tab.value === 'recently_expired' && (
@@ -408,7 +408,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         />
       </div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        {(activeTab === 'recommendations' || activeTab === 'all_active') && (
+        {(activeTab === 'suggestions' || activeTab === 'all_active') && (
           <div className="px-4 mb-4">
             <TodosFilters
               filters={{
@@ -431,9 +431,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           </div>
         )}
 
-        <TabsContent value="recommendations" className="p-4">
+        <TabsContent value="suggestions" className="p-4">
           <TodosCardList
-            tab="recommendations"
+            tab="suggestions"
             filters={filters}
             infiniteData={{
               data: infiniteData?.pages?.flatMap(page => page.data) || [],
