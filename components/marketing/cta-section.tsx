@@ -113,7 +113,7 @@ export function CtaSection() {
 
             <Button
               size="lg"
-              className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+              className="w-full py-4 text-lg font-bold rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >
               {t('card.button')} <ArrowRight size={18} />
             </Button>

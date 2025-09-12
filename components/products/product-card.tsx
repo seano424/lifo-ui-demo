@@ -153,13 +153,13 @@ export function ProductCard({
           {product.brand && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Brand</span>
-              <span className="font-medium">{product.brand}</span>
+              <span className="font-bold">{product.brand}</span>
             </div>
           )}
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Stock</span>
-            <span className="font-medium">
+            <span className="font-bold">
               {product.total_stock} {product.unit_type}
             </span>
           </div>
@@ -182,7 +182,7 @@ export function ProductCard({
 
       {(isDeleting || isUpdating) && (
         <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-2xl">
-          <div className="text-sm font-medium">{isDeleting ? 'Deleting...' : 'Updating...'}</div>
+          <div className="text-sm font-bold">{isDeleting ? 'Deleting...' : 'Updating...'}</div>
         </div>
       )}
     </Card>

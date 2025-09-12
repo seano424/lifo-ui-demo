@@ -54,7 +54,7 @@ export function ActionLog() {
           <TableBody>
             {sampleActionLog.map(log => (
               <TableRow key={log.id}>
-                <TableCell className="font-medium">{log.productName}</TableCell>
+                <TableCell className="font-bold">{log.productName}</TableCell>
                 <TableCell>
                   <Badge className={getActionColor(log.action)}>
                     {log.action.charAt(0).toUpperCase() + log.action.slice(1)}

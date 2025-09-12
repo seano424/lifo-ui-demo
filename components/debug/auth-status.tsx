@@ -100,7 +100,7 @@ export function AuthStatus() {
           </div>
         )}
         <details className="mt-4">
-          <summary className="cursor-pointer font-medium">Raw Session Data</summary>
+          <summary className="cursor-pointer font-bold">Raw Session Data</summary>
           <pre className="mt-2 p-2 bg-gray-50 rounded-2xl text-xs overflow-auto">
             {JSON.stringify(authInfo.rawSession, null, 2)}
           </pre>

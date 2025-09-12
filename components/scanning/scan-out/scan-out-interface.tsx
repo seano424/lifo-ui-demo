@@ -431,7 +431,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border"
               >
                 <div className="flex-1">
-                  <div className="font-medium">{item.productName}</div>
+                  <div className="font-bold">{item.productName}</div>
                   <div className="text-sm text-gray-500">
                     {item.brand} • {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
                   </div>
@@ -517,14 +517,14 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
-                        <div className="font-medium">{item.productName}</div>
+                        <div className="font-bold">{item.productName}</div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
                           {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium text-red-600">
+                        <div className="font-bold text-red-600">
                           -{item.quantity}x {formatPrice(item.price)}
                         </div>
                         <div className="text-xs text-red-500">
@@ -538,13 +538,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
               {/* Total Summary */}
               <div className="border-t pt-3">
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center font-bold">
                   <span>{t('totalItemsRemoved')}:</span>
                   <span className="text-red-600">
                     -{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center font-bold">
                   <span>{t('totalValueRemoved')}:</span>
                   <span className="text-red-600">
                     -

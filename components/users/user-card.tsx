@@ -76,7 +76,7 @@ export function UserCard({ user, onActivate, onDeactivate, isUpdating }: UserCar
 
         {/* Status Badge */}
         <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(user.is_active)}`}
+          className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusColor(user.is_active)}`}
         >
           {user.is_active ? 'Active' : 'Inactive'}
         </span>

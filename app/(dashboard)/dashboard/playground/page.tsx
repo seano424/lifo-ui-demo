@@ -241,7 +241,7 @@ function TestResults({
           <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-2xl">
             <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
-              <p className="font-medium text-red-900">Request Failed</p>
+              <p className="font-bold text-red-900">Request Failed</p>
               <p className="text-red-700 mt-1">{error.message}</p>
             </div>
           </div>
@@ -251,7 +251,7 @@ function TestResults({
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-primary-700">
               <CheckCircle className="h-4 w-4" />
-              <span className="text-sm font-medium">Success</span>
+              <span className="text-sm font-bold">Success</span>
             </div>
             <div className="bg-gray-50 p-3 rounded-2xl">
               <pre className="text-xs overflow-auto max-h-64">
@@ -437,7 +437,7 @@ export default function PlaygroundPage() {
               </div>
               <div className="mt-4 space-y-2">
                 <details className="text-sm">
-                  <summary className="cursor-pointer font-medium text-muted-foreground hover:text-foreground">
+                  <summary className="cursor-pointer font-bold text-muted-foreground hover:text-foreground">
                     View HTML Source
                   </summary>
                   <Textarea
@@ -585,7 +585,7 @@ export default function PlaygroundPage() {
           <CardContent>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="font-medium">General Health:</p>
+                <p className="font-bold">General Health:</p>
                 <Badge
                   variant={
                     healthQuery.error ? 'destructive' : healthQuery.data ? 'default' : 'secondary'
@@ -595,7 +595,7 @@ export default function PlaygroundPage() {
                 </Badge>
               </div>
               <div>
-                <p className="font-medium">Database:</p>
+                <p className="font-bold">Database:</p>
                 <Badge
                   variant={
                     dbHealthQuery.error
@@ -609,7 +609,7 @@ export default function PlaygroundPage() {
                 </Badge>
               </div>
               <div>
-                <p className="font-medium">Alerts Endpoint:</p>
+                <p className="font-bold">Alerts Endpoint:</p>
                 <Badge
                   variant={
                     alertsQuery.error ? 'destructive' : alertsQuery.data ? 'default' : 'secondary'
@@ -619,7 +619,7 @@ export default function PlaygroundPage() {
                 </Badge>
               </div>
               <div>
-                <p className="font-medium">Recommendations:</p>
+                <p className="font-bold">Recommendations:</p>
                 <Badge
                   variant={
                     recommendationsQuery.error
@@ -637,11 +637,11 @@ export default function PlaygroundPage() {
                 </Badge>
               </div>
               <div>
-                <p className="font-medium">FastAPI URL:</p>
+                <p className="font-bold">FastAPI URL:</p>
                 <p className="font-mono text-xs">{FASTAPI_BASE_URL}</p>
               </div>
               <div>
-                <p className="font-medium">Active Store:</p>
+                <p className="font-bold">Active Store:</p>
                 <p className="font-mono text-xs">{activeStoreId || 'Not selected'}</p>
               </div>
             </div>

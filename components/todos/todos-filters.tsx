@@ -57,7 +57,7 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
     <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
       {/* Urgency Filter */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Urgency:</span>
+        <span className="text-sm font-bold text-muted-foreground">Urgency:</span>
         <Select
           value={filters?.urgency || 'all'}
           onValueChange={value =>
@@ -83,7 +83,7 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
 
       {/* Sort Controls */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
+        <span className="text-sm font-bold text-muted-foreground">Sort by:</span>
         <Select
           value={currentSort.field}
           onValueChange={handleSortFieldChange}

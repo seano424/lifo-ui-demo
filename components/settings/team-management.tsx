@@ -217,7 +217,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   <div className="flex items-center gap-3">
                     <Crown className="h-5 w-5 text-yellow-500" />
                     <div>
-                      <Typography variant="p" className="font-medium">
+                      <Typography variant="p" className="font-bold">
                         {t('roles.owners')}
                       </Typography>
                       <Typography variant="small" className="text-muted-foreground">
@@ -234,7 +234,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   <div className="flex items-center gap-3">
                     <UserCheck className="h-5 w-5 text-blue-500" />
                     <div>
-                      <Typography variant="p" className="font-medium">
+                      <Typography variant="p" className="font-bold">
                         {t('roles.managers')}
                       </Typography>
                       <Typography variant="small" className="text-muted-foreground">
@@ -251,7 +251,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   <div className="flex items-center gap-3">
                     <User className="h-5 w-5 text-primary-500" />
                     <div>
-                      <Typography variant="p" className="font-medium">
+                      <Typography variant="p" className="font-bold">
                         {t('roles.employees')}
                       </Typography>
                       <Typography variant="small" className="text-muted-foreground">
@@ -277,7 +277,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   <div className="flex items-center gap-3">
                     <UserPlus className="h-5 w-5" />
                     <div className="text-left">
-                      <div className="font-medium">{t('actions.addEmployee')}</div>
+                      <div className="font-bold">{t('actions.addEmployee')}</div>
                       <div className="text-sm text-muted-foreground">
                         {t('actions.addEmployeeDescription')}
                       </div>
@@ -289,7 +289,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   <div className="flex items-center gap-3">
                     <Shield className="h-5 w-5" />
                     <div className="text-left">
-                      <div className="font-medium">{t('actions.managePermissions')}</div>
+                      <div className="font-bold">{t('actions.managePermissions')}</div>
                       <div className="text-sm text-muted-foreground">
                         {t('actions.managePermissionsDescription')}
                       </div>
@@ -301,7 +301,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                   <div className="flex items-center gap-3">
                     <Activity className="h-5 w-5" />
                     <div className="text-left">
-                      <div className="font-medium">{t('actions.viewActivity')}</div>
+                      <div className="font-bold">{t('actions.viewActivity')}</div>
                       <div className="text-sm text-muted-foreground">
                         {t('actions.viewActivityDescription')}
                       </div>
@@ -339,7 +339,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       <div className="flex items-center gap-3">
                         <Crown className="h-4 w-4 text-yellow-500" />
                         <div>
-                          <Typography variant="p" className="font-medium">
+                          <Typography variant="p" className="font-bold">
                             {owner.full_name}
                           </Typography>
                           <Typography variant="small" className="text-muted-foreground">
@@ -381,7 +381,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       <div className="flex items-center gap-3">
                         <UserCheck className="h-4 w-4 text-blue-500" />
                         <div>
-                          <Typography variant="p" className="font-medium">
+                          <Typography variant="p" className="font-bold">
                             {manager.full_name}
                           </Typography>
                           <Typography variant="small" className="text-muted-foreground">
@@ -421,7 +421,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
                       <div className="flex items-center gap-3">
                         <User className="h-4 w-4 text-primary-500" />
                         <div>
-                          <Typography variant="p" className="font-medium">
+                          <Typography variant="p" className="font-bold">
                             {employee.full_name}
                           </Typography>
                           <Typography variant="small" className="text-muted-foreground">
@@ -476,7 +476,7 @@ export default function TeamManagement({ serverPermissions, storeName }: TeamMan
       {process.env.NODE_ENV === 'development' && serverPermissions && (
         <Card>
           <CardContent className="p-4">
-            <Typography variant="small" className="font-medium text-yellow-800 mb-2">
+            <Typography variant="small" className="font-bold text-yellow-800 mb-2">
               Debug: Server Permissions
             </Typography>
             <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">

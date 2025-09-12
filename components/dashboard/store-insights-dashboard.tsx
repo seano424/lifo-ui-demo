@@ -238,13 +238,13 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                 <h4 className="font-semibold text-sm">{t('overview.recentActivity')}</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="p-3 bg-blue-50 rounded">
-                    <p className="font-medium">{t('overview.actionsTaken')}</p>
+                    <p className="font-bold">{t('overview.actionsTaken')}</p>
                     <p className="text-blue-600">
                       {t('overview.actionsTakenPeriod', { totalActions })}
                     </p>
                   </div>
                   <div className="p-3 bg-primary-50 rounded">
-                    <p className="font-medium">{t('overview.discountsApplied')}</p>
+                    <p className="font-bold">{t('overview.discountsApplied')}</p>
                     <p className="text-primary-600">
                       {t('overview.saved', { discountValue: discountValue.toFixed(0) })}
                     </p>

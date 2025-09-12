@@ -24,6 +24,8 @@ export function TodoCard({ todo }: TodoCardProps) {
   const isExpiringSoon =
     expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
   const isExpired = expiryDate < new Date()
+  const isExpiringToday =
+    expiryDate.toDateString() === new Date().toDateString()
 
   // Get urgency colors and icons
   const getUrgencyConfig = (urgency: TodoItem['urgency']) => {
@@ -34,13 +36,15 @@ export function TodoCard({ todo }: TodoCardProps) {
           textColor: 'text-red-700',
           bgColor: 'bg-red-50 border-red-500',
           badge: 'bg-red-100 text-red-800 border-red-500',
+          badgeVariant: 'destructive' as const,
         }
       case 'high':
         return {
-          color: 'bg-orange-500',
-          textColor: 'text-orange-700',
-          bgColor: 'bg-orange-50 border-orange-500',
-          badge: 'bg-orange-100 text-orange-800 border-orange-500',
+          color: 'bg-red-500',
+          textColor: 'text-red-700',
+          bgColor: 'bg-red-50 border-red-500',
+          badge: 'bg-red-100 text-red-800 border-red-500',
+          badgeVariant: 'destructive' as const,
         }
       case 'medium':
         return {
@@ -48,6 +52,7 @@ export function TodoCard({ todo }: TodoCardProps) {
           textColor: 'text-primary-700',
           bgColor: 'bg-primary-50 border-primary-500',
           badge: 'bg-primary-100 text-primary-800 border-primary-500',
+          badgeVariant: 'primary' as const,
         }
       case 'low':
         return {
@@ -55,6 +60,7 @@ export function TodoCard({ todo }: TodoCardProps) {
           textColor: 'text-secondary-700',
           bgColor: 'bg-secondary-50 border-secondary-500',
           badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
+          badgeVariant: 'secondary' as const,
         }
       case 'maintain':
         return {
@@ -62,6 +68,7 @@ export function TodoCard({ todo }: TodoCardProps) {
           textColor: 'text-blue-700',
           bgColor: 'bg-blue-50 border-blue-500',
           badge: 'bg-blue-100 text-blue-800 border-blue-500',
+          badgeVariant: 'secondary' as const,
         }
       default:
         return {
@@ -69,6 +76,7 @@ export function TodoCard({ todo }: TodoCardProps) {
           textColor: 'text-gray-700',
           bgColor: 'bg-gray-50 border-gray-200',
           badge: 'bg-gray-100 text-gray-800 border-gray-200',
+          badgeVariant: 'secondary' as const,
         }
     }
   }
@@ -93,61 +101,40 @@ export function TodoCard({ todo }: TodoCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
     >
-      <div className="p-4 border flex flex-col gap-2">
-        {/* Priority indicator */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className={cn(
-                'border-2 rounded-full',
-                'h-8 w-8 p-0',
-                urgencyConfig.bgColor
-              )}
-            >
-              {/* {todo.urgency.toUpperCase()} */}
-            </Badge>
-          </div>
-          {isExpired && <Badge variant="destructive">expired</Badge>}
-          {isExpiringSoon && !isExpired && (
-            <Badge variant="primary">expires today</Badge>
+      <div className="p-4 flex gap-3 items-start">
+        <Badge
+          variant="outline"
+          className={cn(
+            'border-2 rounded-full cursor-pointer',
+            'h-6 w-6 p-0',
+            urgencyConfig.bgColor
           )}
-        </div>
+        ></Badge>
 
-        <div className="flex flex-col gap-2">
-          {/* Product name and batch number */}
-          <div className="flex flex-col gap-1">
-            <Typography
-              variant="muted"
-              className="flex items-center gap-1"
-            >
-              <Package className="h-3 w-3" />
-              {todo.batch_id.slice(0, 8)}...
-            </Typography>
+        <div className="flex flex-col min-w-0 flex-1 gap-3">
+          <div className=" flex flex-col gap-1">
             <Typography
               variant="h4"
               className="line-clamp-1"
             >
               {todo.product_name}
             </Typography>
+
+            <div className="flex-1">
+              <Typography className="flex gap-1">
+                <span className="flex-shrink-0">Suggestion</span>
+                <span className="truncate lowercase">
+                  {formatRecommendation(todo.recommendation)} {todo.reason}
+                </span>
+              </Typography>
+            </div>
           </div>
 
-          {/* Recommendation */}
-          <Typography
-            variant="muted"
-            className="flex gap-1 min-w-0"
-          >
-            <span className="flex-shrink-0">Suggestion</span>
-            <span className="truncate lowercase">
-              {formatRecommendation(todo.recommendation)} {todo.reason}
-            </span>
-          </Typography>
-
           {/* Details */}
-          <div>
+          <div className="flex flex-col gap-1">
             <Typography
               variant="muted"
-              className="flex items-center justify-between"
+              className="flex items-center justify-between "
             >
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
@@ -159,14 +146,24 @@ export function TodoCard({ todo }: TodoCardProps) {
               </span>
             </Typography>
 
-            {todo.discount_percent && (
-              <Typography
-                variant="small"
-                className="text-secondary-700"
-              >
-                Suggested discount: {todo.discount_percent}%
-              </Typography>
-            )}
+            <div className="flex items-center justify-between">
+              {todo.discount_percent && (
+                <Badge variant={urgencyConfig.badgeVariant}>
+                  Suggested discount: {todo.discount_percent}%
+                </Badge>
+              )}
+
+              {isExpired && !isExpiringToday && (
+                <Badge variant="destructive">expired</Badge>
+              )}
+
+              {isExpiringSoon && !isExpired && (
+                <Badge variant="primary">expiring soon</Badge>
+              )}
+              {isExpiringToday && (
+                <Badge variant="destructive">expires today</Badge>
+              )}
+            </div>
           </div>
         </div>
       </div>

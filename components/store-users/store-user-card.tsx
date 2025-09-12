@@ -250,7 +250,7 @@ export function StoreUserCard({
           {/* Username (if available) */}
           {storeUser.username && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="font-medium">{t('card.username')}:</span>
+              <span className="font-bold">{t('card.username')}:</span>
               <code className="bg-gray-100 px-2 py-1 rounded-2xl text-xs">
                 {storeUser.username}
               </code>
@@ -259,7 +259,7 @@ export function StoreUserCard({
 
           {/* Permissions Summary */}
           <div className="space-y-2">
-            <Typography variant="small" className="font-medium">
+            <Typography variant="small" className="font-bold">
               {t('card.permissions')}:
             </Typography>
             <div className="flex flex-wrap gap-1">

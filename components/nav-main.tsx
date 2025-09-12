@@ -89,7 +89,7 @@ export function NavMain({
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
-                        className="p-4 font-medium group-data-[collapsible=icon]:hidden"
+                        className="p-4 font-bold group-data-[collapsible=icon]:hidden"
                         tooltip={item.title}
                       >
                         {item.icon && <item.icon />}
@@ -102,7 +102,7 @@ export function NavMain({
                         {item.items.map(subItem => (
                           <SidebarMenuSubItem
                             className={cn(
-                              'hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:active:bg-primary-900 rounded-2xl font-medium pl-6 py-1',
+                              'hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:active:bg-primary-900 rounded-2xl font-bold pl-6 py-1',
                               isPathActive(subItem.url) &&
                                 'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 font-bold',
                               'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0',
@@ -127,7 +127,7 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-medium',
+                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-bold',
                       isPathActive(item.url) &&
                         'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold',
                     )}

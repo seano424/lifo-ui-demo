@@ -885,7 +885,7 @@ export function AddEmployeeDialog({
               {/* <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
-                    <Label className="text-sm font-medium">
+                    <Label className="text-sm font-bold">
                       {t('credentials.email')}
                     </Label>
                     <div className="font-mono text-sm">
@@ -909,7 +909,7 @@ export function AddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
-                    <Label className="text-sm font-medium">
+                    <Label className="text-sm font-bold">
                       {t('credentials.username')}
                     </Label>
                     <div className="font-mono text-sm">
@@ -936,7 +936,7 @@ export function AddEmployeeDialog({
 
                 <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
                   <div>
-                    <Label className="text-sm font-medium">
+                    <Label className="text-sm font-bold">
                       {t('credentials.pin')}
                     </Label>
                     <div className="font-mono text-lg font-bold">
@@ -962,7 +962,7 @@ export function AddEmployeeDialog({
               <Separator />
 
               {/* <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className="font-medium text-blue-900 mb-2">
+                <h4 className="font-bold text-blue-900 mb-2">
                   {t('nextSteps.title')}
                 </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
@@ -1017,7 +1017,7 @@ export function AddEmployeeDialog({
               </Alert>
 
               <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                <h4 className="font-bold text-blue-900 mb-2">What happens next?</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• User receives an email notification about the invitation</li>
                   <li>• They can login with their existing LIFO credentials</li>

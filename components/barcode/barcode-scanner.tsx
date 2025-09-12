@@ -396,7 +396,7 @@ export default function BarcodeScanner({
         {/* Scanning History */}
         {scanningHistory.length > 0 && (
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-600">Recent Scans</h4>
+            <h4 className="text-sm font-bold text-gray-600">Recent Scans</h4>
             <div className="space-y-1">
               {scanningHistory.map((barcode, index) => (
                 <div

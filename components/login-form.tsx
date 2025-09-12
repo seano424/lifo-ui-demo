@@ -288,7 +288,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               New store?{' '}
               <Link
                 href="/onboarding/create-account"
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-bold"
               >
                 Create an account
               </Link>

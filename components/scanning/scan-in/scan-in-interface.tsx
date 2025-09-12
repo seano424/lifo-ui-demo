@@ -147,14 +147,14 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                       className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
-                        <div className="font-medium">{item.productName}</div>
+                        <div className="font-bold">{item.productName}</div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
                           Expires: {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">
+                        <div className="font-bold">
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
                         <div className="text-xs text-gray-600">
@@ -168,11 +168,11 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
 
               {/* Total Summary */}
               <div className="border-t pt-3">
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center font-bold">
                   <span>Total Items:</span>
                   <span>{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
                 </div>
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center font-bold">
                   <span>Total Value:</span>
                   <span>
                     {formatPrice(

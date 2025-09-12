@@ -18,7 +18,7 @@ function Stat({ label, description, subtext }: StatProps) {
         <div className="relative z-10">
           <Typography
             variant="h2"
-            className="text-4xl font-extrabold bg-clip-text text-center text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6"
+            className="text-4xl font-bold bg-clip-text text-center text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6"
           >
             {label}
           </Typography>

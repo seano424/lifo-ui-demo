@@ -148,7 +148,7 @@ export default function InventoryForm({
   return (
     <Card className={className}>
       <CardContent className="p-4 space-y-3">
-        <Label className="font-medium">{finalTitle}</Label>
+        <Label className="font-bold">{finalTitle}</Label>
 
         <div className="grid grid-cols-2 gap-2">
           {showExpiryDate && (

@@ -79,7 +79,7 @@ export function StoreHeaderDisplay({
               <Store className="size-5" />
             </div>
             <div>
-              <p className="font-medium">No store selected</p>
+              <p className="font-bold">No store selected</p>
               <p className="text-sm">Please select a store to continue</p>
             </div>
           </div>

@@ -147,7 +147,7 @@ export function ContactForm() {
           disabled={status.loading}
           loading={status.loading}
           loadingText={t('sending')}
-          className="w-full md:w-auto py-3 text-lg font-medium rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
+          className="w-full md:w-auto py-3 text-lg font-bold rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
         >
           {t('submit')}
         </Button>

@@ -80,7 +80,7 @@ export function CSVMappingInfo() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Brain className="h-5 w-5 text-blue-500" />
-          <h3 className="font-medium">Smart CSV Mapping</h3>
+          <h3 className="font-bold">Smart CSV Mapping</h3>
           <Badge variant="secondary" className="text-xs">
             Intelligent Processing
           </Badge>
@@ -93,7 +93,7 @@ export function CSVMappingInfo() {
 
         {/* Field Mapping Rules */}
         <Collapsible open={showMappingRules} onOpenChange={setShowMappingRules}>
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium hover:text-primary">
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-bold hover:text-primary">
             {showMappingRules ? (
               <ChevronDown className="h-4 w-4" />
             ) : (
@@ -139,7 +139,7 @@ export function CSVMappingInfo() {
 
         {/* Category Defaults */}
         <Collapsible open={showCategoryDefaults} onOpenChange={setShowCategoryDefaults}>
-          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium hover:text-primary">
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm font-bold hover:text-primary">
             {showCategoryDefaults ? (
               <ChevronDown className="h-4 w-4" />
             ) : (
@@ -155,7 +155,7 @@ export function CSVMappingInfo() {
                   className="flex items-center justify-between p-2 bg-gray-50 rounded"
                 >
                   <div>
-                    <span className="font-medium text-sm">{item.category}</span>
+                    <span className="font-bold text-sm">{item.category}</span>
                     <p className="text-xs text-gray-600">{item.description}</p>
                   </div>
                   <Badge variant="outline" className="text-xs">
@@ -172,7 +172,7 @@ export function CSVMappingInfo() {
           <div className="flex items-start gap-2">
             <CheckCircle className="h-4 w-4 text-primary-600 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-primary-800">Processing Guarantees</p>
+              <p className="font-bold text-primary-800">Processing Guarantees</p>
               <ul className="text-primary-700 mt-1 space-y-1 text-xs">
                 <li>• Missing SKUs are auto-generated with unique identifiers</li>
                 <li>• Expiration dates calculated based on category rules</li>
@@ -188,7 +188,7 @@ export function CSVMappingInfo() {
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-blue-800">Error Prevention</p>
+              <p className="font-bold text-blue-800">Error Prevention</p>
               <p className="text-blue-700 text-xs mt-1">
                 Invalid data is automatically corrected or flagged with helpful warnings
               </p>

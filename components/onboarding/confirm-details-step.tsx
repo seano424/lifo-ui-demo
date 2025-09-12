@@ -130,7 +130,7 @@ export function ConfirmDetailsStep() {
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('fields.type')}</div>
+              <div className="text-sm font-bold text-muted-foreground">{t('fields.type')}</div>
               <div>
                 {selectedStoreForm.store_type
                   ? STORE_TYPE_LABELS[
@@ -141,7 +141,7 @@ export function ConfirmDetailsStep() {
             </div>
 
             <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('fields.address')}</div>
+              <div className="text-sm font-bold text-muted-foreground">{t('fields.address')}</div>
               <div>{selectedStoreForm.address || t('values.notProvided')}</div>
               {selectedStoreForm.city && selectedStoreForm.postal_code && (
                 <div className="text-sm text-muted-foreground">
@@ -152,20 +152,20 @@ export function ConfirmDetailsStep() {
 
             {selectedStoreForm.phone && (
               <div>
-                <div className="text-sm font-medium text-muted-foreground">{t('fields.phone')}</div>
+                <div className="text-sm font-bold text-muted-foreground">{t('fields.phone')}</div>
                 <div>{selectedStoreForm.phone}</div>
               </div>
             )}
 
             <div>
-              <div className="text-sm font-medium text-muted-foreground">{t('fields.country')}</div>
+              <div className="text-sm font-bold text-muted-foreground">{t('fields.country')}</div>
               <div>{selectedStoreForm.country || t('values.notSpecified')}</div>
             </div>
 
             {selectedStoreForm.business_name &&
               selectedStoreForm.business_name !== selectedStoreForm.store_name && (
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">
+                  <div className="text-sm font-bold text-muted-foreground">
                     {t('fields.businessName')}
                   </div>
                   <div>{selectedStoreForm.business_name}</div>

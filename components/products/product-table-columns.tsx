@@ -94,7 +94,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div>
-          <div className="font-medium truncate" title={row.original.name}>
+          <div className="font-bold truncate" title={row.original.name}>
             {row.original.name || t('unnamedProduct')}
           </div>
           <div
@@ -174,7 +174,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div className="text-right">
-          <div className="font-medium">{row.original.total_stock || 0}</div>
+          <div className="font-bold">{row.original.total_stock || 0}</div>
           {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),
