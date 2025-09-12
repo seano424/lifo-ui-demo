@@ -2,6 +2,10 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  BatchActionFilters,
+  type BatchActionFiltersType,
+} from '@/components/todos/batch-action-filters'
 import { TodosCardList } from '@/components/todos/todos-card-list'
 import { TodosFilters } from '@/components/todos/todos-filters'
 import { Badge } from '@/components/ui/badge'
@@ -70,6 +74,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+
+  // Batch action filters state
+  const [batchActionFilters, setBatchActionFilters] = useState<BatchActionFiltersType>({
+    sort: { field: 'action_date', direction: 'desc' },
+  })
 
   const [filters, setFilters] = useState<TodoFilters>(() => {
     const baseFilters: TodoFilters = {
@@ -171,6 +180,10 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     })
   }
 
+  const handleBatchActionFiltersChange = (newFilters: BatchActionFiltersType) => {
+    setBatchActionFilters(newFilters)
+  }
+
   const { data: analyticsResponse } = useStoreAnalytics(activeStoreId || '')
 
   const {
@@ -184,7 +197,64 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     urgency: filters.urgency,
   })
 
-  const { data: batchActionsData } = useBatchActionsInfinite(activeStoreId || '', 1)
+  const {
+    data: batchActionsData,
+    isLoading: isBatchActionsLoading,
+    hasNextPage: hasBatchActionsNextPage,
+    fetchNextPage: fetchBatchActionsNextPage,
+    isFetchingNextPage: isFetchingBatchActionsNextPage,
+  } = useBatchActionsInfinite(
+    activeTab === 'action_history' ? activeStoreId || null : null,
+    pageSize || 20,
+  )
+
+  // Memoized batch actions processing with filtering and sorting
+  const processedBatchActions = useMemo(() => {
+    if (activeTab !== 'action_history' || !batchActionsData?.pages) {
+      return []
+    }
+
+    let actions = batchActionsData.pages.flatMap(page => page.data)
+
+    // Apply action type filter
+    if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
+      actions = actions.filter(action => action.actual_action === batchActionFilters.actionType)
+    }
+
+    // Apply sorting
+    if (batchActionFilters?.sort) {
+      actions = [...actions].sort((a, b) => {
+        const { field, direction } = batchActionFilters.sort!
+        const multiplier = direction === 'asc' ? 1 : -1
+
+        switch (field) {
+          case 'action_date':
+            return (
+              (new Date(a.action_date || 0).getTime() - new Date(b.action_date || 0).getTime()) *
+              multiplier
+            )
+          case 'expiry_date':
+            return (
+              (new Date(a.expiry_date || 0).getTime() - new Date(b.expiry_date || 0).getTime()) *
+              multiplier
+            )
+          case 'actual_action':
+            return a.actual_action.localeCompare(b.actual_action) * multiplier
+          case 'effectiveness': {
+            const aEffectiveness =
+              a.recovered_value && a.original_value ? a.recovered_value / a.original_value : 0
+            const bEffectiveness =
+              b.recovered_value && b.original_value ? b.recovered_value / b.original_value : 0
+            return (aEffectiveness - bEffectiveness) * multiplier
+          }
+          default:
+            return 0
+        }
+      })
+    }
+
+    return actions
+  }, [activeTab, batchActionsData?.pages, batchActionFilters])
 
   const getFilteredCount = useCallback(
     (batches: ActionableBatch[], tab: string) => {
@@ -333,11 +403,20 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           </div>
         )}
 
+        {activeTab === 'action_history' && (
+          <div className="px-4 mb-4">
+            <BatchActionFilters
+              filters={batchActionFilters}
+              onFiltersChange={handleBatchActionFiltersChange}
+              isLoading={isBatchActionsLoading}
+            />
+          </div>
+        )}
+
         <TabsContent value="recommendations" className="p-4">
           <TodosCardList
             tab="recommendations"
             filters={filters}
-            pageSize={pageSize}
             infiniteData={{
               data: infiniteData?.pages?.flatMap(page => page.data) || [],
               hasNextPage,
@@ -350,15 +429,26 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </TabsContent>
 
         <TabsContent value="recently_expired" className="p-4">
-          <TodosCardList tab="recently_expired" filters={filters} pageSize={pageSize} />
+          <TodosCardList tab="recently_expired" filters={filters} />
         </TabsContent>
 
         <TabsContent value="all_active" className="p-4">
-          <TodosCardList tab="all_active" filters={filters} pageSize={pageSize} />
+          <TodosCardList tab="all_active" filters={filters} />
         </TabsContent>
 
         <TabsContent value="action_history" className="p-4">
-          <TodosCardList tab="action_history" filters={filters} pageSize={pageSize} />
+          <TodosCardList
+            tab="action_history"
+            filters={filters}
+            processedBatchActions={processedBatchActions}
+            infiniteData={{
+              data: [],
+              hasNextPage: hasBatchActionsNextPage,
+              fetchNextPage: fetchBatchActionsNextPage,
+              isFetchingNextPage: isFetchingBatchActionsNextPage,
+              isLoading: isBatchActionsLoading,
+            }}
+          />
         </TabsContent>
       </Tabs>
     </>
