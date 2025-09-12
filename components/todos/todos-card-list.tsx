@@ -47,7 +47,7 @@ export function TodosCardList({
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Get actionable batches from store analytics for recommendations tab
+  // Get actionable batches from store analytics for suggestions tab
   const { data: analyticsResponse, isLoading: analyticsLoading } = useStoreAnalytics(
     activeStoreId || '',
   )
@@ -80,7 +80,7 @@ export function TodosCardList({
 
   // Memoized data processing to avoid expensive recalculations
   const processedTodos = useMemo(() => {
-    if (tab === 'recommendations') {
+    if (tab === 'suggestions') {
       // Use infinite data for consistency - avoid mixing data sources
       if (infiniteData) {
         const batches = infiniteData.data || []
@@ -168,7 +168,7 @@ export function TodosCardList({
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">
-          {tab === 'recommendations' && 'No recommendations available'}
+          {tab === 'suggestions' && 'No suggestions available'}
           {tab === 'recently_expired' && 'No recently expired batches'}
           {tab === 'all_active' && 'No active batches'}
           {tab === 'action_history' && 'No action history available'}
