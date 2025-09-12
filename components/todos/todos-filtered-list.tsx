@@ -204,7 +204,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     fetchNextPage: fetchBatchActionsNextPage,
     isFetchingNextPage: isFetchingBatchActionsNextPage,
   } = useBatchActionsInfinite(
-    activeTab === 'action_history' ? activeStoreId || null : null,
+    activeStoreId || null,
     pageSize || 20,
   )
 
@@ -274,6 +274,20 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     [filters.urgency],
   )
 
+  const getBatchActionsFilteredCount = useCallback(
+    (actions: any[]) => {
+      if (!actions) return 0
+
+      // Apply action type filter
+      if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
+        return actions.filter(action => action.actual_action === batchActionFilters.actionType).length
+      }
+
+      return actions.length
+    },
+    [batchActionFilters?.actionType],
+  )
+
   const counts = useMemo(() => {
     return {
       recommendations:
@@ -301,7 +315,12 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           : analyticsResponse?.analytics?.actionable_batches?.filter(
               batch => new Date(batch.expiry_date) >= new Date(),
             )?.length || 0,
-      action_history: batchActionsData?.pages?.[0]?.count || 0,
+      action_history:
+        batchActionFilters?.actionType && batchActionFilters.actionType !== 'all'
+          ? getBatchActionsFilteredCount(
+              batchActionsData?.pages?.flatMap(page => page.data) || [],
+            )
+          : batchActionsData?.pages?.[0]?.count || 0,
     }
   }, [
     activeTab,
@@ -309,7 +328,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     filters.urgency,
     analyticsResponse?.analytics?.actionable_batches,
     batchActionsData?.pages,
+    batchActionFilters?.actionType,
     getFilteredCount,
+    getBatchActionsFilteredCount,
   ])
 
   return (
