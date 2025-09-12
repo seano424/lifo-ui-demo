@@ -257,6 +257,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               ref={el => {
                 buttonRefs.current[index] = el
               }}
+              size="lg"
               variant="ghost"
               onClick={() => {
                 setActiveTab(tab.value)
@@ -267,8 +268,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               }}
               className={cn(
                 'rounded-none px-4 relative flex items-center gap-2 pb-4',
-                'hover:bg-transparent group/tab',
-                activeTab === tab.value && 'text-primary',
+                'hover:bg-transparent group/tab font-bold font-sans tracking-tight',
+                activeTab === tab.value ? 'text-primary' : 'text-muted-foreground/90',
                 tab.value === 'recently_expired' && 'hidden lg:flex',
                 tab.value === 'all_active' && 'hidden lg:flex',
               )}
@@ -277,7 +278,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'recommendations' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'recommendations' ? 'primary' : 'secondary'}
+                  variant={activeTab === 'recommendations' ? 'primary' : 'gray'}
                 >
                   {counts.recommendations}
                 </Badge>
@@ -285,7 +286,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'recently_expired' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'recently_expired' ? 'primary' : 'secondary'}
+                  variant={activeTab === 'recently_expired' ? 'primary' : 'gray'}
                 >
                   {counts.recently_expired}
                 </Badge>
@@ -293,7 +294,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'all_active' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'all_active' ? 'primary' : 'secondary'}
+                  variant={activeTab === 'all_active' ? 'primary' : 'gray'}
                 >
                   {counts.all_active}
                 </Badge>
@@ -301,7 +302,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               {tab.value === 'action_history' && (
                 <Badge
                   className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'action_history' ? 'primary' : 'secondary'}
+                  variant={activeTab === 'action_history' ? 'primary' : 'gray'}
                 >
                   {counts.action_history}
                 </Badge>
@@ -309,9 +310,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             </Button>
           ))}
         </div>
-        <div className="absolute left-0 right-0 bottom-0 h-[1px] bg-border" />
+        <div className="absolute left-0 right-0 bottom-0 h-[4px] bg-border" />
         <div
-          className="absolute bottom-0 h-[2px] bg-primary transition-all duration-300 ease-in-out z-10"
+          className="absolute bottom-0 h-[4px] bg-primary transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
           style={{
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
@@ -320,7 +321,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       </div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {(activeTab === 'recommendations' || activeTab === 'all_active') && (
-          <div className="p-4 border-b pb-8 mb-4">
+          <div className="px-4 mb-4">
             <TodosFilters
               filters={{
                 urgency: filters.urgency,
