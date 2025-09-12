@@ -22,6 +22,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { useUrgentTodosCount } from '@/hooks/use-urgent-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
 import { TeamSwitcher } from './team-switcher'
 import { NavbarLogo } from './ui/logo'
@@ -29,6 +30,7 @@ import { Typography } from './ui/typography'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
+  const { count: urgentTodosCount } = useUrgentTodosCount()
 
   return React.useMemo(
     () => ({
@@ -61,6 +63,7 @@ function useNavigationData() {
               title: t('todos'),
               url: '/dashboard/todos',
               icon: ListTodo,
+              badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
             },
           ],
         },
@@ -92,7 +95,7 @@ function useNavigationData() {
         },
       ],
     }),
-    [t],
+    [t, urgentTodosCount],
   )
 }
 

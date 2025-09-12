@@ -19,6 +19,34 @@ import {
 import { cn } from '@/lib/utils'
 import { Typography } from './ui/typography'
 
+// Badge component for navigation items
+function NavBadge({ count, className }: { count: number; className?: string }) {
+  if (count <= 0) return null
+
+  return (
+    <>
+      {/* Badge for expanded sidebar */}
+      <span
+        className={cn(
+          'ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-900 text-xs font-medium text-white',
+          'group-data-[collapsible=icon]:hidden',
+          count > 9 && 'w-6', // Make wider for double digits
+          className,
+        )}
+      >
+        {count > 99 ? '99+' : count}
+      </span>
+      {/* Small dot indicator for collapsed sidebar */}
+      <span
+        className={cn(
+          'absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500',
+          'hidden group-data-[collapsible=icon]:block',
+        )}
+      />
+    </>
+  )
+}
+
 export function NavMain({
   sections,
 }: {
@@ -29,10 +57,12 @@ export function NavMain({
       url: string
       icon?: LucideIcon
       isActive?: boolean
+      badge?: number
       items?: {
         title: string
         url: string
         icon?: LucideIcon
+        badge?: number
       }[]
     }[]
   }[]
@@ -94,6 +124,7 @@ export function NavMain({
                       >
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
+                        {item.badge && <NavBadge count={item.badge} className="ml-0 mr-2" />}
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
@@ -115,6 +146,7 @@ export function NavMain({
                                   <subItem.icon className="!text-secondary-900 dark:!text-primary-50" />
                                 )}
                                 <span>{subItem.title}</span>
+                                {subItem.badge && <NavBadge count={subItem.badge} />}
                               </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -127,7 +159,7 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-medium',
+                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-medium relative',
                       isPathActive(item.url) &&
                         'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold',
                     )}
@@ -143,6 +175,7 @@ export function NavMain({
                         <item.icon className="text-secondary-900 dark:text-primary-50" />
                       )}
                       <span>{item.title}</span>
+                      {item.badge && <NavBadge count={item.badge} />}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
