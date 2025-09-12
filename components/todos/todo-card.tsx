@@ -1,10 +1,10 @@
 'use client'
 
-import { Calendar, MapPin, Package } from 'lucide-react'
+import { Calendar, Package } from 'lucide-react'
 import { useState } from 'react'
 import type { TodoItem } from '@/components/todos/todos-filtered-list'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 
 interface TodoCardProps {
@@ -21,7 +21,8 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   // Format expiry date
   const expiryDate = new Date(todo.expiry_date)
-  const isExpiringSoon = expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
+  const isExpiringSoon =
+    expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
   const isExpired = expiryDate < new Date()
 
   // Get urgency colors and icons
@@ -31,36 +32,36 @@ export function TodoCard({ todo }: TodoCardProps) {
         return {
           color: 'bg-red-500',
           textColor: 'text-red-700',
-          bgColor: 'bg-red-50 border-red-200',
-          badge: 'bg-red-100 text-red-800 border-red-200',
+          bgColor: 'bg-red-50 border-red-500',
+          badge: 'bg-red-100 text-red-800 border-red-500',
         }
       case 'high':
         return {
           color: 'bg-orange-500',
           textColor: 'text-orange-700',
-          bgColor: 'bg-orange-50 border-orange-200',
-          badge: 'bg-orange-100 text-orange-800 border-orange-200',
+          bgColor: 'bg-orange-50 border-orange-500',
+          badge: 'bg-orange-100 text-orange-800 border-orange-500',
         }
       case 'medium':
         return {
-          color: 'bg-yellow-500',
-          textColor: 'text-yellow-700',
-          bgColor: 'bg-yellow-50 border-yellow-200',
-          badge: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+          color: 'bg-primary-500',
+          textColor: 'text-primary-700',
+          bgColor: 'bg-primary-50 border-primary-500',
+          badge: 'bg-primary-100 text-primary-800 border-primary-500',
         }
       case 'low':
         return {
-          color: 'bg-green-500',
-          textColor: 'text-green-700',
-          bgColor: 'bg-green-50 border-green-200',
-          badge: 'bg-green-100 text-green-800 border-green-200',
+          color: 'bg-secondary-500',
+          textColor: 'text-secondary-700',
+          bgColor: 'bg-secondary-50 border-secondary-500',
+          badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
         }
       case 'maintain':
         return {
           color: 'bg-blue-500',
           textColor: 'text-blue-700',
-          bgColor: 'bg-blue-50 border-blue-200',
-          badge: 'bg-blue-100 text-blue-800 border-blue-200',
+          bgColor: 'bg-blue-50 border-blue-500',
+          badge: 'bg-blue-100 text-blue-800 border-blue-500',
         }
       default:
         return {
@@ -76,102 +77,99 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   // Format recommendation for display
   const formatRecommendation = (recommendation: string) => {
-    return recommendation.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+    return recommendation
+      .replace('_', ' ')
+      .replace(/\b\w/g, (l) => l.toUpperCase())
   }
 
   return (
-    <Card
+    <div
       className={cn(
         'cursor-pointer transition-all duration-200 hover:shadow-md',
-        urgencyConfig.bgColor,
-        isHovered && 'transform scale-[1.02]',
+        'border-b',
+        isHovered && 'transform scale-[1.02]'
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
     >
-      <CardContent className="p-4">
+      <div className="p-4 border flex flex-col gap-2">
         {/* Priority indicator */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className={cn('w-3 h-3 rounded-full', urgencyConfig.color)} />
-            <Badge variant="outline" className={cn('text-xs', urgencyConfig.badge)}>
-              {todo.urgency.toUpperCase()}
-            </Badge>
-          </div>
-          {isExpired && (
-            <Badge variant="destructive" className="text-xs">
-              EXPIRED
-            </Badge>
-          )}
-          {isExpiringSoon && !isExpired && (
             <Badge
               variant="outline"
-              className="text-xs bg-amber-50 text-amber-700 border-amber-200"
+              className={cn(
+                'border-2 rounded-full',
+                'h-8 w-8 p-0',
+                urgencyConfig.bgColor
+              )}
             >
-              TODAY
+              {/* {todo.urgency.toUpperCase()} */}
             </Badge>
+          </div>
+          {isExpired && <Badge variant="destructive">expired</Badge>}
+          {isExpiringSoon && !isExpired && (
+            <Badge variant="primary">expires today</Badge>
           )}
         </div>
 
-        {/* Product name and batch number */}
-        <div className="mb-3">
-          <h3 className="font-semibold text-sm mb-1 line-clamp-1">{todo.product_name}</h3>
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <Package className="h-3 w-3" />
-            {todo.batch_id.slice(0, 8)}...
-          </p>
-        </div>
-
-        {/* Recommendation */}
-        <div className="mb-3">
-          <p className={cn('text-sm font-medium mb-1', urgencyConfig.textColor)}>
-            {formatRecommendation(todo.recommendation)}
-          </p>
-          <p className="text-xs text-muted-foreground line-clamp-2">{todo.reason}</p>
-        </div>
-
-        {/* Details */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              Expires: {expiryDate.toLocaleDateString()}
-            </span>
-            <span className="flex items-center gap-1 text-muted-foreground">
+        <div className="flex flex-col gap-2">
+          {/* Product name and batch number */}
+          <div className="flex flex-col gap-1">
+            <Typography
+              variant="muted"
+              className="flex items-center gap-1"
+            >
               <Package className="h-3 w-3" />
-              {todo.current_quantity} left
-            </span>
+              {todo.batch_id.slice(0, 8)}...
+            </Typography>
+            <Typography
+              variant="h4"
+              className="line-clamp-1"
+            >
+              {todo.product_name}
+            </Typography>
           </div>
 
-          <div className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              {todo.location_code}
+          {/* Recommendation */}
+          <Typography
+            variant="muted"
+            className="flex gap-1 min-w-0"
+          >
+            <span className="flex-shrink-0">Suggestion</span>
+            <span className="truncate lowercase">
+              {formatRecommendation(todo.recommendation)} {todo.reason}
             </span>
-            {todo.potential_loss && (
-              <span className="font-medium text-red-600">
-                Loss: ${todo.potential_loss.toFixed(0)}
+          </Typography>
+
+          {/* Details */}
+          <div>
+            <Typography
+              variant="muted"
+              className="flex items-center justify-between"
+            >
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                Expires: {expiryDate.toLocaleDateString()}
               </span>
+              <span className="flex items-center gap-1">
+                <Package className="h-3 w-3" />
+                {todo.current_quantity} left
+              </span>
+            </Typography>
+
+            {todo.discount_percent && (
+              <Typography
+                variant="small"
+                className="text-secondary-700"
+              >
+                Suggested discount: {todo.discount_percent}%
+              </Typography>
             )}
           </div>
-
-          {todo.discount_percent && (
-            <div className="pt-2 border-t border-current/10">
-              <span className="text-xs font-medium text-green-700">
-                Suggested discount: {todo.discount_percent}%
-              </span>
-            </div>
-          )}
         </div>
-
-        {/* Hover state indicator */}
-        {isHovered && (
-          <div className="mt-3 pt-2 border-t border-current/10">
-            <p className="text-xs text-muted-foreground italic">Click to view actions →</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
