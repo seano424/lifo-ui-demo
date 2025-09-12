@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Package } from 'lucide-react'
+import { Calendar, Package, PenLine } from 'lucide-react'
 import { useState } from 'react'
 import type { TodoItem } from '@/components/todos/todos-filtered-list'
 import { Badge } from '@/components/ui/badge'
@@ -34,8 +34,8 @@ export function TodoCard({ todo }: TodoCardProps) {
         return {
           color: 'bg-red-500',
           textColor: 'text-red-700',
-          bgColor: 'bg-red-50 border-red-500',
-          badge: 'bg-red-100 text-red-800 border-red-500',
+          bgColor: 'bg-red-500 border-red-600',
+          badge: 'bg-red-200 text-red-800 border-red-500',
           badgeVariant: 'destructive' as const,
         }
       case 'high':
@@ -92,17 +92,17 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   return (
     <div
-      className={cn('cursor-pointer transition-all duration-200', 'border-b')}
+      className={cn('cursor-pointer transition-all duration-1000', 'border-b')}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
     >
-      <div className="p-4 flex gap-3 items-start">
+      <div className="flex gap-3 px-4 py-6 items-start relative group">
         <Badge
           variant="outline"
           className={cn(
             'border-2 rounded-full cursor-pointer',
-            'h-6 w-6 p-0',
+            'h-6 w-6 p-0 group-hover:bg-brand-white transition-all duration-200',
             urgencyConfig.bgColor
           )}
         ></Badge>
@@ -160,6 +160,13 @@ export function TodoCard({ todo }: TodoCardProps) {
                 <Badge variant="destructive">expires today</Badge>
               )}
             </div>
+          </div>
+        </div>
+
+        <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded p-1.5 group/edit">
+          <PenLine className="h-4 w-4" />
+          <div className="absolute right-2 text-xs w-min text-nowrap bg-brand-dark font-medium text-white rounded-lg py-1 px-2.5 -top-full opacity-0 group-hover/edit:opacity-100 transition-all duration-1000 delay-300">
+            Edit todo
           </div>
         </div>
       </div>

@@ -217,7 +217,7 @@ export function TodosCardList({
 
   return (
     <InfiniteScrollErrorBoundary>
-      <div className="space-y-4">
+      <div className="space-y-4 border-t pt-4">
         <div className="flex flex-col gap-4">
           {tab === 'action_history'
             ? batchActionsDataFlat.map((action) => (
