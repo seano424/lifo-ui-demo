@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BatchActionCard } from '@/components/todos/batch-action-card'
 import { TodoCard } from '@/components/todos/todo-card'
-import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
+import type {
+  TodoFilters,
+  TodoItem,
+} from '@/components/todos/todos-filtered-list'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
@@ -32,16 +35,20 @@ interface TodosCardListProps {
   }
 }
 
-export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCardListProps) {
+export function TodosCardList({
+  tab,
+  filters,
+  pageSize,
+  infiniteData,
+}: TodosCardListProps) {
   const activeStoreId = useActiveStoreId()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   // Get actionable batches from store analytics for recommendations tab
-  const { data: analyticsResponse, isLoading: analyticsLoading } = useStoreAnalytics(
-    activeStoreId || '',
-  )
+  const { data: analyticsResponse, isLoading: analyticsLoading } =
+    useStoreAnalytics(activeStoreId || '')
 
   // Get batch actions for history tab using infinite query
   const {
@@ -53,12 +60,15 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     error: _batchActionsError,
   } = useBatchActionsInfinite(
     tab === 'action_history' ? activeStoreId || null : null,
-    pageSize || DEFAULT_PAGE_SIZE,
+    pageSize || DEFAULT_PAGE_SIZE
   )
 
   // Intersection observer for auto-loading more items (handles both todos and batch actions)
   const { targetRef, isIntersecting } = useIntersectionObserver({
-    enabled: hasMore && !infiniteData?.isFetchingNextPage && !isFetchingBatchActionsNextPage,
+    enabled:
+      hasMore &&
+      !infiniteData?.isFetchingNextPage &&
+      !isFetchingBatchActionsNextPage,
     rootMargin: DEFAULT_ROOT_MARGIN,
   })
 
@@ -104,20 +114,28 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
         const actionableTodos = memoizedBatchToTodo(batches)
         return applyFiltersAndSorting(actionableTodos, filters)
       }
-    } else if (tab === 'recently_expired' && analyticsResponse?.analytics?.actionable_batches) {
-      const expiredBatches = analyticsResponse.analytics.actionable_batches.filter(
-        (batch: ActionableBatch) => new Date(batch.expiry_date) < new Date(),
-      )
+    } else if (
+      tab === 'recently_expired' &&
+      analyticsResponse?.analytics?.actionable_batches
+    ) {
+      const expiredBatches =
+        analyticsResponse.analytics.actionable_batches.filter(
+          (batch: ActionableBatch) => new Date(batch.expiry_date) < new Date()
+        )
 
       const expiredTodos = memoizedBatchToTodo(expiredBatches)
       return applySorting(expiredTodos, filters, {
         field: 'expiry_date',
         direction: 'asc',
       })
-    } else if (tab === 'all_active' && analyticsResponse?.analytics?.actionable_batches) {
-      const activeBatches = analyticsResponse.analytics.actionable_batches.filter(
-        (batch: ActionableBatch) => new Date(batch.expiry_date) >= new Date(),
-      )
+    } else if (
+      tab === 'all_active' &&
+      analyticsResponse?.analytics?.actionable_batches
+    ) {
+      const activeBatches =
+        analyticsResponse.analytics.actionable_batches.filter(
+          (batch: ActionableBatch) => new Date(batch.expiry_date) >= new Date()
+        )
 
       const activeTodos = memoizedBatchToTodo(activeBatches)
       const filteredTodos = applyUrgencyFilter(activeTodos, filters)
@@ -128,7 +146,12 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     }
 
     return []
-  }, [tab, filters, infiniteData, analyticsResponse?.analytics?.actionable_batches])
+  }, [
+    tab,
+    filters,
+    infiniteData,
+    analyticsResponse?.analytics?.actionable_batches,
+  ])
 
   // Update state when processed data changes
   useEffect(() => {
@@ -152,11 +175,18 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     isBatchActionsLoading,
   ])
 
-  if (isLoading || analyticsLoading || (tab === 'action_history' && isBatchActionsLoading)) {
+  if (
+    isLoading ||
+    analyticsLoading ||
+    (tab === 'action_history' && isBatchActionsLoading)
+  ) {
     return (
       <div className="flex flex-col gap-16">
         {Array.from({ length: 4 }, () => (
-          <div key={crypto.randomUUID()} className="flex flex-col gap-4">
+          <div
+            key={crypto.randomUUID()}
+            className="flex flex-col gap-4"
+          >
             <div className="flex gap-4">
               <Skeleton className="h-8 w-8 flex-shrink-0 bg-muted animate-pulse" />
               <div className="w-full flex flex-col gap-2">
@@ -179,7 +209,8 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
   }
 
   // Check if we have no data to display
-  const batchActionsDataFlat = batchActionsData?.pages?.flatMap(page => page.data) || []
+  const batchActionsDataFlat =
+    batchActionsData?.pages?.flatMap((page) => page.data) || []
   const hasNoData =
     tab === 'action_history'
       ? batchActionsDataFlat.length === 0 && !isBatchActionsLoading
@@ -198,20 +229,34 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     )
   }
 
+  console.log('batch actions data', batchActionsData)
+
   return (
     <InfiniteScrollErrorBoundary>
       <div className="space-y-4 flex flex-col">
         <div className="flex flex-col gap-12">
           {tab === 'action_history'
-            ? batchActionsDataFlat.map(action => (
-                <BatchActionCard key={action.action_id} action={action} />
+            ? batchActionsDataFlat.map((action) => (
+                <BatchActionCard
+                  key={action.action_id}
+                  action={action}
+                />
               ))
-            : todos.map(todo => <TodoCard key={todo.batch_id} todo={todo} />)}
+            : todos.map((todo) => (
+                <TodoCard
+                  key={todo.batch_id}
+                  todo={todo}
+                />
+              ))}
         </div>
 
         {hasMore && (
-          <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
-            {infiniteData?.isFetchingNextPage || isFetchingBatchActionsNextPage ? (
+          <div
+            ref={targetRef}
+            className="flex justify-center items-center pt-8 pb-4 min-h-[60px]"
+          >
+            {infiniteData?.isFetchingNextPage ||
+            isFetchingBatchActionsNextPage ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm">
@@ -222,7 +267,10 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
             ) : (
               <div className="text-sm text-muted-foreground opacity-60">
                 Scroll to load more (
-                {tab === 'action_history' ? batchActionsDataFlat.length : todos.length} loaded)
+                {tab === 'action_history'
+                  ? batchActionsDataFlat.length
+                  : todos.length}{' '}
+                loaded)
               </div>
             )}
           </div>
@@ -233,14 +281,20 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
 }
 
 // Helper functions for data processing
-function applyFiltersAndSorting(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
+function applyFiltersAndSorting(
+  todos: TodoItem[],
+  filters: TodoFilters
+): TodoItem[] {
   const filtered = applyUrgencyFilter(todos, filters)
   return applySorting(filtered, filters)
 }
 
-function applyUrgencyFilter(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
+function applyUrgencyFilter(
+  todos: TodoItem[],
+  filters: TodoFilters
+): TodoItem[] {
   if (filters.urgency && filters.urgency !== 'all') {
-    return todos.filter(todo => todo.urgency === filters.urgency)
+    return todos.filter((todo) => todo.urgency === filters.urgency)
   }
   return todos
 }
@@ -248,7 +302,7 @@ function applyUrgencyFilter(todos: TodoItem[], filters: TodoFilters): TodoItem[]
 function applySorting(
   todos: TodoItem[],
   filters: TodoFilters,
-  defaultSort?: Partial<{ field: string; direction: string }>,
+  defaultSort?: Partial<{ field: string; direction: string }>
 ): TodoItem[] {
   if (filters.sort) {
     const validatedSort = validateSortConfig(filters.sort)
