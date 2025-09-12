@@ -5,13 +5,14 @@ import { BatchActionCard } from '@/components/todos/batch-action-card'
 import { TodoCard } from '@/components/todos/todo-card'
 import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import {
   type ActionableBatch,
   useBatchActionsInfinite,
   useStoreAnalytics,
 } from '@/hooks/use-scoring-analytics'
-import { DEFAULT_PAGE_SIZE, DEFAULT_ROOT_MARGIN, SKELETON_ITEM_COUNT } from '@/lib/constants/todos'
+import { DEFAULT_PAGE_SIZE, DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { createTodoSorter, validateSortConfig } from '@/lib/utils/todo-sorting'
 import { memoizedBatchToTodo } from '@/lib/utils/todo-transformers'
@@ -153,9 +154,25 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
 
   if (isLoading || analyticsLoading || (tab === 'action_history' && isBatchActionsLoading)) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: SKELETON_ITEM_COUNT }, () => (
-          <div key={crypto.randomUUID()} className="h-32 bg-muted animate-pulse rounded-lg" />
+      <div className="flex flex-col gap-16">
+        {Array.from({ length: 4 }, () => (
+          <div key={crypto.randomUUID()} className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <Skeleton className="h-8 w-8 flex-shrink-0 bg-muted animate-pulse" />
+              <div className="w-full flex flex-col gap-2">
+                <Skeleton className="h-6 w-64 bg-muted animate-pulse" />
+                <Skeleton className="h-6 w-8/12 bg-muted animate-pulse" />
+                <div className="flex gap-2 justify-between mt-6">
+                  <Skeleton className="h-6 w-1/4 bg-muted animate-pulse" />
+                  <Skeleton className="h-6 w-1/5 bg-muted animate-pulse" />
+                </div>
+                <div className="flex gap-2 justify-between">
+                  <Skeleton className="h-6 w-2/5 bg-muted animate-pulse" />
+                  <Skeleton className="h-6 w-1/4 bg-muted animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     )
