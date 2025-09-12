@@ -34,7 +34,7 @@ export function BatchListSortControls({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="hidden md:block text-sm font-bold text-muted-foreground">
+      <span className="hidden md:block text-sm font-medium text-muted-foreground">
         {t('sortBy')}:
       </span>
 

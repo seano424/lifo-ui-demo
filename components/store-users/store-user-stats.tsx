@@ -78,7 +78,7 @@ export function StoreUserStats() {
       {/* Total Active Users */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">Active Users</CardTitle>
+          <CardTitle className="text-sm font-medium">Active Users</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -95,7 +95,7 @@ export function StoreUserStats() {
       {/* Owners */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">Store Owners</CardTitle>
+          <CardTitle className="text-sm font-medium">Store Owners</CardTitle>
           <Crown className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -109,7 +109,7 @@ export function StoreUserStats() {
       {/* Managers */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">Managers</CardTitle>
+          <CardTitle className="text-sm font-medium">Managers</CardTitle>
           <UserCheck className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -123,7 +123,7 @@ export function StoreUserStats() {
       {/* Employees */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">Employees</CardTitle>
+          <CardTitle className="text-sm font-medium">Employees</CardTitle>
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -137,7 +137,7 @@ export function StoreUserStats() {
       {/* PIN Enabled Users - Second Row */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">PIN Access</CardTitle>
+          <CardTitle className="text-sm font-medium">PIN Access</CardTitle>
           <Shield className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -154,7 +154,7 @@ export function StoreUserStats() {
       {/* Team Growth (placeholder for future analytics) */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">Team Size</CardTitle>
+          <CardTitle className="text-sm font-medium">Team Size</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -166,12 +166,12 @@ export function StoreUserStats() {
       {/* Store Information */}
       <Card className="md:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-bold">Store Details</CardTitle>
+          <CardTitle className="text-sm font-medium">Store Details</CardTitle>
           <Store className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold">{activeStore.store_name}</span>
+            <span className="text-sm font-medium">{activeStore.store_name}</span>
             <Badge variant="secondary">{activeStore.store_type}</Badge>
           </div>
           <div className="flex items-center justify-between text-sm text-muted-foreground">

@@ -110,7 +110,7 @@ export function createBatchTableColumns({
       header: t('headers.product'),
       cell: ({ row }) => (
         <div>
-          <div className="font-bold truncate" title={row.original.products?.name}>
+          <div className="font-medium truncate" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
           <div
@@ -190,7 +190,7 @@ export function createBatchTableColumns({
       cell: ({ row }) => (
         <div className="text-right">
           <span
-            className="font-bold truncate"
+            className="font-medium truncate"
             title={Number(row.original.current_quantity).toLocaleString()}
           >
             {Number(row.original.current_quantity).toLocaleString()}

@@ -372,7 +372,7 @@ export function BatchCard({
                 Expiry Date
               </span>
               <span
-                className={`font-bold ${
+                className={`font-medium ${
                   isExpired
                     ? 'text-red-600'
                     : isExpiringCritical
@@ -388,7 +388,7 @@ export function BatchCard({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Days to Expiry</span>
               <span
-                className={`font-bold ${
+                className={`font-medium ${
                   isExpired
                     ? 'text-red-600'
                     : isExpiringCritical
@@ -411,7 +411,7 @@ export function BatchCard({
                   <MapPin className="h-3 w-3" />
                   Location
                 </span>
-                <span className="font-bold">{batch.location_code}</span>
+                <span className="font-medium">{batch.location_code}</span>
               </div>
             )}
             {batch.supplier && (
@@ -420,7 +420,7 @@ export function BatchCard({
                   <Truck className="h-3 w-3" />
                   Supplier
                 </span>
-                <span className="font-bold truncate max-w-[120px]" title={batch.supplier}>
+                <span className="font-medium truncate max-w-[120px]" title={batch.supplier}>
                   {batch.supplier}
                 </span>
               </div>
@@ -437,7 +437,7 @@ export function BatchCard({
           </div>
 
           <div className="text-right">
-            <div className="text-sm font-bold">
+            <div className="text-sm font-medium">
               ${(Number(batch.current_quantity) * Number(batch.selling_price)).toFixed(2)}
             </div>
             <div className="text-xs text-muted-foreground">Total Value</div>
@@ -447,7 +447,7 @@ export function BatchCard({
 
       {(isDeleting || isUpdating) && (
         <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-2xl">
-          <div className="text-sm font-bold">{isDeleting ? 'Deleting...' : 'Updating...'}</div>
+          <div className="text-sm font-medium">{isDeleting ? 'Deleting...' : 'Updating...'}</div>
         </div>
       )}
     </Card>

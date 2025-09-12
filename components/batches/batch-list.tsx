@@ -169,7 +169,7 @@ export function BatchList({
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {/* Search */}
               <div className="space-y-2">
-                <label className="text-sm font-bold">{t('search')}</label>
+                <label className="text-sm font-medium">{t('search')}</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -183,7 +183,7 @@ export function BatchList({
 
               {/* Status Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-bold">{t('status')}</label>
+                <label className="text-sm font-medium">{t('status')}</label>
                 <Select
                   value={filters.status || 'all'}
                   onValueChange={(value: string) => updateFilter('status', value)}
@@ -204,7 +204,7 @@ export function BatchList({
 
               {/* Expiry Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-1">
+                <label className="text-sm font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   {t('expiringSoon')}
                 </label>
@@ -230,7 +230,7 @@ export function BatchList({
 
               {/* Location Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-1">
+                <label className="text-sm font-medium flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
                   {t('location')}
                 </label>
@@ -243,7 +243,7 @@ export function BatchList({
 
               {/* Stock Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-bold">{t('stockStatus')}</label>
+                <label className="text-sm font-medium">{t('stockStatus')}</label>
                 <Select
                   value={
                     filters.hasStock === undefined
@@ -271,7 +271,7 @@ export function BatchList({
 
               {/* Supplier Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-1">
+                <label className="text-sm font-medium flex items-center gap-1">
                   <Truck className="h-4 w-4" />
                   {t('supplier')}
                 </label>
@@ -284,7 +284,7 @@ export function BatchList({
 
               {/* Clear Filters */}
               <div className="space-y-2">
-                <label className="text-sm font-bold opacity-0">{t('clear')}</label>
+                <label className="text-sm font-medium opacity-0">{t('clear')}</label>
                 <Button
                   variant="outline"
                   onClick={() => {

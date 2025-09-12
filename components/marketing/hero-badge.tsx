@@ -33,7 +33,7 @@ export function HeroBadge({
       >
         <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/5 to-secondary/10 border border-primary/10 px-4 py-1">
           {icon}
-          <span className="text-sm font-bold text-primary">{text}</span>
+          <span className="text-sm font-medium text-primary">{text}</span>
         </div>
       </div>
     </>

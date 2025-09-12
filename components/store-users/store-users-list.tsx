@@ -198,7 +198,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
           {/* Role-based permissions info - only show for owners and managers */}
           {(isOwner || isManager) && canManageUsers && (
             <div className="mb-6 mt-4 p-4 bg-secondary-50 border border-secondary-200 rounded-2xl flex flex-col">
-              <Typography variant="small" className="font-bold text-blue-800 mb-2">
+              <Typography variant="small" className="font-medium text-blue-800 mb-2">
                 {isOwner ? t('permissions.ownerInfo.title') : t('permissions.managerInfo.title')}
               </Typography>
               <Typography variant="small" className="text-blue-700">
@@ -225,7 +225,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               {data.map(storeUser => {
                 return (
                   <TableRow key={storeUser.user_id} className="hover:bg-opacity-0">
-                    <TableCell className="font-bold">
+                    <TableCell className="font-medium">
                       <div>
                         <div>{storeUser.full_name}</div>
                       </div>
@@ -662,7 +662,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
-          <Typography variant="small" className="font-bold text-yellow-800 mb-2">
+          <Typography variant="small" className="font-medium text-yellow-800 mb-2">
             Debug: Store Users List: Only visible in development mode
           </Typography>
           <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">

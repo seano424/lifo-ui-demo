@@ -4,7 +4,11 @@ import { ChevronRight, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -68,28 +72,35 @@ export function NavMain({
 
   return (
     <div className="flex flex-col gap-6">
-      {sections.map(section => (
-        <SidebarGroup className="px-4" key={section.title}>
+      {sections.map((section) => (
+        <SidebarGroup
+          className="px-4"
+          key={section.title}
+        >
           <SidebarGroupLabel className="mb-1">
-            <Typography variant="extraSmall" color="muted" className=" uppercase text-slate-400/90">
+            <Typography
+              variant="extraSmall"
+              color="muted"
+              className=" uppercase text-slate-400/90"
+            >
               {section.title}
             </Typography>
           </SidebarGroupLabel>
           <SidebarMenu>
-            {section.items.map(item =>
+            {section.items.map((item) =>
               item.items && item.items.length > 0 ? (
                 <Collapsible
                   key={item.title}
                   asChild
                   defaultOpen={item.isActive}
                   className={cn(
-                    'group/collapsible group-data-[state=open]/collapsible:flex group-data-[state=open]/collapsible:flex-col group-data-[state=open]/collapsible:items-center',
+                    'group/collapsible group-data-[state=open]/collapsible:flex group-data-[state=open]/collapsible:flex-col group-data-[state=open]/collapsible:items-center'
                   )}
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
-                        className="p-4 font-bold group-data-[collapsible=icon]:hidden"
+                        className="p-4 font-medium group-data-[collapsible=icon]:hidden"
                         tooltip={item.title}
                       >
                         {item.icon && <item.icon />}
@@ -99,18 +110,24 @@ export function NavMain({
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub className="flex flex-col gap-2">
-                        {item.items.map(subItem => (
+                        {item.items.map((subItem) => (
                           <SidebarMenuSubItem
                             className={cn(
-                              'hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:active:bg-primary-900 rounded-2xl font-bold pl-6 py-1',
+                              'hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:active:bg-primary-900 rounded-2xl font-medium pl-6 py-1',
                               isPathActive(subItem.url) &&
                                 'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 font-bold',
-                              'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0',
+                              'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0'
                             )}
                             key={subItem.title}
                           >
-                            <SidebarMenuSubButton asChild tooltip={subItem.title}>
-                              <Link href={subItem.url} onClick={handleLinkClick}>
+                            <SidebarMenuSubButton
+                              asChild
+                              tooltip={subItem.title}
+                            >
+                              <Link
+                                href={subItem.url}
+                                onClick={handleLinkClick}
+                              >
                                 {subItem.icon && (
                                   <subItem.icon className="!text-secondary-900 dark:!text-primary-50" />
                                 )}
@@ -124,12 +141,15 @@ export function NavMain({
                   </SidebarMenuItem>
                 </Collapsible>
               ) : (
-                <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
+                <SidebarMenuItem
+                  className="flex flex-col items-center gap-2"
+                  key={item.title}
+                >
                   <SidebarMenuButton
                     className={cn(
-                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-bold',
+                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-medium',
                       isPathActive(item.url) &&
-                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold',
+                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold'
                     )}
                     asChild
                     tooltip={item.title}
@@ -146,7 +166,7 @@ export function NavMain({
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ),
+              )
             )}
           </SidebarMenu>
         </SidebarGroup>

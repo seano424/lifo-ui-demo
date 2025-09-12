@@ -54,7 +54,7 @@ export function StoreUserFilters({ filters, onFiltersChange }: StoreUserFiltersP
       <CardContent className="pt-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-4 h-4" />
-          <Label className="text-sm font-bold">Filter Users</Label>
+          <Label className="text-sm font-medium">Filter Users</Label>
           {activeFilterCount > 0 && (
             <Badge variant="secondary" className="ml-auto">
               {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} active

@@ -93,7 +93,7 @@ export function OnboardingFlow() {
                       ? 'cursor-pointer hover:text-primary'
                       : 'cursor-not-allowed opacity-50',
                     isCurrentStep || isCompleted
-                      ? 'text-primary font-bold dark:text-gray-300'
+                      ? 'text-primary font-medium dark:text-gray-300'
                       : 'text-muted-foreground',
                   )}
                 >

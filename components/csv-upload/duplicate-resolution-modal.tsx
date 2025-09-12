@@ -106,7 +106,7 @@ export function DuplicateResolutionModal({
             <Card key={`${duplicate.sku}-${duplicate.expiryDate}`} className="p-4">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
-                  <h4 className="font-bold text-lg">{duplicate.productName}</h4>
+                  <h4 className="font-medium text-lg">{duplicate.productName}</h4>
                   <div className="flex gap-4 text-sm text-muted-foreground mt-1">
                     <span>
                       SKU: <code className="bg-muted px-1 rounded">{duplicate.sku}</code>
@@ -125,7 +125,7 @@ export function DuplicateResolutionModal({
               <div className="bg-muted/30 p-4 rounded-2xl mb-4">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-1">
-                    <p className="font-bold text-sm text-blue-700">📦 Current Inventory</p>
+                    <p className="font-medium text-sm text-blue-700">📦 Current Inventory</p>
                     <p className="text-2xl font-bold text-blue-800">{duplicate.existingQuantity}</p>
                     <p className="text-xs text-muted-foreground">
                       {duplicate.existingBatchNumbers.length} batch(es):{' '}
@@ -133,7 +133,7 @@ export function DuplicateResolutionModal({
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="font-bold text-sm text-primary-700">📄 CSV Upload</p>
+                    <p className="font-medium text-sm text-primary-700">📄 CSV Upload</p>
                     <p className="text-2xl font-bold text-primary-800">+{duplicate.newQuantity}</p>
                     <p className="text-xs text-muted-foreground">New batch from CSV</p>
                   </div>
@@ -152,7 +152,7 @@ export function DuplicateResolutionModal({
                     <Label htmlFor={`merge-${index}`} className="cursor-pointer">
                       <div className="flex items-center gap-2 mb-1">
                         <Package className="w-4 h-4 text-blue-600" />
-                        <span className="font-bold">Merge quantities</span>
+                        <span className="font-medium">Merge quantities</span>
                         <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
                           {duplicate.existingQuantity + duplicate.newQuantity} total
                         </Badge>
@@ -170,7 +170,7 @@ export function DuplicateResolutionModal({
                     <Label htmlFor={`add-${index}`} className="cursor-pointer">
                       <div className="flex items-center gap-2 mb-1">
                         <Plus className="w-4 h-4 text-primary-600" />
-                        <span className="font-bold">Add as separate batch</span>
+                        <span className="font-medium">Add as separate batch</span>
                         <Badge variant="outline" className="text-xs bg-primary-50 text-primary-700">
                           New batch
                         </Badge>
@@ -188,7 +188,7 @@ export function DuplicateResolutionModal({
                     <Label htmlFor={`skip-${index}`} className="cursor-pointer">
                       <div className="flex items-center gap-2 mb-1">
                         <X className="w-4 h-4 text-gray-600" />
-                        <span className="font-bold">Skip this item</span>
+                        <span className="font-medium">Skip this item</span>
                         <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700">
                           No change
                         </Badge>

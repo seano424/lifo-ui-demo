@@ -72,7 +72,7 @@ export function CSVSuccessModal({ open, onOpenChange, result, storeId }: CSVSucc
         <div className="space-y-4">
           {/* Import Breakdown */}
           <div className="rounded-2xl bg-gray-50 p-4 space-y-3">
-            <h4 className="font-bold text-sm text-gray-900">Import Summary</h4>
+            <h4 className="font-medium text-sm text-gray-900">Import Summary</h4>
             <div className="grid grid-cols-2 gap-3 text-sm">
               {breakdown.new_products && breakdown.new_products > 0 && (
                 <div className="flex items-center gap-2">

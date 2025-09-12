@@ -140,7 +140,7 @@ export function AddStoreSearchStep() {
                 disabled={isLoading}
               >
                 <CardContent className="p-4">
-                  <div className="font-bold">{place.structured_formatting.main_text}</div>
+                  <div className="font-medium">{place.structured_formatting.main_text}</div>
                   <div className="text-sm text-muted-foreground">
                     {place.structured_formatting.secondary_text || place.description}
                   </div>

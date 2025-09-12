@@ -50,7 +50,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search by Email */}
         <div className="flex-1">
-          <label className="block text-sm font-bold text-gray-700 mb-1">Search by Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Search by Email</label>
           <div className="flex gap-2">
             <input
               type="email"
@@ -72,7 +72,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
 
         {/* Status Filter */}
         <div className="sm:w-48">
-          <label className="block text-sm font-bold text-gray-700 mb-1">Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
           <select
             value={
               filters.is_active === undefined ? 'all' : filters.is_active ? 'active' : 'inactive'
@@ -88,7 +88,7 @@ export function UserFilters({ filters, onFiltersChange }: UserFiltersProps) {
 
         {/* Role Filter (Future Enhancement) */}
         <div className="sm:w-48">
-          <label className="block text-sm font-bold text-gray-700 mb-1">Role</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
           <select
             disabled
             className="w-full px-3 py-2 border border-gray-300 rounded-2xl bg-gray-50 text-gray-500"

@@ -92,11 +92,7 @@ export function TodoCard({ todo }: TodoCardProps) {
 
   return (
     <div
-      className={cn(
-        'cursor-pointer transition-all duration-200 hover:shadow-md',
-        'border-b',
-        isHovered && 'transform scale-[1.02]'
-      )}
+      className={cn('cursor-pointer transition-all duration-200', 'border-b')}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}

@@ -381,7 +381,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           {item.Category}
                         </Badge>
                       </div>
-                      <div className="font-bold">{item.Product_Name}</div>
+                      <div className="font-medium">{item.Product_Name}</div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
                         <div className="flex items-center gap-1">
@@ -408,7 +408,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-700">
+                        <label className="text-xs font-medium text-gray-700">
                           {t('preview.table.expiryDate')}
                         </label>
                         {item.Expiry_Date ? (

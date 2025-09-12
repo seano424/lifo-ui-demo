@@ -62,7 +62,7 @@ export function NoStoresError({
           <CardFooter className="bg-destructive/5 dark:bg-destructive/10 p-4 sm:p-6 border-t border-destructive/20 dark:border-destructive/30">
             <Link href={redirectPath} className="w-full">
               <Button
-                className="w-full bg-gradient-to-r from-primary to-secondary-900 hover:bg-gradient-to-r hover:from-primary/90 hover:to-secondary-900/90 text-primary-foreground font-bold py-1.5 sm:py-2 text-sm sm:text-base shadow-md"
+                className="w-full bg-gradient-to-r from-primary to-secondary-900 hover:bg-gradient-to-r hover:from-primary/90 hover:to-secondary-900/90 text-primary-foreground font-medium py-1.5 sm:py-2 text-sm sm:text-base shadow-md"
                 size="default"
                 type="button"
               >

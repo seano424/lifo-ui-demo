@@ -155,7 +155,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold">{batch.product_name}</h4>
+                      <h4 className="font-medium">{batch.product_name}</h4>
                       <Badge variant="outline" className="text-xs">
                         {batch.category}
                       </Badge>
@@ -254,7 +254,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
             {/* Batch details */}
             {selectedBatch && (
               <div className="bg-muted p-3 rounded-2xl">
-                <h4 className="font-bold">{selectedBatch.product_name}</h4>
+                <h4 className="font-medium">{selectedBatch.product_name}</h4>
                 <p className="text-sm text-muted-foreground">
                   {t('donationDialog.quantity')}: {selectedBatch.quantity} •{' '}
                   {t('donationDialog.expires')}:{' '}
@@ -274,7 +274,7 @@ export function ActionableBatchesEnhanced({ storeId }: ActionableBatchesEnhanced
                   {recipients.map(recipient => (
                     <SelectItem key={recipient.recipient_id} value={recipient.recipient_id}>
                       <div>
-                        <div className="font-bold">{recipient.name}</div>
+                        <div className="font-medium">{recipient.name}</div>
                         <div className="text-sm text-muted-foreground">
                           {recipient.recipient_type} •{' '}
                           {recipient.is_certified

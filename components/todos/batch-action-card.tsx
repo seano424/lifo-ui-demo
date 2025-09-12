@@ -188,7 +188,7 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
             {hasEffectivenessData && effectivenessPercent !== null && (
               <span
                 className={cn(
-                  'font-bold',
+                  'font-medium',
                   effectivenessPercent >= 50 ? 'text-green-600' : 'text-orange-600',
                 )}
               >
@@ -207,7 +207,7 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
                   </span>
                 )}
                 {action.recovered_value && (
-                  <span className="font-bold text-green-700">
+                  <span className="font-medium text-green-700">
                     Recovered: ${action.recovered_value.toFixed(2)}
                   </span>
                 )}
@@ -219,7 +219,7 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
           {action.actual_action === 'donate' &&
             (action.recipient_name || action.recipient_type) && (
               <div className="pt-2 border-t border-current/10">
-                <p className="text-xs font-bold text-green-700">
+                <p className="text-xs font-medium text-green-700">
                   {action.recipient_name && `Donated to: ${action.recipient_name}`}
                   {action.recipient_type &&
                     !action.recipient_name &&
