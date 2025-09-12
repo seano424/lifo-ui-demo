@@ -20,7 +20,6 @@ import {
 } from '@/lib/utils/todo-sorting'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Typography } from '../ui/typography'
 
 export type TodoItem = {
   batch_id: string
@@ -73,10 +72,6 @@ export function TodosFilteredList({
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
-
-  const [customActiveTab, setCustomActiveTab] = useState<
-    'recommendations' | 'recently_expired' | 'all_active' | 'action_history'
-  >('recommendations')
 
   const [activeTab, setActiveTab] = useState<string>(
     initialFilters?.tab || 'recommendations'
@@ -245,13 +240,6 @@ export function TodosFilteredList({
               }}
               variant="ghost"
               onClick={() => {
-                setCustomActiveTab(
-                  tab.value as
-                    | 'recommendations'
-                    | 'recently_expired'
-                    | 'all_active'
-                    | 'action_history'
-                )
                 setActiveTab(tab.value)
                 updateFilters({
                   tab: tab.value as TodoFilters['tab'],
@@ -313,7 +301,7 @@ export function TodosFilteredList({
         className="w-full"
       >
         {(activeTab === 'recommendations' || activeTab === 'all_active') && (
-          <div className="p-4">
+          <div className="p-4 border-b pb-8 mb-4">
             <TodosFilters
               filters={{
                 urgency: filters.urgency,

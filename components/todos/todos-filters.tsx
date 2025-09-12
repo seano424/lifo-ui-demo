@@ -1,5 +1,4 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -24,9 +23,11 @@ interface TodosFiltersProps {
   isLoading: boolean
 }
 
-export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFiltersProps) {
-  const _t = useTranslations('todos.filters')
-
+export function TodosFilters({
+  filters,
+  onFiltersChange,
+  isLoading,
+}: TodosFiltersProps) {
   if (!onFiltersChange) {
     return null
   }
@@ -38,7 +39,10 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
       ...filters,
       sort: {
         field,
-        direction: currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc',
+        direction:
+          currentSort.field === field && currentSort.direction === 'asc'
+            ? 'desc'
+            : 'asc',
       },
     })
   }
@@ -54,13 +58,12 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
   }
 
   return (
-    <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
+    <div className="flex flex-row justify-between gap-4">
       {/* Urgency Filter */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Urgency:</span>
         <Select
           value={filters?.urgency || 'all'}
-          onValueChange={value =>
+          onValueChange={(value) =>
             onFiltersChange({
               ...filters,
               urgency: value === 'all' ? undefined : value,
@@ -68,22 +71,21 @@ export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFilte
           }
           disabled={isLoading}
         >
-          <SelectTrigger className="w-full md:w-[140px]">
+          <SelectTrigger className="w-full flex gap-2 text-nowrap min-w-[200px]">
             <SelectValue placeholder="All urgency levels" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="critical">Critical</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="all">All Urgency Priorities</SelectItem>
+            <SelectItem value="critical">Priority: Critical</SelectItem>
+            <SelectItem value="high">Priority: High</SelectItem>
+            <SelectItem value="medium">Priority: Medium</SelectItem>
+            <SelectItem value="low">Priority: Low</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Sort Controls */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
         <Select
           value={currentSort.field}
           onValueChange={handleSortFieldChange}

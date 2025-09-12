@@ -1,7 +1,6 @@
 'use client'
 
 import { Calendar, Package, PenLine } from 'lucide-react'
-import { useState } from 'react'
 import type { TodoItem } from '@/components/todos/todos-filtered-list'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
@@ -12,8 +11,6 @@ interface TodoCardProps {
 }
 
 export function TodoCard({ todo }: TodoCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
-
   const handleCardClick = () => {
     // TODO: Open bottom sheet with todo details and actions
     // Placeholder for future bottom sheet integration
@@ -93,11 +90,9 @@ export function TodoCard({ todo }: TodoCardProps) {
   return (
     <div
       className={cn('cursor-pointer transition-all duration-1000', 'border-b')}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
     >
-      <div className="flex gap-3 px-4 py-6 items-start relative group">
+      <div className="flex gap-3 px-4 pb-6 items-start relative group">
         <Badge
           variant="outline"
           className={cn(
