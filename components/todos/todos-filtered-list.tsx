@@ -207,11 +207,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       activeTab === 'recommendations' && infiniteData?.pages?.[0]?.count !== undefined
         ? infiniteData.pages[0].count
         : activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
-        ? getFilteredCount(
-            analyticsResponse?.analytics?.actionable_batches || [],
-            'recommendations',
-          )
-        : analyticsResponse?.analytics?.actionable_batches?.length || 0,
+          ? getFilteredCount(
+              analyticsResponse?.analytics?.actionable_batches || [],
+              'recommendations',
+            )
+          : analyticsResponse?.analytics?.actionable_batches?.length || 0,
     recently_expired:
       analyticsResponse?.analytics?.actionable_batches?.filter(
         batch => new Date(batch.expiry_date) < new Date(),

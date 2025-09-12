@@ -630,12 +630,12 @@ export function useTodosInfinite(
     queryKey: ['todos', 'infinite', storeId, pageSize, timeframe, thresholdOverride, filters],
     queryFn: ({ pageParam = 0 }): TodosInfiniteData => {
       let batches = allAnalytics?.analytics?.actionable_batches || []
-      
+
       // Apply urgency filter before pagination
       if (filters?.urgency && filters.urgency !== 'all') {
         batches = batches.filter(batch => batch.urgency === filters.urgency)
       }
-      
+
       const start = pageParam * pageSize
       const end = start + pageSize
 

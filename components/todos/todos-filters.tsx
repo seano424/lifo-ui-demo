@@ -23,11 +23,7 @@ interface TodosFiltersProps {
   isLoading: boolean
 }
 
-export function TodosFilters({
-  filters,
-  onFiltersChange,
-  isLoading,
-}: TodosFiltersProps) {
+export function TodosFilters({ filters, onFiltersChange, isLoading }: TodosFiltersProps) {
   if (!onFiltersChange) {
     return null
   }
@@ -39,10 +35,7 @@ export function TodosFilters({
       ...filters,
       sort: {
         field,
-        direction:
-          currentSort.field === field && currentSort.direction === 'asc'
-            ? 'desc'
-            : 'asc',
+        direction: currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc',
       },
     })
   }
@@ -63,7 +56,7 @@ export function TodosFilters({
       <div className="flex items-center gap-2">
         <Select
           value={filters?.urgency || 'all'}
-          onValueChange={(value) =>
+          onValueChange={value =>
             onFiltersChange({
               ...filters,
               urgency: value === 'all' ? undefined : value,
