@@ -209,17 +209,46 @@ export function TodosFilteredList({
     1
   )
 
+  const getFilteredCount = (batches: any[], tab: string) => {
+    if (!batches) return 0
+
+    // Apply urgency filter if on recommendations or all_active tabs
+    if (
+      (tab === 'recommendations' || tab === 'all_active') &&
+      filters.urgency &&
+      filters.urgency !== 'all'
+    ) {
+      return batches.filter((batch) => batch.urgency === filters.urgency).length
+    }
+
+    return batches.length
+  }
+
   const counts = {
     recommendations:
-      analyticsResponse?.analytics?.actionable_batches?.length || 0,
+      activeTab === 'recommendations' &&
+      filters.urgency &&
+      filters.urgency !== 'all'
+        ? getFilteredCount(
+            analyticsResponse?.analytics?.actionable_batches || [],
+            'recommendations'
+          )
+        : analyticsResponse?.analytics?.actionable_batches?.length || 0,
     recently_expired:
       analyticsResponse?.analytics?.actionable_batches?.filter(
         (batch) => new Date(batch.expiry_date) < new Date()
       )?.length || 0,
     all_active:
-      analyticsResponse?.analytics?.actionable_batches?.filter(
-        (batch) => new Date(batch.expiry_date) >= new Date()
-      )?.length || 0,
+      activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
+        ? getFilteredCount(
+            analyticsResponse?.analytics?.actionable_batches?.filter(
+              (batch) => new Date(batch.expiry_date) >= new Date()
+            ) || [],
+            'all_active'
+          )
+        : analyticsResponse?.analytics?.actionable_batches?.filter(
+            (batch) => new Date(batch.expiry_date) >= new Date()
+          )?.length || 0,
     action_history: batchActionsData?.pages?.[0]?.count || 0,
   }
 
@@ -248,13 +277,14 @@ export function TodosFilteredList({
               }}
               className={cn(
                 'rounded-none px-4 relative flex items-center gap-2 pb-4',
-                'hover:bg-transparent',
+                'hover:bg-transparent group/tab',
                 activeTab === tab.value && 'text-primary'
               )}
             >
               {tab.label}
               {tab.value === 'recommendations' && (
                 <Badge
+                  className="cursor-pointer group-hover/tab:text-primary"
                   variant={activeTab === 'recommendations' ? 'primary' : 'gray'}
                 >
                   {counts.recommendations}
@@ -262,6 +292,7 @@ export function TodosFilteredList({
               )}
               {tab.value === 'recently_expired' && (
                 <Badge
+                  className="cursor-pointer group-hover/tab:text-primary"
                   variant={
                     activeTab === 'recently_expired' ? 'primary' : 'gray'
                   }
@@ -271,6 +302,7 @@ export function TodosFilteredList({
               )}
               {tab.value === 'all_active' && (
                 <Badge
+                  className="cursor-pointer group-hover/tab:text-primary"
                   variant={activeTab === 'all_active' ? 'primary' : 'gray'}
                 >
                   {counts.all_active}
@@ -278,6 +310,7 @@ export function TodosFilteredList({
               )}
               {tab.value === 'action_history' && (
                 <Badge
+                  className="cursor-pointer group-hover/tab:text-primary"
                   variant={activeTab === 'action_history' ? 'primary' : 'gray'}
                 >
                   {counts.action_history}
