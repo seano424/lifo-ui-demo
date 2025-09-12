@@ -180,7 +180,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useTodosInfinite(activeStoreId || '', pageSize || 20)
+  } = useTodosInfinite(activeStoreId || '', pageSize || 20, '7d', undefined, {
+    urgency: filters.urgency,
+  })
 
   const { data: batchActionsData } = useBatchActionsInfinite(activeStoreId || '', 1)
 
@@ -201,7 +203,10 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   const counts = {
     recommendations:
-      activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
+      // Use filtered count from infinite data if available, otherwise use analytics data
+      activeTab === 'recommendations' && infiniteData?.pages?.[0]?.count !== undefined
+        ? infiniteData.pages[0].count
+        : activeTab === 'recommendations' && filters.urgency && filters.urgency !== 'all'
         ? getFilteredCount(
             analyticsResponse?.analytics?.actionable_batches || [],
             'recommendations',

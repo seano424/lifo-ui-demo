@@ -617,6 +617,7 @@ export function useTodosInfinite(
   pageSize: number = 20,
   timeframe: string = '7d',
   thresholdOverride?: number,
+  filters?: { urgency?: string },
 ) {
   // Get the full analytics data first
   const {
@@ -626,9 +627,15 @@ export function useTodosInfinite(
   } = useStoreAnalytics(storeId, timeframe, undefined, thresholdOverride)
 
   return useInfiniteQuery({
-    queryKey: ['todos', 'infinite', storeId, pageSize, timeframe, thresholdOverride],
+    queryKey: ['todos', 'infinite', storeId, pageSize, timeframe, thresholdOverride, filters],
     queryFn: ({ pageParam = 0 }): TodosInfiniteData => {
-      const batches = allAnalytics?.analytics?.actionable_batches || []
+      let batches = allAnalytics?.analytics?.actionable_batches || []
+      
+      // Apply urgency filter before pagination
+      if (filters?.urgency && filters.urgency !== 'all') {
+        batches = batches.filter(batch => batch.urgency === filters.urgency)
+      }
+      
       const start = pageParam * pageSize
       const end = start + pageSize
 

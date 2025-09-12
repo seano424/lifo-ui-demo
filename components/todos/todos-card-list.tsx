@@ -94,7 +94,8 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
       if (infiniteData) {
         const batches = infiniteData.data || []
         const actionableTodos = memoizedBatchToTodo(batches)
-        return applyFiltersAndSorting(actionableTodos, filters)
+        // Only apply sorting since urgency filtering is already done in the hook
+        return applySorting(actionableTodos, filters)
       }
       // Fallback to analytics data only if infinite data is not available
       else if (analyticsResponse?.analytics?.actionable_batches) {
