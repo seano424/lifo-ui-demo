@@ -2,24 +2,27 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { BatchActionCard } from '@/components/todos/batch-action-card'
+import type { BatchActionFiltersType } from '@/components/todos/batch-action-filters'
 import { TodoCard } from '@/components/todos/todo-card'
 import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import {
   type ActionableBatch,
-  useBatchActionsInfinite,
+  type BatchActionWithDetails,
   useStoreAnalytics,
 } from '@/hooks/use-scoring-analytics'
-import { DEFAULT_PAGE_SIZE, DEFAULT_ROOT_MARGIN, SKELETON_ITEM_COUNT } from '@/lib/constants/todos'
+import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { createTodoSorter, validateSortConfig } from '@/lib/utils/todo-sorting'
 import { memoizedBatchToTodo } from '@/lib/utils/todo-transformers'
 
+export type { BatchActionFiltersType as BatchActionFilters }
+
 interface TodosCardListProps {
   tab: string
   filters: TodoFilters
-  pageSize: number
   // Infinite query props (optional for backward compatibility)
   infiniteData?: {
     data: ActionableBatch[]
@@ -29,9 +32,16 @@ interface TodosCardListProps {
     isLoading: boolean
     error?: Error | null
   }
+  // Pre-processed batch actions for action_history tab
+  processedBatchActions?: BatchActionWithDetails[]
 }
 
-export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCardListProps) {
+export function TodosCardList({
+  tab,
+  filters,
+  infiniteData,
+  processedBatchActions = [],
+}: TodosCardListProps) {
   const activeStoreId = useActiveStoreId()
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [hasMore, setHasMore] = useState(false)
@@ -42,50 +52,31 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
     activeStoreId || '',
   )
 
-  // Get batch actions for history tab using infinite query
-  const {
-    data: batchActionsData,
-    isLoading: isBatchActionsLoading,
-    hasNextPage: hasBatchActionsNextPage,
-    fetchNextPage: fetchBatchActionsNextPage,
-    isFetchingNextPage: isFetchingBatchActionsNextPage,
-    error: _batchActionsError,
-  } = useBatchActionsInfinite(
-    tab === 'action_history' ? activeStoreId || null : null,
-    pageSize || DEFAULT_PAGE_SIZE,
-  )
-
-  // Intersection observer for auto-loading more items (handles both todos and batch actions)
+  // Intersection observer for auto-loading more items
   const { targetRef, isIntersecting } = useIntersectionObserver({
-    enabled: hasMore && !infiniteData?.isFetchingNextPage && !isFetchingBatchActionsNextPage,
+    enabled: hasMore && !infiniteData?.isFetchingNextPage,
     rootMargin: DEFAULT_ROOT_MARGIN,
   })
 
   // Auto-fetch next page when sentinel comes into view
   useEffect(() => {
     if (isIntersecting && hasMore) {
-      // For recommendations tab with infinite data
-      if (infiniteData?.fetchNextPage && !infiniteData.isFetchingNextPage) {
+      if (
+        tab !== 'action_history' &&
+        infiniteData?.fetchNextPage &&
+        !infiniteData.isFetchingNextPage
+      ) {
+        infiniteData.fetchNextPage()
+      } else if (
+        tab === 'action_history' &&
+        infiniteData?.fetchNextPage &&
+        !infiniteData.isFetchingNextPage
+      ) {
+        // For action_history, the fetchNextPage is for batch actions
         infiniteData.fetchNextPage()
       }
-      // For history tab with batch actions
-      else if (
-        tab === 'action_history' &&
-        hasBatchActionsNextPage &&
-        !isFetchingBatchActionsNextPage
-      ) {
-        fetchBatchActionsNextPage()
-      }
     }
-  }, [
-    isIntersecting,
-    hasMore,
-    infiniteData,
-    tab,
-    hasBatchActionsNextPage,
-    fetchBatchActionsNextPage,
-    isFetchingBatchActionsNextPage,
-  ])
+  }, [isIntersecting, hasMore, infiniteData, tab])
 
   // Memoized data processing to avoid expensive recalculations
   const processedTodos = useMemo(() => {
@@ -94,7 +85,8 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
       if (infiniteData) {
         const batches = infiniteData.data || []
         const actionableTodos = memoizedBatchToTodo(batches)
-        return applyFiltersAndSorting(actionableTodos, filters)
+        // Only apply sorting since urgency filtering is already done in the hook
+        return applySorting(actionableTodos, filters)
       }
       // Fallback to analytics data only if infinite data is not available
       else if (analyticsResponse?.analytics?.actionable_batches) {
@@ -103,20 +95,26 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
         return applyFiltersAndSorting(actionableTodos, filters)
       }
     } else if (tab === 'recently_expired' && analyticsResponse?.analytics?.actionable_batches) {
-      const criticalBatches = analyticsResponse.analytics.actionable_batches.filter(
-        (batch: ActionableBatch) => batch.urgency === 'critical',
+      const expiredBatches = analyticsResponse.analytics.actionable_batches.filter(
+        (batch: ActionableBatch) => new Date(batch.expiry_date) < new Date(),
       )
 
-      const criticalTodos = memoizedBatchToTodo(criticalBatches)
-      return applySorting(criticalTodos, filters, { field: 'expiry_date', direction: 'asc' })
+      const expiredTodos = memoizedBatchToTodo(expiredBatches)
+      return applySorting(expiredTodos, filters, {
+        field: 'expiry_date',
+        direction: 'asc',
+      })
     } else if (tab === 'all_active' && analyticsResponse?.analytics?.actionable_batches) {
       const activeBatches = analyticsResponse.analytics.actionable_batches.filter(
-        (batch: ActionableBatch) => batch.urgency !== 'critical',
+        (batch: ActionableBatch) => new Date(batch.expiry_date) >= new Date(),
       )
 
       const activeTodos = memoizedBatchToTodo(activeBatches)
       const filteredTodos = applyUrgencyFilter(activeTodos, filters)
-      return applySorting(filteredTodos, filters, { field: 'urgency', direction: 'desc' })
+      return applySorting(filteredTodos, filters, {
+        field: 'urgency',
+        direction: 'desc',
+      })
     }
 
     return []
@@ -129,37 +127,42 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
       setHasMore(infiniteData?.hasNextPage || false)
       setIsLoading(infiniteData?.isLoading || analyticsLoading)
     } else {
-      // Handle action history separately
+      // For action history, we don't use todos state since we use processedBatchActions directly
       setTodos([])
-      setHasMore(hasBatchActionsNextPage || false)
-      setIsLoading(isBatchActionsLoading)
+      setHasMore(infiniteData?.hasNextPage || false)
+      setIsLoading(infiniteData?.isLoading || false)
     }
-  }, [
-    processedTodos,
-    tab,
-    infiniteData?.hasNextPage,
-    infiniteData?.isLoading,
-    analyticsLoading,
-    hasBatchActionsNextPage,
-    isBatchActionsLoading,
-  ])
+  }, [processedTodos, tab, infiniteData?.hasNextPage, infiniteData?.isLoading, analyticsLoading])
 
-  if (isLoading || analyticsLoading || (tab === 'action_history' && isBatchActionsLoading)) {
+  if (isLoading || analyticsLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: SKELETON_ITEM_COUNT }, () => (
-          <div key={crypto.randomUUID()} className="h-32 bg-muted animate-pulse rounded-lg" />
+      <div className="flex flex-col gap-16">
+        {Array.from({ length: 4 }, () => (
+          <div key={crypto.randomUUID()} className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <Skeleton className="h-8 w-8 flex-shrink-0 bg-muted animate-pulse" />
+              <div className="w-full flex flex-col gap-2">
+                <Skeleton className="h-6 w-64 bg-muted animate-pulse" />
+                <Skeleton className="h-6 w-8/12 bg-muted animate-pulse" />
+                <div className="flex gap-2 justify-between mt-6">
+                  <Skeleton className="h-6 w-1/4 bg-muted animate-pulse" />
+                  <Skeleton className="h-6 w-1/5 bg-muted animate-pulse" />
+                </div>
+                <div className="flex gap-2 justify-between">
+                  <Skeleton className="h-6 w-2/5 bg-muted animate-pulse" />
+                  <Skeleton className="h-6 w-1/4 bg-muted animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     )
   }
 
   // Check if we have no data to display
-  const batchActionsDataFlat = batchActionsData?.pages?.flatMap(page => page.data) || []
   const hasNoData =
-    tab === 'action_history'
-      ? batchActionsDataFlat.length === 0 && !isBatchActionsLoading
-      : todos.length === 0
+    tab === 'action_history' ? processedBatchActions.length === 0 : todos.length === 0
 
   if (hasNoData) {
     return (
@@ -176,10 +179,10 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
 
   return (
     <InfiniteScrollErrorBoundary>
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="space-y-4 flex flex-col">
+        <div className="flex flex-col gap-12">
           {tab === 'action_history'
-            ? batchActionsDataFlat.map(action => (
+            ? processedBatchActions.map(action => (
                 <BatchActionCard key={action.action_id} action={action} />
               ))
             : todos.map(todo => <TodoCard key={todo.batch_id} todo={todo} />)}
@@ -187,7 +190,7 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
 
         {hasMore && (
           <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
-            {infiniteData?.isFetchingNextPage || isFetchingBatchActionsNextPage ? (
+            {infiniteData?.isFetchingNextPage ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm">
@@ -197,7 +200,7 @@ export function TodosCardList({ tab, filters, pageSize, infiniteData }: TodosCar
             ) : (
               <div className="text-sm text-muted-foreground opacity-60">
                 Scroll to load more (
-                {tab === 'action_history' ? batchActionsDataFlat.length : todos.length} loaded)
+                {tab === 'action_history' ? processedBatchActions.length : todos.length} loaded)
               </div>
             )}
           </div>

@@ -22,6 +22,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { useUrgentTodosCount } from '@/hooks/use-urgent-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
 import { TeamSwitcher } from './team-switcher'
 import { NavbarLogo } from './ui/logo'
@@ -29,6 +30,7 @@ import { Typography } from './ui/typography'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
+  const { count: urgentTodosCount } = useUrgentTodosCount()
 
   return React.useMemo(
     () => ({
@@ -61,6 +63,7 @@ function useNavigationData() {
               title: t('todos'),
               url: '/dashboard/todos',
               icon: ListTodo,
+              badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
             },
           ],
         },
@@ -92,7 +95,7 @@ function useNavigationData() {
         },
       ],
     }),
-    [t],
+    [t, urgentTodosCount],
   )
 }
 
@@ -131,13 +134,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           size="sm"
           className="group-data-[collapsible=icon]:block hidden"
         />
-
-        <div className="group-data-[collapsible=icon]:hidden sm:hidden">
-          <TeamSwitcher />
-        </div>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />
+        <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
+          <TeamSwitcher />
+        </div>
       </SidebarContent>
       <SidebarFooter className="py-4">
         <NavUser user={user} />
