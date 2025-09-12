@@ -120,13 +120,13 @@ export function TodosCardList({
       tab === 'recently_expired' &&
       analyticsResponse?.analytics?.actionable_batches
     ) {
-      const criticalBatches =
+      const expiredBatches =
         analyticsResponse.analytics.actionable_batches.filter(
-          (batch: ActionableBatch) => batch.urgency === 'critical'
+          (batch: ActionableBatch) => new Date(batch.expiry_date) < new Date()
         )
 
-      const criticalTodos = memoizedBatchToTodo(criticalBatches)
-      return applySorting(criticalTodos, filters, {
+      const expiredTodos = memoizedBatchToTodo(expiredBatches)
+      return applySorting(expiredTodos, filters, {
         field: 'expiry_date',
         direction: 'asc',
       })
@@ -136,7 +136,7 @@ export function TodosCardList({
     ) {
       const activeBatches =
         analyticsResponse.analytics.actionable_batches.filter(
-          (batch: ActionableBatch) => batch.urgency !== 'critical'
+          (batch: ActionableBatch) => new Date(batch.expiry_date) >= new Date()
         )
 
       const activeTodos = memoizedBatchToTodo(activeBatches)

@@ -219,11 +219,11 @@ export function TodosFilteredList({
       analyticsResponse?.analytics?.actionable_batches?.length || 0,
     recently_expired:
       analyticsResponse?.analytics?.actionable_batches?.filter(
-        (batch) => batch.urgency === 'critical'
+        (batch) => new Date(batch.expiry_date) < new Date()
       )?.length || 0,
     all_active:
       analyticsResponse?.analytics?.actionable_batches?.filter(
-        (batch) => batch.urgency !== 'critical'
+        (batch) => new Date(batch.expiry_date) >= new Date()
       )?.length || 0,
     action_history: batchActionsData?.pages?.[0]?.count || 0,
   }

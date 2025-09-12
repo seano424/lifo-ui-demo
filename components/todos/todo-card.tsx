@@ -149,16 +149,13 @@ export function TodoCard({ todo }: TodoCardProps) {
                 </Badge>
               )}
 
-              {isExpired && !isExpiringToday && (
-                <Badge variant="destructive">expired</Badge>
-              )}
-
-              {isExpiringSoon && !isExpired && (
-                <Badge variant="primary">expiring soon</Badge>
-              )}
-              {isExpiringToday && (
+              {isExpiringToday ? (
                 <Badge variant="destructive">expires today</Badge>
-              )}
+              ) : isExpired ? (
+                <Badge variant="destructive">expired</Badge>
+              ) : isExpiringSoon ? (
+                <Badge variant="primary">expiring soon</Badge>
+              ) : null}
             </div>
           </div>
         </div>
