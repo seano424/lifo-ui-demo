@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
   type ActionableBatch,
+  type BatchActionWithDetails,
   useBatchActionsInfinite,
   useStoreAnalytics,
   useTodosInfinite,
@@ -203,10 +204,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     hasNextPage: hasBatchActionsNextPage,
     fetchNextPage: fetchBatchActionsNextPage,
     isFetchingNextPage: isFetchingBatchActionsNextPage,
-  } = useBatchActionsInfinite(
-    activeStoreId || null,
-    pageSize || 20,
-  )
+  } = useBatchActionsInfinite(activeStoreId || null, pageSize || 20)
 
   // Memoized batch actions processing with filtering and sorting
   const processedBatchActions = useMemo(() => {
@@ -275,12 +273,13 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   )
 
   const getBatchActionsFilteredCount = useCallback(
-    (actions: any[]) => {
+    (actions: BatchActionWithDetails[]) => {
       if (!actions) return 0
 
       // Apply action type filter
       if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
-        return actions.filter(action => action.actual_action === batchActionFilters.actionType).length
+        return actions.filter(action => action.actual_action === batchActionFilters.actionType)
+          .length
       }
 
       return actions.length
@@ -317,9 +316,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             )?.length || 0,
       action_history:
         batchActionFilters?.actionType && batchActionFilters.actionType !== 'all'
-          ? getBatchActionsFilteredCount(
-              batchActionsData?.pages?.flatMap(page => page.data) || [],
-            )
+          ? getBatchActionsFilteredCount(batchActionsData?.pages?.flatMap(page => page.data) || [])
           : batchActionsData?.pages?.[0]?.count || 0,
     }
   }, [
