@@ -1,12 +1,12 @@
 'use client'
 
-import { AlertTriangle, CheckCircle2, Clock, History } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import { TodosCardList } from '@/components/todos/todos-card-list'
 import { TodosFilters } from '@/components/todos/todos-filters'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
 import {
   useBatchActionsInfinite,
   useStoreAnalytics,
@@ -18,8 +18,10 @@ import {
   isSortField,
   validateSortConfig,
 } from '@/lib/utils/todo-sorting'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Typography } from '../ui/typography'
 
-// Todo item type based on actionable_batches structure
 export type TodoItem = {
   batch_id: string
   product_name: string
@@ -32,7 +34,6 @@ export type TodoItem = {
   potential_loss?: number
   composite_score?: number
   discount_percent?: number
-  // Action history fields (for action_history tab)
   action_taken?: string
   action_date?: string
   action_user?: string
@@ -72,18 +73,26 @@ export function TodosFilteredList({
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
-  const _t = useTranslations('todos')
+
+  const [customActiveTab, setCustomActiveTab] = useState<
+    'recommendations' | 'recently_expired' | 'all_active' | 'action_history'
+  >('recommendations')
 
   const [activeTab, setActiveTab] = useState<string>(
     initialFilters?.tab || 'recommendations'
   )
+
+  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>(
+    []
+  )
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+
   const [filters, setFilters] = useState<TodoFilters>(() => {
     const baseFilters: TodoFilters = {
       storeId: activeStoreId || undefined,
       tab: (initialFilters?.tab as TodoFilters['tab']) || 'recommendations',
     }
 
-    // Validate urgency filter with runtime check
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
       const validUrgencyLevels = [
         'critical',
@@ -97,7 +106,6 @@ export function TodosFilteredList({
       }
     }
 
-    // Validate sort configuration with runtime checks
     if (initialFilters?.sort) {
       const field = initialFilters.sort
       const direction = initialFilters.direction || 'asc'
@@ -105,11 +113,9 @@ export function TodosFilteredList({
       if (isSortField(field) && isSortDirection(direction)) {
         baseFilters.sort = { field, direction }
       } else {
-        // Use validated sort config as fallback
         baseFilters.sort = validateSortConfig({ field, direction })
       }
     } else {
-      // Default sorting based on tab
       baseFilters.sort =
         baseFilters.tab === 'recommendations'
           ? { field: 'urgency', direction: 'desc' }
@@ -122,6 +128,28 @@ export function TodosFilteredList({
   useEffect(() => {
     setFilters((prev) => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
+
+  useEffect(() => {
+    const updateIndicator = () => {
+      const tabs = [
+        'recommendations',
+        'recently_expired',
+        'all_active',
+        'action_history',
+      ]
+      const activeIndex = tabs.indexOf(activeTab)
+      const activeButton = buttonRefs.current[activeIndex]
+
+      if (activeButton) {
+        const { offsetLeft, offsetWidth } = activeButton
+        setIndicatorStyle({ left: offsetLeft, width: offsetWidth })
+      }
+    }
+
+    updateIndicator()
+    window.addEventListener('resize', updateIndicator)
+    return () => window.removeEventListener('resize', updateIndicator)
+  }, [activeTab])
 
   const updateFilters = (newFilters: Partial<TodoFilters>) => {
     const updatedFilters = { ...filters, ...newFilters }
@@ -156,7 +184,6 @@ export function TodosFilteredList({
     setActiveTab(newTab)
     updateFilters({
       tab: newTab as TodoFilters['tab'],
-      // Reset urgency filter when changing tabs
       urgency: 'all',
     })
   }
@@ -171,10 +198,8 @@ export function TodosFilteredList({
     })
   }
 
-  // Get real counts from analytics data
   const { data: analyticsResponse } = useStoreAnalytics(activeStoreId || '')
 
-  // Get infinite query data for recommendations tab
   const {
     data: infiniteData,
     isLoading: isLoadingInfinite,
@@ -184,7 +209,6 @@ export function TodosFilteredList({
     isFetchingNextPage,
   } = useTodosInfinite(activeStoreId || '', pageSize || 20)
 
-  // Get batch actions data for count (fetch just first page to get total count)
   const { data: batchActionsData } = useBatchActionsInfinite(
     activeStoreId || '',
     1
@@ -205,123 +229,154 @@ export function TodosFilteredList({
   }
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={handleTabChange}
-      className="w-full"
-    >
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger
-          value="recommendations"
-          className="flex items-center gap-2"
-        >
-          <AlertTriangle className="h-4 w-4" />
-          <span className="hidden sm:block">Recommendations</span>
-          <span className="sm:hidden">Rec</span>
-          <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">
-            {counts.recommendations}
-          </span>
-        </TabsTrigger>
-        <TabsTrigger
-          value="recently_expired"
-          className="flex items-center gap-2"
-        >
-          <Clock className="h-4 w-4" />
-          <span className="hidden sm:block">Recently Expired</span>
-          <span className="sm:hidden">Exp</span>
-          <span className="ml-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-800">
-            {counts.recently_expired}
-          </span>
-        </TabsTrigger>
-        <TabsTrigger
-          value="all_active"
-          className="flex items-center gap-2"
-        >
-          <CheckCircle2 className="h-4 w-4" />
-          <span className="hidden sm:block">All Active</span>
-          <span className="sm:hidden">Active</span>
-          <span className="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800">
-            {counts.all_active}
-          </span>
-        </TabsTrigger>
-        <TabsTrigger
-          value="action_history"
-          className="flex items-center gap-2"
-        >
-          <History className="h-4 w-4" />
-          <span className="hidden sm:block">History</span>
-          <span className="sm:hidden">Hist</span>
-          <span className="ml-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-800">
-            {counts.action_history}
-          </span>
-        </TabsTrigger>
-      </TabsList>
-
-      {/* Filters - only show for recommendations and all_active tabs */}
-      {(activeTab === 'recommendations' || activeTab === 'all_active') && (
-        <div className="p-4">
-          <TodosFilters
-            filters={{
-              urgency: filters.urgency,
-              sort: filters.sort,
-            }}
-            onFiltersChange={handleFiltersChange}
-            isLoading={false} // TODO: get from actual data loading state
-          />
+    <>
+      <div className="relative">
+        <div className="flex items-center">
+          {[
+            { label: 'Recommendations', value: 'recommendations' },
+            { label: 'Recently Expired', value: 'recently_expired' },
+            { label: 'All Active', value: 'all_active' },
+            { label: 'Action History', value: 'action_history' },
+          ].map((tab, index) => (
+            <Button
+              key={tab.value}
+              ref={(el) => {
+                buttonRefs.current[index] = el
+              }}
+              variant="ghost"
+              onClick={() => {
+                setCustomActiveTab(
+                  tab.value as
+                    | 'recommendations'
+                    | 'recently_expired'
+                    | 'all_active'
+                    | 'action_history'
+                )
+                setActiveTab(tab.value)
+                updateFilters({
+                  tab: tab.value as TodoFilters['tab'],
+                  urgency: 'all',
+                })
+              }}
+              className={cn(
+                'rounded-none px-4 relative flex items-center gap-2 pb-4',
+                'hover:bg-transparent',
+                activeTab === tab.value && 'text-primary'
+              )}
+            >
+              {tab.label}
+              {tab.value === 'recommendations' && (
+                <Badge
+                  variant={activeTab === 'recommendations' ? 'primary' : 'gray'}
+                >
+                  {counts.recommendations}
+                </Badge>
+              )}
+              {tab.value === 'recently_expired' && (
+                <Badge
+                  variant={
+                    activeTab === 'recently_expired' ? 'primary' : 'gray'
+                  }
+                >
+                  {counts.recently_expired}
+                </Badge>
+              )}
+              {tab.value === 'all_active' && (
+                <Badge
+                  variant={activeTab === 'all_active' ? 'primary' : 'gray'}
+                >
+                  {counts.all_active}
+                </Badge>
+              )}
+              {tab.value === 'action_history' && (
+                <Badge
+                  variant={activeTab === 'action_history' ? 'primary' : 'gray'}
+                >
+                  {counts.action_history}
+                </Badge>
+              )}
+            </Button>
+          ))}
         </div>
-      )}
-
-      <TabsContent
-        value="recommendations"
-        className="p-4"
-      >
-        <TodosCardList
-          tab="recommendations"
-          filters={filters}
-          pageSize={pageSize}
-          infiniteData={{
-            data: infiniteData?.pages?.flatMap((page) => page.data) || [],
-            hasNextPage,
-            fetchNextPage,
-            isFetchingNextPage,
-            isLoading: isLoadingInfinite,
-            error: infiniteError,
+        <div className="absolute left-0 right-0 bottom-0 h-[1px] bg-border" />
+        <div
+          className="absolute bottom-0 h-[2px] bg-primary transition-all duration-300 ease-in-out z-10"
+          style={{
+            left: `${indicatorStyle.left}px`,
+            width: `${indicatorStyle.width}px`,
           }}
         />
-      </TabsContent>
-
-      <TabsContent
-        value="recently_expired"
-        className="p-4"
+      </div>
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full"
       >
-        <TodosCardList
-          tab="recently_expired"
-          filters={filters}
-          pageSize={pageSize}
-        />
-      </TabsContent>
+        {(activeTab === 'recommendations' || activeTab === 'all_active') && (
+          <div className="p-4">
+            <TodosFilters
+              filters={{
+                urgency: filters.urgency,
+                sort: filters.sort,
+              }}
+              onFiltersChange={handleFiltersChange}
+              isLoading={false}
+            />
+          </div>
+        )}
 
-      <TabsContent
-        value="all_active"
-        className="p-4"
-      >
-        <TodosCardList
-          tab="all_active"
-          filters={filters}
-          pageSize={pageSize}
-        />
-      </TabsContent>
+        <TabsContent
+          value="recommendations"
+          className="p-4"
+        >
+          <TodosCardList
+            tab="recommendations"
+            filters={filters}
+            pageSize={pageSize}
+            infiniteData={{
+              data: infiniteData?.pages?.flatMap((page) => page.data) || [],
+              hasNextPage,
+              fetchNextPage,
+              isFetchingNextPage,
+              isLoading: isLoadingInfinite,
+              error: infiniteError,
+            }}
+          />
+        </TabsContent>
 
-      <TabsContent
-        value="action_history"
-        className="p-4"
-      >
-        <TodosCardList
-          tab="action_history"
-          filters={filters}
-          pageSize={pageSize}
-        />
-      </TabsContent>
-    </Tabs>
+        <TabsContent
+          value="recently_expired"
+          className="p-4"
+        >
+          <TodosCardList
+            tab="recently_expired"
+            filters={filters}
+            pageSize={pageSize}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="all_active"
+          className="p-4"
+        >
+          <TodosCardList
+            tab="all_active"
+            filters={filters}
+            pageSize={pageSize}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="action_history"
+          className="p-4"
+        >
+          <TodosCardList
+            tab="action_history"
+            filters={filters}
+            pageSize={pageSize}
+          />
+        </TabsContent>
+      </Tabs>
+    </>
   )
 }

@@ -17,12 +17,10 @@ interface TodosPageProps {
 }
 
 export default async function TodosPage({ searchParams }: TodosPageProps) {
-  // Await searchParams as required in Next.js 15
   const params = await searchParams
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
 
-  // Get current authenticated user
   const {
     data: { user },
     error: authError,
@@ -33,7 +31,6 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
   }
 
   try {
-    // Prefetch user stores and preferences
     await Promise.all([
       queryClient.prefetchQuery({
         queryKey: ['stores', 'userStores', user.id],
@@ -47,25 +44,13 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
       }),
     ])
 
-    // Get user's stores to determine which store to prefetch data for
     const stores = await fetchUserStores(user.id, serverClient)
-    const preferences = await fetchUserPreferences(serverClient)
 
     if (stores.length === 0) {
-      // User has no stores - show error instead of redirecting
       return <NoStoresError />
     }
-
-    // Determine which store to prefetch data for
-    const primaryStoreId = preferences?.primary_store_id
-    const primaryStore = stores.find(s => s.store.store_id === primaryStoreId)
-    const _storeToUse = primaryStore ? primaryStore.store : stores[0].store
-
-    // TODO: Add prefetching for todos data based on active tab
-    // For now, we'll let the client components handle loading
   } catch (error) {
     console.error('[TodosPage] Error prefetching data:', error)
-    // Continue without prefetch - client will handle loading
   }
 
   return (
