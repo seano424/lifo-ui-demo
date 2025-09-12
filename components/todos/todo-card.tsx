@@ -102,14 +102,9 @@ export function TodoCard({ todo }: TodoCardProps) {
           )}
         ></Badge>
 
-        <div className="flex flex-col min-w-0 flex-1 gap-3">
-          <div className=" flex flex-col gap-1">
-            <Typography
-              variant="h4"
-              className="line-clamp-1"
-            >
-              {todo.product_name}
-            </Typography>
+        <div className="flex flex-col min-w-0 flex-1 gap-6">
+          <div className=" flex flex-col gap-2">
+            <Typography variant="h4">{todo.product_name}</Typography>
 
             <div className="flex-1">
               <Typography className="flex gap-1 w-8/12">
@@ -122,7 +117,7 @@ export function TodoCard({ todo }: TodoCardProps) {
           </div>
 
           {/* Details */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             <Typography
               variant="muted"
               className="flex items-center justify-between "
@@ -138,11 +133,18 @@ export function TodoCard({ todo }: TodoCardProps) {
             </Typography>
 
             <div className="flex items-center justify-between">
-              {todo.discount_percent && (
+              {todo.discount_percent != null && todo.discount_percent > 0 && (
                 <Badge variant={urgencyConfig.badgeVariant}>
                   Suggested discount: {todo.discount_percent}%
                 </Badge>
               )}
+
+              {todo.discount_percent == null ||
+                (todo.discount_percent === 0 && (
+                  <Badge variant={urgencyConfig.badgeVariant}>
+                    Suggestion: Healthy & Maintain
+                  </Badge>
+                ))}
 
               {isExpiringToday ? (
                 <Badge variant="destructive">expires today</Badge>
@@ -150,7 +152,9 @@ export function TodoCard({ todo }: TodoCardProps) {
                 <Badge variant="destructive">expired</Badge>
               ) : isExpiringSoon ? (
                 <Badge variant="primary">expiring soon</Badge>
-              ) : null}
+              ) : (
+                <Badge variant="primary">active & healthy</Badge>
+              )}
             </div>
           </div>
         </div>
