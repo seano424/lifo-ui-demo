@@ -409,10 +409,10 @@
       "activeInventory": "Statut de l'inventaire actif",
       "activeBatchesCount": "{needsAttention} sur {total} lots actifs",
       "urgency": {
-        "critical": "Critique",
-        "high": "Priorité élevée (expire dans 2-3 jours)",
-        "medium": "Priorité moyenne (expire dans une semaine)",
-        "low": "Priorité faible (expire dans 2 semaines)"
+        "critical": "Critique (Action Immédiate Requise)",
+        "high": "Priorité Élevée (expire demain)",
+        "medium": "Priorité Moyenne (expire dans 2-7 jours)",
+        "low": "Priorité Faible (durée de vie plus longue)"
       },
       "status": {
         "ok": "OK",

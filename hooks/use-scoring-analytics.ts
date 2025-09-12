@@ -2,9 +2,15 @@
 
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { getMetricsService } from '@/lib/services/metrics'
+import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/supabase'
 import { useScoringThresholds } from './use-scoring-thresholds'
+
+// Type for batch actions from database
+export type BatchAction = Database['inventory']['Tables']['batch_actions']['Row']
+export type ActionType = Database['public']['Enums']['action_type']
 
 // TypeScript interfaces for existing API responses
 export interface ScoringAlert {
@@ -136,6 +142,34 @@ interface SupabaseInsights {
   }
 }
 
+// Actionable batch type from the JSON structure you provided
+export interface ActionableBatch {
+  batch_id: string
+  product_name: string
+  expiry_date: string
+  urgency: 'critical' | 'high' | 'medium' | 'low'
+  recommendation: string
+  discount_percent: number
+  reason: string
+  location_code: string
+  current_quantity: number
+  potential_loss: number
+  composite_score: number
+}
+
+export interface DashboardSummary {
+  total_batches: number
+  total_quantity: number
+  total_value: number
+  expired_count: number
+  expiring_soon_count: number
+}
+
+export interface DashboardAlerts {
+  expired_items: number
+  expiring_soon: number
+}
+
 export interface AnalyticsResponse {
   analytics: {
     timeframe: string
@@ -152,10 +186,25 @@ export interface AnalyticsResponse {
       store_name: string
       insights: SupabaseInsights
     }
+    // New fields from your JSON structure
+    actionable_batches?: ActionableBatch[]
+    dashboard?: {
+      summary?: DashboardSummary
+      alerts?: DashboardAlerts
+    }
+    dashboard_summary?: DashboardSummary
+    dashboard_alerts?: DashboardAlerts
     waste?: WasteAnalytics | { error: string }
     revenue?: RevenueAnalytics | { error: string }
     categories?: CategoryAnalytics | { error: string }
   }
+}
+
+// Interface for todos infinite query pagination
+export interface TodosInfiniteData {
+  data: ActionableBatch[]
+  nextPage: number | undefined
+  count: number
 }
 
 // React Query hooks for scoring alerts and analytics using Next.js API routes
@@ -553,4 +602,175 @@ export async function fetchStoreAnalytics(
 
     throw error
   }
+}
+
+/**
+ * Hook for infinite query pagination of todos (actionable batches)
+ * This provides client-side pagination for better UX and mutation support
+ * @param storeId - Store ID to fetch todos for
+ * @param pageSize - Number of items per page (default: 20)
+ * @param timeframe - Analytics timeframe (default: '7d')
+ * @param thresholdOverride - Optional threshold override
+ */
+export function useTodosInfinite(
+  storeId: string | null,
+  pageSize: number = 20,
+  timeframe: string = '7d',
+  thresholdOverride?: number,
+) {
+  // Get the full analytics data first
+  const {
+    data: allAnalytics,
+    isLoading: isLoadingAnalytics,
+    error: analyticsError,
+  } = useStoreAnalytics(storeId, timeframe, undefined, thresholdOverride)
+
+  return useInfiniteQuery({
+    queryKey: ['todos', 'infinite', storeId, pageSize, timeframe, thresholdOverride],
+    queryFn: ({ pageParam = 0 }): TodosInfiniteData => {
+      const batches = allAnalytics?.analytics?.actionable_batches || []
+      const start = pageParam * pageSize
+      const end = start + pageSize
+
+      return {
+        data: batches.slice(start, end),
+        nextPage: end < batches.length ? pageParam + 1 : undefined,
+        count: batches.length,
+      }
+    },
+    enabled: !!allAnalytics && !isLoadingAnalytics && !analyticsError,
+    initialPageParam: 0,
+    getNextPageParam: lastPage => lastPage.nextPage,
+    staleTime: 10 * 60 * 1000, // 10 minutes - same as base analytics
+  })
+}
+
+// Enhanced batch action type with related data for UI display
+export interface BatchActionWithDetails extends BatchAction {
+  // From the batches table join
+  product_name?: string
+  batch_number?: string
+  sku?: string
+  expiry_date?: string
+  location_code?: string
+
+  // From the donation recipient join (if applicable)
+  recipient_name?: string
+  recipient_type?: string
+
+  // For computing effectiveness
+  original_price?: number
+  new_price?: number
+}
+
+// Interface for batch actions infinite query pagination
+export interface BatchActionsInfiniteData {
+  data: BatchActionWithDetails[]
+  nextPage: number | undefined
+  count: number
+}
+
+/**
+ * Hook for infinite query pagination of batch actions (action history)
+ * Fetches user actions on inventory batches with infinite scrolling support
+ * @param storeId - Store ID to fetch actions for
+ * @param pageSize - Number of items per page (default: 20)
+ * @param filters - Optional filters for action type, date range, etc.
+ */
+export function useBatchActionsInfinite(
+  storeId: string | null,
+  pageSize: number = 20,
+  filters?: {
+    actionType?: ActionType
+    dateFrom?: string
+    dateTo?: string
+  },
+) {
+  return useInfiniteQuery({
+    queryKey: ['batchActions', 'infinite', storeId, pageSize, filters],
+    queryFn: async ({ pageParam = 0 }): Promise<BatchActionsInfiniteData> => {
+      if (!storeId) {
+        return { data: [], nextPage: undefined, count: 0 }
+      }
+
+      const supabase = createClient()
+      const limit = pageSize
+      const offset = pageParam * pageSize
+
+      // Build the query with joins to get related data
+      let query = supabase
+        .schema('inventory')
+        .from('batch_actions')
+        .select(
+          `
+          *,
+          batches (
+            batch_number, 
+            expiry_date,
+            location_code,
+            store_products (
+              products (
+                name,
+                sku
+              )
+            )
+          ),
+          donation_recipients (
+            name,
+            recipient_type
+          )
+        `,
+          { count: 'exact' },
+        )
+        .eq('store_id', storeId)
+        .order('action_date', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      // Apply filters if provided
+      if (filters?.actionType) {
+        query = query.eq('actual_action', filters.actionType)
+      }
+      if (filters?.dateFrom) {
+        query = query.gte('action_date', filters.dateFrom)
+      }
+      if (filters?.dateTo) {
+        query = query.lte('action_date', filters.dateTo)
+      }
+
+      const { data, error, count } = await query
+
+      if (error) {
+        console.error('[useBatchActionsInfinite] Supabase error:', error)
+        throw new Error(`Failed to fetch batch actions: ${error.message}`)
+      }
+
+      // Transform the data to include related information
+      const transformedData: BatchActionWithDetails[] = (data || []).map(action => ({
+        ...action,
+        // Flatten batch data
+        product_name: action.batches?.store_products?.products?.name,
+        batch_number: action.batches?.batch_number,
+        sku: action.batches?.store_products?.products?.sku,
+        expiry_date: action.batches?.expiry_date,
+        location_code: action.batches?.location_code,
+        // Flatten recipient data
+        recipient_name: action.donation_recipients?.name,
+        recipient_type: action.donation_recipients?.recipient_type,
+      }))
+
+      const totalCount = count || 0
+      const hasMore = offset + limit < totalCount
+
+      return {
+        data: transformedData,
+        nextPage: hasMore ? pageParam + 1 : undefined,
+        count: totalCount,
+      }
+    },
+    enabled: !!storeId,
+    initialPageParam: 0,
+    getNextPageParam: lastPage => lastPage.nextPage,
+    staleTime: 5 * 60 * 1000, // 5 minutes - actions don't change often
+    gcTime: 15 * 60 * 1000, // 15 minutes
+  })
 }

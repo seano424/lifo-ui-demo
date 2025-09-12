@@ -476,7 +476,6 @@ class SecureReadOnlyOperations:
                 .eq("store_id", store_id)
                 .gte("composite_score", 0.4)  # Only actionable items
                 .order("composite_score", desc=True)
-                .limit(50)
                 .execute()
             )
 

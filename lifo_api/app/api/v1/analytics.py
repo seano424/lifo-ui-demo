@@ -101,9 +101,7 @@ async def get_dashboard_data(
             },
             "top_categories": analytics_data.get("category_breakdown", [])[:5],
             "recent_activity": analytics_data.get("recent_actions", [])[:10],
-            "actionable_batches": analytics_data.get("actionable_batches", [])[
-                :20
-            ],  # Top 20 most urgent
+            "actionable_batches": analytics_data.get("actionable_batches", []),
             "last_updated": datetime.now().isoformat(),
         }
 
