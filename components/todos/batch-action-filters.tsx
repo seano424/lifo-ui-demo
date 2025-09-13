@@ -31,7 +31,10 @@ export function BatchActionFilters({
     return null
   }
 
-  const currentSort = filters?.sort || { field: 'action_date', direction: 'desc' }
+  const currentSort = filters?.sort || {
+    field: 'action_date',
+    direction: 'desc',
+  }
 
   const handleSortFieldChange = (field: string) => {
     onFiltersChange({
@@ -54,7 +57,7 @@ export function BatchActionFilters({
   }
 
   return (
-    <div className="flex flex-row justify-between gap-4">
+    <div className="flex flex-row sm:justify-between gap-2 overflow-x-auto pb-3">
       {/* Action Type Filter */}
       <div className="flex items-center gap-2">
         <Select
@@ -67,16 +70,31 @@ export function BatchActionFilters({
           }
           disabled={isLoading}
         >
-          <SelectTrigger className="w-full flex gap-2 text-nowrap min-w-[200px]">
+          <SelectTrigger className="w-full flex gap-2 text-nowrap min-w-[115px] sm:min-w-[200px]">
             <SelectValue placeholder="All action types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Action Types</SelectItem>
-            <SelectItem value="discount">Action: Discount</SelectItem>
-            <SelectItem value="donate">Action: Donate</SelectItem>
-            <SelectItem value="dispose">Action: Dispose</SelectItem>
-            <SelectItem value="maintain">Action: Maintain</SelectItem>
-            <SelectItem value="ignored">Action: Ignored</SelectItem>
+            <SelectItem value="all">
+              <span className="flex items-center gap-1">
+                All
+                <span className="hidden sm:inline">Action Types</span>
+              </span>
+            </SelectItem>
+            <SelectItem value="discount">
+              <span className="flex items-center gap-1">Discount</span>
+            </SelectItem>
+            <SelectItem value="donate">
+              <span className="flex items-center gap-1">Donate</span>
+            </SelectItem>
+            <SelectItem value="dispose">
+              <span className="flex items-center gap-1">Dispose</span>
+            </SelectItem>
+            <SelectItem value="maintain">
+              <span className="flex items-center gap-1">Maintain</span>
+            </SelectItem>
+            <SelectItem value="ignored">
+              <span className="flex items-center gap-1">Ignored</span>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -88,7 +106,7 @@ export function BatchActionFilters({
           onValueChange={handleSortFieldChange}
           disabled={isLoading}
         >
-          <SelectTrigger className="w-full md:w-[160px]">
+          <SelectTrigger className="w-full min-w-[140px] md:w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

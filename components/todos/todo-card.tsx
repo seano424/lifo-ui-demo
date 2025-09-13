@@ -114,12 +114,12 @@ export function TodoCard({ todo }: TodoCardProps) {
           )}
         ></Badge>
 
-        <div className="flex flex-col min-w-0 flex-1 gap-6">
+        <div className="flex flex-col min-w-0 flex-1 gap-4">
           <div className=" flex flex-col gap-2">
             <Typography variant="h4">{todo.product_name}</Typography>
 
             <div className="flex-1">
-              <Typography className="flex gap-1 w-8/12">
+              <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">Suggestion</span>
                 <span className="truncate lowercase">
                   {formatRecommendation(todo.recommendation)} • {todo.reason}
@@ -130,7 +130,10 @@ export function TodoCard({ todo }: TodoCardProps) {
 
           {/* Details */}
           <div className="flex flex-col gap-2">
-            <Typography variant="muted" className="flex items-center justify-between ">
+            <Typography
+              variant="muted"
+              className="flex sm:items-center sm:justify-between flex-col-reverse sm:flex-row gap-2"
+            >
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 Expires: {expiryDate.toLocaleDateString()}
@@ -141,7 +144,7 @@ export function TodoCard({ todo }: TodoCardProps) {
               </span>
             </Typography>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap gap-2 items-center justify-between">
               {todo.discount_percent != null && todo.discount_percent > 0 && (
                 <Badge variant={urgencyConfig.badgeVariant}>
                   Suggested discount: {todo.discount_percent}%

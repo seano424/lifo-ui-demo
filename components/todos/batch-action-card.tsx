@@ -120,12 +120,12 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
           <CheckIcon className={cn(actionConfig.textColor, 'h-4 w-4')} />
         </Badge>
 
-        <div className="flex flex-col min-w-0 flex-1 gap-6">
+        <div className="flex flex-col min-w-0 flex-1 gap-4">
           <div className="flex flex-col gap-2">
             <Typography variant="h4">{action.product_name || 'Unknown Product'}</Typography>
 
             <div className="flex-1">
-              <Typography className="flex gap-1 w-8/12">
+              <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">Action</span>
                 <span className="truncate lowercase">
                   {actionConfig.label} •{' '}
@@ -138,7 +138,10 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
 
           {/* Details */}
           <div className="flex flex-col gap-2">
-            <Typography variant="muted" className="flex items-center justify-between">
+            <Typography
+              variant="muted"
+              className="flex sm:items-center sm:justify-between flex-col-reverse sm:flex-row gap-2"
+            >
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 Date: {actionDate.toLocaleDateString()}
@@ -159,17 +162,26 @@ export function BatchActionCard({ action }: BatchActionCardProps) {
               </span>
             </Typography>
 
-            <div className="flex items-center justify-between">
-              <Badge variant={actionConfig.badgeVariant}>{actionConfig.label}</Badge>
+            <div className="flex sm:items-center sm:justify-between flex-col sm:flex-row gap-2">
+              <Badge className="w-max" variant={actionConfig.badgeVariant}>
+                {actionConfig.label}
+              </Badge>
 
               {isRecent ? (
-                <Badge variant="primary">recent action</Badge>
+                <Badge className="w-max" variant="primary">
+                  recent action
+                </Badge>
               ) : hasEffectivenessData && effectivenessPercent !== null ? (
-                <Badge variant={effectivenessPercent >= 50 ? 'primary' : 'secondary'}>
+                <Badge
+                  className="w-max"
+                  variant={effectivenessPercent >= 50 ? 'primary' : 'secondary'}
+                >
                   {effectivenessPercent.toFixed(0)}% recovered
                 </Badge>
               ) : (
-                <Badge variant="secondary">completed</Badge>
+                <Badge className="w-max" variant="secondary">
+                  completed
+                </Badge>
               )}
             </div>
           </div>
