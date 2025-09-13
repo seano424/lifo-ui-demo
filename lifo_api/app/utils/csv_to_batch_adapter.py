@@ -86,6 +86,8 @@ class CSVToBatchAdapter:
             quantity = float(row.get("quantity", 0))
             expiry_date_str = row.get("expiry_date", "")
 
+            from app.services.batch_creation_service import BatchFromScanRequest
+
             # Validate required fields
             if not sku:
                 raise ValueError(f"Row {row_index}: SKU is required")
@@ -102,6 +104,17 @@ class CSVToBatchAdapter:
             # Extract optional fields with defaults
             brand = row.get("brand", "").strip() or None
             category = row.get("category", "").strip() or None
+            batch_number = row.get("batch_number", "").strip() or None
+            
+            # Debug logging for batch number extraction
+            logger.info(
+                "CSV row processing",
+                row_index=row_index,
+                sku=sku,
+                product_name=product_name,
+                raw_batch_number=row.get("batch_number"),
+                processed_batch_number=batch_number,
+            )
 
             # Parse prices
             cost_price = CSVToBatchAdapter._parse_float(
@@ -115,21 +128,25 @@ class CSVToBatchAdapter:
             # Generate a proper barcode if SKU is not barcode-like
             barcode = CSVToBatchAdapter._generate_barcode_from_sku(sku)
 
-            # Create batch request
-            batch_request = BatchFromScanRequest(
-                barcode=barcode,
-                product_name=product_name,
-                brand=brand,
-                category=category,
-                quantity=quantity,
-                expiry_date=expiry_date,
-                cost_price=cost_price,
-                selling_price=selling_price,
-                scan_confidence=1.0,  # CSV data is considered 100% confident
-                ocr_extracted_date=None,  # No OCR for CSV data
-                ocr_confidence=None,
-                openfoodfacts_data=None,  # Could be enhanced later
-            )
+            # Create batch request using the Pydantic model
+            batch_data = {
+                "barcode": barcode,
+                "product_name": product_name,
+                "brand": brand,
+                "category": category,
+                "quantity": quantity,
+                "expiry_date": expiry_date,
+                "batch_number": batch_number,  # Use provided batch number from CSV
+                "cost_price": cost_price if cost_price is not None else None,
+                "selling_price": selling_price if selling_price is not None else None,
+                "scan_confidence": 1.0,  # CSV data is considered 100% confident
+                "ocr_extracted_date": None,  # No OCR for CSV data
+                "ocr_confidence": None,
+                "openfoodfacts_data": None,  # Could be enhanced later
+            }
+            # Create BatchFromScanRequest for validation, then convert back to dict
+            # Create BatchFromScanRequest instance
+            batch_request = BatchFromScanRequest(**batch_data)
 
             return batch_request
 
