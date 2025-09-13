@@ -15,7 +15,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.secure_dependencies import get_current_user, validate_store_access
 from app.database.connection import get_db
-from app.security.csv_security import CSVSecurityError, validate_and_sanitize_csv
+from app.security.csv_security import (
+    CSVSecurityError,
+    validate_and_sanitize_csv,
+)
+from app.utils.performance import measure_time
 
 # Import the unified processor (now properly installed)
 from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
@@ -30,6 +34,7 @@ class FastAPICSVIntegration:
     """
 
     @staticmethod
+    @measure_time("csv_processing_pipeline")
     async def process_csv_upload(
         file_content: bytes, store_id: str, user_id: str
     ) -> dict[str, Any]:
@@ -399,6 +404,7 @@ async def validate_csv(
 
 
 @router.post("/upload-and-create-batches")
+@measure_time("csv_upload_and_batch_creation_full")
 async def upload_csv_and_create_batches(
     file: UploadFile = File(...),
     store_id: str = Form(...),
@@ -473,12 +479,23 @@ async def upload_csv_and_create_batches(
 
         # Step 2: Convert CSV data to batch requests
         from app.utils.csv_to_batch_adapter import CSVToBatchAdapter
+        import time
 
         try:
+            # Time the batch conversion
+            batch_conversion_start = time.time()
             batch_requests = CSVToBatchAdapter.convert_csv_data_to_batch_requests(
                 csv_data=csv_result["data"],
                 store_id=store_id,
                 user_id=current_user["sub"],
+            )
+            batch_conversion_time_ms = (time.time() - batch_conversion_start) * 1000
+            
+            logger.info(
+                "CSV to batch conversion completed",
+                conversion_time_ms=batch_conversion_time_ms,
+                requests_created=len(batch_requests),
+                store_id=store_id,
             )
         except Exception as e:
             raise HTTPException(
@@ -496,11 +513,24 @@ async def upload_csv_and_create_batches(
         from app.services.batch_creation_service import BatchCreationService
 
         batch_service = BatchCreationService()
+        
+        # Time the database operations
+        db_operations_start = time.time()
         batch_results = await batch_service.create_batches_from_csv_bulk(
             store_id=store_id,
             user_id=current_user["sub"],
             batch_requests=batch_requests,
             chunk_size=chunk_size,
+        )
+        db_operations_time_ms = (time.time() - db_operations_start) * 1000
+        
+        logger.info(
+            "Database batch creation completed",
+            db_operations_time_ms=db_operations_time_ms,
+            successful_batches=batch_results["successful"],
+            failed_batches=batch_results["failed"],
+            success_rate=batch_results["success_rate"],
+            store_id=store_id,
         )
 
         # Step 4: Create comprehensive summary
