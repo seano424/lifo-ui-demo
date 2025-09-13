@@ -87,6 +87,7 @@ class UnifiedCSVProcessor:
         "manufacture_date": None,
         "location_code": "MAIN",
         "unit_type": "pcs",
+        "batch_number": None,  # Allow CSV to provide batch numbers
     }
 
     # Security patterns to detect
@@ -326,22 +327,8 @@ class UnifiedCSVProcessor:
                     f"CSV contains {len(df.columns)} columns, maximum allowed is {self.MAX_COLUMNS}"
                 )
 
-            # Check for formula injection in all cells
-            for col in df.columns:
-                for idx, value in df[col].items():
-                    if pd.notna(value) and isinstance(value, str):
-                        row_num = int(idx) + 1 if isinstance(idx, int | str) else 1
-                        if len(value) > self.MAX_CELL_LENGTH:
-                            raise SecurityViolation(
-                                f"Cell content exceeds maximum length at row {row_num}, column '{col}'"
-                            )
-
-                        # Check for dangerous patterns
-                        for pattern in self.FORMULA_PATTERNS:
-                            if re.search(pattern, value, re.IGNORECASE):
-                                raise SecurityViolation(
-                                    f"Potentially dangerous content detected at row {row_num}, column '{col}': {pattern}"
-                                )
+            # OPTIMIZED: Bulk security validation using vectorized operations
+            self._validate_security_bulk(df)
 
             return df
 
@@ -394,6 +381,35 @@ class UnifiedCSVProcessor:
         }
 
         return mappings.get(normalized, normalized)
+
+    def _validate_security_bulk(self, df: pd.DataFrame):
+        """
+        OPTIMIZED: Bulk security validation using vectorized pandas operations
+        Replaces individual cell checking with bulk pattern matching
+        """
+        # Combine all security patterns into single regex for efficiency
+        combined_pattern = '|'.join(self.FORMULA_PATTERNS)
+        
+        # Check for oversized content efficiently
+        for col in df.columns:
+            if df[col].dtype == 'object':  # String columns only
+                # Check cell length limits using vectorized operations
+                too_long = df[col].str.len() > self.MAX_CELL_LENGTH
+                if too_long.any():
+                    long_indices = df[too_long].index
+                    first_long_row = int(long_indices[0]) + 1
+                    raise SecurityViolation(
+                        f"Cell content exceeds maximum length at row {first_long_row}, column '{col}'"
+                    )
+                
+                # Vectorized security pattern check
+                dangerous_content = df[col].str.contains(combined_pattern, case=False, na=False, regex=True)
+                if dangerous_content.any():
+                    dangerous_indices = df[dangerous_content].index
+                    first_dangerous_row = int(dangerous_indices[0]) + 1
+                    raise SecurityViolation(
+                        f"Potentially dangerous content detected at row {first_dangerous_row}, column '{col}'"
+                    )
 
     async def _process_data(self, df: pd.DataFrame) -> list[dict[str, Any]]:
         """Process and validate each row of data"""
@@ -743,17 +759,28 @@ class UnifiedCSVProcessor:
     async def _generate_batch_numbers(
         self, processed_data: list[dict[str, Any]]
     ) -> list[dict[str, Any]]:
-        """Generate unique batch numbers for each item"""
+        """Generate unique batch numbers for items that don't already have them"""
 
         for idx, item in enumerate(processed_data):
-            # Generate batch number: STORE_SKU_YYYYMMDD_SEQUENCE
-            date_str = datetime.now().strftime("%Y%m%d")
-            sequence = f"{int(idx) + 1:03d}"
+            # Only generate batch number if not already provided in CSV
+            existing_batch_number = item.get("batch_number", "").strip()
+            
+            # Debug logging
+            logger.info(f"UnifiedCSVProcessor batch number check: idx={idx}, sku={item.get('sku', 'unknown')}, existing_batch_number='{existing_batch_number}'")
+            
+            if not existing_batch_number:
+                # Generate batch number: STORE_SKU_YYYYMMDD_SEQUENCE
+                date_str = datetime.now().strftime("%Y%m%d")
+                sequence = f"{int(idx) + 1:03d}"
 
-            batch_number = (
-                f"{self.store_id[:8]}_{item['sku'][:10]}_{date_str}_{sequence}"
-            )
-            item["batch_number"] = batch_number
+                batch_number = (
+                    f"{self.store_id[:8]}_{item['sku'][:10]}_{date_str}_{sequence}"
+                )
+                item["batch_number"] = batch_number
+                logger.info(f"Generated batch number: {batch_number}")
+            else:
+                logger.info(f"Keeping CSV-provided batch number: {existing_batch_number}")
+                # If batch_number exists, keep the CSV-provided value
 
         return processed_data
 
