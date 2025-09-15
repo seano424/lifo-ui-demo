@@ -188,7 +188,7 @@ async def performance_health_check(
 
         # Combine all health data
         health_report = {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.utcnow().isoformat(),
             "overall_status": performance_health.get("overall_health", "unknown"),
             "performance_health": performance_health,
             "metrics_summary": metrics_summary,
@@ -261,7 +261,7 @@ async def mobile_performance_health(
         }
 
         mobile_health: dict[str, Any] = {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.utcnow().isoformat(),
             "mobile_targets_status": "optimal",
             "endpoint_performance": {},
             "violations": [],
@@ -390,7 +390,7 @@ async def get_performance_metrics(
             )
 
         return {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.utcnow().isoformat(),
             "time_period_hours": hours,
             "metrics_summary": metrics_summary,
             "time_series_data": time_series_data,

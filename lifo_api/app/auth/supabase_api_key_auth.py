@@ -50,14 +50,30 @@ class SupabaseAPIKeyAuth:
         self.supabase_url = settings.supabase_url
         self.anon_key = settings.supabase_anon_key
         self.service_role_key = settings.supabase_service_role_key
+        
+        # New API keys (preferred)
+        self.publishable_key = settings.supabase_publishable_key
+        self.secret_key = settings.supabase_secret_key
+        
         self.logger = structlog.get_logger().bind(component="supabase_api_key_auth")
 
         # Validate required configuration
         if not self.supabase_url:
             raise ValueError("SUPABASE_URL is required for API key authentication")
 
-        if not self.anon_key:
-            raise ValueError("SUPABASE_ANON_KEY is required for API key authentication")
+        # Check for new keys first, fall back to legacy keys
+        if not self.publishable_key and not self.anon_key:
+            raise ValueError("Either SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY is required for API key authentication")
+        
+        # Determine which key system to use
+        self.use_new_keys = bool(self.publishable_key and self.secret_key)
+        
+        if self.use_new_keys:
+            self.logger.info("Using new Supabase publishable/secret key system")
+        else:
+            self.logger.info("Using legacy Supabase JWT key system")
+            if not self.anon_key:
+                raise ValueError("SUPABASE_ANON_KEY is required when using legacy JWT system")
 
     async def verify_user_token(self, access_token: str) -> APIKeyUser:
         """
@@ -124,9 +140,13 @@ class SupabaseAPIKeyAuth:
         """
         try:
             auth_url = f"{self.supabase_url}/auth/v1/user"
+            
+            # Use appropriate API key based on system
+            api_key = self.publishable_key if self.use_new_keys else self.anon_key
+            
             headers = {
                 "Authorization": f"Bearer {access_token}",
-                "apikey": self.anon_key,
+                "apikey": api_key,
                 "Content-Type": "application/json",
             }
 
@@ -180,11 +200,29 @@ class SupabaseAPIKeyAuth:
             bool: True if valid service key
         """
         try:
+            self.logger.debug("Service key verification attempt", 
+                            use_new_keys=self.use_new_keys,
+                            secret_key_present=bool(self.secret_key),
+                            service_role_key_present=bool(self.service_role_key),
+                            api_key_prefix=api_key[:10] if api_key else None)
+            
             # Use constant-time comparison to prevent timing attacks
-            if hmac.compare_digest(api_key, self.service_role_key):
-                self.logger.info("Service role API key verified")
+            # Check new secret key first, then fall back to legacy service role key
+            if self.use_new_keys and self.secret_key:
+                if hmac.compare_digest(api_key, self.secret_key):
+                    self.logger.info("Secret key verified (new system)")
+                    return True
+                else:
+                    self.logger.debug("Secret key comparison failed")
+            
+            # Fall back to legacy service role key
+            if self.service_role_key and hmac.compare_digest(api_key, self.service_role_key):
+                self.logger.info("Service role key verified (legacy system)")
                 return True
+            else:
+                self.logger.debug("Service role key comparison failed")
 
+            self.logger.debug("No valid service keys matched")
             return False
 
         except Exception as e:
@@ -206,7 +244,11 @@ class SupabaseAPIKeyAuth:
         """
         try:
             refresh_url = f"{self.supabase_url}/auth/v1/token?grant_type=refresh_token"
-            headers = {"apikey": self.anon_key, "Content-Type": "application/json"}
+            
+            # Use appropriate API key based on system
+            api_key = self.publishable_key if self.use_new_keys else self.anon_key
+            
+            headers = {"apikey": api_key, "Content-Type": "application/json"}
             payload = {"refresh_token": refresh_token}
 
             async with httpx.AsyncClient() as client:
@@ -246,8 +288,9 @@ class SupabaseAPIKeyAuth:
         Raises:
             SupabaseAPIKeyError: If authentication fails
         """
-        # Check for API key header first (for service role operations)
+        # Check for API key header FIRST (for service role operations)
         api_key = request.headers.get("apikey")
+        self.logger.debug("API key header check", api_key_present=bool(api_key), api_key_length=len(api_key) if api_key else 0)
 
         if api_key and await self.verify_service_key(api_key):
             # Service role authentication - apikey header is sufficient
@@ -258,10 +301,18 @@ class SupabaseAPIKeyAuth:
                 authenticated_at=datetime.now(UTC),
             )
 
-        # Check for Authorization header
-        authorization = request.headers.get("Authorization")
+        # Check for Authorization header (case-insensitive)
+        authorization = request.headers.get("Authorization") or request.headers.get("authorization")
         if not authorization:
             raise SupabaseAPIKeyError("Authorization header or valid apikey required")
+
+        # Ensure authorization header is a string (handle potential bytes issues)
+        if isinstance(authorization, bytes):
+            try:
+                authorization = authorization.decode('utf-8')
+            except UnicodeDecodeError as e:
+                self.logger.error("Failed to decode authorization header", error=str(e))
+                raise SupabaseAPIKeyError("Invalid authorization header encoding") from e
 
         # Extract token from Authorization header
         if authorization.startswith("Bearer "):

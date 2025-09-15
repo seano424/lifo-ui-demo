@@ -47,11 +47,30 @@ class Settings(BaseSettings):
     db_max_overflow: int = 30
     db_pool_recycle: int = 3600
 
-    # Authentication
-    supabase_url: str = ""
-    supabase_jwt_secret: str = ""
-    supabase_anon_key: str = ""
-    supabase_service_role_key: str = ""
+    # Supabase Authentication
+    supabase_url: str = Field(
+        default="",
+        description="Supabase project URL for authentication and database"
+    )
+    supabase_jwt_secret: str = ""  # Keep for compatibility
+    supabase_anon_key: str = Field(
+        default="",
+        description="Supabase anonymous key for public operations (legacy JWT)"
+    )
+    supabase_service_role_key: str = Field(
+        default="",
+        description="Supabase service role key for admin operations (legacy JWT)"
+    )
+    
+    # New Supabase API Keys (recommended over legacy JWT keys)
+    supabase_publishable_key: str = Field(
+        default="",
+        description="Supabase publishable key (new API key system) for client-side auth"
+    )
+    supabase_secret_key: str = Field(
+        default="",
+        description="Supabase secret key (new API key system) for server-side admin operations"
+    )
 
     # JWT Configuration
     jwt_secret_key: str = Field(
@@ -308,8 +327,15 @@ def get_supabase_config() -> dict[str, Any]:
     """
     return {
         "url": settings.supabase_url,
+        # Legacy JWT keys (for backward compatibility)
         "jwt_secret": settings.supabase_jwt_secret,
+        "anon_key": settings.supabase_anon_key,
         "service_role_key": settings.supabase_service_role_key,
+        # New API keys (recommended)
+        "publishable_key": settings.supabase_publishable_key,
+        "secret_key": settings.supabase_secret_key,
+        "timeout_seconds": settings.auth_timeout_seconds,
+        "retry_attempts": settings.auth_retry_attempts,
     }
 
 

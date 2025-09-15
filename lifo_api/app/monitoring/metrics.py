@@ -344,7 +344,7 @@ class MetricsCollector:
 
                     with self.lock:
                         self.metrics["system_resources"] = system_metrics
-                        self.metrics["system_resources"]["last_updated"] = timestamp
+                        self.metrics["system_resources"]["last_updated"] = timestamp.isoformat()
 
                         # Add to time series
                         for metric_name, value in system_metrics.items():
