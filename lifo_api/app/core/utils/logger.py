@@ -11,7 +11,7 @@ from loguru import logger  # type: ignore
 class StructuredLogger:
     """Structured logger for LIFO AI Core"""
 
-    def __init__(self, service_name: str = "lifo_ai_core", log_level: str = "INFO"):
+    def __init__(self, service_name: str = "lifo_api", log_level: str = "INFO"):
         self.service_name = service_name
         self.log_level = log_level
         self._setup_logger()
@@ -107,7 +107,7 @@ _logger = None
 
 
 def get_logger(
-    service_name: str = "lifo_ai_core", log_level: str = "INFO"
+    service_name: str = "lifo_api", log_level: str = "INFO"
 ) -> StructuredLogger:
     """Get or create logger instance"""
     global _logger

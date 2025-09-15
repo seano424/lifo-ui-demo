@@ -21,8 +21,8 @@ from app.security.csv_security import (
 )
 from app.utils.performance import measure_time
 
-# Import the unified processor (now properly installed)
-from lifo_ai_core.etl.unified_csv_processor import UnifiedCSVProcessor
+# Import the unified processor (now consolidated into lifo_api)
+from app.core.etl.unified_csv_processor import UnifiedCSVProcessor
 
 router = APIRouter()
 logger = structlog.get_logger()

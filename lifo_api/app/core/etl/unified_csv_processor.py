@@ -2,7 +2,7 @@
 Unified CSV Processor for LIFO.AI
 Consolidates all CSV import functionality into a single, secure, comprehensive processor
 Combines the best features from:
-- lifo_ai_core/etl/processor.py (advanced processing)
+- lifo_api/etl/processor.py (advanced processing)
 - lifo_api/secure_csv_processor.py (security)
 - lifo_api/csv_processor.py (validation)
 - Next.js upload logic (integration)

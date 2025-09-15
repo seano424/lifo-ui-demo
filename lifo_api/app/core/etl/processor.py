@@ -1,4 +1,4 @@
-# lifo_ai_core/etl/processor.py
+# lifo_api/etl/processor.py
 
 import csv
 import io
