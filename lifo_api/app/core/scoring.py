@@ -988,7 +988,7 @@ class ScoringService:
     async def score_store_inventory(
         self, store_id: str, recalculate_all: bool = False
     ) -> dict[str, Any]:
-        """Score all active batches for a store with enhanced performance - SECURE READ-ONLY VERSION"""
+        """Score all active batches for a store and save results to database"""
         start_time = datetime.utcnow()
 
         try:
@@ -1032,30 +1032,36 @@ class ScoringService:
                 else:
                     errors.append(f"Failed to score batch {batch_id}")
 
-            # Save all score results to database using secure write operation
+            # Save all score results to database
             if results:
-                scores_data = []
                 for result in results:
-                    scores_data.append(
-                        {
-                            "batch_id": result.batch_id,
-                            "store_id": store_id,
-                            "expiry_score": result.expiry_score,
-                            "velocity_score": result.velocity_score,
-                            "margin_score": result.margin_score,
-                            "composite_score": result.composite_score,
-                            "recommendation": result.recommendation,
-                            "urgency_level": result.urgency_level,
-                            "discount_percent": result.discount_percent,
-                            "reason": result.reason,
-                            "ml_enhanced": result.ml_enhanced,
-                            "confidence_level": result.confidence_level,
-                            "calculated_at": result.calculated_at,
-                        }
+                    try:
+                        await self._save_score_result(result)
+                        await self._track_recommendation(result, store_id)
+                    except Exception as e:
+                        self.logger.error(
+                            "Failed to save score result",
+                            batch_id=result.batch_id,
+                            error=str(e)
+                        )
+                        errors.append(f"Failed to save score for batch {result.batch_id}: {str(e)}")
+                
+                # Commit all database changes
+                try:
+                    await self.db.commit()
+                    self.logger.info(
+                        "Successfully saved scores to database",
+                        store_id=store_id,
+                        saved_count=len(results)
                     )
-
-                # Use secure write operation for scores only
-                await read_ops.store_score_results(scores_data)
+                except Exception as e:
+                    await self.db.rollback()
+                    self.logger.error(
+                        "Failed to commit scores to database",
+                        store_id=store_id,
+                        error=str(e)
+                    )
+                    raise
 
             processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
 
