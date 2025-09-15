@@ -1,0 +1,147 @@
+# Digital Ocean App Platform Configuration for LIFO AI FastAPI Backend - STAGING
+# Deploy: doctl apps create --spec .do/staging.yaml
+# Update: doctl apps update <staging_app_id> --spec .do/staging.yaml
+
+name: lifo-ai-api-staging
+region: nyc1
+
+services:
+- name: fastapi-backend-staging
+  source_dir: lifo_api
+  github:
+    repo: lifo-ai/lifo-app  # Replace with your actual repo
+    branch: staging  # Deploy from staging branch
+    deploy_on_push: true
+  
+  # Build configuration
+  build_command: |
+    pip install --upgrade pip
+    pip install -r requirements.txt
+  
+  # Run command for staging (with debug logging)
+  run_command: gunicorn -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 500 --log-level debug --preload app.main:app
+  
+  # Resource allocation (smaller for staging)
+  instance_count: 1
+  instance_size_slug: basic-xxs  # Minimal resources for testing
+  
+  # Health check
+  health_check:
+    http_path: /api/v1/health
+    initial_delay_seconds: 30
+    period_seconds: 10
+    timeout_seconds: 5
+    failure_threshold: 3
+    success_threshold: 1
+  
+  # Environment variables for staging
+  envs:
+  # Application settings
+  - key: ENVIRONMENT
+    value: staging
+    type: SECRET
+  
+  # Database configuration (staging database)
+  - key: DATABASE_URL
+    value: ""  # Set to staging database URL in DO console
+    type: SECRET
+  
+  - key: SUPABASE_URL
+    value: ""  # Can use same Supabase project or separate staging project
+    type: SECRET
+    
+  - key: SUPABASE_ANON_KEY
+    value: ""  # Staging keys
+    type: SECRET
+  
+  - key: SUPABASE_SERVICE_ROLE_KEY
+    value: ""  # Staging keys
+    type: SECRET
+  
+  # Security (different secret for staging)
+  - key: SECRET_KEY
+    value: ""  # Different secret key for staging
+    type: SECRET
+  
+  - key: ALGORITHM
+    value: HS256
+    
+  - key: ACCESS_TOKEN_EXPIRE_MINUTES
+    value: "480"  # Shorter expiry for testing (8 hours)
+  
+  # API Configuration
+  - key: API_V1_STR
+    value: /api/v1
+    
+  - key: PROJECT_NAME
+    value: "LIFO AI API - Staging"
+  
+  # CORS settings for staging (more permissive for testing)
+  - key: BACKEND_CORS_ORIGINS
+    value: "http://localhost:3000,http://localhost:3001,https://staging-frontend-domain.com,https://preview-*.vercel.app"
+  
+  # Debug settings for staging
+  - key: DEBUG
+    value: "true"
+    
+  - key: LOG_LEVEL
+    value: DEBUG
+  
+  # Performance settings (reduced for staging)
+  - key: WORKERS
+    value: "1"  # Single worker for staging
+    
+  - key: MAX_WORKERS
+    value: "2"
+  
+  # Testing flags
+  - key: ENABLE_TEST_ENDPOINTS
+    value: "true"
+    
+  - key: MOCK_EXTERNAL_SERVICES
+    value: "false"  # Set to true if you want to mock external APIs in staging
+  
+  # HTTP settings
+  http_port: 8080
+  
+  # Routes - this exposes the API publicly
+  routes:
+  - path: /
+  - path: /api
+  - path: /docs  # FastAPI auto-docs
+  - path: /redoc  # Alternative docs
+  - path: /openapi.json
+  - path: /test  # Additional test routes
+
+# Optional: Separate staging database (recommended)
+databases:
+- name: lifo-postgres-staging
+  engine: PG
+  version: "15"
+  size: db-s-1vcpu-1gb  # Same as production for realistic testing
+  num_nodes: 1
+
+# Jobs for staging maintenance
+jobs:
+- name: db-migrate-staging
+  source_dir: lifo_api
+  run_command: alembic upgrade head
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  kind: PRE_DEPLOY  # Runs before deployment
+
+# Test data seeding job (staging only)
+- name: seed-test-data
+  source_dir: lifo_api
+  run_command: python -m app.scripts.seed_test_data  # You'll need to create this
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  kind: POST_DEPLOY  # Runs after successful deployment
+
+alerts:
+- rule: CPU_UTILIZATION
+  value: "90"  # Higher threshold for staging
+- rule: MEM_UTILIZATION  
+  value: "90"
+- rule: RESTART_COUNT
+  value: "10"  # More restarts allowed in staging
