@@ -119,7 +119,7 @@ async def score_store_batch(
         if include_donation_rationale:
             from sqlalchemy import select
 
-            from app.database.inventory_models import StoreSettings
+            from app.database.models import StoreSettings
 
             result = await db.execute(
                 select(StoreSettings).where(StoreSettings.store_id == store_id)

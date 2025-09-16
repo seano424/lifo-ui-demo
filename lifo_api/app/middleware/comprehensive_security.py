@@ -432,6 +432,9 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                     "category",
                     "store_id",
                     "days",
+                    "force_recalculate",
+                    "save_to_database",
+                    "include_donation_rationale",
                 ],
                 "analytics": ["store_id", "days", "metric", "timeframe"],
                 "general": ["page", "limit", "offset", "sort", "order", "filter"],
@@ -500,6 +503,10 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                     return True
                 except ValueError:
                     return False
+
+            elif param_name in ["force_recalculate", "save_to_database", "include_donation_rationale"]:
+                # Boolean parameters
+                return value.lower() in ["true", "false", "1", "0"]
 
             elif param_name in [
                 "urgency",

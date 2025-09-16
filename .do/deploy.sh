@@ -3,7 +3,7 @@
 
 set -e
 
-echo "🚀 LIFO AI FastAPI Deployment Script"
+echo "LIFO AI FastAPI Deployment Script"
 echo "======================================"
 
 # Colors for output

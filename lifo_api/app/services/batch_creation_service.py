@@ -990,7 +990,6 @@ class BatchCreationService:
 
         return batch.batch_id  # type: ignore[return-value]
 
-<<<<<<< HEAD
     # PERFORMANCE OPTIMIZATION: Bulk database operations
     async def _bulk_lookup_products(
         self, session: AsyncSession, store_id: str, barcodes: list[str]

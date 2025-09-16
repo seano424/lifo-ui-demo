@@ -9,7 +9,7 @@ services:
 - name: fastapi-backend-staging
   source_dir: lifo_api
   github:
-    repo: lifo-ai/lifo-app  # Replace with your actual repo
+    repo: lifo-ai/lifo-app 
     branch: staging  # Deploy from staging branch
     deploy_on_push: true
   
