@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
@@ -28,19 +28,15 @@ export function TodoActionBottomSheet({
 
   // Discount tab state
   const [discountPercentage, setDiscountPercentage] = useState(
-    selectedBatch?.discount_percent || 21
+    selectedBatch?.discount_percent || 21,
   )
-  const [selectedPreset, setSelectedPreset] = useState(
-    selectedBatch?.discount_percent || 21
-  )
+  const [_selectedPreset, setSelectedPreset] = useState(selectedBatch?.discount_percent || 21)
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
 
   // Donate tab state
   const [selectedRecipient, setSelectedRecipient] = useState('local-foodbank')
-  const [donateQuantity, setDonateQuantity] = useState(
-    selectedBatch?.current_quantity || 0
-  )
+  const [donateQuantity, setDonateQuantity] = useState(selectedBatch?.current_quantity || 0)
   const [isSelectAll, setIsSelectAll] = useState(true)
 
   const {
@@ -95,8 +91,7 @@ export function TodoActionBottomSheet({
 
   // Calculate price and revenue metrics
   const calculatePriceMetrics = () => {
-    const originalPricePerUnit =
-      selectedBatch.potential_loss / selectedBatch.current_quantity
+    const originalPricePerUnit = selectedBatch.potential_loss / selectedBatch.current_quantity
 
     // Use custom price if enabled and valid, otherwise use percentage discount
     let newPricePerUnit: number
@@ -107,7 +102,7 @@ export function TodoActionBottomSheet({
       if (!Number.isNaN(parsedPrice) && parsedPrice >= 0) {
         newPricePerUnit = parsedPrice
         actualDiscountPercentage = Math.round(
-          ((originalPricePerUnit - parsedPrice) / originalPricePerUnit) * 100
+          ((originalPricePerUnit - parsedPrice) / originalPricePerUnit) * 100,
         )
       } else {
         // Fallback to percentage if custom price is invalid
@@ -119,10 +114,9 @@ export function TodoActionBottomSheet({
       actualDiscountPercentage = discountPercentage
     }
 
-    const totalRevenueRecovery =
-      newPricePerUnit * selectedBatch.current_quantity
+    const totalRevenueRecovery = newPricePerUnit * selectedBatch.current_quantity
     const recoveryPercentage = Math.round(
-      (totalRevenueRecovery / selectedBatch.potential_loss) * 100
+      (totalRevenueRecovery / selectedBatch.potential_loss) * 100,
     )
 
     return {
@@ -156,16 +150,13 @@ export function TodoActionBottomSheet({
       communityImpact: mealsEstimate,
       taxBenefit,
       donatedValue: selectedBatch
-        ? (selectedBatch.potential_loss / selectedBatch.current_quantity) *
-          donateQuantity
+        ? (selectedBatch.potential_loss / selectedBatch.current_quantity) * donateQuantity
         : 0,
     }
   }
 
   const priceMetrics = calculatePriceMetrics()
-  const sellLikelihood = getSellLikelihood(
-    priceMetrics.actualDiscountPercentage
-  )
+  const sellLikelihood = getSellLikelihood(priceMetrics.actualDiscountPercentage)
   const donationImpact = calculateDonationImpact()
 
   // Helper function to get recipient display name
@@ -261,12 +252,7 @@ export function TodoActionBottomSheet({
   ]
 
   return (
-    <BottomSheet
-      isOpen={isOpen}
-      onClose={onClose}
-      title=""
-      variant="fullHeight"
-    >
+    <BottomSheet isOpen={isOpen} onClose={onClose} title="" variant="fullHeight">
       <div className="flex flex-col h-full -mt-4">
         {/* Custom Header with Hide/Show Toggle */}
         <div className="border-b pb-4">
@@ -282,28 +268,16 @@ export function TodoActionBottomSheet({
               {isHeaderExpanded && (
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center gap-4">
-                    <span
-                      className={cn(
-                        'font-medium',
-                        getUrgencyColor(selectedBatch.urgency)
-                      )}
-                    >
+                    <span className={cn('font-medium', getUrgencyColor(selectedBatch.urgency))}>
                       {calculateDaysLeft()}
                     </span>
                     <span>• {selectedBatch.current_quantity} units</span>
-                    <span
-                      className={cn(
-                        'capitalize',
-                        getUrgencyColor(selectedBatch.urgency)
-                      )}
-                    >
+                    <span className={cn('capitalize', getUrgencyColor(selectedBatch.urgency))}>
                       • {selectedBatch.urgency} urgency
                     </span>
                   </div>
                   <div className="text-muted-foreground">
-                    <p className="font-medium">
-                      Suggestion: {selectedBatch.recommendation}
-                    </p>
+                    <p className="font-medium">Suggestion: {selectedBatch.recommendation}</p>
                     <p className="text-xs mt-1">{selectedBatch.reason}</p>
                   </div>
                 </div>
@@ -332,7 +306,7 @@ export function TodoActionBottomSheet({
 
         {/* Tab Navigation */}
         <div className="flex border-b">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               type="button"
               key={tab.id}
@@ -342,7 +316,7 @@ export function TodoActionBottomSheet({
                 'border-b-2 -mb-[2px]',
                 activeTab === tab.id
                   ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >
               <span className="mr-1">{tab.icon}</span>
@@ -360,13 +334,10 @@ export function TodoActionBottomSheet({
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <span className="text-lg">💡</span>
-                    <h3 className="font-semibold text-lg">
-                      MAXIMIZE REVENUE RECOVERY
-                    </h3>
+                    <h3 className="font-semibold text-lg">MAXIMIZE REVENUE RECOVERY</h3>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    AI Suggested Discount:{' '}
-                    {selectedBatch.discount_percent || 21}%
+                    AI Suggested Discount: {selectedBatch.discount_percent || 21}%
                   </p>
                 </div>
 
@@ -386,12 +357,9 @@ export function TodoActionBottomSheet({
                     </div>
                   </div>
                   <div className="text-sm">
-                    <span className="text-muted-foreground">
-                      Revenue recovery:
-                    </span>
+                    <span className="text-muted-foreground">Revenue recovery:</span>
                     <span className="ml-2 font-semibold text-green-600">
-                      €{priceMetrics.totalRevenue.toFixed(2)} (
-                      {priceMetrics.recoveryPercentage}%)
+                      €{priceMetrics.totalRevenue.toFixed(2)} ({priceMetrics.recoveryPercentage}%)
                     </span>
                   </div>
                 </div>
@@ -399,7 +367,7 @@ export function TodoActionBottomSheet({
                 {/* Discount Slider */}
                 <InputSlider
                   value={discountPercentage}
-                  onChange={(value) => {
+                  onChange={value => {
                     setDiscountPercentage(value)
                     setUseCustomPrice(false)
                     setCustomPrice('')
@@ -415,9 +383,7 @@ export function TodoActionBottomSheet({
                 {/* Custom Price Input */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">
-                      Or set specific price:
-                    </label>
+                    <label className="text-sm font-medium">Or set specific price:</label>
                     <button
                       type="button"
                       onClick={() => setUseCustomPrice(!useCustomPrice)}
@@ -425,7 +391,7 @@ export function TodoActionBottomSheet({
                         'px-2 py-1 text-xs rounded border transition-all',
                         useCustomPrice
                           ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background border-border hover:border-primary/50'
+                          : 'bg-background border-border hover:border-primary/50',
                       )}
                     >
                       {useCustomPrice ? 'Using Price' : 'Use Price'}
@@ -440,25 +406,22 @@ export function TodoActionBottomSheet({
                       min="0"
                       placeholder={priceMetrics.newPrice.toFixed(2)}
                       value={customPrice}
-                      onChange={(e) => setCustomPrice(e.target.value)}
+                      onChange={e => setCustomPrice(e.target.value)}
                       disabled={!useCustomPrice}
                       className={cn(
                         'flex-1 px-3 py-2 text-sm border rounded-md transition-all',
                         'focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
                         useCustomPrice
                           ? 'bg-background border-border'
-                          : 'bg-muted border-muted text-muted-foreground cursor-not-allowed'
+                          : 'bg-muted border-muted text-muted-foreground cursor-not-allowed',
                       )}
                     />
-                    <span className="text-xs text-muted-foreground">
-                      per unit
-                    </span>
+                    <span className="text-xs text-muted-foreground">per unit</span>
                   </div>
 
                   {useCustomPrice && customPrice && (
                     <div className="text-xs text-muted-foreground">
-                      This equals a {priceMetrics.actualDiscountPercentage}%
-                      discount
+                      This equals a {priceMetrics.actualDiscountPercentage}% discount
                     </div>
                   )}
                 </div>
@@ -467,7 +430,7 @@ export function TodoActionBottomSheet({
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Quick presets:</label>
                   <div className="flex gap-2">
-                    {[10, 20, 25, 50].map((preset) => (
+                    {[10, 20, 25, 50].map(preset => (
                       <button
                         type="button"
                         key={preset}
@@ -481,12 +444,10 @@ export function TodoActionBottomSheet({
                           'px-3 py-1.5 text-sm rounded-md border transition-all',
                           discountPercentage === preset
                             ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background border-border hover:border-primary/50'
+                            : 'bg-background border-border hover:border-primary/50',
                         )}
                       >
-                        {preset === 21 && discountPercentage === preset
-                          ? '✓ '
-                          : ''}
+                        {preset === 21 && discountPercentage === preset ? '✓ ' : ''}
                         {preset}%
                       </button>
                     ))}
@@ -495,15 +456,11 @@ export function TodoActionBottomSheet({
 
                 {/* Expected Outcome */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Expected outcome:
-                  </label>
+                  <label className="text-sm font-medium">Expected outcome:</label>
                   <div className="space-y-1 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <span>•</span>
-                      <span>
-                        {sellLikelihood}% likely to sell within 2 days
-                      </span>
+                      <span>{sellLikelihood}% likely to sell within 2 days</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span>•</span>
@@ -520,38 +477,30 @@ export function TodoActionBottomSheet({
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <span className="text-lg">✨</span>
-                    <h3 className="font-semibold text-lg">
-                      PREVENT FOOD WASTE
-                    </h3>
+                    <h3 className="font-semibold text-lg">PREVENT FOOD WASTE</h3>
                   </div>
                 </div>
 
                 {/* Donation Impact Box */}
                 <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                   <div className="text-sm space-y-1">
-                    <div className="font-medium text-green-800 mb-2">
-                      Donation Impact:
-                    </div>
+                    <div className="font-medium text-green-800 mb-2">Donation Impact:</div>
                     <div className="text-green-700">
-                      • {donateQuantity} units = ~
-                      {donationImpact.preventedWaste.toFixed(1)}kg prevented
-                      waste
+                      • {donateQuantity} units = ~{donationImpact.preventedWaste.toFixed(1)}kg
+                      prevented waste
                     </div>
                     <div className="text-green-700">
                       • Tax benefit: ~€{donationImpact.taxBenefit.toFixed(2)}
                     </div>
                     <div className="text-green-700">
-                      • Community impact: ~{donationImpact.communityImpact}{' '}
-                      meals
+                      • Community impact: ~{donationImpact.communityImpact} meals
                     </div>
                   </div>
                 </div>
 
                 {/* Recipient Selection */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium">
-                    Select recipient:
-                  </label>
+                  <label className="text-sm font-medium">Select recipient:</label>
                   <div className="space-y-2">
                     {/* Local Food Bank */}
                     <button
@@ -562,7 +511,7 @@ export function TodoActionBottomSheet({
                         'flex items-center justify-between',
                         selectedRecipient === 'local-foodbank'
                           ? 'bg-green-50 border-green-500 text-green-700'
-                          : 'bg-background border-border hover:border-primary/50'
+                          : 'bg-background border-border hover:border-primary/50',
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -586,7 +535,7 @@ export function TodoActionBottomSheet({
                         'flex items-center justify-between',
                         selectedRecipient === 'soup-kitchen'
                           ? 'bg-green-50 border-green-500 text-green-700'
-                          : 'bg-background border-border hover:border-primary/50'
+                          : 'bg-background border-border hover:border-primary/50',
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -619,7 +568,7 @@ export function TodoActionBottomSheet({
                 <div className="space-y-3">
                   <InputSlider
                     value={donateQuantity}
-                    onChange={(value) => {
+                    onChange={value => {
                       setDonateQuantity(value)
                       setIsSelectAll(value === selectedBatch?.current_quantity)
                     }}
@@ -643,7 +592,7 @@ export function TodoActionBottomSheet({
                         'px-4 py-2 text-sm rounded-md border transition-all',
                         isSelectAll
                           ? 'bg-green-500 text-white border-green-500'
-                          : 'bg-background border-border hover:border-green-500 hover:text-green-600'
+                          : 'bg-background border-border hover:border-green-500 hover:text-green-600',
                       )}
                     >
                       SELECT ALL
@@ -669,9 +618,7 @@ export function TodoActionBottomSheet({
 
             {activeTab === 'sold' && (
               <div className="text-center">
-                <p className="text-lg">
-                  Mark as sold content coming in Phase 4
-                </p>
+                <p className="text-lg">Mark as sold content coming in Phase 4</p>
               </div>
             )}
 
@@ -692,27 +639,17 @@ export function TodoActionBottomSheet({
 
         {/* Footer with Actions */}
         <div className="border-t pt-4 flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isProcessing}
-          >
+          <Button variant="outline" onClick={onClose} disabled={isProcessing}>
             Cancel
           </Button>
 
           <div className="flex items-center gap-3">
-            <Button
-              onClick={handleMainAction}
-              disabled={isProcessing}
-              className="min-w-[140px]"
-            >
+            <Button onClick={handleMainAction} disabled={isProcessing} className="min-w-[140px]">
               {isProcessing ? 'Processing...' : getActionButtonText()}
             </Button>
 
             {/* Confidence Indicator */}
-            <div className="text-xs text-muted-foreground">
-              Confidence: {confidence}%
-            </div>
+            <div className="text-xs text-muted-foreground">Confidence: {confidence}%</div>
           </div>
         </div>
       </div>

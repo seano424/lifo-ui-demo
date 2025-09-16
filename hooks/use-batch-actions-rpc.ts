@@ -4,6 +4,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import type { AlertsResponse, ScoringAlert } from './use-scoring-analytics'
+
+// Type definitions for query data
+interface BatchDetail {
+  batch_id: string
+  current_quantity: number
+  selling_price: number
+  [key: string]: unknown
+}
 
 // Type definitions for RPC function parameters
 interface DonateActionParams {
@@ -197,15 +206,20 @@ export function useBatchActionRPC() {
       // Optimistic update: Remove from alerts immediately
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
-      queryClient.setQueryData(queryKeys.alerts.store(storeId), (oldData: any) => {
-        if (oldData?.alerts) {
-          return {
-            ...oldData,
-            alerts: oldData.alerts.filter((alert: any) => alert.batch_id !== variables.batchId),
+      queryClient.setQueryData(
+        queryKeys.alerts.store(storeId),
+        (oldData: AlertsResponse | undefined) => {
+          if (oldData?.alerts) {
+            return {
+              ...oldData,
+              alerts: oldData.alerts.filter(
+                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
+              ),
+            }
           }
-        }
-        return oldData
-      })
+          return oldData
+        },
+      )
 
       return { storeId }
     },
@@ -219,7 +233,7 @@ export function useBatchActionRPC() {
         toast.error(result.error || 'Donation failed')
       }
     },
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
@@ -251,13 +265,15 @@ export function useBatchActionRPC() {
       // Optimistic update: Show new price immediately
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
-      queryClient.setQueryData(queryKeys.batches.detail(variables.batchId), (oldData: any) =>
-        oldData
-          ? {
-              ...oldData,
-              selling_price: oldData.selling_price * (1 - variables.discountPercentage / 100),
-            }
-          : oldData,
+      queryClient.setQueryData(
+        queryKeys.batches.detail(variables.batchId),
+        (oldData: BatchDetail | undefined) =>
+          oldData
+            ? {
+                ...oldData,
+                selling_price: oldData.selling_price * (1 - variables.discountPercentage / 100),
+              }
+            : oldData,
       )
 
       return { storeId }
@@ -272,7 +288,7 @@ export function useBatchActionRPC() {
         toast.error(result.error || 'Discount failed')
       }
     },
-    onError: (error, variables, context) => {
+    onError: (error, variables, _context) => {
       // Rollback optimistic update
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.detail(variables.batchId),
@@ -300,18 +316,25 @@ export function useBatchActionRPC() {
     onMutate: async variables => {
       // Optimistic update: Remove from alerts if all quantity sold
       const storeId = await getStoreIdFromBatch(variables.batchId)
-      const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as any
+      const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as
+        | BatchDetail
+        | undefined
 
       if (batchData && variables.quantity >= batchData.current_quantity) {
-        queryClient.setQueryData(queryKeys.alerts.store(storeId), (oldData: any) => {
-          if (oldData?.alerts) {
-            return {
-              ...oldData,
-              alerts: oldData.alerts.filter((alert: any) => alert.batch_id !== variables.batchId),
+        queryClient.setQueryData(
+          queryKeys.alerts.store(storeId),
+          (oldData: AlertsResponse | undefined) => {
+            if (oldData?.alerts) {
+              return {
+                ...oldData,
+                alerts: oldData.alerts.filter(
+                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
+                ),
+              }
             }
-          }
-          return oldData
-        })
+            return oldData
+          },
+        )
       }
 
       return { storeId }
@@ -326,7 +349,7 @@ export function useBatchActionRPC() {
         toast.error(result.error || 'Update failed')
       }
     },
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
@@ -357,18 +380,25 @@ export function useBatchActionRPC() {
     onMutate: async variables => {
       // Optimistic update: Remove from alerts if all quantity disposed
       const storeId = await getStoreIdFromBatch(variables.batchId)
-      const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as any
+      const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as
+        | BatchDetail
+        | undefined
 
       if (batchData && variables.quantity >= batchData.current_quantity) {
-        queryClient.setQueryData(queryKeys.alerts.store(storeId), (oldData: any) => {
-          if (oldData?.alerts) {
-            return {
-              ...oldData,
-              alerts: oldData.alerts.filter((alert: any) => alert.batch_id !== variables.batchId),
+        queryClient.setQueryData(
+          queryKeys.alerts.store(storeId),
+          (oldData: AlertsResponse | undefined) => {
+            if (oldData?.alerts) {
+              return {
+                ...oldData,
+                alerts: oldData.alerts.filter(
+                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
+                ),
+              }
             }
-          }
-          return oldData
-        })
+            return oldData
+          },
+        )
       }
 
       return { storeId }
@@ -383,7 +413,7 @@ export function useBatchActionRPC() {
         toast.error(result.error || 'Disposal failed')
       }
     },
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
@@ -414,15 +444,20 @@ export function useBatchActionRPC() {
       // Optimistic update: Remove from todos immediately
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
-      queryClient.setQueryData(queryKeys.alerts.store(storeId), (oldData: any) => {
-        if (oldData?.alerts) {
-          return {
-            ...oldData,
-            alerts: oldData.alerts.filter((alert: any) => alert.batch_id !== variables.batchId),
+      queryClient.setQueryData(
+        queryKeys.alerts.store(storeId),
+        (oldData: AlertsResponse | undefined) => {
+          if (oldData?.alerts) {
+            return {
+              ...oldData,
+              alerts: oldData.alerts.filter(
+                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
+              ),
+            }
           }
-        }
-        return oldData
-      })
+          return oldData
+        },
+      )
 
       return { storeId }
     },
@@ -436,7 +471,7 @@ export function useBatchActionRPC() {
         toast.error(result.error || 'Dismiss failed')
       }
     },
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
@@ -472,23 +507,26 @@ export function useBatchActionRPC() {
 
       uniqueStoreIds.forEach(storeId => {
         if (storeId) {
-          queryClient.setQueryData(queryKeys.alerts.store(storeId), (oldData: any) => {
-            if (oldData?.alerts) {
-              return {
-                ...oldData,
-                alerts: oldData.alerts.filter(
-                  (alert: any) => !variables.batchIds.includes(alert.batch_id),
-                ),
+          queryClient.setQueryData(
+            queryKeys.alerts.store(storeId),
+            (oldData: AlertsResponse | undefined) => {
+              if (oldData?.alerts) {
+                return {
+                  ...oldData,
+                  alerts: oldData.alerts.filter(
+                    (alert: ScoringAlert) => !variables.batchIds.includes(alert.batch_id),
+                  ),
+                }
               }
-            }
-            return oldData
-          })
+              return oldData
+            },
+          )
         }
       })
 
       return { storeIds: uniqueStoreIds }
     },
-    onSuccess: async (result, variables, context) => {
+    onSuccess: async (result, variables, _context) => {
       if (result.success) {
         toast.success(`Bulk action completed: ${result.success_count} successful`, {
           description:
@@ -503,7 +541,7 @@ export function useBatchActionRPC() {
       // Invalidate queries for all affected batches
       await Promise.all(variables.batchIds.map(batchId => invalidateRelatedQueries(batchId)))
     },
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       // Rollback optimistic updates
       if (context?.storeIds) {
         context.storeIds.forEach(storeId => {

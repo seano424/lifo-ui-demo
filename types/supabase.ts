@@ -108,6 +108,7 @@ export type Database = {
           critical_threshold: number | null
           currency: string | null
           display_preferences: Json | null
+          donation_preference_config: Json | null
           notification_preferences: Json | null
           opening_hours: Json | null
           peak_hours: Json | null
@@ -123,6 +124,7 @@ export type Database = {
           critical_threshold?: number | null
           currency?: string | null
           display_preferences?: Json | null
+          donation_preference_config?: Json | null
           notification_preferences?: Json | null
           opening_hours?: Json | null
           peak_hours?: Json | null
@@ -138,6 +140,7 @@ export type Database = {
           critical_threshold?: number | null
           currency?: string | null
           display_preferences?: Json | null
+          donation_preference_config?: Json | null
           notification_preferences?: Json | null
           opening_hours?: Json | null
           peak_hours?: Json | null
@@ -1750,12 +1753,27 @@ export type Database = {
           is_duplicate: boolean
         }[]
       }
+      check_existing_store_products: {
+        Args: { pairs: Json }
+        Returns: {
+          product_id: string
+          store_id: string
+        }[]
+      }
       check_security_warnings: {
         Args: Record<PropertyKey, never>
         Returns: {
           item: string
           status: string
           warning_type: string
+        }[]
+      }
+      check_store_access: {
+        Args: { store_id_param: string; user_id_param: string }
+        Returns: {
+          is_active: boolean
+          role_in_store: string
+          user_id: string
         }[]
       }
       check_user_exists_by_email: {
@@ -1790,9 +1808,87 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      execute_bulk_action: {
+        Args: {
+          p_action_params: Json
+          p_action_type: string
+          p_batch_ids: string[]
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_discount_action: {
+        Args: {
+          p_batch_id: string
+          p_discount_percentage: number
+          p_notes?: string
+          p_quantity_affected: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_dismiss_action: {
+        Args: {
+          p_batch_id: string
+          p_dismissal_reason: string
+          p_notes?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_dispose_action: {
+        Args: {
+          p_batch_id: string
+          p_disposal_reason: string
+          p_notes?: string
+          p_quantity_disposed: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_donate_action: {
+        Args: {
+          p_batch_id: string
+          p_donation_recipient_id: string
+          p_notes?: string
+          p_quantity_affected: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_sold_action: {
+        Args: {
+          p_batch_id: string
+          p_notes?: string
+          p_quantity_sold: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
       fast_csv_import_skip_duplicates: {
         Args: { p_csv_data: Json; p_store_id: string; p_user_id: string }
         Returns: Json
+      }
+      find_available_batches_by_barcode: {
+        Args: { barcode_param: string; store_id_param: string }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          brand_name: string
+          category_name: string
+          cost_price: number
+          created_at: string
+          current_quantity: number
+          expiry_date: string
+          location_code: string
+          product_barcode: string
+          product_id: string
+          product_name: string
+          selling_price: number
+          status: string
+          store_id: string
+        }[]
       }
       find_duplicate_batches_bulk: {
         Args: { p_sku_expiry_pairs: string; p_store_id: string }
@@ -2063,6 +2159,15 @@ export type Database = {
         }
         Returns: Json
       }
+      lookup_product_with_cache: {
+        Args: { barcode_param: string }
+        Returns: {
+          cached_at: string
+          found: boolean
+          product_data: Json
+          source: string
+        }[]
+      }
       override_batch_status: {
         Args: {
           p_batch_id: string
@@ -2088,6 +2193,25 @@ export type Database = {
           found_method: string
           input_index: number
           product_id: string
+        }[]
+      }
+      search_products_with_stock: {
+        Args: {
+          max_results?: number
+          search_query: string
+          store_id_param?: string
+        }
+        Returns: {
+          barcode: string
+          batch_count: number
+          brand: string
+          category_name: string
+          image_url: string
+          is_out_of_stock: boolean
+          name: string
+          product_id: string
+          total_available_quantity: number
+          unit_type: string
         }[]
       }
       security_summary: {
@@ -2131,6 +2255,18 @@ export type Database = {
           next_scheduled_run: string
           sold_out_count: number
           updated_count: number
+        }[]
+      }
+      update_batch_quantity: {
+        Args: {
+          batch_id_param: string
+          quantity_to_remove: number
+          reason_param?: string
+        }
+        Returns: {
+          error_message: string
+          new_quantity: number
+          success: boolean
         }[]
       }
       update_expired_batch_statuses: {

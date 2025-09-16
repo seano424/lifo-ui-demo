@@ -31,7 +31,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
       sliderClassName,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = parseInt(e.target.value, 10)
@@ -51,21 +51,13 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
     const progressPercentage = ((value - min) / (max - min)) * 100
 
     return (
-      <div
-        ref={ref}
-        className={cn('space-y-3', className)}
-        {...props}
-      >
+      <div ref={ref} className={cn('space-y-3', className)} {...props}>
         {label && (
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{label}</label>
             <div className="text-right">
               <span className="text-lg font-bold">{value}</span>
-              {suffix && (
-                <span className="text-sm text-muted-foreground ml-1">
-                  {suffix}
-                </span>
-              )}
+              {suffix && <span className="text-sm text-muted-foreground ml-1">{suffix}</span>}
             </div>
           </div>
         )}
@@ -84,7 +76,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                 'h-8 px-2 text-sm text-center border rounded-md',
                 'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
                 'bg-background border-border',
-                inputClassName
+                inputClassName,
               )}
             />
           </div>
@@ -100,7 +92,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
               onChange={handleSliderChange}
               className={cn(
                 'w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer',
-                sliderClassName
+                sliderClassName,
               )}
               style={{
                 background: `linear-gradient(to right, ${sliderColor} 0%, ${sliderColor} ${progressPercentage}%, #e2e8f0 ${progressPercentage}%, #e2e8f0 100%)`,
@@ -110,7 +102,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
         </div>
       </div>
     )
-  }
+  },
 )
 
 InputSlider.displayName = 'InputSlider'
