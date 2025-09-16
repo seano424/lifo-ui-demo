@@ -1778,6 +1778,7 @@
     "pageDescription": "Suggestions personnalisées pour optimiser votre inventaire et réduire les déchets"
   },
   "scanOut": {
+    "available": "Disponible",
     "unknownProduct": "Produit inconnu",
     "unknownBrand": "Marque inconnue",
     "scanProductToRemove": "Scanner le produit à retirer",

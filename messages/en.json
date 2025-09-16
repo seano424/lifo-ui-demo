@@ -163,6 +163,7 @@
     "pageDescription": "View and manage your store's todos"
   },
   "scanOut": {
+    "available": "Available",
     "unknownProduct": "Unknown Product",
     "unknownBrand": "Unknown Brand",
     "scanProductToRemove": "Scan Product to Remove",

@@ -57,20 +57,12 @@ export default function BatchSelectionList({
   }
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={`flex flex-col gap-4 mt-8 ${className}`}>
       <Typography variant="h3" className="font-black">
         Available Batches ({batches.length})
       </Typography>
 
-      {/* <Typography
-        variant="h3"
-        className="border-b pb-2 font-black"
-      >
-        
-        {batches[0].products.product_name}
-      </Typography> */}
-
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="flex flex-col gap-4 max-h-80 bg-secondary-50/10 rounded-2xl px-4 overflow-y-auto">
         {batches.map((batch, index) => {
           const isSelected = selectedBatchId === batch.batch_id
           const isRecommended = index === 0
@@ -79,11 +71,11 @@ export default function BatchSelectionList({
             <div
               key={batch.batch_id}
               className={`
-                relative p-3 border rounded-2xl cursor-pointer transition-all duration-200
+                relative p-3 rounded-2xl cursor-pointer transition-all duration-200 bg-secondary-50/40 flex flex-col gap-2
                 ${
                   isSelected
                     ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    : 'border-gray-200 hover:border-primary-300 hover:bg-primary-50 border-8'
                 }
                 ${isRecommended && !isSelected ? 'border-blue-300 bg-blue-25' : ''}
               `}
@@ -100,7 +92,7 @@ export default function BatchSelectionList({
 
               {/* Recommended Badge */}
               {isRecommended && !isSelected && (
-                <div className="absolute bottom-2 right-2">
+                <div className="absolute bottom-4 right-4">
                   <Typography
                     variant="small"
                     className="p-2 border border-blue-500 bg-blue-50 text-blue-500 text-xs rounded-2xl"
@@ -111,7 +103,7 @@ export default function BatchSelectionList({
               )}
 
               <div className="flex justify-between items-start">
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-1 pb-2">
                   <Typography variant="p">{batch.products.product_name}</Typography>
 
                   <Typography variant="p">Expires: {formatDate(batch.expiry_date)}</Typography>
@@ -125,7 +117,7 @@ export default function BatchSelectionList({
                   </Typography>
 
                   {isRecommended && !isSelected && (
-                    <Typography variant="small" className="text-xs text-blue-600 mt-2 font-light">
+                    <Typography variant="small" className="text-xs text-blue-600 font-light">
                       ↑ Recommended (First to expire)
                     </Typography>
                   )}

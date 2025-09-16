@@ -1771,6 +1771,7 @@
     "pageDescription": "Gepersonaliseerde suggesties om uw voorraad te optimaliseren en afval te verminderen"
   },
   "scanOut": {
+    "available": "Beschikbaar",
     "unknownProduct": "Onbekend product",
     "unknownBrand": "Onbekend merk",
     "scanProductToRemove": "Scan product om te verwijderen",
