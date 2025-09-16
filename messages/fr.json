@@ -1086,6 +1086,43 @@
       "phonePlaceholder": "01 23 45 67 89"
     }
   },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Ajouter détails du magasin",
+        "complete": "Compléter les informations du magasin"
+      },
+      "subtitle": {
+        "manual": "Entrez vos informations de magasin",
+        "complete": "Sélectionnez votre type de magasin et vérifiez les détails"
+      },
+      "labels": {
+        "storeName": "Nom du magasin",
+        "businessName": "Nom de l'entreprise (Optionnel)",
+        "address": "Adresse",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays",
+        "phone": "Numéro de téléphone (Optionnel)",
+        "storeType": "Type de magasin"
+      },
+      "placeholders": {
+        "storeName": "Nom de votre magasin",
+        "businessName": "Si différent du nom du magasin",
+        "address": "123 Rue de la Paix",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "phone": "01 23 45 67 89",
+        "selectStoreType": "Sélectionner le type de magasin"
+      },
+      "buttons": {
+        "back": "Retour",
+        "creating": "Création du magasin...",
+        "create": "Créer le magasin"
+      }
+    }
+  },
   "errors": {
     "pageNotFoundTitle": "Page non trouvée",
     "pageNotFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",
