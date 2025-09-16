@@ -181,6 +181,14 @@ export const queryKeys = {
     analytics: (storeId: string) => [...queryKeys.donations.all, 'analytics', storeId] as const,
   },
 
+  // Batch action queries for inventory management
+  batchActions: {
+    all: ['batchActions'] as const,
+    byStore: (storeId: string) => [...queryKeys.batchActions.all, 'byStore', storeId] as const,
+    history: (storeId: string, days?: number) =>
+      [...queryKeys.batchActions.byStore(storeId), 'history', { days }] as const,
+  },
+
   // Scoring and analytics queries (served by Next.js API routes)
   alerts: {
     all: ['alerts'] as const,
