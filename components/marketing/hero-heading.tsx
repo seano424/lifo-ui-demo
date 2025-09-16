@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { useTranslations } from 'next-intl'
-import { Typography } from '../ui/typography'
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { Typography } from "../ui/typography";
 
 export function HeroHeading() {
-  const t = useTranslations('landingpage')
+  const t = useTranslations("landingpage");
   return (
     <header className="text-6xl md:text-5xl font-bold mb-6 leading-tight">
       <div className="flex items-center justify-center gap-4 mb-2">
@@ -21,16 +21,16 @@ export function HeroHeading() {
         </div>
         <Typography
           as="h1"
-          className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+          className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-primary-900 to-secondary-700"
         >
           LIFO.AI
         </Typography>
       </div>
       <Typography as="h2" className="text-4xl md:text-6xl text-foreground/80">
-        {t('hero.title', {
-          fallback: 'The Future of Inventory Management is Here.',
-        })}{' '}
+        {t("hero.title", {
+          fallback: "The Future of Inventory Management is Here.",
+        })}{" "}
       </Typography>
     </header>
-  )
+  );
 }

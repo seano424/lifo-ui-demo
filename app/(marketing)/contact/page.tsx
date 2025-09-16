@@ -12,7 +12,7 @@ export default function Contact() {
 
   return (
     <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-24 items-center">
+      <div className="flex-1 w-full flex flex-col gap-24 items-center mb-20">
         <div className="flex-1 flex flex-col gap-8 max-w-6xl p-5 w-full">
           <RevealAnimation direction="none">
             <section
@@ -24,7 +24,7 @@ export default function Contact() {
                   <div className="flex items-center justify-center gap-4 mb-2">
                     <Typography
                       as="h1"
-                      className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+                      className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
                     >
                       {t('title')}
                     </Typography>
@@ -45,12 +45,12 @@ export default function Contact() {
               <div className="max-w-7xl mx-auto relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
                   {/* Left column - Contact Form */}
-                  <div className="flex flex-col rounded-2xl bg-white border border-blue-100 shadow-xl p-8 space-y-6">
-                    <div>
-                      <Typography variant="h3" className="text-2xl font-bold text-blue-800 mb-4">
+                  <div className="flex flex-col rounded-2xl bg-white border border-primary-100 shadow-xl p-8 space-y-6">
+                    <div className="flex flex-col gap-1">
+                      <Typography variant="h3" className="text-2xl font-bold text-secondary-950 mb-4">
                         {t('form.title')}
                       </Typography>
-                      <Typography variant="p" className="text-blue-700/80">
+                      <Typography variant="p" className="text-secondary-950/80">
                         {t('form.description')}
                       </Typography>
                     </div>
@@ -62,42 +62,42 @@ export default function Contact() {
                   <div className="space-y-8">
                     <div className="space-y-6">
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+                        <div className="text-secondary-950 bg-secondary-100/70 p-2.5 rounded-2xl border border-secondary-200/50 shadow-sm">
                           <MessageSquare size={22} strokeWidth={1.5} />
                         </div>
-                        <div>
-                          <Typography variant="h4" className="font-bold text-blue-800 mb-1">
+                        <div className="flex flex-col gap-1">
+                          <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
                             {t('features.support.title')}
                           </Typography>
-                          <Typography variant="p" className="text-blue-700/80">
+                          <Typography variant="p" className="text-secondary-950/80">
                             {t('features.support.description')}
                           </Typography>
                         </div>
                       </div>
 
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+                        <div className="text-secondary-950 bg-secondary-100/70 p-2.5 rounded-2xl border border-secondary-200/50 shadow-sm">
                           <Users size={22} strokeWidth={1.5} />
                         </div>
-                        <div>
-                          <Typography variant="h4" className="font-bold text-blue-800 mb-1">
+                        <div className="flex flex-col gap-1">
+                          <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
                             {t('features.expertise.title')}
                           </Typography>
-                          <Typography variant="p" className="text-blue-700/80">
+                          <Typography variant="p" className="text-secondary-950/80">
                             {t('features.expertise.description')}
                           </Typography>
                         </div>
                       </div>
 
                       <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+                        <div className="text-secondary-950 bg-secondary-100/70 p-2.5 rounded-2xl border border-secondary-200/50 shadow-sm">
                           <Mail size={22} strokeWidth={1.5} />
                         </div>
-                        <div>
-                          <Typography variant="h4" className="font-bold text-blue-800 mb-1">
+                        <div className="flex flex-col gap-1">
+                          <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
                             {t('features.followup.title')}
                           </Typography>
-                          <Typography variant="p" className="text-blue-700/80">
+                          <Typography variant="p" className="text-secondary-950/80">
                             {t('features.followup.description')}
                           </Typography>
                         </div>
@@ -110,9 +110,6 @@ export default function Contact() {
           </RevealAnimation>
         </div>
 
-        <RevealAnimation delay={0.4} direction="up">
-          <MarketingFooter />
-        </RevealAnimation>
       </div>
     </main>
   )

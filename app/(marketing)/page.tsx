@@ -32,10 +32,6 @@ export default function Home() {
           <Typography variant="h2">Next steps</Typography>
           {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
         </main> */}
-
-        <RevealAnimation delay={0.8} direction="up">
-          <MarketingFooter />
-        </RevealAnimation>
       </div>
     </main>
   )

@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
-import { ThemeSwitcher } from '@/components/theme-switcher'
-import { LanguageSwitcher } from '@/components/ui/language-switcher'
-import { Typography } from '@/components/ui/typography'
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { Typography } from "@/components/ui/typography";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import Link from "next/link";
 
 export function MarketingFooter() {
-  const currentYear = new Date().getFullYear()
-  const t = useTranslations('footer')
+  const currentYear = new Date().getFullYear();
+  const t = useTranslations("footer");
 
   return (
-    <footer className="w-full bg-gradient-to-b from-background to-background/80 border-t border-foreground/10 py-12 px-4">
+    <footer className="mt-24 w-full bg-background border-t border-foreground/10 py-12 px-4 relative z-10">
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Logo and Description */}
@@ -35,40 +35,43 @@ export function MarketingFooter() {
                 LIFO.AI
               </Typography>
             </div>
-            <Typography variant="p" className="text-sm text-muted-foreground max-w-sm">
-              {t('description')}
+            <Typography
+              variant="p"
+              className="text-sm text-muted-foreground max-w-sm"
+            >
+              {t("description")}
             </Typography>
           </div>
 
           {/* Links */}
           <div className="space-y-4">
             <Typography variant="h4" className="text-base font-bold">
-              {t('quickLinks')}
+              {t("quickLinks")}
             </Typography>
             <div className="grid grid-cols-1 gap-2">
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t('links.aboutUs')}
+                {t("links.aboutUs")}
               </Link>
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t('links.products')}
+                {t("links.products")}
               </Link>
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t('links.pricing')}
+                {t("links.pricing")}
               </Link>
               <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t('links.blog')}
+                {t("links.blog")}
               </Link>
             </div>
           </div>
@@ -76,15 +79,18 @@ export function MarketingFooter() {
           {/* Contact */}
           <div className="space-y-4">
             <Typography variant="h4" className="text-base font-bold">
-              {t('contactUs')}
+              {t("contactUs")}
             </Typography>
             <div className="space-y-2">
               <a
                 href="mailto:contact@lifo-app.com"
                 className="hover:text-foreground transition-colors"
               >
-                <Typography variant="p" className="text-sm text-muted-foreground">
-                  {t('email')}
+                <Typography
+                  variant="p"
+                  className="text-sm text-muted-foreground"
+                >
+                  {t("email")}
                 </Typography>
               </a>
               <div className="flex items-center gap-2 mt-8">
@@ -122,24 +128,24 @@ export function MarketingFooter() {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-foreground/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <Typography variant="small" className="text-xs text-muted-foreground">
-            {t('copyright', { year: currentYear })}
+            {t("copyright", { year: currentYear })}
           </Typography>
           <div className="flex items-center gap-6">
             <Link
               href="#"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              {t('legal.privacyPolicy')}
+              {t("legal.privacyPolicy")}
             </Link>
             <Link
               href="#"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              {t('legal.termsOfService')}
+              {t("legal.termsOfService")}
             </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
