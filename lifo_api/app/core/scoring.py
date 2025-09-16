@@ -915,11 +915,39 @@ class ScoringService:
                         }
                     )
 
-                # DISABLED: Let Next.js handle database writes instead
+                # OPTION A: Use bulk database write operation via Supabase (faster but less isolated)
                 # await read_ops.bulk_store_score_results(scores_data)
-                self.logger.info(
-                    "Skipping database write - Next.js will handle storage"
-                )
+                
+                # OPTION B: Use individual isolated transactions (slower but more reliable)
+                # Enable this for critical operations where data integrity is paramount
+                use_isolated_transactions = True  # Set to False for performance over reliability
+                
+                if use_isolated_transactions:
+                    database_successful = 0
+                    database_failed = 0
+                    
+                    self.logger.info(
+                        "Using isolated transactions for bulk scoring database writes",
+                        total_results=len(results)
+                    )
+                    
+                    for result in results:
+                        success = await self._save_score_result_isolated(result, store_id)
+                        if success:
+                            database_successful += 1
+                        else:
+                            database_failed += 1
+                    
+                    self.logger.info(
+                        "Bulk database operations completed with isolated transactions",
+                        successful=database_successful,
+                        failed=database_failed,
+                        total=len(results)
+                    )
+                else:
+                    self.logger.info(
+                        "Skipping database write - Next.js will handle storage"
+                    )
 
             # Calculate processing time
             end_time = datetime.utcnow()
@@ -986,16 +1014,28 @@ class ScoringService:
             }
 
     async def score_store_inventory(
-        self, store_id: str, recalculate_all: bool = False
+        self, 
+        store_id: str, 
+        recalculate_all: bool = False,
+        store_donation_config: dict | None = None,
+        include_donation_rationale: bool = False
     ) -> dict[str, Any]:
-        """Score all active batches for a store and save results to database"""
+        """Score all active batches for a store and save results to database with proper transaction isolation"""
         start_time = datetime.utcnow()
+        
+        # Initialize tracking variables
+        results = []
+        errors = []
+        high_priority_count = 0
+        batch_ids = []
+        database_operations_successful = 0
+        database_operations_failed = 0
 
         try:
             # Import secure read-only operations
             from app.database.read_only_operations import get_read_only_operations
 
-            # Get read-only operations instance
+            # Get read-only operations instance with fresh session for reads
             read_ops = get_read_only_operations(self.db)
 
             # Get inventory data for scoring using secure read-only view
@@ -1018,59 +1058,64 @@ class ScoringService:
             # Filter for batches that need scoring (if not recalculating all)
             batch_ids = [item["batch_id"] for item in inventory_data]
 
-            # Score each batch
-            results = []
-            errors = []
-            high_priority_count = 0
+            self.logger.info(
+                "Starting batch scoring with transaction isolation",
+                store_id=store_id,
+                total_batches=len(batch_ids),
+                recalculate_all=recalculate_all
+            )
 
+            # Score each batch - computation doesn't require database session
             for batch_id in batch_ids:
-                score_result = await self.score_batch(batch_id)
-                if score_result:
-                    results.append(score_result)
-                    if score_result.composite_score >= 0.6:
-                        high_priority_count += 1
-                else:
-                    errors.append(f"Failed to score batch {batch_id}")
-
-            # Save all score results to database
-            if results:
-                for result in results:
-                    try:
-                        await self._save_score_result(result)
-                        await self._track_recommendation(result, store_id)
-                    except Exception as e:
-                        self.logger.error(
-                            "Failed to save score result",
-                            batch_id=result.batch_id,
-                            error=str(e)
-                        )
-                        errors.append(f"Failed to save score for batch {result.batch_id}: {str(e)}")
-                
-                # Commit all database changes
                 try:
-                    await self.db.commit()
-                    self.logger.info(
-                        "Successfully saved scores to database",
-                        store_id=store_id,
-                        saved_count=len(results)
-                    )
+                    score_result = await self.score_batch(batch_id)
+                    if score_result:
+                        results.append(score_result)
+                        if score_result.composite_score >= 0.6:
+                            high_priority_count += 1
+                    else:
+                        errors.append(f"Failed to score batch {batch_id}")
                 except Exception as e:
-                    await self.db.rollback()
                     self.logger.error(
-                        "Failed to commit scores to database",
-                        store_id=store_id,
+                        "Scoring computation failed for batch",
+                        batch_id=batch_id,
                         error=str(e)
                     )
-                    raise
+                    errors.append(f"Failed to score batch {batch_id}: {str(e)}")
+
+            # Save results using individual isolated transactions to prevent cascade failures
+            if results:
+                self.logger.info(
+                    "Saving score results with individual transaction isolation",
+                    results_count=len(results)
+                )
+                
+                # Process each result in its own isolated transaction
+                for result in results:
+                    success = await self._save_score_result_isolated(result, store_id)
+                    if success:
+                        database_operations_successful += 1
+                    else:
+                        database_operations_failed += 1
+                        errors.append(f"Failed to save score for batch {result.batch_id}")
+
+                self.logger.info(
+                    "Database operations completed",
+                    successful=database_operations_successful,
+                    failed=database_operations_failed,
+                    total_results=len(results)
+                )
 
             processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
 
             self.logger.info(
-                "Store inventory scoring completed",
+                "Store inventory scoring completed with transaction isolation",
                 store_id=store_id,
                 total_batches=len(batch_ids),
                 processed=len(results),
                 high_priority=high_priority_count,
+                database_successful=database_operations_successful,
+                database_failed=database_operations_failed,
                 processing_time_ms=processing_time,
             )
 
@@ -1082,21 +1127,39 @@ class ScoringService:
                 "results": results,
                 "errors": errors,
                 "processing_time_ms": processing_time,
+                "database_operations": {
+                    "successful": database_operations_successful,
+                    "failed": database_operations_failed,
+                    "total": len(results)
+                }
             }
 
         except Exception as e:
-            await self.db.rollback()
+            # Log the error but don't fail the entire operation
             self.logger.error(
-                "Error scoring store inventory", store_id=store_id, error=str(e)
+                "Error in store inventory scoring - returning partial results",
+                store_id=store_id,
+                error=str(e),
+                results_computed=len(results),
+                database_successful=database_operations_successful,
+                database_failed=database_operations_failed
             )
+            
+            processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
+            
             return {
                 "store_id": store_id,
-                "total_items": 0,
-                "processed": 0,
-                "high_priority_count": 0,
-                "results": [],
-                "errors": [str(e)],
-                "processing_time_ms": 0,
+                "total_items": len(batch_ids),
+                "processed": len(results),
+                "high_priority_count": high_priority_count,
+                "results": results,
+                "errors": errors + [f"Partial failure: {str(e)}"],
+                "processing_time_ms": processing_time,
+                "database_operations": {
+                    "successful": database_operations_successful,
+                    "failed": database_operations_failed,
+                    "total": len(results)
+                }
             }
 
     async def _save_score_result(self, result: ScoringResult):
@@ -1142,6 +1205,164 @@ class ScoringService:
                 "Error saving score result", batch_id=result.batch_id, error=str(e)
             )
             raise
+
+    async def _save_score_result_isolated(self, result: ScoringResult, store_id: str) -> bool:
+        """
+        Save scoring result using isolated transaction with advanced retry logic and health monitoring
+        Returns True if successful, False if failed (but doesn't raise exception)
+        """
+        from app.utils.database_health import execute_with_retry, create_fresh_session
+        
+        async def save_operation():
+            # Create a fresh, health-checked database session for this operation
+            isolated_session = await create_fresh_session()
+            
+            try:
+                from app.database.models import ProductScore
+                from decimal import Decimal
+
+                # Delete existing score for this batch within this transaction
+                await isolated_session.execute(
+                    ProductScore.__table__.delete().where(
+                        ProductScore.batch_id == result.batch_id
+                    )
+                )
+
+                # Insert new score within this transaction
+                score = ProductScore(
+                    batch_id=result.batch_id,
+                    store_id=result.store_id,
+                    expiry_score=Decimal(str(result.expiry_score)),
+                    velocity_score=Decimal(str(result.velocity_score)),
+                    margin_score=Decimal(str(result.margin_score)),
+                    composite_score=Decimal(str(result.composite_score)),
+                    recommendation=result.recommendation,
+                    urgency_level=result.urgency_level,
+                    discount_percent=result.discount_percent,
+                    reason=result.reason,
+                    ml_enhanced=result.ml_enhanced,
+                    confidence_level=Decimal(str(result.confidence_level)),
+                    calculated_at=result.calculated_at,
+                    days_to_expiry=result.days_to_expiry,
+                    potential_loss=Decimal(str(result.potential_loss))
+                    if result.potential_loss
+                    else None,
+                    margin_percent=Decimal(str(result.margin_percent))
+                    if result.margin_percent
+                    else None,
+                )
+
+                isolated_session.add(score)
+                
+                # Commit this individual transaction
+                await isolated_session.commit()
+                
+                self.logger.debug(
+                    "Successfully saved score result in isolated transaction",
+                    batch_id=result.batch_id
+                )
+                
+                return True
+
+            except Exception as e:
+                # Rollback this individual transaction
+                await isolated_session.rollback()
+                self.logger.warning(
+                    "Failed to save score result in isolated transaction",
+                    batch_id=result.batch_id,
+                    error=str(e)
+                )
+                raise
+            finally:
+                await isolated_session.close()
+        
+        # Execute with automatic retry logic and health monitoring
+        success, result_data, error = await execute_with_retry(
+            f"save_score_result_{result.batch_id}",
+            save_operation,
+            max_retries=3
+        )
+        
+        if success:
+            # Track recommendation in separate isolated transaction (don't let this failure affect score saving)
+            await self._track_recommendation_isolated(result, store_id)
+            return True
+        else:
+            self.logger.error(
+                "Final failure to save score result after all retries with health monitoring",
+                batch_id=result.batch_id,
+                error=str(error) if error else "Unknown error"
+            )
+            return False
+
+    async def _track_recommendation_isolated(self, result: ScoringResult, store_id: str | None = None) -> bool:
+        """Track AI recommendation using isolated transaction with health monitoring and error handling"""
+        from app.utils.database_health import execute_with_retry, create_fresh_session
+        
+        async def track_operation():
+            # Create a fresh, health-checked database session for this operation
+            isolated_session = await create_fresh_session()
+            
+            try:
+                from app.services.action_tracking import ActionTrackingService
+
+                # Create tracker with isolated session
+                tracker = ActionTrackingService(isolated_session)
+
+                # Map scoring recommendation to database enum
+                db_action = tracker.map_scoring_action_to_enum(result.recommendation)
+
+                # Create recommendation record
+                await tracker.create_recommendation_record(
+                    batch_id=result.batch_id,
+                    store_id=store_id or result.store_id,
+                    ai_recommendation=db_action,
+                    ai_score=result.composite_score,
+                    user_id=None,  # System-generated recommendation
+                    discount_percent=result.discount_percent,
+                    reasoning=result.reason
+                )
+                
+                # Commit the tracking transaction
+                await isolated_session.commit()
+                return True
+
+            except Exception as e:
+                await isolated_session.rollback()
+                self.logger.warning(
+                    "Failed to track AI recommendation in isolated transaction",
+                    batch_id=result.batch_id,
+                    error=str(e)
+                )
+                raise
+            finally:
+                await isolated_session.close()
+        
+        # Execute with retry logic - but don't let tracking failures affect main operation
+        try:
+            success, _, error = await execute_with_retry(
+                f"track_recommendation_{result.batch_id}",
+                track_operation,
+                max_retries=2  # Lower retries for tracking since it's non-critical
+            )
+            
+            if not success:
+                self.logger.warning(
+                    "Failed to track AI recommendation after retries",
+                    batch_id=result.batch_id,
+                    error=str(error) if error else "Unknown error"
+                )
+            
+            return success
+            
+        except Exception as e:
+            # Don't let tracking errors break the scoring - just log them
+            self.logger.warning(
+                "Tracking operation failed completely", 
+                batch_id=result.batch_id,
+                error=str(e)
+            )
+            return False
 
     async def _track_recommendation(
         self, result: ScoringResult, store_id: str | None = None
