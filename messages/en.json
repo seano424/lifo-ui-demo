@@ -1345,6 +1345,43 @@
       "phonePlaceholder": "01 23 45 67 89"
     }
   },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Add Store Details",
+        "complete": "Complete Store Information"
+      },
+      "subtitle": {
+        "manual": "Enter your store information",
+        "complete": "Select your store type and verify details"
+      },
+      "labels": {
+        "storeName": "Store Name",
+        "businessName": "Business Name (Optional)",
+        "address": "Address",
+        "city": "City",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "phone": "Phone Number (Optional)",
+        "storeType": "Store Type"
+      },
+      "placeholders": {
+        "storeName": "Your Store Name",
+        "businessName": "If different from store name",
+        "address": "123 Rue de la Paix",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "phone": "01 23 45 67 89",
+        "selectStoreType": "Select store type"
+      },
+      "buttons": {
+        "back": "Back",
+        "creating": "Creating Store...",
+        "create": "Create Store"
+      }
+    }
+  },
   "errors": {
     "pageNotFoundTitle": "Page not found",
     "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",

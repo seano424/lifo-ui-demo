@@ -42,8 +42,8 @@ export function OnboardingFlow() {
 
   // Get available steps based on Google Places availability
   const availableSteps = useMemo(
-    () => getAvailableSteps(googlePlacesEnabled),
-    [googlePlacesEnabled],
+    () => getAvailableSteps(googlePlacesEnabled, (key: string) => t(key)),
+    [googlePlacesEnabled, t], // Include translation function as dependency
   )
 
   // Initialize manual entry when Google Places is disabled
@@ -66,7 +66,7 @@ export function OnboardingFlow() {
   )
 
   // Show success step when account creation is complete
-  const successStepIndex = getSuccessStepIndex(googlePlacesEnabled)
+  const successStepIndex = getSuccessStepIndex(googlePlacesEnabled, (key: string) => t(key))
   const showSuccessStep = isEmailSent && currentStep === successStepIndex
 
   return (

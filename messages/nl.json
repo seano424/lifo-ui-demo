@@ -1968,5 +1968,42 @@
       "helpText": "Kunt u uw winkel niet vinden? U kunt alle gegevens handmatig toevoegen in de volgende stap.",
       "searchError": "Er ging iets mis tijdens het zoeken. Probeer het opnieuw."
     }
+  },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Winkeldetails toevoegen",
+        "complete": "Winkelinformatie voltooien"
+      },
+      "subtitle": {
+        "manual": "Voer uw winkelinformatie in",
+        "complete": "Selecteer uw winkeltype en controleer de details"
+      },
+      "labels": {
+        "storeName": "Winkelnaam",
+        "businessName": "Bedrijfsnaam (Optioneel)",
+        "address": "Adres",
+        "city": "Stad",
+        "postalCode": "Postcode",
+        "country": "Land",
+        "phone": "Telefoonnummer (Optioneel)",
+        "storeType": "Winkeltype"
+      },
+      "placeholders": {
+        "storeName": "Uw winkelnaam",
+        "businessName": "Indien anders dan winkelnaam",
+        "address": "Hoofdstraat 123",
+        "city": "Amsterdam",
+        "postalCode": "1012 AB",
+        "country": "Nederland",
+        "phone": "06 12 34 56 78",
+        "selectStoreType": "Selecteer winkeltype"
+      },
+      "buttons": {
+        "back": "Terug",
+        "creating": "Winkel aanmaken...",
+        "create": "Winkel aanmaken"
+      }
+    }
   }
 }
