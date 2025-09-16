@@ -1,4 +1,4 @@
-# lifo_ai_core/etl/processor.py
+# lifo_api/etl/processor.py
 
 import csv
 import io
@@ -14,7 +14,7 @@ try:
 except ImportError:
     try:
         # Fallback for when running as script
-        from app.core.database.operations import InventoryOperations
+        from lifo_api.app.core.database.operations import InventoryOperations
     except ImportError:
         # Fallback if database operations not available
         InventoryOperations = None  # type: ignore

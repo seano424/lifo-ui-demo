@@ -52,28 +52,33 @@ class Settings(BaseSettings):
         default="",
         description="Supabase project URL for authentication and database"
     )
+    supabase_jwt_secret: str = ""  # Keep for compatibility
     supabase_anon_key: str = Field(
         default="",
-        description="Supabase anonymous key for public operations"
+        description="Supabase anonymous key for public operations (legacy JWT)"
     )
     supabase_service_role_key: str = Field(
         default="",
-        description="Supabase service role key for admin operations"
+        description="Supabase service role key for admin operations (legacy JWT)"
+    )
+    
+    # New Supabase API Keys (recommended over legacy JWT keys)
+    supabase_publishable_key: str = Field(
+        default="",
+        description="Supabase publishable key (new API key system) for client-side auth"
+    )
+    supabase_secret_key: str = Field(
+        default="",
+        description="Supabase secret key (new API key system) for server-side admin operations"
     )
 
-    # Authentication Configuration
-    auth_timeout_seconds: int = Field(
-        default=30,
-        description="Timeout for authentication requests to Supabase"
+    # JWT Configuration
+    jwt_secret_key: str = Field(
+        default="your-secret-key-change-in-production",
+        description="JWT secret key for token signing and verification",
     )
-    auth_rate_limit_per_minute: int = Field(
-        default=100,
-        description="Rate limit for authentication requests per minute"
-    )
-    auth_retry_attempts: int = Field(
-        default=3,
-        description="Number of retry attempts for failed auth requests"
-    )
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 30
 
     # Logging
     log_level: str = "INFO"
@@ -289,7 +294,7 @@ class Settings(BaseSettings):
         return self.allowed_hosts_list
 
     model_config = SettingsConfigDict(
-        env_file="/home/slim/lifo-app/.env.local",  # Absolute path for reliability
+        env_file=".env.local",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",  # Ignore extra environment variables not defined in the model
@@ -313,9 +318,6 @@ def get_database_url() -> str:
     elif url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql+asyncpg://", 1)
 
-    # Note: statement_cache_size must be passed as integer via connect_args
-    # URL parameters get parsed as strings which causes type errors
-
     return url
 
 
@@ -325,8 +327,13 @@ def get_supabase_config() -> dict[str, Any]:
     """
     return {
         "url": settings.supabase_url,
+        # Legacy JWT keys (for backward compatibility)
+        "jwt_secret": settings.supabase_jwt_secret,
         "anon_key": settings.supabase_anon_key,
         "service_role_key": settings.supabase_service_role_key,
+        # New API keys (recommended)
+        "publishable_key": settings.supabase_publishable_key,
+        "secret_key": settings.supabase_secret_key,
         "timeout_seconds": settings.auth_timeout_seconds,
         "retry_attempts": settings.auth_retry_attempts,
     }

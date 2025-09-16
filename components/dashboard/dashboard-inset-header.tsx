@@ -22,7 +22,7 @@ export default function DashboardInsetHeader({
         className,
       )}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         {isLoading ? (
           <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-full" />
         ) : (
@@ -31,7 +31,7 @@ export default function DashboardInsetHeader({
               {title}
             </Typography>
             {description && (
-              <Typography variant="p" color="muted">
+              <Typography className="max-w-[300px] sm:max-w-full" variant="p" color="muted">
                 {description}
               </Typography>
             )}

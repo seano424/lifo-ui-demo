@@ -403,6 +403,40 @@
         "all": "Tous les niveaux de priorité",
         "allDesc": "Examen complet de l'inventaire"
       }
+    },
+    "batchStatus": {
+      "needsAttention": "Nécessite une attention",
+      "activeInventory": "Statut de l'inventaire actif",
+      "activeBatchesCount": "{needsAttention} sur {total} lots actifs",
+      "urgency": {
+        "critical": "Critique (Action Immédiate Requise)",
+        "high": "Priorité Élevée (expire demain)",
+        "medium": "Priorité Moyenne (expire dans 2-7 jours)",
+        "low": "Priorité Faible (durée de vie plus longue)"
+      },
+      "status": {
+        "ok": "OK",
+        "allGood": "Tous les lots sont en bon état"
+      },
+      "errors": {
+        "loadingError": "Impossible de charger le statut des lots"
+      }
+    },
+    "expiredItems": {
+      "title": "Articles expirés",
+      "subtitle": "Inventaire nécessitant des actions de gestion des déchets",
+      "recentlyExpired": "Récemment expirés",
+      "weekOld": "Vieux d'une semaine",
+      "older": "Plus anciens",
+      "days": "jours",
+      "actionsNeeded": "Actions nécessaires",
+      "reviewDiscounts": "Examiner pour des remises importantes",
+      "scheduleDonation": "Planifier la collecte de dons",
+      "removeFromShelves": "Retirer des étagères",
+      "noExpiredItems": "Aucun article expiré trouvé",
+      "errors": {
+        "loadingError": "Impossible de charger les articles expirés"
+      }
     }
   },
   "dashboard": {
@@ -662,7 +696,7 @@
         "description": "En tant que propriétaire, vous pouvez gérer tous les membres de l'équipe, modifier les rôles (y compris nommer d'autres propriétaires), et accéder à toutes les fonctions du magasin. Vous pouvez gérer les propriétaires, managers et employés."
       },
       "managerInfo": {
-        "title": "Permissions du Manager", 
+        "title": "Permissions du Manager",
         "description": "En tant que manager, vous pouvez gérer les employés (activer/désactiver, supprimer du magasin), mais ne pouvez pas modifier les propriétaires ou autres managers. Seuls les propriétaires peuvent changer les rôles."
       }
     },
@@ -1437,15 +1471,15 @@
       "noActions": "Aucune action immédiate requise ! Tous les lots sont dans les seuils de sécurité.",
       "urgencyLevels": {
         "critical": "Critique",
-        "high": "Élevé",
-        "medium": "Moyen",
-        "low": "Faible"
+        "high": "Élevé Prioritaire",
+        "medium": "Moyen Prioritaire",
+        "low": "Faible Prioritaire"
       },
       "summaryLabels": {
         "critical": "Critique",
-        "high": "Élevé",
-        "medium": "Moyen",
-        "low": "Faible"
+        "high": "Élevé Prioritaire",
+        "medium": "Moyen Prioritaire",
+        "low": "Faible Prioritaire"
       },
       "batchDetails": {
         "qty": "Qté",

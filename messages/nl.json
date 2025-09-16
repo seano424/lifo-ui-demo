@@ -403,6 +403,40 @@
         "all": "Alle prioriteitsniveaus",
         "allDesc": "Volledige voorraadcontrole"
       }
+    },
+    "batchStatus": {
+      "needsAttention": "Heeft aandacht nodig",
+      "activeInventory": "Actieve voorraad status",
+      "activeBatchesCount": "{needsAttention} van {total} actieve batches",
+      "urgency": {
+        "critical": "Kritiek (Onmiddellijke Actie Vereist)",
+        "high": "Hoge Prioriteit (verloopt morgen)",
+        "medium": "Gemiddelde Prioriteit (verloopt binnen 2-7 dagen)",
+        "low": "Lage Prioriteit (langere houdbaarheid)"
+      },
+      "status": {
+        "ok": "OK",
+        "allGood": "Alle batches zijn in goede staat"
+      },
+      "errors": {
+        "loadingError": "Kan batch status niet laden"
+      }
+    },
+    "expiredItems": {
+      "title": "Verlopen artikelen",
+      "subtitle": "Voorraad die afvalbeheer acties vereist",
+      "recentlyExpired": "Recent verlopen",
+      "weekOld": "Week oud",
+      "older": "Ouder",
+      "days": "dagen",
+      "actionsNeeded": "Acties nodig",
+      "reviewDiscounts": "Beoordeel voor hoge kortingen",
+      "scheduleDonation": "Plan donatie ophaling",
+      "removeFromShelves": "Van rekken verwijderen",
+      "noExpiredItems": "Geen verlopen artikelen gevonden",
+      "errors": {
+        "loadingError": "Kan verlopen artikelen niet laden"
+      }
     }
   },
   "dashboard": {
@@ -651,7 +685,7 @@
         "description": "Als eigenaar kunt u alle teamleden beheren, rollen wijzigen (inclusief andere eigenaren benoemen), en toegang tot alle winkelfuncties. U kunt eigenaren, managers en medewerkers beheren."
       },
       "managerInfo": {
-        "title": "Manager Machtigingen", 
+        "title": "Manager Machtigingen",
         "description": "Als manager kunt u medewerkers beheren (activeren/deactiveren, uit winkel verwijderen), maar kunt u geen eigenaren of andere managers wijzigen. Alleen eigenaren kunnen rollen wijzigen."
       }
     },
@@ -1467,15 +1501,15 @@
       "noActions": "Geen onmiddellijke acties vereist! Alle batches vallen binnen veilige score-drempels.",
       "urgencyLevels": {
         "critical": "Kritiek",
-        "high": "Hoog",
-        "medium": "Gemiddeld",
-        "low": "Laag"
+        "high": "Hoog Prioriteit",
+        "medium": "Gemiddeld Prioriteit",
+        "low": "Laag Prioriteit"
       },
       "summaryLabels": {
         "critical": "Kritiek",
-        "high": "Hoog",
-        "medium": "Gemiddeld",
-        "low": "Laag"
+        "high": "Hoog Prioriteit",
+        "medium": "Gemiddeld Prioriteit",
+        "low": "Laag Prioriteit"
       },
       "batchDetails": {
         "qty": "Aantal",

@@ -58,7 +58,7 @@ except ImportError:
 try:
     from ..utils.logger import get_logger
 
-    logger = get_logger("lifo_ai_core.database")
+    logger = get_logger("lifo_api.database")
 except ImportError:
     # Fallback for when dependencies are not available
     import logging
@@ -92,7 +92,7 @@ except ImportError:
             else:
                 print(f"ERROR: {msg}")
 
-    logger = FallbackLogger("lifo_ai_core.database")  # type: ignore
+    logger = FallbackLogger("lifo_api.database")  # type: ignore
 
 # Type aliases for better readability
 ProductDict = dict[str, Any]

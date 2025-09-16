@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useErrorHandler } from '@/components/ui/error-boundary'
+import { useErrorBoundary } from '@/components/ui/error-boundary'
 import { ConfirmNavigation } from '@/components/ui/form-navigation'
 import { StepHeader } from '@/components/ui/step-header'
 import { Typography } from '@/components/ui/typography'
@@ -33,7 +33,7 @@ export function ConfirmDetailsStep() {
 
   const { checkBusiness } = useBusinessCheck()
   const [hasCheckedBusiness, setHasCheckedBusiness] = useState(false)
-  const handleError = useErrorHandler()
+  const { captureError: handleError } = useErrorBoundary()
 
   // Memoize Google Places status to avoid recalculation
   const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])

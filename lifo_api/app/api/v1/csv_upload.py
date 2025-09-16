@@ -13,19 +13,16 @@ import structlog
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.secure_dependencies import (
-    get_current_user,
-    validate_store_access,
-)
-
-# Import the unified processor from consolidated core
-from app.core.etl.unified_csv_processor import UnifiedCSVProcessor
+from app.auth.secure_dependencies import get_current_user, validate_store_access
 from app.database.connection import get_db
 from app.security.csv_security import (
     CSVSecurityError,
     validate_and_sanitize_csv,
 )
 from app.utils.performance import measure_time
+
+# Import the unified processor (now consolidated into lifo_api)
+from app.core.etl.unified_csv_processor import UnifiedCSVProcessor
 
 router = APIRouter()
 logger = structlog.get_logger()
@@ -153,16 +150,42 @@ async def upload_csv(
                 },
             )
 
-        # Prepare response
+        # Debug logging to understand the result structure
+        print(f"[DEBUG] CSV processor result keys: {list(result.keys())}")
+        print(f"[DEBUG] CSV processor result: {result}")
+
+        # Prepare response to match frontend CSVUploadResponse interface
+        processed_count = result["processed_count"]
+        total_items = len(result["data"]) if result.get("data") else 0
+
         response_data: dict[str, Any] = {
             "success": True,
-            "message": f"Successfully processed {result['processed_count']} items",
-            "data": {
-                "processed_count": result["processed_count"],
-                "total_items": len(result["data"]),
+            "processed": processed_count,
+            "skipped": 0,  # TODO: Add skipped count from processor
+            "errors": result.get("errors", []),
+            "total_items": total_items,
+            "processing_time_ms": result.get("metadata", {}).get(
+                "processing_time_ms", 0
+            ),
+            "duplicates_skipped": [],  # TODO: Add from processor if available
+            "performance_metrics": {
+                "items_per_second": processed_count
+                / (result.get("metadata", {}).get("processing_time_ms", 1) / 1000)
+                if result.get("metadata", {}).get("processing_time_ms", 0) > 0
+                else 0,
+                "duplicate_detection_ms": 0,  # TODO: Add from processor
+                "product_resolution_ms": 0,  # TODO: Add from processor
+                "batch_insertion_ms": 0,  # TODO: Add from processor
+                "database_operations_ms": result.get("metadata", {}).get(
+                    "processing_time_ms", 0
+                ),
+            },
+            "message": f"Successfully processed {processed_count} items",
+            # Keep additional data for debugging/extended info AND pass processed data
+            "_internal": {
                 "status": result["status"],
+                "data": result.get("data", []),  # Include the processed data here
                 "warnings": result.get("warnings", []),
-                "errors": result.get("errors", []),
                 "store_id": store_id,
                 "metadata": result.get("metadata", {}),
                 "security": {
@@ -181,7 +204,7 @@ async def upload_csv(
 
         # Add warnings to response if present
         if result.get("warnings"):
-            response_data["data"]["has_warnings"] = True
+            response_data["_internal"]["has_warnings"] = True
             response_data["message"] += f" with {len(result['warnings'])} warnings"
 
         return response_data
