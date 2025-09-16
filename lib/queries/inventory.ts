@@ -4,7 +4,6 @@
  * Follows established patterns for React Query integration
  */
 
-import { scoreAfterScanInClient } from '@/lib/scoring/client-scoring-integration'
 import { createClient } from '@/lib/supabase/client'
 import { BATCH_SOURCES } from '@/types/inventory'
 import type { Database, Json } from '@/types/supabase'
@@ -32,14 +31,6 @@ export interface InventorySubmissionResult {
   storeProductCreated: boolean
   batchId: string
   message: string
-  scoring?: {
-    attempted: boolean
-    success: boolean
-    processed: number
-    high_priority_count: number
-    processing_time_ms: number
-    warning?: string
-  }
 }
 
 /**
@@ -65,17 +56,12 @@ export async function submitScannedProductToInventory(
     // Step 3: CREATE new batch in inventory.batches table
     const batch = await createProductBatch(product.product_id, productData)
 
-    // Step 4: Automatic scoring integration (if enabled)
-
-    const scoringInfo = await scoreAfterScanInClient(productData.storeId, batch.batch_id)
-
     return {
       success: true,
       productId: product.product_id,
       storeProductCreated,
       batchId: batch.batch_id,
       message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
-      scoring: scoringInfo,
     }
   } catch (error) {
     console.error('[submitScannedProductToInventory] Submission failed:', error)
@@ -171,7 +157,7 @@ async function upsertGlobalProduct(
       barcode: productData.barcode || null,
       description: null,
       image_url: null,
-      sku: `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Generate unique SKU
+      sku: `SKU-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`, // Generate unique SKU
       unit_type: 'unit',
       typical_shelf_life_days: calculateShelfLifeFromCategory(productData.category),
       base_cost_price: productData.costPrice,
@@ -309,7 +295,7 @@ async function createProductBatch(
 
   try {
     // Generate unique batch number
-    const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+    const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
 
     const newBatchData: Database['inventory']['Tables']['batches']['Insert'] = {
       batch_number: batchNumber,
@@ -346,7 +332,7 @@ async function createProductBatch(
         // Batch number collision, retry with different number
         const retryBatchData = {
           ...newBatchData,
-          batch_number: `BATCH-${Date.now()}-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+          batch_number: `BATCH-${Date.now()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
         }
 
         const { data: retryBatch, error: retryError } = await supabase
