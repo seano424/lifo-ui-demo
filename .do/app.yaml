@@ -9,7 +9,7 @@ services:
 - name: fastapi-backend
   source_dir: lifo_api
   github:
-    repo: lifo-ai/lifo-app  # Replace with your actual repo
+    repo: lifo-ai/lifo-app
     branch: main
     deploy_on_push: true
   
@@ -78,17 +78,17 @@ services:
   
   # CORS settings for production
   - key: BACKEND_CORS_ORIGINS
-    value: "https://your-frontend-domain.com,https://www.your-frontend-domain.com"  # Replace with actual domains
+    value: "https://lifo-app.com,https://www.lifo-app.com"  # Replace with actual domains
   
   # Google Cloud (if using Vision API)
   - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
     value: ""  # Set in console as base64 encoded service account JSON
     type: SECRET
   
-  # Redis (if using caching)
-  - key: REDIS_URL
-    value: ""  # Set if using Redis
-    type: SECRET
+  # # Redis (if using caching)
+  # - key: REDIS_URL
+  #   value: ""  # Set if using Redis
+  #   type: SECRET
   
   # Monitoring and logging
   - key: LOG_LEVEL

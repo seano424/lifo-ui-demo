@@ -78,7 +78,7 @@ services:
   
   # CORS settings for staging (more permissive for testing)
   - key: BACKEND_CORS_ORIGINS
-    value: "http://localhost:3000,http://localhost:3001,https://staging-frontend-domain.com,https://preview-*.vercel.app"
+    value: "http://localhost:3000,http://localhost:3001,https://lifo-app.com,https://www.lifo-app.com"
   
   # Debug settings for staging
   - key: DEBUG
