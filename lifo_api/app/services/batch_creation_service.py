@@ -990,7 +990,7 @@ class BatchCreationService:
 
         return batch.batch_id  # type: ignore[return-value]
 
-<<<<<<< HEAD
+# <<<<<<< HEAD
     async def _resolve_category_to_uuid(
         self,
         session: AsyncSession,
