@@ -360,26 +360,66 @@ async function createProductBatch(
 }
 
 /**
- * Helper: Map category string to category_id
- * Replaces the missing map_legacy_category RPC function
+ * Category cache for performance optimization
+ */
+let categoryCache: Map<string, string | null> | null = null
+let cacheExpiry = 0
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+/**
+ * Helper: Map category string to category_id with caching
+ * Uses proper column names (display_name_en/display_name_fr) and caching for performance
  */
 async function mapCategoryToId(
   categoryName: string,
   supabase: ReturnType<typeof createClient>,
 ): Promise<string | null> {
   try {
-    const { data: category } = await supabase
-      .schema('inventory')
-      .from('categories')
-      .select('category_id')
-      .ilike('name', `%${categoryName}%`)
-      .limit(1)
-      .maybeSingle()
+    const now = Date.now()
 
-    return category?.category_id || null
+    // Initialize or refresh cache if expired
+    if (!categoryCache || now > cacheExpiry) {
+      const { data: categories } = await supabase
+        .schema('inventory')
+        .from('categories')
+        .select('category_id, display_name_en, display_name_fr, category_code')
+        .eq('is_active', true)
+
+      categoryCache = new Map()
+      cacheExpiry = now + CACHE_TTL
+
+      categories?.forEach(cat => {
+        // Cache multiple variations for faster lookup
+        if (cat.display_name_en) {
+          categoryCache!.set(cat.display_name_en.toLowerCase(), cat.category_id)
+        }
+        if (cat.display_name_fr) {
+          categoryCache!.set(cat.display_name_fr.toLowerCase(), cat.category_id)
+        }
+        if (cat.category_code) {
+          categoryCache!.set(cat.category_code.toLowerCase(), cat.category_id)
+        }
+      })
+    }
+
+    // Try exact match first, then fuzzy match
+    const lowerName = categoryName.toLowerCase()
+
+    // Exact match
+    if (categoryCache.has(lowerName)) {
+      return categoryCache.get(lowerName)!
+    }
+
+    // Fuzzy match
+    for (const [key, value] of categoryCache.entries()) {
+      if (key.includes(lowerName) || lowerName.includes(key)) {
+        return value
+      }
+    }
+
+    return null
   } catch (error) {
     console.warn('[mapCategoryToId] Category mapping failed:', error)
-    // Return null to use default category or create without category
     return null
   }
 }
@@ -500,15 +540,21 @@ async function bulkUpsertStoreProducts(
   // Create product lookup map by barcode
   const productLookup = new Map(products.map(product => [product.barcode, product]))
 
-  // Prepare store product data
+  // Build pairs and data in one pass for better performance
+  const storeProductPairs: Array<{ store_id: string; product_id: string }> = []
   const storeProductData: Database['inventory']['Tables']['store_products']['Insert'][] = []
 
   productsData.forEach(productData => {
     const product = productLookup.get(productData.barcode)
     if (product) {
-      storeProductData.push({
+      const pair = {
         store_id: productData.storeId,
         product_id: product.product_id,
+      }
+
+      storeProductPairs.push(pair)
+      storeProductData.push({
+        ...pair,
         cost_price: productData.costPrice,
         selling_price: productData.sellingPrice,
         is_active: true,
@@ -520,12 +566,6 @@ async function bulkUpsertStoreProducts(
   })
 
   if (storeProductData.length === 0) return
-
-  // Check for existing store-products first to handle RLS properly
-  const storeProductPairs = storeProductData.map(sp => ({
-    store_id: sp.store_id,
-    product_id: sp.product_id,
-  }))
 
   // Get existing store products
   const { data: existingStoreProducts } = await supabase
