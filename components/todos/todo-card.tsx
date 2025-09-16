@@ -9,12 +9,12 @@ import { formatRecommendation } from '@/lib/utils/todo-transformers'
 
 interface TodoCardProps {
   todo: TodoItem
+  onClick?: () => void
 }
 
-export function TodoCard({ todo }: TodoCardProps) {
+export function TodoCard({ todo, onClick }: TodoCardProps) {
   const handleCardClick = () => {
-    // TODO: Open bottom sheet with todo details and actions
-    // Placeholder for future bottom sheet integration
+    onClick?.()
   }
 
   // Format expiry date
@@ -100,8 +100,9 @@ export function TodoCard({ todo }: TodoCardProps) {
   const urgencyConfig = getUrgencyConfig(todo.urgency)
 
   return (
-    <div
-      className={cn('cursor-pointer transition-all duration-1000', 'border-b')}
+    <button
+      type="button"
+      className={cn('cursor-pointer transition-all duration-1000', 'border-b flex flex-col')}
       onClick={handleCardClick}
     >
       <div className="flex gap-3 px-4 pb-6 items-start relative group">
@@ -115,10 +116,10 @@ export function TodoCard({ todo }: TodoCardProps) {
         ></Badge>
 
         <div className="flex flex-col min-w-0 flex-1 gap-4">
-          <div className=" flex flex-col gap-2">
+          <div className="flex flex-col gap-2 items-start">
             <Typography variant="h4">{todo.product_name}</Typography>
 
-            <div className="flex-1">
+            <div className="flex-1 w-full">
               <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">Suggestion</span>
                 <span className="truncate lowercase">
@@ -175,6 +176,6 @@ export function TodoCard({ todo }: TodoCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </button>
   )
 }

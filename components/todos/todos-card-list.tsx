@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BatchActionCard } from '@/components/todos/batch-action-card'
 import type { BatchActionFiltersType } from '@/components/todos/batch-action-filters'
+import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
 import { TodoCard } from '@/components/todos/todo-card'
 import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
@@ -46,6 +47,27 @@ export function TodosCardList({
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Bottom sheet state
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+  const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(null)
+
+  // Handler for opening the bottom sheet with selected batch
+  const handleTodoClick = (batchId: string) => {
+    // Find the batch from analytics response
+    const batch = analyticsResponse?.analytics?.actionable_batches?.find(
+      b => b.batch_id === batchId,
+    )
+    if (batch) {
+      setSelectedBatch(batch)
+      setIsBottomSheetOpen(true)
+    }
+  }
+
+  const handleCloseBottomSheet = () => {
+    setIsBottomSheetOpen(false)
+    setSelectedBatch(null)
+  }
 
   // Get actionable batches from store analytics for suggestions tab
   const { data: analyticsResponse, isLoading: analyticsLoading } = useStoreAnalytics(
@@ -185,7 +207,13 @@ export function TodosCardList({
             ? processedBatchActions.map(action => (
                 <BatchActionCard key={action.action_id} action={action} />
               ))
-            : todos.map(todo => <TodoCard key={todo.batch_id} todo={todo} />)}
+            : todos.map(todo => (
+                <TodoCard
+                  key={todo.batch_id}
+                  todo={todo}
+                  onClick={() => handleTodoClick(todo.batch_id)}
+                />
+              ))}
         </div>
 
         {hasMore && (
@@ -206,6 +234,13 @@ export function TodosCardList({
           </div>
         )}
       </div>
+
+      {/* Todo Action Bottom Sheet */}
+      <TodoActionBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={handleCloseBottomSheet}
+        selectedBatch={selectedBatch}
+      />
     </InfiniteScrollErrorBoundary>
   )
 }
