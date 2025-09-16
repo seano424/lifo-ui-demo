@@ -15,6 +15,33 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 /**
+ * Helper function to trigger background scoring
+ */
+async function triggerBackgroundScoring(storeId: string, triggeredBy: string) {
+  try {
+    const response = await fetch('/api/scoring/trigger', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        storeId,
+        triggeredBy,
+      }),
+    })
+
+    if (!response.ok) {
+      console.warn('[triggerBackgroundScoring] Failed to trigger scoring:', response.status)
+    } else {
+      console.log('[triggerBackgroundScoring] Successfully triggered scoring for store:', storeId)
+    }
+  } catch (error) {
+    console.warn('[triggerBackgroundScoring] Error triggering scoring:', error)
+    // Don't throw - scoring failure shouldn't break the user flow
+  }
+}
+
+/**
  * Hook for submitting a single scanned product to inventory
  * Handles complete workflow: Product → Store Product → Batch creation
  * Follows established cache invalidation patterns for products and batches
@@ -155,6 +182,9 @@ export function useBatchInventorySubmission() {
         queryClient.invalidateQueries({
           queryKey: [...queryKeys.batches.byStore(activeStoreId), 'lowStock'],
         })
+
+        // Trigger background scoring after successful batch submission
+        triggerBackgroundScoring(activeStoreId, 'batch-submission')
 
         // Show appropriate success/failure messages
         if (result.failureCount === 0) {

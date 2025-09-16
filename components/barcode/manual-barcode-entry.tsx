@@ -426,7 +426,7 @@ export default function ManualBarcodeEntry({
                               key={product.product_id}
                               variant="subtleGray"
                               className={`w-full rounded-none justify-start text-left p-3 ${
-                                product.isOutOfStock && 'cursor-not-allowed'
+                                product.isOutOfStock && '!cursor-not-allowed'
                               }`}
                               disabled={product.isOutOfStock}
                               onClick={() => {
@@ -459,7 +459,7 @@ export default function ManualBarcodeEntry({
                                 setBarcode('')
                               }}
                             >
-                              <div className="flex-1">
+                              <div className="flex-1 flex flex-col gap-1">
                                 <Typography variant="p">{product.name}</Typography>
                                 {product.brand && (
                                   <Typography variant="p">{product.brand}</Typography>

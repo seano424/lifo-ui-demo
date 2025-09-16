@@ -493,6 +493,7 @@
       "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen."
     }
   },
+  "cancel": "Annuleren",
   "actions": {
     "add": "Toevoegen",
     "edit": "Bewerken",
@@ -1770,6 +1771,7 @@
     "pageDescription": "Gepersonaliseerde suggesties om uw voorraad te optimaliseren en afval te verminderen"
   },
   "scanOut": {
+    "available": "Beschikbaar",
     "unknownProduct": "Onbekend product",
     "unknownBrand": "Onbekend merk",
     "scanProductToRemove": "Scan product om te verwijderen",
@@ -1901,7 +1903,8 @@
     "noBatchFoundWithExpiry": "Geen batch gevonden met vervaldatum: {date}",
     "noInventoryAvailable": "Geen voorraad beschikbaar voor dit product in de huidige winkel.",
     "ocrProcessingFailed": "OCR-verwerking mislukt",
-    "batchRemovalNote": "Batch verwijdering: {productName} x{quantity}"
+    "batchRemovalNote": "Batch verwijdering: {productName} x{quantity}",
+    "cancel": "Annuleren"
   },
   "inbound": {
     "mobile": {

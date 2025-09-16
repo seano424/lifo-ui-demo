@@ -493,6 +493,7 @@
       "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
     }
   },
+  "cancel": "Annuler",
   "actions": {
     "add": "Ajouter",
     "edit": "Modifier",
@@ -1777,6 +1778,7 @@
     "pageDescription": "Suggestions personnalisées pour optimiser votre inventaire et réduire les déchets"
   },
   "scanOut": {
+    "available": "Disponible",
     "unknownProduct": "Produit inconnu",
     "unknownBrand": "Marque inconnue",
     "scanProductToRemove": "Scanner le produit à retirer",
@@ -1908,7 +1910,8 @@
     "noBatchFoundWithExpiry": "Aucun lot trouvé avec la date d'expiration : {date}",
     "noInventoryAvailable": "Aucun inventaire disponible pour ce produit dans le magasin actuel.",
     "ocrProcessingFailed": "Le traitement OCR a échoué",
-    "batchRemovalNote": "Retrait de lot : {productName} x{quantity}"
+    "batchRemovalNote": "Retrait de lot : {productName} x{quantity}",
+    "cancel": "Annuler"
   },
   "inbound": {
     "mobile": {
