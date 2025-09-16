@@ -294,7 +294,8 @@
     "batchRemovalNote": "Batch removal: {productName} x{quantity}",
     "recentlyRemoved": "Recently Removed ({count} items)",
     "removedQuantityExpires": "Removed {quantity}x • Expires: {date}",
-    "andMoreItems": "... and {count} more items"
+    "andMoreItems": "... and {count} more items",
+    "cancel": "Cancel"
   },
   "buttons": {
     "export": "Export",
@@ -627,9 +628,11 @@
         "label": "Waste Cost",
         "subtitle": "items"
       },
-      "errorMessage": "Some metrics could not be loaded. Please try refreshing."
+      "errorMessage": "Some metrics could not be loaded. Please try refreshing.",
+      "cancel": "Cancel"
     }
   },
+  "cancel": "Cancel",
   "actions": {
     "add": "Add",
     "edit": "Edit",
