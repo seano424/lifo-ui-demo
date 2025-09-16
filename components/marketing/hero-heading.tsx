@@ -21,7 +21,7 @@ export function HeroHeading() {
         </div>
         <Typography
           as="h1"
-          className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-primary-900 to-secondary-700"
+          className="text-5xl md:text-7xl py-6 bg-clip-text text-transparent bg-gradient-to-r from-primary-900 via-primary-700 to-primary-800"
         >
           LIFO.AI
         </Typography>

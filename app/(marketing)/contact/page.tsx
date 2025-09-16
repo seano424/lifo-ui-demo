@@ -3,7 +3,6 @@
 import { Mail, MessageSquare, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { ContactForm } from '@/components/contact-form'
-import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
 import { Typography } from '@/components/ui/typography'
 
