@@ -23,12 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { StepHeader } from '@/components/ui/step-header'
-import {
-  STORE_TYPE_LABELS,
-  STORE_TYPES,
-  type StoreFormData,
-  storeFormSchema,
-} from '@/lib/schemas/store-schemas'
+import { STORE_TYPES, type StoreFormData, storeFormSchema } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
@@ -40,6 +35,7 @@ function isStoreType(value: string | null | undefined): value is StoreFormData['
 
 export function StoreTypeStep() {
   const t = useTranslations('onboarding.storeType')
+  const tStoreTypes = useTranslations('settings.storeInformation.storeTypes')
 
   const { selectedStoreForm, isManualEntry, setSelectedStoreForm, goToNextStep, goToPreviousStep } =
     useOnboardingStore()
@@ -126,9 +122,9 @@ export function StoreTypeStep() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.entries(STORE_TYPE_LABELS).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
+                        {STORE_TYPES.map(storeType => (
+                          <SelectItem key={storeType} value={storeType}>
+                            {tStoreTypes(storeType)}
                           </SelectItem>
                         ))}
                       </SelectContent>
