@@ -32,7 +32,7 @@ export function CtaSection() {
   const t = useTranslations('landingpage.cta')
 
   return (
-    <section className="w-full px-4 my-8 relative overflow-hidden">
+    <section className="w-full px-4 my-8 relative overflow-hidden mb-20">
       {/* Background decorative elements */}
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -74,7 +74,7 @@ export function CtaSection() {
           </div>
 
           {/* Right column - CTA card */}
-          <div className="flex flex-col rounded-2xl bg-white border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
+          <div className="flex flex-col rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
             <div className="flex flex-col gap-1">
               <Typography variant="h3" className="text-2xl font-bold text-secondary-950 mb-4">
                 {t('card.title')}
@@ -112,6 +112,8 @@ export function CtaSection() {
             </div>
 
             <Button
+              asLink
+              href="/contact"
               size="lg"
               className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >

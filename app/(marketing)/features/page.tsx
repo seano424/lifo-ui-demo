@@ -35,7 +35,7 @@ function FeatureCard({
   return (
     <div className="py-12">
       <div
-        className={`flex flex-col justify-center ${reversed ? "xl:flex-row-reverse" : "xl:flex-row"} items-center gap-8 xl:gap-12`}
+        className={`flex flex-col justify-center ${reversed ? "xl:flex-row-reverse" : "xl:flex-row"} items-center gap-8 xl:gap-12 `}
       >
         {/* Content */}
         <div className="flex-1 space-y-6 text-center xl:text-left">
@@ -60,7 +60,7 @@ function FeatureCard({
 
         {/* Visual/Image */}
         <div className="flex-1 flex justify-center w-full">
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full max-w-md">
             <div className="absolute inset-0 bg-gradient-to-br from-primary-100/20 to-secondary-100/20 rounded-3xl blur-3xl"></div>
             <div className="relative bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-3xl p-4 sm:p-6 xl:p-8 shadow-2xl border border-white/20">
               {image}
@@ -293,40 +293,48 @@ export default function FeaturesPage() {
         </div>
 
         {/* Features */}
-        <div className="space-y-12 lg:space-y-16">
-          {/* Real-time Dashboard */}
-          <FeatureCard
-            title="Real-time Dashboard"
-            description="Get instant insights into your inventory with our comprehensive dashboard. Track stock levels, monitor expiration dates, and identify trends at a glance. Make informed decisions with real-time data visualization and automated alerts."
-            icon={<BarChart3 size={32} />}
-            image={<MockDashboard />}
-          />
+        <div className="flex flex-col items-center space-y-12 lg:space-y-16">
+          <div className="w-full max-w-6xl">
+            {/* Real-time Dashboard */}
+            <FeatureCard
+              title="Real-time Dashboard"
+              description="Get instant insights into your inventory with our comprehensive dashboard. Track stock levels, monitor expiration dates, and identify trends at a glance. Make informed decisions with real-time data visualization and automated alerts."
+              icon={<BarChart3 size={32} />}
+              image={<MockDashboard />}
+            />
+          </div>
 
-          {/* Smart Scanning */}
-          <FeatureCard
-            title="Smart Scanning"
-            description="Effortlessly manage your inventory with our advanced scanning technology. Simply scan products to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
-            icon={<Smartphone size={32} />}
-            image={<MockScanning />}
-            reversed
-          />
+          <div className="w-full max-w-6xl">
+            {/* Smart Scanning */}
+            <FeatureCard
+              title="Smart Scanning"
+              description="Effortlessly manage your inventory with our advanced scanning technology. Simply scan products to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
+              icon={<Smartphone size={32} />}
+              image={<MockScanning />}
+              reversed
+            />
+          </div>
 
-          {/* Performance Analytics */}
-          <FeatureCard
-            title="Performance Analytics"
-            description="Understand your business performance with detailed analytics and reporting. Track waste reduction, revenue growth, and operational efficiency. Get actionable insights to optimize your inventory management strategy."
-            icon={<TrendingUp size={32} />}
-            image={<MockAnalytics />}
-          />
+          <div className="w-full max-w-6xl">
+            {/* Performance Analytics */}
+            <FeatureCard
+              title="Performance Analytics"
+              description="Understand your business performance with detailed analytics and reporting. Track waste reduction, revenue growth, and operational efficiency. Get actionable insights to optimize your inventory management strategy."
+              icon={<TrendingUp size={32} />}
+              image={<MockAnalytics />}
+            />
+          </div>
 
-          {/* AI-Powered Insights */}
-          <FeatureCard
-            title="AI-Powered Insights"
-            description="Leverage artificial intelligence to optimize your inventory management. Get smart recommendations for reordering, promotional strategies, and waste reduction. Our AI learns from your patterns to provide personalized suggestions."
-            icon={<Bot size={32} />}
-            image={<MockAI />}
-            reversed
-          />
+          <div className="w-full max-w-6xl">
+            {/* AI-Powered Insights */}
+            <FeatureCard
+              title="AI-Powered Insights"
+              description="Leverage artificial intelligence to optimize your inventory management. Get smart recommendations for reordering, promotional strategies, and waste reduction. Our AI learns from your patterns to provide personalized suggestions."
+              icon={<Bot size={32} />}
+              image={<MockAI />}
+              reversed
+            />
+          </div>
         </div>
 
         {/* Additional Features Grid */}
@@ -380,7 +388,7 @@ export default function FeaturesPage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="group p-6 rounded-3xl bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="group p-6 rounded-3xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 mb-4 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
@@ -406,7 +414,7 @@ export default function FeaturesPage() {
 
         {/* CTA Section */}
         <div className="mt-16 lg:mt-24 text-center">
-          <div className="flex flex-col items-center gap-4  rounded-3xl p-6 sm:p-8 lg:p-12 border border-primary-100/50">
+          <div className="flex flex-col items-center gap-4 rounded-3xl p-6 sm:p-8 lg:p-12 ">
             <Typography
               variant="h2"
               className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-4 lg:mb-6"
@@ -420,7 +428,10 @@ export default function FeaturesPage() {
               Join thousands of businesses already using LIFO.AI to optimize
               their inventory management and reduce waste.
             </Typography>
-            <Button className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <Button
+              asLink
+              href="/pricing"
+              className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
               Start Free Trial
               <ArrowRight size={20} className="ml-2" />
             </Button>

@@ -73,6 +73,8 @@ export function FeaturesSummary() {
 
         <div className="flex flex-col items-center justify-center mt-16">
           <Button
+            asLink
+            href="/features"
             size="lg"
             className="px-8 py-3 text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
           >

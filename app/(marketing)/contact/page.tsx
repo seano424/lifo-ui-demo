@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { Mail, MessageSquare, Users } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { ContactForm } from '@/components/contact-form'
-import { RevealAnimation } from '@/components/ui/reveal-animation'
-import { Typography } from '@/components/ui/typography'
+import { Mail, MessageSquare, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ContactForm } from "@/components/contact-form";
+import { RevealAnimation } from "@/components/ui/reveal-animation";
+import { Typography } from "@/components/ui/typography";
 
 export default function Contact() {
-  const t = useTranslations('contactpage')
+  const t = useTranslations("contactpage");
 
   return (
     <main className="min-h-screen flex flex-col items-center">
@@ -25,15 +25,18 @@ export default function Contact() {
                       as="h1"
                       className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
                     >
-                      {t('title')}
+                      {t("title")}
                     </Typography>
                   </div>
-                  <Typography as="h2" className="text-3xl md:text-5xl text-foreground/80">
-                    {t('subtitle')}
+                  <Typography
+                    as="h2"
+                    className="text-3xl md:text-5xl text-foreground/80"
+                  >
+                    {t("subtitle")}
                   </Typography>
                 </header>
                 <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                  {t('description')}
+                  {t("description")}
                 </p>
               </div>
             </section>
@@ -44,13 +47,16 @@ export default function Contact() {
               <div className="max-w-7xl mx-auto relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
                   {/* Left column - Contact Form */}
-                  <div className="flex flex-col rounded-2xl bg-white border border-primary-100 shadow-xl p-8 space-y-6">
+                  <div className="flex flex-col rounded-2xl bg-white/90 border border-primary-100 shadow-xl p-8 space-y-6 mb-6">
                     <div className="flex flex-col gap-1">
-                      <Typography variant="h3" className="text-2xl font-bold text-secondary-950 mb-4">
-                        {t('form.title')}
+                      <Typography
+                        variant="h3"
+                        className="text-2xl font-bold text-secondary-950 mb-4"
+                      >
+                        {t("form.title")}
                       </Typography>
                       <Typography variant="p" className="text-secondary-950/80">
-                        {t('form.description')}
+                        {t("form.description")}
                       </Typography>
                     </div>
 
@@ -65,11 +71,17 @@ export default function Contact() {
                           <MessageSquare size={22} strokeWidth={1.5} />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
-                            {t('features.support.title')}
+                          <Typography
+                            variant="h4"
+                            className="font-bold text-secondary-950 mb-1"
+                          >
+                            {t("features.support.title")}
                           </Typography>
-                          <Typography variant="p" className="text-secondary-950/80">
-                            {t('features.support.description')}
+                          <Typography
+                            variant="p"
+                            className="text-secondary-950/80"
+                          >
+                            {t("features.support.description")}
                           </Typography>
                         </div>
                       </div>
@@ -79,11 +91,17 @@ export default function Contact() {
                           <Users size={22} strokeWidth={1.5} />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
-                            {t('features.expertise.title')}
+                          <Typography
+                            variant="h4"
+                            className="font-bold text-secondary-950 mb-1"
+                          >
+                            {t("features.expertise.title")}
                           </Typography>
-                          <Typography variant="p" className="text-secondary-950/80">
-                            {t('features.expertise.description')}
+                          <Typography
+                            variant="p"
+                            className="text-secondary-950/80"
+                          >
+                            {t("features.expertise.description")}
                           </Typography>
                         </div>
                       </div>
@@ -93,11 +111,17 @@ export default function Contact() {
                           <Mail size={22} strokeWidth={1.5} />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
-                            {t('features.followup.title')}
+                          <Typography
+                            variant="h4"
+                            className="font-bold text-secondary-950 mb-1"
+                          >
+                            {t("features.followup.title")}
                           </Typography>
-                          <Typography variant="p" className="text-secondary-950/80">
-                            {t('features.followup.description')}
+                          <Typography
+                            variant="p"
+                            className="text-secondary-950/80"
+                          >
+                            {t("features.followup.description")}
                           </Typography>
                         </div>
                       </div>
@@ -108,8 +132,7 @@ export default function Contact() {
             </section>
           </RevealAnimation>
         </div>
-
       </div>
     </main>
-  )
+  );
 }

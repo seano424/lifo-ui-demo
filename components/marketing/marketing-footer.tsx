@@ -6,13 +6,14 @@ import { Typography } from "@/components/ui/typography";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
+import { Linkedin } from "lucide-react";
 
 export function MarketingFooter() {
   const currentYear = new Date().getFullYear();
   const t = useTranslations("footer");
 
   return (
-    <footer className="mt-24 w-full bg-background border-t border-foreground/10 py-12 px-4 relative z-10">
+    <footer className="mt-30 w-full bg-background border-t border-foreground/10 py-12 px-4 relative z-10">
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Logo and Description */}
@@ -44,40 +45,46 @@ export function MarketingFooter() {
           </div>
 
           {/* Links */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Typography variant="h4" className="text-base font-bold">
               {t("quickLinks")}
             </Typography>
             <div className="grid grid-cols-1 gap-2">
               <Link
-                href="#"
+                href="/features"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t("links.aboutUs")}
+                Homepage
               </Link>
               <Link
-                href="#"
+                href="/features"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t("links.products")}
+                Features
               </Link>
               <Link
-                href="#"
+                href="/pricing"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {t("links.pricing")}
               </Link>
               <Link
+                href="/contact"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contact
+              </Link>
+              {/* <Link
                 href="#"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {t("links.blog")}
-              </Link>
+              </Link> */}
             </div>
           </div>
 
           {/* Contact */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Typography variant="h4" className="text-base font-bold">
               {t("contactUs")}
             </Typography>
@@ -100,21 +107,7 @@ export function MarketingFooter() {
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect width="4" height="12" x="2" y="9" />
-                    <circle cx="4" cy="4" r="2" />
-                  </svg>
+                    <Linkedin size={16} />
                 </a>
                 <div className="flex items-center gap-2">
                   <ThemeSwitcher />

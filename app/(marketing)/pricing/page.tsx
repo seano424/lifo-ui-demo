@@ -174,7 +174,7 @@ export default function PricingPage() {
         <div className="flex flex-col items-center justify-center mb-16">
           <Typography
             as="h1"
-            className="text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
+            className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
           >
             Choose Your Plan
           </Typography>
