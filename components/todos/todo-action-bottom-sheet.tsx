@@ -268,8 +268,9 @@ export function TodoActionBottomSheet({
             notes: `Marked ${soldQuantity} units as sold (${soldTiming}) - ${selectedBatch.reason}`,
           })
           break
-        case 'dispose':
-          const disposalReason = selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
+        case 'dispose': {
+          const disposalReason =
+            selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
           await executeDispose({
             batchId: selectedBatch.batch_id,
             quantity: disposeQuantity,
@@ -277,6 +278,7 @@ export function TodoActionBottomSheet({
             notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.reason}${improveAlerts ? ' - User requested alert improvements' : ''}`,
           })
           break
+        }
         case 'more':
           await executeDismiss({
             batchId: selectedBatch.batch_id,
@@ -688,9 +690,7 @@ export function TodoActionBottomSheet({
                     <div className="text-green-700">
                       Total revenue: €{soldMetrics.totalRevenue.toFixed(2)}
                     </div>
-                    <div className="text-green-700">
-                      Profit margin: {soldMetrics.profitMargin}%
-                    </div>
+                    <div className="text-green-700">Profit margin: {soldMetrics.profitMargin}%</div>
                   </div>
                 </div>
 
@@ -820,7 +820,11 @@ export function TodoActionBottomSheet({
                           )}
                         >
                           {selectedDisposalReason === reason.id && (
-                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
                               <path
                                 fillRule="evenodd"
                                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -855,7 +859,11 @@ export function TodoActionBottomSheet({
                           )}
                         >
                           {selectedDisposalReason === 'other' && (
-                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
                               <path
                                 fillRule="evenodd"
                                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -928,7 +936,8 @@ export function TodoActionBottomSheet({
                       • Cost loss: €{disposalMetrics.costLoss.toFixed(2)}
                     </div>
                     <div className="text-red-700">
-                      • Could have donated for tax benefit (~€{disposalMetrics.potentialTaxBenefit.toFixed(2)})
+                      • Could have donated for tax benefit (~€
+                      {disposalMetrics.potentialTaxBenefit.toFixed(2)})
                     </div>
                   </div>
                 </div>
