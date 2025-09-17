@@ -1,4 +1,5 @@
 'use client'
+
 import { useTranslations } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 

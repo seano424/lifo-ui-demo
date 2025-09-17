@@ -73,6 +73,7 @@
   --color-secondary-700: hsl(227 100% 65%);
   --color-secondary-800: hsl(227 100% 63%);
   --color-secondary-900: hsl(227 100% 58%);
+  --color-secondary-950: hsl(227 100% 40%);
 
   /* Font families */
   --font-sans:
@@ -88,7 +89,7 @@
     Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* Breakpoints */
-  --breakpoint-*: initial;
+  /* --breakpoint-*: initial; */
   --breakpoint-xs: 360px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;

@@ -13,14 +13,14 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+      <div className="text-secondary-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
         {icon}
       </div>
-      <div>
-        <Typography variant="h4" className="font-bold text-blue-800 mb-1">
+      <div className="flex flex-col gap-1">
+        <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
           {title}
         </Typography>
-        <Typography variant="p" className="text-blue-700/80">
+        <Typography variant="p" className="text-secondary-950/80">
           {description}
         </Typography>
       </div>
@@ -32,14 +32,14 @@ export function CtaSection() {
   const t = useTranslations('landingpage.cta')
 
   return (
-    <section className="w-full px-4 my-8 relative overflow-hidden">
+    <section className="w-full px-4 my-8 relative overflow-hidden mb-20">
       {/* Background decorative elements */}
 
       <div className="max-w-7xl mx-auto relative z-10">
         <Typography
           as={'h2'}
           variant="h2"
-          className="text-center mb-16 pb-4 text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
+          className="text-center mb-16 pb-4 text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
         >
           {t('title')}
         </Typography>
@@ -74,19 +74,19 @@ export function CtaSection() {
           </div>
 
           {/* Right column - CTA card */}
-          <div className="flex flex-col rounded-2xl bg-white border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
-            <div>
-              <Typography variant="h3" className="text-2xl font-bold text-blue-800 mb-4">
+          <div className="flex flex-col rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
+            <div className="flex flex-col gap-1">
+              <Typography variant="h3" className="text-2xl font-bold text-secondary-950 mb-4">
                 {t('card.title')}
               </Typography>
-              <Typography variant="p" className="text-blue-700/80">
+              <Typography variant="p" className="text-secondary-950/80">
                 {t('card.description')}
               </Typography>
             </div>
 
             <div className="space-y-3 py-4">
               <div className="flex items-center gap-2">
-                <div className="text-primary-500">
+                <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
@@ -94,7 +94,7 @@ export function CtaSection() {
                 </Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-primary-500">
+                <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
@@ -102,7 +102,7 @@ export function CtaSection() {
                 </Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-primary-500">
+                <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
@@ -112,13 +112,15 @@ export function CtaSection() {
             </div>
 
             <Button
+              asLink
+              href="/contact"
               size="lg"
-              className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+              className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >
               {t('card.button')} <ArrowRight size={18} />
             </Button>
 
-            <Typography variant="p" className="text-sm text-center text-blue-700/60">
+            <Typography variant="p" className="text-sm text-center text-secondary-950/60">
               {t('card.noCreditCard')}
             </Typography>
           </div>

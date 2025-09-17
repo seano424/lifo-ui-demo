@@ -1153,6 +1153,7 @@
   "marketing": {
     "nav": {
       "about": "About",
+      "features": "Features",
       "resources": "Resources",
       "product": "Product",
       "pricing": "Pricing",
@@ -1683,6 +1684,8 @@
     },
     "businessStats": {
       "title": "Maximize Your Profits, Minimize Your Losses",
+      "subtitle": "See the real impact LIFO.AI has on businesses like yours",
+      "disclaimer": "Results may vary. Based on average customer data over 12 months.",
       "revenue": {
         "label": "Revenue Increase",
         "description": "Average increase in business revenue",
@@ -2008,6 +2011,173 @@
     "messages": {
       "selectStore": "Please select a store to upload inventory data.",
       "selectStoreInventory": "Please select a store to add inventory."
+    }
+  },
+  "pricingpage": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start with our free trial and scale as you grow. No lock-in, full support included.",
+    "badges": {
+      "mostPopular": "Most Popular",
+      "comingSoon": "Coming Soon"
+    },
+    "common": {
+      "getStarted": "Get Started",
+      "comingSoon": "Coming Soon",
+      "winWinFees": "Win-Win Fees:",
+      "note": "Note:",
+      "pricingNote": "Pricing is subject to change. All fees are to be confirmed."
+    },
+    "plans": {
+      "freeTrial": {
+        "title": "Free Trial",
+        "subtitle": "Pilot shops",
+        "price": "Free",
+        "period": "3 months",
+        "description": "All features, with no limitation, for a 3-month free trial.",
+        "features": {
+          "0": "3 days of Onboarding and Training",
+          "1": "Full support included",
+          "2": "No lock-in - exit anytime",
+          "3": "All features unlocked"
+        },
+        "sellingPoint": "Perfect for testing our solution risk-free"
+      },
+      "light": {
+        "title": "Light",
+        "subtitle": "Small shops, 1 seat only",
+        "price": "9€",
+        "period": "/month",
+        "description": "For small shops starting their inventory management journey.",
+        "features": {
+          "0": "Maximum 3 months of data in Dashboard",
+          "1": "1 user seat included",
+          "2": "Core inventory features",
+          "3": "Email support"
+        },
+        "fees": [
+          { "type": "Margin of products sold", "percentage": "30%" },
+          { "type": "Tax credit", "percentage": "20%" }
+        ],
+        "sellingPoint": "Get started on managing your inventory"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Bigger shops, 2+ FTE",
+        "price": "39€",
+        "period": "/month",
+        "description": "For growing businesses that need team collaboration and advanced features.",
+        "features": {
+          "0": "Unlimited data retention",
+          "1": "2+ user seats",
+          "2": "Role management",
+          "3": "Priority support",
+          "4": "Advanced analytics"
+        },
+        "fees": [
+          { "type": "Margin of products sold", "percentage": "30%" },
+          { "type": "Tax credit", "percentage": "20%" }
+        ],
+        "sellingPoint": "Manage roles in your shop effectively"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "subtitle": "For chains",
+        "price": "Custom",
+        "description": "Tailored solution for multi-location businesses with advanced needs.",
+        "features": {
+          "0": "Multiple POS management",
+          "1": "Advanced analytics",
+          "2": "Custom integrations",
+          "3": "Dedicated support",
+          "4": "Custom pricing per POS"
+        },
+        "fees": [
+          { "type": "Margin of products sold", "percentage": "Custom%" },
+          { "type": "Tax credit", "percentage": "Custom%" }
+        ],
+        "sellingPoint": "Manage multiple POS and get advanced analytics"
+      }
+    }
+  },
+  "featurespage": {
+    "title": "Powerful Features",
+    "subtitle": "Everything you need to manage your inventory efficiently with AI-powered insights and real-time tracking.",
+    "features": {
+      "dashboard": {
+        "title": "Real-time Dashboard",
+        "description": "Get instant insights into your inventory with our comprehensive dashboard. Track stock levels, monitor expiration dates, and identify trends at a glance. Make informed decisions with real-time data visualization and automated alerts."
+      },
+      "scanning": {
+        "title": "Smart Scanning",
+        "description": "Effortlessly manage your inventory with our advanced scanning technology. Simply scan products to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
+      },
+      "analytics": {
+        "title": "Performance Analytics",
+        "description": "Understand your business performance with detailed analytics and reporting. Track waste reduction, revenue growth, and operational efficiency. Get actionable insights to optimize your inventory management strategy."
+      },
+      "ai": {
+        "title": "AI-Powered Insights",
+        "description": "Leverage artificial intelligence to optimize your inventory management. Get smart recommendations for reordering, promotional strategies, and waste reduction. Our AI learns from your patterns to provide personalized suggestions."
+      }
+    },
+    "additionalFeatures": {
+      "title": "Everything You Need",
+      "expiry": {
+        "title": "Expiry Tracking",
+        "description": "Never miss expiration dates with automated alerts and LIFO management."
+      },
+      "security": {
+        "title": "Data Security",
+        "description": "Enterprise-grade security to protect your business data and customer information."
+      },
+      "performance": {
+        "title": "Fast Performance",
+        "description": "Lightning-fast processing and real-time updates for seamless operations."
+      },
+      "tracking": {
+        "title": "Accurate Tracking",
+        "description": "Precise inventory tracking with barcode scanning and automated updates."
+      },
+      "timeSaving": {
+        "title": "Time Savings",
+        "description": "Automate routine tasks and save hours of manual inventory management."
+      },
+      "collaboration": {
+        "title": "Team Collaboration",
+        "description": "Multi-user support with role-based permissions and team management."
+      }
+    },
+    "mockData": {
+      "dashboard": {
+        "inventoryOverview": "Inventory Overview",
+        "items": "Items",
+        "fromLastMonth": "from last month",
+        "expiringSoon": "Expiring Soon",
+        "lowStock": "Low Stock",
+        "totalProducts": "Total Products",
+        "expiringItems": "Expiring Items",
+        "wasteReduced": "Waste Reduced",
+        "revenueIncrease": "Revenue Increase",
+        "performanceAnalytics": "Performance Analytics"
+      },
+      "scanning": {
+        "scanningActive": "Scanning Active",
+        "productScanned": "Product Scanned",
+        "organicMilk": "Organic Milk - 1L",
+        "expDate": "Exp: 2024-01-15 | Stock: 24 units"
+      },
+      "ai": {
+        "title": "AI Recommendations",
+        "reorderMilk": "Reorder milk products",
+        "reorderMilkDesc": "Based on consumption patterns",
+        "promoteExpiring": "Promote expiring items",
+        "promoteExpiringDesc": "23 items expire in 2 days"
+      }
+    },
+    "cta": {
+      "title": "Ready to Transform Your Inventory?",
+      "description": "Transform your inventory management with LIFO.AI and start reducing waste today.",
+      "button": "Start Free Trial"
     }
   }
 }

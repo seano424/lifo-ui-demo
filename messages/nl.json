@@ -962,6 +962,7 @@
   "marketing": {
     "nav": {
       "about": "Over",
+      "features": "Services",
       "resources": "Bronnen",
       "product": "Product",
       "pricing": "Prijzen",
@@ -1210,6 +1211,8 @@
     },
     "businessStats": {
       "title": "Maximaliseer uw winst, minimaliseer uw verlies",
+      "subtitle": "Zie de echte impact die LIFO.AI heeft op bedrijven zoals het uwe",
+      "disclaimer": "Resultaten kunnen variëren. Gebaseerd op gemiddelde klantgegevens over 12 maanden.",
       "revenue": {
         "label": "Omzetstijging",
         "description": "Gemiddelde toename in bedrijfsomzet",
@@ -1972,41 +1975,171 @@
       "searchError": "Er ging iets mis tijdens het zoeken. Probeer het opnieuw."
     }
   },
-  "storeSettings": {
-    "addStoreDetails": {
-      "title": {
-        "manual": "Winkeldetails toevoegen",
-        "complete": "Winkelinformatie voltooien"
+  "pricingpage": {
+    "title": "Kies uw plan",
+    "subtitle": "Begin met onze gratis proefperiode en schaal mee met uw groei. Geen vastlegging, volledige ondersteuning inbegrepen.",
+    "badges": {
+      "mostPopular": "Meest populair",
+      "comingSoon": "Binnenkort beschikbaar"
+    },
+    "common": {
+      "getStarted": "Aan de slag",
+      "comingSoon": "Binnenkort beschikbaar",
+      "winWinFees": "Win-Win kosten:",
+      "note": "Opmerking:",
+      "pricingNote": "Prijzen kunnen wijzigen. Alle kosten moeten nog worden bevestigd."
+    },
+    "plans": {
+      "freeTrial": {
+        "title": "Gratis proefperiode",
+        "subtitle": "Pilot winkels",
+        "price": "Gratis",
+        "period": "3 maanden",
+        "description": "Alle functies, zonder beperkingen, voor een gratis proefperiode van 3 maanden.",
+        "features": {
+          "0": "3 dagen onboarding en training",
+          "1": "Volledige ondersteuning inbegrepen",
+          "2": "Geen vastlegging - stop wanneer u wilt",
+          "3": "Alle functies ontgrendeld"
+        },
+        "sellingPoint": "Perfect om onze oplossing risicovrij te testen"
       },
-      "subtitle": {
-        "manual": "Voer uw winkelinformatie in",
-        "complete": "Selecteer uw winkeltype en controleer de details"
+      "light": {
+        "title": "Light",
+        "subtitle": "Kleine winkels, slechts 1 plaats",
+        "price": "9€",
+        "period": "/maand",
+        "description": "Voor kleine winkels die beginnen met hun voorraadbeheerjournaal.",
+        "features": {
+          "0": "Maximaal 3 maanden data in Dashboard",
+          "1": "1 gebruikersplaats inbegrepen",
+          "2": "Basis voorraad functies",
+          "3": "E-mail ondersteuning"
+        },
+        "fees": [
+          { "type": "Marge van verkochte producten", "percentage": "30%" },
+          { "type": "Belastingkrediet", "percentage": "20%" }
+        ],
+        "sellingPoint": "Begin met het beheren van uw voorraad"
       },
-      "labels": {
-        "storeName": "Winkelnaam",
-        "businessName": "Bedrijfsnaam (Optioneel)",
-        "address": "Adres",
-        "city": "Stad",
-        "postalCode": "Postcode",
-        "country": "Land",
-        "phone": "Telefoonnummer (Optioneel)",
-        "storeType": "Winkeltype"
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Grotere winkels, 2+ FTE",
+        "price": "39€",
+        "period": "/maand",
+        "description": "Voor groeiende bedrijven die teamsamenwerking en geavanceerde functies nodig hebben.",
+        "features": {
+          "0": "Onbeperkte gegevensretentie",
+          "1": "2+ gebruikersplaatsen",
+          "2": "Rolbeheer",
+          "3": "Prioritaire ondersteuning",
+          "4": "Geavanceerde analyses"
+        },
+        "fees": [
+          { "type": "Marge van verkochte producten", "percentage": "30%" },
+          { "type": "Belastingkrediet", "percentage": "20%" }
+        ],
+        "sellingPoint": "Beheer rollen in uw winkel effectief"
       },
-      "placeholders": {
-        "storeName": "Uw winkelnaam",
-        "businessName": "Indien anders dan winkelnaam",
-        "address": "Hoofdstraat 123",
-        "city": "Amsterdam",
-        "postalCode": "1012 AB",
-        "country": "Nederland",
-        "phone": "06 12 34 56 78",
-        "selectStoreType": "Selecteer winkeltype"
-      },
-      "buttons": {
-        "back": "Terug",
-        "creating": "Winkel aanmaken...",
-        "create": "Winkel aanmaken"
+      "enterprise": {
+        "title": "Enterprise",
+        "subtitle": "Voor ketens",
+        "price": "Op maat",
+        "description": "Oplossing op maat voor bedrijven met meerdere locaties en geavanceerde behoeften.",
+        "features": {
+          "0": "Beheer van meerdere kassasystemen",
+          "1": "Geavanceerde analyses",
+          "2": "Aangepaste integraties",
+          "3": "Toegewijde ondersteuning",
+          "4": "Aangepaste prijsstelling per kassasysteem"
+        },
+        "fees": [
+          { "type": "Marge van verkochte producten", "percentage": "Op maat%" },
+          { "type": "Belastingkrediet", "percentage": "Op maat%" }
+        ],
+        "sellingPoint": "Beheer meerdere kassasystemen en krijg geavanceerde analyses"
       }
+    }
+  },
+  "featurespage": {
+    "title": "Krachtige functionaliteiten",
+    "subtitle": "Alles wat u nodig heeft om uw voorraad efficiënt te beheren met AI-aangedreven inzichten en realtime tracking.",
+    "features": {
+      "dashboard": {
+        "title": "Realtime dashboard",
+        "description": "Krijg directe inzichten in uw voorraad met ons uitgebreide dashboard. Volg voorraadniveaus, monitor vervaldatums en identificeer trends in één oogopslag. Neem weloverwogen beslissingen met realtime datavisualisatie en geautomatiseerde waarschuwingen."
+      },
+      "scanning": {
+        "title": "Slimme scanning",
+        "description": "Beheer moeiteloos uw voorraad met onze geavanceerde scantechnologie. Scan eenvoudig producten om voorraadniveaus bij te werken, vervaldatums te volgen en nauwkeurige records bij te houden. Werkt naadloos op elk mobiel apparaat."
+      },
+      "analytics": {
+        "title": "Prestatie analyses",
+        "description": "Begrijp uw bedrijfsprestaties met gedetailleerde analyses en rapportage. Volg afvalvermindering, omzetgroei en operationele efficiëntie. Krijg bruikbare inzichten om uw voorraadbeheerstrategie te optimaliseren."
+      },
+      "ai": {
+        "title": "AI-aangedreven inzichten",
+        "description": "Benut kunstmatige intelligentie om uw voorraadbeheer te optimaliseren. Krijg slimme aanbevelingen voor herbestelling, promotiestrategieën en afvalvermindering. Onze AI leert van uw patronen om gepersonaliseerde suggesties te bieden."
+      }
+    },
+    "additionalFeatures": {
+      "title": "Alles wat u nodig heeft",
+      "expiry": {
+        "title": "Vervaldatum tracking",
+        "description": "Mis nooit vervaldatums met geautomatiseerde waarschuwingen en LIFO-beheer."
+      },
+      "security": {
+        "title": "Gegevensbeveiliging",
+        "description": "Beveiliging op ondernemingsniveau om uw bedrijfsgegevens en klantinformatie te beschermen."
+      },
+      "performance": {
+        "title": "Snelle prestaties",
+        "description": "Bliksemsnelle verwerking en realtime updates voor naadloze operaties."
+      },
+      "tracking": {
+        "title": "Nauwkeurige tracking",
+        "description": "Precieze voorraadtracking met barcodescanning en geautomatiseerde updates."
+      },
+      "timeSaving": {
+        "title": "Tijdsbesparing",
+        "description": "Automatiseer routinetaken en bespaar uren handmatig voorraadbeheer."
+      },
+      "collaboration": {
+        "title": "Teamsamenwerking",
+        "description": "Multi-gebruiker ondersteuning met rolgebaseerde machtigingen en teambeheer."
+      }
+    },
+    "mockData": {
+      "dashboard": {
+        "inventoryOverview": "Voorraad overzicht",
+        "items": "Artikelen",
+        "fromLastMonth": "van vorige maand",
+        "expiringSoon": "Verloopt binnenkort",
+        "lowStock": "Lage voorraad",
+        "totalProducts": "Totaal producten",
+        "expiringItems": "Verlopende artikelen",
+        "wasteReduced": "Afval verminderd",
+        "revenueIncrease": "Omzetstijging",
+        "performanceAnalytics": "Prestatie analyses"
+      },
+      "scanning": {
+        "scanningActive": "Scannen actief",
+        "productScanned": "Product gescand",
+        "organicMilk": "Biologische melk - 1L",
+        "expDate": "Verv: 15-01-2024 | Voorraad: 24 stuks"
+      },
+      "ai": {
+        "title": "AI Aanbevelingen",
+        "reorderMilk": "Zuivelproducten herbestellen",
+        "reorderMilkDesc": "Gebaseerd op consumptiepatronen",
+        "promoteExpiring": "Verlopende artikelen promoten",
+        "promoteExpiringDesc": "23 artikelen verlopen over 2 dagen"
+      }
+    },
+    "cta": {
+      "title": "Klaar om uw voorraad te transformeren?",
+      "description": "Transformeer uw voorraadbeheer met LIFO.AI en begin vandaag nog met afvalvermindering.",
+      "button": "Start gratis proefperiode"
     }
   }
 }
