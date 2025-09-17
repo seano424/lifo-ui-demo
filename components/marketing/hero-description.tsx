@@ -1,16 +1,22 @@
-'use client'
-import { useTranslations } from 'next-intl'
-import { Typography } from '@/components/ui/typography'
+"use client";
+
+import { Typography } from "@/components/ui/typography";
+import { useTranslations } from "next-intl";
+import React from "react";
 
 export function HeroDescription() {
-  const t = useTranslations('landingpage.hero')
+  const t = useTranslations("landingpage.hero");
 
   return (
-    <Typography variant="h3" as="p" className="mb-12 text-muted-foreground max-w-3xl mx-auto">
-      {t('subtitle', {
+    <Typography
+      variant="h3"
+      as="p"
+      className="mb-12 text-muted-foreground max-w-3xl mx-auto"
+    >
+      {t("subtitle", {
         fallback:
-          'Simplify your inventory management, optimize your costs and make informed decisions with our intelligent stock analysis platform.',
+          "Simplify your inventory management, optimize your costs and make informed decisions with our intelligent stock analysis platform.",
       })}
     </Typography>
-  )
+  );
 }

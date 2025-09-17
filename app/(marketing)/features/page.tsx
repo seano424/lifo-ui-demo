@@ -16,6 +16,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface FeatureCardProps {
   title: string;
@@ -73,6 +74,8 @@ function FeatureCard({
 }
 
 function MockDashboard() {
+  const t = useTranslations("featurespage.mockData.dashboard");
+
   return (
     <div className="w-full space-y-4">
       <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-4 sm:p-6 border border-primary-100">
@@ -81,7 +84,7 @@ function MockDashboard() {
             variant="p"
             className="text-sm sm:text-base font-medium text-primary-800"
           >
-            Inventory Overview
+            {t("inventoryOverview")}
           </Typography>
           <TrendingUp size={20} className="text-primary-600" />
         </div>
@@ -90,17 +93,17 @@ function MockDashboard() {
             variant="h3"
             className="text-2xl sm:text-3xl font-bold text-primary-900"
           >
-            1,247 Items
+            1,247 {t("items")}
           </Typography>
           <Typography variant="p" className="text-sm text-primary-700">
-            ↗ +12% from last month
+            ↗ +12% {t("fromLastMonth")}
           </Typography>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 bg-white/80 rounded-xl p-3 sm:p-4 border border-gray-100">
           <Typography variant="p" className="text-xs sm:text-sm text-gray-600">
-            Expiring Soon
+            {t("expiringSoon")}
           </Typography>
           <Typography
             variant="h4"
@@ -111,7 +114,7 @@ function MockDashboard() {
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 bg-white/80 rounded-xl p-3 sm:p-4 border border-gray-100">
           <Typography variant="p" className="text-xs sm:text-sm text-gray-600">
-            Low Stock
+            {t("lowStock")}
           </Typography>
           <Typography
             variant="h4"
@@ -126,6 +129,8 @@ function MockDashboard() {
 }
 
 function MockScanning() {
+  const t = useTranslations("featurespage.mockData.scanning");
+
   return (
     <div className="w-full space-y-4 flex flex-col items-center">
       <div className="bg-gradient-to-br from-secondary-50 to-primary-50 rounded-2xl p-4 sm:p-6 border border-secondary-100 w-full max-w-sm">
@@ -137,7 +142,7 @@ function MockScanning() {
             variant="p"
             className="text-sm sm:text-base font-medium text-secondary-800"
           >
-            Scanning Active
+            {t("scanningActive")}
           </Typography>
         </div>
         <div className="flex flex-col gap-1">
@@ -145,20 +150,20 @@ function MockScanning() {
             variant="h3"
             className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2"
           >
-            Product Scanned
+            {t("productScanned")}
           </Typography>
           <Typography
             variant="p"
             className="text-sm sm:text-base text-secondary-700"
           >
-            Organic Milk - 1L
+            {t("organicMilk")}
           </Typography>
         </div>
         <Typography
           variant="p"
           className="text-xs sm:text-sm text-secondary-600"
         >
-          Exp: 2024-01-15 | Stock: 24 units
+          {t("expDate")}
         </Typography>
       </div>
       <div className="flex items-center justify-center">
@@ -169,6 +174,8 @@ function MockScanning() {
 }
 
 function MockAnalytics() {
+  const t = useTranslations("featurespage.mockData.dashboard");
+
   return (
     <div className="w-full space-y-4">
       <div className="bg-gradient-to-br from-white/90 to-white/70 rounded-2xl p-4 sm:p-6 border border-gray-200">
@@ -176,7 +183,7 @@ function MockAnalytics() {
           variant="h4"
           className="text-lg sm:text-xl font-bold text-gray-800 mb-4"
         >
-          Performance Analytics
+          {t("performanceAnalytics")}
         </Typography>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -184,7 +191,7 @@ function MockAnalytics() {
               variant="p"
               className="text-sm sm:text-base text-gray-600"
             >
-              Waste Reduction
+              {t("wasteReduced")}
             </Typography>
             <Typography
               variant="p"
@@ -204,7 +211,7 @@ function MockAnalytics() {
               variant="p"
               className="text-sm sm:text-base text-gray-600"
             >
-              Revenue Increase
+              {t("revenueIncrease")}
             </Typography>
             <Typography
               variant="p"
@@ -226,6 +233,8 @@ function MockAnalytics() {
 }
 
 function MockAI() {
+  const t = useTranslations("featurespage.mockData.ai");
+
   return (
     <div className="w-full space-y-4">
       <div className="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl p-6 border border-primary-100">
@@ -235,7 +244,7 @@ function MockAI() {
             variant="h4"
             className="text-lg font-bold text-primary-800"
           >
-            AI Recommendations
+            {t("title")}
           </Typography>
         </div>
         <div className="space-y-3">
@@ -245,10 +254,10 @@ function MockAI() {
                 variant="p"
                 className="text-sm font-medium text-primary-800"
               >
-                📦 Reorder milk products
+                📦 {t("reorderMilk")}
               </Typography>
               <Typography variant="p" className="text-xs text-primary-600">
-                Based on consumption patterns
+                {t("reorderMilkDesc")}
               </Typography>
             </div>
           </div>
@@ -258,10 +267,10 @@ function MockAI() {
                 variant="p"
                 className="text-sm font-medium text-primary-800"
               >
-                ⚡ Promote expiring items
+                ⚡ {t("promoteExpiring")}
               </Typography>
               <Typography variant="p" className="text-xs text-primary-600">
-                23 items expire in 2 days
+                {t("promoteExpiringDesc")}
               </Typography>
             </div>
           </div>
@@ -272,6 +281,8 @@ function MockAI() {
 }
 
 export default function FeaturesPage() {
+  const t = useTranslations("featurespage");
+
   return (
     <div className="min-h-screen py-12 sm:py-16 lg:py-20 px-4">
       <div className="max-w-7xl mx-auto">
@@ -281,14 +292,13 @@ export default function FeaturesPage() {
             as="h1"
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-4 sm:mb-6"
           >
-            Powerful Features
+            {t("title")}
           </Typography>
           <Typography
             variant="p"
             className="text-lg sm:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed px-4"
           >
-            Everything you need to manage your inventory efficiently with
-            AI-powered insights and real-time tracking.
+            {t("subtitle")}
           </Typography>
         </div>
 
@@ -297,8 +307,8 @@ export default function FeaturesPage() {
           <div className="w-full max-w-6xl">
             {/* Real-time Dashboard */}
             <FeatureCard
-              title="Real-time Dashboard"
-              description="Get instant insights into your inventory with our comprehensive dashboard. Track stock levels, monitor expiration dates, and identify trends at a glance. Make informed decisions with real-time data visualization and automated alerts."
+              title={t("features.dashboard.title")}
+              description={t("features.dashboard.description")}
               icon={<BarChart3 size={32} />}
               image={<MockDashboard />}
             />
@@ -307,8 +317,8 @@ export default function FeaturesPage() {
           <div className="w-full max-w-6xl">
             {/* Smart Scanning */}
             <FeatureCard
-              title="Smart Scanning"
-              description="Effortlessly manage your inventory with our advanced scanning technology. Simply scan products to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
+              title={t("features.scanning.title")}
+              description={t("features.scanning.description")}
               icon={<Smartphone size={32} />}
               image={<MockScanning />}
               reversed
@@ -318,8 +328,8 @@ export default function FeaturesPage() {
           <div className="w-full max-w-6xl">
             {/* Performance Analytics */}
             <FeatureCard
-              title="Performance Analytics"
-              description="Understand your business performance with detailed analytics and reporting. Track waste reduction, revenue growth, and operational efficiency. Get actionable insights to optimize your inventory management strategy."
+              title={t("features.analytics.title")}
+              description={t("features.analytics.description")}
               icon={<TrendingUp size={32} />}
               image={<MockAnalytics />}
             />
@@ -328,8 +338,8 @@ export default function FeaturesPage() {
           <div className="w-full max-w-6xl">
             {/* AI-Powered Insights */}
             <FeatureCard
-              title="AI-Powered Insights"
-              description="Leverage artificial intelligence to optimize your inventory management. Get smart recommendations for reordering, promotional strategies, and waste reduction. Our AI learns from your patterns to provide personalized suggestions."
+              title={t("features.ai.title")}
+              description={t("features.ai.description")}
               icon={<Bot size={32} />}
               image={<MockAI />}
               reversed
@@ -344,46 +354,40 @@ export default function FeaturesPage() {
             as="h2"
             className=" text-4xl sm:text-5xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-12 lg:mb-16 pb-2"
           >
-            Everything You Need
+            {t("additionalFeatures.title")}
           </Typography>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {[
               {
                 icon: <Calendar size={24} />,
-                title: "Expiry Tracking",
-                description:
-                  "Never miss expiration dates with automated alerts and LIFO management.",
+                title: t("additionalFeatures.expiry.title"),
+                description: t("additionalFeatures.expiry.description"),
               },
               {
                 icon: <Shield size={24} />,
-                title: "Data Security",
-                description:
-                  "Enterprise-grade security to protect your business data and customer information.",
+                title: t("additionalFeatures.security.title"),
+                description: t("additionalFeatures.security.description"),
               },
               {
                 icon: <Zap size={24} />,
-                title: "Fast Performance",
-                description:
-                  "Lightning-fast processing and real-time updates for seamless operations.",
+                title: t("additionalFeatures.performance.title"),
+                description: t("additionalFeatures.performance.description"),
               },
               {
                 icon: <Target size={24} />,
-                title: "Accurate Tracking",
-                description:
-                  "Precise inventory tracking with barcode scanning and automated updates.",
+                title: t("additionalFeatures.tracking.title"),
+                description: t("additionalFeatures.tracking.description"),
               },
               {
                 icon: <Clock size={24} />,
-                title: "Time Savings",
-                description:
-                  "Automate routine tasks and save hours of manual inventory management.",
+                title: t("additionalFeatures.timeSaving.title"),
+                description: t("additionalFeatures.timeSaving.description"),
               },
               {
                 icon: <Users size={24} />,
-                title: "Team Collaboration",
-                description:
-                  "Multi-user support with role-based permissions and team management.",
+                title: t("additionalFeatures.collaboration.title"),
+                description: t("additionalFeatures.collaboration.description"),
               },
             ].map((feature, index) => (
               <div
@@ -419,20 +423,20 @@ export default function FeaturesPage() {
               variant="h2"
               className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-4 lg:mb-6"
             >
-              Ready to Transform Your Inventory?
+              {t("cta.title")}
             </Typography>
             <Typography
               variant="p"
               className="text-lg sm:text-xl text-foreground/70 mb-6 lg:mb-8 max-w-2xl mx-auto px-4"
             >
-              Join thousands of businesses already using LIFO.AI to optimize
-              their inventory management and reduce waste.
+              {t("cta.description")}
             </Typography>
             <Button
               asLink
               href="/pricing"
-              className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-              Start Free Trial
+              className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              {t("cta.button")}
               <ArrowRight size={20} className="ml-2" />
             </Button>
           </div>

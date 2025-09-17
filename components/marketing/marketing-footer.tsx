@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { Typography } from "@/components/ui/typography";
@@ -107,7 +108,7 @@ export function MarketingFooter() {
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
                 >
-                    <Linkedin size={16} />
+                  <Linkedin size={16} />
                 </a>
                 <div className="flex items-center gap-2">
                   <ThemeSwitcher />

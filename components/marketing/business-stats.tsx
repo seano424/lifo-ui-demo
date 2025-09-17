@@ -1,13 +1,6 @@
 "use client";
 import { Typography } from "@/components/ui/typography";
-import {
-  ArrowUpRight,
-  Award,
-  Shield,
-  Sparkles,
-  Target,
-  TrendingUp,
-} from "lucide-react";
+import { Award, Shield, Sparkles, TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface StatProps {
@@ -109,7 +102,7 @@ export function BusinessStats() {
             variant="p"
             className="text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed"
           >
-            See the real impact LIFO.AI has on businesses like yours
+            {t("subtitle")}
           </Typography>
         </div>
 
@@ -146,8 +139,8 @@ export function BusinessStats() {
         <div className="text-center mt-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-100/50 border border-primary-200/90">
             <Typography variant="p" className="text-sm text-foreground/70">
-              💡 <strong>Results may vary.</strong> Based on average customer
-              data over 12 months.
+              💡 <strong>{t("disclaimer").split(".")[0]}.</strong>{" "}
+              {t("disclaimer").split(". ")[1]}.
             </Typography>
           </div>
         </div>

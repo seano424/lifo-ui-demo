@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { ArrowRight, Building2, Check, Sparkles, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface PricingCardProps {
   title: string;
@@ -31,14 +32,16 @@ function PricingCard({
   isComingSoon = false,
   icon,
 }: PricingCardProps) {
+  const t = useTranslations("pricingpage");
+
   return (
     <div className="group relative flex flex-col p-8 rounded-3xl backdrop-blur-md border transition-all duration-500 h-full bg-gradient-to-br from-white/80 to-white/60 border-white/20 shadow-lg hover:shadow-xl hover:from-white/90 hover:to-white/70">
       {/* Popular badge */}
       {isPopular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-gradient-to-r from-primary-700 to-secondary-700 text-white px-2 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
+          <div className="text-center bg-gradient-to-r from-primary-700 to-secondary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
             <Sparkles size={16} />
-            Most Popular
+            {t("badges.mostPopular")}
           </div>
         </div>
       )}
@@ -46,8 +49,8 @@ function PricingCard({
       {/* Coming Soon badge */}
       {isComingSoon && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-full text-xs font-medium">
-            Coming Soon
+          <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap">
+            {t("badges.comingSoon")}
           </div>
         </div>
       )}
@@ -119,7 +122,7 @@ function PricingCard({
             variant="h4"
             className="text-sm font-semibold text-foreground/80 mb-2"
           >
-            Win-Win Fees:
+            {t("common.winWinFees")}
           </Typography>
           {fees.map((fee, index) => (
             <div key={index} className="flex justify-between items-center">
@@ -158,7 +161,7 @@ function PricingCard({
         }`}
         disabled={isComingSoon}
       >
-        {isComingSoon ? "Coming Soon" : "Get Started"}
+        {isComingSoon ? t("common.comingSoon") : t("common.getStarted")}
         {!isComingSoon && <ArrowRight size={16} className="ml-2" />}
       </Button>
     </div>
@@ -166,9 +169,10 @@ function PricingCard({
 }
 
 export default function PricingPage() {
+  const t = useTranslations("pricingpage");
+
   return (
     <div className="min-h-screen py-20 px-4 relative overflow-hidden">
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex flex-col items-center justify-center mb-16">
@@ -176,14 +180,13 @@ export default function PricingPage() {
             as="h1"
             className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
           >
-            Choose Your Plan
+            {t("title")}
           </Typography>
           <Typography
             variant="p"
             className="text-center text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed"
           >
-            Start with our free trial and scale as you grow. No lock-in, full
-            support included.
+            {t("subtitle")}
           </Typography>
         </div>
 
@@ -191,84 +194,102 @@ export default function PricingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 mt-8">
           {/* Free Trial */}
           <PricingCard
-            title="Free Trial"
-            subtitle="Pilot shops"
-            price="Free"
-            period="3 months"
-            description="All features, with no limitation, for a 3-month free trial."
+            title={t("plans.freeTrial.title")}
+            subtitle={t("plans.freeTrial.subtitle")}
+            price={t("plans.freeTrial.price")}
+            period={t("plans.freeTrial.period")}
+            description={t("plans.freeTrial.description")}
             features={[
-              "3 days of Onboarding and Training",
-              "Full support included",
-              "No lock-in - exit anytime",
-              "All features unlocked",
+              t("plans.freeTrial.features.0"),
+              t("plans.freeTrial.features.1"),
+              t("plans.freeTrial.features.2"),
+              t("plans.freeTrial.features.3"),
             ]}
             fees={[]}
-            sellingPoint="Perfect for testing our solution risk-free"
+            sellingPoint={t("plans.freeTrial.sellingPoint")}
             icon={<Sparkles size={24} />}
           />
 
           {/* Light */}
           <PricingCard
-            title="Light"
-            subtitle="Small shops, 1 seat only"
-            price="9€"
-            period="/month"
-            description="For small shops starting their inventory management journey."
+            title={t("plans.light.title")}
+            subtitle={t("plans.light.subtitle")}
+            price={t("plans.light.price")}
+            period={t("plans.light.period")}
+            description={t("plans.light.description")}
             features={[
-              "Maximum 3 months of data in Dashboard",
-              "1 user seat included",
-              "Core inventory features",
-              "Email support",
+              t("plans.light.features.0"),
+              t("plans.light.features.1"),
+              t("plans.light.features.2"),
+              t("plans.light.features.3"),
             ]}
             fees={[
-              { type: "Margin of products sold", percentage: "30%" },
-              { type: "Tax credit", percentage: "20%" },
+              {
+                type: t("plans.light.fees.0.type"),
+                percentage: t("plans.light.fees.0.percentage"),
+              },
+              {
+                type: t("plans.light.fees.1.type"),
+                percentage: t("plans.light.fees.1.percentage"),
+              },
             ]}
-            sellingPoint="Get started on managing your inventory"
+            sellingPoint={t("plans.light.sellingPoint")}
             icon={<Users size={24} />}
           />
 
           {/* Pro */}
           <PricingCard
-            title="Pro"
-            subtitle="Bigger shops, 2+ FTE"
-            price="39€"
-            period="/month"
-            description="For growing businesses that need team collaboration and advanced features."
+            title={t("plans.pro.title")}
+            subtitle={t("plans.pro.subtitle")}
+            price={t("plans.pro.price")}
+            period={t("plans.pro.period")}
+            description={t("plans.pro.description")}
             features={[
-              "Unlimited data retention",
-              "2+ user seats",
-              "Role management",
-              "Priority support",
-              "Advanced analytics",
+              t("plans.pro.features.0"),
+              t("plans.pro.features.1"),
+              t("plans.pro.features.2"),
+              t("plans.pro.features.3"),
+              t("plans.pro.features.4"),
             ]}
             fees={[
-              { type: "Margin of products sold", percentage: "30%" },
-              { type: "Tax credit", percentage: "20%" },
+              {
+                type: t("plans.pro.fees.0.type"),
+                percentage: t("plans.pro.fees.0.percentage"),
+              },
+              {
+                type: t("plans.pro.fees.1.type"),
+                percentage: t("plans.pro.fees.1.percentage"),
+              },
             ]}
-            sellingPoint="Manage roles in your shop effectively"
+            sellingPoint={t("plans.pro.sellingPoint")}
             isPopular={true}
             icon={<Building2 size={24} />}
           />
 
           {/* Enterprise */}
           <PricingCard
-            title="Enterprise"
-            subtitle="For chains"
-            price="Custom"
-            description="Tailored solution for multi-location businesses with advanced needs."
+            title={t("plans.enterprise.title")}
+            subtitle={t("plans.enterprise.subtitle")}
+            price={t("plans.enterprise.price")}
+            description={t("plans.enterprise.description")}
             features={[
-              "Multiple POS management",
-              "Advanced analytics",
-              "Custom integrations",
-              "Dedicated support",
-              "Custom pricing per POS",
+              t("plans.enterprise.features.0"),
+              t("plans.enterprise.features.1"),
+              t("plans.enterprise.features.2"),
+              t("plans.enterprise.features.3"),
+              t("plans.enterprise.features.4"),
             ]}
             fees={[
-              { type: "Margin of products sold", percentage: "Custom%" },
-              { type: "Tax credit", percentage: "Custom%" },
+              {
+                type: t("plans.enterprise.fees.0.type"),
+                percentage: t("plans.enterprise.fees.0.percentage"),
+              },
+              {
+                type: t("plans.enterprise.fees.1.type"),
+                percentage: t("plans.enterprise.fees.1.percentage"),
+              },
             ]}
-            sellingPoint="Manage multiple POS and get advanced analytics"
+            sellingPoint={t("plans.enterprise.sellingPoint")}
             isComingSoon={true}
             icon={<Building2 size={24} />}
           />
@@ -278,8 +299,7 @@ export default function PricingPage() {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-100">
             <Typography variant="p" className="text-sm text-foreground/70">
-              💡 <strong>Note:</strong> Pricing is subject to change. All fees
-              are to be confirmed.
+              💡 <strong>{t("common.note")}</strong> {t("common.pricingNote")}
             </Typography>
           </div>
         </div>
