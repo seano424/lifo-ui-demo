@@ -25,21 +25,9 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
 
   const batchActionsQuery = useBatchActionsInfinite(activeStoreId || null, pageSize)
 
-  console.log('[ActionHistoryTab] Batch actions query status:', {
-    status: batchActionsQuery.status,
-    fetchStatus: batchActionsQuery.fetchStatus,
-    isLoading: batchActionsQuery.isLoading,
-    isFetching: batchActionsQuery.isFetching,
-    isStale: batchActionsQuery.isStale,
-    dataUpdatedAt: batchActionsQuery.dataUpdatedAt,
-    data: batchActionsQuery.data,
-    error: batchActionsQuery.error,
-  })
-
   // Force refetch when tab becomes active and data is stale
   useEffect(() => {
     if (batchActionsQuery.isStale) {
-      console.log('[ActionHistoryTab] Refetching stale batch actions data')
       batchActionsQuery.refetch()
     }
   }, [batchActionsQuery.isStale, batchActionsQuery.refetch])
@@ -54,30 +42,12 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
 
   // Memoized batch actions processing with filtering and sorting
   const processedBatchActions = useMemo(() => {
-    console.log('[ActionHistoryTab.processedBatchActions] Debug info:', {
-      hasBatchActionsData: !!batchActionsData,
-      hasPages: !!batchActionsData?.pages,
-      pagesLength: batchActionsData?.pages?.length,
-      firstPageData: batchActionsData?.pages?.[0]?.data,
-      firstPageCount: batchActionsData?.pages?.[0]?.count,
-      batchActionsData,
-      isBatchActionsLoading,
-    })
-
     if (!batchActionsData?.pages) {
-      console.log('[ActionHistoryTab.processedBatchActions] Early return - no data')
       return []
     }
 
     let actions = batchActionsData.pages.flatMap(page => page.data)
-    console.log('[ActionHistoryTab.processedBatchActions] Starting with actions:', actions.length)
     if (actions.length > 0) {
-      console.log('[ActionHistoryTab.processedBatchActions] Sample action:', {
-        action_date: actions[0].action_date,
-        actual_action: actions[0].actual_action,
-        action_type: actions[0].action_type,
-        performed_at: actions[0].performed_at,
-      })
     }
 
     // Apply action type filter
@@ -117,9 +87,8 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
       })
     }
 
-    console.log('[ActionHistoryTab.processedBatchActions] Final actions:', actions.length)
     return actions
-  }, [batchActionsData, batchActionFilters, isBatchActionsLoading])
+  }, [batchActionsData, batchActionFilters])
 
   const handleBatchActionFiltersChange = (newFilters: BatchActionFiltersType) => {
     setBatchActionFilters(newFilters)

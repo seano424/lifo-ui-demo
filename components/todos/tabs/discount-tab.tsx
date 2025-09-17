@@ -22,14 +22,6 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
 
-  console.log('[DiscountTab] Component initialized with batch:', {
-    batchId: selectedBatch.batch_id,
-    productName: selectedBatch.product_name,
-    currentQuantity: selectedBatch.current_quantity,
-    potentialLoss: selectedBatch.potential_loss,
-    suggestedDiscount: selectedBatch.discount_percent,
-  })
-
   // Calculate price metrics
   const calculatePriceMetrics = () => {
     const originalPrice = selectedBatch.potential_loss / selectedBatch.current_quantity
@@ -57,12 +49,6 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
       recoveryPercentage,
     }
 
-    console.log('[DiscountTab] Price metrics calculated:', {
-      ...metrics,
-      useCustomPrice,
-      customPrice: useCustomPrice ? customPrice : 'N/A',
-    })
-
     return metrics
   }
 
@@ -76,11 +62,6 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
     else if (discount >= 20) likelihood = 85
     else if (discount >= 10) likelihood = 70
 
-    console.log('[DiscountTab] Sell likelihood calculated:', {
-      discountPercentage: discount,
-      likelihood,
-    })
-
     return likelihood
   }
 
@@ -88,12 +69,6 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Handle discount slider change
   const handleDiscountChange = (value: number) => {
-    console.log('[DiscountTab] Discount percentage changed:', {
-      oldValue: discountPercentage,
-      newValue: value,
-      wasUsingCustomPrice: useCustomPrice,
-    })
-
     setDiscountPercentage(value)
     setUseCustomPrice(false)
     setCustomPrice('')
@@ -101,29 +76,12 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Handle custom price input
   const handleCustomPriceChange = (value: string) => {
-    console.log('[DiscountTab] Custom price changed:', {
-      oldValue: customPrice,
-      newValue: value,
-      wasUsingSlider: !useCustomPrice,
-    })
-
     setCustomPrice(value)
     setUseCustomPrice(!!value)
   }
 
   // Handle discount execution
   const handleDiscountAction = async () => {
-    console.log('[DiscountTab] Starting discount process:', {
-      batchId: selectedBatch.batch_id,
-      productName: selectedBatch.product_name,
-      quantity: selectedBatch.current_quantity,
-      discountPercentage: priceMetrics.actualDiscountPercentage,
-      useCustomPrice,
-      customPrice: useCustomPrice ? customPrice : 'N/A',
-      originalPrice: priceMetrics.originalPrice,
-      newPrice: priceMetrics.newPrice,
-    })
-
     try {
       const params = {
         batchId: selectedBatch.batch_id,
@@ -134,17 +92,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.reason}`,
       }
 
-      console.log('[DiscountTab] Executing RPC with params:', params)
-
-      const result = await executeDiscount(params)
-
-      console.log('[DiscountTab] Discount successful:', {
-        result,
-        actionId: result?.action_id,
-        originalPrice: result?.original_price,
-        newPrice: result?.new_price,
-        savingsTotal: result?.savings_total,
-      })
+      const _result = await executeDiscount(params)
 
       // Success - close the modal
       onClose()
@@ -158,15 +106,6 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
       })
     }
   }
-
-  console.log('[DiscountTab] Component render state:', {
-    discountPercentage,
-    customPrice,
-    useCustomPrice,
-    isDiscounting,
-    priceMetrics,
-    sellLikelihood,
-  })
 
   return (
     <div>

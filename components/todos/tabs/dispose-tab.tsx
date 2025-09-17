@@ -31,26 +31,12 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   const [customDisposalReason, setCustomDisposalReason] = useState('')
   const [improveAlerts, setImproveAlerts] = useState(false)
 
-  console.log('[DisposeTab] Component initialized with batch:', {
-    batchId: selectedBatch.batch_id,
-    productName: selectedBatch.product_name,
-    currentQuantity: selectedBatch.current_quantity,
-    potentialLoss: selectedBatch.potential_loss,
-    urgency: selectedBatch.urgency,
-  })
-
   // Update quantity when batch changes or select all toggles
   useEffect(() => {
-    console.log('[DisposeTab] Batch or select all changed:', {
-      batchId: selectedBatch.batch_id,
-      currentQuantity: selectedBatch.current_quantity,
-      isDisposeSelectAll,
-    })
-
     if (isDisposeSelectAll) {
       setDisposeQuantity(selectedBatch.current_quantity)
     }
-  }, [selectedBatch.current_quantity, selectedBatch.batch_id, isDisposeSelectAll])
+  }, [selectedBatch.current_quantity, isDisposeSelectAll])
 
   // Calculate disposal metrics
   const calculateDisposalMetrics = () => {
@@ -65,12 +51,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       environmentalImpact: Math.round(wasteWeight * 2.1), // CO2 equivalent estimate
     }
 
-    console.log('[DisposeTab] Disposal metrics calculated:', {
-      ...metrics,
-      disposeQuantity,
-      remainingQuantity: selectedBatch.current_quantity - disposeQuantity,
-    })
-
     return metrics
   }
 
@@ -78,26 +58,12 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
-    console.log('[DisposeTab] Quantity changed:', {
-      oldValue: disposeQuantity,
-      newValue: value,
-      max: selectedBatch.current_quantity,
-    })
-
     setDisposeQuantity(value)
     setIsDisposeSelectAll(value === selectedBatch.current_quantity)
   }
 
   // Handle select all toggle
   const handleSelectAllToggle = () => {
-    console.log('[DisposeTab] Select all toggled:', {
-      wasSelectAll: isDisposeSelectAll,
-      willBeSelectAll: !isDisposeSelectAll,
-      quantity: isDisposeSelectAll
-        ? Math.floor(selectedBatch.current_quantity / 2)
-        : selectedBatch.current_quantity,
-    })
-
     if (isDisposeSelectAll) {
       setDisposeQuantity(Math.floor(selectedBatch.current_quantity / 2))
       setIsDisposeSelectAll(false)
@@ -109,11 +75,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
   // Handle disposal reason selection
   const handleDisposalReasonChange = (reason: string) => {
-    console.log('[DisposeTab] Disposal reason changed:', {
-      oldReason: selectedDisposalReason,
-      newReason: reason,
-    })
-
     setSelectedDisposalReason(reason)
     if (reason !== 'other') {
       setCustomDisposalReason('')
@@ -122,11 +83,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
   // Handle custom reason input
   const handleCustomReasonChange = (value: string) => {
-    console.log('[DisposeTab] Custom reason changed:', {
-      oldValue: customDisposalReason,
-      newValue: value,
-    })
-
     setCustomDisposalReason(value)
   }
 
@@ -134,16 +90,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   const handleDisposeAction = async () => {
     const disposalReason =
       selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
-
-    console.log('[DisposeTab] Starting disposal process:', {
-      batchId: selectedBatch.batch_id,
-      productName: selectedBatch.product_name,
-      quantity: disposeQuantity,
-      disposalReason,
-      selectedReason: selectedDisposalReason,
-      customReason: selectedDisposalReason === 'other' ? customDisposalReason : 'N/A',
-      improveAlerts,
-    })
 
     try {
       const params = {
@@ -153,16 +99,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.reason}${improveAlerts ? ' - User requested alert improvements' : ''}`,
       }
 
-      console.log('[DisposeTab] Executing RPC with params:', params)
-
-      const result = await executeDispose(params)
-
-      console.log('[DisposeTab] Disposal successful:', {
-        result,
-        actionId: result?.action_id,
-        remainingQuantity: result?.remaining_quantity,
-        totalLossValue: result?.total_loss_value,
-      })
+      const _result = await executeDispose(params)
 
       // Success - close the modal
       onClose()
@@ -177,16 +114,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       })
     }
   }
-
-  console.log('[DisposeTab] Component render state:', {
-    disposeQuantity,
-    isDisposeSelectAll,
-    selectedDisposalReason,
-    customDisposalReason,
-    improveAlerts,
-    isDisposing,
-    disposalMetrics,
-  })
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4">
@@ -293,10 +220,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
             type="checkbox"
             checked={improveAlerts}
             onChange={e => {
-              console.log('[DisposeTab] Improve alerts toggled:', {
-                oldValue: improveAlerts,
-                newValue: e.target.checked,
-              })
               setImproveAlerts(e.target.checked)
             }}
             className="mt-1 rounded border-blue-300 text-blue-600 focus:ring-blue-500"

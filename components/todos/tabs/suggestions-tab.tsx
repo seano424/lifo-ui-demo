@@ -18,11 +18,6 @@ interface SuggestionsTabProps {
 export function SuggestionsTab({ filters, pageSize = 20, onFiltersChange }: SuggestionsTabProps) {
   const activeStoreId = useActiveStoreId()
 
-  console.log('[SuggestionsTab] Store context:', {
-    activeStoreId,
-    filters,
-  })
-
   // Primary data source: infinite query for suggestions
   const {
     data: infiniteData,

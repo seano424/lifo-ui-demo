@@ -701,23 +701,11 @@ export function useBatchActionsInfinite(
     dateTo?: string
   },
 ) {
-  console.log('[useBatchActionsInfinite] Hook called with:', {
-    storeId,
-    pageSize,
-    filters,
-  })
-
   return useInfiniteQuery({
     queryKey: storeId
       ? queryKeys.batchActions.infinite(storeId, pageSize, filters)
       : ['batchActions', 'disabled'],
     queryFn: async ({ pageParam = 0 }): Promise<BatchActionsInfiniteData> => {
-      console.log('[useBatchActionsInfinite] QueryFn executing with:', {
-        storeId,
-        pageParam,
-        pageSize,
-        filters,
-      })
       if (!storeId) {
         return { data: [], nextPage: undefined, count: 0 }
       }
@@ -766,45 +754,11 @@ export function useBatchActionsInfinite(
         query = query.lte('performed_at', filters.dateTo)
       }
 
-      console.log('[useBatchActionsInfinite] Query details:', {
-        storeId,
-        schema: 'inventory',
-        table: 'batch_action_entries',
-        filters: {
-          store_id: storeId,
-          action_type: filters?.actionType || 'none',
-          dateFrom: filters?.dateFrom || 'none',
-          dateTo: filters?.dateTo || 'none',
-        },
-        orderBy: 'performed_at DESC',
-        pagination: `LIMIT ${limit} OFFSET ${offset}`,
-      })
-
-      console.log('[useBatchActionsInfinite] About to execute query for store:', storeId)
       const { data, error, count } = await query
 
-      console.log('[useBatchActionsInfinite] Query executed:', {
-        hasError: !!error,
-        errorMessage: error?.message,
-        dataLength: data?.length || 0,
-        totalCount: count,
-      })
-
       if (error) {
-        console.error('[useBatchActionsInfinite] Supabase error:', error)
         throw new Error(`Failed to fetch batch actions: ${error.message}`)
       }
-
-      // Log the raw data for debugging
-      console.log('[useBatchActionsInfinite] Raw batch actions data:', {
-        storeId,
-        pageParam,
-        offset,
-        limit,
-        dataLength: data?.length || 0,
-        count,
-        rawData: data,
-      })
 
       // Transform the data to include related information
       const transformedData: BatchActionWithDetails[] = (data || []).map(action => ({
@@ -825,11 +779,6 @@ export function useBatchActionsInfinite(
         original_value: action.total_original_value,
         recovered_value: action.total_recovered_value,
       }))
-
-      console.log('[useBatchActionsInfinite] Transformed data:', {
-        transformedLength: transformedData.length,
-        transformedData,
-      })
 
       const totalCount = count || 0
       const hasMore = offset + limit < totalCount

@@ -68,11 +68,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
 
-  console.log('[TodosFilteredList] Store context:', {
-    activeStoreId,
-    initialFilters,
-  })
-
   const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'suggestions')
 
   const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])

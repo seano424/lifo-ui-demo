@@ -31,16 +31,10 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
   // Update quantity when batch changes or select all toggles
   useEffect(() => {
-    console.log('[DonateTab] Batch or select all changed:', {
-      batchId: selectedBatch.batch_id,
-      currentQuantity: selectedBatch.current_quantity,
-      isSelectAll,
-    })
-
     if (isSelectAll) {
       setDonateQuantity(selectedBatch.current_quantity)
     }
-  }, [selectedBatch.current_quantity, selectedBatch.batch_id, isSelectAll])
+  }, [selectedBatch.current_quantity, isSelectAll])
 
   // Calculate donation impact metrics
   const calculateDonationImpact = () => {
@@ -48,14 +42,6 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       (donateQuantity * selectedBatch.potential_loss) / selectedBatch.current_quantity
     const mealsProvided = Math.round(donateQuantity * 2.5) // Estimate
     const taxBenefit = preventedWaste * 0.25 // Estimate 25% tax benefit
-
-    console.log('[DonateTab] Impact calculation:', {
-      donateQuantity,
-      preventedWaste,
-      mealsProvided,
-      taxBenefit,
-      potentialLoss: selectedBatch.potential_loss,
-    })
 
     return {
       preventedWaste,
@@ -68,26 +54,12 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
-    console.log('[DonateTab] Quantity changed:', {
-      oldValue: donateQuantity,
-      newValue: value,
-      max: selectedBatch.current_quantity,
-    })
-
     setDonateQuantity(value)
     setIsSelectAll(value === selectedBatch.current_quantity)
   }
 
   // Handle select all toggle
   const handleSelectAllToggle = () => {
-    console.log('[DonateTab] Select all toggled:', {
-      wasSelectAll: isSelectAll,
-      willBeSelectAll: !isSelectAll,
-      quantity: isSelectAll
-        ? Math.floor(selectedBatch.current_quantity / 2)
-        : selectedBatch.current_quantity,
-    })
-
     if (isSelectAll) {
       setDonateQuantity(Math.floor(selectedBatch.current_quantity / 2))
       setIsSelectAll(false)
@@ -99,14 +71,6 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
   // Handle donation execution
   const handleDonateAction = async () => {
-    console.log('[DonateTab] Starting donation process:', {
-      batchId: selectedBatch.batch_id,
-      productName: selectedBatch.product_name,
-      quantity: donateQuantity,
-      recipientId: selectedRecipient,
-      recipientName: DONATION_RECIPIENTS.find(r => r.id === selectedRecipient)?.name,
-    })
-
     try {
       const params = {
         batchId: selectedBatch.batch_id,
@@ -117,16 +81,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         } - ${selectedBatch.reason}`,
       }
 
-      console.log('[DonateTab] Executing RPC with params:', params)
-
-      const result = await executeDonate(params)
-
-      console.log('[DonateTab] Donation successful:', {
-        result,
-        actionId: result?.action_id,
-        remainingQuantity: result?.remaining_quantity,
-        totalValueDonated: result?.total_value_donated,
-      })
+      const _result = await executeDonate(params)
 
       // Success - close the modal
       onClose()
@@ -141,14 +96,6 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
     }
   }
 
-  console.log('[DonateTab] Component render state:', {
-    selectedRecipient,
-    donateQuantity,
-    isSelectAll,
-    isDonating,
-    impact,
-  })
-
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4">
       {/* Recipient Selection */}
@@ -160,7 +107,6 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
               key={recipient.id}
               type="button"
               onClick={() => {
-                console.log('[DonateTab] Recipient selected:', recipient)
                 setSelectedRecipient(recipient.id)
               }}
               className={cn(

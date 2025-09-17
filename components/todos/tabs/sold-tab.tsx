@@ -27,25 +27,12 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   const [isSoldSelectAll, setIsSoldSelectAll] = useState(true)
   const [soldTiming, setSoldTiming] = useState('just-now')
 
-  console.log('[SoldTab] Component initialized with batch:', {
-    batchId: selectedBatch.batch_id,
-    productName: selectedBatch.product_name,
-    currentQuantity: selectedBatch.current_quantity,
-    potentialLoss: selectedBatch.potential_loss,
-  })
-
   // Update quantity when batch changes or select all toggles
   useEffect(() => {
-    console.log('[SoldTab] Batch or select all changed:', {
-      batchId: selectedBatch.batch_id,
-      currentQuantity: selectedBatch.current_quantity,
-      isSoldSelectAll,
-    })
-
     if (isSoldSelectAll) {
       setSoldQuantity(selectedBatch.current_quantity)
     }
-  }, [selectedBatch.current_quantity, selectedBatch.batch_id, isSoldSelectAll])
+  }, [selectedBatch.current_quantity, isSoldSelectAll])
 
   // Calculate sold metrics
   const calculateSoldMetrics = () => {
@@ -59,12 +46,6 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
       profitMargin,
     }
 
-    console.log('[SoldTab] Sold metrics calculated:', {
-      ...metrics,
-      soldQuantity,
-      remainingQuantity: selectedBatch.current_quantity - soldQuantity,
-    })
-
     return metrics
   }
 
@@ -72,26 +53,12 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
 
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
-    console.log('[SoldTab] Quantity changed:', {
-      oldValue: soldQuantity,
-      newValue: value,
-      max: selectedBatch.current_quantity,
-    })
-
     setSoldQuantity(value)
     setIsSoldSelectAll(value === selectedBatch.current_quantity)
   }
 
   // Handle select all toggle
   const handleSelectAllToggle = () => {
-    console.log('[SoldTab] Select all toggled:', {
-      wasSelectAll: isSoldSelectAll,
-      willBeSelectAll: !isSoldSelectAll,
-      quantity: isSoldSelectAll
-        ? Math.floor(selectedBatch.current_quantity / 2)
-        : selectedBatch.current_quantity,
-    })
-
     if (isSoldSelectAll) {
       setSoldQuantity(Math.floor(selectedBatch.current_quantity / 2))
       setIsSoldSelectAll(false)
@@ -103,24 +70,11 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
 
   // Handle timing selection
   const handleTimingChange = (timing: string) => {
-    console.log('[SoldTab] Sale timing changed:', {
-      oldTiming: soldTiming,
-      newTiming: timing,
-    })
-
     setSoldTiming(timing)
   }
 
   // Handle sold execution
   const handleSoldAction = async () => {
-    console.log('[SoldTab] Starting sold process:', {
-      batchId: selectedBatch.batch_id,
-      productName: selectedBatch.product_name,
-      quantity: soldQuantity,
-      timing: soldTiming,
-      timingLabel: SALE_TIMING_OPTIONS.find(t => t.id === soldTiming)?.label,
-    })
-
     try {
       const params = {
         batchId: selectedBatch.batch_id,
@@ -128,16 +82,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
         notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find(t => t.id === soldTiming)?.label}) - ${selectedBatch.reason}`,
       }
 
-      console.log('[SoldTab] Executing RPC with params:', params)
-
-      const result = await executeSold(params)
-
-      console.log('[SoldTab] Sold action successful:', {
-        result,
-        actionId: result?.action_id,
-        remainingQuantity: result?.remaining_quantity,
-        revenueRecovered: result?.revenue_recovered,
-      })
+      const _result = await executeSold(params)
 
       // Success - close the modal
       onClose()
@@ -151,14 +96,6 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
       })
     }
   }
-
-  console.log('[SoldTab] Component render state:', {
-    soldQuantity,
-    isSoldSelectAll,
-    soldTiming,
-    isMarkingSold,
-    soldMetrics,
-  })
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4">
