@@ -1,12 +1,12 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
 
 @plugin 'tailwind-scrollbar';
 @plugin 'tailwindcss-debug-screens' {
-  classname: "debug-screens";
-  position: "bottom, left";
-  prefix: "screen: ";
+  classname: 'debug-screens';
+  position: 'bottom, left';
+  prefix: 'screen: ';
 }
 
 @theme {
@@ -78,18 +78,18 @@
   /* Font families */
   --font-sans:
     var(--font-montserrat), ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    "Noto Sans", sans-serif;
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
   --font-heading:
     var(--font-raleway), ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    "Noto Sans", sans-serif;
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
   --font-mono:
     var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, "Liberation Mono", "Courier New", monospace;
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* Breakpoints */
-  --breakpoint-*: initial;
+  /* --breakpoint-*: initial; */
   --breakpoint-xs: 360px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
@@ -198,9 +198,9 @@
 
 @layer base {
   button:not(:disabled),
-  [role="button"]:not(:disabled),
-  [role="tab"]:not(:disabled),
-  [role="menuitem"]:not(:disabled) {
+  [role='button']:not(:disabled),
+  [role='tab']:not(:disabled),
+  [role='menuitem']:not(:disabled) {
     cursor: pointer;
   }
 

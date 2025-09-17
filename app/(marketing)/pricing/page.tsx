@@ -92,8 +92,8 @@ function PricingCard({
       {/* Features */}
       <div className="flex-grow mb-6">
         <ul className="space-y-3">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-start gap-3">
+          {features.map(feature => (
+            <li key={feature} className="flex items-start gap-3">
               <Check size={18} className="text-primary-600 mt-0.5 flex-shrink-0" />
               <Typography variant="p" className="text-foreground/80 text-sm">
                 {feature}
@@ -109,8 +109,8 @@ function PricingCard({
           <Typography variant="h4" className="text-sm font-semibold text-foreground/80 mb-2">
             {t('common.winWinFees')}
           </Typography>
-          {fees.map((fee, index) => (
-            <div key={index} className="flex justify-between items-center">
+          {fees.map(fee => (
+            <div key={fee.type} className="flex justify-between items-center">
               <Typography variant="p" className="text-xs text-foreground/70">
                 {fee.type}
               </Typography>

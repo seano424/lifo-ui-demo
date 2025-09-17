@@ -338,9 +338,9 @@ export default function FeaturesPage() {
                 title: t('additionalFeatures.collaboration.title'),
                 description: t('additionalFeatures.collaboration.description'),
               },
-            ].map((feature, index) => (
+            ].map(feature => (
               <div
-                key={index}
+                key={feature.title}
                 className="group p-6 rounded-3xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 mb-4 group-hover:scale-110 transition-transform duration-300">
