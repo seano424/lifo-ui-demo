@@ -199,9 +199,6 @@ export function TodosCardList({
     )
   }
 
-  console.log('[TodosCardList] processedBatchActions', processedBatchActions)
-  console.log('[TodosCardList] todos', todos)
-
   return (
     <InfiniteScrollErrorBoundary>
       <div className="space-y-4 flex flex-col">

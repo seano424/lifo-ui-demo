@@ -156,6 +156,23 @@ export function useBatchActionRPC() {
     }
 
     if (storeId) {
+      // Trigger scoring API to recalculate scores after batch action
+      try {
+        await fetch('/api/scoring/trigger', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            storeId,
+            triggeredBy: 'batch_action',
+          }),
+        })
+      } catch (error) {
+        console.warn('Failed to trigger scoring recalculation:', error)
+        // Don't fail the entire operation if scoring trigger fails
+      }
+
       // Invalidate all related queries
       await Promise.all([
         // Remove from todos/alerts
@@ -182,6 +199,32 @@ export function useBatchActionRPC() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batchActions.byStore(storeId),
         }),
+
+        // Invalidate use-scoring-analytics hooks used by todos-filtered-list tabs
+        // useScoringAlerts hook - invalidate both default and threshold variants
+        queryClient.invalidateQueries({
+          queryKey: ['alerts', 'store', storeId],
+        }),
+
+        // useStoreAnalytics hook - invalidate all timeframes and variants
+        queryClient.invalidateQueries({
+          queryKey: ['analytics', 'store', storeId],
+        }),
+
+        // useTodosInfinite hook - invalidate all variations
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'infinite', storeId],
+        }),
+
+        // useBatchActionsInfinite hook - invalidate action history pagination
+        queryClient.invalidateQueries({
+          queryKey: ['batchActions', 'infinite', storeId],
+        }),
+
+        // Invalidate actionable batches specifically
+        queryClient.invalidateQueries({
+          queryKey: ['actionable_batches', storeId],
+        }),
       ])
     }
   }
@@ -189,27 +232,50 @@ export function useBatchActionRPC() {
   // 1. DONATE ACTION
   const executeDonate = useMutation({
     mutationFn: async (params: DonateParams): Promise<ActionResult> => {
-      const userId = await getCurrentUserId()
+      console.log('🎁 DONATE ACTION STARTED:', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+        donationRecipientId: params.donationRecipientId,
+        notes: params.notes,
+      })
 
-      const { data, error } = await supabase.rpc('execute_donate_action', {
+      const userId = await getCurrentUserId()
+      console.log('🔑 User ID retrieved:', userId)
+
+      const rpcParams = {
         p_batch_id: params.batchId,
         p_quantity_affected: params.quantity,
         p_donation_recipient_id: params.donationRecipientId,
         p_user_id: userId,
         p_notes: params.notes || null,
-      } as DonateActionParams)
+      } as DonateActionParams
 
-      if (error) throw error
+      console.log('📞 Calling execute_donate_action RPC with params:', rpcParams)
+
+      const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
+
+      console.log('📥 RPC Response received:', { data, error })
+
+      if (error) {
+        console.error('❌ RPC Error:', error)
+        throw error
+      }
+
+      console.log('✅ Donation action completed successfully:', data)
       return data as ActionResult
     },
     onMutate: async variables => {
+      console.log('🔄 DONATE onMutate triggered:', variables)
+
       // Optimistic update: Remove from alerts immediately
       const storeId = await getStoreIdFromBatch(variables.batchId)
+      console.log('🏪 Store ID for batch:', storeId)
 
       queryClient.setQueryData(
         queryKeys.alerts.store(storeId),
         (oldData: AlertsResponse | undefined) => {
           if (oldData?.alerts) {
+            console.log('📊 Optimistically removing batch from alerts:', variables.batchId)
             return {
               ...oldData,
               alerts: oldData.alerts.filter(
@@ -224,77 +290,129 @@ export function useBatchActionRPC() {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      console.log('🎉 DONATE onSuccess triggered:', { result, variables, context })
+
       if (result.success) {
+        console.log('✅ Donation successful, showing success toast')
         toast.success(`Successfully donated ${variables.quantity} units`, {
           description: `Total value donated: €${result.total_value_donated?.toFixed(2)}`,
         })
+        console.log('🔄 Invalidating related queries...')
         await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        console.log('✅ Queries invalidated successfully')
       } else {
+        console.error('❌ Donation failed according to result:', result)
         toast.error(result.error || 'Donation failed')
       }
     },
-    onError: (error, _variables, context) => {
+    onError: (error, variables, context) => {
+      console.error('💥 DONATE onError triggered:', { error, variables, context })
+
       // Rollback optimistic update
       if (context?.storeId) {
+        console.log('🔄 Rolling back optimistic update for store:', context.storeId)
         queryClient.invalidateQueries({
           queryKey: queryKeys.alerts.store(context.storeId),
         })
       }
+
+      console.error('❌ Showing error toast')
       toast.error('Failed to execute donation')
-      console.error('Donate action error:', error)
+      console.error('💥 Full donation error details:', error)
     },
   })
 
   // 2. DISCOUNT ACTION
   const executeDiscount = useMutation({
     mutationFn: async (params: DiscountParams): Promise<ActionResult> => {
-      const userId = await getCurrentUserId()
+      console.log('💰 DISCOUNT ACTION STARTED:', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+        discountPercentage: params.discountPercentage,
+        notes: params.notes,
+      })
 
-      const { data, error } = await supabase.rpc('execute_discount_action', {
+      const userId = await getCurrentUserId()
+      console.log('🔑 User ID retrieved:', userId)
+
+      const rpcParams = {
         p_batch_id: params.batchId,
         p_quantity_affected: params.quantity,
         p_discount_percentage: params.discountPercentage,
         p_user_id: userId,
         p_notes: params.notes || null,
-      } as DiscountActionParams)
+      } as DiscountActionParams
 
-      if (error) throw error
+      console.log('📞 Calling execute_discount_action RPC with params:', rpcParams)
+
+      const { data, error } = await supabase.rpc('execute_discount_action', rpcParams)
+
+      console.log('📥 RPC Response received:', { data, error })
+
+      if (error) {
+        console.error('❌ RPC Error:', error)
+        throw error
+      }
+
+      console.log('✅ Discount action completed successfully:', data)
       return data as ActionResult
     },
     onMutate: async variables => {
+      console.log('🔄 DISCOUNT onMutate triggered:', variables)
+
       // Optimistic update: Show new price immediately
       const storeId = await getStoreIdFromBatch(variables.batchId)
+      console.log('🏪 Store ID for batch:', storeId)
 
       queryClient.setQueryData(
         queryKeys.batches.detail(variables.batchId),
-        (oldData: BatchDetail | undefined) =>
-          oldData
-            ? {
-                ...oldData,
-                selling_price: oldData.selling_price * (1 - variables.discountPercentage / 100),
-              }
-            : oldData,
+        (oldData: BatchDetail | undefined) => {
+          if (oldData) {
+            const newPrice = oldData.selling_price * (1 - variables.discountPercentage / 100)
+            console.log('💰 Optimistically updating price:', {
+              originalPrice: oldData.selling_price,
+              newPrice,
+              discountPercentage: variables.discountPercentage,
+            })
+            return {
+              ...oldData,
+              selling_price: newPrice,
+            }
+          }
+          return oldData
+        },
       )
 
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      console.log('🎉 DISCOUNT onSuccess triggered:', { result, variables, context })
+
       if (result.success) {
+        console.log('✅ Discount successful, showing success toast')
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
           description: `New price: €${result.new_price?.toFixed(2)}`,
         })
+        console.log('🔄 Invalidating related queries...')
         await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        console.log('✅ Queries invalidated successfully')
       } else {
+        console.error('❌ Discount failed according to result:', result)
         toast.error(result.error || 'Discount failed')
       }
     },
-    onError: (error, variables, _context) => {
+    onError: (error, variables, context) => {
+      console.error('💥 DISCOUNT onError triggered:', { error, variables, context })
+
       // Rollback optimistic update
+      console.log('🔄 Rolling back optimistic price update for batch:', variables.batchId)
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.detail(variables.batchId),
       })
+
+      console.error('❌ Showing error toast')
       toast.error('Failed to apply discount')
-      console.error('Discount action error:', error)
+      console.error('💥 Full discount error details:', error)
     },
   })
 
