@@ -1,14 +1,17 @@
-"use client";
+'use client'
 
+import { Menu } from 'lucide-react'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { CompactLanguageSwitcher } from "@/components/ui/compact-language-switcher";
-import { NavbarLogo } from "@/components/ui/logo";
+} from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
+import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
+import { NavbarLogo } from '@/components/ui/logo'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,41 +19,32 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { hasEnvVars } from "@/lib/utils";
-import { Menu } from "lucide-react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { AuthButton } from "../auth-button";
-import { EnvVarWarning } from "../env-var-warning";
+} from '@/components/ui/navigation-menu'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { hasEnvVars } from '@/lib/utils'
+import { AuthButton } from '../auth-button'
+import { EnvVarWarning } from '../env-var-warning'
 
 interface MenuItem {
-  title: string;
-  url: string;
-  description?: string;
-  icon?: React.ReactNode;
-  items?: MenuItem[];
+  title: string
+  url: string
+  description?: string
+  icon?: React.ReactNode
+  items?: MenuItem[]
 }
 
 interface MarketingNavProps {
   logo?: {
-    url: string;
-    src: string;
-    alt: string;
-    title: string;
-  };
-  menu?: MenuItem[];
+    url: string
+    src: string
+    alt: string
+    title: string
+  }
+  menu?: MenuItem[]
 }
 
 const MarketingNav = ({ menu }: MarketingNavProps) => {
-  const t = useTranslations("marketing.nav");
+  const t = useTranslations('marketing.nav')
 
   const defaultMenu = [
     // {
@@ -114,20 +108,20 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
     //   ],
     // },
     {
-      title: t("features"),
-      url: "/features",
+      title: t('features'),
+      url: '/features',
     },
     {
-      title: t("pricing"),
-      url: "/pricing",
+      title: t('pricing'),
+      url: '/pricing',
     },
     {
-      title: t("contactUs"),
-      url: "/contact",
+      title: t('contactUs'),
+      url: '/contact',
     },
-  ];
+  ]
 
-  const menuItems = menu || defaultMenu;
+  const menuItems = menu || defaultMenu
   return (
     <section>
       <nav className="hidden justify-between lg:flex container mx-auto">
@@ -135,9 +129,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
           <NavbarLogo variant="text" href="/" />
 
           <NavigationMenu>
-            <NavigationMenuList>
-              {menuItems.map((item) => renderMenuItem(item))}
-            </NavigationMenuList>
+            <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
           </NavigationMenu>
         </div>
 
@@ -164,20 +156,14 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col h-full gap-10 p-4">
-                <Accordion
-                  type="single"
-                  collapsible
-                  className="flex w-full flex-col gap-4"
-                >
-                  {menuItems.map((item) => renderMobileMenuItem(item))}
+                <Accordion type="single" collapsible className="flex w-full flex-col gap-4">
+                  {menuItems.map(item => renderMobileMenuItem(item))}
                 </Accordion>
 
                 <div className="flex flex-col gap-3">
                   <AuthButton isMobile />
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                    <span className="text-sm text-muted-foreground">
-                      Langue
-                    </span>
+                    <span className="text-sm text-muted-foreground">Langue</span>
                     <CompactLanguageSwitcher />
                   </div>
                 </div>
@@ -187,8 +173,8 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
 const renderMenuItem = (item: MenuItem) => {
   if (item.items) {
@@ -198,14 +184,14 @@ const renderMenuItem = (item: MenuItem) => {
           {item.title}
         </NavigationMenuTrigger>
         <NavigationMenuContent className="bg-popover text-popover-foreground w-full min-w-80">
-          {item.items.map((subItem) => (
+          {item.items.map(subItem => (
             <NavigationMenuLink asChild key={subItem.title}>
               <SubMenuLink item={subItem} />
             </NavigationMenuLink>
           ))}
         </NavigationMenuContent>
       </NavigationMenuItem>
-    );
+    )
   }
 
   return (
@@ -217,8 +203,8 @@ const renderMenuItem = (item: MenuItem) => {
         {item.title}
       </NavigationMenuLink>
     </NavigationMenuItem>
-  );
-};
+  )
+}
 
 const renderMobileMenuItem = (item: MenuItem) => {
   if (item.items) {
@@ -228,20 +214,20 @@ const renderMobileMenuItem = (item: MenuItem) => {
           {item.title}
         </AccordionTrigger>
         <AccordionContent className="mt-2">
-          {item.items.map((subItem) => (
+          {item.items.map(subItem => (
             <SubMenuLink key={subItem.title} item={subItem} />
           ))}
         </AccordionContent>
       </AccordionItem>
-    );
+    )
   }
 
   return (
     <Link key={item.title} href={item.url} className="text-md font-semibold">
       {item.title}
     </Link>
-  );
-};
+  )
+}
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
@@ -253,13 +239,11 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
       <div>
         <div className="text-sm font-semibold">{item.title}</div>
         {item.description && (
-          <p className="text-sm leading-snug text-muted-foreground">
-            {item.description}
-          </p>
+          <p className="text-sm leading-snug text-muted-foreground">{item.description}</p>
         )}
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export { MarketingNav };
+export { MarketingNav }

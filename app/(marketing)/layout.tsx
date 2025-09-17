@@ -1,6 +1,6 @@
+import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { MarketingNav } from '@/components/marketing/marketing-nav'
 import { GridBackground } from '@/components/ui/grid-background'
-import { MarketingFooter } from '@/components/marketing/marketing-footer'
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (

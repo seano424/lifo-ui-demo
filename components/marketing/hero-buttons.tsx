@@ -1,12 +1,11 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Sparkles } from "lucide-react";
-import { useTranslations } from "next-intl";
-import React from "react";
+import { LayoutDashboard, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
 
 export function HeroButtons() {
-  const t = useTranslations("landingpage.hero.buttons");
+  const t = useTranslations('landingpage.hero.buttons')
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
@@ -27,8 +26,8 @@ export function HeroButtons() {
         className="px-6 py-3 rounded-2xl border-foreground/20 hover:border-foreground/40 transition-colors flex items-center gap-2"
       >
         <Sparkles size={18} />
-        {t("freeTrial")}
+        {t('freeTrial')}
       </Button>
     </div>
-  );
+  )
 }

@@ -1,13 +1,13 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Typography } from "@/components/ui/typography";
-import { ArrowRight, Calendar, Check, Clock, Shield, Zap } from "lucide-react";
-import { useTranslations } from "next-intl";
+'use client'
+import { ArrowRight, Calendar, Check, Clock, Shield, Zap } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 
 interface CtaFeatureProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
+  icon: React.ReactNode
+  title: string
+  description: string
 }
 
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
@@ -25,11 +25,11 @@ function CtaFeature({ icon, title, description }: CtaFeatureProps) {
         </Typography>
       </div>
     </div>
-  );
+  )
 }
 
 export function CtaSection() {
-  const t = useTranslations("landingpage.cta");
+  const t = useTranslations('landingpage.cta')
 
   return (
     <section className="w-full px-4 my-8 relative overflow-hidden mb-20">
@@ -37,11 +37,11 @@ export function CtaSection() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <Typography
-          as={"h2"}
+          as={'h2'}
           variant="h2"
           className="text-center mb-16 pb-4 text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
         >
-          {t("title")}
+          {t('title')}
         </Typography>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left column - Features */}
@@ -49,26 +49,26 @@ export function CtaSection() {
             <div className="space-y-6">
               <CtaFeature
                 icon={<Zap size={22} strokeWidth={1.5} />}
-                title={t("features.quickSetup.title")}
-                description={t("features.quickSetup.description")}
+                title={t('features.quickSetup.title')}
+                description={t('features.quickSetup.description')}
               />
 
               <CtaFeature
                 icon={<Calendar size={22} strokeWidth={1.5} />}
-                title={t("features.freeTrial.title")}
-                description={t("features.freeTrial.description")}
+                title={t('features.freeTrial.title')}
+                description={t('features.freeTrial.description')}
               />
 
               <CtaFeature
                 icon={<Shield size={22} strokeWidth={1.5} />}
-                title={t("features.support.title")}
-                description={t("features.support.description")}
+                title={t('features.support.title')}
+                description={t('features.support.description')}
               />
 
               <CtaFeature
                 icon={<Clock size={22} strokeWidth={1.5} />}
-                title={t("features.immediateResults.title")}
-                description={t("features.immediateResults.description")}
+                title={t('features.immediateResults.title')}
+                description={t('features.immediateResults.description')}
               />
             </div>
           </div>
@@ -76,14 +76,11 @@ export function CtaSection() {
           {/* Right column - CTA card */}
           <div className="flex flex-col rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
             <div className="flex flex-col gap-1">
-              <Typography
-                variant="h3"
-                className="text-2xl font-bold text-secondary-950 mb-4"
-              >
-                {t("card.title")}
+              <Typography variant="h3" className="text-2xl font-bold text-secondary-950 mb-4">
+                {t('card.title')}
               </Typography>
               <Typography variant="p" className="text-secondary-950/80">
-                {t("card.description")}
+                {t('card.description')}
               </Typography>
             </div>
 
@@ -93,7 +90,7 @@ export function CtaSection() {
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
-                  {t("card.benefits.noCommitment")}
+                  {t('card.benefits.noCommitment')}
                 </Typography>
               </div>
               <div className="flex items-center gap-2">
@@ -101,7 +98,7 @@ export function CtaSection() {
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
-                  {t("card.benefits.instantSetup")}
+                  {t('card.benefits.instantSetup')}
                 </Typography>
               </div>
               <div className="flex items-center gap-2">
@@ -109,7 +106,7 @@ export function CtaSection() {
                   <Check size={20} />
                 </div>
                 <Typography variant="p" className="text-gray-700 font-semibold">
-                  {t("card.benefits.support")}
+                  {t('card.benefits.support')}
                 </Typography>
               </div>
             </div>
@@ -120,18 +117,15 @@ export function CtaSection() {
               size="lg"
               className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >
-              {t("card.button")} <ArrowRight size={18} />
+              {t('card.button')} <ArrowRight size={18} />
             </Button>
 
-            <Typography
-              variant="p"
-              className="text-sm text-center text-secondary-950/60"
-            >
-              {t("card.noCreditCard")}
+            <Typography variant="p" className="text-sm text-center text-secondary-950/60">
+              {t('card.noCreditCard')}
             </Typography>
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

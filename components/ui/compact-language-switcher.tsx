@@ -1,27 +1,27 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
+import { Globe } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { type Language, useLanguageStore } from "@/lib/stores/language-store";
-import { Globe } from "lucide-react";
+} from '@/components/ui/dropdown-menu'
+import { type Language, useLanguageStore } from '@/lib/stores/language-store'
 
 const LIFO_LANGUAGES = {
-  fr: { name: "Français" },
-  en: { name: "English" },
-  nl: { name: "Nederlands" },
-} as const;
+  fr: { name: 'Français' },
+  en: { name: 'English' },
+  nl: { name: 'Nederlands' },
+} as const
 
 export function CompactLanguageSwitcher() {
-  const { currentLanguage, setLanguage, isLoading } = useLanguageStore();
+  const { currentLanguage, setLanguage, isLoading } = useLanguageStore()
 
   const handleLanguageChange = async (language: string) => {
-    await setLanguage(language as Language);
-  };
+    await setLanguage(language as Language)
+  }
 
   return (
     <DropdownMenu>
@@ -35,12 +35,12 @@ export function CompactLanguageSwitcher() {
           <DropdownMenuItem
             key={code}
             onClick={() => handleLanguageChange(code)}
-            className={currentLanguage === code ? "bg-muted" : ""}
+            className={currentLanguage === code ? 'bg-muted' : ''}
           >
             <span>{name}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

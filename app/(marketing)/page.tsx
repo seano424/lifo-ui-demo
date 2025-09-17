@@ -3,7 +3,6 @@ import { BusinessStats } from '@/components/marketing/business-stats'
 import { CtaSection } from '@/components/marketing/cta-section'
 import { Divider } from '@/components/marketing/divider'
 import { FeaturesSummary } from '@/components/marketing/features-summary'
-import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
 
 export default function Home() {
