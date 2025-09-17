@@ -39,9 +39,18 @@ export function Logo({ variant = 'vertical', size = 'md', className, darkMode, h
 
   if (variant === 'text') {
     const textElement = (
-      <Typography className="font-black font-heading lowercase text-3xl lg:text-4xl" variant="h2">
-        LIFO.ai
-      </Typography>
+      <div className="flex items-center gap-2">
+        <Image
+          src="/logos/lifo-logo-icon.svg"
+          alt="LIFO Icon"
+          className="h-16 w-16"
+          width={32}
+          height={32}
+        />
+        <Typography className="font-black font-heading text-3xl lg:text-4xl" variant="h2">
+          Lifo
+        </Typography>
+      </div>
     )
 
     if (href) {
@@ -99,12 +108,14 @@ export function NavbarLogo({
   className,
   size = 'md',
   variant = 'vertical',
+  href = '/',
 }: {
   className?: string
   size?: LogoSize
   variant?: LogoVariant
+  href?: string
 }) {
-  return <Logo variant={variant} size={size} className={className} />
+  return <Logo variant={variant} size={size} className={className} href={href} />
 }
 
 export function AppIcon({ className, size = 'sm' }: { className?: string; size?: LogoSize }) {

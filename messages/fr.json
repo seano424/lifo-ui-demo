@@ -1018,6 +1018,7 @@
   "marketing": {
     "nav": {
       "about": "À propos",
+      "features": "Services",
       "resources": "Ressources",
       "product": "Produit",
       "pricing": "Tarifs",
@@ -1217,6 +1218,8 @@
     },
     "businessStats": {
       "title": "Maximisez vos profits, minimisez vos pertes",
+      "subtitle": "Découvrez l'impact réel de LIFO.AI sur des entreprises comme la vôtre",
+      "disclaimer": "Les résultats peuvent varier. Basé sur les données moyennes des clients sur 12 mois.",
       "revenue": {
         "label": "Augmentation des revenus",
         "description": "Augmentation moyenne des revenus commerciaux",
@@ -1925,6 +1928,176 @@
     "messages": {
       "selectStore": "Veuillez sélectionner un magasin pour télécharger les données d'inventaire.",
       "selectStoreInventory": "Veuillez sélectionner un magasin pour ajouter de l'inventaire."
+    }
+  },
+  "pricingpage": {
+    "title": "Choisissez votre plan",
+    "subtitle": "Commencez avec notre essai gratuit et évoluez selon vos besoins. Sans engagement, support complet inclus.",
+    "badges": {
+      "mostPopular": "Le plus populaire",
+      "comingSoon": "Bientôt disponible"
+    },
+    "common": {
+      "getStarted": "Commencer",
+      "comingSoon": "Bientôt disponible",
+      "winWinFees": "Frais gagnant-gagnant :",
+      "note": "Note :",
+      "pricingNote": "Les prix sont sujets à modification. Tous les frais sont à confirmer."
+    },
+    "plans": {
+      "freeTrial": {
+        "title": "Essai gratuit",
+        "subtitle": "Magasins pilotes",
+        "price": "Gratuit",
+        "period": "3 mois",
+        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 3 mois.",
+        "features": {
+          "0": "3 jours d'intégration et de formation",
+          "1": "Support complet inclus",
+          "2": "Sans engagement - sortie à tout moment",
+          "3": "Toutes les fonctionnalités débloquées"
+        },
+        "sellingPoint": "Parfait pour tester notre solution sans risque"
+      },
+      "light": {
+        "title": "Léger",
+        "subtitle": "Petits magasins, 1 place seulement",
+        "price": "9€",
+        "period": "/mois",
+        "description": "Pour les petits magasins qui commencent leur parcours de gestion d'inventaire.",
+        "features": {
+          "0": "Maximum 3 mois de données dans le tableau de bord",
+          "1": "1 place utilisateur incluse",
+          "2": "Fonctionnalités d'inventaire de base",
+          "3": "Support par email"
+        },
+        "fees": [
+          { "type": "Marge des produits vendus", "percentage": "30%" },
+          { "type": "Crédit d'impôt", "percentage": "20%" }
+        ],
+        "sellingPoint": "Commencez à gérer votre inventaire"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Grands magasins, 2+ ETP",
+        "price": "39€",
+        "period": "/mois",
+        "description": "Pour les entreprises en croissance qui ont besoin de collaboration d'équipe et de fonctionnalités avancées.",
+        "features": {
+          "0": "Rétention de données illimitée",
+          "1": "2+ places utilisateur",
+          "2": "Gestion des rôles",
+          "3": "Support prioritaire",
+          "4": "Analyses avancées"
+        },
+        "fees": [
+          { "type": "Marge des produits vendus", "percentage": "30%" },
+          { "type": "Crédit d'impôt", "percentage": "20%" }
+        ],
+        "sellingPoint": "Gérez efficacement les rôles dans votre magasin"
+      },
+      "enterprise": {
+        "title": "Entreprise",
+        "subtitle": "Pour les chaînes",
+        "price": "Personnalisé",
+        "description": "Solution sur mesure pour les entreprises multi-sites avec des besoins avancés.",
+        "features": {
+          "0": "Gestion de multiples points de vente",
+          "1": "Analyses avancées",
+          "2": "Intégrations personnalisées",
+          "3": "Support dédié",
+          "4": "Tarification personnalisée par point de vente"
+        },
+        "fees": [
+          {
+            "type": "Marge des produits vendus",
+            "percentage": "Personnalisé%"
+          },
+          { "type": "Crédit d'impôt", "percentage": "Personnalisé%" }
+        ],
+        "sellingPoint": "Gérez plusieurs points de vente et obtenez des analyses avancées"
+      }
+    }
+  },
+  "featurespage": {
+    "title": "Fonctionnalités puissantes",
+    "subtitle": "Tout ce dont vous avez besoin pour gérer efficacement votre inventaire avec des insights alimentés par l'IA et un suivi en temps réel.",
+    "features": {
+      "dashboard": {
+        "title": "Tableau de bord en temps réel",
+        "description": "Obtenez des insights instantanés sur votre inventaire avec notre tableau de bord complet. Suivez les niveaux de stock, surveillez les dates d'expiration et identifiez les tendances d'un coup d'œil. Prenez des décisions éclairées avec la visualisation de données en temps réel et les alertes automatisées."
+      },
+      "scanning": {
+        "title": "Scan intelligent",
+        "description": "Gérez facilement votre inventaire avec notre technologie de scan avancée. Scannez simplement les produits pour mettre à jour les niveaux de stock, suivre les dates d'expiration et maintenir des enregistrements précis. Fonctionne parfaitement sur tout appareil mobile."
+      },
+      "analytics": {
+        "title": "Analyses de performance",
+        "description": "Comprenez les performances de votre entreprise avec des analyses et rapports détaillés. Suivez la réduction des déchets, la croissance des revenus et l'efficacité opérationnelle. Obtenez des insights exploitables pour optimiser votre stratégie de gestion d'inventaire."
+      },
+      "ai": {
+        "title": "Insights alimentés par l'IA",
+        "description": "Exploitez l'intelligence artificielle pour optimiser votre gestion d'inventaire. Obtenez des recommandations intelligentes pour les réapprovisionnements, les stratégies promotionnelles et la réduction des déchets. Notre IA apprend de vos habitudes pour fournir des suggestions personnalisées."
+      }
+    },
+    "additionalFeatures": {
+      "title": "Tout ce dont vous avez besoin",
+      "expiry": {
+        "title": "Suivi d'expiration",
+        "description": "Ne manquez jamais les dates d'expiration avec les alertes automatisées et la gestion LIFO."
+      },
+      "security": {
+        "title": "Sécurité des données",
+        "description": "Sécurité de niveau entreprise pour protéger vos données commerciales et informations clients."
+      },
+      "performance": {
+        "title": "Performance rapide",
+        "description": "Traitement ultra-rapide et mises à jour en temps réel pour des opérations fluides."
+      },
+      "tracking": {
+        "title": "Suivi précis",
+        "description": "Suivi d'inventaire précis avec scan de codes-barres et mises à jour automatisées."
+      },
+      "timeSaving": {
+        "title": "Gain de temps",
+        "description": "Automatisez les tâches routinières et économisez des heures de gestion d'inventaire manuelle."
+      },
+      "collaboration": {
+        "title": "Collaboration d'équipe",
+        "description": "Support multi-utilisateur avec permissions basées sur les rôles et gestion d'équipe."
+      }
+    },
+    "mockData": {
+      "dashboard": {
+        "inventoryOverview": "Aperçu de l'inventaire",
+        "items": "Articles",
+        "fromLastMonth": "du mois dernier",
+        "expiringSoon": "Expire bientôt",
+        "lowStock": "Stock faible",
+        "totalProducts": "Produits totaux",
+        "expiringItems": "Articles expirants",
+        "wasteReduced": "Déchets réduits",
+        "revenueIncrease": "Augmentation des revenus",
+        "performanceAnalytics": "Analyses de performance"
+      },
+      "scanning": {
+        "scanningActive": "Scan actif",
+        "productScanned": "Produit scanné",
+        "organicMilk": "Lait bio - 1L",
+        "expDate": "Exp: 15/01/2024 | Stock: 24 unités"
+      },
+      "ai": {
+        "title": "Recommandations IA",
+        "reorderMilk": "Réapprovisionner les produits laitiers",
+        "reorderMilkDesc": "Basé sur les habitudes de consommation",
+        "promoteExpiring": "Promouvoir les articles expirants",
+        "promoteExpiringDesc": "23 articles expirent dans 2 jours"
+      }
+    },
+    "cta": {
+      "title": "Prêt à transformer votre inventaire ?",
+      "description": "Transformez votre gestion d'inventaire avec LIFO.AI et commencez à réduire les déchets dès aujourd'hui.",
+      "button": "Commencer l'essai gratuit"
     }
   }
 }
