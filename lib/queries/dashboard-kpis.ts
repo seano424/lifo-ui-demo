@@ -93,40 +93,40 @@ export async function fetchInventoryKPI(storeId: string): Promise<InventoryKPI> 
   }
 }
 
-// Fetch Sales KPI (using inventory.batch_actions with discount actions)
+// Fetch Sales KPI (using inventory.batch_action_entries with discount actions)
 export async function fetchSalesKPI(storeId: string): Promise<SalesKPI> {
   const supabase = createClient()
   const dates = getDateRanges()
 
-  // Today's sales using batch_actions with discount actions
+  // Today's sales using batch_action_entries with discount actions
   const { data: todayData, error: todayError } = await supabase
     .schema('inventory')
-    .from('batch_actions')
-    .select('recovered_value')
+    .from('batch_action_entries')
+    .select('total_recovered_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'discount')
-    .gte('action_date', dates.todayStart)
-    .lt('action_date', dates.todayEnd)
+    .eq('action_type', 'discount')
+    .gte('performed_at', dates.todayStart)
+    .lt('performed_at', dates.todayEnd)
 
   if (todayError) throw todayError
 
   const totalRevenue =
-    todayData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
+    todayData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
 
   const transactionCount = todayData?.length ?? 0
 
   // Yesterday's sales for comparison
   const { data: yesterdayData } = await supabase
     .schema('inventory')
-    .from('batch_actions')
-    .select('recovered_value')
+    .from('batch_action_entries')
+    .select('total_recovered_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'discount')
-    .gte('action_date', dates.yesterdayStart)
-    .lt('action_date', dates.yesterdayEnd)
+    .eq('action_type', 'discount')
+    .gte('performed_at', dates.yesterdayStart)
+    .lt('performed_at', dates.yesterdayEnd)
 
   const yesterdayRevenue =
-    yesterdayData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
+    yesterdayData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
 
   const change = totalRevenue - yesterdayRevenue
   const changePercent = yesterdayRevenue > 0 ? (change / yesterdayRevenue) * 100 : 0
@@ -139,7 +139,7 @@ export async function fetchSalesKPI(storeId: string): Promise<SalesKPI> {
   }
 }
 
-// Fetch Donation KPI (using inventory.batch_actions)
+// Fetch Donation KPI (using inventory.batch_action_entries)
 export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
   const supabase = createClient()
   const dates = getDateRanges()
@@ -147,16 +147,17 @@ export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
   // Today's donations
   const { data: todayData, error: todayError } = await supabase
     .schema('inventory')
-    .from('batch_actions')
-    .select('original_value, donation_recipient_id')
+    .from('batch_action_entries')
+    .select('total_original_value, donation_recipient_id')
     .eq('store_id', storeId)
-    .eq('actual_action', 'donate')
-    .gte('action_date', dates.todayStart)
-    .lt('action_date', dates.todayEnd)
+    .eq('action_type', 'donate')
+    .gte('performed_at', dates.todayStart)
+    .lt('performed_at', dates.todayEnd)
 
   if (todayError) throw todayError
 
-  const totalValue = todayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
+  const totalValue =
+    todayData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
   const uniqueRecipients = new Set(
     todayData?.filter(a => a.donation_recipient_id).map(a => a.donation_recipient_id),
@@ -166,15 +167,15 @@ export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
   // Yesterday's donations for comparison
   const { data: yesterdayData } = await supabase
     .schema('inventory')
-    .from('batch_actions')
-    .select('original_value')
+    .from('batch_action_entries')
+    .select('total_original_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'donate')
-    .gte('action_date', dates.yesterdayStart)
-    .lt('action_date', dates.yesterdayEnd)
+    .eq('action_type', 'donate')
+    .gte('performed_at', dates.yesterdayStart)
+    .lt('performed_at', dates.yesterdayEnd)
 
   const yesterdayValue =
-    yesterdayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
+    yesterdayData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
   const change = totalValue - yesterdayValue
   const changePercent = yesterdayValue > 0 ? (change / yesterdayValue) * 100 : 0
@@ -187,7 +188,7 @@ export async function fetchDonationKPI(storeId: string): Promise<DonationKPI> {
   }
 }
 
-// Fetch Waste KPI (using inventory.batch_actions)
+// Fetch Waste KPI (using inventory.batch_action_entries)
 export async function fetchWasteKPI(storeId: string): Promise<WasteKPI> {
   const supabase = createClient()
   const dates = getDateRanges()
@@ -195,31 +196,32 @@ export async function fetchWasteKPI(storeId: string): Promise<WasteKPI> {
   // Today's waste
   const { data: todayData, error: todayError } = await supabase
     .schema('inventory')
-    .from('batch_actions')
-    .select('original_value')
+    .from('batch_action_entries')
+    .select('total_original_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'dispose')
-    .gte('action_date', dates.todayStart)
-    .lt('action_date', dates.todayEnd)
+    .eq('action_type', 'dispose')
+    .gte('performed_at', dates.todayStart)
+    .lt('performed_at', dates.todayEnd)
 
   if (todayError) throw todayError
 
-  const totalCost = todayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
+  const totalCost =
+    todayData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
   const itemCount = todayData?.length ?? 0
 
   // Yesterday's waste for comparison
   const { data: yesterdayData } = await supabase
     .schema('inventory')
-    .from('batch_actions')
-    .select('original_value')
+    .from('batch_action_entries')
+    .select('total_original_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'dispose')
-    .gte('action_date', dates.yesterdayStart)
-    .lt('action_date', dates.yesterdayEnd)
+    .eq('action_type', 'dispose')
+    .gte('performed_at', dates.yesterdayStart)
+    .lt('performed_at', dates.yesterdayEnd)
 
   const yesterdayCost =
-    yesterdayData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
+    yesterdayData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
   const change = totalCost - yesterdayCost
   const changePercent = yesterdayCost > 0 ? (change / yesterdayCost) * 100 : 0

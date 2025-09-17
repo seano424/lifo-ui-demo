@@ -381,6 +381,7 @@ export type Database = {
       batch_action_entries: {
         Row: {
           action_type: Database["public"]["Enums"]["action_type"]
+          ai_score: number | null
           batch_id: string
           batch_initial_quantity: number
           discount_percentage: number | null
@@ -391,6 +392,8 @@ export type Database = {
           performed_at: string | null
           performed_by: string | null
           quantity_affected: number
+          recommended_action: Database["public"]["Enums"]["action_type"] | null
+          store_id: string | null
           total_original_value: number
           total_recovered_value: number
           verified_at: string | null
@@ -398,6 +401,7 @@ export type Database = {
         }
         Insert: {
           action_type: Database["public"]["Enums"]["action_type"]
+          ai_score?: number | null
           batch_id: string
           batch_initial_quantity: number
           discount_percentage?: number | null
@@ -408,6 +412,8 @@ export type Database = {
           performed_at?: string | null
           performed_by?: string | null
           quantity_affected: number
+          recommended_action?: Database["public"]["Enums"]["action_type"] | null
+          store_id?: string | null
           total_original_value?: number
           total_recovered_value?: number
           verified_at?: string | null
@@ -415,6 +421,7 @@ export type Database = {
         }
         Update: {
           action_type?: Database["public"]["Enums"]["action_type"]
+          ai_score?: number | null
           batch_id?: string
           batch_initial_quantity?: number
           discount_percentage?: number | null
@@ -425,6 +432,8 @@ export type Database = {
           performed_at?: string | null
           performed_by?: string | null
           quantity_affected?: number
+          recommended_action?: Database["public"]["Enums"]["action_type"] | null
+          store_id?: string | null
           total_original_value?: number
           total_recovered_value?: number
           verified_at?: string | null
@@ -1914,6 +1923,40 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_batch_actions_with_details: {
+        Args: {
+          p_action_type?: string
+          p_date_from?: string
+          p_date_to?: string
+          p_limit?: number
+          p_offset?: number
+          p_store_id: string
+        }
+        Returns: {
+          action_date: string
+          action_id: string
+          actual_action: string
+          ai_score: number
+          batch_id: string
+          batch_number: string
+          created_at: string
+          donation_recipient_id: string
+          expiry_date: string
+          location_code: string
+          notes: string
+          original_value: number
+          performed_by: string
+          product_name: string
+          quantity_affected: number
+          recipient_name: string
+          recipient_type: string
+          recommended_action: string
+          recovered_value: number
+          sku: string
+          store_id: string
+          total_count: number
+        }[]
+      }
       get_csv_upload_stats: {
         Args: { p_days_back?: number; p_store_id: string }
         Returns: {
@@ -1927,9 +1970,9 @@ export type Database = {
       get_current_kpis: {
         Args: { p_store_id: string }
         Returns: {
-          current_value: number
           kpi_name: string
-          last_updated: string
+          kpi_value: number
+          timestamp_value: string
         }[]
       }
       get_current_user_with_pin_auth: {

@@ -45,13 +45,13 @@ export type TodoFilters = {
   urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
   sort?: {
     field:
-    | 'expiry_date'
-    | 'urgency'
-    | 'current_quantity'
-    | 'potential_loss'
-    | 'alphabetical'
-    | 'action_date'
-    | 'effectiveness'
+      | 'expiry_date'
+      | 'urgency'
+      | 'current_quantity'
+      | 'potential_loss'
+      | 'alphabetical'
+      | 'action_date'
+      | 'effectiveness'
     direction: 'asc' | 'desc'
   }
 }
@@ -222,7 +222,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       console.log('[TodosFilteredList] Refetching stale batch actions data')
       batchActionsQuery.refetch()
     }
-  }, [activeTab])
+  }, [activeTab, batchActionsQuery.isStale, batchActionsQuery.refetch])
 
   const {
     data: batchActionsData,
@@ -231,8 +231,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     fetchNextPage: fetchBatchActionsNextPage,
     isFetchingNextPage: isFetchingBatchActionsNextPage,
   } = batchActionsQuery
-
-
 
   // Memoized batch actions processing with filtering and sorting
   const processedBatchActions = useMemo(() => {
@@ -293,7 +291,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     }
 
     return actions
-  }, [activeTab, batchActionsData?.pages, batchActionFilters])
+  }, [activeTab, batchActionsData, batchActionFilters, isBatchActionsLoading])
 
   const getFilteredCount = useCallback(
     (batches: ActionableBatch[], tab: string) => {
@@ -336,9 +334,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           ? infiniteData.pages[0].count
           : activeTab === 'suggestions' && filters.urgency && filters.urgency !== 'all'
             ? getFilteredCount(
-              analyticsResponse?.analytics?.actionable_batches || [],
-              'suggestions',
-            )
+                analyticsResponse?.analytics?.actionable_batches || [],
+                'suggestions',
+              )
             : analyticsResponse?.analytics?.actionable_batches?.length || 0,
       recently_expired:
         analyticsResponse?.analytics?.actionable_batches?.filter(
@@ -347,14 +345,14 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       all_active:
         activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
           ? getFilteredCount(
-            analyticsResponse?.analytics?.actionable_batches?.filter(
-              batch => new Date(batch.expiry_date) >= new Date(),
-            ) || [],
-            'all_active',
-          )
+              analyticsResponse?.analytics?.actionable_batches?.filter(
+                batch => new Date(batch.expiry_date) >= new Date(),
+              ) || [],
+              'all_active',
+            )
           : analyticsResponse?.analytics?.actionable_batches?.filter(
-            batch => new Date(batch.expiry_date) >= new Date(),
-          )?.length || 0,
+              batch => new Date(batch.expiry_date) >= new Date(),
+            )?.length || 0,
       action_history:
         batchActionFilters?.actionType && batchActionFilters.actionType !== 'all'
           ? getBatchActionsFilteredCount(batchActionsData?.pages?.flatMap(page => page.data) || [])

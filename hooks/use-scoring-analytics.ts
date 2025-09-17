@@ -10,7 +10,7 @@ import type { Database } from '@/types/supabase'
 import { useScoringThresholds } from './use-scoring-thresholds'
 
 // Type for batch actions from database
-export type BatchAction = Database['inventory']['Tables']['batch_actions']['Row']
+export type BatchAction = Database['inventory']['Tables']['batch_action_entries']['Row']
 export type ActionType = Database['public']['Enums']['action_type']
 
 // TypeScript interfaces for existing API responses
@@ -669,6 +669,13 @@ export interface BatchActionWithDetails extends BatchAction {
   // For computing effectiveness
   original_price?: number
   new_price?: number
+
+  // Backward compatibility aliases for old column names
+  action_id: string // Maps to entry_id
+  action_date: string | null // Maps to performed_at
+  actual_action: Database['public']['Enums']['action_type'] // Maps to action_type
+  original_value: number // Maps to total_original_value
+  recovered_value: number // Maps to total_recovered_value
 }
 
 // Interface for batch actions infinite query pagination
@@ -722,12 +729,12 @@ export function useBatchActionsInfinite(
       // Build the query with joins to get related data
       let query = supabase
         .schema('inventory')
-        .from('batch_actions')
+        .from('batch_action_entries')
         .select(
           `
           *,
           batches (
-            batch_number, 
+            batch_number,
             expiry_date,
             location_code,
             store_products (
@@ -745,31 +752,31 @@ export function useBatchActionsInfinite(
           { count: 'exact' },
         )
         .eq('store_id', storeId)
-        .order('action_date', { ascending: false })
+        .order('performed_at', { ascending: false })
         .range(offset, offset + limit - 1)
 
       // Apply filters if provided
       if (filters?.actionType) {
-        query = query.eq('actual_action', filters.actionType)
+        query = query.eq('action_type', filters.actionType)
       }
       if (filters?.dateFrom) {
-        query = query.gte('action_date', filters.dateFrom)
+        query = query.gte('performed_at', filters.dateFrom)
       }
       if (filters?.dateTo) {
-        query = query.lte('action_date', filters.dateTo)
+        query = query.lte('performed_at', filters.dateTo)
       }
 
       console.log('[useBatchActionsInfinite] Query details:', {
         storeId,
         schema: 'inventory',
-        table: 'batch_actions',
+        table: 'batch_action_entries',
         filters: {
           store_id: storeId,
-          actual_action: filters?.actionType || 'none',
+          action_type: filters?.actionType || 'none',
           dateFrom: filters?.dateFrom || 'none',
           dateTo: filters?.dateTo || 'none',
         },
-        orderBy: 'action_date DESC',
+        orderBy: 'performed_at DESC',
         pagination: `LIMIT ${limit} OFFSET ${offset}`,
       })
 
@@ -811,6 +818,12 @@ export function useBatchActionsInfinite(
         // Flatten recipient data
         recipient_name: action.donation_recipients?.name,
         recipient_type: action.donation_recipients?.recipient_type,
+        // Map new column names to old ones for backward compatibility
+        action_id: action.entry_id,
+        action_date: action.performed_at,
+        actual_action: action.action_type,
+        original_value: action.total_original_value,
+        recovered_value: action.total_recovered_value,
       }))
 
       console.log('[useBatchActionsInfinite] Transformed data:', {
