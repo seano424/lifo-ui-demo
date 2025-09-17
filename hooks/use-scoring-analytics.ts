@@ -847,3 +847,66 @@ export function useBatchActionsInfinite(
     gcTime: 0, // Don't cache for debugging
   })
 }
+
+// Count hooks for tab badges
+export function useSuggestionsCount(storeId: string | null, urgency?: string) {
+  const { data: analyticsResponse } = useStoreAnalytics(storeId || '')
+  const { data: infiniteData } = useTodosInfinite(storeId || '', 20, '7d', undefined, {
+    urgency: urgency && urgency !== 'all' ? urgency : undefined,
+  })
+
+  // Use infinite query count if available, otherwise calculate from analytics
+  if (infiniteData?.pages?.[0]?.count !== undefined) {
+    return infiniteData.pages[0].count
+  }
+
+  if (!analyticsResponse?.analytics?.actionable_batches) return 0
+
+  if (urgency && urgency !== 'all') {
+    return analyticsResponse.analytics.actionable_batches.filter(batch => batch.urgency === urgency)
+      .length
+  }
+
+  return analyticsResponse.analytics.actionable_batches.length
+}
+
+export function useRecentlyExpiredCount(storeId: string | null) {
+  const { data: analyticsResponse } = useStoreAnalytics(storeId || '')
+
+  if (!analyticsResponse?.analytics?.actionable_batches) return 0
+
+  return analyticsResponse.analytics.actionable_batches.filter(
+    batch => new Date(batch.expiry_date) < new Date(),
+  ).length
+}
+
+export function useAllActiveCount(storeId: string | null, urgency?: string) {
+  const { data: analyticsResponse } = useStoreAnalytics(storeId || '')
+
+  if (!analyticsResponse?.analytics?.actionable_batches) return 0
+
+  const activeBatches = analyticsResponse.analytics.actionable_batches.filter(
+    batch => new Date(batch.expiry_date) >= new Date(),
+  )
+
+  if (urgency && urgency !== 'all') {
+    return activeBatches.filter(batch => batch.urgency === urgency).length
+  }
+
+  return activeBatches.length
+}
+
+export function useActionHistoryCount(storeId: string | null, actionType?: string) {
+  const { data: batchActionsData } = useBatchActionsInfinite(storeId, 20)
+
+  if (!batchActionsData?.pages?.[0]) return 0
+
+  // Use filtered count if action type is specified
+  if (actionType && actionType !== 'all') {
+    const allActions = batchActionsData.pages.flatMap(page => page.data)
+    return allActions.filter(action => action.actual_action === actionType).length
+  }
+
+  // Use total count from first page
+  return batchActionsData.pages[0].count || 0
+}
