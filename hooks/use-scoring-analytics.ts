@@ -3,6 +3,7 @@
 'use client'
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { getMetricsService } from '@/lib/services/metrics'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
@@ -693,9 +694,23 @@ export function useBatchActionsInfinite(
     dateTo?: string
   },
 ) {
+  console.log('[useBatchActionsInfinite] Hook called with:', {
+    storeId,
+    pageSize,
+    filters,
+  })
+
   return useInfiniteQuery({
-    queryKey: ['batchActions', 'infinite', storeId, pageSize, filters],
+    queryKey: storeId
+      ? queryKeys.batchActions.infinite(storeId, pageSize, filters)
+      : ['batchActions', 'disabled'],
     queryFn: async ({ pageParam = 0 }): Promise<BatchActionsInfiniteData> => {
+      console.log('[useBatchActionsInfinite] QueryFn executing with:', {
+        storeId,
+        pageParam,
+        pageSize,
+        filters,
+      })
       if (!storeId) {
         return { data: [], nextPage: undefined, count: 0 }
       }
@@ -744,12 +759,45 @@ export function useBatchActionsInfinite(
         query = query.lte('action_date', filters.dateTo)
       }
 
+      console.log('[useBatchActionsInfinite] Query details:', {
+        storeId,
+        schema: 'inventory',
+        table: 'batch_actions',
+        filters: {
+          store_id: storeId,
+          actual_action: filters?.actionType || 'none',
+          dateFrom: filters?.dateFrom || 'none',
+          dateTo: filters?.dateTo || 'none',
+        },
+        orderBy: 'action_date DESC',
+        pagination: `LIMIT ${limit} OFFSET ${offset}`,
+      })
+
+      console.log('[useBatchActionsInfinite] About to execute query for store:', storeId)
       const { data, error, count } = await query
+
+      console.log('[useBatchActionsInfinite] Query executed:', {
+        hasError: !!error,
+        errorMessage: error?.message,
+        dataLength: data?.length || 0,
+        totalCount: count,
+      })
 
       if (error) {
         console.error('[useBatchActionsInfinite] Supabase error:', error)
         throw new Error(`Failed to fetch batch actions: ${error.message}`)
       }
+
+      // Log the raw data for debugging
+      console.log('[useBatchActionsInfinite] Raw batch actions data:', {
+        storeId,
+        pageParam,
+        offset,
+        limit,
+        dataLength: data?.length || 0,
+        count,
+        rawData: data,
+      })
 
       // Transform the data to include related information
       const transformedData: BatchActionWithDetails[] = (data || []).map(action => ({
@@ -765,6 +813,11 @@ export function useBatchActionsInfinite(
         recipient_type: action.donation_recipients?.recipient_type,
       }))
 
+      console.log('[useBatchActionsInfinite] Transformed data:', {
+        transformedLength: transformedData.length,
+        transformedData,
+      })
+
       const totalCount = count || 0
       const hasMore = offset + limit < totalCount
 
@@ -777,7 +830,7 @@ export function useBatchActionsInfinite(
     enabled: !!storeId,
     initialPageParam: 0,
     getNextPageParam: lastPage => lastPage.nextPage,
-    staleTime: 5 * 60 * 1000, // 5 minutes - actions don't change often
-    gcTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 0, // Force fresh queries for debugging
+    gcTime: 0, // Don't cache for debugging
   })
 }

@@ -45,13 +45,13 @@ export type TodoFilters = {
   urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
   sort?: {
     field:
-      | 'expiry_date'
-      | 'urgency'
-      | 'current_quantity'
-      | 'potential_loss'
-      | 'alphabetical'
-      | 'action_date'
-      | 'effectiveness'
+    | 'expiry_date'
+    | 'urgency'
+    | 'current_quantity'
+    | 'potential_loss'
+    | 'alphabetical'
+    | 'action_date'
+    | 'effectiveness'
     direction: 'asc' | 'desc'
   }
 }
@@ -70,6 +70,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
+
+  console.log('[TodosFilteredList] Store context:', {
+    activeStoreId,
+    initialFilters,
+  })
 
   const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'suggestions')
 
@@ -198,21 +203,57 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     urgency: filters.urgency,
   })
 
+  const batchActionsQuery = useBatchActionsInfinite(activeStoreId || null, pageSize || 20)
+
+  console.log('[TodosFilteredList] Batch actions query status:', {
+    status: batchActionsQuery.status,
+    fetchStatus: batchActionsQuery.fetchStatus,
+    isLoading: batchActionsQuery.isLoading,
+    isFetching: batchActionsQuery.isFetching,
+    isStale: batchActionsQuery.isStale,
+    dataUpdatedAt: batchActionsQuery.dataUpdatedAt,
+    data: batchActionsQuery.data,
+    error: batchActionsQuery.error,
+  })
+
+  // Force refetch when switching to action history tab
+  useEffect(() => {
+    if (activeTab === 'action_history' && batchActionsQuery.isStale) {
+      console.log('[TodosFilteredList] Refetching stale batch actions data')
+      batchActionsQuery.refetch()
+    }
+  }, [activeTab])
+
   const {
     data: batchActionsData,
     isLoading: isBatchActionsLoading,
     hasNextPage: hasBatchActionsNextPage,
     fetchNextPage: fetchBatchActionsNextPage,
     isFetchingNextPage: isFetchingBatchActionsNextPage,
-  } = useBatchActionsInfinite(activeStoreId || null, pageSize || 20)
+  } = batchActionsQuery
+
+
 
   // Memoized batch actions processing with filtering and sorting
   const processedBatchActions = useMemo(() => {
+    console.log('[processedBatchActions] Debug info:', {
+      activeTab,
+      hasBatchActionsData: !!batchActionsData,
+      hasPages: !!batchActionsData?.pages,
+      pagesLength: batchActionsData?.pages?.length,
+      firstPageData: batchActionsData?.pages?.[0]?.data,
+      firstPageCount: batchActionsData?.pages?.[0]?.count,
+      batchActionsData,
+      isBatchActionsLoading,
+    })
+
     if (activeTab !== 'action_history' || !batchActionsData?.pages) {
+      console.log('[processedBatchActions] Early return - no data or wrong tab')
       return []
     }
 
     let actions = batchActionsData.pages.flatMap(page => page.data)
+    console.log('[processedBatchActions] Flattened actions:', actions)
 
     // Apply action type filter
     if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
@@ -295,9 +336,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           ? infiniteData.pages[0].count
           : activeTab === 'suggestions' && filters.urgency && filters.urgency !== 'all'
             ? getFilteredCount(
-                analyticsResponse?.analytics?.actionable_batches || [],
-                'suggestions',
-              )
+              analyticsResponse?.analytics?.actionable_batches || [],
+              'suggestions',
+            )
             : analyticsResponse?.analytics?.actionable_batches?.length || 0,
       recently_expired:
         analyticsResponse?.analytics?.actionable_batches?.filter(
@@ -306,14 +347,14 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       all_active:
         activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
           ? getFilteredCount(
-              analyticsResponse?.analytics?.actionable_batches?.filter(
-                batch => new Date(batch.expiry_date) >= new Date(),
-              ) || [],
-              'all_active',
-            )
-          : analyticsResponse?.analytics?.actionable_batches?.filter(
+            analyticsResponse?.analytics?.actionable_batches?.filter(
               batch => new Date(batch.expiry_date) >= new Date(),
-            )?.length || 0,
+            ) || [],
+            'all_active',
+          )
+          : analyticsResponse?.analytics?.actionable_batches?.filter(
+            batch => new Date(batch.expiry_date) >= new Date(),
+          )?.length || 0,
       action_history:
         batchActionFilters?.actionType && batchActionFilters.actionType !== 'all'
           ? getBatchActionsFilteredCount(batchActionsData?.pages?.flatMap(page => page.data) || [])

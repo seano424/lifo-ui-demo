@@ -199,21 +199,24 @@ export function TodosCardList({
     )
   }
 
+  console.log('[TodosCardList] processedBatchActions', processedBatchActions)
+  console.log('[TodosCardList] todos', todos)
+
   return (
     <InfiniteScrollErrorBoundary>
       <div className="space-y-4 flex flex-col">
         <div className="flex flex-col gap-12">
           {tab === 'action_history'
             ? processedBatchActions.map(action => (
-                <BatchActionCard key={action.action_id} action={action} />
-              ))
+              <BatchActionCard key={action.action_id} action={action} />
+            ))
             : todos.map(todo => (
-                <TodoCard
-                  key={todo.batch_id}
-                  todo={todo}
-                  onClick={() => handleTodoClick(todo.batch_id)}
-                />
-              ))}
+              <TodoCard
+                key={todo.batch_id}
+                todo={todo}
+                onClick={() => handleTodoClick(todo.batch_id)}
+              />
+            ))}
         </div>
 
         {hasMore && (

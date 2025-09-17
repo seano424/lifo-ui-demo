@@ -187,6 +187,14 @@ export const queryKeys = {
     byStore: (storeId: string) => [...queryKeys.batchActions.all, 'byStore', storeId] as const,
     history: (storeId: string, days?: number) =>
       [...queryKeys.batchActions.byStore(storeId), 'history', { days }] as const,
+    infinite: (storeId: string, pageSize: number, filters?: object) =>
+      [
+        ...queryKeys.batchActions.byStore(storeId),
+        'infinite',
+        'pageSize',
+        pageSize,
+        ...(filters ? ['filters', JSON.stringify(filters)] : []),
+      ] as const,
   },
 
   // Scoring and analytics queries (served by Next.js API routes)
