@@ -39,6 +39,18 @@ export function TodoActionBottomSheet({
   const [donateQuantity, setDonateQuantity] = useState(selectedBatch?.current_quantity || 0)
   const [isSelectAll, setIsSelectAll] = useState(true)
 
+  // Sold tab state
+  const [soldQuantity, setSoldQuantity] = useState(selectedBatch?.current_quantity || 0)
+  const [isSoldSelectAll, setIsSoldSelectAll] = useState(true)
+  const [soldTiming, setSoldTiming] = useState('just-now')
+
+  // Dispose tab state
+  const [disposeQuantity, setDisposeQuantity] = useState(selectedBatch?.current_quantity || 0)
+  const [isDisposeSelectAll, setIsDisposeSelectAll] = useState(true)
+  const [selectedDisposalReason, setSelectedDisposalReason] = useState('expired')
+  const [customDisposalReason, setCustomDisposalReason] = useState('')
+  const [improveAlerts, setImproveAlerts] = useState(false)
+
   const {
     executeDonate,
     executeDiscount,
@@ -48,11 +60,15 @@ export function TodoActionBottomSheet({
     isProcessing,
   } = useBatchActionRPC()
 
-  // Update donate state when selectedBatch changes
+  // Update donate, sold, and dispose state when selectedBatch changes
   useEffect(() => {
     if (selectedBatch) {
       setDonateQuantity(selectedBatch.current_quantity)
       setIsSelectAll(true)
+      setSoldQuantity(selectedBatch.current_quantity)
+      setIsSoldSelectAll(true)
+      setDisposeQuantity(selectedBatch.current_quantity)
+      setIsDisposeSelectAll(true)
     }
   }, [selectedBatch])
 
@@ -155,9 +171,37 @@ export function TodoActionBottomSheet({
     }
   }
 
+  // Calculate sold metrics
+  const calculateSoldMetrics = () => {
+    const pricePerUnit = selectedBatch.potential_loss / selectedBatch.current_quantity
+    const totalRevenue = pricePerUnit * soldQuantity
+    const profitMargin = 100 // Full price = 100% profit margin
+
+    return {
+      pricePerUnit,
+      totalRevenue,
+      profitMargin,
+    }
+  }
+
+  // Calculate disposal metrics
+  const calculateDisposalMetrics = () => {
+    const pricePerUnit = selectedBatch.potential_loss / selectedBatch.current_quantity
+    const costLoss = pricePerUnit * disposeQuantity
+    const taxBenefitRate = 0.6 // €0.60 per unit (could have been donated)
+    const potentialTaxBenefit = disposeQuantity * taxBenefitRate
+
+    return {
+      costLoss,
+      potentialTaxBenefit,
+    }
+  }
+
   const priceMetrics = calculatePriceMetrics()
   const sellLikelihood = getSellLikelihood(priceMetrics.actualDiscountPercentage)
   const donationImpact = calculateDonationImpact()
+  const soldMetrics = calculateSoldMetrics()
+  const disposalMetrics = calculateDisposalMetrics()
 
   // Helper function to get recipient display name
   const getRecipientName = (recipientId: string) => {
@@ -181,9 +225,13 @@ export function TodoActionBottomSheet({
           ? `Set Price €${priceMetrics.newPrice.toFixed(2)}`
           : `Apply ${priceMetrics.actualDiscountPercentage}% Discount`
       case 'sold':
-        return 'Mark as Sold'
+        return soldQuantity === selectedBatch.current_quantity
+          ? 'Mark All as Sold'
+          : `Mark ${soldQuantity} as Sold`
       case 'dispose':
-        return 'Mark as Disposed'
+        return disposeQuantity === selectedBatch.current_quantity
+          ? 'Dispose All'
+          : `Dispose ${disposeQuantity} Units`
       case 'more':
         return 'Dismiss Alert'
       default:
@@ -216,16 +264,17 @@ export function TodoActionBottomSheet({
         case 'sold':
           await executeSold({
             batchId: selectedBatch.batch_id,
-            quantity: selectedBatch.current_quantity,
-            notes: 'Marked as sold from todos',
+            quantity: soldQuantity,
+            notes: `Marked ${soldQuantity} units as sold (${soldTiming}) - ${selectedBatch.reason}`,
           })
           break
         case 'dispose':
+          const disposalReason = selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
           await executeDispose({
             batchId: selectedBatch.batch_id,
-            quantity: selectedBatch.current_quantity,
-            disposalReason: 'expired',
-            notes: 'Disposed due to expiry',
+            quantity: disposeQuantity,
+            disposalReason,
+            notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.reason}${improveAlerts ? ' - User requested alert improvements' : ''}`,
           })
           break
         case 'more':
@@ -617,14 +666,308 @@ export function TodoActionBottomSheet({
             )}
 
             {activeTab === 'sold' && (
-              <div className="text-center">
-                <p className="text-lg">Mark as sold content coming in Phase 4</p>
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-lg">🎉</span>
+                    <h3 className="font-semibold text-lg">FULL PRICE SUCCESS</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Great news! You sold at full price.
+                  </p>
+                </div>
+
+                {/* Sale Details Box */}
+                <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                  <div className="text-sm space-y-1">
+                    <div className="font-medium text-green-800 mb-2">Sale details:</div>
+                    <div className="text-green-700">
+                      Price per unit: €{soldMetrics.pricePerUnit.toFixed(2)}
+                    </div>
+                    <div className="text-green-700">
+                      Total revenue: €{soldMetrics.totalRevenue.toFixed(2)}
+                    </div>
+                    <div className="text-green-700">
+                      Profit margin: {soldMetrics.profitMargin}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Units Sold Slider */}
+                <div className="space-y-3">
+                  <InputSlider
+                    value={soldQuantity}
+                    onChange={value => {
+                      setSoldQuantity(value)
+                      setIsSoldSelectAll(value === selectedBatch?.current_quantity)
+                    }}
+                    min={1}
+                    max={selectedBatch?.current_quantity || 1}
+                    step={1}
+                    label="Units sold:"
+                    suffix={`/${selectedBatch?.current_quantity}`}
+                    sliderColor="#22c55e"
+                  />
+
+                  {/* Select All Button */}
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSoldQuantity(selectedBatch?.current_quantity || 0)
+                        setIsSoldSelectAll(true)
+                      }}
+                      className={cn(
+                        'px-4 py-2 text-sm rounded-md border transition-all',
+                        isSoldSelectAll
+                          ? 'bg-green-500 text-white border-green-500'
+                          : 'bg-background border-border hover:border-green-500 hover:text-green-600',
+                      )}
+                    >
+                      SELECT ALL
+                    </button>
+                  </div>
+                </div>
+
+                {/* AI Learning Section */}
+                <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 text-blue-700 mb-2">
+                    <span>📊</span>
+                    <span className="text-sm font-medium">
+                      This helps our AI learn your customer preferences!
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sale Timing Options */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">When did this sell?</label>
+                  <div className="flex gap-3">
+                    {[
+                      { id: 'just-now', label: 'Just now' },
+                      { id: 'today', label: 'Today' },
+                      { id: 'yesterday', label: 'Yesterday' },
+                    ].map(option => (
+                      <button
+                        type="button"
+                        key={option.id}
+                        onClick={() => setSoldTiming(option.id)}
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-2 text-sm rounded-md border transition-all',
+                          soldTiming === option.id
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-border hover:border-primary/50',
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'w-3 h-3 rounded-full border-2 transition-all',
+                            soldTiming === option.id
+                              ? 'bg-primary-foreground border-primary-foreground'
+                              : 'border-border',
+                          )}
+                        />
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
             {activeTab === 'dispose' && (
-              <div className="text-center">
-                <p className="text-lg">Dispose content coming in Phase 5</p>
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-lg">⚠️</span>
+                    <h3 className="font-semibold text-lg">DISPOSAL TRACKING</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Unfortunately, we need to track waste to help prevent it in the future.
+                  </p>
+                </div>
+
+                {/* Disposal Reason Selection */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">Disposal reason:</label>
+                  <div className="space-y-2">
+                    {[
+                      { id: 'expired', label: 'Expired - past safe consumption', selected: true },
+                      { id: 'damaged', label: 'Damaged during handling', selected: false },
+                      { id: 'deteriorated', label: 'Quality deteriorated', selected: false },
+                      { id: 'complaint', label: 'Customer complaint', selected: false },
+                    ].map(reason => (
+                      <button
+                        type="button"
+                        key={reason.id}
+                        onClick={() => setSelectedDisposalReason(reason.id)}
+                        className={cn(
+                          'w-full p-3 text-left rounded-lg border transition-all',
+                          'flex items-center gap-3',
+                          selectedDisposalReason === reason.id
+                            ? 'bg-red-50 border-red-500 text-red-700'
+                            : 'bg-background border-border hover:border-red-300',
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'w-5 h-5 border-2 rounded transition-all flex items-center justify-center',
+                            selectedDisposalReason === reason.id
+                              ? 'bg-red-500 border-red-500'
+                              : 'border-border',
+                          )}
+                        >
+                          {selectedDisposalReason === reason.id && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="font-medium">{reason.label}</span>
+                      </button>
+                    ))}
+
+                    {/* Other reason option */}
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDisposalReason('other')}
+                        className={cn(
+                          'w-full p-3 text-left rounded-lg border transition-all',
+                          'flex items-center gap-3',
+                          selectedDisposalReason === 'other'
+                            ? 'bg-red-50 border-red-500 text-red-700'
+                            : 'bg-background border-border hover:border-red-300',
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'w-5 h-5 border-2 rounded transition-all flex items-center justify-center',
+                            selectedDisposalReason === 'other'
+                              ? 'bg-red-500 border-red-500'
+                              : 'border-border',
+                          )}
+                        >
+                          {selectedDisposalReason === 'other' && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="font-medium">Other:</span>
+                      </button>
+
+                      {selectedDisposalReason === 'other' && (
+                        <input
+                          type="text"
+                          placeholder="Specify other reason..."
+                          value={customDisposalReason}
+                          onChange={e => setCustomDisposalReason(e.target.value)}
+                          className={cn(
+                            'w-full px-3 py-2 text-sm border rounded-md transition-all ml-8',
+                            'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
+                            'bg-background border-border',
+                          )}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Units Disposed Slider */}
+                <div className="space-y-3">
+                  <InputSlider
+                    value={disposeQuantity}
+                    onChange={value => {
+                      setDisposeQuantity(value)
+                      setIsDisposeSelectAll(value === selectedBatch?.current_quantity)
+                    }}
+                    min={1}
+                    max={selectedBatch?.current_quantity || 1}
+                    step={1}
+                    label="Units disposed:"
+                    suffix={`/${selectedBatch?.current_quantity}`}
+                    sliderColor="#ef4444"
+                  />
+
+                  {/* Select All Button */}
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDisposeQuantity(selectedBatch?.current_quantity || 0)
+                        setIsDisposeSelectAll(true)
+                      }}
+                      className={cn(
+                        'px-4 py-2 text-sm rounded-md border transition-all',
+                        isDisposeSelectAll
+                          ? 'bg-red-500 text-white border-red-500'
+                          : 'bg-background border-border hover:border-red-500 hover:text-red-600',
+                      )}
+                    >
+                      SELECT ALL
+                    </button>
+                  </div>
+                </div>
+
+                {/* Financial Impact */}
+                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                  <div className="text-sm space-y-1">
+                    <div className="font-medium text-red-800 mb-2">Financial impact:</div>
+                    <div className="text-red-700">
+                      • Cost loss: €{disposalMetrics.costLoss.toFixed(2)}
+                    </div>
+                    <div className="text-red-700">
+                      • Could have donated for tax benefit (~€{disposalMetrics.potentialTaxBenefit.toFixed(2)})
+                    </div>
+                  </div>
+                </div>
+
+                {/* Alert Improvement Option */}
+                <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                  <div className="flex items-center gap-2 text-blue-700 mb-2">
+                    <span>💡</span>
+                    <span className="text-sm font-medium">
+                      Set earlier alerts to prevent this in the future?
+                    </span>
+                  </div>
+                  <div className="flex gap-3 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setImproveAlerts(true)}
+                      className={cn(
+                        'px-4 py-2 text-sm rounded-md border transition-all',
+                        improveAlerts
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'bg-background border-border hover:border-blue-500 hover:text-blue-600',
+                      )}
+                    >
+                      Yes, improve my alerts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImproveAlerts(false)}
+                      className={cn(
+                        'px-4 py-2 text-sm rounded-md border transition-all',
+                        !improveAlerts
+                          ? 'bg-gray-500 text-white border-gray-500'
+                          : 'bg-background border-border hover:border-gray-500 hover:text-gray-600',
+                      )}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
