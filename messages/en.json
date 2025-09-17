@@ -163,6 +163,7 @@
     "pageDescription": "View and manage your store's todos"
   },
   "scanOut": {
+    "available": "Available",
     "unknownProduct": "Unknown Product",
     "unknownBrand": "Unknown Brand",
     "scanProductToRemove": "Scan Product to Remove",
@@ -294,7 +295,8 @@
     "batchRemovalNote": "Batch removal: {productName} x{quantity}",
     "recentlyRemoved": "Recently Removed ({count} items)",
     "removedQuantityExpires": "Removed {quantity}x • Expires: {date}",
-    "andMoreItems": "... and {count} more items"
+    "andMoreItems": "... and {count} more items",
+    "cancel": "Cancel"
   },
   "buttons": {
     "export": "Export",
@@ -627,9 +629,11 @@
         "label": "Waste Cost",
         "subtitle": "items"
       },
-      "errorMessage": "Some metrics could not be loaded. Please try refreshing."
+      "errorMessage": "Some metrics could not be loaded. Please try refreshing.",
+      "cancel": "Cancel"
     }
   },
+  "cancel": "Cancel",
   "actions": {
     "add": "Add",
     "edit": "Edit",
@@ -1344,6 +1348,43 @@
       "postalCodePlaceholder": "75001",
       "countryPlaceholder": "France",
       "phonePlaceholder": "01 23 45 67 89"
+    }
+  },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Add Store Details",
+        "complete": "Complete Store Information"
+      },
+      "subtitle": {
+        "manual": "Enter your store information",
+        "complete": "Select your store type and verify details"
+      },
+      "labels": {
+        "storeName": "Store Name",
+        "businessName": "Business Name (Optional)",
+        "address": "Address",
+        "city": "City",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "phone": "Phone Number (Optional)",
+        "storeType": "Store Type"
+      },
+      "placeholders": {
+        "storeName": "Your Store Name",
+        "businessName": "If different from store name",
+        "address": "123 Rue de la Paix",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "phone": "01 23 45 67 89",
+        "selectStoreType": "Select store type"
+      },
+      "buttons": {
+        "back": "Back",
+        "creating": "Creating Store...",
+        "create": "Create Store"
+      }
     }
   },
   "errors": {

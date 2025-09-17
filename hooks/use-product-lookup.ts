@@ -1,5 +1,11 @@
-// hooks/use-product-lookup.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  openFoodFactsClient,
+  type ProductLookupResult,
+  transformOpenFoodFactsProduct,
+} from '@/lib/queries/open-food-facts'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { createClient } from '@/lib/supabase/client'
 
 // Constants
 const LOOKUP_CONFIG = {
@@ -11,15 +17,52 @@ const LOOKUP_CONFIG = {
   RETRY_COUNT: 1,
 } as const
 
-import {
-  openFoodFactsClient,
-  type ProductLookupResult,
-  transformOpenFoodFactsProduct,
-} from '@/lib/queries/open-food-facts'
-import { queryKeys } from '@/lib/queries/query-keys'
-import { createClient } from '@/lib/supabase/client'
+// Types
+export interface SupabaseProductSearchResult {
+  product_id: string
+  name: string
+  brand?: string
+  category?: string
+  barcode?: string
+  image_url?: string
+  unit_type?: string
+  total_available_quantity?: number
+  batch_count?: number
+  isOutOfStock?: boolean
+}
 
-// Hook to lookup product by barcode with caching
+interface RpcLookupResult {
+  found: boolean
+  product_data?: unknown
+  source?: string
+  cached_at?: string
+}
+
+// Utilities
+function parseFirstCategory(categories: unknown): string | null {
+  if (!categories) return null
+  try {
+    const categoryStr = String(categories)
+    if (!categoryStr || categoryStr === 'undefined' || categoryStr === 'null') return null
+    const firstCategory = categoryStr.split(',')[0]?.trim()
+    return firstCategory || null
+  } catch {
+    return null
+  }
+}
+
+function isValidCategory(obj: unknown): obj is { display_name_en: string } | null {
+  if (obj === null) return true
+  if (typeof obj === 'object' && obj !== null) {
+    return (
+      'display_name_en' in obj &&
+      typeof (obj as Record<string, unknown>).display_name_en === 'string'
+    )
+  }
+  return false
+}
+
+// Main product lookup hook using optimized RPC function
 export function useProductLookup(barcode: string | null, enabled: boolean = true) {
   return useQuery({
     queryKey: queryKeys.productLookup.byBarcode(barcode || ''),
@@ -28,119 +71,38 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
         throw new Error('No barcode provided')
       }
 
-      // First, check our cache
       const supabase = createClient()
-      const { data: cachedProduct } = await supabase
-        .from('product_recognition_cache')
-        .select('*')
-        .eq('barcode', barcode)
+
+      // Use optimized RPC function that checks cache and products in one call
+      const { data: lookupResult, error: rpcError } = await supabase
+        .rpc('lookup_product_with_cache', { barcode_param: barcode })
         .single()
 
-      if (cachedProduct) {
-        return {
-          barcode,
-          found: true,
-          product: cachedProduct.open_food_facts_data,
-          source: 'cache',
-          cached_at: cachedProduct.last_verified,
-        }
+      // If RPC function doesn't exist, fall back to manual lookup
+      if (rpcError?.code === '42883') {
+        return await fallbackProductLookup(barcode, supabase)
       }
 
-      // If not cached, check our Supabase products database first
-      const { data: supabaseProduct, error: supabaseError } = await supabase
-        .schema('inventory')
-        .from('products')
-        .select('product_id, name, brand, barcode, image_url, open_food_facts_data, is_verified')
-        .eq('barcode', barcode)
-        .single()
-
-      if (supabaseError && supabaseError.code !== 'PGRST116') {
-        console.error('[ProductLookup] Supabase query error:', supabaseError)
+      if (rpcError) {
+        console.error('[ProductLookup] RPC lookup failed:', rpcError)
+        return await fallbackProductLookup(barcode, supabase)
       }
 
-      if (supabaseProduct) {
-        // If we have Open Food Facts data, use it
-        if (supabaseProduct.open_food_facts_data) {
-          // Cache the Supabase product for future lookups
-          await supabase.from('product_recognition_cache').upsert({
-            barcode,
-            product_name: supabaseProduct.name,
-            brand: supabaseProduct.brand || null,
-            category: parseFirstCategory(supabaseProduct.open_food_facts_data.categories),
-            image_url: supabaseProduct.image_url || null,
-            open_food_facts_data: supabaseProduct.open_food_facts_data,
-            is_verified: supabaseProduct.is_verified,
-            verification_count: 1,
-          })
-
+      if (lookupResult && typeof lookupResult === 'object' && 'found' in lookupResult) {
+        const result = lookupResult as RpcLookupResult
+        if (result.found) {
           return {
             barcode,
             found: true,
-            product: supabaseProduct.open_food_facts_data,
-            source: 'supabase',
-          }
-        } else {
-          // If no Open Food Facts data, create a minimal product structure
-          const minimalProduct = {
-            _id: supabaseProduct.product_id,
-            product_name: supabaseProduct.name,
-            brands: supabaseProduct.brand || '',
-            image_front_url: supabaseProduct.image_url || '',
-            categories: '',
-          }
-
-          // Cache the minimal product
-          await supabase.from('product_recognition_cache').upsert({
-            barcode,
-            product_name: supabaseProduct.name,
-            brand: supabaseProduct.brand || null,
-            category: null,
-            image_url: supabaseProduct.image_url || null,
-            open_food_facts_data: minimalProduct,
-            is_verified: supabaseProduct.is_verified,
-            verification_count: 1,
-          })
-
-          return {
-            barcode,
-            found: true,
-            product: minimalProduct,
-            source: 'supabase',
+            product: result.product_data as ProductLookupResult['product'],
+            source: result.source as ProductLookupResult['source'],
+            cached_at: result.cached_at,
           }
         }
       }
 
-      // If not in Supabase either, fetch from Open Food Facts
-      try {
-        const offResponse = await openFoodFactsClient.lookupProduct(barcode)
-        const result = transformOpenFoodFactsProduct(barcode, offResponse)
-
-        // Cache successful lookups
-        if (result.found && result.product) {
-          await supabase.from('product_recognition_cache').upsert({
-            barcode,
-            product_name:
-              result.product.product_name || result.product.product_name_en || 'Unknown Product',
-            brand: result.product.brands || null,
-            category: parseFirstCategory(result.product.categories),
-            image_url: result.product.image_front_url || result.product.image_url || null,
-            open_food_facts_data: result.product,
-            typical_shelf_life_days: null, // We'll estimate this later
-            is_verified: false,
-            verification_count: 1,
-          })
-        }
-
-        return result
-      } catch (error) {
-        console.error('Product lookup failed:', error)
-        return {
-          barcode,
-          found: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          source: 'open_food_facts',
-        }
-      }
+      // Not found in cache or Supabase, fetch from Open Food Facts
+      return await fetchFromOpenFoodFacts(barcode, supabase)
     },
     enabled: enabled && !!barcode && barcode.length >= LOOKUP_CONFIG.MIN_BARCODE_LENGTH,
     staleTime: LOOKUP_CONFIG.CACHE_STALE_TIME,
@@ -149,7 +111,309 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
   })
 }
 
-// Hook to search products by name
+// Fallback function for manual lookup when RPC is not available
+async function fallbackProductLookup(
+  barcode: string,
+  supabase: ReturnType<typeof createClient>,
+): Promise<ProductLookupResult> {
+  // Check cache first
+  const { data: cachedProduct } = await supabase
+    .from('product_recognition_cache')
+    .select('*')
+    .eq('barcode', barcode)
+    .maybeSingle()
+
+  if (cachedProduct) {
+    return {
+      barcode,
+      found: true,
+      product: cachedProduct.open_food_facts_data,
+      source: 'cache',
+      cached_at: cachedProduct.last_verified,
+    }
+  }
+
+  // Check products table
+  const { data: supabaseProduct } = await supabase
+    .schema('inventory')
+    .from('products')
+    .select('product_id, name, brand, barcode, image_url, open_food_facts_data, is_verified')
+    .eq('barcode', barcode)
+    .maybeSingle()
+
+  if (supabaseProduct) {
+    const productData = supabaseProduct.open_food_facts_data || {
+      _id: supabaseProduct.product_id,
+      product_name: supabaseProduct.name,
+      brands: supabaseProduct.brand || '',
+      image_front_url: supabaseProduct.image_url || '',
+      categories: '',
+    }
+
+    // Cache in background (don't await)
+    supabase.from('product_recognition_cache').upsert({
+      barcode,
+      product_name: supabaseProduct.name,
+      brand: supabaseProduct.brand || null,
+      category: parseFirstCategory(productData.categories),
+      image_url: supabaseProduct.image_url || null,
+      open_food_facts_data: productData,
+      is_verified: supabaseProduct.is_verified,
+      verification_count: 1,
+    })
+
+    return {
+      barcode,
+      found: true,
+      product: productData,
+      source: 'supabase',
+    }
+  }
+
+  // Fetch from Open Food Facts
+  return await fetchFromOpenFoodFacts(barcode, supabase)
+}
+
+// Open Food Facts lookup with caching
+async function fetchFromOpenFoodFacts(
+  barcode: string,
+  supabase: ReturnType<typeof createClient>,
+): Promise<ProductLookupResult> {
+  try {
+    const offResponse = await openFoodFactsClient.lookupProduct(barcode)
+    const result = transformOpenFoodFactsProduct(barcode, offResponse)
+
+    // Cache successful lookups in background (don't await)
+    if (result.found && result.product) {
+      supabase.from('product_recognition_cache').upsert({
+        barcode,
+        product_name:
+          result.product.product_name || result.product.product_name_en || 'Unknown Product',
+        brand: result.product.brands || null,
+        category: parseFirstCategory(result.product.categories),
+        image_url: result.product.image_front_url || result.product.image_url || null,
+        open_food_facts_data: result.product,
+        is_verified: false,
+        verification_count: 1,
+      })
+    }
+
+    return result
+  } catch (error) {
+    console.error('[ProductLookup] Open Food Facts lookup failed:', error)
+    return {
+      barcode,
+      found: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      source: 'open_food_facts',
+    }
+  }
+}
+
+// Optimized product search using RPC function
+export function useSupabaseProductSearch(storeId?: string) {
+  return useMutation({
+    mutationFn: async (query: string): Promise<SupabaseProductSearchResult[]> => {
+      if (!query || query.length < LOOKUP_CONFIG.MIN_SEARCH_LENGTH - 1) {
+        return []
+      }
+
+      const supabase = createClient()
+
+      // Try optimized RPC function first
+      const { data: rpcResults, error: rpcError } = await supabase.rpc(
+        'search_products_with_stock',
+        {
+          search_query: query,
+          store_id_param: storeId || null,
+          max_results: LOOKUP_CONFIG.MAX_SEARCH_RESULTS,
+        },
+      )
+
+      // If RPC function works, use it
+      if (!rpcError && rpcResults) {
+        return rpcResults.map(
+          (row: {
+            product_id: string
+            name: string
+            brand?: string
+            category_name?: string
+            barcode?: string
+            image_url?: string
+            unit_type?: string
+            total_available_quantity?: number
+            batch_count?: number
+            is_out_of_stock?: boolean
+          }) => ({
+            product_id: row.product_id,
+            name: row.name,
+            brand: row.brand || undefined,
+            category: row.category_name || undefined,
+            barcode: row.barcode || undefined,
+            image_url: row.image_url || undefined,
+            unit_type: row.unit_type || undefined,
+            total_available_quantity: row.total_available_quantity || undefined,
+            batch_count: row.batch_count || undefined,
+            isOutOfStock: row.is_out_of_stock || false,
+          }),
+        )
+      }
+
+      // Fallback to manual queries if RPC fails
+      console.warn('[SupabaseProductSearch] RPC failed, using fallback:', rpcError?.message)
+      return await fallbackProductSearch(query, storeId, supabase)
+    },
+  })
+}
+
+// Fallback product search using correct relationship path
+async function fallbackProductSearch(
+  query: string,
+  storeId: string | undefined,
+  supabase: ReturnType<typeof createClient>,
+): Promise<SupabaseProductSearchResult[]> {
+  if (storeId) {
+    // For outbound: Use a simplified approach with two separate queries
+    // First get products that match the search
+    const { data: matchingProducts, error: productError } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select(
+        `
+        product_id,
+        name,
+        brand,
+        barcode,
+        image_url,
+        unit_type,
+        categories (
+          display_name_en
+        )
+      `,
+      )
+      .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
+      .limit(LOOKUP_CONFIG.MAX_SEARCH_RESULTS)
+
+    if (productError) {
+      console.error('[SupabaseProductSearch] Product search failed:', productError)
+      throw productError
+    }
+
+    if (!matchingProducts || matchingProducts.length === 0) {
+      return []
+    }
+
+    // Get product IDs for stock lookup
+    const productIds = matchingProducts.map(p => p.product_id)
+
+    // Now get stock information for these products
+    const { data: stockData, error: stockError } = await supabase
+      .schema('inventory')
+      .from('store_products')
+      .select(
+        `
+        product_id,
+        batches (
+          current_quantity,
+          status
+        )
+      `,
+      )
+      .eq('store_id', storeId)
+      .eq('is_active', true)
+      .in('product_id', productIds)
+
+    if (stockError) {
+      console.error('[SupabaseProductSearch] Stock lookup failed:', stockError)
+      throw stockError
+    }
+
+    // Create a map for quick stock lookups
+    const stockMap = new Map<string, { totalQuantity: number; batchCount: number }>()
+
+    for (const storeProduct of stockData || []) {
+      const productId = storeProduct.product_id
+      const activeBatches = Array.isArray(storeProduct.batches)
+        ? storeProduct.batches
+        : storeProduct.batches
+          ? [storeProduct.batches]
+          : []
+
+      let totalQuantity = 0
+      let batchCount = 0
+
+      for (const batch of activeBatches) {
+        if (batch?.status === 'active' && batch.current_quantity > 0) {
+          totalQuantity += batch.current_quantity
+          batchCount += 1
+        }
+      }
+
+      stockMap.set(productId, { totalQuantity, batchCount })
+    }
+
+    // Combine product data with stock data
+    return matchingProducts
+      .map(product => {
+        const stock = stockMap.get(product.product_id)
+        const categories = isValidCategory(product.categories) ? product.categories : null
+
+        return {
+          product_id: product.product_id,
+          name: product.name,
+          brand: product.brand || undefined,
+          category: categories?.display_name_en || undefined,
+          barcode: product.barcode || undefined,
+          image_url: product.image_url || undefined,
+          unit_type: product.unit_type || undefined,
+          total_available_quantity: stock?.totalQuantity || 0,
+          batch_count: stock?.batchCount || 0,
+          isOutOfStock: !stock || stock.totalQuantity === 0,
+        }
+      })
+      .filter(result => !result.isOutOfStock) // Only return products with stock
+  } else {
+    // For inbound: Simple products search
+    const { data, error } = await supabase
+      .schema('inventory')
+      .from('products')
+      .select(
+        `
+        product_id,
+        name,
+        brand,
+        barcode,
+        image_url,
+        unit_type,
+        categories (
+          display_name_en
+        )
+      `,
+      )
+      .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
+      .limit(LOOKUP_CONFIG.MAX_SEARCH_RESULTS)
+
+    if (error) {
+      console.error('[SupabaseProductSearch] Product search failed:', error)
+      throw error
+    }
+
+    return (data || []).map(product => {
+      const categories = isValidCategory(product.categories) ? product.categories : null
+      return {
+        product_id: product.product_id,
+        name: product.name,
+        brand: product.brand || undefined,
+        category: categories?.display_name_en || undefined,
+        barcode: product.barcode || undefined,
+        image_url: product.image_url || undefined,
+        unit_type: product.unit_type || undefined,
+      }
+    })
+  }
+}
+
+// Open Food Facts search hook
 export function useProductSearch() {
   return useMutation({
     mutationFn: async (query: string) => {
@@ -161,7 +425,7 @@ export function useProductSearch() {
   })
 }
 
-// Hook to manually add product to cache
+// Manual cache management hooks
 export function useAddProductToCache() {
   const queryClient = useQueryClient()
 
@@ -195,7 +459,7 @@ export function useAddProductToCache() {
             categories: category,
             image_front_url: imageUrl,
           },
-          is_verified: true, // Manual entries are considered verified
+          is_verified: true,
           verification_count: 1,
         })
         .select()
@@ -205,7 +469,6 @@ export function useAddProductToCache() {
       return data
     },
     onSuccess: data => {
-      // Invalidate and update the cache
       queryClient.invalidateQueries({
         queryKey: queryKeys.productLookup.byBarcode(data.barcode),
       })
@@ -213,7 +476,6 @@ export function useAddProductToCache() {
   })
 }
 
-// Hook to verify and update cached product
 export function useVerifyProduct() {
   const queryClient = useQueryClient()
 
@@ -240,16 +502,10 @@ export function useVerifyProduct() {
       }
 
       if (corrections) {
-        updateData.product_name = corrections.product_name
-        updateData.brand = corrections.brand
-        updateData.category = corrections.category
-
-        // Update the open_food_facts_data as well
+        Object.assign(updateData, corrections)
         updateData.open_food_facts_data = {
           ...(updateData.open_food_facts_data || {}),
-          product_name: corrections.product_name,
-          brands: corrections.brand,
-          categories: corrections.category,
+          ...corrections,
         }
       }
 
@@ -264,104 +520,9 @@ export function useVerifyProduct() {
       return data
     },
     onSuccess: data => {
-      // Invalidate the product lookup cache
       queryClient.invalidateQueries({
         queryKey: queryKeys.productLookup.byBarcode(data.barcode),
       })
-    },
-  })
-}
-
-// Type guard for category data
-function isValidCategory(obj: unknown): obj is { display_name_en: string } | null {
-  if (obj === null) return true
-  if (typeof obj === 'object' && obj !== null) {
-    return (
-      'display_name_en' in obj &&
-      typeof (obj as Record<string, unknown>).display_name_en === 'string'
-    )
-  }
-  return false
-}
-
-// Safe category parser utility
-function parseFirstCategory(categories: unknown): string | null {
-  if (!categories) return null
-
-  try {
-    const categoryStr = String(categories)
-    if (!categoryStr || categoryStr === 'undefined' || categoryStr === 'null') return null
-
-    const firstCategory = categoryStr.split(',')[0]?.trim()
-    return firstCategory || null
-  } catch {
-    return null
-  }
-}
-
-// Hook to search products by name in Supabase (for outbound/scan-out)
-// For outbound: searches batches with available stock
-// For inbound: searches all products
-export interface SupabaseProductSearchResult {
-  product_id: string
-  name: string
-  brand?: string
-  category?: string
-  barcode?: string
-  image_url?: string
-  unit_type?: string
-  total_available_quantity?: number // Total available across all batches
-  batch_count?: number // Number of batches available
-  isOutOfStock?: boolean // True if no stock available
-}
-
-export function useSupabaseProductSearch(_storeId?: string) {
-  return useMutation({
-    mutationFn: async (query: string): Promise<SupabaseProductSearchResult[]> => {
-      if (!query || query.length < LOOKUP_CONFIG.MIN_SEARCH_LENGTH - 1) {
-        return []
-      }
-
-      const supabase = createClient()
-
-      // Search products directly - simpler approach for both inbound and outbound
-      const { data, error } = await supabase
-        .schema('inventory')
-        .from('products')
-        .select(`
-          product_id, 
-          name, 
-          brand, 
-          barcode, 
-          image_url, 
-          unit_type,
-          categories (
-            display_name_en
-          )
-        `)
-        .or(`name.ilike.%${query}%,brand.ilike.%${query}%`)
-        .limit(LOOKUP_CONFIG.MAX_SEARCH_RESULTS)
-
-      if (error) {
-        console.error('[SupabaseProductSearch] Failed to search products:', error)
-        throw error
-      }
-
-      // Transform the results to include category name
-      const results = (data || []).map(product => {
-        const categories = isValidCategory(product.categories) ? product.categories : null
-        return {
-          product_id: product.product_id,
-          name: product.name,
-          brand: product.brand || undefined,
-          category: categories?.display_name_en || undefined,
-          barcode: product.barcode || undefined,
-          image_url: product.image_url || undefined,
-          unit_type: product.unit_type || undefined,
-        }
-      })
-
-      return results
     },
   })
 }

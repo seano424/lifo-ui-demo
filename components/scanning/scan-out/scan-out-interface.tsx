@@ -299,7 +299,11 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           handleBatchSelected(matchedBatch)
         } else {
           // No matching batch found
-          setOcrError(t('noBatchFoundWithExpiry', { date: result.expiryDateInfo.extractedDate }))
+          setOcrError(
+            t('noBatchFoundWithExpiry', {
+              date: result.expiryDateInfo.extractedDate,
+            }),
+          )
         }
       } else {
         setOcrError(result.error?.message || t('ocrProcessingFailed'))
@@ -321,7 +325,10 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         quantityRemoved: item.quantity,
         reason: 'scan-out',
         storeId: activeStore?.store_id || '',
-        notes: t('batchRemovalNote', { productName: item.productName, quantity: item.quantity }),
+        notes: t('batchRemovalNote', {
+          productName: item.productName,
+          quantity: item.quantity,
+        }),
       })),
       {
         onSuccess: result => {
@@ -431,6 +438,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border"
               >
                 <div className="flex-1">
+                  <div className="font-medium">
+                    {item.maxQuantity} {t('available')}
+                  </div>
                   <div className="font-medium">{item.productName}</div>
                   <div className="text-sm text-gray-500">
                     {item.brand} • {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
@@ -587,7 +597,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               </DialogTitle>
               <DialogDescription>
                 {submissionResult.successCount === submissionResult.totalCount
-                  ? t('successfullyRemoved', { count: submissionResult.successCount })
+                  ? t('successfullyRemoved', {
+                      count: submissionResult.successCount,
+                    })
                   : t('partiallyRemoved', {
                       success: submissionResult.successCount,
                       total: submissionResult.totalCount,

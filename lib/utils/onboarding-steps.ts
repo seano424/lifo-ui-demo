@@ -3,7 +3,7 @@
  */
 
 // Translation function type - will be set by components using the utilities
-type TranslationFunction = (key: string) => string
+export type TranslationFunction = (key: string) => string
 let translateFunction: TranslationFunction | null = null
 
 // Function to set the translation function from components
@@ -80,11 +80,19 @@ function getStepsWithLabels(steps: StepConfig[]): StepConfigWithLabel[] {
 /**
  * Get the available steps based on Google Places availability
  */
-export function getAvailableSteps(isGooglePlacesEnabled: boolean): StepConfigWithLabel[] {
+export function getAvailableSteps(
+  isGooglePlacesEnabled: boolean,
+  t?: TranslationFunction,
+): StepConfigWithLabel[] {
   const filteredSteps = ALL_STEPS.filter(
     step => !step.requiresGooglePlaces || isGooglePlacesEnabled,
   )
-  return getStepsWithLabels(filteredSteps)
+  // Use provided translation function or fall back to module-level one
+  const translationFn = t || translateFunction
+  return filteredSteps.map(step => ({
+    ...step,
+    label: translationFn ? translationFn(step.labelKey) : step.labelFallback,
+  }))
 }
 
 /**
@@ -153,6 +161,9 @@ export function getPreviousStepId(
 /**
  * Get the success step index (total steps + 1)
  */
-export function getSuccessStepIndex(isGooglePlacesEnabled: boolean): number {
-  return getAvailableSteps(isGooglePlacesEnabled).length + 1
+export function getSuccessStepIndex(
+  isGooglePlacesEnabled: boolean,
+  t?: TranslationFunction,
+): number {
+  return getAvailableSteps(isGooglePlacesEnabled, t).length + 1
 }

@@ -493,6 +493,7 @@
       "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
     }
   },
+  "cancel": "Annuler",
   "actions": {
     "add": "Ajouter",
     "edit": "Modifier",
@@ -1085,6 +1086,43 @@
       "postalCodePlaceholder": "75001",
       "countryPlaceholder": "France",
       "phonePlaceholder": "01 23 45 67 89"
+    }
+  },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Ajouter détails du magasin",
+        "complete": "Compléter les informations du magasin"
+      },
+      "subtitle": {
+        "manual": "Entrez vos informations de magasin",
+        "complete": "Sélectionnez votre type de magasin et vérifiez les détails"
+      },
+      "labels": {
+        "storeName": "Nom du magasin",
+        "businessName": "Nom de l'entreprise (Optionnel)",
+        "address": "Adresse",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays",
+        "phone": "Numéro de téléphone (Optionnel)",
+        "storeType": "Type de magasin"
+      },
+      "placeholders": {
+        "storeName": "Nom de votre magasin",
+        "businessName": "Si différent du nom du magasin",
+        "address": "123 Rue de la Paix",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "phone": "01 23 45 67 89",
+        "selectStoreType": "Sélectionner le type de magasin"
+      },
+      "buttons": {
+        "back": "Retour",
+        "creating": "Création du magasin...",
+        "create": "Créer le magasin"
+      }
     }
   },
   "errors": {
@@ -1743,6 +1781,7 @@
     "pageDescription": "Suggestions personnalisées pour optimiser votre inventaire et réduire les déchets"
   },
   "scanOut": {
+    "available": "Disponible",
     "unknownProduct": "Produit inconnu",
     "unknownBrand": "Marque inconnue",
     "scanProductToRemove": "Scanner le produit à retirer",
@@ -1874,7 +1913,8 @@
     "noBatchFoundWithExpiry": "Aucun lot trouvé avec la date d'expiration : {date}",
     "noInventoryAvailable": "Aucun inventaire disponible pour ce produit dans le magasin actuel.",
     "ocrProcessingFailed": "Le traitement OCR a échoué",
-    "batchRemovalNote": "Retrait de lot : {productName} x{quantity}"
+    "batchRemovalNote": "Retrait de lot : {productName} x{quantity}",
+    "cancel": "Annuler"
   },
   "inbound": {
     "mobile": {
