@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
-import './globals.css'
-import { getMessages } from 'next-intl/server'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
+import type { Metadata } from 'next'
+import { getMessages } from 'next-intl/server'
+import { ThemeProvider } from 'next-themes'
+import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
+import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -59,8 +59,8 @@ export default async function RootLayout({
       <body className={`font-sans antialiased ${devMode && 'debug-screens'}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light" // Changed from "system" to "light" to avoid transitions - To change when we have a good dark mode that works well with the new design
+          enableSystem={false}
           disableTransitionOnChange
         >
           <ReactQueryProvider>
