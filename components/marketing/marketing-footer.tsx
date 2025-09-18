@@ -48,7 +48,7 @@ export function MarketingFooter() {
             </Typography>
             <div className="grid grid-cols-1 gap-2">
               <Link
-                href="/features"
+                href="/"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Homepage

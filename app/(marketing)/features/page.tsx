@@ -40,6 +40,7 @@ function FeatureCard({ title, description, icon, image, reversed = false }: Feat
             </div>
             <Typography
               variant="h2"
+              as="h1"
               className="text-2xl sm:text-3xl xl:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
             >
               {title}
@@ -234,7 +235,7 @@ export default function FeaturesPage() {
 
   return (
     <div className="min-h-screen py-12 sm:py-16 lg:py-20 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 lg:mb-20">
           <Typography
@@ -245,7 +246,7 @@ export default function FeaturesPage() {
           </Typography>
           <Typography
             variant="p"
-            className="text-lg sm:text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed px-4"
+            className="text-lg sm:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed"
           >
             {t('subtitle')}
           </Typography>
