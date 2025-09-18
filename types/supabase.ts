@@ -465,6 +465,13 @@ export type Database = {
             foreignKeyName: "batch_action_entries_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
+            referencedRelation: "batch_todo_states"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_action_entries_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
             referencedRelation: "batches"
             referencedColumns: ["batch_id"]
           },
@@ -553,6 +560,13 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batch_status"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batch_todo_states"
             referencedColumns: ["batch_id"]
           },
           {
@@ -1191,6 +1205,37 @@ export type Database = {
         }
         Relationships: []
       }
+      batch_todo_states: {
+        Row: {
+          ai_calculated_at: string | null
+          ai_recommendation: string | null
+          available_quantity: number | null
+          batch_id: string | null
+          batch_number: string | null
+          batch_status: string | null
+          composite_score: number | null
+          current_quantity: number | null
+          days_to_expiry: number | null
+          expiry_date: string | null
+          hours_since_last_action: number | null
+          last_action_quantity: number | null
+          last_action_time: string | null
+          last_action_type: Database["public"]["Enums"]["action_type"] | null
+          last_discount_percent: number | null
+          priority_order: number | null
+          product_brand: string | null
+          product_name: string | null
+          store_id: string | null
+          todo_state: string | null
+          total_actions_ever: number | null
+          total_discounted_quantity: number | null
+          total_disposed_quantity: number | null
+          total_donated_quantity: number | null
+          urgency_level: string | null
+          view_refreshed_at: string | null
+        }
+        Relationships: []
+      }
       batches_needing_action: {
         Row: {
           batch_id: string | null
@@ -1474,6 +1519,13 @@ export type Database = {
             foreignKeyName: "sales_events_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
+            referencedRelation: "batch_todo_states"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
             referencedRelation: "batches"
             referencedColumns: ["batch_id"]
           },
@@ -1485,6 +1537,18 @@ export type Database = {
             referencedColumns: ["batch_id"]
           },
         ]
+      }
+      todos_dashboard_view: {
+        Row: {
+          avg_score: number | null
+          item_count: number | null
+          max_days_to_expiry: number | null
+          min_days_to_expiry: number | null
+          store_id: string | null
+          todo_state: string | null
+          total_value: number | null
+        }
+        Relationships: []
       }
     }
     Functions: {
@@ -1612,9 +1676,17 @@ export type Database = {
         Args: { p_actions: Json; p_batch_id: string }
         Returns: Json
       }
+      refresh_todo_states: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       resolve_category_from_off_data: {
         Args: { off_categories: string[] }
         Returns: string
+      }
+      should_refresh_todos: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       trigger_manual_expiry_cleanup: {
         Args: Record<PropertyKey, never>
@@ -1836,15 +1908,6 @@ export type Database = {
         }
         Returns: Json
       }
-      execute_dismiss_action: {
-        Args: {
-          p_batch_id: string
-          p_dismissal_reason: string
-          p_notes?: string
-          p_user_id: string
-        }
-        Returns: Json
-      }
       execute_dispose_action: {
         Args: {
           p_batch_id: string
@@ -1909,9 +1972,51 @@ export type Database = {
           sku: string
         }[]
       }
+      get_action_history_enhanced: {
+        Args: {
+          p_action_type?: string
+          p_limit?: number
+          p_offset?: number
+          p_store_id: string
+        }
+        Returns: {
+          action_type: string
+          batch_id: string
+          batch_number: string
+          discount_percentage: number
+          entry_id: string
+          notes: string
+          original_value: number
+          performed_at: string
+          performed_by_email: string
+          product_name: string
+          quantity_affected: number
+          recipient_name: string
+          recovered_value: number
+          total_count: number
+        }[]
+      }
       get_actionable_batches: {
         Args: { input_store_id: string }
         Returns: Json
+      }
+      get_all_active_with_states: {
+        Args: { p_limit?: number; p_offset?: number; p_store_id: string }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          composite_score: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          hours_since_last_action: number
+          product_brand: string
+          product_name: string
+          todo_state: string
+          total_actions_ever: number
+          total_count: number
+        }[]
       }
       get_automation_status: {
         Args: Record<PropertyKey, never>
@@ -1979,9 +2084,46 @@ export type Database = {
         Args: { p_user_id?: string; p_username?: string }
         Returns: Json
       }
+      get_donated_items: {
+        Args: {
+          p_days_back?: number
+          p_limit?: number
+          p_offset?: number
+          p_store_id: string
+        }
+        Returns: {
+          batch_id: string
+          batch_number: string
+          donated_at: string
+          donation_recipient_name: string
+          expiry_date: string
+          notes: string
+          product_brand: string
+          product_name: string
+          quantity_donated: number
+          total_count: number
+        }[]
+      }
       get_enum_values: {
         Args: { enum_name: string; schema_name?: string }
         Returns: string[]
+      }
+      get_items_needing_reeval: {
+        Args: { p_limit?: number; p_offset?: number; p_store_id: string }
+        Returns: {
+          ai_calculated_at: string
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          composite_score: number
+          current_quantity: number
+          expiry_date: string
+          last_action_time: string
+          last_action_type: string
+          product_brand: string
+          product_name: string
+          total_count: number
+        }[]
       }
       get_kpi_comparison: {
         Args: {
@@ -1997,6 +2139,54 @@ export type Database = {
           current_value: number
           kpi_name: string
           previous_value: number
+        }[]
+      }
+      get_pending_actions: {
+        Args: { p_limit?: number; p_offset?: number; p_store_id: string }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          composite_score: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          priority_order: number
+          product_brand: string
+          product_name: string
+          total_count: number
+          urgency_level: string
+        }[]
+      }
+      get_recently_discounted: {
+        Args: { p_limit?: number; p_offset?: number; p_store_id: string }
+        Returns: {
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+          expiry_date: string
+          hours_since_last_action: number
+          last_action_time: string
+          last_discount_percent: number
+          product_brand: string
+          product_name: string
+          total_count: number
+          total_discounted_quantity: number
+        }[]
+      }
+      get_recently_expired_enhanced: {
+        Args: { p_limit?: number; p_offset?: number; p_store_id: string }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+          days_since_expiry: number
+          expiry_date: string
+          has_recent_actions: boolean
+          product_brand: string
+          product_name: string
+          total_count: number
         }[]
       }
       get_store_alerts_optimized: {
@@ -2148,6 +2338,28 @@ export type Database = {
           timezone: string
           updated_at: string
           waste_reduction_target_percent: number
+        }[]
+      }
+      get_todos_dashboard_overview: {
+        Args: { p_store_id: string }
+        Returns: {
+          avg_score: number
+          item_count: number
+          todo_state: string
+          total_value: number
+          urgency_distribution: Json
+        }[]
+      }
+      get_todos_summary: {
+        Args: { p_store_id: string }
+        Returns: {
+          last_refreshed: string
+          needs_reeval_count: number
+          pending_actions_count: number
+          recently_discounted_count: number
+          recently_donated_count: number
+          recently_expired_count: number
+          total_active_count: number
         }[]
       }
       get_user_by_username: {

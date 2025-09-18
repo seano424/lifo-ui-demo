@@ -224,6 +224,47 @@ export function useBatchActionRPC() {
         queryClient.invalidateQueries({
           queryKey: ['actionable_batches', storeId],
         }),
+
+        // 🆕 NEW: Invalidate the new todos state queries
+        // Todos state summary (for tab counters)
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'summary', storeId],
+        }),
+
+        // Pending actions tab
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'pending', storeId],
+        }),
+
+        // Recently discounted tab
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'discounted', storeId],
+        }),
+
+        // Recently donated tab
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'donated', storeId],
+        }),
+
+        // Recently expired tab
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'expired', storeId],
+        }),
+
+        // Items needing re-evaluation
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'reeval', storeId],
+        }),
+
+        // All active with states
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'active', storeId],
+        }),
+
+        // Action history enhanced
+        queryClient.invalidateQueries({
+          queryKey: ['todos', 'history', storeId],
+        }),
       ])
     }
   }
