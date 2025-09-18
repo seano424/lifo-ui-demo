@@ -2,20 +2,15 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { ActionHistoryTab } from '@/components/todos/tabs/action-history-tab'
 import { AllActiveTab } from '@/components/todos/tabs/all-active-tab'
 import { PendingActionsTab } from '@/components/todos/tabs/pending-actions-tab'
-import { RecentlyDiscountedTab } from '@/components/todos/tabs/recently-discounted-tab'
-import { RecentlyDonatedTab } from '@/components/todos/tabs/recently-donated-tab'
 import { RecentlyExpiredTab } from '@/components/todos/tabs/recently-expired-tab'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
   useAllActiveWithStates,
-  useDonatedItems,
   usePendingActions,
-  useRecentlyDiscounted,
   useRecentlyExpired,
   useTodosSummary,
 } from '@/hooks/use-todos-rpc'
@@ -43,22 +38,19 @@ export type TodoItem = {
 export type TodoFilters = {
   storeId?: string
   tab?:
-    | 'pending_actions'
-    | 'recently_discounted'
-    | 'recently_donated'
+    | 'todays_tasks'
     | 'recently_expired'
-    | 'all_active'
-    | 'action_history'
+    | 'upcoming_tasks'
   urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
   sort?: {
     field:
-      | 'expiry_date'
-      | 'urgency'
-      | 'current_quantity'
-      | 'potential_loss'
-      | 'alphabetical'
-      | 'action_date'
-      | 'effectiveness'
+    | 'expiry_date'
+    | 'urgency'
+    | 'current_quantity'
+    | 'potential_loss'
+    | 'alphabetical'
+    | 'action_date'
+    | 'effectiveness'
     direction: 'asc' | 'desc'
   }
 }
@@ -78,7 +70,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
 
-  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'pending_actions')
+  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'todays_tasks')
 
   const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
@@ -86,7 +78,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const [filters, setFilters] = useState<TodoFilters>(() => {
     const baseFilters: TodoFilters = {
       storeId: activeStoreId || undefined,
-      tab: (initialFilters?.tab as TodoFilters['tab']) || 'pending_actions',
+      tab: (initialFilters?.tab as TodoFilters['tab']) || 'todays_tasks',
     }
 
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
@@ -107,7 +99,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       }
     } else {
       baseFilters.sort =
-        baseFilters.tab === 'pending_actions'
+        baseFilters.tab === 'todays_tasks'
           ? { field: 'urgency', direction: 'desc' }
           : { field: 'expiry_date', direction: 'asc' }
     }
@@ -120,36 +112,30 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   }, [activeStoreId])
 
   // Get counts using the new todos summary hook
-  const { data: todosSummary } = useTodosSummary(activeStoreId || '')
+  const validStoreId = activeStoreId || ''
+  const hasValidStore = !!activeStoreId && activeStoreId !== ''
+  const { data: todosSummary } = useTodosSummary(validStoreId)
+
+  console.log('TodosSummary', todosSummary)
 
   // Get actual data for each tab to show correct counts
-  const pendingActionsQuery = usePendingActions(activeStoreId || '', {
+  const pendingActionsQuery = usePendingActions(validStoreId, {
     limit: 1,
-    enabled: !!activeStoreId,
+    enabled: hasValidStore,
   })
-  const recentlyDiscountedQuery = useRecentlyDiscounted(activeStoreId || '', {
+  const recentlyExpiredQuery = useRecentlyExpired(validStoreId, {
     limit: 1,
-    enabled: !!activeStoreId,
+    enabled: hasValidStore,
   })
-  const recentlyExpiredQuery = useRecentlyExpired(activeStoreId || '', {
+  const allActiveQuery = useAllActiveWithStates(validStoreId, {
     limit: 1,
-    enabled: !!activeStoreId,
-  })
-  const recentlyDonatedQuery = useDonatedItems(activeStoreId || '', {
-    limit: 1,
-    enabled: !!activeStoreId,
-  })
-  const allActiveQuery = useAllActiveWithStates(activeStoreId || '', {
-    limit: 1,
-    enabled: !!activeStoreId,
+    enabled: hasValidStore,
   })
 
   // Calculate actual counts from the first page
   const actualCounts = {
     pending_actions: pendingActionsQuery.data?.pages?.[0]?.[0]?.total_count || 0,
-    recently_discounted: recentlyDiscountedQuery.data?.pages?.[0]?.[0]?.total_count || 0,
     recently_expired: recentlyExpiredQuery.data?.pages?.[0]?.[0]?.total_count || 0,
-    recently_donated: recentlyDonatedQuery.data?.pages?.[0]?.[0]?.total_count || 0,
     all_active: allActiveQuery.data?.pages?.[0]?.[0]?.total_count || 0,
   }
 
@@ -164,12 +150,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   useEffect(() => {
     const updateIndicator = () => {
       const tabs = [
-        'pending_actions',
-        'recently_discounted',
-        'recently_donated',
+        'todays_tasks',
         'recently_expired',
-        'all_active',
-        'action_history',
+        'upcoming_tasks',
       ]
       const activeIndex = tabs.indexOf(activeTab)
       const activeButton = buttonRefs.current[activeIndex]
@@ -191,7 +174,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
     const params = new URLSearchParams(searchParams.toString())
 
-    if (updatedFilters.tab && updatedFilters.tab !== 'pending_actions') {
+    if (updatedFilters.tab && updatedFilters.tab !== 'todays_tasks') {
       params.set('tab', updatedFilters.tab)
     } else {
       params.delete('tab')
@@ -235,14 +218,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   return (
     <>
       <div className="relative">
-        <div className="flex items-center justify-between sm:justify-start gap-4 overflow-x-auto">
+        <div className="overflow-x-auto flex w-full">
           {[
-            { label: 'Pending Actions', value: 'pending_actions' },
-            { label: 'Recently Discounted', value: 'recently_discounted' },
-            { label: 'Recently Donated', value: 'recently_donated' },
+            { label: "Today's Tasks", value: 'todays_tasks' },
             { label: 'Recently Expired', value: 'recently_expired' },
-            { label: 'All Active', value: 'all_active' },
-            { label: 'Action History', value: 'action_history' },
+            { label: 'Upcoming Tasks', value: 'upcoming_tasks' },
           ].map((tab, index) => (
             <Button
               key={tab.value}
@@ -261,11 +241,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               className={cn(
                 'rounded-none px-4 relative flex items-center gap-2 pb-4 whitespace-nowrap',
                 'hover:bg-transparent group/tab font-bold font-sans tracking-tight',
-                activeTab === tab.value ? 'text-primary' : 'text-muted-foreground/90',
-                tab.value === 'recently_discounted' && 'hidden lg:flex',
-                tab.value === 'recently_donated' && 'hidden lg:flex',
-                tab.value === 'recently_expired' && 'hidden lg:flex',
-                tab.value === 'all_active' && 'hidden lg:flex',
+                activeTab === tab.value ? 'text-primary' : 'text-muted-foreground/90'
               )}
             >
               {tab.label}
@@ -273,12 +249,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
                 className="cursor-pointer group-hover/tab:text-primary"
                 variant={activeTab === tab.value ? 'primary' : 'gray'}
               >
-                {tab.value === 'pending_actions' && actualCounts.pending_actions}
-                {tab.value === 'recently_discounted' && actualCounts.recently_discounted}
-                {tab.value === 'recently_donated' && actualCounts.recently_donated}
+                {tab.value === 'todays_tasks' && actualCounts.pending_actions}
                 {tab.value === 'recently_expired' && actualCounts.recently_expired}
-                {tab.value === 'all_active' && actualCounts.all_active}
-                {tab.value === 'action_history' && '•'}
+                {tab.value === 'upcoming_tasks' && actualCounts.all_active}
               </Badge>
             </Button>
           ))}
@@ -293,7 +266,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         />
       </div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsContent value="pending_actions">
+        <TabsContent value="todays_tasks">
           <PendingActionsTab
             filters={filters}
             pageSize={pageSize}
@@ -301,24 +274,12 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           />
         </TabsContent>
 
-        <TabsContent value="recently_discounted">
-          <RecentlyDiscountedTab filters={filters} pageSize={pageSize} />
-        </TabsContent>
-
-        <TabsContent value="recently_donated">
-          <RecentlyDonatedTab filters={filters} pageSize={pageSize} />
-        </TabsContent>
-
         <TabsContent value="recently_expired">
           <RecentlyExpiredTab filters={filters} pageSize={pageSize} />
         </TabsContent>
 
-        <TabsContent value="all_active">
+        <TabsContent value="upcoming_tasks">
           <AllActiveTab filters={filters} onFiltersChange={handleFiltersChange} />
-        </TabsContent>
-
-        <TabsContent value="action_history">
-          <ActionHistoryTab filters={filters} pageSize={pageSize} />
         </TabsContent>
       </Tabs>
     </>

@@ -2062,6 +2062,42 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_batch_todo_states: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_store_id?: string
+          p_todo_state?: string
+        }
+        Returns: {
+          ai_calculated_at: string
+          ai_recommendation: string
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          batch_status: string
+          composite_score: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          hours_since_last_action: number
+          last_action_quantity: number
+          last_action_time: string
+          last_action_type: Database["public"]["Enums"]["action_type"]
+          last_discount_percent: number
+          priority_order: number
+          product_brand: string
+          product_name: string
+          store_id: string
+          todo_state: string
+          total_actions_ever: number
+          total_discounted_quantity: number
+          total_disposed_quantity: number
+          total_donated_quantity: number
+          urgency_level: string
+          view_refreshed_at: string
+        }[]
+      }
       get_csv_upload_stats: {
         Args: { p_days_back?: number; p_store_id: string }
         Returns: {
@@ -2083,6 +2119,21 @@ export type Database = {
       get_current_user_with_pin_auth: {
         Args: { p_user_id?: string; p_username?: string }
         Returns: Json
+      }
+      get_dashboard_summary: {
+        Args: { p_store_id: string }
+        Returns: {
+          critical_count: number
+          expired_items_count: number
+          expired_items_value: number
+          high_count: number
+          low_count: number
+          medium_count: number
+          needs_attention_count: number
+          needs_attention_percentage: number
+          ok_count: number
+          total_active_batches: number
+        }[]
       }
       get_donated_items: {
         Args: {

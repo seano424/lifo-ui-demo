@@ -34,6 +34,8 @@ export function BatchStatusSummary() {
   const { data, isLoading, error } = useStoreAnalytics(activeStoreId, '7d')
   const { count: totalActiveBatchesCount, isLoading: isLoadingActiveBatches } = useActiveBatches()
 
+  console.log('BatchStatusSummary data', data)
+
   if (isLoading || isLoadingActiveBatches) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">

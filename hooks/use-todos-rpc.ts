@@ -116,6 +116,19 @@ interface NeedsReeval {
   total_count: number
 }
 
+interface DashboardSummary {
+  total_active_batches: number
+  needs_attention_count: number
+  critical_count: number
+  high_count: number
+  medium_count: number
+  low_count: number
+  ok_count: number
+  needs_attention_percentage: number
+  expired_items_count: number
+  expired_items_value: number
+}
+
 export function useTodosSummary(storeId: string) {
   const supabase = createClient()
 
@@ -129,7 +142,26 @@ export function useTodosSummary(storeId: string) {
       if (error) throw error
       return data[0] // RPC returns array with single object
     },
+    enabled: !!storeId && storeId !== '', // Only run if we have a valid storeId
     refetchInterval: 30000, // Refresh every 30 seconds for real-time counters
+  })
+}
+
+export function useDashboardSummary(storeId: string) {
+  const supabase = createClient()
+
+  return useQuery({
+    queryKey: ['dashboard', 'summary', storeId],
+    queryFn: async (): Promise<DashboardSummary> => {
+      const { data, error } = await supabase.rpc('get_dashboard_summary', {
+        p_store_id: storeId,
+      })
+
+      if (error) throw error
+      return data[0] // RPC returns array with single object
+    },
+    enabled: !!storeId && storeId !== '', // Only run if we have a valid storeId
+    refetchInterval: 60000, // Refresh every minute for dashboard updates
   })
 }
 
@@ -301,7 +333,7 @@ export function useAllActiveWithStates(
       return allPages.length
     },
     initialPageParam: 0,
-    enabled,
+    enabled: enabled && !!storeId && storeId !== '', // Only run if we have a valid storeId
   })
 }
 
@@ -347,4 +379,5 @@ export type {
   ActionHistory,
   AllActive,
   NeedsReeval,
+  DashboardSummary,
 }
