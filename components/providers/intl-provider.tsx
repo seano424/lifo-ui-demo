@@ -2,6 +2,7 @@
 
 import { NextIntlClientProvider } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
+import { loadMessages } from '@/lib/load-messages'
 import { useLanguageStore } from '@/lib/stores/language-store'
 
 interface Messages {
@@ -19,36 +20,16 @@ export function IntlProvider({
   const [messages, setMessages] = useState<Messages>(initialMessages)
   const [isHydrated, setIsHydrated] = useState(false)
 
-  const loadMessages = useCallback(async (language: string) => {
+  const loadMessagesCallback = useCallback(async (language: string) => {
     try {
-      let newMessages: { default: Record<string, unknown> }
-      switch (language) {
-        case 'en':
-          newMessages = await import(`../../messages/en.json`)
-          break
-        case 'nl':
-          newMessages = await import(`../../messages/nl.json`)
-          break
-        default:
-          newMessages = await import(`../../messages/fr.json`)
-          break
-      }
+      const newMessages = await loadMessages(language)
       // Only update messages if we successfully loaded them and they contain data
-      if (newMessages.default && Object.keys(newMessages.default).length > 0) {
-        setMessages(newMessages.default)
+      if (newMessages && Object.keys(newMessages).length > 0) {
+        setMessages(newMessages)
       }
     } catch (error) {
       console.error(`Failed to load messages for ${language}:`, error)
-      // Fallback to French
-      try {
-        const fallbackMessages = await import(`../../messages/fr.json`)
-        if (fallbackMessages.default && Object.keys(fallbackMessages.default).length > 0) {
-          setMessages(fallbackMessages.default)
-        }
-      } catch (fallbackError) {
-        console.error('Failed to load fallback messages:', fallbackError)
-        // Keep existing messages instead of overriding with potentially empty initialMessages
-      }
+      // Keep existing messages instead of overriding with potentially empty initialMessages
     }
   }, [])
 
@@ -63,7 +44,7 @@ export function IntlProvider({
         const parsed = JSON.parse(storedLanguage)
         if (parsed.state?.currentLanguage && parsed.state.currentLanguage !== 'fr') {
           // Load the stored visitor language immediately
-          loadMessages(parsed.state.currentLanguage)
+          loadMessagesCallback(parsed.state.currentLanguage)
           return
         }
       }
@@ -71,14 +52,16 @@ export function IntlProvider({
       // Check browser language if no stored preference
       const browserLang = navigator.language.split('-')[0]
       if (['en', 'nl'].includes(browserLang) && browserLang !== 'fr') {
-        loadMessages(browserLang)
+        loadMessagesCallback(browserLang)
         return
       }
     }
 
-    // Normal language change handling
-    loadMessages(currentLanguage)
-  }, [currentLanguage, isHydrated, loadMessages])
+    // Normal language change handling (only when language actually changes)
+    if (isHydrated) {
+      loadMessagesCallback(currentLanguage)
+    }
+  }, [currentLanguage, isHydrated, loadMessagesCallback])
 
   // Ensure we always have valid messages before rendering
   const validMessages = messages && Object.keys(messages).length > 0 ? messages : initialMessages
