@@ -4,39 +4,16 @@ import { AlertTriangle, Calendar, Clock } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useActiveBatches } from '@/hooks/use-batches'
-import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
+import { useDashboardSummary } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
-interface ActionableBatch {
-  batch_id: string
-  product_name: string
-  expiry_date: string
-  urgency: 'critical' | 'high' | 'medium' | 'low'
-  current_quantity: number
-  potential_loss: number
-  status?: string // Add optional status field
-}
-
-interface AnalyticsData {
-  analytics?: {
-    actionable_batches?: ActionableBatch[]
-    dashboard_summary?: {
-      total_batches: number
-      expired_count: number
-    }
-  }
-}
 
 export function BatchStatusSummary() {
   const t = useTranslations('storeInsights.batchStatus')
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useStoreAnalytics(activeStoreId, '7d')
-  const { count: totalActiveBatchesCount, isLoading: isLoadingActiveBatches } = useActiveBatches()
+  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
 
-  console.log('BatchStatusSummary data', data)
-
-  if (isLoading || isLoadingActiveBatches) {
+  if (isLoading) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
         <div className="space-y-4">
@@ -62,31 +39,20 @@ export function BatchStatusSummary() {
     )
   }
 
-  const actionableBatches =
-    (data?.analytics as AnalyticsData['analytics'])?.actionable_batches || []
+  // Use data from the centralized dashboard summary
+  const totalActiveBatchesCount = data.total_active_batches
+  const criticalCount = data.critical_count
+  const highCount = data.high_count
+  const mediumCount = data.medium_count
+  const lowCount = data.low_count
+  const okCount = data.ok_count
 
-  // Use server-provided urgency levels from AI-enhanced scoring
-  const activeBatchesFromActionable = actionableBatches
-
-  // Count batches by SERVER urgency levels (trust AI-enhanced scoring)
-  const criticalCount = activeBatchesFromActionable.filter(
-    batch => batch.urgency === 'critical',
-  ).length
-  const highCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'high').length
-  const mediumCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'medium').length
-  const lowCount = activeBatchesFromActionable.filter(batch => batch.urgency === 'low').length
-
+  // Calculate total needs attention and percentages
   // Only Critical and High priority items need immediate attention
   const totalNeedsAttention = criticalCount + highCount
-  // Medium and Low priority items are considered OK (have time to plan)
-  const okCount =
-    mediumCount +
-    lowCount +
-    (totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount))
-  const attentionPercentage =
-    totalActiveBatchesCount > 0
-      ? Math.round((totalNeedsAttention / totalActiveBatchesCount) * 100)
-      : 0
+  const attentionPercentage = totalActiveBatchesCount > 0
+    ? Math.round((totalNeedsAttention / totalActiveBatchesCount) * 100)
+    : 0
 
   const getUrgencyIcon = (urgency: string) => {
     switch (urgency) {
@@ -188,7 +154,7 @@ export function BatchStatusSummary() {
               variant="h2"
               className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
             >
-              {okCount}
+              {totalActiveBatchesCount - totalNeedsAttention}
             </Typography>
           </div>
         </div>
@@ -222,7 +188,7 @@ export function BatchStatusSummary() {
             )}
 
             {/* Other OK items */}
-            {totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount) > 0 && (
+            {okCount - mediumCount - lowCount > 0 && (
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   <div className="h-4 w-4 bg-primary-500 rounded-full" />
@@ -231,7 +197,7 @@ export function BatchStatusSummary() {
                   </Typography>
                 </div>
                 <Typography variant="p">
-                  {totalActiveBatchesCount - (criticalCount + highCount + mediumCount + lowCount)}
+                  {okCount - mediumCount - lowCount}
                 </Typography>
               </div>
             )}
@@ -249,7 +215,7 @@ export function BatchStatusSummary() {
             </div>
             <div className="mt-2 flex justify-between items-center">
               <Typography variant="small" className=" mt-1">
-                {okCount} {t('status.ok')}
+                {totalActiveBatchesCount - totalNeedsAttention} {t('status.ok')}
               </Typography>
               <Typography variant="small" className=" mt-1">
                 {t('activeBatchesCount', {

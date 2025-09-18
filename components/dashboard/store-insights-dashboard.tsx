@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { useDashboardInsights } from '@/hooks/use-scoring-analytics'
-import { useDashboardSummary } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { ActionableBatchesEnhanced } from './actionable-batches-enhanced'
 
@@ -80,26 +79,6 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     error: insightsError,
   } = useDashboardInsights(storeId)
 
-  const {
-    data: dashboardSummary,
-    isLoading: summaryLoading,
-    error: summaryError,
-  } = useDashboardSummary(storeId)
-
-  // Log the dashboard summary data
-  if (dashboardSummary) {
-    console.log('Dashboard Summary Data:', dashboardSummary)
-    console.log('Total Active Batches:', dashboardSummary.total_active_batches)
-    console.log('Needs Attention Count:', dashboardSummary.needs_attention_count)
-    console.log('Critical Count:', dashboardSummary.critical_count)
-    console.log('High Count:', dashboardSummary.high_count)
-    console.log('Medium Count:', dashboardSummary.medium_count)
-    console.log('Low Count:', dashboardSummary.low_count)
-    console.log('OK Count:', dashboardSummary.ok_count)
-    console.log('Needs Attention %:', dashboardSummary.needs_attention_percentage)
-    console.log('Expired Items Count:', dashboardSummary.expired_items_count)
-    console.log('Expired Items Value:', dashboardSummary.expired_items_value)
-  }
 
   if (!storeId) {
     return null

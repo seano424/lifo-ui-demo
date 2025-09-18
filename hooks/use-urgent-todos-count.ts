@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
+import { useDashboardSummary } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 /**
@@ -8,18 +8,16 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
  */
 export function useUrgentTodosCount() {
   const activeStoreId = useActiveStoreId()
-  const { data: analyticsData, isLoading, error } = useStoreAnalytics(activeStoreId || '', '7d')
+  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
 
   const urgentCount = useMemo(() => {
-    if (!analyticsData?.analytics?.actionable_batches) {
+    if (!data) {
       return 0
     }
 
-    const actionableBatches = analyticsData.analytics.actionable_batches
-    return actionableBatches.filter(
-      batch => batch.urgency === 'critical' || batch.urgency === 'high',
-    ).length
-  }, [analyticsData?.analytics?.actionable_batches])
+    // Critical + High priority = urgent todos
+    return data.critical_count + data.high_count
+  }, [data])
 
   return {
     count: urgentCount,

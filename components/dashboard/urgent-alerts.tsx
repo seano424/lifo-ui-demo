@@ -7,20 +7,10 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useStoreAnalytics } from '@/hooks/use-scoring-analytics'
+import { useDashboardSummary } from '@/hooks/use-todos-rpc'
 import { useScoringThresholds } from '@/hooks/use-scoring-thresholds'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { AlertQuickToggle } from './alert-quick-toggle'
-
-interface ActionableBatch {
-  urgency: 'critical' | 'high' | 'medium' | 'low'
-}
-
-interface AnalyticsData {
-  analytics?: {
-    actionable_batches?: ActionableBatch[]
-  }
-}
 
 // Convert threshold to user-friendly level names
 function thresholdToLevelName(
@@ -36,7 +26,7 @@ function thresholdToLevelName(
 export function UrgentAlerts() {
   const t = useTranslations('storeInsights.urgentAlerts')
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useStoreAnalytics(activeStoreId, '7d')
+  const { data, isLoading, error } = useDashboardSummary(activeStoreId)
   const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
 
   const isInitialLoading = isLoading
@@ -74,10 +64,6 @@ export function UrgentAlerts() {
     )
   }
 
-  // Updated to use new FastAPI dashboard structure
-  const urgencyDistribution = data?.analytics?.fastapi_analytics?.urgency_distribution
-  const supabaseInsights = data?.analytics?.insights
-
   const formatMessageWithBold = (message: string) => {
     // Match patterns like "8 critical items" at the beginning
     const match = message.match(/^(\d+\s+[^(]+?)(\s*\(|$|expiring|need)(.*)/)
@@ -94,64 +80,18 @@ export function UrgentAlerts() {
   }
 
   const getMessage = () => {
-    // Priority 1: Use FastAPI actionable_batches to get accurate urgency counts
-    // This is the most accurate since it uses actual AI scoring data
-    const actionableBatches = (data?.analytics as AnalyticsData['analytics'])?.actionable_batches
-    if (actionableBatches && Array.isArray(actionableBatches)) {
-      const criticalCount = actionableBatches.filter(
-        (batch: ActionableBatch) => batch.urgency === 'critical',
-      ).length
-      const highCount = actionableBatches.filter(
-        (batch: ActionableBatch) => batch.urgency === 'high',
-      ).length
-      const mediumCount = actionableBatches.filter(
-        (batch: ActionableBatch) => batch.urgency === 'medium',
-      ).length
-      const lowCount = actionableBatches.filter(
-        (batch: ActionableBatch) => batch.urgency === 'low',
-      ).length
-      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
-
-      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
+    if (!data) {
+      return t('errors.loadingAlerts')
     }
 
-    // Priority 2: Use FastAPI urgency distribution if available
-    if (
-      urgencyDistribution &&
-      typeof urgencyDistribution === 'object' &&
-      urgencyDistribution !== null
-    ) {
-      const dist = urgencyDistribution as {
-        critical?: number
-        high?: number
-        medium?: number
-        low?: number
-      }
-      const criticalCount = dist.critical || 0
-      const highCount = dist.high || 0
-      const mediumCount = dist.medium || 0
-      const lowCount = dist.low || 0
-      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
+    // Use dashboard summary data directly
+    const criticalCount = data.critical_count
+    const highCount = data.high_count
+    const mediumCount = data.medium_count
+    const lowCount = data.low_count
+    const totalAlerts = criticalCount + highCount + mediumCount + lowCount
 
-      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
-    }
-
-    // Fallback: Use Supabase insights structure (less accurate)
-    if (
-      supabaseInsights?.high_urgency &&
-      supabaseInsights?.expiring_soon &&
-      supabaseInsights?.ready_for_discount
-    ) {
-      const criticalCount = supabaseInsights.high_urgency.count || 0
-      const highCount = Math.max(0, (supabaseInsights.expiring_soon.count || 0) - criticalCount)
-      const mediumCount = supabaseInsights.ready_for_discount.count || 0
-      const lowCount = 0 // This fallback doesn't have low priority classification
-      const totalAlerts = criticalCount + highCount + mediumCount + lowCount
-
-      return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
-    }
-
-    return t('errors.loadingAlerts')
+    return getUrgencyMessage(criticalCount, highCount, mediumCount, lowCount, totalAlerts)
   }
 
   const getUrgencyMessage = (
