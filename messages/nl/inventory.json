@@ -1,0 +1,528 @@
+{
+  "products": {
+    "manualEntry": {
+      "title": "Handmatige invoer",
+      "manualSearch": "Handmatig zoeken",
+      "productSelected": "Product geselecteerd",
+      "searchByBarcode": "Zoeken op barcode",
+      "searchByProductName": "Of zoeken op productnaam",
+      "inStockItemsOnly": "(Alleen voorradige artikelen)",
+      "barcodePlaceholder": "Barcodenummer (8+ cijfers)...",
+      "searchPlaceholder": "Zoeken in Open Food Facts database...",
+      "inventorySearchPlaceholder": "Zoeken naar producten in voorraad...",
+      "productFound": "Product gevonden!",
+      "outOfStock": "Niet op voorraad",
+      "noStockAvailable": "Geen voorraad beschikbaar in deze winkel",
+      "unitsAvailable": "eenheden beschikbaar",
+      "outOfStockCannotSelect": "Niet op voorraad - Kan niet selecteren",
+      "selectThisProduct": "Dit product selecteren",
+      "productNotFound": "Product niet gevonden in database. Je kunt het hieronder handmatig toevoegen.",
+      "addProductManually": "Product handmatig toevoegen",
+      "noProductsFound": "Geen producten gevonden die overeenkomen met",
+      "autoProceedException": "Gaat automatisch door naar vervaldatum scannen na selectie",
+      "barcodeValidation": "Barcode moet minimaal 8 cijfers bevatten en alleen nummers",
+      "batchCount": "batches"
+    },
+    "table": {
+      "productDetails": "Productdetails",
+      "category": "Categorie",
+      "brand": "Merk",
+      "stock": "Voorraad",
+      "pricing": "Prijzen",
+      "activeBatches": "Actieve batches",
+      "actions": "Acties",
+      "unnamedProduct": "Naamloos product",
+      "uncategorized": "Ongecategoriseerd",
+      "cost": "Kostprijs",
+      "batch": "batch",
+      "batches": "batches",
+      "units": "eenheden"
+    },
+    "catalog": {
+      "title": "Productencatalogus",
+      "description": "Beheer uw productcatalogus en voorraad",
+      "clickToSort": "Klik op kolomkoppen om te sorteren",
+      "sortedBy": "Gesorteerd op",
+      "ascending": "↑",
+      "descending": "↓"
+    },
+    "empty": {
+      "title": "Geen producten gevonden",
+      "description": "Begin door je eerste product toe te voegen",
+      "storeDescription": "Begin door je eerste product aan deze winkel toe te voegen"
+    },
+    "loading": {
+      "loadingMore": "Meer laden...",
+      "showing": "Toont",
+      "of": "van",
+      "products": "producten"
+    },
+    "errors": {
+      "loadingError": "Fout bij laden van producten",
+      "unexpectedError": "Er is een onverwachte fout opgetreden"
+    },
+    "fields": {
+      "name": "Naam",
+      "productName": "Productnaam",
+      "barcode": "Barcode",
+      "brand": "Merk",
+      "category": "Categorie",
+      "sku": "SKU"
+    },
+    "placeholders": {
+      "productName": "bijv., Biologische volle melk",
+      "brand": "bijv., Danone",
+      "barcode": "bijv., 078000113464",
+      "selectCategory": "Selecteer categorie"
+    },
+    "confirmations": {
+      "deleteProduct": "Weet je zeker dat je dit product wilt verwijderen?",
+      "enterNewPrice": "Voer nieuwe prijs in:"
+    }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "Batch nr.",
+        "product": "Product",
+        "supplier": "Leverancier",
+        "expiryDate": "Vervaldatum",
+        "stock": "Voorraad",
+        "costPrice": "Kostprijs",
+        "sellPrice": "Verkoopprijs",
+        "status": "Status",
+        "location": "Locatie"
+      },
+      "actions": {
+        "viewDetails": "Details bekijken",
+        "editBatch": "Batch bewerken",
+        "markAsExpired": "Markeren als verlopen",
+        "markAsDamaged": "Markeren als beschadigd",
+        "deleteBatch": "Batch verwijderen"
+      },
+      "emptyState": {
+        "title": "Geen batches gevonden",
+        "description": "Je hebt nog geen batches in je inventaris. Begin met het toevoegen van je eerste batch om vervaldatums bij te houden en voorraadniveaus te beheren.",
+        "addFirstBatch": "Eerste batch toevoegen"
+      },
+      "loadMore": "Meer batches laden ({remaining} resterend)",
+      "loading": "Laden..."
+    },
+    "status": {
+      "active": "Actief",
+      "expired": "Verlopen",
+      "damaged": "Beschadigd",
+      "soldOut": "Uitverkocht",
+      "reserved": "Gereserveerd"
+    },
+    "expiry": {
+      "expired": "Verlopen",
+      "daysLeft": "{days}d over"
+    }
+  },
+  "inbound": {
+    "mobile": {
+      "barcodeScanning": "Barcode scannen",
+      "csvBulkImport": "CSV bulk import"
+    },
+    "desktop": {
+      "manualEntry": "Handmatige invoer",
+      "csvBulkImport": "CSV bulk import"
+    },
+    "messages": {
+      "selectStore": "Selecteer een winkel om voorraadgegevens te uploaden.",
+      "selectStoreInventory": "Selecteer een winkel om voorraad toe te voegen."
+    }
+  },
+  "manualInbound": {
+    "selectedProduct": {
+      "title": "Geselecteerd product",
+      "fields": {
+        "name": "Naam:",
+        "brand": "Merk:",
+        "category": "Categorie:",
+        "barcode": "Barcode:"
+      }
+    },
+    "batchDetails": {
+      "title": "Batch details"
+    },
+    "buttons": {
+      "addBatch": "Batch toevoegen",
+      "clear": "Wissen",
+      "submitAll": "Alles indienen",
+      "cancel": "Annuleren",
+      "submitting": "Indienen...",
+      "submitToInventory": "Indienen bij voorraad",
+      "addMoreProducts": "Meer producten toevoegen",
+      "viewInInventory": "Bekijken in voorraad"
+    },
+    "batchItems": {
+      "title": "Batch items om in te dienen",
+      "description": "{count, plural, one {# batch klaar om in te dienen} other {# batches klaar om in te dienen}}"
+    },
+    "confirmation": {
+      "title": "Indiening bevestigen",
+      "description": "Bekijk de items hieronder voordat je ze indient bij je voorraad.",
+      "submitText": "Je staat op het punt om {count, plural, one {# batch} other {# batches}} in te dienen bij de voorraad:",
+      "totals": {
+        "totalItems": "Totaal items:",
+        "totalValue": "Totale waarde:"
+      },
+      "itemDetails": {
+        "expires": "Verloopt:",
+        "total": "Totaal:"
+      }
+    },
+    "success": {
+      "title": "Voorraad succesvol bijgewerkt!",
+      "description": {
+        "allSuccess": "Succesvol {count, plural, one {# batch} other {# batches}} toegevoegd aan je voorraad.",
+        "partialSuccess": "{successCount} van {totalCount} batches toegevoegd aan voorraad."
+      }
+    },
+    "alerts": {
+      "gettingStarted": "Begin met het zoeken naar een product met behulp van de barcode of productnaam zoekfunctie hierboven. Na het selecteren van een product, kun je de vervaldatum, hoeveelheid en prijs toevoegen."
+    }
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Product scannen",
+      "scanExpiryDate": "Vervaldatum scannen"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Richt camera op barcode",
+      "pointAtExpiryDate": "Richt camera op vervaldatum"
+    },
+    "permissions": {
+      "barcodeRequired": "Cameratoegang is vereist voor het scannen van barcodes.",
+      "expiryRequired": "Cameratoegang is vereist voor het vastleggen van vervaldatums."
+    },
+    "alerts": {
+      "serviceUnavailable": "Sorry, deze service is momenteel niet beschikbaar. Gebruik handmatige datuminvoer.",
+      "ocrError": "OCR fout: {error}",
+      "backendUnavailable": "FastAPI backend is niet beschikbaar. Gebruik handmatige invoer.",
+      "scanInstructions": "Richt je camera op elke productbarcode. De scanner detecteert automatisch ondersteunde formaten en zoekt productinformatie op uit Open Food Facts."
+    },
+    "buttons": {
+      "captureExpiryDate": "Vervaldatum vastleggen",
+      "processingOCR": "OCR verwerken...",
+      "clearError": "Fout wissen",
+      "manualEntry": "Handmatige invoer"
+    }
+  },
+  "scanningWorkflow": {
+    "steps": {
+      "scanBarcode": "Barcode scannen",
+      "changeProduct": "Product wijzigen",
+      "scanExpiryDate": "Vervaldatum scannen",
+      "reviewDetails": "Details controleren",
+      "previousStep": "Vorige stap"
+    }
+  },
+  "scanningInterface": {
+    "camera": {
+      "scanProduct": "Product scannen",
+      "scanDifferentProduct": "Ander product scannen"
+    },
+    "product": {
+      "productFound": "Product gevonden! Klaar om verder te gaan met het scannen van de vervaldatum.",
+      "productNotFound": "Product niet gevonden in database. Je moet het mogelijk handmatig toevoegen.",
+      "autoProceeding": "Automatisch doorgaan naar vervaldatum scannen..."
+    },
+    "expiry": {
+      "manualEntryFallback": "📝 Handmatige invoer (OCR niet beschikbaar)",
+      "orEnterManually": "Of handmatig invoeren",
+      "confirmDate": "Datum bevestigen"
+    },
+    "inventory": {
+      "addToInventory": "Toevoegen aan voorraad",
+      "addedToList": "{productName} toegevoegd aan je lijst! Scan het volgende product.",
+      "finishAndSubmit": "Voltooien en {count, plural, one {# item} other {# items}} indienen"
+    },
+    "submission": {
+      "title": "Indiening bevestigen",
+      "description": "Bekijk de items hieronder voordat je ze indient bij je voorraad.",
+      "submitText": "Je staat op het punt om {count, plural, one {# item} other {# items}} in te dienen bij de voorraad:",
+      "totals": {
+        "totalItems": "Totaal items:",
+        "totalValue": "Totale waarde:",
+        "expires": "Verloopt:"
+      },
+      "buttons": {
+        "cancel": "Annuleren",
+        "submitting": "Indienen...",
+        "submitToInventory": "Indienen bij voorraad"
+      }
+    },
+    "success": {
+      "title": "Voorraad succesvol bijgewerkt!",
+      "description": {
+        "allSuccess": "Succesvol {count, plural, one {# item} other {# items}} toegevoegd aan je voorraad.",
+        "partialSuccess": "{successCount} van {totalCount} items toegevoegd aan voorraad."
+      },
+      "buttons": {
+        "keepScanning": "Blijven scannen",
+        "viewInDashboard": "Bekijken in dashboard"
+      }
+    },
+    "navigation": {
+      "backTo": "Terug naar {stepName}",
+      "goBack": "Ga terug"
+    },
+    "lookupErrors": {
+      "lookupFailed": "Opzoeken mislukt: {error}"
+    }
+  },
+  "inventoryForm": {
+    "titles": {
+      "productDetails": "Productdetails",
+      "detailsCaptured": "Details succesvol vastgelegd",
+      "reviewAndSubmit": "Controleren en indienen bij voorraad"
+    },
+    "labels": {
+      "expiryDate": "Vervaldatum",
+      "quantity": "Hoeveelheid",
+      "pricePerUnit": "Prijs per eenheid (€)",
+      "editableNote": "(bewerkbaar)"
+    },
+    "buttons": {
+      "confirm": "Bevestigen"
+    }
+  },
+  "productCard": {
+    "titles": {
+      "selectedProduct": "Geselecteerd product",
+      "productInformation": "Productinformatie"
+    },
+    "fallbacks": {
+      "unknownProduct": "Onbekend product"
+    }
+  },
+  "scannedItemsList": {
+    "title": "Batch items",
+    "itemLabels": {
+      "quantity": "Hoeveelheid:",
+      "price": "Prijs:",
+      "expiry": "Vervalt:"
+    },
+    "editDialog": {
+      "title": "Item bewerken",
+      "descriptions": {
+        "quickEdit": "Snel bewerken van vervaldatum, hoeveelheid en prijs. Klik op \"Details bewerken\" voor meer opties.",
+        "fullEdit": "Bewerk alle productdetails inclusief naam, merk, barcode en voorraadinformatie."
+      },
+      "sections": {
+        "productDetails": "Productdetails",
+        "inventoryDetails": "Voorraaddetails",
+        "quickEdit": "Snel bewerken"
+      },
+      "formLabels": {
+        "productName": "Productnaam",
+        "brand": "Merk",
+        "barcode": "Barcode",
+        "expiryDate": "Vervaldatum",
+        "quantity": "Hoeveelheid",
+        "price": "Prijs (€)"
+      },
+      "placeholders": {
+        "productName": "Voer productnaam in",
+        "brand": "Merknaam",
+        "barcode": "Barcode nummer"
+      },
+      "buttons": {
+        "editDetails": "Details bewerken",
+        "hideDetails": "Details verbergen",
+        "cancel": "Annuleren",
+        "saveChanges": "Wijzigingen opslaan"
+      }
+    }
+  },
+  "csvUpload": {
+    "title": "Ultra-snelle CSV Upload",
+    "subtitle": "Bliksemsnel verwerken",
+    "dropZone": {
+      "dropHere": "Sleep je CSV-bestand hierheen",
+      "orBrowse": "of klik om te bladeren",
+      "chooseFile": "Bestand kiezen"
+    },
+    "preview": {
+      "title": "Voorbeeld",
+      "table": {
+        "sku": "SKU",
+        "productName": "Productnaam",
+        "category": "Categorie",
+        "quantity": "Aantal",
+        "expiryDate": "Vervaldatum"
+      },
+      "selectDate": "Selecteer datum",
+      "missingExpiryDate": "Vervaldatum ontbreekt",
+      "quantityLabel": "Aantal:"
+    },
+    "buttons": {
+      "upload": "Uploaden (Auto-sla duplicaten over)",
+      "processing": "Verwerken...",
+      "reset": "Reset",
+      "uploadAnother": "Upload een ander bestand"
+    },
+    "results": {
+      "title": "Upload voltooid!",
+      "successSummary": "Succesvol {processed} items verwerkt",
+      "duplicatesSkipped": " • {skipped} duplicaten overgeslagen",
+      "uploadCompleted": "Upload voltooid",
+      "completedIn": "⚡ Voltooid in {time}ms",
+      "metrics": {
+        "processed": "Verwerkt",
+        "skipped": "Overgeslagen",
+        "itemsPerSec": "Items/sec",
+        "totalTime": "Totale tijd"
+      },
+      "performance": {
+        "title": "Bulk Operatie Prestatie Uitsplitsing",
+        "duplicateCheck": "Duplicaat Controle",
+        "productResolution": "Product Resolutie",
+        "batchInsertion": "Batch Invoegen",
+        "productsCreated": "Producten Aangemaakt",
+        "dbProcessing": "DB Verwerking",
+        "optimization": "⚡ Bulk operaties verminderde verwerkingstijd met {percentage}% vergeleken met individuele verwerking"
+      },
+      "duplicates": {
+        "viewSkipped": "Bekijk overgeslagen duplicaten ({count})",
+        "expiry": "Verval"
+      }
+    },
+    "errors": {
+      "invalidFile": "Selecteer een CSV-bestand",
+      "analysisFailure": "CSV-bestand analyse mislukt",
+      "noFile": "Selecteer eerst een bestand",
+      "noStore": "Winkelinformatie ontbreekt. Vernieuw en probeer opnieuw.",
+      "uploadFailed": "Upload mislukt",
+      "startFailed": "Kan upload niet starten. Probeer het opnieuw."
+    },
+    "performanceInfo": {
+      "title": "Bulk-geoptimaliseerde Ultra-snelle Prestaties",
+      "features": {
+        "bulkOps": "3 bulk database operaties in plaats van N individuele aanroepen",
+        "autoDuplicate": "Automatische duplicaat detectie zonder gebruikersinterventie",
+        "realtime": "Real-time prestatiemetrieken en tijdsuitsplitsing",
+        "target": "Doel: 1000+ items/sec met database RPC functies"
+      },
+      "footer": "🚀 Geoptimaliseerd voor maximale snelheid met behoud van data-integriteit"
+    }
+  },
+  "store": {
+    "creation": {
+      "success": {
+        "title": "Winkel succesvol aangemaakt!",
+        "description": "Uw winkel \"{storeName}\" is aangemaakt en klaar voor gebruik.",
+        "whatsNext": {
+          "title": "Wat nu?",
+          "steps": {
+            "configure": {
+              "title": "Configureer uw winkelinstellingen",
+              "description": "Stel meldingen, integraties en teamrechten in."
+            },
+            "inventory": {
+              "title": "Voeg uw eerste producten toe",
+              "description": "Upload uw inventaris via CSV of scan producten handmatig."
+            },
+            "team": {
+              "title": "Nodig teamleden uit",
+              "description": "Voeg collega's toe om te helpen bij het beheren van uw winkelinventaris."
+            }
+          }
+        },
+        "actions": {
+          "goToSettings": "Ga naar winkelinstellingen",
+          "goToDashboard": "Ga naar dashboard"
+        }
+      }
+    },
+    "urgentAlerts": {
+      "levels": {
+        "urgentOnly": "Alleen urgente items",
+        "priority": "Prioriteitsitems",
+        "allFlagged": "Alle gemarkeerde items",
+        "completeReview": "Volledige beoordeling"
+      },
+      "errors": {
+        "connectionError": "Verbindingsfout",
+        "unableToLoad": "Kan inventarismeldingen niet laden. Probeer het opnieuw.",
+        "loadingAlerts": "Meldingen laden..."
+      },
+      "messages": {
+        "nothingToShow": "Geen items hebben nu aandacht nodig - je bent helemaal bij!",
+        "itemNeedsAction": "{count, plural, one {item heeft} other {items hebben}} onmiddellijke actie nodig",
+        "itemMayNeedAction": "{count, plural, one {item heeft mogelijk} other {items hebben mogelijk}} binnenkort aandacht nodig",
+        "itemsFlagged": "{count, plural, one {item gemarkeerd} other {items gemarkeerd}} voor beoordeling",
+        "itemsMonitoring": "{count, plural, one {item gemarkeerd} other {items gemarkeerd}} voor monitoring"
+      },
+      "buttons": {
+        "viewInventory": "Bekijk inventaris",
+        "viewItems": "Bekijk items"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "urgent": "Urgent",
+        "default": "Standaard",
+        "early": "Vroeg"
+      },
+      "tooltips": {
+        "urgentTitle": "Alleen urgente items die onmiddellijke actie vereisen",
+        "urgentSubtitle": "Minste waarschuwingen - meest restrictief",
+        "defaultTitle": "Items die binnenkort aandacht nodig hebben",
+        "defaultSubtitle": "Evenwichtige weergave - aanbevolen",
+        "earlyTitle": "Alle gemarkeerde items en vroege waarschuwingen",
+        "earlySubtitle": "Meeste waarschuwingen - maximale preventie"
+      }
+    },
+    "actionableBatches": {
+      "title": "Score-gebaseerde aanbevelingen",
+      "loading": "Uitvoerbare batches laden...",
+      "error": "Kan score-aanbevelingen niet laden. Probeer het opnieuw.",
+      "noActions": "Geen onmiddellijke acties vereist! Alle batches vallen binnen veilige score-drempels.",
+      "urgencyLevels": {
+        "critical": "Kritiek",
+        "high": "Hoog Prioriteit",
+        "medium": "Gemiddeld Prioriteit",
+        "low": "Laag Prioriteit"
+      },
+      "summaryLabels": {
+        "critical": "Kritiek",
+        "high": "Hoog Prioriteit",
+        "medium": "Gemiddeld Prioriteit",
+        "low": "Laag Prioriteit"
+      },
+      "batchDetails": {
+        "qty": "Aantal",
+        "daysToExpiry": "dagen tot vervaldatum",
+        "lossRisk": "Verliesrisico",
+        "score": "Score"
+      },
+      "buttons": {
+        "executeDonation": "Donatie uitvoeren",
+        "donateInstead": "Doneer in plaats daarvan",
+        "cancel": "Annuleren",
+        "confirmDonation": "Donatie bevestigen"
+      },
+      "scoringRecommendation": {
+        "label": "Score-aanbeveling",
+        "urgency": "Urgentie",
+        "score": "Score"
+      },
+      "donationDialog": {
+        "title": "Batch doneren",
+        "description": "Selecteer een ontvanger voor {productName}",
+        "quantity": "Hoeveelheid",
+        "expires": "Verloopt",
+        "selectRecipient": "Selecteer donatie-ontvanger",
+        "chooseRecipient": "Kies een ontvanger...",
+        "certified": "Gecertificeerd",
+        "notCertified": "Niet gecertificeerd",
+        "notesLabel": "Notities (optioneel)",
+        "notesPlaceholder": "Voeg notities toe over deze donatie..."
+      }
+    }
+  }
+}

@@ -40,6 +40,8 @@ credentials/
 !package-lock.json
 !tsconfig.json
 !biome.json
+!messages/**/*.json
+!messages/*.json
 
 # vercel
 .vercel

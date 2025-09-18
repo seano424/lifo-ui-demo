@@ -1,0 +1,529 @@
+{
+  "products": {
+    "manualEntry": {
+      "title": "Manual Entry",
+      "manualSearch": "Manual Search",
+      "productSelected": "Product Selected",
+      "searchByBarcode": "Search by Barcode",
+      "searchByProductName": "Or Search by Product Name",
+      "inStockItemsOnly": "(In-stock items only)",
+      "barcodePlaceholder": "Barcode number (8+ digits)...",
+      "searchPlaceholder": "Search Open Food Facts database...",
+      "inventorySearchPlaceholder": "Search products in inventory...",
+      "productFound": "Product Found!",
+      "outOfStock": "Out of Stock",
+      "noStockAvailable": "No stock available in this store",
+      "unitsAvailable": "units available",
+      "outOfStockCannotSelect": "Out of Stock - Cannot Select",
+      "selectThisProduct": "Select This Product",
+      "productNotFound": "Product not found in database. You can add it manually below.",
+      "addProductManually": "Add Product Manually",
+      "noProductsFound": "No products found matching",
+      "autoProceedException": "Will automatically proceed to expiry date scanning after selection",
+      "barcodeValidation": "Barcode must be at least 8 digits and contain only numbers",
+      "batchCount": "batches"
+    },
+    "table": {
+      "productDetails": "Product Details",
+      "category": "Category",
+      "brand": "Brand",
+      "stock": "Stock",
+      "pricing": "Pricing",
+      "activeBatches": "Active Batches",
+      "actions": "Actions",
+      "unnamedProduct": "Unnamed Product",
+      "uncategorized": "Uncategorized",
+      "cost": "Cost",
+      "batch": "batch",
+      "batches": "batches",
+      "units": "units"
+    },
+    "catalog": {
+      "title": "Products Catalog",
+      "description": "Manage your product catalog and inventory",
+      "clickToSort": "Click column headers to sort",
+      "sortedBy": "Sorted by",
+      "ascending": "↑",
+      "descending": "↓"
+    },
+    "empty": {
+      "title": "No products found",
+      "description": "Get started by adding your first product",
+      "storeDescription": "Get started by adding your first product to this store"
+    },
+    "loading": {
+      "loadingMore": "Loading more...",
+      "showing": "Showing",
+      "of": "of",
+      "products": "products"
+    },
+    "errors": {
+      "loadingError": "Error Loading Products",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "fields": {
+      "name": "Name",
+      "productName": "Product Name",
+      "barcode": "Barcode",
+      "brand": "Brand",
+      "category": "Category",
+      "sku": "SKU"
+    },
+    "placeholders": {
+      "productName": "e.g., Organic Whole Milk",
+      "brand": "e.g., Danone",
+      "barcode": "e.g., 078000113464",
+      "selectCategory": "Select category"
+    },
+    "confirmations": {
+      "deleteProduct": "Are you sure you want to delete this product?",
+      "enterNewPrice": "Enter new price:"
+    }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "Batch #",
+        "product": "Product",
+        "supplier": "Supplier",
+        "expiryDate": "Expiry Date",
+        "stock": "Stock",
+        "costPrice": "Cost Price",
+        "sellPrice": "Sell Price",
+        "status": "Status",
+        "location": "Location"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "editBatch": "Edit Batch",
+        "markAsExpired": "Mark as Expired",
+        "markAsDamaged": "Mark as Damaged",
+        "deleteBatch": "Delete Batch"
+      },
+      "emptyState": {
+        "title": "No batches found",
+        "description": "Try adjusting your search or filters. ",
+        "addFirstBatch": "Add First Batch"
+      },
+      "loadMore": "Load More Batches ({remaining} remaining)",
+      "loading": "Loading more..."
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "damaged": "Damaged",
+      "soldOut": "Sold Out",
+      "reserved": "Reserved"
+    },
+    "expiry": {
+      "expired": "Expired",
+      "daysLeft": "{days}d left"
+    }
+  },
+  "inbound": {
+    "mobile": {
+      "barcodeScanning": "Barcode Scanning",
+      "csvBulkImport": "CSV Bulk Import"
+    },
+    "desktop": {
+      "manualEntry": "Manual Entry",
+      "csvBulkImport": "CSV Bulk Import"
+    },
+    "messages": {
+      "selectStore": "Please select a store to upload inventory data.",
+      "selectStoreInventory": "Please select a store to add inventory."
+    }
+  },
+  "manualInbound": {
+    "selectedProduct": {
+      "title": "Selected Product",
+      "fields": {
+        "name": "Name:",
+        "brand": "Brand:",
+        "category": "Category:",
+        "barcode": "Barcode:"
+      }
+    },
+    "batchDetails": {
+      "title": "Batch Details"
+    },
+    "buttons": {
+      "addBatch": "Add Batch",
+      "clear": "Clear",
+      "submitAll": "Submit All",
+      "cancel": "Cancel",
+      "submitting": "Submitting...",
+      "submitToInventory": "Submit to Inventory",
+      "addMoreProducts": "Add More Products",
+      "viewInInventory": "View in Inventory"
+    },
+    "batchItems": {
+      "title": "Batch items to submit",
+      "description": "{count, plural, one {# batch ready to submit} other {# batches ready to submit}}"
+    },
+    "confirmation": {
+      "title": "Confirm Submission",
+      "description": "Review the items below before submitting them to your inventory.",
+      "submitText": "You are about to submit {count, plural, one {# batch} other {# batches}} to inventory:",
+      "totals": {
+        "totalItems": "Total Items:",
+        "totalValue": "Total Value:"
+      },
+      "itemDetails": {
+        "expires": "Expires:",
+        "total": "Total:"
+      }
+    },
+    "success": {
+      "title": "Inventory Updated Successfully!",
+      "description": {
+        "allSuccess": "Successfully added {count, plural, one {# batch} other {# batches}} to your inventory.",
+        "partialSuccess": "Added {successCount} of {totalCount} batches to inventory."
+      }
+    },
+    "alerts": {
+      "gettingStarted": "Start by searching for a product using the barcode or product name search above. After selecting a product, you'll be able to add expiry date, quantity, and price."
+    }
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Scan Product",
+      "scanExpiryDate": "Scan Expiry Date"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Point camera at barcode",
+      "pointAtExpiryDate": "Point camera at expiry date"
+    },
+    "permissions": {
+      "barcodeRequired": "Camera access is required for barcode scanning.",
+      "expiryRequired": "Camera access is required for capturing expiry dates."
+    },
+    "alerts": {
+      "serviceUnavailable": "Sorry, this service is currently unavailable. Please use manual date entry.",
+      "ocrError": "OCR Error: {error}",
+      "backendUnavailable": "FastAPI backend is not available. Please use manual entry.",
+      "scanInstructions": "Point your camera at any product barcode. The scanner will automatically detect supported formats and look up product information from Open Food Facts."
+    },
+    "buttons": {
+      "captureExpiryDate": "Capture Expiry Date",
+      "processingOCR": "Processing OCR...",
+      "clearError": "Clear Error",
+      "manualEntry": "Manual Entry"
+    }
+  },
+  "scanningWorkflow": {
+    "steps": {
+      "scanBarcode": "Scan Barcode",
+      "changeProduct": "Change Product",
+      "scanExpiryDate": "Scan Expiry Date",
+      "reviewDetails": "Review Details",
+      "previousStep": "Previous Step"
+    }
+  },
+  "scanningInterface": {
+    "camera": {
+      "scanProduct": "Scan Product",
+      "scanDifferentProduct": "Scan Different Product"
+    },
+    "product": {
+      "productFound": "Product found! Ready to proceed to expiry date scanning.",
+      "productNotFound": "Product not found in database. You may need to add it manually.",
+      "autoProceeding": "Automatically proceeding to expiry date scanning..."
+    },
+    "expiry": {
+      "manualEntryFallback": "📝 Manual Entry (OCR unavailable)",
+      "orEnterManually": "Or enter manually",
+      "confirmDate": "Confirm Date"
+    },
+    "inventory": {
+      "addToInventory": "Add to Inventory",
+      "addedToList": "Added {productName} to your list! Scan the next product.",
+      "finishAndSubmit": "Finish and submit {count, plural, one {# item} other {# items}}"
+    },
+    "submission": {
+      "title": "Confirm Submission",
+      "description": "Review the items below before submitting them to your inventory.",
+      "submitText": "You are about to submit {count, plural, one {# item} other {# items}} to inventory:",
+      "totals": {
+        "totalItems": "Total Items:",
+        "totalValue": "Total Value:",
+        "expires": "Expires:"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "submitting": "Submitting...",
+        "submitToInventory": "Submit to Inventory"
+      }
+    },
+    "success": {
+      "title": "Inventory Updated Successfully!",
+      "description": {
+        "allSuccess": "Successfully added {count, plural, one {# item} other {# items}} to your inventory.",
+        "partialSuccess": "Added {successCount} of {totalCount} items to inventory."
+      },
+      "buttons": {
+        "keepScanning": "Keep Scanning",
+        "viewInDashboard": "View in Dashboard"
+      }
+    },
+    "navigation": {
+      "backTo": "Back to {stepName}",
+      "goBack": "Go Back"
+    },
+    "lookupErrors": {
+      "lookupFailed": "Lookup failed: {error}"
+    }
+  },
+  "inventoryForm": {
+    "titles": {
+      "productDetails": "Product Details",
+      "detailsCaptured": "Details captured successfully",
+      "reviewAndSubmit": "Review and submit to inventory"
+    },
+    "labels": {
+      "expiryDate": "Expiry Date",
+      "quantity": "Quantity",
+      "pricePerUnit": "Price per unit (€)",
+      "editableNote": "(editable)"
+    },
+    "buttons": {
+      "confirm": "Confirm"
+    }
+  },
+  "productCard": {
+    "titles": {
+      "selectedProduct": "Selected Product",
+      "productInformation": "Product Information"
+    },
+    "fallbacks": {
+      "unknownProduct": "Unknown Product"
+    }
+  },
+  "scannedItemsList": {
+    "title": "Batch items",
+    "itemLabels": {
+      "quantity": "Quantity:",
+      "price": "Price:",
+      "expiry": "Expiry:"
+    },
+    "editDialog": {
+      "title": "Edit Item",
+      "descriptions": {
+        "quickEdit": "Quick edit expiry date, quantity, and price. Click \"Edit Details\" for more options.",
+        "fullEdit": "Edit all product details including name, brand, barcode, and inventory information."
+      },
+      "sections": {
+        "productDetails": "Product Details",
+        "inventoryDetails": "Inventory Details",
+        "quickEdit": "Quick Edit"
+      },
+      "formLabels": {
+        "productName": "Product Name",
+        "brand": "Brand",
+        "barcode": "Barcode",
+        "expiryDate": "Expiry Date",
+        "quantity": "Quantity",
+        "price": "Price (€)"
+      },
+      "placeholders": {
+        "productName": "Enter product name",
+        "brand": "Brand name",
+        "barcode": "Barcode number"
+      },
+      "buttons": {
+        "editDetails": "Edit Details",
+        "hideDetails": "Hide Details",
+        "cancel": "Cancel",
+        "saveChanges": "Save Changes"
+      }
+    }
+  },
+
+  "csvUpload": {
+    "title": "Ultra-Fast CSV Upload",
+    "subtitle": "Lightning-fast processing",
+    "dropZone": {
+      "dropHere": "Drop your CSV file here",
+      "orBrowse": "or click to browse",
+      "chooseFile": "Choose File"
+    },
+    "preview": {
+      "title": "Preview",
+      "table": {
+        "sku": "SKU",
+        "productName": "Product Name",
+        "category": "Category",
+        "quantity": "Qty",
+        "expiryDate": "Expiry Date"
+      },
+      "selectDate": "Select date",
+      "missingExpiryDate": "Missing expiry date",
+      "quantityLabel": "Qty:"
+    },
+    "buttons": {
+      "upload": "Upload",
+      "processing": "Processing...",
+      "reset": "Reset",
+      "uploadAnother": "Upload Another File"
+    },
+    "results": {
+      "title": "Upload Complete!",
+      "successSummary": "Successfully processed {processed} items",
+      "duplicatesSkipped": " • {skipped} duplicates skipped",
+      "uploadCompleted": "Upload completed",
+      "completedIn": "⚡ Completed in {time}ms",
+      "metrics": {
+        "processed": "Processed",
+        "skipped": "Skipped",
+        "itemsPerSec": "Items/sec",
+        "totalTime": "Total time"
+      },
+      "performance": {
+        "title": "Bulk Operation Performance Breakdown",
+        "duplicateCheck": "Duplicate Check",
+        "productResolution": "Product Resolution",
+        "batchInsertion": "Batch Insertion",
+        "productsCreated": "Products Created",
+        "dbProcessing": "DB Processing",
+        "optimization": "⚡ Bulk operations reduced processing time by {percentage}% compared to individual processing"
+      },
+      "duplicates": {
+        "viewSkipped": "View Skipped Duplicates ({count})",
+        "expiry": "Expiry"
+      }
+    },
+    "errors": {
+      "invalidFile": "Please select a CSV file",
+      "analysisFailure": "Failed to analyze CSV file",
+      "noFile": "Please select a file first",
+      "noStore": "Store information is missing. Please refresh and try again.",
+      "uploadFailed": "Upload Failed",
+      "startFailed": "Failed to start upload. Please try again."
+    },
+    "performanceInfo": {
+      "title": "Bulk-Optimized Ultra-Fast Performance",
+      "features": {
+        "bulkOps": "3 bulk database operations instead of N individual calls",
+        "autoDuplicate": "Automatic duplicate detection with zero user intervention",
+        "realtime": "Real-time performance metrics and timing breakdown",
+        "target": "Target: 1000+ items/sec with database RPC functions"
+      },
+      "footer": "🚀 Optimized for maximum speed while maintaining data integrity"
+    }
+  },
+  "store": {
+    "creation": {
+      "success": {
+        "title": "Store Created Successfully!",
+        "description": "Your store \"{storeName}\" has been created and is ready to use.",
+        "whatsNext": {
+          "title": "What's Next?",
+          "steps": {
+            "configure": {
+              "title": "Configure your store settings",
+              "description": "Set up notifications, integrations, and team permissions."
+            },
+            "inventory": {
+              "title": "Add your first products",
+              "description": "Upload your inventory via CSV or scan products manually."
+            },
+            "team": {
+              "title": "Invite team members",
+              "description": "Add colleagues to help manage your store inventory."
+            }
+          }
+        },
+        "actions": {
+          "goToSettings": "Go to Store Settings",
+          "goToDashboard": "Go to Dashboard"
+        }
+      }
+    },
+    "urgentAlerts": {
+      "levels": {
+        "urgentOnly": "Urgent Items Only",
+        "priority": "Priority Items",
+        "allFlagged": "All Flagged Items",
+        "completeReview": "Complete Review"
+      },
+      "errors": {
+        "connectionError": "Connection Error",
+        "unableToLoad": "Unable to load inventory alerts. Please try again.",
+        "loadingAlerts": "Loading alerts..."
+      },
+      "messages": {
+        "nothingToShow": "No items need attention right now - you're all caught up!",
+        "itemNeedsAction": "{count, plural, one {item needs} other {items need}} immediate action",
+        "itemMayNeedAction": "{count, plural, one {item may need} other {items may need}} attention soon",
+        "itemsFlagged": "{count, plural, one {item flagged} other {items flagged}} for review",
+        "itemsMonitoring": "{count, plural, one {item flagged} other {items flagged}} for monitoring"
+      },
+      "buttons": {
+        "viewInventory": "View inventory",
+        "viewItems": "View items"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "urgent": "Urgent",
+        "default": "Default",
+        "early": "Early"
+      },
+      "tooltips": {
+        "urgentTitle": "Only urgent items requiring immediate action",
+        "urgentSubtitle": "Fewest alerts - most restrictive",
+        "defaultTitle": "Items needing attention soon",
+        "defaultSubtitle": "Balanced view - recommended",
+        "earlyTitle": "All flagged items and early warnings",
+        "earlySubtitle": "Most alerts - maximum prevention"
+      }
+    },
+    "actionableBatches": {
+      "title": "Scoring-Based Recommendations",
+      "loading": "Loading actionable batches...",
+      "error": "Failed to load scoring recommendations. Please try again.",
+      "noActions": "No immediate actions required! All batches are within safe scoring thresholds.",
+      "urgencyLevels": {
+        "critical": "Critical",
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "low": "Low Priority"
+      },
+      "summaryLabels": {
+        "critical": "Critical",
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "low": "Low Priority"
+      },
+      "batchDetails": {
+        "qty": "Qty",
+        "daysToExpiry": "days to expiry",
+        "lossRisk": "Loss Risk",
+        "score": "Score"
+      },
+      "buttons": {
+        "executeDonation": "Execute Donation",
+        "donateInstead": "Donate Instead",
+        "cancel": "Cancel",
+        "confirmDonation": "Confirm Donation"
+      },
+      "scoringRecommendation": {
+        "label": "Scoring Recommendation",
+        "urgency": "Urgency",
+        "score": "Score"
+      },
+      "donationDialog": {
+        "title": "Donate Batch",
+        "description": "Select a recipient for {productName}",
+        "quantity": "Quantity",
+        "expires": "Expires",
+        "selectRecipient": "Select Donation Recipient",
+        "chooseRecipient": "Choose a recipient...",
+        "certified": "Certified",
+        "notCertified": "Not certified",
+        "notesLabel": "Notes (optional)",
+        "notesPlaceholder": "Add any notes about this donation..."
+      }
+    }
+  }
+}

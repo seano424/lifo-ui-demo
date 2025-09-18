@@ -1,0 +1,130 @@
+{
+  "actions": {
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "scan": "Scanner",
+    "discount": "Remise",
+    "donate": "Faire un don"
+  },
+  "forms": {
+    "productName": "Nom du produit",
+    "expirationDate": "Date d'expiration",
+    "quantity": "Quantité",
+    "price": "Prix",
+    "category": "Catégorie",
+    "required": "Requis"
+  },
+  "status": {
+    "fresh": "Frais",
+    "expiringSoon": "Expire bientôt",
+    "expired": "Expiré",
+    "discounted": "En promotion",
+    "donated": "Donné",
+    "sold": "Vendu"
+  },
+  "validation": {
+    "required": "Ce champ est requis",
+    "invalidEmail": "Adresse e-mail invalide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "dateMustBeFuture": "La date doit être dans le futur"
+  },
+  "common": {
+    "more": "Plus"
+  },
+  "breadcrumbs": {
+    "batches": "Lots",
+    "billing": "Facturations",
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire",
+    "inbound": "Entrées",
+    "outbound": "Sorties",
+    "analytics": "Analyses",
+    "performance": "Performance",
+    "milestones": "Étapes",
+    "todos": "À faire",
+    "settings": "Paramètres",
+    "store": "Magasin",
+    "team": "Équipe",
+    "users": "Utilisateurs",
+    "teams": "Équipes",
+    "stores": "Magasins",
+    "products": "Produits",
+    "categories": "Catégories",
+    "reports": "Rapports",
+    "notifications": "Notifications",
+    "account": "Compte",
+    "profile": "Profil",
+    "help": "Aide",
+    "support": "Support",
+    "addStore": "Ajouter un magasin"
+  },
+  "navUser": {
+    "upgradeToPro": "Passer à Pro",
+    "account": "Compte",
+    "billing": "Facturation",
+    "notifications": "Notifications",
+    "language": "Langue"
+  },
+  "errors": {
+    "pageNotFoundTitle": "Page non trouvée",
+    "pageNotFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backToHome": "Retour à l'accueil",
+    "goBack": "Retour",
+    "needHelp": "Besoin d'aide ?",
+    "contactSupport": "Contactez notre équipe de support",
+    "common": {
+      "genericError": "Une erreur s'est produite",
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+      "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+      "unauthorized": "Vous n'avez pas l'autorisation d'accéder à cette ressource.",
+      "notFound": "La ressource demandée n'a pas été trouvée.",
+      "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
+      "timeoutError": "Délai d'attente dépassé. Veuillez réessayer.",
+      "unknownError": "Une erreur inconnue s'est produite"
+    },
+    "forms": {
+      "required": "Ce champ est obligatoire",
+      "invalidEmail": "Veuillez saisir une adresse email valide",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+      "invalidPhone": "Veuillez saisir un numéro de téléphone valide",
+      "invalidUrl": "Veuillez saisir une URL valide",
+      "nameTooLong": "Le nom est trop long",
+      "emailTaken": "Cette adresse email est déjà utilisée",
+      "usernameTaken": "Ce nom d'utilisateur est déjà pris",
+      "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores"
+    },
+    "api": {
+      "createFailed": "Échec de la création de l'élément",
+      "updateFailed": "Échec de la mise à jour de l'élément",
+      "deleteFailed": "Échec de la suppression de l'élément",
+      "loadFailed": "Échec du chargement des données",
+      "saveFailed": "Échec de l'enregistrement des modifications",
+      "uploadFailed": "Échec du téléchargement du fichier",
+      "connectionFailed": "Échec de la connexion",
+      "authFailed": "Échec de l'authentification"
+    },
+    "emptyStates": {
+      "noResults": "Aucun résultat trouvé",
+      "noData": "Aucune donnée disponible",
+      "noBatches": "Aucun lot trouvé",
+      "noProducts": "Aucun produit trouvé",
+      "noUsers": "Aucun utilisateur trouvé",
+      "emptySearch": "Aucun résultat ne correspond à votre recherche",
+      "tryDifferentSearch": "Essayez d'ajuster vos critères de recherche"
+    },
+    "loading": {
+      "loading": "Chargement...",
+      "processing": "Traitement...",
+      "saving": "Enregistrement...",
+      "uploading": "Téléchargement...",
+      "searching": "Recherche...",
+      "deleting": "Suppression...",
+      "updating": "Mise à jour..."
+    }
+  },
+  "cancel": "Annuler"
+}
