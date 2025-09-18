@@ -1,0 +1,762 @@
+{
+  "dashboard": {
+    "quickActions": {
+      "title": "Snelle Acties",
+      "description": "Voeg snel producten toe, verwijder of bekijk producten en taken.",
+      "addProducts": {
+        "title": "Producten Toevoegen",
+        "description": "Voeg nieuwe producten toe aan uw voorraad met behulp van barcode-scanning of handmatige invoer.",
+        "action": "Nieuwe producten toevoegen"
+      },
+      "todoSuggestions": {
+        "title": "Todo Suggesties",
+        "description": "Bekijk en beheer taken die door LIFO.AI zijn voorgesteld om uw voorraad te optimaliseren.",
+        "action": "Bekijk todos"
+      },
+      "removeProducts": {
+        "title": "Producten Verwijderen",
+        "description": "Registreer verkopen, donaties of afval voor artikelen die uw voorraad verlaten.",
+        "action": "Verwijder producten"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "Geen Winkels Gevonden",
+        "description": "U moet een winkel aanmaken voordat u producten kunt beheren. Stel uw eerste winkel in om door te gaan.",
+        "tip": {
+          "title": "Waarom heb ik een winkel nodig?",
+          "description": "Winkels helpen u uw voorraad te organiseren en producten efficiënt te volgen. Elke winkel kan zijn eigen voorraad, instellingen en teamleden hebben."
+        },
+        "button": "Maak uw eerste winkel aan"
+      }
+    },
+    "kpis": {
+      "title": "Overzicht belangrijke statistieken",
+      "refresh": "Vernieuwen",
+      "inventory": {
+        "label": "Totale voorraadwaarde",
+        "subtitle": "batches",
+        "productCount": "producten"
+      },
+      "sales": {
+        "label": "Verkoopontvangsten",
+        "subtitle": "verkopen"
+      },
+      "donations": {
+        "label": "Donaties",
+        "subtitle": "ontvangers"
+      },
+      "waste": {
+        "label": "Afvalkosten",
+        "subtitle": "items"
+      },
+      "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen."
+    }
+  },
+  "alerts": {
+    "sensitivity": {
+      "title": "Waarschuwingsgevoeligheid",
+      "description": "Hoe gevoelig moeten waarschuwingen zijn voor potentiële verspilling?",
+      "helpText": "Bepaal wanneer items verschijnen in uw waarschuwingen en dashboard.",
+      "helpTextLine2": "Hogere gevoeligheid = meer vroege waarschuwingen",
+      "helpTextLine3": "Lagere gevoeligheid = alleen kritische items",
+      "currentPreference": "Kies uw waarschuwingsvoorkeur",
+      "levels": {
+        "conservative": "Conservatief",
+        "balanced": "Gebalanceerd",
+        "proactive": "Proactief",
+        "conservativeTitle": "Conservatief - Alleen kritisch",
+        "balancedTitle": "Gebalanceerd - Actie nodig (Aanbevolen)",
+        "proactiveTitle": "Proactief - Vroege waarschuwingen"
+      },
+      "descriptions": {
+        "conservative": "Toon alleen kritieke items die directe actie vereisen",
+        "balanced": "Toon items die binnenkort aandacht nodig hebben (aanbevolen)",
+        "proactive": "Vroege waarschuwingen voor alle items die mogelijk aandacht nodig hebben"
+      },
+      "expectedCounts": {
+        "conservative": "Minder waarschuwingen, hogere urgentie",
+        "balanced": "Gematigde waarschuwingen, goede balans",
+        "proactive": "Meer waarschuwingen, vroege preventie"
+      },
+      "selectDescriptions": {
+        "conservative": "Items die vandaag/morgen verlopen of met hoog verspillingsrisico",
+        "balanced": "Items die deze week aandacht nodig hebben",
+        "proactive": "Alle items die mogelijk binnenkort aandacht nodig hebben"
+      },
+      "technical": {
+        "showDetails": "Technische details tonen",
+        "thresholds": "Technische drempels:",
+        "warningLevel": "Waarschuwingsniveau",
+        "criticalLevel": "Kritisch niveau",
+        "compositeScore": "samengestelde score",
+        "howScoringWorks": "Hoe scoring werkt:",
+        "expiryScore": "Vervalscore: Hoe dicht bij vervaldatum",
+        "marginScore": "Margescore: Winstmarge in gevaar",
+        "velocityScore": "Snelheidsscore: Hoe snel het item meestal verkoopt"
+      },
+      "actions": {
+        "resetToDefaults": "Standaardwaarden herstellen",
+        "saving": "Opslaan...",
+        "settingsSavedAuto": "Instellingen automatisch opgeslagen"
+      }
+    }
+  },
+  "storeInsights": {
+    "title": "Vandaag's prioriteitsacties",
+    "description": "Beoordeel en onderneem actie op de meest urgente items.",
+    "takeAction": "Actie ondernemen",
+    "loadingInsights": "Winkel inzichten laden...",
+    "dashboardTitle": "Winkel Inzichten Dashboard",
+    "unableToLoad": "Kan inzichten niet laden",
+    "failedToLoad": "Fout bij laden van winkel inzichten:",
+    "unknownError": "Onbekende fout",
+    "storeId": "Winkel ID:",
+    "metrics": {
+      "urgentItems": "Urgente Items",
+      "urgentItemsDesc": "Hoge urgentie batches",
+      "actionsTaken": "Acties Ondernomen",
+      "actionsTakenDesc": "Totaal acties deze periode",
+      "discountValue": "Kortingswaarde",
+      "discountValueDesc": "Totaal toegepaste kortingen",
+      "avgScore": "Gem Score",
+      "avgScoreDesc": "Gemiddelde urgentiescore"
+    },
+    "overview": {
+      "title": "Winkel Overzicht & Analytics",
+      "description": "{actionsTaken} acties ondernomen • {urgentBatches} urgente items gevolgd",
+      "scoringAlert": "Scoring Waarschuwing:",
+      "urgentBatchesAlert": "{urgentBatches} urgente batches hebben onmiddellijke aandacht nodig om verliezen te voorkomen.",
+      "recentActivity": "Recente Activiteit",
+      "actionsTaken": "Acties Ondernomen",
+      "actionsTakenPeriod": "{totalActions} deze periode",
+      "discountsApplied": "Kortingen Toegepast",
+      "saved": "€{discountValue} bespaard",
+      "averageScore": "Gemiddelde Score: {avgScore}% • €{discountValue} kortingen toegepast",
+      "discountsAppliedText": "kortingen toegepast",
+      "showDetails": "Details Tonen",
+      "hideDetails": "Details Verbergen"
+    },
+    "urgentAlerts": {
+      "errors": {
+        "connectionError": "Verbindingsfout",
+        "unableToLoad": "Kan urgente meldingen niet laden",
+        "loadingAlerts": "Meldingen laden..."
+      },
+      "buttons": {
+        "viewInventory": "Voorraad bekijken",
+        "viewItems": "Items bekijken"
+      },
+      "levels": {
+        "urgentOnly": "Alleen kritiek",
+        "priority": "Hoge prioriteit",
+        "allFlagged": "Gemiddelde prioriteit",
+        "completeReview": "Volledige beoordeling"
+      },
+      "messages": {
+        "nothingToShow": "Geen urgente items op dit moment",
+        "criticalItemsAction": "{count} kritieke items hebben onmiddellijke actie nodig (verlopen of verlopen binnen 24 uur)",
+        "highPriorityItems": "{count} hoge prioriteit items (verlopen binnen 2-3 dagen)",
+        "criticalItems": "{count} kritieke items (verlopen of verlopen binnen 24 uur)",
+        "mediumPriorityItems": "{count} gemiddelde prioriteit items (verlopen binnen een week)",
+        "lowPriorityItems": "{count} lage prioriteit items (verlopen binnen 2 weken)"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "critical": "Kritiek",
+        "high": "Hoog",
+        "medium": "Medium",
+        "all": "Alle"
+      },
+      "tooltips": {
+        "critical": "Alleen kritieke items",
+        "criticalDesc": "Verlopen of verlopen binnen 24 uur",
+        "high": "Kritiek + Hoge prioriteit",
+        "highDesc": "Items die binnen 2-3 dagen verlopen",
+        "medium": "Tot gemiddelde prioriteit",
+        "mediumDesc": "Items die binnen een week verlopen",
+        "all": "Alle prioriteitsniveaus",
+        "allDesc": "Volledige voorraadcontrole"
+      }
+    },
+    "batchStatus": {
+      "needsAttention": "Heeft aandacht nodig",
+      "activeInventory": "Actieve voorraad status",
+      "activeBatchesCount": "{needsAttention} van {total} actieve batches",
+      "urgency": {
+        "critical": "Kritiek (Onmiddellijke Actie Vereist)",
+        "high": "Hoge Prioriteit (verloopt morgen)",
+        "medium": "Gemiddelde Prioriteit (verloopt binnen 2-7 dagen)",
+        "low": "Lage Prioriteit (langere houdbaarheid)"
+      },
+      "status": {
+        "ok": "OK",
+        "allGood": "Alle batches zijn in goede staat"
+      },
+      "errors": {
+        "loadingError": "Kan batch status niet laden"
+      }
+    },
+    "expiredItems": {
+      "title": "Verlopen artikelen",
+      "subtitle": "Voorraad die afvalbeheer acties vereist",
+      "recentlyExpired": "Recent verlopen",
+      "weekOld": "Week oud",
+      "older": "Ouder",
+      "days": "dagen",
+      "actionsNeeded": "Acties nodig",
+      "reviewDiscounts": "Beoordeel voor hoge kortingen",
+      "scheduleDonation": "Plan donatie ophaling",
+      "removeFromShelves": "Van rekken verwijderen",
+      "noExpiredItems": "Geen verlopen artikelen gevonden",
+      "errors": {
+        "loadingError": "Kan verlopen artikelen niet laden"
+      }
+    }
+  },
+  "navigation": {
+    "dashboard-title": "Winkel",
+    "dashboard": "Dashboard",
+    "operations": "Operaties",
+    "inventory": "Voorraad",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "todos": "Te doen",
+    "performance": "Prestaties",
+    "milestones": "Mijlpalen",
+    "analytics": "Analyses",
+    "settings": "Instellingen",
+    "helpCenter": "Helpcentrum",
+    "logout": "Uitloggen",
+    "batches": "Batches",
+    "products": "Producten"
+  },
+  "batchFilters": {
+    "expiryFilter": "Vervaldatum filter",
+    "allItems": "Alle items",
+    "expiringInDays": "Verloopt over {days} dagen",
+    "status": "Status",
+    "allStatuses": "Alle statussen",
+    "active": "Actief",
+    "expired": "Verlopen",
+    "damaged": "Beschadigd",
+    "soldOut": "Uitverkocht",
+    "reserved": "Gereserveerd",
+    "itemCount": "{count} items"
+  },
+  "batchList": {
+    "errorLoadingBatches": "Fout bij laden van batches",
+    "unexpectedError": "Er is een onverwachte fout opgetreden",
+    "currentBatches": "{count} huidige batches",
+    "filters": "Filters",
+    "search": "Zoeken",
+    "searchBatches": "Zoek batches...",
+    "status": "Status",
+    "allStatuses": "Alle statussen",
+    "active": "Actief",
+    "expired": "Verlopen",
+    "damaged": "Beschadigd",
+    "soldOut": "Uitverkocht",
+    "reserved": "Gereserveerd",
+    "expiringSoon": "Verloopt binnenkort",
+    "allDates": "Alle datums",
+    "expiringInDays": "Verloopt over {days} dagen",
+    "location": "Locatie",
+    "locationCode": "Locatiecode...",
+    "stockStatus": "Voorraadstatus",
+    "allStockLevels": "Alle voorraadniveaus",
+    "inStock": "Op voorraad",
+    "outOfStock": "Niet op voorraad",
+    "supplier": "Leverancier",
+    "supplierName": "Naam leverancier...",
+    "clear": "Wissen",
+    "clearFilters": "Filters wissen",
+    "loadingMore": "Meer laden...",
+    "loadMoreBatches": "Meer batches laden",
+    "showingBatches": "{count} batches weergegeven",
+    "filteredFrom": "(gefilterd van {total})",
+    "noBatchesFound": "Geen batches gevonden",
+    "noBatchesYet": "Nog geen batches",
+    "tryAdjustingFilters": "Probeer je zoekterm of filters aan te passen",
+    "productNoBatches": "Dit product heeft nog geen batches",
+    "getStartedFirstBatch": "Begin door je eerste batch toe te voegen",
+    "convenience": {
+      "expiringSoon": "Verloopt binnenkort",
+      "noBatchesExpiringSoon": "Geen batches verlopen binnenkort",
+      "productBatches": "Product batches",
+      "productNoBatches": "Dit product heeft nog geen batches",
+      "lowStockAlert": "Lage voorraad waarschuwing",
+      "allBatchesSufficientStock": "Alle batches hebben voldoende voorraad"
+    }
+  },
+  "batchSort": {
+    "sortBy": "Sorteer op",
+    "createdDate": "Aanmaakdatum",
+    "expiryDate": "Vervaldatum",
+    "batchNumber": "Batchnummer",
+    "supplier": "Leverancier",
+    "stockLevel": "Voorraadniveau",
+    "costPrice": "Kostprijs",
+    "sellingPrice": "Verkoopprijs",
+    "status": "Status",
+    "asc": "ASC",
+    "desc": "DESC"
+  },
+  "productSort": {
+    "sortBy": "Sorteer op",
+    "unknown": "Onbekend",
+    "sortProductsBy": "Sorteer producten op",
+    "current": "Huidige",
+    "ascending": "Oplopend",
+    "descending": "Aflopend",
+    "productCount": "{count} producten",
+    "productName": "Productnaam",
+    "productNameDesc": "Sorteer alfabetisch op productnaam",
+    "category": "Categorie",
+    "categoryDesc": "Groepeer op productcategorie",
+    "brand": "Merk",
+    "brandDesc": "Sorteer alfabetisch op merk",
+    "stockLevel": "Voorraadniveau",
+    "stockLevelDesc": "Sorteer op huidige voorraadhoeveelheid",
+    "sellingPrice": "Verkoopprijs",
+    "sellingPriceDesc": "Sorteer op productverkoopprijs",
+    "activeBatches": "Actieve batches",
+    "activeBatchesDesc": "Sorteer op aantal actieve batches",
+    "dateAdded": "Datum toegevoegd",
+    "dateAddedDesc": "Sorteer op wanneer product werd toegevoegd",
+    "quickSort": {
+      "newestFirst": "Nieuwste eerst",
+      "aToZ": "A-Z",
+      "lowStock": "Lage voorraad",
+      "highestPrice": "Hoogste prijs",
+      "mostBatches": "Meeste batches"
+    }
+  },
+  "productFilters": {
+    "categoryFilter": "Categorie filter",
+    "allCategories": "Alle categorieën",
+    "productCount": "{count} producten"
+  },
+  "productListSort": {
+    "name": "Naam",
+    "category": "Categorie",
+    "brand": "Merk",
+    "stock": "Voorraad",
+    "price": "Prijs",
+    "activeBatches": "Actieve batches",
+    "dateAdded": "Datum toegevoegd",
+    "lastUpdated": "Laatst bijgewerkt"
+  },
+  "productTable": {
+    "product": "Product",
+    "unnamedProduct": "Naamloos product",
+    "notAvailable": "N.v.t.",
+    "category": "Categorie",
+    "uncategorized": "Niet gecategoriseerd",
+    "brand": "Merk",
+    "totalStock": "Totale voorraad",
+    "activeBatches": "Actieve batches",
+    "dateAdded": "Datum toegevoegd",
+    "openMenu": "Menu openen",
+    "actions": "Acties",
+    "viewDetails": "Details bekijken",
+    "viewBatches": "Batches bekijken",
+    "editProduct": "Product bewerken",
+    "updatePrice": "Prijs bijwerken",
+    "enterNewPrice": "Voer nieuwe prijs in (€):",
+    "deleteProduct": "Product verwijderen",
+    "confirmDeleteProduct": "Weet u zeker dat u dit product wilt verwijderen?"
+  },
+  "todos": {
+    "pageDescription": "Gepersonaliseerde suggesties om uw voorraad te optimaliseren en afval te verminderen"
+  },
+  "scanOut": {
+    "available": "Beschikbaar",
+    "unknownProduct": "Onbekend product",
+    "unknownBrand": "Onbekend merk",
+    "scanProductToRemove": "Scan product om te verwijderen",
+    "pointCameraAtBarcode": "Richt camera op product barcode",
+    "title": "Scannen voor uitgang",
+    "description": "Scan artikelen wanneer ze de voorraad verlaten",
+    "scanning": {
+      "scanNextProduct": "Volgend product scannen",
+      "scanProductBarcode": "Product barcode scannen",
+      "pointAtBarcode": "Richt op de barcode",
+      "productFound": "Product gevonden!",
+      "notFoundInInventory": "Product niet gevonden in voorraad",
+      "addToRemovalList": "Toevoegen aan verwijderlijst"
+    },
+    "productDetails": {
+      "title": "Productdetails",
+      "brand": "Merk",
+      "category": "Categorie",
+      "barcode": "Barcode",
+      "availableStock": "Beschikbare voorraad",
+      "units": "eenheden",
+      "noBrand": "Geen merk",
+      "uncategorized": "Ongecategoriseerd",
+      "noBarcode": "Geen barcode"
+    },
+    "batchSelection": {
+      "title": "Batch selecteren",
+      "selectBatch": "Selecteer een batch om te verwijderen",
+      "expires": "Verloopt op",
+      "expired": "Verlopen",
+      "available": "beschikbaar",
+      "selectThisBatch": "Deze batch selecteren"
+    },
+    "quantityInput": {
+      "title": "Hoeveelheid om te verwijderen",
+      "quantity": "Hoeveelheid",
+      "maxAvailable": "Maximum beschikbaar: {max} eenheden",
+      "enterQuantity": "Voer de hoeveelheid in om te verwijderen"
+    },
+    "reasonSelection": {
+      "title": "Reden voor verwijdering",
+      "selectReason": "Selecteer een reden voor deze verwijdering",
+      "reasons": {
+        "sale": "Verkoop",
+        "donation": "Donatie",
+        "waste": "Afval",
+        "damaged": "Beschadigd",
+        "expired": "Verlopen",
+        "other": "Anders"
+      }
+    },
+    "itemsList": {
+      "title": "Items om te verwijderen",
+      "noItems": "Nog geen items toegevoegd",
+      "itemCount": "{count, plural, one {# item} other {# items}} om te verwijderen",
+      "quantity": "Aantal",
+      "reason": "Reden",
+      "remove": "Verwijderen"
+    },
+    "confirmation": {
+      "title": "Verwijdering bevestigen",
+      "description": "Bekijk de items hieronder voordat u ze uit de voorraad verwijdert.",
+      "submitText": "U staat op het punt om {count, plural, one {# item} other {# items}} uit de voorraad te verwijderen:",
+      "itemDetails": {
+        "expires": "Verloopt:",
+        "reason": "Reden:",
+        "quantity": "Hoeveelheid:"
+      }
+    },
+    "success": {
+      "title": "Items succesvol verwijderd!",
+      "description": "Succesvol {count, plural, one {# item} other {# items}} verwijderd uit uw voorraad.",
+      "summary": {
+        "totalItems": "Totaal verwijderde items:",
+        "byReason": "Per reden:",
+        "sales": "Verkopen",
+        "donations": "Donaties",
+        "waste": "Afval"
+      }
+    },
+    "buttons": {
+      "scanProduct": "Product scannen",
+      "selectBatch": "Batch selecteren",
+      "addToList": "Toevoegen aan lijst",
+      "removeFromInventory": "Verwijderen uit voorraad",
+      "cancel": "Annuleren",
+      "confirm": "Bevestigen",
+      "back": "Terug",
+      "continue": "Doorgaan",
+      "finish": "Voltooien",
+      "scanNext": "Volgende scannen",
+      "viewDashboard": "Dashboard bekijken",
+      "submitting": "Indienen..."
+    },
+    "alerts": {
+      "maxQuantityExceeded": "Hoeveelheid kan beschikbare voorraad niet overschrijden",
+      "quantityRequired": "Voer een geldige hoeveelheid in",
+      "reasonRequired": "Selecteer een reden",
+      "noItemsToRemove": "Geen items om te verwijderen",
+      "scanError": "Scanfout: {error}",
+      "submissionError": "Indienfout: {error}"
+    },
+    "recentlyRemoved": "Recent verwijderd ({count} items)",
+    "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt: {date}",
+    "andMoreItems": "... en nog {count} items",
+    "captureExpiryDate": "Vervaldatum vastleggen",
+    "pointCameraAtExpiry": "Richt camera op vervaldatum",
+    "backToChangeProduct": "Terug om product te wijzigen",
+    "itemsToRemove": "Items om te verwijderen ({count})",
+    "total": "Totaal",
+    "expires": "Verloopt",
+    "remove": "Verwijderen",
+    "clearAll": "Alles wissen",
+    "submitAll": "Alles indienen ({count} items)",
+    "confirmCheckout": "Uitgang bevestigen",
+    "reviewItemsBeforeRemoval": "Controleer onderstaande items voordat u ze uit de voorraad verwijdert.",
+    "aboutToRemoveItems": "U staat op het punt {count} items uit de voorraad te verwijderen:",
+    "totalItemsRemoved": "Totaal verwijderde items",
+    "totalValueRemoved": "Totale verwijderde waarde",
+    "processing": "Verwerken...",
+    "confirmRemoval": "Verwijdering bevestigen",
+    "inventoryUpdatedSuccessfully": "Voorraad succesvol bijgewerkt!",
+    "successfullyRemoved": "Succesvol {count} items uit voorraad verwijderd.",
+    "partiallyRemoved": "{success} van {total} items uit voorraad verwijderd.",
+    "continueScanning": "Doorgaan met scannen",
+    "viewInDashboard": "Bekijk in dashboard",
+    "noActiveStore": "Geen actieve winkel geselecteerd",
+    "cameraNotReady": "Camera niet gereed",
+    "noBatchFoundWithExpiry": "Geen batch gevonden met vervaldatum: {date}",
+    "noInventoryAvailable": "Geen voorraad beschikbaar voor dit product in de huidige winkel.",
+    "ocrProcessingFailed": "OCR-verwerking mislukt",
+    "batchRemovalNote": "Batch verwijdering: {productName} x{quantity}",
+    "cancel": "Annuleren"
+  },
+  "buttons": {
+    "export": "Exporteren",
+    "addBatch": "Batch toevoegen",
+    "addProduct": "Product toevoegen",
+    "lookup": "Opzoeken",
+    "selectProduct": "Product selecteren",
+    "change": "Wijzigen",
+    "loadMore": "Meer producten laden",
+    "updatePrice": "Prijs bijwerken",
+    "viewBatches": "Batches bekijken",
+    "editProduct": "Product bewerken",
+    "deleteProduct": "Product verwijderen"
+  },
+  "dashboardNav": {
+    "projects": "Projecten",
+    "more": "Meer",
+    "viewProject": "Project bekijken",
+    "shareProject": "Project delen",
+    "deleteProject": "Project verwijderen",
+    "kpiCard": {
+      "failedToLoad": "Gegevens laden mislukt",
+      "viewDetails": "Details bekijken"
+    },
+    "pages": {
+      "dashboard": "Dashboard overzicht",
+      "notifications": "Binnenkort beschikbaar: Notificaties",
+      "todos": "Todos: Suggesties voor u",
+      "products": "Producten",
+      "batches": "Voorraad batches",
+      "users": "Teambeheer",
+      "account": "Accountinstellingen"
+    },
+    "descriptions": {
+      "batches": "Bekijk en beheer de voorraad batches van uw winkel",
+      "products": "Bekijk en beheer uw product voorraad"
+    }
+  },
+  "users": {
+    "title": "Teambeheer",
+    "description": "Nodig nieuwe teamleden uit in uw winkel en beheer hun rollen en machtigingen.",
+    "addEmployee": "Team lid uitnodigen",
+    "showing": "{current} van {total} gebruikers weergegeven",
+    "noUsersFound": "Geen gebruikers gevonden",
+    "name": "Naam",
+    "username": "Gebruikersnaam",
+    "email": "E-mail",
+    "role": "Rol",
+    "status": "Status",
+    "pinStatus": "PIN Status",
+    "actions": "Acties",
+    "active": "Actief",
+    "inactive": "Inactief",
+    "locked": "Vergrendeld",
+    "pinActive": "PIN Actief",
+    "noPin": "Geen PIN",
+    "loadMoreUsers": "Meer gebruikers laden",
+    "loadingMore": "Laden...",
+    "noUsersMessage": "Deze winkel heeft nog geen gebruikers.",
+    "permissions": {
+      "ownerInfo": {
+        "title": "Eigenaar Machtigingen",
+        "description": "Als eigenaar kunt u alle teamleden beheren, rollen wijzigen (inclusief andere eigenaren benoemen), en toegang tot alle winkelfuncties. U kunt eigenaren, managers en medewerkers beheren."
+      },
+      "managerInfo": {
+        "title": "Manager Machtigingen",
+        "description": "Als manager kunt u medewerkers beheren (activeren/deactiveren, uit winkel verwijderen), maar kunt u geen eigenaren of andere managers wijzigen. Alleen eigenaren kunnen rollen wijzigen."
+      }
+    },
+    "errors": {
+      "mustHaveOwner": "Er moet altijd minstens één eigenaar zijn."
+    },
+    "dropdown": {
+      "userActions": "Gebruikersacties",
+      "makeEmployee": "Maak medewerker",
+      "makeManager": "Maak gérant",
+      "makeOwner": "Maak eigenaar",
+      "resetPin": "PIN resetten",
+      "unlockPin": "PIN ontgrendelen",
+      "deactivateUser": "Gebruiker deactiveren",
+      "reactivateUser": "Gebruiker reactiveren",
+      "removeFromStore": "Verwijderen uit winkel"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Gebruikersrol bewerken",
+        "description": "{name} heeft momenteel de rol van: {role}",
+        "roleLabel": "Rol",
+        "selectPlaceholder": "Selecteer een rol",
+        "cancel": "Annuleren",
+        "save": "Wijzigingen opslaan"
+      },
+      "removeUser": {
+        "title": "Gebruiker uit winkel verwijderen",
+        "description": "Dit zal {name} permanent verwijderen uit {store}. Ze zullen alle toegang tot deze winkel verliezen, hun huidige rol en machtigingen verliezen, en moeten opnieuw worden uitgenodigd als u ze terug wilt. Hun gebruikersaccount blijft actief voor andere winkels.",
+        "cancel": "Annuleren",
+        "confirm": "Verwijderen uit winkel"
+      },
+      "resetPin": {
+        "title": "PIN resetten voor {name}",
+        "description": "Dit genereert een nieuwe PIN en stuurt deze naar de medewerker via e-mail. Hun huidige PIN werkt niet meer.",
+        "employee": "Medewerker",
+        "username": "Gebruikersnaam",
+        "email": "E-mail",
+        "currentStatus": "Huidige status",
+        "statusLocked": "Vergrendeld",
+        "statusActive": "Actief",
+        "cancel": "Annuleren",
+        "confirm": "PIN resetten"
+      },
+      "unlockPin": {
+        "title": "PIN ontgrendelen voor {name}",
+        "description": "Dit ontgrendelt onmiddellijk de PIN van de medewerker en reset hun teller voor mislukte pogingen.",
+        "employee": "Medewerker",
+        "username": "Gebruikersnaam",
+        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte PIN-pogingen",
+        "cancel": "Annuleren",
+        "confirm": "PIN ontgrendelen"
+      }
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "manager": "Gérant",
+      "employee": "Medewerker",
+      "staff": "Personeel",
+      "admin": "Beheerder",
+      "user": "Gebruiker",
+      "unknown": "Onbekend"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Uitgeschakeld",
+        "locked": "PIN Vergrendeld",
+        "pending": "PIN In afwachting",
+        "active": "PIN Actief"
+      },
+      "inactive": "Inactief",
+      "username": "Gebruikersnaam",
+      "permissions": "Machtigingen",
+      "lastLogin": "Laatste aanmelding",
+      "failedAttempts": "{count} mislukte PIN poging{plural}",
+      "enablePin": "PIN inschakelen",
+      "disablePin": "PIN uitschakelen",
+      "removeDialog": {
+        "title": "Gebruiker uit winkel verwijderen",
+        "description": "Weet u zeker dat u {name} uit deze winkel wilt verwijderen? Dit deactiveert hun toegang maar verwijdert hun account niet.",
+        "cancel": "Annuleren",
+        "confirm": "Gebruiker verwijderen"
+      }
+    }
+  },
+  "addEmployee": {
+    "title": "Nieuwe medewerker toevoegen",
+    "description": "Maak een nieuw medewerkersaccount aan met PIN-authenticatie. Inloggegevens worden per e-mail verzonden.",
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "username": "Gebruikersnaam",
+      "role": "Rol",
+      "language": "Taal",
+      "firstNamePlaceholder": "Jan",
+      "lastNamePlaceholder": "Jansen",
+      "emailPlaceholder": "test@example.com (gebruik nep e-mail voor testen)",
+      "emailNote": "Gebruik test@example.com voor testen. Echte e-mails ontvangen inloggegevens.",
+      "usernamePlaceholder": "jan.jansen",
+      "usernameNote": "Medewerker gebruikt deze gebruikersnaam om in te loggen",
+      "usernameAvailable": "Gebruikersnaam is beschikbaar",
+      "usernameTaken": "Gebruikersnaam is al bezet",
+      "reset": "Resetten"
+    },
+    "roles": {
+      "employee": "Medewerker",
+      "manager": "Gérant"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Gebruikersnaam:",
+      "pin": "PIN:",
+      "pinNote": "Wordt automatisch gegenereerd (6 cijfers)",
+      "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
+    },
+    "buttons": {
+      "cancel": "Annuleren",
+      "create": "Medewerker aanmaken",
+      "creating": "Aanmaken...",
+      "done": "Klaar",
+      "retrySending": "Opnieuw proberen"
+    },
+    "success": {
+      "title": "Medewerker succesvol aangemaakt!",
+      "description": "{name} is toegevoegd aan uw winkel. Bewaar deze inloggegevens en deel ze met de medewerker.",
+      "emailSending": "E-mail versturen...",
+      "emailSent": "Welkomst-e-mail succesvol verzonden naar {email}",
+      "emailPreparing": "E-mail voorbereiden voor {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "E-mailstatus: {error}"
+    },
+    "credentials": {
+      "email": "E-mail",
+      "username": "Gebruikersnaam",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Volgende stappen:",
+      "loginTab": "• De medewerker kan inloggen via het \"Medewerker\" tabblad op de inlogpagina",
+      "useCredentials": "• Gebruik gebruikersnaam: {username} en PIN: {pin}",
+      "resetPin": "• De PIN kan op elk moment worden gereset vanaf de teambeheerpagina",
+      "permissions": "• De medewerker kan producten scannen en basisvoorraad beheren"
+    },
+    "errors": {
+      "fillFields": "Vul alle verplichte velden in",
+      "usernameTaken": "Gebruikersnaam is al bezet. Kies een andere.",
+      "noStore": "Geen winkel geselecteerd",
+      "checkUsername": "Kon beschikbaarheid gebruikersnaam niet controleren",
+      "createFailed": "Kon medewerker niet aanmaken",
+      "copyFailed": "Kon niet kopiëren naar klembord"
+    },
+    "toast": {
+      "created": "Medewerker succesvol aangemaakt via server API!",
+      "emailSent": "Welkomst-e-mail succesvol verzonden!",
+      "emailFailed": "E-mail verzenden mislukt: {error}",
+      "emailError": "Fout bij verzenden e-mail: {error}",
+      "emailSkipped": "Medewerker aangemaakt! E-mail overgeslagen voor testadres.",
+      "copied": "{field} gekopieerd naar klembord"
+    }
+  },
+  "timeSelector": {
+    "periods": {
+      "thisWeek": "Deze week",
+      "lastWeek": "Vorige week",
+      "thisMonth": "Deze maand",
+      "lastMonth": "Vorige maand",
+      "last7Days": "Laatste 7 dagen",
+      "last30Days": "Laatste 30 dagen",
+      "allTime": "Alle tijd"
+    },
+    "compareLabels": {
+      "lastWeek": "Vorige week",
+      "previousWeek": "Voorgaande week",
+      "lastMonth": "Vorige maand",
+      "previousMonth": "Voorgaande maand",
+      "previous7Days": "Voorgaande 7 dagen",
+      "previous30Days": "Voorgaande 30 dagen",
+      "previousYear": "Vorig jaar"
+    }
+  }
+}

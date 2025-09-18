@@ -1,0 +1,131 @@
+{
+  "actions": {
+    "add": "Toevoegen",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "scan": "Scannen",
+    "discount": "Korting",
+    "donate": "Doneren"
+  },
+  "forms": {
+    "productName": "Productnaam",
+    "expirationDate": "Vervaldatum",
+    "quantity": "Hoeveelheid",
+    "price": "Prijs",
+    "category": "Categorie",
+    "required": "Vereist"
+  },
+  "status": {
+    "fresh": "Vers",
+    "expiringSoon": "Verloopt Binnenkort",
+    "expired": "Verlopen",
+    "discounted": "Korting",
+    "donated": "Gedoneerd",
+    "sold": "Verkocht"
+  },
+  "validation": {
+    "required": "Dit veld is verplicht",
+    "invalidEmail": "Ongeldig e-mailadres",
+    "passwordTooShort": "Wachtwoord moet minimaal 8 tekens bevatten",
+    "dateMustBeFuture": "Datum moet in de toekomst liggen"
+  },
+  "common": {
+    "more": "Meer"
+  },
+  "breadcrumbs": {
+    "batches": "Partijen",
+    "billing": "Facturering",
+    "dashboard": "Dashboard",
+    "inventory": "Voorraad",
+    "inbound": "Inkomend",
+    "outbound": "Uitgaand",
+    "analytics": "Analyses",
+    "performance": "Prestaties",
+    "milestones": "Mijlpalen",
+    "todos": "Te doen",
+    "settings": "Instellingen",
+    "store": "Winkel",
+    "team": "Team",
+    "users": "Gebruikers",
+    "teams": "Teams",
+    "stores": "Winkels",
+    "products": "Producten",
+    "categories": "Categorieën",
+    "reports": "Rapporten",
+    "notifications": "Meldingen",
+    "account": "Account",
+    "profile": "Profiel",
+    "help": "Help",
+    "support": "Ondersteuning",
+    "addStore": "Winkel toevoegen"
+  },
+  "navUser": {
+    "upgradeToPro": "Upgrade naar Pro",
+    "account": "Account",
+    "billing": "Facturering",
+    "notifications": "Notificaties",
+    "language": "Taal"
+  },
+  "errors": {
+    "pageNotFoundTitle": "Pagina niet gevonden",
+    "pageNotFoundDescription": "De pagina die u zoekt bestaat niet of is verplaatst.",
+    "backToHome": "Terug naar startpagina",
+    "goBack": "Ga terug",
+    "needHelp": "Hulp nodig?",
+    "contactSupport": "Neem contact op met ons ondersteuningsteam",
+    "common": {
+      "genericError": "Er is een fout opgetreden",
+      "networkError": "Netwerkfout. Controleer uw verbinding.",
+      "serverError": "Serverfout. Probeer het later opnieuw.",
+      "unauthorized": "U heeft geen toestemming om toegang te krijgen tot deze resource.",
+      "notFound": "De gevraagde resource is niet gevonden.",
+      "validationFailed": "Controleer uw invoer en probeer opnieuw.",
+      "timeoutError": "Verzoek verlopen. Probeer opnieuw.",
+      "unknownError": "Er is een onbekende fout opgetreden"
+    },
+    "forms": {
+      "required": "Dit veld is verplicht",
+      "invalidEmail": "Voer een geldig e-mailadres in",
+      "passwordTooShort": "Wachtwoord moet minimaal 6 tekens bevatten",
+      "passwordsNoMatch": "Wachtwoorden komen niet overeen",
+      "invalidPhone": "Voer een geldig telefoonnummer in",
+      "invalidUrl": "Voer een geldige URL in",
+      "nameTooLong": "Naam is te lang",
+      "emailTaken": "Dit e-mailadres is al in gebruik",
+      "usernameTaken": "Deze gebruikersnaam is al bezet",
+      "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
+    },
+    "api": {
+      "createFailed": "Item aanmaken mislukt",
+      "updateFailed": "Item bijwerken mislukt",
+      "deleteFailed": "Item verwijderen mislukt",
+      "loadFailed": "Gegevens laden mislukt",
+      "saveFailed": "Wijzigingen opslaan mislukt",
+      "uploadFailed": "Bestand uploaden mislukt",
+      "connectionFailed": "Verbinding mislukt",
+      "authFailed": "Authenticatie mislukt"
+    },
+    "emptyStates": {
+      "noResults": "Geen resultaten gevonden",
+      "noData": "Geen gegevens beschikbaar",
+      "noBatches": "Geen batches gevonden",
+      "noProducts": "Geen producten gevonden",
+      "noUsers": "Geen gebruikers gevonden",
+      "emptySearch": "Geen resultaten komen overeen met uw zoekopdracht",
+      "tryDifferentSearch": "Probeer uw zoekcriteria aan te passen"
+    },
+    "loading": {
+      "loading": "Laden...",
+      "processing": "Verwerken...",
+      "saving": "Opslaan...",
+      "uploading": "Uploaden...",
+      "searching": "Zoeken...",
+      "deleting": "Verwijderen...",
+      "updating": "Bijwerken..."
+    }
+  },
+  "cancel": "Annuleren"
+
+}

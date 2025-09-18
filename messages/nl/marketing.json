@@ -1,0 +1,471 @@
+{
+  "marketing": {
+    "nav": {
+      "about": "Over",
+      "features": "Services",
+      "resources": "Bronnen",
+      "product": "Product",
+      "pricing": "Prijzen",
+      "builtFor": "Gemaakt voor",
+      "helpCenter": "Helpcentrum",
+      "helpCenterDesc": "Krijg hier alle antwoorden die je nodig hebt",
+      "contactUs": "Contact",
+      "contactUsDesc": "We zijn er om je te helpen met al je vragen",
+      "status": "Status",
+      "statusDesc": "Controleer de huidige status van onze diensten en API's",
+      "terms": "Servicevoorwaarden",
+      "termsDesc": "Onze algemene voorwaarden voor het gebruik van onze diensten",
+      "blog": "Blog",
+      "blogDesc": "Het laatste nieuws, updates en informatie uit de sector",
+      "company": "Bedrijf",
+      "companyDesc": "Onze missie is innoveren en de wereld versterken",
+      "careers": "Carrières",
+      "careersDesc": "Bekijk vacatures en ontdek onze werkruimte",
+      "support": "Ondersteuning",
+      "supportDesc": "Neem contact op met ons ondersteuningsteam of bezoek onze communityforums"
+    },
+    "auth": {
+      "login": "Inloggen",
+      "signup": "Bedrijfsregistratie",
+      "logout": "Uitloggen",
+      "goToDashboard": "Dashboard",
+      "signUpForm": {
+        "title": "Registreren",
+        "description": "Maak een nieuw account",
+        "email": "E-mail",
+        "emailPlaceholder": "m@voorbeeld.com",
+        "password": "Wachtwoord",
+        "repeatPassword": "Herhaal wachtwoord",
+        "creatingAccount": "Account aanmaken...",
+        "signUpButton": "Registreren",
+        "alreadyHaveAccount": "Heb je al een account?",
+        "loginLink": "Inloggen"
+      },
+      "forgotPassword": {
+        "title": "Reset je wachtwoord",
+        "description": "Voer je e-mailadres in en we sturen je een link om je wachtwoord te resetten",
+        "email": "E-mail",
+        "emailPlaceholder": "m@voorbeeld.com",
+        "sending": "Verzenden...",
+        "sendResetEmail": "Verstuur reset e-mail",
+        "alreadyHaveAccount": "Heb je al een account?",
+        "loginLink": "Inloggen",
+        "checkEmailTitle": "Controleer je e-mail",
+        "checkEmailDescription": "Wachtwoord reset instructies verzonden",
+        "emailInstructions": "Als je geregistreerd bent met je e-mail en wachtwoord, ontvang je een wachtwoord reset e-mail.",
+        "backToLogin": "Terug naar inloggen"
+      },
+      "updatePassword": {
+        "title": "Reset je wachtwoord",
+        "description": "Voer hieronder je nieuwe wachtwoord in.",
+        "newPassword": "Nieuw wachtwoord",
+        "newPasswordPlaceholder": "Nieuw wachtwoord (min 6 tekens)",
+        "saving": "Opslaan...",
+        "savePassword": "Nieuw wachtwoord opslaan"
+      },
+      "errors": {
+        "passwordTooShort": "Wachtwoord moet minimaal 6 tekens bevatten",
+        "passwordsNoMatch": "Wachtwoorden komen niet overeen",
+        "genericError": "Er is een fout opgetreden"
+      }
+    },
+    "onboarding": {
+      "stepLabels": {
+        "storeLookup": "Winkel opzoeken",
+        "addStoreDetails": "Winkelgegevens toevoegen",
+        "reviewVerify": "Controleren en verifiëren",
+        "createAccount": "Account aanmaken"
+      },
+      "storeSearch": {
+        "placeholder": "Voer uw winkelnaam of adres in..."
+      },
+      "confirmDetails": {
+        "title": "Controleer uw winkelgegevens",
+        "subtitle": "We controleren of dit bedrijf niet al geregistreerd staat voordat we uw account aanmaken",
+        "fields": {
+          "type": "Type",
+          "address": "Adres",
+          "phone": "Telefoon",
+          "country": "Land",
+          "businessName": "Bedrijfsnaam"
+        },
+        "values": {
+          "notSpecified": "Niet gespecificeerd",
+          "notProvided": "Niet opgegeven"
+        },
+        "businessCheck": {
+          "verifyPrompt": "Voordat u uw account aanmaakt, moeten we controleren of dit bedrijf nog niet geregistreerd is.",
+          "verifyButton": "Bedrijf verifiëren",
+          "checking": "Controleren...",
+          "alreadyRegistered": "Dit bedrijf is al geregistreerd.",
+          "alreadyRegisteredDesc": "De winkel die u heeft geselecteerd heeft al een account. Log in of neem contact met ons op voor hulp.",
+          "existingStore": "Bestaande winkel:",
+          "contactSupport": "Contact opnemen",
+          "tryDifferentStore": "Andere winkel proberen",
+          "businessVerified": "Bedrijf geverifieerd!",
+          "businessVerifiedDesc": "Deze winkel is nog niet geregistreerd. U kunt doorgaan met het aanmaken van uw account."
+        },
+        "errors": {
+          "noStoreInfo": "Geen winkelinformatie gevonden. Ga terug en voltooi de vorige stappen.",
+          "startOver": "Opnieuw beginnen"
+        }
+      },
+      "storeType": {
+        "storeNamePlaceholder": "Uw winkelnaam",
+        "selectStoreType": "Selecteer winkeltype",
+        "businessNamePlaceholder": "Indien anders dan winkelnaam",
+        "addressPlaceholder": "123 Hoofdstraat",
+        "cityPlaceholder": "Amsterdam",
+        "postalCodePlaceholder": "1012 AB",
+        "countryPlaceholder": "Nederland",
+        "phonePlaceholder": "020 123 4567"
+      },
+      "signupForm": {
+        "businessRegistered": "Bedrijf al geregistreerd",
+        "businessRegisteredDesc": "Dit bedrijf staat al in ons systeem. Neem contact op met support of probeer een andere winkel.",
+        "backButton": "Terug",
+        "tryDifferentStore": "Probeer andere winkel",
+        "signInRequired": "Inloggen vereist:",
+        "testModeWarning": "Testmodus vereist dat u eerst ingelogd bent. Schakel over naar MOCK-modus als u wilt testen zonder authenticatie.",
+        "createAccount": "Maak uw account aan",
+        "createAccountDesc": "Bijna klaar! Maak uw account aan om toegang te krijgen tot het {storeName} dashboard.",
+        "fullName": "Volledige naam",
+        "fullNamePlaceholder": "Uw volledige naam",
+        "email": "E-mail",
+        "emailPlaceholder": "manager@uwwinkel.com",
+        "password": "Wachtwoord",
+        "confirmPassword": "Bevestig wachtwoord",
+        "creatingAccount": "Account aanmaken",
+        "createAccountButton": "Account aanmaken",
+        "noChanges": "Er worden geen echte wijzigingen aangebracht",
+        "realChanges": "Echte database wijzigingen met uw account"
+      },
+      "errors": {
+        "passwordTooShort": "Wachtwoord moet minimaal 6 tekens bevatten",
+        "passwordsNoMatch": "Wachtwoorden komen niet overeen",
+        "storeInfoMissing": "Winkelinformatie ontbreekt. Ga terug en voltooi de winkelinstelling.",
+        "businessAlreadyRegistered": "Dit bedrijf is al geregistreerd. Neem contact op met ondersteuning.",
+        "testModeSignInRequired": "Testmodus vereist dat u eerst ingelogd bent.",
+        "signupError": "Er is een fout opgetreden tijdens registratie",
+        "noStoreInfo": "Geen winkelinformatie gevonden. Ga terug en voltooi de vorige stappen.",
+        "startOver": "Opnieuw beginnen"
+      },
+      "form": {
+        "passwordRequirement": "Moet minimaal 6 tekens bevatten",
+        "testingButton": "Testen",
+        "termsAndPrivacy": "Door een account aan te maken, gaat u akkoord met onze Servicevoorwaarden en Privacybeleid. U ontvangt een bevestigingse-mail om uw account te verifiëren.",
+        "testModePrefix": "🧪 {mode} modus: "
+      }
+    }
+  },
+  "landingpage": {
+    "hero": {
+      "title": "De toekomst van voorraadbeheer is hier.",
+      "subtitle": "De slimme oplossing om verspilling te verminderen en uw winst te verhogen",
+      "buttons": {
+        "freeTrial": "Start mijn gratis proefperiode",
+        "explore": "Verken het platform"
+      },
+      "badge": {
+        "text": "Geniet van een gratis proefperiode van 14 dagen"
+      }
+    },
+    "features": {
+      "title": "Revolutioneer uw voorraadcontrole",
+      "expiryTracking": {
+        "title": "Real-time houdbaarheidscontrole",
+        "description": "Mis nooit meer een houdbaarheidsdatum met geautomatiseerde monitoring van uw hele voorraad."
+      },
+      "predictiveAlerts": {
+        "title": "Voorspellende waarschuwingen",
+        "description": "Verminder uw verliezen aanzienlijk dankzij de meldingen die door AI worden gevoed vóór het verstrijken van de producten."
+      },
+      "timeSaving": {
+        "title": "Tijdsbesparing",
+        "description": "Enorme vermindering van de tijd die wordt besteed aan handmatig ontvangstbeheer en dagelijkse voorraden."
+      },
+      "errorFree": {
+        "title": "Foutloze operaties",
+        "description": "Eliminatie van menselijke fouten en administratief papierwerk."
+      },
+      "discoverButton": "Ontdek LIFO",
+      "noCommitment": "Geen verplichtingen!"
+    },
+    "businessStats": {
+      "title": "Maximaliseer uw winst, minimaliseer uw verlies",
+      "subtitle": "Zie de echte impact die LIFO.AI heeft op bedrijven zoals het uwe",
+      "disclaimer": "Resultaten kunnen variëren. Gebaseerd op gemiddelde klantgegevens over 12 maanden.",
+      "revenue": {
+        "label": "Omzetstijging",
+        "description": "Gemiddelde toename in bedrijfsomzet",
+        "subtext": "Automatische kortingssuggesties om producten snel te verplaatsen voordat ze verlopen."
+      },
+      "lossReduction": {
+        "label": "Verliesreductie",
+        "description": "Verminder eenvoudig afval en bespaar geld",
+        "subtext": "Minder verlopen producten terwijl u minder aan voorraadbeheer doet."
+      },
+      "taxCredits": {
+        "label": "Belastingvoordelen",
+        "description": "Vanaf de eerste maand op donaties",
+        "subtext": "Verhoog uw fiscaal aftrekbare donaties door te verbinden met een non-profitorganisatie."
+      }
+    },
+    "cta": {
+      "title": "Stap vandaag nog over op LIFO",
+      "features": {
+        "quickSetup": {
+          "title": "Snelle installatie",
+          "description": "Direct te gebruiken oplossing binnen minuten. Geen complexe configuratie vereist."
+        },
+        "freeTrial": {
+          "title": "30 dagen gratis proefperiode",
+          "description": "Test alle functies zonder verplichtingen. Eenvoudige opzegging op elk moment."
+        },
+        "support": {
+          "title": "Toegewijde ondersteuning",
+          "description": "Ons team van experts begeleidt u bij elke stap van uw reis."
+        },
+        "immediateResults": {
+          "title": "Onmiddellijke resultaten",
+          "description": "Verminder afval en verhoog winst vanaf de eerste week van gebruik."
+        }
+      },
+      "card": {
+        "title": "Klaar om uw voorraadbeheer te transformeren?",
+        "description": "Word lid van LIFO om uw inventaris te optimaliseren en de winst te maximaliseren.",
+        "benefits": {
+          "noCommitment": "Geen verplichtingen",
+          "instantSetup": "Directe installatie",
+          "support": "24/7 Ondersteuning"
+        },
+        "button": "Meld u aan voor de wachtlijst",
+        "noCreditCard": "Geen creditcard vereist"
+      }
+    }
+  },
+  "pricingpage": {
+    "title": "Kies uw plan",
+    "subtitle": "Begin met onze gratis proefperiode en schaal mee met uw groei. Geen vastlegging, volledige ondersteuning inbegrepen.",
+    "badges": {
+      "mostPopular": "Meest populair",
+      "comingSoon": "Binnenkort beschikbaar"
+    },
+    "common": {
+      "getStarted": "Aan de slag",
+      "comingSoon": "Binnenkort beschikbaar",
+      "winWinFees": "Win-Win kosten:",
+      "note": "Opmerking:",
+      "pricingNote": "Prijzen kunnen wijzigen. Alle kosten moeten nog worden bevestigd."
+    },
+    "plans": {
+      "freeTrial": {
+        "title": "Gratis proefperiode",
+        "subtitle": "Pilot winkels",
+        "price": "Gratis",
+        "period": "3 maanden",
+        "description": "Alle functies, zonder beperkingen, voor een gratis proefperiode van 3 maanden.",
+        "features": {
+          "0": "3 dagen onboarding en training",
+          "1": "Volledige ondersteuning inbegrepen",
+          "2": "Geen vastlegging - stop wanneer u wilt",
+          "3": "Alle functies ontgrendeld"
+        },
+        "sellingPoint": "Perfect om onze oplossing risicovrij te testen"
+      },
+      "light": {
+        "title": "Light",
+        "subtitle": "Kleine winkels, slechts 1 plaats",
+        "price": "9€",
+        "period": "/maand",
+        "description": "Voor kleine winkels die beginnen met hun voorraadbeheerjournaal.",
+        "features": {
+          "0": "Maximaal 3 maanden data in Dashboard",
+          "1": "1 gebruikersplaats inbegrepen",
+          "2": "Basis voorraad functies",
+          "3": "E-mail ondersteuning"
+        },
+        "fees": [
+          { "type": "Marge van verkochte producten", "percentage": "30%" },
+          { "type": "Belastingkrediet", "percentage": "20%" }
+        ],
+        "sellingPoint": "Begin met het beheren van uw voorraad"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Grotere winkels, 2+ FTE",
+        "price": "39€",
+        "period": "/maand",
+        "description": "Voor groeiende bedrijven die teamsamenwerking en geavanceerde functies nodig hebben.",
+        "features": {
+          "0": "Onbeperkte gegevensretentie",
+          "1": "2+ gebruikersplaatsen",
+          "2": "Rolbeheer",
+          "3": "Prioritaire ondersteuning",
+          "4": "Geavanceerde analyses"
+        },
+        "fees": [
+          { "type": "Marge van verkochte producten", "percentage": "30%" },
+          { "type": "Belastingkrediet", "percentage": "20%" }
+        ],
+        "sellingPoint": "Beheer rollen in uw winkel effectief"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "subtitle": "Voor ketens",
+        "price": "Op maat",
+        "description": "Oplossing op maat voor bedrijven met meerdere locaties en geavanceerde behoeften.",
+        "features": {
+          "0": "Beheer van meerdere kassasystemen",
+          "1": "Geavanceerde analyses",
+          "2": "Aangepaste integraties",
+          "3": "Toegewijde ondersteuning",
+          "4": "Aangepaste prijsstelling per kassasysteem"
+        },
+        "fees": [
+          { "type": "Marge van verkochte producten", "percentage": "Op maat%" },
+          { "type": "Belastingkrediet", "percentage": "Op maat%" }
+        ],
+        "sellingPoint": "Beheer meerdere kassasystemen en krijg geavanceerde analyses"
+      }
+    }
+  },
+  "featurespage": {
+    "title": "Krachtige functionaliteiten",
+    "subtitle": "Alles wat u nodig heeft om uw voorraad efficiënt te beheren met AI-aangedreven inzichten en realtime tracking.",
+    "features": {
+      "dashboard": {
+        "title": "Realtime dashboard",
+        "description": "Krijg directe inzichten in uw voorraad met ons uitgebreide dashboard. Volg voorraadniveaus, monitor vervaldatums en identificeer trends in één oogopslag. Neem weloverwogen beslissingen met realtime datavisualisatie en geautomatiseerde waarschuwingen."
+      },
+      "scanning": {
+        "title": "Slimme scanning",
+        "description": "Beheer moeiteloos uw voorraad met onze geavanceerde scantechnologie. Scan eenvoudig producten om voorraadniveaus bij te werken, vervaldatums te volgen en nauwkeurige records bij te houden. Werkt naadloos op elk mobiel apparaat."
+      },
+      "analytics": {
+        "title": "Prestatie analyses",
+        "description": "Begrijp uw bedrijfsprestaties met gedetailleerde analyses en rapportage. Volg afvalvermindering, omzetgroei en operationele efficiëntie. Krijg bruikbare inzichten om uw voorraadbeheerstrategie te optimaliseren."
+      },
+      "ai": {
+        "title": "AI-aangedreven inzichten",
+        "description": "Benut kunstmatige intelligentie om uw voorraadbeheer te optimaliseren. Krijg slimme aanbevelingen voor herbestelling, promotiestrategieën en afvalvermindering. Onze AI leert van uw patronen om gepersonaliseerde suggesties te bieden."
+      }
+    },
+    "additionalFeatures": {
+      "title": "Alles wat u nodig heeft",
+      "expiry": {
+        "title": "Vervaldatum tracking",
+        "description": "Mis nooit vervaldatums met geautomatiseerde waarschuwingen en LIFO-beheer."
+      },
+      "security": {
+        "title": "Gegevensbeveiliging",
+        "description": "Beveiliging op ondernemingsniveau om uw bedrijfsgegevens en klantinformatie te beschermen."
+      },
+      "performance": {
+        "title": "Snelle prestaties",
+        "description": "Bliksemsnelle verwerking en realtime updates voor naadloze operaties."
+      },
+      "tracking": {
+        "title": "Nauwkeurige tracking",
+        "description": "Precieze voorraadtracking met barcodescanning en geautomatiseerde updates."
+      },
+      "timeSaving": {
+        "title": "Tijdsbesparing",
+        "description": "Automatiseer routinetaken en bespaar uren handmatig voorraadbeheer."
+      },
+      "collaboration": {
+        "title": "Teamsamenwerking",
+        "description": "Multi-gebruiker ondersteuning met rolgebaseerde machtigingen en teambeheer."
+      }
+    },
+    "mockData": {
+      "dashboard": {
+        "inventoryOverview": "Voorraad overzicht",
+        "items": "Artikelen",
+        "fromLastMonth": "van vorige maand",
+        "expiringSoon": "Verloopt binnenkort",
+        "lowStock": "Lage voorraad",
+        "totalProducts": "Totaal producten",
+        "expiringItems": "Verlopende artikelen",
+        "wasteReduced": "Afval verminderd",
+        "revenueIncrease": "Omzetstijging",
+        "performanceAnalytics": "Prestatie analyses"
+      },
+      "scanning": {
+        "scanningActive": "Scannen actief",
+        "productScanned": "Product gescand",
+        "organicMilk": "Biologische melk - 1L",
+        "expDate": "Verv: 15-01-2024 | Voorraad: 24 stuks"
+      },
+      "ai": {
+        "title": "AI Aanbevelingen",
+        "reorderMilk": "Zuivelproducten herbestellen",
+        "reorderMilkDesc": "Gebaseerd op consumptiepatronen",
+        "promoteExpiring": "Verlopende artikelen promoten",
+        "promoteExpiringDesc": "23 artikelen verlopen over 2 dagen"
+      }
+    },
+    "cta": {
+      "title": "Klaar om uw voorraad te transformeren?",
+      "description": "Transformeer uw voorraadbeheer met LIFO.AI en begin vandaag nog met afvalvermindering.",
+      "button": "Start gratis proefperiode"
+    }
+  },
+  "contactpage": {
+    "title": "Contact",
+    "subtitle": "Wij zijn er om u te helpen",
+    "description": "Heeft u een vraag, suggestie of hulp nodig? Ons team staat klaar om u te ondersteunen.",
+    "form": {
+      "title": "Stuur ons een bericht",
+      "description": "Vul het onderstaande formulier in en ons team zal zo snel mogelijk contact met u opnemen.",
+      "name": "Naam",
+      "namePlaceholder": "Uw naam",
+      "email": "E-mail",
+      "emailPlaceholder": "uw@email.com",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Onderwerp van uw bericht",
+      "message": "Bericht",
+      "messagePlaceholder": "Uw bericht...",
+      "submit": "Bericht verzenden",
+      "sending": "Verzenden...",
+      "success": "Uw bericht is succesvol verzonden. We nemen zo snel mogelijk contact met u op.",
+      "error": "Er is een fout opgetreden bij het verzenden van het bericht"
+    },
+    "api": {
+      "allFieldsRequired": "Alle velden zijn verplicht",
+      "emailSendingFailed": "E-mail verzenden mislukt",
+      "internalServerError": "Interne serverfout"
+    },
+    "features": {
+      "support": {
+        "title": "Snelle ondersteuning",
+        "description": "Ons team reageert doorgaans binnen 24 werkuren op al uw vragen."
+      },
+      "expertise": {
+        "title": "Toegewijde expertise",
+        "description": "Specialisten in voorraadbeheer om uw vragen te beantwoorden."
+      },
+      "followup": {
+        "title": "Persoonlijke opvolging",
+        "description": "Elke aanvraag wordt individueel behandeld met persoonlijke opvolging."
+      }
+    }
+  },
+  "footer": {
+    "description": "Bedrijven helpen voorraad te optimaliseren met intelligente oplossingen om afval te verminderen en winst te maximaliseren.",
+    "quickLinks": "Snelle Links",
+    "links": {
+      "aboutUs": "Over Ons",
+      "products": "Producten",
+      "pricing": "Prijzen",
+      "blog": "Blog"
+    },
+    "contactUs": "Neem Contact Op",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Alle rechten voorbehouden.",
+    "legal": {
+      "privacyPolicy": "Privacybeleid",
+      "termsOfService": "Servicevoorwaarden"
+    }
+  }
+}
