@@ -7,7 +7,6 @@ import { Typography } from '@/components/ui/typography'
 import { useDashboardSummary } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
-
 export function BatchStatusSummary() {
   const t = useTranslations('storeInsights.batchStatus')
   const activeStoreId = useActiveStoreId()
@@ -50,9 +49,10 @@ export function BatchStatusSummary() {
   // Calculate total needs attention and percentages
   // Only Critical and High priority items need immediate attention
   const totalNeedsAttention = criticalCount + highCount
-  const attentionPercentage = totalActiveBatchesCount > 0
-    ? Math.round((totalNeedsAttention / totalActiveBatchesCount) * 100)
-    : 0
+  const attentionPercentage =
+    totalActiveBatchesCount > 0
+      ? Math.round((totalNeedsAttention / totalActiveBatchesCount) * 100)
+      : 0
 
   const getUrgencyIcon = (urgency: string) => {
     switch (urgency) {
@@ -196,9 +196,7 @@ export function BatchStatusSummary() {
                     {t('status.ok')}
                   </Typography>
                 </div>
-                <Typography variant="p">
-                  {okCount - mediumCount - lowCount}
-                </Typography>
+                <Typography variant="p">{okCount - mediumCount - lowCount}</Typography>
               </div>
             )}
           </div>

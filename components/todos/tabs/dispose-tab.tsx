@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { InputSlider } from '@/components/ui/input-slider'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
 
 interface DisposeTabProps {
@@ -96,7 +96,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         batchId: selectedBatch.batch_id,
         quantity: disposeQuantity,
         disposalReason,
-        notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.reason}${improveAlerts ? ' - User requested alert improvements' : ''}`,
+        notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.ai_reasoning}${improveAlerts ? ' - User requested alert improvements' : ''}`,
       }
 
       const _result = await executeDispose(params)

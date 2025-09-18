@@ -1,19 +1,17 @@
 import type { TodoItem } from '@/components/todos/todos-filtered-list'
-import type { BatchActionWithDetails } from '@/hooks/use-scoring-analytics'
-import type { ActionableBatch as RpcActionableBatch } from '@/hooks/use-todos-rpc'
-import type { ActionableBatch as AnalyticsActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { BatchActionWithDetails, ActionableBatch } from '@/hooks/use-todos-rpc'
 
-// Transform old analytics ActionableBatch to TodoItem
-export function transformActionableBatchToTodo(batch: AnalyticsActionableBatch): TodoItem {
+// Transform ActionableBatch to TodoItem
+export function transformActionableBatchToTodo(batch: ActionableBatch): TodoItem {
   return {
     batch_id: batch.batch_id,
     product_name: batch.product_name,
     current_quantity: batch.current_quantity,
     expiry_date: batch.expiry_date,
     location_code: batch.location_code,
-    urgency: batch.urgency,
-    recommendation: batch.recommendation || 'No recommendation',
-    reason: batch.reason || 'No reason provided',
+    urgency: batch.urgency_level,
+    recommendation: batch.ai_recommendation || 'No recommendation',
+    reason: batch.ai_reasoning || 'No reason provided',
     potential_loss: batch.potential_loss,
     discount_percent: batch.discount_percent,
     composite_score: batch.composite_score,
@@ -21,7 +19,7 @@ export function transformActionableBatchToTodo(batch: AnalyticsActionableBatch):
 }
 
 // Transform new RPC ActionableBatch to TodoItem
-export function transformRpcActionableBatchToTodo(batch: RpcActionableBatch): TodoItem {
+export function transformRpcActionableBatchToTodo(batch: ActionableBatch): TodoItem {
   return {
     batch_id: batch.batch_id,
     product_name: batch.product_name,
@@ -82,7 +80,7 @@ export function formatRecommendation(recommendation: string): string {
 // Pre-configured memoized transformers
 export const memoizedBatchToTodo = createMemoizedTransformer(
   transformActionableBatchToTodo,
-  batch => `${batch.batch_id}-${batch.current_quantity}-${batch.urgency}`,
+  batch => `${batch.batch_id}-${batch.current_quantity}-${batch.urgency_level}`,
 )
 
 export const memoizedRpcBatchToTodo = createMemoizedTransformer(

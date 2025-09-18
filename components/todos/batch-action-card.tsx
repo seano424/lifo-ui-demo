@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
-import type { BatchActionWithDetails } from '@/hooks/use-scoring-analytics'
+import type { BatchActionWithDetails } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
 
 interface BatchActionCardProps {

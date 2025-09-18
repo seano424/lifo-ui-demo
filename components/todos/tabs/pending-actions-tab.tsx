@@ -9,7 +9,7 @@ import { TodosFilters } from '@/components/todos/todos-filters'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { type PendingAction, useFlattenedTodosData, usePendingActions } from '@/hooks/use-todos-rpc'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -42,7 +42,6 @@ export function PendingActionsTab({
 
   const { isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } = pendingQuery
 
-  // 🔥 FIX: Pass the entire query object, not just data
   const pendingActions = useFlattenedTodosData<PendingAction>(pendingQuery)
 
   // Convert to TodoItem format for existing components
@@ -87,18 +86,25 @@ export function PendingActionsTab({
     const pendingAction = pendingActions.find(action => action.batch_id === batchId)
     if (pendingAction) {
       // Convert to ActionableBatch format for the bottom sheet
-      const batch = {
+      const batch: ActionableBatch = {
         batch_id: pendingAction.batch_id,
+        batch_number: pendingAction.batch_number,
         product_name: pendingAction.product_name,
+        product_brand: pendingAction.product_brand,
+        sku: '',
         expiry_date: pendingAction.expiry_date,
-        urgency: pendingAction.urgency_level as 'critical' | 'high' | 'medium' | 'low',
-        recommendation: pendingAction.ai_recommendation,
-        discount_percent: 20, // Default, could be enhanced based on AI recommendation
-        reason: `${pendingAction.days_to_expiry} days to expiry`,
-        location_code: '',
         current_quantity: pendingAction.current_quantity,
-        potential_loss: 0,
+        location_code: '',
+        unit_price: 0,
+        urgency_level: pendingAction.urgency_level as 'critical' | 'high' | 'medium' | 'low',
+        days_to_expiry: pendingAction.days_to_expiry,
+        ai_recommendation: pendingAction.ai_recommendation,
+        ai_reasoning: `${pendingAction.days_to_expiry} days to expiry`,
         composite_score: pendingAction.composite_score,
+        potential_loss: 0,
+        discount_percent: 20,
+        todo_state: 'needs_attention',
+        total_count: 1,
       }
       setSelectedBatch(batch)
       setIsBottomSheetOpen(true)

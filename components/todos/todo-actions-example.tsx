@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 
 interface TodoActionsExampleProps {
   batch: ActionableBatch
@@ -51,7 +51,7 @@ export function TodoActionsExample({ batch, onActionComplete }: TodoActionsExamp
         batchId: batch.batch_id,
         quantity: batch.current_quantity,
         donationRecipientId: donationRecipient,
-        notes: notes || `Quick donation - ${batch.recommendation}`,
+        notes: notes || `Quick donation - ${batch.ai_recommendation}`,
       })
       onActionComplete?.()
     } catch (error) {
@@ -65,7 +65,7 @@ export function TodoActionsExample({ batch, onActionComplete }: TodoActionsExamp
         batchId: batch.batch_id,
         quantity: batch.current_quantity,
         discountPercentage: batch.discount_percent || 20,
-        notes: notes || `Applied ${batch.discount_percent}% discount - ${batch.reason}`,
+        notes: notes || `Applied ${batch.discount_percent}% discount - ${batch.ai_reasoning}`,
       })
       onActionComplete?.()
     } catch (error) {
@@ -139,15 +139,17 @@ export function TodoActionsExample({ batch, onActionComplete }: TodoActionsExamp
             {batch.potential_loss.toFixed(2)} at risk
           </p>
         </div>
-        <Badge className={`text-white ${getUrgencyColor(batch.urgency)}`}>{batch.urgency}</Badge>
+        <Badge className={`text-white ${getUrgencyColor(batch.urgency_level)}`}>
+          {batch.urgency_level}
+        </Badge>
       </div>
 
       {/* Recommendation */}
       <div className="bg-muted/50 p-3 rounded">
         <p className="text-sm">
-          <strong>Recommendation:</strong> {batch.recommendation}
+          <strong>Recommendation:</strong> {batch.ai_recommendation}
         </p>
-        <p className="text-xs text-muted-foreground mt-1">{batch.reason}</p>
+        <p className="text-xs text-muted-foreground mt-1">{batch.ai_reasoning}</p>
       </div>
 
       {/* Quick Action Buttons */}

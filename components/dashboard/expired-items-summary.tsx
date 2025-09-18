@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Clock, TrendingDown } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
@@ -10,7 +10,7 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 export function ExpiredItemsSummary() {
   const t = useTranslations('storeInsights.expiredItems')
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useDashboardSummary(activeStoreId)
+  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
 
   if (isLoading) {
     return (
@@ -82,7 +82,9 @@ export function ExpiredItemsSummary() {
                 </Typography>
               </div>
               <div className="text-right">
-                <Typography variant="p" className="font-semibold">{expiredCount}</Typography>
+                <Typography variant="p" className="font-semibold">
+                  {expiredCount}
+                </Typography>
                 <Typography variant="small" className="text-gray-500">
                   €{Math.round(expiredValue).toLocaleString()}
                 </Typography>

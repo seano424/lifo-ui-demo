@@ -7,7 +7,11 @@ import {
 } from '@/components/todos/batch-action-filters'
 import { TodosCardList } from '@/components/todos/todos-card-list'
 import type { TodoFilters } from '@/components/todos/todos-filtered-list'
-import { useBatchActionsInfinite } from '@/hooks/use-scoring-analytics'
+import {
+  useActionHistory,
+  type BatchActionWithDetails,
+  type ActionType,
+} from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 interface ActionHistoryTabProps {
@@ -23,7 +27,7 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
     sort: { field: 'action_date', direction: 'desc' },
   })
 
-  const batchActionsQuery = useBatchActionsInfinite(activeStoreId || null, pageSize)
+  const batchActionsQuery = useActionHistory(activeStoreId || '', { limit: pageSize })
 
   // Force refetch when tab becomes active and data is stale
   useEffect(() => {
@@ -46,13 +50,13 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
       return []
     }
 
-    let actions = batchActionsData.pages.flatMap(page => page.data)
+    let actions = batchActionsData.pages.flat()
     if (actions.length > 0) {
     }
 
     // Apply action type filter
     if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
-      actions = actions.filter(action => action.actual_action === batchActionFilters.actionType)
+      actions = actions.filter(action => action.action_type === batchActionFilters.actionType)
     }
 
     // Apply sorting
@@ -63,17 +67,17 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
 
         switch (field) {
           case 'action_date': {
-            const aDate = a.action_date ? new Date(a.action_date) : new Date(0)
-            const bDate = b.action_date ? new Date(b.action_date) : new Date(0)
+            const aDate = a.performed_at ? new Date(a.performed_at) : new Date(0)
+            const bDate = b.performed_at ? new Date(b.performed_at) : new Date(0)
             return (aDate.getTime() - bDate.getTime()) * multiplier
           }
           case 'expiry_date':
             return (
-              (new Date(a.expiry_date || 0).getTime() - new Date(b.expiry_date || 0).getTime()) *
+              (new Date(a.performed_at || 0).getTime() - new Date(b.performed_at || 0).getTime()) *
               multiplier
             )
           case 'actual_action':
-            return a.actual_action.localeCompare(b.actual_action) * multiplier
+            return a.action_type.localeCompare(b.action_type) * multiplier
           case 'effectiveness': {
             const aEffectiveness =
               a.recovered_value && a.original_value ? a.recovered_value / a.original_value : 0
@@ -87,7 +91,27 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
       })
     }
 
-    return actions
+    // Transform ActionHistory to BatchActionWithDetails format
+    return actions.map(
+      (action): BatchActionWithDetails =>
+        ({
+          ...action,
+          action_id: action.entry_id,
+          action_date: action.performed_at,
+          actual_action: action.action_type as ActionType,
+          original_value: action.original_value,
+          recovered_value: action.recovered_value,
+          product_name: action.product_name,
+          batch_number: action.batch_number,
+          sku: '',
+          expiry_date: '',
+          location_code: '',
+          recipient_name: action.recipient_name,
+          recipient_type: undefined,
+          original_price: undefined,
+          new_price: undefined,
+        }) as BatchActionWithDetails,
+    )
   }, [batchActionsData, batchActionFilters])
 
   const handleBatchActionFiltersChange = (newFilters: BatchActionFiltersType) => {

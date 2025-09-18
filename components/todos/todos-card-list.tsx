@@ -9,9 +9,9 @@ import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-li
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
-import { type BatchActionWithDetails } from '@/hooks/use-scoring-analytics'
 import {
   type ActionableBatch,
+  type BatchActionWithDetails,
   useActionableBatches,
 } from '@/hooks/use-todos-rpc'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
@@ -44,7 +44,7 @@ export function TodosCardList({
   console.log('🃏 TodosCardList render:', {
     tab,
     urgency: filters.urgency,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   })
 
   const activeStoreId = useActiveStoreId()
@@ -54,7 +54,7 @@ export function TodosCardList({
     console.log('🔄 TodosCardList mounted/updated:', {
       tab,
       activeStoreId,
-      filtersUrgency: filters.urgency
+      filtersUrgency: filters.urgency,
     })
 
     return () => {
@@ -72,7 +72,7 @@ export function TodosCardList({
   // Handler for opening the bottom sheet with selected batch
   const handleTodoClick = (batchId: string) => {
     // Always use RPC data
-    const allBatches = rpcActionableBatches.data?.pages?.flatMap(page => page) || []
+    const allBatches = rpcActionableBatches.data?.pages?.flat() || []
     const batch = allBatches.find(b => b.batch_id === batchId)
 
     if (batch) {
@@ -91,15 +91,16 @@ export function TodosCardList({
 
   const rpcActionableBatches = useActionableBatches(activeStoreId || '', {
     enabled: shouldFetchRPC,
-    urgencyFilter: filters.urgency === 'all' || filters.urgency === 'maintain'
-      ? undefined
-      : filters.urgency as 'critical' | 'high' | 'medium' | 'low',
+    urgencyFilter:
+      filters.urgency === 'all' || filters.urgency === 'maintain'
+        ? undefined
+        : (filters.urgency as 'critical' | 'high' | 'medium' | 'low'),
   })
 
   // Only log when actually fetching RPC data
   if (shouldFetchRPC) {
     console.log('🟢 RPC ActionableBatches:', {
-      dataCount: rpcActionableBatches.data?.pages?.flatMap(page => page).length ?? 0,
+      dataCount: rpcActionableBatches.data?.pages?.flat().length ?? 0,
       hasNextPage: rpcActionableBatches.hasNextPage,
       currentTab: tab,
       filters,
@@ -108,14 +109,22 @@ export function TodosCardList({
 
   // Intersection observer for auto-loading more items
   const { targetRef, isIntersecting } = useIntersectionObserver({
-    enabled: hasMore && !(tab === 'action_history' ? actionHistoryInfinite?.isFetchingNextPage : rpcActionableBatches.isFetchingNextPage),
+    enabled:
+      hasMore &&
+      !(tab === 'action_history'
+        ? actionHistoryInfinite?.isFetchingNextPage
+        : rpcActionableBatches.isFetchingNextPage),
     rootMargin: DEFAULT_ROOT_MARGIN,
   })
 
   // Auto-fetch next page when sentinel comes into view
   useEffect(() => {
     if (isIntersecting && hasMore) {
-      if (tab === 'action_history' && actionHistoryInfinite?.fetchNextPage && !actionHistoryInfinite.isFetchingNextPage) {
+      if (
+        tab === 'action_history' &&
+        actionHistoryInfinite?.fetchNextPage &&
+        !actionHistoryInfinite.isFetchingNextPage
+      ) {
         actionHistoryInfinite.fetchNextPage()
       } else if (tab !== 'action_history' && !rpcActionableBatches.isFetchingNextPage) {
         rpcActionableBatches.fetchNextPage()
@@ -126,20 +135,18 @@ export function TodosCardList({
   // Memoized data processing to avoid expensive recalculations
   const processedTodos = useMemo(() => {
     // Get all batches from RPC
-    const allBatches = rpcActionableBatches.data?.pages?.flatMap(page => page) || []
+    const allBatches = rpcActionableBatches.data?.pages?.flat() || []
 
     if (tab === 'suggestions') {
       // Filter for suggestions (urgent_action or needs_attention)
       const suggestionBatches = allBatches.filter(
-        batch => batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention'
+        batch => batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention',
       )
       const actionableTodos = memoizedRpcBatchToTodo(suggestionBatches)
       return applySorting(actionableTodos, filters)
     } else if (tab === 'recently_expired') {
       // Filter for expired items
-      const expiredBatches = allBatches.filter(
-        batch => batch.todo_state === 'expired'
-      )
+      const expiredBatches = allBatches.filter(batch => batch.todo_state === 'expired')
       const expiredTodos = memoizedRpcBatchToTodo(expiredBatches)
       return applySorting(expiredTodos, filters, {
         field: 'expiry_date',
@@ -147,9 +154,7 @@ export function TodosCardList({
       })
     } else if (tab === 'all_active') {
       // Filter for active (non-expired) items
-      const activeBatches = allBatches.filter(
-        batch => batch.todo_state !== 'expired'
-      )
+      const activeBatches = allBatches.filter(batch => batch.todo_state !== 'expired')
       const activeTodos = memoizedRpcBatchToTodo(activeBatches)
       const filteredTodos = applyUrgencyFilter(activeTodos, filters)
       return applySorting(filteredTodos, filters, {
@@ -173,7 +178,13 @@ export function TodosCardList({
       setHasMore(actionHistoryInfinite?.hasNextPage || false)
       setIsLoading(actionHistoryInfinite?.isLoading || false)
     }
-  }, [processedTodos, tab, rpcActionableBatches.hasNextPage, rpcActionableBatches.isLoading, actionHistoryInfinite])
+  }, [
+    processedTodos,
+    tab,
+    rpcActionableBatches.hasNextPage,
+    rpcActionableBatches.isLoading,
+    actionHistoryInfinite,
+  ])
 
   if (isLoading) {
     return (
@@ -224,20 +235,24 @@ export function TodosCardList({
         <div className="flex flex-col gap-12">
           {tab === 'action_history'
             ? processedBatchActions.map(action => (
-              <BatchActionCard key={action.action_id} action={action} />
-            ))
+                <BatchActionCard key={action.action_id} action={action} />
+              ))
             : todos.map(todo => (
-              <TodoCard
-                key={todo.batch_id}
-                todo={todo}
-                onClick={() => handleTodoClick(todo.batch_id)}
-              />
-            ))}
+                <TodoCard
+                  key={todo.batch_id}
+                  todo={todo}
+                  onClick={() => handleTodoClick(todo.batch_id)}
+                />
+              ))}
         </div>
 
         {hasMore && (
           <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
-            {(tab === 'action_history' ? actionHistoryInfinite?.isFetchingNextPage : rpcActionableBatches.isFetchingNextPage) ? (
+            {(
+              tab === 'action_history'
+                ? actionHistoryInfinite?.isFetchingNextPage
+                : rpcActionableBatches.isFetchingNextPage
+            ) ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm">

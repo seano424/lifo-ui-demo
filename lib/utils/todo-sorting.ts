@@ -1,5 +1,5 @@
 import type { TodoItem } from '@/components/todos/todos-filtered-list'
-import type { BatchActionWithDetails } from '@/hooks/use-scoring-analytics'
+import type { BatchActionWithDetails } from '@/hooks/use-todos-rpc'
 
 export type SortField =
   | 'urgency'

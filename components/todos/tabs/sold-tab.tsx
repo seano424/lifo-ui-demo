@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { InputSlider } from '@/components/ui/input-slider'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
 
 interface SoldTabProps {
@@ -79,7 +79,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
       const params = {
         batchId: selectedBatch.batch_id,
         quantity: soldQuantity,
-        notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find(t => t.id === soldTiming)?.label}) - ${selectedBatch.reason}`,
+        notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find(t => t.id === soldTiming)?.label}) - ${selectedBatch.ai_reasoning}`,
       }
 
       const _result = await executeSold(params)

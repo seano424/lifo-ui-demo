@@ -1,29 +1,108 @@
 // hooks/use-todos-rpc.ts
-import { useMemo } from 'react'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
-  fetchTodosSummary,
-  fetchDashboardSummary,
-  fetchPendingActions,
-  fetchRecentlyDiscounted,
-  fetchDonatedItems,
-  fetchRecentlyExpired,
-  fetchActionHistory,
-  fetchAllActiveWithStates,
-  fetchItemsNeedingReeval,
-  fetchActionableBatches,
-  type TodosSummary,
-  type PendingAction,
-  type RecentlyDiscounted,
-  type DonatedItem,
-  type RecentlyExpired,
+  type ActionableBatch,
   type ActionHistory,
   type AllActive,
-  type NeedsReeval,
-  type ActionableBatch,
   type DashboardSummary,
+  type DonatedItem,
+  fetchActionableBatches,
+  fetchActionHistory,
+  fetchAllActiveWithStates,
+  fetchDashboardSummary,
+  fetchDonatedItems,
+  fetchItemsNeedingReeval,
+  fetchPendingActions,
+  fetchRecentlyDiscounted,
+  fetchRecentlyExpired,
+  fetchTodosSummary,
+  type NeedsReeval,
+  type PendingAction,
+  type RecentlyDiscounted,
+  type RecentlyExpired,
+  type TodosSummary,
 } from '@/lib/queries/todos-rpc'
+import type { Database } from '@/types/supabase'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+
+export type BatchAction = Database['inventory']['Tables']['batch_action_entries']['Row']
+export type ActionType = Database['public']['Enums']['action_type']
+
+// Enhanced batch action type with related data for UI display
+export interface BatchActionWithDetails extends BatchAction {
+  // From the batches table join
+  product_name?: string
+  batch_number?: string
+  sku?: string
+  expiry_date?: string
+  location_code?: string
+
+  // From the donation recipient join (if applicable)
+  recipient_name?: string
+  recipient_type?: string
+
+  // For computing effectiveness
+  original_price?: number
+  new_price?: number
+
+  // Backward compatibility aliases for old column names
+  action_id: string // Maps to entry_id
+  action_date: string | null // Maps to performed_at
+  actual_action: Database['public']['Enums']['action_type'] // Maps to action_type
+  original_value: number // Maps to total_original_value
+  recovered_value: number // Maps to total_recovered_value
+}
+
+export interface ScoringAlert {
+  batch_id: string
+  batch_number: string
+  sku: string
+  product_name: string
+  category: string
+  brand: string
+  quantity: number
+  unit_type: string
+  days_to_expiry: number
+  expiry_date: string
+  current_price: number
+  cost_price: number
+  margin_percent: number
+  composite_score: number
+  recommendation: string
+  urgency_level: 'critical' | 'high' | 'medium' | 'low'
+  potential_loss: number
+  location: string
+  supplier: string
+  calculated_at: string | null
+  suggested_actions: string[]
+  priority_score: number
+}
+
+export interface AlertsSummary {
+  total_alerts: number
+  critical_count: number
+  high_count: number
+  medium_count: number
+  low_count: number
+  total_potential_loss: number
+  categories_affected: number
+  avg_days_to_expiry: number
+  expired_items: number
+}
+
+export interface AlertsResponse {
+  alerts: ScoringAlert[]
+  summary: AlertsSummary
+  filters: {
+    store_id: string
+    threshold: number
+    urgency_level?: string
+    category?: string
+    limit: number
+  }
+}
 
 // Utility hook to get flattened data from infinite queries
 export function useFlattenedTodosData<T>(query: { data?: { pages?: T[][] } }): T[] {
@@ -202,20 +281,20 @@ export function useActionableBatches(
     limit = 50,
     enabled = true,
     urgencyFilter,
-    stateFilter
+    stateFilter,
   }: {
     limit?: number
     enabled?: boolean
     urgencyFilter?: 'critical' | 'high' | 'medium' | 'low' | 'all'
     stateFilter?: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok' | 'all'
-  } = {}
+  } = {},
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.actionableBatches(storeId, limit, urgencyFilter, stateFilter),
     queryFn: async ({ pageParam = 0 }) => {
       const data = await fetchActionableBatches(storeId, {
         limit,
-        offset: pageParam * limit
+        offset: pageParam * limit,
       })
 
       // Apply client-side filters if needed
@@ -245,22 +324,27 @@ export function useActionableBatches(
 }
 
 // Helper hook to get filtered data for specific tabs
-export function useTabActionableBatches(storeId: string, tab: string, filters?: any) {
+export function useTabActionableBatches(
+  storeId: string,
+  tab: string,
+  filters?: { urgency?: string },
+) {
   const baseQuery = useActionableBatches(storeId, {
     enabled: !!storeId,
-    urgencyFilter: filters?.urgency,
+    urgencyFilter: filters?.urgency as 'critical' | 'high' | 'medium' | 'low' | 'all' | undefined,
   })
 
   return useMemo(() => {
-    const allData = baseQuery.data?.pages.flatMap(page => page) || []
+    const allData = baseQuery.data?.pages.flat() || []
 
     let filteredData = allData
 
     switch (tab) {
       case 'suggestions':
         // Items needing immediate attention
-        filteredData = allData.filter((batch: ActionableBatch) =>
-          batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention'
+        filteredData = allData.filter(
+          (batch: ActionableBatch) =>
+            batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention',
         )
         break
       case 'recently_expired':
@@ -281,21 +365,21 @@ export function useTabActionableBatches(storeId: string, tab: string, filters?: 
       hasNextPage: baseQuery.hasNextPage,
       fetchNextPage: baseQuery.fetchNextPage,
       isFetchingNextPage: baseQuery.isFetchingNextPage,
-      error: baseQuery.error
+      error: baseQuery.error,
     }
   }, [baseQuery, tab])
 }
 
 // Export types for use in components
 export type {
-  TodosSummary,
-  PendingAction,
-  RecentlyDiscounted,
-  DonatedItem,
-  RecentlyExpired,
+  ActionableBatch,
   ActionHistory,
   AllActive,
-  NeedsReeval,
-  ActionableBatch,
   DashboardSummary,
+  DonatedItem,
+  NeedsReeval,
+  PendingAction,
+  RecentlyDiscounted,
+  RecentlyExpired,
+  TodosSummary,
 }

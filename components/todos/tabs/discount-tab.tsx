@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
 
 interface DiscountTabProps {
@@ -88,8 +88,8 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         quantity: selectedBatch.current_quantity,
         discountPercentage: priceMetrics.actualDiscountPercentage,
         notes: useCustomPrice
-          ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.reason}`
-          : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.reason}`,
+          ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_reasoning}`
+          : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_reasoning}`,
       }
 
       const _result = await executeDiscount(params)

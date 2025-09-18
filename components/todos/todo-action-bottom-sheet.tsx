@@ -86,11 +86,15 @@ export function TodoActionBottomSheet({
               {isHeaderExpanded && (
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center gap-4">
-                    <span className={cn('font-medium', getUrgencyColor(selectedBatch.urgency_level))}>
+                    <span
+                      className={cn('font-medium', getUrgencyColor(selectedBatch.urgency_level))}
+                    >
                       {calculateDaysLeft()}
                     </span>
                     <span>• {selectedBatch.current_quantity} units</span>
-                    <span className={cn('capitalize', getUrgencyColor(selectedBatch.urgency_level))}>
+                    <span
+                      className={cn('capitalize', getUrgencyColor(selectedBatch.urgency_level))}
+                    >
                       • {selectedBatch.urgency_level} urgency
                     </span>
                   </div>

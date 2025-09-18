@@ -1,10 +1,10 @@
 // hooks/use-batch-actions-rpc.ts
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
-import type { AlertsResponse, ScoringAlert } from './use-scoring-analytics'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import type { AlertsResponse, ScoringAlert } from './use-todos-rpc'
 
 // Type definitions for query data
 interface BatchDetail {
@@ -199,8 +199,6 @@ export function useBatchActionRPC() {
           queryKey: queryKeys.batchActions.byStore(storeId),
         }),
 
-        // Invalidate use-scoring-analytics hooks used by todos-filtered-list tabs
-        // useScoringAlerts hook - invalidate both default and threshold variants
         queryClient.invalidateQueries({
           queryKey: ['alerts', 'store', storeId],
         }),
@@ -689,12 +687,12 @@ export function useBatchActionRPC() {
 
 // Export types for use in components
 export type {
-  DonateParams,
-  DiscountParams,
-  SoldParams,
-  DisposeParams,
-  DismissParams,
-  BulkParams,
   ActionResult,
   BulkActionResult,
+  BulkParams,
+  DiscountParams,
+  DismissParams,
+  DisposeParams,
+  DonateParams,
+  SoldParams,
 }

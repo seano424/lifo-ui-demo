@@ -34,10 +34,7 @@ export function SuggestionsTab({ filters, onFiltersChange }: SuggestionsTabProps
       </div>
 
       <div className="p-4">
-        <TodosCardList
-          tab="suggestions"
-          filters={filters}
-        />
+        <TodosCardList tab="suggestions" filters={filters} />
       </div>
     </>
   )

@@ -26,7 +26,7 @@ function thresholdToLevelName(
 export function UrgentAlerts() {
   const t = useTranslations('storeInsights.urgentAlerts')
   const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useDashboardSummary(activeStoreId)
+  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
   const { warningThreshold } = useScoringThresholds(activeStoreId || undefined)
 
   const isInitialLoading = isLoading

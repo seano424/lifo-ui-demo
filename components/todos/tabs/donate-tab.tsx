@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { InputSlider } from '@/components/ui/input-slider'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
 
 interface DonateTabProps {
@@ -78,7 +78,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         donationRecipientId: selectedRecipient,
         notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name} to ${
           DONATION_RECIPIENTS.find(r => r.id === selectedRecipient)?.name
-        } - ${selectedBatch.reason}`,
+        } - ${selectedBatch.ai_reasoning}`,
       }
 
       const _result = await executeDonate(params)

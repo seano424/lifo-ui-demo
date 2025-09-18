@@ -180,7 +180,7 @@ export async function fetchDashboardSummary(storeId: string): Promise<DashboardS
 
 export async function fetchPendingActions(
   storeId: string,
-  { limit, offset }: PaginationParams
+  { limit, offset }: PaginationParams,
 ): Promise<PendingAction[]> {
   const supabase = createClient()
 
@@ -196,7 +196,7 @@ export async function fetchPendingActions(
 
 export async function fetchRecentlyDiscounted(
   storeId: string,
-  { limit, offset }: PaginationParams
+  { limit, offset }: PaginationParams,
 ): Promise<RecentlyDiscounted[]> {
   const supabase = createClient()
 
@@ -213,7 +213,7 @@ export async function fetchRecentlyDiscounted(
 export async function fetchDonatedItems(
   storeId: string,
   { limit, offset }: PaginationParams,
-  daysBack: number = 7
+  daysBack: number = 7,
 ): Promise<DonatedItem[]> {
   const supabase = createClient()
 
@@ -230,7 +230,7 @@ export async function fetchDonatedItems(
 
 export async function fetchRecentlyExpired(
   storeId: string,
-  { limit, offset }: PaginationParams
+  { limit, offset }: PaginationParams,
 ): Promise<RecentlyExpired[]> {
   const supabase = createClient()
 
@@ -247,7 +247,7 @@ export async function fetchRecentlyExpired(
 export async function fetchActionHistory(
   storeId: string,
   { limit, offset }: PaginationParams,
-  actionType?: string
+  actionType?: string,
 ): Promise<ActionHistory[]> {
   const supabase = createClient()
 
@@ -264,7 +264,7 @@ export async function fetchActionHistory(
 
 export async function fetchAllActiveWithStates(
   storeId: string,
-  { limit, offset }: PaginationParams
+  { limit, offset }: PaginationParams,
 ): Promise<AllActive[]> {
   const supabase = createClient()
 
@@ -280,7 +280,7 @@ export async function fetchAllActiveWithStates(
 
 export async function fetchItemsNeedingReeval(
   storeId: string,
-  { limit, offset }: PaginationParams
+  { limit, offset }: PaginationParams,
 ): Promise<NeedsReeval[]> {
   const supabase = createClient()
 
@@ -296,7 +296,7 @@ export async function fetchItemsNeedingReeval(
 
 export async function fetchActionableBatches(
   storeId: string,
-  { limit, offset }: PaginationParams
+  { limit, offset }: PaginationParams,
 ): Promise<ActionableBatch[]> {
   const supabase = createClient()
 
