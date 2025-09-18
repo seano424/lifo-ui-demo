@@ -1,0 +1,263 @@
+{
+  "settings": {
+    "title": "Instellingen",
+    "description": "Beheer uw voorkeuren en accountinstellingen",
+    "language": {
+      "currentLanguage": "Huidige taal",
+      "title": "Taal",
+      "description": "Kies uw voorkeurstaal voor de interface",
+      "preferred": "Voorkeurstaal"
+    },
+    "tabs": {
+      "store": "Winkel",
+      "notifications": "Meldingen",
+      "account": "Account",
+      "team": "Team",
+      "billing": "Facturering",
+      "security": "Beveiliging",
+      "storeDescription": "Beheer uw winkelinstellingen.",
+      "notificationsDescription": "Beheer uw meldingsinstellingen."
+    },
+    "errors": {
+      "loadingFailed": "Kan instellingen niet laden. Probeer de pagina te vernieuwen."
+    },
+    "notifications": {
+      "comingSoonTitle": "Binnenkort: Meldingen",
+      "comingSoonDescription": "We werken aan het toevoegen van meldingen aan uw dashboard.",
+      "checkBackSoon": "Kom binnenkort terug."
+    },
+    "billing": {
+      "comingSoonTitle": "Binnenkort: Facturering",
+      "comingSoonDescription": "Facturering en abonnementsbeheer functies komen eraan.",
+      "checkBackSoon": "Kom binnenkort terug."
+    },
+    "security": {
+      "comingSoonTitle": "Binnenkort: Beveiliging",
+      "comingSoonDescription": "Geavanceerde beveiligingsinstellingen en API-sleutelbeheer komen binnenkort.",
+      "checkBackSoon": "Kom binnenkort terug."
+    },
+    "storeInformation": {
+      "title": "Winkelinformatie",
+      "description": "Beheer de basisinformatie en instellingen van uw winkel",
+      "editStore": "Winkel bewerken",
+      "permissionError": "U heeft geen toestemming om winkelinstellingen te bekijken.",
+      "sections": {
+        "storeDetails": "Winkeldetails",
+        "addressInformation": "Adresinformatie",
+        "contactInformation": "Contactinformatie",
+        "storeDescription": "Winkelbeschrijving",
+        "businessSettings": "Bedrijfsinstellingen"
+      },
+      "fields": {
+        "storeName": "Winkelnaam",
+        "businessName": "Bedrijfsnaam",
+        "storeCode": "Winkelcode",
+        "storeType": "Winkeltype",
+        "sizeCategory": "Grootte categorie",
+        "address": "Adres",
+        "city": "Stad",
+        "postalCode": "Postcode",
+        "country": "Land",
+        "phone": "Telefoonnummer",
+        "email": "E-mailadres",
+        "website": "Website URL",
+        "description": "Beschrijving",
+        "defaultMarkup": "Standaard marge (%)",
+        "wasteReductionTarget": "Doel voor afvalvermindering (%)"
+      },
+      "placeholders": {
+        "storeName": "Voer winkelnaam in",
+        "businessName": "Voer bedrijfsnaam in",
+        "storeCode": "Voer winkelcode in",
+        "address": "Voer adres in",
+        "city": "Voer stad in",
+        "postalCode": "Voer postcode in",
+        "phone": "Voer telefoonnummer in",
+        "email": "Voer e-mailadres in",
+        "website": "https://voorbeeld.com",
+        "description": "Beschrijf uw winkel..."
+      },
+      "selectPlaceholders": {
+        "storeType": "Selecteer winkeltype",
+        "sizeCategory": "Selecteer grootte categorie",
+        "country": "Selecteer land"
+      },
+      "storeTypes": {
+        "supermarket": "Supermarkt",
+        "convenience": "Buurtwinkel",
+        "restaurant": "Restaurant",
+        "bakery": "Bakkerij",
+        "butcher": "Slagerij",
+        "organic": "Biologische winkel"
+      },
+      "sizeCategories": {
+        "small": "Klein (< 500 m²)",
+        "medium": "Middel (500-1500 m²)",
+        "large": "Groot (1500-5000 m²)",
+        "hypermarket": "Hypermarkt (> 5000 m²)"
+      },
+      "countries": {
+        "France": "Frankrijk",
+        "Netherlands": "Nederland",
+        "Belgium": "België",
+        "Germany": "Duitsland",
+        "Spain": "Spanje",
+        "Italy": "Italië"
+      },
+      "actions": {
+        "saveChanges": "Wijzigingen opslaan",
+        "saving": "Opslaan...",
+        "cancel": "Annuleren",
+        "unsavedChanges": "U heeft niet-opgeslagen wijzigingen"
+      },
+      "messages": {
+        "notSet": "Niet ingesteld",
+        "noDescription": "Geen beschrijving opgegeven"
+      },
+      "validation": {
+        "storeNameRequired": "Winkelnaam is verplicht",
+        "storeNameTooLong": "Winkelnaam is te lang",
+        "businessNameTooLong": "Bedrijfsnaam is te lang",
+        "storeCodeRequired": "Winkelcode is verplicht",
+        "storeCodeTooLong": "Winkelcode is te lang",
+        "addressTooLong": "Adres is te lang",
+        "cityTooLong": "Stadsnaam is te lang",
+        "postalCodeTooLong": "Postcode is te lang",
+        "countryTooLong": "Landnaam is te lang",
+        "phoneTooLong": "Telefoonnummer is te lang",
+        "invalidEmail": "Ongeldig e-mailformaat",
+        "invalidWebsite": "Ongeldige website URL",
+        "descriptionTooLong": "Beschrijving is te lang"
+      },
+      "addStore": "Winkel toevoegen"
+    }
+  },
+  "onboarding": {
+    "stepLabels": {
+      "storeLookup": "Winkel zoeken",
+      "addStoreDetails": "Winkeldetails toevoegen",
+      "reviewVerify": "Controleren en verifiëren",
+      "createAccount": "Account aanmaken"
+    },
+    "storeSearch": {
+      "title": "Vind uw winkel",
+      "subtitle": "Zoek naar uw bedrijf of voeg handmatig toe",
+      "placeholder": "Voer uw winkelnaam of adres in...",
+      "searchingText": "Zoeken naar winkels...",
+      "noResultsFound": "Geen winkels gevonden voor \"{query}\"",
+      "tryDifferentTerm": "Probeer een andere zoekterm of voeg uw winkel handmatig toe",
+      "addManuallyButton": "Winkelgegevens handmatig toevoegen",
+      "helpText": "Kunt u uw winkel niet vinden? U kunt alle gegevens handmatig toevoegen in de volgende stap.",
+      "searchError": "Er ging iets mis tijdens het zoeken. Probeer het opnieuw."
+    },
+    "storeType": {
+      "addStoreDetailsTitle": "Winkeldetails toevoegen",
+      "completeStoreInformationTitle": "Winkelinformatie voltooien",
+      "storeInformationCardTitle": "Winkelinformatie",
+      "storeNameLabel": "Winkelnaam",
+      "storeTypeLabel": "Winkeltype",
+      "businessNameLabel": "Bedrijfsnaam",
+      "addressLabel": "Adres",
+      "cityLabel": "Stad",
+      "postalCodeLabel": "Postcode",
+      "countryLabel": "Land",
+      "phoneLabel": "Telefoonnummer",
+      "continueButton": "Doorgaan",
+      "storeNamePlaceholder": "Naam van uw winkel",
+      "selectStoreType": "Selecteer winkeltype",
+      "businessNamePlaceholder": "Indien anders dan winkelnaam",
+      "addressPlaceholder": "123 Hoofdstraat",
+      "cityPlaceholder": "Amsterdam",
+      "postalCodePlaceholder": "1012 AB",
+      "countryPlaceholder": "Nederland",
+      "phonePlaceholder": "020 123 4567"
+    },
+    "addStoreSearch": {
+      "title": "Voeg uw winkel toe",
+      "subtitle": "Zoek naar uw bedrijf of voeg handmatig toe",
+      "placeholder": "Voer uw winkelnaam of adres in...",
+      "searchingText": "Zoeken naar winkels...",
+      "noResultsFound": "Geen winkels gevonden voor \"{query}\"",
+      "tryDifferentTerm": "Probeer een andere zoekterm of voeg uw winkel handmatig toe",
+      "addManuallyButton": "Winkelgegevens handmatig toevoegen",
+      "helpText": "Kunt u uw winkel niet vinden? U kunt alle gegevens handmatig toevoegen in de volgende stap.",
+      "searchError": "Er ging iets mis tijdens het zoeken. Probeer het opnieuw."
+    }
+  },
+  "account": {
+    "title": "Accountinformatie",
+    "description": "Beheer uw accountinstellingen en voorkeuren.",
+    "profile": {
+      "title": "Profielinformatie",
+      "fullName": "Volledige naam",
+      "username": "Gebruikersnaam",
+      "email": "E-mailadres",
+      "fullNamePlaceholder": "Voer uw volledige naam in",
+      "emailPlaceholder": "Voer uw e-mailadres in",
+      "noName": "Geen naam",
+      "noUsername": "Geen gebruikersnaam",
+      "noEmail": "Geen e-mail",
+      "emailNotice": "E-mail kan niet worden gewijzigd. Neem contact op met ondersteuning indien nodig.",
+      "edit": "Bewerken",
+      "save": "Wijzigingen opslaan",
+      "cancel": "Annuleren",
+      "saving": "Opslaan...",
+      "saveChanges": "Wijzigingen opslaan",
+      "validation": {
+        "nameRequired": "Volledige naam is verplicht",
+        "nameTooLong": "Volledige naam moet minder dan 100 tekens bevatten",
+        "usernameRequired": "Gebruikersnaam moet minimaal 2 tekens bevatten",
+        "usernameTooLong": "Gebruikersnaam moet minder dan 50 tekens bevatten",
+        "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
+      },
+      "placeholders": {
+        "fullName": "Voer uw volledige naam in",
+        "email": "Voer uw e-mailadres in",
+        "username": "Voer uw gebruikersnaam in"
+      }
+    },
+    "phone": {
+      "title": "Telefoonnummer",
+      "label": "Telefoonnummer",
+      "placeholder": "+31 6 12 34 56 78",
+      "description": "Voer uw telefoonnummer in met landcode (optioneel)",
+      "noPhone": "Geen telefoonnummer ingesteld",
+      "addNotice": "Voeg een telefoonnummer toe voor accountbeveiliging en meldingen",
+      "invalidPhone": "Voer een geldig telefoonnummer in",
+      "verified": "Geverifieerd",
+      "edit": "Bewerken",
+      "save": "Telefoon opslaan",
+      "cancel": "Annuleren",
+      "saving": "Opslaan..."
+    },
+    "language": {
+      "currentLanguage": "Huidige taal",
+      "title": "Taalvoorkeur",
+      "description": "Kies uw voorkeurstaal voor de interface"
+    },
+    "status": {
+      "title": "Accountstatus",
+      "accountStatus": "Status:",
+      "emailVerified": "E-mail geverifieerd:",
+      "phoneVerified": "Telefoon geverifieerd:",
+      "active": "Actief",
+      "inactive": "Inactief",
+      "verified": "Geverifieerd",
+      "unverified": "Niet geverifieerd"
+    },
+    "errors": {
+      "updateProfile": "Kan profiel niet bijwerken",
+      "updatePhone": "Kan telefoonnummer niet bijwerken"
+    },
+    "activity": {
+      "title": "Accountactiviteit",
+      "memberSince": "Lid sinds {date}",
+      "lastLogin": "Laatste login: {date}",
+      "neverLoggedIn": "Nooit ingelogd",
+      "failedAttempts": "{count} mislukte PIN poging{plural}"
+    },
+    "security": {
+      "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
+    }
+  }
+}

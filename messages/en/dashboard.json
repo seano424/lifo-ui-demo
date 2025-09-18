@@ -1,0 +1,763 @@
+{
+  "dashboard": {
+    "quickActions": {
+      "title": "Quick Actions",
+      "description": "Quickly add, remove, or view products and tasks.",
+      "addProducts": {
+        "title": "Add Products",
+        "description": "Add new products to your inventory with barcode scanning or manual entry.",
+        "action": "Add new products"
+      },
+      "todoSuggestions": {
+        "title": "Todo Suggestions",
+        "description": "View and manage tasks suggested by LIFO.AI to optimize your inventory.",
+        "action": "View todos"
+      },
+      "removeProducts": {
+        "title": "Remove Products",
+        "description": "Register sales, donations, or waste for items leaving your inventory.",
+        "action": "Remove products"
+      }
+    },
+    "errors": {
+      "noStores": {
+        "title": "No Stores Found",
+        "description": "You need to create a store before you can manage products. Please set up your first store to continue.",
+        "tip": {
+          "title": "Why do I need a store?",
+          "description": "Stores help you organize your inventory and track products efficiently. Each store can have its own inventory, settings, and team members."
+        },
+        "button": "Create Your First Store"
+      }
+    },
+    "kpis": {
+      "title": "Key Metrics Overview",
+      "refresh": "Refresh",
+      "inventory": {
+        "label": "Total Inventory Value",
+        "subtitle": "batches",
+        "productCount": "products"
+      },
+      "sales": {
+        "label": "Sales Revenue",
+        "subtitle": "sales"
+      },
+      "donations": {
+        "label": "Donations",
+        "subtitle": "recipients"
+      },
+      "waste": {
+        "label": "Waste Cost",
+        "subtitle": "items"
+      },
+      "errorMessage": "Some metrics could not be loaded. Please try refreshing.",
+      "cancel": "Cancel"
+    }
+  },
+  "alerts": {
+    "sensitivity": {
+      "title": "Alert Sensitivity",
+      "description": "How sensitive should alerts be to potential waste?",
+      "helpText": "Control when items appear in your alerts and dashboard.",
+      "helpTextLine2": "Higher sensitivity = more early warnings",
+      "helpTextLine3": "Lower sensitivity = only critical items",
+      "currentPreference": "Choose your alert preference",
+      "levels": {
+        "conservative": "Conservative",
+        "balanced": "Balanced",
+        "proactive": "Proactive",
+        "conservativeTitle": "Conservative - Critical Only",
+        "balancedTitle": "Balanced - Action Needed (Recommended)",
+        "proactiveTitle": "Proactive - Early Warnings"
+      },
+      "descriptions": {
+        "conservative": "Only show critical items requiring immediate action",
+        "balanced": "Show items needing attention soon (recommended)",
+        "proactive": "Early warnings for all items that might need attention"
+      },
+      "expectedCounts": {
+        "conservative": "Fewer alerts, higher urgency",
+        "balanced": "Moderate alerts, good balance",
+        "proactive": "More alerts, early prevention"
+      },
+      "selectDescriptions": {
+        "conservative": "Items expiring today/tomorrow or with high waste risk",
+        "balanced": "Items needing attention this week",
+        "proactive": "All items that might need attention soon"
+      },
+      "technical": {
+        "showDetails": "Show technical details",
+        "thresholds": "Technical Thresholds:",
+        "warningLevel": "Warning Level",
+        "criticalLevel": "Critical Level",
+        "compositeScore": "composite score",
+        "howScoringWorks": "How scoring works:",
+        "expiryScore": "Expiry Score: How close to expiration date",
+        "marginScore": "Margin Score: Profit margin at risk",
+        "velocityScore": "Velocity Score: How fast the item usually sells"
+      },
+      "actions": {
+        "resetToDefaults": "Reset to Defaults",
+        "saving": "Saving...",
+        "settingsSavedAuto": "Settings saved automatically"
+      }
+    }
+  },
+  "storeInsights": {
+    "title": "Today's priority actions",
+    "description": "Review and take action on the most urgent items.",
+    "takeAction": "Take Action",
+    "loadingInsights": "Loading store insights...",
+    "dashboardTitle": "Store Insights Dashboard",
+    "unableToLoad": "Unable to load insights",
+    "failedToLoad": "Failed to load store insights:",
+    "unknownError": "Unknown error",
+    "storeId": "Store ID:",
+    "metrics": {
+      "urgentItems": "Urgent Items",
+      "urgentItemsDesc": "High urgency batches",
+      "actionsTaken": "Actions Taken",
+      "actionsTakenDesc": "Total actions this period",
+      "discountValue": "Discount Value",
+      "discountValueDesc": "Total discounts applied",
+      "avgScore": "Avg Score",
+      "avgScoreDesc": "Average urgency score"
+    },
+    "overview": {
+      "title": "Store Overview & Analytics",
+      "description": "{actionsTaken} actions taken • {urgentBatches} urgent items tracked",
+      "scoringAlert": "Scoring Alert:",
+      "urgentBatchesAlert": "{urgentBatches} urgent batches need immediate attention to prevent losses.",
+      "recentActivity": "Recent Activity",
+      "actionsTaken": "Actions Taken",
+      "actionsTakenPeriod": "{totalActions} this period",
+      "discountsApplied": "Discounts Applied",
+      "saved": "€{discountValue} saved",
+      "averageScore": "Average Score: {avgScore}% • €{discountValue} discounts applied",
+      "discountsAppliedText": "discounts applied",
+      "showDetails": "Show Details",
+      "hideDetails": "Hide Details"
+    },
+    "urgentAlerts": {
+      "errors": {
+        "connectionError": "Connection Error",
+        "unableToLoad": "Unable to load urgent alerts",
+        "loadingAlerts": "Loading alerts..."
+      },
+      "buttons": {
+        "viewInventory": "View Inventory",
+        "viewItems": "View Items"
+      },
+      "levels": {
+        "urgentOnly": "Critical Only",
+        "priority": "High Priority",
+        "allFlagged": "Medium Priority",
+        "completeReview": "Complete Review"
+      },
+      "messages": {
+        "nothingToShow": "No urgent items at this time",
+        "criticalItemsAction": "{count} critical items need immediate action (expired or expiring within 24 hours)",
+        "highPriorityItems": "{count} high priority items (expiring within 2-3 days)",
+        "criticalItems": "{count} critical items (expired or expiring within 24 hours)",
+        "mediumPriorityItems": "{count} medium priority items (expiring within a week)",
+        "lowPriorityItems": "{count} low priority items (expiring within 2 weeks)"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "critical": "Critical",
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "all": "All Priority Levels"
+      },
+      "tooltips": {
+        "critical": "Critical Items Only",
+        "criticalDesc": "Expired or expiring within 24 hours",
+        "high": "Critical + High Priority",
+        "highDesc": "Items expiring within 2-3 days",
+        "medium": "Medium Priority (expiring within a week)",
+        "mediumDesc": "Items expiring within a week",
+        "all": "All Priority Levels",
+        "allDesc": "Complete inventory review"
+      }
+    },
+    "batchStatus": {
+      "needsAttention": "Needs attention",
+      "activeInventory": "Active inventory status",
+      "activeBatchesCount": "{needsAttention} of {total} active batches",
+      "urgency": {
+        "critical": "Critical (Immediate Action Required)",
+        "high": "High Priority (expires tomorrow)",
+        "medium": "Medium Priority (expires within 2-7 days)",
+        "low": "Low Priority (longer shelf life)"
+      },
+      "status": {
+        "ok": "OK",
+        "allGood": "All batches are in good condition"
+      },
+      "errors": {
+        "loadingError": "Unable to load batch status"
+      }
+    },
+    "expiredItems": {
+      "title": "Expired Items",
+      "subtitle": "Inventory requiring waste management actions",
+      "recentlyExpired": "Recently Expired",
+      "weekOld": "Week Old",
+      "older": "Older",
+      "days": "days",
+      "actionsNeeded": "Actions Needed",
+      "reviewDiscounts": "Review for heavy discounts",
+      "scheduleDonation": "Schedule donation pickup",
+      "removeFromShelves": "Remove from shelves",
+      "noExpiredItems": "No expired items found",
+      "errors": {
+        "loadingError": "Unable to load expired items"
+      }
+    }
+  },
+  "navigation": {
+    "dashboard-title": "Store",
+    "dashboard": "Dashboard",
+    "operations": "Operations",
+    "inventory": "Inventory",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "todos": "Todos",
+    "performance": "Performance",
+    "milestones": "Milestones",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "helpCenter": "Help Center",
+    "logout": "Logout",
+    "batches": "Batches",
+    "products": "Products"
+  },
+  "batchFilters": {
+    "expiryFilter": "Expiry filter",
+    "allItems": "All items",
+    "expiringInDays": "Expiring in {days} days",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "active": "Active",
+    "expired": "Expired",
+    "damaged": "Damaged",
+    "soldOut": "Sold Out",
+    "reserved": "Reserved",
+    "itemCount": "{count} items"
+  },
+  "batchList": {
+    "errorLoadingBatches": "Error Loading Batches",
+    "unexpectedError": "An unexpected error occurred",
+    "currentBatches": "{count} current batches",
+    "filters": "Filters",
+    "search": "Search",
+    "searchBatches": "Search batches...",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "active": "Active",
+    "expired": "Expired",
+    "damaged": "Damaged",
+    "soldOut": "Sold Out",
+    "reserved": "Reserved",
+    "expiringSoon": "Expiring Soon",
+    "allDates": "All dates",
+    "expiringInDays": "Expiring in {days} days",
+    "location": "Location",
+    "locationCode": "Location code...",
+    "stockStatus": "Stock Status",
+    "allStockLevels": "All stock levels",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "supplier": "Supplier",
+    "supplierName": "Supplier name...",
+    "clear": "Clear",
+    "clearFilters": "Clear Filters",
+    "loadingMore": "Loading more...",
+    "loadMoreBatches": "Load More Batches",
+    "showingBatches": "Showing {count} batches",
+    "filteredFrom": "(filtered from {total})",
+    "noBatchesFound": "No batches found",
+    "noBatchesYet": "No batches yet",
+    "tryAdjustingFilters": "Try adjusting your search or filters",
+    "productNoBatches": "This product has no batches yet",
+    "getStartedFirstBatch": "Get started by adding your first batch",
+    "convenience": {
+      "expiringSoon": "Expiring Soon",
+      "noBatchesExpiringSoon": "No batches expiring soon",
+      "productBatches": "Product Batches",
+      "productNoBatches": "This product has no batches yet",
+      "lowStockAlert": "Low Stock Alert",
+      "allBatchesSufficientStock": "All batches have sufficient stock"
+    }
+  },
+  "batchSort": {
+    "sortBy": "Sort by",
+    "createdDate": "Created Date",
+    "expiryDate": "Expiry Date",
+    "batchNumber": "Batch Number",
+    "supplier": "Supplier",
+    "stockLevel": "Stock Level",
+    "costPrice": "Cost Price",
+    "sellingPrice": "Selling Price",
+    "status": "Status",
+    "asc": "ASC",
+    "desc": "DESC"
+  },
+  "productSort": {
+    "sortBy": "Sort by",
+    "unknown": "Unknown",
+    "sortProductsBy": "Sort Products By",
+    "current": "Current",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "productCount": "{count} products",
+    "productName": "Product Name",
+    "productNameDesc": "Sort alphabetically by product name",
+    "category": "Category",
+    "categoryDesc": "Group by product category",
+    "brand": "Brand",
+    "brandDesc": "Sort alphabetically by brand",
+    "stockLevel": "Stock Level",
+    "stockLevelDesc": "Sort by current inventory quantity",
+    "sellingPrice": "Selling Price",
+    "sellingPriceDesc": "Sort by product selling price",
+    "activeBatches": "Active Batches",
+    "activeBatchesDesc": "Sort by number of active batches",
+    "dateAdded": "Date Added",
+    "dateAddedDesc": "Sort by when product was added",
+    "quickSort": {
+      "newestFirst": "Newest First",
+      "aToZ": "A-Z",
+      "lowStock": "Low Stock",
+      "highestPrice": "Highest Price",
+      "mostBatches": "Most Batches"
+    }
+  },
+  "productFilters": {
+    "categoryFilter": "Category filter",
+    "allCategories": "All categories",
+    "productCount": "{count} products"
+  },
+  "productListSort": {
+    "name": "Name",
+    "category": "Category",
+    "brand": "Brand",
+    "stock": "Stock",
+    "price": "Price",
+    "activeBatches": "Active Batches",
+    "dateAdded": "Date Added",
+    "lastUpdated": "Last Updated"
+  },
+  "productTable": {
+    "product": "Product",
+    "unnamedProduct": "Unnamed Product",
+    "notAvailable": "N/A",
+    "category": "Category",
+    "uncategorized": "Uncategorized",
+    "brand": "Brand",
+    "totalStock": "Total Stock",
+    "activeBatches": "Active Batches",
+    "dateAdded": "Date Added",
+    "openMenu": "Open menu",
+    "actions": "Actions",
+    "viewDetails": "View Details",
+    "viewBatches": "View Batches",
+    "editProduct": "Edit Product",
+    "updatePrice": "Update Price",
+    "enterNewPrice": "Enter new price (€):",
+    "deleteProduct": "Delete Product",
+    "confirmDeleteProduct": "Are you sure you want to delete this product?"
+  },
+  "todos": {
+    "pageDescription": "View and manage your store's todos"
+  },
+  "scanOut": {
+    "available": "Available",
+    "unknownProduct": "Unknown Product",
+    "unknownBrand": "Unknown Brand",
+    "scanProductToRemove": "Scan Product to Remove",
+    "pointCameraAtBarcode": "Point camera at product barcode",
+    "title": "Scan Out",
+    "description": "Scan items when they leave inventory",
+    "scanning": {
+      "scanNextProduct": "Scan next product",
+      "scanProductBarcode": "Scan product barcode",
+      "pointAtBarcode": "Point at barcode",
+      "productFound": "Product found!",
+      "notFoundInInventory": "Product not found in inventory",
+      "addToRemovalList": "Add to removal list"
+    },
+    "productDetails": {
+      "title": "Product details",
+      "brand": "Brand",
+      "category": "Category",
+      "barcode": "Barcode",
+      "availableStock": "Available stock",
+      "units": "units",
+      "noBrand": "No brand",
+      "uncategorized": "Uncategorized",
+      "noBarcode": "No barcode"
+    },
+    "batchSelection": {
+      "title": "Select batch",
+      "selectBatch": "Select a batch to remove",
+      "expires": "Expires on",
+      "expired": "Expired",
+      "available": "available",
+      "selectThisBatch": "Select this batch"
+    },
+    "quantityInput": {
+      "title": "Quantity to remove",
+      "quantity": "Quantity",
+      "maxAvailable": "Maximum available: {max} units",
+      "enterQuantity": "Enter quantity to remove"
+    },
+    "reasonSelection": {
+      "title": "Reason for removal",
+      "selectReason": "Select a reason for this removal",
+      "reasons": {
+        "sale": "Sale",
+        "donation": "Donation",
+        "waste": "Waste",
+        "damaged": "Damaged",
+        "expired": "Expired",
+        "other": "Other"
+      }
+    },
+    "itemsList": {
+      "title": "Items to remove",
+      "noItems": "No items added yet",
+      "itemCount": "{count, plural, one {# item} other {# items}} to remove",
+      "quantity": "Qty",
+      "reason": "Reason",
+      "remove": "Remove"
+    },
+    "confirmation": {
+      "title": "Confirm removal",
+      "description": "Review the items below before removing them from inventory.",
+      "submitText": "You are about to remove {count, plural, one {# item} other {# items}} from inventory:",
+      "itemDetails": {
+        "expires": "Expires:",
+        "reason": "Reason:",
+        "quantity": "Quantity:"
+      }
+    },
+    "success": {
+      "title": "Items removed successfully!",
+      "description": "Successfully removed {count, plural, one {# item} other {# items}} from your inventory.",
+      "summary": {
+        "totalItems": "Total items removed:",
+        "byReason": "By reason:",
+        "sales": "Sales",
+        "donations": "Donations",
+        "waste": "Waste"
+      }
+    },
+    "buttons": {
+      "scanProduct": "Scan product",
+      "selectBatch": "Select batch",
+      "addToList": "Add to list",
+      "removeFromInventory": "Remove from inventory",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "back": "Back",
+      "continue": "Continue",
+      "finish": "Finish",
+      "scanNext": "Scan next",
+      "viewDashboard": "View dashboard",
+      "submitting": "Submitting..."
+    },
+    "alerts": {
+      "maxQuantityExceeded": "Quantity cannot exceed available stock",
+      "quantityRequired": "Please enter a valid quantity",
+      "reasonRequired": "Please select a reason",
+      "noItemsToRemove": "No items to remove",
+      "scanError": "Scan error: {error}",
+      "submissionError": "Submission error: {error}"
+    },
+    "captureExpiryDate": "Capture Expiry Date",
+    "pointCameraAtExpiry": "Point camera at expiry date",
+    "backToChangeProduct": "Back to Change Product",
+    "itemsToRemove": "Items to Remove ({count})",
+    "total": "Total",
+    "expires": "Expires",
+    "remove": "Remove",
+    "clearAll": "Clear All",
+    "submitAll": "Submit All ({count} items)",
+    "confirmCheckout": "Confirm Checkout",
+    "reviewItemsBeforeRemoval": "Review the items below before removing them from inventory.",
+    "aboutToRemoveItems": "You are about to remove {count} items from inventory:",
+    "totalItemsRemoved": "Total Items Removed",
+    "totalValueRemoved": "Total Value Removed",
+    "processing": "Processing...",
+    "confirmRemoval": "Confirm Removal",
+    "inventoryUpdatedSuccessfully": "Inventory Updated Successfully!",
+    "successfullyRemoved": "Successfully removed {count} items from inventory.",
+    "partiallyRemoved": "Removed {success} of {total} items from inventory.",
+    "continueScanning": "Continue Scanning",
+    "viewInDashboard": "View in Dashboard",
+    "noActiveStore": "No active store selected",
+    "cameraNotReady": "Camera not ready",
+    "noBatchFoundWithExpiry": "No batch found with expiry date: {date}",
+    "noInventoryAvailable": "No inventory available for this product in the current store.",
+    "ocrProcessingFailed": "OCR processing failed",
+    "batchRemovalNote": "Batch removal: {productName} x{quantity}",
+    "recentlyRemoved": "Recently Removed ({count} items)",
+    "removedQuantityExpires": "Removed {quantity}x • Expires: {date}",
+    "andMoreItems": "... and {count} more items",
+    "cancel": "Cancel"
+  },
+  "buttons": {
+    "export": "Export",
+    "addBatch": "Add Batch",
+    "addProduct": "Add Product",
+    "lookup": "Lookup",
+    "selectProduct": "Select Product",
+    "change": "Change",
+    "loadMore": "Load More Products",
+    "updatePrice": "Update Price",
+    "viewBatches": "View Batches",
+    "editProduct": "Edit Product",
+    "deleteProduct": "Delete Product"
+  },
+  "dashboardNav": {
+    "projects": "Projects",
+    "more": "More",
+    "viewProject": "View Project",
+    "shareProject": "Share Project",
+    "deleteProject": "Delete Project",
+    "kpiCard": {
+      "failedToLoad": "Failed to load data",
+      "viewDetails": "View details"
+    },
+    "pages": {
+      "dashboard": "Dashboard Overview",
+      "notifications": "Coming Soon: Notifications",
+      "todos": "Todos: Suggestions for you",
+      "products": "Products",
+      "batches": "Inventory Batches",
+      "users": "Team Management",
+      "account": "Account settings"
+    },
+    "descriptions": {
+      "batches": "View and manage your store's inventory batches",
+      "products": "View and manage your store's product inventory"
+    }
+  },
+  "users": {
+    "title": "Team Management",
+    "description": "Invite new team members to your store and manage their roles and permissions.",
+    "addEmployee": "Invite team member",
+    "showing": "Showing {current} of {total} users",
+    "noUsersFound": "No users found",
+    "name": "Name",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "pinStatus": "PIN Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "locked": "Locked",
+    "pinActive": "PIN Active",
+    "noPin": "No PIN",
+    "loadMoreUsers": "Load More Users",
+    "loadingMore": "Loading more...",
+    "noUsersMessage": "This store doesn't have any users yet.",
+    "permissions": {
+      "ownerInfo": {
+        "title": "Owner Permissions",
+        "description": "As an owner, you can manage all team members, change roles (including making other owners), and access all store functions. You can manage owners, managers, and employees."
+      },
+      "managerInfo": {
+        "title": "Manager Permissions",
+        "description": "As a manager, you can manage employees (activate/deactivate, remove from store), but cannot modify owners or other managers. Only owners can change roles."
+      }
+    },
+    "errors": {
+      "mustHaveOwner": "There must always be at least one owner."
+    },
+    "dropdown": {
+      "userActions": "User Actions",
+      "makeEmployee": "Make Employee",
+      "makeManager": "Make Manager",
+      "makeOwner": "Make Owner",
+      "resetPin": "Reset PIN",
+      "unlockPin": "Unlock PIN",
+      "deactivateUser": "Deactivate User",
+      "reactivateUser": "Reactivate User",
+      "removeFromStore": "Remove from Store"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Edit User Role",
+        "description": "{name} currently has the role of: {role}",
+        "roleLabel": "Role",
+        "selectPlaceholder": "Select a role",
+        "cancel": "Cancel",
+        "save": "Save changes"
+      },
+      "removeUser": {
+        "title": "Remove User from Store",
+        "description": "This will permanently remove {name} from {store}. They will lose all access to this store, lose their current role and permissions, and need to be re-invited if you want them back. Their user account will remain active for other stores.",
+        "cancel": "Cancel",
+        "confirm": "Remove from Store"
+      },
+      "resetPin": {
+        "title": "Reset PIN for {name}",
+        "description": "This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.",
+        "employee": "Employee",
+        "username": "Username",
+        "email": "Email",
+        "currentStatus": "Current Status",
+        "statusLocked": "Locked",
+        "statusActive": "Active",
+        "cancel": "Cancel",
+        "confirm": "Reset PIN"
+      },
+      "unlockPin": {
+        "title": "Unlock PIN for {name}",
+        "description": "This will immediately unlock the employee's PIN and reset their failed attempts counter.",
+        "employee": "Employee",
+        "username": "Username",
+        "lockedMessage": "The account is currently locked due to failed PIN attempts",
+        "cancel": "Cancel",
+        "confirm": "Unlock PIN"
+      }
+    },
+    "roles": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "employee": "Employee",
+      "staff": "Staff",
+      "admin": "Administrator",
+      "user": "User",
+      "unknown": "Unknown"
+    },
+    "card": {
+      "pinStatus": {
+        "disabled": "PIN Disabled",
+        "locked": "PIN Locked",
+        "pending": "PIN Pending",
+        "active": "PIN Active"
+      },
+      "inactive": "Inactive",
+      "username": "Username",
+      "permissions": "Permissions",
+      "lastLogin": "Last login",
+      "failedAttempts": "{count} failed PIN attempt{plural}",
+      "enablePin": "Enable PIN",
+      "disablePin": "Disable PIN",
+      "removeDialog": {
+        "title": "Remove User from Store",
+        "description": "Are you sure you want to remove {name} from this store? This will deactivate their access but won't delete their account.",
+        "cancel": "Cancel",
+        "confirm": "Remove User"
+      }
+    }
+  },
+  "addEmployee": {
+    "title": "Add New Employee",
+    "description": "Create a new employee account with PIN authentication. Login credentials will be sent by email.",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "username": "Username",
+      "role": "Role",
+      "language": "Language",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "emailPlaceholder": "test@example.com (use fake email for testing)",
+      "emailNote": "Use test@example.com for testing. Real emails will receive login credentials.",
+      "usernamePlaceholder": "john.doe",
+      "usernameNote": "Employee will use this username to log in",
+      "usernameAvailable": "Username is available",
+      "usernameTaken": "Username is already taken",
+      "reset": "Reset"
+    },
+    "roles": {
+      "employee": "Employee",
+      "manager": "Manager"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Username:",
+      "pin": "PIN:",
+      "pinNote": "Will be generated automatically (6 digits)",
+      "loginNote": "The employee can log in using the \"Employee\" tab with their username and PIN"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Employee",
+      "creating": "Creating...",
+      "done": "Done",
+      "retrySending": "Retry sending"
+    },
+    "success": {
+      "title": "Employee Created Successfully!",
+      "description": "{name} has been added to your store. Save these credentials and share them with the employee.",
+      "emailSending": "Sending email...",
+      "emailSent": "Welcome email sent successfully to {email}",
+      "emailPreparing": "Preparing email for {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Email status: {error}"
+    },
+    "credentials": {
+      "email": "Email",
+      "username": "Username",
+      "pin": "PIN"
+    },
+    "nextSteps": {
+      "title": "Next Steps:",
+      "loginTab": "• The employee can log in using the \"Employee\" tab on the login page",
+      "useCredentials": "• Use username: {username} and PIN: {pin}",
+      "resetPin": "• The PIN can be reset at any time from the team management page",
+      "permissions": "• The employee can scan products and manage basic inventory"
+    },
+    "errors": {
+      "fillFields": "Please fill in all required fields",
+      "usernameTaken": "Username is already taken. Please choose a different one.",
+      "noStore": "No store selected",
+      "checkUsername": "Failed to check username availability",
+      "createFailed": "Failed to create employee",
+      "copyFailed": "Failed to copy to clipboard"
+    },
+    "toast": {
+      "created": "Employee created successfully using server API!",
+      "emailSent": "Welcome email sent successfully!",
+      "emailFailed": "Failed to send email: {error}",
+      "emailError": "Error sending email: {error}",
+      "emailSkipped": "Employee created! Email skipped for test address.",
+      "copied": "{field} copied to clipboard"
+    }
+  },
+  "timeSelector": {
+    "periods": {
+      "thisWeek": "This Week",
+      "lastWeek": "Last Week",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "allTime": "All Time"
+    },
+    "compareLabels": {
+      "lastWeek": "Last Week",
+      "previousWeek": "Previous Week",
+      "lastMonth": "Last Month",
+      "previousMonth": "Previous Month",
+      "previous7Days": "Previous 7 Days",
+      "previous30Days": "Previous 30 Days",
+      "previousYear": "Previous Year"
+    }
+  }
+}

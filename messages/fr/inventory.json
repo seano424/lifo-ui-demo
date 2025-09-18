@@ -1,0 +1,528 @@
+{
+  "products": {
+    "manualEntry": {
+      "title": "Saisie manuelle",
+      "manualSearch": "Recherche manuelle",
+      "productSelected": "Produit sélectionné",
+      "searchByBarcode": "Rechercher par code-barres",
+      "searchByProductName": "Ou rechercher par nom de produit",
+      "inStockItemsOnly": "(Articles en stock uniquement)",
+      "barcodePlaceholder": "Numéro de code-barres (8+ chiffres)...",
+      "searchPlaceholder": "Rechercher dans la base Open Food Facts...",
+      "inventorySearchPlaceholder": "Rechercher des produits en inventaire...",
+      "productFound": "Produit trouvé !",
+      "outOfStock": "Rupture de stock",
+      "noStockAvailable": "Aucun stock disponible dans ce magasin",
+      "unitsAvailable": "unités disponibles",
+      "outOfStockCannotSelect": "Rupture de stock - Impossible de sélectionner",
+      "selectThisProduct": "Sélectionner ce produit",
+      "productNotFound": "Produit non trouvé dans la base de données. Vous pouvez l'ajouter manuellement ci-dessous.",
+      "addProductManually": "Ajouter un produit manuellement",
+      "noProductsFound": "Aucun produit trouvé correspondant à",
+      "autoProceedException": "Procédera automatiquement au scan de la date d'expiration après sélection",
+      "barcodeValidation": "Le code-barres doit contenir au moins 8 chiffres et uniquement des nombres",
+      "batchCount": "lots"
+    },
+    "table": {
+      "productDetails": "Détails du produit",
+      "category": "Catégorie",
+      "brand": "Marque",
+      "stock": "Stock",
+      "pricing": "Prix",
+      "activeBatches": "Lots actifs",
+      "actions": "Actions",
+      "unnamedProduct": "Produit sans nom",
+      "uncategorized": "Non catégorisé",
+      "cost": "Coût",
+      "batch": "lot",
+      "batches": "lots",
+      "units": "unités"
+    },
+    "catalog": {
+      "title": "Catalogue des produits",
+      "description": "Gérez votre catalogue de produits et votre inventaire",
+      "clickToSort": "Cliquez sur les en-têtes de colonne pour trier",
+      "sortedBy": "Trié par",
+      "ascending": "↑",
+      "descending": "↓"
+    },
+    "empty": {
+      "title": "Aucun produit trouvé",
+      "description": "Commencez par ajouter votre premier produit",
+      "storeDescription": "Commencez par ajouter votre premier produit à ce magasin"
+    },
+    "loading": {
+      "loadingMore": "Chargement en cours...",
+      "showing": "Affichage de",
+      "of": "sur",
+      "products": "produits"
+    },
+    "errors": {
+      "loadingError": "Erreur de chargement des produits",
+      "unexpectedError": "Une erreur inattendue s'est produite"
+    },
+    "fields": {
+      "name": "Nom",
+      "productName": "Nom du produit",
+      "barcode": "Code-barres",
+      "brand": "Marque",
+      "category": "Catégorie",
+      "sku": "SKU"
+    },
+    "placeholders": {
+      "productName": "par ex., Lait entier bio",
+      "brand": "par ex., Danone",
+      "barcode": "par ex., 078000113464",
+      "selectCategory": "Sélectionner une catégorie"
+    },
+    "confirmations": {
+      "deleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?",
+      "enterNewPrice": "Entrez le nouveau prix :"
+    }
+  },
+  "batches": {
+    "table": {
+      "headers": {
+        "batchNumber": "N° de lot",
+        "product": "Produit",
+        "supplier": "Fournisseur",
+        "expiryDate": "Date d'expiration",
+        "stock": "Stock",
+        "costPrice": "Prix de revient",
+        "sellPrice": "Prix de vente",
+        "status": "Statut",
+        "location": "Emplacement"
+      },
+      "actions": {
+        "viewDetails": "Voir les détails",
+        "editBatch": "Modifier le lot",
+        "markAsExpired": "Marquer comme expiré",
+        "markAsDamaged": "Marquer comme endommagé",
+        "deleteBatch": "Supprimer le lot"
+      },
+      "emptyState": {
+        "title": "Aucun lot trouvé",
+        "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock.",
+        "addFirstBatch": "Ajouter le premier lot"
+      },
+      "loadMore": "Charger plus de lots ({remaining} restants)",
+      "loading": "Chargement en cours..."
+    },
+    "status": {
+      "active": "Actif",
+      "expired": "Expiré",
+      "damaged": "Endommagé",
+      "soldOut": "Épuisé",
+      "reserved": "Réservé"
+    },
+    "expiry": {
+      "expired": "Expiré",
+      "daysLeft": "{days}j restants"
+    }
+  },
+  "inbound": {
+    "mobile": {
+      "barcodeScanning": "Scan de codes-barres",
+      "csvBulkImport": "Import CSV en masse"
+    },
+    "desktop": {
+      "manualEntry": "Saisie manuelle",
+      "csvBulkImport": "Import CSV en masse"
+    },
+    "messages": {
+      "selectStore": "Veuillez sélectionner un magasin pour télécharger les données d'inventaire.",
+      "selectStoreInventory": "Veuillez sélectionner un magasin pour ajouter de l'inventaire."
+    }
+  },
+  "manualInbound": {
+    "selectedProduct": {
+      "title": "Produit sélectionné",
+      "fields": {
+        "name": "Nom :",
+        "brand": "Marque :",
+        "category": "Catégorie :",
+        "barcode": "Code-barres :"
+      }
+    },
+    "batchDetails": {
+      "title": "Détails du lot"
+    },
+    "buttons": {
+      "addBatch": "Ajouter lot",
+      "clear": "Effacer",
+      "submitAll": "Soumettre tout",
+      "cancel": "Annuler",
+      "submitting": "Soumission...",
+      "submitToInventory": "Soumettre à l'inventaire",
+      "addMoreProducts": "Ajouter plus de produits",
+      "viewInInventory": "Voir dans l'inventaire"
+    },
+    "batchItems": {
+      "title": "Articles de lot à soumettre",
+      "description": "{count, plural, one {# lot prêt à soumettre} other {# lots prêts à soumettre}}"
+    },
+    "confirmation": {
+      "title": "Confirmer la soumission",
+      "description": "Vérifiez les articles ci-dessous avant de les soumettre à votre inventaire.",
+      "submitText": "Vous êtes sur le point de soumettre {count, plural, one {# lot} other {# lots}} à l'inventaire :",
+      "totals": {
+        "totalItems": "Total d'articles :",
+        "totalValue": "Valeur totale :"
+      },
+      "itemDetails": {
+        "expires": "Expire :",
+        "total": "Total :"
+      }
+    },
+    "success": {
+      "title": "Inventaire mis à jour avec succès !",
+      "description": {
+        "allSuccess": "Ajouté avec succès {count, plural, one {# lot} other {# lots}} à votre inventaire.",
+        "partialSuccess": "Ajouté {successCount} sur {totalCount} lots à l'inventaire."
+      }
+    },
+    "alerts": {
+      "gettingStarted": "Commencez par rechercher un produit en utilisant le code-barres ou la recherche par nom de produit ci-dessus. Après avoir sélectionné un produit, vous pourrez ajouter la date d'expiration, la quantité et le prix."
+    }
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Scanner le produit",
+      "scanExpiryDate": "Scanner la date d'expiration"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Pointez la caméra sur le code-barres",
+      "pointAtExpiryDate": "Pointez la caméra sur la date d'expiration"
+    },
+    "permissions": {
+      "barcodeRequired": "L'accès à la caméra est requis pour scanner les codes-barres.",
+      "expiryRequired": "L'accès à la caméra est requis pour capturer les dates d'expiration."
+    },
+    "alerts": {
+      "serviceUnavailable": "Désolé, ce service est actuellement indisponible. Veuillez utiliser la saisie manuelle de date.",
+      "ocrError": "Erreur OCR : {error}",
+      "backendUnavailable": "Le backend FastAPI n'est pas disponible. Veuillez utiliser la saisie manuelle.",
+      "scanInstructions": "Pointez votre caméra sur n'importe quel code-barres de produit. Le scanner détectera automatiquement les formats pris en charge et recherchera les informations du produit dans Open Food Facts."
+    },
+    "buttons": {
+      "captureExpiryDate": "Capturer la date d'expiration",
+      "processingOCR": "Traitement OCR...",
+      "clearError": "Effacer l'erreur",
+      "manualEntry": "Saisie manuelle"
+    }
+  },
+  "scanningWorkflow": {
+    "steps": {
+      "scanBarcode": "Scanner code-barres",
+      "changeProduct": "Changer produit",
+      "scanExpiryDate": "Scanner date d'expiration",
+      "reviewDetails": "Réviser détails",
+      "previousStep": "Étape précédente"
+    }
+  },
+  "scanningInterface": {
+    "camera": {
+      "scanProduct": "Scanner le produit",
+      "scanDifferentProduct": "Scanner un autre produit"
+    },
+    "product": {
+      "productFound": "Produit trouvé ! Prêt à procéder au scan de la date d'expiration.",
+      "productNotFound": "Produit non trouvé dans la base de données. Vous devrez peut-être l'ajouter manuellement.",
+      "autoProceeding": "Passage automatique au scan de la date d'expiration..."
+    },
+    "expiry": {
+      "manualEntryFallback": "📝 Saisie manuelle (OCR indisponible)",
+      "orEnterManually": "Ou saisir manuellement",
+      "confirmDate": "Confirmer la date"
+    },
+    "inventory": {
+      "addToInventory": "Ajouter à l'inventaire",
+      "addedToList": "{productName} ajouté à votre liste ! Scannez le produit suivant.",
+      "finishAndSubmit": "Terminer et soumettre {count, plural, one {# article} other {# articles}}"
+    },
+    "submission": {
+      "title": "Confirmer la soumission",
+      "description": "Vérifiez les articles ci-dessous avant de les soumettre à votre inventaire.",
+      "submitText": "Vous êtes sur le point de soumettre {count, plural, one {# article} other {# articles}} à l'inventaire :",
+      "totals": {
+        "totalItems": "Total d'articles :",
+        "totalValue": "Valeur totale :",
+        "expires": "Expire :"
+      },
+      "buttons": {
+        "cancel": "Annuler",
+        "submitting": "Soumission...",
+        "submitToInventory": "Soumettre à l'inventaire"
+      }
+    },
+    "success": {
+      "title": "Inventaire mis à jour avec succès !",
+      "description": {
+        "allSuccess": "Ajouté avec succès {count, plural, one {# article} other {# articles}} à votre inventaire.",
+        "partialSuccess": "Ajouté {successCount} sur {totalCount} articles à l'inventaire."
+      },
+      "buttons": {
+        "keepScanning": "Continuer le scan",
+        "viewInDashboard": "Voir dans le tableau de bord"
+      }
+    },
+    "navigation": {
+      "backTo": "Retour à {stepName}",
+      "goBack": "Retour"
+    },
+    "lookupErrors": {
+      "lookupFailed": "Échec de la recherche : {error}"
+    }
+  },
+  "inventoryForm": {
+    "titles": {
+      "productDetails": "Détails du produit",
+      "detailsCaptured": "Détails capturés avec succès",
+      "reviewAndSubmit": "Réviser et soumettre à l'inventaire"
+    },
+    "labels": {
+      "expiryDate": "Date d'expiration",
+      "quantity": "Quantité",
+      "pricePerUnit": "Prix par unité (€)",
+      "editableNote": "(modifiable)"
+    },
+    "buttons": {
+      "confirm": "Confirmer"
+    }
+  },
+  "productCard": {
+    "titles": {
+      "selectedProduct": "Produit sélectionné",
+      "productInformation": "Informations produit"
+    },
+    "fallbacks": {
+      "unknownProduct": "Produit inconnu"
+    }
+  },
+  "scannedItemsList": {
+    "title": "Articles de lot",
+    "itemLabels": {
+      "quantity": "Quantité :",
+      "price": "Prix :",
+      "expiry": "Expiration :"
+    },
+    "editDialog": {
+      "title": "Modifier l'article",
+      "descriptions": {
+        "quickEdit": "Modification rapide de la date d'expiration, quantité et prix. Cliquez sur \"Modifier les détails\" pour plus d'options.",
+        "fullEdit": "Modifier tous les détails du produit incluant nom, marque, code-barres et informations d'inventaire."
+      },
+      "sections": {
+        "productDetails": "Détails du produit",
+        "inventoryDetails": "Détails d'inventaire",
+        "quickEdit": "Modification rapide"
+      },
+      "formLabels": {
+        "productName": "Nom du produit",
+        "brand": "Marque",
+        "barcode": "Code-barres",
+        "expiryDate": "Date d'expiration",
+        "quantity": "Quantité",
+        "price": "Prix (€)"
+      },
+      "placeholders": {
+        "productName": "Saisissez le nom du produit",
+        "brand": "Nom de marque",
+        "barcode": "Numéro de code-barres"
+      },
+      "buttons": {
+        "editDetails": "Modifier les détails",
+        "hideDetails": "Masquer les détails",
+        "cancel": "Annuler",
+        "saveChanges": "Sauvegarder les modifications"
+      }
+    }
+  },
+  "csvUpload": {
+    "title": "Téléchargement CSV ultra-rapide",
+    "subtitle": "Traitement ultra-rapide",
+    "dropZone": {
+      "dropHere": "Déposez votre fichier CSV ici",
+      "orBrowse": "ou cliquez pour parcourir",
+      "chooseFile": "Choisir un fichier"
+    },
+    "preview": {
+      "title": "Aperçu",
+      "table": {
+        "sku": "SKU",
+        "productName": "Nom du produit",
+        "category": "Catégorie",
+        "quantity": "Qté",
+        "expiryDate": "Date d'expiration"
+      },
+      "selectDate": "Sélectionner une date",
+      "missingExpiryDate": "Date d'expiration manquante",
+      "quantityLabel": "Qté :"
+    },
+    "buttons": {
+      "upload": "Télécharger (Ignorer auto. les doublons)",
+      "processing": "Traitement...",
+      "reset": "Réinitialiser",
+      "uploadAnother": "Télécharger un autre fichier"
+    },
+    "results": {
+      "title": "Téléchargement terminé !",
+      "successSummary": "{processed} articles traités avec succès",
+      "duplicatesSkipped": " • {skipped} doublons ignorés",
+      "uploadCompleted": "Téléchargement terminé",
+      "completedIn": "⚡ Terminé en {time}ms",
+      "metrics": {
+        "processed": "Traités",
+        "skipped": "Ignorés",
+        "itemsPerSec": "Articles/sec",
+        "totalTime": "Temps total"
+      },
+      "performance": {
+        "title": "Décomposition des performances des opérations groupées",
+        "duplicateCheck": "Vérification des doublons",
+        "productResolution": "Résolution des produits",
+        "batchInsertion": "Insertion par lot",
+        "productsCreated": "Produits créés",
+        "dbProcessing": "Traitement BD",
+        "optimization": "⚡ Les opérations groupées ont réduit le temps de traitement de {percentage}% par rapport au traitement individuel"
+      },
+      "duplicates": {
+        "viewSkipped": "Voir les doublons ignorés ({count})",
+        "expiry": "Expiration"
+      }
+    },
+    "errors": {
+      "invalidFile": "Veuillez sélectionner un fichier CSV",
+      "analysisFailure": "Échec de l'analyse du fichier CSV",
+      "noFile": "Veuillez d'abord sélectionner un fichier",
+      "noStore": "Informations du magasin manquantes. Actualisez et réessayez.",
+      "uploadFailed": "Échec du téléchargement",
+      "startFailed": "Impossible de démarrer le téléchargement. Veuillez réessayer."
+    },
+    "performanceInfo": {
+      "title": "Performances ultra-rapides optimisées en masse",
+      "features": {
+        "bulkOps": "3 opérations de base de données en masse au lieu de N appels individuels",
+        "autoDuplicate": "Détection automatique des doublons sans intervention de l'utilisateur",
+        "realtime": "Métriques de performance et décomposition temporelle en temps réel",
+        "target": "Objectif : 1000+ articles/sec avec les fonctions RPC de base de données"
+      },
+      "footer": "🚀 Optimisé pour une vitesse maximale tout en maintenant l'intégrité des données"
+    }
+  },
+  "store": {
+    "creation": {
+      "success": {
+        "title": "Magasin créé avec succès !",
+        "description": "Votre magasin \"{storeName}\" a été créé et est prêt à être utilisé.",
+        "whatsNext": {
+          "title": "Et maintenant ?",
+          "steps": {
+            "configure": {
+              "title": "Configurez les paramètres de votre magasin",
+              "description": "Configurez les notifications, intégrations et permissions d'équipe."
+            },
+            "inventory": {
+              "title": "Ajoutez vos premiers produits",
+              "description": "Téléchargez votre inventaire via CSV ou scannez les produits manuellement."
+            },
+            "team": {
+              "title": "Invitez des membres de l'équipe",
+              "description": "Ajoutez des collègues pour vous aider à gérer l'inventaire de votre magasin."
+            }
+          }
+        },
+        "actions": {
+          "goToSettings": "Aller aux paramètres du magasin",
+          "goToDashboard": "Aller au tableau de bord"
+        }
+      }
+    },
+    "urgentAlerts": {
+      "levels": {
+        "urgentOnly": "Articles urgents uniquement",
+        "priority": "Articles prioritaires",
+        "allFlagged": "Tous les articles signalés",
+        "completeReview": "Révision complète"
+      },
+      "errors": {
+        "connectionError": "Erreur de connexion",
+        "unableToLoad": "Impossible de charger les alertes d'inventaire. Veuillez réessayer.",
+        "loadingAlerts": "Chargement des alertes..."
+      },
+      "messages": {
+        "nothingToShow": "Aucun article ne nécessite d'attention pour le moment - tout est en ordre !",
+        "itemNeedsAction": "{count, plural, one {article nécessite} other {articles nécessitent}} une action immédiate",
+        "itemMayNeedAction": "{count, plural, one {article pourrait nécessiter} other {articles pourraient nécessiter}} de l'attention bientôt",
+        "itemsFlagged": "{count, plural, one {article signalé} other {articles signalés}} pour révision",
+        "itemsMonitoring": "{count, plural, one {article signalé} other {articles signalés}} pour surveillance"
+      },
+      "buttons": {
+        "viewInventory": "Voir l'inventaire",
+        "viewItems": "Voir les articles"
+      }
+    },
+    "alertQuickToggle": {
+      "levels": {
+        "urgent": "Urgent",
+        "default": "Défaut",
+        "early": "Précoce"
+      },
+      "tooltips": {
+        "urgentTitle": "Seuls les éléments urgents nécessitant une action immédiate",
+        "urgentSubtitle": "Moins d'alertes - plus restrictif",
+        "defaultTitle": "Éléments nécessitant une attention prochainement",
+        "defaultSubtitle": "Vue équilibrée - recommandé",
+        "earlyTitle": "Tous les éléments signalés et alertes précoces",
+        "earlySubtitle": "Plus d'alertes - prévention maximale"
+      }
+    },
+    "actionableBatches": {
+      "title": "Recommandations basées sur le score",
+      "loading": "Chargement des lots exploitables...",
+      "error": "Impossible de charger les recommandations de score. Veuillez réessayer.",
+      "noActions": "Aucune action immédiate requise ! Tous les lots sont dans les seuils de sécurité.",
+      "urgencyLevels": {
+        "critical": "Critique",
+        "high": "Élevé Prioritaire",
+        "medium": "Moyen Prioritaire",
+        "low": "Faible Prioritaire"
+      },
+      "summaryLabels": {
+        "critical": "Critique",
+        "high": "Élevé Prioritaire",
+        "medium": "Moyen Prioritaire",
+        "low": "Faible Prioritaire"
+      },
+      "batchDetails": {
+        "qty": "Qté",
+        "daysToExpiry": "jours avant expiration",
+        "lossRisk": "Risque de perte",
+        "score": "Score"
+      },
+      "buttons": {
+        "executeDonation": "Exécuter la donation",
+        "donateInstead": "Donner plutôt",
+        "cancel": "Annuler",
+        "confirmDonation": "Confirmer la donation"
+      },
+      "scoringRecommendation": {
+        "label": "Recommandation de score",
+        "urgency": "Urgence",
+        "score": "Score"
+      },
+      "donationDialog": {
+        "title": "Donner le lot",
+        "description": "Sélectionnez un destinataire pour {productName}",
+        "quantity": "Quantité",
+        "expires": "Expire",
+        "selectRecipient": "Sélectionner le destinataire de la donation",
+        "chooseRecipient": "Choisir un destinataire...",
+        "certified": "Certifié",
+        "notCertified": "Non certifié",
+        "notesLabel": "Notes (optionnel)",
+        "notesPlaceholder": "Ajoutez des notes sur cette donation..."
+      }
+    }
+  }
+}

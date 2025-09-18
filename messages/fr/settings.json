@@ -1,0 +1,300 @@
+{
+  "settings": {
+    "title": "Paramètres",
+    "description": "Gérez vos préférences et paramètres de compte",
+    "language": {
+      "currentLanguage": "Langue actuelle",
+      "title": "Langue",
+      "description": "Choisissez votre langue préférée pour l'interface",
+      "preferred": "Langue préférée"
+    },
+    "tabs": {
+      "store": "Magasin",
+      "notifications": "Notifications",
+      "account": "Compte",
+      "team": "Équipe",
+      "billing": "Facturation",
+      "security": "Sécurité",
+      "storeDescription": "Gérez les paramètres de votre magasin.",
+      "notificationsDescription": "Gérez vos paramètres de notification."
+    },
+    "errors": {
+      "loadingFailed": "Échec du chargement des paramètres. Veuillez rafraîchir la page."
+    },
+    "notifications": {
+      "comingSoonTitle": "Bientôt disponible : Notifications",
+      "comingSoonDescription": "Nous travaillons sur l'ajout de notifications à votre tableau de bord.",
+      "checkBackSoon": "Veuillez revenir bientôt."
+    },
+    "billing": {
+      "comingSoonTitle": "Bientôt disponible : Facturation",
+      "comingSoonDescription": "Les fonctionnalités de facturation et de gestion des abonnements arrivent bientôt.",
+      "checkBackSoon": "Veuillez revenir bientôt."
+    },
+    "security": {
+      "comingSoonTitle": "Bientôt disponible : Sécurité",
+      "comingSoonDescription": "Paramètres de sécurité avancés et gestion des clés API à venir.",
+      "checkBackSoon": "Veuillez revenir bientôt."
+    },
+    "storeInformation": {
+      "title": "Informations du magasin",
+      "description": "Gérez les informations de base et les paramètres de votre magasin",
+      "editStore": "Modifier le magasin",
+      "permissionError": "Vous n'avez pas la permission de voir les paramètres du magasin.",
+      "sections": {
+        "storeDetails": "Détails du magasin",
+        "addressInformation": "Informations d'adresse",
+        "contactInformation": "Informations de contact",
+        "storeDescription": "Description du magasin",
+        "businessSettings": "Paramètres commerciaux"
+      },
+      "fields": {
+        "storeName": "Nom du magasin",
+        "businessName": "Nom de l'entreprise",
+        "storeCode": "Code du magasin",
+        "storeType": "Type de magasin",
+        "sizeCategory": "Catégorie de taille",
+        "address": "Adresse",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays",
+        "phone": "Numéro de téléphone",
+        "email": "Adresse e-mail",
+        "website": "URL du site web",
+        "description": "Description",
+        "defaultMarkup": "Marge par défaut (%)",
+        "wasteReductionTarget": "Objectif de réduction des déchets (%)"
+      },
+      "placeholders": {
+        "storeName": "Entrez le nom du magasin",
+        "businessName": "Entrez le nom de l'entreprise",
+        "storeCode": "Entrez le code du magasin",
+        "address": "Entrez l'adresse",
+        "city": "Entrez la ville",
+        "postalCode": "Entrez le code postal",
+        "phone": "Entrez le numéro de téléphone",
+        "email": "Entrez l'adresse e-mail",
+        "website": "https://exemple.com",
+        "description": "Décrivez votre magasin..."
+      },
+      "selectPlaceholders": {
+        "storeType": "Sélectionnez le type de magasin",
+        "sizeCategory": "Sélectionnez la catégorie de taille",
+        "country": "Sélectionnez le pays"
+      },
+      "storeTypes": {
+        "supermarket": "Supermarché",
+        "convenience": "Magasin de proximité",
+        "restaurant": "Restaurant",
+        "bakery": "Boulangerie",
+        "butcher": "Boucherie",
+        "organic": "Magasin bio"
+      },
+      "sizeCategories": {
+        "small": "Petit (< 500 m²)",
+        "medium": "Moyen (500-1500 m²)",
+        "large": "Grand (1500-5000 m²)",
+        "hypermarket": "Hypermarché (> 5000 m²)"
+      },
+      "countries": {
+        "France": "France",
+        "Netherlands": "Pays-Bas",
+        "Belgium": "Belgique",
+        "Germany": "Allemagne",
+        "Spain": "Espagne",
+        "Italy": "Italie"
+      },
+      "actions": {
+        "saveChanges": "Enregistrer les modifications",
+        "saving": "Enregistrement...",
+        "cancel": "Annuler",
+        "unsavedChanges": "Vous avez des modifications non enregistrées"
+      },
+      "messages": {
+        "notSet": "Non défini",
+        "noDescription": "Aucune description fournie"
+      },
+      "validation": {
+        "storeNameRequired": "Le nom du magasin est requis",
+        "storeNameTooLong": "Le nom du magasin est trop long",
+        "businessNameTooLong": "Le nom de l'entreprise est trop long",
+        "storeCodeRequired": "Le code du magasin est requis",
+        "storeCodeTooLong": "Le code du magasin est trop long",
+        "addressTooLong": "L'adresse est trop longue",
+        "cityTooLong": "Le nom de la ville est trop long",
+        "postalCodeTooLong": "Le code postal est trop long",
+        "countryTooLong": "Le nom du pays est trop long",
+        "phoneTooLong": "Le numéro de téléphone est trop long",
+        "invalidEmail": "Format d'e-mail invalide",
+        "invalidWebsite": "URL de site web invalide",
+        "descriptionTooLong": "La description est trop longue"
+      },
+      "addStore": "Ajouter un magasin"
+    },
+    "addStoreSearch": {
+      "title": "Ajouter votre magasin",
+      "subtitle": "Recherchez votre entreprise ou ajoutez-la manuellement",
+      "placeholder": "Saisissez le nom ou l'adresse de votre magasin...",
+      "searchingText": "Recherche de magasins...",
+      "noResultsFound": "Aucun magasin trouvé correspondant à \"{query}\"",
+      "tryDifferentTerm": "Essayez un terme différent ou ajoutez votre magasin manuellement",
+      "addManuallyButton": "Ajouter les détails du magasin manuellement",
+      "helpText": "Vous ne trouvez pas votre magasin ? Vous pouvez ajouter tous les détails manuellement à l'étape suivante.",
+      "searchError": "Une erreur s'est produite lors de la recherche. Veuillez réessayer."
+    }
+  },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Ajouter détails du magasin",
+        "complete": "Compléter les informations du magasin"
+      },
+      "subtitle": {
+        "manual": "Entrez vos informations de magasin",
+        "complete": "Sélectionnez votre type de magasin et vérifiez les détails"
+      },
+      "labels": {
+        "storeName": "Nom du magasin",
+        "businessName": "Nom de l'entreprise (Optionnel)",
+        "address": "Adresse",
+        "city": "Ville",
+        "postalCode": "Code postal",
+        "country": "Pays",
+        "phone": "Numéro de téléphone (Optionnel)",
+        "storeType": "Type de magasin"
+      },
+      "placeholders": {
+        "storeName": "Nom de votre magasin",
+        "businessName": "Si différent du nom du magasin",
+        "address": "123 Rue de la Paix",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "phone": "01 23 45 67 89",
+        "selectStoreType": "Sélectionner le type de magasin"
+      },
+      "buttons": {
+        "back": "Retour",
+        "creating": "Création du magasin...",
+        "create": "Créer le magasin"
+      }
+    }
+  },
+  "onboarding": {
+    "stepLabels": {
+      "storeLookup": "Recherche de magasin",
+      "addStoreDetails": "Ajouter détails du magasin",
+      "reviewVerify": "Réviser et vérifier",
+      "createAccount": "Créer un compte"
+    },
+    "storeSearch": {
+      "title": "Trouver votre magasin",
+      "subtitle": "Recherchez votre entreprise ou ajoutez-la manuellement",
+      "placeholder": "Saisissez le nom ou l'adresse de votre magasin...",
+      "searchingText": "Recherche de magasins...",
+      "noResultsFound": "Aucun magasin trouvé correspondant à \"{query}\"",
+      "tryDifferentTerm": "Essayez un terme différent ou ajoutez votre magasin manuellement",
+      "addManuallyButton": "Ajouter les détails du magasin manuellement",
+      "helpText": "Vous ne trouvez pas votre magasin ? Vous pouvez ajouter tous les détails manuellement à l'étape suivante.",
+      "searchError": "Une erreur s'est produite lors de la recherche. Veuillez réessayer."
+    },
+    "storeType": {
+      "addStoreDetailsTitle": "Ajouter détails du magasin",
+      "completeStoreInformationTitle": "Compléter les informations du magasin",
+      "storeInformationCardTitle": "Informations du magasin",
+      "storeNameLabel": "Nom du magasin",
+      "storeTypeLabel": "Type de magasin",
+      "businessNameLabel": "Nom de l'entreprise",
+      "addressLabel": "Adresse",
+      "cityLabel": "Ville",
+      "postalCodeLabel": "Code postal",
+      "countryLabel": "Pays",
+      "phoneLabel": "Numéro de téléphone",
+      "continueButton": "Continuer",
+      "storeNamePlaceholder": "Nom de votre magasin",
+      "selectStoreType": "Sélectionner le type de magasin",
+      "businessNamePlaceholder": "Si différent du nom du magasin",
+      "addressPlaceholder": "123 Rue de la Paix",
+      "cityPlaceholder": "Paris",
+      "postalCodePlaceholder": "75001",
+      "countryPlaceholder": "France",
+      "phonePlaceholder": "01 23 45 67 89"
+    }
+  },
+  "account": {
+    "title": "Informations du compte",
+    "description": "Gérez les paramètres et préférences de votre compte.",
+    "profile": {
+      "title": "Informations de profil",
+      "fullName": "Nom complet",
+      "username": "Nom d'utilisateur",
+      "email": "Adresse e-mail",
+      "fullNamePlaceholder": "Entrez votre nom complet",
+      "emailPlaceholder": "Entrez votre adresse e-mail",
+      "noName": "Aucun nom",
+      "noUsername": "Aucun nom d'utilisateur",
+      "noEmail": "Aucun e-mail",
+      "emailNotice": "L'e-mail ne peut pas être modifié. Contactez le support si nécessaire.",
+      "edit": "Modifier",
+      "save": "Sauvegarder les modifications",
+      "cancel": "Annuler",
+      "saving": "Sauvegarde...",
+      "saveChanges": "Enregistrer les modifications",
+      "validation": {
+        "nameRequired": "Le nom complet est requis",
+        "nameTooLong": "Le nom complet doit contenir moins de 100 caractères",
+        "usernameRequired": "Le nom d'utilisateur doit contenir au moins 2 caractères",
+        "usernameTooLong": "Le nom d'utilisateur doit contenir moins de 50 caractères",
+        "usernameInvalid": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas"
+      },
+      "placeholders": {
+        "fullName": "Entrez votre nom complet",
+        "email": "Entrez votre adresse e-mail",
+        "username": "Entrez votre nom d'utilisateur"
+      }
+    },
+    "phone": {
+      "title": "Numéro de téléphone",
+      "label": "Numéro de téléphone",
+      "placeholder": "+33 1 23 45 67 89",
+      "description": "Entrez votre numéro de téléphone avec l'indicatif pays (optionnel)",
+      "noPhone": "Aucun numéro de téléphone défini",
+      "addNotice": "Ajoutez un numéro de téléphone pour la sécurité du compte et les notifications",
+      "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
+      "verified": "Vérifié",
+      "edit": "Modifier",
+      "save": "Sauvegarder le téléphone",
+      "cancel": "Annuler",
+      "saving": "Sauvegarde..."
+    },
+    "language": {
+      "currentLanguage": "Langue actuelle",
+      "title": "Préférence de langue",
+      "description": "Choisissez votre langue préférée pour l'interface"
+    },
+    "status": {
+      "title": "Statut du compte",
+      "accountStatus": "Statut:",
+      "emailVerified": "E-mail vérifié:",
+      "phoneVerified": "Téléphone vérifié:",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "verified": "Vérifié",
+      "unverified": "Non vérifié"
+    },
+    "errors": {
+      "updateProfile": "Échec de la mise à jour du profil",
+      "updatePhone": "Échec de la mise à jour du numéro de téléphone"
+    },
+    "activity": {
+      "title": "Activité du compte",
+      "memberSince": "Membre depuis {date}",
+      "lastLogin": "Dernière connexion: {date}",
+      "neverLoggedIn": "Jamais connecté",
+      "failedAttempts": "{count} tentative{plural} PIN échouée{plural}"
+    },
+    "security": {
+      "notice": "Ce compte est personnel. Vous pouvez changer votre mot de passe dans la page de connexion."
+    }
+  }
+}
