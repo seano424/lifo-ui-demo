@@ -13,6 +13,7 @@ import {
   usePendingActions,
   useRecentlyExpired,
   useTodosSummary,
+  useDashboardSummary,
 } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
@@ -38,9 +39,9 @@ export type TodoItem = {
 export type TodoFilters = {
   storeId?: string
   tab?:
-    | 'todays_tasks'
-    | 'recently_expired'
-    | 'upcoming_tasks'
+  | 'needs_attention'
+  | 'all_active_todos'
+  | 'recently_expired'
   urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
   sort?: {
     field:
@@ -70,7 +71,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
 
-  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'todays_tasks')
+  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'needs_attention')
 
   const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
@@ -78,7 +79,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const [filters, setFilters] = useState<TodoFilters>(() => {
     const baseFilters: TodoFilters = {
       storeId: activeStoreId || undefined,
-      tab: (initialFilters?.tab as TodoFilters['tab']) || 'todays_tasks',
+      tab: (initialFilters?.tab as TodoFilters['tab']) || 'needs_attention',
     }
 
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
@@ -99,7 +100,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       }
     } else {
       baseFilters.sort =
-        baseFilters.tab === 'todays_tasks'
+        baseFilters.tab === 'needs_attention'
           ? { field: 'urgency', direction: 'desc' }
           : { field: 'expiry_date', direction: 'asc' }
     }
@@ -111,48 +112,24 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
-  // Get counts using the new todos summary hook
+  // Get counts using dashboard summary for consistency
   const validStoreId = activeStoreId || ''
   const hasValidStore = !!activeStoreId && activeStoreId !== ''
-  const { data: todosSummary } = useTodosSummary(validStoreId)
+  const { data: dashboardSummary } = useDashboardSummary(validStoreId)
 
-  console.log('TodosSummary', todosSummary)
-
-  // Get actual data for each tab to show correct counts
-  const pendingActionsQuery = usePendingActions(validStoreId, {
-    limit: 1,
-    enabled: hasValidStore,
-  })
-  const recentlyExpiredQuery = useRecentlyExpired(validStoreId, {
-    limit: 1,
-    enabled: hasValidStore,
-  })
-  const allActiveQuery = useAllActiveWithStates(validStoreId, {
-    limit: 1,
-    enabled: hasValidStore,
-  })
-
-  // Calculate actual counts from the first page
-  const actualCounts = {
-    pending_actions: pendingActionsQuery.data?.pages?.[0]?.[0]?.total_count || 0,
-    recently_expired: recentlyExpiredQuery.data?.pages?.[0]?.[0]?.total_count || 0,
-    all_active: allActiveQuery.data?.pages?.[0]?.[0]?.total_count || 0,
+  // Calculate tab counts from dashboard summary
+  const tabCounts = {
+    needs_attention: dashboardSummary ? dashboardSummary.critical_count + dashboardSummary.high_count : 0,
+    all_active_todos: dashboardSummary?.total_active_batches || 0,
+    recently_expired: dashboardSummary?.expired_items_count || 0,
   }
-
-  // Debug the summary vs actual data discrepancy
-  console.log('TodosSummary Debug:', {
-    todosSummary,
-    actualCounts,
-    recently_expired_summary: todosSummary?.recently_expired_count,
-    recently_expired_actual: actualCounts.recently_expired,
-  })
 
   useEffect(() => {
     const updateIndicator = () => {
       const tabs = [
-        'todays_tasks',
+        'needs_attention',
+        'all_active_todos',
         'recently_expired',
-        'upcoming_tasks',
       ]
       const activeIndex = tabs.indexOf(activeTab)
       const activeButton = buttonRefs.current[activeIndex]
@@ -174,7 +151,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
     const params = new URLSearchParams(searchParams.toString())
 
-    if (updatedFilters.tab && updatedFilters.tab !== 'todays_tasks') {
+    if (updatedFilters.tab && updatedFilters.tab !== 'needs_attention') {
       params.set('tab', updatedFilters.tab)
     } else {
       params.delete('tab')
@@ -220,9 +197,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       <div className="relative">
         <div className="overflow-x-auto flex w-full">
           {[
-            { label: "Today's Tasks", value: 'todays_tasks' },
+            { label: "Needs Attention", value: 'needs_attention' },
+            { label: 'All Active Todos', value: 'all_active_todos' },
             { label: 'Recently Expired', value: 'recently_expired' },
-            { label: 'Upcoming Tasks', value: 'upcoming_tasks' },
           ].map((tab, index) => (
             <Button
               key={tab.value}
@@ -249,9 +226,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
                 className="cursor-pointer group-hover/tab:text-primary"
                 variant={activeTab === tab.value ? 'primary' : 'gray'}
               >
-                {tab.value === 'todays_tasks' && actualCounts.pending_actions}
-                {tab.value === 'recently_expired' && actualCounts.recently_expired}
-                {tab.value === 'upcoming_tasks' && actualCounts.all_active}
+                {tabCounts[tab.value as keyof typeof tabCounts]}
               </Badge>
             </Button>
           ))}
@@ -266,7 +241,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         />
       </div>
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsContent value="todays_tasks">
+        <TabsContent value="needs_attention">
           <PendingActionsTab
             filters={filters}
             pageSize={pageSize}
@@ -274,12 +249,12 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           />
         </TabsContent>
 
-        <TabsContent value="recently_expired">
-          <RecentlyExpiredTab filters={filters} pageSize={pageSize} />
+        <TabsContent value="all_active_todos">
+          <AllActiveTab filters={filters} onFiltersChange={handleFiltersChange} />
         </TabsContent>
 
-        <TabsContent value="upcoming_tasks">
-          <AllActiveTab filters={filters} onFiltersChange={handleFiltersChange} />
+        <TabsContent value="recently_expired">
+          <RecentlyExpiredTab filters={filters} pageSize={pageSize} />
         </TabsContent>
       </Tabs>
     </>
