@@ -9,10 +9,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
-  useAllActiveWithStates,
-  usePendingActions,
-  useRecentlyExpired,
-  useTodosSummary,
   useDashboardSummary,
 } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -112,10 +108,10 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
-  // Get counts using dashboard summary for consistency
   const validStoreId = activeStoreId || ''
-  const hasValidStore = !!activeStoreId && activeStoreId !== ''
   const { data: dashboardSummary } = useDashboardSummary(validStoreId)
+
+  console.log('🚀 Dashboard Summary:', dashboardSummary)
 
   // Calculate tab counts from dashboard summary
   const tabCounts = {

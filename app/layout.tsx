@@ -59,8 +59,8 @@ export default async function RootLayout({
       <body className={`font-sans antialiased ${devMode && 'debug-screens'}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light" // Changed from "system" to "light" to avoid transitions - To change when we have a good dark mode that works well with the new design
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem={true}
           disableTransitionOnChange
         >
           <ReactQueryProvider>

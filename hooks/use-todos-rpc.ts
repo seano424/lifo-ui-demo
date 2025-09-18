@@ -1,4 +1,5 @@
 // hooks/use-todos-rpc.ts
+import { useMemo } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 
@@ -113,6 +114,27 @@ interface NeedsReeval {
   last_action_type: string
   last_action_time: string
   ai_calculated_at: string
+  total_count: number
+}
+
+interface ActionableBatch {
+  batch_id: string
+  batch_number: string
+  product_name: string
+  product_brand: string
+  sku: string
+  expiry_date: string
+  current_quantity: number
+  location_code: string
+  unit_price: number
+  urgency_level: 'critical' | 'high' | 'medium' | 'low'
+  days_to_expiry: number
+  ai_recommendation: string
+  ai_reasoning: string
+  composite_score: number
+  potential_loss: number
+  discount_percent: number
+  todo_state: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok'
   total_count: number
 }
 
@@ -369,6 +391,98 @@ export function useFlattenedTodosData<T>(query: { data?: { pages?: T[][] } }): T
   return query?.data?.pages?.flatMap((page: T[]) => page) ?? []
 }
 
+export function useActionableBatches(
+  storeId: string,
+  {
+    limit = 50,
+    enabled = true,
+    urgencyFilter,
+    stateFilter
+  }: {
+    limit?: number
+    enabled?: boolean
+    urgencyFilter?: 'critical' | 'high' | 'medium' | 'low' | 'all'
+    stateFilter?: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok' | 'all'
+  } = {}
+) {
+  const supabase = createClient()
+
+  return useInfiniteQuery({
+    queryKey: ['actionable-batches', storeId, limit, urgencyFilter, stateFilter],
+    queryFn: async ({ pageParam = 0 }): Promise<ActionableBatch[]> => {
+      const { data, error } = await supabase.rpc('get_actionable_batches', {
+        p_store_id: storeId,
+        p_limit: limit,
+        p_offset: pageParam * limit,
+      })
+
+      if (error) throw error
+
+      let filteredData = data || []
+
+      // Apply client-side filters if needed
+      if (urgencyFilter && urgencyFilter !== 'all') {
+        filteredData = filteredData.filter(batch => batch.urgency_level === urgencyFilter)
+      }
+
+      if (stateFilter && stateFilter !== 'all') {
+        filteredData = filteredData.filter(batch => batch.todo_state === stateFilter)
+      }
+
+      return filteredData
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length === 0 || lastPage.length < limit) return undefined
+      return allPages.length
+    },
+    initialPageParam: 0,
+    enabled: enabled && !!storeId && storeId !== '',
+    refetchInterval: 60000, // Refresh every minute
+  })
+}
+
+// Helper hook to get filtered data for specific tabs
+export function useTabActionableBatches(storeId: string, tab: string, filters?: any) {
+  const baseQuery = useActionableBatches(storeId, {
+    enabled: !!storeId,
+    urgencyFilter: filters?.urgency,
+  })
+
+  return useMemo(() => {
+    const allData = baseQuery.data?.pages.flatMap(page => page) || []
+
+    let filteredData = allData
+
+    switch (tab) {
+      case 'suggestions':
+        // Items needing immediate attention
+        filteredData = allData.filter((batch: ActionableBatch) =>
+          batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention'
+        )
+        break
+      case 'recently_expired':
+        // Recently expired items
+        filteredData = allData.filter((batch: ActionableBatch) => batch.todo_state === 'expired')
+        break
+      case 'all_active':
+        // All non-expired items
+        filteredData = allData.filter((batch: ActionableBatch) => batch.todo_state !== 'expired')
+        break
+      default:
+        filteredData = allData
+    }
+
+    return {
+      data: filteredData,
+      isLoading: baseQuery.isLoading,
+      hasNextPage: baseQuery.hasNextPage,
+      fetchNextPage: baseQuery.fetchNextPage,
+      isFetchingNextPage: baseQuery.isFetchingNextPage,
+      error: baseQuery.error
+    }
+  }, [baseQuery, tab])
+}
+
 // Export types for use in components
 export type {
   TodosSummary,
@@ -379,5 +493,6 @@ export type {
   ActionHistory,
   AllActive,
   NeedsReeval,
+  ActionableBatch,
   DashboardSummary,
 }
