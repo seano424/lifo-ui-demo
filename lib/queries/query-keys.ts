@@ -11,17 +11,23 @@ export const queryKeys = {
     detail: (storeId: string) => [...queryKeys.stores.all, 'detail', storeId] as const,
   },
 
-  // Todos and RPC queries
+  // Enhanced Todos and RPC queries with section-specific support
   todos: {
     all: ['todos'] as const,
 
-    // Summary queries
+    // Summary queries (existing)
     summary: (storeId: string) => [...queryKeys.todos.all, 'summary', storeId] as const,
     dashboardSummary: (storeId: string) =>
       [...queryKeys.todos.all, 'dashboardSummary', storeId] as const,
 
-    // Infinite query lists
+    // Enhanced infinite query lists with section support
     lists: () => [...queryKeys.todos.all, 'list'] as const,
+
+    // Section-specific infinite queries (NEW)
+    bySection: (storeId: string, section: string, limit: number) =>
+      [...queryKeys.todos.lists(), 'bySection', storeId, section, limit] as const,
+
+    // Legacy section queries (can be kept for compatibility)
     pending: (storeId: string, limit: number) =>
       [...queryKeys.todos.lists(), 'pending', storeId, limit] as const,
     discounted: (storeId: string, limit: number) =>
@@ -43,7 +49,7 @@ export const queryKeys = {
     reeval: (storeId: string, limit: number) =>
       [...queryKeys.todos.lists(), 'reeval', storeId, limit] as const,
 
-    // Actionable batches with filtering
+    // Actionable batches with filtering (existing)
     actionableBatches: (
       storeId: string,
       limit: number,
@@ -289,6 +295,37 @@ export const queryKeys = {
     },
   },
 } as const
+
+// Type-safe helper functions for section-specific keys
+export const todosSectionKeys = {
+  bySection: (storeId: string, section: string, limit: number) =>
+    queryKeys.todos.bySection(storeId, section, limit),
+
+  // Specific section keys for better type safety
+  immediateAction: (storeId: string, limit: number = 10) =>
+    queryKeys.todos.bySection(storeId, 'immediate_action', limit),
+
+  recentlyExpired: (storeId: string, limit: number = 20) =>
+    queryKeys.todos.bySection(storeId, 'recently_expired', limit),
+
+  inProgress: (storeId: string, limit: number = 30) =>
+    queryKeys.todos.bySection(storeId, 'in_progress', limit),
+
+  discounted: (storeId: string, limit: number = 20) =>
+    queryKeys.todos.bySection(storeId, 'discounted', limit),
+
+  readyForDonation: (storeId: string, limit: number = 15) =>
+    queryKeys.todos.bySection(storeId, 'ready_for_donation', limit),
+
+  completedToday: (storeId: string, limit: number = 10) =>
+    queryKeys.todos.bySection(storeId, 'completed_today', limit),
+
+  actionHistory: (storeId: string, limit: number = 50) =>
+    queryKeys.todos.bySection(storeId, 'action_history', limit),
+
+  needsReeval: (storeId: string, limit: number = 20) =>
+    queryKeys.todos.bySection(storeId, 'needs_reeval', limit),
+}
 
 // Type helpers for query key validation
 export type QueryKey = typeof queryKeys

@@ -1,11 +1,11 @@
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
-import { redirect } from 'next/navigation'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
-import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
+import TodoSections from '@/components/todos/todo-sections'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { redirect } from 'next/navigation'
 
 interface TodosPageProps {
   searchParams: Promise<{
@@ -61,14 +61,16 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
           description="Manage actionable inventory items and track your progress"
         />
 
-        <TodosFilteredList
+        {/* <TodosFilteredList
           initialFilters={{
             tab: params.tab,
             urgency: params.urgency,
             sort: params.sort,
             direction: params.direction,
           }}
-        />
+        /> */}
+
+        <TodoSections />
       </div>
     </HydrationBoundary>
   )
