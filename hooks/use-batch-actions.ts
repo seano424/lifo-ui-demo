@@ -58,6 +58,12 @@ interface DonatePreparedActionParams {
   p_notes?: string | null
 }
 
+interface IgnoreActionParams {
+  p_batch_id: string
+  p_user_id: string
+  p_notes?: string | null
+}
+
 interface BulkActionParams {
   p_batch_ids: string[]
   p_action_type:
@@ -67,6 +73,7 @@ interface BulkActionParams {
     | 'dispose'
     | 'dismiss'
     | 'donate_prepared'
+    | 'ignore'
   p_action_params: Record<string, unknown>
   p_user_id: string
 }
@@ -134,6 +141,11 @@ interface DonatePreparedParams {
   notes?: string
 }
 
+interface IgnoreParams {
+  batchId: string
+  notes?: string
+}
+
 interface BulkParams {
   batchIds: string[]
   actionType:
@@ -143,6 +155,7 @@ interface BulkParams {
     | 'dispose'
     | 'dismiss'
     | 'donate_prepared'
+    | 'ignore'
   actionParams: Record<string, unknown>
 }
 
@@ -190,7 +203,8 @@ export function useBatchActions() {
       | 'sold'
       | 'dispose'
       | 'dismiss'
-      | 'donate_prepared',
+      | 'donate_prepared'
+      | 'ignore',
     storeId?: string
   ) => {
     // Get store ID from batch if not provided
@@ -675,7 +689,66 @@ export function useBatchActions() {
     },
   })
 
-  // 7. BULK ACTION
+  // 7. IGNORE ACTION
+  const executeIgnore = useMutation({
+    mutationFn: async (params: IgnoreParams): Promise<ActionResult> => {
+      const userId = await getCurrentUserId()
+
+      const { data, error } = await supabase.rpc('execute_ignore_action', {
+        p_batch_id: params.batchId,
+        p_user_id: userId,
+        p_notes: params.notes || null,
+      } as IgnoreActionParams)
+
+      if (error) throw error
+      return data as ActionResult
+    },
+    onMutate: async (variables) => {
+      const storeId = await getStoreIdFromBatch(variables.batchId)
+
+      // Optimistically remove from alerts since ignored items shouldn't show up
+      queryClient.setQueryData(
+        queryKeys.alerts.store(storeId),
+        (oldData: AlertsResponse | undefined) => {
+          if (oldData?.alerts) {
+            return {
+              ...oldData,
+              alerts: oldData.alerts.filter(
+                (alert: ScoringAlert) => alert.batch_id !== variables.batchId
+              ),
+            }
+          }
+          return oldData
+        }
+      )
+
+      return { storeId }
+    },
+    onSuccess: async (result, variables, context) => {
+      if (result.success) {
+        toast.success('Item ignored successfully', {
+          description: 'This item will no longer appear in active recommendations',
+        })
+        await invalidateRelatedQueries(
+          variables.batchId,
+          'ignore',
+          context?.storeId
+        )
+      } else {
+        toast.error(result.error || 'Ignore action failed')
+      }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.storeId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.alerts.store(context.storeId),
+        })
+      }
+      toast.error('Failed to ignore item')
+    },
+  })
+
+  // 8. BULK ACTION
   const executeBulk = useMutation({
     mutationFn: async (params: BulkParams): Promise<BulkActionResult> => {
       const userId = await getCurrentUserId()
@@ -800,6 +873,9 @@ export function useBatchActions() {
       preparationDetails,
     })
 
+  const markAsIgnored = (batchId: string, notes?: string) =>
+    executeIgnore.mutate({ batchId, notes })
+
   return {
     // Direct mutation functions with full parameters
     executeDonate: executeDonate.mutateAsync,
@@ -808,6 +884,7 @@ export function useBatchActions() {
     executeDispose: executeDispose.mutateAsync,
     executeDismiss: executeDismiss.mutateAsync,
     executeDonatePrepared: executeDonatePrepared.mutateAsync,
+    executeIgnore: executeIgnore.mutateAsync,
     executeBulk: executeBulk.mutateAsync,
 
     // Convenience methods (simplified interface)
@@ -816,6 +893,7 @@ export function useBatchActions() {
     markAsDisposed,
     markAsSold,
     markAsDonatePrepared,
+    markAsIgnored,
 
     // Loading states
     isDonating: executeDonate.isPending,
@@ -824,6 +902,7 @@ export function useBatchActions() {
     isDisposing: executeDispose.isPending,
     isDismissing: executeDismiss.isPending,
     isPreparingDonation: executeDonatePrepared.isPending,
+    isIgnoring: executeIgnore.isPending,
     isBulkProcessing: executeBulk.isPending,
 
     // Global loading state
@@ -834,6 +913,7 @@ export function useBatchActions() {
       executeDispose.isPending ||
       executeDismiss.isPending ||
       executeDonatePrepared.isPending ||
+      executeIgnore.isPending ||
       executeBulk.isPending,
 
     // Raw mutation objects for advanced usage
@@ -843,6 +923,7 @@ export function useBatchActions() {
     disposeMutation: executeDispose,
     dismissMutation: executeDismiss,
     donatePreparedMutation: executeDonatePrepared,
+    ignoreMutation: executeIgnore,
     bulkMutation: executeBulk,
   }
 }
@@ -857,5 +938,6 @@ export type {
   DisposeParams,
   DonateParams,
   DonatePreparedParams,
+  IgnoreParams,
   SoldParams,
 }

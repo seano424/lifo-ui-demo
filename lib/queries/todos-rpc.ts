@@ -236,7 +236,7 @@ export function getAllSections(): {
  * Helper to determine which sections should be invalidated after a batch action
  */
 export function getSectionsToInvalidateAfterAction(
-  actionType: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared'
+  actionType: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared' | 'ignore' | 'dismiss'
 ): TodoSection[] {
   const baseInvalidations: TodoSection[] = [
     'immediate_action',
@@ -253,6 +253,14 @@ export function getSectionsToInvalidateAfterAction(
 
     case 'donate_prepared':
       return [...baseInvalidations, 'ready_for_donation']
+
+    case 'ignore':
+      // Ignored items should disappear from most active sections
+      return [...baseInvalidations, 'recently_expired', 'needs_reeval']
+
+    case 'dismiss':
+      // Dismissed recommendations should disappear from most sections
+      return [...baseInvalidations, 'recently_expired', 'needs_reeval']
 
     case 'donate':
     case 'dispose':
