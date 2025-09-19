@@ -31,7 +31,7 @@ export function MarketingFooter() {
               </div>
               <Typography
                 variant="h4"
-                className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
+                className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"
               >
                 LIFO.AI
               </Typography>
@@ -48,7 +48,7 @@ export function MarketingFooter() {
             </Typography>
             <div className="grid grid-cols-1 gap-2">
               <Link
-                href="/features"
+                href="/"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Homepage

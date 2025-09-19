@@ -130,19 +130,25 @@ function PricingCard({
       </div>
 
       {/* CTA Button */}
-      <Button
-        className={`w-full group-hover:scale-105 transition-transform duration-300 ${
-          isComingSoon
-            ? 'opacity-50 cursor-not-allowed'
-            : isPopular
-              ? 'hover:from-primary-700 hover:to-secondary-700'
-              : ''
-        }`}
-        disabled={isComingSoon}
-      >
-        {isComingSoon ? t('common.comingSoon') : t('common.getStarted')}
-        {!isComingSoon && <ArrowRight size={16} className="ml-2" />}
-      </Button>
+      {isComingSoon ? (
+        <Button
+          className="w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed transition-transform duration-300 hover:from-gray-400 hover:to-gray-500"
+          disabled={true}
+        >
+          {t('common.comingSoon')}
+        </Button>
+      ) : (
+        <Button
+          className={`w-full group-hover:scale-105 transition-transform duration-300 ${
+            isPopular ? 'hover:from-primary-700 hover:to-secondary-700' : ''
+          }`}
+          asLink={true}
+          href="/onboarding/create-account"
+        >
+          {t('common.getStarted')}
+          <ArrowRight size={16} className="ml-2" />
+        </Button>
+      )}
     </div>
   )
 }
@@ -170,7 +176,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 mt-20">
           {/* Free Trial */}
           <PricingCard
             title={t('plans.freeTrial.title')}
@@ -185,6 +191,7 @@ export default function PricingPage() {
               t('plans.freeTrial.features.3'),
             ]}
             fees={[]}
+            isPopular={true}
             sellingPoint={t('plans.freeTrial.sellingPoint')}
             icon={<Sparkles size={24} />}
           />
@@ -212,6 +219,7 @@ export default function PricingPage() {
                 percentage: t('plans.light.fees.1.percentage'),
               },
             ]}
+            isComingSoon={true}
             sellingPoint={t('plans.light.sellingPoint')}
             icon={<Users size={24} />}
           />
@@ -241,7 +249,7 @@ export default function PricingPage() {
               },
             ]}
             sellingPoint={t('plans.pro.sellingPoint')}
-            isPopular={true}
+            isComingSoon={true}
             icon={<Building2 size={24} />}
           />
 
