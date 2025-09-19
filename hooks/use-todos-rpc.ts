@@ -27,7 +27,8 @@ import type { Database } from '@/types/supabase'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
-export type BatchAction = Database['inventory']['Tables']['batch_action_entries']['Row']
+export type BatchAction =
+  Database['inventory']['Tables']['batch_actions']['Row']
 export type ActionType = Database['public']['Enums']['action_type']
 
 // Enhanced batch action type with related data for UI display
@@ -105,7 +106,9 @@ export interface AlertsResponse {
 }
 
 // Utility hook to get flattened data from infinite queries
-export function useFlattenedTodosData<T>(query: { data?: { pages?: T[][] } }): T[] {
+export function useFlattenedTodosData<T>(query: {
+  data?: { pages?: T[][] }
+}): T[] {
   return query?.data?.pages?.flatMap((page: T[]) => page) ?? []
 }
 
@@ -136,7 +139,7 @@ export function useDashboardSummary(storeId: string) {
 // Infinite query hooks for paginated data
 export function usePendingActions(
   storeId: string,
-  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {},
+  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.pending(storeId, limit),
@@ -155,7 +158,7 @@ export function usePendingActions(
 
 export function useRecentlyDiscounted(
   storeId: string,
-  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {},
+  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.discounted(storeId, limit),
@@ -178,12 +181,16 @@ export function useDonatedItems(
     limit = 20,
     daysBack = 7,
     enabled = true,
-  }: { limit?: number; daysBack?: number; enabled?: boolean } = {},
+  }: { limit?: number; daysBack?: number; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.donated(storeId, limit, daysBack),
     queryFn: ({ pageParam = 0 }) =>
-      fetchDonatedItems(storeId, { limit, offset: pageParam * limit }, daysBack),
+      fetchDonatedItems(
+        storeId,
+        { limit, offset: pageParam * limit },
+        daysBack
+      ),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length === 0 || lastPage.length < limit) return undefined
       return allPages.length
@@ -197,7 +204,7 @@ export function useDonatedItems(
 
 export function useRecentlyExpired(
   storeId: string,
-  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {},
+  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.expired(storeId, limit),
@@ -220,12 +227,16 @@ export function useActionHistory(
     limit = 20,
     actionType,
     enabled = true,
-  }: { limit?: number; actionType?: string; enabled?: boolean } = {},
+  }: { limit?: number; actionType?: string; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.history(storeId, limit, actionType),
     queryFn: ({ pageParam = 0 }) =>
-      fetchActionHistory(storeId, { limit, offset: pageParam * limit }, actionType),
+      fetchActionHistory(
+        storeId,
+        { limit, offset: pageParam * limit },
+        actionType
+      ),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length === 0 || lastPage.length < limit) return undefined
       return allPages.length
@@ -239,7 +250,7 @@ export function useActionHistory(
 
 export function useAllActiveWithStates(
   storeId: string,
-  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {},
+  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.active(storeId, limit),
@@ -258,7 +269,7 @@ export function useAllActiveWithStates(
 
 export function useItemsNeedingReeval(
   storeId: string,
-  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {},
+  { limit = 20, enabled = true }: { limit?: number; enabled?: boolean } = {}
 ) {
   return useInfiniteQuery({
     queryKey: queryKeys.todos.reeval(storeId, limit),
@@ -286,11 +297,22 @@ export function useActionableBatches(
     limit?: number
     enabled?: boolean
     urgencyFilter?: 'critical' | 'high' | 'medium' | 'low' | 'all'
-    stateFilter?: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok' | 'all'
-  } = {},
+    stateFilter?:
+      | 'expired'
+      | 'urgent_action'
+      | 'needs_attention'
+      | 'monitor'
+      | 'ok'
+      | 'all'
+  } = {}
 ) {
   return useInfiniteQuery({
-    queryKey: queryKeys.todos.actionableBatches(storeId, limit, urgencyFilter, stateFilter),
+    queryKey: queryKeys.todos.actionableBatches(
+      storeId,
+      limit,
+      urgencyFilter,
+      stateFilter
+    ),
     queryFn: async ({ pageParam = 0 }) => {
       const data = await fetchActionableBatches(storeId, {
         limit,
@@ -301,11 +323,15 @@ export function useActionableBatches(
       let filteredData = data
 
       if (urgencyFilter && urgencyFilter !== 'all') {
-        filteredData = filteredData.filter(batch => batch.urgency_level === urgencyFilter)
+        filteredData = filteredData.filter(
+          (batch) => batch.urgency_level === urgencyFilter
+        )
       }
 
       if (stateFilter && stateFilter !== 'all') {
-        filteredData = filteredData.filter(batch => batch.todo_state === stateFilter)
+        filteredData = filteredData.filter(
+          (batch) => batch.todo_state === stateFilter
+        )
       }
 
       return filteredData
@@ -327,11 +353,17 @@ export function useActionableBatches(
 export function useTabActionableBatches(
   storeId: string,
   tab: string,
-  filters?: { urgency?: string },
+  filters?: { urgency?: string }
 ) {
   const baseQuery = useActionableBatches(storeId, {
     enabled: !!storeId,
-    urgencyFilter: filters?.urgency as 'critical' | 'high' | 'medium' | 'low' | 'all' | undefined,
+    urgencyFilter: filters?.urgency as
+      | 'critical'
+      | 'high'
+      | 'medium'
+      | 'low'
+      | 'all'
+      | undefined,
   })
 
   return useMemo(() => {
@@ -344,16 +376,21 @@ export function useTabActionableBatches(
         // Items needing immediate attention
         filteredData = allData.filter(
           (batch: ActionableBatch) =>
-            batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention',
+            batch.todo_state === 'urgent_action' ||
+            batch.todo_state === 'needs_attention'
         )
         break
       case 'recently_expired':
         // Recently expired items
-        filteredData = allData.filter((batch: ActionableBatch) => batch.todo_state === 'expired')
+        filteredData = allData.filter(
+          (batch: ActionableBatch) => batch.todo_state === 'expired'
+        )
         break
       case 'all_active':
         // All non-expired items
-        filteredData = allData.filter((batch: ActionableBatch) => batch.todo_state !== 'expired')
+        filteredData = allData.filter(
+          (batch: ActionableBatch) => batch.todo_state !== 'expired'
+        )
         break
       default:
         filteredData = allData

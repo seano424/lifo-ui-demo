@@ -378,12 +378,13 @@ export type Database = {
   }
   inventory: {
     Tables: {
-      batch_action_entries: {
+      batch_actions: {
         Row: {
           action_type: Database["public"]["Enums"]["action_type"]
           ai_score: number | null
           batch_id: string
           batch_initial_quantity: number
+          created_at: string
           discount_percentage: number | null
           disposal_reason: string | null
           donation_recipient_id: string | null
@@ -404,6 +405,7 @@ export type Database = {
           ai_score?: number | null
           batch_id: string
           batch_initial_quantity: number
+          created_at?: string
           discount_percentage?: number | null
           disposal_reason?: string | null
           donation_recipient_id?: string | null
@@ -424,6 +426,7 @@ export type Database = {
           ai_score?: number | null
           batch_id?: string
           batch_initial_quantity?: number
+          created_at?: string
           discount_percentage?: number | null
           disposal_reason?: string | null
           donation_recipient_id?: string | null
@@ -441,107 +444,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "batch_action_entries_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "automation_preview"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_action_entries_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batch_expiry_status"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_action_entries_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batch_status"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_action_entries_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batch_todo_states"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_action_entries_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batches"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_action_entries_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batches_needing_action"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_action_entries_donation_recipient_id_fkey"
-            columns: ["donation_recipient_id"]
-            isOneToOne: false
-            referencedRelation: "donation_recipients"
-            referencedColumns: ["recipient_id"]
-          },
-        ]
-      }
-      batch_actions: {
-        Row: {
-          action_date: string | null
-          action_id: string
-          actual_action: Database["public"]["Enums"]["action_type"]
-          ai_score: number | null
-          batch_id: string
-          created_at: string | null
-          donation_recipient_id: string | null
-          notes: string | null
-          original_value: number | null
-          performed_by: string | null
-          quantity_affected: number | null
-          recommended_action: Database["public"]["Enums"]["action_type"]
-          recovered_value: number | null
-          store_id: string
-        }
-        Insert: {
-          action_date?: string | null
-          action_id?: string
-          actual_action: Database["public"]["Enums"]["action_type"]
-          ai_score?: number | null
-          batch_id: string
-          created_at?: string | null
-          donation_recipient_id?: string | null
-          notes?: string | null
-          original_value?: number | null
-          performed_by?: string | null
-          quantity_affected?: number | null
-          recommended_action: Database["public"]["Enums"]["action_type"]
-          recovered_value?: number | null
-          store_id: string
-        }
-        Update: {
-          action_date?: string | null
-          action_id?: string
-          actual_action?: Database["public"]["Enums"]["action_type"]
-          ai_score?: number | null
-          batch_id?: string
-          created_at?: string | null
-          donation_recipient_id?: string | null
-          notes?: string | null
-          original_value?: number | null
-          performed_by?: string | null
-          quantity_affected?: number | null
-          recommended_action?: Database["public"]["Enums"]["action_type"]
-          recovered_value?: number | null
-          store_id?: string
-        }
-        Relationships: [
-          {
             foreignKeyName: "batch_actions_batch_id_fkey"
             columns: ["batch_id"]
             isOneToOne: false
@@ -574,13 +476,6 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "batch_actions_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batches_needing_action"
             referencedColumns: ["batch_id"]
           },
           {
@@ -1213,6 +1108,7 @@ export type Database = {
           batch_id: string | null
           batch_number: string | null
           batch_status: string | null
+          completion_status: string | null
           composite_score: number | null
           current_quantity: number | null
           days_to_expiry: number | null
@@ -1231,48 +1127,9 @@ export type Database = {
           total_discounted_quantity: number | null
           total_disposed_quantity: number | null
           total_donated_quantity: number | null
+          total_sold_quantity: number | null
           urgency_level: string | null
           view_refreshed_at: string | null
-        }
-        Relationships: []
-      }
-      batches_needing_action: {
-        Row: {
-          batch_id: string | null
-          brand: string | null
-          current_quantity: number | null
-          expiry_date: string | null
-          product_id: string | null
-          product_name: string | null
-          recommendation: string | null
-          selling_price: number | null
-          status: string | null
-          store_id: string | null
-          store_name: string | null
-          total_value: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "batches_store_product_fkey"
-            columns: ["store_id", "product_id"]
-            isOneToOne: false
-            referencedRelation: "store_products"
-            referencedColumns: ["store_id", "product_id"]
-          },
-        ]
-      }
-      donation_impact: {
-        Row: {
-          donation_count: number | null
-          last_donation_date: string | null
-          recipient_name: string | null
-          recipient_type:
-            | Database["public"]["Enums"]["donation_recipient_type"]
-            | null
-          store_id: string | null
-          total_quantity_donated: number | null
-          total_tax_benefit: number | null
-          total_value_donated: number | null
         }
         Relationships: []
       }
@@ -1443,19 +1300,6 @@ export type Database = {
           },
         ]
       }
-      recommendation_analytics: {
-        Row: {
-          actual_action: Database["public"]["Enums"]["action_type"] | null
-          avg_ai_score: number | null
-          recommendation_count: number | null
-          recommended_action: Database["public"]["Enums"]["action_type"] | null
-          recovery_percentage: number | null
-          store_id: string | null
-          total_original_value: number | null
-          total_recovered_value: number | null
-        }
-        Relationships: []
-      }
       sales_summary: {
         Row: {
           batch_id: string | null
@@ -1529,26 +1373,7 @@ export type Database = {
             referencedRelation: "batches"
             referencedColumns: ["batch_id"]
           },
-          {
-            foreignKeyName: "sales_events_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batches_needing_action"
-            referencedColumns: ["batch_id"]
-          },
         ]
-      }
-      todos_dashboard_view: {
-        Row: {
-          avg_score: number | null
-          item_count: number | null
-          max_days_to_expiry: number | null
-          min_days_to_expiry: number | null
-          store_id: string | null
-          todo_state: string | null
-          total_value: number | null
-        }
-        Relationships: []
       }
     }
     Functions: {
@@ -1722,24 +1547,6 @@ export type Database = {
       [_ in never]: never
     }
     Views: {
-      dashboard_kpi_daily: {
-        Row: {
-          active_batches_count: number | null
-          discount_revenue: number | null
-          donated_quantity: number | null
-          donations_value: number | null
-          inventory_value: number | null
-          items_sold: number | null
-          metric_date: string | null
-          sales_count: number | null
-          sales_revenue: number | null
-          store_id: string | null
-          total_quantity: number | null
-          waste_value: number | null
-          wasted_quantity: number | null
-        }
-        Relationships: []
-      }
       inventory_view_for_scoring: {
         Row: {
           batch_id: string | null
@@ -1792,6 +1599,17 @@ export type Database = {
           message: string
           success: boolean
           user_id: string
+        }[]
+      }
+      audit_function_security: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          arguments: string
+          function_name: string
+          has_search_path: boolean
+          is_security_definer: boolean
+          schema_name: string
+          security_status: string
         }[]
       }
       bulk_csv_import: {
@@ -1928,6 +1746,15 @@ export type Database = {
         }
         Returns: Json
       }
+      execute_donate_prepared_action: {
+        Args: {
+          p_batch_id: string
+          p_notes?: string
+          p_quantity_affected: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
       execute_sold_action: {
         Args: {
           p_batch_id: string
@@ -1997,7 +1824,9 @@ export type Database = {
         }[]
       }
       get_actionable_batches: {
-        Args: { input_store_id: string }
+        Args:
+          | { input_store_id: string }
+          | { p_limit?: number; p_offset?: number; p_store_id: string }
         Returns: Json
       }
       get_all_active_with_states: {
@@ -2391,6 +2220,28 @@ export type Database = {
           waste_reduction_target_percent: number
         }[]
       }
+      get_todos_dashboard: {
+        Args: { p_store_id: string }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          completion_status: string
+          composite_score: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          hours_since_last_action: number
+          last_action_time: string
+          last_action_type: Database["public"]["Enums"]["action_type"]
+          last_discount_percent: number
+          priority_order: number
+          product_brand: string
+          product_name: string
+          todo_state: string
+          urgency_level: string
+        }[]
+      }
       get_todos_dashboard_overview: {
         Args: { p_store_id: string }
         Returns: {
@@ -2703,7 +2554,14 @@ export type Database = {
       }
     }
     Enums: {
-      action_type: "discount" | "donate" | "dispose" | "maintain" | "ignored"
+      action_type:
+        | "discount"
+        | "donate"
+        | "dispose"
+        | "maintain"
+        | "ignored"
+        | "donate_prepared"
+        | "sold"
       donation_recipient_type:
         | "food_bank"
         | "soup_kitchen"
@@ -3265,7 +3123,15 @@ export const Constants = {
   },
   public: {
     Enums: {
-      action_type: ["discount", "donate", "dispose", "maintain", "ignored"],
+      action_type: [
+        "discount",
+        "donate",
+        "dispose",
+        "maintain",
+        "ignored",
+        "donate_prepared",
+        "sold",
+      ],
       donation_recipient_type: [
         "food_bank",
         "soup_kitchen",

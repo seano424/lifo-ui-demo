@@ -7,11 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useDashboardSummary } from '@/hooks/use-todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
-import {
-  isSortDirection,
-  isSortField,
-  validateSortConfig,
-} from '@/lib/utils/todo-sorting'
+import { isSortDirection, isSortField, validateSortConfig } from '@/lib/utils/todo-sorting'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
@@ -59,21 +55,14 @@ interface TodosFilteredListProps {
   pageSize?: number
 }
 
-export function TodosFilteredList({
-  initialFilters,
-  pageSize = 20,
-}: TodosFilteredListProps) {
+export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
 
-  const [activeTab, setActiveTab] = useState<string>(
-    initialFilters?.tab || 'all_active_todos'
-  )
+  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'all_active_todos')
 
-  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>(
-    []
-  )
+  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
   const [filters, setFilters] = useState<TodoFilters>(() => {
@@ -83,13 +72,7 @@ export function TodosFilteredList({
     }
 
     if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
-      const validUrgencyLevels = [
-        'critical',
-        'high',
-        'medium',
-        'low',
-        'maintain',
-      ]
+      const validUrgencyLevels = ['critical', 'high', 'medium', 'low', 'maintain']
       if (validUrgencyLevels.includes(initialFilters.urgency)) {
         baseFilters.urgency = initialFilters.urgency as TodoFilters['urgency']
       }
@@ -112,7 +95,7 @@ export function TodosFilteredList({
   })
 
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, storeId: activeStoreId || undefined }))
+    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
   const validStoreId = activeStoreId || ''
@@ -190,7 +173,7 @@ export function TodosFilteredList({
           ].map((tab, index) => (
             <Button
               key={tab.value}
-              ref={(el) => {
+              ref={el => {
                 buttonRefs.current[index] = el
               }}
               size="lg"
@@ -205,9 +188,7 @@ export function TodosFilteredList({
               className={cn(
                 'rounded-none px-4 relative flex items-center gap-2 pb-4 whitespace-nowrap',
                 'hover:bg-transparent group/tab font-bold font-sans tracking-tight',
-                activeTab === tab.value
-                  ? 'text-primary'
-                  : 'text-muted-foreground/90'
+                activeTab === tab.value ? 'text-primary' : 'text-muted-foreground/90',
               )}
             >
               {tab.label}
@@ -236,10 +217,7 @@ export function TodosFilteredList({
             display: activeTab === 'all_active_todos' ? 'block' : 'none',
           }}
         >
-          <AllActiveTab
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-          />
+          <AllActiveTab filters={filters} onFiltersChange={handleFiltersChange} />
         </div>
 
         <div
@@ -247,10 +225,7 @@ export function TodosFilteredList({
             display: activeTab === 'recently_expired' ? 'block' : 'none',
           }}
         >
-          <RecentlyExpiredTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <RecentlyExpiredTab filters={filters} pageSize={pageSize} />
         </div>
       </div>
     </>

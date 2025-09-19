@@ -50,7 +50,7 @@ function calculateChange(current: number, previous: number) {
 
 export async function fetchInventoryKPITrends(
   storeId: string,
-  timeRange: TimeRange,
+  timeRange: TimeRange
 ): Promise<KPITrendData> {
   const supabase = createClient()
 
@@ -79,11 +79,19 @@ export async function fetchInventoryKPITrends(
   if (previousError) throw previousError
 
   const current =
-    currentData?.reduce((sum, batch) => sum + batch.current_quantity * batch.selling_price, 0) ?? 0
+    currentData?.reduce(
+      (sum, batch) => sum + batch.current_quantity * batch.selling_price,
+      0
+    ) ?? 0
   const previous =
-    previousData?.reduce((sum, batch) => sum + batch.current_quantity * batch.selling_price, 0) ?? 0
+    previousData?.reduce(
+      (sum, batch) => sum + batch.current_quantity * batch.selling_price,
+      0
+    ) ?? 0
 
-  const uniqueProducts = new Set(currentData?.map(batch => batch.product_id) ?? [])
+  const uniqueProducts = new Set(
+    currentData?.map((batch) => batch.product_id) ?? []
+  )
 
   const dailyValues =
     currentData?.reduce(
@@ -93,7 +101,7 @@ export async function fetchInventoryKPITrends(
         acc[date] = (acc[date] || 0) + value
         return acc
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     ) ?? {}
 
   const values = Object.values(dailyValues)
@@ -120,13 +128,13 @@ export async function fetchInventoryKPITrends(
 
 export async function fetchSalesKPITrends(
   storeId: string,
-  timeRange: TimeRange,
+  timeRange: TimeRange
 ): Promise<KPITrendData> {
   const supabase = createClient()
 
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
-    .from('batch_action_entries')
+    .from('batch_actions')
     .select('total_recovered_value, performed_at')
     .eq('store_id', storeId)
     .eq('action_type', 'discount')
@@ -137,7 +145,7 @@ export async function fetchSalesKPITrends(
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
-    .from('batch_action_entries')
+    .from('batch_actions')
     .select('total_recovered_value')
     .eq('store_id', storeId)
     .eq('action_type', 'discount')
@@ -147,9 +155,15 @@ export async function fetchSalesKPITrends(
   if (previousError) throw previousError
 
   const current =
-    currentData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
+    currentData?.reduce(
+      (sum, action) => sum + (action.total_recovered_value || 0),
+      0
+    ) ?? 0
   const previous =
-    previousData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
+    previousData?.reduce(
+      (sum, action) => sum + (action.total_recovered_value || 0),
+      0
+    ) ?? 0
 
   const dailySales =
     currentData?.reduce(
@@ -159,7 +173,7 @@ export async function fetchSalesKPITrends(
         acc[date] = (acc[date] || 0) + value
         return acc
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     ) ?? {}
 
   const values = Object.values(dailySales)
@@ -198,13 +212,13 @@ export async function fetchSalesKPITrends(
 
 export async function fetchDonationKPITrends(
   storeId: string,
-  timeRange: TimeRange,
+  timeRange: TimeRange
 ): Promise<KPITrendData> {
   const supabase = createClient()
 
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
-    .from('batch_action_entries')
+    .from('batch_actions')
     .select('total_original_value, donation_recipient_id, performed_at')
     .eq('store_id', storeId)
     .eq('action_type', 'donate')
@@ -215,7 +229,7 @@ export async function fetchDonationKPITrends(
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
-    .from('batch_action_entries')
+    .from('batch_actions')
     .select('total_original_value, donation_recipient_id')
     .eq('store_id', storeId)
     .eq('action_type', 'donate')
@@ -225,12 +239,20 @@ export async function fetchDonationKPITrends(
   if (previousError) throw previousError
 
   const current =
-    currentData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
+    currentData?.reduce(
+      (sum, action) => sum + (action.total_original_value || 0),
+      0
+    ) ?? 0
   const previous =
-    previousData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
+    previousData?.reduce(
+      (sum, action) => sum + (action.total_original_value || 0),
+      0
+    ) ?? 0
 
   const uniqueRecipients = new Set(
-    currentData?.filter(a => a.donation_recipient_id).map(a => a.donation_recipient_id),
+    currentData
+      ?.filter((a) => a.donation_recipient_id)
+      .map((a) => a.donation_recipient_id)
   )
 
   const dailyDonations =
@@ -241,7 +263,7 @@ export async function fetchDonationKPITrends(
         acc[date] = (acc[date] || 0) + value
         return acc
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     ) ?? {}
 
   const values = Object.values(dailyDonations)
@@ -267,13 +289,13 @@ export async function fetchDonationKPITrends(
 
 export async function fetchWasteKPITrends(
   storeId: string,
-  timeRange: TimeRange,
+  timeRange: TimeRange
 ): Promise<KPITrendData> {
   const supabase = createClient()
 
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
-    .from('batch_action_entries')
+    .from('batch_actions')
     .select('total_original_value, performed_at')
     .eq('store_id', storeId)
     .eq('action_type', 'dispose')
@@ -284,7 +306,7 @@ export async function fetchWasteKPITrends(
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
-    .from('batch_action_entries')
+    .from('batch_actions')
     .select('total_original_value')
     .eq('store_id', storeId)
     .eq('action_type', 'dispose')
@@ -294,9 +316,15 @@ export async function fetchWasteKPITrends(
   if (previousError) throw previousError
 
   const current =
-    currentData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
+    currentData?.reduce(
+      (sum, action) => sum + (action.total_original_value || 0),
+      0
+    ) ?? 0
   const previous =
-    previousData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
+    previousData?.reduce(
+      (sum, action) => sum + (action.total_original_value || 0),
+      0
+    ) ?? 0
 
   const dailyWaste =
     currentData?.reduce(
@@ -306,7 +334,7 @@ export async function fetchWasteKPITrends(
         acc[date] = (acc[date] || 0) + value
         return acc
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     ) ?? {}
 
   const values = Object.values(dailyWaste)
@@ -332,7 +360,7 @@ export async function fetchWasteKPITrends(
 
 export async function fetchDashboardKPITrends(
   storeId: string,
-  timeRange: TimeRange,
+  timeRange: TimeRange
 ): Promise<DashboardKPITrends> {
   const [inventory, sales, donations, waste] = await Promise.all([
     fetchInventoryKPITrends(storeId, timeRange),
