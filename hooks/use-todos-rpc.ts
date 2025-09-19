@@ -22,7 +22,7 @@ import {
   type RecentlyDiscounted,
   type RecentlyExpired,
   type TodosSummary,
-} from '@/lib/queries/todos-rpc'
+} from '@/lib/queries/todos-rpc-v1'
 import type { Database } from '@/types/supabase'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
