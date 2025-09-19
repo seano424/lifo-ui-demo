@@ -1,76 +1,84 @@
-import { Package, Users, Zap } from 'lucide-react'
+'use client'
 import { ContentCard, NextStepsGrid, SupportPageWrapper } from '@/components/support'
+import { Package, Users, Zap } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-const initialSetupItems = [
-  'Complete your business profile',
-  'Set up your first store location',
-  'Configure notification preferences',
-  'Choose your currency and units',
+const getInitialSetupItems = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
+  t('steps.initialSetup.items.0'),
+  t('steps.initialSetup.items.1'),
+  t('steps.initialSetup.items.2'),
+  t('steps.initialSetup.items.3'),
 ]
 
-const teamSetupItems = [
-  'Invite team members via email',
-  'Assign roles and permissions',
-  'Set up store access controls',
-  'Configure approval workflows',
+const getTeamSetupItems = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
+  t('steps.teamSetup.items.0'),
+  t('steps.teamSetup.items.1'),
+  t('steps.teamSetup.items.2'),
+  t('steps.teamSetup.items.3'),
 ]
 
-const firstProductsItems = [
-  'Scan or manually add product information',
-  'Set up product categories',
-  'Configure pricing and cost data',
-  'Upload product images',
+const getFirstProductsItems = (t: ReturnType<typeof useTranslations<'support'>>) => [
+  t('steps.firstProducts.items.0'),
+  t('steps.firstProducts.items.1'),
+  t('steps.firstProducts.items.2'),
+  t('steps.firstProducts.items.3'),
 ]
 
-const nextSteps = [
+const getNextSteps = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
   {
-    title: 'Scan Your First Batch',
-    description: 'Process your first delivery using the scan-in workflow',
-    linkText: 'Learn about scan-in →',
+    title: t('nextSteps.items.0.title'),
+    description: t('nextSteps.items.0.description'),
+    linkText: t('nextSteps.items.0.linkText'),
     linkHref: '/support/scan-in',
   },
   {
-    title: 'Explore Features',
-    description: 'Discover advanced inventory management tools',
-    linkText: 'View inventory guide →',
+    title: t('nextSteps.items.1.title'),
+    description: t('nextSteps.items.1.description'),
+    linkText: t('nextSteps.items.1.linkText'),
     linkHref: '/support/inventory-management',
   },
 ]
 
 export default function QuickStartGuidePage() {
+  const t = useTranslations('support.quickStartGuide')
+  const initialSetupItems = getInitialSetupItems(t)
+  const teamSetupItems = getTeamSetupItems(t)
+  const firstProductsItems = getFirstProductsItems(t)
+  const nextSteps = getNextSteps(t)
+
   return (
     <SupportPageWrapper
-      title="Quick Start Guide"
-      description="Get up and running with LIFO in just a few simple steps"
-      readTime="5 min read"
-      intro="Welcome to LIFO! This guide will help you set up your inventory management system and get started with your first products in minutes."
+      title={t('title')}
+      description={t('description')}
+      readTime={t('readTime')}
+      intro={t('intro')}
     >
       <div className="space-y-6">
         <ContentCard
-          title="Step 1: Initial Setup"
-          description="Configure your basic account settings and preferences:"
+          title={t('steps.initialSetup.title')}
+          description={t('steps.initialSetup.description')}
           icon={Zap}
           variant="simple"
           simpleItems={initialSetupItems}
         />
 
         <ContentCard
-          title="Step 2: Team Setup"
-          description="Add team members and configure their access levels:"
+          title={t('steps.teamSetup.title')}
+          description={t('steps.teamSetup.description')}
           icon={Users}
           variant="simple"
           simpleItems={teamSetupItems}
         />
 
         <ContentCard
-          title="Step 3: Add Your First Products"
-          description="Start building your product catalog:"
+          title={t('steps.firstProducts.title')}
+          description={t('steps.firstProducts.description')}
           icon={Package}
           variant="simple"
           simpleItems={firstProductsItems}
         />
 
-        <NextStepsGrid title="Next Steps" items={nextSteps} />
+        <NextStepsGrid title={t('nextSteps.title')} items={nextSteps} />
       </div>
     </SupportPageWrapper>
   )

@@ -1,9 +1,11 @@
-import type { LucideIcon } from 'lucide-react'
-import { ChevronRight, Clock, Workflow, Zap } from 'lucide-react'
-import Link from 'next/link'
+'use client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
+import type { LucideIcon } from 'lucide-react'
+import { ChevronRight, Clock, Workflow, Zap } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 
 interface SupportArticle {
   title: string
@@ -21,58 +23,58 @@ interface SupportSection {
   articles: SupportArticle[]
 }
 
-const supportSections: SupportSection[] = [
+const getSupportSections = (t: ReturnType<typeof useTranslations<'marketing'>>): SupportSection[] => [
   {
     id: 'getting-started',
-    title: 'Getting Started',
-    description: 'Everything you need to know to start using LIFO effectively',
+    title: t('sections.gettingStarted.title'),
+    description: t('sections.gettingStarted.description'),
     icon: Zap,
     articles: [
       {
-        title: 'Quick Start Guide',
-        description: 'Get up and running with LIFO in under 10 minutes',
+        title: t('articles.quickStartGuide.title'),
+        description: t('articles.quickStartGuide.description'),
         href: '/support/quick-start-guide',
-        readTime: '5 min',
+        readTime: t('articles.quickStartGuide.readTime'),
       },
       {
-        title: 'Inventory Management',
-        description: 'Real-time views, alerts, and reconciliation',
+        title: t('articles.inventoryManagement.title'),
+        description: t('articles.inventoryManagement.description'),
         href: '/support/inventory-management',
-        readTime: '5 min',
+        readTime: t('articles.inventoryManagement.readTime'),
       },
       {
-        title: 'Scan-In Process',
-        description: 'Recording deliveries, returns, and new inventory',
+        title: t('articles.scanInProcess.title'),
+        description: t('articles.scanInProcess.description'),
         href: '/support/scan-in',
-        readTime: '4 min',
+        readTime: t('articles.scanInProcess.readTime'),
       },
     ],
   },
   {
     id: 'workflows',
-    title: 'Workflows & Processes',
-    description: 'Step-by-step guides for core LIFO workflows',
+    title: t('sections.workflowsProcesses.title'),
+    description: t('sections.workflowsProcesses.description'),
     icon: Workflow,
     articles: [
       {
-        title: 'Multi-Store Management',
-        description: 'Managing multiple locations and staff access',
+        title: t('articles.multiStoreManagement.title'),
+        description: t('articles.multiStoreManagement.description'),
         href: '/support/multi-store',
-        readTime: '5 min',
+        readTime: t('articles.multiStoreManagement.readTime'),
         comingSoon: true,
       },
       {
-        title: 'User Roles & Permissions',
-        description: 'Understanding different access levels and capabilities',
+        title: t('articles.userRolesPermissions.title'),
+        description: t('articles.userRolesPermissions.description'),
         href: '/support/roles-permissions',
-        readTime: '6 min',
+        readTime: t('articles.userRolesPermissions.readTime'),
         comingSoon: true,
       },
       {
-        title: 'Scan-Out Process',
-        description: 'Recording sales, discounts, donations, and waste',
+        title: t('articles.scanOutProcess.title'),
+        description: t('articles.scanOutProcess.description'),
         href: '/support/scan-out',
-        readTime: '8 min',
+        readTime: t('articles.scanOutProcess.readTime'),
         comingSoon: true,
       },
     ],
@@ -106,6 +108,9 @@ const supportSections: SupportSection[] = [
 ]
 
 export default function SupportPage() {
+  const t = useTranslations('support.mainPage')
+  const sections = getSupportSections(t)
+
   return (
     <main className="min-h-screen py-20 px-4 relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
@@ -115,19 +120,19 @@ export default function SupportPage() {
             as="h1"
             className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
           >
-            Support Center
+            {t('title')}
           </Typography>
           <Typography
             variant="p"
             className="text-center text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed"
           >
-            Find guides and articles to help you get the most out of LIFO
+            {t('subtitle')}
           </Typography>
         </div>
 
         {/* Support Sections */}
         <div className="space-y-8 sm:space-y-12">
-          {supportSections.map(section => (
+          {sections.map(section => (
             <div key={section.id} className="space-y-4 sm:space-y-6">
               {/* Section Header */}
               <div className="flex items-start gap-3 sm:items-center">
@@ -158,7 +163,7 @@ export default function SupportPage() {
                             {article.title}
                           </Typography>
                           <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-md">
-                            Coming Soon
+                            {t('common.comingSoon')}
                           </span>
                         </div>
                       </CardHeader>
@@ -219,18 +224,18 @@ export default function SupportPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   <Typography variant="h3" className="text-base sm:text-lg font-semibold mb-1">
-                    Need More Help?
+                    {t('contactSupport.title')}
                   </Typography>
                   <Typography variant="p" color="muted" className="text-sm">
-                    Can't find what you're looking for? Our team is here to help.
+                    {t('contactSupport.description')}
                   </Typography>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                   <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
-                    <Link href="/contact">Contact Support</Link>
+                    <Link href="/contact">{t('contactSupport.buttons.contactSupport')}</Link>
                   </Button>
                   <Button size="sm" className="w-full sm:w-auto" asChild>
-                    <Link href="mailto:support@lifo-app.com">Email Us</Link>
+                    <Link href="mailto:support@lifo-app.com">{t('contactSupport.buttons.emailUs')}</Link>
                   </Button>
                 </div>
               </div>

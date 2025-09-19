@@ -1,86 +1,113 @@
-import { AlertCircle, BarChart, Package, TrendingUp } from 'lucide-react'
+'use client'
 import { FeatureCard, SupportPageWrapper } from '@/components/support'
+import { AlertCircle, BarChart, Package, TrendingUp } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-// Data for feature cards
-const features = [
+const getFeatures = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
   {
     icon: Package,
-    title: 'Inventory Tracking',
-    description:
-      'Track inventory levels in real-time with automated updates from scan-in/out operations',
+    title: t('features.inventoryTracking.title'),
+    description: t('features.inventoryTracking.description'),
     features: [
       {
-        title: 'Real-time Updates',
-        description: 'Automatic inventory adjustments with every scan',
+        title: t('features.inventoryTracking.items.0.title'),
+        description: t('features.inventoryTracking.items.0.description'),
       },
       {
-        title: 'Multi-location Support',
-        description: 'Track inventory across different warehouses',
+        title: t('features.inventoryTracking.items.1.title'),
+        description: t('features.inventoryTracking.items.1.description'),
       },
-      { title: 'Batch Tracking', description: 'Monitor inventory by delivery batches' },
       {
-        title: 'Product Variants',
-        description: 'Separate tracking for sizes, colors, and configurations',
+        title: t('features.inventoryTracking.items.2.title'),
+        description: t('features.inventoryTracking.items.2.description'),
+      },
+      {
+        title: t('features.inventoryTracking.items.3.title'),
+        description: t('features.inventoryTracking.items.3.description'),
       },
     ],
   },
   {
     icon: BarChart,
-    title: 'Analytics & Reporting',
-    description: 'Gain insights into your inventory performance with comprehensive analytics',
+    title: t('features.analyticsReporting.title'),
+    description: t('features.analyticsReporting.description'),
     features: [
-      { title: 'Turnover Rates', description: 'Identify fast and slow-moving products' },
-      { title: 'Stock Aging', description: 'Track how long inventory stays in warehouse' },
-      { title: 'Demand Forecasting', description: 'Predict future inventory needs' },
-      { title: 'Cost Analysis', description: 'Monitor carrying costs and storage fees' },
+      {
+        title: t('features.analyticsReporting.items.0.title'),
+        description: t('features.analyticsReporting.items.0.description'),
+      },
+      {
+        title: t('features.analyticsReporting.items.1.title'),
+        description: t('features.analyticsReporting.items.1.description'),
+      },
+      {
+        title: t('features.analyticsReporting.items.2.title'),
+        description: t('features.analyticsReporting.items.2.description'),
+      },
+      {
+        title: t('features.analyticsReporting.items.3.title'),
+        description: t('features.analyticsReporting.items.3.description'),
+      },
     ],
   },
   {
     icon: AlertCircle,
-    title: 'Stock Alerts & Notifications',
-    description: 'Stay informed about critical inventory levels with automated alerts',
+    title: t('features.stockAlerts.title'),
+    description: t('features.stockAlerts.description'),
     features: [
       {
-        title: 'Low Stock Alerts',
-        description: 'Notifications when inventory drops below threshold',
+        title: t('features.stockAlerts.items.0.title'),
+        description: t('features.stockAlerts.items.0.description'),
       },
-      { title: 'Overstock Warnings', description: 'Alerts for excess inventory accumulation' },
-      { title: 'Expiry Notifications', description: 'Track products approaching expiration dates' },
       {
-        title: 'Custom Thresholds',
-        description: 'Set specific alert levels for different products',
+        title: t('features.stockAlerts.items.1.title'),
+        description: t('features.stockAlerts.items.1.description'),
+      },
+      {
+        title: t('features.stockAlerts.items.2.title'),
+        description: t('features.stockAlerts.items.2.description'),
+      },
+      {
+        title: t('features.stockAlerts.items.3.title'),
+        description: t('features.stockAlerts.items.3.description'),
       },
     ],
   },
   {
     icon: TrendingUp,
-    title: 'LIFO Optimization',
-    description: 'Leverage Last-In-First-Out methodology for optimal inventory management',
+    title: t('features.lifoOptimization.title'),
+    description: t('features.lifoOptimization.description'),
     features: [
       {
-        title: 'Automatic LIFO Sorting',
-        description: 'System prioritizes newest inventory for fulfillment',
+        title: t('features.lifoOptimization.items.0.title'),
+        description: t('features.lifoOptimization.items.0.description'),
       },
       {
-        title: 'Cost Optimization',
-        description: 'Maximize profitability with intelligent inventory selection',
+        title: t('features.lifoOptimization.items.1.title'),
+        description: t('features.lifoOptimization.items.1.description'),
       },
       {
-        title: 'Freshness Management',
-        description: 'Ensure customers receive the freshest products',
+        title: t('features.lifoOptimization.items.2.title'),
+        description: t('features.lifoOptimization.items.2.description'),
       },
-      { title: 'Tax Benefits', description: 'Optimize tax implications with LIFO accounting' },
+      {
+        title: t('features.lifoOptimization.items.3.title'),
+        description: t('features.lifoOptimization.items.3.description'),
+      },
     ],
   },
 ]
 
 export default function InventoryManagementPage() {
+  const t = useTranslations('support.inventoryManagement')
+  const features = getFeatures(t)
+
   return (
     <SupportPageWrapper
-      title="Inventory Management"
-      description="Master your inventory with LIFO's comprehensive management tools"
-      readTime="5 min read"
-      intro="Effective inventory management is crucial for business success. LIFO provides comprehensive tools to track, analyze, and optimize your inventory levels."
+      title={t('title')}
+      description={t('description')}
+      readTime={t('readTime')}
+      intro={t('intro')}
     >
       {/* Feature Cards */}
       <div className="grid gap-6 md:grid-cols-2">

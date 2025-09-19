@@ -411,6 +411,296 @@
       "button": "Start gratis proefperiode"
     }
   },
+  "support": {
+    "mainPage": {
+      "title": "Helpcentrum",
+      "subtitle": "Vind gidsen en artikelen om het meeste uit LIFO te halen",
+      "sections": {
+        "gettingStarted": {
+          "title": "Aan de slag",
+          "description": "Alles wat u moet weten om LIFO effectief te gaan gebruiken"
+        },
+        "workflowsProcesses": {
+          "title": "Workflows en processen",
+          "description": "Stap-voor-stap gidsen voor de belangrijkste LIFO workflows"
+        }
+      },
+      "articles": {
+        "quickStartGuide": {
+          "title": "Snelstartgids",
+          "description": "Aan de slag met LIFO in minder dan 10 minuten",
+          "readTime": "5 min"
+        },
+        "inventoryManagement": {
+          "title": "Voorraadbeheer",
+          "description": "Real-time overzichten, waarschuwingen en afstemming",
+          "readTime": "5 min"
+        },
+        "scanInProcess": {
+          "title": "Inscanproces",
+          "description": "Registreren van leveringen, retouren en nieuwe voorraad",
+          "readTime": "4 min"
+        },
+        "multiStoreManagement": {
+          "title": "Multi-winkel beheer",
+          "description": "Beheer van meerdere locaties en personeelstoegang",
+          "readTime": "5 min",
+          "comingSoon": true
+        },
+        "userRolesPermissions": {
+          "title": "Gebruikersrollen en machtigingen",
+          "description": "Begrijpen van verschillende toegangsniveaus en mogelijkheden",
+          "readTime": "6 min",
+          "comingSoon": true
+        },
+        "scanOutProcess": {
+          "title": "Uitscanproces",
+          "description": "Registreren van verkopen, kortingen, donaties en afval",
+          "readTime": "8 min",
+          "comingSoon": true
+        }
+      },
+      "contactSupport": {
+        "title": "Meer hulp nodig?",
+        "description": "Kunt u niet vinden wat u zoekt? Ons team staat klaar om u te helpen.",
+        "buttons": {
+          "contactSupport": "Contact opnemen",
+          "emailUs": "E-mail ons"
+        }
+      },
+      "common": {
+        "comingSoon": "Binnenkort beschikbaar",
+        "readTime": "min lezen"
+      }
+    },
+    "quickStartGuide": {
+      "title": "Snelstartgids",
+      "description": "Aan de slag met LIFO in een paar eenvoudige stappen",
+      "readTime": "5 min lezen",
+      "intro": "Welkom bij LIFO! Deze gids helpt u bij het instellen van uw voorraadbeheer systeem en het starten met uw eerste producten in enkele minuten.",
+      "steps": {
+        "initialSetup": {
+          "title": "Stap 1: Initiële setup",
+          "description": "Configureer uw basisinstellingen en voorkeuren:",
+          "items": [
+            "Vul uw bedrijfsprofiel in",
+            "Stel uw eerste winkellocatie in",
+            "Configureer meldingsvoorkeuren",
+            "Kies uw valuta en eenheden"
+          ]
+        },
+        "teamSetup": {
+          "title": "Stap 2: Team setup",
+          "description": "Voeg teamleden toe en configureer hun toegangsniveaus:",
+          "items": [
+            "Nodig teamleden uit via e-mail",
+            "Wijs rollen en machtigingen toe",
+            "Stel winkeltoegangscontroles in",
+            "Configureer goedkeuringsworkflows"
+          ]
+        },
+        "firstProducts": {
+          "title": "Stap 3: Voeg uw eerste producten toe",
+          "description": "Begin met het opbouwen van uw productcatalogus:",
+          "items": [
+            "Scan of voeg handmatig productinformatie toe",
+            "Stel productcategorieën in",
+            "Configureer prijzen en kosten",
+            "Upload productafbeeldingen"
+          ]
+        }
+      },
+      "nextSteps": {
+        "title": "Volgende stappen",
+        "items": [
+          {
+            "title": "Scan uw eerste batch",
+            "description": "Verwerk uw eerste levering met het inscanproces",
+            "linkText": "Meer over inscannen →"
+          },
+          {
+            "title": "Verken functies",
+            "description": "Ontdek geavanceerde voorraadbeheertools",
+            "linkText": "Bekijk voorraadgids →"
+          }
+        ]
+      }
+    },
+    "inventoryManagement": {
+      "title": "Voorraadbeheer",
+      "description": "Beheers uw voorraad met LIFO's uitgebreide beheertools",
+      "readTime": "5 min lezen",
+      "intro": "Effectief voorraadbeheer is cruciaal voor zakelijk succes. LIFO biedt uitgebreide tools om uw voorraadniveaus te volgen, analyseren en optimaliseren.",
+      "features": {
+        "inventoryTracking": {
+          "title": "Voorraadtracking",
+          "description": "Volg voorraadniveaus in real-time met automatische updates van in-/uitscanoperaties",
+          "items": [
+            {
+              "title": "Real-time updates",
+              "description": "Automatische voorraadaanpassingen bij elke scan"
+            },
+            {
+              "title": "Multi-locatie ondersteuning",
+              "description": "Volg voorraad in verschillende magazijnen"
+            },
+            {
+              "title": "Batchtracking",
+              "description": "Monitor voorraad per leveringsbatch"
+            },
+            {
+              "title": "Productvarianten",
+              "description": "Aparte tracking voor maten, kleuren en configuraties"
+            }
+          ]
+        },
+        "analyticsReporting": {
+          "title": "Analyses & rapportage",
+          "description": "Krijg inzicht in uw voorraadprestaties met uitgebreide analyses",
+          "items": [
+            {
+              "title": "Omloopsnelheden",
+              "description": "Identificeer snel- en langzaamlopende producten"
+            },
+            {
+              "title": "Voorraadveroudering",
+              "description": "Volg hoe lang voorraad in magazijn blijft"
+            },
+            {
+              "title": "Vraagvoorspelling",
+              "description": "Voorspel toekomstige voorraadbehoeften"
+            },
+            {
+              "title": "Kostenanalyse",
+              "description": "Monitor voorraad- en opslagkosten"
+            }
+          ]
+        },
+        "stockAlerts": {
+          "title": "Voorraadwaarschuwingen",
+          "description": "Blijf geïnformeerd over kritieke voorraadniveaus met geautomatiseerde waarschuwingen",
+          "items": [
+            {
+              "title": "Lage voorraadwaarschuwingen",
+              "description": "Meldingen wanneer voorraad onder drempel komt"
+            },
+            {
+              "title": "Overvoorraadwaarschuwingen",
+              "description": "Waarschuwingen voor overmatige voorraadopbouw"
+            },
+            {
+              "title": "Vervalwaarschuwingen",
+              "description": "Volg producten die hun vervaldatum naderen"
+            },
+            {
+              "title": "Aangepaste drempels",
+              "description": "Stel specifieke waarschuwingsniveaus in per product"
+            }
+          ]
+        },
+        "lifoOptimization": {
+          "title": "LIFO-optimalisatie",
+          "description": "Gebruik Last-In-First-Out methodologie voor optimaal voorraadbeheer",
+          "items": [
+            {
+              "title": "Automatische LIFO-sortering",
+              "description": "Systeem prioriteert nieuwste voorraad voor verwerking"
+            },
+            {
+              "title": "Kostenoptimalisatie",
+              "description": "Maximaliseer winstgevendheid met intelligente selectie"
+            },
+            {
+              "title": "Versheidsbeheer",
+              "description": "Zorg dat klanten de versste producten ontvangen"
+            },
+            {
+              "title": "Belastingvoordelen",
+              "description": "Optimaliseer fiscale implicaties met LIFO-boekhouding"
+            }
+          ]
+        }
+      }
+    },
+    "scanInProcess": {
+      "title": "Inscanproces",
+      "description": "Beheers het inscanproces voor het toevoegen van producten aan uw voorraad",
+      "readTime": "4 min lezen",
+      "intro": "Het inscanproces is de basis van voorraadbeheer in LIFO. Gebruik dit proces bij het ontvangen van leveringen, retouren of het toevoegen van nieuwe voorraad.",
+      "basicSteps": {
+        "title": "Basis scanstappen",
+        "steps": [
+          {
+            "number": 1,
+            "description": "Ga naar \"Inscannen\" vanaf het dashboard"
+          },
+          {
+            "number": 2,
+            "description": "Selecteer de levering of batch die u verwerkt"
+          },
+          {
+            "number": 3,
+            "description": "Scan barcodes of voer handmatig in"
+          },
+          {
+            "number": 4,
+            "description": "Verifieer productdetails en hoeveelheden"
+          },
+          {
+            "number": 5,
+            "description": "Bevestig en sla de batch op"
+          }
+        ]
+      },
+      "newProducts": {
+        "title": "Nieuwe producten toevoegen",
+        "description": "Bij het scannen van onbekende barcodes vraagt LIFO u om een nieuw product aan te maken:",
+        "items": [
+          {
+            "problem": "Productinformatie",
+            "solution": "Vul productnaam en beschrijving in"
+          },
+          {
+            "problem": "Categorieën & attributen",
+            "solution": "Stel categorie en aangepaste attributen in"
+          },
+          {
+            "problem": "Productafbeeldingen",
+            "solution": "Voeg productafbeeldingen toe indien beschikbaar"
+          },
+          {
+            "problem": "Prijzen",
+            "solution": "Stel prijsinformatie in"
+          }
+        ]
+      },
+      "imageRecognition": {
+        "title": "Beeldherkenning",
+        "description": "LIFO kan producten herkennen van afbeeldingen wanneer barcodes beschadigd of ontbreken. Maak simpelweg een foto van het product en het systeem zal overeenkomsten suggereren."
+      },
+      "troubleshooting": {
+        "title": "Probleemoplossing",
+        "items": [
+          {
+            "problem": "Barcode scant niet",
+            "solution": "Reinig de barcode, verbeter verlichting of voer handmatig in"
+          },
+          {
+            "problem": "Verkeerd product",
+            "solution": "Controleer of er meerdere barcodes op de verpakking staan"
+          },
+          {
+            "problem": "Hoeveelheidsverschil",
+            "solution": "Controleer fysieke telling tegen systeemregistraties"
+          },
+          {
+            "problem": "Dubbele producten",
+            "solution": "Gebruik de batch review functie om duplicaten te identificeren"
+          }
+        ]
+      }
+    }
+  },
   "contactpage": {
     "title": "Contact",
     "subtitle": "Wij zijn er om u te helpen",

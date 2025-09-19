@@ -50,14 +50,17 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
                   </div>
 
                   {/* Description */}
-                  <Typography variant="p" className="text-muted-foreground leading-relaxed">
-                    {item.description}
-                  </Typography>
+                  <div className="flex flex-col gap-2">
 
-                  {/* Link text with hover effect */}
-                  <div className="inline-flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all duration-200 group-hover:text-primary-700">
-                    <span>{item.linkText}</span>
-                    <ExternalLink className="h-4 w-4" />
+                    <Typography variant="p" className="text-muted-foreground leading-relaxed">
+                      {item.description}
+                    </Typography>
+
+                    {/* Link text with hover effect */}
+                    <div className="inline-flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all duration-200 group-hover:text-primary-700">
+                      <span>{item.linkText}</span>
+                      <ExternalLink className="h-4 w-4" />
+                    </div>
                   </div>
                 </div>
               </CardContent>

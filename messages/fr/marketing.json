@@ -326,6 +326,296 @@
       "button": "Commencer l'essai gratuit"
     }
   },
+  "support": {
+    "mainPage": {
+      "title": "Centre d'aide",
+      "subtitle": "Trouvez des guides et articles pour tirer le meilleur parti de LIFO",
+      "sections": {
+        "gettingStarted": {
+          "title": "Commencer",
+          "description": "Tout ce que vous devez savoir pour commencer à utiliser LIFO efficacement"
+        },
+        "workflowsProcesses": {
+          "title": "Flux de travail et processus",
+          "description": "Guides étape par étape pour les flux de travail principaux de LIFO"
+        }
+      },
+      "articles": {
+        "quickStartGuide": {
+          "title": "Guide de démarrage rapide",
+          "description": "Soyez opérationnel avec LIFO en moins de 10 minutes",
+          "readTime": "5 min"
+        },
+        "inventoryManagement": {
+          "title": "Gestion des stocks",
+          "description": "Vues en temps réel, alertes et rapprochement",
+          "readTime": "5 min"
+        },
+        "scanInProcess": {
+          "title": "Processus de scan d'entrée",
+          "description": "Enregistrement des livraisons, retours et nouveaux stocks",
+          "readTime": "4 min"
+        },
+        "multiStoreManagement": {
+          "title": "Gestion multi-magasins",
+          "description": "Gestion de plusieurs emplacements et accès du personnel",
+          "readTime": "5 min",
+          "comingSoon": true
+        },
+        "userRolesPermissions": {
+          "title": "Rôles et permissions utilisateurs",
+          "description": "Comprendre les différents niveaux d'accès et capacités",
+          "readTime": "6 min",
+          "comingSoon": true
+        },
+        "scanOutProcess": {
+          "title": "Processus de scan de sortie",
+          "description": "Enregistrement des ventes, remises, dons et déchets",
+          "readTime": "8 min",
+          "comingSoon": true
+        }
+      },
+      "contactSupport": {
+        "title": "Besoin d'aide supplémentaire ?",
+        "description": "Vous ne trouvez pas ce que vous cherchez ? Notre équipe est là pour vous aider.",
+        "buttons": {
+          "contactSupport": "Contacter le support",
+          "emailUs": "Nous écrire"
+        }
+      },
+      "common": {
+        "comingSoon": "Bientôt disponible",
+        "readTime": "min de lecture"
+      }
+    },
+    "quickStartGuide": {
+      "title": "Guide de démarrage rapide",
+      "description": "Soyez opérationnel avec LIFO en quelques étapes simples",
+      "readTime": "5 min de lecture",
+      "intro": "Bienvenue sur LIFO ! Ce guide vous aidera à configurer votre système de gestion des stocks et à commencer avec vos premiers produits en quelques minutes.",
+      "steps": {
+        "initialSetup": {
+          "title": "Étape 1 : Configuration initiale",
+          "description": "Configurez vos paramètres de base et vos préférences :",
+          "items": [
+            "Complétez votre profil d'entreprise",
+            "Configurez votre premier point de vente",
+            "Paramétrez vos préférences de notification",
+            "Choisissez votre devise et vos unités"
+          ]
+        },
+        "teamSetup": {
+          "title": "Étape 2 : Configuration de l'équipe",
+          "description": "Ajoutez des membres à votre équipe et configurez leurs niveaux d'accès :",
+          "items": [
+            "Invitez les membres de l'équipe par email",
+            "Attribuez les rôles et permissions",
+            "Configurez les contrôles d'accès au magasin",
+            "Paramétrez les workflows d'approbation"
+          ]
+        },
+        "firstProducts": {
+          "title": "Étape 3 : Ajoutez vos premiers produits",
+          "description": "Commencez à construire votre catalogue de produits :",
+          "items": [
+            "Scannez ou ajoutez manuellement les informations produits",
+            "Configurez les catégories de produits",
+            "Définissez les prix et les coûts",
+            "Téléchargez les images des produits"
+          ]
+        }
+      },
+      "nextSteps": {
+        "title": "Prochaines étapes",
+        "items": [
+          {
+            "title": "Scannez votre premier lot",
+            "description": "Traitez votre première livraison avec le processus de scan d'entrée",
+            "linkText": "En savoir plus sur le scan d'entrée →"
+          },
+          {
+            "title": "Explorez les fonctionnalités",
+            "description": "Découvrez les outils avancés de gestion des stocks",
+            "linkText": "Voir le guide d'inventaire →"
+          }
+        ]
+      }
+    },
+    "inventoryManagement": {
+      "title": "Gestion des stocks",
+      "description": "Maîtrisez votre inventaire avec les outils complets de LIFO",
+      "readTime": "5 min de lecture",
+      "intro": "Une gestion efficace des stocks est cruciale pour le succès de votre entreprise. LIFO fournit des outils complets pour suivre, analyser et optimiser vos niveaux de stock.",
+      "features": {
+        "inventoryTracking": {
+          "title": "Suivi des stocks",
+          "description": "Suivez les niveaux de stock en temps réel avec des mises à jour automatiques des opérations d'entrée/sortie",
+          "items": [
+            {
+              "title": "Mises à jour en temps réel",
+              "description": "Ajustements automatiques de l'inventaire à chaque scan"
+            },
+            {
+              "title": "Support multi-sites",
+              "description": "Suivez les stocks dans différents entrepôts"
+            },
+            {
+              "title": "Suivi par lots",
+              "description": "Surveillez l'inventaire par lots de livraison"
+            },
+            {
+              "title": "Variantes de produits",
+              "description": "Suivi distinct pour les tailles, couleurs et configurations"
+            }
+          ]
+        },
+        "analyticsReporting": {
+          "title": "Analyses et rapports",
+          "description": "Obtenez des insights sur la performance de votre inventaire avec des analyses complètes",
+          "items": [
+            {
+              "title": "Taux de rotation",
+              "description": "Identifiez les produits à rotation rapide et lente"
+            },
+            {
+              "title": "Vieillissement des stocks",
+              "description": "Suivez la durée de stockage des produits"
+            },
+            {
+              "title": "Prévision de la demande",
+              "description": "Anticipez les besoins futurs en stock"
+            },
+            {
+              "title": "Analyse des coûts",
+              "description": "Surveillez les coûts de stockage et les frais"
+            }
+          ]
+        },
+        "stockAlerts": {
+          "title": "Alertes et notifications",
+          "description": "Restez informé des niveaux critiques de stock avec des alertes automatisées",
+          "items": [
+            {
+              "title": "Alertes de stock bas",
+              "description": "Notifications quand le stock passe sous le seuil"
+            },
+            {
+              "title": "Alertes de surstock",
+              "description": "Alertes en cas d'accumulation excessive"
+            },
+            {
+              "title": "Notifications d'expiration",
+              "description": "Suivez les produits approchant de leur date limite"
+            },
+            {
+              "title": "Seuils personnalisés",
+              "description": "Définissez des niveaux d'alerte spécifiques par produit"
+            }
+          ]
+        },
+        "lifoOptimization": {
+          "title": "Optimisation LIFO",
+          "description": "Utilisez la méthode Last-In-First-Out pour une gestion optimale des stocks",
+          "items": [
+            {
+              "title": "Tri LIFO automatique",
+              "description": "Le système priorise les stocks les plus récents"
+            },
+            {
+              "title": "Optimisation des coûts",
+              "description": "Maximisez la rentabilité avec une sélection intelligente"
+            },
+            {
+              "title": "Gestion de la fraîcheur",
+              "description": "Assurez-vous que les clients reçoivent les produits les plus frais"
+            },
+            {
+              "title": "Avantages fiscaux",
+              "description": "Optimisez les implications fiscales avec la comptabilité LIFO"
+            }
+          ]
+        }
+      }
+    },
+    "scanInProcess": {
+      "title": "Processus de scan d'entrée",
+      "description": "Maîtrisez le processus de scan pour ajouter des produits à votre inventaire",
+      "readTime": "4 min de lecture",
+      "intro": "Le processus de scan d'entrée est la base de la gestion des stocks dans LIFO. Utilisez ce processus lors de la réception des livraisons, des retours ou de l'ajout de nouveaux stocks.",
+      "basicSteps": {
+        "title": "Étapes de base du scan",
+        "steps": [
+          {
+            "number": 1,
+            "description": "Accédez à \"Scan d'entrée\" depuis le tableau de bord"
+          },
+          {
+            "number": 2,
+            "description": "Sélectionnez la livraison ou le lot à traiter"
+          },
+          {
+            "number": 3,
+            "description": "Scannez les codes-barres ou saisissez manuellement"
+          },
+          {
+            "number": 4,
+            "description": "Vérifiez les détails et quantités des produits"
+          },
+          {
+            "number": 5,
+            "description": "Confirmez et enregistrez le lot"
+          }
+        ]
+      },
+      "newProducts": {
+        "title": "Ajout de nouveaux produits",
+        "description": "Lors du scan de codes-barres inconnus, LIFO vous invite à créer un nouveau produit :",
+        "items": [
+          {
+            "problem": "Informations produit",
+            "solution": "Remplissez le nom et la description du produit"
+          },
+          {
+            "problem": "Catégories et attributs",
+            "solution": "Définissez la catégorie et les attributs personnalisés"
+          },
+          {
+            "problem": "Images produit",
+            "solution": "Ajoutez des images du produit si disponibles"
+          },
+          {
+            "problem": "Prix",
+            "solution": "Définissez les informations de prix"
+          }
+        ]
+      },
+      "imageRecognition": {
+        "title": "Reconnaissance d'image",
+        "description": "LIFO peut reconnaître les produits à partir d'images lorsque les codes-barres sont endommagés ou manquants. Prenez simplement une photo du produit et le système suggérera des correspondances."
+      },
+      "troubleshooting": {
+        "title": "Dépannage",
+        "items": [
+          {
+            "problem": "Le code-barre ne scanne pas",
+            "solution": "Nettoyez le code-barre, améliorez l'éclairage ou saisissez manuellement"
+          },
+          {
+            "problem": "Mauvais produit",
+            "solution": "Vérifiez s'il y a plusieurs codes-barres sur l'emballage"
+          },
+          {
+            "problem": "Différence de quantité",
+            "solution": "Vérifiez le comptage physique par rapport aux enregistrements"
+          },
+          {
+            "problem": "Produits en double",
+            "solution": "Utilisez la fonction de révision des lots pour identifier les doublons"
+          }
+        ]
+      }
+    }
+  },
   "contactpage": {
     "title": "Contactez-nous",
     "subtitle": "Nous sommes là pour vous aider",

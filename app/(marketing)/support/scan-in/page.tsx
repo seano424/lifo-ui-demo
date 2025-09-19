@@ -1,64 +1,107 @@
+'use client'
 import { ContentCard, SupportPageWrapper } from '@/components/support'
 import { AlertTriangle, Camera, Package, ScanLine } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-const scanInSteps = [
-  { number: 1, description: 'Navigate to "Scan In" from the main dashboard' },
-  { number: 2, description: "Select the delivery or batch you're processing" },
-  { number: 3, description: 'Scan product barcodes or enter manually' },
-  { number: 4, description: 'Verify product details and quantities' },
-  { number: 5, description: 'Confirm and save the batch' },
-]
-
-const newProductFeatures = [
-  { problem: 'Product Information', solution: 'Fill in product name and description' },
-  { problem: 'Categories & Attributes', solution: 'Set category and any custom attributes' },
-  { problem: 'Product Images', solution: 'Add product images if available' },
-  { problem: 'Pricing', solution: 'Set pricing information' },
-]
-
-const troubleshootingItems = [
+const getScanInSteps = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
   {
-    problem: "Barcode Won't Scan",
-    solution: 'Clean the barcode, improve lighting, or enter manually',
+    number: 1,
+    description: t('basicSteps.steps.0.description'),
   },
-  { problem: 'Wrong Product', solution: 'Check if there are multiple barcodes on the packaging' },
-  { problem: 'Quantity Mismatch', solution: 'Double-check physical count against system records' },
-  { problem: 'Duplicate Entries', solution: 'Use the batch review feature to identify duplicates' },
+  {
+    number: 2,
+    description: t('basicSteps.steps.1.description'),
+  },
+  {
+    number: 3,
+    description: t('basicSteps.steps.2.description'),
+  },
+  {
+    number: 4,
+    description: t('basicSteps.steps.3.description'),
+  },
+  {
+    number: 5,
+    description: t('basicSteps.steps.4.description'),
+  },
+]
+
+const getNewProductFeatures = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
+  {
+    problem: t('newProducts.items.0.problem'),
+    solution: t('newProducts.items.0.solution'),
+  },
+  {
+    problem: t('newProducts.items.1.problem'),
+    solution: t('newProducts.items.1.solution'),
+  },
+  {
+    problem: t('newProducts.items.2.problem'),
+    solution: t('newProducts.items.2.solution'),
+  },
+  {
+    problem: t('newProducts.items.3.problem'),
+    solution: t('newProducts.items.3.solution'),
+  },
+]
+
+const getTroubleshootingItems = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
+  {
+    problem: t('troubleshooting.items.0.problem'),
+    solution: t('troubleshooting.items.0.solution'),
+  },
+  {
+    problem: t('troubleshooting.items.1.problem'),
+    solution: t('troubleshooting.items.1.solution'),
+  },
+  {
+    problem: t('troubleshooting.items.2.problem'),
+    solution: t('troubleshooting.items.2.solution'),
+  },
+  {
+    problem: t('troubleshooting.items.3.problem'),
+    solution: t('troubleshooting.items.3.solution'),
+  },
 ]
 
 export default function ScanInProcessPage() {
+  const t = useTranslations('support.scanInProcess')
+  const scanInSteps = getScanInSteps(t)
+  const newProductFeatures = getNewProductFeatures(t)
+  const troubleshootingItems = getTroubleshootingItems(t)
+
   return (
     <SupportPageWrapper
-      title="Scan-In Process"
-      description="Master the scan-in workflow for adding products to your inventory"
-      readTime="4 min read"
-      intro="The scan-in process is the foundation of inventory management in LIFO. Use this process when receiving deliveries, returns, or adding new inventory."
+      title={t('title')}
+      description={t('description')}
+      readTime={t('readTime')}
+      intro={t('intro')}
     >
       <div className="space-y-6">
         <ContentCard
-          title="Basic Scan-In Steps"
+          title={t('basicSteps.title')}
           icon={ScanLine}
           variant="steps"
           steps={scanInSteps}
         />
 
         <ContentCard
-          title="Adding New Products"
-          description="When scanning unknown barcodes, LIFO will prompt you to create a new product:"
+          title={t('newProducts.title')}
+          description={t('newProducts.description')}
           icon={Package}
           variant="troubleshooting"
           troubleshootingItems={newProductFeatures}
         />
 
         <ContentCard
-          title="Image Recognition"
-          description="LIFO can recognize products from images when barcodes are damaged or missing. Simply take a photo of the product and the system will suggest matches."
+          title={t('imageRecognition.title')}
+          description={t('imageRecognition.description')}
           icon={Camera}
           variant="simple"
         />
 
         <ContentCard
-          title="Troubleshooting"
+          title={t('troubleshooting.title')}
           icon={AlertTriangle}
           variant="troubleshooting"
           troubleshootingItems={troubleshootingItems}
