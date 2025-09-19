@@ -1,9 +1,9 @@
 'use client'
 
-import { ContactForm } from '@/components/contact-form'
-import { Typography } from '@/components/ui/typography'
 import { Mail, MessageSquare, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { ContactForm } from '@/components/contact-form'
+import { Typography } from '@/components/ui/typography'
 
 export default function Contact() {
   const t = useTranslations('contactpage')
@@ -54,10 +54,16 @@ export default function Contact() {
                   <MessageSquare size={20} strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Typography variant="h3" className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2">
+                  <Typography
+                    variant="h3"
+                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                  >
                     {t('features.support.title')}
                   </Typography>
-                  <Typography variant="p" className="text-xs lg:text-sm text-foreground/70 leading-relaxed">
+                  <Typography
+                    variant="p"
+                    className="text-xs lg:text-sm text-foreground/70 leading-relaxed"
+                  >
                     {t('features.support.description')}
                   </Typography>
                 </div>
@@ -68,10 +74,16 @@ export default function Contact() {
                   <Users size={20} strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Typography variant="h3" className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2">
+                  <Typography
+                    variant="h3"
+                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                  >
                     {t('features.expertise.title')}
                   </Typography>
-                  <Typography variant="p" className="text-xs lg:text-sm text-foreground/70 leading-relaxed">
+                  <Typography
+                    variant="p"
+                    className="text-xs lg:text-sm text-foreground/70 leading-relaxed"
+                  >
                     {t('features.expertise.description')}
                   </Typography>
                 </div>
@@ -82,10 +94,16 @@ export default function Contact() {
                   <Mail size={20} strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Typography variant="h3" className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2">
+                  <Typography
+                    variant="h3"
+                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                  >
                     {t('features.followup.title')}
                   </Typography>
-                  <Typography variant="p" className="text-xs lg:text-sm text-foreground/70 leading-relaxed">
+                  <Typography
+                    variant="p"
+                    className="text-xs lg:text-sm text-foreground/70 leading-relaxed"
+                  >
                     {t('features.followup.description')}
                   </Typography>
                 </div>

@@ -1,20 +1,27 @@
-import { Typography } from '@/components/ui/typography'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { RevealAnimation } from '@/components/ui/reveal-animation'
-import { 
-  BookOpen, 
-  Zap, 
-  Users, 
-  Workflow,
-  ScanLine,
-  Package,
-  ChevronRight,
-  Clock
-} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { ChevronRight, Clock, Workflow, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 
-const supportSections = [
+interface SupportArticle {
+  title: string
+  description: string
+  href: string
+  readTime: string
+  comingSoon?: boolean
+}
+
+interface SupportSection {
+  id: string
+  title: string
+  description: string
+  icon: LucideIcon
+  articles: SupportArticle[]
+}
+
+const supportSections: SupportSection[] = [
   {
     id: 'getting-started',
     title: 'Getting Started',
@@ -23,157 +30,212 @@ const supportSections = [
     articles: [
       {
         title: 'Quick Start Guide',
-        description: 'Welcome to LIFO - Overview and value proposition',
-        href: '/support/getting-started/quick-start-guide',
-        readTime: '5 min'
-      },
-      {
-        title: 'System Requirements',
-        description: 'iOS/Android compatibility, browser requirements',
-        href: '/support/getting-started/system-requirements',
-        readTime: '2 min'
-      },
-      {
-        title: 'Account Setup Process',
-        description: 'Step-by-step store onboarding',
-        href: '/support/getting-started/account-setup',
-        readTime: '8 min'
-      },
-      {
-        title: 'User Roles & Permissions',
-        description: 'Admin, Manager, and Employee role guides',
-        href: '/support/getting-started/user-roles',
-        readTime: '6 min'
-      }
-    ]
-  },
-  {
-    id: 'workflows',
-    title: 'Core Workflow Guides',
-    description: 'Master the essential processes that power your inventory management',
-    icon: Workflow,
-    articles: [
-      {
-        title: 'Scan-In Process',
-        description: 'Adding products, batch registration, and troubleshooting',
-        href: '/support/workflows/scan-in',
-        readTime: '10 min'
-      },
-      {
-        title: 'Scan-Out Process',
-        description: 'Recording sales, discounts, donations, and waste',
-        href: '/support/workflows/scan-out',
-        readTime: '8 min'
+        description: 'Get up and running with LIFO in under 10 minutes',
+        href: '/support/quick-start-guide',
+        readTime: '5 min',
       },
       {
         title: 'Inventory Management',
         description: 'Real-time views, alerts, and reconciliation',
-        href: '/support/workflows/inventory-management',
-        readTime: '12 min'
-      }
-    ]
-  }
+        href: '/support/inventory-management',
+        readTime: '5 min',
+      },
+      {
+        title: 'Scan-In Process',
+        description: 'Recording deliveries, returns, and new inventory',
+        href: '/support/scan-in',
+        readTime: '4 min',
+      },
+    ],
+  },
+  {
+    id: 'workflows',
+    title: 'Workflows & Processes',
+    description: 'Step-by-step guides for core LIFO workflows',
+    icon: Workflow,
+    articles: [
+      {
+        title: 'Multi-Store Management',
+        description: 'Managing multiple locations and staff access',
+        href: '/support/multi-store',
+        readTime: '5 min',
+        comingSoon: true,
+      },
+      {
+        title: 'User Roles & Permissions',
+        description: 'Understanding different access levels and capabilities',
+        href: '/support/roles-permissions',
+        readTime: '6 min',
+        comingSoon: true,
+      },
+      {
+        title: 'Scan-Out Process',
+        description: 'Recording sales, discounts, donations, and waste',
+        href: '/support/scan-out',
+        readTime: '8 min',
+        comingSoon: true,
+      },
+    ],
+  },
+  // {
+  //   id: 'products',
+  //   title: 'Product Management',
+  //   description: 'Managing your inventory catalog and product data',
+  //   icon: Package,
+  //   articles: [
+  //     {
+  //       title: 'Adding Products',
+  //       description: 'Creating and configuring product entries',
+  //       href: '/support/adding-products',
+  //       readTime: '7 min'
+  //     },
+  //     {
+  //       title: 'Barcode Scanning',
+  //       description: 'Working with barcodes and scanning',
+  //       href: '/support/barcode-scanning',
+  //       readTime: '5 min'
+  //     },
+  //     {
+  //       title: 'Product Categories',
+  //       description: 'Organizing products with categories and tags',
+  //       href: '/support/categories',
+  //       readTime: '8 min'
+  //     }
+  //   ]
+  // }
 ]
 
 export default function SupportPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-24 items-center">
-        <div className="flex-1 flex flex-col gap-12 max-w-6xl px-5 sm:p-5 w-full">
-          
-          {/* Hero Section */}
-          <RevealAnimation direction="none">
-            <div className="text-center space-y-6 py-12">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
-                <BookOpen size={16} />
-                Knowledge Base
+    <main className="min-h-screen py-20 px-4 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="flex flex-col items-center justify-center mb-16">
+          <Typography
+            as="h1"
+            className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
+          >
+            Support Center
+          </Typography>
+          <Typography
+            variant="p"
+            className="text-center text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed"
+          >
+            Find guides and articles to help you get the most out of LIFO
+          </Typography>
+        </div>
+
+        {/* Support Sections */}
+        <div className="space-y-8 sm:space-y-12">
+          {supportSections.map(section => (
+            <div key={section.id} className="space-y-4 sm:space-y-6">
+              {/* Section Header */}
+              <div className="flex items-start gap-3 sm:items-center">
+                <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                  <section.icon className="h-8 w-8 text-primary" />
+                </div>
+                <div className="min-w-0 flex flex-col">
+                  <Typography variant="h2" className="text-lg sm:text-xl font-semibold">
+                    {section.title}
+                  </Typography>
+                  <Typography variant="p" color="muted" className="text-sm sm:text-base">
+                    {section.description}
+                  </Typography>
+                </div>
               </div>
-              <Typography variant="h1" className="text-4xl sm:text-5xl">
-                LIFO Support Center
-              </Typography>
-              <Typography variant="p" color="muted" className="text-xl max-w-2xl mx-auto">
-                Master your inventory management with our comprehensive guides. 
-                Everything you need to use LIFO like a pro.
-              </Typography>
-            </div>
-          </RevealAnimation>
 
-          {/* Support Sections */}
-          <div className="space-y-16">
-            {supportSections.map((section, sectionIndex) => (
-              <RevealAnimation 
-                key={section.id} 
-                delay={0.2 * (sectionIndex + 1)} 
-                direction="up"
-              >
-                <div className="space-y-6">
-                  {/* Section Header */}
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <section.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <Typography variant="h2" className="text-2xl font-bold">
-                        {section.title}
-                      </Typography>
-                      <Typography variant="p" color="muted">
-                        {section.description}
-                      </Typography>
-                    </div>
-                  </div>
-
-                  {/* Articles Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {section.articles.map((article) => (
-                      <Link key={article.href} href={article.href}>
-                        <Card className="h-full hover:shadow-lg transition-shadow duration-300 hover:border-primary/20 group cursor-pointer">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between">
-                              <Typography variant="h3" className="text-lg font-semibold group-hover:text-primary transition-colors">
-                                {article.title}
-                              </Typography>
-                              <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 ml-2 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <Typography variant="p" color="muted" className="text-sm mb-3">
-                              {article.description}
+              {/* Articles Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {section.articles.map(article =>
+                  article.comingSoon ? (
+                    <Card key={article.href} className="h-full opacity-60 cursor-not-allowed">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <Typography
+                            variant="h3"
+                            className="text-sm sm:text-base font-medium leading-tight text-muted-foreground"
+                          >
+                            {article.title}
+                          </Typography>
+                          <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-md">
+                            Coming Soon
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <Typography
+                          variant="p"
+                          color="muted"
+                          className="text-xs sm:text-sm mb-3 line-clamp-2"
+                        >
+                          {article.description}
+                        </Typography>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground font-bold">
+                          <Clock className="h-3 w-3 " />
+                          <span>{article.readTime}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Link key={article.href} href={article.href}>
+                      <Card className="h-full hover:shadow-md transition-shadow duration-200 cursor-pointer">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <Typography
+                              variant="h3"
+                              className="text-sm sm:text-base font-medium leading-tight"
+                            >
+                              {article.title}
                             </Typography>
-                            <div className="inline-flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                              <Clock size={12} />
-                              {article.readTime} read
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </RevealAnimation>
-            ))}
-          </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <Typography
+                            variant="p"
+                            color="muted"
+                            className="text-xs sm:text-sm mb-3 line-clamp-2"
+                          >
+                            {article.description}
+                          </Typography>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground font-bold">
+                            <Clock className="h-3 w-3 " />
+                            <span>{article.readTime}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ),
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
 
-          {/* CTA Section */}
-          <RevealAnimation delay={0.8} direction="up">
-            <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-              <CardContent className="p-8 text-center">
-                <Typography variant="h3" className="text-xl font-semibold mb-3">
-                  Need More Help?
-                </Typography>
-                <Typography variant="p" color="muted" className="mb-6">
-                  Can't find what you're looking for? Our support team is here to help.
-                </Typography>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="outline" asLink href="/contact">
-                    Contact Support
+        {/* Contact Support */}
+        <div className="border-t pt-6 sm:pt-8 mt-8 sm:mt-12">
+          <Card className="bg-muted/30">
+            <CardContent className="p-4 sm:p-6 bg-white/75 rounded-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  <Typography variant="h3" className="text-base sm:text-lg font-semibold mb-1">
+                    Need More Help?
+                  </Typography>
+                  <Typography variant="p" color="muted" className="text-sm">
+                    Can't find what you're looking for? Our team is here to help.
+                  </Typography>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
+                    <Link href="/contact">Contact Support</Link>
                   </Button>
-                  <Button asLink href="/onboarding/create-account">
-                    Start Your Free Trial
+                  <Button size="sm" className="w-full sm:w-auto" asChild>
+                    <Link href="mailto:support@lifo-app.com">Email Us</Link>
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </RevealAnimation>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </main>

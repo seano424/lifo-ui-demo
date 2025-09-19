@@ -116,6 +116,10 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       url: '/pricing',
     },
     {
+      title: t('support'),
+      url: '/support',
+    },
+    {
       title: t('contactUs'),
       url: '/contact',
     },

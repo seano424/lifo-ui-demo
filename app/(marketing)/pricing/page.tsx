@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
 import { ArrowRight, Building2, Check, Sparkles, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
+import { Typography } from '@/components/ui/typography'
 
 interface PricingCardProps {
   title: string
@@ -139,10 +139,9 @@ function PricingCard({
         </Button>
       ) : (
         <Button
-          className={`w-full group-hover:scale-105 transition-transform duration-300 ${isPopular
-            ? 'hover:from-primary-700 hover:to-secondary-700'
-            : ''
-            }`}
+          className={`w-full group-hover:scale-105 transition-transform duration-300 ${
+            isPopular ? 'hover:from-primary-700 hover:to-secondary-700' : ''
+          }`}
           asLink={true}
           href="/onboarding/create-account"
         >
@@ -221,7 +220,6 @@ export default function PricingPage() {
               },
             ]}
             isComingSoon={true}
-
             sellingPoint={t('plans.light.sellingPoint')}
             icon={<Users size={24} />}
           />
@@ -252,7 +250,6 @@ export default function PricingPage() {
             ]}
             sellingPoint={t('plans.pro.sellingPoint')}
             isComingSoon={true}
-
             icon={<Building2 size={24} />}
           />
 
