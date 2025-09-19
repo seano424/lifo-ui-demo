@@ -178,7 +178,7 @@ class TestScoringMathematicalVulnerabilities:
     def test_donation_scoring_component_validation(self):
         """🚨 NEW: Test donation scoring component edge cases"""
         scorer = InventoryScorer()
-        
+
         # Test donation scoring with extreme values
         extreme_scenarios = [
             ("", -100.0, -50, "invalid_strategy", 999.0),  # Invalid category and strategy
@@ -187,7 +187,7 @@ class TestScoringMathematicalVulnerabilities:
             ("dairy", 25.0, 2, "balanced", float('inf')),  # Infinite multiplier
             (None, 10.0, 1, None, -5.0),  # None values and negative multiplier
         ]
-        
+
         for category, margin, days, strategy, multiplier in extreme_scenarios:
             try:
                 score = scorer.calculate_donation_score(
@@ -197,12 +197,12 @@ class TestScoringMathematicalVulnerabilities:
                     store_donation_strategy=strategy or "balanced",
                     donation_multiplier=multiplier if not math.isinf(multiplier) else 1.0
                 )
-                
+
                 # Validation checks for donation score
                 assert 0.0 <= score <= 1.0, f"Donation score out of range: {score}"
                 assert not math.isnan(score), f"Donation score is NaN: {score}"
                 assert not math.isinf(score), f"Donation score is infinite: {score}"
-                
+
             except Exception as e:
                 # Should handle gracefully, not crash
                 assert "division by zero" not in str(e).lower(), f"Division by zero in donation scoring: {e}"
@@ -210,7 +210,7 @@ class TestScoringMathematicalVulnerabilities:
     def test_enhanced_composite_scoring_bounds(self):
         """🚨 NEW: Test enhanced 4-component composite scoring bounds"""
         scorer = InventoryScorer()
-        
+
         # Test that enhanced composite score stays within bounds
         test_combinations = [
             (1.0, 1.0, 1.0, 1.0),  # All maximum
@@ -219,7 +219,7 @@ class TestScoringMathematicalVulnerabilities:
             (1.0, 0.0, 0.5, 0.2),  # High expiry, low velocity
             (0.1, 1.0, 0.1, 1.0),  # Low expiry, high velocity and donation
         ]
-        
+
         for expiry, velocity, margin, donation in test_combinations:
             composite = scorer._calculate_composite_score_with_donation(
                 expiry_score=expiry,
@@ -227,29 +227,29 @@ class TestScoringMathematicalVulnerabilities:
                 margin_score=margin,
                 donation_score=donation
             )
-            
+
             assert 0.0 <= composite <= 1.0, f"Composite score out of bounds: {composite}"
             assert not math.isnan(composite), f"Composite score is NaN: {composite}"
             assert not math.isinf(composite), f"Composite score is infinite: {composite}"
 
     def test_donation_weight_validation_bypass(self):
         """🚨 NEW: Test donation weight validation in enhanced scoring"""
-        
+
         # Test enhanced weights that sum correctly
         valid_enhanced_weights = ScoringWeights(
             expiry=0.40, velocity=0.25, margin=0.15, donation=0.20
         )
-        
+
         try:
             valid_enhanced_weights.validate_sum()
         except ValueError:
             pytest.fail("Valid enhanced weights should pass validation")
-        
+
         # Test enhanced weights that sum incorrectly
         invalid_enhanced_weights = ScoringWeights(
             expiry=0.50, velocity=0.30, margin=0.20, donation=0.20  # Sum = 1.2
         )
-        
+
         with pytest.raises(ValueError):
             invalid_enhanced_weights.validate_sum()
 

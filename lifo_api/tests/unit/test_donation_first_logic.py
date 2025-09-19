@@ -3,12 +3,16 @@ Comprehensive unit tests for donation-first enhancement logic
 Tests the enhanced scoring algorithm, donation preference system, and store configuration
 """
 
-import pytest
 from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 
-from app.core.scoring import InventoryScorer, ScoringWeights, ScoringResult
-from app.core.donation_engine import SimplifiedDonationEngine, DonationPriority, SimpleActionRecommendation
+import pytest
+
+from app.core.donation_engine import (
+    DonationPriority,
+    SimplifiedDonationEngine,
+)
+from app.core.scoring import InventoryScorer, ScoringResult, ScoringWeights
 from app.database.inventory_models import ActionType, DonationRecipientType
 
 
@@ -31,7 +35,7 @@ class TestDonationScoringAlgorithm:
             store_donation_strategy="balanced",
             donation_multiplier=1.0
         )
-        
+
         assert 0.7 <= score <= 1.0, f"Fresh produce should have high donation score, got {score}"
 
     def test_donation_score_calculation_special_handling(self, scorer):
@@ -44,7 +48,7 @@ class TestDonationScoringAlgorithm:
             store_donation_strategy="balanced",
             donation_multiplier=1.0
         )
-        
+
         assert 0.3 <= score <= 0.6, f"Special handling categories should have moderate donation scores, got {score}"
 
     def test_donation_score_with_different_strategies(self, scorer):
@@ -55,22 +59,22 @@ class TestDonationScoringAlgorithm:
             "days_to_expiry": 2,
             "donation_multiplier": 1.0
         }
-        
+
         donation_first_score = scorer.calculate_donation_score(
             **test_params,
             store_donation_strategy="donation_first"
         )
-        
+
         balanced_score = scorer.calculate_donation_score(
             **test_params,
             store_donation_strategy="balanced"
         )
-        
+
         discount_first_score = scorer.calculate_donation_score(
             **test_params,
             store_donation_strategy="discount_first"
         )
-        
+
         assert donation_first_score > balanced_score > discount_first_score, \
             f"Scores should decrease: donation_first ({donation_first_score}) > balanced ({balanced_score}) > discount_first ({discount_first_score})"
 
@@ -83,7 +87,7 @@ class TestDonationScoringAlgorithm:
             store_donation_strategy="balanced",
             donation_multiplier=1.0
         )
-        
+
         enhanced_score = scorer.calculate_donation_score(
             category="dry_goods",
             margin_percent=10.0,
@@ -91,7 +95,7 @@ class TestDonationScoringAlgorithm:
             store_donation_strategy="balanced",
             donation_multiplier=2.0
         )
-        
+
         assert enhanced_score > base_score, f"Enhanced multiplier should increase score: {enhanced_score} > {base_score}"
 
     def test_enhanced_composite_scoring_with_donation_component(self, scorer):
@@ -101,7 +105,7 @@ class TestDonationScoringAlgorithm:
         scorer.calculate_velocity_score = Mock(return_value=0.6)
         scorer.calculate_margin_score = Mock(return_value=0.4)
         scorer.calculate_donation_score = Mock(return_value=0.9)
-        
+
         # Test composite calculation
         composite_score = scorer._calculate_composite_score_with_donation(
             expiry_score=0.8,
@@ -110,7 +114,7 @@ class TestDonationScoringAlgorithm:
             donation_score=0.9,
             weights=ScoringWeights()
         )
-        
+
         # Expected: (0.8 * 0.40) + (0.6 * 0.25) + (0.4 * 0.15) + (0.9 * 0.20) = 0.32 + 0.15 + 0.06 + 0.18 = 0.71
         expected_score = 0.71
         assert abs(composite_score - expected_score) < 0.01, f"Expected {expected_score}, got {composite_score}"
@@ -118,7 +122,7 @@ class TestDonationScoringAlgorithm:
     def test_weighted_scoring_distribution(self, scorer):
         """Test that scoring weights are properly distributed"""
         weights = ScoringWeights()
-        
+
         assert weights.expiry == 0.40, "Expiry weight should be 40%"
         assert weights.velocity == 0.25, "Velocity weight should be 25%"
         assert weights.margin == 0.15, "Margin weight should be 15%"
@@ -144,20 +148,20 @@ class TestDonationEngine:
             "selling_price": 10.0,
             "current_quantity": 5.0
         }
-        
+
         store_config = {
             "strategy": "donation_first",
             "donation_first_threshold": 0.4,
             "force_donation_categories": [],
             "min_margin_for_discount": 5.0
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.7,
             store_donation_config=store_config
         )
-        
+
         assert recommendation.recommended_action == ActionType.DONATE, f"Should recommend donation, got {recommendation.recommended_action}"
         assert recommendation.priority == DonationPriority.CRITICAL, f"Should be critical priority, got {recommendation.priority}"
         assert "Donation-first approach" in recommendation.notes
@@ -172,21 +176,21 @@ class TestDonationEngine:
             "selling_price": 10.0,  # 40% margin
             "current_quantity": 10.0
         }
-        
+
         store_config = {
             "strategy": "balanced",
             "donation_first_threshold": 0.6,
             "force_donation_categories": [],
             "min_margin_for_discount": 5.0
         }
-        
+
         # High AI score should trigger donation with balanced strategy
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.8,
             store_donation_config=store_config
         )
-        
+
         assert recommendation.recommended_action == ActionType.DONATE, f"High score should recommend donation, got {recommendation.recommended_action}"
 
     def test_discount_first_strategy_high_margin(self, engine):
@@ -199,20 +203,20 @@ class TestDonationEngine:
             "selling_price": 10.0,  # 50% margin
             "current_quantity": 8.0
         }
-        
+
         store_config = {
             "strategy": "discount_first",
             "donation_first_threshold": 0.8,
             "force_donation_categories": [],
             "min_margin_for_discount": 5.0
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.7,
             store_donation_config=store_config
         )
-        
+
         assert recommendation.recommended_action == ActionType.DISCOUNT, f"High margin should recommend discount with discount_first strategy, got {recommendation.recommended_action}"
 
     def test_forced_donation_categories(self, engine):
@@ -225,20 +229,20 @@ class TestDonationEngine:
             "selling_price": 10.0,  # High margin
             "current_quantity": 15.0
         }
-        
+
         store_config = {
             "strategy": "discount_first",
             "donation_first_threshold": 0.8,
             "force_donation_categories": ["fresh_produce"],
             "min_margin_for_discount": 5.0
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.5,  # Low AI score
             store_donation_config=store_config
         )
-        
+
         assert recommendation.recommended_action == ActionType.DONATE, f"Forced donation category should override discount_first strategy, got {recommendation.recommended_action}"
         assert "Store policy: forced donation" in recommendation.notes
 
@@ -252,20 +256,20 @@ class TestDonationEngine:
             "selling_price": 10.0,  # 5% margin
             "current_quantity": 6.0
         }
-        
+
         store_config = {
             "strategy": "balanced",
             "donation_first_threshold": 0.6,
             "force_donation_categories": [],
             "min_margin_for_discount": 15.0  # Higher than actual margin
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.7,
             store_donation_config=store_config
         )
-        
+
         assert recommendation.recommended_action == ActionType.DONATE, f"Low margin should favor donation, got {recommendation.recommended_action}"
 
     def test_quantity_threshold_for_donation(self, engine):
@@ -278,20 +282,20 @@ class TestDonationEngine:
             "selling_price": 6.0,
             "current_quantity": 0.5  # Below minimum threshold
         }
-        
+
         store_config = {
             "strategy": "donation_first",
             "donation_first_threshold": 0.4,
             "force_donation_categories": [],
             "min_margin_for_discount": 5.0
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.8,
             store_donation_config=store_config
         )
-        
+
         assert recommendation.recommended_action == ActionType.DISCOUNT, f"Small quantity should switch to discount, got {recommendation.recommended_action}"
         assert "Quantity too small" in recommendation.notes
 
@@ -302,11 +306,11 @@ class TestDonationEngine:
         assert DonationRecipientType.FOOD_BANK in fresh_recipients
         assert DonationRecipientType.SOUP_KITCHEN in fresh_recipients
         assert DonationRecipientType.ANIMAL_SHELTER in fresh_recipients
-        
+
         # Special handling categories should have limited recipients
         meat_recipients = engine._get_suitable_recipients("fresh_meat_fish")
         assert meat_recipients == [DonationRecipientType.FOOD_BANK]
-        
+
         # Bakery should have community-focused recipients
         bakery_recipients = engine._get_suitable_recipients("bakery_fresh")
         assert DonationRecipientType.SOUP_KITCHEN in bakery_recipients
@@ -322,13 +326,13 @@ class TestDonationEngine:
             "selling_price": 6.0,
             "current_quantity": 10.0
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.9,
             store_donation_config={"strategy": "donation_first"}
         )
-        
+
         assert recommendation.recommended_action == ActionType.DISPOSE, f"Expired products should be disposed, got {recommendation.recommended_action}"
         assert recommendation.priority == DonationPriority.CRITICAL
         assert "expired" in recommendation.notes.lower()
@@ -340,7 +344,7 @@ class TestDonationPreferenceIntegration:
     def test_store_preference_config_validation(self):
         """Test store donation preference configuration validation"""
         from app.api.v1.donation_preferences import DonationPreferenceConfig
-        
+
         # Test valid configuration
         valid_config = DonationPreferenceConfig(
             strategy="donation_first",
@@ -350,7 +354,7 @@ class TestDonationPreferenceIntegration:
             donation_weight_multiplier=1.5,
             social_impact_weight=0.2
         )
-        
+
         assert valid_config.strategy == "donation_first"
         assert valid_config.donation_first_threshold == 0.4
         assert valid_config.force_donation_categories == ["fresh_produce"]
@@ -358,9 +362,9 @@ class TestDonationPreferenceIntegration:
     def test_donation_preference_defaults(self):
         """Test default values for donation preferences"""
         from app.api.v1.donation_preferences import DonationPreferenceConfig
-        
+
         default_config = DonationPreferenceConfig()
-        
+
         assert default_config.strategy == "balanced"
         assert default_config.donation_first_threshold == 0.6
         assert default_config.force_donation_categories == []
@@ -370,17 +374,16 @@ class TestDonationPreferenceIntegration:
 
     def test_category_donation_suitability(self):
         """Test category-based donation suitability ratings"""
-        from app.api.v1.donation_preferences import get_donation_categories
-        
-        # This would test the endpoint but since it's async, 
+
+        # This would test the endpoint but since it's async,
         # we'll test the concept via the engine
         engine = SimplifiedDonationEngine()
-        
+
         # Excellent donation categories
         excellent_categories = {"fresh_produce", "bakery_fresh", "dry_goods"}
         for category in excellent_categories:
             assert category in engine.donation_suitable_categories, f"{category} should be donation suitable"
-        
+
         # Special handling categories
         special_categories = {"fresh_meat_fish", "dairy", "frozen"}
         for category in special_categories:
@@ -400,8 +403,7 @@ class TestScoringAPIEnhancement:
     @pytest.mark.asyncio
     async def test_donation_insights_generation(self):
         """Test donation insights generation logic"""
-        from app.core.scoring import ScoringService
-        
+
         # Create mock data
         inventory_data = [
             {
@@ -413,7 +415,7 @@ class TestScoringAPIEnhancement:
                 "days_to_expiry": 2
             },
             {
-                "batch_id": "batch_002", 
+                "batch_id": "batch_002",
                 "category": "bakery_fresh",
                 "current_quantity": 8,
                 "selling_price": 4.0,
@@ -421,7 +423,7 @@ class TestScoringAPIEnhancement:
                 "days_to_expiry": 1
             }
         ]
-        
+
         score_results = [
             ScoringResult(
                 batch_id="batch_001",
@@ -454,17 +456,17 @@ class TestScoringAPIEnhancement:
                 calculated_at=datetime.now()
             )
         ]
-        
+
         # Create scorer instance
         mock_db = AsyncMock()
         scorer = InventoryScorer(mock_db)
-        
+
         # Test insights generation
         donation_config = {"strategy": "balanced"}
         insights = await scorer._generate_donation_insights(
             inventory_data, score_results, donation_config
         )
-        
+
         assert "donation_insights" in insights
         assert insights["donation_insights"]["total_donation_suitable"] == 2
         assert insights["donation_insights"]["strategy_applied"] == "balanced"
@@ -478,7 +480,7 @@ class TestEdgeCases:
     def test_missing_store_config_fallback(self):
         """Test fallback behavior when store config is missing"""
         engine = SimplifiedDonationEngine()
-        
+
         batch_data = {
             "batch_id": "test_batch",
             "category": "fresh_produce",
@@ -487,21 +489,21 @@ class TestEdgeCases:
             "selling_price": 6.0,
             "current_quantity": 5.0
         }
-        
+
         # No store config provided - should use defaults
         recommendation = engine.evaluate_action_recommendation(
             batch_data=batch_data,
             ai_score=0.7,
             store_donation_config=None
         )
-        
+
         assert recommendation is not None
         assert recommendation.recommended_action in [ActionType.DONATE, ActionType.DISCOUNT, ActionType.MAINTAIN]
 
     def test_invalid_data_handling(self):
         """Test handling of invalid or missing data"""
         engine = SimplifiedDonationEngine()
-        
+
         invalid_batch_data = {
             "batch_id": "test_batch",
             "category": "",  # Empty category
@@ -510,12 +512,12 @@ class TestEdgeCases:
             "selling_price": 0,  # Zero price
             "current_quantity": -1  # Negative quantity
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=invalid_batch_data,
             ai_score=0.5
         )
-        
+
         # Should return a fallback recommendation
         assert recommendation.recommended_action == ActionType.MAINTAIN
         assert "evaluation failed" in recommendation.notes.lower()
@@ -523,7 +525,7 @@ class TestEdgeCases:
     def test_extreme_values_handling(self):
         """Test handling of extreme values"""
         engine = SimplifiedDonationEngine()
-        
+
         extreme_batch_data = {
             "batch_id": "extreme_test",
             "category": "fresh_produce",
@@ -532,12 +534,12 @@ class TestEdgeCases:
             "selling_price": 2000.0,  # Very high price
             "current_quantity": 10000.0  # Very large quantity
         }
-        
+
         recommendation = engine.evaluate_action_recommendation(
             batch_data=extreme_batch_data,
             ai_score=1.0  # Maximum AI score
         )
-        
+
         assert recommendation is not None
         assert recommendation.quantity_affected == 10000.0
         assert recommendation.original_value == 20000000.0  # 10000 * 2000
