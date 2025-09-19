@@ -3,7 +3,7 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
-import type { ActionableBatch } from '@/hooks/use-scoring-analytics'
+import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
 import { DiscountTab } from './tabs/discount-tab'
 import { DisposeTab } from './tabs/dispose-tab'
@@ -79,24 +79,24 @@ export function TodoActionBottomSheet({
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-semibold">
                   {selectedBatch.product_name} - Batch #
-                  {selectedBatch.batch_id.slice(0, 8).toUpperCase()}
+                  {selectedBatch.batch_number || selectedBatch.batch_id.slice(0, 8).toUpperCase()}
                 </h2>
               </div>
 
               {isHeaderExpanded && (
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center gap-4">
-                    <span className={cn('font-medium', getUrgencyColor(selectedBatch.urgency))}>
+                    <span className={cn('font-medium', getUrgencyColor(selectedBatch.urgency_level))}>
                       {calculateDaysLeft()}
                     </span>
                     <span>• {selectedBatch.current_quantity} units</span>
-                    <span className={cn('capitalize', getUrgencyColor(selectedBatch.urgency))}>
-                      • {selectedBatch.urgency} urgency
+                    <span className={cn('capitalize', getUrgencyColor(selectedBatch.urgency_level))}>
+                      • {selectedBatch.urgency_level} urgency
                     </span>
                   </div>
                   <div className="text-muted-foreground">
-                    <p className="font-medium">Suggestion: {selectedBatch.recommendation}</p>
-                    <p className="text-xs mt-1">{selectedBatch.reason}</p>
+                    <p className="font-medium">Suggestion: {selectedBatch.ai_recommendation}</p>
+                    <p className="text-xs mt-1">{selectedBatch.ai_reasoning}</p>
                   </div>
                 </div>
               )}

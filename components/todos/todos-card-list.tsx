@@ -9,41 +9,58 @@ import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-li
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
+import { type BatchActionWithDetails } from '@/hooks/use-scoring-analytics'
 import {
   type ActionableBatch,
-  type BatchActionWithDetails,
-  useStoreAnalytics,
-} from '@/hooks/use-scoring-analytics'
+  useActionableBatches,
+} from '@/hooks/use-todos-rpc'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { createTodoSorter, validateSortConfig } from '@/lib/utils/todo-sorting'
-import { memoizedBatchToTodo } from '@/lib/utils/todo-transformers'
+import { memoizedRpcBatchToTodo } from '@/lib/utils/todo-transformers'
 
 export type { BatchActionFiltersType as BatchActionFilters }
 
 interface TodosCardListProps {
   tab: string
   filters: TodoFilters
-  // Infinite query props (optional for backward compatibility)
-  infiniteData?: {
-    data: ActionableBatch[]
+  // Pre-processed batch actions for action_history tab
+  processedBatchActions?: BatchActionWithDetails[]
+  // Action history infinite scroll props
+  actionHistoryInfinite?: {
     hasNextPage?: boolean
     fetchNextPage: () => void
     isFetchingNextPage: boolean
     isLoading: boolean
-    error?: Error | null
   }
-  // Pre-processed batch actions for action_history tab
-  processedBatchActions?: BatchActionWithDetails[]
 }
 
 export function TodosCardList({
   tab,
   filters,
-  infiniteData,
   processedBatchActions = [],
+  actionHistoryInfinite,
 }: TodosCardListProps) {
+  console.log('🃏 TodosCardList render:', {
+    tab,
+    urgency: filters.urgency,
+    timestamp: Date.now()
+  })
+
   const activeStoreId = useActiveStoreId()
+
+  // Diagnostic: Check for mount/unmount cycles
+  useEffect(() => {
+    console.log('🔄 TodosCardList mounted/updated:', {
+      tab,
+      activeStoreId,
+      filtersUrgency: filters.urgency
+    })
+
+    return () => {
+      console.log('🔄 TodosCardList cleanup:', { tab })
+    }
+  }, [tab, activeStoreId, filters.urgency])
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -54,10 +71,10 @@ export function TodosCardList({
 
   // Handler for opening the bottom sheet with selected batch
   const handleTodoClick = (batchId: string) => {
-    // Find the batch from analytics response
-    const batch = analyticsResponse?.analytics?.actionable_batches?.find(
-      b => b.batch_id === batchId,
-    )
+    // Always use RPC data
+    const allBatches = rpcActionableBatches.data?.pages?.flatMap(page => page) || []
+    const batch = allBatches.find(b => b.batch_id === batchId)
+
     if (batch) {
       setSelectedBatch(batch)
       setIsBottomSheetOpen(true)
@@ -69,69 +86,71 @@ export function TodosCardList({
     setSelectedBatch(null)
   }
 
-  // Get actionable batches from store analytics for suggestions tab
-  const { data: analyticsResponse, isLoading: analyticsLoading } = useStoreAnalytics(
-    activeStoreId || '',
-  )
+  // Only use RPC hooks for non-action-history tabs
+  const shouldFetchRPC = !!activeStoreId && tab !== 'action_history'
+
+  const rpcActionableBatches = useActionableBatches(activeStoreId || '', {
+    enabled: shouldFetchRPC,
+    urgencyFilter: filters.urgency === 'all' || filters.urgency === 'maintain'
+      ? undefined
+      : filters.urgency as 'critical' | 'high' | 'medium' | 'low',
+  })
+
+  // Only log when actually fetching RPC data
+  if (shouldFetchRPC) {
+    console.log('🟢 RPC ActionableBatches:', {
+      dataCount: rpcActionableBatches.data?.pages?.flatMap(page => page).length ?? 0,
+      hasNextPage: rpcActionableBatches.hasNextPage,
+      currentTab: tab,
+      filters,
+    })
+  }
 
   // Intersection observer for auto-loading more items
   const { targetRef, isIntersecting } = useIntersectionObserver({
-    enabled: hasMore && !infiniteData?.isFetchingNextPage,
+    enabled: hasMore && !(tab === 'action_history' ? actionHistoryInfinite?.isFetchingNextPage : rpcActionableBatches.isFetchingNextPage),
     rootMargin: DEFAULT_ROOT_MARGIN,
   })
 
   // Auto-fetch next page when sentinel comes into view
   useEffect(() => {
     if (isIntersecting && hasMore) {
-      if (
-        tab !== 'action_history' &&
-        infiniteData?.fetchNextPage &&
-        !infiniteData.isFetchingNextPage
-      ) {
-        infiniteData.fetchNextPage()
-      } else if (
-        tab === 'action_history' &&
-        infiniteData?.fetchNextPage &&
-        !infiniteData.isFetchingNextPage
-      ) {
-        // For action_history, the fetchNextPage is for batch actions
-        infiniteData.fetchNextPage()
+      if (tab === 'action_history' && actionHistoryInfinite?.fetchNextPage && !actionHistoryInfinite.isFetchingNextPage) {
+        actionHistoryInfinite.fetchNextPage()
+      } else if (tab !== 'action_history' && !rpcActionableBatches.isFetchingNextPage) {
+        rpcActionableBatches.fetchNextPage()
       }
     }
-  }, [isIntersecting, hasMore, infiniteData, tab])
+  }, [isIntersecting, hasMore, tab, actionHistoryInfinite, rpcActionableBatches])
 
   // Memoized data processing to avoid expensive recalculations
   const processedTodos = useMemo(() => {
-    if (tab === 'suggestions') {
-      // Use infinite data for consistency - avoid mixing data sources
-      if (infiniteData) {
-        const batches = infiniteData.data || []
-        const actionableTodos = memoizedBatchToTodo(batches)
-        // Only apply sorting since urgency filtering is already done in the hook
-        return applySorting(actionableTodos, filters)
-      }
-      // Fallback to analytics data only if infinite data is not available
-      else if (analyticsResponse?.analytics?.actionable_batches) {
-        const batches = analyticsResponse.analytics.actionable_batches
-        const actionableTodos = memoizedBatchToTodo(batches)
-        return applyFiltersAndSorting(actionableTodos, filters)
-      }
-    } else if (tab === 'recently_expired' && analyticsResponse?.analytics?.actionable_batches) {
-      const expiredBatches = analyticsResponse.analytics.actionable_batches.filter(
-        (batch: ActionableBatch) => new Date(batch.expiry_date) < new Date(),
-      )
+    // Get all batches from RPC
+    const allBatches = rpcActionableBatches.data?.pages?.flatMap(page => page) || []
 
-      const expiredTodos = memoizedBatchToTodo(expiredBatches)
+    if (tab === 'suggestions') {
+      // Filter for suggestions (urgent_action or needs_attention)
+      const suggestionBatches = allBatches.filter(
+        batch => batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention'
+      )
+      const actionableTodos = memoizedRpcBatchToTodo(suggestionBatches)
+      return applySorting(actionableTodos, filters)
+    } else if (tab === 'recently_expired') {
+      // Filter for expired items
+      const expiredBatches = allBatches.filter(
+        batch => batch.todo_state === 'expired'
+      )
+      const expiredTodos = memoizedRpcBatchToTodo(expiredBatches)
       return applySorting(expiredTodos, filters, {
         field: 'expiry_date',
         direction: 'asc',
       })
-    } else if (tab === 'all_active' && analyticsResponse?.analytics?.actionable_batches) {
-      const activeBatches = analyticsResponse.analytics.actionable_batches.filter(
-        (batch: ActionableBatch) => new Date(batch.expiry_date) >= new Date(),
+    } else if (tab === 'all_active') {
+      // Filter for active (non-expired) items
+      const activeBatches = allBatches.filter(
+        batch => batch.todo_state !== 'expired'
       )
-
-      const activeTodos = memoizedBatchToTodo(activeBatches)
+      const activeTodos = memoizedRpcBatchToTodo(activeBatches)
       const filteredTodos = applyUrgencyFilter(activeTodos, filters)
       return applySorting(filteredTodos, filters, {
         field: 'urgency',
@@ -140,23 +159,23 @@ export function TodosCardList({
     }
 
     return []
-  }, [tab, filters, infiniteData, analyticsResponse?.analytics?.actionable_batches])
+  }, [tab, filters, rpcActionableBatches.data])
 
   // Update state when processed data changes
   useEffect(() => {
     if (tab !== 'action_history') {
       setTodos(processedTodos)
-      setHasMore(infiniteData?.hasNextPage || false)
-      setIsLoading(infiniteData?.isLoading || analyticsLoading)
+      setHasMore(rpcActionableBatches.hasNextPage || false)
+      setIsLoading(rpcActionableBatches.isLoading)
     } else {
-      // For action history, we don't use todos state since we use processedBatchActions directly
+      // For action history, we use processedBatchActions directly from props
       setTodos([])
-      setHasMore(infiniteData?.hasNextPage || false)
-      setIsLoading(infiniteData?.isLoading || false)
+      setHasMore(actionHistoryInfinite?.hasNextPage || false)
+      setIsLoading(actionHistoryInfinite?.isLoading || false)
     }
-  }, [processedTodos, tab, infiniteData?.hasNextPage, infiniteData?.isLoading, analyticsLoading])
+  }, [processedTodos, tab, rpcActionableBatches.hasNextPage, rpcActionableBatches.isLoading, actionHistoryInfinite])
 
-  if (isLoading || analyticsLoading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-16">
         {Array.from({ length: 4 }, () => (
@@ -205,20 +224,20 @@ export function TodosCardList({
         <div className="flex flex-col gap-12">
           {tab === 'action_history'
             ? processedBatchActions.map(action => (
-                <BatchActionCard key={action.action_id} action={action} />
-              ))
+              <BatchActionCard key={action.action_id} action={action} />
+            ))
             : todos.map(todo => (
-                <TodoCard
-                  key={todo.batch_id}
-                  todo={todo}
-                  onClick={() => handleTodoClick(todo.batch_id)}
-                />
-              ))}
+              <TodoCard
+                key={todo.batch_id}
+                todo={todo}
+                onClick={() => handleTodoClick(todo.batch_id)}
+              />
+            ))}
         </div>
 
         {hasMore && (
           <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
-            {infiniteData?.isFetchingNextPage ? (
+            {(tab === 'action_history' ? actionHistoryInfinite?.isFetchingNextPage : rpcActionableBatches.isFetchingNextPage) ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm">
@@ -246,11 +265,6 @@ export function TodosCardList({
 }
 
 // Helper functions for data processing
-function applyFiltersAndSorting(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
-  const filtered = applyUrgencyFilter(todos, filters)
-  return applySorting(filtered, filters)
-}
-
 function applyUrgencyFilter(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
   if (filters.urgency && filters.urgency !== 'all') {
     return todos.filter(todo => todo.urgency === filters.urgency)

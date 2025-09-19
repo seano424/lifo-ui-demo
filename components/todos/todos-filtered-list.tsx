@@ -7,7 +7,6 @@ import { PendingActionsTab } from '@/components/todos/tabs/pending-actions-tab'
 import { RecentlyExpiredTab } from '@/components/todos/tabs/recently-expired-tab'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
 import {
   useDashboardSummary,
 } from '@/hooks/use-todos-rpc'
@@ -236,23 +235,24 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           }}
         />
       </div>
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsContent value="needs_attention">
+      <div className="w-full">
+        {/* Keep all tab components mounted but only show the active one */}
+        <div style={{ display: activeTab === 'needs_attention' ? 'block' : 'none' }}>
           <PendingActionsTab
             filters={filters}
             pageSize={pageSize}
             onFiltersChange={handleFiltersChange}
           />
-        </TabsContent>
+        </div>
 
-        <TabsContent value="all_active_todos">
+        <div style={{ display: activeTab === 'all_active_todos' ? 'block' : 'none' }}>
           <AllActiveTab filters={filters} onFiltersChange={handleFiltersChange} />
-        </TabsContent>
+        </div>
 
-        <TabsContent value="recently_expired">
+        <div style={{ display: activeTab === 'recently_expired' ? 'block' : 'none' }}>
           <RecentlyExpiredTab filters={filters} pageSize={pageSize} />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </>
   )
 }

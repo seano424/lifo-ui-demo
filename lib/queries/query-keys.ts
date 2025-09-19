@@ -11,6 +11,43 @@ export const queryKeys = {
     detail: (storeId: string) => [...queryKeys.stores.all, 'detail', storeId] as const,
   },
 
+
+  // Todos and RPC queries
+  todos: {
+    all: ['todos'] as const,
+
+    // Summary queries
+    summary: (storeId: string) => [...queryKeys.todos.all, 'summary', storeId] as const,
+    dashboardSummary: (storeId: string) => [...queryKeys.todos.all, 'dashboardSummary', storeId] as const,
+
+    // Infinite query lists
+    lists: () => [...queryKeys.todos.all, 'list'] as const,
+    pending: (storeId: string, limit: number) =>
+      [...queryKeys.todos.lists(), 'pending', storeId, limit] as const,
+    discounted: (storeId: string, limit: number) =>
+      [...queryKeys.todos.lists(), 'discounted', storeId, limit] as const,
+    donated: (storeId: string, limit: number, daysBack: number) =>
+      [...queryKeys.todos.lists(), 'donated', storeId, limit, daysBack] as const,
+    expired: (storeId: string, limit: number) =>
+      [...queryKeys.todos.lists(), 'expired', storeId, limit] as const,
+    history: (storeId: string, limit: number, actionType?: string) =>
+      [...queryKeys.todos.lists(), 'history', storeId, limit, ...(actionType ? [actionType] : [])] as const,
+    active: (storeId: string, limit: number) =>
+      [...queryKeys.todos.lists(), 'active', storeId, limit] as const,
+    reeval: (storeId: string, limit: number) =>
+      [...queryKeys.todos.lists(), 'reeval', storeId, limit] as const,
+
+    // Actionable batches with filtering
+    actionableBatches: (storeId: string, limit: number, urgencyFilter?: string, stateFilter?: string) => [
+      ...queryKeys.todos.lists(),
+      'actionableBatches',
+      storeId,
+      limit,
+      ...(urgencyFilter ? [urgencyFilter] : []),
+      ...(stateFilter ? [stateFilter] : [])
+    ] as const,
+  },
+
   // User preferences
   userPreferences: {
     all: ['userPreferences'] as const,

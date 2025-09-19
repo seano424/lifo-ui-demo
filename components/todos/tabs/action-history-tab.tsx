@@ -109,8 +109,7 @@ export function ActionHistoryTab({ filters, pageSize = 20 }: ActionHistoryTabPro
           tab="action_history"
           filters={filters}
           processedBatchActions={processedBatchActions}
-          infiniteData={{
-            data: [],
+          actionHistoryInfinite={{
             hasNextPage: hasBatchActionsNextPage,
             fetchNextPage: fetchBatchActionsNextPage,
             isFetchingNextPage: isFetchingBatchActionsNextPage,
