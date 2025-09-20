@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useDashboardSummary } from '@/hooks/use-todos-sections'
+import { useDashboardSummary } from '@/hooks/use-dashboard-summary'
 import { AlertTriangle, Calendar, Clock } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
@@ -10,6 +10,7 @@ export function BatchStatusSummary() {
   const t = useTranslations('storeInsights.batchStatus')
 
   const { data, isLoading, error } = useDashboardSummary()
+  console.log('dashboard summary', data)
 
   if (isLoading) {
     return (

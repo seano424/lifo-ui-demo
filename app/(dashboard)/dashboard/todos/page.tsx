@@ -1,4 +1,3 @@
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import TodoSections from '@/components/todos/todo-sections'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
@@ -56,12 +55,12 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col gap-6">
-        <DashboardInsetHeader
+        {/* <DashboardInsetHeader
           title="Todos"
           description="Manage actionable inventory items and track your progress"
         />
 
-        {/* <TodosFilteredList
+        <TodosFilteredList
           initialFilters={{
             tab: params.tab,
             urgency: params.urgency,

@@ -222,7 +222,7 @@ export async function fetchDashboardSummary(
     // get_dashboard_summary returns an array with a single object
     // Extract the first object
     return (
-      (data && data[0]) || {
+      data?.[0] || {
         total_active_batches: 0,
         needs_attention_count: 0,
         critical_count: 0,
