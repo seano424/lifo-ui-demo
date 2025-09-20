@@ -2,10 +2,13 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
+  type DashboardSummary,
   type TodoItem,
   type TodoSection,
+  type TodosDashboardOverview,
+  fetchDashboardSummary,
   fetchTodosBySection,
-  fetchTodosDashboardSummary,
+  fetchTodosDashboardOverview,
   getAllSections,
   getSectionConfig,
   getSectionDisplayName,
@@ -84,10 +87,19 @@ export function useTodosSections() {
   const actionHistory = useTodosSection('action_history')
   const needsReeval = useTodosSection('needs_reeval')
 
-  // Dashboard summary query
+  // FIXED: Dashboard summary query - calls the right function with correct types
   const summary = useQuery({
     queryKey: queryKeys.todos.dashboardSummary(activeStoreId || ''),
-    queryFn: () => fetchTodosDashboardSummary(activeStoreId!),
+    queryFn: () => fetchDashboardSummary(activeStoreId!),
+    enabled: !!activeStoreId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // FIXED: Dashboard overview query - separate query for overview data
+  const overview = useQuery({
+    queryKey: [...queryKeys.todos.lists(), 'overview', activeStoreId || ''],
+    queryFn: () => fetchTodosDashboardOverview(activeStoreId!),
     enabled: !!activeStoreId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
@@ -103,7 +115,8 @@ export function useTodosSections() {
     completedToday.isLoading ||
     actionHistory.isLoading ||
     needsReeval.isLoading ||
-    summary.isLoading
+    summary.isLoading ||
+    overview.isLoading
 
   const isAnyFetching =
     immediateAction.isFetching ||
@@ -114,7 +127,8 @@ export function useTodosSections() {
     completedToday.isFetching ||
     actionHistory.isFetching ||
     needsReeval.isFetching ||
-    summary.isFetching
+    summary.isFetching ||
+    overview.isFetching
 
   const hasAnyError =
     immediateAction.isError ||
@@ -125,7 +139,8 @@ export function useTodosSections() {
     completedToday.isError ||
     actionHistory.isError ||
     needsReeval.isError ||
-    summary.isError
+    summary.isError ||
+    overview.isError
 
   const sections = {
     immediateAction,
@@ -142,12 +157,20 @@ export function useTodosSections() {
     // Individual sections with consistent interface
     sections,
 
-    // Dashboard summary data
+    // FIXED: Dashboard summary data (single object)
     summary: {
-      data: summary.data || [],
+      data: summary.data,
       isLoading: summary.isLoading,
       isError: summary.isError,
       error: summary.error,
+    },
+
+    // FIXED: Dashboard overview data (array of objects)
+    overview: {
+      data: overview.data || [],
+      isLoading: overview.isLoading,
+      isError: overview.isError,
+      error: overview.error,
     },
 
     // Aggregate states
@@ -215,13 +238,26 @@ export function useNeedsReevalTodos(customPageSize?: number) {
   return useTodosSection('needs_reeval', customPageSize)
 }
 
-// Dashboard summary hook
-export function useTodosDashboardSummary() {
+// FIXED: Dashboard summary hook - returns single object
+export function useDashboardSummary() {
   const activeStoreId = useActiveStoreId()
 
   return useQuery({
     queryKey: queryKeys.todos.dashboardSummary(activeStoreId || ''),
-    queryFn: () => fetchTodosDashboardSummary(activeStoreId!),
+    queryFn: () => fetchDashboardSummary(activeStoreId!),
+    enabled: !!activeStoreId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+// FIXED: Dashboard overview hook - returns array
+export function useTodosDashboardOverview() {
+  const activeStoreId = useActiveStoreId()
+
+  return useQuery({
+    queryKey: [...queryKeys.todos.lists(), 'overview', activeStoreId || ''],
+    queryFn: () => fetchTodosDashboardOverview(activeStoreId!),
     enabled: !!activeStoreId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
@@ -237,9 +273,9 @@ export function useTodosSectionMetadata() {
   }
 }
 
-// Hook for section-specific counts (derived from summary)
+// FIXED: Hook for section-specific counts (derived from summary)
 export function useTodosSectionCounts() {
-  const summary = useTodosDashboardSummary()
+  const summary = useDashboardSummary()
 
   if (!summary.data) {
     return {
@@ -250,36 +286,28 @@ export function useTodosSectionCounts() {
   }
 
   // Transform summary data into section counts
-  const counts = summary.data.reduce(
-    (acc, item) => {
-      // Map todo_state to section names
-      const sectionMap: Record<string, string> = {
-        immediate_action: 'immediateAction',
-        recently_expired: 'recentlyExpired',
-        recently_discounted: 'discounted',
-        ready_for_donation: 'readyForDonation',
-        needs_reeval: 'needsReeval',
-      }
-
-      const sectionKey = sectionMap[item.todo_state]
-      if (sectionKey) {
-        acc[sectionKey] = item.item_count
-      }
-
-      return acc
-    },
-    {} as Record<string, number>
-  )
+  // NOTE: This works with the single object structure from get_dashboard_summary
+  const counts = {
+    immediateAction: summary.data.needs_attention_count || 0,
+    critical: summary.data.critical_count || 0,
+    high: summary.data.high_count || 0,
+    medium: summary.data.medium_count || 0,
+    low: summary.data.low_count || 0,
+    ok: summary.data.ok_count || 0,
+    expired: summary.data.expired_items_count || 0,
+  }
 
   return {
     counts,
     isLoading: summary.isLoading,
     isError: summary.isError,
-    totalItems: Object.values(counts).reduce((sum, count) => sum + count, 0),
+    totalItems: summary.data.total_active_batches || 0,
+    needsAttentionPercentage: summary.data.needs_attention_percentage || 0,
+    expiredItemsValue: summary.data.expired_items_value || 0,
   }
 }
 
 // Type exports for external use
-export type { TodoItem, TodoSection }
+export type { DashboardSummary, TodoItem, TodoSection, TodosDashboardOverview }
 export type TodosSectionHook = ReturnType<typeof useTodosSection>
 export type TodosSectionsHook = ReturnType<typeof useTodosSections>

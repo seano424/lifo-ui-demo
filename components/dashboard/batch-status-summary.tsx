@@ -1,16 +1,15 @@
 'use client'
 
-import { AlertTriangle, Calendar, Clock } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useDashboardSummary } from '@/hooks/use-todos-rpc'
-import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useDashboardSummary } from '@/hooks/use-todos-sections'
+import { AlertTriangle, Calendar, Clock } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function BatchStatusSummary() {
   const t = useTranslations('storeInsights.batchStatus')
-  const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
+
+  const { data, isLoading, error } = useDashboardSummary()
 
   if (isLoading) {
     return (
@@ -38,7 +37,6 @@ export function BatchStatusSummary() {
     )
   }
 
-  // Use data from the centralized dashboard summary
   const totalActiveBatchesCount = data.total_active_batches
   const criticalCount = data.critical_count
   const highCount = data.high_count
@@ -47,7 +45,6 @@ export function BatchStatusSummary() {
   const okCount = data.ok_count
 
   // Calculate total needs attention and percentages
-  // Only Critical and High priority items need immediate attention
   const totalNeedsAttention = criticalCount + highCount
   const attentionPercentage =
     totalActiveBatchesCount > 0
@@ -111,7 +108,10 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('critical')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography
+                    variant="p"
+                    className="text-gray-700 dark:text-brand-white"
+                  >
                     {getUrgencyLabel('critical')}
                   </Typography>
                 </div>
@@ -124,7 +124,10 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('high')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography
+                    variant="p"
+                    className="text-gray-700 dark:text-brand-white"
+                  >
                     {getUrgencyLabel('high')}
                   </Typography>
                 </div>
@@ -138,7 +141,10 @@ export function BatchStatusSummary() {
                 <div className="h-8 w-8 bg-primary-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                   <div className="h-2 w-2 bg-white rounded-full" />
                 </div>
-                <Typography variant="p" className="">
+                <Typography
+                  variant="p"
+                  className=""
+                >
                   {t('status.allGood')}
                 </Typography>
               </div>
@@ -146,6 +152,7 @@ export function BatchStatusSummary() {
           </div>
         </div>
       </div>
+
       <div className="bg-white dark:bg-brand-dark rounded-2xl border lg:w-1/2 flex flex-col">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
@@ -166,7 +173,10 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('medium')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography
+                    variant="p"
+                    className="text-gray-700 dark:text-brand-white"
+                  >
                     {getUrgencyLabel('medium')}
                   </Typography>
                 </div>
@@ -179,7 +189,10 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('low')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography
+                    variant="p"
+                    className="text-gray-700 dark:text-brand-white"
+                  >
                     {getUrgencyLabel('low')}
                   </Typography>
                 </div>
@@ -192,17 +205,25 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   <div className="h-4 w-4 bg-primary-500 rounded-full" />
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography
+                    variant="p"
+                    className="text-gray-700 dark:text-brand-white"
+                  >
                     {t('status.ok')}
                   </Typography>
                 </div>
-                <Typography variant="p">{okCount - mediumCount - lowCount}</Typography>
+                <Typography variant="p">
+                  {okCount - mediumCount - lowCount}
+                </Typography>
               </div>
             )}
           </div>
 
           <div className="flex flex-col gap-2 flex-1 justify-end text-right mt-4">
-            <Typography variant="h4" className="lowercase text-primary-900 dark:text-brand-white">
+            <Typography
+              variant="h4"
+              className="lowercase text-primary-900 dark:text-brand-white"
+            >
               {attentionPercentage}% {t('needsAttention')}
             </Typography>
             <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-2">
@@ -212,10 +233,16 @@ export function BatchStatusSummary() {
               />
             </div>
             <div className="mt-2 flex justify-between items-center">
-              <Typography variant="small" className=" mt-1">
+              <Typography
+                variant="small"
+                className=" mt-1"
+              >
                 {totalActiveBatchesCount - totalNeedsAttention} {t('status.ok')}
               </Typography>
-              <Typography variant="small" className=" mt-1">
+              <Typography
+                variant="small"
+                className=" mt-1"
+              >
                 {t('activeBatchesCount', {
                   needsAttention: totalNeedsAttention,
                   total: totalActiveBatchesCount,

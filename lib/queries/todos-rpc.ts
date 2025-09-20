@@ -48,6 +48,29 @@ export type TodoItem = {
   view_refreshed_at: string
 }
 
+// FIXED: Dashboard summary type - this is what get_dashboard_summary actually returns
+export type DashboardSummary = {
+  total_active_batches: number
+  needs_attention_count: number
+  critical_count: number
+  high_count: number
+  medium_count: number
+  low_count: number
+  ok_count: number
+  needs_attention_percentage: number
+  expired_items_count: number
+  expired_items_value: number
+}
+
+// FIXED: Dashboard overview type - this is what get_todos_dashboard_overview should return
+export type TodosDashboardOverview = {
+  todo_state: string
+  item_count: number
+  total_value: number
+  avg_score: number
+  urgency_distribution: Record<string, number>
+}
+
 // Page parameters for infinite queries
 export type TodosPageParam = {
   page: number
@@ -178,21 +201,54 @@ export async function fetchTodosBySection(
 }
 
 /**
- * Fetch summary data for the todos dashboard
- * Uses existing get_todos_dashboard_overview RPC
+ * FIXED: Fetch dashboard summary - calls get_dashboard_summary (returns single object)
  */
-export async function fetchTodosDashboardSummary(
+export async function fetchDashboardSummary(
   storeId: string,
   serverClient?: ServerClient
-): Promise<
-  {
-    todo_state: string
-    item_count: number
-    total_value: number
-    avg_score: number
-    urgency_distribution: Record<string, number>
-  }[]
-> {
+): Promise<DashboardSummary> {
+  const supabase = serverClient || createClient()
+
+  try {
+    const { data, error } = await supabase.rpc('get_dashboard_summary', {
+      p_store_id: storeId,
+    })
+
+    if (error) {
+      console.error('[fetchDashboardSummary] Error:', error)
+      throw new Error(`Failed to fetch dashboard summary: ${error.message}`)
+    }
+
+    // get_dashboard_summary returns an array with a single object
+    // Extract the first object
+    return (
+      (data && data[0]) || {
+        total_active_batches: 0,
+        needs_attention_count: 0,
+        critical_count: 0,
+        high_count: 0,
+        medium_count: 0,
+        low_count: 0,
+        ok_count: 0,
+        needs_attention_percentage: 0,
+        expired_items_count: 0,
+        expired_items_value: 0,
+      }
+    )
+  } catch (err) {
+    console.error('[fetchDashboardSummary] Unexpected error:', err)
+    throw err
+  }
+}
+
+/**
+ * FIXED: Fetch todos dashboard overview - calls get_todos_dashboard_overview (returns array)
+ * NOTE: This function currently has SQL errors - once fixed, it will return array
+ */
+export async function fetchTodosDashboardOverview(
+  storeId: string,
+  serverClient?: ServerClient
+): Promise<TodosDashboardOverview[]> {
   const supabase = serverClient || createClient()
 
   try {
@@ -201,13 +257,13 @@ export async function fetchTodosDashboardSummary(
     })
 
     if (error) {
-      console.error('[fetchTodosDashboardSummary] Error:', error)
-      throw new Error(`Failed to fetch dashboard summary: ${error.message}`)
+      console.error('[fetchTodosDashboardOverview] Error:', error)
+      throw new Error(`Failed to fetch dashboard overview: ${error.message}`)
     }
 
     return data || []
   } catch (err) {
-    console.error('[fetchTodosDashboardSummary] Unexpected error:', err)
+    console.error('[fetchTodosDashboardOverview] Unexpected error:', err)
     throw err
   }
 }
@@ -236,7 +292,14 @@ export function getAllSections(): {
  * Helper to determine which sections should be invalidated after a batch action
  */
 export function getSectionsToInvalidateAfterAction(
-  actionType: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared' | 'ignore' | 'dismiss'
+  actionType:
+    | 'discount'
+    | 'donate'
+    | 'dispose'
+    | 'sold'
+    | 'donate_prepared'
+    | 'ignore'
+    | 'dismiss'
 ): TodoSection[] {
   const baseInvalidations: TodoSection[] = [
     'immediate_action',
