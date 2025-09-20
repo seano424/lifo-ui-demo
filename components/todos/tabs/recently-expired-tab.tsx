@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
 import { TodoCard } from '@/components/todos/todo-card'
 import type { TodoFilters } from '@/components/todos/todos-filtered-list'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -14,6 +13,7 @@ import {
 } from '@/hooks/use-todos-rpc'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useEffect, useMemo } from 'react'
 
 interface RecentlyExpiredTabProps {
   filters: TodoFilters
@@ -29,14 +29,15 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
     enabled: !!activeStoreId,
   })
 
-  const { isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } = expiredQuery
+  const { isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    expiredQuery
 
   // Flatten the infinite query data - pass the complete query object
   const expiredItems = useFlattenedTodosData<RecentlyExpired>(expiredQuery)
 
   // Convert to TodoItem format for existing components
   const todos = useMemo(() => {
-    return expiredItems.map(item => ({
+    return expiredItems.map((item) => ({
       batch_id: item.batch_id,
       product_name: item.product_name,
       expiry_date: item.expiry_date,
@@ -79,7 +80,10 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
       <div className="p-4">
         <div className="flex flex-col gap-16">
           {Array.from({ length: 4 }, () => (
-            <div key={crypto.randomUUID()} className="flex flex-col gap-4">
+            <div
+              key={crypto.randomUUID()}
+              className="flex flex-col gap-4"
+            >
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -104,7 +108,9 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
   if (error) {
     return (
       <div className="p-4 py-8 text-center">
-        <p className="text-destructive">Error loading expired items: {error.message}</p>
+        <p className="text-destructive">
+          Error loading expired items: {error.message}
+        </p>
       </div>
     )
   }
@@ -128,10 +134,31 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
       <div className="p-4">
         <div className="space-y-4 flex flex-col">
           <div className="flex flex-col gap-12">
-            {todos.map(todo => (
+            {todos.map((todo) => (
               <TodoCard
                 key={todo.batch_id}
-                todo={todo}
+                todo={{
+                  ai_recommendation: todo.recommendation,
+                  batch_id: todo.batch_id,
+                  store_id: todo.location_code,
+                  batch_number: todo.batch_id,
+                  product_name: todo.product_name,
+                  product_brand: todo.product_name,
+                  current_quantity: todo.current_quantity,
+                  last_action_type: null,
+                  last_action_time: null,
+                  completion_status: 'pending',
+                  todo_state: 'ok',
+                  urgency_level: 'high',
+                  days_to_expiry: 0,
+                  priority_order: 0,
+                  expiry_date: todo.expiry_date,
+                  composite_score: todo.composite_score || null,
+                  last_discount_percent: null,
+                  hours_since_last_action: 0,
+                  total_actions_ever: 0,
+                  view_refreshed_at: new Date().toISOString(),
+                }}
                 onClick={() => handleTodoClick(todo.batch_id)}
               />
             ))}

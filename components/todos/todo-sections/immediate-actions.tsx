@@ -1,10 +1,11 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { TodoCard } from '@/components/todos/todo-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { useImmediateActionTodos } from '@/hooks/use-todos-sections'
 import { AlertTriangle } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function ImmediateActions() {
   const {
@@ -16,14 +17,27 @@ export default function ImmediateActions() {
     isFetchingNextPage,
   } = useImmediateActionTodos()
 
+  // Intersection observer for auto-loading more items
+  const { targetRef, isIntersecting } = useIntersectionObserver({
+    enabled: hasNextPage && !isFetchingNextPage,
+    rootMargin: '100px',
+  })
+
+  // Auto-fetch next page when sentinel comes into view
+  useEffect(() => {
+    if (isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [isIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage])
+
   // Loading state for initial load
   if (isLoading) {
-    return <Card>Loading</Card>
+    return <div>Loading</div>
   }
 
   // Error state
   if (isError) {
-    return <Card>Error</Card>
+    return <div>Error</div>
   }
 
   // Flatten the infinite query data
@@ -31,51 +45,47 @@ export default function ImmediateActions() {
 
   // Empty state
   if (todosList.length === 0) {
-    return <Card>Empty</Card>
+    return <div>Empty</div>
   }
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
-            {'title'}
-          </div>
-          <span className="text-sm font-normal bg-red-100 text-red-700 px-2 py-1 rounded-full">
-            {todosList.length} {todosList.length === 1 ? 'item' : 'items'}
-          </span>
-        </CardTitle>
-      </CardHeader>
+  console.log('🃏 todosList', todosList)
 
-      <CardContent className="space-y-3">
+  return (
+    <section className="flex flex-col gap-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5 text-red-500" />
+          Immediate Actions
+        </div>
+        <span className="text-sm font-normal bg-red-100 text-red-700 px-2 py-1 rounded-full">
+          {todosList.length} {todosList.length === 1 ? 'item' : 'items'}
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-4">
         {todosList.map((todo) => (
-          <div
+          <TodoCard
             key={todo.batch_id}
-            className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            {todo.product_name}
-          </div>
+            todo={todo}
+          />
         ))}
 
-        {/* Infinite Loading */}
+        {/* Infinite Loading Sentinel */}
         {hasNextPage && (
-          <div className="pt-4 text-center">
-            <Button
-              variant="outline"
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="w-full"
-            >
-              {isFetchingNextPage ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                  loading
-                </>
-              ) : (
-                'loadMore'
-              )}
-            </Button>
+          <div
+            ref={targetRef}
+            className="flex justify-center items-center pt-4 pb-2 min-h-[60px]"
+          >
+            {isFetchingNextPage ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm">Loading more items...</span>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground opacity-60">
+                Scroll to load more ({todosList.length} loaded)
+              </div>
+            )}
           </div>
         )}
 
@@ -104,7 +114,7 @@ export default function ImmediateActions() {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }

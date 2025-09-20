@@ -1,11 +1,11 @@
 'use client'
 
-import { Calendar, Package, PenLine } from 'lucide-react'
-import type { TodoItem } from '@/components/todos/todos-filtered-list'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
+import { Calendar, Package, PenLine } from 'lucide-react'
 
 interface TodoCardProps {
   todo: TodoItem
@@ -20,8 +20,11 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   // Format expiry date
   const expiryDate = new Date(todo.expiry_date)
   const today = new Date()
-  const isExpiringSoon = expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
-  const isExpired = expiryDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const isExpiringSoon =
+    expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
+  const isExpired =
+    expiryDate <
+    new Date(today.getFullYear(), today.getMonth(), today.getDate())
   const isExpiringToday = expiryDate.toDateString() === today.toDateString()
 
   // Calculate days since expiry for expired items
@@ -29,11 +32,15 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     if (!isExpired) return ''
 
     // Use date-only comparison to avoid timezone issues
-    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const todayDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    )
     const expiryDateOnly = new Date(
       expiryDate.getFullYear(),
       expiryDate.getMonth(),
-      expiryDate.getDate(),
+      expiryDate.getDate()
     )
 
     const diffTime = todayDate.getTime() - expiryDateOnly.getTime()
@@ -44,7 +51,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   }
 
   // Get urgency colors and icons
-  const getUrgencyConfig = (urgency: TodoItem['urgency']) => {
+  const getUrgencyConfig = (urgency: TodoItem['urgency_level']) => {
     switch (urgency) {
       case 'critical':
         return {
@@ -78,14 +85,6 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
           badgeVariant: 'secondary' as const,
         }
-      case 'maintain':
-        return {
-          color: 'bg-blue-500',
-          textColor: 'text-blue-700',
-          bgColor: 'group-hover:bg-blue-50 border-blue-500',
-          badge: 'bg-blue-100 text-blue-800 border-blue-500',
-          badgeVariant: 'secondary' as const,
-        }
       default:
         return {
           color: 'bg-gray-500',
@@ -97,12 +96,15 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     }
   }
 
-  const urgencyConfig = getUrgencyConfig(todo.urgency)
+  const urgencyConfig = getUrgencyConfig(todo.urgency_level)
 
   return (
     <button
       type="button"
-      className={cn('cursor-pointer transition-all duration-1000', 'border-b flex flex-col')}
+      className={cn(
+        'cursor-pointer transition-all duration-1000',
+        'border-b flex flex-col'
+      )}
       onClick={handleCardClick}
     >
       <div className="flex gap-3 px-4 pb-6 items-start relative group">
@@ -111,7 +113,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           className={cn(
             'border-2 rounded-full cursor-pointer',
             'h-6 w-6 p-0 bg-brand-white transition-all duration-200',
-            urgencyConfig.bgColor,
+            urgencyConfig.bgColor
           )}
         ></Badge>
 
@@ -123,7 +125,9 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">Suggestion</span>
                 <span className="truncate lowercase">
-                  {formatRecommendation(todo.recommendation)} • {todo.reason}
+                  {formatRecommendation(
+                    todo.ai_recommendation || 'No recommendation'
+                  )}
                 </span>
               </Typography>
             </div>
@@ -146,14 +150,18 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             </Typography>
 
             <div className="flex flex-wrap gap-2 items-center justify-between">
-              {todo.discount_percent != null && todo.discount_percent > 0 && (
-                <Badge variant={urgencyConfig.badgeVariant}>
-                  Suggested discount: {todo.discount_percent}%
-                </Badge>
-              )}
+              {todo.last_discount_percent != null &&
+                todo.last_discount_percent > 0 && (
+                  <Badge variant={urgencyConfig.badgeVariant}>
+                    Suggested discount: {todo.last_discount_percent}%
+                  </Badge>
+                )}
 
-              {(todo.discount_percent == null || todo.discount_percent === 0) && (
-                <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
+              {(todo.last_discount_percent == null ||
+                todo.last_discount_percent === 0) && (
+                <Badge variant={urgencyConfig.badgeVariant}>
+                  Suggestion: Healthy & Maintain
+                </Badge>
               )}
 
               {isExpiringToday ? (
