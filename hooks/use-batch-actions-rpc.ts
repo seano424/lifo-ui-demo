@@ -4,7 +4,7 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { AlertsResponse, ScoringAlert } from './use-todos-rpc'
+import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
 
 // Type definitions for query data
 interface BatchDetail {
@@ -172,11 +172,53 @@ export function useBatchActionRPC() {
         // Don't fail the entire operation if scoring trigger fails
       }
 
-      // Invalidate all related queries
+      // Invalidate all related queries using the new filtering system
       await Promise.all([
-        // Remove from todos/alerts
+        // 🎯 NEW: Target specific completion status filters (invalidate all page sizes)
         queryClient.invalidateQueries({
-          queryKey: queryKeys.alerts.store(storeId),
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'pending' } }],
+          exact: false,
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'in_progress' } }],
+          exact: false,
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'completed' } }],
+          exact: false,
+        }),
+
+        // 🎯 NEW: Use convenience query keys for common filters
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.pending(storeId),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.inProgress(storeId),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.completed(storeId),
+        }),
+
+        // 🎯 NEW: Dashboard summaries using proper query keys
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.dashboardSummary(storeId),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.summary(storeId),
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.overview(storeId),
+        }),
+
+        // 🎯 NEW: Invalidate all todos queries broadly to catch any filtering combinations
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.all,
         }),
 
         // Update analytics dashboard
@@ -197,71 +239,6 @@ export function useBatchActionRPC() {
         // Update action history
         queryClient.invalidateQueries({
           queryKey: queryKeys.batchActions.byStore(storeId),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: ['alerts', 'store', storeId],
-        }),
-
-        // useStoreAnalytics hook - invalidate all timeframes and variants
-        queryClient.invalidateQueries({
-          queryKey: ['analytics', 'store', storeId],
-        }),
-
-        // useTodosInfinite hook - invalidate all variations
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'infinite', storeId],
-        }),
-
-        // useBatchActionsInfinite hook - invalidate action history pagination
-        queryClient.invalidateQueries({
-          queryKey: ['batchActions', 'infinite', storeId],
-        }),
-
-        // Invalidate actionable batches specifically
-        queryClient.invalidateQueries({
-          queryKey: ['actionable_batches', storeId],
-        }),
-
-        // 🆕 NEW: Invalidate the new todos state queries
-        // Todos state summary (for tab counters)
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'summary', storeId],
-        }),
-
-        // Pending actions tab
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'pending', storeId],
-        }),
-
-        // Recently discounted tab
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'discounted', storeId],
-        }),
-
-        // Recently donated tab
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'donated', storeId],
-        }),
-
-        // Recently expired tab
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'expired', storeId],
-        }),
-
-        // Items needing re-evaluation
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'reeval', storeId],
-        }),
-
-        // All active with states
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'active', storeId],
-        }),
-
-        // Action history enhanced
-        queryClient.invalidateQueries({
-          queryKey: ['todos', 'history', storeId],
         }),
       ])
     }
@@ -289,23 +266,24 @@ export function useBatchActionRPC() {
       return data as ActionResult
     },
     onMutate: async variables => {
-      // Optimistic update: Remove from alerts immediately
+      // Optimistic update: Remove from pending todos immediately
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
-      queryClient.setQueryData(
-        queryKeys.alerts.store(storeId),
-        (oldData: AlertsResponse | undefined) => {
-          if (oldData?.alerts) {
-            return {
-              ...oldData,
-              alerts: oldData.alerts.filter(
-                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
-              ),
-            }
-          }
-          return oldData
-        },
-      )
+      // Remove from pending todos with different page sizes
+      const pendingQueries = queryClient.getQueriesData({
+        queryKey: [...queryKeys.todos.all, 'filtered'],
+        predicate: (query) => {
+          const queryKey = query.queryKey as any[]
+          return queryKey?.[2]?.storeId === storeId &&
+                 queryKey?.[2]?.filters?.completion_status === 'pending'
+        }
+      })
+
+      pendingQueries.forEach(([queryKey, data]) => {
+        if (Array.isArray(data)) {
+          queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+        }
+      })
 
       return { storeId }
     },
@@ -320,10 +298,11 @@ export function useBatchActionRPC() {
       }
     },
     onError: (_error, _variables, context) => {
-      // Rollback optimistic update
+      // Rollback optimistic update by invalidating pending todos
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.alerts.store(context.storeId),
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          exact: false,
         })
       }
 
@@ -353,9 +332,10 @@ export function useBatchActionRPC() {
       return data as ActionResult
     },
     onMutate: async variables => {
-      // Optimistic update: Show new price immediately
+      // Optimistic update: Update batch price and potentially move to in_progress
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
+      // Update batch detail with new price
       queryClient.setQueryData(
         queryKeys.batches.detail(variables.batchId),
         (oldData: BatchDetail | undefined) => {
@@ -408,27 +388,28 @@ export function useBatchActionRPC() {
       return data as ActionResult
     },
     onMutate: async variables => {
-      // Optimistic update: Remove from alerts if all quantity sold
+      // Optimistic update: Remove from pending if all quantity sold
       const storeId = await getStoreIdFromBatch(variables.batchId)
       const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as
         | BatchDetail
         | undefined
 
       if (batchData && variables.quantity >= batchData.current_quantity) {
-        queryClient.setQueryData(
-          queryKeys.alerts.store(storeId),
-          (oldData: AlertsResponse | undefined) => {
-            if (oldData?.alerts) {
-              return {
-                ...oldData,
-                alerts: oldData.alerts.filter(
-                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
-                ),
-              }
-            }
-            return oldData
-          },
-        )
+        // Remove from pending todos (will become completed)
+        const pendingQueries = queryClient.getQueriesData({
+          queryKey: [...queryKeys.todos.all, 'filtered'],
+          predicate: (query) => {
+            const queryKey = query.queryKey as any[]
+            return queryKey?.[2]?.storeId === storeId &&
+                   queryKey?.[2]?.filters?.completion_status === 'pending'
+          }
+        })
+
+        pendingQueries.forEach(([queryKey, data]) => {
+          if (Array.isArray(data)) {
+            queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+          }
+        })
       }
 
       return { storeId }
@@ -447,7 +428,8 @@ export function useBatchActionRPC() {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.alerts.store(context.storeId),
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          exact: false,
         })
       }
       toast.error('Failed to mark as sold')
@@ -471,27 +453,28 @@ export function useBatchActionRPC() {
       return data as ActionResult
     },
     onMutate: async variables => {
-      // Optimistic update: Remove from alerts if all quantity disposed
+      // Optimistic update: Remove from pending if all quantity disposed
       const storeId = await getStoreIdFromBatch(variables.batchId)
       const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as
         | BatchDetail
         | undefined
 
       if (batchData && variables.quantity >= batchData.current_quantity) {
-        queryClient.setQueryData(
-          queryKeys.alerts.store(storeId),
-          (oldData: AlertsResponse | undefined) => {
-            if (oldData?.alerts) {
-              return {
-                ...oldData,
-                alerts: oldData.alerts.filter(
-                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
-                ),
-              }
-            }
-            return oldData
-          },
-        )
+        // Remove from pending todos (will become completed)
+        const pendingQueries = queryClient.getQueriesData({
+          queryKey: [...queryKeys.todos.all, 'filtered'],
+          predicate: (query) => {
+            const queryKey = query.queryKey as any[]
+            return queryKey?.[2]?.storeId === storeId &&
+                   queryKey?.[2]?.filters?.completion_status === 'pending'
+          }
+        })
+
+        pendingQueries.forEach(([queryKey, data]) => {
+          if (Array.isArray(data)) {
+            queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+          }
+        })
       }
 
       return { storeId }
@@ -510,7 +493,8 @@ export function useBatchActionRPC() {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.alerts.store(context.storeId),
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          exact: false,
         })
       }
       toast.error('Failed to dispose items')
@@ -533,23 +517,24 @@ export function useBatchActionRPC() {
       return data as ActionResult
     },
     onMutate: async variables => {
-      // Optimistic update: Remove from todos immediately
+      // Optimistic update: Remove from pending todos immediately (dismissed = completed)
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
-      queryClient.setQueryData(
-        queryKeys.alerts.store(storeId),
-        (oldData: AlertsResponse | undefined) => {
-          if (oldData?.alerts) {
-            return {
-              ...oldData,
-              alerts: oldData.alerts.filter(
-                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
-              ),
-            }
-          }
-          return oldData
-        },
-      )
+      // Remove from pending todos
+      const pendingQueries = queryClient.getQueriesData({
+        queryKey: [...queryKeys.todos.all, 'filtered'],
+        predicate: (query) => {
+          const queryKey = query.queryKey as any[]
+          return queryKey?.[2]?.storeId === storeId &&
+                 queryKey?.[2]?.filters?.completion_status === 'pending'
+        }
+      })
+
+      pendingQueries.forEach(([queryKey, data]) => {
+        if (Array.isArray(data)) {
+          queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+        }
+      })
 
       return { storeId }
     },
@@ -567,7 +552,8 @@ export function useBatchActionRPC() {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.alerts.store(context.storeId),
+          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          exact: false,
         })
       }
       toast.error('Failed to dismiss recommendation')
@@ -590,7 +576,7 @@ export function useBatchActionRPC() {
       return data as BulkActionResult
     },
     onMutate: async variables => {
-      // Optimistic update: Remove all batches from alerts
+      // Optimistic update: Remove all batches from pending todos
       const storeIds = await Promise.all(
         variables.batchIds.map(batchId => getStoreIdFromBatch(batchId)),
       )
@@ -598,20 +584,21 @@ export function useBatchActionRPC() {
 
       uniqueStoreIds.forEach(storeId => {
         if (storeId) {
-          queryClient.setQueryData(
-            queryKeys.alerts.store(storeId),
-            (oldData: AlertsResponse | undefined) => {
-              if (oldData?.alerts) {
-                return {
-                  ...oldData,
-                  alerts: oldData.alerts.filter(
-                    (alert: ScoringAlert) => !variables.batchIds.includes(alert.batch_id),
-                  ),
-                }
-              }
-              return oldData
-            },
-          )
+          // Remove from pending todos
+          const pendingQueries = queryClient.getQueriesData({
+            queryKey: [...queryKeys.todos.all, 'filtered'],
+            predicate: (query) => {
+              const queryKey = query.queryKey as any[]
+              return queryKey?.[2]?.storeId === storeId &&
+                     queryKey?.[2]?.filters?.completion_status === 'pending'
+            }
+          })
+
+          pendingQueries.forEach(([queryKey, data]) => {
+            if (Array.isArray(data)) {
+              queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id)))
+            }
+          })
         }
       })
 
@@ -638,7 +625,8 @@ export function useBatchActionRPC() {
         context.storeIds.forEach(storeId => {
           if (storeId) {
             queryClient.invalidateQueries({
-              queryKey: queryKeys.alerts.store(storeId),
+              queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'pending' } }],
+              exact: false,
             })
           }
         })
