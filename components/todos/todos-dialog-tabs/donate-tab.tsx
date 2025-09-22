@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { InputSlider } from '@/components/ui/input-slider'
+import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 interface DonateTabProps {
   selectedBatch: ActionableBatch

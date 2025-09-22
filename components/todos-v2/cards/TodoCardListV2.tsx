@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
-import type { ActionableBatch } from '@/lib/queries/todos-rpc-v1'
+import type { ActionableBatch } from '@/lib/utils/todo-transformers'
 import { useEffect, useMemo, useState } from 'react'
 import type { SortConfig } from '../filters/TodoSortControls'
 

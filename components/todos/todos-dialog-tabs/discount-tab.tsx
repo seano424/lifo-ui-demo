@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
+import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import type { ActionableBatch } from '@/hooks/use-todos-rpc'
 import { cn } from '@/lib/utils'
+import { useState } from 'react'
 
 interface DiscountTabProps {
   selectedBatch: ActionableBatch

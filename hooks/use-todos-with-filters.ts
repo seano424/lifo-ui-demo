@@ -1,5 +1,3 @@
-// hooks/use-todos-with-filters.ts - New flexible filtering hooks
-
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchTodosWithFilters,

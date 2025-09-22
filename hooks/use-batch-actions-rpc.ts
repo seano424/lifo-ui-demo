@@ -1,10 +1,31 @@
 // hooks/use-batch-actions-rpc.ts
 
 import { queryKeys } from '@/lib/queries/query-keys'
+import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc-v2'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { TodoItem, TodoFilters } from '@/lib/queries/todos-rpc-v2'
+
+export interface ActionableBatch {
+  batch_id: string
+  batch_number: string
+  product_name: string
+  product_brand: string
+  sku: string
+  expiry_date: string
+  current_quantity: number
+  location_code: string
+  unit_price: number
+  urgency_level: 'critical' | 'high' | 'medium' | 'low'
+  days_to_expiry: number
+  ai_recommendation: string
+  ai_reasoning: string
+  composite_score: number
+  potential_loss: number
+  discount_percent: number
+  todo_state: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok'
+  total_count: number
+}
 
 // Type for the query key structure used in the filtered todos queries
 interface TodoQueryKeyParams {
@@ -326,7 +347,10 @@ export function useBatchActionRPC() {
           queryKey: [
             ...queryKeys.todos.all,
             'filtered',
-            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+            {
+              storeId: context.storeId,
+              filters: { completion_status: 'pending' },
+            },
           ],
           exact: false,
         })
@@ -460,7 +484,10 @@ export function useBatchActionRPC() {
           queryKey: [
             ...queryKeys.todos.all,
             'filtered',
-            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+            {
+              storeId: context.storeId,
+              filters: { completion_status: 'pending' },
+            },
           ],
           exact: false,
         })
@@ -532,7 +559,10 @@ export function useBatchActionRPC() {
           queryKey: [
             ...queryKeys.todos.all,
             'filtered',
-            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+            {
+              storeId: context.storeId,
+              filters: { completion_status: 'pending' },
+            },
           ],
           exact: false,
         })
@@ -598,7 +628,10 @@ export function useBatchActionRPC() {
           queryKey: [
             ...queryKeys.todos.all,
             'filtered',
-            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+            {
+              storeId: context.storeId,
+              filters: { completion_status: 'pending' },
+            },
           ],
           exact: false,
         })

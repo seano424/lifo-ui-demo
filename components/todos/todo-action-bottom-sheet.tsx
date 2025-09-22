@@ -1,14 +1,14 @@
 'use client'
 
+import { BottomSheet } from '@/components/ui/bottom-sheet'
+import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
+import { cn } from '@/lib/utils'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
-import { BottomSheet } from '@/components/ui/bottom-sheet'
-import type { ActionableBatch } from '@/hooks/use-todos-rpc'
-import { cn } from '@/lib/utils'
-import { DiscountTab } from './tabs/discount-tab'
-import { DisposeTab } from './tabs/dispose-tab'
-import { DonateTab } from './tabs/donate-tab'
-import { SoldTab } from './tabs/sold-tab'
+import { DiscountTab } from './todos-dialog-tabs/discount-tab'
+import { DisposeTab } from './todos-dialog-tabs/dispose-tab'
+import { DonateTab } from './todos-dialog-tabs/donate-tab'
+import { SoldTab } from './todos-dialog-tabs/sold-tab'
 
 interface TodoActionBottomSheetProps {
   isOpen: boolean

@@ -1,14 +1,12 @@
+import { useDashboardSummary } from '@/hooks/use-dashboard-summary'
 import { useMemo } from 'react'
-import { useDashboardSummary } from '@/hooks/use-todos-rpc'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 
 /**
  * Hook to get the count of urgent todos (critical + high priority)
  * Used for displaying notification badges in navigation
  */
 export function useUrgentTodosCount() {
-  const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
+  const { data, isLoading, error } = useDashboardSummary()
 
   const urgentCount = useMemo(() => {
     if (!data) {

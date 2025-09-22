@@ -1,16 +1,14 @@
 'use client'
 
-import { AlertTriangle } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import { useDashboardSummary } from '@/hooks/use-todos-rpc'
-import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useDashboardSummary } from '@/hooks/use-dashboard-summary'
+import { AlertTriangle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function ExpiredItemsSummary() {
   const t = useTranslations('storeInsights.expiredItems')
-  const activeStoreId = useActiveStoreId()
-  const { data, isLoading, error } = useDashboardSummary(activeStoreId || '')
+  const { data, isLoading, error } = useDashboardSummary()
 
   if (isLoading) {
     return (

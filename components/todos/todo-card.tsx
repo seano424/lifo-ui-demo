@@ -2,10 +2,8 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
-import type { TodoItem as TodoItemV1 } from '@/lib/queries/todos-rpc'
-import type { TodoItem as TodoItemV2 } from '@/lib/queries/todos-rpc-v2'
+import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
 
-type TodoItem = TodoItemV1 | TodoItemV2
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
 import { Calendar, Package, PenLine } from 'lucide-react'
