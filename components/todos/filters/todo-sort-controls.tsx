@@ -107,14 +107,14 @@ export function TodoSortControls({
   }, [currentSortConfig.field])
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center sm:justify-start w-full sm:w-auto gap-2">
       {/* Sort Field Selector */}
       <Select
         value={currentSortConfig.field}
         onValueChange={value => handleSortFieldChange(value as SortField)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[160px] md:w-[180px]" id="todos-sort-field-trigger">
+        <SelectTrigger className="sm:w-[160px] md:w-[180px]" id="todos-sort-field-trigger">
           <SelectValue>{currentOption?.label || 'Sort by'}</SelectValue>
         </SelectTrigger>
         <SelectContent id="todos-sort-field-content">
@@ -133,10 +133,10 @@ export function TodoSortControls({
 
       {/* Sort Direction Toggle */}
       <Button
-        variant="outline"
+        variant="subtleTertiary"
         onClick={handleDirectionToggle}
         disabled={isLoading}
-        className="w-auto select-none px-3"
+        className="w-32 select-none px-3"
         title={`Sort ${currentSortConfig.direction === 'asc' ? 'ascending' : 'descending'}`}
       >
         {currentSortConfig.direction === 'asc' ? (
@@ -144,9 +144,7 @@ export function TodoSortControls({
         ) : (
           <ArrowDown className="h-4 w-4" />
         )}
-        <span className="ml-1 hidden sm:flex">
-          {currentSortConfig.direction === 'asc' ? 'Asc' : 'Desc'}
-        </span>
+        <span className="ml-1 flex">{currentSortConfig.direction === 'asc' ? 'Asc' : 'Desc'}</span>
       </Button>
     </div>
   )

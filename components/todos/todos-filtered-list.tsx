@@ -11,15 +11,15 @@ import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/querie
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { TodoFiltersPanel, type TodoFiltersState } from './filters/TodoFiltersPanel'
-import type { SortDirection, SortField } from './filters/TodoSortControls'
-import { CompletedTab } from './tabs/CompletedTab'
-import { InProgressTab } from './tabs/InProgressTab'
-import { PendingTab } from './tabs/PendingTab'
+import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
+import type { SortDirection, SortField } from './filters/todo-sort-controls'
+import { CompletedTab } from './todos-main-tabs/completed-tab'
+import { InProgressTab } from './todos-main-tabs/in-progress-tab'
+import { PendingTab } from './todos-main-tabs/pending-tab'
 
 export type TodoTabType = 'pending' | 'in_progress' | 'completed'
 
-interface TodosFilteredListV2Props {
+interface TodosFilteredListProps {
   initialFilters?: {
     tab?: string
     urgency?: string[]
@@ -32,7 +32,7 @@ interface TodosFilteredListV2Props {
   pageSize?: number
 }
 
-export function TodosFilteredListV2({ initialFilters, pageSize = 20 }: TodosFilteredListV2Props) {
+export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const router = useRouter()
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(

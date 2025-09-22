@@ -3,10 +3,10 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { TodoFiltersBarSimple, type TodoFilterValues } from './TodoFiltersBarSimple'
-import { TodoSearchBar } from './TodoSearchBar'
-import { TodoSortControls, type SortConfig } from './TodoSortControls'
 import { useCallback } from 'react'
+import { TodoFiltersBar, type TodoFilterValues } from './todo-filters-bar'
+import { TodoSearchBar } from './todo-search-bar'
+import { TodoSortControls, type SortConfig } from './todo-sort-controls'
 
 export interface TodoFiltersState {
   // Filters
@@ -105,9 +105,9 @@ export function TodoFiltersPanel({
 
       {/* Filter Controls */}
       <div className="space-y-4">
-        <div className="flex flex-col lg:flex-row gap-4 items-start justify-between">
+        <div className="flex flex-col lg:flex-row gap-2 items-start justify-between">
           <div className="flex-1">
-            <TodoFiltersBarSimple
+            <TodoFiltersBar
               filters={{
                 urgency_level: filters.urgency_level,
                 action_type: filters.action_type,

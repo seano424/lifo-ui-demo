@@ -9,9 +9,9 @@ import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { ActionableBatch } from '@/lib/utils/todo-transformers'
 import { useEffect, useMemo, useState } from 'react'
-import type { SortConfig } from '../filters/TodoSortControls'
+import type { SortConfig } from './filters/todo-sort-controls'
 
-interface TodoCardListV2Props {
+interface TodoCardListProps {
   todos: TodoItem[]
   isLoading: boolean
   isFetching: boolean
@@ -23,7 +23,7 @@ interface TodoCardListV2Props {
   emptyStateIcon?: string
 }
 
-export function TodoCardListV2({
+export function TodoCardList({
   todos,
   isLoading,
   isFetching,
@@ -33,7 +33,7 @@ export function TodoCardListV2({
   sortConfig,
   emptyStateMessage = 'No todos found',
   emptyStateIcon = '📋',
-}: TodoCardListV2Props) {
+}: TodoCardListProps) {
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(null)

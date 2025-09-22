@@ -22,6 +22,8 @@ const buttonVariants = cva(
           'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
         ghost:
           'hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
+        subtleTertiary:
+          'bg-primary-50 text-primary-900 dark:bg-primary-900/10 dark:text-primary-300',
         link: 'text-primary-900 underline-offset-4 hover:underline dark:text-primary-300',
 
         // New subtle variants using lighter shades
@@ -29,8 +31,6 @@ const buttonVariants = cva(
           'bg-primary-600 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
         subtleSecondary:
           'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-200 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900/30',
-        subtleTertiary:
-          'bg-tertiary-100 text-tertiary-900 shadow-xs hover:bg-tertiary-200 dark:bg-tertiary-900/20 dark:text-tertiary-300 dark:hover:bg-tertiary-900/30',
 
         // Brand variants (preserved for backward compatibility)
         brand:

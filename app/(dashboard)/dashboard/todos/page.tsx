@@ -1,7 +1,7 @@
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 
-import { TodosFilteredListV2 } from '@/components/todos-v2/TodosFilteredListV2'
+import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -65,7 +65,7 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
           description="Manage actionable inventory items and track your progress"
         />
 
-        <TodosFilteredListV2
+        <TodosFilteredList
           initialFilters={{
             tab: params.tab,
             urgency: params.urgency?.split(','),

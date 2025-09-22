@@ -1,5 +1,3 @@
-// lib/queries/todos-rpc-v2.ts - Updated with flexible filtering
-
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 

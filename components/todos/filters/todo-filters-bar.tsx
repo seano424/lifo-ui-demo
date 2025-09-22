@@ -16,7 +16,7 @@ export interface TodoFilterValues {
   batch_status?: BatchStatus[]
 }
 
-interface TodoFiltersBarSimpleProps {
+interface TodoFiltersBarProps {
   filters: TodoFilterValues
   onFiltersChange: (filters: TodoFilterValues) => void
   isLoading?: boolean
@@ -66,11 +66,11 @@ const BATCH_STATUS_OPTIONS: { value: BatchStatus | 'all'; label: string }[] = [
   { value: 'expired', label: 'Expired' },
 ]
 
-export function TodoFiltersBarSimple({
+export function TodoFiltersBar({
   filters,
   onFiltersChange,
   isLoading = false,
-}: TodoFiltersBarSimpleProps) {
+}: TodoFiltersBarProps) {
   const handleUrgencyChange = (urgency: TodoUrgencyLevel | 'all') => {
     if (urgency === 'all') {
       onFiltersChange({
@@ -136,13 +136,13 @@ export function TodoFiltersBarSimple({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap justify-center sm:justify-start gap-2">
         {/* Urgency Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-[180px] justify-between"
+              className="w-full sm:w-[180px] justify-between"
               disabled={isLoading}
               id="todos-urgency-filter-trigger"
             >
@@ -154,7 +154,7 @@ export function TodoFiltersBarSimple({
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[200px] p-2">
+          <DropdownMenuContent className="min-w-[200px] p-2">
             <div className="space-y-1">
               {URGENCY_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
@@ -194,7 +194,7 @@ export function TodoFiltersBarSimple({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-[180px] justify-between"
+              className="w-full sm:w-[180px] justify-between"
               disabled={isLoading}
               id="todos-action-filter-trigger"
             >
@@ -244,7 +244,7 @@ export function TodoFiltersBarSimple({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-[180px] justify-between"
+              className="w-full sm:w-[180px] justify-between"
               disabled={isLoading}
               id="todos-status-filter-trigger"
             >

@@ -1,8 +1,8 @@
 'use client'
 
 import { useInProgressTodos } from '@/hooks/use-todos-with-filters'
-import { TodoCardListV2 } from '../cards/TodoCardListV2'
-import type { TodoFiltersState } from '../filters/TodoFiltersPanel'
+import type { TodoFiltersState } from '../filters/todo-filters-panel'
+import { TodoCardList } from '../todo-card-list'
 
 interface InProgressTabProps {
   filters: TodoFiltersState
@@ -66,7 +66,7 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
   }
 
   return (
-    <TodoCardListV2
+    <TodoCardList
       todos={todos}
       isLoading={isLoading}
       isFetching={isFetching}
