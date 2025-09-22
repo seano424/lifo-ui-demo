@@ -1,5 +1,5 @@
 import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchDashboardSummary } from '@/lib/queries/todos-rpc-v2'
+import { fetchDashboardSummary } from '@/lib/queries/todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useQuery } from '@tanstack/react-query'
 

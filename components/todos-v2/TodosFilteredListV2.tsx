@@ -7,7 +7,7 @@ import {
   useInProgressTodos,
   usePendingTodos,
 } from '@/hooks/use-todos-with-filters'
-import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc-v2'
+import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'

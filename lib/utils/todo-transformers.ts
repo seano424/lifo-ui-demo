@@ -1,4 +1,4 @@
-import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { Database } from '@/types/supabase'
 
 export type BatchAction = Database['inventory']['Tables']['batch_actions']['Row']

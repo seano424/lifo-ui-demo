@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
-import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'

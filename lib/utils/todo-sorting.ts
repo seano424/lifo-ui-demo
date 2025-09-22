@@ -1,4 +1,4 @@
-import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { BatchActionWithDetails } from '@/lib/utils/todo-transformers'
 
 export type SortField =

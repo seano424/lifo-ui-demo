@@ -1,7 +1,7 @@
 // hooks/use-batch-actions-rpc.ts
 
 import { queryKeys } from '@/lib/queries/query-keys'
-import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc-v2'
+import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'

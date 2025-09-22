@@ -1,13 +1,8 @@
 import type { BatchFilters } from './batches'
 import type { ProductFilters } from './products'
 import type { StoreUserFilters } from './store-users'
+import type { TodoCompletionStatus, TodoFilters, TodoSection, TodoUrgencyLevel } from './todos-rpc'
 import type { UserFilters } from './users'
-import type {
-  TodoFilters,
-  TodoSection,
-  TodoCompletionStatus,
-  TodoUrgencyLevel,
-} from './todos-rpc-v2'
 
 export const queryKeys = {
   // Store-related queries

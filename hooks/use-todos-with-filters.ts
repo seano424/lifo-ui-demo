@@ -4,7 +4,7 @@ import {
   type TodoActionType,
   type TodoFilters,
   type TodoUrgencyLevel,
-} from '@/lib/queries/todos-rpc-v2'
+} from '@/lib/queries/todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
