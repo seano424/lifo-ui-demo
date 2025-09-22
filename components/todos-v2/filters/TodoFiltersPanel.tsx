@@ -1,11 +1,14 @@
 'use client'
 
-import { TodoFiltersBarSimple, type TodoFilterValues } from './TodoFiltersBarSimple'
-import { TodoSortControls, type SortConfig } from './TodoSortControls'
-import { TodoSearchBar } from './TodoSearchBar'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
+import {
+  TodoFiltersBarSimple,
+  type TodoFilterValues,
+} from './TodoFiltersBarSimple'
+import { TodoSearchBar } from './TodoSearchBar'
+import { TodoSortControls, type SortConfig } from './TodoSortControls'
 
 export interface TodoFiltersState {
   // Filters
@@ -82,8 +85,8 @@ export function TodoFiltersPanel({
                 Active filters applied
               </span>
               <Button
-                variant="ghost"
                 size="sm"
+                variant="destructive"
                 onClick={clearAllFilters}
                 className="h-8"
               >
@@ -98,7 +101,7 @@ export function TodoFiltersPanel({
 
       {/* Filter Controls */}
       <div className="space-y-4">
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="flex flex-col lg:flex-row gap-4 items-start justify-between">
           <div className="flex-1">
             <TodoFiltersBarSimple
               filters={{
@@ -111,16 +114,11 @@ export function TodoFiltersPanel({
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground hidden lg:inline">
-              Sort:
-            </span>
-            <TodoSortControls
-              sortConfig={filters.sortConfig}
-              onSortChange={handleSortChange}
-              isLoading={isLoading}
-            />
-          </div>
+          <TodoSortControls
+            sortConfig={filters.sortConfig}
+            onSortChange={handleSortChange}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </Card>

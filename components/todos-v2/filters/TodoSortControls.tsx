@@ -32,41 +32,45 @@ interface TodoSortControlsProps {
   isLoading?: boolean
 }
 
-const SORT_OPTIONS: { value: SortField; label: string; description?: string }[] = [
+const SORT_OPTIONS: {
+  value: SortField
+  label: string
+  description?: string
+}[] = [
   {
     value: 'urgency',
     label: 'Urgency',
-    description: 'Sort by priority level (critical → low)'
+    description: 'Sort by priority level (critical → low)',
   },
   {
     value: 'expiry_date',
     label: 'Expiry Date',
-    description: 'Sort by when items expire'
+    description: 'Sort by when items expire',
   },
   {
     value: 'current_quantity',
     label: 'Quantity',
-    description: 'Sort by current stock quantity'
+    description: 'Sort by current stock quantity',
   },
   {
     value: 'potential_loss',
     label: 'Potential Loss',
-    description: 'Sort by estimated financial impact'
+    description: 'Sort by estimated financial impact',
   },
   {
     value: 'alphabetical',
     label: 'Product Name',
-    description: 'Sort alphabetically by product name'
+    description: 'Sort alphabetically by product name',
   },
   {
     value: 'action_date',
     label: 'Last Action',
-    description: 'Sort by when action was last taken'
+    description: 'Sort by when action was last taken',
   },
   {
     value: 'effectiveness',
     label: 'Effectiveness',
-    description: 'Sort by action effectiveness score'
+    description: 'Sort by action effectiveness score',
   },
 ]
 
@@ -75,7 +79,10 @@ export function TodoSortControls({
   onSortChange,
   isLoading = false,
 }: TodoSortControlsProps) {
-  const defaultSortConfig = { field: 'urgency' as SortField, direction: 'desc' as SortDirection }
+  const defaultSortConfig = {
+    field: 'urgency' as SortField,
+    direction: 'desc' as SortDirection,
+  }
   const currentSortConfig = sortConfig || defaultSortConfig
 
   const handleSortFieldChange = (field: SortField) => {
@@ -94,7 +101,9 @@ export function TodoSortControls({
   }
 
   const getCurrentOption = () => {
-    return SORT_OPTIONS.find(option => option.value === currentSortConfig.field)
+    return SORT_OPTIONS.find(
+      (option) => option.value === currentSortConfig.field
+    )
   }
 
   return (
@@ -106,13 +115,14 @@ export function TodoSortControls({
         disabled={isLoading}
       >
         <SelectTrigger className="w-[160px] md:w-[180px]">
-          <SelectValue>
-            {getCurrentOption()?.label || 'Sort by'}
-          </SelectValue>
+          <SelectValue>{getCurrentOption()?.label || 'Sort by'}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {SORT_OPTIONS.map(option => (
-            <SelectItem key={option.value} value={option.value}>
+          {SORT_OPTIONS.map((option) => (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+            >
               <div className="flex flex-col">
                 <span className="font-medium">{option.label}</span>
                 {option.description && (
@@ -129,7 +139,6 @@ export function TodoSortControls({
       {/* Sort Direction Toggle */}
       <Button
         variant="outline"
-        size="sm"
         onClick={handleDirectionToggle}
         disabled={isLoading}
         className="w-auto select-none px-3"
@@ -144,11 +153,6 @@ export function TodoSortControls({
           {currentSortConfig.direction === 'asc' ? 'Asc' : 'Desc'}
         </span>
       </Button>
-
-      {/* Sort Info Display */}
-      <div className="hidden md:flex text-xs text-muted-foreground">
-        {getCurrentOption()?.description}
-      </div>
     </div>
   )
 }
