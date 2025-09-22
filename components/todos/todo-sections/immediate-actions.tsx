@@ -4,7 +4,7 @@ import { TodoCard } from '@/components/todos/todo-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { useImmediateActionTodos } from '@/hooks/use-todos-sections'
-import { AlertTriangle } from 'lucide-react'
+import { TriangleAlert } from 'lucide-react'
 import { useEffect } from 'react'
 
 export default function ImmediateActions() {
@@ -52,9 +52,9 @@ export default function ImmediateActions() {
 
   return (
     <section className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-red-500" />
+          <TriangleAlert className="h-5 w-5 text-red-500" />
           Immediate Actions
         </div>
         <span className="text-sm font-normal bg-red-100 text-red-700 px-2 py-1 rounded-full">
@@ -62,7 +62,7 @@ export default function ImmediateActions() {
         </span>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-8">
         {todosList.map((todo) => (
           <TodoCard
             key={todo.batch_id}

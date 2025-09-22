@@ -2,6 +2,7 @@ import type { BatchFilters } from './batches'
 import type { ProductFilters } from './products'
 import type { StoreUserFilters } from './store-users'
 import type { UserFilters } from './users'
+import type { TodoFilters, TodoSection, TodoCompletionStatus, TodoUrgencyLevel } from './todos-rpc-v2'
 
 export const queryKeys = {
   // Store-related queries
@@ -11,25 +12,53 @@ export const queryKeys = {
     detail: (storeId: string) => [...queryKeys.stores.all, 'detail', storeId] as const,
   },
 
-  // Enhanced Todos and RPC queries with section-specific support
+  // Enhanced Todos and RPC queries with flexible filtering support
   todos: {
     all: ['todos'] as const,
 
-    // Summary queries (existing)
-    summary: (storeId: string) => [...queryKeys.todos.all, 'summary', storeId] as const,
+    // NEW: Flexible filtering query key - The main one you'll use
+    withFilters: (storeId: string, filters: TodoFilters, pageSize: number) =>
+      [...queryKeys.todos.all, 'filtered', { storeId, filters, pageSize }] as const,
+
+    // Convenience keys for common filter patterns
+    byStatus: (storeId: string, status: TodoCompletionStatus, pageSize: number) =>
+      [...queryKeys.todos.all, 'by-status', { storeId, status, pageSize }] as const,
+
+    byUrgency: (storeId: string, urgency: TodoUrgencyLevel[], pageSize: number) =>
+      [...queryKeys.todos.all, 'by-urgency', { storeId, urgency, pageSize }] as const,
+
+    // BACKWARD COMPATIBILITY: Keep old section-based keys during migration
+    bySection: (storeId: string, section: TodoSection, pageSize: number) =>
+      [...queryKeys.todos.all, 'section', { storeId, section, pageSize }] as const,
+
+    // Dashboard queries
+    summary: (storeId: string) =>
+      [...queryKeys.todos.all, 'summary', storeId] as const,
+
     dashboardSummary: (storeId: string) =>
       [...queryKeys.todos.all, 'dashboardSummary', storeId] as const,
 
-    // Enhanced infinite query lists with section support
+    overview: (storeId: string) =>
+      [...queryKeys.todos.all, 'overview', storeId] as const,
+
+    // Specific convenience keys for common combinations
+    pending: (storeId: string, filters?: Partial<TodoFilters>, pageSize: number = 20) =>
+      [...queryKeys.todos.all, 'pending', { storeId, filters, pageSize }] as const,
+
+    inProgress: (storeId: string, filters?: Partial<TodoFilters>, pageSize: number = 20) =>
+      [...queryKeys.todos.all, 'in-progress', { storeId, filters, pageSize }] as const,
+
+    completed: (storeId: string, filters?: Partial<TodoFilters>, pageSize: number = 20) =>
+      [...queryKeys.todos.all, 'completed', { storeId, filters, pageSize }] as const,
+
+    urgent: (storeId: string, pageSize: number = 20) =>
+      [...queryKeys.todos.all, 'urgent', { storeId, pageSize }] as const,
+
+    expiring: (storeId: string, daysMax: number, pageSize: number = 20) =>
+      [...queryKeys.todos.all, 'expiring', { storeId, daysMax, pageSize }] as const,
+
+    // Legacy section queries (kept for backward compatibility)
     lists: () => [...queryKeys.todos.all, 'list'] as const,
-
-    // Section-specific infinite queries (NEW)
-    bySection: (storeId: string, section: string, limit: number) =>
-      [...queryKeys.todos.lists(), 'bySection', storeId, section, limit] as const,
-
-    // Legacy section queries (can be kept for compatibility)
-    pending: (storeId: string, limit: number) =>
-      [...queryKeys.todos.lists(), 'pending', storeId, limit] as const,
     discounted: (storeId: string, limit: number) =>
       [...queryKeys.todos.lists(), 'discounted', storeId, limit] as const,
     donated: (storeId: string, limit: number, daysBack: number) =>
@@ -296,35 +325,35 @@ export const queryKeys = {
   },
 } as const
 
-// Type-safe helper functions for section-specific keys
+// Type-safe helper functions for section-specific keys (backward compatibility)
 export const todosSectionKeys = {
-  bySection: (storeId: string, section: string, limit: number) =>
+  bySection: (storeId: string, section: TodoSection, limit: number) =>
     queryKeys.todos.bySection(storeId, section, limit),
 
   // Specific section keys for better type safety
   immediateAction: (storeId: string, limit: number = 10) =>
-    queryKeys.todos.bySection(storeId, 'immediate_action', limit),
+    queryKeys.todos.bySection(storeId, 'immediate_action' as TodoSection, limit),
 
   recentlyExpired: (storeId: string, limit: number = 20) =>
-    queryKeys.todos.bySection(storeId, 'recently_expired', limit),
+    queryKeys.todos.bySection(storeId, 'recently_expired' as TodoSection, limit),
 
   inProgress: (storeId: string, limit: number = 30) =>
-    queryKeys.todos.bySection(storeId, 'in_progress', limit),
+    queryKeys.todos.bySection(storeId, 'in_progress' as TodoSection, limit),
 
   discounted: (storeId: string, limit: number = 20) =>
-    queryKeys.todos.bySection(storeId, 'discounted', limit),
+    queryKeys.todos.bySection(storeId, 'discounted' as TodoSection, limit),
 
   readyForDonation: (storeId: string, limit: number = 15) =>
-    queryKeys.todos.bySection(storeId, 'ready_for_donation', limit),
+    queryKeys.todos.bySection(storeId, 'ready_for_donation' as TodoSection, limit),
 
   completedToday: (storeId: string, limit: number = 10) =>
-    queryKeys.todos.bySection(storeId, 'completed_today', limit),
+    queryKeys.todos.bySection(storeId, 'completed_today' as TodoSection, limit),
 
   actionHistory: (storeId: string, limit: number = 50) =>
-    queryKeys.todos.bySection(storeId, 'action_history', limit),
+    queryKeys.todos.bySection(storeId, 'action_history' as TodoSection, limit),
 
   needsReeval: (storeId: string, limit: number = 20) =>
-    queryKeys.todos.bySection(storeId, 'needs_reeval', limit),
+    queryKeys.todos.bySection(storeId, 'needs_reeval' as TodoSection, limit),
 }
 
 // Type helpers for query key validation

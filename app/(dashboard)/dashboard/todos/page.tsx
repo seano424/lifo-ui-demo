@@ -1,5 +1,8 @@
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
-import TodoSections from '@/components/todos/todo-sections'
+
+// import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
+import { TodosFilteredListV2 } from '@/components/todos-v2/TodosFilteredListV2'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -12,6 +15,9 @@ interface TodosPageProps {
     urgency?: string
     sort?: string
     direction?: string
+    actionType?: string
+    batchStatus?: string
+    productName?: string
   }>
 }
 
@@ -55,12 +61,12 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col gap-6">
-        {/* <DashboardInsetHeader
+        <DashboardInsetHeader
           title="Todos"
           description="Manage actionable inventory items and track your progress"
         />
 
-        <TodosFilteredList
+        {/* <TodosFilteredList
           initialFilters={{
             tab: params.tab,
             urgency: params.urgency,
@@ -69,7 +75,17 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
           }}
         /> */}
 
-        <TodoSections />
+        <TodosFilteredListV2
+          initialFilters={{
+            tab: params.tab,
+            urgency: params.urgency?.split(','),
+            actionType: params.actionType?.split(','),
+            batchStatus: params.batchStatus?.split(','),
+            productName: params.productName,
+            sort: params.sort,
+            direction: params.direction,
+          }}
+        />
       </div>
     </HydrationBoundary>
   )
