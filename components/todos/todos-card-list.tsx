@@ -4,10 +4,7 @@ import { BatchActionCard } from '@/components/todos/batch-action-card'
 import type { BatchActionFiltersType } from '@/components/todos/batch-action-filters'
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
 import { TodoCard } from '@/components/todos/todo-card'
-import type {
-  TodoFilters,
-  TodoItem,
-} from '@/components/todos/todos-filtered-list'
+import type { TodoFilters, TodoItem } from '@/components/todos/todos-filtered-list'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
@@ -70,15 +67,13 @@ export function TodosCardList({
 
   // Bottom sheet state
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-  const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(
-    null
-  )
+  const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(null)
 
   // Handler for opening the bottom sheet with selected batch
   const handleTodoClick = (batchId: string) => {
     // Always use RPC data
     const allBatches = rpcActionableBatches.data?.pages?.flat() || []
-    const batch = allBatches.find((b) => b.batch_id === batchId)
+    const batch = allBatches.find(b => b.batch_id === batchId)
 
     if (batch) {
       setSelectedBatch(batch)
@@ -131,20 +126,11 @@ export function TodosCardList({
         !actionHistoryInfinite.isFetchingNextPage
       ) {
         actionHistoryInfinite.fetchNextPage()
-      } else if (
-        tab !== 'action_history' &&
-        !rpcActionableBatches.isFetchingNextPage
-      ) {
+      } else if (tab !== 'action_history' && !rpcActionableBatches.isFetchingNextPage) {
         rpcActionableBatches.fetchNextPage()
       }
     }
-  }, [
-    isIntersecting,
-    hasMore,
-    tab,
-    actionHistoryInfinite,
-    rpcActionableBatches,
-  ])
+  }, [isIntersecting, hasMore, tab, actionHistoryInfinite, rpcActionableBatches])
 
   // Memoized data processing to avoid expensive recalculations
   const processedTodos = useMemo(() => {
@@ -154,17 +140,13 @@ export function TodosCardList({
     if (tab === 'suggestions') {
       // Filter for suggestions (urgent_action or needs_attention)
       const suggestionBatches = allBatches.filter(
-        (batch) =>
-          batch.todo_state === 'urgent_action' ||
-          batch.todo_state === 'needs_attention'
+        batch => batch.todo_state === 'urgent_action' || batch.todo_state === 'needs_attention',
       )
       const actionableTodos = memoizedRpcBatchToTodo(suggestionBatches)
       return applySorting(actionableTodos, filters)
     } else if (tab === 'recently_expired') {
       // Filter for expired items
-      const expiredBatches = allBatches.filter(
-        (batch) => batch.todo_state === 'expired'
-      )
+      const expiredBatches = allBatches.filter(batch => batch.todo_state === 'expired')
       const expiredTodos = memoizedRpcBatchToTodo(expiredBatches)
       return applySorting(expiredTodos, filters, {
         field: 'expiry_date',
@@ -172,9 +154,7 @@ export function TodosCardList({
       })
     } else if (tab === 'all_active') {
       // Filter for active (non-expired) items
-      const activeBatches = allBatches.filter(
-        (batch) => batch.todo_state !== 'expired'
-      )
+      const activeBatches = allBatches.filter(batch => batch.todo_state !== 'expired')
       const activeTodos = memoizedRpcBatchToTodo(activeBatches)
       const filteredTodos = applyUrgencyFilter(activeTodos, filters)
       return applySorting(filteredTodos, filters, {
@@ -210,10 +190,7 @@ export function TodosCardList({
     return (
       <div className="flex flex-col gap-16">
         {Array.from({ length: 4 }, () => (
-          <div
-            key={crypto.randomUUID()}
-            className="flex flex-col gap-4"
-          >
+          <div key={crypto.randomUUID()} className="flex flex-col gap-4">
             <div className="flex gap-4">
               <Skeleton className="h-8 w-8 flex-shrink-0 bg-muted animate-pulse" />
               <div className="w-full flex flex-col gap-2">
@@ -237,9 +214,7 @@ export function TodosCardList({
 
   // Check if we have no data to display
   const hasNoData =
-    tab === 'action_history'
-      ? processedBatchActions.length === 0
-      : todos.length === 0
+    tab === 'action_history' ? processedBatchActions.length === 0 : todos.length === 0
 
   if (hasNoData) {
     return (
@@ -259,13 +234,10 @@ export function TodosCardList({
       <div className="space-y-4 flex flex-col">
         <div className="flex flex-col gap-12">
           {tab === 'action_history'
-            ? processedBatchActions.map((action) => (
-                <BatchActionCard
-                  key={action.action_id}
-                  action={action}
-                />
+            ? processedBatchActions.map(action => (
+                <BatchActionCard key={action.action_id} action={action} />
               ))
-            : todos.map((todo) => (
+            : todos.map(todo => (
                 <TodoCard
                   key={todo.batch_id}
                   todo={{
@@ -296,10 +268,7 @@ export function TodosCardList({
         </div>
 
         {hasMore && (
-          <div
-            ref={targetRef}
-            className="flex justify-center items-center pt-8 pb-4 min-h-[60px]"
-          >
+          <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
             {(
               tab === 'action_history'
                 ? actionHistoryInfinite?.isFetchingNextPage
@@ -315,10 +284,7 @@ export function TodosCardList({
             ) : (
               <div className="text-sm text-muted-foreground opacity-60">
                 Scroll to load more (
-                {tab === 'action_history'
-                  ? processedBatchActions.length
-                  : todos.length}{' '}
-                loaded)
+                {tab === 'action_history' ? processedBatchActions.length : todos.length} loaded)
               </div>
             )}
           </div>
@@ -336,12 +302,9 @@ export function TodosCardList({
 }
 
 // Helper functions for data processing
-function applyUrgencyFilter(
-  todos: TodoItem[],
-  filters: TodoFilters
-): TodoItem[] {
+function applyUrgencyFilter(todos: TodoItem[], filters: TodoFilters): TodoItem[] {
   if (filters.urgency && filters.urgency !== 'all') {
-    return todos.filter((todo) => todo.urgency === filters.urgency)
+    return todos.filter(todo => todo.urgency === filters.urgency)
   }
   return todos
 }
@@ -349,7 +312,7 @@ function applyUrgencyFilter(
 function applySorting(
   todos: TodoItem[],
   filters: TodoFilters,
-  defaultSort?: Partial<{ field: string; direction: string }>
+  defaultSort?: Partial<{ field: string; direction: string }>,
 ): TodoItem[] {
   if (filters.sort) {
     const validatedSort = validateSortConfig(filters.sort)

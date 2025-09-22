@@ -2,7 +2,10 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
-import type { TodoItem } from '@/lib/queries/todos-rpc'
+import type { TodoItem as TodoItemV1 } from '@/lib/queries/todos-rpc'
+import type { TodoItem as TodoItemV2 } from '@/lib/queries/todos-rpc-v2'
+
+type TodoItem = TodoItemV1 | TodoItemV2
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
 import { Calendar, Package, PenLine } from 'lucide-react'
@@ -20,11 +23,8 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   // Format expiry date
   const expiryDate = new Date(todo.expiry_date)
   const today = new Date()
-  const isExpiringSoon =
-    expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
-  const isExpired =
-    expiryDate <
-    new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const isExpiringSoon = expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
+  const isExpired = expiryDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())
   const isExpiringToday = expiryDate.toDateString() === today.toDateString()
 
   // Calculate days since expiry for expired items
@@ -32,15 +32,11 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     if (!isExpired) return ''
 
     // Use date-only comparison to avoid timezone issues
-    const todayDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    )
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
     const expiryDateOnly = new Date(
       expiryDate.getFullYear(),
       expiryDate.getMonth(),
-      expiryDate.getDate()
+      expiryDate.getDate(),
     )
 
     const diffTime = todayDate.getTime() - expiryDateOnly.getTime()
@@ -101,10 +97,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   return (
     <button
       type="button"
-      className={cn(
-        'cursor-pointer transition-all duration-1000',
-        'border-b flex flex-col'
-      )}
+      className={cn('cursor-pointer transition-all duration-1000', 'border-b flex flex-col')}
       onClick={handleCardClick}
     >
       <div className="flex gap-3 px-4 pb-6 items-start relative group">
@@ -113,7 +106,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           className={cn(
             'border-2 rounded-full cursor-pointer',
             'h-6 w-6 p-0 bg-brand-white transition-all duration-200',
-            urgencyConfig.bgColor
+            urgencyConfig.bgColor,
           )}
         ></Badge>
 
@@ -125,9 +118,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">Suggestion</span>
                 <span className="truncate lowercase">
-                  {formatRecommendation(
-                    todo.ai_recommendation || 'No recommendation'
-                  )}
+                  {formatRecommendation(todo.ai_recommendation || 'No recommendation')}
                 </span>
               </Typography>
             </div>
@@ -150,18 +141,14 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             </Typography>
 
             <div className="flex flex-wrap gap-2 items-center justify-between">
-              {todo.last_discount_percent != null &&
-                todo.last_discount_percent > 0 && (
-                  <Badge variant={urgencyConfig.badgeVariant}>
-                    Suggested discount: {todo.last_discount_percent}%
-                  </Badge>
-                )}
-
-              {(todo.last_discount_percent == null ||
-                todo.last_discount_percent === 0) && (
+              {todo.last_discount_percent != null && todo.last_discount_percent > 0 && (
                 <Badge variant={urgencyConfig.badgeVariant}>
-                  Suggestion: Healthy & Maintain
+                  Suggested discount: {todo.last_discount_percent}%
                 </Badge>
+              )}
+
+              {(todo.last_discount_percent == null || todo.last_discount_percent === 0) && (
+                <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
               )}
 
               {isExpiringToday ? (

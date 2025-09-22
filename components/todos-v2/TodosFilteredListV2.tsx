@@ -7,18 +7,11 @@ import {
   useInProgressTodos,
   usePendingTodos,
 } from '@/hooks/use-todos-with-filters'
-import type {
-  BatchStatus,
-  TodoActionType,
-  TodoUrgencyLevel,
-} from '@/lib/queries/todos-rpc-v2'
+import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc-v2'
 import { cn } from '@/lib/utils'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  TodoFiltersPanel,
-  type TodoFiltersState,
-} from './filters/TodoFiltersPanel'
+import { TodoFiltersPanel, type TodoFiltersState } from './filters/TodoFiltersPanel'
 import type { SortDirection, SortField } from './filters/TodoSortControls'
 import { CompletedTab } from './tabs/CompletedTab'
 import { InProgressTab } from './tabs/InProgressTab'
@@ -39,20 +32,19 @@ interface TodosFilteredListV2Props {
   pageSize?: number
 }
 
-export function TodosFilteredListV2({
-  initialFilters,
-  pageSize = 20,
-}: TodosFilteredListV2Props) {
+export function TodosFilteredListV2({ initialFilters, pageSize = 20 }: TodosFilteredListV2Props) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
-    (initialFilters?.tab as TodoTabType) || 'pending'
+    (initialFilters?.tab as TodoTabType) || 'pending',
   )
 
   // Tab indicator animation
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+
+  // Track if this is the initial render to prevent URL update loops
+  const isInitialRender = useRef(true)
 
   // Unified filter state with stable default sort config
   const defaultSortConfig = useMemo(
@@ -60,7 +52,7 @@ export function TodosFilteredListV2({
       field: 'urgency' as const,
       direction: 'desc' as const,
     }),
-    []
+    [],
   )
 
   const [filters, setFilters] = useState<TodoFiltersState>(() => {
@@ -105,13 +97,13 @@ export function TodosFilteredListV2({
         component: CompletedTab,
       },
     ],
-    [pendingTodos?.length, inProgressTodos?.length, completedTodos?.length]
+    [pendingTodos?.length, inProgressTodos?.length, completedTodos?.length],
   )
 
   // Update tab indicator position
   useEffect(() => {
     const updateIndicator = () => {
-      const activeIndex = tabs.findIndex((tab) => tab.id === activeTab)
+      const activeIndex = tabs.findIndex(tab => tab.id === activeTab)
       const activeButton = buttonRefs.current[activeIndex]
 
       if (activeButton) {
@@ -125,52 +117,45 @@ export function TodosFilteredListV2({
     return () => window.removeEventListener('resize', updateIndicator)
   }, [activeTab, tabs])
 
-  // Update URL when tab or filters change
+  // Update URL when tab or filters change (skip initial render)
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString())
+    // Skip URL update on initial render to prevent loops
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
+
+    const params = new URLSearchParams()
 
     // Update tab
     if (activeTab !== 'pending') {
       params.set('tab', activeTab)
-    } else {
-      params.delete('tab')
     }
 
     // Update filters
     if (filters.urgency_level?.length) {
       params.set('urgency', filters.urgency_level.join(','))
-    } else {
-      params.delete('urgency')
     }
 
     if (filters.action_type?.length) {
       params.set('actionType', filters.action_type.join(','))
-    } else {
-      params.delete('actionType')
     }
 
     if (filters.batch_status?.length) {
       params.set('batchStatus', filters.batch_status.join(','))
-    } else {
-      params.delete('batchStatus')
     }
 
     if (filters.product_name) {
       params.set('productName', filters.product_name)
-    } else {
-      params.delete('productName')
     }
 
     if (filters.sortConfig) {
       params.set('sort', filters.sortConfig.field)
       params.set('direction', filters.sortConfig.direction)
-    } else {
-      params.delete('sort')
-      params.delete('direction')
     }
 
     router.push(`?${params.toString()}`)
-  }, [activeTab, filters, router, searchParams])
+  }, [activeTab, filters, router])
 
   const handleTabChange = (tabId: TodoTabType) => {
     setActiveTab(tabId)
@@ -178,18 +163,17 @@ export function TodosFilteredListV2({
     // setFilters(prev => ({ ...prev, product_name: undefined }))
   }
 
-  const handleFiltersChange = useCallback((newFilters: TodoFiltersState) => {
-    setFilters(newFilters)
-  }, [])
+  const handleFiltersChange = useCallback(
+    (newFilters: TodoFiltersState | ((prevFilters: TodoFiltersState) => TodoFiltersState)) => {
+      setFilters(newFilters)
+    },
+    [],
+  )
 
   return (
     <div className="space-y-6">
       {/* Filter Panel */}
-      <TodoFiltersPanel
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        isLoading={false}
-      />
+      <TodoFiltersPanel filters={filters} onFiltersChange={handleFiltersChange} isLoading={false} />
 
       {/* Tab Navigation */}
       <div className="relative">
@@ -206,9 +190,7 @@ export function TodosFilteredListV2({
               className={cn(
                 'rounded-none px-4 relative flex items-center gap-2 pb-4 whitespace-nowrap',
                 'hover:bg-transparent group/tab font-bold font-sans tracking-tight',
-                activeTab === tab.id
-                  ? 'text-primary'
-                  : 'text-muted-foreground/90'
+                activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}
             >
               {tab.label}
@@ -241,10 +223,7 @@ export function TodosFilteredListV2({
             display: activeTab === 'pending' ? 'block' : 'none',
           }}
         >
-          <PendingTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <PendingTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
@@ -252,10 +231,7 @@ export function TodosFilteredListV2({
             display: activeTab === 'in_progress' ? 'block' : 'none',
           }}
         >
-          <InProgressTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <InProgressTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
@@ -263,10 +239,7 @@ export function TodosFilteredListV2({
             display: activeTab === 'completed' ? 'block' : 'none',
           }}
         >
-          <CompletedTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <CompletedTab filters={filters} pageSize={pageSize} />
         </div>
       </div>
     </div>

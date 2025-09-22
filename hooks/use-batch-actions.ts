@@ -148,14 +148,7 @@ interface IgnoreParams {
 
 interface BulkParams {
   batchIds: string[]
-  actionType:
-    | 'donate'
-    | 'discount'
-    | 'sold'
-    | 'dispose'
-    | 'dismiss'
-    | 'donate_prepared'
-    | 'ignore'
+  actionType: 'donate' | 'discount' | 'sold' | 'dispose' | 'dismiss' | 'donate_prepared' | 'ignore'
   actionParams: Record<string, unknown>
 }
 
@@ -205,7 +198,7 @@ export function useBatchActions() {
       | 'dismiss'
       | 'donate_prepared'
       | 'ignore',
-    storeId?: string
+    storeId?: string,
   ) => {
     // Get store ID from batch if not provided
     if (!storeId) {
@@ -230,9 +223,8 @@ export function useBatchActions() {
       }
 
       // NEW: Smart section-specific invalidation
-      const sectionsToInvalidate =
-        getSectionsToInvalidateAfterAction(actionType)
-      sectionsToInvalidate.forEach((section) => {
+      const sectionsToInvalidate = getSectionsToInvalidateAfterAction(actionType)
+      sectionsToInvalidate.forEach(section => {
         queryClient.invalidateQueries({
           queryKey: [...queryKeys.todos.lists(), 'bySection', storeId, section],
         })
@@ -328,10 +320,7 @@ export function useBatchActions() {
         }),
       ])
 
-      console.log(
-        `[BatchActions] Invalidated sections after ${actionType}:`,
-        sectionsToInvalidate
-      )
+      console.log(`[BatchActions] Invalidated sections after ${actionType}:`, sectionsToInvalidate)
     }
   }
 
@@ -348,10 +337,7 @@ export function useBatchActions() {
         p_notes: params.notes || null,
       } as DonateActionParams
 
-      const { data, error } = await supabase.rpc(
-        'execute_donate_action',
-        rpcParams
-      )
+      const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
 
       if (error) {
         throw error
@@ -359,7 +345,7 @@ export function useBatchActions() {
 
       return data as ActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
       queryClient.setQueryData(
@@ -369,12 +355,12 @@ export function useBatchActions() {
             return {
               ...oldData,
               alerts: oldData.alerts.filter(
-                (alert: ScoringAlert) => alert.batch_id !== variables.batchId
+                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
               ),
             }
           }
           return oldData
-        }
+        },
       )
 
       return { storeId }
@@ -384,11 +370,7 @@ export function useBatchActions() {
         toast.success(`Successfully donated ${variables.quantity} units`, {
           description: `Total value donated: €${result.total_value_donated?.toFixed(2)}`,
         })
-        await invalidateRelatedQueries(
-          variables.batchId,
-          'donate',
-          context?.storeId
-        )
+        await invalidateRelatedQueries(variables.batchId, 'donate', context?.storeId)
       } else {
         toast.error(result.error || 'Donation failed')
       }
@@ -416,10 +398,7 @@ export function useBatchActions() {
         p_notes: params.notes || null,
       } as DiscountActionParams
 
-      const { data, error } = await supabase.rpc(
-        'execute_discount_action',
-        rpcParams
-      )
+      const { data, error } = await supabase.rpc('execute_discount_action', rpcParams)
 
       if (error) {
         throw error
@@ -427,22 +406,21 @@ export function useBatchActions() {
 
       return data as ActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
       queryClient.setQueryData(
         queryKeys.batches.detail(variables.batchId),
         (oldData: BatchDetail | undefined) => {
           if (oldData) {
-            const newPrice =
-              oldData.selling_price * (1 - variables.discountPercentage / 100)
+            const newPrice = oldData.selling_price * (1 - variables.discountPercentage / 100)
             return {
               ...oldData,
               selling_price: newPrice,
             }
           }
           return oldData
-        }
+        },
       )
 
       return { storeId }
@@ -452,11 +430,7 @@ export function useBatchActions() {
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
           description: `New price: €${result.new_price?.toFixed(2)}`,
         })
-        await invalidateRelatedQueries(
-          variables.batchId,
-          'discount',
-          context?.storeId
-        )
+        await invalidateRelatedQueries(variables.batchId, 'discount', context?.storeId)
       } else {
         toast.error(result.error || 'Discount failed')
       }
@@ -484,11 +458,11 @@ export function useBatchActions() {
       if (error) throw error
       return data as ActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeId = await getStoreIdFromBatch(variables.batchId)
-      const batchData = queryClient.getQueryData(
-        queryKeys.batches.detail(variables.batchId)
-      ) as BatchDetail | undefined
+      const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as
+        | BatchDetail
+        | undefined
 
       if (batchData && variables.quantity >= batchData.current_quantity) {
         queryClient.setQueryData(
@@ -498,12 +472,12 @@ export function useBatchActions() {
               return {
                 ...oldData,
                 alerts: oldData.alerts.filter(
-                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId
+                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
                 ),
               }
             }
             return oldData
-          }
+          },
         )
       }
 
@@ -514,11 +488,7 @@ export function useBatchActions() {
         toast.success(`Marked ${variables.quantity} units as sold`, {
           description: `Revenue: €${result.revenue_recovered?.toFixed(2)}`,
         })
-        await invalidateRelatedQueries(
-          variables.batchId,
-          'sold',
-          context?.storeId
-        )
+        await invalidateRelatedQueries(variables.batchId, 'sold', context?.storeId)
       } else {
         toast.error(result.error || 'Update failed')
       }
@@ -549,11 +519,11 @@ export function useBatchActions() {
       if (error) throw error
       return data as ActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeId = await getStoreIdFromBatch(variables.batchId)
-      const batchData = queryClient.getQueryData(
-        queryKeys.batches.detail(variables.batchId)
-      ) as BatchDetail | undefined
+      const batchData = queryClient.getQueryData(queryKeys.batches.detail(variables.batchId)) as
+        | BatchDetail
+        | undefined
 
       if (batchData && variables.quantity >= batchData.current_quantity) {
         queryClient.setQueryData(
@@ -563,12 +533,12 @@ export function useBatchActions() {
               return {
                 ...oldData,
                 alerts: oldData.alerts.filter(
-                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId
+                  (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
                 ),
               }
             }
             return oldData
-          }
+          },
         )
       }
 
@@ -579,11 +549,7 @@ export function useBatchActions() {
         toast.success(`Disposed ${variables.quantity} units`, {
           description: `Reason: ${variables.disposalReason}`,
         })
-        await invalidateRelatedQueries(
-          variables.batchId,
-          'dispose',
-          context?.storeId
-        )
+        await invalidateRelatedQueries(variables.batchId, 'dispose', context?.storeId)
       } else {
         toast.error(result.error || 'Disposal failed')
       }
@@ -613,7 +579,7 @@ export function useBatchActions() {
       if (error) throw error
       return data as ActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
       queryClient.setQueryData(
@@ -623,12 +589,12 @@ export function useBatchActions() {
             return {
               ...oldData,
               alerts: oldData.alerts.filter(
-                (alert: ScoringAlert) => alert.batch_id !== variables.batchId
+                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
               ),
             }
           }
           return oldData
-        }
+        },
       )
 
       return { storeId }
@@ -638,11 +604,7 @@ export function useBatchActions() {
         toast.success('Recommendation dismissed', {
           description: `Reason: ${variables.dismissalReason}`,
         })
-        await invalidateRelatedQueries(
-          variables.batchId,
-          'dismiss',
-          context?.storeId
-        )
+        await invalidateRelatedQueries(variables.batchId, 'dismiss', context?.storeId)
       } else {
         toast.error(result.error || 'Dismiss failed')
       }
@@ -662,16 +624,13 @@ export function useBatchActions() {
     mutationFn: async (params: DonatePreparedParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
 
-      const { data, error } = await supabase.rpc(
-        'execute_donate_prepared_action',
-        {
-          p_batch_id: params.batchId,
-          p_quantity_affected: params.quantity,
-          p_preparation_details: params.preparationDetails || null,
-          p_user_id: userId,
-          p_notes: params.notes || null,
-        } as DonatePreparedActionParams
-      )
+      const { data, error } = await supabase.rpc('execute_donate_prepared_action', {
+        p_batch_id: params.batchId,
+        p_quantity_affected: params.quantity,
+        p_preparation_details: params.preparationDetails || null,
+        p_user_id: userId,
+        p_notes: params.notes || null,
+      } as DonatePreparedActionParams)
 
       if (error) throw error
       return data as ActionResult
@@ -703,7 +662,7 @@ export function useBatchActions() {
       if (error) throw error
       return data as ActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeId = await getStoreIdFromBatch(variables.batchId)
 
       // Optimistically remove from alerts since ignored items shouldn't show up
@@ -714,12 +673,12 @@ export function useBatchActions() {
             return {
               ...oldData,
               alerts: oldData.alerts.filter(
-                (alert: ScoringAlert) => alert.batch_id !== variables.batchId
+                (alert: ScoringAlert) => alert.batch_id !== variables.batchId,
               ),
             }
           }
           return oldData
-        }
+        },
       )
 
       return { storeId }
@@ -729,11 +688,7 @@ export function useBatchActions() {
         toast.success('Item ignored successfully', {
           description: 'This item will no longer appear in active recommendations',
         })
-        await invalidateRelatedQueries(
-          variables.batchId,
-          'ignore',
-          context?.storeId
-        )
+        await invalidateRelatedQueries(variables.batchId, 'ignore', context?.storeId)
       } else {
         toast.error(result.error || 'Ignore action failed')
       }
@@ -763,13 +718,13 @@ export function useBatchActions() {
       if (error) throw error
       return data as BulkActionResult
     },
-    onMutate: async (variables) => {
+    onMutate: async variables => {
       const storeIds = await Promise.all(
-        variables.batchIds.map((batchId) => getStoreIdFromBatch(batchId))
+        variables.batchIds.map(batchId => getStoreIdFromBatch(batchId)),
       )
       const uniqueStoreIds = [...new Set(storeIds)]
 
-      uniqueStoreIds.forEach((storeId) => {
+      uniqueStoreIds.forEach(storeId => {
         if (storeId) {
           queryClient.setQueryData(
             queryKeys.alerts.store(storeId),
@@ -778,13 +733,12 @@ export function useBatchActions() {
                 return {
                   ...oldData,
                   alerts: oldData.alerts.filter(
-                    (alert: ScoringAlert) =>
-                      !variables.batchIds.includes(alert.batch_id)
+                    (alert: ScoringAlert) => !variables.batchIds.includes(alert.batch_id),
                   ),
                 }
               }
               return oldData
-            }
+            },
           )
         }
       })
@@ -793,31 +747,24 @@ export function useBatchActions() {
     },
     onSuccess: async (result, variables, _context) => {
       if (result.success) {
-        toast.success(
-          `Bulk action completed: ${result.success_count} successful`,
-          {
-            description:
-              result.error_count > 0
-                ? `${result.error_count} items failed`
-                : 'All items processed',
-          }
-        )
+        toast.success(`Bulk action completed: ${result.success_count} successful`, {
+          description:
+            result.error_count > 0 ? `${result.error_count} items failed` : 'All items processed',
+        })
       } else {
         toast.warning(
-          `Bulk action: ${result.success_count} succeeded, ${result.error_count} failed`
+          `Bulk action: ${result.success_count} succeeded, ${result.error_count} failed`,
         )
       }
 
       // Invalidate queries for all affected batches
       await Promise.all(
-        variables.batchIds.map((batchId) =>
-          invalidateRelatedQueries(batchId, variables.actionType)
-        )
+        variables.batchIds.map(batchId => invalidateRelatedQueries(batchId, variables.actionType)),
       )
     },
     onError: (_error, _variables, context) => {
       if (context?.storeIds) {
-        context.storeIds.forEach((storeId) => {
+        context.storeIds.forEach(storeId => {
           if (storeId) {
             queryClient.invalidateQueries({
               queryKey: queryKeys.alerts.store(storeId),
@@ -830,22 +777,14 @@ export function useBatchActions() {
   })
 
   // Convenience methods (compatible with existing interface)
-  const markAsDiscounted = (
-    batchId: string,
-    discountPercentage: number,
-    quantity?: number
-  ) =>
+  const markAsDiscounted = (batchId: string, discountPercentage: number, quantity?: number) =>
     executeDiscount.mutate({
       batchId,
       discountPercentage,
       quantity: quantity || 1,
     })
 
-  const markAsDonated = (
-    batchId: string,
-    donationRecipientId: string,
-    quantity?: number
-  ) =>
+  const markAsDonated = (batchId: string, donationRecipientId: string, quantity?: number) =>
     executeDonate.mutate({
       batchId,
       donationRecipientId,
@@ -862,11 +801,7 @@ export function useBatchActions() {
   const markAsSold = (batchId: string, quantity: number) =>
     executeSold.mutate({ batchId, quantity })
 
-  const markAsDonatePrepared = (
-    batchId: string,
-    quantity?: number,
-    preparationDetails?: string
-  ) =>
+  const markAsDonatePrepared = (batchId: string, quantity?: number, preparationDetails?: string) =>
     executeDonatePrepared.mutate({
       batchId,
       quantity: quantity || 1,

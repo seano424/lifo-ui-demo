@@ -37,32 +37,24 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
       fetchBatchesPage(
         { page: pageParam, pageSize },
         { ...filters, storeId: activeStoreId || undefined },
-        undefined
+        undefined,
       ),
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+    getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId,
     retry: (failureCount, error: SupabaseError) => {
       if (error?.message?.includes('failed to parse order')) {
-        console.error(
-          '[useBatches] PostgREST ordering error - not retrying:',
-          error
-        )
+        console.error('[useBatches] PostgREST ordering error - not retrying:', error)
         return false
       }
-      if (
-        error?.status &&
-        error.status >= 400 &&
-        error.status < 500 &&
-        error.status !== 408
-      ) {
+      if (error?.status && error.status >= 400 && error.status < 500 && error.status !== 408) {
         return false
       }
       return failureCount < 3
     },
   })
 
-  const data = result.data?.pages.flatMap((page) => page.data) ?? []
+  const data = result.data?.pages.flatMap(page => page.data) ?? []
 
   return {
     data,
@@ -77,12 +69,9 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   }
 }
 
-export function useBatchesWithSort(
-  initialSort?: BatchSort,
-  pageSize: number = 20
-) {
+export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 20) {
   const [currentSort, setCurrentSort] = useState<BatchSort>(
-    initialSort || { field: 'expiry_date', direction: 'asc' }
+    initialSort || { field: 'expiry_date', direction: 'asc' },
   )
 
   const filters: BatchFilters = {
@@ -92,10 +81,9 @@ export function useBatchesWithSort(
   const result = useBatches(filters, pageSize)
 
   const updateSort = useCallback((field: BatchSortField) => {
-    setCurrentSort((prev) => ({
+    setCurrentSort(prev => ({
       field,
-      direction:
-        prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
+      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
     }))
   }, [])
 
@@ -103,7 +91,7 @@ export function useBatchesWithSort(
     (field: BatchSortField): BatchSortDirection | null => {
       return currentSort.field === field ? currentSort.direction : null
     },
-    [currentSort]
+    [currentSort],
   )
 
   return {
@@ -124,12 +112,7 @@ export function useBatch(batchId: string) {
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
-      if (
-        error?.status &&
-        error.status >= 400 &&
-        error.status < 500 &&
-        error.status !== 408
-      ) {
+      if (error?.status && error.status >= 400 && error.status < 500 && error.status !== 408) {
         return false
       }
       return failureCount < 3
@@ -140,7 +123,7 @@ export function useBatch(batchId: string) {
 export function useBatchesForProduct(
   productId: string,
   filters: Omit<BatchFilters, 'product_id'> = {},
-  pageSize: number = 20
+  pageSize: number = 20,
 ) {
   const activeStoreId = useActiveStoreId()
 
@@ -150,28 +133,23 @@ export function useBatchesForProduct(
       fetchBatchesForProduct(
         productId,
         { page: pageParam, pageSize },
-        { ...filters, storeId: activeStoreId || undefined }
+        { ...filters, storeId: activeStoreId || undefined },
       ),
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+    getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!productId && !!activeStoreId,
     retry: (failureCount, error: SupabaseError) => {
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
-      if (
-        error?.status &&
-        error.status >= 400 &&
-        error.status < 500 &&
-        error.status !== 408
-      ) {
+      if (error?.status && error.status >= 400 && error.status < 500 && error.status !== 408) {
         return false
       }
       return failureCount < 3
     },
   })
 
-  const data = result.data?.pages.flatMap((page) => page.data) ?? []
+  const data = result.data?.pages.flatMap(page => page.data) ?? []
 
   return {
     data,
@@ -190,11 +168,7 @@ export function useExpiringBatches(daysAhead: number = 7) {
   const activeStoreId = useActiveStoreId()
 
   return useQuery({
-    queryKey: [
-      ...queryKeys.batches.byStore(activeStoreId || ''),
-      'expiring',
-      { daysAhead },
-    ],
+    queryKey: [...queryKeys.batches.byStore(activeStoreId || ''), 'expiring', { daysAhead }],
     queryFn: () => fetchExpiringBatches(activeStoreId!, daysAhead),
     enabled: !!activeStoreId,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -203,12 +177,7 @@ export function useExpiringBatches(daysAhead: number = 7) {
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
-      if (
-        error?.status &&
-        error.status >= 400 &&
-        error.status < 500 &&
-        error.status !== 408
-      ) {
+      if (error?.status && error.status >= 400 && error.status < 500 && error.status !== 408) {
         return false
       }
       return failureCount < 3
@@ -232,12 +201,7 @@ export function useLowStockBatches(thresholdQuantity: number = 10) {
       if (error?.message?.includes('failed to parse order')) {
         return false
       }
-      if (
-        error?.status &&
-        error.status >= 400 &&
-        error.status < 500 &&
-        error.status !== 408
-      ) {
+      if (error?.status && error.status >= 400 && error.status < 500 && error.status !== 408) {
         return false
       }
       return failureCount < 3
@@ -266,9 +230,7 @@ export function useBatchActions() {
   const activeStoreId = useActiveStoreId()
 
   const createMutation = useMutation({
-    mutationFn: (
-      batchData: Database['inventory']['Tables']['batches']['Insert']
-    ) => {
+    mutationFn: (batchData: Database['inventory']['Tables']['batches']['Insert']) => {
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }
@@ -279,7 +241,7 @@ export function useBatchActions() {
       }
       return createBatch(batchWithStore)
     },
-    onSuccess: (newBatch) => {
+    onSuccess: newBatch => {
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
@@ -287,16 +249,10 @@ export function useBatchActions() {
       }
 
       queryClient.invalidateQueries({
-        queryKey: queryKeys.batches.byProduct(
-          activeStoreId || '',
-          newBatch.product_id
-        ),
+        queryKey: queryKeys.batches.byProduct(activeStoreId || '', newBatch.product_id),
       })
 
-      queryClient.setQueryData(
-        queryKeys.batches.detail(newBatch.batch_id),
-        newBatch
-      )
+      queryClient.setQueryData(queryKeys.batches.detail(newBatch.batch_id), newBatch)
 
       queryClient.invalidateQueries({
         queryKey: queryKeys.products.detail(newBatch.product_id),
@@ -331,16 +287,12 @@ export function useBatchActions() {
         queryKey: queryKeys.batches.detail(batchId),
       })
 
-      const previousBatch = queryClient.getQueryData(
-        queryKeys.batches.detail(batchId)
-      )
+      const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId))
 
       queryClient.setQueryData(
         queryKeys.batches.detail(batchId),
         (old: BatchWithProduct | undefined) =>
-          old
-            ? { ...old, ...updates, updated_at: new Date().toISOString() }
-            : undefined
+          old ? { ...old, ...updates, updated_at: new Date().toISOString() } : undefined,
       )
 
       if (activeStoreId) {
@@ -351,9 +303,8 @@ export function useBatchActions() {
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page) => {
-                if (!page || !page.data || !Array.isArray(page.data))
-                  return page
+              pages: oldData.pages.map(page => {
+                if (!page || !page.data || !Array.isArray(page.data)) return page
 
                 return {
                   ...page,
@@ -364,12 +315,12 @@ export function useBatchActions() {
                           ...updates,
                           updated_at: new Date().toISOString(),
                         }
-                      : batch
+                      : batch,
                   ),
                 }
               }),
             }
-          }
+          },
         )
       }
 
@@ -378,10 +329,7 @@ export function useBatchActions() {
 
     onError: (err, _variables, context) => {
       if (context?.previousBatch) {
-        queryClient.setQueryData(
-          queryKeys.batches.detail(context.batchId),
-          context.previousBatch
-        )
+        queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
       }
       console.error('Failed to update batch:', err)
       toast.error('Failed to update batch')
@@ -399,10 +347,7 @@ export function useBatchActions() {
 
       if (data) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.byProduct(
-            activeStoreId || '',
-            data.product_id
-          ),
+          queryKey: queryKeys.batches.byProduct(activeStoreId || '', data.product_id),
         })
       }
     },
@@ -415,14 +360,14 @@ export function useBatchActions() {
   const deleteMutation = useMutation({
     mutationFn: (batchId: string) => deleteBatch(batchId),
 
-    onMutate: async (batchId) => {
+    onMutate: async batchId => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.batches.detail(batchId),
       })
 
-      const previousBatch = queryClient.getQueryData(
-        queryKeys.batches.detail(batchId)
-      ) as BatchWithProduct | undefined
+      const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId)) as
+        | BatchWithProduct
+        | undefined
 
       queryClient.removeQueries({ queryKey: queryKeys.batches.detail(batchId) })
 
@@ -434,20 +379,17 @@ export function useBatchActions() {
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page) => {
-                if (!page || !page.data || !Array.isArray(page.data))
-                  return page
+              pages: oldData.pages.map(page => {
+                if (!page || !page.data || !Array.isArray(page.data)) return page
 
                 return {
                   ...page,
-                  data: page.data.filter(
-                    (batch: Batch) => batch.batch_id !== batchId
-                  ),
+                  data: page.data.filter((batch: Batch) => batch.batch_id !== batchId),
                   count: Math.max(0, (page.count || 0) - 1),
                 }
               }),
             }
-          }
+          },
         )
       }
 
@@ -456,10 +398,7 @@ export function useBatchActions() {
 
     onError: (err, _batchId, context) => {
       if (context?.previousBatch) {
-        queryClient.setQueryData(
-          queryKeys.batches.detail(context.batchId),
-          context.previousBatch
-        )
+        queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
       }
       console.error('Failed to delete batch:', err)
       toast.error('Failed to delete batch')
@@ -476,7 +415,7 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byProduct(
             activeStoreId || '',
-            context.previousBatch.product_id
+            context.previousBatch.product_id,
           ),
         })
         queryClient.invalidateQueries({
@@ -496,7 +435,7 @@ export function useBatchActions() {
         batchId,
         updates: { current_quantity: newQuantity },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const updateBatchPrice = useCallback(
@@ -508,7 +447,7 @@ export function useBatchActions() {
           selling_price: sellingPrice,
         },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const updateBatchLocation = useCallback(
@@ -517,7 +456,7 @@ export function useBatchActions() {
         batchId,
         updates: { location_code: locationCode },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const markBatchAsExpired = useCallback(
@@ -526,7 +465,7 @@ export function useBatchActions() {
         batchId,
         updates: { status: 'expired' },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const markBatchAsDamaged = useCallback(
@@ -535,7 +474,7 @@ export function useBatchActions() {
         batchId,
         updates: { status: 'damaged' },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const markBatchAsSoldOut = useCallback(
@@ -547,7 +486,7 @@ export function useBatchActions() {
           current_quantity: 0,
         },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const reserveBatchQuantity = useCallback(
@@ -556,14 +495,14 @@ export function useBatchActions() {
         batchId,
         updates: { reserved_quantity: reservedQuantity },
       }),
-    [updateMutation]
+    [updateMutation],
   )
 
   const processSale = useCallback(
     (batchId: string, soldQuantity: number) => {
-      const currentBatch = queryClient.getQueryData(
-        queryKeys.batches.detail(batchId)
-      ) as Batch | undefined
+      const currentBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId)) as
+        | Batch
+        | undefined
 
       if (!currentBatch) {
         toast.error('Batch not found')
@@ -586,7 +525,7 @@ export function useBatchActions() {
         },
       })
     },
-    [updateMutation, queryClient]
+    [updateMutation, queryClient],
   )
 
   return {
@@ -623,30 +562,23 @@ export function useBatchSummary(productId?: string) {
 
   return {
     totalBatches: allBatches?.length || 0,
-    activeBatches: allBatches?.filter((b) => b.status === 'active').length || 0,
-    expiredBatches:
-      allBatches?.filter((b) => b.status === 'expired').length || 0,
-    totalStock:
-      allBatches?.reduce((sum, b) => sum + Number(b.current_quantity), 0) || 0,
+    activeBatches: allBatches?.filter(b => b.status === 'active').length || 0,
+    expiredBatches: allBatches?.filter(b => b.status === 'expired').length || 0,
+    totalStock: allBatches?.reduce((sum, b) => sum + Number(b.current_quantity), 0) || 0,
     totalValue:
-      allBatches?.reduce(
-        (sum, b) => sum + Number(b.current_quantity) * Number(b.cost_price),
-        0
-      ) || 0,
+      allBatches?.reduce((sum, b) => sum + Number(b.current_quantity) * Number(b.cost_price), 0) ||
+      0,
   }
 }
 
 export function useBatchAlerts() {
-  const { data: expiringBatches, isLoading: isLoadingExpiring } =
-    useExpiringBatches(7)
-  const { data: lowStockBatches, isLoading: isLoadingLowStock } =
-    useLowStockBatches(10)
+  const { data: expiringBatches, isLoading: isLoadingExpiring } = useExpiringBatches(7)
+  const { data: lowStockBatches, isLoading: isLoadingLowStock } = useLowStockBatches(10)
 
   return {
     expiringBatches: expiringBatches || [],
     lowStockBatches: lowStockBatches || [],
-    hasAlerts:
-      (expiringBatches?.length || 0) > 0 || (lowStockBatches?.length || 0) > 0,
+    hasAlerts: (expiringBatches?.length || 0) > 0 || (lowStockBatches?.length || 0) > 0,
     isLoading: isLoadingExpiring || isLoadingLowStock,
   }
 }
@@ -660,7 +592,7 @@ export function useBatchesByCategory(_category: string) {
 }
 
 export function useBatchesByStatus(
-  status: 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved'
+  status: 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved',
 ) {
   return useBatches({ status })
 }
@@ -671,11 +603,8 @@ type SupabaseError = Error & {
 }
 
 function isInfiniteData(
-  data: unknown
-): data is InfiniteData<
-  { data: Batch[]; nextPage?: number; count?: number },
-  number
-> {
+  data: unknown,
+): data is InfiniteData<{ data: Batch[]; nextPage?: number; count?: number }, number> {
   return (
     data !== null &&
     typeof data === 'object' &&

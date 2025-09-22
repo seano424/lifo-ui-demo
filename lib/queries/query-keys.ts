@@ -2,7 +2,12 @@ import type { BatchFilters } from './batches'
 import type { ProductFilters } from './products'
 import type { StoreUserFilters } from './store-users'
 import type { UserFilters } from './users'
-import type { TodoFilters, TodoSection, TodoCompletionStatus, TodoUrgencyLevel } from './todos-rpc-v2'
+import type {
+  TodoFilters,
+  TodoSection,
+  TodoCompletionStatus,
+  TodoUrgencyLevel,
+} from './todos-rpc-v2'
 
 export const queryKeys = {
   // Store-related queries
@@ -32,14 +37,12 @@ export const queryKeys = {
       [...queryKeys.todos.all, 'section', { storeId, section, pageSize }] as const,
 
     // Dashboard queries
-    summary: (storeId: string) =>
-      [...queryKeys.todos.all, 'summary', storeId] as const,
+    summary: (storeId: string) => [...queryKeys.todos.all, 'summary', storeId] as const,
 
     dashboardSummary: (storeId: string) =>
       [...queryKeys.todos.all, 'dashboardSummary', storeId] as const,
 
-    overview: (storeId: string) =>
-      [...queryKeys.todos.all, 'overview', storeId] as const,
+    overview: (storeId: string) => [...queryKeys.todos.all, 'overview', storeId] as const,
 
     // Specific convenience keys for common combinations
     pending: (storeId: string, filters?: Partial<TodoFilters>, pageSize: number = 20) =>

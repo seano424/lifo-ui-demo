@@ -26,13 +26,7 @@ export type TodoItem = {
   product_name: string
   product_brand: string | null
   current_quantity: number
-  last_action_type:
-    | 'discount'
-    | 'donate'
-    | 'dispose'
-    | 'sold'
-    | 'donate_prepared'
-    | null
+  last_action_type: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared' | null
   last_action_time: string | null
   completion_status: 'pending' | 'in_progress' | 'completed'
   todo_state: string
@@ -150,7 +144,7 @@ export async function fetchTodosBySection(
   storeId: string,
   section: TodoSection,
   { page, pageSize }: TodosPageParam,
-  serverClient?: ServerClient
+  serverClient?: ServerClient,
 ): Promise<{
   data: TodoItem[]
   count: number | null
@@ -169,13 +163,8 @@ export async function fetchTodosBySection(
     })
 
     if (error) {
-      console.error(
-        `[fetchTodosBySection] Error for section ${section}:`,
-        error
-      )
-      throw new Error(
-        `Failed to fetch todos for section ${section}: ${error.message}`
-      )
+      console.error(`[fetchTodosBySection] Error for section ${section}:`, error)
+      throw new Error(`Failed to fetch todos for section ${section}: ${error.message}`)
     }
 
     const todos = (data || []) as TodoItem[]
@@ -192,10 +181,7 @@ export async function fetchTodosBySection(
       hasMore,
     }
   } catch (err) {
-    console.error(
-      `[fetchTodosBySection] Unexpected error for section ${section}:`,
-      err
-    )
+    console.error(`[fetchTodosBySection] Unexpected error for section ${section}:`, err)
     throw err
   }
 }
@@ -205,7 +191,7 @@ export async function fetchTodosBySection(
  */
 export async function fetchDashboardSummary(
   storeId: string,
-  serverClient?: ServerClient
+  serverClient?: ServerClient,
 ): Promise<DashboardSummary> {
   const supabase = serverClient || createClient()
 
@@ -247,7 +233,7 @@ export async function fetchDashboardSummary(
  */
 export async function fetchTodosDashboardOverview(
   storeId: string,
-  serverClient?: ServerClient
+  serverClient?: ServerClient,
 ): Promise<TodosDashboardOverview[]> {
   const supabase = serverClient || createClient()
 
@@ -292,14 +278,7 @@ export function getAllSections(): {
  * Helper to determine which sections should be invalidated after a batch action
  */
 export function getSectionsToInvalidateAfterAction(
-  actionType:
-    | 'discount'
-    | 'donate'
-    | 'dispose'
-    | 'sold'
-    | 'donate_prepared'
-    | 'ignore'
-    | 'dismiss'
+  actionType: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared' | 'ignore' | 'dismiss',
 ): TodoSection[] {
   const baseInvalidations: TodoSection[] = [
     'immediate_action',

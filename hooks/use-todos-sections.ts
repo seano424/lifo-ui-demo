@@ -2,11 +2,7 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
-import {
-  type TodoSection,
-  fetchTodosBySection,
-  getSectionConfig,
-} from '@/lib/queries/todos-rpc'
+import { type TodoSection, fetchTodosBySection, getSectionConfig } from '@/lib/queries/todos-rpc'
 
 // hooks/use-todo-section.ts
 export function useTodoSection(section: TodoSection, pageSize?: number) {
@@ -15,17 +11,13 @@ export function useTodoSection(section: TodoSection, pageSize?: number) {
   const finalPageSize = pageSize || config.defaultPageSize
 
   return useInfiniteQuery({
-    queryKey: queryKeys.todos.bySection(
-      activeStoreId || '',
-      section,
-      finalPageSize
-    ),
+    queryKey: queryKeys.todos.bySection(activeStoreId || '', section, finalPageSize),
     queryFn: ({ pageParam = 0 }) =>
       fetchTodosBySection(activeStoreId!, section, {
         page: pageParam,
         pageSize: finalPageSize,
       }),
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+    getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId,
     staleTime: config.staleTimeMs,
@@ -40,11 +32,9 @@ export const useImmediateActionTodos = (pageSize?: number) =>
 export const useRecentlyExpiredTodos = (pageSize?: number) =>
   useTodoSection('recently_expired', pageSize)
 
-export const useInProgressTodos = (pageSize?: number) =>
-  useTodoSection('in_progress', pageSize)
+export const useInProgressTodos = (pageSize?: number) => useTodoSection('in_progress', pageSize)
 
-export const useDiscountedTodos = (pageSize?: number) =>
-  useTodoSection('discounted', pageSize)
+export const useDiscountedTodos = (pageSize?: number) => useTodoSection('discounted', pageSize)
 
 export const useReadyForDonationTodos = (pageSize?: number) =>
   useTodoSection('ready_for_donation', pageSize)

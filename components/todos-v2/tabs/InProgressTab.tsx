@@ -26,7 +26,7 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
       batch_status: filters.batch_status,
       product_name: filters.product_name,
     },
-    pageSize
+    pageSize,
   )
 
   if (isError) {
@@ -55,10 +55,11 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
         <div className="text-6xl mb-4">⚡</div>
         <h3 className="text-lg font-semibold mb-2">No todos in progress</h3>
         <p className="text-muted-foreground">
-          {Object.values(filters).some(f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true))
+          {Object.values(filters).some(
+            f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true),
+          )
             ? 'Try adjusting your filters to see more items.'
-            : 'No items are currently being worked on.'
-          }
+            : 'No items are currently being worked on.'}
         </p>
       </div>
     )

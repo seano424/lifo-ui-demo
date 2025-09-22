@@ -1,14 +1,15 @@
 'use client'
 
-import { TodoCard } from '@/components/todos/todo-card'
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+import { TodoCard } from '@/components/todos/todo-card'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
+import type { ActionableBatch } from '@/lib/queries/todos-rpc-v1'
+import { useEffect, useMemo, useState } from 'react'
 import type { SortConfig } from '../filters/TodoSortControls'
-import { useEffect, useState, useMemo } from 'react'
 
 interface TodoCardListV2Props {
   todos: TodoItem[]
@@ -35,7 +36,7 @@ export function TodoCardListV2({
 }: TodoCardListV2Props) {
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-  const [selectedBatch, setSelectedBatch] = useState<any | null>(null)
+  const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(null)
 
   // Intersection observer for infinite scroll
   const { targetRef, isIntersecting } = useIntersectionObserver({
@@ -55,15 +56,22 @@ export function TodoCardListV2({
     if (!sortConfig || !todos.length) return todos
 
     return [...todos].sort((a, b) => {
-      let aVal: any
-      let bVal: any
+      let aVal: string | number
+      let bVal: string | number
 
       switch (sortConfig.field) {
-        case 'urgency':
-          const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1, none: 0 }
+        case 'urgency': {
+          const urgencyOrder = {
+            critical: 4,
+            high: 3,
+            medium: 2,
+            low: 1,
+            none: 0,
+          }
           aVal = urgencyOrder[a.urgency_level as keyof typeof urgencyOrder] || 0
           bVal = urgencyOrder[b.urgency_level as keyof typeof urgencyOrder] || 0
           break
+        }
         case 'expiry_date':
           aVal = new Date(a.expiry_date).getTime()
           bVal = new Date(b.expiry_date).getTime()
@@ -99,21 +107,30 @@ export function TodoCardListV2({
     const todo = sortedTodos.find(t => t.batch_id === batchId)
     if (todo) {
       // Map TodoItem to ActionableBatch format for the bottom sheet
-      const mappedBatch = {
+      const mappedBatch: ActionableBatch = {
         batch_id: todo.batch_id,
-        store_id: todo.store_id,
         batch_number: todo.batch_number,
         product_name: todo.product_name,
-        product_brand: todo.product_brand,
-        current_quantity: todo.current_quantity,
+        product_brand: todo.product_brand || '',
+        sku: '', // Not available in TodoItem, using empty string
         expiry_date: todo.expiry_date,
-        urgency_level: todo.urgency_level,
-        completion_status: todo.completion_status,
-        last_action_type: todo.last_action_type,
-        last_action_time: todo.last_action_time,
-        ai_recommendation: todo.ai_recommendation,
-        composite_score: todo.composite_score,
-        // Add any other fields needed by the bottom sheet
+        current_quantity: todo.current_quantity,
+        location_code: '', // Not available in TodoItem, using empty string
+        unit_price: 0, // Not available in TodoItem, using 0
+        urgency_level:
+          todo.urgency_level === 'none'
+            ? 'low'
+            : (todo.urgency_level as 'critical' | 'high' | 'medium' | 'low'),
+        days_to_expiry: Math.ceil(
+          (new Date(todo.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+        ),
+        ai_recommendation: todo.ai_recommendation || '',
+        ai_reasoning: '', // Not available in TodoItem, using empty string
+        composite_score: todo.composite_score || 0,
+        potential_loss: 0, // Not available in TodoItem, using 0
+        discount_percent: 0, // Not available in TodoItem, using 0
+        todo_state: 'needs_attention' as const, // Default state
+        total_count: 1, // Default count
       }
 
       setSelectedBatch(mappedBatch)
@@ -129,8 +146,8 @@ export function TodoCardListV2({
   if (isLoading) {
     return (
       <div className="flex flex-col gap-16">
-        {Array.from({ length: 4 }, (_, i) => (
-          <div key={i} className="flex flex-col gap-4">
+        {Array.from({ length: 4 }, () => (
+          <div key={crypto.randomUUID()} className="flex flex-col gap-4">
             <div className="flex gap-4">
               <Skeleton className="h-8 w-8 flex-shrink-0 bg-muted animate-pulse" />
               <div className="w-full flex flex-col gap-2">
@@ -157,9 +174,7 @@ export function TodoCardListV2({
       <div className="text-center py-12">
         <div className="text-6xl mb-4">{emptyStateIcon}</div>
         <h3 className="text-lg font-semibold mb-2">{emptyStateMessage}</h3>
-        <p className="text-muted-foreground">
-          Try adjusting your filters to see more items.
-        </p>
+        <p className="text-muted-foreground">Try adjusting your filters to see more items.</p>
       </div>
     )
   }
@@ -168,7 +183,7 @@ export function TodoCardListV2({
     <InfiniteScrollErrorBoundary>
       <div className="space-y-4 flex flex-col">
         <div className="flex flex-col gap-12">
-          {sortedTodos.map((todo) => (
+          {sortedTodos.map(todo => (
             <TodoCard
               key={todo.batch_id}
               todo={todo}
@@ -179,10 +194,7 @@ export function TodoCardListV2({
 
         {/* Infinite scroll sentinel */}
         {hasNextPage && (
-          <div
-            ref={targetRef}
-            className="flex justify-center items-center pt-8 pb-4 min-h-[60px]"
-          >
+          <div ref={targetRef} className="flex justify-center items-center pt-8 pb-4 min-h-[60px]">
             {isFetchingNextPage ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

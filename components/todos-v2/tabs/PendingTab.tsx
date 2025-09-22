@@ -26,7 +26,7 @@ export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
       batch_status: filters.batch_status,
       product_name: filters.product_name,
     },
-    pageSize
+    pageSize,
   )
 
   if (isError) {
@@ -55,10 +55,11 @@ export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
         <div className="text-6xl mb-4">🎉</div>
         <h3 className="text-lg font-semibold mb-2">No pending todos!</h3>
         <p className="text-muted-foreground">
-          {Object.values(filters).some(f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true))
+          {Object.values(filters).some(
+            f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true),
+          )
             ? 'Try adjusting your filters to see more items.'
-            : 'All caught up! No items need immediate attention.'
-          }
+            : 'All caught up! No items need immediate attention.'}
         </p>
       </div>
     )

@@ -50,13 +50,7 @@ export type TodoItem = {
   product_name: string
   product_brand: string | null
   current_quantity: number
-  last_action_type:
-    | 'discount'
-    | 'donate'
-    | 'dispose'
-    | 'sold'
-    | 'donate_prepared'
-    | null
+  last_action_type: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared' | null
   last_action_time: string | null
   completion_status: 'pending' | 'in_progress' | 'completed'
   todo_state: string
@@ -107,7 +101,7 @@ export type TodosPageParam = {
 export async function fetchTodosWithFilters(
   storeId: string,
   filters: TodoFilters,
-  { limit, offset }: { limit: number; offset: number }
+  { limit, offset }: { limit: number; offset: number },
 ): Promise<TodoItem[]> {
   const supabase = createClient()
 
@@ -129,7 +123,7 @@ export async function fetchTodosBySection(
   storeId: string,
   section: TodoSection,
   { page, pageSize }: TodosPageParam,
-  serverClient?: ServerClient
+  serverClient?: ServerClient,
 ): Promise<{
   data: TodoItem[]
   count: number | null
@@ -147,13 +141,8 @@ export async function fetchTodosBySection(
     })
 
     if (error) {
-      console.error(
-        `[fetchTodosBySection] Error for section ${section}:`,
-        error
-      )
-      throw new Error(
-        `Failed to fetch todos for section ${section}: ${error.message}`
-      )
+      console.error(`[fetchTodosBySection] Error for section ${section}:`, error)
+      throw new Error(`Failed to fetch todos for section ${section}: ${error.message}`)
     }
 
     const todos = (data || []) as TodoItem[]
@@ -167,10 +156,7 @@ export async function fetchTodosBySection(
       hasMore,
     }
   } catch (err) {
-    console.error(
-      `[fetchTodosBySection] Unexpected error for section ${section}:`,
-      err
-    )
+    console.error(`[fetchTodosBySection] Unexpected error for section ${section}:`, err)
     throw err
   }
 }
@@ -180,7 +166,7 @@ export async function fetchTodosBySection(
  */
 export async function fetchDashboardSummary(
   storeId: string,
-  serverClient?: ServerClient
+  serverClient?: ServerClient,
 ): Promise<DashboardSummary> {
   const supabase = serverClient || createClient()
 
@@ -219,7 +205,7 @@ export async function fetchDashboardSummary(
  */
 export async function fetchTodosDashboardOverview(
   storeId: string,
-  serverClient?: ServerClient
+  serverClient?: ServerClient,
 ): Promise<TodosDashboardOverview[]> {
   const supabase = serverClient || createClient()
 
@@ -243,27 +229,21 @@ export async function fetchTodosDashboardOverview(
 /**
  * NEW: Helper functions for common filter combinations
  */
-export function createPendingFilter(
-  additionalFilters?: Partial<TodoFilters>
-): TodoFilters {
+export function createPendingFilter(additionalFilters?: Partial<TodoFilters>): TodoFilters {
   return {
     completion_status: 'pending',
     ...additionalFilters,
   }
 }
 
-export function createInProgressFilter(
-  additionalFilters?: Partial<TodoFilters>
-): TodoFilters {
+export function createInProgressFilter(additionalFilters?: Partial<TodoFilters>): TodoFilters {
   return {
     completion_status: 'in_progress',
     ...additionalFilters,
   }
 }
 
-export function createCompletedFilter(
-  additionalFilters?: Partial<TodoFilters>
-): TodoFilters {
+export function createCompletedFilter(additionalFilters?: Partial<TodoFilters>): TodoFilters {
   return {
     completion_status: 'completed',
     ...additionalFilters,
@@ -271,7 +251,7 @@ export function createCompletedFilter(
 }
 
 export function createUrgentFilter(
-  urgencyLevels: TodoUrgencyLevel[] = ['critical', 'high']
+  urgencyLevels: TodoUrgencyLevel[] = ['critical', 'high'],
 ): TodoFilters {
   return {
     urgency_level: urgencyLevels,

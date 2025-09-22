@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ArrowDown, ArrowUp } from 'lucide-react'
+import { useMemo } from 'react'
 
 export type SortField =
   | 'urgency'
@@ -74,16 +75,17 @@ const SORT_OPTIONS: {
   },
 ]
 
+const DEFAULT_SORT_CONFIG: SortConfig = {
+  field: 'urgency',
+  direction: 'desc',
+}
+
 export function TodoSortControls({
   sortConfig,
   onSortChange,
   isLoading = false,
 }: TodoSortControlsProps) {
-  const defaultSortConfig = {
-    field: 'urgency' as SortField,
-    direction: 'desc' as SortDirection,
-  }
-  const currentSortConfig = sortConfig || defaultSortConfig
+  const currentSortConfig = sortConfig || DEFAULT_SORT_CONFIG
 
   const handleSortFieldChange = (field: SortField) => {
     // Keep same direction when changing field
@@ -100,35 +102,28 @@ export function TodoSortControls({
     })
   }
 
-  const getCurrentOption = () => {
-    return SORT_OPTIONS.find(
-      (option) => option.value === currentSortConfig.field
-    )
-  }
+  const currentOption = useMemo(() => {
+    return SORT_OPTIONS.find(option => option.value === currentSortConfig.field)
+  }, [currentSortConfig.field])
 
   return (
     <div className="flex items-center gap-2">
       {/* Sort Field Selector */}
       <Select
         value={currentSortConfig.field}
-        onValueChange={(value) => handleSortFieldChange(value as SortField)}
+        onValueChange={value => handleSortFieldChange(value as SortField)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[160px] md:w-[180px]">
-          <SelectValue>{getCurrentOption()?.label || 'Sort by'}</SelectValue>
+        <SelectTrigger className="w-[160px] md:w-[180px]" id="todos-sort-field-trigger">
+          <SelectValue>{currentOption?.label || 'Sort by'}</SelectValue>
         </SelectTrigger>
-        <SelectContent>
-          {SORT_OPTIONS.map((option) => (
-            <SelectItem
-              key={option.value}
-              value={option.value}
-            >
+        <SelectContent id="todos-sort-field-content">
+          {SORT_OPTIONS.map(option => (
+            <SelectItem key={option.value} value={option.value}>
               <div className="flex flex-col">
                 <span className="font-medium">{option.label}</span>
                 {option.description && (
-                  <span className="text-xs text-muted-foreground">
-                    {option.description}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{option.description}</span>
                 )}
               </div>
             </SelectItem>

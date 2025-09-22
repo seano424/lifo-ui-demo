@@ -29,15 +29,14 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
     enabled: !!activeStoreId,
   })
 
-  const { isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    expiredQuery
+  const { isLoading, error, hasNextPage, fetchNextPage, isFetchingNextPage } = expiredQuery
 
   // Flatten the infinite query data - pass the complete query object
   const expiredItems = useFlattenedTodosData<RecentlyExpired>(expiredQuery)
 
   // Convert to TodoItem format for existing components
   const todos = useMemo(() => {
-    return expiredItems.map((item) => ({
+    return expiredItems.map(item => ({
       batch_id: item.batch_id,
       product_name: item.product_name,
       expiry_date: item.expiry_date,
@@ -80,10 +79,7 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
       <div className="p-4">
         <div className="flex flex-col gap-16">
           {Array.from({ length: 4 }, () => (
-            <div
-              key={crypto.randomUUID()}
-              className="flex flex-col gap-4"
-            >
+            <div key={crypto.randomUUID()} className="flex flex-col gap-4">
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -108,9 +104,7 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
   if (error) {
     return (
       <div className="p-4 py-8 text-center">
-        <p className="text-destructive">
-          Error loading expired items: {error.message}
-        </p>
+        <p className="text-destructive">Error loading expired items: {error.message}</p>
       </div>
     )
   }
@@ -134,7 +128,7 @@ export function RecentlyExpiredTab({ pageSize = 20 }: RecentlyExpiredTabProps) {
       <div className="p-4">
         <div className="space-y-4 flex flex-col">
           <div className="flex flex-col gap-12">
-            {todos.map((todo) => (
+            {todos.map(todo => (
               <TodoCard
                 key={todo.batch_id}
                 todo={{

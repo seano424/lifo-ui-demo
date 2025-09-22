@@ -3,12 +3,10 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import {
-  TodoFiltersBarSimple,
-  type TodoFilterValues,
-} from './TodoFiltersBarSimple'
+import { TodoFiltersBarSimple, type TodoFilterValues } from './TodoFiltersBarSimple'
 import { TodoSearchBar } from './TodoSearchBar'
 import { TodoSortControls, type SortConfig } from './TodoSortControls'
+import { useCallback } from 'react'
 
 export interface TodoFiltersState {
   // Filters
@@ -23,7 +21,9 @@ export interface TodoFiltersState {
 
 interface TodoFiltersPanelProps {
   filters: TodoFiltersState
-  onFiltersChange: (filters: TodoFiltersState) => void
+  onFiltersChange: (
+    filters: TodoFiltersState | ((prevFilters: TodoFiltersState) => TodoFiltersState),
+  ) => void
   isLoading?: boolean
   className?: string
 }
@@ -34,32 +34,41 @@ export function TodoFiltersPanel({
   isLoading = false,
   className,
 }: TodoFiltersPanelProps) {
-  const handleFilterChange = (newFilters: TodoFilterValues) => {
-    onFiltersChange({
-      ...filters,
-      ...newFilters,
-    })
-  }
+  const handleFilterChange = useCallback(
+    (newFilters: TodoFilterValues) => {
+      onFiltersChange((prevFilters: TodoFiltersState) => ({
+        ...prevFilters,
+        ...newFilters,
+      }))
+    },
+    [onFiltersChange],
+  )
 
-  const handleSortChange = (sortConfig: SortConfig) => {
-    onFiltersChange({
-      ...filters,
-      sortConfig,
-    })
-  }
+  const handleSortChange = useCallback(
+    (sortConfig: SortConfig) => {
+      onFiltersChange((prevFilters: TodoFiltersState) => ({
+        ...prevFilters,
+        sortConfig,
+      }))
+    },
+    [onFiltersChange],
+  )
 
-  const handleSearchChange = (product_name: string | undefined) => {
-    onFiltersChange({
-      ...filters,
-      product_name,
-    })
-  }
+  const handleSearchChange = useCallback(
+    (product_name: string | undefined) => {
+      onFiltersChange((prevFilters: TodoFiltersState) => ({
+        ...prevFilters,
+        product_name,
+      }))
+    },
+    [onFiltersChange],
+  )
 
-  const clearAllFilters = () => {
-    onFiltersChange({
-      sortConfig: filters.sortConfig, // Keep sort config or reset it too?
-    })
-  }
+  const clearAllFilters = useCallback(() => {
+    onFiltersChange((prevFilters: TodoFiltersState) => ({
+      sortConfig: prevFilters.sortConfig, // Keep sort config
+    }))
+  }, [onFiltersChange])
 
   const hasActiveFilters =
     filters.urgency_level?.length ||
@@ -84,12 +93,7 @@ export function TodoFiltersPanel({
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Active filters applied
               </span>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={clearAllFilters}
-                className="h-8"
-              >
+              <Button size="sm" variant="destructive" onClick={clearAllFilters} className="h-8">
                 Clear all
               </Button>
             </>

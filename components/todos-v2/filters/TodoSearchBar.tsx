@@ -28,7 +28,7 @@ export function TodoSearchBar({
   useEffect(() => {
     const trimmed = debouncedSearchTerm.trim()
     onSearchChange(trimmed || undefined)
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm, onSearchChange])
 
   // Sync with external changes
   useEffect(() => {
@@ -51,7 +51,7 @@ export function TodoSearchBar({
           type="text"
           placeholder={placeholder}
           value={localSearchTerm}
-          onChange={(e) => setLocalSearchTerm(e.target.value)}
+          onChange={e => setLocalSearchTerm(e.target.value)}
           disabled={isLoading}
           className="pl-10 pr-10"
         />
@@ -69,9 +69,7 @@ export function TodoSearchBar({
 
       {/* Search Stats */}
       {isLoading && hasSearch && (
-        <div className="text-xs text-muted-foreground whitespace-nowrap">
-          Searching...
-        </div>
+        <div className="text-xs text-muted-foreground whitespace-nowrap">Searching...</div>
       )}
     </div>
   )

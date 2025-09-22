@@ -4,7 +4,14 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { TodoItem } from '@/lib/queries/todos-rpc-v2'
+import type { TodoItem, TodoFilters } from '@/lib/queries/todos-rpc-v2'
+
+// Type for the query key structure used in the filtered todos queries
+interface TodoQueryKeyParams {
+  storeId: string
+  filters?: TodoFilters
+  pageSize?: number
+}
 
 // Type definitions for query data
 interface BatchDetail {
@@ -176,17 +183,29 @@ export function useBatchActionRPC() {
       await Promise.all([
         // 🎯 NEW: Target specific completion status filters (invalidate all page sizes)
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'pending' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId, filters: { completion_status: 'pending' } },
+          ],
           exact: false,
         }),
 
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'in_progress' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId, filters: { completion_status: 'in_progress' } },
+          ],
           exact: false,
         }),
 
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'completed' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId, filters: { completion_status: 'completed' } },
+          ],
           exact: false,
         }),
 
@@ -272,16 +291,19 @@ export function useBatchActionRPC() {
       // Remove from pending todos with different page sizes
       const pendingQueries = queryClient.getQueriesData({
         queryKey: [...queryKeys.todos.all, 'filtered'],
-        predicate: (query) => {
-          const queryKey = query.queryKey as any[]
-          return queryKey?.[2]?.storeId === storeId &&
-                 queryKey?.[2]?.filters?.completion_status === 'pending'
-        }
+        predicate: query => {
+          const queryKey = query.queryKey as readonly unknown[]
+          const params = queryKey?.[2] as TodoQueryKeyParams | undefined
+          return params?.storeId === storeId && params?.filters?.completion_status === 'pending'
+        },
       })
 
       pendingQueries.forEach(([queryKey, data]) => {
         if (Array.isArray(data)) {
-          queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+          queryClient.setQueryData(
+            queryKey,
+            data.filter((item: TodoItem) => item.batch_id !== variables.batchId),
+          )
         }
       })
 
@@ -301,7 +323,11 @@ export function useBatchActionRPC() {
       // Rollback optimistic update by invalidating pending todos
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+          ],
           exact: false,
         })
       }
@@ -398,16 +424,19 @@ export function useBatchActionRPC() {
         // Remove from pending todos (will become completed)
         const pendingQueries = queryClient.getQueriesData({
           queryKey: [...queryKeys.todos.all, 'filtered'],
-          predicate: (query) => {
-            const queryKey = query.queryKey as any[]
-            return queryKey?.[2]?.storeId === storeId &&
-                   queryKey?.[2]?.filters?.completion_status === 'pending'
-          }
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            const params = queryKey?.[2] as TodoQueryKeyParams | undefined
+            return params?.storeId === storeId && params?.filters?.completion_status === 'pending'
+          },
         })
 
         pendingQueries.forEach(([queryKey, data]) => {
           if (Array.isArray(data)) {
-            queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+            queryClient.setQueryData(
+              queryKey,
+              data.filter((item: TodoItem) => item.batch_id !== variables.batchId),
+            )
           }
         })
       }
@@ -428,7 +457,11 @@ export function useBatchActionRPC() {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+          ],
           exact: false,
         })
       }
@@ -463,16 +496,19 @@ export function useBatchActionRPC() {
         // Remove from pending todos (will become completed)
         const pendingQueries = queryClient.getQueriesData({
           queryKey: [...queryKeys.todos.all, 'filtered'],
-          predicate: (query) => {
-            const queryKey = query.queryKey as any[]
-            return queryKey?.[2]?.storeId === storeId &&
-                   queryKey?.[2]?.filters?.completion_status === 'pending'
-          }
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            const params = queryKey?.[2] as TodoQueryKeyParams | undefined
+            return params?.storeId === storeId && params?.filters?.completion_status === 'pending'
+          },
         })
 
         pendingQueries.forEach(([queryKey, data]) => {
           if (Array.isArray(data)) {
-            queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+            queryClient.setQueryData(
+              queryKey,
+              data.filter((item: TodoItem) => item.batch_id !== variables.batchId),
+            )
           }
         })
       }
@@ -493,7 +529,11 @@ export function useBatchActionRPC() {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+          ],
           exact: false,
         })
       }
@@ -523,16 +563,19 @@ export function useBatchActionRPC() {
       // Remove from pending todos
       const pendingQueries = queryClient.getQueriesData({
         queryKey: [...queryKeys.todos.all, 'filtered'],
-        predicate: (query) => {
-          const queryKey = query.queryKey as any[]
-          return queryKey?.[2]?.storeId === storeId &&
-                 queryKey?.[2]?.filters?.completion_status === 'pending'
-        }
+        predicate: query => {
+          const queryKey = query.queryKey as readonly unknown[]
+          const params = queryKey?.[2] as TodoQueryKeyParams | undefined
+          return params?.storeId === storeId && params?.filters?.completion_status === 'pending'
+        },
       })
 
       pendingQueries.forEach(([queryKey, data]) => {
         if (Array.isArray(data)) {
-          queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => item.batch_id !== variables.batchId))
+          queryClient.setQueryData(
+            queryKey,
+            data.filter((item: TodoItem) => item.batch_id !== variables.batchId),
+          )
         }
       })
 
@@ -552,7 +595,11 @@ export function useBatchActionRPC() {
       // Rollback optimistic update
       if (context?.storeId) {
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered', { storeId: context.storeId, filters: { completion_status: 'pending' } }],
+          queryKey: [
+            ...queryKeys.todos.all,
+            'filtered',
+            { storeId: context.storeId, filters: { completion_status: 'pending' } },
+          ],
           exact: false,
         })
       }
@@ -587,16 +634,19 @@ export function useBatchActionRPC() {
           // Remove from pending todos
           const pendingQueries = queryClient.getQueriesData({
             queryKey: [...queryKeys.todos.all, 'filtered'],
-            predicate: (query) => {
-              const queryKey = query.queryKey as any[]
-              return queryKey?.[2]?.storeId === storeId &&
-                     queryKey?.[2]?.filters?.completion_status === 'pending'
-            }
+            predicate: query => {
+              const queryKey = query.queryKey as readonly unknown[]
+              const params = queryKey?.[2] as TodoQueryKeyParams | undefined
+              return params?.storeId === storeId && params?.filters?.completion_status === 'pending'
+            },
           })
 
           pendingQueries.forEach(([queryKey, data]) => {
             if (Array.isArray(data)) {
-              queryClient.setQueryData(queryKey, data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id)))
+              queryClient.setQueryData(
+                queryKey,
+                data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id)),
+              )
             }
           })
         }
@@ -625,7 +675,11 @@ export function useBatchActionRPC() {
         context.storeIds.forEach(storeId => {
           if (storeId) {
             queryClient.invalidateQueries({
-              queryKey: [...queryKeys.todos.all, 'filtered', { storeId, filters: { completion_status: 'pending' } }],
+              queryKey: [
+                ...queryKeys.todos.all,
+                'filtered',
+                { storeId, filters: { completion_status: 'pending' } },
+              ],
               exact: false,
             })
           }

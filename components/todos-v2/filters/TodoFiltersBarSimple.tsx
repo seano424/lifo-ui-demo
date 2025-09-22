@@ -7,11 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type {
-  BatchStatus,
-  TodoActionType,
-  TodoUrgencyLevel,
-} from '@/lib/queries/todos-rpc-v2'
+import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc-v2'
 import { ChevronDown, X } from 'lucide-react'
 
 export interface TodoFilterValues {
@@ -29,12 +25,22 @@ interface TodoFiltersBarSimpleProps {
 const URGENCY_OPTIONS: {
   value: TodoUrgencyLevel | 'all'
   label: string
-  color: string
+  color:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'outline'
+    | 'ghost'
+    | 'cyan'
+    | 'gray'
+    | 'blue'
+    | 'green'
 }[] = [
   { value: 'all', label: 'All Urgency Levels', color: 'gray' },
   { value: 'critical', label: 'Critical', color: 'destructive' },
-  { value: 'high', label: 'High', color: 'orange' },
-  { value: 'medium', label: 'Medium', color: 'yellow' },
+  { value: 'high', label: 'High', color: 'destructive' },
+  { value: 'medium', label: 'Medium', color: 'blue' },
   { value: 'low', label: 'Low', color: 'blue' },
   { value: 'none', label: 'None', color: 'gray' },
 ]
@@ -76,7 +82,7 @@ export function TodoFiltersBarSimple({
 
     const current = filters.urgency_level || []
     const updated = current.includes(urgency)
-      ? current.filter((u) => u !== urgency)
+      ? current.filter(u => u !== urgency)
       : [...current, urgency]
 
     onFiltersChange({
@@ -96,7 +102,7 @@ export function TodoFiltersBarSimple({
 
     const current = filters.action_type || []
     const updated = current.includes(action)
-      ? current.filter((a) => a !== action)
+      ? current.filter(a => a !== action)
       : [...current, action]
 
     onFiltersChange({
@@ -116,7 +122,7 @@ export function TodoFiltersBarSimple({
 
     const current = filters.batch_status || []
     const updated = current.includes(status)
-      ? current.filter((s) => s !== status)
+      ? current.filter(s => s !== status)
       : [...current, status]
 
     onFiltersChange({
@@ -126,9 +132,7 @@ export function TodoFiltersBarSimple({
   }
 
   const hasActiveFilters =
-    filters.urgency_level?.length ||
-    filters.action_type?.length ||
-    filters.batch_status?.length
+    filters.urgency_level?.length || filters.action_type?.length || filters.batch_status?.length
 
   return (
     <div className="space-y-3">
@@ -140,6 +144,7 @@ export function TodoFiltersBarSimple({
               variant="outline"
               className="w-[180px] justify-between"
               disabled={isLoading}
+              id="todos-urgency-filter-trigger"
             >
               <span>
                 {filters.urgency_level?.length
@@ -151,13 +156,11 @@ export function TodoFiltersBarSimple({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {URGENCY_OPTIONS.map((option) => {
+              {URGENCY_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.urgency_level?.length
-                  : filters.urgency_level?.includes(
-                      option.value as TodoUrgencyLevel
-                    )
+                  : filters.urgency_level?.includes(option.value as TodoUrgencyLevel)
 
                 return (
                   <div
@@ -175,10 +178,7 @@ export function TodoFiltersBarSimple({
                       {option.label}
                     </span>
                     {!isAll && (
-                      <Badge
-                        variant={option.color as any}
-                        className="ml-2"
-                      >
+                      <Badge variant={option.color} className="ml-2">
                         {option.value}
                       </Badge>
                     )}
@@ -196,6 +196,7 @@ export function TodoFiltersBarSimple({
               variant="outline"
               className="w-[180px] justify-between"
               disabled={isLoading}
+              id="todos-action-filter-trigger"
             >
               <span>
                 {filters.action_type?.length
@@ -207,13 +208,11 @@ export function TodoFiltersBarSimple({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {ACTION_OPTIONS.map((option) => {
+              {ACTION_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.action_type?.length
-                  : filters.action_type?.includes(
-                      option.value as TodoActionType
-                    )
+                  : filters.action_type?.includes(option.value as TodoActionType)
 
                 return (
                   <div
@@ -247,6 +246,7 @@ export function TodoFiltersBarSimple({
               variant="outline"
               className="w-[180px] justify-between"
               disabled={isLoading}
+              id="todos-status-filter-trigger"
             >
               <span>
                 {filters.batch_status?.length
@@ -258,7 +258,7 @@ export function TodoFiltersBarSimple({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {BATCH_STATUS_OPTIONS.map((option) => {
+              {BATCH_STATUS_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.batch_status?.length
@@ -280,9 +280,7 @@ export function TodoFiltersBarSimple({
                       {option.label}
                     </span>
                     {!isAll && (
-                      <Badge
-                        variant={option.value === 'active' ? 'default' : 'gray'}
-                      >
+                      <Badge variant={option.value === 'active' ? 'default' : 'gray'}>
                         {option.value}
                       </Badge>
                     )}
@@ -292,51 +290,29 @@ export function TodoFiltersBarSimple({
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
-
       </div>
 
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
-          {filters.urgency_level?.map((urgency) => (
-            <Badge
-              key={urgency}
-              variant="secondary"
-              className="gap-1"
-            >
+          {filters.urgency_level?.map(urgency => (
+            <Badge key={urgency} variant="secondary" className="gap-1">
               Urgency: {urgency}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => handleUrgencyChange(urgency)}
-              />
+              <X className="h-3 w-3 cursor-pointer" onClick={() => handleUrgencyChange(urgency)} />
             </Badge>
           ))}
 
-          {filters.action_type?.map((action) => (
-            <Badge
-              key={action}
-              variant="secondary"
-              className="gap-1"
-            >
+          {filters.action_type?.map(action => (
+            <Badge key={action} variant="secondary" className="gap-1">
               Action: {action}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => handleActionChange(action)}
-              />
+              <X className="h-3 w-3 cursor-pointer" onClick={() => handleActionChange(action)} />
             </Badge>
           ))}
 
-          {filters.batch_status?.map((status) => (
-            <Badge
-              key={status}
-              variant="secondary"
-              className="gap-1"
-            >
+          {filters.batch_status?.map(status => (
+            <Badge key={status} variant="secondary" className="gap-1">
               Status: {status}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => handleStatusChange(status)}
-              />
+              <X className="h-3 w-3 cursor-pointer" onClick={() => handleStatusChange(status)} />
             </Badge>
           ))}
         </div>

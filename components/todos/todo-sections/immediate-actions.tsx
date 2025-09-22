@@ -41,7 +41,7 @@ export default function ImmediateActions() {
   }
 
   // Flatten the infinite query data
-  const todosList = todos?.pages.flatMap((page) => page.data) || []
+  const todosList = todos?.pages.flatMap(page => page.data) || []
 
   // Empty state
   if (todosList.length === 0) {
@@ -63,19 +63,13 @@ export default function ImmediateActions() {
       </div>
 
       <div className="flex flex-col gap-8">
-        {todosList.map((todo) => (
-          <TodoCard
-            key={todo.batch_id}
-            todo={todo}
-          />
+        {todosList.map(todo => (
+          <TodoCard key={todo.batch_id} todo={todo} />
         ))}
 
         {/* Infinite Loading Sentinel */}
         {hasNextPage && (
-          <div
-            ref={targetRef}
-            className="flex justify-center items-center pt-4 pb-2 min-h-[60px]"
-          >
+          <div ref={targetRef} className="flex justify-center items-center pt-4 pb-2 min-h-[60px]">
             {isFetchingNextPage ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

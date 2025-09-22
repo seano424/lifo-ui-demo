@@ -13,18 +13,11 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 /**
  * Main hook for flexible todo filtering with infinite scroll
  */
-export function useTodosWithFilters(
-  filters: TodoFilters = {},
-  pageSize: number = 20
-) {
+export function useTodosWithFilters(filters: TodoFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
 
   const result = useInfiniteQuery({
-    queryKey: queryKeys.todos.withFilters(
-      activeStoreId || '',
-      filters,
-      pageSize
-    ),
+    queryKey: queryKeys.todos.withFilters(activeStoreId || '', filters, pageSize),
     queryFn: ({ pageParam = 0 }) => {
       if (!activeStoreId) throw new Error('No active store')
 
@@ -66,40 +59,40 @@ export function useTodosWithFilters(
 
 export function usePendingTodos(
   additionalFilters?: Omit<TodoFilters, 'completion_status'>,
-  pageSize: number = 20
+  pageSize: number = 20,
 ) {
   return useTodosWithFilters(
     {
       completion_status: 'pending',
       ...additionalFilters,
     },
-    pageSize
+    pageSize,
   )
 }
 
 export function useInProgressTodos(
   additionalFilters?: Omit<TodoFilters, 'completion_status'>,
-  pageSize: number = 20
+  pageSize: number = 20,
 ) {
   return useTodosWithFilters(
     {
       completion_status: 'in_progress',
       ...additionalFilters,
     },
-    pageSize
+    pageSize,
   )
 }
 
 export function useCompletedTodos(
   additionalFilters?: Omit<TodoFilters, 'completion_status'>,
-  pageSize: number = 20
+  pageSize: number = 20,
 ) {
   return useTodosWithFilters(
     {
       completion_status: 'completed',
       ...additionalFilters,
     },
-    pageSize
+    pageSize,
   )
 }
 
@@ -114,7 +107,7 @@ export function useUrgentTodos(pageSize: number = 20) {
       urgency_level: ['critical', 'high'],
       completion_status: 'pending',
     },
-    pageSize
+    pageSize,
   )
 }
 
@@ -126,7 +119,7 @@ export function useExpiringTodos(daysMax: number = 3, pageSize: number = 20) {
       batch_status: ['active'],
       completion_status: 'pending',
     },
-    pageSize
+    pageSize,
   )
 }
 
@@ -138,7 +131,7 @@ export function useDiscountableTodos(pageSize: number = 20) {
       completion_status: 'pending',
       urgency_level: ['high', 'medium'],
     },
-    pageSize
+    pageSize,
   )
 }
 
@@ -149,7 +142,7 @@ export function useDonatableTodos(pageSize: number = 20) {
       action_type: ['donate', 'donate_prepared'],
       completion_status: 'pending',
     },
-    pageSize
+    pageSize,
   )
 }
 
@@ -159,7 +152,7 @@ export function useRecentlyCompletedTodos(pageSize: number = 50) {
     {
       completion_status: 'completed',
     },
-    pageSize
+    pageSize,
   )
 }
 
@@ -168,50 +161,39 @@ export function useRecentlyCompletedTodos(pageSize: number = 50) {
  */
 
 // Filter by specific urgency levels
-export function useTodosByUrgency(
-  urgencyLevels: TodoUrgencyLevel[],
-  pageSize: number = 20
-) {
+export function useTodosByUrgency(urgencyLevels: TodoUrgencyLevel[], pageSize: number = 20) {
   return useTodosWithFilters(
     {
       urgency_level: urgencyLevels,
     },
-    pageSize
+    pageSize,
   )
 }
 
 // Filter by specific action types
-export function useTodosByActionType(
-  actionTypes: TodoActionType[],
-  pageSize: number = 20
-) {
+export function useTodosByActionType(actionTypes: TodoActionType[], pageSize: number = 20) {
   return useTodosWithFilters(
     {
       action_type: actionTypes,
     },
-    pageSize
+    pageSize,
   )
 }
 
 // Search todos by product name
-export function useTodosByProductName(
-  productName: string,
-  pageSize: number = 20
-) {
+export function useTodosByProductName(productName: string, pageSize: number = 20) {
   return useTodosWithFilters(
     {
       product_name: productName,
     },
-    pageSize
+    pageSize,
   )
 }
 
 /**
  * HELPER HOOK - For components that need flattened data (your existing pattern)
  */
-export function useFlattenedTodosData<T>(query: {
-  data?: { pages?: T[][] }
-}): T[] {
+export function useFlattenedTodosData<T>(query: { data?: { pages?: T[][] } }): T[] {
   return query?.data?.pages?.flatMap((page: T[]) => page) ?? []
 }
 
@@ -220,32 +202,23 @@ export function useFlattenedTodosData<T>(query: {
  */
 
 // Pending todos with urgency filter
-export function usePendingTodosByUrgency(
-  urgency: TodoUrgencyLevel[],
-  pageSize: number = 20
-) {
+export function usePendingTodosByUrgency(urgency: TodoUrgencyLevel[], pageSize: number = 20) {
   return usePendingTodos({ urgency_level: urgency }, pageSize)
 }
 
 // In-progress todos with action type filter
-export function useInProgressTodosByAction(
-  actionTypes: TodoActionType[],
-  pageSize: number = 20
-) {
+export function useInProgressTodosByAction(actionTypes: TodoActionType[], pageSize: number = 20) {
   return useInProgressTodos({ action_type: actionTypes }, pageSize)
 }
 
 // Completed todos with time range
-export function useCompletedTodosRecent(
-  daysBack: number = 7,
-  pageSize: number = 50
-) {
+export function useCompletedTodosRecent(daysBack: number = 7, pageSize: number = 50) {
   console.log('daysBack to get completed todos', daysBack)
   return useCompletedTodos(
     {
       // Note: You might need to add date filtering to your RPC function
       // For now, this just gets all completed todos
     },
-    pageSize
+    pageSize,
   )
 }
