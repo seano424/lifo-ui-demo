@@ -1,5 +1,6 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,9 +12,7 @@ import type {
   TodoActionType,
   TodoUrgencyLevel,
 } from '@/lib/queries/todos-rpc-v2'
-import { Badge } from '@/components/ui/badge'
-import { X, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronDown, X } from 'lucide-react'
 
 export interface TodoFilterValues {
   urgency_level?: TodoUrgencyLevel[]
@@ -27,7 +26,11 @@ interface TodoFiltersBarSimpleProps {
   isLoading?: boolean
 }
 
-const URGENCY_OPTIONS: { value: TodoUrgencyLevel | 'all'; label: string; color: string }[] = [
+const URGENCY_OPTIONS: {
+  value: TodoUrgencyLevel | 'all'
+  label: string
+  color: string
+}[] = [
   { value: 'all', label: 'All Urgency Levels', color: 'gray' },
   { value: 'critical', label: 'Critical', color: 'destructive' },
   { value: 'high', label: 'High', color: 'orange' },
@@ -36,7 +39,11 @@ const URGENCY_OPTIONS: { value: TodoUrgencyLevel | 'all'; label: string; color: 
   { value: 'none', label: 'None', color: 'gray' },
 ]
 
-const ACTION_OPTIONS: { value: TodoActionType | 'all'; label: string; icon?: string }[] = [
+const ACTION_OPTIONS: {
+  value: TodoActionType | 'all'
+  label: string
+  icon?: string
+}[] = [
   { value: 'all', label: 'All Actions', icon: '🎯' },
   { value: 'discount', label: 'Discount', icon: '🏷️' },
   { value: 'donate', label: 'Donate', icon: '🤝' },
@@ -69,7 +76,7 @@ export function TodoFiltersBarSimple({
 
     const current = filters.urgency_level || []
     const updated = current.includes(urgency)
-      ? current.filter(u => u !== urgency)
+      ? current.filter((u) => u !== urgency)
       : [...current, urgency]
 
     onFiltersChange({
@@ -89,7 +96,7 @@ export function TodoFiltersBarSimple({
 
     const current = filters.action_type || []
     const updated = current.includes(action)
-      ? current.filter(a => a !== action)
+      ? current.filter((a) => a !== action)
       : [...current, action]
 
     onFiltersChange({
@@ -109,17 +116,13 @@ export function TodoFiltersBarSimple({
 
     const current = filters.batch_status || []
     const updated = current.includes(status)
-      ? current.filter(s => s !== status)
+      ? current.filter((s) => s !== status)
       : [...current, status]
 
     onFiltersChange({
       ...filters,
       batch_status: updated.length > 0 ? updated : undefined,
     })
-  }
-
-  const clearAllFilters = () => {
-    onFiltersChange({})
   }
 
   const hasActiveFilters =
@@ -141,19 +144,20 @@ export function TodoFiltersBarSimple({
               <span>
                 {filters.urgency_level?.length
                   ? `Urgency (${filters.urgency_level.length})`
-                  : 'Filter by urgency'
-                }
+                  : 'Filter by urgency'}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {URGENCY_OPTIONS.map(option => {
+              {URGENCY_OPTIONS.map((option) => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.urgency_level?.length
-                  : filters.urgency_level?.includes(option.value as TodoUrgencyLevel)
+                  : filters.urgency_level?.includes(
+                      option.value as TodoUrgencyLevel
+                    )
 
                 return (
                   <div
@@ -163,7 +167,7 @@ export function TodoFiltersBarSimple({
                   >
                     <span className="flex items-center gap-2">
                       <input
-                        type={isAll ? "radio" : "checkbox"}
+                        type={isAll ? 'radio' : 'checkbox'}
                         checked={isSelected || false}
                         onChange={() => {}}
                         className="rounded"
@@ -171,7 +175,10 @@ export function TodoFiltersBarSimple({
                       {option.label}
                     </span>
                     {!isAll && (
-                      <Badge variant={option.color as any} className="ml-2">
+                      <Badge
+                        variant={option.color as any}
+                        className="ml-2"
+                      >
                         {option.value}
                       </Badge>
                     )}
@@ -193,19 +200,20 @@ export function TodoFiltersBarSimple({
               <span>
                 {filters.action_type?.length
                   ? `Actions (${filters.action_type.length})`
-                  : 'Filter by action'
-                }
+                  : 'Filter by action'}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {ACTION_OPTIONS.map(option => {
+              {ACTION_OPTIONS.map((option) => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.action_type?.length
-                  : filters.action_type?.includes(option.value as TodoActionType)
+                  : filters.action_type?.includes(
+                      option.value as TodoActionType
+                    )
 
                 return (
                   <div
@@ -215,7 +223,7 @@ export function TodoFiltersBarSimple({
                   >
                     <span className="flex items-center gap-2">
                       <input
-                        type={isAll ? "radio" : "checkbox"}
+                        type={isAll ? 'radio' : 'checkbox'}
                         checked={isSelected || false}
                         onChange={() => {}}
                         className="rounded"
@@ -243,15 +251,14 @@ export function TodoFiltersBarSimple({
               <span>
                 {filters.batch_status?.length
                   ? `Status (${filters.batch_status.length})`
-                  : 'Filter by status'
-                }
+                  : 'Filter by status'}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {BATCH_STATUS_OPTIONS.map(option => {
+              {BATCH_STATUS_OPTIONS.map((option) => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.batch_status?.length
@@ -265,7 +272,7 @@ export function TodoFiltersBarSimple({
                   >
                     <span className="flex items-center gap-2">
                       <input
-                        type={isAll ? "radio" : "checkbox"}
+                        type={isAll ? 'radio' : 'checkbox'}
                         checked={isSelected || false}
                         onChange={() => {}}
                         className="rounded"
@@ -273,7 +280,9 @@ export function TodoFiltersBarSimple({
                       {option.label}
                     </span>
                     {!isAll && (
-                      <Badge variant={option.value === 'active' ? 'success' : 'gray'}>
+                      <Badge
+                        variant={option.value === 'active' ? 'default' : 'gray'}
+                      >
                         {option.value}
                       </Badge>
                     )}
@@ -284,23 +293,12 @@ export function TodoFiltersBarSimple({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Clear All Button */}
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearAllFilters}
-            className="h-10"
-          >
-            Clear all
-          </Button>
-        )}
       </div>
 
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
-          {filters.urgency_level?.map(urgency => (
+          {filters.urgency_level?.map((urgency) => (
             <Badge
               key={urgency}
               variant="secondary"
@@ -314,7 +312,7 @@ export function TodoFiltersBarSimple({
             </Badge>
           ))}
 
-          {filters.action_type?.map(action => (
+          {filters.action_type?.map((action) => (
             <Badge
               key={action}
               variant="secondary"
@@ -328,7 +326,7 @@ export function TodoFiltersBarSimple({
             </Badge>
           ))}
 
-          {filters.batch_status?.map(status => (
+          {filters.batch_status?.map((status) => (
             <Badge
               key={status}
               variant="secondary"

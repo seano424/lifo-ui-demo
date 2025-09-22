@@ -5,6 +5,7 @@ import { TodoSortControls, type SortConfig } from './TodoSortControls'
 import { TodoSearchBar } from './TodoSearchBar'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
 
 export interface TodoFiltersState {
   // Filters
@@ -51,6 +52,12 @@ export function TodoFiltersPanel({
     })
   }
 
+  const clearAllFilters = () => {
+    onFiltersChange({
+      sortConfig: filters.sortConfig, // Keep sort config or reset it too?
+    })
+  }
+
   const hasActiveFilters =
     filters.urgency_level?.length ||
     filters.action_type?.length ||
@@ -68,11 +75,21 @@ export function TodoFiltersPanel({
           placeholder="Search products..."
         />
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
           {hasActiveFilters && (
-            <span className="hidden sm:inline">
-              Active filters applied
-            </span>
+            <>
+              <span className="hidden sm:inline text-sm text-muted-foreground">
+                Active filters applied
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAllFilters}
+                className="h-8"
+              >
+                Clear all
+              </Button>
+            </>
           )}
         </div>
       </div>
