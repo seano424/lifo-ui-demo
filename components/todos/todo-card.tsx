@@ -6,7 +6,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
-import { Calendar, Package, PenLine } from 'lucide-react'
+import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 
 interface TodoCardProps {
@@ -17,18 +17,18 @@ interface TodoCardProps {
 // Move urgency config outside component for better performance
 const URGENCY_CONFIG = {
   critical: {
-    color: 'bg-red-500',
-    textColor: 'text-red-700',
-    bgColor: 'group-hover:bg-red-500 border-red-600',
-    badge: 'bg-red-200 text-red-800 border-red-500',
-    badgeVariant: 'destructive' as const,
+    color: 'bg-primary-500',
+    textColor: 'text-primary-700',
+    bgColor: 'group-hover:bg-primary-500 border-primary-600',
+    badge: 'bg-primary-200 text-primary-800 border-primary-500',
+    badgeVariant: 'default' as const,
   },
   high: {
-    color: 'bg-red-500',
-    textColor: 'text-red-700',
-    bgColor: 'group-hover:bg-red-50 border-red-500',
-    badge: 'bg-red-100 text-red-800 border-red-500',
-    badgeVariant: 'destructive' as const,
+    color: 'bg-primary-500',
+    textColor: 'text-primary-700',
+    bgColor: 'group-hover:bg-primary-50 border-primary-500',
+    badge: 'bg-primary-100 text-primary-800 border-primary-500',
+    badgeVariant: 'default' as const,
   },
   medium: {
     color: 'bg-primary-500',
@@ -75,17 +75,17 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   const tomorrowStartOfDay = addDays(todayStartOfDay, 1)
 
   const isExpiringSoon = isBefore(expiryStartOfDay, tomorrowStartOfDay) || isToday(expiryDate)
-  const isExpired = isBefore(expiryStartOfDay, todayStartOfDay)
+  const isExpiring = isBefore(expiryStartOfDay, todayStartOfDay)
   const isExpiringToday = isToday(expiryDate)
 
-  // Calculate days since expiry for expired items using date-fns
-  const getExpiredText = () => {
-    if (!isExpired) return ''
+  // Calculate days since expiry for expiring items using date-fns
+  const getExpiringText = () => {
+    if (!isExpiring) return ''
 
     const diffDays = differenceInDays(todayStartOfDay, expiryStartOfDay)
 
-    if (diffDays === 1) return 'Expired yesterday'
-    return `Expired ${diffDays} days ago`
+    if (diffDays === 1) return 'Expiring yesterday'
+    return `Expiring ${diffDays} days ago`
   }
 
   // Simple lookup for urgency configuration - no memoization needed since config is static
@@ -122,10 +122,14 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           variant="outline"
           className={cn(
             'border-2 rounded-full cursor-pointer',
-            'h-6 w-6 p-0 bg-brand-white transition-all duration-200',
+            'h-6 w-6 p-0 bg-brand-white dark:bg-brand-dark transition-all duration-200 items-center justify-center',
             urgencyConfig.bgColor,
           )}
-        ></Badge>
+        >
+          {isCompleted && (
+            <CheckIcon className="h-4 w-4 text-primary dark:text-secondary-400 stroke-3" />
+          )}
+        </Badge>
 
         <div className="flex flex-col min-w-0 flex-1 gap-4">
           <div className="flex flex-col gap-2 items-start">
@@ -181,7 +185,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             <div className="flex flex-wrap gap-2 items-center justify-between">
               {isCompleted && !wasDisposed && <Badge variant={'primary'}>Completed</Badge>}
 
-              {isCompleted && wasDisposed && <Badge variant={'destructive'}>Disposed</Badge>}
+              {isCompleted && wasDisposed && <Badge variant={'default'}>Disposed</Badge>}
 
               {todo.last_discount_percent != null &&
                 todo.last_discount_percent > 0 &&
@@ -206,9 +210,9 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               {isCompleted ? (
                 <Badge variant="primary">{getCompletionDateText()}</Badge>
               ) : isExpiringToday ? (
-                <Badge variant="destructive">Expires today</Badge>
-              ) : isExpired ? (
-                <Badge variant="destructive">{getExpiredText()}</Badge>
+                <Badge variant="default">Expires today</Badge>
+              ) : isExpiring ? (
+                <Badge variant="default">{getExpiringText()}</Badge>
               ) : isExpiringSoon ? (
                 <Badge variant="primary">Expiring soon</Badge>
               ) : wasDonated ? (

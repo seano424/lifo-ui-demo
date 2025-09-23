@@ -33,16 +33,15 @@ const URGENCY_OPTIONS: {
     | 'outline'
     | 'ghost'
     | 'cyan'
-    | 'gray'
     | 'blue'
     | 'green'
 }[] = [
-  { value: 'all', label: 'All Urgency Levels', color: 'gray' },
+  { value: 'all', label: 'All Urgency Levels', color: 'default' },
   { value: 'critical', label: 'Critical', color: 'destructive' },
   { value: 'high', label: 'High', color: 'destructive' },
   { value: 'medium', label: 'Medium', color: 'blue' },
   { value: 'low', label: 'Low', color: 'blue' },
-  { value: 'none', label: 'None', color: 'gray' },
+  { value: 'none', label: 'None', color: 'default' },
 ]
 
 const ACTION_OPTIONS: {
@@ -296,21 +295,21 @@ export function TodoFiltersBar({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
           {filters.urgency_level?.map(urgency => (
-            <Badge key={urgency} variant="secondary" className="gap-1">
+            <Badge key={urgency} variant="default" className="gap-1">
               Urgency: {urgency}
               <X className="h-3 w-3 cursor-pointer" onClick={() => handleUrgencyChange(urgency)} />
             </Badge>
           ))}
 
           {filters.action_type?.map(action => (
-            <Badge key={action} variant="secondary" className="gap-1">
+            <Badge key={action} variant="default" className="gap-1">
               Action: {action}
               <X className="h-3 w-3 cursor-pointer" onClick={() => handleActionChange(action)} />
             </Badge>
           ))}
 
           {filters.batch_status?.map(status => (
-            <Badge key={status} variant="secondary" className="gap-1">
+            <Badge key={status} variant="default" className="gap-1">
               Status: {status}
               <X className="h-3 w-3 cursor-pointer" onClick={() => handleStatusChange(status)} />
             </Badge>

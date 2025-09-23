@@ -7,21 +7,22 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-2xl tracking-wide font-semibold font-heading transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'rounded-2xl transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         // Enhanced variants using new color palettes
         default:
           'bg-primary-900 text-white shadow-sm hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
-        destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-red-700 dark:hover:bg-red-700',
         subtleDestructive: 'bg-red-100 text-red-900 shadow-xs hover:bg-red-200',
         outline:
           'border border-input bg-background shadow-xs hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
         secondary:
           'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
         ghost:
-          'hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
+          'hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/0 dark:text-primary-300',
         subtleTertiary:
           'bg-primary-50 text-primary-900 dark:bg-primary-900/10 dark:text-primary-300',
         link: 'text-primary-900 underline-offset-4 hover:underline dark:text-primary-300',
@@ -44,7 +45,7 @@ const buttonVariants = cva(
         subtleGray: 'bg-gray-100 text-gray-900 shadow-sm hover:bg-gray-200',
       },
       size: {
-        sm: 'px-3 py-1.5 text-xs',
+        sm: 'px-3 py-1.5 text-sm',
         default: 'px-6 py-2.5 text-sm',
         lg: 'px-6 py-3 text-base',
         xl: 'px-8 py-4 text-lg',

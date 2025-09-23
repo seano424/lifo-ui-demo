@@ -93,7 +93,7 @@ export function TodoFiltersPanel({
               <span className="hidden sm:inline text-sm text-muted-foreground">
                 Active filters applied
               </span>
-              <Button size="sm" variant="destructive" onClick={clearAllFilters} className="h-8">
+              <Button size="sm" variant="secondary" onClick={clearAllFilters} className="h-8">
                 Clear all
               </Button>
             </>

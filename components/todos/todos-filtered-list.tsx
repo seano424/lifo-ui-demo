@@ -194,14 +194,14 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               size={isMobile ? 'default' : 'lg'}
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'rounded-none relative flex items-center pb-4 whitespace-nowrap gap-1',
+                'rounded-none relative flex items-center pb-4 whitespace-nowrap gap-1 sm:gap-2',
                 'hover:bg-transparent group/tab',
                 activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}
             >
               {tab.label}
               <Badge
-                className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm"
+                className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm flex items-center justify-center rounded-full px-3"
                 variant={activeTab === tab.id ? 'primary' : 'default'}
               >
                 {tab.count}
