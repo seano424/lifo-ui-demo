@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,6 +46,7 @@ interface AddStoreDetailsStepProps {
 export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStoreDetailsStepProps) {
   const { selectedStoreForm, isManualEntry, setSelectedStoreForm, setCurrentStep } =
     useAddStoreStore()
+  const t = useTranslations('storeSettings.addStoreDetails')
 
   const form = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -89,12 +91,10 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
     <div className="mx-auto">
       <div className="flex flex-col gap-2 mb-6">
         <Typography variant="h1">
-          {isManualEntry ? 'Add Store Details' : 'Complete Store Information'}
+          {isManualEntry ? t('title.manual') : t('title.complete')}
         </Typography>
         <Typography variant="p" color="muted">
-          {isManualEntry
-            ? 'Enter your store information'
-            : 'Select your store type and verify details'}
+          {isManualEntry ? t('subtitle.manual') : t('subtitle.complete')}
         </Typography>
       </div>
 
@@ -106,10 +106,10 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
               name="store_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Store Name</FormLabel>
+                  <FormLabel>{t('labels.storeName')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Your Store Name"
+                      placeholder={t('placeholders.storeName')}
                       {...field}
                       value={coerceToString(field.value)}
                     />
@@ -124,10 +124,10 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
               name="business_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Business Name (Optional)</FormLabel>
+                  <FormLabel>{t('labels.businessName')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="If different from store name"
+                      placeholder={t('placeholders.businessName')}
                       {...field}
                       value={coerceToString(field.value)}
                     />
@@ -142,10 +142,10 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>{t('labels.address')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="123 Rue de la Paix"
+                      placeholder={t('placeholders.address')}
                       {...field}
                       value={coerceToString(field.value)}
                     />
@@ -161,9 +161,13 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>{t('labels.city')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Paris" {...field} value={coerceToString(field.value)} />
+                      <Input
+                        placeholder={t('placeholders.city')}
+                        {...field}
+                        value={coerceToString(field.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -175,9 +179,13 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                 name="postal_code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Postal Code</FormLabel>
+                    <FormLabel>{t('labels.postalCode')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="75001" {...field} value={coerceToString(field.value)} />
+                      <Input
+                        placeholder={t('placeholders.postalCode')}
+                        {...field}
+                        value={coerceToString(field.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -191,9 +199,13 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country</FormLabel>
+                    <FormLabel>{t('labels.country')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="France" {...field} value={coerceToString(field.value)} />
+                      <Input
+                        placeholder={t('placeholders.country')}
+                        {...field}
+                        value={coerceToString(field.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -204,10 +216,10 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number (Optional)</FormLabel>
+                    <FormLabel>{t('labels.phone')}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="01 23 45 67 89"
+                        placeholder={t('placeholders.phone')}
                         {...field}
                         value={coerceToString(field.value)}
                       />
@@ -223,14 +235,14 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
               name="store_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Store Type</FormLabel>
+                  <FormLabel>{t('labels.storeType')}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={typeof field.value === 'string' ? field.value : undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select store type" />
+                        <SelectValue placeholder={t('placeholders.selectStoreType')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -249,11 +261,11 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
             <div className="flex gap-3 pt-4">
               {isGooglePlacesEnabled() && (
                 <Button type="button" variant="outline" onClick={handleBack} className="w-full">
-                  Back
+                  {t('buttons.back')}
                 </Button>
               )}
               <Button type="submit" className="w-full mx-auto font-bold" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating Store...' : 'Create Store'}
+                {isSubmitting ? t('buttons.creating') : t('buttons.create')}
               </Button>
             </div>
           </form>

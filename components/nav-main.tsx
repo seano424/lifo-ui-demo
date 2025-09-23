@@ -81,11 +81,28 @@ export function NavMain({
   const isPathActive = (itemUrl: string) => {
     if (!isHydrated) return false // Prevent hydration mismatch
 
-    if (pathname === itemUrl) return true
+    // Strip query parameters from the item URL for comparison
+    const itemPath = itemUrl.split('?')[0]
+
+    // pathname from usePathname() already excludes query parameters
+    // Exact match is the primary check
+    if (pathname === itemPath) return true
+
+    // Special handling for /dashboard - only match exact path
+    // to prevent it from matching /dashboard/todos, /dashboard/inventory, etc.
+    if (itemPath === '/dashboard') {
+      return pathname === '/dashboard'
+    }
 
     // Special handling for settings: treat /settings/store as active for /settings
-    if (itemUrl.includes('/settings')) {
-      return pathname.startsWith(itemUrl)
+    if (itemPath.includes('/settings')) {
+      return pathname.startsWith(itemPath)
+    }
+
+    // Check if current path starts with the item URL (for nested routes)
+    // This handles cases like /dashboard/todos/123 matching /dashboard/todos
+    if (pathname.startsWith(`${itemPath}/`)) {
+      return true
     }
 
     return false
@@ -161,7 +178,7 @@ export function NavMain({
                     className={cn(
                       'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-primary-900 dark:active:bg-primary-900 dark:data-[active=true]:bg-primary-900 py-2 px-2 font-medium relative',
                       isPathActive(item.url) &&
-                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold',
+                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:bg-primary-900 dark:hover:bg-primary-900 dark:active:bg-primary-900 text-secondary-900 dark:text-brand-white font-bold ',
                     )}
                     asChild
                     tooltip={item.title}

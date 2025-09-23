@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle, Check, Package, Plus, RefreshCcw, Trash2 } from 'lucide-react'
+import { AlertCircle, Check, Loader2, Package, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
@@ -322,8 +322,14 @@ export default function ManualInboundEntry({
                 disabled={scannedItems.length === 0 || isSubmittingBatch}
                 variant="secondary"
               >
-                <Check className="w-4 h-4 mr-2" />
-                {t('buttons.submitAll')} ({scannedItems.length})
+                {isSubmittingBatch ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4 mr-2" />
+                )}
+                {isSubmittingBatch
+                  ? t('buttons.submitting')
+                  : `${t('buttons.submitAll')} (${scannedItems.length})`}
               </Button>
             </div>
           </CardHeader>
@@ -415,7 +421,11 @@ export default function ManualInboundEntry({
               onClick={handleConfirmSubmission}
               disabled={isSubmittingBatch}
             >
-              <Check className="w-4 h-4 mr-2" />
+              {isSubmittingBatch ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4 mr-2" />
+              )}
               {isSubmittingBatch ? t('buttons.submitting') : t('buttons.submitToInventory')}
             </Button>
           </DialogFooter>

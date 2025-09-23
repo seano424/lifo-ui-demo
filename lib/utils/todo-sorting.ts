@@ -1,5 +1,5 @@
-import type { TodoItem } from '@/components/todos/todos-filtered-list'
-import type { BatchActionWithDetails } from '@/hooks/use-scoring-analytics'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
+import type { BatchActionWithDetails } from '@/lib/utils/todo-transformers'
 
 export type SortField =
   | 'urgency'
@@ -22,6 +22,7 @@ const URGENCY_ORDER = {
   medium: 2,
   low: 1,
   maintain: 0,
+  none: 0,
 } as const
 
 const ACTION_TYPE_ORDER = {
@@ -39,8 +40,8 @@ export function createTodoSorter(sort: SortConfig) {
 
     switch (sort.field) {
       case 'urgency': {
-        aVal = URGENCY_ORDER[a.urgency] || 0
-        bVal = URGENCY_ORDER[b.urgency] || 0
+        aVal = URGENCY_ORDER[a.urgency_level] || 0
+        bVal = URGENCY_ORDER[b.urgency_level] || 0
         break
       }
       case 'expiry_date': {
@@ -54,8 +55,8 @@ export function createTodoSorter(sort: SortConfig) {
         break
       }
       case 'potential_loss': {
-        aVal = a.potential_loss || 0
-        bVal = b.potential_loss || 0
+        aVal = a.composite_score || 0
+        bVal = b.composite_score || 0
         break
       }
       case 'alphabetical': {

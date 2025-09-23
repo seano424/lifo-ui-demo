@@ -41,9 +41,33 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error) {
+      // Handle different error types appropriately
+      if (error.message?.includes('refresh_token_not_found')) {
+        // This is expected when tokens expire - not an error condition
+        console.log('[Middleware] Session expired, user needs to re-authenticate')
+      } else if (error.message?.includes('Auth session missing')) {
+        // Normal for logged-out users - don't log
+      } else if (error.message?.includes('JWT')) {
+        // Token format issues
+        console.log('[Middleware] Invalid token format, clearing session')
+      } else {
+        // Only log unexpected errors
+        console.error('[Middleware] Unexpected auth error:', error.message)
+      }
+      user = null
+    } else {
+      user = data?.user || null
+    }
+  } catch (err) {
+    // Handle any unexpected errors
+    console.error('[Middleware] Unexpected error getting user:', err)
+    user = null
+  }
 
   // Allow requests with auth codes to pass through (for password reset, etc.)
   const hasAuthCode = request.nextUrl.searchParams.get('code')
@@ -56,7 +80,10 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/onboarding/create-account') &&
     !request.nextUrl.pathname.startsWith('/onboarding/success') &&
-    !request.nextUrl.pathname.startsWith('/contact')
+    !request.nextUrl.pathname.startsWith('/contact') &&
+    !request.nextUrl.pathname.startsWith('/features') &&
+    !request.nextUrl.pathname.startsWith('/pricing') &&
+    !request.nextUrl.pathname.startsWith('/support')
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()

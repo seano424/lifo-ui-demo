@@ -71,7 +71,7 @@ export function useUsers(filters: UserFilters = {}, pageSize: number = 20) {
 export function useCurrentUser() {
   return useQuery({
     queryKey: queryKeys.auth.currentUser(),
-    queryFn: async (): Promise<User> => {
+    queryFn: async (): Promise<User | null> => {
       const supabase = createClient()
       const {
         data: { user },
@@ -79,7 +79,9 @@ export function useCurrentUser() {
       } = await supabase.auth.getUser()
 
       if (error || !user) {
-        throw new Error('Not authenticated')
+        // Return null instead of throwing error for unauthenticated users
+        // This allows components to handle both authenticated and unauthenticated states
+        return null
       }
 
       // Extract metadata and return flattened User object
@@ -144,7 +146,7 @@ export function useCurrentUserStoreRole() {
       } = await supabase.auth.getUser()
 
       if (authError || !user) {
-        throw new Error('Not authenticated')
+        return null
       }
 
       const { data: storeUserData, error: storeUserError } = await supabase.rpc(

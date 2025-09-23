@@ -34,12 +34,14 @@ yarn-error.log*
 .env.local
 .env
 
-# Google Cloud credentials
 credentials/
 *.json
 !package.json
 !package-lock.json
 !tsconfig.json
+!biome.json
+!messages/**/*.json
+!messages/*.json
 
 # vercel
 .vercel
@@ -51,6 +53,7 @@ next-env.d.ts
 
 .claude
 .cursor
+.vscode/
 
 # Test files and images
 test-images/

@@ -1,0 +1,676 @@
+{
+  "marketing": {
+    "nav": {
+      "about": "À propos",
+      "features": "Services",
+      "resources": "Ressources",
+      "product": "Produit",
+      "pricing": "Tarifs",
+      "builtFor": "Conçu pour",
+      "helpCenter": "Centre d'aide",
+      "helpCenterDesc": "Obtenez toutes les réponses dont vous avez besoin ici",
+      "contactUs": "Nous contacter",
+      "contactUsDesc": "Nous sommes là pour vous aider avec toutes vos questions",
+      "status": "Statut",
+      "statusDesc": "Vérifiez l'état actuel de nos services et API",
+      "terms": "Conditions d'utilisation",
+      "termsDesc": "Nos conditions générales d'utilisation de nos services",
+      "blog": "Blog",
+      "blogDesc": "Les dernières actualités, mises à jour et informations du secteur",
+      "company": "Entreprise",
+      "companyDesc": "Notre mission est d'innover et d'autonomiser le monde",
+      "careers": "Carrières",
+      "careersDesc": "Parcourez les offres d'emploi et découvrez notre espace de travail",
+      "support": "Support",
+      "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires"
+    },
+    "auth": {
+      "login": "Connexion",
+      "signup": "Inscription entreprise",
+      "logout": "Déconnexion",
+      "goToDashboard": "Tableau de bord",
+      "signUpForm": {
+        "title": "S'inscrire",
+        "description": "Créer un nouveau compte",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "password": "Mot de passe",
+        "repeatPassword": "Répéter le mot de passe",
+        "creatingAccount": "Création du compte...",
+        "signUpButton": "S'inscrire",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Se connecter"
+      },
+      "forgotPassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Saisissez votre email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+        "email": "Email",
+        "emailPlaceholder": "m@exemple.com",
+        "sending": "Envoi en cours...",
+        "sendResetEmail": "Envoyer l'email de réinitialisation",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "loginLink": "Se connecter",
+        "checkEmailTitle": "Vérifiez votre email",
+        "checkEmailDescription": "Instructions de réinitialisation du mot de passe envoyées",
+        "emailInstructions": "Si vous vous êtes inscrit avec votre email et mot de passe, vous recevrez un email de réinitialisation.",
+        "backToLogin": "Retour à la connexion"
+      },
+      "updatePassword": {
+        "title": "Réinitialiser votre mot de passe",
+        "description": "Veuillez saisir votre nouveau mot de passe ci-dessous.",
+        "newPassword": "Nouveau mot de passe",
+        "newPasswordPlaceholder": "Nouveau mot de passe (min 6 caractères)",
+        "saving": "Enregistrement...",
+        "savePassword": "Enregistrer le nouveau mot de passe"
+      },
+      "errors": {
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+        "genericError": "Une erreur s'est produite"
+      }
+    }
+  },
+  "landingpage": {
+    "hero": {
+      "title": "L'avenir de la gestion des stocks est là.",
+      "subtitle": "La solution intelligente pour réduire le gaspillage et augmenter vos bénéfices",
+      "buttons": {
+        "freeTrial": "Démarrer mon essai gratuit",
+        "explore": "Explorer la plateforme"
+      },
+      "badge": {
+        "text": "Profitez d'un essai gratuit de 14 jours"
+      }
+    },
+    "features": {
+      "title": "Révolutionnez votre gestion de stock",
+      "expiryTracking": {
+        "title": "Suivi des dates d'expiration en temps réel",
+        "description": "Ne manquez plus jamais une date d'expiration grâce à la surveillance automatisée de tout votre inventaire."
+      },
+      "predictiveAlerts": {
+        "title": "Alertes prédictives",
+        "description": "Réduisez considérablement vos pertes grâce aux notifications alimentées par l'IA avant l'expiration des produits."
+      },
+      "timeSaving": {
+        "title": "Gain de temps",
+        "description": "Réduction énorme du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
+      },
+      "errorFree": {
+        "title": "Opérations sans erreur",
+        "description": "Élimination des erreurs humaines et des tâches administratives."
+      },
+      "discoverButton": "Découvrir LIFO",
+      "noCommitment": "Sans engagement !"
+    },
+    "businessStats": {
+      "title": "Maximisez vos profits, minimisez vos pertes",
+      "subtitle": "Découvrez l'impact réel de LIFO.AI sur des entreprises comme la vôtre",
+      "disclaimer": "Les résultats peuvent varier. Basé sur les données moyennes des clients sur 12 mois.",
+      "revenue": {
+        "label": "Augmentation des revenus",
+        "description": "Augmentation moyenne des revenus commerciaux",
+        "subtext": "Suggestions automatiques de remises pour écouler rapidement les produits avant leur expiration."
+      },
+      "lossReduction": {
+        "label": "Réduction des pertes",
+        "description": "Réduisez facilement les déchets et économisez de l'argent",
+        "subtext": "Moins de produits périmés tout en réduisant le travail de gestion des stocks."
+      },
+      "taxCredits": {
+        "label": "Crédits d'impôt",
+        "description": "Dès le premier mois sur les dons",
+        "subtext": "Augmentez vos dons déductibles d'impôts en vous connectant avec une organisation à but non lucratif."
+      }
+    },
+    "cta": {
+      "title": "Passez à LIFO aujourd'hui",
+      "features": {
+        "quickSetup": {
+          "title": "Installation rapide",
+          "description": "Solution prête à l'emploi en quelques minutes. Aucune configuration complexe requise."
+        },
+        "freeTrial": {
+          "title": "Essai gratuit de 30 jours",
+          "description": "Testez toutes les fonctionnalités sans engagement. Résiliation facile à tout moment."
+        },
+        "support": {
+          "title": "Support dédié",
+          "description": "Notre équipe d'experts vous guide à chaque étape de votre parcours."
+        },
+        "immediateResults": {
+          "title": "Résultats immédiats",
+          "description": "Réduisez les déchets et augmentez les bénéfices dès la première semaine d'utilisation."
+        }
+      },
+      "card": {
+        "title": "Prêt à transformer votre gestion de stock ?",
+        "description": "Rejoignez LIFO pour optimiser votre inventaire et maximiser vos profits.",
+        "benefits": {
+          "noCommitment": "Sans engagement",
+          "instantSetup": "Installation instantanée",
+          "support": "Support 24/7"
+        },
+        "button": "Rejoindre la liste d'attente",
+        "noCreditCard": "Aucune carte de crédit requise"
+      }
+    }
+  },
+  "pricingpage": {
+    "title": "Choisissez votre plan",
+    "subtitle": "Commencez avec notre essai gratuit et évoluez selon vos besoins. Sans engagement, support complet inclus.",
+    "badges": {
+      "mostPopular": "Le plus populaire",
+      "comingSoon": "Bientôt disponible"
+    },
+    "common": {
+      "getStarted": "Commencer",
+      "comingSoon": "Bientôt disponible",
+      "winWinFees": "Frais gagnant-gagnant :",
+      "note": "Note :",
+      "pricingNote": "Les prix sont sujets à modification. Tous les frais sont à confirmer."
+    },
+    "plans": {
+      "freeTrial": {
+        "title": "Essai gratuit",
+        "subtitle": "Magasins pilotes",
+        "price": "Gratuit",
+        "period": "3 mois",
+        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 3 mois.",
+        "features": {
+          "0": "3 jours d'intégration et de formation",
+          "1": "Support complet inclus",
+          "2": "Sans engagement - sortie à tout moment",
+          "3": "Toutes les fonctionnalités débloquées"
+        },
+        "sellingPoint": "Parfait pour tester notre solution sans risque"
+      },
+      "light": {
+        "title": "Léger",
+        "subtitle": "Petits magasins, 1 place seulement",
+        "price": "9€",
+        "period": "/mois",
+        "description": "Pour les petits magasins qui commencent leur parcours de gestion d'inventaire.",
+        "features": {
+          "0": "Maximum 3 mois de données dans le tableau de bord",
+          "1": "1 place utilisateur incluse",
+          "2": "Fonctionnalités d'inventaire de base",
+          "3": "Support par email"
+        },
+        "fees": [
+          { "type": "Marge des produits vendus", "percentage": "30%" },
+          { "type": "Crédit d'impôt", "percentage": "20%" }
+        ],
+        "sellingPoint": "Commencez à gérer votre inventaire"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Grands magasins, 2+ ETP",
+        "price": "39€",
+        "period": "/mois",
+        "description": "Pour les entreprises en croissance qui ont besoin de collaboration d'équipe et de fonctionnalités avancées.",
+        "features": {
+          "0": "Rétention de données illimitée",
+          "1": "2+ places utilisateur",
+          "2": "Gestion des rôles",
+          "3": "Support prioritaire",
+          "4": "Analyses avancées"
+        },
+        "fees": [
+          { "type": "Marge des produits vendus", "percentage": "30%" },
+          { "type": "Crédit d'impôt", "percentage": "20%" }
+        ],
+        "sellingPoint": "Gérez efficacement les rôles dans votre magasin"
+      },
+      "enterprise": {
+        "title": "Entreprise",
+        "subtitle": "Pour les chaînes",
+        "price": "Personnalisé",
+        "description": "Solution sur mesure pour les entreprises multi-sites avec des besoins avancés.",
+        "features": {
+          "0": "Gestion de multiples points de vente",
+          "1": "Analyses avancées",
+          "2": "Intégrations personnalisées",
+          "3": "Support dédié",
+          "4": "Tarification personnalisée par point de vente"
+        },
+        "fees": [
+          {
+            "type": "Marge des produits vendus",
+            "percentage": "Personnalisé%"
+          },
+          { "type": "Crédit d'impôt", "percentage": "Personnalisé%" }
+        ],
+        "sellingPoint": "Gérez plusieurs points de vente et obtenez des analyses avancées"
+      }
+    }
+  },
+  "featurespage": {
+    "title": "Fonctionnalités puissantes",
+    "subtitle": "Tout ce dont vous avez besoin pour gérer efficacement votre inventaire avec des insights alimentés par l'IA et un suivi en temps réel.",
+    "features": {
+      "dashboard": {
+        "title": "Tableau de bord en temps réel",
+        "description": "Obtenez des insights instantanés sur votre inventaire avec notre tableau de bord complet. Suivez les niveaux de stock, surveillez les dates d'expiration et identifiez les tendances d'un coup d'œil. Prenez des décisions éclairées avec la visualisation de données en temps réel et les alertes automatisées."
+      },
+      "scanning": {
+        "title": "Scan intelligent",
+        "description": "Gérez facilement votre inventaire avec notre technologie de scan avancée. Scannez simplement les produits pour mettre à jour les niveaux de stock, suivre les dates d'expiration et maintenir des enregistrements précis. Fonctionne parfaitement sur tout appareil mobile."
+      },
+      "analytics": {
+        "title": "Analyses de performance",
+        "description": "Comprenez les performances de votre entreprise avec des analyses et rapports détaillés. Suivez la réduction des déchets, la croissance des revenus et l'efficacité opérationnelle. Obtenez des insights exploitables pour optimiser votre stratégie de gestion d'inventaire."
+      },
+      "ai": {
+        "title": "Insights alimentés par l'IA",
+        "description": "Exploitez l'intelligence artificielle pour optimiser votre gestion d'inventaire. Obtenez des recommandations intelligentes pour les réapprovisionnements, les stratégies promotionnelles et la réduction des déchets. Notre IA apprend de vos habitudes pour fournir des suggestions personnalisées."
+      }
+    },
+    "additionalFeatures": {
+      "title": "Tout ce dont vous avez besoin",
+      "expiry": {
+        "title": "Suivi d'expiration",
+        "description": "Ne manquez jamais les dates d'expiration avec les alertes automatisées et la gestion LIFO."
+      },
+      "security": {
+        "title": "Sécurité des données",
+        "description": "Sécurité de niveau entreprise pour protéger vos données commerciales et informations clients."
+      },
+      "performance": {
+        "title": "Performance rapide",
+        "description": "Traitement ultra-rapide et mises à jour en temps réel pour des opérations fluides."
+      },
+      "tracking": {
+        "title": "Suivi précis",
+        "description": "Suivi d'inventaire précis avec scan de codes-barres et mises à jour automatisées."
+      },
+      "timeSaving": {
+        "title": "Gain de temps",
+        "description": "Automatisez les tâches routinières et économisez des heures de gestion d'inventaire manuelle."
+      },
+      "collaboration": {
+        "title": "Collaboration d'équipe",
+        "description": "Support multi-utilisateur avec permissions basées sur les rôles et gestion d'équipe."
+      }
+    },
+    "mockData": {
+      "dashboard": {
+        "inventoryOverview": "Aperçu de l'inventaire",
+        "items": "Articles",
+        "fromLastMonth": "du mois dernier",
+        "expiringSoon": "Expire bientôt",
+        "lowStock": "Stock faible",
+        "totalProducts": "Produits totaux",
+        "expiringItems": "Articles expirants",
+        "wasteReduced": "Déchets réduits",
+        "revenueIncrease": "Augmentation des revenus",
+        "performanceAnalytics": "Analyses de performance"
+      },
+      "scanning": {
+        "scanningActive": "Scan actif",
+        "productScanned": "Produit scanné",
+        "organicMilk": "Lait bio - 1L",
+        "expDate": "Exp: 15/01/2024 | Stock: 24 unités"
+      },
+      "ai": {
+        "title": "Recommandations IA",
+        "reorderMilk": "Réapprovisionner les produits laitiers",
+        "reorderMilkDesc": "Basé sur les habitudes de consommation",
+        "promoteExpiring": "Promouvoir les articles expirants",
+        "promoteExpiringDesc": "23 articles expirent dans 2 jours"
+      }
+    },
+    "cta": {
+      "title": "Prêt à transformer votre inventaire ?",
+      "description": "Transformez votre gestion d'inventaire avec LIFO.AI et commencez à réduire les déchets dès aujourd'hui.",
+      "button": "Commencer l'essai gratuit"
+    }
+  },
+  "support": {
+    "mainPage": {
+      "title": "Centre d'aide",
+      "subtitle": "Trouvez des guides et articles pour tirer le meilleur parti de LIFO",
+      "sections": {
+        "gettingStarted": {
+          "title": "Commencer",
+          "description": "Tout ce que vous devez savoir pour commencer à utiliser LIFO efficacement"
+        },
+        "workflowsProcesses": {
+          "title": "Flux de travail et processus",
+          "description": "Guides étape par étape pour les flux de travail principaux de LIFO"
+        }
+      },
+      "articles": {
+        "quickStartGuide": {
+          "title": "Guide de démarrage rapide",
+          "description": "Soyez opérationnel avec LIFO en moins de 10 minutes",
+          "readTime": "5 min"
+        },
+        "inventoryManagement": {
+          "title": "Gestion des stocks",
+          "description": "Vues en temps réel, alertes et rapprochement",
+          "readTime": "5 min"
+        },
+        "scanInProcess": {
+          "title": "Processus de scan d'entrée",
+          "description": "Enregistrement des livraisons, retours et nouveaux stocks",
+          "readTime": "4 min"
+        },
+        "multiStoreManagement": {
+          "title": "Gestion multi-magasins",
+          "description": "Gestion de plusieurs emplacements et accès du personnel",
+          "readTime": "5 min",
+          "comingSoon": true
+        },
+        "userRolesPermissions": {
+          "title": "Rôles et permissions utilisateurs",
+          "description": "Comprendre les différents niveaux d'accès et capacités",
+          "readTime": "6 min",
+          "comingSoon": true
+        },
+        "scanOutProcess": {
+          "title": "Processus de scan de sortie",
+          "description": "Enregistrement des ventes, remises, dons et déchets",
+          "readTime": "8 min",
+          "comingSoon": true
+        }
+      },
+      "contactSupport": {
+        "title": "Besoin d'aide supplémentaire ?",
+        "description": "Vous ne trouvez pas ce que vous cherchez ? Notre équipe est là pour vous aider.",
+        "buttons": {
+          "contactSupport": "Contacter le support",
+          "emailUs": "Nous écrire"
+        }
+      },
+      "common": {
+        "comingSoon": "Bientôt disponible",
+        "readTime": "min de lecture"
+      }
+    },
+    "quickStartGuide": {
+      "title": "Guide de démarrage rapide",
+      "description": "Soyez opérationnel avec LIFO en quelques étapes simples",
+      "readTime": "5 min de lecture",
+      "intro": "Bienvenue sur LIFO ! Ce guide vous aidera à configurer votre système de gestion des stocks et à commencer avec vos premiers produits en quelques minutes.",
+      "steps": {
+        "initialSetup": {
+          "title": "Étape 1 : Configuration initiale",
+          "description": "Configurez vos paramètres de base et vos préférences :",
+          "items": [
+            "Complétez votre profil d'entreprise",
+            "Configurez votre premier point de vente",
+            "Paramétrez vos préférences de notification",
+            "Choisissez votre devise et vos unités"
+          ]
+        },
+        "teamSetup": {
+          "title": "Étape 2 : Configuration de l'équipe",
+          "description": "Ajoutez des membres à votre équipe et configurez leurs niveaux d'accès :",
+          "items": [
+            "Invitez les membres de l'équipe par email",
+            "Attribuez les rôles et permissions",
+            "Configurez les contrôles d'accès au magasin",
+            "Paramétrez les workflows d'approbation"
+          ]
+        },
+        "firstProducts": {
+          "title": "Étape 3 : Ajoutez vos premiers produits",
+          "description": "Commencez à construire votre catalogue de produits :",
+          "items": [
+            "Scannez ou ajoutez manuellement les informations produits",
+            "Configurez les catégories de produits",
+            "Définissez les prix et les coûts",
+            "Téléchargez les images des produits"
+          ]
+        }
+      },
+      "nextSteps": {
+        "title": "Prochaines étapes",
+        "items": [
+          {
+            "title": "Scannez votre premier lot",
+            "description": "Traitez votre première livraison avec le processus de scan d'entrée",
+            "linkText": "En savoir plus sur le scan d'entrée →"
+          },
+          {
+            "title": "Explorez les fonctionnalités",
+            "description": "Découvrez les outils avancés de gestion des stocks",
+            "linkText": "Voir le guide d'inventaire →"
+          }
+        ]
+      }
+    },
+    "inventoryManagement": {
+      "title": "Gestion des stocks",
+      "description": "Maîtrisez votre inventaire avec les outils complets de LIFO",
+      "readTime": "5 min de lecture",
+      "intro": "Une gestion efficace des stocks est cruciale pour le succès de votre entreprise. LIFO fournit des outils complets pour suivre, analyser et optimiser vos niveaux de stock.",
+      "features": {
+        "inventoryTracking": {
+          "title": "Suivi des stocks",
+          "description": "Suivez les niveaux de stock en temps réel avec des mises à jour automatiques des opérations d'entrée/sortie",
+          "items": [
+            {
+              "title": "Mises à jour en temps réel",
+              "description": "Ajustements automatiques de l'inventaire à chaque scan"
+            },
+            {
+              "title": "Support multi-sites",
+              "description": "Suivez les stocks dans différents entrepôts"
+            },
+            {
+              "title": "Suivi par lots",
+              "description": "Surveillez l'inventaire par lots de livraison"
+            },
+            {
+              "title": "Variantes de produits",
+              "description": "Suivi distinct pour les tailles, couleurs et configurations"
+            }
+          ]
+        },
+        "analyticsReporting": {
+          "title": "Analyses et rapports",
+          "description": "Obtenez des insights sur la performance de votre inventaire avec des analyses complètes",
+          "items": [
+            {
+              "title": "Taux de rotation",
+              "description": "Identifiez les produits à rotation rapide et lente"
+            },
+            {
+              "title": "Vieillissement des stocks",
+              "description": "Suivez la durée de stockage des produits"
+            },
+            {
+              "title": "Prévision de la demande",
+              "description": "Anticipez les besoins futurs en stock"
+            },
+            {
+              "title": "Analyse des coûts",
+              "description": "Surveillez les coûts de stockage et les frais"
+            }
+          ]
+        },
+        "stockAlerts": {
+          "title": "Alertes et notifications",
+          "description": "Restez informé des niveaux critiques de stock avec des alertes automatisées",
+          "items": [
+            {
+              "title": "Alertes de stock bas",
+              "description": "Notifications quand le stock passe sous le seuil"
+            },
+            {
+              "title": "Alertes de surstock",
+              "description": "Alertes en cas d'accumulation excessive"
+            },
+            {
+              "title": "Notifications d'expiration",
+              "description": "Suivez les produits approchant de leur date limite"
+            },
+            {
+              "title": "Seuils personnalisés",
+              "description": "Définissez des niveaux d'alerte spécifiques par produit"
+            }
+          ]
+        },
+        "lifoOptimization": {
+          "title": "Optimisation LIFO",
+          "description": "Utilisez la méthode Last-In-First-Out pour une gestion optimale des stocks",
+          "items": [
+            {
+              "title": "Tri LIFO automatique",
+              "description": "Le système priorise les stocks les plus récents"
+            },
+            {
+              "title": "Optimisation des coûts",
+              "description": "Maximisez la rentabilité avec une sélection intelligente"
+            },
+            {
+              "title": "Gestion de la fraîcheur",
+              "description": "Assurez-vous que les clients reçoivent les produits les plus frais"
+            },
+            {
+              "title": "Avantages fiscaux",
+              "description": "Optimisez les implications fiscales avec la comptabilité LIFO"
+            }
+          ]
+        }
+      }
+    },
+    "scanInProcess": {
+      "title": "Processus de scan d'entrée",
+      "description": "Maîtrisez le processus de scan pour ajouter des produits à votre inventaire",
+      "readTime": "4 min de lecture",
+      "intro": "Le processus de scan d'entrée est la base de la gestion des stocks dans LIFO. Utilisez ce processus lors de la réception des livraisons, des retours ou de l'ajout de nouveaux stocks.",
+      "basicSteps": {
+        "title": "Étapes de base du scan",
+        "steps": [
+          {
+            "number": 1,
+            "description": "Accédez à \"Scan d'entrée\" depuis le tableau de bord"
+          },
+          {
+            "number": 2,
+            "description": "Sélectionnez la livraison ou le lot à traiter"
+          },
+          {
+            "number": 3,
+            "description": "Scannez les codes-barres ou saisissez manuellement"
+          },
+          {
+            "number": 4,
+            "description": "Vérifiez les détails et quantités des produits"
+          },
+          {
+            "number": 5,
+            "description": "Confirmez et enregistrez le lot"
+          }
+        ]
+      },
+      "newProducts": {
+        "title": "Ajout de nouveaux produits",
+        "description": "Lors du scan de codes-barres inconnus, LIFO vous invite à créer un nouveau produit :",
+        "items": [
+          {
+            "problem": "Informations produit",
+            "solution": "Remplissez le nom et la description du produit"
+          },
+          {
+            "problem": "Catégories et attributs",
+            "solution": "Définissez la catégorie et les attributs personnalisés"
+          },
+          {
+            "problem": "Images produit",
+            "solution": "Ajoutez des images du produit si disponibles"
+          },
+          {
+            "problem": "Prix",
+            "solution": "Définissez les informations de prix"
+          }
+        ]
+      },
+      "imageRecognition": {
+        "title": "Reconnaissance d'image",
+        "description": "LIFO peut reconnaître les produits à partir d'images lorsque les codes-barres sont endommagés ou manquants. Prenez simplement une photo du produit et le système suggérera des correspondances."
+      },
+      "troubleshooting": {
+        "title": "Dépannage",
+        "items": [
+          {
+            "problem": "Le code-barre ne scanne pas",
+            "solution": "Nettoyez le code-barre, améliorez l'éclairage ou saisissez manuellement"
+          },
+          {
+            "problem": "Mauvais produit",
+            "solution": "Vérifiez s'il y a plusieurs codes-barres sur l'emballage"
+          },
+          {
+            "problem": "Différence de quantité",
+            "solution": "Vérifiez le comptage physique par rapport aux enregistrements"
+          },
+          {
+            "problem": "Produits en double",
+            "solution": "Utilisez la fonction de révision des lots pour identifier les doublons"
+          }
+        ]
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour vous aider",
+    "description": "Une question, une suggestion ou besoin d'assistance ? Notre équipe est prête à vous accompagner.",
+    "form": {
+      "title": "Envoyez-nous un message",
+      "description": "Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les plus brefs délais.",
+      "name": "Nom",
+      "namePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Sujet de votre message",
+      "message": "Message",
+      "messagePlaceholder": "Votre message...",
+      "submit": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "success": "Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.",
+      "error": "Une erreur est survenue lors de l'envoi du message"
+    },
+    "api": {
+      "allFieldsRequired": "Tous les champs sont requis",
+      "emailSendingFailed": "Échec de l'envoi de l'email",
+      "internalServerError": "Erreur interne du serveur"
+    },
+    "features": {
+      "support": {
+        "title": "Support réactif",
+        "description": "Notre équipe répond généralement sous 24h ouvrées à toutes vos demandes."
+      },
+      "expertise": {
+        "title": "Expertise dédiée",
+        "description": "Des experts spécialisés dans la gestion d'inventaire pour répondre à vos questions."
+      },
+      "followup": {
+        "title": "Suivi personnalisé",
+        "description": "Chaque demande est traitée individuellement avec un suivi personnalisé."
+      }
+    }
+  },
+  "footer": {
+    "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
+    "quickLinks": "Liens Rapides",
+    "links": {
+      "aboutUs": "À Propos",
+      "products": "Produits",
+      "pricing": "Tarifs",
+      "blog": "Blog"
+    },
+    "contactUs": "Contactez-Nous",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. Tous droits réservés.",
+    "legal": {
+      "privacyPolicy": "Politique de Confidentialité",
+      "termsOfService": "Conditions d'Utilisation"
+    }
+  }
+}

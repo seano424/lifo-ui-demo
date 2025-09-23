@@ -1,6 +1,6 @@
 'use client'
 
-import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import {
@@ -47,100 +47,81 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
   const t = useTranslations('marketing.nav')
 
   const defaultMenu = [
+    // {
+    //   title: t('product'),
+    //   url: '#',
+    //   items: [
+    //     {
+    //       title: t('blog'),
+    //       description: t('blogDesc'),
+    //       icon: <Book className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //     {
+    //       title: t('company'),
+    //       description: t('companyDesc'),
+    //       icon: <Trees className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //     {
+    //       title: t('careers'),
+    //       description: t('careersDesc'),
+    //       icon: <Sunset className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //     {
+    //       title: t('support'),
+    //       description: t('supportDesc'),
+    //       icon: <Zap className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: t('resources'),
+    //   url: '#',
+    //   items: [
+    //     {
+    //       title: t('contactUs'),
+    //       description: t('contactUsDesc'),
+    //       icon: <Sunset className="size-5 shrink-0" />,
+    //       url: '/contact',
+    //     },
+    //     {
+    //       title: t('helpCenter'),
+    //       description: t('helpCenterDesc'),
+    //       icon: <Zap className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //     {
+    //       title: t('status'),
+    //       description: t('statusDesc'),
+    //       icon: <Trees className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //     {
+    //       title: t('terms'),
+    //       description: t('termsDesc'),
+    //       icon: <Book className="size-5 shrink-0" />,
+    //       url: '#',
+    //     },
+    //   ],
+    // },
     {
-      title: t('product'),
-      url: '#',
-      items: [
-        {
-          title: t('blog'),
-          description: t('blogDesc'),
-          icon: <Book className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('company'),
-          description: t('companyDesc'),
-          icon: <Trees className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('careers'),
-          description: t('careersDesc'),
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('support'),
-          description: t('supportDesc'),
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: t('builtFor'),
-      url: '#',
-      items: [
-        {
-          title: t('contactUs'),
-          description: t('contactUsDesc'),
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: '/contact',
-        },
-        {
-          title: t('helpCenter'),
-          description: t('helpCenterDesc'),
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('status'),
-          description: t('statusDesc'),
-          icon: <Trees className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('terms'),
-          description: t('termsDesc'),
-          icon: <Book className="size-5 shrink-0" />,
-          url: '#',
-        },
-      ],
-    },
-
-    {
-      title: t('resources'),
-      url: '#',
-      items: [
-        {
-          title: t('contactUs'),
-          description: t('contactUsDesc'),
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: '/contact',
-        },
-        {
-          title: t('helpCenter'),
-          description: t('helpCenterDesc'),
-          icon: <Zap className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('status'),
-          description: t('statusDesc'),
-          icon: <Trees className="size-5 shrink-0" />,
-          url: '#',
-        },
-        {
-          title: t('terms'),
-          description: t('termsDesc'),
-          icon: <Book className="size-5 shrink-0" />,
-          url: '#',
-        },
-      ],
+      title: t('features'),
+      url: '/features',
     },
     {
       title: t('pricing'),
-      url: '#',
+      url: '/pricing',
+    },
+    {
+      title: t('support'),
+      url: '/support',
+    },
+    {
+      title: t('contactUs'),
+      url: '/contact',
     },
   ]
 
@@ -149,7 +130,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
     <section>
       <nav className="hidden justify-between lg:flex container mx-auto">
         <div className="flex items-center gap-8">
-          <NavbarLogo variant="text" />
+          <NavbarLogo variant="text" href="/" />
 
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
@@ -165,7 +146,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       {/* Mobile */}
       <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
-          <NavbarLogo variant="text" />
+          <NavbarLogo variant="text" href="/" />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -221,7 +202,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-white rounded-2xl tracking-wide font-medium font-heading text-sm"
+        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-white rounded-2xl tracking-wide font-medium font-heading text-base"
       >
         {item.title}
       </NavigationMenuLink>

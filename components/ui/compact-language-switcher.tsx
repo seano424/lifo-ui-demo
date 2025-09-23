@@ -26,8 +26,8 @@ export function CompactLanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="px-2" disabled={isLoading}>
-          <Globe className="h-4 w-4 text-muted-foreground" />
+        <Button variant="ghost" size="icon" disabled={isLoading}>
+          <Globe className="!h-5 !w-5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

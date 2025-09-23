@@ -9,8 +9,8 @@ import {
   ScanSearch,
   SettingsIcon,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
@@ -61,7 +61,7 @@ function useNavigationData() {
             },
             {
               title: t('todos'),
-              url: '/dashboard/todos',
+              url: '/dashboard/todos?sort=urgency&direction=desc&urgency=critical%2Chigh', // this is to get the todos sorted by urgency by default -> high and critical
               icon: ListTodo,
               badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
             },
@@ -113,15 +113,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="bg-secondary-100/10 dark:bg-brand-dark border-l-none"
       {...props}
     >
-      <SidebarHeader className="flex flex-col gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
+      <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
         <Link
           href="/"
           className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
           <NavbarLogo variant="icon" size="sm" className="dark:hidden" />
           <NavbarLogo variant="icon-dark" size="sm" className="dark:block hidden" />
-          <Typography variant="h2" className="lowercase font-black">
-            LIFO
+          <Typography variant="h2" className="font-black">
+            Lifo
           </Typography>
         </Link>
         <NavbarLogo

@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { getRequestConfig } from 'next-intl/server'
+import { loadMessages } from './lib/load-messages'
 
 async function detectLanguageFromHeaders(): Promise<string> {
   try {
@@ -68,6 +69,20 @@ export default getRequestConfig(async () => {
       if (['en', 'fr', 'nl'].includes(userLang)) {
         locale = userLang
       }
+    } else {
+      // 4. For non-authenticated users, try to read from the language preference cookie
+      const langCookie = cookieStore.get('lifo-language-preference')
+      if (langCookie?.value) {
+        try {
+          const parsed = JSON.parse(langCookie.value)
+          const storedLang = parsed.state?.currentLanguage
+          if (storedLang && ['en', 'fr', 'nl'].includes(storedLang)) {
+            locale = storedLang
+          }
+        } catch {
+          // Invalid cookie data, continue with header detection
+        }
+      }
     }
   } catch (error) {
     // Fallback to detected/default locale if Supabase fails
@@ -78,7 +93,7 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: (await import(`./messages/${locale}.json`)).default,
+    messages: await loadMessages(locale),
     timeZone: 'Europe/Paris',
     onError(_error) {
       if (process.env.NODE_ENV === 'development') {

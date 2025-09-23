@@ -1,15 +1,15 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
 import { BatchStatusSummary } from '@/components/dashboard/batch-status-summary'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
-// import { UrgentAlerts } from '@/components/dashboard/urgent-alerts'
 import { ExpiredItemsSummary } from '@/components/dashboard/expired-items-summary'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
 import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
+
 import { useBatches } from '@/hooks/use-batches'
+import { useTranslations } from 'next-intl'
 
 export default function Page() {
   const t = useTranslations('dashboardNav.pages')
@@ -22,7 +22,6 @@ export default function Page() {
 
       {hasBatches && <BatchStatusSummary />}
       {hasBatches && <ExpiredItemsSummary />}
-      {/* {hasBatches && <UrgentAlerts />} */}
 
       {hasBatches && (
         <div className="border p-5 rounded-2xl">

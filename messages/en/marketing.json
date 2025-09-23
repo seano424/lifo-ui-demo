@@ -1,0 +1,761 @@
+{
+  "marketing": {
+    "nav": {
+      "about": "About",
+      "features": "Features",
+      "resources": "Resources",
+      "product": "Product",
+      "pricing": "Pricing",
+      "builtFor": "Built for",
+      "helpCenter": "Help Center",
+      "helpCenterDesc": "Get all the answers you need right here",
+      "contactUs": "Contact Us",
+      "contactUsDesc": "We are here to help you with any questions you have",
+      "status": "Status",
+      "statusDesc": "Check the current status of our services and APIs",
+      "terms": "Terms of Service",
+      "termsDesc": "Our terms and conditions for using our services",
+      "blog": "Blog",
+      "blogDesc": "The latest industry news, updates, and info",
+      "company": "Company",
+      "companyDesc": "Our mission is to innovate and empower the world",
+      "careers": "Careers",
+      "careersDesc": "Browse job listing and discover our workspace",
+      "support": "Support",
+      "supportDesc": "Get in touch with our support team or visit our community forums"
+    },
+    "auth": {
+      "login": "Login",
+      "signup": "Business Signup",
+      "logout": "Logout",
+      "goToDashboard": "Dashboard",
+      "signUpForm": {
+        "title": "Sign up",
+        "description": "Create a new account",
+        "email": "Email",
+        "emailPlaceholder": "m@example.com",
+        "password": "Password",
+        "repeatPassword": "Repeat Password",
+        "creatingAccount": "Creating an account...",
+        "signUpButton": "Sign up",
+        "alreadyHaveAccount": "Already have an account?",
+        "loginLink": "Login"
+      },
+      "forgotPassword": {
+        "title": "Reset Your Password",
+        "description": "Type in your email and we'll send you a link to reset your password",
+        "email": "Email",
+        "emailPlaceholder": "m@example.com",
+        "sending": "Sending...",
+        "sendResetEmail": "Send reset email",
+        "alreadyHaveAccount": "Already have an account?",
+        "loginLink": "Login",
+        "checkEmailTitle": "Check Your Email",
+        "checkEmailDescription": "Password reset instructions sent",
+        "emailInstructions": "If you registered using your email and password, you will receive a password reset email.",
+        "backToLogin": "Back to login"
+      },
+      "updatePassword": {
+        "title": "Reset Your Password",
+        "description": "Please enter your new password below.",
+        "newPassword": "New password",
+        "newPasswordPlaceholder": "New password (min 6 characters)",
+        "saving": "Saving...",
+        "savePassword": "Save new password"
+      },
+      "errors": {
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsNoMatch": "Passwords do not match",
+        "genericError": "An error occurred"
+      }
+    },
+    "onboarding": {
+      "stepLabels": {
+        "storeLookup": "Store Lookup",
+        "addStoreDetails": "Add Store Details",
+        "reviewVerify": "Review & Verify",
+        "createAccount": "Create Account"
+      },
+      "storeSearch": {
+        "placeholder": "Enter your store name or address..."
+      },
+      "confirmDetails": {
+        "title": "Review Your Store Details",
+        "subtitle": "We'll verify this business isn't already registered before creating your account",
+        "fields": {
+          "type": "Type",
+          "address": "Address",
+          "phone": "Phone",
+          "country": "Country",
+          "businessName": "Business Name"
+        },
+        "values": {
+          "notSpecified": "Not specified",
+          "notProvided": "Not provided"
+        },
+        "businessCheck": {
+          "verifyPrompt": "Before creating your account, we need to verify this business isn't already registered.",
+          "verifyButton": "Verify Business",
+          "checking": "Checking...",
+          "alreadyRegistered": "This business is already registered.",
+          "alreadyRegisteredDesc": "The store you selected already has an account. Log in or contact us for help.",
+          "existingStore": "Existing Store:",
+          "contactSupport": "Contact Support",
+          "tryDifferentStore": "Try Different Store",
+          "businessVerified": "Business verified!",
+          "businessVerifiedDesc": "This store is not yet registered. You can proceed with creating your account."
+        },
+        "errors": {
+          "noStoreInfo": "No store information found. Please go back and complete the previous steps.",
+          "startOver": "Start Over"
+        }
+      },
+      "storeType": {
+        "storeNamePlaceholder": "Your Store Name",
+        "selectStoreType": "Select store type",
+        "businessNamePlaceholder": "If different from store name",
+        "addressPlaceholder": "123 Rue de la Paix",
+        "cityPlaceholder": "Paris",
+        "postalCodePlaceholder": "75001",
+        "countryPlaceholder": "France",
+        "phonePlaceholder": "01 23 45 67 89"
+      },
+      "signupForm": {
+        "businessRegistered": "Business Already Registered",
+        "businessRegisteredDesc": "This business is already in our system. Please contact support or try a different store.",
+        "backButton": "Back",
+        "tryDifferentStore": "Try Different Store",
+        "signInRequired": "Sign in required:",
+        "testModeWarning": "Test mode requires you to be signed in first. Switch to MOCK mode if you want to test without authentication.",
+        "createAccount": "Create Your Account",
+        "createAccountDesc": "Almost done! Create your account to access your {storeName} dashboard.",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Your full name",
+        "email": "Email",
+        "emailPlaceholder": "manager@yourstore.com",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "creatingAccount": "Creating Account",
+        "createAccountButton": "Create Account",
+        "noChanges": "No real changes will be made",
+        "realChanges": "Real database changes with your account"
+      },
+      "errors": {
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsNoMatch": "Passwords do not match",
+        "storeInfoMissing": "Store information is missing. Please go back and complete store setup.",
+        "businessAlreadyRegistered": "This business is already registered. Please contact support.",
+        "testModeSignInRequired": "Test mode requires you to be signed in first.",
+        "signupError": "An error occurred during signup",
+        "noStoreInfo": "No store information found. Please go back and complete the previous steps.",
+        "startOver": "Start Over"
+      },
+      "form": {
+        "passwordRequirement": "Must be at least 6 characters",
+        "testingButton": "Testing",
+        "termsAndPrivacy": "By creating an account, you agree to our Terms of Service and Privacy Policy. You'll receive a confirmation email to verify your account.",
+        "testModePrefix": "🧪 {mode} mode: "
+      }
+    }
+  },
+  "landingpage": {
+    "hero": {
+      "title": "The Future of Inventory Management is Here.",
+      "subtitle": "The smart solution to reduce waste and increase your profits",
+      "buttons": {
+        "freeTrial": "Start my free trial",
+        "explore": "Explore the platform"
+      },
+      "badge": {
+        "text": "Enjoy a 14-day free trial"
+      }
+    },
+    "features": {
+      "title": "Revolutionize Your Stock Control",
+      "expiryTracking": {
+        "title": "Real-time Expiry Tracking",
+        "description": "Never miss an expiration date with automated monitoring of your entire inventory."
+      },
+      "predictiveAlerts": {
+        "title": "Predictive Alerts",
+        "description": "Drastically reduce waste with AI-powered notifications before products expire."
+      },
+      "timeSaving": {
+        "title": "Time Saving",
+        "description": "Huge reduction in time spent on manual receipt management and daily inventories."
+      },
+      "errorFree": {
+        "title": "Error-Free Operations",
+        "description": "Elimination of human errors and administrative paperwork."
+      },
+      "discoverButton": "Discover LIFO",
+      "noCommitment": "No commitment!"
+    },
+    "businessStats": {
+      "title": "Maximize Your Profits, Minimize Your Losses",
+      "subtitle": "See the real impact LIFO.AI has on businesses like yours",
+      "disclaimer": "Results may vary. Based on average customer data over 12 months.",
+      "revenue": {
+        "label": "Revenue Increase",
+        "description": "Average increase in business revenue",
+        "subtext": "Automatic discount suggestions to help move products quickly before they expire."
+      },
+      "lossReduction": {
+        "label": "Loss Reduction",
+        "description": "Easily reduce waste and save money",
+        "subtext": "Fewer expired products while doing less inventory management work."
+      },
+      "taxCredits": {
+        "label": "Tax Credits",
+        "description": "From the first month on donations",
+        "subtext": "Increase your tax-deductible donations by connecting with a non-profit organization."
+      }
+    },
+    "cta": {
+      "title": "Switch to LIFO today",
+      "features": {
+        "quickSetup": {
+          "title": "Quick Setup",
+          "description": "Ready-to-use solution in minutes. No complex configuration required."
+        },
+        "freeTrial": {
+          "title": "30-day Free Trial",
+          "description": "Test all features with no commitment. Easy cancellation at any time."
+        },
+        "support": {
+          "title": "Dedicated Support",
+          "description": "Our team of experts guides you through every step of your journey."
+        },
+        "immediateResults": {
+          "title": "Immediate Results",
+          "description": "Reduce waste and increase profits from the first week of use."
+        }
+      },
+      "card": {
+        "title": "Ready to transform your inventory management?",
+        "description": "Join LIFO to optimize your inventory and maximize profits.",
+        "benefits": {
+          "noCommitment": "No commitment",
+          "instantSetup": "Instant setup",
+          "support": "24/7 Support"
+        },
+        "button": "Join the waitlist",
+        "noCreditCard": "No credit card required"
+      }
+    }
+  },
+  "featurespage": {
+    "title": "Powerful Features",
+    "subtitle": "Everything you need to manage your inventory efficiently with AI-powered insights and real-time tracking.",
+    "features": {
+      "dashboard": {
+        "title": "Real-time Dashboard",
+        "description": "Get instant insights into your inventory with our comprehensive dashboard. Track stock levels, monitor expiration dates, and identify trends at a glance. Make informed decisions with real-time data visualization and automated alerts."
+      },
+      "scanning": {
+        "title": "Smart Scanning",
+        "description": "Effortlessly manage your inventory with our advanced scanning technology. Simply scan products to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
+      },
+      "analytics": {
+        "title": "Performance Analytics",
+        "description": "Understand your business performance with detailed analytics and reporting. Track waste reduction, revenue growth, and operational efficiency. Get actionable insights to optimize your inventory management strategy."
+      },
+      "ai": {
+        "title": "AI-Powered Insights",
+        "description": "Leverage artificial intelligence to optimize your inventory management. Get smart recommendations for reordering, promotional strategies, and waste reduction. Our AI learns from your patterns to provide personalized suggestions."
+      }
+    },
+    "additionalFeatures": {
+      "title": "Everything You Need",
+      "expiry": {
+        "title": "Expiry Tracking",
+        "description": "Never miss expiration dates with automated alerts and LIFO management."
+      },
+      "security": {
+        "title": "Data Security",
+        "description": "Enterprise-grade security to protect your business data and customer information."
+      },
+      "performance": {
+        "title": "Fast Performance",
+        "description": "Lightning-fast processing and real-time updates for seamless operations."
+      },
+      "tracking": {
+        "title": "Accurate Tracking",
+        "description": "Precise inventory tracking with barcode scanning and automated updates."
+      },
+      "timeSaving": {
+        "title": "Time Savings",
+        "description": "Automate routine tasks and save hours of manual inventory management."
+      },
+      "collaboration": {
+        "title": "Team Collaboration",
+        "description": "Multi-user support with role-based permissions and team management."
+      }
+    },
+    "mockData": {
+      "dashboard": {
+        "inventoryOverview": "Inventory Overview",
+        "items": "Items",
+        "fromLastMonth": "from last month",
+        "expiringSoon": "Expiring Soon",
+        "lowStock": "Low Stock",
+        "totalProducts": "Total Products",
+        "expiringItems": "Expiring Items",
+        "wasteReduced": "Waste Reduced",
+        "revenueIncrease": "Revenue Increase",
+        "performanceAnalytics": "Performance Analytics"
+      },
+      "scanning": {
+        "scanningActive": "Scanning Active",
+        "productScanned": "Product Scanned",
+        "organicMilk": "Organic Milk - 1L",
+        "expDate": "Exp: 2024-01-15 | Stock: 24 units"
+      },
+      "ai": {
+        "title": "AI Recommendations",
+        "reorderMilk": "Reorder milk products",
+        "reorderMilkDesc": "Based on consumption patterns",
+        "promoteExpiring": "Promote expiring items",
+        "promoteExpiringDesc": "23 items expire in 2 days"
+      }
+    },
+    "cta": {
+      "title": "Ready to Transform Your Inventory?",
+      "description": "Transform your inventory management with LIFO.AI and start reducing waste today.",
+      "button": "Start Free Trial"
+    }
+  },
+  "pricingpage": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start with our free trial and scale as you grow. No lock-in, full support included.",
+    "badges": {
+      "mostPopular": "Most Popular",
+      "comingSoon": "Coming Soon"
+    },
+    "common": {
+      "getStarted": "Get Started",
+      "comingSoon": "Coming Soon",
+      "winWinFees": "Win-Win Fees:",
+      "note": "Note:",
+      "pricingNote": "Pricing is subject to change. All fees are to be confirmed."
+    },
+    "plans": {
+      "freeTrial": {
+        "title": "Free Trial",
+        "subtitle": "Pilot shops",
+        "price": "Free",
+        "period": "3 months",
+        "description": "All features, with no limitation, for a 3-month free trial.",
+        "features": {
+          "0": "3 days of Onboarding and Training",
+          "1": "Full support included",
+          "2": "No lock-in - exit anytime",
+          "3": "All features unlocked"
+        },
+        "sellingPoint": "Perfect for testing our solution risk-free"
+      },
+      "light": {
+        "title": "Light",
+        "subtitle": "Small shops, 1 seat only",
+        "price": "9€",
+        "period": "/month",
+        "description": "For small shops starting their inventory management journey.",
+        "features": {
+          "0": "Maximum 3 months of data in Dashboard",
+          "1": "1 user seat included",
+          "2": "Core inventory features",
+          "3": "Email support"
+        },
+        "fees": [
+          { "type": "Margin of products sold", "percentage": "30%" },
+          { "type": "Tax credit", "percentage": "20%" }
+        ],
+        "sellingPoint": "Get started on managing your inventory"
+      },
+      "pro": {
+        "title": "Pro",
+        "subtitle": "Bigger shops, 2+ FTE",
+        "price": "39€",
+        "period": "/month",
+        "description": "For growing businesses that need team collaboration and advanced features.",
+        "features": {
+          "0": "Unlimited data retention",
+          "1": "2+ user seats",
+          "2": "Role management",
+          "3": "Priority support",
+          "4": "Advanced analytics"
+        },
+        "fees": [
+          { "type": "Margin of products sold", "percentage": "30%" },
+          { "type": "Tax credit", "percentage": "20%" }
+        ],
+        "sellingPoint": "Manage roles in your shop effectively"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "subtitle": "For chains",
+        "price": "Custom",
+        "description": "Tailored solution for multi-location businesses with advanced needs.",
+        "features": {
+          "0": "Multiple POS management",
+          "1": "Advanced analytics",
+          "2": "Custom integrations",
+          "3": "Dedicated support",
+          "4": "Custom pricing per POS"
+        },
+        "fees": [
+          { "type": "Margin of products sold", "percentage": "Custom%" },
+          { "type": "Tax credit", "percentage": "Custom%" }
+        ],
+        "sellingPoint": "Manage multiple POS and get advanced analytics"
+      }
+    }
+  },
+  "support": {
+    "mainPage": {
+      "title": "Support Center",
+      "subtitle": "Find guides and articles to help you get the most out of LIFO",
+      "sections": {
+        "gettingStarted": {
+          "title": "Getting Started",
+          "description": "Everything you need to know to start using LIFO effectively"
+        },
+        "workflowsProcesses": {
+          "title": "Workflows & Processes",
+          "description": "Step-by-step guides for core LIFO workflows"
+        }
+      },
+      "articles": {
+        "quickStartGuide": {
+          "title": "Quick Start Guide",
+          "description": "Get up and running with LIFO in under 10 minutes",
+          "readTime": "5 min"
+        },
+        "inventoryManagement": {
+          "title": "Inventory Management",
+          "description": "Real-time views, alerts, and reconciliation",
+          "readTime": "5 min"
+        },
+        "scanInProcess": {
+          "title": "Scan-In Process",
+          "description": "Recording deliveries, returns, and new inventory",
+          "readTime": "4 min"
+        },
+        "multiStoreManagement": {
+          "title": "Multi-Store Management",
+          "description": "Managing multiple locations and staff access",
+          "readTime": "5 min",
+          "comingSoon": true
+        },
+        "userRolesPermissions": {
+          "title": "User Roles & Permissions",
+          "description": "Understanding different access levels and capabilities",
+          "readTime": "6 min",
+          "comingSoon": true
+        },
+        "scanOutProcess": {
+          "title": "Scan-Out Process",
+          "description": "Recording sales, discounts, donations, and waste",
+          "readTime": "8 min",
+          "comingSoon": true
+        }
+      },
+      "contactSupport": {
+        "title": "Need More Help?",
+        "description": "Can't find what you're looking for? Our team is here to help.",
+        "buttons": {
+          "contactSupport": "Contact Support",
+          "emailUs": "Email Us"
+        }
+      },
+      "common": {
+        "comingSoon": "Coming Soon",
+        "readTime": "min read"
+      }
+    },
+    "quickStartGuide": {
+      "title": "Quick Start Guide",
+      "description": "Get up and running with LIFO in just a few simple steps",
+      "readTime": "5 min read",
+      "intro": "Welcome to LIFO! This guide will help you set up your inventory management system and get started with your first products in minutes.",
+      "steps": {
+        "initialSetup": {
+          "title": "Step 1: Initial Setup",
+          "description": "Configure your basic account settings and preferences:",
+          "items": [
+            "Complete your business profile",
+            "Set up your first store location",
+            "Configure notification preferences",
+            "Choose your currency and units"
+          ]
+        },
+        "teamSetup": {
+          "title": "Step 2: Team Setup",
+          "description": "Add team members and configure their access levels:",
+          "items": [
+            "Invite team members via email",
+            "Assign roles and permissions",
+            "Set up store access controls",
+            "Configure approval workflows"
+          ]
+        },
+        "firstProducts": {
+          "title": "Step 3: Add Your First Products",
+          "description": "Start building your product catalog:",
+          "items": [
+            "Scan or manually add product information",
+            "Set up product categories",
+            "Configure pricing and cost data",
+            "Upload product images"
+          ]
+        }
+      },
+      "nextSteps": {
+        "title": "Next Steps",
+        "items": [
+          {
+            "title": "Scan Your First Batch",
+            "description": "Process your first delivery using the scan-in workflow",
+            "linkText": "Learn about scan-in →"
+          },
+          {
+            "title": "Explore Features",
+            "description": "Discover advanced inventory management tools",
+            "linkText": "View inventory guide →"
+          }
+        ]
+      }
+    },
+    "inventoryManagement": {
+      "title": "Inventory Management",
+      "description": "Master your inventory with LIFO's comprehensive management tools",
+      "readTime": "5 min read",
+      "intro": "Effective inventory management is crucial for business success. LIFO provides comprehensive tools to track, analyze, and optimize your inventory levels.",
+      "features": {
+        "inventoryTracking": {
+          "title": "Inventory Tracking",
+          "description": "Track inventory levels in real-time with automated updates from scan-in/out operations",
+          "items": [
+            {
+              "title": "Real-time Updates",
+              "description": "Automatic inventory adjustments with every scan"
+            },
+            {
+              "title": "Multi-location Support",
+              "description": "Track inventory across different warehouses"
+            },
+            {
+              "title": "Batch Tracking",
+              "description": "Monitor inventory by delivery batches"
+            },
+            {
+              "title": "Product Variants",
+              "description": "Separate tracking for sizes, colors, and configurations"
+            }
+          ]
+        },
+        "analyticsReporting": {
+          "title": "Analytics & Reporting",
+          "description": "Gain insights into your inventory performance with comprehensive analytics",
+          "items": [
+            {
+              "title": "Turnover Rates",
+              "description": "Identify fast and slow-moving products"
+            },
+            {
+              "title": "Stock Aging",
+              "description": "Track how long inventory stays in warehouse"
+            },
+            {
+              "title": "Demand Forecasting",
+              "description": "Predict future inventory needs"
+            },
+            {
+              "title": "Cost Analysis",
+              "description": "Monitor carrying costs and storage fees"
+            }
+          ]
+        },
+        "stockAlerts": {
+          "title": "Stock Alerts & Notifications",
+          "description": "Stay informed about critical inventory levels with automated alerts",
+          "items": [
+            {
+              "title": "Low Stock Alerts",
+              "description": "Notifications when inventory drops below threshold"
+            },
+            {
+              "title": "Overstock Warnings",
+              "description": "Alerts for excess inventory accumulation"
+            },
+            {
+              "title": "Expiry Notifications",
+              "description": "Track products approaching expiration dates"
+            },
+            {
+              "title": "Custom Thresholds",
+              "description": "Set specific alert levels for different products"
+            }
+          ]
+        },
+        "lifoOptimization": {
+          "title": "LIFO Optimization",
+          "description": "Leverage Last-In-First-Out methodology for optimal inventory management",
+          "items": [
+            {
+              "title": "Automatic LIFO Sorting",
+              "description": "System prioritizes newest inventory for fulfillment"
+            },
+            {
+              "title": "Cost Optimization",
+              "description": "Maximize profitability with intelligent inventory selection"
+            },
+            {
+              "title": "Freshness Management",
+              "description": "Ensure customers receive the freshest products"
+            },
+            {
+              "title": "Tax Benefits",
+              "description": "Optimize tax implications with LIFO accounting"
+            }
+          ]
+        }
+      }
+    },
+    "scanInProcess": {
+      "title": "Scan-In Process",
+      "description": "Master the scan-in workflow for adding products to your inventory",
+      "readTime": "4 min read",
+      "intro": "The scan-in process is the foundation of inventory management in LIFO. Use this process when receiving deliveries, returns, or adding new inventory.",
+      "basicSteps": {
+        "title": "Basic Scan-In Steps",
+        "steps": [
+          {
+            "number": 1,
+            "description": "Navigate to \"Scan In\" from the main dashboard"
+          },
+          {
+            "number": 2,
+            "description": "Select the delivery or batch you're processing"
+          },
+          {
+            "number": 3,
+            "description": "Scan product barcodes or enter manually"
+          },
+          {
+            "number": 4,
+            "description": "Verify product details and quantities"
+          },
+          {
+            "number": 5,
+            "description": "Confirm and save the batch"
+          }
+        ]
+      },
+      "newProducts": {
+        "title": "Adding New Products",
+        "description": "When scanning unknown barcodes, LIFO will prompt you to create a new product:",
+        "items": [
+          {
+            "problem": "Product Information",
+            "solution": "Fill in product name and description"
+          },
+          {
+            "problem": "Categories & Attributes",
+            "solution": "Set category and any custom attributes"
+          },
+          {
+            "problem": "Product Images",
+            "solution": "Add product images if available"
+          },
+          {
+            "problem": "Pricing",
+            "solution": "Set pricing information"
+          }
+        ]
+      },
+      "imageRecognition": {
+        "title": "Image Recognition",
+        "description": "LIFO can recognize products from images when barcodes are damaged or missing. Simply take a photo of the product and the system will suggest matches."
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "items": [
+          {
+            "problem": "Barcode Won't Scan",
+            "solution": "Clean the barcode, improve lighting, or enter manually"
+          },
+          {
+            "problem": "Wrong Product",
+            "solution": "Check if there are multiple barcodes on the packaging"
+          },
+          {
+            "problem": "Quantity Mismatch",
+            "solution": "Double-check physical count against system records"
+          },
+          {
+            "problem": "Duplicate Products",
+            "solution": "Use the batch review feature to identify duplicates"
+          }
+        ]
+      }
+    }
+  },
+  "contactpage": {
+    "title": "Contact Us",
+    "subtitle": "We are here to help",
+    "description": "Have a question, suggestion, or need assistance? Our team is ready to assist you.",
+    "form": {
+      "title": "Send us a message",
+      "description": "Fill out the form below and our team will get back to you as soon as possible.",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Subject of your message",
+      "message": "Message",
+      "messagePlaceholder": "Your message...",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "success": "Your message has been sent successfully. We will get back to you as soon as possible.",
+      "error": "An error occurred while sending the message"
+    },
+    "api": {
+      "allFieldsRequired": "All fields are required",
+      "emailSendingFailed": "Failed to send email",
+      "internalServerError": "Internal server error"
+    },
+    "features": {
+      "support": {
+        "title": "Responsive Support",
+        "description": "Our team typically responds within 24 business hours to all your inquiries."
+      },
+      "expertise": {
+        "title": "Dedicated Expertise",
+        "description": "Specialists in inventory management to answer your questions."
+      },
+      "followup": {
+        "title": "Personalized Follow-up",
+        "description": "Each request is handled individually with personalized follow-up."
+      }
+    }
+  },
+  "footer": {
+    "description": "Helping businesses optimize inventory management with intelligent solutions to reduce waste and maximize profits.",
+    "quickLinks": "Quick Links",
+    "links": {
+      "aboutUs": "About Us",
+      "products": "Products",
+      "pricing": "Pricing",
+      "blog": "Blog"
+    },
+    "contactUs": "Contact Us",
+    "email": "contact@lifo-app.com",
+    "copyright": "© {year} LIFO.AI. All rights reserved.",
+    "legal": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    }
+  }
+}

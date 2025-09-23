@@ -127,34 +127,35 @@ export async function fetchSalesKPITrends(
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
     .from('batch_actions')
-    .select('recovered_value, action_date')
+    .select('total_recovered_value, performed_at')
     .eq('store_id', storeId)
-    .eq('actual_action', 'discount')
-    .gte('action_date', timeRange.start.toISOString())
-    .lte('action_date', timeRange.end.toISOString())
+    .eq('action_type', 'discount')
+    .gte('performed_at', timeRange.start.toISOString())
+    .lte('performed_at', timeRange.end.toISOString())
 
   if (currentError) throw currentError
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
     .from('batch_actions')
-    .select('recovered_value')
+    .select('total_recovered_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'discount')
-    .gte('action_date', timeRange.compareStart.toISOString())
-    .lte('action_date', timeRange.compareEnd.toISOString())
+    .eq('action_type', 'discount')
+    .gte('performed_at', timeRange.compareStart.toISOString())
+    .lte('performed_at', timeRange.compareEnd.toISOString())
 
   if (previousError) throw previousError
 
-  const current = currentData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
+  const current =
+    currentData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
   const previous =
-    previousData?.reduce((sum, action) => sum + (action.recovered_value || 0), 0) ?? 0
+    previousData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
 
   const dailySales =
     currentData?.reduce(
       (acc, action) => {
-        const date = new Date(action.action_date).toDateString()
-        const value = action.recovered_value || 0
+        const date = new Date(action.performed_at).toDateString()
+        const value = action.total_recovered_value || 0
         acc[date] = (acc[date] || 0) + value
         return acc
       },
@@ -204,27 +205,29 @@ export async function fetchDonationKPITrends(
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
     .from('batch_actions')
-    .select('original_value, donation_recipient_id, action_date')
+    .select('total_original_value, donation_recipient_id, performed_at')
     .eq('store_id', storeId)
-    .eq('actual_action', 'donate')
-    .gte('action_date', timeRange.start.toISOString())
-    .lte('action_date', timeRange.end.toISOString())
+    .eq('action_type', 'donate')
+    .gte('performed_at', timeRange.start.toISOString())
+    .lte('performed_at', timeRange.end.toISOString())
 
   if (currentError) throw currentError
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
     .from('batch_actions')
-    .select('original_value, donation_recipient_id')
+    .select('total_original_value, donation_recipient_id')
     .eq('store_id', storeId)
-    .eq('actual_action', 'donate')
-    .gte('action_date', timeRange.compareStart.toISOString())
-    .lte('action_date', timeRange.compareEnd.toISOString())
+    .eq('action_type', 'donate')
+    .gte('performed_at', timeRange.compareStart.toISOString())
+    .lte('performed_at', timeRange.compareEnd.toISOString())
 
   if (previousError) throw previousError
 
-  const current = currentData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
-  const previous = previousData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
+  const current =
+    currentData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
+  const previous =
+    previousData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
   const uniqueRecipients = new Set(
     currentData?.filter(a => a.donation_recipient_id).map(a => a.donation_recipient_id),
@@ -233,8 +236,8 @@ export async function fetchDonationKPITrends(
   const dailyDonations =
     currentData?.reduce(
       (acc, action) => {
-        const date = new Date(action.action_date).toDateString()
-        const value = action.original_value || 0
+        const date = new Date(action.performed_at).toDateString()
+        const value = action.total_original_value || 0
         acc[date] = (acc[date] || 0) + value
         return acc
       },
@@ -271,33 +274,35 @@ export async function fetchWasteKPITrends(
   const { data: currentData, error: currentError } = await supabase
     .schema('inventory')
     .from('batch_actions')
-    .select('original_value, action_date')
+    .select('total_original_value, performed_at')
     .eq('store_id', storeId)
-    .eq('actual_action', 'dispose')
-    .gte('action_date', timeRange.start.toISOString())
-    .lte('action_date', timeRange.end.toISOString())
+    .eq('action_type', 'dispose')
+    .gte('performed_at', timeRange.start.toISOString())
+    .lte('performed_at', timeRange.end.toISOString())
 
   if (currentError) throw currentError
 
   const { data: previousData, error: previousError } = await supabase
     .schema('inventory')
     .from('batch_actions')
-    .select('original_value')
+    .select('total_original_value')
     .eq('store_id', storeId)
-    .eq('actual_action', 'dispose')
-    .gte('action_date', timeRange.compareStart.toISOString())
-    .lte('action_date', timeRange.compareEnd.toISOString())
+    .eq('action_type', 'dispose')
+    .gte('performed_at', timeRange.compareStart.toISOString())
+    .lte('performed_at', timeRange.compareEnd.toISOString())
 
   if (previousError) throw previousError
 
-  const current = currentData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
-  const previous = previousData?.reduce((sum, action) => sum + (action.original_value || 0), 0) ?? 0
+  const current =
+    currentData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
+  const previous =
+    previousData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
   const dailyWaste =
     currentData?.reduce(
       (acc, action) => {
-        const date = new Date(action.action_date).toDateString()
-        const value = action.original_value || 0
+        const date = new Date(action.performed_at).toDateString()
+        const value = action.total_original_value || 0
         acc[date] = (acc[date] || 0) + value
         return acc
       },

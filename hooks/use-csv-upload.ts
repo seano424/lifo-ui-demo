@@ -57,7 +57,6 @@ export function useCSVUpload() {
     const lines = text.trim().split('\n')
 
     if (lines.length < 2) {
-      console.warn('⚠️ [USE-CSV-UPLOAD] CSV file has no data rows')
       return []
     }
 
@@ -122,14 +121,6 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      console.log('🚀 [CSV-UPLOAD] Starting upload process...')
-      console.log('📁 [CSV-UPLOAD] File details:', {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        storeId,
-      })
-
       // Get the Supabase session token for authentication
       const supabase = createClient()
       const {
@@ -138,11 +129,8 @@ export function useCSVUpload() {
       } = await supabase.auth.getSession()
 
       if (sessionError || !session?.access_token) {
-        console.error('❌ [CSV-UPLOAD] Authentication failed:', sessionError)
         throw new Error('Authentication required. Please sign in again.')
       }
-
-      console.log('✅ [CSV-UPLOAD] Authentication successful, user ID:', session.user?.id)
 
       const formData = new FormData()
 
@@ -150,9 +138,6 @@ export function useCSVUpload() {
       // Always use file upload for Python API
       formData.append('file', file)
       formData.append('store_id', storeId)
-
-      console.log('📤 [CSV-UPLOAD] Sending request to Python API...')
-      console.log('🔗 [CSV-UPLOAD] Endpoint: http://localhost:8000/api/v1/csv-upload/upload')
 
       // Use the Python FastAPI upload route for data processing (read-only)
       const response = await fetch('http://localhost:8000/api/v1/csv-upload/upload', {
@@ -164,32 +149,17 @@ export function useCSVUpload() {
       })
 
       if (!response.ok) {
-        console.error('❌ [CSV-UPLOAD] Python API failed with status:', response.status)
         const error = await response.json()
-        console.error('❌ [CSV-UPLOAD] Python API error details:', error)
         throw new Error(error.error || `Upload failed: ${response.statusText}`)
       }
 
-      console.log('✅ [CSV-UPLOAD] Python API response received successfully')
       const result = await response.json()
 
-      console.log('📊 [CSV-UPLOAD] Python API result:', {
-        success: result.success,
-        processed: result.processed,
-        total_items: result.total_items,
-        processing_time_ms: result.processing_time_ms,
-        hasInternalData: !!result._internal,
-        message: result.message,
-      })
-
       // Phase 2: Save processed data to database
-      console.log('💾 [CSV-UPLOAD] Starting database persistence...')
 
       if (result.success && result._internal?.data) {
         try {
           // Use Next.js API route to save batches (handles Supabase operations)
-          console.log('📡 [CSV-UPLOAD] Calling Next.js API to save batches...')
-          console.log('📦 [CSV-UPLOAD] Data to save:', result._internal.data.length, 'items')
 
           const saveResponse = await fetch('/api/inventory/save-csv-batches', {
             method: 'POST',
@@ -205,21 +175,16 @@ export function useCSVUpload() {
 
           if (saveResponse.ok) {
             const saveResult = await saveResponse.json()
-            console.log('✅ [CSV-UPLOAD] Database save successful:', saveResult)
 
             // Update result with actual database metrics
             result.processed = saveResult.saved_count || result.processed
             result.message = `Successfully imported ${saveResult.saved_count || result.processed} items to inventory`
           } else {
-            console.warn('⚠️ [CSV-UPLOAD] Database save failed, but CSV processing succeeded')
             // Don't throw error - CSV processing succeeded, just database save failed
           }
-        } catch (saveError) {
-          console.warn('⚠️ [CSV-UPLOAD] Database save error:', saveError)
+        } catch (_saveError) {
           // Don't throw error - CSV processing succeeded
         }
-      } else {
-        console.log('⚠️ [CSV-UPLOAD] No valid data to save to database')
       }
 
       return result
@@ -263,14 +228,6 @@ export function useCSVUpload() {
       })
     },
     onError: (error: Error) => {
-      console.error('💥 [USE-CSV-UPLOAD] Upload ERROR callback triggered')
-      console.error('❌ [USE-CSV-UPLOAD] Error details:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-      })
-
       toast.error(`Upload failed: ${error.message}`, {
         description: 'Please check your CSV format and try again',
         duration: TOAST_DURATIONS.ERROR,

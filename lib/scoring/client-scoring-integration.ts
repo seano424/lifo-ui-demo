@@ -69,12 +69,7 @@ export async function scoreAfterScanInClient(
 
     // Call FastAPI scoring endpoint
     const fastApiBaseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-    console.log(
-      '[CLIENT-SCORING] Attempting to score batch for store:',
-      storeId,
-      'using FastAPI:',
-      fastApiBaseUrl,
-    )
+
     const endpoint = `${fastApiBaseUrl}/api/v1/scoring/batch/${storeId}`
 
     const controller = new AbortController()

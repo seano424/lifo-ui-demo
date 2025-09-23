@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
-import './globals.css'
 import { getMessages } from 'next-intl/server'
+import { ThemeProvider } from 'next-themes'
+import { Toaster } from 'sonner'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
+import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -59,8 +60,8 @@ export default async function RootLayout({
       <body className={`font-sans antialiased ${devMode && 'debug-screens'}`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light" // Use light theme as default until we add dark themes across
+          enableSystem={false}
           disableTransitionOnChange
         >
           <ReactQueryProvider>
@@ -68,6 +69,21 @@ export default async function RootLayout({
               <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
+          <Toaster
+            position="top-right"
+            richColors
+            theme="light"
+            className="toaster"
+            toastOptions={{
+              className: 'toast',
+              duration: 4000,
+              style: {
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
+                border: '1px solid hsl(var(--border))',
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

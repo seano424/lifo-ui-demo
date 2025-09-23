@@ -1,0 +1,299 @@
+{
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your preferences and account settings",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the interface",
+      "preferred": "Preferred Language"
+    },
+    "tabs": {
+      "store": "Store",
+      "notifications": "Notifications",
+      "account": "Account",
+      "team": "Team",
+      "billing": "Billing",
+      "security": "Security",
+      "storeDescription": "Manage your store settings.",
+      "notificationsDescription": "Manage your notification settings."
+    },
+    "errors": {
+      "loadingFailed": "Failed to load settings. Please try refreshing the page."
+    },
+    "notifications": {
+      "comingSoonTitle": "Coming Soon: Notifications",
+      "comingSoonDescription": "We're working on adding notifications to your dashboard.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "billing": {
+      "comingSoonTitle": "Coming Soon: Billing",
+      "comingSoonDescription": "Billing and subscription management features are on the way.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "security": {
+      "comingSoonTitle": "Coming Soon: Security",
+      "comingSoonDescription": "Advanced security settings and API key management coming soon.",
+      "checkBackSoon": "Please check back soon."
+    },
+    "storeInformation": {
+      "title": "Store Information",
+      "description": "Manage your store's basic information and settings",
+      "editStore": "Edit Store",
+      "permissionError": "You don't have permission to view store settings.",
+      "sections": {
+        "storeDetails": "Store Details",
+        "addressInformation": "Address Information",
+        "contactInformation": "Contact Information",
+        "storeDescription": "Store Description",
+        "businessSettings": "Business Settings"
+      },
+      "fields": {
+        "storeName": "Store Name",
+        "businessName": "Business Name",
+        "storeCode": "Store Code",
+        "storeType": "Store Type",
+        "sizeCategory": "Size Category",
+        "address": "Street Address",
+        "city": "City",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "phone": "Phone Number",
+        "email": "Email Address",
+        "website": "Website URL",
+        "description": "Description",
+        "defaultMarkup": "Default Markup (%)",
+        "wasteReductionTarget": "Waste Reduction Target (%)"
+      },
+      "placeholders": {
+        "storeName": "Enter store name",
+        "businessName": "Enter business name",
+        "storeCode": "Enter store code",
+        "address": "Enter street address",
+        "city": "Enter city",
+        "postalCode": "Enter postal code",
+        "phone": "Enter phone number",
+        "email": "Enter email address",
+        "website": "https://example.com",
+        "description": "Describe your store..."
+      },
+      "selectPlaceholders": {
+        "storeType": "Select store type",
+        "sizeCategory": "Select size category",
+        "country": "Select country"
+      },
+      "storeTypes": {
+        "supermarket": "Supermarket",
+        "convenience": "Convenience Store",
+        "restaurant": "Restaurant",
+        "bakery": "Bakery",
+        "butcher": "Butcher Shop",
+        "organic": "Organic Store"
+      },
+      "sizeCategories": {
+        "small": "Small (< 500 sqm)",
+        "medium": "Medium (500-1500 sqm)",
+        "large": "Large (1500-5000 sqm)",
+        "hypermarket": "Hypermarket (> 5000 sqm)"
+      },
+      "countries": {
+        "France": "France",
+        "Netherlands": "Netherlands",
+        "Belgium": "Belgium",
+        "Germany": "Germany",
+        "Spain": "Spain",
+        "Italy": "Italy"
+      },
+      "actions": {
+        "saveChanges": "Save Changes",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "unsavedChanges": "You have unsaved changes"
+      },
+      "messages": {
+        "notSet": "Not set",
+        "noDescription": "No description provided"
+      },
+      "validation": {
+        "storeNameRequired": "Store name is required",
+        "storeNameTooLong": "Store name too long",
+        "businessNameTooLong": "Business name too long",
+        "storeCodeRequired": "Store code is required",
+        "storeCodeTooLong": "Store code too long",
+        "addressTooLong": "Address too long",
+        "cityTooLong": "City name too long",
+        "postalCodeTooLong": "Postal code too long",
+        "countryTooLong": "Country name too long",
+        "phoneTooLong": "Phone number too long",
+        "invalidEmail": "Invalid email format",
+        "invalidWebsite": "Invalid website URL",
+        "descriptionTooLong": "Description too long"
+      },
+      "addStore": "Add Store"
+    },
+    "addStoreSearch": {
+      "title": "Add Your Store",
+      "subtitle": "Search for your business or add it manually",
+      "placeholder": "Enter your store name or address...",
+      "searchingText": "Searching for stores...",
+      "noResultsFound": "No stores found matching \"{query}\"",
+      "tryDifferentTerm": "Try a different search term or add your store manually",
+      "addManuallyButton": "Add store details manually",
+      "helpText": "Can't find your store? You can add all details manually in the next step.",
+      "searchError": "Something went wrong while searching. Please try again."
+    }
+  },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Add Store Details",
+        "complete": "Complete Store Information"
+      },
+      "subtitle": {
+        "manual": "Enter your store information",
+        "complete": "Select your store type and verify details"
+      },
+      "labels": {
+        "storeName": "Store Name",
+        "businessName": "Business Name (Optional)",
+        "address": "Address",
+        "city": "City",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "phone": "Phone Number (Optional)",
+        "storeType": "Store Type"
+      },
+      "placeholders": {
+        "storeName": "Your Store Name",
+        "businessName": "If different from store name",
+        "address": "123 Rue de la Paix",
+        "city": "Paris",
+        "postalCode": "75001",
+        "country": "France",
+        "phone": "01 23 45 67 89",
+        "selectStoreType": "Select store type"
+      },
+      "buttons": {
+        "back": "Back",
+        "creating": "Creating Store...",
+        "create": "Create Store"
+      }
+    }
+  },
+  "onboarding": {
+    "stepLabels": {
+      "storeLookup": "Store Lookup",
+      "addStoreDetails": "Add Store Details",
+      "reviewVerify": "Review & Verify",
+      "createAccount": "Create Account"
+    },
+    "storeSearch": {
+      "title": "Find Your Store",
+      "subtitle": "Search for your business or add it manually",
+      "placeholder": "Enter your store name or address...",
+      "searchingText": "Searching for stores...",
+      "noResultsFound": "No stores found matching \"{query}\"",
+      "tryDifferentTerm": "Try a different search term or add your store manually",
+      "addManuallyButton": "Add store details manually",
+      "helpText": "Can't find your store? You can add all details manually in the next step.",
+      "searchError": "Something went wrong while searching. Please try again."
+    },
+    "storeType": {
+      "addStoreDetailsTitle": "Add Store Details",
+      "completeStoreInformationTitle": "Complete Store Information",
+      "storeInformationCardTitle": "Store Information",
+      "storeNameLabel": "Store Name",
+      "storeTypeLabel": "Store Type",
+      "businessNameLabel": "Business Name",
+      "addressLabel": "Address",
+      "cityLabel": "City",
+      "postalCodeLabel": "Postal Code",
+      "countryLabel": "Country",
+      "phoneLabel": "Phone Number",
+      "continueButton": "Continue",
+      "storeNamePlaceholder": "Your Store Name",
+      "selectStoreType": "Select store type",
+      "businessNamePlaceholder": "If different from store name",
+      "addressPlaceholder": "123 Main Street",
+      "cityPlaceholder": "Paris",
+      "postalCodePlaceholder": "75001",
+      "countryPlaceholder": "France",
+      "phonePlaceholder": "01 23 45 67 89"
+    }
+  },
+  "account": {
+    "title": "Account Information",
+    "description": "Manage your account settings and preferences.",
+    "profile": {
+      "title": "Profile Information",
+      "fullName": "Full Name",
+      "username": "Username",
+      "email": "Email Address",
+      "fullNamePlaceholder": "Enter your full name",
+      "emailPlaceholder": "Enter your email address",
+      "noName": "No name",
+      "noUsername": "No username",
+      "noEmail": "No email",
+      "emailNotice": "Email cannot be changed. Contact support if needed.",
+      "edit": "Edit",
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "saveChanges": "Save Changes",
+      "validation": {
+        "nameRequired": "Full name is required",
+        "nameTooLong": "Full name must be less than 100 characters",
+        "usernameRequired": "Username must be at least 2 characters",
+        "usernameTooLong": "Username must be less than 50 characters",
+        "usernameInvalid": "Username can only contain letters, numbers, and underscores"
+      },
+      "placeholders": {
+        "fullName": "Enter your full name",
+        "email": "Enter your email address",
+        "username": "Enter your username"
+      }
+    },
+    "phone": {
+      "title": "Phone Number",
+      "label": "Phone Number",
+      "placeholder": "+33 1 23 45 67 89",
+      "description": "Enter your phone number with country code (optional)",
+      "noPhone": "No phone number set",
+      "addNotice": "Add a phone number for account security and notifications",
+      "invalidPhone": "Please enter a valid phone number",
+      "verified": "Verified",
+      "edit": "Edit",
+      "save": "Save Phone",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "language": {
+      "currentLanguage": "Current Language",
+      "title": "Language Preference",
+      "description": "Choose your preferred language for the interface"
+    },
+    "status": {
+      "title": "Account Status",
+      "accountStatus": "Status:",
+      "emailVerified": "Email Verified:",
+      "phoneVerified": "Phone Verified:",
+      "active": "Active",
+      "inactive": "Inactive",
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
+    "errors": {
+      "updateProfile": "Failed to update profile",
+      "updatePhone": "Failed to update phone number"
+    },
+    "activity": {
+      "title": "Account Activity",
+      "memberSince": "Member since {date}",
+      "lastLogin": "Last login: {date}",
+      "neverLoggedIn": "Never logged in",
+      "failedAttempts": "{count} failed PIN attempt{plural}"
+    },
+    "security": {
+      "notice": "This is your personal account. You can change your password in the login page."
+    }
+  }
+}

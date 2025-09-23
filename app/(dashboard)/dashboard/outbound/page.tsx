@@ -19,15 +19,15 @@ export default function OutboundPage() {
         <ScanOutInterface onItemRemoved={handleItemRemoved} />
 
         {removedItems.length > 0 && (
-          <div className="mt-8 space-y-2">
+          <div className="mt-8 flex flex-col gap-8">
             <Typography variant="h3" className="text-center font-black text-primary-900">
               {t('recentlyRemoved', { count: removedItems.length })}
             </Typography>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {removedItems.slice(0, 5).map((item, index) => (
                 <div
                   key={`${item.id}-${index}-${item.expiryDate}`}
-                  className="py-4 px-8 bg-primary-900 text-white rounded-2xl border border-primary-200 w-max mx-auto"
+                  className="py-4 px-8 bg-primary-900 text-white rounded-2xl border border-primary-200 w-max mx-auto flex flex-col gap-2"
                 >
                   <Typography variant="p" className="font-bold text-white">
                     {item.productName}
@@ -40,12 +40,12 @@ export default function OutboundPage() {
                   </Typography>
                 </div>
               ))}
-              {removedItems.length > 5 && (
-                <Typography variant="p">
-                  {t('andMoreItems', { count: removedItems.length - 5 })}
-                </Typography>
-              )}
             </div>
+            {removedItems.length > 5 && (
+              <Typography variant="p">
+                {t('andMoreItems', { count: removedItems.length - 5 })}
+              </Typography>
+            )}
           </div>
         )}
       </div>

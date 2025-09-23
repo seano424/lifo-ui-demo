@@ -3,116 +3,114 @@
 import { Mail, MessageSquare, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { ContactForm } from '@/components/contact-form'
-import { MarketingFooter } from '@/components/marketing/marketing-footer'
-import { RevealAnimation } from '@/components/ui/reveal-animation'
 import { Typography } from '@/components/ui/typography'
 
 export default function Contact() {
   const t = useTranslations('contactpage')
 
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-24 items-center">
-        <div className="flex-1 flex flex-col gap-8 max-w-6xl p-5 w-full">
-          <RevealAnimation direction="none">
-            <section
-              aria-labelledby="contact-heading"
-              className="flex flex-col gap-4 items-center py-4 px-4"
-            >
-              <div className="text-center max-w-4xl mx-auto">
-                <header className="text-6xl md:text-5xl font-bold mb-6 leading-tight">
-                  <div className="flex items-center justify-center gap-4 mb-2">
-                    <Typography
-                      as="h1"
-                      className="text-5xl md:text-7xl bg-clip-text text-transparent py-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-                    >
-                      {t('title')}
-                    </Typography>
-                  </div>
-                  <Typography as="h2" className="text-3xl md:text-5xl text-foreground/80">
-                    {t('subtitle')}
-                  </Typography>
-                </header>
-                <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                  {t('description')}
-                </p>
-              </div>
-            </section>
-          </RevealAnimation>
-
-          <RevealAnimation delay={0.2} direction="right">
-            <section className="w-full px-4 my-4 relative overflow-hidden">
-              <div className="max-w-7xl mx-auto relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-                  {/* Left column - Contact Form */}
-                  <div className="flex flex-col rounded-2xl bg-white border border-blue-100 shadow-xl p-8 space-y-6">
-                    <div>
-                      <Typography variant="h3" className="text-2xl font-bold text-blue-800 mb-4">
-                        {t('form.title')}
-                      </Typography>
-                      <Typography variant="p" className="text-blue-700/80">
-                        {t('form.description')}
-                      </Typography>
-                    </div>
-
-                    <ContactForm />
-                  </div>
-
-                  {/* Right column - Features */}
-                  <div className="space-y-8">
-                    <div className="space-y-6">
-                      <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
-                          <MessageSquare size={22} strokeWidth={1.5} />
-                        </div>
-                        <div>
-                          <Typography variant="h4" className="font-bold text-blue-800 mb-1">
-                            {t('features.support.title')}
-                          </Typography>
-                          <Typography variant="p" className="text-blue-700/80">
-                            {t('features.support.description')}
-                          </Typography>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
-                          <Users size={22} strokeWidth={1.5} />
-                        </div>
-                        <div>
-                          <Typography variant="h4" className="font-bold text-blue-800 mb-1">
-                            {t('features.expertise.title')}
-                          </Typography>
-                          <Typography variant="p" className="text-blue-700/80">
-                            {t('features.expertise.description')}
-                          </Typography>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-4 items-start">
-                        <div className="text-blue-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
-                          <Mail size={22} strokeWidth={1.5} />
-                        </div>
-                        <div>
-                          <Typography variant="h4" className="font-bold text-blue-800 mb-1">
-                            {t('features.followup.title')}
-                          </Typography>
-                          <Typography variant="p" className="text-blue-700/80">
-                            {t('features.followup.description')}
-                          </Typography>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </RevealAnimation>
+    <main className="min-h-screen py-20 px-4 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="flex flex-col items-center justify-center mb-16">
+          <Typography
+            as="h1"
+            className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
+          >
+            {t('title')}
+          </Typography>
+          <Typography
+            variant="p"
+            className="text-center text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed"
+          >
+            {t('description')}
+          </Typography>
         </div>
 
-        <RevealAnimation delay={0.4} direction="up">
-          <MarketingFooter />
-        </RevealAnimation>
+        {/* Contact Form and Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start max-w-6xl mx-auto">
+          {/* Left column - Contact Form */}
+          <div className="flex flex-col rounded-3xl bg-gradient-to-br from-white/80 to-white/60 border border-white/20 shadow-lg p-6 lg:p-8 space-y-6">
+            <div className="flex flex-col gap-1">
+              <Typography
+                variant="h3"
+                className="text-xl lg:text-2xl font-bold text-foreground mb-4"
+              >
+                {t('form.title')}
+              </Typography>
+              <Typography variant="p" className="text-sm lg:text-base text-foreground/70">
+                {t('form.description')}
+              </Typography>
+            </div>
+
+            <ContactForm />
+          </div>
+
+          {/* Right column - Features */}
+          <div className="space-y-6 lg:space-y-8 h-full flex flex-col justify-center py-4 lg:py-0">
+            <div className="space-y-4 lg:space-y-6">
+              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
+                  <MessageSquare size={20} strokeWidth={1.5} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Typography
+                    variant="h3"
+                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                  >
+                    {t('features.support.title')}
+                  </Typography>
+                  <Typography
+                    variant="p"
+                    className="text-xs lg:text-sm text-foreground/70 leading-relaxed"
+                  >
+                    {t('features.support.description')}
+                  </Typography>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
+                  <Users size={20} strokeWidth={1.5} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Typography
+                    variant="h3"
+                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                  >
+                    {t('features.expertise.title')}
+                  </Typography>
+                  <Typography
+                    variant="p"
+                    className="text-xs lg:text-sm text-foreground/70 leading-relaxed"
+                  >
+                    {t('features.expertise.description')}
+                  </Typography>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
+                  <Mail size={20} strokeWidth={1.5} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Typography
+                    variant="h3"
+                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                  >
+                    {t('features.followup.title')}
+                  </Typography>
+                  <Typography
+                    variant="p"
+                    className="text-xs lg:text-sm text-foreground/70 leading-relaxed"
+                  >
+                    {t('features.followup.description')}
+                  </Typography>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   )

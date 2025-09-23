@@ -323,7 +323,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot="sidebar-header"
       data-sidebar="header"
       className={cn(
-        'flex flex-col gap-6 px-2',
+        'gap-6 px-2',
         'group-data-[state=collapsed]:py-0 group-data-[state=collapsed]:gap-0',
         className,
       )}

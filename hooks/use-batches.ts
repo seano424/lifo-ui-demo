@@ -6,24 +6,6 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-type SupabaseError = Error & {
-  status?: number
-  code?: string
-}
-
-function isInfiniteData(
-  data: unknown,
-): data is InfiniteData<{ data: Batch[]; nextPage?: number; count?: number }, number> {
-  return (
-    data !== null &&
-    typeof data === 'object' &&
-    'pages' in data &&
-    Array.isArray((data as Record<string, unknown>).pages)
-  )
-}
-
-import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
 import {
   type Batch,
   type BatchFilters,
@@ -43,6 +25,8 @@ import {
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { Database } from '@/types/supabase'
+import { useCallback, useState } from 'react'
+import { toast } from 'sonner'
 
 export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
@@ -611,4 +595,20 @@ export function useBatchesByStatus(
   status: 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved',
 ) {
   return useBatches({ status })
+}
+
+type SupabaseError = Error & {
+  status?: number
+  code?: string
+}
+
+function isInfiniteData(
+  data: unknown,
+): data is InfiniteData<{ data: Batch[]; nextPage?: number; count?: number }, number> {
+  return (
+    data !== null &&
+    typeof data === 'object' &&
+    'pages' in data &&
+    Array.isArray((data as Record<string, unknown>).pages)
+  )
 }

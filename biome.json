@@ -1,0 +1,136 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto",
+    "bracketSameLine": false,
+    "bracketSpacing": true,
+    "useEditorconfig": true,
+    "includes": [
+      "**/*.{js,jsx,ts,tsx,json}",
+      "!node_modules/**",
+      "!.next/**",
+      "!out/**",
+      "!build/**",
+      "!dist/**",
+      "!next-env.d.ts",
+      "!types/supabase.ts",
+      "!*.env*",
+      "!*.log*",
+      "!**/*.css"
+    ]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": true,
+        "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "noSvgWithoutTitle": "off",
+        "useButtonType": "warn",
+        "useKeyWithClickEvents": "off",
+        "useValidAnchor": "warn",
+        "useFocusableInteractive": "off",
+        "useSemanticElements": "off"
+      },
+      "complexity": {
+        "recommended": true
+      },
+      "correctness": {
+        "recommended": true,
+        "useUniqueElementIds": "off",
+        "noUnusedFunctionParameters": "warn",
+        "noUnusedVariables": "warn",
+        "noNestedComponentDefinitions": "warn",
+        "noInvalidUseBeforeDeclaration": "off",
+        "useExhaustiveDependencies": "warn"
+      },
+      "nursery": {
+        "recommended": true
+      },
+      "performance": {
+        "recommended": true
+      },
+      "security": {
+        "recommended": true
+      },
+      "style": {
+        "recommended": true,
+        "useConst": "error",
+        "useTemplate": "error",
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "recommended": true,
+        "noImplicitAnyLet": "warn",
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn",
+        "useIterableCallbackReturn": "off",
+        "noSelfCompare": "warn",
+        "noDocumentCookie": "off",
+        "noRedeclare": "warn"
+      }
+    },
+    "includes": [
+      "**/*.{js,jsx,ts,tsx}",
+      "!node_modules/**",
+      "!.next/**",
+      "!out/**",
+      "!build/**",
+      "!dist/**",
+      "!next-env.d.ts",
+      "!types/supabase.ts"
+    ]
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto",
+      "bracketSpacing": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "trailingCommas": "none"
+    }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  }
+}

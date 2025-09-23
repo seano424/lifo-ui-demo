@@ -1,11 +1,12 @@
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
-import { redirect } from 'next/navigation'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
+import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { redirect } from 'next/navigation'
 
 interface TodosPageProps {
   searchParams: Promise<{
@@ -13,6 +14,9 @@ interface TodosPageProps {
     urgency?: string
     sort?: string
     direction?: string
+    actionType?: string
+    batchStatus?: string
+    productName?: string
   }>
 }
 
@@ -61,14 +65,19 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
           description="Manage actionable inventory items and track your progress"
         />
 
-        <TodosFilteredList
-          initialFilters={{
-            tab: params.tab,
-            urgency: params.urgency,
-            sort: params.sort,
-            direction: params.direction,
-          }}
-        />
+        <ErrorBoundary>
+          <TodosFilteredList
+            initialFilters={{
+              tab: params.tab,
+              urgency: params.urgency?.split(','),
+              actionType: params.actionType?.split(','),
+              batchStatus: params.batchStatus?.split(','),
+              productName: params.productName,
+              sort: params.sort,
+              direction: params.direction,
+            }}
+          />
+        </ErrorBoundary>
       </div>
     </HydrationBoundary>
   )
