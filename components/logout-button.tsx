@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
+import { setUserInitiatedLogout } from '@/hooks/use-auth-state-monitor'
 
 interface LogoutButtonProps {
   className?: string
@@ -31,13 +32,16 @@ export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps)
   const queryClient = useQueryClient()
 
   const logout = async () => {
+    // Mark this as a user-initiated logout to prevent showing security warning
+    setUserInitiatedLogout(true)
+
     const supabase = createClient()
     await supabase.auth.signOut()
 
     // Clear all cached query data to prevent data leakage between users
     queryClient.clear()
 
-    router.push('/dashboard')
+    router.push('/')
   }
 
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from 'sonner'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
@@ -68,6 +69,21 @@ export default async function RootLayout({
               <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
+          <Toaster
+            position="top-right"
+            richColors
+            theme="light"
+            className="toaster"
+            toastOptions={{
+              className: 'toast',
+              duration: 4000,
+              style: {
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
+                border: '1px solid hsl(var(--border))',
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>
