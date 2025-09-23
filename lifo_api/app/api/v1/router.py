@@ -17,6 +17,7 @@ from app.api.v1 import (
     health,
     image_recognition,
     mobile_endpoints,
+    multi_store_analytics,
     mvp_analytics,
     product_scanning,
     scan_workflows,
@@ -131,6 +132,14 @@ router.include_router(
     security.router,
     prefix="/security",
     tags=["Security Monitoring"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Multi-store analytics for Phase 3 MVP (5-10 stores)
+router.include_router(
+    multi_store_analytics.router,
+    prefix="/multi-store",
+    tags=["Multi-Store Analytics"],
     responses={404: {"description": "Not found"}},
 )
 

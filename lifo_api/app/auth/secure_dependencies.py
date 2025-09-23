@@ -381,30 +381,146 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
     Raises:
         AuthorizationException: If user doesn't have access
     """
-    # For now, implement basic validation
-    # In production, this would check database for user-store relationships
+    from app.auth.monitoring import record_suspicious_activity
+    from app.database.supabase_service import SupabaseService
+    
+    # Validate store ID format first (prevent injection)
+    try:
+        validated_store_id = validate_store_id_format(store_id)
+    except HTTPException as e:
+        logger.warning("Invalid store ID format in access check", store_id=store_id)
+        raise AuthorizationException("Invalid store ID format") from e
 
-    # Service role has access to all stores
+    # Service role has access to all stores (admin access)
     if current_user.get("role") == "service_role":
+        logger.info(
+            "Service role accessing store",
+            store_id=validated_store_id,
+            user_role="service_role"
+        )
         return True
 
-    # For regular users, we would check store_users table
-    # This is a placeholder that should be implemented with actual database checks
-
+    # Extract and validate user ID from token
     user_id = current_user.get("sub")
     if not user_id:
-        logger.warning("User ID not found in token")
-        raise AuthorizationException("Invalid user token")
+        logger.error("User ID not found in authentication token")
+        raise AuthorizationException("Invalid authentication token")
 
-    # TODO: Implement actual store access validation with database
-    # For now, allow access (this should be fixed in production)
-    logger.warning(
-        "Store access validation not fully implemented",
-        store_id=store_id,
-        user_id=user_id,
-    )
-
-    return True
+    # Initialize Supabase service for database queries
+    supabase_service = SupabaseService()
+    
+    try:
+        # Use service role client for authorization checks (bypass RLS)
+        admin_client = supabase_service.get_admin_client()
+        
+        # Check 1: Is user the owner of the store?
+        store_response = (
+            admin_client.schema("business")
+            .table("stores")
+            .select("owner_id, is_active, store_name")
+            .eq("store_id", validated_store_id)
+            .single()
+            .execute()
+        )
+        
+        if not store_response.data:
+            # Store doesn't exist - deny access without revealing this
+            logger.warning(
+                "Access attempt to non-existent store",
+                store_id=validated_store_id,
+                user_id=user_id
+            )
+            record_suspicious_activity(
+                activity_type="non_existent_store_access",
+                details={"store_id": validated_store_id},
+                user_id=user_id
+            )
+            raise AuthorizationException("Access denied")
+        
+        store_data = store_response.data
+        
+        # Check if store is active
+        if not store_data.get("is_active", False):
+            logger.warning(
+                "Access attempt to inactive store",
+                store_id=validated_store_id,
+                user_id=user_id,
+                store_name=store_data.get("store_name")
+            )
+            raise AuthorizationException("Store is not active")
+        
+        # Check if user is the owner
+        if str(store_data.get("owner_id")) == str(user_id):
+            logger.info(
+                "Store owner accessing their store",
+                store_id=validated_store_id,
+                user_id=user_id,
+                store_name=store_data.get("store_name")
+            )
+            return True
+        
+        # Check 2: Is user a member of the store with active access?
+        member_response = (
+            admin_client.schema("business")
+            .table("store_users")
+            .select("user_id, role_in_store, is_active, permissions")
+            .eq("store_id", validated_store_id)
+            .eq("user_id", user_id)
+            .eq("is_active", True)
+            .single()
+            .execute()
+        )
+        
+        if member_response.data:
+            member_data = member_response.data
+            logger.info(
+                "Store member accessing store",
+                store_id=validated_store_id,
+                user_id=user_id,
+                role_in_store=member_data.get("role_in_store"),
+                store_name=store_data.get("store_name")
+            )
+            return True
+        
+        # User has no access to this store
+        logger.warning(
+            "Unauthorized store access attempt",
+            store_id=validated_store_id,
+            user_id=user_id,
+            store_name=store_data.get("store_name")
+        )
+        
+        # Record this as a security event
+        record_suspicious_activity(
+            activity_type="unauthorized_store_access",
+            details={
+                "store_id": validated_store_id,
+                "store_name": store_data.get("store_name")
+            },
+            user_id=user_id
+        )
+        
+        raise AuthorizationException(
+            "You do not have permission to access this store"
+        )
+        
+    except AuthorizationException:
+        # Re-raise authorization exceptions
+        raise
+    except Exception as e:
+        # Log database errors but don't expose details
+        logger.error(
+            "Database error during store access validation",
+            store_id=validated_store_id,
+            user_id=user_id,
+            error=str(e)
+        )
+        
+        # Fail safe - deny access on any error
+        # This follows the principle of least privilege
+        raise AuthorizationException(
+            "Unable to verify store access permissions"
+        ) from e
 
 
 def validate_api_key(api_key: str) -> bool:

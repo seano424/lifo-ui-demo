@@ -242,7 +242,7 @@ class StoreSettings(Base):
         get_json_type(), default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
     )
     donation_preference_config = Column(
-        get_json_type(), 
+        get_json_type(),
         default={
             "strategy": "balanced",
             "donation_first_threshold": 0.6,

@@ -229,20 +229,4 @@ async def get_donation_analytics_summary(
         ) from e
 
 
-# Legacy endpoint stubs for backwards compatibility
-@router.get("/compliance/alerts")
-async def get_compliance_alerts():
-    """Legacy endpoint - returns empty for simplified system"""
-    return {
-        "alerts": [],
-        "message": "Compliance alerts not implemented in simplified system",
-    }
-
-
-@router.get("/analytics/kpi")
-async def get_donation_kpis():
-    """Legacy endpoint - returns basic metrics"""
-    return {
-        "message": "KPI tracking simplified - use /analytics/summary instead",
-        "redirect": "/api/v1/donation-queries/analytics/summary",
-    }
+# Legacy endpoints removed - functionality consolidated into /analytics/summary

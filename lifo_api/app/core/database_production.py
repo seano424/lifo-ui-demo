@@ -3,8 +3,7 @@ Production database configuration for LIFO AI Engine
 Optimized for Digital Ocean App Platform deployment
 """
 
-import os
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import structlog
 from sqlalchemy import pool
@@ -25,30 +24,30 @@ class Base(DeclarativeBase):
 
 class DatabaseManager:
     """Production database manager with connection pooling and error handling"""
-    
+
     def __init__(self):
         self.engine = None
         self.async_session_maker = None
         self._initialize_engine()
-    
+
     def _initialize_engine(self):
         """Initialize async database engine with production settings"""
         database_url = settings.database_url
-        
+
         if not database_url:
             raise ValueError("DATABASE_URL environment variable is required for production")
-        
+
         # Convert postgres:// to postgresql:// if needed (for compatibility)
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
-        
+
         # Ensure async driver
         if not database_url.startswith("postgresql+asyncpg://"):
             if database_url.startswith("postgresql://"):
                 database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
             else:
                 raise ValueError("Database URL must use PostgreSQL")
-        
+
         # Production engine configuration
         engine_kwargs = {
             "url": database_url,
@@ -67,9 +66,9 @@ class DatabaseManager:
                 "prepared_statement_cache_size": 0,  # Disable prepared statement cache
             }
         }
-        
+
         self.engine = create_async_engine(**engine_kwargs)
-        
+
         self.async_session_maker = async_sessionmaker(
             bind=self.engine,
             class_=AsyncSession,
@@ -77,19 +76,19 @@ class DatabaseManager:
             autoflush=True,
             autocommit=False,
         )
-        
+
         logger.info(
             "Database engine initialized",
             pool_size=settings.db_pool_size,
             max_overflow=settings.db_max_overflow,
             pool_recycle=settings.db_pool_recycle,
         )
-    
+
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Get database session with proper error handling"""
         if not self.async_session_maker:
             raise RuntimeError("Database not initialized")
-        
+
         async with self.async_session_maker() as session:
             try:
                 yield session
@@ -99,7 +98,7 @@ class DatabaseManager:
                 raise
             finally:
                 await session.close()
-    
+
     async def health_check(self) -> bool:
         """Check database connectivity for health endpoints"""
         try:
@@ -109,7 +108,7 @@ class DatabaseManager:
         except Exception as e:
             logger.error("Database health check failed", error=str(e))
             return False
-    
+
     async def close(self):
         """Clean shutdown of database connections"""
         if self.engine:

@@ -68,8 +68,6 @@ async def get_mobile_batch_summary(
     Returns only essential data for quick mobile consumption
     Target: <0.3s response time
     """
-    start_time = time.time()
-
     try:
         store_id = validate_store_id_format(store_id)
 
@@ -81,108 +79,24 @@ async def get_mobile_batch_summary(
             urgency_filter=None,
         )
 
-        if not inventory_data:
-            return MobileBatchSummary(
-                urgent_batches=[],
-                expiring_today=[],
-                action_needed=[],
-                total_active_batches=0,
-                store_health_score=1.0,
-                cache_expires_in=300,
-            )
+        # Use the new mobile batch summary processor
+        from app.utils.mobile_endpoint_helpers import MobileBatchSummaryProcessor
 
-        # Mobile-optimized categorization with performance limits
-        urgent_batches = []
-        expiring_today = []
-        action_needed = []
-        total_value_at_risk = 0.0
-
-        # Mobile data is already optimized and limited
-        for item in inventory_data:
-            days_to_expiry = item["days_to_expiry"]
-
-            # Quick urgency calculation (optimized for mobile)
-            urgency_score = _calculate_quick_urgency_score(days_to_expiry)
-
-            mobile_item = {
-                "batch_id": item["batch_id"],
-                "sku": item["sku"],
-                "category": item["category"],
-                "quantity": item["current_quantity"],
-                "days_to_expiry": days_to_expiry,
-                "urgency_score": urgency_score,
-                "estimated_value": item["current_quantity"] * item["selling_price"],
-            }
-
-            # Only include essential details for mobile
-            if not include_details:
-                mobile_item = {
-                    "batch_id": item["batch_id"],
-                    "sku": item["sku"],
-                    "days_to_expiry": days_to_expiry,
-                    "urgency_score": urgency_score,
-                    "quantity": item["current_quantity"],
-                }
-
-            # Categorize for mobile display
-            if urgency_score >= 0.8:
-                urgent_batches.append(mobile_item)
-                total_value_at_risk += mobile_item.get("estimated_value", 0)
-            elif days_to_expiry <= 0:
-                expiring_today.append(mobile_item)
-                total_value_at_risk += mobile_item.get("estimated_value", 0) * 0.5
-            elif urgency_score >= 0.6:
-                action_needed.append(mobile_item)
-
-        # Limit results for mobile performance
-        urgent_batches = sorted(
-            urgent_batches, key=lambda x: x["urgency_score"], reverse=True
-        )[:limit_urgent]
-        expiring_today = sorted(expiring_today, key=lambda x: x["days_to_expiry"])[
-            :limit_urgent
-        ]
-        action_needed = sorted(
-            action_needed, key=lambda x: x["urgency_score"], reverse=True
-        )[:limit_urgent]
-
-        # Calculate store health score (simplified for mobile)
-        total_items = len(inventory_data)
-        urgent_count = len(urgent_batches)
-        expiring_count = len(expiring_today)
-
-        health_score = max(
-            0.0, 1.0 - ((urgent_count + expiring_count) / max(total_items, 1)) * 2
-        )
-
-        processing_time_ms = (time.time() - start_time) * 1000
-
-        # MOBILE PERFORMANCE: Record metrics for optimization
-        mobile_query_monitor.record_query(
-            "mobile_summary",
-            processing_time_ms,
-            len(urgent_batches) + len(expiring_today) + len(action_needed),
+        processor = MobileBatchSummaryProcessor()
+        mobile_response, processing_time_ms = await processor.process_mobile_summary(
+            store_id, inventory_data, include_details, limit_urgent
         )
 
         logger.info(
             "Mobile summary generated",
             store_id=store_id,
-            total_items=total_items,
-            urgent_items=urgent_count,
-            expiring_today=expiring_count,
-            health_score=health_score,
+            total_items=mobile_response.total_active_batches,
+            urgent_items=len(mobile_response.urgent_batches),
+            expiring_today=len(mobile_response.expiring_today),
+            health_score=mobile_response.store_health_score,
             processing_time_ms=processing_time_ms,
             mobile_target_met=processing_time_ms <= 300,  # 300ms mobile target
             user_id=current_user["sub"],
-        )
-
-        # MOBILE OPTIMIZATION: Compress response data
-        mobile_response = MobileBatchSummary(
-            urgent_batches=compress_for_mobile(urgent_batches, "standard"),
-            expiring_today=compress_for_mobile(expiring_today, "standard"),
-            action_needed=compress_for_mobile(action_needed, "standard"),
-            total_active_batches=total_items,
-            store_health_score=round(health_score, 2),
-            cache_expires_in=180,  # 3 minutes cache for mobile
         )
 
         return mobile_response
@@ -311,8 +225,6 @@ async def get_mobile_store_health(
     Mobile-optimized store health overview
     Provides key metrics for mobile dashboard
     """
-    start_time = time.time()
-
     try:
         store_id = validate_store_id_format(store_id)
 
@@ -320,58 +232,11 @@ async def get_mobile_store_health(
         mobile_optimizer = create_mobile_query_optimizer(db)
         analytics_data = await mobile_optimizer.get_store_health_metrics(store_id)
 
-        if not analytics_data:
-            return MobileStoreHealth(
-                overall_score=1.0,
-                critical_items=0,
-                expiring_soon=0,
-                total_value_at_risk=0.0,
-                trends={},
-                last_action_taken=None,
-                next_recommended_action=None,
-            )
+        # Use the new mobile store health processor
+        from app.utils.mobile_endpoint_helpers import MobileStoreHealthProcessor
 
-        # Mobile-optimized metrics from single query
-        total_items = analytics_data.get("total_batches", 0)
-        critical_items = analytics_data.get("critical_batches", 0)
-        expiring_soon = analytics_data.get("expiring_soon", 0)
-
-        # Overall health score
-        overall_score = 1.0
-        if total_items > 0:
-            risk_ratio = (critical_items + expiring_soon) / total_items
-            overall_score = max(0.0, 1.0 - risk_ratio * 1.5)
-
-        # Simplified trends for mobile (numeric values for mobile display)
-        trends: dict[str, float] = {
-            "waste_reduction_score": 0.8,  # Numeric score 0-1 instead of string
-            "efficiency_score": 0.85,
-            "action_rate": 0.7,
-        }
-
-        # Next recommended action
-        next_action = None
-        if critical_items > 0:
-            next_action = (
-                f"Review {critical_items} critical items requiring immediate attention"
-            )
-        elif expiring_soon > 0:
-            next_action = f"Monitor {expiring_soon} items expiring soon"
-        else:
-            next_action = "Continue monitoring - store performing well"
-
-        (time.time() - start_time) * 1000
-
-        return MobileStoreHealth(
-            overall_score=round(overall_score, 2),
-            critical_items=critical_items,
-            expiring_soon=expiring_soon,
-            total_value_at_risk=analytics_data.get("total_value", 0)
-            * 0.1,  # Estimated risk
-            trends=trends,
-            last_action_taken="Recent discount applied",  # Would come from action log
-            next_recommended_action=next_action,
-        )
+        processor = MobileStoreHealthProcessor()
+        return processor.process_store_health(analytics_data)
 
     except Exception as e:
         logger.error(

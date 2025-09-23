@@ -41,7 +41,6 @@ def get_auth_users_fk() -> str:
 def get_uuid_type():
     """Get the correct UUID type based on environment (String for SQLite, UUID for PostgreSQL)"""
     from sqlalchemy.dialects.postgresql import UUID
-
     return (
         SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else UUID(as_uuid=True)
     )
@@ -303,7 +302,7 @@ class Batch(Base):
     verification_status = Column(
         String(20), default="verified"
     )  # VerificationStatus enum values
-    
+
     # OCR fields for expiry date extraction
     ocr_extracted_date = Column(String(255))  # Raw OCR text for expiry date
     ocr_confidence: Column[DECIMAL] = Column(

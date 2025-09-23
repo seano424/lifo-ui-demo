@@ -18,7 +18,7 @@ Key Features:
 import uuid
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 # Conditional imports to handle missing dependencies gracefully
 try:
@@ -202,7 +202,7 @@ class InventoryOperations:
         try:
             # Placeholder query structure - would use actual models in production
             query = text("""
-                SELECT 
+                SELECT
                     product_id,
                     name,
                     brand,
@@ -212,8 +212,8 @@ class InventoryOperations:
                     unit_type,
                     created_at,
                     updated_at
-                FROM business.global_products 
-                WHERE barcode = :barcode 
+                FROM business.global_products
+                WHERE barcode = :barcode
                 AND is_active = true
             """)
 
@@ -270,7 +270,7 @@ class InventoryOperations:
         try:
             # Use PostgreSQL full-text search and similarity functions
             query = text("""
-                SELECT 
+                SELECT
                     product_id,
                     name,
                     brand,
@@ -279,11 +279,11 @@ class InventoryOperations:
                     typical_shelf_life_days,
                     unit_type,
                     similarity(name, :search_term) as score
-                FROM business.global_products 
-                WHERE 
+                FROM business.global_products
+                WHERE
                     is_active = true
                     AND (
-                        name ILIKE :search_pattern 
+                        name ILIKE :search_pattern
                         OR similarity(name, :search_term) > 0.3
                     )
                 ORDER BY score DESC, name ASC
@@ -373,7 +373,7 @@ class InventoryOperations:
                     :updated_at,
                     true
                 )
-                RETURNING product_id, name, brand, barcode, primary_category, 
+                RETURNING product_id, name, brand, barcode, primary_category,
                           typical_shelf_life_days, unit_type, created_at, updated_at
             """)
 
@@ -480,7 +480,7 @@ class InventoryOperations:
                     :added_at,
                     true
                 )
-                ON CONFLICT (store_id, global_product_id) 
+                ON CONFLICT (store_id, global_product_id)
                 DO UPDATE SET
                     default_cost_price = EXCLUDED.default_cost_price,
                     default_selling_price = EXCLUDED.default_selling_price,
@@ -586,7 +586,7 @@ class InventoryOperations:
                     :updated_at,
                     true
                 )
-                RETURNING batch_id, batch_number, expiry_date, initial_quantity, 
+                RETURNING batch_id, batch_number, expiry_date, initial_quantity,
                           current_quantity, created_at
             """)
 
@@ -681,7 +681,7 @@ class InventoryOperations:
             where_clause = " AND ".join(where_conditions)
 
             count_query = text(f"""
-                SELECT COUNT(*) 
+                SELECT COUNT(*)
                 FROM business.inventory_batches ib
                 JOIN business.global_products gp ON ib.global_product_id = gp.product_id
                 WHERE {where_clause}
@@ -704,7 +704,7 @@ class InventoryOperations:
 
             while offset < total_count:
                 query = text(f"""
-                    SELECT 
+                    SELECT
                         ib.batch_id,
                         ib.batch_number,
                         ib.expiry_date,
@@ -821,21 +821,21 @@ class InventoryOperations:
                 start_date = end_date - timedelta(days=30)
 
             query = text("""
-                SELECT 
+                SELECT
                     COUNT(DISTINCT ib.batch_id) as total_batches,
                     COUNT(DISTINCT ib.global_product_id) as unique_products,
                     SUM(ib.current_quantity) as total_quantity,
                     SUM(ib.current_quantity * COALESCE(ib.cost_price, 0)) as total_cost_value,
                     SUM(ib.current_quantity * COALESCE(ib.selling_price, 0)) as total_selling_value,
-                    COUNT(CASE WHEN ib.expiry_date <= CURRENT_DATE + INTERVAL '7 days' 
+                    COUNT(CASE WHEN ib.expiry_date <= CURRENT_DATE + INTERVAL '7 days'
                                THEN 1 END) as expiring_soon_count,
-                    COUNT(CASE WHEN ib.expiry_date <= CURRENT_DATE 
+                    COUNT(CASE WHEN ib.expiry_date <= CURRENT_DATE
                                THEN 1 END) as expired_count,
                     AVG(EXTRACT(EPOCH FROM (ib.expiry_date - CURRENT_DATE)) / 86400) as avg_days_to_expiry,
                     COUNT(CASE WHEN ib.current_quantity <= 5 THEN 1 END) as low_stock_count,
                     AVG(ib.current_quantity) as avg_batch_quantity
                 FROM business.inventory_batches ib
-                WHERE 
+                WHERE
                     ib.store_id = :store_id
                     AND ib.is_active = true
                     AND ib.created_at >= :start_date
@@ -928,7 +928,7 @@ class InventoryOperations:
     # ML Feature Preparation Operations
 
     async def prepareMLFeatures(
-        self, store_id: str, feature_types: Optional[list[str]] = None
+        self, store_id: str, feature_types: list[str] | None = None
     ) -> dict[str, Any]:
         """
         Prepare features for machine learning models
@@ -954,20 +954,20 @@ class InventoryOperations:
                 ]
 
             query = text("""
-                SELECT 
+                SELECT
                     ib.batch_id,
                     gp.primary_category,
                     EXTRACT(EPOCH FROM (ib.expiry_date - CURRENT_DATE)) / 86400 as days_to_expiry,
                     ib.current_quantity,
                     ib.initial_quantity,
                     (ib.initial_quantity - ib.current_quantity) as quantity_sold,
-                    CASE WHEN ib.initial_quantity > 0 
-                         THEN (ib.initial_quantity - ib.current_quantity) / ib.initial_quantity 
+                    CASE WHEN ib.initial_quantity > 0
+                         THEN (ib.initial_quantity - ib.current_quantity) / ib.initial_quantity
                          ELSE 0 END as sell_through_rate,
                     COALESCE(ib.cost_price, 0) as cost_price,
                     COALESCE(ib.selling_price, 0) as selling_price,
-                    CASE WHEN ib.cost_price > 0 
-                         THEN (ib.selling_price - ib.cost_price) / ib.cost_price 
+                    CASE WHEN ib.cost_price > 0
+                         THEN (ib.selling_price - ib.cost_price) / ib.cost_price
                          ELSE 0 END as margin_percentage,
                     gp.typical_shelf_life_days,
                     EXTRACT(EPOCH FROM (CURRENT_DATE - ib.created_at)) / 86400 as days_in_inventory,
@@ -975,7 +975,7 @@ class InventoryOperations:
                     ib.location_code
                 FROM business.inventory_batches ib
                 JOIN business.global_products gp ON ib.global_product_id = gp.product_id
-                WHERE 
+                WHERE
                     ib.store_id = :store_id
                     AND ib.is_active = true
                     AND ib.current_quantity > 0
@@ -1009,7 +1009,7 @@ class InventoryOperations:
                 features.append(feature_row)
 
             # Category encoding for ML
-            categories = list(set(f["primary_category"] for f in features))
+            categories = list({f["primary_category"] for f in features})
             category_mapping = {cat: idx for idx, cat in enumerate(sorted(categories))}
 
             ml_features = {
@@ -1142,8 +1142,8 @@ class InventoryOperations:
             # Create secure query using VALUES clause
             values_clause = ", ".join(value_clauses)
             query = text(f"""
-                UPDATE business.inventory_batches 
-                SET 
+                UPDATE business.inventory_batches
+                SET
                     current_quantity = update_data.new_quantity,
                     updated_at = :updated_at
                 FROM (VALUES {values_clause}) AS update_data(batch_id, new_quantity)
@@ -1193,7 +1193,7 @@ class InventoryOperations:
 
             # Test table access
             count_query = text("""
-                SELECT 
+                SELECT
                     (SELECT COUNT(*) FROM business.inventory_batches WHERE is_active = true) as active_batches,
                     (SELECT COUNT(*) FROM business.global_products WHERE is_active = true) as active_products
             """)

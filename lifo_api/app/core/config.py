@@ -61,7 +61,7 @@ class Settings(BaseSettings):
         default="",
         description="Supabase service role key for admin operations (legacy JWT)"
     )
-    
+
     # New Supabase API Keys (recommended over legacy JWT keys)
     supabase_publishable_key: str = Field(
         default="",
@@ -334,8 +334,9 @@ def get_supabase_config() -> dict[str, Any]:
         # New API keys (recommended)
         "publishable_key": settings.supabase_publishable_key,
         "secret_key": settings.supabase_secret_key,
-        "timeout_seconds": settings.auth_timeout_seconds,
-        "retry_attempts": settings.auth_retry_attempts,
+        # Default timeout and retry settings for auth operations
+        "timeout_seconds": 30,
+        "retry_attempts": 3,
     }
 
 

@@ -132,7 +132,7 @@ def get_auth_health():
     global _performance_monitor
     if not _performance_monitor:
         _performance_monitor = AuthPerformanceMonitor()
-    
+
     return {
         "status": "healthy",
         "metrics": _performance_monitor.get_metrics(),
@@ -187,7 +187,7 @@ class AuthPerformanceMonitor:
                 (self.metrics["slow_requests"] / max(self.metrics["total_requests"], 1)) * 100, 2
             )
         }
-    
+
     def get_metrics(self) -> dict:
         """Alias for get_stats() for compatibility"""
         return self.get_stats()

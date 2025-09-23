@@ -59,7 +59,7 @@ async def get_comprehensive_database_health(
         raise HTTPException(
             status_code=500,
             detail=f"Health check failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/connections")
 async def get_connection_stats(
@@ -93,7 +93,7 @@ async def get_connection_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Connection monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/performance/queries")
 async def get_query_performance_stats(
@@ -138,7 +138,7 @@ async def get_query_performance_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Query performance monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/storage/tables")
 async def get_table_size_stats(
@@ -180,7 +180,7 @@ async def get_table_size_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Table size monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/replication")
 async def get_replication_stats(
@@ -223,7 +223,7 @@ async def get_replication_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Replication monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/locks")
 async def get_lock_stats(
@@ -266,7 +266,7 @@ async def get_lock_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Lock monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/cache")
 async def get_cache_stats(
@@ -311,7 +311,7 @@ async def get_cache_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Cache monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/metrics/lifo")
 async def get_lifo_specific_metrics(
@@ -369,7 +369,7 @@ async def get_lifo_specific_metrics(
         raise HTTPException(
             status_code=500,
             detail=f"LIFO metrics monitoring failed: {str(e)}"
-        )
+        ) from e
 
 @router.get("/alerts/generate")
 async def generate_monitoring_alerts(
@@ -474,7 +474,7 @@ async def generate_monitoring_alerts(
         raise HTTPException(
             status_code=500,
             detail=f"Alert generation failed: {str(e)}"
-        )
+        ) from e
 
 @router.post("/maintenance/analyze")
 async def analyze_maintenance_needs(
@@ -526,4 +526,4 @@ async def analyze_maintenance_needs(
         raise HTTPException(
             status_code=500,
             detail=f"Maintenance analysis failed: {str(e)}"
-        )
+        ) from e

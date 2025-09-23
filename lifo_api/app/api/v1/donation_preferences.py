@@ -4,7 +4,7 @@ Manages store-level donation vs discount preferences for the donation-first
 enhancement system.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -113,7 +113,7 @@ async def get_donation_preferences(
     """
 
     # Validate store access
-    await validate_store_access(store_id, current_user, db)
+    await validate_store_access(store_id, current_user)
 
     try:
         # Query store settings
@@ -139,7 +139,7 @@ async def get_donation_preferences(
             )
 
         # Extract donation preferences with defaults
-        donation_config: Dict[str, Any] = store_settings.donation_preference_config or {}
+        donation_config: dict[str, Any] = store_settings.donation_preference_config or {}
         preferences = DonationPreferenceConfig(**donation_config)
 
         return DonationPreferenceResponse(
@@ -190,7 +190,7 @@ async def update_donation_preferences(
     """
 
     # Validate store access
-    await validate_store_access(store_id, current_user, db)
+    await validate_store_access(store_id, current_user)
 
     try:
         # Validate strategy value

@@ -303,6 +303,25 @@ async def get_database_session() -> AsyncSession:
     return async_session()()
 
 
+async def get_async_database_session() -> AsyncSession:
+    """
+    Get an async database session for use in async contexts
+    
+    Returns:
+        AsyncSession: Async database session
+    """
+    return async_session()()
+
+
+def get_db_sync():
+    """
+    Synchronous database session function for legacy CSV processor compatibility
+    Note: This returns None to trigger graceful fallback in CSV processor
+    The CSV processor will use hardcoded category codes instead of database lookups
+    """
+    return None
+
+
 class DatabaseManager:
     """
     Database manager for advanced operations

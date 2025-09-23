@@ -238,7 +238,11 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
         # Check for required headers on certain endpoints
         if request.method in ["POST", "PUT", "PATCH"]:
             content_type = request.headers.get("content-type", "")
-            if not content_type and request.url.path.startswith("/api/"):
+            # Only require Content-Type for endpoints that actually need a request body
+            # Scoring endpoints use query parameters, not request body
+            if (not content_type and
+                request.url.path.startswith("/api/") and
+                not request.url.path.startswith("/api/v1/scoring/")):
                 validation_result["valid"] = False
                 validation_result["details"]["missing_content_type"] = True
 

@@ -21,15 +21,15 @@ class Environment(str, Enum):
 
 class EnvironmentConfig:
     """Environment-specific configuration manager"""
-    
+
     def __init__(self):
         self.current_env = self._detect_environment()
         logger.info(f"Initialized environment: {self.current_env}")
-    
+
     def _detect_environment(self) -> Environment:
         """Detect current environment from environment variables"""
         env_var = os.getenv("ENVIRONMENT", "development").lower()
-        
+
         # Handle common variations
         if env_var in ["dev", "develop", "development"]:
             return Environment.DEVELOPMENT
@@ -40,27 +40,27 @@ class EnvironmentConfig:
         else:
             logger.warning(f"Unknown environment '{env_var}', defaulting to development")
             return Environment.DEVELOPMENT
-    
+
     @property
     def is_development(self) -> bool:
         """Check if running in development environment"""
         return self.current_env == Environment.DEVELOPMENT
-    
+
     @property
     def is_staging(self) -> bool:
         """Check if running in staging environment"""
         return self.current_env == Environment.STAGING
-    
+
     @property
     def is_production(self) -> bool:
         """Check if running in production environment"""
         return self.current_env == Environment.PRODUCTION
-    
+
     @property
     def is_deployed(self) -> bool:
         """Check if running in a deployed environment (staging or production)"""
         return self.current_env in [Environment.STAGING, Environment.PRODUCTION]
-    
+
     def get_database_pool_config(self) -> dict[str, Any]:
         """Get environment-appropriate database pool configuration"""
         if self.is_production:
@@ -81,7 +81,7 @@ class EnvironmentConfig:
                 "max_overflow": 5,
                 "pool_recycle": 1800,
             }
-    
+
     def get_worker_config(self) -> dict[str, Any]:
         """Get environment-appropriate worker configuration"""
         if self.is_production:
@@ -105,7 +105,7 @@ class EnvironmentConfig:
                 "max_requests": 100,
                 "timeout": 60,
             }
-    
+
     def get_logging_config(self) -> dict[str, Any]:
         """Get environment-appropriate logging configuration"""
         if self.is_production:
@@ -129,7 +129,7 @@ class EnvironmentConfig:
                 "enable_request_logging": True,
                 "enable_performance_logging": True,
             }
-    
+
     def get_cors_config(self) -> dict[str, Any]:
         """Get environment-appropriate CORS configuration"""
         if self.is_production:
@@ -150,14 +150,14 @@ class EnvironmentConfig:
                 "BACKEND_CORS_ORIGINS",
                 "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000"
             )
-        
+
         return {
             "allow_origins": default_origins.split(",") if isinstance(default_origins, str) else default_origins,
             "allow_credentials": True,
             "allow_methods": ["*"],
             "allow_headers": ["*"],
         }
-    
+
     def get_feature_flags(self) -> dict[str, bool]:
         """Get environment-specific feature flags"""
         base_flags = {
@@ -168,7 +168,7 @@ class EnvironmentConfig:
             "enable_performance_monitoring": True,  # Always enabled
             "mock_external_services": False,
         }
-        
+
         if self.is_development:
             base_flags.update({
                 "enable_test_endpoints": True,
@@ -181,15 +181,15 @@ class EnvironmentConfig:
                 "enable_experimental_features": True,
             })
         # Production keeps the base flags (most restrictive)
-        
+
         # Allow override from environment variables
-        for flag, default in base_flags.items():
+        for flag, _default in base_flags.items():
             env_value = os.getenv(flag.upper())
             if env_value is not None:
                 base_flags[flag] = env_value.lower() in ("true", "1", "yes", "on")
-        
+
         return base_flags
-    
+
     def get_rate_limit_config(self) -> dict[str, int]:
         """Get environment-appropriate rate limiting configuration"""
         if self.is_production:
@@ -207,14 +207,14 @@ class EnvironmentConfig:
                 "requests_per_minute": 1000,  # Very permissive for development
                 "burst": 100,
             }
-    
+
     def should_seed_test_data(self) -> bool:
         """Check if test data should be seeded"""
         return (
-            self.is_staging and 
+            self.is_staging and
             os.getenv("SEED_TEST_DATA", "false").lower() in ("true", "1", "yes", "on")
         )
-    
+
     def get_app_info(self) -> dict[str, Any]:
         """Get application information for health checks and monitoring"""
         return {
