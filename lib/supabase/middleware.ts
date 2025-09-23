@@ -41,9 +41,23 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error) {
+      // Log the error but don't crash the middleware
+      console.warn('[Middleware] Auth error:', error.message)
+      // Treat as logged out but continue
+      user = null
+    } else {
+      user = data?.user || null
+    }
+  } catch (err) {
+    // Handle any unexpected errors
+    console.error('[Middleware] Unexpected error getting user:', err)
+    user = null
+  }
 
   // Allow requests with auth codes to pass through (for password reset, etc.)
   const hasAuthCode = request.nextUrl.searchParams.get('code')
