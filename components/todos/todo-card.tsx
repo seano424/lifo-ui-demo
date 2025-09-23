@@ -40,8 +40,8 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     const diffTime = todayDate.getTime() - expiryDateOnly.getTime()
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
-    if (diffDays === 1) return 'expired yesterday'
-    return `expired ${diffDays} days ago`
+    if (diffDays === 1) return 'Expired yesterday'
+    return `Expired ${diffDays} days ago`
   }
 
   // Get urgency colors and icons
@@ -93,9 +93,24 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   const urgencyConfig = getUrgencyConfig(todo.urgency_level)
 
   const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
-
+  const wasDonated = todo.last_action_type === 'donate'
+  const wasDisposed = todo.last_action_type === 'dispose'
   const isCompleted = todo.completion_status === 'completed'
   const lastActionType = todo.last_action_type
+  const completionDate = todo.last_action_time ? new Date(todo.last_action_time) : null
+
+  const getCompletionDateText = () => {
+    switch (lastActionType) {
+      case 'donate':
+        return `Donated on ${completionDate?.toLocaleDateString()}`
+      case 'dispose':
+        return `Disposed on ${completionDate?.toLocaleDateString()}`
+      case 'sold':
+        return `Completed on ${completionDate?.toLocaleDateString()}`
+      default:
+        return `Completed on ${completionDate?.toLocaleDateString()}`
+    }
+  }
 
   return (
     <button
@@ -135,7 +150,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             >
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                Expires: {expiryDate.toLocaleDateString()}
+                {expiryDate.toLocaleDateString()}
               </span>
 
               {!isCompleted && (
@@ -151,7 +166,13 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                 </Typography>
               )}
 
-              {isCompleted && lastActionType === 'dispose' && (
+              {isCompleted && wasDonated && (
+                <Typography variant="small" className="flex items-center gap-1">
+                  🎁 Donated!
+                </Typography>
+              )}
+
+              {isCompleted && wasDisposed && (
                 <Typography variant="small" className="flex items-center gap-1">
                   🗑️ All disposed!
                 </Typography>
@@ -159,9 +180,9 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             </Typography>
 
             <div className="flex flex-wrap gap-2 items-center justify-between">
-              {isCompleted && (
-                <Badge variant={urgencyConfig.badgeVariant}>Completed: {lastActionType}</Badge>
-              )}
+              {isCompleted && !wasDisposed && <Badge variant={'primary'}>Completed</Badge>}
+
+              {isCompleted && wasDisposed && <Badge variant={'destructive'}>Disposed</Badge>}
 
               {todo.last_discount_percent != null &&
                 todo.last_discount_percent > 0 &&
@@ -183,14 +204,20 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                   <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
                 )}
 
-              {isExpiringToday ? (
-                <Badge variant="destructive">expires today</Badge>
+              {isCompleted ? (
+                <Badge variant="primary">{getCompletionDateText()}</Badge>
+              ) : isExpiringToday ? (
+                <Badge variant="destructive">Expires today</Badge>
               ) : isExpired ? (
                 <Badge variant="destructive">{getExpiredText()}</Badge>
               ) : isExpiringSoon ? (
-                <Badge variant="primary">expiring soon</Badge>
+                <Badge variant="primary">Expiring soon</Badge>
+              ) : wasDonated ? (
+                <Badge className="hidden" variant="primary">
+                  Donated
+                </Badge>
               ) : (
-                <Badge variant="primary">active & healthy</Badge>
+                <Badge variant="primary">Active & healthy</Badge>
               )}
             </div>
           </div>

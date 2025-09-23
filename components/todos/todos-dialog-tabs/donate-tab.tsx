@@ -3,7 +3,9 @@
 import { InputSlider } from '@/components/ui/input-slider'
 import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
+import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
 interface DonateTabProps {
@@ -11,23 +13,77 @@ interface DonateTabProps {
   onClose: () => void
 }
 
-// Donation recipients configuration
-const DONATION_RECIPIENTS = [
-  { id: 'local-foodbank', name: 'Local Foodbank', default: true },
-  { id: 'soup-kitchen', name: 'Soup Kitchen' },
-  { id: 'charity-org', name: 'Charity Organization' },
-  { id: 'community-center', name: 'Community Center' },
-]
+// Type for donation recipients from database
+interface DonationRecipient {
+  recipient_id: string
+  name: string
+  recipient_type: string
+  store_id: string
+  is_active: boolean
+}
+
+// Hook to fetch donation recipients for the current store
+function useDonationRecipients(batchId: string) {
+  const supabase = createClient()
+
+  return useQuery({
+    queryKey: ['donation-recipients', batchId],
+    queryFn: async () => {
+      // First get the store_id from the batch
+      const { data: batchData, error: batchError } = await supabase
+        .schema('inventory')
+        .from('batches')
+        .select('store_id')
+        .eq('batch_id', batchId)
+        .single()
+
+      if (batchError) throw batchError
+      if (!batchData?.store_id) throw new Error('Store ID not found for batch')
+
+      // Then get donation recipients for that store
+      const { data, error } = await supabase
+        .schema('inventory')
+        .from('donation_recipients')
+        .select('recipient_id, name, recipient_type, store_id, is_active')
+        .eq('store_id', batchData.store_id)
+        .eq('is_active', true)
+        .order('name')
+
+      if (error) throw error
+      return data as DonationRecipient[]
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!batchId, // Only run if we have a batch ID
+  })
+}
 
 export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   const { executeDonate, isDonating } = useBatchActionRPC()
 
-  // State management
-  const [selectedRecipient, setSelectedRecipient] = useState(
-    DONATION_RECIPIENTS.find(r => r.default)?.id || 'local-foodbank',
+  // Fetch donation recipients for this batch
+  const { data: recipients = [], isLoading: loadingRecipients } = useDonationRecipients(
+    selectedBatch.batch_id, // Changed to use batch_id instead of store_id
   )
+
+  // State management
+  const [selectedRecipient, setSelectedRecipient] = useState<string>('')
   const [donateQuantity, setDonateQuantity] = useState(selectedBatch.current_quantity)
   const [isSelectAll, setIsSelectAll] = useState(true)
+
+  // Set default recipient when recipients load
+  useEffect(() => {
+    if (recipients.length > 0 && !selectedRecipient) {
+      // Prefer food banks, then charities, then any other type
+      const defaultRecipient =
+        recipients.find(r => r.recipient_type === 'food_bank') ||
+        recipients.find(r => r.recipient_type === 'charity') ||
+        recipients[0]
+
+      if (defaultRecipient) {
+        setSelectedRecipient(defaultRecipient.recipient_id)
+      }
+    }
+  }, [recipients, selectedRecipient])
 
   // Update quantity when batch changes or select all toggles
   useEffect(() => {
@@ -71,14 +127,20 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
   // Handle donation execution
   const handleDonateAction = async () => {
+    if (!selectedRecipient) {
+      console.error('No donation recipient selected')
+      return
+    }
+
     try {
+      const recipientName =
+        recipients.find(r => r.recipient_id === selectedRecipient)?.name || 'Unknown'
+
       const params = {
         batchId: selectedBatch.batch_id,
         quantity: donateQuantity,
-        donationRecipientId: selectedRecipient,
-        notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name} to ${
-          DONATION_RECIPIENTS.find(r => r.id === selectedRecipient)?.name
-        } - ${selectedBatch.ai_reasoning}`,
+        donationRecipientId: selectedRecipient, // Now using actual UUID
+        notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name} to ${recipientName} - ${selectedBatch.ai_reasoning}`,
       }
 
       const _result = await executeDonate(params)
@@ -92,8 +154,33 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         stack: error instanceof Error ? error.stack : undefined,
         batchId: selectedBatch.batch_id,
         quantity: donateQuantity,
+        selectedRecipient,
       })
     }
+  }
+
+  // Loading state
+  if (loadingRecipients) {
+    return (
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+          <span className="ml-2 text-gray-600">Loading donation recipients...</span>
+        </div>
+      </div>
+    )
+  }
+
+  // No recipients available
+  if (recipients.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="text-center py-8">
+          <p className="text-gray-600 mb-4">No donation recipients available for this store.</p>
+          <p className="text-sm text-gray-500">Contact your admin to set up donation recipients.</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -101,22 +188,23 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       {/* Recipient Selection */}
       <div className="mb-6">
         <h3 className="text-sm font-medium mb-3">Select Recipient</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {DONATION_RECIPIENTS.map(recipient => (
+        <div className="grid grid-cols-1 gap-2">
+          {recipients.map(recipient => (
             <button
-              key={recipient.id}
+              key={recipient.recipient_id}
               type="button"
-              onClick={() => {
-                setSelectedRecipient(recipient.id)
-              }}
+              onClick={() => setSelectedRecipient(recipient.recipient_id)}
               className={cn(
-                'p-3 rounded-lg border text-sm font-medium transition-colors',
-                selectedRecipient === recipient.id
+                'p-3 rounded-lg border text-sm font-medium transition-colors text-left',
+                selectedRecipient === recipient.recipient_id
                   ? 'bg-purple-50 border-purple-300 text-purple-700'
                   : 'bg-white border-gray-200 hover:bg-gray-50',
               )}
             >
-              {recipient.name}
+              <div className="font-medium">{recipient.name}</div>
+              <div className="text-xs text-gray-500 capitalize">
+                {recipient.recipient_type.replace('_', ' ')}
+              </div>
             </button>
           ))}
         </div>
@@ -147,6 +235,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
           max={selectedBatch.current_quantity}
           step={1}
           label={`${donateQuantity} units`}
+          sliderColor="#9333ea"
         />
 
         <p className="text-xs text-gray-500 mt-2">
@@ -187,7 +276,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       <button
         type="button"
         onClick={handleDonateAction}
-        disabled={isDonating || donateQuantity === 0}
+        disabled={isDonating || donateQuantity === 0 || !selectedRecipient}
         className={cn(
           'w-full py-3 px-4 rounded-lg font-medium transition-colors',
           'bg-green-600 text-white hover:bg-green-700',
@@ -199,8 +288,10 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
             <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
             Processing Donation...
           </span>
+        ) : selectedRecipient ? (
+          `Donate ${donateQuantity} Units to ${recipients.find(r => r.recipient_id === selectedRecipient)?.name}`
         ) : (
-          `Donate ${donateQuantity} Units to ${DONATION_RECIPIENTS.find(r => r.id === selectedRecipient)?.name}`
+          'Select a Recipient'
         )}
       </button>
     </div>

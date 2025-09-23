@@ -25,6 +25,7 @@ export interface ActionableBatch {
   discount_percent: number
   todo_state: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok'
   total_count: number
+  store_id?: string // Made optional since we can fetch it dynamically if needed
 }
 
 // Type for the query key structure used in the filtered todos queries
@@ -202,7 +203,7 @@ export function useBatchActionRPC() {
 
       // Invalidate all related queries using the new filtering system
       await Promise.all([
-        // 🎯 NEW: Target specific completion status filters (invalidate all page sizes)
+        // Target specific completion status filters (invalidate all page sizes)
         queryClient.invalidateQueries({
           queryKey: [
             ...queryKeys.todos.all,
@@ -230,7 +231,7 @@ export function useBatchActionRPC() {
           exact: false,
         }),
 
-        // 🎯 NEW: Use convenience query keys for common filters
+        // Use convenience query keys for common filters
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.pending(storeId),
         }),
@@ -243,7 +244,7 @@ export function useBatchActionRPC() {
           queryKey: queryKeys.todos.completed(storeId),
         }),
 
-        // 🎯 NEW: Dashboard summaries using proper query keys
+        // Dashboard summaries using proper query keys
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.dashboardSummary(storeId),
         }),
@@ -256,7 +257,7 @@ export function useBatchActionRPC() {
           queryKey: queryKeys.todos.overview(storeId),
         }),
 
-        // 🎯 NEW: Invalidate all todos queries broadly to catch any filtering combinations
+        // Invalidate all todos queries broadly to catch any filtering combinations
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.all,
         }),
@@ -279,6 +280,11 @@ export function useBatchActionRPC() {
         // Update action history
         queryClient.invalidateQueries({
           queryKey: queryKeys.batchActions.byStore(storeId),
+        }),
+
+        // ADDED: Invalidate donation recipients cache in case it changed
+        queryClient.invalidateQueries({
+          queryKey: ['donation-recipients', storeId],
         }),
       ])
     }
@@ -360,7 +366,7 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 2. DISCOUNT ACTION
+  // 2. DISCOUNT ACTION (unchanged)
   const executeDiscount = useMutation({
     mutationFn: async (params: DiscountParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
@@ -422,7 +428,7 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 3. SOLD ACTION
+  // 3. SOLD ACTION (unchanged)
   const executeSold = useMutation({
     mutationFn: async (params: SoldParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
@@ -496,7 +502,7 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 4. DISPOSE ACTION
+  // 4. DISPOSE ACTION (unchanged)
   const executeDispose = useMutation({
     mutationFn: async (params: DisposeParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
@@ -571,7 +577,7 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 5. DISMISS ACTION
+  // 5. DISMISS ACTION (unchanged)
   const executeDismiss = useMutation({
     mutationFn: async (params: DismissParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
@@ -640,7 +646,7 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 6. BULK ACTION
+  // 6. BULK ACTION (unchanged)
   const executeBulk = useMutation({
     mutationFn: async (params: BulkParams): Promise<BulkActionResult> => {
       const userId = await getCurrentUserId()
