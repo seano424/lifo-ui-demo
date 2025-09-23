@@ -219,8 +219,12 @@ export function useBatchActionRPC() {
     return data?.store_id || ''
   }
 
-  // Comprehensive invalidation after successful actions
-  const invalidateRelatedQueries = async (batchId: string, storeId?: string) => {
+  // More targeted invalidation after successful actions
+  const invalidateRelatedQueries = async (
+    batchId: string,
+    storeId?: string,
+    actionType?: 'donate' | 'discount' | 'sold' | 'dispose' | 'dismiss',
+  ) => {
     // Get store ID from batch if not provided
     if (!storeId) {
       storeId = await getStoreIdFromBatch(batchId)
@@ -243,92 +247,63 @@ export function useBatchActionRPC() {
         // Don't fail the entire operation if scoring trigger fails
       }
 
-      // Invalidate all related queries using the new filtering system
-      await Promise.all([
-        // Target specific completion status filters (invalidate all page sizes)
+      // Always invalidate core todos queries - use the actual query pattern that the hooks use
+      const coreInvalidations = [
+        // Invalidate all filtered todos queries (this covers pending, in-progress, completed)
         queryClient.invalidateQueries({
-          queryKey: [
-            ...queryKeys.todos.all,
-            'filtered',
-            { storeId, filters: { completion_status: 'pending' } },
-          ],
-          exact: false,
+          queryKey: [...queryKeys.todos.all, 'filtered'],
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            const params = queryKey?.[2] as { storeId?: string } | undefined
+            return params?.storeId === storeId
+          },
         }),
-
-        queryClient.invalidateQueries({
-          queryKey: [
-            ...queryKeys.todos.all,
-            'filtered',
-            { storeId, filters: { completion_status: 'in_progress' } },
-          ],
-          exact: false,
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: [
-            ...queryKeys.todos.all,
-            'filtered',
-            { storeId, filters: { completion_status: 'completed' } },
-          ],
-          exact: false,
-        }),
-
-        // Use convenience query keys for common filters
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.pending(storeId),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.inProgress(storeId),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.completed(storeId),
-        }),
-
-        // Dashboard summaries using proper query keys
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.dashboardSummary(storeId),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.summary(storeId),
-        }),
-
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.overview(storeId),
-        }),
-
-        // Invalidate all todos queries broadly to catch any filtering combinations
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.all,
-        }),
-
-        // Update analytics dashboard
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.analytics.store(storeId),
-        }),
-
-        // Refresh batch details
+        // Refresh specific batch details
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.detail(batchId),
         }),
-
-        // Update store batches
+        // Update dashboard summary
         queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.byStore(storeId),
+          queryKey: queryKeys.todos.dashboardSummary(storeId),
         }),
+      ]
 
-        // Update action history
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batchActions.byStore(storeId),
-        }),
+      // Action-specific invalidations
+      const actionSpecificInvalidations = []
 
-        // ADDED: Invalidate donation recipients cache in case it changed
-        queryClient.invalidateQueries({
-          queryKey: ['donation-recipients', storeId],
-        }),
-      ])
+      if (actionType === 'donate' || actionType === 'sold' || actionType === 'dispose') {
+        // These actions typically complete todos - but filtering is already covered by coreInvalidations
+        // No additional invalidation needed since we're already invalidating all filtered queries
+      }
+
+      if (actionType === 'donate') {
+        // Invalidate donation-specific queries
+        actionSpecificInvalidations.push(
+          queryClient.invalidateQueries({
+            queryKey: ['donation-recipients', storeId],
+          }),
+        )
+      }
+
+      if (actionType === 'discount') {
+        // For discounts, also update batch pricing
+        actionSpecificInvalidations.push(
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.byStore(storeId),
+          }),
+        )
+      }
+
+      // Always update action history for completed actions
+      if (actionType) {
+        actionSpecificInvalidations.push(
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batchActions.byStore(storeId),
+          }),
+        )
+      }
+
+      await Promise.all([...coreInvalidations, ...actionSpecificInvalidations])
     }
   }
 
@@ -391,7 +366,7 @@ export function useBatchActionRPC() {
         toast.success(`Successfully donated ${variables.quantity} units`, {
           description: `Total value donated: €${result.total_value_donated?.toFixed(2)}`,
         })
-        await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        await invalidateRelatedQueries(variables.batchId, context?.storeId, 'donate')
       } else {
         toast.error(result.error || 'Donation failed')
       }
@@ -471,7 +446,7 @@ export function useBatchActionRPC() {
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
           description: `New price: €${result.new_price?.toFixed(2)}`,
         })
-        await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        await invalidateRelatedQueries(variables.batchId, context?.storeId, 'discount')
       } else {
         toast.error(result.error || 'Discount failed')
       }
@@ -543,7 +518,7 @@ export function useBatchActionRPC() {
         toast.success(`Marked ${variables.quantity} units as sold`, {
           description: `Revenue: €${result.revenue_recovered?.toFixed(2)}`,
         })
-        await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        await invalidateRelatedQueries(variables.batchId, context?.storeId, 'sold')
       } else {
         toast.error(result.error || 'Update failed')
       }
@@ -626,7 +601,7 @@ export function useBatchActionRPC() {
         toast.success(`Disposed ${variables.quantity} units`, {
           description: `Reason: ${variables.disposalReason}`,
         })
-        await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        await invalidateRelatedQueries(variables.batchId, context?.storeId, 'dispose')
       } else {
         toast.error(result.error || 'Disposal failed')
       }
@@ -695,7 +670,7 @@ export function useBatchActionRPC() {
         toast.success('Recommendation dismissed', {
           description: `Reason: ${variables.dismissalReason}`,
         })
-        await invalidateRelatedQueries(variables.batchId, context?.storeId)
+        await invalidateRelatedQueries(variables.batchId, context?.storeId, 'dismiss')
       } else {
         toast.error(result.error || 'Dismiss failed')
       }

@@ -7,88 +7,89 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
 import { Calendar, Package, PenLine } from 'lucide-react'
-import { useMemo } from 'react'
+import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 
 interface TodoCardProps {
   todo: TodoItem
   onClick?: () => void
 }
 
+// Move urgency config outside component for better performance
+const URGENCY_CONFIG = {
+  critical: {
+    color: 'bg-red-500',
+    textColor: 'text-red-700',
+    bgColor: 'group-hover:bg-red-500 border-red-600',
+    badge: 'bg-red-200 text-red-800 border-red-500',
+    badgeVariant: 'destructive' as const,
+  },
+  high: {
+    color: 'bg-red-500',
+    textColor: 'text-red-700',
+    bgColor: 'group-hover:bg-red-50 border-red-500',
+    badge: 'bg-red-100 text-red-800 border-red-500',
+    badgeVariant: 'destructive' as const,
+  },
+  medium: {
+    color: 'bg-primary-500',
+    textColor: 'text-primary-700',
+    bgColor: 'group-hover:bg-primary-50 border-primary-500',
+    badge: 'bg-primary-100 text-primary-800 border-primary-500',
+    badgeVariant: 'primary' as const,
+  },
+  low: {
+    color: 'bg-secondary-500',
+    textColor: 'text-secondary-700',
+    bgColor: 'group-hover:bg-secondary-50 border-secondary-500',
+    badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
+    badgeVariant: 'secondary' as const,
+  },
+  none: {
+    color: 'bg-gray-500',
+    textColor: 'text-gray-700',
+    bgColor: 'group-hover:bg-gray-50 border-gray-200',
+    badge: 'bg-gray-100 text-gray-800 border-gray-200',
+    badgeVariant: 'secondary' as const,
+  },
+  default: {
+    color: 'bg-gray-500',
+    textColor: 'text-gray-700',
+    bgColor: 'group-hover:bg-gray-50 border-gray-200',
+    badge: 'bg-gray-100 text-gray-800 border-gray-200',
+    badgeVariant: 'secondary' as const,
+  },
+} as const
+
 export function TodoCard({ todo, onClick }: TodoCardProps) {
   const handleCardClick = () => {
     onClick?.()
   }
 
-  // Format expiry date with consistent timezone handling
+  // Format expiry date with reliable timezone handling using date-fns
   const expiryDate = new Date(todo.expiry_date)
   const today = new Date()
 
-  // Use consistent date comparison at start of day
-  const todayStartOfDay = new Date(today.setHours(0, 0, 0, 0))
-  const expiryStartOfDay = new Date(new Date(todo.expiry_date).setHours(0, 0, 0, 0))
-  const tomorrowStartOfDay = new Date(todayStartOfDay.getTime() + 24 * 60 * 60 * 1000)
+  // Use date-fns for reliable date comparisons
+  const expiryStartOfDay = startOfDay(expiryDate)
+  const todayStartOfDay = startOfDay(today)
+  const tomorrowStartOfDay = addDays(todayStartOfDay, 1)
 
-  const isExpiringSoon = expiryStartOfDay <= tomorrowStartOfDay
-  const isExpired = expiryStartOfDay < todayStartOfDay
-  const isExpiringToday = expiryStartOfDay.getTime() === todayStartOfDay.getTime()
+  const isExpiringSoon = isBefore(expiryStartOfDay, tomorrowStartOfDay) || isToday(expiryDate)
+  const isExpired = isBefore(expiryStartOfDay, todayStartOfDay)
+  const isExpiringToday = isToday(expiryDate)
 
-  // Calculate days since expiry for expired items
+  // Calculate days since expiry for expired items using date-fns
   const getExpiredText = () => {
     if (!isExpired) return ''
 
-    const diffTime = todayStartOfDay.getTime() - expiryStartOfDay.getTime()
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    const diffDays = differenceInDays(todayStartOfDay, expiryStartOfDay)
 
     if (diffDays === 1) return 'Expired yesterday'
     return `Expired ${diffDays} days ago`
   }
 
-  // Memoize urgency configuration to prevent recalculation on every render
-  const urgencyConfig = useMemo(() => {
-    const urgency = todo.urgency_level
-    switch (urgency) {
-      case 'critical':
-        return {
-          color: 'bg-red-500',
-          textColor: 'text-red-700',
-          bgColor: 'group-hover:bg-red-500 border-red-600',
-          badge: 'bg-red-200 text-red-800 border-red-500',
-          badgeVariant: 'destructive' as const,
-        }
-      case 'high':
-        return {
-          color: 'bg-red-500',
-          textColor: 'text-red-700',
-          bgColor: 'group-hover:bg-red-50 border-red-500',
-          badge: 'bg-red-100 text-red-800 border-red-500',
-          badgeVariant: 'destructive' as const,
-        }
-      case 'medium':
-        return {
-          color: 'bg-primary-500',
-          textColor: 'text-primary-700',
-          bgColor: 'group-hover:bg-primary-50 border-primary-500',
-          badge: 'bg-primary-100 text-primary-800 border-primary-500',
-          badgeVariant: 'primary' as const,
-        }
-      case 'low':
-        return {
-          color: 'bg-secondary-500',
-          textColor: 'text-secondary-700',
-          bgColor: 'group-hover:bg-secondary-50 border-secondary-500',
-          badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
-          badgeVariant: 'secondary' as const,
-        }
-      default:
-        return {
-          color: 'bg-gray-500',
-          textColor: 'text-gray-700',
-          bgColor: 'group-hover:bg-gray-50 border-gray-200',
-          badge: 'bg-gray-100 text-gray-800 border-gray-200',
-          badgeVariant: 'secondary' as const,
-        }
-    }
-  }, [todo.urgency_level])
+  // Simple lookup for urgency configuration - no memoization needed since config is static
+  const urgencyConfig = URGENCY_CONFIG[todo.urgency_level] || URGENCY_CONFIG.default
 
   const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
   const wasDonated = todo.last_action_type === 'donate'
