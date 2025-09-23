@@ -34,7 +34,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
       isPercentage = false,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = parseInt(e.target.value, 10)
@@ -54,21 +54,16 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
     // Native range inputs position thumbs with some inset from edges
     const progressRatio = max === min ? 1 : (value - min) / (max - min)
     const thumbInset = 2.5 // Percentage inset from each edge for thumb positioning
-    const progressPercentage =
-      thumbInset + progressRatio * (100 - 2 * thumbInset)
+    const progressPercentage = thumbInset + progressRatio * (100 - 2 * thumbInset)
 
     return (
-      <div
-        ref={ref}
-        className={cn('space-y-3', className)}
-        {...props}
-      >
+      <div ref={ref} className={cn('space-y-3', className)} {...props}>
         <div className="flex flex-col gap-8">
           {/* Manual Input */}
           <div
             className={cn(
               'flex-shrink-0 relative items-center flex',
-              label ? 'justify-between' : 'justify-end'
+              label ? 'justify-between' : 'justify-end',
             )}
           >
             {label && <Typography variant="p">{label}</Typography>}
@@ -86,14 +81,12 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                   'bg-background border-border',
                   isPercentage &&
                     '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
-                  inputClassName
+                  inputClassName,
                 )}
               />
 
               {isPercentage && (
-                <Typography className="absolute right-4 top-1/2 -translate-y-1/2">
-                  %
-                </Typography>
+                <Typography className="absolute right-4 top-1/2 -translate-y-1/2">%</Typography>
               )}
             </div>
           </div>
@@ -120,14 +113,14 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
               onChange={handleSliderChange}
               className={cn(
                 'w-full h-8 opacity-0 bg-transparent rounded-full appearance-none cursor-pointer relative z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:border-gray-400 [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:mt-[-4px] [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:border-gray-400 [&::-moz-range-thumb]:margin-top-[-4px]',
-                sliderClassName
+                sliderClassName,
               )}
             />
           </div>
         </div>
       </div>
     )
-  }
+  },
 )
 
 InputSlider.displayName = 'InputSlider'

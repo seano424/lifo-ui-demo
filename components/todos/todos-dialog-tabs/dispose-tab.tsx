@@ -26,12 +26,9 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   const { executeDispose, isDisposing } = useBatchActionRPC()
 
   // Dispose tab state
-  const [disposeQuantity, setDisposeQuantity] = useState(
-    selectedBatch.current_quantity
-  )
+  const [disposeQuantity, setDisposeQuantity] = useState(selectedBatch.current_quantity)
   const [isDisposeSelectAll, setIsDisposeSelectAll] = useState(true)
-  const [selectedDisposalReason, setSelectedDisposalReason] =
-    useState('expired')
+  const [selectedDisposalReason, setSelectedDisposalReason] = useState('expired')
   const [customDisposalReason, setCustomDisposalReason] = useState('')
   const [improveAlerts, setImproveAlerts] = useState(false)
 
@@ -44,8 +41,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
   // Calculate disposal metrics
   const calculateDisposalMetrics = () => {
-    const lossPerUnit =
-      selectedBatch.potential_loss / selectedBatch.current_quantity
+    const lossPerUnit = selectedBatch.potential_loss_value / selectedBatch.current_quantity
     const totalLossValue = lossPerUnit * disposeQuantity
     const wasteWeight = disposeQuantity * 0.5 // Estimate 500g per unit
 
@@ -94,9 +90,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   // Handle dispose execution
   const handleDisposeAction = async () => {
     const disposalReason =
-      selectedDisposalReason === 'other'
-        ? customDisposalReason
-        : selectedDisposalReason
+      selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
 
     try {
       const params = {
@@ -140,9 +134,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         {/* Loss Impact Box */}
         <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6">
           <div className="text-sm space-y-1">
-            <div className="font-medium text-red-800 mb-2">
-              Disposal Impact:
-            </div>
+            <div className="font-medium text-red-800 mb-2">Disposal Impact:</div>
             <div className="text-red-700">
               Financial loss: €{disposalMetrics.totalLossValue.toFixed(2)}
             </div>
@@ -159,7 +151,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         <div className="mb-6">
           <h3 className="text-sm font-medium mb-3">Reason for Disposal</h3>
           <div className="grid grid-cols-2 gap-2">
-            {DISPOSAL_REASONS.map((reason) => (
+            {DISPOSAL_REASONS.map(reason => (
               <button
                 key={reason.id}
                 type="button"
@@ -168,7 +160,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
                   'p-3 rounded-lg border text-sm font-medium transition-colors text-left',
                   selectedDisposalReason === reason.id
                     ? 'bg-red-50 border-red-300 text-red-700'
-                    : 'bg-white border-gray-200 hover:bg-gray-50'
+                    : 'bg-white border-gray-200 hover:bg-gray-50',
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -184,7 +176,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
               <input
                 type="text"
                 value={customDisposalReason}
-                onChange={(e) => handleCustomReasonChange(e.target.value)}
+                onChange={e => handleCustomReasonChange(e.target.value)}
                 placeholder="Enter custom disposal reason"
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               />
@@ -203,7 +195,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
                 'text-sm font-medium px-3 py-1 rounded-full transition-colors',
                 isDisposeSelectAll
                   ? 'bg-red-100 text-red-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
               )}
             >
               {isDisposeSelectAll ? 'All Selected' : 'Select All'}
@@ -232,18 +224,16 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
             <input
               type="checkbox"
               checked={improveAlerts}
-              onChange={(e) => {
+              onChange={e => {
                 setImproveAlerts(e.target.checked)
               }}
               className="mt-1 rounded border-blue-300 text-blue-600 focus:ring-blue-500"
             />
             <div>
-              <span className="text-sm font-medium text-blue-800">
-                Help improve our alerts
-              </span>
+              <span className="text-sm font-medium text-blue-800">Help improve our alerts</span>
               <p className="text-xs text-blue-600 mt-1">
-                This disposal could have been prevented with earlier alerts.
-                Check this to help us improve timing.
+                This disposal could have been prevented with earlier alerts. Check this to help us
+                improve timing.
               </p>
             </div>
           </label>
@@ -262,11 +252,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
-        <Button
-          variant="subtleTertiary"
-          size="lg"
-          onClick={onClose}
-        >
+        <Button variant="subtleTertiary" size="lg" onClick={onClose}>
           Cancel
         </Button>
         <Button

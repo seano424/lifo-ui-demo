@@ -68,6 +68,9 @@ export function TodoActionBottomSheet({
             <Typography className="px-2">
               {selectedBatch.current_quantity} remaining
             </Typography>
+            <Typography className="px-2">
+              €{selectedBatch.unit_price.toFixed(2)}
+            </Typography>
           </div>
         </div>
       }

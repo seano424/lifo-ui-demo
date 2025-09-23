@@ -31,23 +31,11 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
   )
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
-  const [newPrice, setNewPrice] = useState(0) // new price
-
-  useEffect(() => {
-    setNewPrice(
-      (selectedBatch.potential_loss / selectedBatch.current_quantity) *
-        (1 - discountPercentage / 100)
-    )
-  }, [
-    discountPercentage,
-    selectedBatch.potential_loss,
-    selectedBatch.current_quantity,
-  ])
 
   // Calculate price metrics
   const calculatePriceMetrics = () => {
     const originalPrice =
-      selectedBatch.potential_loss / selectedBatch.current_quantity
+      selectedBatch.potential_loss_value / selectedBatch.current_quantity
     let actualDiscountPercentage = discountPercentage
     let newPrice = originalPrice * (1 - discountPercentage / 100)
 
@@ -200,12 +188,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
               min={5}
               max={85}
               step={1}
-              label={`New price: ${newPrice.toFixed(2)}`}
+              label={`New price: €${priceMetrics.newPrice.toFixed(2)}`}
               suffix="%"
               isPercentage
-              sliderColor="#8b5cf6"
             />
-            <p>{selectedBatch.unit_price}</p>
 
             {/* Quick Preset Buttons */}
             <div className="flex gap-2">

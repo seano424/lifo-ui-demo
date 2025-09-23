@@ -15,13 +15,16 @@ export interface ActionableBatch {
   expiry_date: string
   current_quantity: number
   location_code: string
-  unit_price: number
+  unit_price: number // Now available from database
+  selling_price: number // Now available from database
+  cost_price: number // Now available from database
+  current_selling_price: number // Now available from database (price after discount)
+  potential_loss_value: number // Fixed field name (was potential_loss)
   urgency_level: 'critical' | 'high' | 'medium' | 'low'
   days_to_expiry: number
   ai_recommendation: string
   ai_reasoning: string
   composite_score: number
-  potential_loss: number
   discount_percent: number
   todo_state: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok'
   total_count: number
@@ -40,6 +43,8 @@ interface BatchDetail {
   batch_id: string
   current_quantity: number
   selling_price: number
+  current_selling_price: number
+  cost_price: number
   [key: string]: unknown
 }
 
@@ -427,12 +432,15 @@ export function useBatchActionRPC() {
       // Update batch detail with new price
       queryClient.setQueryData(
         queryKeys.batches.detail(variables.batchId),
-        (oldData: BatchDetail | undefined) => {
+        (oldData: TodoItem | undefined) => {
           if (oldData) {
-            const newPrice = oldData.selling_price * (1 - variables.discountPercentage / 100)
+            // Use optional chaining and nullish coalescing for safer access
+            const basePrice = oldData.selling_price ?? oldData.unit_price ?? 0
+            const newPrice = basePrice * (1 - variables.discountPercentage / 100)
             return {
               ...oldData,
-              selling_price: newPrice,
+              current_selling_price: newPrice,
+              last_discount_percent: variables.discountPercentage,
             }
           }
           return oldData

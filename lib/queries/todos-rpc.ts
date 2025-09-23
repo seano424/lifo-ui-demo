@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
+import type { Database } from '@/types/supabase'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -40,29 +41,8 @@ export interface TodoFilters {
   days_to_expiry_min?: number
 }
 
-// Todo item type returned from the RPC function
-export type TodoItem = {
-  batch_id: string
-  store_id: string
-  batch_number: string
-  product_name: string
-  product_brand: string | null
-  current_quantity: number
-  last_action_type: 'discount' | 'donate' | 'dispose' | 'sold' | 'donate_prepared' | null
-  last_action_time: string | null
-  completion_status: 'pending' | 'in_progress' | 'completed'
-  todo_state: string
-  urgency_level: 'critical' | 'high' | 'medium' | 'low' | 'none'
-  days_to_expiry: number
-  priority_order: number
-  expiry_date: string
-  composite_score: number | null
-  ai_recommendation: string | null
-  last_discount_percent: number | null
-  hours_since_last_action: number | null
-  total_actions_ever: number
-  view_refreshed_at: string
-}
+// Todo item type returned from the RPC function - uses generated database type
+export type TodoItem = Database['inventory']['Views']['batch_todo_states']['Row']
 
 // Dashboard summary type
 export type DashboardSummary = {

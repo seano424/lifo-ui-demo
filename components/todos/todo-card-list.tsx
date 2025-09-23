@@ -116,7 +116,11 @@ export function TodoCardList({
         expiry_date: todo.expiry_date,
         current_quantity: todo.current_quantity,
         location_code: '', // Not available in TodoItem, using empty string
-        unit_price: 0, // Not available in TodoItem, using 0
+        unit_price: todo.unit_price || 0,
+        selling_price: todo.selling_price || 0,
+        cost_price: todo.cost_price || 0,
+        current_selling_price: todo.current_selling_price || 0,
+        potential_loss_value: todo.potential_loss_value || 0,
         urgency_level:
           todo.urgency_level === 'none'
             ? 'low'
@@ -127,7 +131,6 @@ export function TodoCardList({
         ai_recommendation: todo.ai_recommendation || '',
         ai_reasoning: '', // Not available in TodoItem, using empty string
         composite_score: todo.composite_score || 0,
-        potential_loss: 0, // Not available in TodoItem, using 0
         discount_percent: 0, // Not available in TodoItem, using 0
         todo_state: 'needs_attention' as const, // Default state
         total_count: 1, // Default count
