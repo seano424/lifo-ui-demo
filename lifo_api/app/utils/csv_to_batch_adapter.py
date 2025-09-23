@@ -1,6 +1,7 @@
 """
 CSV to Batch Adapter Utility
 Converts CSV processed data to BatchFromScanRequest format for batch creation
+UPDATED: Now uses unified CSV services to eliminate duplicate code
 """
 
 from datetime import date, datetime, timedelta
@@ -16,7 +17,7 @@ logger = structlog.get_logger()
 class CSVToBatchAdapter:
     """
     Utility class to convert CSV processed data to batch creation requests
-    Bridges the gap between CSV upload processing and batch creation service
+    Updated to use unified CSV services for consistency
     """
 
     @staticmethod
@@ -110,7 +111,7 @@ class CSVToBatchAdapter:
                 or None
             )
             batch_number = row.get("batch_number", "").strip() or None
-            
+
             # Debug logging for batch number extraction
             logger.info(
                 "CSV row processing",
@@ -148,6 +149,7 @@ class CSVToBatchAdapter:
                 "ocr_extracted_date": None,  # No OCR for CSV data
                 "ocr_confidence": None,
                 "openfoodfacts_data": None,  # Could be enhanced later
+                "sku": sku,  # Pass the original SKU from CSV
             }
             # Create BatchFromScanRequest for validation, then convert back to dict
             # Create BatchFromScanRequest instance
@@ -201,20 +203,14 @@ class CSVToBatchAdapter:
     @staticmethod
     def _generate_barcode_from_sku(sku: str) -> str:
         """
-        Generate a barcode from SKU for CSV imports
-        If SKU looks like a barcode (8+ digits), use it directly
-        Otherwise, generate a unique barcode
+        Generate a unique barcode from SKU for CSV imports
+        Always generate a hash-based barcode to ensure uniqueness
         """
         # Clean SKU
         clean_sku = sku.strip().upper()
 
-        # If SKU is already barcode-like (8+ characters, mostly numeric)
-        if (
-            len(clean_sku) >= 8
-            and clean_sku.replace("-", "").replace("_", "").isalnum()
-        ):
-            # Use first 13 characters to fit EAN-13 format
-            return clean_sku[:13]
+        # Always generate hash-based barcode to prevent collisions
+        # Even if SKU looks barcode-like, truncation can cause duplicates
 
         # Generate a barcode from SKU hash
         # Use a predictable hash so same SKU always gets same barcode

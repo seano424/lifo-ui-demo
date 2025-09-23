@@ -1,11 +1,18 @@
 """
 Unified CSV Processor for LIFO.AI
-Consolidates all CSV import functionality into a single, secure, comprehensive processor
-Combines the best features from:
-- lifo_api/etl/processor.py (advanced processing)
-- lifo_api/secure_csv_processor.py (security)
-- lifo_api/csv_processor.py (validation)
-- Next.js upload logic (integration)
+DEPRECATED: This module has been superseded by the new unified CSV services architecture.
+
+Legacy module - replaced by: app.services.csv.unified_csv_service
+The new architecture eliminates duplicate code and provides:
+- Better security validation
+- Consolidated parsing engine  
+- Centralized category mapping
+- Unified error handling
+- Template generation
+
+For new implementations, use: from app.services.csv import create_unified_csv_service
+
+This file is kept for backward compatibility but will be removed in future versions.
 """
 
 import asyncio
@@ -23,8 +30,9 @@ import pandas as pd
 
 # Import database operations for category resolution
 try:
-    from app.database.connection import get_db_sync
     from sqlalchemy import text
+
+    from app.database.connection import get_db_sync
 except ImportError:
     # Fallback for testing or standalone usage
     get_db_sync = None
@@ -395,7 +403,7 @@ class UnifiedCSVProcessor:
         """
         # Combine all security patterns into single regex for efficiency
         combined_pattern = '|'.join(self.FORMULA_PATTERNS)
-        
+
         # Check for oversized content efficiently
         for col in df.columns:
             if df[col].dtype == 'object':  # String columns only
@@ -407,7 +415,7 @@ class UnifiedCSVProcessor:
                     raise SecurityViolation(
                         f"Cell content exceeds maximum length at row {first_long_row}, column '{col}'"
                     )
-                
+
                 # Vectorized security pattern check
                 dangerous_content = df[col].str.contains(combined_pattern, case=False, na=False, regex=True)
                 if dangerous_content.any():
@@ -677,8 +685,17 @@ class UnifiedCSVProcessor:
                 )
                 return category_code
 
+            # Get database connection
+            db_connection = get_db_sync()
+            if db_connection is None:
+                # Fallback: return category_code if no database access (pgbouncer compatibility)
+                logger.debug(
+                    f"Database access disabled for pgbouncer compatibility, using category_code: {category_code}"
+                )
+                return category_code
+
             # Query database for category UUID
-            with get_db_sync() as db:
+            with db_connection as db:
                 result = db.execute(
                     text(
                         "SELECT category_id FROM inventory.categories WHERE category_code = :code LIMIT 1"
@@ -836,10 +853,10 @@ class UnifiedCSVProcessor:
         for idx, item in enumerate(processed_data):
             # Only generate batch number if not already provided in CSV
             existing_batch_number = item.get("batch_number", "").strip()
-            
+
             # Debug logging
             logger.info(f"UnifiedCSVProcessor batch number check: idx={idx}, sku={item.get('sku', 'unknown')}, existing_batch_number='{existing_batch_number}'")
-            
+
             if not existing_batch_number:
                 # Generate batch number: STORE_SKU_YYYYMMDD_SEQUENCE
                 date_str = datetime.now().strftime("%Y%m%d")

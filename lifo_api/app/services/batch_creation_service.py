@@ -31,6 +31,9 @@ class BatchFromScanRequest(BaseModel):
     )
     brand: str | None = Field(None, max_length=100, description="Product brand")
     category: str | None = Field(None, max_length=100, description="Product category")
+    
+    # CSV imports provide SKU - add this field for proper handling
+    sku: str | None = Field(None, max_length=100, description="Product SKU from CSV import")
 
     # Batch details
     quantity: float = Field(..., gt=0, description="Initial quantity")
@@ -188,15 +191,16 @@ class BatchCreationService:
             return existing_product.product_id, False, was_updated  # type: ignore[return-value]
 
         # Find or create category if provided
-        category_id = None
         if batch_data.category:
-            category_id = await self._find_or_create_category(
+            await self._find_or_create_category(
                 session, batch_data.category, user_id
             )
 
-        # Create new product
+        # Create new product - use provided SKU or generate one
+        product_sku = batch_data.sku if batch_data.sku else f"SCAN-{batch_data.barcode}"
+        
         new_product = Product(
-            sku=f"SCAN-{batch_data.barcode}",
+            sku=product_sku,
             name=batch_data.product_name,
             category_id=await self._resolve_category_to_uuid(
                 session, batch_data.category, "dry_goods"
@@ -349,8 +353,8 @@ class BatchCreationService:
         from app.database.inventory_models import Product, StoreProduct
 
         # Remove duplicates and empty barcodes
-        unique_barcodes = list(set(b for b in barcodes if b and b.strip()))
-        
+        unique_barcodes = list({b for b in barcodes if b and b.strip()})
+
         if not unique_barcodes:
             return {}
 
@@ -365,26 +369,26 @@ class BatchCreationService:
                         StoreProduct.store_id.is_(None),  # Product exists but not in this store
                         and_(
                             StoreProduct.store_id == store_id,
-                            StoreProduct.is_active == True
+                            StoreProduct.is_active
                         )
                     )
                 )
             )
         )
-        
+
         existing_products = {}
         for row in result:
             barcode, product_id, store_id_result = row
             exists_in_store = store_id_result == store_id
             existing_products[barcode] = (product_id, exists_in_store)
-            
+
         logger.info(
             "Bulk product lookup completed",
             requested_barcodes=len(unique_barcodes),
             found_products=len(existing_products),
             store_id=store_id,
         )
-        
+
         return existing_products
 
     async def _bulk_create_missing_products(
@@ -399,8 +403,9 @@ class BatchCreationService:
         Bulk create products that don't exist yet
         Returns dict mapping barcode -> product_id for newly created products
         """
-        from app.database.inventory_models import Product, StoreProduct
         import time
+
+        from app.database.inventory_models import Product, StoreProduct
 
         new_products = {}
         products_to_create = []
@@ -408,11 +413,11 @@ class BatchCreationService:
 
         for request in batch_requests:
             barcode = request.barcode
-            
+
             # Skip if product already exists
             if barcode in existing_products:
                 product_id, exists_in_store = existing_products[barcode]
-                
+
                 # If product exists but not in store, add to store
                 if not exists_in_store:
                     store_product = StoreProduct(
@@ -442,9 +447,17 @@ class BatchCreationService:
             }
             shelf_life = category_shelf_life.get(request.category or "other", 30)
 
+            # Use provided SKU from CSV or generate unique one
+            if hasattr(request, 'sku') and request.sku:
+                product_sku = request.sku
+            else:
+                # Generate unique SKU for products without SKU
+                import uuid as uuid_lib
+                product_sku = f"CSV_{barcode[:10]}_{uuid_lib.uuid4().hex[:8].upper()}"
+            
             product = Product(
                 product_id=product_id,
-                sku=f"CSV_{barcode[:10]}_{int(time.time())}",  # Generate unique SKU
+                sku=product_sku,  # Use provided SKU or generated unique one
                 name=request.product_name,
                 brand=request.brand,
                 barcode=barcode,
@@ -545,9 +558,9 @@ class BatchCreationService:
                     created_by=uuid.UUID(user_id),
                     status="active",
                 )
-                
+
                 batches_to_create.append(batch)
-                
+
                 # Prepare success record
                 successful_batches.append({
                     "batch_id": str(batch.batch_id),
@@ -642,7 +655,7 @@ class BatchCreationService:
                         "product_name": request.product_name,
                         "error": f"Bulk processing failed: {str(e)}",
                     })
-                
+
                 return {
                     "successful": [],
                     "failed": failed_batches,
@@ -1001,8 +1014,8 @@ class BatchCreationService:
         from app.database.inventory_models import Product, StoreProduct
 
         # Remove duplicates and empty barcodes
-        unique_barcodes = list(set(b for b in barcodes if b and b.strip()))
-        
+        unique_barcodes = list({b for b in barcodes if b and b.strip()})
+
         if not unique_barcodes:
             return {}
 
@@ -1017,26 +1030,26 @@ class BatchCreationService:
                         StoreProduct.store_id.is_(None),  # Product exists but not in this store
                         and_(
                             StoreProduct.store_id == store_id,
-                            StoreProduct.is_active == True
+                            StoreProduct.is_active
                         )
                     )
                 )
             )
         )
-        
+
         existing_products = {}
         for row in result:
             barcode, product_id, store_id_result = row
             exists_in_store = store_id_result == store_id
             existing_products[barcode] = (product_id, exists_in_store)
-            
+
         logger.info(
             "Bulk product lookup completed",
             requested_barcodes=len(unique_barcodes),
             found_products=len(existing_products),
             store_id=store_id,
         )
-        
+
         return existing_products
 
     async def _bulk_create_missing_products(
@@ -1051,8 +1064,9 @@ class BatchCreationService:
         Bulk create products that don't exist yet
         Returns dict mapping barcode -> product_id for newly created products
         """
-        from app.database.inventory_models import Product, StoreProduct
         import time
+
+        from app.database.inventory_models import Product, StoreProduct
 
         new_products = {}
         products_to_create = []
@@ -1060,11 +1074,11 @@ class BatchCreationService:
 
         for request in batch_requests:
             barcode = request.barcode
-            
+
             # Skip if product already exists
             if barcode in existing_products:
                 product_id, exists_in_store = existing_products[barcode]
-                
+
                 # If product exists but not in store, add to store
                 if not exists_in_store:
                     store_product = StoreProduct(
@@ -1094,9 +1108,17 @@ class BatchCreationService:
             }
             shelf_life = category_shelf_life.get(request.category or "other", 30)
 
+            # Use provided SKU from CSV or generate unique one
+            if hasattr(request, 'sku') and request.sku:
+                product_sku = request.sku
+            else:
+                # Generate unique SKU for products without SKU
+                import uuid as uuid_lib
+                product_sku = f"CSV_{barcode[:10]}_{uuid_lib.uuid4().hex[:8].upper()}"
+            
             product = Product(
                 product_id=product_id,
-                sku=f"CSV_{barcode[:10]}_{int(time.time())}",  # Generate unique SKU
+                sku=product_sku,  # Use provided SKU or generated unique one
                 name=request.product_name,
                 brand=request.brand,
                 barcode=barcode,
@@ -1197,9 +1219,9 @@ class BatchCreationService:
                     created_by=uuid.UUID(user_id),
                     status="active",
                 )
-                
+
                 batches_to_create.append(batch)
-                
+
                 # Prepare success record
                 successful_batches.append({
                     "batch_id": str(batch.batch_id),
@@ -1294,7 +1316,7 @@ class BatchCreationService:
                         "product_name": request.product_name,
                         "error": f"Bulk processing failed: {str(e)}",
                     })
-                
+
                 return {
                     "successful": [],
                     "failed": failed_batches,
