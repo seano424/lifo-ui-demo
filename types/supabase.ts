@@ -1127,6 +1127,7 @@ export type Database = {
           total_discounted_quantity: number | null
           total_disposed_quantity: number | null
           total_donated_quantity: number | null
+          total_ignored_quantity: number | null
           total_sold_quantity: number | null
           urgency_level: string | null
           view_refreshed_at: string | null
@@ -1726,6 +1727,15 @@ export type Database = {
         }
         Returns: Json
       }
+      execute_dismiss_action: {
+        Args: {
+          p_batch_id: string
+          p_dismissal_reason: string
+          p_notes?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       execute_dispose_action: {
         Args: {
           p_batch_id: string
@@ -1753,6 +1763,10 @@ export type Database = {
           p_quantity_affected: number
           p_user_id: string
         }
+        Returns: Json
+      }
+      execute_ignore_action: {
+        Args: { p_batch_id: string; p_notes?: string; p_user_id: string }
         Returns: Json
       }
       execute_sold_action: {
@@ -1892,12 +1906,14 @@ export type Database = {
         }[]
       }
       get_batch_todo_states: {
-        Args: {
-          p_limit?: number
-          p_offset?: number
-          p_store_id?: string
-          p_todo_state?: string
-        }
+        Args:
+          | { limit_rows?: number; target_store_id?: string }
+          | {
+              p_limit?: number
+              p_offset?: number
+              p_store_id?: string
+              p_todo_state?: string
+            }
         Returns: {
           ai_calculated_at: string
           ai_recommendation: string
@@ -2220,6 +2236,36 @@ export type Database = {
           waste_reduction_target_percent: number
         }[]
       }
+      get_todos_by_section: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_section_filter: string
+          p_store_id: string
+        }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          completion_status: string
+          composite_score: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          hours_since_last_action: number
+          last_action_time: string
+          last_action_type: Database["public"]["Enums"]["action_type"]
+          last_discount_percent: number
+          priority_order: number
+          product_brand: string
+          product_name: string
+          store_id: string
+          todo_state: string
+          total_actions_ever: number
+          urgency_level: string
+          view_refreshed_at: string
+        }[]
+      }
       get_todos_dashboard: {
         Args: { p_store_id: string }
         Returns: {
@@ -2262,6 +2308,36 @@ export type Database = {
           recently_donated_count: number
           recently_expired_count: number
           total_active_count: number
+        }[]
+      }
+      get_todos_with_filters: {
+        Args: {
+          p_filters?: Json
+          p_limit?: number
+          p_offset?: number
+          p_store_id: string
+        }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          completion_status: string
+          composite_score: number
+          current_quantity: number
+          days_to_expiry: number
+          expiry_date: string
+          hours_since_last_action: number
+          last_action_time: string
+          last_action_type: Database["public"]["Enums"]["action_type"]
+          last_discount_percent: number
+          priority_order: number
+          product_brand: string
+          product_name: string
+          store_id: string
+          todo_state: string
+          total_actions_ever: number
+          urgency_level: string
+          view_refreshed_at: string
         }[]
       }
       get_user_by_username: {
