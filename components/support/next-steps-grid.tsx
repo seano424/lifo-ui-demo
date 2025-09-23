@@ -51,7 +51,6 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
 
                   {/* Description */}
                   <div className="flex flex-col gap-2">
-
                     <Typography variant="p" className="text-muted-foreground leading-relaxed">
                       {item.description}
                     </Typography>

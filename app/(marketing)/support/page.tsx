@@ -23,7 +23,9 @@ interface SupportSection {
   articles: SupportArticle[]
 }
 
-const getSupportSections = (t: ReturnType<typeof useTranslations<'marketing'>>): SupportSection[] => [
+const getSupportSections = (
+  t: ReturnType<typeof useTranslations<'marketing'>>,
+): SupportSection[] => [
   {
     id: 'getting-started',
     title: t('sections.gettingStarted.title'),
@@ -235,7 +237,9 @@ export default function SupportPage() {
                     <Link href="/contact">{t('contactSupport.buttons.contactSupport')}</Link>
                   </Button>
                   <Button size="sm" className="w-full sm:w-auto" asChild>
-                    <Link href="mailto:support@lifo-app.com">{t('contactSupport.buttons.emailUs')}</Link>
+                    <Link href="mailto:support@lifo-app.com">
+                      {t('contactSupport.buttons.emailUs')}
+                    </Link>
                   </Button>
                 </div>
               </div>

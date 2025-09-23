@@ -10,7 +10,6 @@ export function BatchStatusSummary() {
   const t = useTranslations('storeInsights.batchStatus')
 
   const { data, isLoading, error } = useDashboardSummary()
-  console.log('dashboard summary', data)
 
   if (isLoading) {
     return (
