@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
-import { Toaster } from 'sonner'
+import { Toaster } from '@/components/ui/toaster'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
@@ -74,6 +74,8 @@ export default async function RootLayout({
             richColors
             theme="light"
             className="toaster"
+            closeButton
+            closeOnClickOutside
             toastOptions={{
               className: 'toast',
               duration: 4000,
