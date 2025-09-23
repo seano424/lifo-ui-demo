@@ -183,3 +183,4 @@ dmypy.json
 
 # Deployment app IDs (keep these local)
 .do/*_app_id.txt
+.do/ENVIRONMENT_VARIABLES_CHECKLIST.md
