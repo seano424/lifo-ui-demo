@@ -7,6 +7,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
 import { Calendar, Package, PenLine } from 'lucide-react'
+import { useMemo } from 'react'
 
 interface TodoCardProps {
   todo: TodoItem
@@ -18,34 +19,33 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     onClick?.()
   }
 
-  // Format expiry date
+  // Format expiry date with consistent timezone handling
   const expiryDate = new Date(todo.expiry_date)
   const today = new Date()
-  const isExpiringSoon = expiryDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) // within 24 hours
-  const isExpired = expiryDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  const isExpiringToday = expiryDate.toDateString() === today.toDateString()
+
+  // Use consistent date comparison at start of day
+  const todayStartOfDay = new Date(today.setHours(0, 0, 0, 0))
+  const expiryStartOfDay = new Date(new Date(todo.expiry_date).setHours(0, 0, 0, 0))
+  const tomorrowStartOfDay = new Date(todayStartOfDay.getTime() + 24 * 60 * 60 * 1000)
+
+  const isExpiringSoon = expiryStartOfDay <= tomorrowStartOfDay
+  const isExpired = expiryStartOfDay < todayStartOfDay
+  const isExpiringToday = expiryStartOfDay.getTime() === todayStartOfDay.getTime()
 
   // Calculate days since expiry for expired items
   const getExpiredText = () => {
     if (!isExpired) return ''
 
-    // Use date-only comparison to avoid timezone issues
-    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-    const expiryDateOnly = new Date(
-      expiryDate.getFullYear(),
-      expiryDate.getMonth(),
-      expiryDate.getDate(),
-    )
-
-    const diffTime = todayDate.getTime() - expiryDateOnly.getTime()
+    const diffTime = todayStartOfDay.getTime() - expiryStartOfDay.getTime()
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
     if (diffDays === 1) return 'Expired yesterday'
     return `Expired ${diffDays} days ago`
   }
 
-  // Get urgency colors and icons
-  const getUrgencyConfig = (urgency: TodoItem['urgency_level']) => {
+  // Memoize urgency configuration to prevent recalculation on every render
+  const urgencyConfig = useMemo(() => {
+    const urgency = todo.urgency_level
     switch (urgency) {
       case 'critical':
         return {
@@ -88,9 +88,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           badgeVariant: 'secondary' as const,
         }
     }
-  }
-
-  const urgencyConfig = getUrgencyConfig(todo.urgency_level)
+  }, [todo.urgency_level])
 
   const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
   const wasDonated = todo.last_action_type === 'donate'

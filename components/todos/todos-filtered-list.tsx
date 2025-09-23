@@ -45,8 +45,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
-  // Track if this is the initial render to prevent URL update loops
-  const isInitialRender = useRef(true)
+  // Track if filters/tab have been initialized from URL
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // Unified filter state with stable default sort config
   const defaultSortConfig = useMemo(
@@ -119,11 +119,15 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     return () => window.removeEventListener('resize', updateIndicator)
   }, [activeTab, tabs])
 
-  // Update URL when tab or filters change (skip initial render)
+  // Mark as initialized after first render
   useEffect(() => {
-    // Skip URL update on initial render to prevent loops
-    if (isInitialRender.current) {
-      isInitialRender.current = false
+    setIsInitialized(true)
+  }, [])
+
+  // Update URL when tab or filters change (only after initialization)
+  useEffect(() => {
+    // Skip URL update until component is initialized to prevent loops
+    if (!isInitialized) {
       return
     }
 
@@ -157,7 +161,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     }
 
     router.replace(`?${params.toString()}`, { scroll: false })
-  }, [activeTab, filters, router])
+  }, [activeTab, filters, router, isInitialized])
 
   const handleTabChange = (tabId: TodoTabType) => {
     setActiveTab(tabId)

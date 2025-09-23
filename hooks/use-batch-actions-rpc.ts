@@ -153,6 +153,48 @@ interface BulkParams {
   actionParams: Record<string, unknown>
 }
 
+// Validation helper functions
+const validateBatchId = (batchId: string): void => {
+  if (!batchId || typeof batchId !== 'string' || batchId.trim().length === 0) {
+    throw new Error('Invalid batch ID: Batch ID is required and must be a non-empty string')
+  }
+  // Basic UUID format validation (optional, but recommended for security)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!uuidRegex.test(batchId)) {
+    throw new Error('Invalid batch ID format: Must be a valid UUID')
+  }
+}
+
+const validateQuantity = (quantity: number, fieldName = 'Quantity'): void => {
+  if (typeof quantity !== 'number' || Number.isNaN(quantity)) {
+    throw new Error(`Invalid ${fieldName}: Must be a valid number`)
+  }
+  if (quantity <= 0) {
+    throw new Error(`Invalid ${fieldName}: Must be greater than 0`)
+  }
+  if (!Number.isInteger(quantity)) {
+    throw new Error(`Invalid ${fieldName}: Must be a whole number`)
+  }
+}
+
+const validatePercentage = (percentage: number, fieldName = 'Percentage'): void => {
+  if (typeof percentage !== 'number' || Number.isNaN(percentage)) {
+    throw new Error(`Invalid ${fieldName}: Must be a valid number`)
+  }
+  if (percentage < 0 || percentage > 100) {
+    throw new Error(`Invalid ${fieldName}: Must be between 0 and 100`)
+  }
+}
+
+const validateString = (value: string, fieldName: string, maxLength = 500): void => {
+  if (!value || typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`Invalid ${fieldName}: ${fieldName} is required and must be a non-empty string`)
+  }
+  if (value.length > maxLength) {
+    throw new Error(`Invalid ${fieldName}: Must be less than ${maxLength} characters`)
+  }
+}
+
 export function useBatchActionRPC() {
   const queryClient = useQueryClient()
   const supabase = createClient()
@@ -293,6 +335,14 @@ export function useBatchActionRPC() {
   // 1. DONATE ACTION
   const executeDonate = useMutation({
     mutationFn: async (params: DonateParams): Promise<ActionResult> => {
+      // Validate inputs
+      validateBatchId(params.batchId)
+      validateQuantity(params.quantity, 'Donation quantity')
+      validateString(params.donationRecipientId, 'Donation recipient ID')
+      if (params.notes && params.notes.length > 500) {
+        throw new Error('Notes must be less than 500 characters')
+      }
+
       const userId = await getCurrentUserId()
 
       const rpcParams = {
@@ -366,9 +416,17 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 2. DISCOUNT ACTION (unchanged)
+  // 2. DISCOUNT ACTION
   const executeDiscount = useMutation({
     mutationFn: async (params: DiscountParams): Promise<ActionResult> => {
+      // Validate inputs
+      validateBatchId(params.batchId)
+      validateQuantity(params.quantity, 'Discount quantity')
+      validatePercentage(params.discountPercentage, 'Discount percentage')
+      if (params.notes && params.notes.length > 500) {
+        throw new Error('Notes must be less than 500 characters')
+      }
+
       const userId = await getCurrentUserId()
 
       const rpcParams = {
@@ -428,9 +486,16 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 3. SOLD ACTION (unchanged)
+  // 3. SOLD ACTION
   const executeSold = useMutation({
     mutationFn: async (params: SoldParams): Promise<ActionResult> => {
+      // Validate inputs
+      validateBatchId(params.batchId)
+      validateQuantity(params.quantity, 'Sold quantity')
+      if (params.notes && params.notes.length > 500) {
+        throw new Error('Notes must be less than 500 characters')
+      }
+
       const userId = await getCurrentUserId()
 
       const { data, error } = await supabase.rpc('execute_sold_action', {
@@ -502,9 +567,17 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 4. DISPOSE ACTION (unchanged)
+  // 4. DISPOSE ACTION
   const executeDispose = useMutation({
     mutationFn: async (params: DisposeParams): Promise<ActionResult> => {
+      // Validate inputs
+      validateBatchId(params.batchId)
+      validateQuantity(params.quantity, 'Disposal quantity')
+      validateString(params.disposalReason, 'Disposal reason')
+      if (params.notes && params.notes.length > 500) {
+        throw new Error('Notes must be less than 500 characters')
+      }
+
       const userId = await getCurrentUserId()
 
       const { data, error } = await supabase.rpc('execute_dispose_action', {
@@ -646,9 +719,38 @@ export function useBatchActionRPC() {
     },
   })
 
-  // 6. BULK ACTION (unchanged)
+  // 6. BULK ACTION
   const executeBulk = useMutation({
     mutationFn: async (params: BulkParams): Promise<BulkActionResult> => {
+      // Validate inputs
+      if (!Array.isArray(params.batchIds) || params.batchIds.length === 0) {
+        throw new Error('Invalid batch IDs: Must provide at least one batch ID')
+      }
+      if (params.batchIds.length > 100) {
+        throw new Error('Too many batch IDs: Maximum 100 batches allowed per bulk operation')
+      }
+
+      // Validate each batch ID
+      params.batchIds.forEach((batchId, index) => {
+        try {
+          validateBatchId(batchId)
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown validation error'
+          throw new Error(`Invalid batch ID at position ${index + 1}: ${errorMessage}`)
+        }
+      })
+
+      // Validate action type
+      const validActionTypes = ['donate', 'discount', 'sold', 'dispose', 'dismiss']
+      if (!validActionTypes.includes(params.actionType)) {
+        throw new Error(`Invalid action type: Must be one of ${validActionTypes.join(', ')}`)
+      }
+
+      // Validate action params
+      if (!params.actionParams || typeof params.actionParams !== 'object') {
+        throw new Error('Invalid action parameters: Must be a valid object')
+      }
+
       const userId = await getCurrentUserId()
 
       const { data, error } = await supabase.rpc('execute_bulk_action', {

@@ -25,9 +25,13 @@ export function useTodosWithFilters(filters: TodoFilters = {}, pageSize: number 
       })
     },
     getNextPageParam: (lastPage, allPages) => {
-      // If we got fewer items than requested, there are no more pages
-      if (lastPage.length < pageSize) return undefined
-      return allPages.length // Next page number
+      // Fixed: Check if we got exactly 0 items OR less than requested
+      // This handles the edge case where the last page has exactly pageSize items
+      if (lastPage.length === 0 || lastPage.length < pageSize) {
+        return undefined
+      }
+      // Return the next page number (current page count becomes next page index)
+      return allPages.length
     },
     initialPageParam: 0,
     enabled: !!activeStoreId,
