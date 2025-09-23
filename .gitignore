@@ -93,80 +93,72 @@ env/
 .coverage
 htmlcov/
 
-# Manual test artifacts
+# Manual test artifacts and reports
 /tests/manual/*.json
 /comprehensive_api_test_report_*.json
+*_report_*.json
+*.report
+report_*
+
+# Test data and debug files
+test_data/
+test_archive/
+test_*.py
+*debug*
+debug/
 
 # Environment backups
 *.env.backup
 *.env.legacy
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-# Python lib directories (but not our TypeScript lib folder)
-**/lib64/
-**/lib/python*/
-venv/lib/
-env/lib/
-.venv/lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+
+# Documentation artifacts (keep essential docs only)
+PERFORMANCE_OPTIMIZATION_REPORT.md
+PRODUCT_SCORING_RULES_DOCUMENTATION.md
+DONATION_FIRST_REFERENCE.md
+ARCHITECTURE_MIGRATION_GUIDE.md
+SECURITY_AUDIT_REPORT.md
+DOCUMENTATION.md
+docs/archive/
+
+# Development logs and temporary files (expanded)
+*.log
+logs/
+*.tmp
+*.bak
+*~
+*.debug
+*.trace
+
+# Performance and monitoring files
+*.prof
+*.perf
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker artifacts
+.dockerignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # PyInstaller
 *.manifest
 *.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -178,28 +170,6 @@ ipython_config.py
 # pyenv
 .python-version
 
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
 # mkdocs documentation
 /site
 
@@ -208,5 +178,5 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# Pyre type checker
-.pyre/
+# Deployment app IDs (keep these local)
+.do/*_app_id.txt

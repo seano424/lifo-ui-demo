@@ -17,7 +17,7 @@ from app.api.v1.donation_preferences import (
     get_donation_strategies,
     update_donation_preferences,
 )
-from app.database.inventory_models import StoreSettings
+from app.database.models import StoreSettings
 from app.database.models import User
 
 

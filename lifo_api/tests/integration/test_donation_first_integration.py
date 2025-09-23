@@ -12,7 +12,7 @@ from httpx import AsyncClient
 
 from app.core.donation_engine import SimplifiedDonationEngine
 from app.core.scoring import InventoryScorer, ScoringService
-from app.database.inventory_models import StoreSettings
+from app.database.models import StoreSettings
 from app.database.models import User
 from app.main import app
 
@@ -23,7 +23,8 @@ class TestDonationFirstScoringIntegration:
     @pytest.fixture
     async def client(self):
         """Create test client"""
-        async with AsyncClient(app=app, base_url="http://testserver") as ac:
+        from httpx import ASGITransport
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver") as ac:
             yield ac
 
     @pytest.fixture

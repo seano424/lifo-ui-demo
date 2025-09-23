@@ -26,7 +26,7 @@ import pytest
 # Load .env.test file if it exists
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
@@ -421,7 +421,7 @@ def security_test_payloads():
 @pytest.fixture
 async def async_client(test_settings):
     """Async HTTP client for testing async endpoints."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
 
 
