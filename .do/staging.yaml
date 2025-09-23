@@ -15,8 +15,9 @@ services:
   
   # Build configuration
   build_command: |
-    pip install --upgrade pip
-    pip install -r requirements.txt
+    pip install uv
+    uv pip install --system --require-locked
+
   
   # Run command for staging (with debug logging)
   run_command: gunicorn -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 500 --log-level debug --preload app.main:app
