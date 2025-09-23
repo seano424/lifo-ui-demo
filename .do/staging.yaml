@@ -125,6 +125,10 @@ databases:
 jobs:
 - name: db-migrate-staging
   source_dir: lifo_api
+  github:
+    repo: lifo-ai/lifo-app
+    branch: staging
+    deploy_on_push: true
   run_command: alembic upgrade head
   instance_count: 1
   instance_size_slug: basic-xxs
@@ -133,15 +137,16 @@ jobs:
 # Test data seeding job (staging only)
 - name: seed-test-data
   source_dir: lifo_api
-  run_command: python -m app.scripts.seed_test_data  # You'll need to create this
+  github:
+    repo: lifo-ai/lifo-app
+    branch: staging
+    deploy_on_push: true
+  run_command: python -m app.scripts.seed_test_data  # todo
   instance_count: 1
   instance_size_slug: basic-xxs
   kind: POST_DEPLOY  # Runs after successful deployment
 
 alerts:
-- rule: CPU_UTILIZATION
-  value: 90  # Higher threshold for staging
-- rule: MEM_UTILIZATION  
-  value: 90
-- rule: RESTART_COUNT
-  value: 10  # More restarts allowed in staging
+- rule: DEPLOYMENT_FAILED
+- rule: DEPLOYMENT_LIVE
+- rule: DOMAIN_FAILED

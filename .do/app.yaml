@@ -10,7 +10,7 @@ services:
   source_dir: lifo_api
   github:
     repo: lifo-ai/lifo-app
-    branch: main
+    branch: main  # Production deploys from main branch
     deploy_on_push: true
   
   # Build configuration
@@ -78,7 +78,7 @@ services:
   
   # CORS settings for production
   - key: BACKEND_CORS_ORIGINS
-    value: "https://lifo-app.com,https://www.lifo-app.com"  # Replace with actual domains
+    value: "https://lifo-app.com,https://www.lifo-app.com"
   
   # Google Cloud (if using Vision API)
   - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
@@ -144,8 +144,8 @@ jobs:
 
 alerts:
 - rule: CPU_UTILIZATION
-  value: "80"
+  value: 80
 - rule: MEM_UTILIZATION  
-  value: "80"
+  value: 80
 - rule: RESTART_COUNT
-  value: "5"
+  value: 5
