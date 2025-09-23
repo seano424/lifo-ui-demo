@@ -46,9 +46,19 @@ export async function updateSession(request: NextRequest) {
     const { data, error } = await supabase.auth.getUser()
 
     if (error) {
-      // Log the error but don't crash the middleware
-      console.warn('[Middleware] Auth error:', error.message)
-      // Treat as logged out but continue
+      // Handle different error types appropriately
+      if (error.message?.includes('refresh_token_not_found')) {
+        // This is expected when tokens expire - not an error condition
+        console.log('[Middleware] Session expired, user needs to re-authenticate')
+      } else if (error.message?.includes('Auth session missing')) {
+        // Normal for logged-out users - don't log
+      } else if (error.message?.includes('JWT')) {
+        // Token format issues
+        console.log('[Middleware] Invalid token format, clearing session')
+      } else {
+        // Only log unexpected errors
+        console.error('[Middleware] Unexpected auth error:', error.message)
+      }
       user = null
     } else {
       user = data?.user || null
