@@ -79,14 +79,6 @@ npm run dev
 5. **European Pilot** - Advanced donation system
 6. **Production** - Deployment and monitoring
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Complete Documentation](./DOCUMENTATION.md) for setup and architecture details.
-- Deployment and production guidelines
-
-## 📄 License
-
-This project is licensed under the MIT License - see the documentation for details.
 
 ---
 

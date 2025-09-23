@@ -1,7 +1,0 @@
-sku,product_name,category,quantity,expiry_date,cost_price,selling_price,batch_number
-BULK001,Canned Tomatoes 12-pack,Canned Goods,144,2026-08-01,12.00,24.00,BATCH-BULK-001
-BULK002,Rice 25kg Bag,Pantry,4,2026-12-31,25.00,45.00,BATCH-BULK-002
-BULK003,Frozen Vegetables Mix,Frozen Foods,60,2026-03-15,2.50,4.50,BATCH-BULK-003
-BULK004,Olive Oil 5L,Pantry,20,2026-10-01,15.00,28.00,BATCH-BULK-004
-BULK005,Protein Powder 2kg,Supplements,25,2026-05-01,35.00,65.00,BATCH-BULK-005
-BULK006,Energy Drinks 24-pack,Beverages,50,2025-11-30,18.00,36.00,BATCH-BULK-006
