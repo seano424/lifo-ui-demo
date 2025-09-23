@@ -1,5 +1,154 @@
 @import 'tailwindcss';
 
+/* Custom Sonner Toast Styles */
+:root {
+  --sonner-toast-bg: hsl(var(--background));
+  --sonner-toast-border: hsl(var(--border));
+  --sonner-toast-text: hsl(var(--foreground));
+
+  /* Success - Use Secondary (Blue) */
+  --sonner-success-bg: hsl(var(--secondary));
+  --sonner-success-border: hsl(var(--secondary));
+  --sonner-success-text: hsl(var(--secondary-foreground));
+
+  /* Error - Use Primary (Purple) with more intensity */
+  --sonner-error-bg: hsl(var(--primary));
+  --sonner-error-border: hsl(var(--primary));
+  --sonner-error-text: hsl(var(--primary-foreground));
+
+  /* Warning - Use Primary but lighter */
+  --sonner-warning-bg: hsl(252 100% 75%);
+  --sonner-warning-border: hsl(252 100% 70%);
+  --sonner-warning-text: hsl(0 0% 100%);
+}
+
+/* Sonner Toast Container */
+[data-sonner-toaster] {
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+/* Individual Toast Styling */
+[data-sonner-toast] {
+  border-radius: 12px;
+  border: 1px solid var(--sonner-toast-border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  font-weight: 500;
+}
+
+[data-sonner-toast][data-styled="true"] {
+  padding: 16px 20px;
+  gap: 12px;
+}
+
+/* Success Toast - Force styling */
+[data-sonner-toast][data-type="success"],
+[data-sonner-toast][data-type="success"][data-styled="true"] {
+  background: hsl(227 100% 63%) !important;
+  border-color: hsl(227 100% 63%) !important;
+  color: white !important;
+}
+
+/* Error Toast - Force styling */
+[data-sonner-toast][data-type="error"],
+[data-sonner-toast][data-type="error"][data-styled="true"] {
+  background: hsl(252 100% 57%) !important;
+  border-color: hsl(252 100% 57%) !important;
+  color: white !important;
+}
+
+/* Warning Toast - Force styling */
+[data-sonner-toast][data-type="warning"],
+[data-sonner-toast][data-type="warning"][data-styled="true"] {
+  background: hsl(252 100% 75%) !important;
+  border-color: hsl(252 100% 70%) !important;
+  color: white !important;
+}
+
+/* Toast Title */
+[data-sonner-toast] [data-title] {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.4;
+  color: inherit;
+}
+
+/* Toast Description */
+[data-sonner-toast] [data-description] {
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.9;
+  color: inherit;
+}
+
+/* Ensure colored toasts have white text and icons */
+[data-sonner-toast][data-type="success"] [data-title],
+[data-sonner-toast][data-type="success"] [data-description],
+[data-sonner-toast][data-type="success"] [data-icon],
+[data-sonner-toast][data-type="error"] [data-title],
+[data-sonner-toast][data-type="error"] [data-description],
+[data-sonner-toast][data-type="error"] [data-icon],
+[data-sonner-toast][data-type="warning"] [data-title],
+[data-sonner-toast][data-type="warning"] [data-description],
+[data-sonner-toast][data-type="warning"] [data-icon] {
+  color: white !important;
+}
+
+/* Close Button */
+[data-sonner-toast] [data-close-button] {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: inherit;
+}
+
+[data-sonner-toast] [data-close-button]:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Custom Session Termination Toast */
+.session-termination-toast {
+  animation: slideInFromRight 0.3s ease-out;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Gradient background using primary and secondary */
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%) !important;
+  border: 1px solid hsl(var(--primary)) !important;
+
+  /* Enhanced styling */
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.session-termination-toast [data-icon] {
+  animation: pulse 2s infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @plugin 'tailwind-scrollbar';
