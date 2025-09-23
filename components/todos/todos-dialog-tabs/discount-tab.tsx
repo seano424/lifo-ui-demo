@@ -27,24 +27,29 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Discount tab state
   const [discountPercentage, setDiscountPercentage] = useState(
-    selectedBatch?.discount_percent || 20,
+    selectedBatch?.discount_percent || 20
   )
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
 
   // Calculate price metrics
   const calculatePriceMetrics = () => {
-    const originalPrice = selectedBatch.potential_loss / selectedBatch.current_quantity
+    const originalPrice =
+      selectedBatch.potential_loss / selectedBatch.current_quantity
     let actualDiscountPercentage = discountPercentage
     let newPrice = originalPrice * (1 - discountPercentage / 100)
 
     if (useCustomPrice && customPrice) {
       const customPriceNum = Number(customPrice)
       // Validate custom price: must be positive and not exceed original price
-      if (customPriceNum > 0 && customPriceNum <= originalPrice && !Number.isNaN(customPriceNum)) {
+      if (
+        customPriceNum > 0 &&
+        customPriceNum <= originalPrice &&
+        !Number.isNaN(customPriceNum)
+      ) {
         newPrice = customPriceNum
         actualDiscountPercentage = Math.round(
-          ((originalPrice - customPriceNum) / originalPrice) * 100,
+          ((originalPrice - customPriceNum) / originalPrice) * 100
         )
       } else {
         // If invalid, fall back to percentage-based discount
@@ -54,7 +59,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
     const totalRevenue = newPrice * selectedBatch.current_quantity
     const originalRevenue = originalPrice * selectedBatch.current_quantity
-    const recoveryPercentage = Math.round((totalRevenue / originalRevenue) * 100)
+    const recoveryPercentage = Math.round(
+      (totalRevenue / originalRevenue) * 100
+    )
 
     const metrics = {
       originalPrice,
@@ -87,7 +94,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
     return DISCOUNT_THRESHOLDS.base.likelihood
   }
 
-  const sellLikelihood = getSellLikelihood(priceMetrics.actualDiscountPercentage)
+  const sellLikelihood = getSellLikelihood(
+    priceMetrics.actualDiscountPercentage
+  )
 
   // Handle discount slider change
   const handleDiscountChange = (value: number) => {
@@ -138,7 +147,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-lg">💡</span>
-              <h3 className="font-semibold text-lg">MAXIMIZE REVENUE RECOVERY</h3>
+              <h3 className="font-semibold text-lg">
+                MAXIMIZE REVENUE RECOVERY
+              </h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               AI Suggested Discount: {selectedBatch.discount_percent || 20}%
@@ -150,7 +161,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm">
                 <span className="text-muted-foreground">Original:</span>
-                <span className="ml-2 font-semibold">€{priceMetrics.originalPrice.toFixed(2)}</span>
+                <span className="ml-2 font-semibold">
+                  €{priceMetrics.originalPrice.toFixed(2)}
+                </span>
                 <span className="mx-3 text-muted-foreground">→</span>
                 <span className="text-muted-foreground">New:</span>
                 <span className="ml-2 font-semibold text-green-600">
@@ -161,7 +174,8 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
             <div className="text-sm">
               <span className="text-muted-foreground">Revenue recovery:</span>
               <span className="ml-2 font-semibold text-green-600">
-                €{priceMetrics.totalRevenue.toFixed(2)} ({priceMetrics.recoveryPercentage}%)
+                €{priceMetrics.totalRevenue.toFixed(2)} (
+                {priceMetrics.recoveryPercentage}%)
               </span>
             </div>
           </div>
@@ -181,7 +195,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
             {/* Quick Preset Buttons */}
             <div className="flex gap-2 mt-3">
-              {[10, 20, 25, 50].map(preset => (
+              {[10, 20, 25, 50].map((preset) => (
                 <Button
                   key={preset}
                   variant="outline"
@@ -191,7 +205,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
                     'flex-1',
                     discountPercentage === preset &&
                       !useCustomPrice &&
-                      'bg-purple-100 border-purple-300',
+                      'bg-purple-100 border-purple-300'
                   )}
                 >
                   {preset}%
@@ -215,18 +229,24 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
                   'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors',
                   useCustomPrice
                     ? 'bg-purple-50 border-purple-300 text-purple-700'
-                    : 'border-gray-200 hover:border-purple-300',
+                    : 'border-gray-200 hover:border-purple-300'
                 )}
               >
                 <div
                   className={cn(
                     'w-4 h-4 rounded border-2 transition-colors',
-                    useCustomPrice ? 'bg-purple-600 border-purple-600' : 'border-gray-300',
+                    useCustomPrice
+                      ? 'bg-purple-600 border-purple-600'
+                      : 'border-gray-300'
                   )}
                 >
-                  {useCustomPrice && <span className="text-white text-xs">✓</span>}
+                  {useCustomPrice && (
+                    <span className="text-white text-xs">✓</span>
+                  )}
                 </div>
-                <span className="text-sm font-medium">Set custom price instead</span>
+                <span className="text-sm font-medium">
+                  Set custom price instead
+                </span>
               </button>
             </div>
 
@@ -236,7 +256,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
                 <input
                   type="number"
                   value={customPrice}
-                  onChange={e => handleCustomPriceChange(e.target.value)}
+                  onChange={(e) => handleCustomPriceChange(e.target.value)}
                   placeholder="Enter price"
                   className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   step="0.01"
@@ -248,7 +268,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
           {/* Expected Outcome */}
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-sm font-medium mb-2 text-blue-800">Expected Outcome</h3>
+            <h3 className="text-sm font-medium mb-2 text-blue-800">
+              Expected Outcome
+            </h3>
             <div className="space-y-1 text-sm text-blue-700">
               <div className="flex justify-between">
                 <span>Sell likelihood:</span>
@@ -256,26 +278,31 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
               </div>
               <div className="flex justify-between">
                 <span>Revenue recovery:</span>
-                <span className="font-medium">€{priceMetrics.totalRevenue.toFixed(2)}</span>
+                <span className="font-medium">
+                  €{priceMetrics.totalRevenue.toFixed(2)}
+                </span>
               </div>
             </div>
             <p className="text-xs text-blue-600 mt-2">
-              This discount will update the batch price and keep it active for sale.
+              This discount will update the batch price and keep it active for
+              sale.
             </p>
           </div>
         </div>
 
         {/* footer */}
-        <div className="sticky bottom-0">
-          <button
-            type="button"
+        <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
+          <Button
+            variant="subtleTertiary"
+            size="lg"
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            size="lg"
             onClick={handleDiscountAction}
             disabled={isDiscounting}
-            className={cn(
-              'w-full py-3 px-4 rounded-lg font-medium transition-colors',
-              'bg-purple-600 text-white hover:bg-purple-700',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-            )}
           >
             {isDiscounting ? (
               <span className="flex items-center justify-center gap-2">
@@ -287,7 +314,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
             ) : (
               `Apply ${priceMetrics.actualDiscountPercentage}% Discount`
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </ErrorBoundary>
