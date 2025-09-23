@@ -31,7 +31,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
       sliderClassName,
       ...props
     },
-    ref
+    ref,
   ) => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = parseInt(e.target.value, 10)
@@ -49,27 +49,18 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
 
     // Calculate progress percentage to match native thumb positioning
     // Native range inputs position thumbs with some inset from edges
-    const progressRatio = (value - min) / (max - min)
+    const progressRatio = max === min ? 1 : (value - min) / (max - min)
     const thumbInset = 2.5 // Percentage inset from each edge for thumb positioning
-    const progressPercentage =
-      thumbInset + progressRatio * (100 - 2 * thumbInset)
+    const progressPercentage = thumbInset + progressRatio * (100 - 2 * thumbInset)
 
     return (
-      <div
-        ref={ref}
-        className={cn('space-y-3', className)}
-        {...props}
-      >
+      <div ref={ref} className={cn('space-y-3', className)} {...props}>
         {label && (
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">{label}</label>
             <div className="text-right">
               <span className="text-lg font-bold">{value}</span>
-              {suffix && (
-                <span className="text-sm text-muted-foreground ml-1">
-                  {suffix}
-                </span>
-              )}
+              {suffix && <span className="text-sm text-muted-foreground ml-1">{suffix}</span>}
             </div>
           </div>
         )}
@@ -88,7 +79,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                 'h-8 px-2 text-sm text-center border rounded-md',
                 'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
                 'bg-background border-border',
-                inputClassName
+                inputClassName,
               )}
             />
           </div>
@@ -100,7 +91,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
             {/* Progress fill */}
             <div
               className="h-7 bg-black rounded-full transition-all ease-in-out absolute left-0 pointer-events-none flex justify-end items-center p-px"
-              style={{ width: `${progressPercentage}%` }}
+              style={{ width: `${progressRatio === 1 ? 100 : Math.max(6, progressPercentage)}%` }}
             >
               <div className="h-6 w-6 rounded-full bg-white" />
             </div>
@@ -113,14 +104,14 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
               onChange={handleSliderChange}
               className={cn(
                 'w-full h-8 opacity-0 bg-transparent rounded-full appearance-none cursor-pointer relative z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:border-gray-400 [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:mt-[-4px] [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:border-gray-400 [&::-moz-range-thumb]:margin-top-[-4px]',
-                sliderClassName
+                sliderClassName,
               )}
             />
           </div>
         </div>
       </div>
     )
-  }
+  },
 )
 
 InputSlider.displayName = 'InputSlider'

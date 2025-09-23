@@ -65,9 +65,7 @@ export function TodoActionBottomSheet({
               {new Date(selectedBatch.expiry_date).toLocaleDateString()}
             </Typography>
             <Typography className="px-2">{calculateDaysLeft()}</Typography>
-            <Typography className="px-2">
-              {selectedBatch.current_quantity} remaining
-            </Typography>
+            <Typography className="px-2">{selectedBatch.current_quantity} remaining</Typography>
           </div>
         </div>
       }
@@ -76,7 +74,7 @@ export function TodoActionBottomSheet({
       <div className="flex flex-col h-full">
         {/* Tab Navigation */}
         <div className="flex gap-4 w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <Button
               key={tab.id}
               variant={activeTab === tab.id ? 'default' : 'outline'}
@@ -91,31 +89,15 @@ export function TodoActionBottomSheet({
         {/* Tab Content Area */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'discount' && (
-            <DiscountTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
+            <DiscountTab selectedBatch={selectedBatch} onClose={onClose} />
           )}
 
-          {activeTab === 'donate' && (
-            <DonateTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
-          )}
+          {activeTab === 'donate' && <DonateTab selectedBatch={selectedBatch} onClose={onClose} />}
 
-          {activeTab === 'sold' && (
-            <SoldTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
-          )}
+          {activeTab === 'sold' && <SoldTab selectedBatch={selectedBatch} onClose={onClose} />}
 
           {activeTab === 'dispose' && (
-            <DisposeTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
+            <DisposeTab selectedBatch={selectedBatch} onClose={onClose} />
           )}
         </div>
       </div>
