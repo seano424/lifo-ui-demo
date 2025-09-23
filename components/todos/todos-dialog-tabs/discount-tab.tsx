@@ -27,7 +27,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Discount tab state
   const [discountPercentage, setDiscountPercentage] = useState(
-    selectedBatch?.discount_percent || 21,
+    selectedBatch?.discount_percent || 20,
   )
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
@@ -141,7 +141,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
               <h3 className="font-semibold text-lg">MAXIMIZE REVENUE RECOVERY</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              AI Suggested Discount: {selectedBatch.discount_percent || 21}%
+              AI Suggested Discount: {selectedBatch.discount_percent || 20}%
             </p>
           </div>
 

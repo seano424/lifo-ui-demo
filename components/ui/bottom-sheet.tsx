@@ -9,13 +9,28 @@ import { cn } from '@/lib/utils'
 interface BottomSheetProps {
   isOpen: boolean
   onClose: () => void
-  title: string
+  title?: string
+  titleElement?: React.ReactNode
   children: React.ReactNode
   variant?: 'default' | 'fullHeight'
+  className?: string
+  contentBgMuted?: boolean
 }
 
 const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
-  ({ isOpen, onClose, title, children, variant = 'default' }, ref) => {
+  (
+    {
+      isOpen,
+      onClose,
+      title,
+      titleElement,
+      children,
+      variant = 'default',
+      className,
+      contentBgMuted = false,
+    },
+    ref
+  ) => {
     const isMobile = useIsMobile()
     const contentRef = React.useRef<HTMLDivElement>(null)
     const [isDragging, setIsDragging] = React.useState(false)
@@ -68,13 +83,16 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
     }, [isOpen, onClose])
 
     return (
-      <DialogPrimitive.Root open={isOpen} onOpenChange={open => !open && onClose()}>
+      <DialogPrimitive.Root
+        open={isOpen}
+        onOpenChange={(open) => !open && onClose()}
+      >
         <DialogPrimitive.Portal>
           <DialogPrimitive.Overlay
             className={cn(
               'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
               'data-[state=open]:animate-in data-[state=closed]:animate-out',
-              'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+              'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
             )}
             onClick={onClose}
           />
@@ -82,6 +100,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
             ref={ref}
             className={cn(
               'fixed z-50 bg-background shadow-xl',
+              className,
               'focus:outline-none',
               isMobile
                 ? [
@@ -100,10 +119,11 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                     'data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-top-[48%]',
                     'data-[state=open]:duration-200 data-[state=closed]:duration-150',
                     variant === 'fullHeight' ? 'h-[90vh]' : 'max-h-[85vh]',
-                  ],
+                  ]
             )}
             style={{
-              transform: isMobile && dragY > 0 ? `translateY(${dragY}px)` : undefined,
+              transform:
+                isMobile && dragY > 0 ? `translateY(${dragY}px)` : undefined,
               transition: isDragging ? 'none' : undefined,
             }}
             onTouchStart={handleTouchStart}
@@ -119,15 +139,15 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
               )}
 
               <div className="flex items-center justify-between px-6 py-4 border-b">
-                <DialogPrimitive.Title className="text-lg font-semibold font-heading">
-                  {title}
+                <DialogPrimitive.Title>
+                  {titleElement || title}
                 </DialogPrimitive.Title>
                 <DialogPrimitive.Close
                   className={cn(
-                    'rounded-full p-2',
+                    'rounded-full p-2 border',
                     'ring-offset-background transition-opacity',
-                    'hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                    'disabled:pointer-events-none',
+                    'hover:opacity-70 focus:outline-none focus:ring-0 focus:ring-offset-0',
+                    'disabled:pointer-events-none'
                   )}
                   onClick={onClose}
                 >
@@ -141,6 +161,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                 className={cn(
                   'flex-1 overflow-y-auto px-6 py-4',
                   'scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent',
+                  contentBgMuted && 'bg-muted'
                 )}
               >
                 {children}
@@ -150,7 +171,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
     )
-  },
+  }
 )
 
 BottomSheet.displayName = 'BottomSheet'
