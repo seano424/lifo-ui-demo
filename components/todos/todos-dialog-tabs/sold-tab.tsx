@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
+import { Typography } from '@/components/ui/typography'
 import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { cn } from '@/lib/utils'
@@ -102,11 +103,11 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* content */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {/* Header */}
-        <div className="text-center mb-6">
+        {/* <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-lg">🎉</span>
             <h3 className="font-semibold text-lg">FULL PRICE SUCCESS</h3>
@@ -114,10 +115,10 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
           <p className="text-sm text-muted-foreground">
             Great news! You sold at full price.
           </p>
-        </div>
+        </div> */}
 
         {/* Sale Details Box */}
-        <div className="bg-green-50 border border-green-200 p-4 rounded-lg mb-6">
+        {/* <div className="bg-green-50 border border-green-200 p-4 rounded-lg mb-6">
           <div className="text-sm space-y-1">
             <div className="font-medium text-green-800 mb-2">Sale details:</div>
             <div className="text-green-700">
@@ -130,44 +131,22 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
               Profit margin: {soldMetrics.profitMargin}%
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Quantity Selection */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium">Units Sold</h3>
-            <button
-              type="button"
-              onClick={handleSelectAllToggle}
-              className={cn(
-                'text-sm font-medium px-3 py-1 rounded-full transition-colors',
-                isSoldSelectAll
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              )}
-            >
-              {isSoldSelectAll ? 'All Selected' : 'Select All'}
-            </button>
-          </div>
 
-          <InputSlider
-            value={soldQuantity}
-            onChange={handleQuantityChange}
-            min={1}
-            max={selectedBatch.current_quantity}
-            step={1}
-            label={`${soldQuantity} units`}
-            suffix={`/${selectedBatch.current_quantity}`}
-            sliderColor="#22c55e"
-          />
-
-          <p className="text-xs text-gray-500 mt-2">
-            Out of {selectedBatch.current_quantity} available units
-          </p>
-        </div>
+        <InputSlider
+          value={soldQuantity}
+          onChange={handleQuantityChange}
+          min={1}
+          max={selectedBatch.current_quantity}
+          step={1}
+          suffix={`/${selectedBatch.current_quantity}`}
+          label={`${soldQuantity}/${selectedBatch.current_quantity} `}
+        />
 
         {/* Sale Timing Options */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <h3 className="text-sm font-medium mb-3">When did this sell?</h3>
           <div className="grid grid-cols-2 gap-2">
             {SALE_TIMING_OPTIONS.map((option) => (
@@ -186,10 +165,10 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
               </button>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* AI Learning Section */}
-        <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg mb-6">
+        {/* <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg mb-6">
           <div className="flex items-center gap-2 text-blue-700 mb-2">
             <span>📊</span>
             <span className="text-sm font-medium">
@@ -200,17 +179,17 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
             Your sale data improves future demand predictions and pricing
             recommendations.
           </p>
-        </div>
+        </div> */}
 
         {/* Expected Outcome */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        {/* <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <h3 className="text-sm font-medium mb-2">Expected Outcome</h3>
           <p className="text-sm text-gray-600">
             {soldQuantity === selectedBatch.current_quantity
               ? 'This will mark all units as sold and remove this item from your todo list.'
               : `This will reduce inventory by ${soldQuantity} units. The remaining ${selectedBatch.current_quantity - soldQuantity} units will stay active for sale.`}
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* footer */}

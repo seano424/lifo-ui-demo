@@ -123,7 +123,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* content */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {/* Header */}

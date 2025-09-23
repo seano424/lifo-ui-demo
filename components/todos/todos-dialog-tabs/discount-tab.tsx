@@ -6,7 +6,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Configurable discount thresholds for sell likelihood calculation
 const DISCOUNT_THRESHOLDS = {
@@ -31,6 +31,18 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
   )
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
+  const [newPrice, setNewPrice] = useState(0) // new price
+
+  useEffect(() => {
+    setNewPrice(
+      (selectedBatch.potential_loss / selectedBatch.current_quantity) *
+        (1 - discountPercentage / 100)
+    )
+  }, [
+    discountPercentage,
+    selectedBatch.potential_loss,
+    selectedBatch.current_quantity,
+  ])
 
   // Calculate price metrics
   const calculatePriceMetrics = () => {
@@ -140,11 +152,11 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   return (
     <ErrorBoundary>
-      <div>
+      <div className="flex flex-col h-full">
         {/* content */}
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {/* Header */}
-          <div className="text-center mb-6">
+          {/* <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-lg">💡</span>
               <h3 className="font-semibold text-lg">
@@ -154,10 +166,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
             <p className="text-sm text-muted-foreground mb-4">
               AI Suggested Discount: {selectedBatch.discount_percent || 20}%
             </p>
-          </div>
+          </div> */}
 
           {/* Price Comparison Box */}
-          <div className="bg-muted/50 p-4 rounded-lg border mb-6">
+          {/* <div className="bg-muted/50 p-4 rounded-lg border mb-6">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm">
                 <span className="text-muted-foreground">Original:</span>
@@ -178,35 +190,33 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
                 {priceMetrics.recoveryPercentage}%)
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Discount Slider */}
-          <div className="mb-6">
+          <div className="flex flex-col gap-4">
             <InputSlider
               value={discountPercentage}
               onChange={handleDiscountChange}
               min={5}
-              max={70}
+              max={85}
               step={1}
-              label="Adjust discount:"
+              label={`New price: ${newPrice.toFixed(2)}`}
               suffix="%"
+              isPercentage
               sliderColor="#8b5cf6"
             />
+            <p>{selectedBatch.unit_price}</p>
 
             {/* Quick Preset Buttons */}
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2">
               {[10, 20, 25, 50].map((preset) => (
                 <Button
                   key={preset}
-                  variant="outline"
-                  size="sm"
+                  variant={
+                    discountPercentage === preset ? 'default' : 'outline'
+                  }
+                  className="py-4 text-lg rounded-full"
                   onClick={() => handleDiscountChange(preset)}
-                  className={cn(
-                    'flex-1',
-                    discountPercentage === preset &&
-                      !useCustomPrice &&
-                      'bg-purple-100 border-purple-300'
-                  )}
                 >
                   {preset}%
                 </Button>
@@ -215,7 +225,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           </div>
 
           {/* Custom Price Toggle */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
               <button
                 type="button"
@@ -264,10 +274,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
                 />
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Expected Outcome */}
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+          {/* <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <h3 className="text-sm font-medium mb-2 text-blue-800">
               Expected Outcome
             </h3>
@@ -287,7 +297,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
               This discount will update the batch price and keep it active for
               sale.
             </p>
-          </div>
+          </div> */}
         </div>
 
         {/* footer */}
