@@ -9,8 +9,8 @@ import {
   ScanSearch,
   SettingsIcon,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
@@ -61,7 +61,7 @@ function useNavigationData() {
             },
             {
               title: t('todos'),
-              url: '/dashboard/todos',
+              url: '/dashboard/todos?sort=urgency&direction=desc&urgency=critical%2Chigh', // this is to get the todos sorted by urgency by default -> high and critical
               icon: ListTodo,
               badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
             },

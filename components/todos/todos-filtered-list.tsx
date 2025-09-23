@@ -1,65 +1,32 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  BatchActionFilters,
-  type BatchActionFiltersType,
-} from '@/components/todos/batch-action-filters'
-import { TodosCardList } from '@/components/todos/todos-card-list'
-import { TodosFilters } from '@/components/todos/todos-filters'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { useMediaQuery } from '@/hooks/use-mobile'
 import {
-  type ActionableBatch,
-  type BatchActionWithDetails,
-  useBatchActionsInfinite,
-  useStoreAnalytics,
-  useTodosInfinite,
-} from '@/hooks/use-scoring-analytics'
-import { useActiveStoreId } from '@/lib/stores/store-context'
+  useCompletedTodos,
+  useInProgressTodos,
+  usePendingTodos,
+} from '@/hooks/use-todos-with-filters'
+import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
-import { isSortDirection, isSortField, validateSortConfig } from '@/lib/utils/todo-sorting'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
+import type { SortDirection, SortField } from './filters/todo-sort-controls'
+import { CompletedTab } from './todos-main-tabs/completed-tab'
+import { InProgressTab } from './todos-main-tabs/in-progress-tab'
+import { PendingTab } from './todos-main-tabs/pending-tab'
 
-export type TodoItem = {
-  batch_id: string
-  product_name: string
-  expiry_date: string
-  urgency: 'critical' | 'high' | 'medium' | 'low' | 'maintain'
-  recommendation: string
-  reason: string
-  location_code: string
-  current_quantity: number
-  potential_loss?: number
-  composite_score?: number
-  discount_percent?: number
-  action_taken?: string
-  action_date?: string
-  action_user?: string
-}
-
-export type TodoFilters = {
-  storeId?: string
-  tab?: 'suggestions' | 'recently_expired' | 'all_active' | 'action_history'
-  urgency?: 'critical' | 'high' | 'medium' | 'low' | 'maintain' | 'all'
-  sort?: {
-    field:
-      | 'expiry_date'
-      | 'urgency'
-      | 'current_quantity'
-      | 'potential_loss'
-      | 'alphabetical'
-      | 'action_date'
-      | 'effectiveness'
-    direction: 'asc' | 'desc'
-  }
-}
+export type TodoTabType = 'pending' | 'in_progress' | 'completed'
 
 interface TodosFilteredListProps {
   initialFilters?: {
     tab?: string
-    urgency?: string
+    urgency?: string[]
+    actionType?: string[]
+    batchStatus?: string[]
+    productName?: string
     sort?: string
     direction?: string
   }
@@ -68,59 +35,77 @@ interface TodosFilteredListProps {
 
 export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const activeStoreId = useActiveStoreId()
+  const { isMobile } = useMediaQuery()
 
-  const [activeTab, setActiveTab] = useState<string>(initialFilters?.tab || 'suggestions')
+  const [activeTab, setActiveTab] = useState<TodoTabType>(
+    (initialFilters?.tab as TodoTabType) || 'pending',
+  )
 
-  const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>([])
+  // Tab indicator animation
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
 
-  // Batch action filters state
-  const [batchActionFilters, setBatchActionFilters] = useState<BatchActionFiltersType>({
-    sort: { field: 'action_date', direction: 'desc' },
+  // Track if filters/tab have been initialized from URL
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Unified filter state with stable default sort config
+  const defaultSortConfig = useMemo(
+    () => ({
+      field: 'urgency' as const,
+      direction: 'desc' as const,
+    }),
+    [],
+  )
+
+  const [filters, setFilters] = useState<TodoFiltersState>(() => {
+    return {
+      urgency_level: initialFilters?.urgency as TodoUrgencyLevel[] | undefined,
+      action_type: initialFilters?.actionType as TodoActionType[] | undefined,
+      batch_status: initialFilters?.batchStatus as BatchStatus[] | undefined,
+      product_name: initialFilters?.productName || undefined,
+      sortConfig: initialFilters?.sort
+        ? {
+            field: initialFilters.sort as SortField,
+            direction: (initialFilters.direction as SortDirection) || 'desc',
+          }
+        : defaultSortConfig,
+    }
   })
 
-  const [filters, setFilters] = useState<TodoFilters>(() => {
-    const baseFilters: TodoFilters = {
-      storeId: activeStoreId || undefined,
-      tab: (initialFilters?.tab as TodoFilters['tab']) || 'suggestions',
-    }
+  // Get data for tab counts
+  const { data: pendingTodos } = usePendingTodos(filters, pageSize)
+  const { data: inProgressTodos } = useInProgressTodos(filters, pageSize)
+  const { data: completedTodos } = useCompletedTodos(filters, pageSize)
 
-    if (initialFilters?.urgency && initialFilters.urgency !== 'all') {
-      const validUrgencyLevels = ['critical', 'high', 'medium', 'low', 'maintain']
-      if (validUrgencyLevels.includes(initialFilters.urgency)) {
-        baseFilters.urgency = initialFilters.urgency as TodoFilters['urgency']
-      }
-    }
+  // Tab configuration
+  const tabs = useMemo(
+    () => [
+      {
+        id: 'pending' as TodoTabType,
+        label: 'Pending',
+        count: pendingTodos?.length || 0,
+        component: PendingTab,
+      },
+      {
+        id: 'in_progress' as TodoTabType,
+        label: 'In Progress',
+        count: inProgressTodos?.length || 0,
+        component: InProgressTab,
+      },
+      {
+        id: 'completed' as TodoTabType,
+        label: 'Completed',
+        count: completedTodos?.length || 0,
+        component: CompletedTab,
+      },
+    ],
+    [pendingTodos?.length, inProgressTodos?.length, completedTodos?.length],
+  )
 
-    if (initialFilters?.sort) {
-      const field = initialFilters.sort
-      const direction = initialFilters.direction || 'asc'
-
-      if (isSortField(field) && isSortDirection(direction)) {
-        baseFilters.sort = { field, direction }
-      } else {
-        baseFilters.sort = validateSortConfig({ field, direction })
-      }
-    } else {
-      baseFilters.sort =
-        baseFilters.tab === 'suggestions'
-          ? { field: 'urgency', direction: 'desc' }
-          : { field: 'expiry_date', direction: 'asc' }
-    }
-
-    return baseFilters
-  })
-
-  useEffect(() => {
-    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
-  }, [activeStoreId])
-
+  // Update tab indicator position
   useEffect(() => {
     const updateIndicator = () => {
-      const tabs = ['suggestions', 'recently_expired', 'all_active', 'action_history']
-      const activeIndex = tabs.indexOf(activeTab)
+      const activeIndex = tabs.findIndex(tab => tab.id === activeTab)
       const activeButton = buttonRefs.current[activeIndex]
 
       if (activeButton) {
@@ -132,272 +117,100 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     updateIndicator()
     window.addEventListener('resize', updateIndicator)
     return () => window.removeEventListener('resize', updateIndicator)
-  }, [activeTab])
+  }, [activeTab, tabs])
 
-  const updateFilters = (newFilters: Partial<TodoFilters>) => {
-    const updatedFilters = { ...filters, ...newFilters }
-    setFilters(updatedFilters)
+  // Mark as initialized after first render
+  useEffect(() => {
+    setIsInitialized(true)
+  }, [])
 
-    const params = new URLSearchParams(searchParams.toString())
-
-    if (updatedFilters.tab && updatedFilters.tab !== 'suggestions') {
-      params.set('tab', updatedFilters.tab)
-    } else {
-      params.delete('tab')
+  // Update URL when tab or filters change (only after initialization)
+  useEffect(() => {
+    // Skip URL update until component is initialized to prevent loops
+    if (!isInitialized) {
+      return
     }
 
-    if (updatedFilters.urgency && updatedFilters.urgency !== 'all') {
-      params.set('urgency', updatedFilters.urgency)
-    } else {
-      params.delete('urgency')
+    const params = new URLSearchParams()
+
+    // Update tab
+    if (activeTab !== 'pending') {
+      params.set('tab', activeTab)
     }
 
-    if (updatedFilters.sort) {
-      params.set('sort', updatedFilters.sort.field)
-      params.set('direction', updatedFilters.sort.direction)
-    } else {
-      params.delete('sort')
-      params.delete('direction')
+    // Update filters
+    if (filters.urgency_level?.length) {
+      params.set('urgency', filters.urgency_level.join(','))
     }
 
-    router.push(`?${params.toString()}`)
+    if (filters.action_type?.length) {
+      params.set('actionType', filters.action_type.join(','))
+    }
+
+    if (filters.batch_status?.length) {
+      params.set('batchStatus', filters.batch_status.join(','))
+    }
+
+    if (filters.product_name) {
+      params.set('productName', filters.product_name)
+    }
+
+    if (filters.sortConfig) {
+      params.set('sort', filters.sortConfig.field)
+      params.set('direction', filters.sortConfig.direction)
+    }
+
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [activeTab, filters, router, isInitialized])
+
+  const handleTabChange = (tabId: TodoTabType) => {
+    setActiveTab(tabId)
+    // Optionally reset filters when changing tabs
+    // setFilters(prev => ({ ...prev, product_name: undefined }))
   }
 
-  const handleTabChange = (newTab: string) => {
-    setActiveTab(newTab)
-    updateFilters({
-      tab: newTab as TodoFilters['tab'],
-      urgency: 'all',
-    })
-  }
-
-  const handleFiltersChange = (newFilters: {
-    urgency?: string
-    sort?: { field: string; direction: 'asc' | 'desc' }
-  }) => {
-    updateFilters({
-      urgency: newFilters.urgency as TodoFilters['urgency'],
-      sort: newFilters.sort as TodoFilters['sort'],
-    })
-  }
-
-  const handleBatchActionFiltersChange = (newFilters: BatchActionFiltersType) => {
-    setBatchActionFilters(newFilters)
-  }
-
-  const { data: analyticsResponse } = useStoreAnalytics(activeStoreId || '')
-
-  const {
-    data: infiniteData,
-    isLoading: isLoadingInfinite,
-    error: infiniteError,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useTodosInfinite(activeStoreId || '', pageSize || 20, '7d', undefined, {
-    urgency: filters.urgency,
-  })
-
-  const {
-    data: batchActionsData,
-    isLoading: isBatchActionsLoading,
-    hasNextPage: hasBatchActionsNextPage,
-    fetchNextPage: fetchBatchActionsNextPage,
-    isFetchingNextPage: isFetchingBatchActionsNextPage,
-  } = useBatchActionsInfinite(activeStoreId || null, pageSize || 20)
-
-  // Memoized batch actions processing with filtering and sorting
-  const processedBatchActions = useMemo(() => {
-    if (activeTab !== 'action_history' || !batchActionsData?.pages) {
-      return []
-    }
-
-    let actions = batchActionsData.pages.flatMap(page => page.data)
-
-    // Apply action type filter
-    if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
-      actions = actions.filter(action => action.actual_action === batchActionFilters.actionType)
-    }
-
-    // Apply sorting
-    if (batchActionFilters?.sort) {
-      actions = [...actions].sort((a, b) => {
-        const { field, direction } = batchActionFilters.sort!
-        const multiplier = direction === 'asc' ? 1 : -1
-
-        switch (field) {
-          case 'action_date':
-            return (
-              (new Date(a.action_date || 0).getTime() - new Date(b.action_date || 0).getTime()) *
-              multiplier
-            )
-          case 'expiry_date':
-            return (
-              (new Date(a.expiry_date || 0).getTime() - new Date(b.expiry_date || 0).getTime()) *
-              multiplier
-            )
-          case 'actual_action':
-            return a.actual_action.localeCompare(b.actual_action) * multiplier
-          case 'effectiveness': {
-            const aEffectiveness =
-              a.recovered_value && a.original_value ? a.recovered_value / a.original_value : 0
-            const bEffectiveness =
-              b.recovered_value && b.original_value ? b.recovered_value / b.original_value : 0
-            return (aEffectiveness - bEffectiveness) * multiplier
-          }
-          default:
-            return 0
-        }
-      })
-    }
-
-    return actions
-  }, [activeTab, batchActionsData?.pages, batchActionFilters])
-
-  const getFilteredCount = useCallback(
-    (batches: ActionableBatch[], tab: string) => {
-      if (!batches) return 0
-
-      // Apply urgency filter if on suggestions or all_active tabs
-      if (
-        (tab === 'suggestions' || tab === 'all_active') &&
-        filters.urgency &&
-        filters.urgency !== 'all'
-      ) {
-        return batches.filter(batch => batch.urgency === filters.urgency).length
-      }
-
-      return batches.length
+  const handleFiltersChange = useCallback(
+    (newFilters: TodoFiltersState | ((prevFilters: TodoFiltersState) => TodoFiltersState)) => {
+      setFilters(newFilters)
     },
-    [filters.urgency],
+    [],
   )
-
-  const getBatchActionsFilteredCount = useCallback(
-    (actions: BatchActionWithDetails[]) => {
-      if (!actions) return 0
-
-      // Apply action type filter
-      if (batchActionFilters?.actionType && batchActionFilters.actionType !== 'all') {
-        return actions.filter(action => action.actual_action === batchActionFilters.actionType)
-          .length
-      }
-
-      return actions.length
-    },
-    [batchActionFilters?.actionType],
-  )
-
-  const counts = useMemo(() => {
-    return {
-      suggestions:
-        // Use filtered count from infinite data if available, otherwise use analytics data
-        activeTab === 'suggestions' && infiniteData?.pages?.[0]?.count !== undefined
-          ? infiniteData.pages[0].count
-          : activeTab === 'suggestions' && filters.urgency && filters.urgency !== 'all'
-            ? getFilteredCount(
-                analyticsResponse?.analytics?.actionable_batches || [],
-                'suggestions',
-              )
-            : analyticsResponse?.analytics?.actionable_batches?.length || 0,
-      recently_expired:
-        analyticsResponse?.analytics?.actionable_batches?.filter(
-          batch => new Date(batch.expiry_date) < new Date(),
-        )?.length || 0,
-      all_active:
-        activeTab === 'all_active' && filters.urgency && filters.urgency !== 'all'
-          ? getFilteredCount(
-              analyticsResponse?.analytics?.actionable_batches?.filter(
-                batch => new Date(batch.expiry_date) >= new Date(),
-              ) || [],
-              'all_active',
-            )
-          : analyticsResponse?.analytics?.actionable_batches?.filter(
-              batch => new Date(batch.expiry_date) >= new Date(),
-            )?.length || 0,
-      action_history:
-        batchActionFilters?.actionType && batchActionFilters.actionType !== 'all'
-          ? getBatchActionsFilteredCount(batchActionsData?.pages?.flatMap(page => page.data) || [])
-          : batchActionsData?.pages?.[0]?.count || 0,
-    }
-  }, [
-    activeTab,
-    infiniteData?.pages,
-    filters.urgency,
-    analyticsResponse?.analytics?.actionable_batches,
-    batchActionsData?.pages,
-    batchActionFilters?.actionType,
-    getFilteredCount,
-    getBatchActionsFilteredCount,
-  ])
 
   return (
-    <>
-      <div className="relative">
-        <div className="flex items-center justify-between sm:justify-start gap-4">
-          {[
-            { label: 'Suggestions', value: 'suggestions' },
-            { label: 'Recently Expired', value: 'recently_expired' },
-            { label: 'All Active', value: 'all_active' },
-            { label: 'Action History', value: 'action_history' },
-          ].map((tab, index) => (
+    <div className="space-y-6">
+      {/* Filter Panel */}
+      <TodoFiltersPanel filters={filters} onFiltersChange={handleFiltersChange} isLoading={false} />
+
+      {/* Tab Navigation */}
+      <div className="relative mb-10">
+        <div className="overflow-x-auto flex gap-4 justify-between sm:justify-start w-full">
+          {tabs.map((tab, index) => (
             <Button
-              key={tab.value}
-              ref={el => {
+              key={tab.id}
+              ref={(el: HTMLButtonElement | null) => {
                 buttonRefs.current[index] = el
               }}
-              size="lg"
               variant="ghost"
-              onClick={() => {
-                setActiveTab(tab.value)
-                updateFilters({
-                  tab: tab.value as TodoFilters['tab'],
-                  urgency: 'all',
-                })
-              }}
+              size={isMobile ? 'default' : 'lg'}
+              onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'rounded-none px-4 relative flex items-center gap-2 pb-4',
-                'hover:bg-transparent group/tab font-bold font-sans tracking-tight',
-                activeTab === tab.value ? 'text-primary' : 'text-muted-foreground/90',
-                tab.value === 'recently_expired' && 'hidden lg:flex',
-                tab.value === 'all_active' && 'hidden lg:flex',
+                'rounded-none relative flex items-center pb-4 whitespace-nowrap gap-1 sm:gap-2',
+                'hover:bg-transparent group/tab',
+                activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}
             >
               {tab.label}
-              {tab.value === 'suggestions' && (
-                <Badge
-                  className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'suggestions' ? 'primary' : 'gray'}
-                >
-                  {counts.suggestions}
-                </Badge>
-              )}
-              {tab.value === 'recently_expired' && (
-                <Badge
-                  className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'recently_expired' ? 'primary' : 'gray'}
-                >
-                  {counts.recently_expired}
-                </Badge>
-              )}
-              {tab.value === 'all_active' && (
-                <Badge
-                  className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'all_active' ? 'primary' : 'gray'}
-                >
-                  {counts.all_active}
-                </Badge>
-              )}
-              {tab.value === 'action_history' && (
-                <Badge
-                  className="cursor-pointer group-hover/tab:text-primary"
-                  variant={activeTab === 'action_history' ? 'primary' : 'gray'}
-                >
-                  {counts.action_history}
-                </Badge>
-              )}
+              <Badge
+                className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm flex items-center justify-center rounded-full px-3"
+                variant={activeTab === tab.id ? 'primary' : 'default'}
+              >
+                {tab.count}
+              </Badge>
             </Button>
           ))}
         </div>
+
+        {/* Tab indicator */}
         <div className="absolute left-0 right-0 bottom-0 h-[4px] bg-border" />
         <div
           className="absolute bottom-0 h-[4px] bg-primary transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
@@ -407,68 +220,34 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           }}
         />
       </div>
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        {(activeTab === 'suggestions' || activeTab === 'all_active') && (
-          <div className="px-4 mb-4">
-            <TodosFilters
-              filters={{
-                urgency: filters.urgency,
-                sort: filters.sort,
-              }}
-              onFiltersChange={handleFiltersChange}
-              isLoading={false}
-            />
-          </div>
-        )}
 
-        {activeTab === 'action_history' && (
-          <div className="px-4 mb-4">
-            <BatchActionFilters
-              filters={batchActionFilters}
-              onFiltersChange={handleBatchActionFiltersChange}
-              isLoading={isBatchActionsLoading}
-            />
-          </div>
-        )}
+      {/* Tab Content */}
+      <div className="w-full">
+        {/* Keep all tab components mounted but only show the active one */}
+        <div
+          style={{
+            display: activeTab === 'pending' ? 'block' : 'none',
+          }}
+        >
+          <PendingTab filters={filters} pageSize={pageSize} />
+        </div>
 
-        <TabsContent value="suggestions" className="p-4">
-          <TodosCardList
-            tab="suggestions"
-            filters={filters}
-            infiniteData={{
-              data: infiniteData?.pages?.flatMap(page => page.data) || [],
-              hasNextPage,
-              fetchNextPage,
-              isFetchingNextPage,
-              isLoading: isLoadingInfinite,
-              error: infiniteError,
-            }}
-          />
-        </TabsContent>
+        <div
+          style={{
+            display: activeTab === 'in_progress' ? 'block' : 'none',
+          }}
+        >
+          <InProgressTab filters={filters} pageSize={pageSize} />
+        </div>
 
-        <TabsContent value="recently_expired" className="p-4">
-          <TodosCardList tab="recently_expired" filters={filters} />
-        </TabsContent>
-
-        <TabsContent value="all_active" className="p-4">
-          <TodosCardList tab="all_active" filters={filters} />
-        </TabsContent>
-
-        <TabsContent value="action_history" className="p-4">
-          <TodosCardList
-            tab="action_history"
-            filters={filters}
-            processedBatchActions={processedBatchActions}
-            infiniteData={{
-              data: [],
-              hasNextPage: hasBatchActionsNextPage,
-              fetchNextPage: fetchBatchActionsNextPage,
-              isFetchingNextPage: isFetchingBatchActionsNextPage,
-              isLoading: isBatchActionsLoading,
-            }}
-          />
-        </TabsContent>
-      </Tabs>
-    </>
+        <div
+          style={{
+            display: activeTab === 'completed' ? 'block' : 'none',
+          }}
+        >
+          <CompletedTab filters={filters} pageSize={pageSize} />
+        </div>
+      </div>
+    </div>
   )
 }

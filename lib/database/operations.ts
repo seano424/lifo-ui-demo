@@ -916,10 +916,6 @@ export class InventoryOperations {
       }
     }
 
-    console.log(
-      `✅ [DB-OPS] Individual processing completed: ${processed} items processed, ${errors.length} errors`,
-    )
-
     return {
       processed,
       errors,

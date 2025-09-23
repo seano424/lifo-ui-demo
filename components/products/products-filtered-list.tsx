@@ -78,7 +78,7 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
       params.delete('direction')
     }
 
-    router.push(`?${params.toString()}`)
+    router.replace(`?${params.toString()}`)
   }
 
   const handleSortChange = (newSort: ProductSort) => {

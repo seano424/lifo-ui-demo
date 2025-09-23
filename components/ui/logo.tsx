@@ -108,7 +108,7 @@ export function NavbarLogo({
   className,
   size = 'md',
   variant = 'vertical',
-  href = '/',
+  href,
 }: {
   className?: string
   size?: LogoSize
