@@ -101,7 +101,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFi
       params.delete('direction')
     }
 
-    router.push(`?${params.toString()}`)
+    router.replace(`?${params.toString()}`)
   }
 
   const handleSortChange = (newSort: BatchSort) => {

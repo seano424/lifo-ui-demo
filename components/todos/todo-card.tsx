@@ -92,6 +92,11 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
   const urgencyConfig = getUrgencyConfig(todo.urgency_level)
 
+  const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
+
+  const isCompleted = todo.completion_status === 'completed'
+  const lastActionType = todo.last_action_type
+
   return (
     <button
       type="button"
@@ -132,22 +137,51 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                 <Calendar className="h-3 w-3" />
                 Expires: {expiryDate.toLocaleDateString()}
               </span>
-              <span className="flex items-center gap-1">
-                <Package className="h-3 w-3" />
-                {todo.current_quantity} left
-              </span>
+
+              {!isCompleted && (
+                <span className="flex items-center gap-1">
+                  <Package className="h-3 w-3" />
+                  {todo.current_quantity} left
+                </span>
+              )}
+
+              {isCompleted && lastActionType === 'sold' && (
+                <Typography variant="small" className="flex items-center gap-1">
+                  🎉 All sold!
+                </Typography>
+              )}
+
+              {isCompleted && lastActionType === 'dispose' && (
+                <Typography variant="small" className="flex items-center gap-1">
+                  🗑️ All disposed!
+                </Typography>
+              )}
             </Typography>
 
             <div className="flex flex-wrap gap-2 items-center justify-between">
-              {todo.last_discount_percent != null && todo.last_discount_percent > 0 && (
+              {isCompleted && (
+                <Badge variant={urgencyConfig.badgeVariant}>Completed: {lastActionType}</Badge>
+              )}
+
+              {todo.last_discount_percent != null &&
+                todo.last_discount_percent > 0 &&
+                !wasDiscounted &&
+                !isCompleted && (
+                  <Badge variant={urgencyConfig.badgeVariant}>
+                    Suggested discount: {todo.last_discount_percent}%
+                  </Badge>
+                )}
+
+              {wasDiscounted && (
                 <Badge variant={urgencyConfig.badgeVariant}>
-                  Suggested discount: {todo.last_discount_percent}%
+                  Currently discounted: {todo.last_discount_percent}%
                 </Badge>
               )}
 
-              {(todo.last_discount_percent == null || todo.last_discount_percent === 0) && (
-                <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
-              )}
+              {(todo.last_discount_percent == null || todo.last_discount_percent === 0) &&
+                !isCompleted && (
+                  <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
+                )}
 
               {isExpiringToday ? (
                 <Badge variant="destructive">expires today</Badge>

@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useMediaQuery } from '@/hooks/use-mobile'
 import {
   useCompletedTodos,
   useInProgressTodos,
@@ -34,6 +35,7 @@ interface TodosFilteredListProps {
 
 export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const router = useRouter()
+  const { isMobile } = useMediaQuery()
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -154,7 +156,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       params.set('direction', filters.sortConfig.direction)
     }
 
-    router.push(`?${params.toString()}`)
+    router.replace(`?${params.toString()}`, { scroll: false })
   }, [activeTab, filters, router])
 
   const handleTabChange = (tabId: TodoTabType) => {
@@ -176,27 +178,27 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       <TodoFiltersPanel filters={filters} onFiltersChange={handleFiltersChange} isLoading={false} />
 
       {/* Tab Navigation */}
-      <div className="relative">
-        <div className="overflow-x-auto flex w-full">
+      <div className="relative mb-10">
+        <div className="overflow-x-auto flex gap-4 justify-between sm:justify-start w-full">
           {tabs.map((tab, index) => (
             <Button
               key={tab.id}
               ref={(el: HTMLButtonElement | null) => {
                 buttonRefs.current[index] = el
               }}
-              size="lg"
               variant="ghost"
+              size={isMobile ? 'default' : 'lg'}
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'rounded-none px-4 relative flex items-center gap-2 pb-4 whitespace-nowrap',
-                'hover:bg-transparent group/tab font-bold font-sans tracking-tight',
+                'rounded-none relative flex items-center pb-4 whitespace-nowrap gap-1',
+                'hover:bg-transparent group/tab',
                 activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}
             >
               {tab.label}
               <Badge
-                className="cursor-pointer group-hover/tab:text-primary"
-                variant={activeTab === tab.id ? 'default' : 'secondary'}
+                className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm"
+                variant={activeTab === tab.id ? 'primary' : 'default'}
               >
                 {tab.count}
               </Badge>

@@ -1,5 +1,6 @@
 'use client'
 
+import { Typography } from '@/components/ui/typography'
 import { useInProgressTodos } from '@/hooks/use-todos-with-filters'
 import type { TodoFiltersState } from '../filters/todo-filters-panel'
 import { TodoCardList } from '../todo-card-list'
@@ -53,14 +54,16 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">⚡</div>
-        <h3 className="text-lg font-semibold mb-2">No todos in progress</h3>
-        <p className="text-muted-foreground">
+        <Typography variant="h3" color="primary">
+          No todos in progress
+        </Typography>
+        <Typography variant="p" color="muted">
           {Object.values(filters).some(
             f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true),
           )
             ? 'Try adjusting your filters to see more items.'
             : 'No items are currently being worked on.'}
-        </p>
+        </Typography>
       </div>
     )
   }
