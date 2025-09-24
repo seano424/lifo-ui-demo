@@ -6,6 +6,7 @@ import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { useEffect, useState } from 'react'
+import { useMediaQuery } from '@/hooks/use-mobile'
 
 interface DisposeTabProps {
   selectedBatch: TodoItem
@@ -24,11 +25,15 @@ const DISPOSAL_REASONS = [
 
 export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   const { executeDispose, isDisposing } = useBatchActionRPC()
+  const { isMobile } = useMediaQuery()
 
   // Dispose tab state
-  const [disposeQuantity, setDisposeQuantity] = useState(selectedBatch.current_quantity || 0)
+  const [disposeQuantity, setDisposeQuantity] = useState(
+    selectedBatch.current_quantity || 0
+  )
   const [isDisposeSelectAll, setIsDisposeSelectAll] = useState(true)
-  const [selectedDisposalReason, setSelectedDisposalReason] = useState('expired')
+  const [selectedDisposalReason, setSelectedDisposalReason] =
+    useState('expired')
   const [customDisposalReason, setCustomDisposalReason] = useState('')
   const [improveAlerts] = useState(false)
 
@@ -61,7 +66,9 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   // Handle dispose execution
   const handleDisposeAction = async () => {
     const disposalReason =
-      selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
+      selectedDisposalReason === 'other'
+        ? customDisposalReason
+        : selectedDisposalReason
 
     try {
       const params = {
@@ -93,16 +100,23 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Disposal Reason Selection */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="p" className="xs:text-lg">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
             Why are you disposing this?
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
-              {DISPOSAL_REASONS.map(reason => (
+              {DISPOSAL_REASONS.map((reason) => (
                 <Button
                   key={reason.id}
                   size="lg"
-                  variant={selectedDisposalReason === reason.id ? 'subtleTertiary' : 'outline'}
+                  variant={
+                    selectedDisposalReason === reason.id
+                      ? 'subtleTertiary'
+                      : 'outline'
+                  }
                   onClick={() => handleDisposalReasonChange(reason.id)}
                   className="border-none shadow justify-start"
                 >
@@ -118,7 +132,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
                 <input
                   type="text"
                   value={customDisposalReason}
-                  onChange={e => handleCustomReasonChange(e.target.value)}
+                  onChange={(e) => handleCustomReasonChange(e.target.value)}
                   placeholder="Enter custom disposal reason"
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
@@ -129,7 +143,10 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
         {/* Quantity Selection */}
         <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
-          <Typography variant="p" className="xs:text-lg">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
             How many units to dispose?
           </Typography>
           <div className="bg-white rounded-2xl p-4">
@@ -148,11 +165,16 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
-        <Button size="lg" variant="subtleGray" onClick={onClose} className="rounded-full flex-1">
+        <Button
+          size={isMobile ? 'default' : 'lg'}
+          variant="subtleGray"
+          onClick={onClose}
+          className="rounded-full flex-1"
+        >
           Cancel
         </Button>
         <Button
-          size="lg"
+          size={isMobile ? 'default' : 'lg'}
           variant="black"
           className="rounded-full flex-1"
           onClick={handleDisposeAction}

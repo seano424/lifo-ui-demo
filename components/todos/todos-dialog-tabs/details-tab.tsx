@@ -319,7 +319,14 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
           size="lg"
           variant="subtleGray"
           onClick={onClose}
-          className="rounded-full px-40"
+          className="rounded-full px-40 hidden sm:block"
+        >
+          Close
+        </Button>
+        <Button
+          variant="subtleGray"
+          onClick={onClose}
+          className="rounded-full px-40 sm:hidden"
         >
           Close
         </Button>

@@ -11,7 +11,13 @@ import { DetailsTab } from './todos-dialog-tabs/details-tab'
 import { SoldTab } from './todos-dialog-tabs/sold-tab'
 import { Typography } from '../ui/typography'
 import { Button } from '@/components/ui/button'
-import { PercentIcon, PackageOpenIcon, TagIcon, PackageXIcon, SparklesIcon } from 'lucide-react'
+import {
+  PercentIcon,
+  PackageOpenIcon,
+  TagIcon,
+  PackageXIcon,
+  SparklesIcon,
+} from 'lucide-react'
 
 interface TodoActionBottomSheetProps {
   isOpen: boolean
@@ -61,7 +67,10 @@ export function TodoActionBottomSheet({
       onClose={onClose}
       titleElement={
         <div className="flex flex-col gap-2 max-w-[280px] sm:max-w-max">
-          <Typography className="leading-normal truncate" variant="h4">
+          <Typography
+            className="leading-normal truncate"
+            variant="h4"
+          >
             {selectedBatch.product_name || ''}
           </Typography>
           <div className="flex flex-row sm:items-center divide-x">
@@ -69,7 +78,9 @@ export function TodoActionBottomSheet({
               <Typography className="pr-2 text-xs sm:text-base">
                 {new Date(selectedBatch.expiry_date || '').toLocaleDateString()}
               </Typography>
-              <Typography className="px-2 text-xs sm:text-base">{calculateDaysLeft()}</Typography>
+              <Typography className="px-2 text-xs sm:text-base">
+                {calculateDaysLeft()}
+              </Typography>
             </div>
             <div className="divide-x flex">
               <Typography className="px-2 text-xs sm:text-base">
@@ -87,37 +98,56 @@ export function TodoActionBottomSheet({
         {/* Tab Content Area */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'discount' && (
-            <DiscountTab selectedBatch={selectedBatch} onClose={onClose} />
+            <DiscountTab
+              selectedBatch={selectedBatch}
+              onClose={onClose}
+            />
           )}
 
-          {activeTab === 'donate' && <DonateTab selectedBatch={selectedBatch} onClose={onClose} />}
+          {activeTab === 'donate' && (
+            <DonateTab
+              selectedBatch={selectedBatch}
+              onClose={onClose}
+            />
+          )}
 
-          {activeTab === 'sold' && <SoldTab selectedBatch={selectedBatch} onClose={onClose} />}
+          {activeTab === 'sold' && (
+            <SoldTab
+              selectedBatch={selectedBatch}
+              onClose={onClose}
+            />
+          )}
 
           {activeTab === 'dispose' && (
-            <DisposeTab selectedBatch={selectedBatch} onClose={onClose} />
+            <DisposeTab
+              selectedBatch={selectedBatch}
+              onClose={onClose}
+            />
           )}
 
           {activeTab === 'details' && (
-            <DetailsTab selectedBatch={selectedBatch} onClose={onClose} />
+            <DetailsTab
+              selectedBatch={selectedBatch}
+              onClose={onClose}
+            />
           )}
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex w-full overflow-x-auto px-4 pb-8 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent justify-center">
-          {tabs.map(tab => (
-            <Button
+        <div className="flex w-full overflow-x-auto px-4 pb-8 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent  gap-1 justify-between pt-2">
+          {tabs.map((tab) => (
+            <button
               key={tab.id}
-              variant="ghost"
+              type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0',
-                activeTab === tab.id && 'text-primary bg-primary-50',
+                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 flex-shrink-0 p-2 rounded-xl',
+                activeTab === tab.id && 'text-primary bg-primary-50'
               )}
             >
               <tab.icon className="size-4" />
               {tab.label}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
