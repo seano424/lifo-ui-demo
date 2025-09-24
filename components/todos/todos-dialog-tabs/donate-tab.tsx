@@ -205,7 +205,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       {/* content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Recipient Selection */}
-        <div className="flex flex-col gap-4 px-8 flex-1 justify-center">
+        <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography
             variant="p"
             className="xs:text-lg"
@@ -239,7 +239,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         </div>
 
         {/* Quantity Selection */}
-        <div className="px-8 flex-1 flex flex-col justify-center gap-4">
+        <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
           <Typography
             variant="p"
             className="xs:text-lg"
@@ -261,7 +261,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted rounded-b-2xl gap-4">
+      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size="lg"
           variant="subtleGray"

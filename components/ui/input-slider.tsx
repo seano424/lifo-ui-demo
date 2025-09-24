@@ -67,7 +67,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
           {/* Manual Input */}
           <div
             className={cn(
-              'flex-shrink-0 relative items-center flex',
+              'flex-shrink-0 relative items-center flex gap-4',
               label ? 'justify-between' : 'justify-end'
             )}
           >

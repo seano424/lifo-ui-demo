@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { DiscountTab } from './todos-dialog-tabs/discount-tab'
 import { DisposeTab } from './todos-dialog-tabs/dispose-tab'
 import { DonateTab } from './todos-dialog-tabs/donate-tab'
+import { DetailsTab } from './todos-dialog-tabs/details-tab'
 import { SoldTab } from './todos-dialog-tabs/sold-tab'
 import { Typography } from '../ui/typography'
 import { Button } from '@/components/ui/button'
@@ -61,30 +62,37 @@ export function TodoActionBottomSheet({
 
   return (
     <BottomSheet
+      variant="fullHeight"
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
-        <div className="flex flex-col gap-2">
-          <Typography variant="h3">{selectedBatch.product_name}</Typography>
+        <div className="flex flex-col gap-2 max-w-[280px] sm:max-w-max">
+          <Typography
+            className="leading-normal truncate"
+            variant="h4"
+          >
+            {selectedBatch.product_name}
+          </Typography>
           <div className="flex flex-row sm:items-center divide-x">
             <div className="divide-x flex">
-              <Typography className="px-2">
+              <Typography className="pr-2 text-xs sm:text-base">
                 {new Date(selectedBatch.expiry_date).toLocaleDateString()}
               </Typography>
-              <Typography className="px-2">{calculateDaysLeft()}</Typography>
+              <Typography className="px-2 text-xs sm:text-base">
+                {calculateDaysLeft()}
+              </Typography>
             </div>
             <div className="divide-x flex">
-              <Typography className="px-2">
+              <Typography className="px-2 text-xs sm:text-base">
                 {selectedBatch.current_quantity} units
               </Typography>
-              <Typography className="px-2">
+              <Typography className="px-2 text-xs sm:text-base">
                 €{selectedBatch.unit_price.toFixed(2)}
               </Typography>
             </div>
           </div>
         </div>
       }
-      variant="fullHeight"
     >
       <div className="flex flex-col h-full">
         {/* Tab Content Area */}
@@ -116,6 +124,13 @@ export function TodoActionBottomSheet({
               onClose={onClose}
             />
           )}
+
+          {activeTab === 'details' && (
+            <DetailsTab
+              selectedBatch={selectedBatch}
+              onClose={onClose}
+            />
+          )}
         </div>
 
         {/* Tab Navigation */}
@@ -126,7 +141,7 @@ export function TodoActionBottomSheet({
               variant="ghost"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 sm:text-base hover:bg-opacity-0',
+                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0',
                 activeTab === tab.id && 'text-primary bg-primary-50'
               )}
             >

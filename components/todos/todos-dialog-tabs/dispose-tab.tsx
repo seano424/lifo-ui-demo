@@ -136,7 +136,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
             Why are you disposing this?
           </Typography>
           <div className="bg-white rounded-2xl p-4">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
               {DISPOSAL_REASONS.map((reason) => (
                 <Button
                   key={reason.id}
@@ -171,7 +171,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         </div>
 
         {/* Quantity Selection */}
-        <div className="px-8 flex-1 flex flex-col justify-center gap-4">
+        <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
           <Typography
             variant="p"
             className="xs:text-lg"
@@ -193,7 +193,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted rounded-b-2xl gap-4">
+      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size="lg"
           variant="subtleGray"
