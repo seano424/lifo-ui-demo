@@ -213,7 +213,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
               Processing Sale...
             </span>
           ) : (
-            'Mark as Sold'
+            `Mark ${soldQuantity} unit${soldQuantity > 1 ? 's' : ''} as sold`
           )}
         </Button>
       </div>

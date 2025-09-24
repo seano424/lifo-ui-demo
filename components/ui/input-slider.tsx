@@ -112,15 +112,15 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
           {/* Slider */}
           <div className="flex-1 relative flex items-center">
             {/* Background track */}
-            <div className="w-full h-2 bg-muted rounded-full absolute" />
+            <div className="w-full h-12 bg-linear-to-r from-secondary-800 to-secondary-900 rounded-full absolute" />
             {/* Progress fill */}
             <div
-              className="h-2 bg-brand-dark rounded-full transition-all ease-in-out absolute left-0 pointer-events-none flex justify-end items-center"
+              className="h-12 bg-linear-to-r from-primary-900  to-primary-800 transition-all ease-in-out rounded-l-full  absolute left-0 pointer-events-none flex justify-end items-center"
               style={{
                 width: `${progressRatio === 1 ? 100 : Math.max(6, progressPercentage)}%`,
               }}
             >
-              <div className="h-8 w-8 rounded-full bg-brand-dark shadow-primary" />
+              <div className="h-16 w-16 rounded-full bg-brand-white absolute top-1/2 -translate-y-1/2 z-10 -right-4" />
             </div>
             <input
               type="range"
