@@ -133,10 +133,10 @@ static_sites:
   - path: /static
 
 # Jobs for maintenance tasks (optional)
-jobs:
-- name: db-migrate
+# jobs: # Database migrations handled by Supabase, not Alembic
+# - name: db-migrate
   source_dir: lifo_api
-  run_command: alembic upgrade head
+  # run_command: alembic upgrade head # Not needed for Supabase
   instance_count: 1
   instance_size_slug: basic-xxs
   kind: PRE_DEPLOY  # Runs before deployment

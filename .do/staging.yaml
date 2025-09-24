@@ -122,29 +122,10 @@ databases:
   num_nodes: 1
 
 # Jobs for staging maintenance
-jobs:
-- name: db-migrate-staging
-  source_dir: lifo_api
-  github:
-    repo: lifo-ai/lifo-app
-    branch: staging
-    deploy_on_push: true
-  run_command: alembic upgrade head
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  kind: PRE_DEPLOY  # Runs before deployment
 
-# Test data seeding job (staging only)
-- name: seed-test-data
-  source_dir: lifo_api
-  github:
-    repo: lifo-ai/lifo-app
-    branch: staging
-    deploy_on_push: true
-  run_command: python -m app.scripts.seed_test_data  # todo
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  kind: POST_DEPLOY  # Runs after successful deployment
+# Database migrations are handled by Supabase, not needed here
+# Jobs removed: db-migrate-staging and seed-test-data
+
 
 alerts:
 - rule: DEPLOYMENT_FAILED
