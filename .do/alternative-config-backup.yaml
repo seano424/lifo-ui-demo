@@ -1,3 +1,5 @@
+# BACKUP: Alternative app.yaml configuration from lifo_api/.do/app.yaml
+# This was the configuration found in the duplicate directory before consolidation
 # Digital Ocean App Platform Configuration for LIFO API
 # Multi-store deployment specification
 
@@ -9,14 +11,14 @@ services:
     repo: lifo-ai/lifo-app  # Correct repository
     branch: main
     deploy_on_push: true
-  
+
   # Docker configuration
   dockerfile_path: Dockerfile
-  
+
   # Instance configuration for 5-10 stores
   instance_count: 1
   instance_size_slug: professional-s  # 1 vCPU, 2GB RAM
-  
+
   # Environment variables
   envs:
   - key: ENVIRONMENT
@@ -50,7 +52,7 @@ services:
     value: "true"
   - key: RATE_LIMIT_REQUESTS_PER_MINUTE
     value: "60"
-  
+
   # Health check
   health_check:
     http_path: /api/v1/health
@@ -59,12 +61,12 @@ services:
     timeout_seconds: 5
     success_threshold: 1
     failure_threshold: 3
-  
+
   # HTTP configuration
   http_port: 8000
   routes:
   - path: /
-  
+
   # Auto-scaling for multi-store load
   autoscaling:
     min_instance_count: 1
@@ -82,7 +84,7 @@ databases:
   version: "14"
   size_slug: db-s-1vcpu-1gb  # Start small, can scale up
   num_nodes: 1
-  
+
 # Domain configuration
 domains:
 - domain: lifo-app.com  # Update with your actual production domain
