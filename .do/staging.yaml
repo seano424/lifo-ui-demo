@@ -13,10 +13,9 @@ services:
     branch: staging  # Deploy from staging branch
     deploy_on_push: true
   
-  # Build configuration
-  build_command: |
-    pip install uv
-    uv pip install --system --require-locked
+  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
+  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
+
 
   
   # Run command for staging (with debug logging)
