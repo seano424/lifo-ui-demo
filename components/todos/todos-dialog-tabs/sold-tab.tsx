@@ -7,6 +7,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
+import { toast } from 'sonner'
 
 interface SoldTabProps {
   selectedBatch: TodoItem
@@ -59,7 +60,8 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
 
       await executeSold(params)
 
-      // Success - close the modal
+      // Success - show success toast and close the modal
+      toast.success(`Successfully marked ${soldQuantity} units as sold`)
       onClose()
     } catch (error) {
       console.error('[SoldTab] Sold action failed:', {
@@ -69,6 +71,10 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
         batchId: selectedBatch.batch_id,
         quantity: soldQuantity,
       })
+
+      // Show user-facing error message
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      toast.error(`Failed to mark items as sold: ${errorMessage}`)
     }
   }
 

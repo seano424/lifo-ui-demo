@@ -7,6 +7,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
+import { toast } from 'sonner'
 
 interface DisposeTabProps {
   selectedBatch: TodoItem
@@ -65,6 +66,12 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
     const disposalReason =
       selectedDisposalReason === 'other' ? customDisposalReason : selectedDisposalReason
 
+    // Validate custom disposal reason if 'other' is selected
+    if (selectedDisposalReason === 'other' && !customDisposalReason.trim()) {
+      toast.error('Please provide a disposal reason')
+      return
+    }
+
     try {
       const params = {
         batchId: selectedBatch.batch_id || '',
@@ -75,7 +82,8 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
       await executeDispose(params)
 
-      // Success - close the modal
+      // Success - show success toast and close the modal
+      toast.success(`Successfully disposed ${disposeQuantity} units`)
       onClose()
     } catch (error) {
       console.error('[DisposeTab] Disposal failed:', {
@@ -86,6 +94,10 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         quantity: disposeQuantity,
         disposalReason,
       })
+
+      // Show user-facing error message
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      toast.error(`Failed to dispose items: ${errorMessage}`)
     }
   }
 

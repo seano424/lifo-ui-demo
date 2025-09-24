@@ -89,10 +89,10 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                 <span
                   className={cn(
                     daysToExpiry < 0
-                      ? 'text-primary-600'
+                      ? 'text-red-600'
                       : daysToExpiry <= 7
-                        ? 'text-primary-600'
-                        : 'text-primary-600',
+                        ? 'text-orange-600'
+                        : 'text-green-600',
                   )}
                 >
                   (
@@ -130,7 +130,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                     {Math.round(
                       (((selectedBatch.selling_price || 0) -
                         (selectedBatch.current_selling_price || 0)) /
-                        (selectedBatch.selling_price || 1)) *
+                        Math.max(selectedBatch.selling_price || 1, 0.01)) *
                         100,
                     )}
                     % off)

@@ -7,6 +7,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
+import { toast } from 'sonner'
 
 interface DiscountTabProps {
   selectedBatch: TodoItem
@@ -26,10 +27,13 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Calculate price metrics
   const calculatePriceMetrics = () => {
-    const originalPrice =
-      (selectedBatch.potential_loss_value || 0) / (selectedBatch.current_quantity || 1)
+    const originalPrice = Number(
+      ((selectedBatch.potential_loss_value || 0) / (selectedBatch.current_quantity || 1)).toFixed(
+        2,
+      ),
+    )
     let actualDiscountPercentage = discountPercentage
-    let newPrice = originalPrice * (1 - discountPercentage / 100)
+    let newPrice = Number((originalPrice * (1 - discountPercentage / 100)).toFixed(2))
 
     if (useCustomPrice && customPrice) {
       const customPriceNum = Number(customPrice)
@@ -41,7 +45,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         )
       } else {
         // If invalid, fall back to percentage-based discount
-        newPrice = originalPrice * (1 - discountPercentage / 100)
+        newPrice = Number((originalPrice * (1 - discountPercentage / 100)).toFixed(2))
       }
     }
 
@@ -85,7 +89,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
       await executeDiscount(params)
 
-      // Success - close the modal
+      // Success - show success toast and close the modal
+      toast.success(
+        `Successfully applied ${priceMetrics.actualDiscountPercentage}% discount to ${selectedBatch.product_name}`,
+      )
       onClose()
     } catch (error) {
       console.error('[DiscountTab] Discount failed:', {
@@ -95,6 +102,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         batchId: selectedBatch.batch_id,
         discountPercentage: priceMetrics.actualDiscountPercentage,
       })
+
+      // Show user-facing error message
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      toast.error(`Failed to apply discount: ${errorMessage}`)
     }
   }
 

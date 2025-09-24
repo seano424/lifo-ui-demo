@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
+import { toast } from 'sonner'
 
 interface DonateTabProps {
   selectedBatch: TodoItem
@@ -104,7 +105,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // Handle donation execution
   const handleDonateAction = async () => {
     if (!selectedRecipient) {
-      console.error('No donation recipient selected')
+      toast.error('Please select a donation recipient')
       return
     }
 
@@ -121,7 +122,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
       await executeDonate(params)
 
-      // Success - close the modal
+      // Success - show success toast and close the modal
+      toast.success(`Successfully donated ${donateQuantity} units to ${recipientName}`)
       onClose()
     } catch (error) {
       console.error('[DonateTab] Donation failed:', {
@@ -132,6 +134,10 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         quantity: donateQuantity,
         selectedRecipient,
       })
+
+      // Show user-facing error message
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      toast.error(`Failed to process donation: ${errorMessage}`)
     }
   }
 
