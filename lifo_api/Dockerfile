@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY pyproject.toml uv.lock .
 RUN pip install uv
-RUN uv pip install --system --require-locked
+RUN uv sync --frozen --no-dev
 
 
 # Production stage
