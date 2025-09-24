@@ -66,7 +66,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   }
 
   // Format expiry date with reliable timezone handling using date-fns
-  const expiryDate = new Date(todo.expiry_date)
+  const expiryDate = todo.expiry_date ? new Date(todo.expiry_date) : new Date()
   const today = new Date()
 
   // Use date-fns for reliable date comparisons
@@ -89,7 +89,8 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   }
 
   // Simple lookup for urgency configuration - no memoization needed since config is static
-  const urgencyConfig = URGENCY_CONFIG[todo.urgency_level] || URGENCY_CONFIG.default
+  const urgencyConfig =
+    URGENCY_CONFIG[todo.urgency_level as keyof typeof URGENCY_CONFIG] || URGENCY_CONFIG.default
 
   const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
   const wasDonated = todo.last_action_type === 'donate'
@@ -122,7 +123,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           variant="outline"
           className={cn(
             'border-2 rounded-full cursor-pointer',
-            'h-6 w-6 p-0 bg-brand-white dark:bg-brand-dark transition-all duration-200 items-center justify-center',
+            'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-brand-dark transition-all duration-200 items-center justify-center',
             urgencyConfig.bgColor,
           )}
         >
@@ -132,8 +133,10 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
         </Badge>
 
         <div className="flex flex-col min-w-0 flex-1 gap-4">
-          <div className="flex flex-col gap-2 items-start">
-            <Typography variant="h4">{todo.product_name}</Typography>
+          <div className="flex flex-col gap-2 items-start text-left min-w-0">
+            <Typography variant="h4" className="truncate w-full pb-1">
+              {todo.product_name}
+            </Typography>
 
             <div className="flex-1 w-full">
               <Typography className="flex gap-1 sm:w-8/12">
@@ -147,27 +150,26 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
           {/* Details */}
           <div className="flex flex-col gap-2">
-            <Typography
-              variant="muted"
-              className="flex sm:items-center sm:justify-between flex-col-reverse sm:flex-row gap-2"
-            >
-              <span className="flex items-center gap-1">
+            <div className="flex items-center flex-wrap divide-x divide-muted">
+              <Typography variant="muted" className="flex items-center gap-1 pr-2">
                 <Calendar className="h-3 w-3" />
                 {expiryDate.toLocaleDateString()}
-              </span>
+              </Typography>
 
               {!isCompleted && (
-                <span className="flex items-center gap-1">
+                <Typography variant="muted" className="flex items-center gap-1 px-2">
                   <Package className="h-3 w-3" />
                   {todo.current_quantity} left
-                </span>
+                </Typography>
               )}
 
               {isCompleted && lastActionType === 'sold' && (
-                <Typography variant="small" className="flex items-center gap-1">
+                <Typography variant="small" className="flex items-center gap-1 px-2">
                   🎉 All sold!
                 </Typography>
               )}
+              {/* {isCompleted && lastActionType === 'sold' && (
+              )} */}
 
               {isCompleted && wasDonated && (
                 <Typography variant="small" className="flex items-center gap-1">
@@ -180,11 +182,9 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                   🗑️ All disposed!
                 </Typography>
               )}
-            </Typography>
+            </div>
 
-            <div className="flex flex-wrap gap-2 items-center justify-between">
-              {isCompleted && !wasDisposed && <Badge variant={'primary'}>Completed</Badge>}
-
+            <div className="flex flex-wrap items-center gap-2">
               {isCompleted && wasDisposed && <Badge variant={'default'}>Disposed</Badge>}
 
               {todo.last_discount_percent != null &&

@@ -9,13 +9,15 @@ import { cn } from '@/lib/utils'
 interface BottomSheetProps {
   isOpen: boolean
   onClose: () => void
-  title: string
+  title?: string
+  titleElement?: React.ReactNode
   children: React.ReactNode
   variant?: 'default' | 'fullHeight'
+  className?: string
 }
 
 const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
-  ({ isOpen, onClose, title, children, variant = 'default' }, ref) => {
+  ({ isOpen, onClose, title, titleElement, children, variant = 'default', className }, ref) => {
     const isMobile = useIsMobile()
     const contentRef = React.useRef<HTMLDivElement>(null)
     const [isDragging, setIsDragging] = React.useState(false)
@@ -82,6 +84,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
             ref={ref}
             className={cn(
               'fixed z-50 bg-background shadow-xl',
+              className,
               'focus:outline-none',
               isMobile
                 ? [
@@ -118,15 +121,13 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                 </div>
               )}
 
-              <div className="flex items-center justify-between px-6 py-4 border-b">
-                <DialogPrimitive.Title className="text-lg font-semibold font-heading">
-                  {title}
-                </DialogPrimitive.Title>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-muted">
+                <DialogPrimitive.Title>{titleElement || title}</DialogPrimitive.Title>
                 <DialogPrimitive.Close
                   className={cn(
-                    'rounded-full p-2',
+                    'rounded-full p-2 border',
                     'ring-offset-background transition-opacity',
-                    'hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                    'hover:opacity-70 focus:outline-none focus:ring-0 focus:ring-offset-0',
                     'disabled:pointer-events-none',
                   )}
                   onClick={onClose}
@@ -139,7 +140,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
               <div
                 ref={contentRef}
                 className={cn(
-                  'flex-1 overflow-y-auto px-6 py-4',
+                  'flex-1 overflow-y-auto',
                   'scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent',
                 )}
               >

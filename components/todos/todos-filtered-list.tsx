@@ -36,6 +36,7 @@ interface TodosFilteredListProps {
 export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const router = useRouter()
   const { isMobile } = useMediaQuery()
+  const [showFilters, setShowFilters] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -179,7 +180,29 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   return (
     <div className="space-y-6">
       {/* Filter Panel */}
-      <TodoFiltersPanel filters={filters} onFiltersChange={handleFiltersChange} isLoading={false} />
+      <div className="flex sm:hidden justify-center py-4 border-y border-muted">
+        <Button variant="subtleTertiary" onClick={() => setShowFilters(!showFilters)}>
+          Filters
+        </Button>
+      </div>
+
+      {showFilters && (
+        <div className="sm:hidden">
+          <TodoFiltersPanel
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            isLoading={false}
+          />
+        </div>
+      )}
+
+      <div className="hidden sm:block">
+        <TodoFiltersPanel
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          isLoading={false}
+        />
+      </div>
 
       {/* Tab Navigation */}
       <div className="relative mb-10">
@@ -194,7 +217,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               size={isMobile ? 'default' : 'lg'}
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'rounded-none relative flex items-center pb-4 whitespace-nowrap gap-1 sm:gap-2',
+                'rounded-none relative flex flex-col-reverse sm:flex-row items-center pb-4 whitespace-nowrap gap-1 gap-2',
                 'hover:bg-transparent group/tab',
                 activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}
