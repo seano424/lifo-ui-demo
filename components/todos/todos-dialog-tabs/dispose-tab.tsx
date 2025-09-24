@@ -210,7 +210,6 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
             step={1}
             label={`${disposeQuantity} units`}
             suffix={`/${selectedBatch.current_quantity}`}
-            sliderColor="#ef4444"
           />
 
           <p className="text-xs text-gray-500 mt-2">

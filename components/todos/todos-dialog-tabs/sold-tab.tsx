@@ -25,7 +25,9 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   const { executeSold, isMarkingSold } = useBatchActionRPC()
 
   // Sold tab state
-  const [soldQuantity, setSoldQuantity] = useState(selectedBatch.current_quantity)
+  const [soldQuantity, setSoldQuantity] = useState(
+    selectedBatch.current_quantity
+  )
   const [isSoldSelectAll, setIsSoldSelectAll] = useState(true)
   const [soldTiming, setSoldTiming] = useState('just-now')
 
@@ -38,7 +40,8 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
 
   // Calculate sold metrics
   const calculateSoldMetrics = () => {
-    const pricePerUnit = selectedBatch.potential_loss_value / selectedBatch.current_quantity
+    const pricePerUnit =
+      selectedBatch.potential_loss_value / selectedBatch.current_quantity
     const totalRevenue = pricePerUnit * soldQuantity
     const profitMargin = 100 // Full price = 100% profit margin
 
@@ -81,7 +84,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
       const params = {
         batchId: selectedBatch.batch_id,
         quantity: soldQuantity,
-        notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find(t => t.id === soldTiming)?.label}) - ${selectedBatch.ai_reasoning}`,
+        notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find((t) => t.id === soldTiming)?.label}) - ${selectedBatch.ai_reasoning}`,
       }
 
       const _result = await executeSold(params)
@@ -139,7 +142,8 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
           max={selectedBatch.current_quantity}
           step={1}
           suffix={`/${selectedBatch.current_quantity}`}
-          label={`${soldQuantity}/${selectedBatch.current_quantity} `}
+          label={`Mark as sold: ${soldQuantity}/${selectedBatch.current_quantity} `}
+          actionButton={<div>hello world</div>}
         />
 
         {/* Sale Timing Options */}
@@ -191,10 +195,18 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
-        <Button variant="subtleTertiary" size="lg" onClick={onClose}>
+        <Button
+          variant="subtleTertiary"
+          size="lg"
+          onClick={onClose}
+        >
           Cancel
         </Button>
-        <Button size="lg" onClick={handleSoldAction} disabled={isMarkingSold || soldQuantity === 0}>
+        <Button
+          size="lg"
+          onClick={handleSoldAction}
+          disabled={isMarkingSold || soldQuantity === 0}
+        >
           {isMarkingSold ? (
             <span className="flex items-center justify-center gap-2">
               <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />

@@ -62,13 +62,16 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   const { executeDonate, isDonating } = useBatchActionRPC()
 
   // Fetch donation recipients for this batch
-  const { data: recipients = [], isLoading: loadingRecipients } = useDonationRecipients(
-    selectedBatch.batch_id, // Changed to use batch_id instead of store_id
-  )
+  const { data: recipients = [], isLoading: loadingRecipients } =
+    useDonationRecipients(
+      selectedBatch.batch_id // Changed to use batch_id instead of store_id
+    )
 
   // State management
   const [selectedRecipient, setSelectedRecipient] = useState<string>('')
-  const [donateQuantity, setDonateQuantity] = useState(selectedBatch.current_quantity)
+  const [donateQuantity, setDonateQuantity] = useState(
+    selectedBatch.current_quantity
+  )
   const [isSelectAll, setIsSelectAll] = useState(true)
 
   // Set default recipient when recipients load
@@ -76,8 +79,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
     if (recipients.length > 0 && !selectedRecipient) {
       // Prefer food banks, then charities, then any other type
       const defaultRecipient =
-        recipients.find(r => r.recipient_type === 'food_bank') ||
-        recipients.find(r => r.recipient_type === 'charity') ||
+        recipients.find((r) => r.recipient_type === 'food_bank') ||
+        recipients.find((r) => r.recipient_type === 'charity') ||
         recipients[0]
 
       if (defaultRecipient) {
@@ -96,7 +99,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // Calculate donation impact metrics
   const calculateDonationImpact = () => {
     const preventedWaste =
-      (donateQuantity * selectedBatch.potential_loss_value) / selectedBatch.current_quantity
+      (donateQuantity * selectedBatch.potential_loss_value) /
+      selectedBatch.current_quantity
     const mealsProvided = Math.round(donateQuantity * 2.5) // Estimate
     const taxBenefit = preventedWaste * 0.25 // Estimate 25% tax benefit
 
@@ -135,7 +139,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
     try {
       const recipientName =
-        recipients.find(r => r.recipient_id === selectedRecipient)?.name || 'Unknown'
+        recipients.find((r) => r.recipient_id === selectedRecipient)?.name ||
+        'Unknown'
 
       const params = {
         batchId: selectedBatch.batch_id,
@@ -166,7 +171,9 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
-          <span className="ml-2 text-gray-600">Loading donation recipients...</span>
+          <span className="ml-2 text-gray-600">
+            Loading donation recipients...
+          </span>
         </div>
       </div>
     )
@@ -177,8 +184,12 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
     return (
       <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="text-center py-8">
-          <p className="text-gray-600 mb-4">No donation recipients available for this store.</p>
-          <p className="text-sm text-gray-500">Contact your admin to set up donation recipients.</p>
+          <p className="text-gray-600 mb-4">
+            No donation recipients available for this store.
+          </p>
+          <p className="text-sm text-gray-500">
+            Contact your admin to set up donation recipients.
+          </p>
         </div>
       </div>
     )
@@ -192,7 +203,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         <div className="mb-6">
           <h3 className="text-sm font-medium mb-3">Select Recipient</h3>
           <div className="grid grid-cols-1 gap-2">
-            {recipients.map(recipient => (
+            {recipients.map((recipient) => (
               <button
                 key={recipient.recipient_id}
                 type="button"
@@ -201,7 +212,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
                   'p-3 rounded-lg border text-sm font-medium transition-colors text-left',
                   selectedRecipient === recipient.recipient_id
                     ? 'bg-purple-50 border-purple-300 text-purple-700'
-                    : 'bg-white border-gray-200 hover:bg-gray-50',
+                    : 'bg-white border-gray-200 hover:bg-gray-50'
                 )}
               >
                 <div className="font-medium">{recipient.name}</div>
@@ -224,7 +235,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
                 'text-sm font-medium px-3 py-1 rounded-full transition-colors',
                 isSelectAll
                   ? 'bg-purple-100 text-purple-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               )}
             >
               {isSelectAll ? 'All Selected' : 'Select All'}
@@ -237,8 +248,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
             min={1}
             max={selectedBatch.current_quantity}
             step={1}
-            label={`${donateQuantity} units`}
-            sliderColor="#9333ea"
+            label={`Donate: ${donateQuantity} units`}
           />
 
           <p className="text-xs text-gray-500 mt-2">
@@ -248,7 +258,9 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
         {/* Donation Impact */}
         <div className="mb-6 p-4 bg-green-50 rounded-lg">
-          <h3 className="text-sm font-medium mb-3 text-green-800">Donation Impact</h3>
+          <h3 className="text-sm font-medium mb-3 text-green-800">
+            Donation Impact
+          </h3>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-green-700">Prevented Waste Value:</span>
@@ -258,11 +270,15 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-green-700">Estimated Meals Provided:</span>
-              <span className="font-medium text-green-800">{impact.mealsProvided}</span>
+              <span className="font-medium text-green-800">
+                {impact.mealsProvided}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-green-700">Potential Tax Benefit:</span>
-              <span className="font-medium text-green-800">€{impact.taxBenefit.toFixed(2)}</span>
+              <span className="font-medium text-green-800">
+                €{impact.taxBenefit.toFixed(2)}
+              </span>
             </div>
           </div>
         </div>
@@ -280,7 +296,11 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
-        <Button variant="subtleTertiary" size="lg" onClick={onClose}>
+        <Button
+          variant="subtleTertiary"
+          size="lg"
+          onClick={onClose}
+        >
           Cancel
         </Button>
         <Button

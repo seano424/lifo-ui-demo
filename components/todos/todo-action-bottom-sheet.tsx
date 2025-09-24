@@ -56,7 +56,6 @@ export function TodoActionBottomSheet({
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      contentBgMuted={true}
       titleElement={
         <div className="flex flex-col gap-4">
           <Typography variant="h3">{selectedBatch.product_name}</Typography>
