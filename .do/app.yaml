@@ -13,10 +13,9 @@ services:
     branch: main  # Production deploys from main branch
     deploy_on_push: true
   
-  # Build configuration
-  build_command: |
-    pip install uv
-    uv pip install --system --require-locked
+  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
+  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
+
   
   # Run command for production
   run_command: gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 1000 --preload app.main:app
