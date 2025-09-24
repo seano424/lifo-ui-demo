@@ -18,8 +18,10 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock .
+RUN pip install uv
+RUN uv pip install --system --require-locked
+
 
 # Production stage
 FROM python:3.11-slim as production
