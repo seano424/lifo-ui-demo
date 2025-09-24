@@ -1,7 +1,7 @@
 'use client'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
-import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { DiscountTab } from './todos-dialog-tabs/discount-tab'
@@ -11,18 +11,12 @@ import { DetailsTab } from './todos-dialog-tabs/details-tab'
 import { SoldTab } from './todos-dialog-tabs/sold-tab'
 import { Typography } from '../ui/typography'
 import { Button } from '@/components/ui/button'
-import {
-  PercentIcon,
-  PackageOpenIcon,
-  TagIcon,
-  PackageXIcon,
-  SparklesIcon,
-} from 'lucide-react'
+import { PercentIcon, PackageOpenIcon, TagIcon, PackageXIcon, SparklesIcon } from 'lucide-react'
 
 interface TodoActionBottomSheetProps {
   isOpen: boolean
   onClose: () => void
-  selectedBatch: ActionableBatch | null
+  selectedBatch: TodoItem | null
 }
 
 type TabType = 'donate' | 'discount' | 'sold' | 'dispose' | 'details'
@@ -41,7 +35,7 @@ export function TodoActionBottomSheet({
   // Calculate days until expiry
   const calculateDaysLeft = () => {
     const today = new Date()
-    const expiryDate = new Date(selectedBatch.expiry_date)
+    const expiryDate = new Date(selectedBatch.expiry_date || '')
     const diffTime = expiryDate.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
@@ -67,27 +61,22 @@ export function TodoActionBottomSheet({
       onClose={onClose}
       titleElement={
         <div className="flex flex-col gap-2 max-w-[280px] sm:max-w-max">
-          <Typography
-            className="leading-normal truncate"
-            variant="h4"
-          >
-            {selectedBatch.product_name}
+          <Typography className="leading-normal truncate" variant="h4">
+            {selectedBatch.product_name || ''}
           </Typography>
           <div className="flex flex-row sm:items-center divide-x">
             <div className="divide-x flex">
               <Typography className="pr-2 text-xs sm:text-base">
-                {new Date(selectedBatch.expiry_date).toLocaleDateString()}
+                {new Date(selectedBatch.expiry_date || '').toLocaleDateString()}
               </Typography>
-              <Typography className="px-2 text-xs sm:text-base">
-                {calculateDaysLeft()}
-              </Typography>
+              <Typography className="px-2 text-xs sm:text-base">{calculateDaysLeft()}</Typography>
             </div>
             <div className="divide-x flex">
               <Typography className="px-2 text-xs sm:text-base">
-                {selectedBatch.current_quantity} units
+                {selectedBatch.current_quantity || 0} units
               </Typography>
               <Typography className="px-2 text-xs sm:text-base">
-                €{selectedBatch.unit_price.toFixed(2)}
+                €{(selectedBatch.unit_price || 0).toFixed(2)}
               </Typography>
             </div>
           </div>
@@ -98,51 +87,32 @@ export function TodoActionBottomSheet({
         {/* Tab Content Area */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'discount' && (
-            <DiscountTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
+            <DiscountTab selectedBatch={selectedBatch} onClose={onClose} />
           )}
 
-          {activeTab === 'donate' && (
-            <DonateTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
-          )}
+          {activeTab === 'donate' && <DonateTab selectedBatch={selectedBatch} onClose={onClose} />}
 
-          {activeTab === 'sold' && (
-            <SoldTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
-          )}
+          {activeTab === 'sold' && <SoldTab selectedBatch={selectedBatch} onClose={onClose} />}
 
           {activeTab === 'dispose' && (
-            <DisposeTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
+            <DisposeTab selectedBatch={selectedBatch} onClose={onClose} />
           )}
 
           {activeTab === 'details' && (
-            <DetailsTab
-              selectedBatch={selectedBatch}
-              onClose={onClose}
-            />
+            <DetailsTab selectedBatch={selectedBatch} onClose={onClose} />
           )}
         </div>
 
         {/* Tab Navigation */}
         <div className="flex w-full overflow-x-auto px-4 pb-8 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent justify-center">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <Button
               key={tab.id}
               variant="ghost"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0',
-                activeTab === tab.id && 'text-primary bg-primary-50'
+                activeTab === tab.id && 'text-primary bg-primary-50',
               )}
             >
               <tab.icon className="size-4" />

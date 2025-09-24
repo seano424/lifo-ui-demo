@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
-import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
@@ -18,7 +18,7 @@ const DISCOUNT_THRESHOLDS = {
 } as const
 
 interface DiscountTabProps {
-  selectedBatch: ActionableBatch
+  selectedBatch: TodoItem
   onClose: () => void
 }
 
@@ -27,7 +27,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Discount tab state
   const [discountPercentage, setDiscountPercentage] = useState(
-    selectedBatch?.discount_percent || 20
+    selectedBatch?.discount_percent || 20,
   )
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
@@ -35,21 +35,17 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
   // Calculate price metrics
   const calculatePriceMetrics = () => {
     const originalPrice =
-      selectedBatch.potential_loss_value / selectedBatch.current_quantity
+      (selectedBatch.potential_loss_value || 0) / (selectedBatch.current_quantity || 1)
     let actualDiscountPercentage = discountPercentage
     let newPrice = originalPrice * (1 - discountPercentage / 100)
 
     if (useCustomPrice && customPrice) {
       const customPriceNum = Number(customPrice)
       // Validate custom price: must be positive and not exceed original price
-      if (
-        customPriceNum > 0 &&
-        customPriceNum <= originalPrice &&
-        !Number.isNaN(customPriceNum)
-      ) {
+      if (customPriceNum > 0 && customPriceNum <= originalPrice && !Number.isNaN(customPriceNum)) {
         newPrice = customPriceNum
         actualDiscountPercentage = Math.round(
-          ((originalPrice - customPriceNum) / originalPrice) * 100
+          ((originalPrice - customPriceNum) / originalPrice) * 100,
         )
       } else {
         // If invalid, fall back to percentage-based discount
@@ -59,9 +55,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
     const totalRevenue = newPrice * selectedBatch.current_quantity
     const originalRevenue = originalPrice * selectedBatch.current_quantity
-    const recoveryPercentage = Math.round(
-      (totalRevenue / originalRevenue) * 100
-    )
+    const recoveryPercentage = Math.round((totalRevenue / originalRevenue) * 100)
 
     const metrics = {
       originalPrice,
@@ -94,9 +88,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
     return DISCOUNT_THRESHOLDS.base.likelihood
   }
 
-  const sellLikelihood = getSellLikelihood(
-    priceMetrics.actualDiscountPercentage
-  )
+  const sellLikelihood = getSellLikelihood(priceMetrics.actualDiscountPercentage)
 
   // Handle discount slider change
   const handleDiscountChange = (value: number) => {
@@ -115,12 +107,12 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
   const handleDiscountAction = async () => {
     try {
       const params = {
-        batchId: selectedBatch.batch_id,
-        quantity: selectedBatch.current_quantity,
+        batchId: selectedBatch.batch_id || '',
+        quantity: selectedBatch.current_quantity || 0,
         discountPercentage: priceMetrics.actualDiscountPercentage,
         notes: useCustomPrice
-          ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_reasoning}`
-          : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_reasoning}`,
+          ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_recommendation || ''}`
+          : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_recommendation || ''}`,
       }
 
       const _result = await executeDiscount(params)
@@ -144,20 +136,15 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Discount Preset Options */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography
-            variant="p"
-            className="xs:text-lg"
-          >
+          <Typography variant="p" className="xs:text-lg">
             Select discount percentage
           </Typography>
           <div className="grid grid-cols-2 gap-2 bg-white rounded-2xl p-4">
-            {[10, 20, 25, 50].map((preset) => (
+            {[10, 20, 25, 50].map(preset => (
               <Button
                 key={preset}
                 size="lg"
-                variant={
-                  discountPercentage === preset ? 'subtleTertiary' : 'outline'
-                }
+                variant={discountPercentage === preset ? 'subtleTertiary' : 'outline'}
                 onClick={() => handleDiscountChange(preset)}
                 className="border-none shadow"
               >
@@ -169,10 +156,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
         {/* Discount Slider */}
         <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
-          <Typography
-            variant="p"
-            className="xs:text-lg"
-          >
+          <Typography variant="p" className="xs:text-lg">
             Or set a custom discount
           </Typography>
           <div className="bg-white rounded-2xl p-4">
@@ -192,12 +176,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
-        <Button
-          size="lg"
-          variant="subtleGray"
-          onClick={onClose}
-          className="rounded-full flex-1"
-        >
+        <Button size="lg" variant="subtleGray" onClick={onClose} className="rounded-full flex-1">
           Cancel
         </Button>
         <Button

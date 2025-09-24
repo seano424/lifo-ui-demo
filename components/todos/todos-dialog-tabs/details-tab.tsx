@@ -2,19 +2,18 @@
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 
 interface DetailsTabProps {
-  selectedBatch: ActionableBatch
+  selectedBatch: TodoItem
   onClose: () => void
 }
 
 export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   // Calculate metrics
   const daysToExpiry = Math.floor(
-    (new Date(selectedBatch.expiry_date).getTime() - Date.now()) /
-      (1000 * 60 * 60 * 24)
+    (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) / (1000 * 60 * 60 * 24),
   )
 
   const formatCurrency = (value: number) => `€${value.toFixed(2)}`
@@ -22,7 +21,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric'
+      year: 'numeric',
     })
   }
 
@@ -32,7 +31,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       day: 'numeric',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   }
 
@@ -50,7 +49,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     }
   }
 
-  const statusDisplay = getStatusDisplay(selectedBatch.todo_state)
+  const statusDisplay = getStatusDisplay(selectedBatch.todo_state || '')
 
   return (
     <div className="flex flex-col h-full bg-muted">
@@ -65,7 +64,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             <div className="flex justify-between items-start">
               <span className="text-sm text-muted-foreground">Product</span>
               <div className="text-sm font-medium text-right">
-                <div>{selectedBatch.product_name}</div>
+                <div>{selectedBatch.product_name || ''}</div>
                 {selectedBatch.product_brand && (
                   <div className="text-muted-foreground">{selectedBatch.product_brand}</div>
                 )}
@@ -73,23 +72,33 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Batch Number</span>
-              <span className="text-sm font-medium">{selectedBatch.batch_number}</span>
+              <span className="text-sm font-medium">{selectedBatch.batch_number || ''}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Status</span>
-              <span className={cn("text-sm font-medium px-2 py-1 rounded", statusDisplay.className)}>
+              <span
+                className={cn('text-sm font-medium px-2 py-1 rounded', statusDisplay.className)}
+              >
                 {statusDisplay.label}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Expiry Date</span>
               <span className="text-sm font-medium">
-                {formatDate(selectedBatch.expiry_date)}
-                <span className={cn(
-                  "ml-2 text-xs",
-                  daysToExpiry < 0 ? "text-red-600" : daysToExpiry <= 7 ? "text-orange-600" : "text-green-600"
-                )}>
-                  ({daysToExpiry < 0 ? `${Math.abs(daysToExpiry)} days ago` : `${daysToExpiry} days`})
+                {formatDate(selectedBatch.expiry_date || '')}
+                <span
+                  className={cn(
+                    'ml-2 text-xs',
+                    daysToExpiry < 0
+                      ? 'text-red-600'
+                      : daysToExpiry <= 7
+                        ? 'text-orange-600'
+                        : 'text-green-600',
+                  )}
+                >
+                  (
+                  {daysToExpiry < 0 ? `${Math.abs(daysToExpiry)} days ago` : `${daysToExpiry} days`}
+                  )
                 </span>
               </span>
             </div>
@@ -104,23 +113,36 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
           <div className="bg-white rounded-2xl p-4 space-y-3">
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Current Quantity</span>
-              <span className="text-sm font-medium">{selectedBatch.current_quantity} units</span>
+              <span className="text-sm font-medium">
+                {selectedBatch.current_quantity || 0} units
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Cost Price</span>
-              <span className="text-sm font-medium">{formatCurrency(selectedBatch.cost_price)}</span>
+              <span className="text-sm font-medium">
+                {formatCurrency(selectedBatch.cost_price || 0)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Original Price</span>
-              <span className="text-sm font-medium">{formatCurrency(selectedBatch.selling_price)}</span>
+              <span className="text-sm font-medium">
+                {formatCurrency(selectedBatch.selling_price || 0)}
+              </span>
             </div>
-            {selectedBatch.current_selling_price !== selectedBatch.selling_price && (
+            {(selectedBatch.current_selling_price || 0) !== (selectedBatch.selling_price || 0) && (
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Current Price</span>
                 <span className="text-sm font-medium text-green-600">
-                  {formatCurrency(selectedBatch.current_selling_price)}
+                  {formatCurrency(selectedBatch.current_selling_price || 0)}
                   <span className="ml-1 text-xs">
-                    ({Math.round(((selectedBatch.selling_price - selectedBatch.current_selling_price) / selectedBatch.selling_price) * 100)}% off)
+                    (
+                    {Math.round(
+                      (((selectedBatch.selling_price || 0) -
+                        (selectedBatch.current_selling_price || 0)) /
+                        (selectedBatch.selling_price || 1)) *
+                        100,
+                    )}
+                    % off)
                   </span>
                 </span>
               </div>
@@ -128,7 +150,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Potential Loss</span>
               <span className="text-sm font-medium text-red-600">
-                {formatCurrency(selectedBatch.potential_loss_value)}
+                {formatCurrency(selectedBatch.potential_loss_value || 0)}
               </span>
             </div>
           </div>
@@ -151,14 +173,14 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Last Action Time</span>
                   <span className="text-sm font-medium">
-                    {formatDateTime(selectedBatch.last_action_time)}
+                    {formatDateTime(selectedBatch.last_action_time || '')}
                   </span>
                 </div>
                 {selectedBatch.last_action_quantity && (
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Last Action Quantity</span>
                     <span className="text-sm font-medium">
-                      {selectedBatch.last_action_quantity} units
+                      {selectedBatch.last_action_quantity || 0} units
                     </span>
                   </div>
                 )}
@@ -170,30 +192,36 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             )}
 
             <div className="border-t pt-3 space-y-2">
-              <div className="text-xs font-medium text-muted-foreground uppercase">Total Actions</div>
+              <div className="text-xs font-medium text-muted-foreground uppercase">
+                Total Actions
+              </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                {selectedBatch.total_sold_quantity > 0 && (
+                {(selectedBatch.total_sold_quantity || 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Sold:</span>
-                    <span className="font-medium">{selectedBatch.total_sold_quantity}</span>
+                    <span className="font-medium">{selectedBatch.total_sold_quantity || 0}</span>
                   </div>
                 )}
-                {selectedBatch.total_discounted_quantity > 0 && (
+                {(selectedBatch.total_discounted_quantity || 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Discounted:</span>
-                    <span className="font-medium">{selectedBatch.total_discounted_quantity}</span>
+                    <span className="font-medium">
+                      {selectedBatch.total_discounted_quantity || 0}
+                    </span>
                   </div>
                 )}
-                {selectedBatch.total_donated_quantity > 0 && (
+                {(selectedBatch.total_donated_quantity || 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Donated:</span>
-                    <span className="font-medium">{selectedBatch.total_donated_quantity}</span>
+                    <span className="font-medium">{selectedBatch.total_donated_quantity || 0}</span>
                   </div>
                 )}
-                {selectedBatch.total_disposed_quantity > 0 && (
+                {(selectedBatch.total_disposed_quantity || 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Disposed:</span>
-                    <span className="font-medium">{selectedBatch.total_disposed_quantity}</span>
+                    <span className="font-medium">
+                      {selectedBatch.total_disposed_quantity || 0}
+                    </span>
                   </div>
                 )}
               </div>
@@ -211,39 +239,42 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Recommendation</span>
                 <span className="text-sm font-medium capitalize">
-                  {selectedBatch.ai_recommendation.replace('_', ' ')}
+                  {(selectedBatch.ai_recommendation || '').replace('_', ' ')}
                 </span>
               </div>
               {selectedBatch.composite_score && (
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Priority Score</span>
                   <span className="text-sm font-medium">
-                    {Math.round(selectedBatch.composite_score * 100)}%
+                    {Math.round((selectedBatch.composite_score || 0) * 100)}%
                   </span>
                 </div>
               )}
               {selectedBatch.urgency_level && (
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Urgency</span>
-                  <span className={cn(
-                    "text-sm font-medium capitalize px-2 py-1 rounded",
-                    selectedBatch.urgency_level === 'critical' ? 'bg-red-50 text-red-600' :
-                    selectedBatch.urgency_level === 'high' ? 'bg-orange-50 text-orange-600' :
-                    selectedBatch.urgency_level === 'medium' ? 'bg-yellow-50 text-yellow-600' :
-                    'bg-green-50 text-green-600'
-                  )}>
-                    {selectedBatch.urgency_level}
+                  <span
+                    className={cn(
+                      'text-sm font-medium capitalize px-2 py-1 rounded',
+                      selectedBatch.urgency_level === 'critical'
+                        ? 'bg-red-50 text-red-600'
+                        : selectedBatch.urgency_level === 'high'
+                          ? 'bg-orange-50 text-orange-600'
+                          : selectedBatch.urgency_level === 'medium'
+                            ? 'bg-yellow-50 text-yellow-600'
+                            : 'bg-green-50 text-green-600',
+                    )}
+                  >
+                    {selectedBatch.urgency_level || ''}
                   </span>
                 </div>
               )}
-              {selectedBatch.ai_reasoning && (
+              {false && selectedBatch.ai_recommendation && (
                 <div className="border-t pt-3">
                   <div className="text-xs font-medium text-muted-foreground uppercase mb-2">
                     AI Reasoning
                   </div>
-                  <p className="text-sm text-gray-700">
-                    {selectedBatch.ai_reasoning}
-                  </p>
+                  <p className="text-sm text-gray-700">{selectedBatch.ai_recommendation || ''}</p>
                 </div>
               )}
             </div>
@@ -253,12 +284,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-center border-t border-muted gap-4">
-        <Button
-          size="lg"
-          variant="subtleGray"
-          onClick={onClose}
-          className="rounded-full px-12"
-        >
+        <Button size="lg" variant="subtleGray" onClick={onClose} className="rounded-full px-12">
           Close
         </Button>
       </div>
