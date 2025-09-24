@@ -188,11 +188,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
             />
           </div>
         </div>
-
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 pt-4 pb-2 flex justify-between border-t border-muted rounded-b-2xl gap-4">
+      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted rounded-b-2xl gap-4">
         <Button
           size="lg"
           variant="subtleGray"

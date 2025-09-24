@@ -219,7 +219,9 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
                   key={recipient.recipient_id}
                   size="lg"
                   variant={
-                    selectedRecipient === recipient.recipient_id ? 'subtleTertiary' : 'outline'
+                    selectedRecipient === recipient.recipient_id
+                      ? 'subtleTertiary'
+                      : 'outline'
                   }
                   onClick={() => setSelectedRecipient(recipient.recipient_id)}
                   className="border-none shadow justify-start"
@@ -259,7 +261,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 pt-4 pb-2 flex justify-between border-t border-muted rounded-b-2xl gap-4">
+      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted rounded-b-2xl gap-4">
         <Button
           size="lg"
           variant="subtleGray"
