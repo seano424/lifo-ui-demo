@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { queryKeys } from '@/lib/queries/query-keys'
 
 // Global state to track user-initiated logouts
 let isUserInitiatedLogout = false
@@ -43,14 +44,22 @@ export function useAuthStateMonitor() {
         hasShownLogoutToast.current = false
 
         // Invalidate user queries to refresh user data
-        queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
+        queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
         console.log('[AuthStateMonitor] User signed in, refreshing user data')
       }
 
       if (event === 'SIGNED_OUT') {
-        // Clear all cached query data when user signs out
+        console.log('[AuthStateMonitor] SIGNED_OUT event - clearing cache and forcing UI update')
+
+        // First, immediately set current user to null to force UI update
+        queryClient.setQueryData(queryKeys.auth.currentUser(), null)
+
+        // Then clear all cached query data when user signs out
         queryClient.clear()
+
+        // Force immediate re-render of any components using the current user query
+        queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
         if (!isUserInitiatedLogout && !hasShownLogoutToast.current) {
           // This was an automatic/security-related logout

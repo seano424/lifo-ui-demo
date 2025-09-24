@@ -1,6 +1,5 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
@@ -29,19 +28,46 @@ interface LogoutButtonProps {
 export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps) {
   const t = useTranslations('marketing.auth')
   const router = useRouter()
-  const queryClient = useQueryClient()
 
   const logout = async () => {
-    // Mark this as a user-initiated logout to prevent showing security warning
-    setUserInitiatedLogout(true)
+    try {
+      console.log('[LogoutButton] Starting logout process')
 
-    const supabase = createClient()
-    await supabase.auth.signOut()
+      // Mark this as a user-initiated logout to prevent showing security warning
+      setUserInitiatedLogout(true)
 
-    // Clear all cached query data to prevent data leakage between users
-    queryClient.clear()
+      const supabase = createClient()
+      console.log('[LogoutButton] Calling supabase.auth.signOut()')
+      const { error } = await supabase.auth.signOut()
 
-    router.push('/')
+      if (error) {
+        console.error('[LogoutButton] Logout error:', error)
+
+        // Handle rate limiting gracefully
+        if (error.message?.includes('too many') || error.message?.includes('rate limit')) {
+          console.log('[LogoutButton] Rate limited - clearing local state anyway')
+          // Continue with logout flow even if Supabase request failed
+        } else {
+          throw error
+        }
+      }
+
+      console.log(
+        '[LogoutButton] Logout successful - auth state monitor will handle cache clearing',
+      )
+
+      // Don't manipulate cache here - let useAuthStateMonitor handle it
+      // This prevents race conditions and ensures consistent state management
+
+      console.log('[LogoutButton] Redirecting to home page')
+      router.push('/')
+    } catch (error) {
+      console.error('[LogoutButton] Logout failed:', error)
+      // Reset the flag on error
+      setUserInitiatedLogout(false)
+      // Still redirect on error
+      router.push('/')
+    }
   }
 
   return (

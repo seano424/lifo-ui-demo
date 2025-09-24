@@ -122,7 +122,8 @@ export function useCurrentUser() {
 
       return transformedUser as User
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // Always check for fresh data - critical for auth state
+    gcTime: 0, // Don't cache user data after logout
     retry: false,
   })
 }
