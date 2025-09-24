@@ -42,8 +42,6 @@ const robotoMono = Roboto_Mono({
   weight: ['400', '500', '600', '700'],
 })
 
-const devMode = process.env.NODE_ENV === 'development'
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -57,7 +55,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} scroll-smooth`}
     >
-      <body className={`font-sans antialiased ${devMode && 'debug-screens'}`}>
+      <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light" // Use light theme as default until we add dark themes across

@@ -10,6 +10,13 @@ import { DonateTab } from './todos-dialog-tabs/donate-tab'
 import { SoldTab } from './todos-dialog-tabs/sold-tab'
 import { Typography } from '../ui/typography'
 import { Button } from '@/components/ui/button'
+import {
+  PercentIcon,
+  PackageOpenIcon,
+  TagIcon,
+  PackageXIcon,
+  SparklesIcon,
+} from 'lucide-react'
 
 interface TodoActionBottomSheetProps {
   isOpen: boolean
@@ -39,17 +46,17 @@ export function TodoActionBottomSheet({
 
     if (diffDays === 0) return 'Expires today'
     if (diffDays === 1) return '1 day left'
-    if (diffDays < 0) return `Expired ${Math.abs(diffDays)} days ago`
+    if (diffDays < 0) return `${Math.abs(diffDays)} days ago`
     return `${diffDays} days left`
   }
 
   // Tab configuration
   const tabs = [
-    { id: 'sold' as TabType, label: 'Mark as Sold', icon: '✅' },
-    { id: 'discount' as TabType, label: 'Discount', icon: '💰' },
-    { id: 'donate' as TabType, label: 'Donate items', icon: '🎯' },
-    { id: 'details' as TabType, label: 'More Details', icon: '🗑️' },
-    { id: 'dispose' as TabType, label: 'Dispose', icon: '🗑️' },
+    { id: 'discount' as TabType, label: 'Discount', icon: PercentIcon },
+    { id: 'donate' as TabType, label: 'Donate', icon: PackageOpenIcon },
+    { id: 'sold' as TabType, label: 'Sell', icon: TagIcon },
+    { id: 'details' as TabType, label: 'Details', icon: SparklesIcon },
+    { id: 'dispose' as TabType, label: 'Dispose', icon: PackageXIcon },
   ]
 
   return (
@@ -57,40 +64,29 @@ export function TodoActionBottomSheet({
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <Typography variant="h3">{selectedBatch.product_name}</Typography>
-          <div className="flex items-center divide-x divide-muted-foreground">
-            <Typography className="pr-2">
-              {new Date(selectedBatch.expiry_date).toLocaleDateString()}
-            </Typography>
-            <Typography className="px-2">{calculateDaysLeft()}</Typography>
-            <Typography className="px-2">
-              {selectedBatch.current_quantity} remaining
-            </Typography>
-            <Typography className="px-2">
-              €{selectedBatch.unit_price.toFixed(2)}
-            </Typography>
+          <div className="flex flex-row sm:items-center divide-x">
+            <div className="divide-x flex">
+              <Typography className="px-2">
+                {new Date(selectedBatch.expiry_date).toLocaleDateString()}
+              </Typography>
+              <Typography className="px-2">{calculateDaysLeft()}</Typography>
+            </div>
+            <div className="divide-x flex">
+              <Typography className="px-2">
+                {selectedBatch.current_quantity} units
+              </Typography>
+              <Typography className="px-2">
+                €{selectedBatch.unit_price.toFixed(2)}
+              </Typography>
+            </div>
           </div>
         </div>
       }
       variant="fullHeight"
     >
       <div className="flex flex-col h-full">
-        {/* Tab Navigation */}
-        <div className="flex gap-4 w-full overflow-x-auto p-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent justify-between bg-brand-white">
-          {tabs.map((tab) => (
-            <Button
-              key={tab.id}
-              size="lg"
-              variant={activeTab === tab.id ? 'default' : 'outline'}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn('transition-all flex-shrink-0')}
-            >
-              {tab.label}
-            </Button>
-          ))}
-        </div>
-
         {/* Tab Content Area */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'discount' && (
@@ -120,6 +116,24 @@ export function TodoActionBottomSheet({
               onClose={onClose}
             />
           )}
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex w-full overflow-x-auto px-4 pb-8 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent justify-center">
+          {tabs.map((tab) => (
+            <Button
+              key={tab.id}
+              variant="ghost"
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 sm:text-base',
+                activeTab === tab.id && 'text-primary'
+              )}
+            >
+              <tab.icon className="size-4" />
+              {tab.label}
+            </Button>
+          ))}
         </div>
       </div>
     </BottomSheet>

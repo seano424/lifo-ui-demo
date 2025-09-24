@@ -103,107 +103,70 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-muted">
       {/* content */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {/* Header */}
-        {/* <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-lg">🎉</span>
-            <h3 className="font-semibold text-lg">FULL PRICE SUCCESS</h3>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Great news! You sold at full price.
-          </p>
-        </div> */}
-
-        {/* Sale Details Box */}
-        {/* <div className="bg-green-50 border border-green-200 p-4 rounded-lg mb-6">
-          <div className="text-sm space-y-1">
-            <div className="font-medium text-green-800 mb-2">Sale details:</div>
-            <div className="text-green-700">
-              Price per unit: €{soldMetrics.pricePerUnit.toFixed(2)}
-            </div>
-            <div className="text-green-700">
-              Total revenue: €{soldMetrics.totalRevenue.toFixed(2)}
-            </div>
-            <div className="text-green-700">
-              Profit margin: {soldMetrics.profitMargin}%
-            </div>
-          </div>
-        </div> */}
-
-        {/* Quantity Selection */}
-
-        <InputSlider
-          value={soldQuantity}
-          onChange={handleQuantityChange}
-          min={1}
-          max={selectedBatch.current_quantity}
-          step={1}
-          suffix={`/${selectedBatch.current_quantity}`}
-          label={`Mark as sold: ${soldQuantity}/${selectedBatch.current_quantity} `}
-          actionButton={<div>hello world</div>}
-        />
-
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Sale Timing Options */}
-        {/* <div className="mb-6">
-          <h3 className="text-sm font-medium mb-3">When did this sell?</h3>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-4 px-8 flex-1 justify-center">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
+            When did this sell?
+          </Typography>
+          <div className="grid grid-cols-2 gap-2 bg-white rounded-2xl p-4">
             {SALE_TIMING_OPTIONS.map((option) => (
-              <button
+              <Button
                 key={option.id}
-                type="button"
+                size="lg"
+                variant={
+                  soldTiming === option.id ? 'subtleTertiary' : 'outline'
+                }
                 onClick={() => handleTimingChange(option.id)}
-                className={cn(
-                  'p-3 rounded-lg border text-sm font-medium transition-colors',
-                  soldTiming === option.id
-                    ? 'bg-green-50 border-green-300 text-green-700'
-                    : 'bg-white border-gray-200 hover:bg-gray-50'
-                )}
+                className="border-none shadow"
               >
                 {option.label}
-              </button>
+              </Button>
             ))}
           </div>
-        </div> */}
+        </div>
 
-        {/* AI Learning Section */}
-        {/* <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg mb-6">
-          <div className="flex items-center gap-2 text-blue-700 mb-2">
-            <span>📊</span>
-            <span className="text-sm font-medium">
-              This helps our AI learn your customer preferences!
-            </span>
+        {/* Quantity Slider */}
+        <div className="px-8 flex-1 flex flex-col justify-center gap-4">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
+            How many units did you sell?
+          </Typography>
+          <div className="bg-white rounded-2xl p-4">
+            <InputSlider
+              value={soldQuantity}
+              onChange={handleQuantityChange}
+              min={1}
+              max={selectedBatch.current_quantity}
+              step={1}
+              suffix={`/${selectedBatch.current_quantity}`}
+              label={`Mark as sold: ${soldQuantity} units`}
+            />
           </div>
-          <p className="text-xs text-blue-600">
-            Your sale data improves future demand predictions and pricing
-            recommendations.
-          </p>
-        </div> */}
-
-        {/* Expected Outcome */}
-        {/* <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium mb-2">Expected Outcome</h3>
-          <p className="text-sm text-gray-600">
-            {soldQuantity === selectedBatch.current_quantity
-              ? 'This will mark all units as sold and remove this item from your todo list.'
-              : `This will reduce inventory by ${soldQuantity} units. The remaining ${selectedBatch.current_quantity - soldQuantity} units will stay active for sale.`}
-          </p>
-        </div> */}
+        </div>
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
+      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted rounded-b-2xl gap-4">
         <Button
-          variant="subtleTertiary"
           size="lg"
+          variant="subtleGray"
           onClick={onClose}
+          className="rounded-full flex-1"
         >
           Cancel
         </Button>
         <Button
           size="lg"
+          variant="black"
+          className="rounded-full flex-1"
           onClick={handleSoldAction}
           disabled={isMarkingSold || soldQuantity === 0}
         >
@@ -212,8 +175,10 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
               <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
               Processing Sale...
             </span>
+          ) : soldQuantity === selectedBatch.current_quantity ? (
+            'Sell all'
           ) : (
-            `Mark ${soldQuantity} unit${soldQuantity > 1 ? 's' : ''} as sold`
+            `Sell ${soldQuantity}`
           )}
         </Button>
       </div>
