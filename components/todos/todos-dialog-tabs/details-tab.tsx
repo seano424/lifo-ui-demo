@@ -14,8 +14,7 @@ interface DetailsTabProps {
 export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   // Calculate metrics
   const daysToExpiry = Math.floor(
-    (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) /
-      (1000 * 60 * 60 * 24)
+    (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) / (1000 * 60 * 60 * 24),
   )
 
   const formatCurrency = (value: number) => `€${value.toFixed(2)}`
@@ -68,35 +67,22 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               <Typography variant="p">Product</Typography>
               <Typography variant="p">
                 <span>{selectedBatch.product_name || ''}</span>
-                {selectedBatch.product_brand && (
-                  <span>{selectedBatch.product_brand}</span>
-                )}
+                {selectedBatch.product_brand && <span>{selectedBatch.product_brand}</span>}
               </Typography>
             </div>
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Batch Number</span>
               <span>{selectedBatch.batch_number || ''}</span>
             </Typography>
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Status</span>
               <span>
-                <span
-                  className={cn('px-2 py-1 rounded', statusDisplay.className)}
-                >
+                <span className={cn('px-2 py-1 rounded', statusDisplay.className)}>
                   {statusDisplay.label}
                 </span>
               </span>
             </Typography>
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Expiry Date</span>
               <span className="flex items-center gap-2">
                 {formatDate(selectedBatch.expiry_date || '')}
@@ -106,13 +92,11 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                       ? 'text-primary-600'
                       : daysToExpiry <= 7
                         ? 'text-primary-600'
-                        : 'text-primary-600'
+                        : 'text-primary-600',
                   )}
                 >
                   (
-                  {daysToExpiry < 0
-                    ? `${Math.abs(daysToExpiry)} days ago`
-                    : `${daysToExpiry} days`}
+                  {daysToExpiry < 0 ? `${Math.abs(daysToExpiry)} days ago` : `${daysToExpiry} days`}
                   )
                 </span>
               </span>
@@ -124,33 +108,20 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">Inventory & Pricing</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-3">
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Current Quantity</span>
               <span>{selectedBatch.current_quantity || 0} units</span>
             </Typography>
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Cost Price</span>
               <span>{formatCurrency(selectedBatch.cost_price || 0)}</span>
             </Typography>
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Original Price</span>
               <span>{formatCurrency(selectedBatch.selling_price || 0)}</span>
             </Typography>
-            {(selectedBatch.current_selling_price || 0) !==
-              (selectedBatch.selling_price || 0) && (
-              <Typography
-                variant="p"
-                className="flex justify-between capitalize"
-              >
+            {(selectedBatch.current_selling_price || 0) !== (selectedBatch.selling_price || 0) && (
+              <Typography variant="p" className="flex justify-between capitalize">
                 <span>Current Price</span>
                 <span>
                   {formatCurrency(selectedBatch.current_selling_price || 0)}
@@ -160,21 +131,16 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                       (((selectedBatch.selling_price || 0) -
                         (selectedBatch.current_selling_price || 0)) /
                         (selectedBatch.selling_price || 1)) *
-                        100
+                        100,
                     )}
                     % off)
                   </span>
                 </span>
               </Typography>
             )}
-            <Typography
-              variant="p"
-              className="flex justify-between capitalize"
-            >
+            <Typography variant="p" className="flex justify-between capitalize">
               <span>Potential Loss</span>
-              <span>
-                {formatCurrency(selectedBatch.potential_loss_value || 0)}
-              </span>
+              <span>{formatCurrency(selectedBatch.potential_loss_value || 0)}</span>
             </Typography>
           </div>
         </div>
@@ -185,83 +151,52 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
           <div className="bg-white rounded-2xl p-4 space-y-3">
             {selectedBatch.last_action_type ? (
               <>
-                <Typography
-                  variant="p"
-                  className="flex justify-between capitalize"
-                >
+                <Typography variant="p" className="flex justify-between capitalize">
                   <span>Last Action</span>
-                  <span>
-                    {selectedBatch.last_action_type.replace('_', ' ')}
-                  </span>
+                  <span>{selectedBatch.last_action_type.replace('_', ' ')}</span>
                 </Typography>
-                <Typography
-                  variant="p"
-                  className="flex justify-between capitalize"
-                >
+                <Typography variant="p" className="flex justify-between capitalize">
                   <span>Last Action Time</span>
-                  <span>
-                    {formatDateTime(selectedBatch.last_action_time || '')}
-                  </span>
+                  <span>{formatDateTime(selectedBatch.last_action_time || '')}</span>
                 </Typography>
                 {selectedBatch.last_action_quantity && (
-                  <Typography
-                    variant="p"
-                    className="flex justify-between capitalize"
-                  >
+                  <Typography variant="p" className="flex justify-between capitalize">
                     <span>Last Action Quantity</span>
                     <span>{selectedBatch.last_action_quantity || 0} units</span>
                   </Typography>
                 )}
               </>
             ) : (
-              <Typography
-                variant="p"
-                className="text-center py-2"
-              >
+              <Typography variant="p" className="text-center py-2">
                 No actions taken yet
               </Typography>
             )}
 
             <div className="border-t pt-3 space-y-2">
-              <Typography
-                variant="p"
-                className="uppercase"
-              >
+              <Typography variant="p" className="uppercase">
                 Total Actions
               </Typography>
               <div>
                 {(selectedBatch.total_sold_quantity || 0) > 0 && (
-                  <Typography
-                    variant="p"
-                    className="flex justify-between capitalize"
-                  >
+                  <Typography variant="p" className="flex justify-between capitalize">
                     <span>Sold:</span>
                     <span>{selectedBatch.total_sold_quantity || 0}</span>
                   </Typography>
                 )}
                 {(selectedBatch.total_discounted_quantity || 0) > 0 && (
-                  <Typography
-                    variant="p"
-                    className="flex justify-between capitalize"
-                  >
+                  <Typography variant="p" className="flex justify-between capitalize">
                     <span>Discounted:</span>
                     <span>{selectedBatch.total_discounted_quantity || 0}</span>
                   </Typography>
                 )}
                 {(selectedBatch.total_donated_quantity || 0) > 0 && (
-                  <Typography
-                    variant="p"
-                    className="flex justify-between capitalize"
-                  >
+                  <Typography variant="p" className="flex justify-between capitalize">
                     <span>Donated:</span>
                     <span>{selectedBatch.total_donated_quantity || 0}</span>
                   </Typography>
                 )}
                 {(selectedBatch.total_disposed_quantity || 0) > 0 && (
-                  <Typography
-                    variant="p"
-                    className="flex justify-between capitalize"
-                  >
+                  <Typography variant="p" className="flex justify-between capitalize">
                     <span>Disposed:</span>
                     <span>{selectedBatch.total_disposed_quantity || 0}</span>
                   </Typography>
@@ -278,16 +213,12 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             <div className="bg-white rounded-2xl p-4 space-y-3">
               <div className="flex justify-between capitalize">
                 <span>Recommendation</span>
-                <span>
-                  {(selectedBatch.ai_recommendation || '').replace('_', ' ')}
-                </span>
+                <span>{(selectedBatch.ai_recommendation || '').replace('_', ' ')}</span>
               </div>
               {selectedBatch.composite_score && (
                 <div className="flex justify-between capitalize">
                   <span>Priority Score</span>
-                  <span>
-                    {Math.round((selectedBatch.composite_score || 0) * 100)}%
-                  </span>
+                  <span>{Math.round((selectedBatch.composite_score || 0) * 100)}%</span>
                 </div>
               )}
               {selectedBatch.urgency_level && (
@@ -323,11 +254,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         >
           Close
         </Button>
-        <Button
-          variant="subtleGray"
-          onClick={onClose}
-          className="rounded-full px-40 sm:hidden"
-        >
+        <Button variant="subtleGray" onClick={onClose} className="rounded-full px-40 sm:hidden">
           Close
         </Button>
       </div>

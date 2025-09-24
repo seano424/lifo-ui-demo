@@ -64,16 +64,13 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
   const { isMobile } = useMediaQuery()
   // Fetch donation recipients for this batch
-  const { data: recipients = [], isLoading: loadingRecipients } =
-    useDonationRecipients(
-      selectedBatch.batch_id || '' // Changed to use batch_id instead of store_id
-    )
+  const { data: recipients = [], isLoading: loadingRecipients } = useDonationRecipients(
+    selectedBatch.batch_id || '', // Changed to use batch_id instead of store_id
+  )
 
   // State management
   const [selectedRecipient, setSelectedRecipient] = useState<string>('')
-  const [donateQuantity, setDonateQuantity] = useState(
-    selectedBatch.current_quantity || 0
-  )
+  const [donateQuantity, setDonateQuantity] = useState(selectedBatch.current_quantity || 0)
   const [isSelectAll, setIsSelectAll] = useState(true)
 
   // Set default recipient when recipients load
@@ -81,8 +78,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
     if (recipients.length > 0 && !selectedRecipient) {
       // Prefer food banks, then charities, then any other type
       const defaultRecipient =
-        recipients.find((r) => r.recipient_type === 'food_bank') ||
-        recipients.find((r) => r.recipient_type === 'charity') ||
+        recipients.find(r => r.recipient_type === 'food_bank') ||
+        recipients.find(r => r.recipient_type === 'charity') ||
         recipients[0]
 
       if (defaultRecipient) {
@@ -113,8 +110,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
     try {
       const recipientName =
-        recipients.find((r) => r.recipient_id === selectedRecipient)?.name ||
-        'Unknown'
+        recipients.find(r => r.recipient_id === selectedRecipient)?.name || 'Unknown'
 
       const params = {
         batchId: selectedBatch.batch_id || '',
@@ -146,9 +142,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         <div className="flex-1 overflow-y-auto flex items-center justify-center">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
-            <span className="ml-2 text-gray-600">
-              Loading donation recipients...
-            </span>
+            <span className="ml-2 text-gray-600">Loading donation recipients...</span>
           </div>
         </div>
       </div>
@@ -161,9 +155,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       <div className="flex flex-col h-full bg-muted">
         <div className="flex-1 overflow-y-auto flex items-center justify-center px-8">
           <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">
-              No donation recipients available for this store.
-            </p>
+            <p className="text-gray-600 mb-4">No donation recipients available for this store.</p>
             <p className="text-sm text-gray-500">
               Contact your admin to set up donation recipients.
             </p>
@@ -179,22 +171,17 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Recipient Selection */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography
-            variant="p"
-            className="xs:text-lg"
-          >
+          <Typography variant="p" className="xs:text-lg">
             Select donation recipient
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <div className="grid grid-cols-1 gap-2">
-              {recipients.map((recipient) => (
+              {recipients.map(recipient => (
                 <Button
                   key={recipient.recipient_id}
                   size="lg"
                   variant={
-                    selectedRecipient === recipient.recipient_id
-                      ? 'subtleTertiary'
-                      : 'outline'
+                    selectedRecipient === recipient.recipient_id ? 'subtleTertiary' : 'outline'
                   }
                   onClick={() => setSelectedRecipient(recipient.recipient_id)}
                   className="border-none shadow justify-start"
@@ -213,10 +200,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
 
         {/* Quantity Selection */}
         <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
-          <Typography
-            variant="p"
-            className="xs:text-lg"
-          >
+          <Typography variant="p" className="xs:text-lg">
             How many units to donate?
           </Typography>
           <div className="bg-white rounded-2xl p-4">
