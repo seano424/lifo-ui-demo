@@ -170,8 +170,7 @@ Thumbs.db
 profile_default/
 ipython_config.py
 
-# pyenv
-.python-version
+
 
 # mkdocs documentation
 /site
