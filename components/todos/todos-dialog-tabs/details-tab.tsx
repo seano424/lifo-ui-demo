@@ -1,5 +1,6 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
@@ -13,7 +14,8 @@ interface DetailsTabProps {
 export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   // Calculate metrics
   const daysToExpiry = Math.floor(
-    (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+    (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) /
+      (1000 * 60 * 60 * 24)
   )
 
   const formatCurrency = (value: number) => `€${value.toFixed(2)}`
@@ -41,7 +43,10 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       case 'expired':
         return { label: 'Expired', className: 'text-red-600 bg-red-50' }
       case 'expiring_soon':
-        return { label: 'Expiring Soon', className: 'text-orange-600 bg-orange-50' }
+        return {
+          label: 'Expiring Soon',
+          className: 'text-orange-600 bg-orange-50',
+        }
       case 'fresh':
         return { label: 'Fresh', className: 'text-green-600 bg-green-50' }
       default:
@@ -57,82 +62,97 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Product Information */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="p" className="xs:text-lg">
-            Product Information
-          </Typography>
+          <Typography variant="h4">Product Information</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-3">
             <div className="flex justify-between items-start">
-              <span className="text-sm text-muted-foreground">Product</span>
-              <div className="text-sm font-medium text-right">
-                <div>{selectedBatch.product_name || ''}</div>
+              <Typography variant="p">Product</Typography>
+              <Typography variant="p">
+                <span>{selectedBatch.product_name || ''}</span>
                 {selectedBatch.product_brand && (
-                  <div className="text-muted-foreground">{selectedBatch.product_brand}</div>
+                  <span>{selectedBatch.product_brand}</span>
                 )}
-              </div>
+              </Typography>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Batch Number</span>
-              <span className="text-sm font-medium">{selectedBatch.batch_number || ''}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Status</span>
-              <span
-                className={cn('text-sm font-medium px-2 py-1 rounded', statusDisplay.className)}
-              >
-                {statusDisplay.label}
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Batch Number</span>
+              <span>{selectedBatch.batch_number || ''}</span>
+            </Typography>
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Status</span>
+              <span>
+                <span
+                  className={cn('px-2 py-1 rounded', statusDisplay.className)}
+                >
+                  {statusDisplay.label}
+                </span>
               </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Expiry Date</span>
-              <span className="text-sm font-medium">
+            </Typography>
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Expiry Date</span>
+              <span className="flex items-center gap-2">
                 {formatDate(selectedBatch.expiry_date || '')}
                 <span
                   className={cn(
-                    'ml-2 text-xs',
                     daysToExpiry < 0
-                      ? 'text-red-600'
+                      ? 'text-primary-600'
                       : daysToExpiry <= 7
-                        ? 'text-orange-600'
-                        : 'text-green-600',
+                        ? 'text-primary-600'
+                        : 'text-primary-600'
                   )}
                 >
                   (
-                  {daysToExpiry < 0 ? `${Math.abs(daysToExpiry)} days ago` : `${daysToExpiry} days`}
+                  {daysToExpiry < 0
+                    ? `${Math.abs(daysToExpiry)} days ago`
+                    : `${daysToExpiry} days`}
                   )
                 </span>
               </span>
-            </div>
+            </Typography>
           </div>
         </div>
 
         {/* Inventory & Pricing */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="p" className="xs:text-lg">
-            Inventory & Pricing
-          </Typography>
+          <Typography variant="h4">Inventory & Pricing</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Current Quantity</span>
-              <span className="text-sm font-medium">
-                {selectedBatch.current_quantity || 0} units
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Cost Price</span>
-              <span className="text-sm font-medium">
-                {formatCurrency(selectedBatch.cost_price || 0)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Original Price</span>
-              <span className="text-sm font-medium">
-                {formatCurrency(selectedBatch.selling_price || 0)}
-              </span>
-            </div>
-            {(selectedBatch.current_selling_price || 0) !== (selectedBatch.selling_price || 0) && (
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Current Price</span>
-                <span className="text-sm font-medium text-green-600">
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Current Quantity</span>
+              <span>{selectedBatch.current_quantity || 0} units</span>
+            </Typography>
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Cost Price</span>
+              <span>{formatCurrency(selectedBatch.cost_price || 0)}</span>
+            </Typography>
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Original Price</span>
+              <span>{formatCurrency(selectedBatch.selling_price || 0)}</span>
+            </Typography>
+            {(selectedBatch.current_selling_price || 0) !==
+              (selectedBatch.selling_price || 0) && (
+              <Typography
+                variant="p"
+                className="flex justify-between capitalize"
+              >
+                <span>Current Price</span>
+                <span>
                   {formatCurrency(selectedBatch.current_selling_price || 0)}
                   <span className="ml-1 text-xs">
                     (
@@ -140,89 +160,111 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                       (((selectedBatch.selling_price || 0) -
                         (selectedBatch.current_selling_price || 0)) /
                         (selectedBatch.selling_price || 1)) *
-                        100,
+                        100
                     )}
                     % off)
                   </span>
                 </span>
-              </div>
+              </Typography>
             )}
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Potential Loss</span>
-              <span className="text-sm font-medium text-red-600">
+            <Typography
+              variant="p"
+              className="flex justify-between capitalize"
+            >
+              <span>Potential Loss</span>
+              <span>
                 {formatCurrency(selectedBatch.potential_loss_value || 0)}
               </span>
-            </div>
+            </Typography>
           </div>
         </div>
 
         {/* Action History */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="p" className="xs:text-lg">
-            Action History
-          </Typography>
+          <Typography variant="h4">Action History</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-3">
             {selectedBatch.last_action_type ? (
               <>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Last Action</span>
-                  <span className="text-sm font-medium capitalize">
+                <Typography
+                  variant="p"
+                  className="flex justify-between capitalize"
+                >
+                  <span>Last Action</span>
+                  <span>
                     {selectedBatch.last_action_type.replace('_', ' ')}
                   </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Last Action Time</span>
-                  <span className="text-sm font-medium">
+                </Typography>
+                <Typography
+                  variant="p"
+                  className="flex justify-between capitalize"
+                >
+                  <span>Last Action Time</span>
+                  <span>
                     {formatDateTime(selectedBatch.last_action_time || '')}
                   </span>
-                </div>
+                </Typography>
                 {selectedBatch.last_action_quantity && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Last Action Quantity</span>
-                    <span className="text-sm font-medium">
-                      {selectedBatch.last_action_quantity || 0} units
-                    </span>
-                  </div>
+                  <Typography
+                    variant="p"
+                    className="flex justify-between capitalize"
+                  >
+                    <span>Last Action Quantity</span>
+                    <span>{selectedBatch.last_action_quantity || 0} units</span>
+                  </Typography>
                 )}
               </>
             ) : (
-              <div className="text-sm text-muted-foreground text-center py-2">
+              <Typography
+                variant="p"
+                className="text-center py-2"
+              >
                 No actions taken yet
-              </div>
+              </Typography>
             )}
 
             <div className="border-t pt-3 space-y-2">
-              <div className="text-xs font-medium text-muted-foreground uppercase">
+              <Typography
+                variant="p"
+                className="uppercase"
+              >
                 Total Actions
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              </Typography>
+              <div>
                 {(selectedBatch.total_sold_quantity || 0) > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sold:</span>
-                    <span className="font-medium">{selectedBatch.total_sold_quantity || 0}</span>
-                  </div>
+                  <Typography
+                    variant="p"
+                    className="flex justify-between capitalize"
+                  >
+                    <span>Sold:</span>
+                    <span>{selectedBatch.total_sold_quantity || 0}</span>
+                  </Typography>
                 )}
                 {(selectedBatch.total_discounted_quantity || 0) > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Discounted:</span>
-                    <span className="font-medium">
-                      {selectedBatch.total_discounted_quantity || 0}
-                    </span>
-                  </div>
+                  <Typography
+                    variant="p"
+                    className="flex justify-between capitalize"
+                  >
+                    <span>Discounted:</span>
+                    <span>{selectedBatch.total_discounted_quantity || 0}</span>
+                  </Typography>
                 )}
                 {(selectedBatch.total_donated_quantity || 0) > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Donated:</span>
-                    <span className="font-medium">{selectedBatch.total_donated_quantity || 0}</span>
-                  </div>
+                  <Typography
+                    variant="p"
+                    className="flex justify-between capitalize"
+                  >
+                    <span>Donated:</span>
+                    <span>{selectedBatch.total_donated_quantity || 0}</span>
+                  </Typography>
                 )}
                 {(selectedBatch.total_disposed_quantity || 0) > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Disposed:</span>
-                    <span className="font-medium">
-                      {selectedBatch.total_disposed_quantity || 0}
-                    </span>
-                  </div>
+                  <Typography
+                    variant="p"
+                    className="flex justify-between capitalize"
+                  >
+                    <span>Disposed:</span>
+                    <span>{selectedBatch.total_disposed_quantity || 0}</span>
+                  </Typography>
                 )}
               </div>
             </div>
@@ -232,49 +274,38 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         {/* AI Insights */}
         {selectedBatch.ai_recommendation && (
           <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-            <Typography variant="p" className="xs:text-lg">
-              AI Insights
-            </Typography>
+            <Typography variant="h4">AI Insights</Typography>
             <div className="bg-white rounded-2xl p-4 space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Recommendation</span>
-                <span className="text-sm font-medium capitalize">
+              <div className="flex justify-between capitalize">
+                <span>Recommendation</span>
+                <span>
                   {(selectedBatch.ai_recommendation || '').replace('_', ' ')}
                 </span>
               </div>
               {selectedBatch.composite_score && (
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Priority Score</span>
-                  <span className="text-sm font-medium">
+                <div className="flex justify-between capitalize">
+                  <span>Priority Score</span>
+                  <span>
                     {Math.round((selectedBatch.composite_score || 0) * 100)}%
                   </span>
                 </div>
               )}
               {selectedBatch.urgency_level && (
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Urgency</span>
-                  <span
-                    className={cn(
-                      'text-sm font-medium capitalize px-2 py-1 rounded',
+                <div className="flex justify-between capitalize">
+                  <span>Urgency</span>
+                  <Badge
+                    variant={
                       selectedBatch.urgency_level === 'critical'
-                        ? 'bg-red-50 text-red-600'
+                        ? 'primary'
                         : selectedBatch.urgency_level === 'high'
-                          ? 'bg-orange-50 text-orange-600'
+                          ? 'primary'
                           : selectedBatch.urgency_level === 'medium'
-                            ? 'bg-yellow-50 text-yellow-600'
-                            : 'bg-green-50 text-green-600',
-                    )}
+                            ? 'secondary'
+                            : 'secondary'
+                    }
                   >
                     {selectedBatch.urgency_level || ''}
-                  </span>
-                </div>
-              )}
-              {false && selectedBatch.ai_recommendation && (
-                <div className="border-t pt-3">
-                  <div className="text-xs font-medium text-muted-foreground uppercase mb-2">
-                    AI Reasoning
-                  </div>
-                  <p className="text-sm text-gray-700">{selectedBatch.ai_recommendation || ''}</p>
+                  </Badge>
                 </div>
               )}
             </div>
@@ -284,7 +315,12 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
 
       {/* footer */}
       <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-center border-t border-muted gap-4">
-        <Button size="lg" variant="subtleGray" onClick={onClose} className="rounded-full px-12">
+        <Button
+          size="lg"
+          variant="subtleGray"
+          onClick={onClose}
+          className="rounded-full px-40"
+        >
           Close
         </Button>
       </div>
