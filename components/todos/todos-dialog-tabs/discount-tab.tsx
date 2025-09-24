@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
-import { ErrorBoundary } from '@/components/ui/error-boundary'
+import { Typography } from '@/components/ui/typography'
 import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { cn } from '@/lib/utils'
@@ -139,49 +139,43 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
   }
 
   return (
-    <ErrorBoundary>
-      <div className="flex flex-col h-full">
-        {/* content */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          {/* Header */}
-          {/* <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-lg">💡</span>
-              <h3 className="font-semibold text-lg">
-                MAXIMIZE REVENUE RECOVERY
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              AI Suggested Discount: {selectedBatch.discount_percent || 20}%
-            </p>
-          </div> */}
+    <div className="flex flex-col h-full bg-muted">
+      {/* content */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
+        {/* Discount Preset Options */}
+        <div className="flex flex-col gap-4 px-8 flex-1 justify-center">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
+            Select discount percentage
+          </Typography>
+          <div className="grid grid-cols-2 gap-2 bg-white rounded-2xl p-4">
+            {[10, 20, 25, 50].map((preset) => (
+              <Button
+                key={preset}
+                size="lg"
+                variant={
+                  discountPercentage === preset ? 'subtleTertiary' : 'outline'
+                }
+                onClick={() => handleDiscountChange(preset)}
+                className="border-none shadow"
+              >
+                {preset}%
+              </Button>
+            ))}
+          </div>
+        </div>
 
-          {/* Price Comparison Box */}
-          {/* <div className="bg-muted/50 p-4 rounded-lg border mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm">
-                <span className="text-muted-foreground">Original:</span>
-                <span className="ml-2 font-semibold">
-                  €{priceMetrics.originalPrice.toFixed(2)}
-                </span>
-                <span className="mx-3 text-muted-foreground">→</span>
-                <span className="text-muted-foreground">New:</span>
-                <span className="ml-2 font-semibold text-green-600">
-                  €{priceMetrics.newPrice.toFixed(2)}
-                </span>
-              </div>
-            </div>
-            <div className="text-sm">
-              <span className="text-muted-foreground">Revenue recovery:</span>
-              <span className="ml-2 font-semibold text-green-600">
-                €{priceMetrics.totalRevenue.toFixed(2)} (
-                {priceMetrics.recoveryPercentage}%)
-              </span>
-            </div>
-          </div> */}
-
-          {/* Discount Slider */}
-          <div className="flex flex-col gap-4">
+        {/* Discount Slider */}
+        <div className="px-8 flex-1 flex flex-col justify-center gap-4">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
+            Or set a custom discount
+          </Typography>
+          <div className="bg-white rounded-2xl p-4">
             <InputSlider
               value={discountPercentage}
               onChange={handleDiscountChange}
@@ -192,127 +186,40 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
               suffix="%"
               isPercentage
             />
-
-            {/* Quick Preset Buttons */}
-            <div className="flex gap-2">
-              {[10, 20, 25, 50].map((preset) => (
-                <Button
-                  key={preset}
-                  variant={
-                    discountPercentage === preset ? 'default' : 'outline'
-                  }
-                  className="py-4 text-lg rounded-full"
-                  onClick={() => handleDiscountChange(preset)}
-                >
-                  {preset}%
-                </Button>
-              ))}
-            </div>
           </div>
-
-          {/* Custom Price Toggle */}
-          {/* <div className="mb-6">
-            <div className="flex items-center gap-3 mb-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setUseCustomPrice(!useCustomPrice)
-                  if (useCustomPrice) {
-                    setCustomPrice('')
-                  }
-                }}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors',
-                  useCustomPrice
-                    ? 'bg-purple-50 border-purple-300 text-purple-700'
-                    : 'border-gray-200 hover:border-purple-300'
-                )}
-              >
-                <div
-                  className={cn(
-                    'w-4 h-4 rounded border-2 transition-colors',
-                    useCustomPrice
-                      ? 'bg-purple-600 border-purple-600'
-                      : 'border-gray-300'
-                  )}
-                >
-                  {useCustomPrice && (
-                    <span className="text-white text-xs">✓</span>
-                  )}
-                </div>
-                <span className="text-sm font-medium">
-                  Set custom price instead
-                </span>
-              </button>
-            </div>
-
-            {useCustomPrice && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">€</span>
-                <input
-                  type="number"
-                  value={customPrice}
-                  onChange={(e) => handleCustomPriceChange(e.target.value)}
-                  placeholder="Enter price"
-                  className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  step="0.01"
-                  min="0"
-                />
-              </div>
-            )}
-          </div> */}
-
-          {/* Expected Outcome */}
-          {/* <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-sm font-medium mb-2 text-blue-800">
-              Expected Outcome
-            </h3>
-            <div className="space-y-1 text-sm text-blue-700">
-              <div className="flex justify-between">
-                <span>Sell likelihood:</span>
-                <span className="font-medium">{sellLikelihood}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Revenue recovery:</span>
-                <span className="font-medium">
-                  €{priceMetrics.totalRevenue.toFixed(2)}
-                </span>
-              </div>
-            </div>
-            <p className="text-xs text-blue-600 mt-2">
-              This discount will update the batch price and keep it active for
-              sale.
-            </p>
-          </div> */}
         </div>
 
-        {/* footer */}
-        <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
-          <Button
-            variant="subtleTertiary"
-            size="lg"
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            size="lg"
-            onClick={handleDiscountAction}
-            disabled={isDiscounting}
-          >
-            {isDiscounting ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                Processing Discount...
-              </span>
-            ) : useCustomPrice && customPrice ? (
-              `Set Price €${priceMetrics.newPrice.toFixed(2)}`
-            ) : (
-              `Apply ${priceMetrics.actualDiscountPercentage}% Discount`
-            )}
-          </Button>
-        </div>
       </div>
-    </ErrorBoundary>
+
+      {/* footer */}
+      <div className="sticky bottom-0 bg-brand-white px-8 pt-4 pb-2 flex justify-between border-t border-muted rounded-b-2xl gap-4">
+        <Button
+          size="lg"
+          variant="subtleGray"
+          onClick={onClose}
+          className="rounded-full flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          size="lg"
+          variant="black"
+          className="rounded-full flex-1"
+          onClick={handleDiscountAction}
+          disabled={isDiscounting}
+        >
+          {isDiscounting ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              Processing Discount...
+            </span>
+          ) : useCustomPrice && customPrice ? (
+            `Set Price €${priceMetrics.newPrice.toFixed(2)}`
+          ) : (
+            `Apply ${priceMetrics.actualDiscountPercentage}% Discount`
+          )}
+        </Button>
+      </div>
+    </div>
   )
 }

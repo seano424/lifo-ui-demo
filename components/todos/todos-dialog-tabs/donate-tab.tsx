@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
+import { Typography } from '@/components/ui/typography'
 import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { createClient } from '@/lib/supabase/client'
@@ -168,12 +169,14 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // Loading state
   if (loadingRecipients) {
     return (
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
-          <span className="ml-2 text-gray-600">
-            Loading donation recipients...
-          </span>
+      <div className="flex flex-col h-full bg-muted">
+        <div className="flex-1 overflow-y-auto flex items-center justify-center">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+            <span className="ml-2 text-gray-600">
+              Loading donation recipients...
+            </span>
+          </div>
         </div>
       </div>
     )
@@ -182,129 +185,93 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // No recipients available
   if (recipients.length === 0) {
     return (
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="text-center py-8">
-          <p className="text-gray-600 mb-4">
-            No donation recipients available for this store.
-          </p>
-          <p className="text-sm text-gray-500">
-            Contact your admin to set up donation recipients.
-          </p>
+      <div className="flex flex-col h-full bg-muted">
+        <div className="flex-1 overflow-y-auto flex items-center justify-center px-8">
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">
+              No donation recipients available for this store.
+            </p>
+            <p className="text-sm text-gray-500">
+              Contact your admin to set up donation recipients.
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-muted">
       {/* content */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
         {/* Recipient Selection */}
-        <div className="mb-6">
-          <h3 className="text-sm font-medium mb-3">Select Recipient</h3>
-          <div className="grid grid-cols-1 gap-2">
-            {recipients.map((recipient) => (
-              <button
-                key={recipient.recipient_id}
-                type="button"
-                onClick={() => setSelectedRecipient(recipient.recipient_id)}
-                className={cn(
-                  'p-3 rounded-lg border text-sm font-medium transition-colors text-left',
-                  selectedRecipient === recipient.recipient_id
-                    ? 'bg-purple-50 border-purple-300 text-purple-700'
-                    : 'bg-white border-gray-200 hover:bg-gray-50'
-                )}
-              >
-                <div className="font-medium">{recipient.name}</div>
-                <div className="text-xs text-gray-500 capitalize">
-                  {recipient.recipient_type.replace('_', ' ')}
-                </div>
-              </button>
-            ))}
+        <div className="flex flex-col gap-4 px-8 flex-1 justify-center">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
+            Select donation recipient
+          </Typography>
+          <div className="bg-white rounded-2xl p-4">
+            <div className="grid grid-cols-1 gap-2">
+              {recipients.map((recipient) => (
+                <Button
+                  key={recipient.recipient_id}
+                  size="lg"
+                  variant={
+                    selectedRecipient === recipient.recipient_id ? 'subtleTertiary' : 'outline'
+                  }
+                  onClick={() => setSelectedRecipient(recipient.recipient_id)}
+                  className="border-none shadow justify-start"
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{recipient.name}</div>
+                    <div className="text-xs text-muted-foreground capitalize">
+                      {recipient.recipient_type.replace('_', ' ')}
+                    </div>
+                  </div>
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Quantity Selection */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium">Donation Quantity</h3>
-            <button
-              type="button"
-              onClick={handleSelectAllToggle}
-              className={cn(
-                'text-sm font-medium px-3 py-1 rounded-full transition-colors',
-                isSelectAll
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              )}
-            >
-              {isSelectAll ? 'All Selected' : 'Select All'}
-            </button>
+        <div className="px-8 flex-1 flex flex-col justify-center gap-4">
+          <Typography
+            variant="p"
+            className="xs:text-lg"
+          >
+            How many units to donate?
+          </Typography>
+          <div className="bg-white rounded-2xl p-4">
+            <InputSlider
+              value={donateQuantity}
+              onChange={handleQuantityChange}
+              min={1}
+              max={selectedBatch.current_quantity}
+              step={1}
+              suffix={`/${selectedBatch.current_quantity}`}
+              label={`Mark for donation: ${donateQuantity} units`}
+            />
           </div>
-
-          <InputSlider
-            value={donateQuantity}
-            onChange={handleQuantityChange}
-            min={1}
-            max={selectedBatch.current_quantity}
-            step={1}
-            label={`Donate: ${donateQuantity} units`}
-          />
-
-          <p className="text-xs text-gray-500 mt-2">
-            Out of {selectedBatch.current_quantity} available units
-          </p>
-        </div>
-
-        {/* Donation Impact */}
-        <div className="mb-6 p-4 bg-green-50 rounded-lg">
-          <h3 className="text-sm font-medium mb-3 text-green-800">
-            Donation Impact
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-green-700">Prevented Waste Value:</span>
-              <span className="font-medium text-green-800">
-                €{impact.preventedWaste.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-green-700">Estimated Meals Provided:</span>
-              <span className="font-medium text-green-800">
-                {impact.mealsProvided}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-green-700">Potential Tax Benefit:</span>
-              <span className="font-medium text-green-800">
-                €{impact.taxBenefit.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Expected Outcome */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium mb-2">Expected Outcome</h3>
-          <p className="text-sm text-gray-600">
-            {donateQuantity === selectedBatch.current_quantity
-              ? 'This donation will fully resolve the alert and remove this item from your todo list.'
-              : `This partial donation will reduce inventory by ${donateQuantity} units. The alert will remain active for the remaining ${selectedBatch.current_quantity - donateQuantity} units.`}
-          </p>
         </div>
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white p-8 flex justify-between">
+      <div className="sticky bottom-0 bg-brand-white px-8 pt-4 pb-2 flex justify-between border-t border-muted rounded-b-2xl gap-4">
         <Button
-          variant="subtleTertiary"
           size="lg"
+          variant="subtleGray"
           onClick={onClose}
+          className="rounded-full flex-1"
         >
           Cancel
         </Button>
         <Button
           size="lg"
+          variant="black"
+          className="rounded-full flex-1"
           onClick={handleDonateAction}
           disabled={isDonating || donateQuantity === 0 || !selectedRecipient}
         >
@@ -313,8 +280,10 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
               <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
               Processing Donation...
             </span>
+          ) : donateQuantity === selectedBatch.current_quantity ? (
+            'Donate all'
           ) : (
-            'Mark for Donation'
+            `Donate ${donateQuantity}`
           )}
         </Button>
       </div>
