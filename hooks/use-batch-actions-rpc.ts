@@ -769,7 +769,7 @@ export function useBatchActionRPC() {
             if (Array.isArray(data)) {
               queryClient.setQueryData(
                 queryKey,
-                data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id)),
+                data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id || '')),
               )
             }
           })

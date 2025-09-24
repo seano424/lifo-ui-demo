@@ -66,7 +66,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   }
 
   // Format expiry date with reliable timezone handling using date-fns
-  const expiryDate = new Date(todo.expiry_date)
+  const expiryDate = todo.expiry_date ? new Date(todo.expiry_date) : new Date()
   const today = new Date()
 
   // Use date-fns for reliable date comparisons
@@ -89,7 +89,8 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   }
 
   // Simple lookup for urgency configuration - no memoization needed since config is static
-  const urgencyConfig = URGENCY_CONFIG[todo.urgency_level] || URGENCY_CONFIG.default
+  const urgencyConfig =
+    URGENCY_CONFIG[todo.urgency_level as keyof typeof URGENCY_CONFIG] || URGENCY_CONFIG.default
 
   const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
   const wasDonated = todo.last_action_type === 'donate'

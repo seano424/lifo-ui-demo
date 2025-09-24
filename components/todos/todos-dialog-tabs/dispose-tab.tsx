@@ -5,7 +5,6 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 
 interface DisposeTabProps {
@@ -31,7 +30,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   const [isDisposeSelectAll, setIsDisposeSelectAll] = useState(true)
   const [selectedDisposalReason, setSelectedDisposalReason] = useState('expired')
   const [customDisposalReason, setCustomDisposalReason] = useState('')
-  const [improveAlerts, setImproveAlerts] = useState(false)
+  const [improveAlerts] = useState(false)
 
   // Update quantity when batch changes or select all toggles
   useEffect(() => {
@@ -40,40 +39,10 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
     }
   }, [selectedBatch.current_quantity, isDisposeSelectAll])
 
-  // Calculate disposal metrics
-  const calculateDisposalMetrics = () => {
-    const lossPerUnit =
-      (selectedBatch.potential_loss_value || 0) / (selectedBatch.current_quantity || 1)
-    const totalLossValue = lossPerUnit * disposeQuantity
-    const wasteWeight = disposeQuantity * 0.5 // Estimate 500g per unit
-
-    const metrics = {
-      lossPerUnit,
-      totalLossValue,
-      wasteWeight,
-      environmentalImpact: Math.round(wasteWeight * 2.1), // CO2 equivalent estimate
-    }
-
-    return metrics
-  }
-
-  const disposalMetrics = calculateDisposalMetrics()
-
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
     setDisposeQuantity(value)
     setIsDisposeSelectAll(value === selectedBatch.current_quantity)
-  }
-
-  // Handle select all toggle
-  const handleSelectAllToggle = () => {
-    if (isDisposeSelectAll) {
-      setDisposeQuantity(Math.floor((selectedBatch.current_quantity || 0) / 2))
-      setIsDisposeSelectAll(false)
-    } else {
-      setDisposeQuantity(selectedBatch.current_quantity || 0)
-      setIsDisposeSelectAll(true)
-    }
   }
 
   // Handle disposal reason selection
@@ -102,7 +71,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.ai_recommendation || ''}${improveAlerts ? ' - User requested alert improvements' : ''}`,
       }
 
-      const _result = await executeDispose(params)
+      await executeDispose(params)
 
       // Success - close the modal
       onClose()

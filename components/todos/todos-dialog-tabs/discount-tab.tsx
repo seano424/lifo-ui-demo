@@ -5,17 +5,7 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import { cn } from '@/lib/utils'
-import { useEffect, useState } from 'react'
-
-// Configurable discount thresholds for sell likelihood calculation
-const DISCOUNT_THRESHOLDS = {
-  base: { minDiscount: 0, likelihood: 25 },
-  low: { minDiscount: 10, likelihood: 70 },
-  medium: { minDiscount: 20, likelihood: 85 },
-  high: { minDiscount: 30, likelihood: 90 },
-  veryHigh: { minDiscount: 50, likelihood: 95 },
-} as const
+import { useState } from 'react'
 
 interface DiscountTabProps {
   selectedBatch: TodoItem
@@ -27,7 +17,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   // Discount tab state
   const [discountPercentage, setDiscountPercentage] = useState(
-    selectedBatch?.discount_percent || 20,
+    selectedBatch?.last_discount_percent || 20,
   )
   const [customPrice, setCustomPrice] = useState<string>('')
   const [useCustomPrice, setUseCustomPrice] = useState(false)
@@ -53,8 +43,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
       }
     }
 
-    const totalRevenue = newPrice * selectedBatch.current_quantity
-    const originalRevenue = originalPrice * selectedBatch.current_quantity
+    const currentQuantity = selectedBatch.current_quantity || 0
+    const totalRevenue = newPrice * currentQuantity
+    const originalRevenue = originalPrice * currentQuantity
     const recoveryPercentage = Math.round((totalRevenue / originalRevenue) * 100)
 
     const metrics = {
@@ -71,36 +62,11 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
   const priceMetrics = calculatePriceMetrics()
 
-  // Get sell likelihood based on discount using configurable thresholds
-  const getSellLikelihood = (discount: number) => {
-    if (discount >= DISCOUNT_THRESHOLDS.veryHigh.minDiscount) {
-      return DISCOUNT_THRESHOLDS.veryHigh.likelihood
-    }
-    if (discount >= DISCOUNT_THRESHOLDS.high.minDiscount) {
-      return DISCOUNT_THRESHOLDS.high.likelihood
-    }
-    if (discount >= DISCOUNT_THRESHOLDS.medium.minDiscount) {
-      return DISCOUNT_THRESHOLDS.medium.likelihood
-    }
-    if (discount >= DISCOUNT_THRESHOLDS.low.minDiscount) {
-      return DISCOUNT_THRESHOLDS.low.likelihood
-    }
-    return DISCOUNT_THRESHOLDS.base.likelihood
-  }
-
-  const sellLikelihood = getSellLikelihood(priceMetrics.actualDiscountPercentage)
-
   // Handle discount slider change
   const handleDiscountChange = (value: number) => {
     setDiscountPercentage(value)
     setUseCustomPrice(false)
     setCustomPrice('')
-  }
-
-  // Handle custom price input
-  const handleCustomPriceChange = (value: string) => {
-    setCustomPrice(value)
-    setUseCustomPrice(!!value)
   }
 
   // Handle discount execution
@@ -115,7 +81,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_recommendation || ''}`,
       }
 
-      const _result = await executeDiscount(params)
+      await executeDiscount(params)
 
       // Success - close the modal
       onClose()

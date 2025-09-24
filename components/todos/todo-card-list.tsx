@@ -72,16 +72,16 @@ export function TodoCardList({
           break
         }
         case 'expiry_date':
-          aVal = new Date(a.expiry_date).getTime()
-          bVal = new Date(b.expiry_date).getTime()
+          aVal = a.expiry_date ? new Date(a.expiry_date).getTime() : 0
+          bVal = b.expiry_date ? new Date(b.expiry_date).getTime() : 0
           break
         case 'current_quantity':
-          aVal = a.current_quantity
-          bVal = b.current_quantity
+          aVal = a.current_quantity || 0
+          bVal = b.current_quantity || 0
           break
         case 'alphabetical':
-          aVal = a.product_name.toLowerCase()
-          bVal = b.product_name.toLowerCase()
+          aVal = (a.product_name || '').toLowerCase()
+          bVal = (b.product_name || '').toLowerCase()
           break
         case 'action_date':
           aVal = a.last_action_time ? new Date(a.last_action_time).getTime() : 0
@@ -158,7 +158,7 @@ export function TodoCardList({
             <TodoCard
               key={todo.batch_id}
               todo={todo}
-              onClick={() => handleTodoClick(todo.batch_id)}
+              onClick={() => handleTodoClick(todo.batch_id || '')}
             />
           ))}
         </div>

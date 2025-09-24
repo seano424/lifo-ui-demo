@@ -5,7 +5,6 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
-import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 
 interface SoldTabProps {
@@ -36,39 +35,10 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
     }
   }, [selectedBatch.current_quantity, isSoldSelectAll])
 
-  // Calculate sold metrics
-  const calculateSoldMetrics = () => {
-    const pricePerUnit =
-      (selectedBatch.potential_loss_value || 0) / (selectedBatch.current_quantity || 1)
-    const totalRevenue = pricePerUnit * soldQuantity
-    const profitMargin = 100 // Full price = 100% profit margin
-
-    const metrics = {
-      pricePerUnit,
-      totalRevenue,
-      profitMargin,
-    }
-
-    return metrics
-  }
-
-  const soldMetrics = calculateSoldMetrics()
-
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
     setSoldQuantity(value)
     setIsSoldSelectAll(value === selectedBatch.current_quantity)
-  }
-
-  // Handle select all toggle
-  const handleSelectAllToggle = () => {
-    if (isSoldSelectAll) {
-      setSoldQuantity(Math.floor((selectedBatch.current_quantity || 0) / 2))
-      setIsSoldSelectAll(false)
-    } else {
-      setSoldQuantity(selectedBatch.current_quantity || 0)
-      setIsSoldSelectAll(true)
-    }
   }
 
   // Handle timing selection
@@ -85,7 +55,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
         notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find(t => t.id === soldTiming)?.label}) - ${selectedBatch.ai_recommendation || ''}`,
       }
 
-      const _result = await executeSold(params)
+      await executeSold(params)
 
       // Success - close the modal
       onClose()

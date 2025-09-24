@@ -6,7 +6,6 @@ import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { createClient } from '@/lib/supabase/client'
-import { cn } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
@@ -94,37 +93,10 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
     }
   }, [selectedBatch.current_quantity, isSelectAll])
 
-  // Calculate donation impact metrics
-  const calculateDonationImpact = () => {
-    const preventedWaste =
-      (donateQuantity * (selectedBatch.potential_loss_value || 0)) / (selectedBatch.current_quantity || 1)
-    const mealsProvided = Math.round(donateQuantity * 2.5) // Estimate
-    const taxBenefit = preventedWaste * 0.25 // Estimate 25% tax benefit
-
-    return {
-      preventedWaste,
-      mealsProvided,
-      taxBenefit,
-    }
-  }
-
-  const impact = calculateDonationImpact()
-
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
     setDonateQuantity(value)
     setIsSelectAll(value === selectedBatch.current_quantity)
-  }
-
-  // Handle select all toggle
-  const handleSelectAllToggle = () => {
-    if (isSelectAll) {
-      setDonateQuantity(Math.floor((selectedBatch.current_quantity || 0) / 2))
-      setIsSelectAll(false)
-    } else {
-      setDonateQuantity(selectedBatch.current_quantity)
-      setIsSelectAll(true)
-    }
   }
 
   // Handle donation execution
@@ -145,7 +117,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name || ''} to ${recipientName} - ${selectedBatch.ai_recommendation || ''}`,
       }
 
-      const _result = await executeDonate(params)
+      await executeDonate(params)
 
       // Success - close the modal
       onClose()
