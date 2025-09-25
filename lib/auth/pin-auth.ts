@@ -24,7 +24,6 @@ export interface PINValidationData {
 
 // PIN configuration constants
 export const PIN_CONFIG = {
-  length: 6,
   maxAttempts: 3,
   lockoutDurationMinutes: 15,
   expiryDays: 90,
@@ -59,15 +58,21 @@ export const BLOCKED_PINS = [
 ] as const
 
 /**
- * Generate a secure 6-digit PIN
+ * Generate a secure PIN (defaults to 6 digits, but can be customized)
  */
-export function generateSecurePIN(): string {
+export function generateSecurePIN(length: number = 6): string {
+  if (length < 6) {
+    throw new Error('PIN length must be at least 6 digits')
+  }
+
   let pin: string
   let attempts = 0
   const maxAttempts = 100
+  const min = 10 ** (length - 1)
+  const max = 10 ** length - 1
 
   do {
-    pin = Math.floor(100000 + Math.random() * 900000).toString()
+    pin = Math.floor(min + Math.random() * (max - min + 1)).toString()
     attempts++
 
     if (attempts > maxAttempts) {
@@ -82,11 +87,11 @@ export function generateSecurePIN(): string {
  * Check if PIN contains sequential numbers
  */
 function isSequentialPIN(pin: string): boolean {
-  if (pin.length !== 6) return false
+  if (pin.length < 6) return false
 
   const digits = pin.split('').map(Number)
 
-  // Check ascending sequence (1234, 2345, etc.)
+  // Check ascending sequence (123456, 234567, etc.)
   let isAscending = true
   for (let i = 1; i < digits.length; i++) {
     if (digits[i] !== digits[i - 1] + 1) {
@@ -95,7 +100,7 @@ function isSequentialPIN(pin: string): boolean {
     }
   }
 
-  // Check descending sequence (4321, 5432, etc.)
+  // Check descending sequence (654321, 765432, etc.)
   let isDescending = true
   for (let i = 1; i < digits.length; i++) {
     if (digits[i] !== digits[i - 1] - 1) {
@@ -249,6 +254,13 @@ export async function updateUserPIN(
 
   try {
     // Validate new PIN strength
+    if (newPin.length < 6) {
+      return {
+        success: false,
+        error: 'PIN must be at least 6 digits long.',
+      }
+    }
+
     if (BLOCKED_PINS.includes(newPin as (typeof BLOCKED_PINS)[number]) || isSequentialPIN(newPin)) {
       return {
         success: false,
