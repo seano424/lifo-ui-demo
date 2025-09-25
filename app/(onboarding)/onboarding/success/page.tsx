@@ -23,7 +23,7 @@ function SuccessContent() {
           <CardContent className="flex flex-col gap-4">
             <Typography variant="p" color="muted">
               We&#39;ve sent you a confirmation email. Please check your inbox and click the
-              verification link to activate your account.
+              verification link to complete your registration.
             </Typography>
 
             <div>
@@ -31,10 +31,10 @@ function SuccessContent() {
                 <strong>What&#39;s next?</strong>
               </Typography>
               <ul className="mt-2 space-y-1">
-                <li>1. Check your email for verification link</li>
-                <li>2. Click the link to verify your account</li>
-                <li>3. Access your store dashboard</li>
-                <li>4. Start tracking your inventory</li>
+                <li>1. Check your email for the verification link</li>
+                <li>2. Click the link to confirm your account</li>
+                <li>3. You&#39;ll be redirected to the login page</li>
+                <li>4. Sign in and access your store dashboard</li>
               </ul>
             </div>
 

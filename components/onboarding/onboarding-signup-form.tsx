@@ -96,7 +96,7 @@ export function OnboardingSignUpForm({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/login`,
             data: {
               store_name: selectedStoreForm?.store_name || 'Unknown Store',
               full_name: fullName,
