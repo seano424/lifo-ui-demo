@@ -7,25 +7,24 @@ Optimized architecture with clear frontend-backend separation:
 
 from fastapi import APIRouter
 
-from app.api.v1 import (
-    analytics,
-    automated_scoring,
-    batch_creation,
-    csv,
-    csv_upload,
-    debug_health,
-    donation_queries,
-    donations,
-    health,
-    image_recognition,
-    mobile_endpoints,
-    multi_store_analytics,
-    mvp_analytics,
-    product_scanning,
-    scan_workflows,
-    scoring,
-    security,
-)
+# Import modules directly to avoid __init__.py dependencies
+from app.api.v1 import analytics
+# from app.api.v1 import automated_scoring  # TODO: Module on different branch
+from app.api.v1 import batch_creation
+from app.api.v1 import csv
+from app.api.v1 import csv_upload
+from app.api.v1 import debug_health
+from app.api.v1 import donation_queries
+from app.api.v1 import donations
+from app.api.v1 import health
+from app.api.v1 import image_recognition
+from app.api.v1 import mobile_endpoints
+from app.api.v1 import multi_store_analytics
+from app.api.v1 import mvp_analytics
+from app.api.v1 import product_scanning
+from app.api.v1 import scan_workflows
+from app.api.v1 import scoring
+from app.api.v1 import security
 
 # Create the main v1 router
 router = APIRouter()
@@ -55,12 +54,13 @@ router.include_router(
 )
 
 # Automated scoring system management
-router.include_router(
-    automated_scoring.router,
-    prefix="/automated-scoring",
-    tags=["Automated Scoring Management"],
-    responses={404: {"description": "Not found"}},
-)
+# TODO: Commented out - module on different branch
+# router.include_router(
+#     automated_scoring.router,
+#     prefix="/automated-scoring",
+#     tags=["Automated Scoring Management"],
+#     responses={404: {"description": "Not found"}},
+# )
 
 router.include_router(
     analytics.router,
