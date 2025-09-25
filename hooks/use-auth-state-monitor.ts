@@ -9,15 +9,54 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useStoreState } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 
-// Global state to track user-initiated logouts
-let isUserInitiatedLogout = false
+/**
+ * Singleton class to manage logout state across the application.
+ * This ensures proper encapsulation and prevents direct manipulation.
+ */
+class LogoutStateManager {
+  private isUserInitiatedLogout = false
 
-export function setUserInitiatedLogout(value: boolean) {
-  isUserInitiatedLogout = value
+  /**
+   * Sets whether the current logout was initiated by the user.
+   * @param value - true if user clicked logout, false otherwise
+   */
+  setUserInitiated(value: boolean): void {
+    this.isUserInitiatedLogout = value
+  }
+
+  /**
+   * Checks if the current logout was initiated by the user.
+   * @returns true if user initiated the logout
+   */
+  isUserInitiated(): boolean {
+    return this.isUserInitiatedLogout
+  }
+
+  /**
+   * Resets the logout state. Called after logout is processed.
+   */
+  reset(): void {
+    this.isUserInitiatedLogout = false
+  }
 }
 
+// Singleton instance
+const logoutStateManager = new LogoutStateManager()
+
+/**
+ * Sets whether the current logout was initiated by the user.
+ * @param value - true if user clicked logout, false otherwise
+ */
+export function setUserInitiatedLogout(value: boolean): void {
+  logoutStateManager.setUserInitiated(value)
+}
+
+/**
+ * Checks if the current logout was initiated by the user.
+ * @returns true if user initiated the logout
+ */
 export function isLogoutUserInitiated(): boolean {
-  return isUserInitiatedLogout
+  return logoutStateManager.isUserInitiated()
 }
 
 /**
@@ -37,13 +76,13 @@ export function useAuthStateMonitor() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       logger.log('AuthStateMonitor', `Auth event: ${event}`, {
         hasSession: !!session,
-        userInitiated: isUserInitiatedLogout,
+        userInitiated: logoutStateManager.isUserInitiated(),
         hasShownToast: hasShownLogoutToast.current,
       })
 
       if (event === 'SIGNED_IN') {
         // Reset flags on successful sign in
-        isUserInitiatedLogout = false
+        logoutStateManager.reset()
         hasShownLogoutToast.current = false
 
         // Invalidate user queries to refresh user data
@@ -67,7 +106,7 @@ export function useAuthStateMonitor() {
           currentPath !== '/'
 
         if (shouldRedirect) {
-          const redirectPath = isUserInitiatedLogout ? '/' : '/auth/login'
+          const redirectPath = logoutStateManager.isUserInitiated() ? '/' : '/auth/login'
           router.push(redirectPath)
         }
 
@@ -83,7 +122,7 @@ export function useAuthStateMonitor() {
           // Then clear all cached query data when user signs out
           queryClient.clear()
 
-          if (!isUserInitiatedLogout && !hasShownLogoutToast.current) {
+          if (!logoutStateManager.isUserInitiated() && !hasShownLogoutToast.current) {
             // This was an automatic/security-related logout
             hasShownLogoutToast.current = true
 
@@ -104,12 +143,12 @@ export function useAuthStateMonitor() {
               'AuthStateMonitor',
               'Automatic session termination detected, showing user feedback',
             )
-          } else if (isUserInitiatedLogout) {
+          } else if (logoutStateManager.isUserInitiated()) {
             logger.log('AuthStateMonitor', 'User-initiated logout, no feedback needed')
           }
 
           // Reset the flag after handling
-          isUserInitiatedLogout = false
+          logoutStateManager.reset()
         }, 100) // 100ms delay to allow redirect to start
       }
 
