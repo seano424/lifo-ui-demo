@@ -45,7 +45,14 @@ export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps)
         logger.error('LogoutButton', 'Logout error:', error)
 
         // Handle rate limiting gracefully
-        if (error.message?.includes('too many') || error.message?.includes('rate limit')) {
+        // Check for common rate limit error codes/statuses
+        const isRateLimitError =
+          error.status === 429 || // Standard HTTP rate limit status
+          error.code === 'rate_limit_exceeded' ||
+          error.message?.toLowerCase().includes('rate limit') ||
+          error.message?.toLowerCase().includes('too many')
+
+        if (isRateLimitError) {
           logger.log('LogoutButton', 'Rate limited - clearing local state anyway')
           // Continue with logout flow even if Supabase request failed
         } else {
