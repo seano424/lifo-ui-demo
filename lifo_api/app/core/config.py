@@ -146,6 +146,32 @@ class Settings(BaseSettings):
         default=72, description="Hours to retain performance metrics"
     )
 
+    # Automated Scoring Configuration
+    enable_automated_scoring: bool = Field(
+        default=True, description="Enable automated scoring scheduler"
+    )
+    default_scoring_cron: str = Field(
+        default="0 */4 * * *", description="Default cron expression for automated scoring (every 4 hours)"
+    )
+    default_scoring_timezone: str = Field(
+        default="UTC", description="Default timezone for automated scoring schedules"
+    )
+    scoring_max_retries: int = Field(
+        default=3, description="Maximum retry attempts for failed scoring jobs"
+    )
+    scoring_retry_delay_minutes: int = Field(
+        default=5, description="Minutes to wait between scoring retry attempts"
+    )
+    scoring_timeout_minutes: int = Field(
+        default=15, description="Timeout in minutes for scoring operations"
+    )
+    scoring_batch_size: int = Field(
+        default=500, description="Default batch size for automated scoring"
+    )
+    max_concurrent_scoring_jobs: int = Field(
+        default=5, description="Maximum concurrent scoring jobs allowed"
+    )
+
     # Mobile performance thresholds
     mobile_response_time_critical_ms: int = Field(
         default=200, description="Critical mobile response time threshold (ms)"
@@ -294,11 +320,12 @@ class Settings(BaseSettings):
         return self.allowed_hosts_list
 
     model_config = SettingsConfigDict(
-        env_file=".env.local",
+        env_file=[".env.local", "../.env.local", "../../.env.local"],  # Try multiple paths for .env file
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",  # Ignore extra environment variables not defined in the model
         env_nested_delimiter=None,  # Disable nested parsing
+        env_ignore_empty=True,  # Ignore empty .env files
     )
 
 
