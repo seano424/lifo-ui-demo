@@ -232,6 +232,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         else:
             logger.info("Automated scoring system disabled in configuration")
 
+        # Log debug health endpoints availability for production troubleshooting
+        debug_endpoints = [
+            f"{settings.api_v1_prefix}/debug/minimal",
+            f"{settings.api_v1_prefix}/debug/debug-request",
+            f"{settings.api_v1_prefix}/debug/middleware-check",
+            f"{settings.api_v1_prefix}/debug/environment-status",
+            f"{settings.api_v1_prefix}/debug/database-connectivity",
+            f"{settings.api_v1_prefix}/debug/production-troubleshoot"
+        ]
+        logger.info(
+            "Debug health endpoints available for production troubleshooting",
+            endpoints=debug_endpoints,
+            environment=settings.environment
+        )
+
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
         # Don't raise - allow server to start with Supabase-only mode
