@@ -55,15 +55,14 @@ export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps)
 
       logger.log(
         'LogoutButton',
-        'Logout successful - auth state monitor will handle cache clearing',
+        'Logout successful - auth state monitor will handle redirect and cache clearing',
       )
 
-      // Don't manipulate cache here - let useAuthStateMonitor handle it
+      // Don't manipulate cache or redirect here - let useAuthStateMonitor handle it
       // This prevents race conditions and ensures consistent state management
     } catch (error) {
       logger.error('LogoutButton', 'Logout failed:', error)
-    } finally {
-      logger.log('LogoutButton', 'Redirecting to home page')
+      // Only redirect on error to show error state
       router.push('/')
     }
   }
