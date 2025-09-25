@@ -3,7 +3,7 @@
 # Update: doctl apps update <staging_app_id> --spec .do/staging.yaml
 
 name: lifo-ai-api-staging
-region: nyc1
+region: ams3
 
 services:
 - name: fastapi-backend-staging

@@ -3,7 +3,7 @@
 # Update: doctl apps update <app_id> --spec .do/app.yaml
 
 name: lifo-ai-api
-region: nyc1
+region: ams3
 
 services:
 - name: fastapi-backend
