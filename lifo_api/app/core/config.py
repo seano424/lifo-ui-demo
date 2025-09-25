@@ -332,13 +332,6 @@ class Settings(BaseSettings):
 # Create global settings instance
 settings = Settings()
 
-# Debug logging for deployment troubleshooting
-import os
-print(f"DEBUG: SUPABASE_URL from os.environ: {os.environ.get('SUPABASE_URL', 'NOT_SET')}")
-print(f"DEBUG: supabase_url from settings: {getattr(settings, 'supabase_url', 'NOT_SET')}")
-print(f"DEBUG: Environment: {getattr(settings, 'environment', 'NOT_SET')}")
-print(f"DEBUG: Available env vars starting with SUPABASE: {[k for k in os.environ.keys() if k.startswith('SUPABASE')]}")
-
 
 def get_database_url() -> str:
     """
