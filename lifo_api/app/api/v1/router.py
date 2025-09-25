@@ -9,9 +9,11 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     analytics,
+    automated_scoring,
     batch_creation,
     csv,
     csv_upload,
+    debug_health,
     donation_queries,
     donations,
     health,
@@ -36,11 +38,27 @@ router.include_router(
     responses={503: {"description": "Service unavailable"}},
 )
 
+# Debug health endpoints (for production troubleshooting)
+router.include_router(
+    debug_health.router,
+    prefix="/debug",
+    tags=["Debug & Troubleshooting"],
+    responses={503: {"description": "Service unavailable"}},
+)
+
 # Include AI feature routers only (CRUD operations removed)
 router.include_router(
     scoring.router,
     prefix="/scoring",
     tags=["AI Scoring"],
+    responses={404: {"description": "Not found"}},
+)
+
+# Automated scoring system management
+router.include_router(
+    automated_scoring.router,
+    prefix="/automated-scoring",
+    tags=["Automated Scoring Management"],
     responses={404: {"description": "Not found"}},
 )
 

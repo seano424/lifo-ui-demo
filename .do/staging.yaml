@@ -25,9 +25,9 @@ services:
   instance_count: 1
   instance_size_slug: basic-xxs  # Minimal resources for testing
   
-  # Health check
+  # Health check - fixed path to match FastAPI routing
   health_check:
-    http_path: /api/v1/health/
+    http_path: /api/v1/health
     initial_delay_seconds: 30
     period_seconds: 10
     timeout_seconds: 5

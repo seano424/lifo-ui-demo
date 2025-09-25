@@ -302,14 +302,22 @@ class Settings(BaseSettings):
                 if host and not host.startswith("*"):  # No wildcards in production
                     hosts.append(host)
 
-            # Add specific production domains only (no wildcards)
-            # Production domains must be explicitly configured via FRONTEND_URL and API_URL
+            # Add DigitalOcean App Platform hosts for health checks
+            hosts.extend([
+                "*.ondigitalocean.app",  # DigitalOcean App Platform domains
+            ])
 
-            return hosts if hosts else ["127.0.0.1"]  # Fallback to localhost only
+            return hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]  # Fallback includes DO domains
 
         elif self.environment == "staging":
             # Staging - limited hosts
             hosts = ["localhost", "127.0.0.1"]
+
+            # Add DigitalOcean staging domains
+            hosts.extend([
+                "*.ondigitalocean.app",
+            ])
+
             if self.frontend_url:
                 host = self.frontend_url.replace("https://", "").replace("http://", "")
                 if host:
