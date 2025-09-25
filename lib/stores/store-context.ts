@@ -14,7 +14,7 @@ interface StoreState {
   isLoadingStores: boolean
   isChangingStore: boolean
 
-  setActiveStore: (store: Store) => void
+  setActiveStore: (store: Store | null) => void
   setUserStores: (userStores: UserStore[]) => void
   setLoadingStores: (loading: boolean) => void
   setChangingStore: (changing: boolean) => void
@@ -33,8 +33,12 @@ export const useStoreState = create<StoreState>()(
 
     setActiveStore: store => {
       // Persist to localStorage when setting active store
-      if (store && typeof window !== 'undefined') {
-        localStorage.setItem(ACTIVE_STORE_KEY, store.store_id)
+      if (typeof window !== 'undefined') {
+        if (store) {
+          localStorage.setItem(ACTIVE_STORE_KEY, store.store_id)
+        } else {
+          localStorage.removeItem(ACTIVE_STORE_KEY)
+        }
       }
       set({ activeStore: store })
     },

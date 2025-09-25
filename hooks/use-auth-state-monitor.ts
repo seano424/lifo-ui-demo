@@ -6,17 +6,57 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { useStoreState } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 
-// Global state to track user-initiated logouts
-let isUserInitiatedLogout = false
+/**
+ * Singleton class to manage logout state across the application.
+ * This ensures proper encapsulation and prevents direct manipulation.
+ */
+class LogoutStateManager {
+  private isUserInitiatedLogout = false
 
-export function setUserInitiatedLogout(value: boolean) {
-  isUserInitiatedLogout = value
+  /**
+   * Sets whether the current logout was initiated by the user.
+   * @param value - true if user clicked logout, false otherwise
+   */
+  setUserInitiated(value: boolean): void {
+    this.isUserInitiatedLogout = value
+  }
+
+  /**
+   * Checks if the current logout was initiated by the user.
+   * @returns true if user initiated the logout
+   */
+  isUserInitiated(): boolean {
+    return this.isUserInitiatedLogout
+  }
+
+  /**
+   * Resets the logout state. Called after logout is processed.
+   */
+  reset(): void {
+    this.isUserInitiatedLogout = false
+  }
 }
 
+// Singleton instance
+const logoutStateManager = new LogoutStateManager()
+
+/**
+ * Sets whether the current logout was initiated by the user.
+ * @param value - true if user clicked logout, false otherwise
+ */
+export function setUserInitiatedLogout(value: boolean): void {
+  logoutStateManager.setUserInitiated(value)
+}
+
+/**
+ * Checks if the current logout was initiated by the user.
+ * @returns true if user initiated the logout
+ */
 export function isLogoutUserInitiated(): boolean {
-  return isUserInitiatedLogout
+  return logoutStateManager.isUserInitiated()
 }
 
 /**
@@ -28,6 +68,7 @@ export function useAuthStateMonitor() {
   const queryClient = useQueryClient()
   const supabase = createClient()
   const hasShownLogoutToast = useRef(false)
+  const { setActiveStore, setUserStores } = useStoreState()
 
   useEffect(() => {
     const {
@@ -35,67 +76,80 @@ export function useAuthStateMonitor() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       logger.log('AuthStateMonitor', `Auth event: ${event}`, {
         hasSession: !!session,
-        userInitiated: isUserInitiatedLogout,
+        userInitiated: logoutStateManager.isUserInitiated(),
         hasShownToast: hasShownLogoutToast.current,
       })
 
       if (event === 'SIGNED_IN') {
         // Reset flags on successful sign in
-        isUserInitiatedLogout = false
+        logoutStateManager.reset()
         hasShownLogoutToast.current = false
 
         // Invalidate user queries to refresh user data
         queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
-        logger.log('AuthStateMonitor', 'User signed in, refreshing user data')
+        // Force refresh of store-related queries to prevent showing old user's stores
+        queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
+        queryClient.invalidateQueries({ queryKey: queryKeys.userPreferences.all })
+
+        logger.log('AuthStateMonitor', 'User signed in, refreshing user data and stores')
       }
 
       if (event === 'SIGNED_OUT') {
-        logger.log('AuthStateMonitor', 'SIGNED_OUT event - clearing cache and forcing UI update')
+        logger.log('AuthStateMonitor', 'SIGNED_OUT event - redirecting then clearing cache')
 
-        // First, immediately set current user to null to force UI update
-        queryClient.setQueryData(queryKeys.auth.currentUser(), null)
-
-        // Then clear all cached query data when user signs out
-        queryClient.clear()
-
-        if (!isUserInitiatedLogout && !hasShownLogoutToast.current) {
-          // This was an automatic/security-related logout
-          hasShownLogoutToast.current = true
-
-          toast.error('Your session was terminated for security reasons. Please log in again.', {
-            duration: 6000, // Show for 6 seconds
-            description: 'This can happen when logging in from multiple devices or locations.',
-            className: 'session-termination-toast',
-            style: {
-              background: 'hsl(var(--primary))',
-              color: 'hsl(var(--primary-foreground))',
-              border: '1px solid hsl(var(--primary))',
-              borderRadius: '12px',
-              fontWeight: '500',
-            },
-          })
-
-          logger.log(
-            'AuthStateMonitor',
-            'Automatic session termination detected, showing user feedback',
-          )
-        } else if (isUserInitiatedLogout) {
-          logger.log('AuthStateMonitor', 'User-initiated logout, no feedback needed')
-        }
-
-        // Reset the flag after handling
-        isUserInitiatedLogout = false
-
-        // Redirect to login page if not already there
+        // Redirect FIRST to avoid "Not authenticated" errors on dashboard pages
         const currentPath = window.location.pathname
-        if (
+        const shouldRedirect =
           !currentPath.startsWith('/auth') &&
           !currentPath.startsWith('/onboarding') &&
           currentPath !== '/'
-        ) {
-          router.push('/auth/login')
+
+        if (shouldRedirect) {
+          const redirectPath = logoutStateManager.isUserInitiated() ? '/' : '/auth/login'
+          router.push(redirectPath)
         }
+
+        // Short delay to allow redirect to start before clearing data
+        setTimeout(() => {
+          // Clear user data to force UI update
+          queryClient.setQueryData(queryKeys.auth.currentUser(), null)
+
+          // Clear Zustand store state (localStorage handled in setActiveStore)
+          setActiveStore(null)
+          setUserStores([])
+
+          // Then clear all cached query data when user signs out
+          queryClient.clear()
+
+          if (!logoutStateManager.isUserInitiated() && !hasShownLogoutToast.current) {
+            // This was an automatic/security-related logout
+            hasShownLogoutToast.current = true
+
+            toast.error('Your session was terminated for security reasons. Please log in again.', {
+              duration: 6000, // Show for 6 seconds
+              description: 'This can happen when logging in from multiple devices or locations.',
+              className: 'session-termination-toast',
+              style: {
+                background: 'hsl(var(--primary))',
+                color: 'hsl(var(--primary-foreground))',
+                border: '1px solid hsl(var(--primary))',
+                borderRadius: '12px',
+                fontWeight: '500',
+              },
+            })
+
+            logger.log(
+              'AuthStateMonitor',
+              'Automatic session termination detected, showing user feedback',
+            )
+          } else if (logoutStateManager.isUserInitiated()) {
+            logger.log('AuthStateMonitor', 'User-initiated logout, no feedback needed')
+          }
+
+          // Reset the flag after handling
+          logoutStateManager.reset()
+        }, 100) // 100ms delay to allow redirect to start
       }
 
       if (event === 'TOKEN_REFRESHED') {
@@ -108,7 +162,7 @@ export function useAuthStateMonitor() {
       logger.log('AuthStateMonitor', 'Cleaning up auth state subscription')
       subscription.unsubscribe()
     }
-  }, [router, queryClient, supabase.auth])
+  }, [router, queryClient, supabase.auth, setActiveStore, setUserStores])
 
   return {
     setUserInitiatedLogout,
