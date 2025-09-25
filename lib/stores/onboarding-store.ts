@@ -1,12 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { STORE_TYPES } from '@/lib/schemas/store-schemas'
-import {
-  getAvailableSteps,
-  getStepIndexById,
-  STEP_IDS,
-  type StepId,
-} from '@/lib/utils/onboarding-steps'
+import { stepManager, STEP_IDS, type StepId } from '@/lib/utils/onboarding-step-manager'
 import type { Database } from '@/types/supabase'
 
 // Database types
@@ -75,15 +70,15 @@ export type OnboardingStore = OnboardingData & {
   setIsCheckingBusiness: (checking: boolean) => void
   reset: () => void
 
-  // Current step (supports both step numbers and IDs)
+  // Clean step management - reactive with Zustand
   currentStep: number
-  currentStepId: StepId
+  getCurrentStepId: () => StepId
   setCurrentStep: (step: number) => void
-  setCurrentStepById: (stepId: StepId, isGooglePlacesEnabled: boolean) => void
-
-  // Navigation helpers
-  goToNextStep: (isGooglePlacesEnabled: boolean) => void
-  goToPreviousStep: (isGooglePlacesEnabled: boolean) => void
+  goToStep: (stepIndex: number) => void
+  goToNextStep: () => boolean
+  goToPreviousStep: () => boolean
+  canGoNext: () => boolean
+  canGoBack: () => boolean
 
   // Helper methods
   convertFormDataToInsert: (formData: StoreFormData, storeCode: string) => StoreInsert
@@ -107,10 +102,9 @@ const initialState: OnboardingData = {
 
 export const useOnboardingStore = create<OnboardingStore>()(
   devtools(
-    (set, get) => ({
+    set => ({
       ...initialState,
-      currentStep: 1,
-      currentStepId: STEP_IDS.STORE_SEARCH, // Default to first step
+      currentStep: 1, // Start at step 1
 
       setSearchQuery: query => set({ searchQuery: query }),
       setSelectedStoreForm: store => set({ selectedStoreForm: store, isManualEntry: false }),
@@ -122,49 +116,42 @@ export const useOnboardingStore = create<OnboardingStore>()(
       setBusinessCheckResult: result => set({ businessCheckResult: result }),
       setIsCheckingBusiness: checking => set({ isCheckingBusiness: checking }),
 
-      setCurrentStep: step => {
+      // Clean step management - reactive with Zustand
+      getCurrentStepId: () => stepManager.getCurrentStep()?.id || STEP_IDS.STORE_TYPE,
+
+      setCurrentStep: (step: number) => {
+        stepManager.setCurrentIndex(step)
         set({ currentStep: step })
       },
 
-      setCurrentStepById: (stepId: StepId, isGooglePlacesEnabled: boolean) => {
-        const stepIndex = getStepIndexById(stepId, isGooglePlacesEnabled)
-        set({ currentStep: stepIndex, currentStepId: stepId })
+      goToStep: (stepIndex: number) => {
+        stepManager.setCurrentIndex(stepIndex)
+        set({ currentStep: stepIndex })
       },
 
-      goToNextStep: (isGooglePlacesEnabled: boolean) => {
-        const { currentStepId } = get()
-        const availableSteps = getAvailableSteps(isGooglePlacesEnabled)
-        const currentIndex = availableSteps.findIndex(step => step.id === currentStepId)
-
-        if (currentIndex < availableSteps.length - 1) {
-          const nextStep = availableSteps[currentIndex + 1]
-          set({
-            currentStep: currentIndex + 2, // +2 because of 1-based indexing
-            currentStepId: nextStep.id,
-          })
+      goToNextStep: () => {
+        const success = stepManager.goToNext()
+        if (success) {
+          set({ currentStep: stepManager.getCurrentIndex() })
         }
+        return success
       },
 
-      goToPreviousStep: (isGooglePlacesEnabled: boolean) => {
-        const { currentStepId } = get()
-        const availableSteps = getAvailableSteps(isGooglePlacesEnabled)
-        const currentIndex = availableSteps.findIndex(step => step.id === currentStepId)
-
-        if (currentIndex > 0) {
-          const previousStep = availableSteps[currentIndex - 1]
-          set({
-            currentStep: currentIndex, // currentIndex is already 1-based when going backwards
-            currentStepId: previousStep.id,
-          })
+      goToPreviousStep: () => {
+        const success = stepManager.goToPrevious()
+        if (success) {
+          set({ currentStep: stepManager.getCurrentIndex() })
         }
+        return success
       },
 
-      reset: () =>
-        set({
-          ...initialState,
-          currentStep: 1,
-          currentStepId: STEP_IDS.STORE_SEARCH,
-        }),
+      canGoNext: () => stepManager.canGoNext(),
+      canGoBack: () => stepManager.canGoBack(),
+
+      reset: () => {
+        stepManager.setCurrentIndex(1)
+        set({ ...initialState, currentStep: 1 })
+      },
 
       // Helper method to convert form data to database insert format
       convertFormDataToInsert: (formData: StoreFormData, storeCode: string): StoreInsert => ({

@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { ConfirmDetailsStep } from '@/components/onboarding/confirm-details-step'
 import { OnboardingSignUpForm } from '@/components/onboarding/onboarding-signup-form'
 import { OnboardingSuccess } from '@/components/onboarding/onboarding-success'
@@ -11,66 +11,35 @@ import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { cn } from '@/lib/utils'
 import { FORM_CONSTANTS } from '@/lib/utils/form-helpers'
-import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
-import {
-  getAvailableSteps,
-  getSuccessStepIndex,
-  STEP_IDS,
-  setOnboardingTranslations,
-} from '@/lib/utils/onboarding-steps'
+import { stepManager, STEP_IDS } from '@/lib/utils/onboarding-step-manager'
 import { Typography } from '../ui/typography'
 
 export function OnboardingFlow() {
   const t = useTranslations('onboarding')
 
-  const {
-    currentStep,
-    setCurrentStep,
-    businessCheckResult,
-    setManualEntry,
-    isEmailSent,
-    selectedStoreForm,
-  } = useOnboardingStore()
+  const { currentStep, goToStep, businessCheckResult, isEmailSent, selectedStoreForm } =
+    useOnboardingStore()
 
-  // Memoize Google Places status to avoid recalculation on every render
-  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
-
-  // Set up translations for onboarding steps
-  useEffect(() => {
-    setOnboardingTranslations((key: string) => t(key))
-  }, [t])
-
-  // Get available steps based on Google Places availability
-  const availableSteps = useMemo(
-    () => getAvailableSteps(googlePlacesEnabled, (key: string) => t(key)),
-    [googlePlacesEnabled, t], // Include translation function as dependency
-  )
-
-  // Initialize manual entry when Google Places is disabled
-  useEffect(() => {
-    if (!googlePlacesEnabled) {
-      setManualEntry(true)
-    }
-  }, [googlePlacesEnabled, setManualEntry])
+  // Get all steps from step manager
+  const allSteps = stepManager.getAllSteps()
 
   // Create step configuration with accessibility
   const steps = useMemo(
     () =>
-      availableSteps.map((step, index) => ({
+      allSteps.map(step => ({
         ...step,
-        accessible:
-          index + 1 <= currentStep &&
-          (step.id !== STEP_IDS.CREATE_ACCOUNT || !businessCheckResult?.exists),
+        label: t(step.labelKey) || step.labelFallback,
+        accessible: stepManager.getStepAccessibility(step.index, businessCheckResult?.exists),
       })),
-    [availableSteps, currentStep, businessCheckResult?.exists],
+    [allSteps, t, businessCheckResult?.exists],
   )
 
   // Show success step when account creation is complete
-  const successStepIndex = getSuccessStepIndex(googlePlacesEnabled, (key: string) => t(key))
+  const successStepIndex = stepManager.getSuccessStepIndex()
   const showSuccessStep = isEmailSent && currentStep === successStepIndex
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div>
       {/* Progress indicator - hide on success */}
       {!showSuccessStep && (
         <>
@@ -84,7 +53,7 @@ export function OnboardingFlow() {
               return (
                 <button
                   type="button"
-                  onClick={() => isAccessible && setCurrentStep(stepNumber)}
+                  onClick={() => isAccessible && goToStep(stepNumber)}
                   key={step.label}
                   disabled={!isAccessible}
                   className={cn(
@@ -133,20 +102,32 @@ export function OnboardingFlow() {
           </ErrorBoundary>
         ) : (
           <ErrorBoundary>
-            {googlePlacesEnabled && currentStep === 1 && <StoreSearchStep />}
-            {googlePlacesEnabled && currentStep === 2 && <StoreTypeStep />}
-            {googlePlacesEnabled && currentStep === 3 && <ConfirmDetailsStep />}
-            {googlePlacesEnabled && currentStep === 4 && <OnboardingSignUpForm />}
-            {!googlePlacesEnabled && currentStep === 1 && <StoreTypeStep />}
-            {!googlePlacesEnabled && currentStep === 2 && <ConfirmDetailsStep />}
-            {!googlePlacesEnabled && currentStep === 3 && <OnboardingSignUpForm />}
+            {(() => {
+              // Get the current step - super clean, no conditionals!
+              const currentStepConfig = stepManager.getCurrentStep()
+              if (!currentStepConfig) return null
+
+              // Simple component mapping based on step ID
+              switch (currentStepConfig.id) {
+                case STEP_IDS.STORE_SEARCH:
+                  return <StoreSearchStep />
+                case STEP_IDS.STORE_TYPE:
+                  return <StoreTypeStep />
+                case STEP_IDS.CONFIRM_DETAILS:
+                  return <ConfirmDetailsStep />
+                case STEP_IDS.CREATE_ACCOUNT:
+                  return <OnboardingSignUpForm />
+                default:
+                  return null
+              }
+            })()}
           </ErrorBoundary>
         )}
       </div>
 
       {/* Helper text for business verification */}
       {businessCheckResult?.exists &&
-        currentStep >= availableSteps.findIndex(s => s.id === STEP_IDS.CONFIRM_DETAILS) + 1 && (
+        currentStep >= (stepManager.getIndexByStepId(STEP_IDS.CONFIRM_DETAILS) || 0) && (
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Need help with business verification?{' '}
