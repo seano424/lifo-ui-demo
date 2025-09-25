@@ -24,14 +24,14 @@ services:
   instance_count: 1
   instance_size_slug: basic-xxs  # Can scale up to professional-xs, professional-s, etc.
   
-  # Health check
-  health_check:
-    http_path: /api/v1/health
-    initial_delay_seconds: 30
-    period_seconds: 10
-    timeout_seconds: 5
-    failure_threshold: 3
-    success_threshold: 1
+  # Health check - TEMPORARILY DISABLED for debugging
+  # health_check:
+  #   http_path: /api/v1/health
+  #   initial_delay_seconds: 30
+  #   period_seconds: 10
+  #   timeout_seconds: 5
+  #   failure_threshold: 3
+  #   success_threshold: 1
   
   # Environment variables
   envs:
