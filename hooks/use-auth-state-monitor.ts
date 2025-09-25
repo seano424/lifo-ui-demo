@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { logger } from '@/lib/utils/logger'
 
 // Global state to track user-initiated logouts
 let isUserInitiatedLogout = false
@@ -31,7 +33,7 @@ export function useAuthStateMonitor() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log(`[AuthStateMonitor] Auth event: ${event}`, {
+      logger.log('AuthStateMonitor', `Auth event: ${event}`, {
         hasSession: !!session,
         userInitiated: isUserInitiatedLogout,
         hasShownToast: hasShownLogoutToast.current,
@@ -43,13 +45,18 @@ export function useAuthStateMonitor() {
         hasShownLogoutToast.current = false
 
         // Invalidate user queries to refresh user data
-        queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
+        queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
-        console.log('[AuthStateMonitor] User signed in, refreshing user data')
+        logger.log('AuthStateMonitor', 'User signed in, refreshing user data')
       }
 
       if (event === 'SIGNED_OUT') {
-        // Clear all cached query data when user signs out
+        logger.log('AuthStateMonitor', 'SIGNED_OUT event - clearing cache and forcing UI update')
+
+        // First, immediately set current user to null to force UI update
+        queryClient.setQueryData(queryKeys.auth.currentUser(), null)
+
+        // Then clear all cached query data when user signs out
         queryClient.clear()
 
         if (!isUserInitiatedLogout && !hasShownLogoutToast.current) {
@@ -69,11 +76,12 @@ export function useAuthStateMonitor() {
             },
           })
 
-          console.log(
-            '[AuthStateMonitor] Automatic session termination detected, showing user feedback',
+          logger.log(
+            'AuthStateMonitor',
+            'Automatic session termination detected, showing user feedback',
           )
         } else if (isUserInitiatedLogout) {
-          console.log('[AuthStateMonitor] User-initiated logout, no feedback needed')
+          logger.log('AuthStateMonitor', 'User-initiated logout, no feedback needed')
         }
 
         // Reset the flag after handling
@@ -91,13 +99,13 @@ export function useAuthStateMonitor() {
       }
 
       if (event === 'TOKEN_REFRESHED') {
-        console.log('[AuthStateMonitor] Token refreshed successfully')
+        logger.log('AuthStateMonitor', 'Token refreshed successfully')
       }
     })
 
     // Cleanup subscription on unmount
     return () => {
-      console.log('[AuthStateMonitor] Cleaning up auth state subscription')
+      logger.log('AuthStateMonitor', 'Cleaning up auth state subscription')
       subscription.unsubscribe()
     }
   }, [router, queryClient, supabase.auth])
@@ -106,53 +114,4 @@ export function useAuthStateMonitor() {
     setUserInitiatedLogout,
     isLogoutUserInitiated,
   }
-}
-
-/**
- * Hook to detect refresh token errors and provide appropriate feedback
- */
-export function useRefreshTokenErrorHandler() {
-  useEffect(() => {
-    // Listen for global fetch errors that might indicate refresh token issues
-    const originalFetch = window.fetch
-
-    window.fetch = async (...args) => {
-      const response = await originalFetch(...args)
-
-      // Check for auth-related errors
-      if (response.status === 401 && !isUserInitiatedLogout) {
-        const url = args[0]?.toString() || 'unknown'
-
-        // Only show feedback for non-auth endpoints to avoid noise
-        if (!url.includes('/auth/') && !url.includes('/login')) {
-          console.log(`[RefreshTokenErrorHandler] 401 detected on ${url}`)
-
-          // Check if we still have a session
-          const supabase = createClient()
-          const {
-            data: { session },
-          } = await supabase.auth.getSession()
-
-          if (!session) {
-            toast.error('Your session has expired. Please log in again.', {
-              duration: 5000,
-              description: 'Your authentication token is no longer valid.',
-              style: {
-                background: 'hsl(var(--primary))',
-                color: 'hsl(var(--primary-foreground))',
-                border: '1px solid hsl(var(--primary))',
-              },
-            })
-          }
-        }
-      }
-
-      return response
-    }
-
-    // Cleanup
-    return () => {
-      window.fetch = originalFetch
-    }
-  }, [])
 }

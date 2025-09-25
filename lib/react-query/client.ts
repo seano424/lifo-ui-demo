@@ -3,6 +3,7 @@
 import { QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { isLogoutUserInitiated } from '@/hooks/use-auth-state-monitor'
+import { logger } from '@/lib/utils/logger'
 
 type StatusError = { status: number; message?: string }
 
@@ -40,7 +41,7 @@ export function createQueryClient() {
         retry: (failureCount, error: unknown) => {
           // Don't retry auth errors - they need user intervention
           if (isAuthError(error)) {
-            console.log('[QueryClient] Auth error detected, not retrying:', error)
+            logger.log('QueryClient', 'Auth error detected, not retrying:', error)
             return false
           }
 
@@ -57,7 +58,7 @@ export function createQueryClient() {
         throwOnError: error => {
           // Only throw auth errors if they're not user-initiated logouts
           if (isAuthError(error) && !isLogoutUserInitiated()) {
-            console.log('[QueryClient] Authentication error in query:', error)
+            logger.log('QueryClient', 'Authentication error in query:', error)
 
             // Show a toast for auth errors if not already logging out
             if (hasStatus(error) && error.status === 401) {
@@ -76,7 +77,7 @@ export function createQueryClient() {
         retry: (failureCount, error: unknown) => {
           // Don't retry auth errors for mutations either
           if (isAuthError(error)) {
-            console.log('[QueryClient] Auth error in mutation, not retrying:', error)
+            logger.log('QueryClient', 'Auth error in mutation, not retrying:', error)
             return false
           }
           return failureCount < 1
@@ -84,7 +85,7 @@ export function createQueryClient() {
         // Global error handler for mutations
         throwOnError: error => {
           if (isAuthError(error) && !isLogoutUserInitiated()) {
-            console.log('[QueryClient] Authentication error in mutation:', error)
+            logger.log('QueryClient', 'Authentication error in mutation:', error)
 
             if (hasStatus(error) && error.status === 401) {
               toast.error('Authentication required. Please log in again.', {
