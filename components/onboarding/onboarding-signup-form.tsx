@@ -3,7 +3,7 @@
 import { AlertTriangle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,13 +15,11 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
-const ONBOARDING_MODE = process.env.NEXT_PUBLIC_ONBOARDING_MODE || 'production'
-
 export function OnboardingSignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
-  const t = useTranslations('onboarding.signupForm')
+  const t = useTranslations('marketing.onboarding.signupForm')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -40,13 +38,19 @@ export function OnboardingSignUpForm({
     businessCheckResult,
     setUserDetails,
     setEmailSent,
-    setCurrentStep,
+    goToPreviousStep,
+    reset,
   } = useOnboardingStore()
 
-  // Determine what's required based on mode
-  const requiresAuth = ONBOARDING_MODE === 'test'
-  const isAuthReady = !requiresAuth || !!currentUser?.id
-  const showAuthWarning = requiresAuth && !currentUser?.id
+  // Check if user is logged in - if so, use their ID, otherwise they'll need to sign up
+  const isLoggedIn = !!currentUser?.id
+
+  // Pre-fill email if user is logged in
+  useEffect(() => {
+    if (currentUser?.email && !email) {
+      setEmail(currentUser.email)
+    }
+  }, [currentUser?.email, email])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,13 +58,13 @@ export function OnboardingSignUpForm({
     setError(null)
 
     // Validation
-    if (ONBOARDING_MODE === 'production' && password.length < 6) {
+    if (!isLoggedIn && password.length < 6) {
       setError(t('errors.passwordTooShort'))
       setIsLoading(false)
       return
     }
 
-    if (password !== confirmPassword) {
+    if (!isLoggedIn && password !== confirmPassword) {
       setError(t('errors.passwordsNoMatch'))
       setIsLoading(false)
       return
@@ -79,47 +83,31 @@ export function OnboardingSignUpForm({
     }
 
     try {
-      let userId: string = ''
+      let userId: string
 
-      switch (ONBOARDING_MODE) {
-        case 'mock':
-          // Mock mode: generate fake user ID
-          userId = `mock-user-${Date.now()}`
-          break
+      if (isLoggedIn) {
+        // User is already logged in, use their current ID
+        userId = currentUser.id
+      } else {
+        // User needs to sign up first
+        const supabase = createClient()
 
-        case 'test': {
-          // Test mode: use current logged-in user
-          const currentUserId = currentUser?.id
-          if (!currentUserId) {
-            setError(t('errors.testModeSignInRequired'))
-            setIsLoading(false)
-            return
-          }
-          userId = currentUserId
-          break
-        }
-        default: {
-          // Production mode: create new auth user
-          const supabase = createClient()
-
-          const { data: authData, error: authError } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/dashboard`,
-              data: {
-                store_name: selectedStoreForm?.store_name || 'Unknown Store',
-                full_name: fullName,
-              },
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              store_name: selectedStoreForm?.store_name || 'Unknown Store',
+              full_name: fullName,
             },
-          })
+          },
+        })
 
-          if (authError) throw authError
-          if (!authData.user) throw new Error('No user data returned from Supabase')
+        if (authError) throw authError
+        if (!authData.user) throw new Error('No user data returned from Supabase')
 
-          userId = authData.user.id
-          break
-        }
+        userId = authData.user.id
       }
 
       // Prepare store data for API call
@@ -133,7 +121,7 @@ export function OnboardingSignUpForm({
         business_name: confirmedStoreInsert?.business_name,
       }
 
-      // Call API
+      // Call unified API
       const response = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -153,13 +141,8 @@ export function OnboardingSignUpForm({
       setUserDetails({ email, password, fullName })
       setEmailSent(true)
 
-      // Redirect based on mode
-      const redirectPath =
-        ONBOARDING_MODE === 'production'
-          ? '/onboarding/success'
-          : `/onboarding/success?mode=${ONBOARDING_MODE}`
-
-      router.push(redirectPath)
+      // Redirect to success page
+      router.push('/onboarding/success')
     } catch (error: unknown) {
       console.error('💥 Signup error:', error)
       setError(error instanceof Error ? error.message : t('errors.signupError'))
@@ -176,7 +159,7 @@ export function OnboardingSignUpForm({
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{t('errors.noStoreInfo')}</AlertDescription>
         </Alert>
-        <Button onClick={() => setCurrentStep(1)} className="mt-4">
+        <Button onClick={() => reset()} className="mt-4">
           {t('errors.startOver')}
         </Button>
       </div>
@@ -198,10 +181,10 @@ export function OnboardingSignUpForm({
           </AlertDescription>
         </Alert>
         <div className="flex gap-2 mt-4">
-          <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
+          <Button variant="outline" onClick={() => goToPreviousStep()} className="flex-1">
             {t('backButton')}
           </Button>
-          <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
+          <Button variant="outline" onClick={() => reset()} className="flex-1">
             {t('tryDifferentStore')}
           </Button>
         </div>
@@ -214,16 +197,6 @@ export function OnboardingSignUpForm({
 
   return (
     <div className={cn('flex flex-col gap-6 mx-auto', className)} {...props}>
-      {/* Auth requirement warning */}
-      {showAuthWarning && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>{t('signInRequired')}</strong> {t('testModeWarning')}
-          </AlertDescription>
-        </Alert>
-      )}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">{t('createAccount')}</CardTitle>
@@ -253,11 +226,12 @@ export function OnboardingSignUpForm({
                   required
                   value={email}
                   onChange={e => setEmail(e.target.value)}
+                  disabled={isLoggedIn} // Disable if user is already logged in
                 />
               </div>
 
-              {/* Only show password fields in production mode */}
-              {ONBOARDING_MODE === 'production' && (
+              {/* Only show password fields if user is not already logged in */}
+              {!isLoggedIn && (
                 <>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="password">{t('password')}</Label>
@@ -271,7 +245,7 @@ export function OnboardingSignUpForm({
                       onChange={e => setPassword(e.target.value)}
                     />
                     <Typography variant="p" color="muted">
-                      {t('form.passwordRequirement')}
+                      Password must be at least 6 characters long
                     </Typography>
                   </div>
 
@@ -289,6 +263,15 @@ export function OnboardingSignUpForm({
                 </>
               )}
 
+              {isLoggedIn && (
+                <Alert>
+                  <AlertDescription>
+                    You are logged in as {currentUser?.email}. This store will be associated with
+                    your account.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {error && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
@@ -296,24 +279,19 @@ export function OnboardingSignUpForm({
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full" disabled={isLoading || !isAuthReady}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading
-                  ? `${ONBOARDING_MODE === 'production' ? t('creatingAccount') : t('form.testingButton')}...`
-                  : `${ONBOARDING_MODE === 'production' ? t('createAccountButton') : `🧪 Test ${ONBOARDING_MODE.toUpperCase()}`}`}
+                  ? isLoggedIn
+                    ? 'Creating store...'
+                    : 'Creating account...'
+                  : isLoggedIn
+                    ? 'Create Store'
+                    : t('createAccountButton')}
               </Button>
 
-              {ONBOARDING_MODE === 'production' && (
+              {!isLoggedIn && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
-                  {t('form.termsAndPrivacy')}
-                </Typography>
-              )}
-
-              {ONBOARDING_MODE !== 'production' && (
-                <Typography variant="p" color="muted" className="text-center text-sm">
-                  {t('form.testModePrefix', {
-                    mode: ONBOARDING_MODE.toUpperCase(),
-                  })}
-                  {ONBOARDING_MODE === 'mock' ? t('noChanges') : t('realChanges')}
+                  By creating an account, you agree to our Terms of Service and Privacy Policy
                 </Typography>
               )}
             </div>

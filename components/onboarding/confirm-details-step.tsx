@@ -2,7 +2,7 @@
 
 import { AlertTriangle, CheckCircle, Phone } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,7 +14,6 @@ import { useBusinessCheck } from '@/hooks/use-business-check'
 import { convertFormDataToStoreInsert, STORE_TYPE_LABELS } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { generateTempStoreCode } from '@/lib/utils/form-helpers'
-import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 export function ConfirmDetailsStep() {
   const t = useTranslations('marketing.onboarding.confirmDetails')
@@ -24,7 +23,7 @@ export function ConfirmDetailsStep() {
     businessCheckResult,
     isCheckingBusiness,
     setConfirmedStoreInsert,
-    setCurrentStep,
+    reset,
     setBusinessCheckResult,
     setIsCheckingBusiness,
     goToNextStep,
@@ -34,9 +33,6 @@ export function ConfirmDetailsStep() {
   const { checkBusiness } = useBusinessCheck()
   const [hasCheckedBusiness, setHasCheckedBusiness] = useState(false)
   const { captureError: handleError } = useErrorBoundary()
-
-  // Memoize Google Places status to avoid recalculation
-  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
 
   const handleCheckBusiness = async () => {
     if (!selectedStoreForm) return
@@ -88,16 +84,16 @@ export function ConfirmDetailsStep() {
         tempStoreCode,
       )
       setConfirmedStoreInsert(storeInsert)
-      goToNextStep(googlePlacesEnabled)
+      goToNextStep()
     }
   }
 
   const handleBack = () => {
-    goToPreviousStep(googlePlacesEnabled)
+    goToPreviousStep()
   }
 
   const handleEdit = () => {
-    goToPreviousStep(googlePlacesEnabled)
+    goToPreviousStep()
   }
 
   const handleContactSupport = () => {
@@ -110,7 +106,7 @@ export function ConfirmDetailsStep() {
         <Typography variant="p" color="muted">
           {t('errors.noStoreInfo')}
         </Typography>
-        <Button onClick={() => setCurrentStep(1)} className="mt-4">
+        <Button onClick={() => reset()} className="mt-4">
           {t('errors.startOver')}
         </Button>
       </div>
@@ -230,7 +226,7 @@ export function ConfirmDetailsStep() {
                             <Phone className="h-4 w-4" />
                             {t('businessCheck.contactSupport')}
                           </Button>
-                          <Button variant="outline" size="sm" onClick={() => setCurrentStep(1)}>
+                          <Button variant="outline" size="sm" onClick={() => reset()}>
                             {t('businessCheck.tryDifferentStore')}
                           </Button>
                         </div>
