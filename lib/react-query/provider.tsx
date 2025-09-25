@@ -6,12 +6,11 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useState } from 'react'
 import { createQueryClient } from './client'
-import { useAuthStateMonitor, useRefreshTokenErrorHandler } from '@/hooks/use-auth-state-monitor'
+import { useAuthStateMonitor } from '@/hooks/use-auth-state-monitor'
 
 function AuthStateProvider({ children }: { children: React.ReactNode }) {
   // Initialize auth state monitoring
   useAuthStateMonitor()
-  useRefreshTokenErrorHandler()
 
   return <>{children}</>
 }
