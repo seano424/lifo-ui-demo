@@ -6,6 +6,8 @@ import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
@@ -32,18 +34,32 @@ function useDonationRecipients(batchId: string) {
   return useQuery({
     queryKey: ['donation-recipients', batchId],
     queryFn: async () => {
+      const startTime = performance.now()
+      logger.log('DonateTab', 'Starting donation recipients query', { batchId })
+
       // First get the store_id from the batch
+      const batchStartTime = performance.now()
       const { data: batchData, error: batchError } = await supabase
         .schema('inventory')
         .from('batches')
         .select('store_id')
         .eq('batch_id', batchId)
         .single()
+      const batchEndTime = performance.now()
+      logger.log(
+        'DonateTab',
+        `Batch store lookup took ${(batchEndTime - batchStartTime).toFixed(2)}ms`,
+        {
+          batchId,
+          storeId: batchData?.store_id,
+        },
+      )
 
       if (batchError) throw batchError
       if (!batchData?.store_id) throw new Error('Store ID not found for batch')
 
       // Then get donation recipients for that store
+      const recipientsStartTime = performance.now()
       const { data, error } = await supabase
         .schema('inventory')
         .from('donation_recipients')
@@ -51,6 +67,18 @@ function useDonationRecipients(batchId: string) {
         .eq('store_id', batchData.store_id)
         .eq('is_active', true)
         .order('name')
+      const recipientsEndTime = performance.now()
+
+      const totalTime = performance.now() - startTime
+      logger.log(
+        'DonateTab',
+        `Recipients query completed in ${(recipientsEndTime - recipientsStartTime).toFixed(2)}ms (total: ${totalTime.toFixed(2)}ms)`,
+        {
+          batchId,
+          storeId: batchData.store_id,
+          recipientCount: data?.length || 0,
+        },
+      )
 
       if (error) throw error
       return data as DonationRecipient[]
@@ -61,7 +89,17 @@ function useDonationRecipients(batchId: string) {
 }
 
 export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
-  const { executeDonate, isDonating } = useBatchActionRPC()
+  const activeStoreId = useActiveStoreId()
+
+  // Log to verify we have the store ID
+  useEffect(() => {
+    logger.log('DonateTab', 'Active store ID from context', {
+      activeStoreId,
+      batchId: selectedBatch.batch_id,
+    })
+  }, [activeStoreId, selectedBatch.batch_id])
+
+  const { executeDonate, isDonating } = useBatchActionRPC(activeStoreId || undefined)
 
   const { isMobile } = useMediaQuery()
   // Fetch donation recipients for this batch

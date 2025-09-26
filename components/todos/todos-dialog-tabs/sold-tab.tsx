@@ -5,6 +5,7 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
@@ -23,7 +24,8 @@ const SALE_TIMING_OPTIONS = [
 ]
 
 export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
-  const { executeSold, isMarkingSold } = useBatchActionRPC()
+  const activeStoreId = useActiveStoreId()
+  const { executeSold, isMarkingSold } = useBatchActionRPC(activeStoreId || undefined)
   const { isMobile } = useMediaQuery()
 
   // Sold tab state

@@ -5,6 +5,7 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
@@ -25,7 +26,8 @@ const DISPOSAL_REASONS = [
 ]
 
 export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
-  const { executeDispose, isDisposing } = useBatchActionRPC()
+  const activeStoreId = useActiveStoreId()
+  const { executeDispose, isDisposing } = useBatchActionRPC(activeStoreId || undefined)
   const { isMobile } = useMediaQuery()
 
   // Dispose tab state
