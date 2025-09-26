@@ -29,7 +29,7 @@ export function useBatchTodo(batchId: string | null) {
     queryKey: queryKeys.batches.todo(batchId || ''),
     queryFn: () => fetchBatchTodo(batchId!),
     enabled: !!batchId,
-    staleTime: 0, // Always refetch - important for seeing updates
-    gcTime: 3 * 60 * 1000, // 3 minutes
+    staleTime: 30 * 1000, // 30 seconds - reasonable for batch data
+    gcTime: 5 * 60 * 1000, // 5 minutes
   })
 }

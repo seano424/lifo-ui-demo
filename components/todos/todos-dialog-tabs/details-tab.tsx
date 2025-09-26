@@ -14,6 +14,7 @@ import {
 import { Typography } from '@/components/ui/typography'
 import { useBatchActions } from '@/hooks/use-batches'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
+import type { Database } from '@/types/supabase'
 import { cn } from '@/lib/utils'
 import { Edit3, Save, X } from 'lucide-react'
 import { useState } from 'react'
@@ -27,13 +28,21 @@ interface DetailsTabProps {
 export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   const { updateBatch, isUpdating } = useBatchActions()
 
+  // Type-safe batch status
+  const validStatuses = ['active', 'expired', 'damaged', 'sold_out', 'reserved'] as const
+  type BatchStatus = (typeof validStatuses)[number]
+
+  const isValidStatus = (status: string): status is BatchStatus =>
+    validStatuses.includes(status as BatchStatus)
+
+  const formatDateForInput = (date: string | null) =>
+    date ? new Date(date).toISOString().split('T')[0] : ''
+
   // Editing state
   const [isEditing, setIsEditing] = useState(false)
   const [editedValues, setEditedValues] = useState({
     batch_number: selectedBatch.batch_number || '',
-    expiry_date: selectedBatch.expiry_date
-      ? new Date(selectedBatch.expiry_date).toISOString().split('T')[0]
-      : '',
+    expiry_date: formatDateForInput(selectedBatch.expiry_date),
     current_quantity: selectedBatch.current_quantity || 0,
     cost_price: selectedBatch.cost_price || 0,
     selling_price: selectedBatch.selling_price || 0,
@@ -54,29 +63,67 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     })
   }
 
+  // Constants for validation
+  const MAX_BATCH_NUMBER_LENGTH = 50
+  const MAX_YEARS_IN_PAST = 10
+  const MAX_YEARS_IN_FUTURE = 5
+
+  const formatCurrencyValue = (value: number): number => {
+    return Math.round(value * 100) / 100 // Ensure 2 decimal places
+  }
+
   const validateForm = (): string | null => {
+    // Batch number validation
     if (!editedValues.batch_number?.trim()) {
       return 'Batch number is required'
     }
+    if (editedValues.batch_number.length > MAX_BATCH_NUMBER_LENGTH) {
+      return `Batch number must be less than ${MAX_BATCH_NUMBER_LENGTH} characters`
+    }
+    // Basic alphanumeric validation (adjust based on business requirements)
+    const batchNumberRegex = /^[a-zA-Z0-9\-_\s]+$/
+    if (!batchNumberRegex.test(editedValues.batch_number)) {
+      return 'Batch number can only contain letters, numbers, hyphens, underscores, and spaces'
+    }
+
+    // Expiry date validation
     if (!editedValues.expiry_date) {
       return 'Expiry date is required'
     }
+    const expiryDate = new Date(editedValues.expiry_date)
+    const pastLimit = new Date()
+    pastLimit.setFullYear(pastLimit.getFullYear() - MAX_YEARS_IN_PAST)
+    const futureLimit = new Date()
+    futureLimit.setFullYear(futureLimit.getFullYear() + MAX_YEARS_IN_FUTURE)
+
+    if (expiryDate < pastLimit) {
+      return `Expiry date cannot be more than ${MAX_YEARS_IN_PAST} years in the past`
+    }
+    if (expiryDate > futureLimit) {
+      return `Expiry date cannot be more than ${MAX_YEARS_IN_FUTURE} years in the future`
+    }
+
+    // Quantity validation
     if (editedValues.current_quantity < 0) {
       return 'Quantity must be 0 or greater'
     }
+    if (!Number.isInteger(editedValues.current_quantity)) {
+      return 'Quantity must be a whole number'
+    }
+
+    // Price validation
     if (editedValues.cost_price < 0) {
       return 'Cost price must be 0 or greater'
     }
     if (editedValues.selling_price < 0) {
       return 'Selling price must be 0 or greater'
     }
-    // Validate expiry date is not too far in the past (more than 10 years)
-    const expiryDate = new Date(editedValues.expiry_date)
-    const tenYearsAgo = new Date()
-    tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10)
-    if (expiryDate < tenYearsAgo) {
-      return 'Expiry date seems too far in the past'
+    // Validate reasonable price limits (adjust based on business requirements)
+    const MAX_PRICE = 999999.99
+    if (editedValues.cost_price > MAX_PRICE || editedValues.selling_price > MAX_PRICE) {
+      return `Prices cannot exceed €${MAX_PRICE.toLocaleString()}`
     }
+
     return null
   }
 
@@ -96,28 +143,35 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
           batch_number: editedValues.batch_number.trim(),
           expiry_date: editedValues.expiry_date,
           current_quantity: editedValues.current_quantity,
-          cost_price: editedValues.cost_price,
-          selling_price: editedValues.selling_price,
-          status: editedValues.batch_status as
-            | 'active'
-            | 'expired'
-            | 'damaged'
-            | 'sold_out'
-            | 'reserved',
-        },
+          cost_price: formatCurrencyValue(editedValues.cost_price),
+          selling_price: formatCurrencyValue(editedValues.selling_price),
+          status: isValidStatus(editedValues.batch_status) ? editedValues.batch_status : 'active',
+        } as Database['inventory']['Tables']['batches']['Update'],
       })
       setIsEditing(false)
     } catch (error) {
       console.error('Failed to update batch:', error)
+
+      if (error instanceof Error) {
+        if (error.message.includes('constraint') || error.message.includes('duplicate')) {
+          toast.error('Invalid data: Batch number may already exist or contain invalid characters')
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          toast.error('Network error: Please check your connection and try again')
+        } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+          toast.error('Permission denied: You may not have access to update this batch')
+        } else {
+          toast.error(`Update failed: ${error.message}`)
+        }
+      } else {
+        toast.error('An unexpected error occurred while updating the batch')
+      }
     }
   }
 
   const handleCancel = () => {
     setEditedValues({
       batch_number: selectedBatch.batch_number || '',
-      expiry_date: selectedBatch.expiry_date
-        ? new Date(selectedBatch.expiry_date).toISOString().split('T')[0]
-        : '',
+      expiry_date: formatDateForInput(selectedBatch.expiry_date),
       current_quantity: selectedBatch.current_quantity || 0,
       cost_price: selectedBatch.cost_price || 0,
       selling_price: selectedBatch.selling_price || 0,
@@ -330,7 +384,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                     onChange={e =>
                       setEditedValues(prev => ({
                         ...prev,
-                        cost_price: Math.max(0, Number(e.target.value) || 0),
+                        cost_price: formatCurrencyValue(Math.max(0, Number(e.target.value) || 0)),
                       }))
                     }
                     className={cn('w-24', editedValues.cost_price < 0 && 'border-red-500')}
@@ -355,7 +409,9 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                     onChange={e =>
                       setEditedValues(prev => ({
                         ...prev,
-                        selling_price: Math.max(0, Number(e.target.value) || 0),
+                        selling_price: formatCurrencyValue(
+                          Math.max(0, Number(e.target.value) || 0),
+                        ),
                       }))
                     }
                     className={cn('w-24', editedValues.selling_price < 0 && 'border-red-500')}
