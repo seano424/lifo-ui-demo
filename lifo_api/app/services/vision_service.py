@@ -195,6 +195,13 @@ class GoogleVisionService:
             # Check for GOOGLE_APPLICATION_CREDENTIALS - could be file path or JSON content
             credentials_env = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
             if credentials_env:
+                logger.info(
+                    "Found GOOGLE_APPLICATION_CREDENTIALS environment variable",
+                    length=len(credentials_env),
+                    starts_with=credentials_env[:10],
+                    is_file=os.path.isfile(credentials_env)
+                )
+
                 # First, check if it's a file path (traditional approach)
                 if os.path.isfile(credentials_env):
                     try:
@@ -216,10 +223,12 @@ class GoogleVisionService:
                         return None
 
                 # If not a file, try parsing as JSON content (DigitalOcean direct setup)
-                elif credentials_env.strip().startswith('{'):
+                # More robust JSON detection
+                stripped_env = credentials_env.strip()
+                if stripped_env.startswith('{') and stripped_env.endswith('}'):
                     try:
                         logger.info("Detected JSON content in GOOGLE_APPLICATION_CREDENTIALS, parsing directly")
-                        service_account_info = json.loads(credentials_env)
+                        service_account_info = json.loads(stripped_env)
 
                         # Validate required fields
                         required_fields = ['type', 'project_id', 'private_key', 'client_email']
@@ -249,7 +258,7 @@ class GoogleVisionService:
                             "Failed to parse GOOGLE_APPLICATION_CREDENTIALS as JSON",
                             error=str(e),
                             env_length=len(credentials_env),
-                            env_preview=credentials_env[:50] + "..." if len(credentials_env) > 50 else credentials_env
+                            env_preview=stripped_env[:100] + "..." if len(stripped_env) > 100 else stripped_env
                         )
                         return None
                     except Exception as e:
@@ -259,6 +268,13 @@ class GoogleVisionService:
                             error_type=type(e).__name__
                         )
                         return None
+                else:
+                    logger.warning(
+                        "GOOGLE_APPLICATION_CREDENTIALS found but not recognized as file path or JSON",
+                        starts_with=stripped_env[:20],
+                        ends_with=stripped_env[-10:] if len(stripped_env) > 10 else stripped_env,
+                        length=len(stripped_env)
+                    )
 
             # No explicit credentials found - will use default credential chain
             logger.info("No explicit Google credentials found, will use default credential chain (gcloud auth)")
