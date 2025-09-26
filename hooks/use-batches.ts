@@ -335,18 +335,6 @@ export function useBatchActions() {
       toast.error('Failed to update batch')
     },
 
-    onSuccess: (data, { batchId }) => {
-      // Immediately invalidate the batch todo query after successful update
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.batches.todo(batchId),
-      })
-      // Also force refetch
-      queryClient.refetchQueries({
-        queryKey: queryKeys.batches.todo(batchId),
-      })
-      toast.success('Batch updated successfully')
-    },
-
     onSettled: (data, _error, { batchId }) => {
       // Invalidate batch-related queries
       queryClient.invalidateQueries({
@@ -383,7 +371,15 @@ export function useBatchActions() {
       }
     },
 
-    onSuccess: () => {
+    onSuccess: (_data, { batchId }) => {
+      // Immediately invalidate the batch todo query after successful update
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.batches.todo(batchId),
+      })
+      // Also force refetch
+      queryClient.refetchQueries({
+        queryKey: queryKeys.batches.todo(batchId),
+      })
       toast.success('Batch updated successfully')
     },
   })
