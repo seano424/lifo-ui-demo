@@ -695,6 +695,9 @@ async def get_endpoint_error_analysis(endpoint_path: str):
             },
         )
 
+@app.get("/api/v1/test")
+async def test_endpoint():
+    return {"msg": "Test endpoint works"}
 
 if __name__ == "__main__":
     # For development
