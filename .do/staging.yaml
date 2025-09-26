@@ -111,6 +111,8 @@ services:
   - path: /redoc  # Alternative docs
   - path: /openapi.json
   - path: /test  # Additional test routes
+  - path: /api/v1/{rest_of_path:*}  # All API v1 paths
+  - path: /api
 
 # Optional: Separate staging database (recommended)
 databases:

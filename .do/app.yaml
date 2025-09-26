@@ -79,7 +79,7 @@ services:
   - key: BACKEND_CORS_ORIGINS
     value: "https://lifo-app.com,https://www.lifo-app.com"
   
-  # Google Cloud (if using Vision API)
+  # Google Cloud
   - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
     value: ""  # Set in console as base64 encoded service account JSON
     type: SECRET
@@ -114,6 +114,8 @@ services:
   - path: /docs  # FastAPI auto-docs
   - path: /redoc  # Alternative docs
   - path: /openapi.json
+  - path: /api/v1/{rest_of_path:*}  # All API v1 paths
+  - path: /api
 
 # Optional: Database (if you want managed PostgreSQL)
 databases:
