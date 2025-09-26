@@ -5,6 +5,7 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
@@ -15,7 +16,8 @@ interface DiscountTabProps {
 }
 
 export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
-  const { executeDiscount, isDiscounting } = useBatchActionRPC()
+  const activeStoreId = useActiveStoreId()
+  const { executeDiscount, isDiscounting } = useBatchActionRPC(activeStoreId || undefined)
 
   const { isMobile } = useMediaQuery()
   // Discount tab state
