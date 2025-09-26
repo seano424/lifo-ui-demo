@@ -305,6 +305,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.detail(batchId),
         }),
+        // Refresh specific batch todo data (used by BatchTable)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.batches.todo(batchId),
+        }),
         // Update dashboard summary
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.dashboardSummary(storeId),

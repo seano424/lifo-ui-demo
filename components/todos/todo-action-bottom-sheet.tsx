@@ -26,7 +26,7 @@ export function TodoActionBottomSheet({
   onClose,
   selectedBatch,
 }: TodoActionBottomSheetProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('discount')
+  const [activeTab, setActiveTab] = useState<TabType>('details')
 
   if (!selectedBatch) {
     return null
@@ -47,10 +47,10 @@ export function TodoActionBottomSheet({
 
   // Tab configuration
   const tabs = [
+    { id: 'details' as TabType, label: 'Details', icon: SparklesIcon },
     { id: 'discount' as TabType, label: 'Discount', icon: PercentIcon },
     { id: 'donate' as TabType, label: 'Donate', icon: PackageOpenIcon },
     { id: 'sold' as TabType, label: 'Sell', icon: TagIcon },
-    { id: 'details' as TabType, label: 'Details', icon: SparklesIcon },
     { id: 'dispose' as TabType, label: 'Dispose', icon: PackageXIcon },
   ]
 

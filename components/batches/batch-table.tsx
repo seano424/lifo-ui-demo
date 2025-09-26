@@ -22,9 +22,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useBatchActions } from '@/hooks/use-batches'
 import { useColumnSizing } from '@/hooks/use-column-sizing'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
+import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+import { useBatchTodo } from '@/hooks/use-batch-todo'
 
 const VALID_COLUMN_IDS = [
   'batch_number',
@@ -45,12 +46,22 @@ interface BatchTableProps {
 }
 
 export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTableProps) {
-  const { markBatchAsExpired, markBatchAsDamaged, isUpdating } = useBatchActions()
   const t = useTranslations('batches.table')
   const tStatus = useTranslations('batches.status')
   const tExpiry = useTranslations('batches.expiry')
 
   const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useColumnSizing()
+
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+
+  // Fetch the todo data for the selected batch
+  const { data: selectedBatchTodo } = useBatchTodo(selectedBatchId)
+
+  const handleBatchClick = (batch: BatchWithProduct) => {
+    setSelectedBatchId(batch.batch_id)
+    setIsBottomSheetOpen(true)
+  }
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
@@ -84,9 +95,6 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
     t,
     tStatus,
     tExpiry,
-    markBatchAsExpired,
-    markBatchAsDamaged,
-    isUpdating,
     DEFAULT_COLUMN_WIDTHS,
   })
 
@@ -130,55 +138,70 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table
-        style={{
-          tableLayout: 'fixed',
+    <>
+      <div className="overflow-x-auto">
+        <Table
+          style={{
+            tableLayout: 'fixed',
+          }}
+        >
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead
+                    key={header.id}
+                    className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
+                    style={{
+                      width: header.getSize(),
+                      minWidth: header.getSize(),
+                      maxWidth: header.getSize(),
+                      position: 'relative',
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.column.getCanResize() && <ColumnResizer header={header} />}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map(row => (
+              <TableRow
+                key={row.id}
+                onClick={() => handleBatchClick(row.original)}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+              >
+                {row.getVisibleCells().map(cell => (
+                  <TableCell
+                    key={cell.id}
+                    style={{
+                      width: cell.column.getSize(),
+                      minWidth: cell.column.getSize(),
+                      maxWidth: cell.column.getSize(),
+                    }}
+                    className="border-r border-border/50 last:border-r-0 overflow-hidden"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <TodoActionBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => {
+          setIsBottomSheetOpen(false)
+          setSelectedBatchId(null)
         }}
-      >
-        <TableHeader>
-          {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <TableHead
-                  key={header.id}
-                  className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
-                  style={{
-                    width: header.getSize(),
-                    minWidth: header.getSize(),
-                    maxWidth: header.getSize(),
-                    position: 'relative',
-                  }}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                  {header.column.getCanResize() && <ColumnResizer header={header} />}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map(row => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map(cell => (
-                <TableCell
-                  key={cell.id}
-                  style={{
-                    width: cell.column.getSize(),
-                    minWidth: cell.column.getSize(),
-                    maxWidth: cell.column.getSize(),
-                  }}
-                  className="border-r border-border/50 last:border-r-0 overflow-hidden"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+        selectedBatch={selectedBatchTodo || null}
+      />
+    </>
   )
 }

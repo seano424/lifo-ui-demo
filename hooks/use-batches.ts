@@ -335,13 +335,44 @@ export function useBatchActions() {
       toast.error('Failed to update batch')
     },
 
+    onSuccess: (data, { batchId }) => {
+      // Immediately invalidate the batch todo query after successful update
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.batches.todo(batchId),
+      })
+      // Also force refetch
+      queryClient.refetchQueries({
+        queryKey: queryKeys.batches.todo(batchId),
+      })
+      toast.success('Batch updated successfully')
+    },
+
     onSettled: (data, _error, { batchId }) => {
+      // Invalidate batch-related queries
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.detail(batchId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.batches.todo(batchId),
       })
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
+        })
+
+        // Invalidate todo-related queries that depend on batch data
+        queryClient.invalidateQueries({
+          queryKey: [...queryKeys.todos.all, 'filtered'],
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            const params = queryKey?.[2] as { storeId?: string } | undefined
+            return params?.storeId === activeStoreId
+          },
+        })
+
+        // Invalidate dashboard summaries since batch updates affect metrics
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.dashboardSummary(activeStoreId),
         })
       }
 
