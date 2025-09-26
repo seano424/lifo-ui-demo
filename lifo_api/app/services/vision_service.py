@@ -4,13 +4,17 @@ Provides real Google Vision integration for complex image processing tasks
 """
 
 import asyncio
+import base64
 import io
+import json
+import os
 import re
 from datetime import datetime, timedelta
 
 import structlog
 from google.api_core.client_options import ClientOptions
 from google.cloud import vision
+from google.oauth2 import service_account
 from PIL import Image
 
 from app.models.base import ConfigurableModel
@@ -74,8 +78,11 @@ class GoogleVisionService:
         self._initialize_client()
 
     def _initialize_client(self):
-        """Initialize Google Vision API client with EU regional endpoint"""
+        """Initialize Google Vision API client with EU regional endpoint using Google's official credential method"""
         try:
+            # Load credentials using Google's recommended approach for containers
+            credentials = self._load_google_credentials()
+
             # Use EU regional endpoint for European operations
             # Better latency and data residency compliance for EU users
             client_options = ClientOptions(
@@ -83,13 +90,29 @@ class GoogleVisionService:
                 quota_project_id=self.project_id,
             )
 
-            self.client = vision.ImageAnnotatorClient(client_options=client_options)
-            logger.info(
-                "Google Vision API client initialized successfully",
-                region="EU",
-                endpoint="eu-vision.googleapis.com",
-                project_id=self.project_id,
-            )
+            # Initialize client with explicit credentials (Google's official method)
+            if credentials:
+                self.client = vision.ImageAnnotatorClient(
+                    credentials=credentials,
+                    client_options=client_options
+                )
+                logger.info(
+                    "Google Vision API client initialized successfully with explicit credentials",
+                    region="EU",
+                    endpoint="eu-vision.googleapis.com",
+                    project_id=self.project_id,
+                    credential_method="service_account_info"
+                )
+            else:
+                # Fallback to default credential chain (for local development with gcloud auth)
+                self.client = vision.ImageAnnotatorClient(client_options=client_options)
+                logger.info(
+                    "Google Vision API client initialized with default credentials",
+                    region="EU",
+                    endpoint="eu-vision.googleapis.com",
+                    project_id=self.project_id,
+                    credential_method="default_chain"
+                )
 
         except Exception as e:
             logger.error(
@@ -101,6 +124,153 @@ class GoogleVisionService:
             )
             # For development, we'll create a None client and handle gracefully
             self.client = None
+
+    def _load_google_credentials(self) -> service_account.Credentials | None:
+        """
+        Load Google Cloud credentials using Google's official recommended method for containers.
+        Uses Credentials.from_service_account_info() as per Google's best practices.
+
+        Returns:
+            service_account.Credentials object or None if no credentials available
+        """
+        try:
+            # Check for JSON credentials in environment (DigitalOcean App Platform pattern)
+            credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+
+            if credentials_json:
+                try:
+                    # Try parsing as direct JSON first
+                    if credentials_json.strip().startswith('{'):
+                        service_account_info = json.loads(credentials_json)
+                        logger.debug("Loaded Google credentials from JSON environment variable")
+                    else:
+                        # Try base64 decoding if it's encoded
+                        try:
+                            decoded_credentials = base64.b64decode(credentials_json).decode('utf-8')
+                            service_account_info = json.loads(decoded_credentials)
+                            logger.debug("Loaded Google credentials from base64-encoded environment variable")
+                        except Exception:
+                            logger.error("Failed to decode base64 credentials, trying as direct JSON")
+                            service_account_info = json.loads(credentials_json)
+
+                    # Validate required fields
+                    required_fields = ['type', 'project_id', 'private_key', 'client_email']
+                    missing_fields = [field for field in required_fields if field not in service_account_info]
+                    if missing_fields:
+                        logger.error(
+                            "Missing required fields in service account JSON",
+                            missing_fields=missing_fields
+                        )
+                        return None
+
+                    # Create credentials using Google's official method
+                    credentials = service_account.Credentials.from_service_account_info(
+                        service_account_info
+                    )
+
+                    logger.info(
+                        "Google Cloud credentials loaded successfully",
+                        method="service_account_info",
+                        project_id=service_account_info.get('project_id'),
+                        client_email=service_account_info.get('client_email', '')[:20] + "..."  # Log partial email for debugging
+                    )
+                    return credentials
+
+                except json.JSONDecodeError as e:
+                    logger.error(
+                        "Failed to parse Google credentials JSON",
+                        error=str(e),
+                        json_length=len(credentials_json),
+                        json_preview=credentials_json[:50] + "..." if len(credentials_json) > 50 else credentials_json
+                    )
+                    return None
+                except Exception as e:
+                    logger.error(
+                        "Failed to create Google credentials from JSON",
+                        error=str(e),
+                        error_type=type(e).__name__
+                    )
+                    return None
+
+            # Check for GOOGLE_APPLICATION_CREDENTIALS - could be file path or JSON content
+            credentials_env = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+            if credentials_env:
+                # First, check if it's a file path (traditional approach)
+                if os.path.isfile(credentials_env):
+                    try:
+                        credentials = service_account.Credentials.from_service_account_file(
+                            credentials_env
+                        )
+                        logger.info(
+                            "Google Cloud credentials loaded from file",
+                            method="service_account_file",
+                            file_path=credentials_env
+                        )
+                        return credentials
+                    except Exception as e:
+                        logger.error(
+                            "Failed to load Google credentials from file",
+                            error=str(e),
+                            file_path=credentials_env
+                        )
+                        return None
+
+                # If not a file, try parsing as JSON content (DigitalOcean direct setup)
+                elif credentials_env.strip().startswith('{'):
+                    try:
+                        logger.info("Detected JSON content in GOOGLE_APPLICATION_CREDENTIALS, parsing directly")
+                        service_account_info = json.loads(credentials_env)
+
+                        # Validate required fields
+                        required_fields = ['type', 'project_id', 'private_key', 'client_email']
+                        missing_fields = [field for field in required_fields if field not in service_account_info]
+                        if missing_fields:
+                            logger.error(
+                                "Missing required fields in GOOGLE_APPLICATION_CREDENTIALS JSON",
+                                missing_fields=missing_fields
+                            )
+                            return None
+
+                        # Create credentials using Google's official method
+                        credentials = service_account.Credentials.from_service_account_info(
+                            service_account_info
+                        )
+
+                        logger.info(
+                            "Google Cloud credentials loaded from GOOGLE_APPLICATION_CREDENTIALS JSON",
+                            method="service_account_info_from_env",
+                            project_id=service_account_info.get('project_id'),
+                            client_email=service_account_info.get('client_email', '')[:20] + "..."
+                        )
+                        return credentials
+
+                    except json.JSONDecodeError as e:
+                        logger.error(
+                            "Failed to parse GOOGLE_APPLICATION_CREDENTIALS as JSON",
+                            error=str(e),
+                            env_length=len(credentials_env),
+                            env_preview=credentials_env[:50] + "..." if len(credentials_env) > 50 else credentials_env
+                        )
+                        return None
+                    except Exception as e:
+                        logger.error(
+                            "Failed to create credentials from GOOGLE_APPLICATION_CREDENTIALS JSON",
+                            error=str(e),
+                            error_type=type(e).__name__
+                        )
+                        return None
+
+            # No explicit credentials found - will use default credential chain
+            logger.info("No explicit Google credentials found, will use default credential chain (gcloud auth)")
+            return None
+
+        except Exception as e:
+            logger.error(
+                "Unexpected error loading Google credentials",
+                error=str(e),
+                error_type=type(e).__name__
+            )
+            return None
 
     async def process_image(self, image_data: bytes) -> VisionScanResult:
         """
