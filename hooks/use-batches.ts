@@ -25,6 +25,7 @@ import {
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { Database } from '@/types/supabase'
+import type { TodoFilters } from '@/lib/queries/todos-rpc'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -350,11 +351,31 @@ export function useBatchActions() {
 
         // Invalidate todo-related queries that depend on batch data
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered'],
           predicate: query => {
             const queryKey = query.queryKey as readonly unknown[]
-            const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === activeStoreId
+            // Match the exact structure: ["todos", "filtered", { storeId, filters, pageSize }]
+            if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+              const params = queryKey?.[2] as
+                | { storeId?: string; filters?: TodoFilters; pageSize?: number }
+                | undefined
+              return params?.storeId === activeStoreId
+            }
+            return false
+          },
+        })
+
+        // Also force refetch to ensure immediate data updates
+        queryClient.refetchQueries({
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            // Match the exact structure: ["todos", "filtered", { storeId, filters, pageSize }]
+            if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+              const params = queryKey?.[2] as
+                | { storeId?: string; filters?: TodoFilters; pageSize?: number }
+                | undefined
+              return params?.storeId === activeStoreId
+            }
+            return false
           },
         })
 
