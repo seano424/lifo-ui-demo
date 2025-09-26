@@ -247,6 +247,32 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             environment=settings.environment
         )
 
+        # Validate Google Cloud credentials during startup (helps with deployment debugging)
+        try:
+            from app.services.vision_service import GoogleVisionService
+
+            # Test credential loading (without full client initialization)
+            vision_service = GoogleVisionService()
+            if vision_service.client:
+                logger.info(
+                    "Google Cloud Vision API credentials validated successfully",
+                    client_available=True,
+                    credential_method="validated_during_startup"
+                )
+            else:
+                logger.warning(
+                    "Google Cloud Vision API client not available",
+                    client_available=False,
+                    note="Vision API features will be disabled"
+                )
+        except Exception as vision_error:
+            logger.error(
+                "Failed to initialize Google Vision service during startup",
+                error=str(vision_error),
+                error_type=type(vision_error).__name__,
+                note="Vision API features will be unavailable"
+            )
+
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
         # Don't raise - allow server to start with Supabase-only mode
@@ -527,6 +553,10 @@ app.add_exception_handler(Exception, general_exception_handler)
 # Include API v1 router
 app.include_router(api_v1_router, prefix=settings.api_v1_prefix)
 
+# Include API v1 router with /v1 prefix for Digital Ocean App Platform compatibility
+# DO strips /api from routes, so we need to handle both /api/v1/* and /v1/* patterns
+app.include_router(api_v1_router, prefix="/v1")
+
 
 # Root endpoint
 @app.get("/", tags=["Health"])
@@ -696,6 +726,7 @@ async def get_endpoint_error_analysis(endpoint_path: str):
         )
 
 @app.get("/api/v1/test")
+@app.get("/v1/test")  # Digital Ocean App Platform compatibility
 async def test_endpoint():
     return {"msg": "Test endpoint works"}
 
