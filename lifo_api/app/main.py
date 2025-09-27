@@ -213,6 +213,25 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             high_security_mode=settings.environment == "production",
         )
 
+        # Initialize automated scoring system if enabled
+        if settings.enable_automated_scoring:
+            try:
+                from app.core.automated_scoring import initialize_automated_scoring
+                await initialize_automated_scoring()
+                logger.info(
+                    "Automated scoring system initialized successfully",
+                    default_cron=settings.default_scoring_cron,
+                    timezone=settings.default_scoring_timezone
+                )
+            except Exception as auto_score_error:
+                logger.error(
+                    "Failed to initialize automated scoring system",
+                    error=str(auto_score_error)
+                )
+                # Don't fail startup for automated scoring issues
+        else:
+            logger.info("Automated scoring system disabled in configuration")
+
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
         # Don't raise - allow server to start with Supabase-only mode
@@ -235,6 +254,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
         except Exception as e:
             logger.error("Error collecting final performance statistics", error=str(e))
+
+    # Shutdown automated scoring system
+    if settings.enable_automated_scoring:
+        try:
+            from app.core.automated_scoring import shutdown_automated_scoring
+            await shutdown_automated_scoring()
+            logger.info("Automated scoring system shutdown completed")
+        except Exception as e:
+            logger.error("Error shutting down automated scoring system", error=str(e))
 
     await engine().dispose()
 
