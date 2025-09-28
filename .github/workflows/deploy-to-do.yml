@@ -25,6 +25,10 @@ jobs:
         uv sync --locked --all-extras
     
     - name: Run basic health check
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
       run: |
         cd lifo_api
         .venv/bin/python -c "
