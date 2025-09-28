@@ -107,14 +107,6 @@ databases:
   size: db-s-1vcpu-1gb  # Can scale up
   num_nodes: 1
 
-# Optional: Static assets (if serving any)
-static_sites:
-- name: api-docs
-  source_dir: docs
-  index_document: index.html
-  error_document: index.html
-  routes:
-  - path: /static
 
 # Jobs for maintenance tasks (optional)
 # Database migrations handled by Supabase, not Alembic
