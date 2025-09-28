@@ -157,6 +157,7 @@
     }
   },
   "pricingpage": {
+    "contactUs": "Contactez-nous pour vos questions",
     "title": "Choisissez votre plan",
     "subtitle": "Commencez avec notre essai gratuit et évoluez selon vos besoins. Sans engagement, support complet inclus.",
     "badges": {
@@ -175,10 +176,10 @@
         "title": "Essai gratuit",
         "subtitle": "Magasins pilotes",
         "price": "Gratuit",
-        "period": "3 mois",
-        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 3 mois.",
+        "period": "2 mois",
+        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 2 mois.",
         "features": {
-          "0": "3 jours d'intégration et de formation",
+          "0": "1 jour d'intégration et de formation",
           "1": "Support complet inclus",
           "2": "Sans engagement - sortie à tout moment",
           "3": "Toutes les fonctionnalités débloquées"
