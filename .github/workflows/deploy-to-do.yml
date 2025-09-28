@@ -27,13 +27,15 @@ jobs:
     - name: Run basic health check
       run: |
         cd lifo_api
-        python -c "
+        .venv/bin/python -c "
         import sys
         try:
             from app.main import app
             print('✅ Application imports successfully')
         except Exception as e:
             print(f'❌ Import failed: {e}')
+            print(f'Python path: {sys.path}')
+            print(f'Python executable: {sys.executable}')
             sys.exit(1)
         "
     
