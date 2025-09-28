@@ -104,12 +104,9 @@ services:
   http_port: 8080
   
   # Routes - production API endpoints
+  # Let FastAPI handle all routing internally (no path stripping)
   routes:
-  - path: /
-  - path: /api
-  - path: /docs  # Keep docs available in production
-  - path: /redoc
-  - path: /openapi.json
+  - path: /            # Forward all paths to FastAPI without modification
 
 # Production database (optional - if not using Supabase)
 databases:
