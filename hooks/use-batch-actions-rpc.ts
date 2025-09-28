@@ -3,6 +3,7 @@
 import { queryKeys } from '@/lib/queries/query-keys'
 import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -15,13 +16,16 @@ export interface ActionableBatch {
   expiry_date: string
   current_quantity: number
   location_code: string
-  unit_price: number
+  unit_price: number // Now available from database
+  selling_price: number // Now available from database
+  cost_price: number // Now available from database
+  current_selling_price: number // Now available from database (price after discount)
+  potential_loss_value: number // Fixed field name (was potential_loss)
   urgency_level: 'critical' | 'high' | 'medium' | 'low'
   days_to_expiry: number
   ai_recommendation: string
   ai_reasoning: string
   composite_score: number
-  potential_loss: number
   discount_percent: number
   todo_state: 'expired' | 'urgent_action' | 'needs_attention' | 'monitor' | 'ok'
   total_count: number
@@ -40,6 +44,8 @@ interface BatchDetail {
   batch_id: string
   current_quantity: number
   selling_price: number
+  current_selling_price: number
+  cost_price: number
   [key: string]: unknown
 }
 
@@ -195,7 +201,7 @@ const validateString = (value: string, fieldName: string, maxLength = 500): void
   }
 }
 
-export function useBatchActionRPC() {
+export function useBatchActionRPC(providedStoreId?: string) {
   const queryClient = useQueryClient()
   const supabase = createClient()
 
@@ -210,12 +216,33 @@ export function useBatchActionRPC() {
 
   // Helper function to get store ID from batch
   const getStoreIdFromBatch = async (batchId: string): Promise<string> => {
+    // If store ID was provided to the hook, use it instead of querying
+    if (providedStoreId) {
+      logger.log('BatchActions', 'Using provided store ID (no DB query needed)', {
+        batchId,
+        storeId: providedStoreId,
+      })
+      return providedStoreId
+    }
+
+    // Fallback to querying if no store ID provided
+    logger.warn('BatchActions', 'No store ID provided, falling back to DB query', { batchId })
+    const startTime = performance.now()
     const { data } = await supabase
       .schema('inventory')
       .from('batches')
       .select('store_id')
       .eq('batch_id', batchId)
       .single()
+    const endTime = performance.now()
+    logger.log(
+      'BatchActions',
+      `getStoreIdFromBatch DB query took ${(endTime - startTime).toFixed(2)}ms`,
+      {
+        batchId,
+        storeId: data?.store_id,
+      },
+    )
     return data?.store_id || ''
   }
 
@@ -225,6 +252,9 @@ export function useBatchActionRPC() {
     storeId?: string,
     actionType?: 'donate' | 'discount' | 'sold' | 'dispose' | 'dismiss',
   ) => {
+    const invalidationStartTime = performance.now()
+    logger.log('BatchActions', 'Starting query invalidation', { batchId, storeId, actionType })
+
     // Get store ID from batch if not provided
     if (!storeId) {
       storeId = await getStoreIdFromBatch(batchId)
@@ -232,20 +262,33 @@ export function useBatchActionRPC() {
 
     if (storeId) {
       // Trigger scoring API to recalculate scores after batch action
-      try {
-        await fetch('/api/scoring/trigger', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            storeId,
-            triggeredBy: 'batch_action',
-          }),
+      // Fire-and-forget: Don't await this since scoring can happen in background
+      const scoringStartTime = performance.now()
+      fetch('/api/scoring/trigger', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          storeId,
+          triggeredBy: 'batch_action',
+        }),
+      })
+        .then(response => {
+          const scoringEndTime = performance.now()
+          logger.log(
+            'BatchActions',
+            `Scoring API (background) completed in ${(scoringEndTime - scoringStartTime).toFixed(2)}ms`,
+            {
+              storeId,
+              status: response.status,
+            },
+          )
         })
-      } catch (_error) {
-        // Don't fail the entire operation if scoring trigger fails
-      }
+        .catch(_error => {
+          logger.warn('BatchActions', 'Scoring API (background) failed', { error: _error })
+          // Don't fail the entire operation if scoring trigger fails
+        })
 
       // Always invalidate core todos queries - use the actual query pattern that the hooks use
       const coreInvalidations = [
@@ -261,6 +304,10 @@ export function useBatchActionRPC() {
         // Refresh specific batch details
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.detail(batchId),
+        }),
+        // Refresh specific batch todo data (used by BatchTable)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.batches.todo(batchId),
         }),
         // Update dashboard summary
         queryClient.invalidateQueries({
@@ -303,7 +350,21 @@ export function useBatchActionRPC() {
         )
       }
 
+      const invalidationPromiseStart = performance.now()
       await Promise.all([...coreInvalidations, ...actionSpecificInvalidations])
+      const invalidationPromiseEnd = performance.now()
+
+      const totalInvalidationTime = performance.now() - invalidationStartTime
+      logger.log(
+        'BatchActions',
+        `Query invalidation completed in ${totalInvalidationTime.toFixed(2)}ms`,
+        {
+          batchId,
+          storeId,
+          actionType,
+          promiseTime: (invalidationPromiseEnd - invalidationPromiseStart).toFixed(2),
+        },
+      )
     }
   }
 
@@ -328,7 +389,17 @@ export function useBatchActionRPC() {
         p_notes: params.notes || null,
       } as DonateActionParams
 
+      logger.log('BatchActions', 'Starting donate RPC call', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+      })
+      const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
+      const endTime = performance.now()
+      logger.log('BatchActions', `Donate RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
+        success: !error,
+        batchId: params.batchId,
+      })
 
       if (error) {
         throw error
@@ -412,7 +483,22 @@ export function useBatchActionRPC() {
         p_notes: params.notes || null,
       } as DiscountActionParams
 
+      logger.log('BatchActions', 'Starting discount RPC call', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+        discountPercentage: params.discountPercentage,
+      })
+      const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_discount_action', rpcParams)
+      const endTime = performance.now()
+      logger.log(
+        'BatchActions',
+        `Discount RPC completed in ${(endTime - startTime).toFixed(2)}ms`,
+        {
+          success: !error,
+          batchId: params.batchId,
+        },
+      )
 
       if (error) {
         throw error
@@ -427,12 +513,15 @@ export function useBatchActionRPC() {
       // Update batch detail with new price
       queryClient.setQueryData(
         queryKeys.batches.detail(variables.batchId),
-        (oldData: BatchDetail | undefined) => {
+        (oldData: TodoItem | undefined) => {
           if (oldData) {
-            const newPrice = oldData.selling_price * (1 - variables.discountPercentage / 100)
+            // Use optional chaining and nullish coalescing for safer access
+            const basePrice = oldData.selling_price ?? oldData.unit_price ?? 0
+            const newPrice = basePrice * (1 - variables.discountPercentage / 100)
             return {
               ...oldData,
-              selling_price: newPrice,
+              current_selling_price: newPrice,
+              last_discount_percent: variables.discountPercentage,
             }
           }
           return oldData
@@ -473,12 +562,22 @@ export function useBatchActionRPC() {
 
       const userId = await getCurrentUserId()
 
+      logger.log('BatchActions', 'Starting sold RPC call', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+      })
+      const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_sold_action', {
         p_batch_id: params.batchId,
         p_quantity_sold: params.quantity,
         p_user_id: userId,
         p_notes: params.notes || null,
       } as SoldActionParams)
+      const endTime = performance.now()
+      logger.log('BatchActions', `Sold RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
+        success: !error,
+        batchId: params.batchId,
+      })
 
       if (error) throw error
       return data as ActionResult
@@ -555,6 +654,12 @@ export function useBatchActionRPC() {
 
       const userId = await getCurrentUserId()
 
+      logger.log('BatchActions', 'Starting dispose RPC call', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+        disposalReason: params.disposalReason,
+      })
+      const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_dispose_action', {
         p_batch_id: params.batchId,
         p_quantity_disposed: params.quantity,
@@ -562,6 +667,11 @@ export function useBatchActionRPC() {
         p_user_id: userId,
         p_notes: params.notes || null,
       } as DisposeActionParams)
+      const endTime = performance.now()
+      logger.log('BatchActions', `Dispose RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
+        success: !error,
+        batchId: params.batchId,
+      })
 
       if (error) throw error
       return data as ActionResult
@@ -761,7 +871,7 @@ export function useBatchActionRPC() {
             if (Array.isArray(data)) {
               queryClient.setQueryData(
                 queryKey,
-                data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id)),
+                data.filter((item: TodoItem) => !variables.batchIds.includes(item.batch_id || '')),
               )
             }
           })

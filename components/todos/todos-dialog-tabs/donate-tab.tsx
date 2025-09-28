@@ -1,15 +1,20 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
-import type { ActionableBatch } from '@/hooks/use-batch-actions-rpc'
+import { Typography } from '@/components/ui/typography'
+import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
 import { createClient } from '@/lib/supabase/client'
-import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useMediaQuery } from '@/hooks/use-mobile'
+import { toast } from 'sonner'
 
 interface DonateTabProps {
-  selectedBatch: ActionableBatch
+  selectedBatch: TodoItem
   onClose: () => void
 }
 
@@ -29,18 +34,32 @@ function useDonationRecipients(batchId: string) {
   return useQuery({
     queryKey: ['donation-recipients', batchId],
     queryFn: async () => {
+      const startTime = performance.now()
+      logger.log('DonateTab', 'Starting donation recipients query', { batchId })
+
       // First get the store_id from the batch
+      const batchStartTime = performance.now()
       const { data: batchData, error: batchError } = await supabase
         .schema('inventory')
         .from('batches')
         .select('store_id')
         .eq('batch_id', batchId)
         .single()
+      const batchEndTime = performance.now()
+      logger.log(
+        'DonateTab',
+        `Batch store lookup took ${(batchEndTime - batchStartTime).toFixed(2)}ms`,
+        {
+          batchId,
+          storeId: batchData?.store_id,
+        },
+      )
 
       if (batchError) throw batchError
       if (!batchData?.store_id) throw new Error('Store ID not found for batch')
 
       // Then get donation recipients for that store
+      const recipientsStartTime = performance.now()
       const { data, error } = await supabase
         .schema('inventory')
         .from('donation_recipients')
@@ -48,6 +67,18 @@ function useDonationRecipients(batchId: string) {
         .eq('store_id', batchData.store_id)
         .eq('is_active', true)
         .order('name')
+      const recipientsEndTime = performance.now()
+
+      const totalTime = performance.now() - startTime
+      logger.log(
+        'DonateTab',
+        `Recipients query completed in ${(recipientsEndTime - recipientsStartTime).toFixed(2)}ms (total: ${totalTime.toFixed(2)}ms)`,
+        {
+          batchId,
+          storeId: batchData.store_id,
+          recipientCount: data?.length || 0,
+        },
+      )
 
       if (error) throw error
       return data as DonationRecipient[]
@@ -58,16 +89,27 @@ function useDonationRecipients(batchId: string) {
 }
 
 export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
-  const { executeDonate, isDonating } = useBatchActionRPC()
+  const activeStoreId = useActiveStoreId()
 
+  // Log to verify we have the store ID
+  useEffect(() => {
+    logger.log('DonateTab', 'Active store ID from context', {
+      activeStoreId,
+      batchId: selectedBatch.batch_id,
+    })
+  }, [activeStoreId, selectedBatch.batch_id])
+
+  const { executeDonate, isDonating } = useBatchActionRPC(activeStoreId || undefined)
+
+  const { isMobile } = useMediaQuery()
   // Fetch donation recipients for this batch
   const { data: recipients = [], isLoading: loadingRecipients } = useDonationRecipients(
-    selectedBatch.batch_id, // Changed to use batch_id instead of store_id
+    selectedBatch.batch_id || '', // Changed to use batch_id instead of store_id
   )
 
   // State management
   const [selectedRecipient, setSelectedRecipient] = useState<string>('')
-  const [donateQuantity, setDonateQuantity] = useState(selectedBatch.current_quantity)
+  const [donateQuantity, setDonateQuantity] = useState(selectedBatch.current_quantity || 0)
   const [isSelectAll, setIsSelectAll] = useState(true)
 
   // Set default recipient when recipients load
@@ -88,25 +130,9 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // Update quantity when batch changes or select all toggles
   useEffect(() => {
     if (isSelectAll) {
-      setDonateQuantity(selectedBatch.current_quantity)
+      setDonateQuantity(selectedBatch.current_quantity || 0)
     }
   }, [selectedBatch.current_quantity, isSelectAll])
-
-  // Calculate donation impact metrics
-  const calculateDonationImpact = () => {
-    const preventedWaste =
-      (donateQuantity * selectedBatch.potential_loss) / selectedBatch.current_quantity
-    const mealsProvided = Math.round(donateQuantity * 2.5) // Estimate
-    const taxBenefit = preventedWaste * 0.25 // Estimate 25% tax benefit
-
-    return {
-      preventedWaste,
-      mealsProvided,
-      taxBenefit,
-    }
-  }
-
-  const impact = calculateDonationImpact()
 
   // Handle quantity slider change
   const handleQuantityChange = (value: number) => {
@@ -114,21 +140,10 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
     setIsSelectAll(value === selectedBatch.current_quantity)
   }
 
-  // Handle select all toggle
-  const handleSelectAllToggle = () => {
-    if (isSelectAll) {
-      setDonateQuantity(Math.floor(selectedBatch.current_quantity / 2))
-      setIsSelectAll(false)
-    } else {
-      setDonateQuantity(selectedBatch.current_quantity)
-      setIsSelectAll(true)
-    }
-  }
-
   // Handle donation execution
   const handleDonateAction = async () => {
     if (!selectedRecipient) {
-      console.error('No donation recipient selected')
+      toast.error('Please select a donation recipient')
       return
     }
 
@@ -137,15 +152,16 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         recipients.find(r => r.recipient_id === selectedRecipient)?.name || 'Unknown'
 
       const params = {
-        batchId: selectedBatch.batch_id,
+        batchId: selectedBatch.batch_id || '',
         quantity: donateQuantity,
         donationRecipientId: selectedRecipient, // Now using actual UUID
-        notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name} to ${recipientName} - ${selectedBatch.ai_reasoning}`,
+        notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name || ''} to ${recipientName} - ${selectedBatch.ai_recommendation || ''}`,
       }
 
-      const _result = await executeDonate(params)
+      await executeDonate(params)
 
-      // Success - close the modal
+      // Success - show success toast and close the modal
+      toast.success(`Successfully donated ${donateQuantity} units to ${recipientName}`)
       onClose()
     } catch (error) {
       console.error('[DonateTab] Donation failed:', {
@@ -156,16 +172,22 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         quantity: donateQuantity,
         selectedRecipient,
       })
+
+      // Show user-facing error message
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      toast.error(`Failed to process donation: ${errorMessage}`)
     }
   }
 
   // Loading state
   if (loadingRecipients) {
     return (
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
-          <span className="ml-2 text-gray-600">Loading donation recipients...</span>
+      <div className="flex flex-col h-full bg-muted">
+        <div className="flex-1 overflow-y-auto flex items-center justify-center">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+            <span className="ml-2 text-gray-600">Loading donation recipients...</span>
+          </div>
         </div>
       </div>
     )
@@ -174,126 +196,100 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // No recipients available
   if (recipients.length === 0) {
     return (
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="text-center py-8">
-          <p className="text-gray-600 mb-4">No donation recipients available for this store.</p>
-          <p className="text-sm text-gray-500">Contact your admin to set up donation recipients.</p>
+      <div className="flex flex-col h-full bg-muted">
+        <div className="flex-1 overflow-y-auto flex items-center justify-center px-8">
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">No donation recipients available for this store.</p>
+            <p className="text-sm text-gray-500">
+              Contact your admin to set up donation recipients.
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-4">
-      {/* Recipient Selection */}
-      <div className="mb-6">
-        <h3 className="text-sm font-medium mb-3">Select Recipient</h3>
-        <div className="grid grid-cols-1 gap-2">
-          {recipients.map(recipient => (
-            <button
-              key={recipient.recipient_id}
-              type="button"
-              onClick={() => setSelectedRecipient(recipient.recipient_id)}
-              className={cn(
-                'p-3 rounded-lg border text-sm font-medium transition-colors text-left',
-                selectedRecipient === recipient.recipient_id
-                  ? 'bg-purple-50 border-purple-300 text-purple-700'
-                  : 'bg-white border-gray-200 hover:bg-gray-50',
-              )}
-            >
-              <div className="font-medium">{recipient.name}</div>
-              <div className="text-xs text-gray-500 capitalize">
-                {recipient.recipient_type.replace('_', ' ')}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Quantity Selection */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-sm font-medium">Donation Quantity</h3>
-          <button
-            type="button"
-            onClick={handleSelectAllToggle}
-            className={cn(
-              'text-sm font-medium px-3 py-1 rounded-full transition-colors',
-              isSelectAll
-                ? 'bg-purple-100 text-purple-700'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-            )}
-          >
-            {isSelectAll ? 'All Selected' : 'Select All'}
-          </button>
+    <div className="flex flex-col h-full bg-muted">
+      {/* content */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
+        {/* Recipient Selection */}
+        <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
+          <Typography variant="p" className="xs:text-lg">
+            Select donation recipient
+          </Typography>
+          <div className="bg-white rounded-2xl p-4">
+            <div className="grid grid-cols-1 gap-2">
+              {recipients.map(recipient => (
+                <Button
+                  key={recipient.recipient_id}
+                  size="lg"
+                  variant={
+                    selectedRecipient === recipient.recipient_id ? 'subtleTertiary' : 'outline'
+                  }
+                  onClick={() => setSelectedRecipient(recipient.recipient_id)}
+                  className="border-none shadow justify-start"
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{recipient.name}</div>
+                    <div className="text-xs text-muted-foreground capitalize">
+                      {recipient.recipient_type.replace('_', ' ')}
+                    </div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <InputSlider
-          value={donateQuantity}
-          onChange={handleQuantityChange}
-          min={1}
-          max={selectedBatch.current_quantity}
-          step={1}
-          label={`${donateQuantity} units`}
-          sliderColor="#9333ea"
-        />
-
-        <p className="text-xs text-gray-500 mt-2">
-          Out of {selectedBatch.current_quantity} available units
-        </p>
-      </div>
-
-      {/* Donation Impact */}
-      <div className="mb-6 p-4 bg-green-50 rounded-lg">
-        <h3 className="text-sm font-medium mb-3 text-green-800">Donation Impact</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-green-700">Prevented Waste Value:</span>
-            <span className="font-medium text-green-800">€{impact.preventedWaste.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-green-700">Estimated Meals Provided:</span>
-            <span className="font-medium text-green-800">{impact.mealsProvided}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-green-700">Potential Tax Benefit:</span>
-            <span className="font-medium text-green-800">€{impact.taxBenefit.toFixed(2)}</span>
+        {/* Quantity Selection */}
+        <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
+          <Typography variant="p" className="xs:text-lg">
+            How many units to donate?
+          </Typography>
+          <div className="bg-white rounded-2xl p-4">
+            <InputSlider
+              value={donateQuantity}
+              onChange={handleQuantityChange}
+              min={1}
+              max={selectedBatch.current_quantity || 0}
+              step={1}
+              suffix={`/${selectedBatch.current_quantity}`}
+              label={`Mark for donation: ${donateQuantity} units`}
+            />
           </div>
         </div>
       </div>
 
-      {/* Expected Outcome */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-sm font-medium mb-2">Expected Outcome</h3>
-        <p className="text-sm text-gray-600">
-          {donateQuantity === selectedBatch.current_quantity
-            ? 'This donation will fully resolve the alert and remove this item from your todo list.'
-            : `This partial donation will reduce inventory by ${donateQuantity} units. The alert will remain active for the remaining ${selectedBatch.current_quantity - donateQuantity} units.`}
-        </p>
+      {/* footer */}
+      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
+        <Button
+          size={isMobile ? 'default' : 'lg'}
+          variant="subtleGray"
+          onClick={onClose}
+          className="rounded-full flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          size={isMobile ? 'default' : 'lg'}
+          variant="black"
+          className="rounded-full flex-1"
+          onClick={handleDonateAction}
+          disabled={isDonating || donateQuantity === 0 || !selectedRecipient}
+        >
+          {isDonating ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              Processing Donation...
+            </span>
+          ) : donateQuantity === (selectedBatch.current_quantity || 0) ? (
+            'Donate all'
+          ) : (
+            `Donate ${donateQuantity}`
+          )}
+        </Button>
       </div>
-
-      {/* Action Button */}
-      <button
-        type="button"
-        onClick={handleDonateAction}
-        disabled={isDonating || donateQuantity === 0 || !selectedRecipient}
-        className={cn(
-          'w-full py-3 px-4 rounded-lg font-medium transition-colors',
-          'bg-green-600 text-white hover:bg-green-700',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-        )}
-      >
-        {isDonating ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-            Processing Donation...
-          </span>
-        ) : selectedRecipient ? (
-          `Donate ${donateQuantity} Units to ${recipients.find(r => r.recipient_id === selectedRecipient)?.name}`
-        ) : (
-          'Select a Recipient'
-        )}
-      </button>
     </div>
   )
 }

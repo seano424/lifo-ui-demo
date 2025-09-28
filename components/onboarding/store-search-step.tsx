@@ -20,7 +20,7 @@ type SearchState = 'idle' | 'typing' | 'searching' | 'results' | 'no-results' | 
 export function StoreSearchStep() {
   const t = useTranslations('onboarding.storeSearch')
 
-  const { searchQuery, setSearchQuery, setSelectedStoreForm, setManualEntry, setCurrentStep } =
+  const { searchQuery, setSearchQuery, setSelectedStoreForm, setManualEntry, goToNextStep } =
     useOnboardingStore()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
@@ -36,8 +36,8 @@ export function StoreSearchStep() {
   // Define manual entry handler first
   const handleManualEntry = useCallback(() => {
     setManualEntry(true)
-    setCurrentStep(2)
-  }, [setManualEntry, setCurrentStep])
+    goToNextStep()
+  }, [setManualEntry, goToNextStep])
 
   // If Google Places is disabled, redirect to manual entry immediately
   useEffect(() => {
@@ -101,7 +101,7 @@ export function StoreSearchStep() {
       }
 
       setSelectedStoreForm(storeFormData)
-      setCurrentStep(2)
+      goToNextStep()
     }
     // Error handling is done in the hook and displayed via the error state
   }

@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 // Types for the authentication modes
 type AuthMode = 'admin' | 'employee'
@@ -59,7 +60,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         })
 
         if (userError) {
-          console.error('Failed to lookup user by username:', userError)
+          logger.error('LoginForm', 'Failed to lookup user by username:', userError)
           throw new Error('Authentication service error')
         }
 
@@ -120,7 +121,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         })
 
         if (sessionError) {
-          console.error('❌ Failed to set session:', sessionError)
+          logger.error('LoginForm', 'Failed to set session:', sessionError)
           throw new Error('Failed to create session')
         }
       } else {
@@ -205,8 +206,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                     placeholder="••••••"
                     value={pin}
                     onChange={e => setPin(e.target.value)}
-                    maxLength={6}
-                    pattern="[0-9]{6}"
                     required
                     autoComplete="current-password"
                     disabled={isLoading}

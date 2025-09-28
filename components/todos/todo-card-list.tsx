@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import type { ActionableBatch } from '@/lib/utils/todo-transformers'
 import { useEffect, useMemo, useState } from 'react'
 import type { SortConfig } from './filters/todo-sort-controls'
 
@@ -36,7 +35,7 @@ export function TodoCardList({
 }: TodoCardListProps) {
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
-  const [selectedBatch, setSelectedBatch] = useState<ActionableBatch | null>(null)
+  const [selectedBatch, setSelectedBatch] = useState<TodoItem | null>(null)
 
   // Intersection observer for infinite scroll
   const { targetRef, isIntersecting } = useIntersectionObserver({
@@ -73,16 +72,16 @@ export function TodoCardList({
           break
         }
         case 'expiry_date':
-          aVal = new Date(a.expiry_date).getTime()
-          bVal = new Date(b.expiry_date).getTime()
+          aVal = a.expiry_date ? new Date(a.expiry_date).getTime() : 0
+          bVal = b.expiry_date ? new Date(b.expiry_date).getTime() : 0
           break
         case 'current_quantity':
-          aVal = a.current_quantity
-          bVal = b.current_quantity
+          aVal = a.current_quantity || 0
+          bVal = b.current_quantity || 0
           break
         case 'alphabetical':
-          aVal = a.product_name.toLowerCase()
-          bVal = b.product_name.toLowerCase()
+          aVal = (a.product_name || '').toLowerCase()
+          bVal = (b.product_name || '').toLowerCase()
           break
         case 'action_date':
           aVal = a.last_action_time ? new Date(a.last_action_time).getTime() : 0
@@ -103,37 +102,9 @@ export function TodoCardList({
   }, [todos, sortConfig])
 
   const handleTodoClick = (batchId: string) => {
-    // Convert TodoItem to the format expected by the bottom sheet
     const todo = sortedTodos.find(t => t.batch_id === batchId)
     if (todo) {
-      // Map TodoItem to ActionableBatch format for the bottom sheet
-      const mappedBatch: ActionableBatch = {
-        batch_id: todo.batch_id,
-        batch_number: todo.batch_number,
-        product_name: todo.product_name,
-        product_brand: todo.product_brand || '',
-        sku: '', // Not available in TodoItem, using empty string
-        expiry_date: todo.expiry_date,
-        current_quantity: todo.current_quantity,
-        location_code: '', // Not available in TodoItem, using empty string
-        unit_price: 0, // Not available in TodoItem, using 0
-        urgency_level:
-          todo.urgency_level === 'none'
-            ? 'low'
-            : (todo.urgency_level as 'critical' | 'high' | 'medium' | 'low'),
-        days_to_expiry: Math.ceil(
-          (new Date(todo.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-        ),
-        ai_recommendation: todo.ai_recommendation || '',
-        ai_reasoning: '', // Not available in TodoItem, using empty string
-        composite_score: todo.composite_score || 0,
-        potential_loss: 0, // Not available in TodoItem, using 0
-        discount_percent: 0, // Not available in TodoItem, using 0
-        todo_state: 'needs_attention' as const, // Default state
-        total_count: 1, // Default count
-      }
-
-      setSelectedBatch(mappedBatch)
+      setSelectedBatch(todo)
       setIsBottomSheetOpen(true)
     }
   }
@@ -187,7 +158,7 @@ export function TodoCardList({
             <TodoCard
               key={todo.batch_id}
               todo={todo}
-              onClick={() => handleTodoClick(todo.batch_id)}
+              onClick={() => handleTodoClick(todo.batch_id || '')}
             />
           ))}
         </div>

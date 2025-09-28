@@ -84,6 +84,18 @@ export async function fetchStoreSettings(
   })
 
   if (storeError) {
+    // Only suppress auth errors during logout - let other errors through normally
+    if (
+      storeError.message?.includes('JWT') ||
+      storeError.message?.includes('invalid') ||
+      storeError.code === 'PGRST301' ||
+      storeError.message?.includes('Auth session missing')
+    ) {
+      console.log('🔐 Store fetch skipped - user not authenticated')
+      throw new Error('User not authenticated')
+    }
+
+    // Log all other errors normally and let React Query handle them
     console.error('❌ Store fetch error:', storeError)
     throw new Error(`Failed to fetch store: ${storeError.message}`)
   }

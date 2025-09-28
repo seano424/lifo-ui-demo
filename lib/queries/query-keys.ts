@@ -143,6 +143,8 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.batches.details(), id] as const,
     byProduct: (storeId: string, productId: string) =>
       [...queryKeys.batches.byStore(storeId), 'byProduct', productId] as const,
+    // Batch todo state queries (for accessing batch_todo_states view)
+    todo: (batchId: string) => [...queryKeys.batches.all, 'todo', batchId] as const,
   },
 
   // Store users queries
