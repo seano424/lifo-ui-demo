@@ -1,14 +1,13 @@
 """
 Supabase JWT Authentication for LIFO AI Engine
-Provides seamless integration with existing Supabase authentication
-Updated to use modern JWKS-based verification instead of legacy JWT secret
+Modern authentication using Supabase Auth API instead of legacy JWT secrets
+Provides seamless integration with Supabase authentication system
 """
 
 from datetime import UTC, datetime
 from typing import Any
 
 import httpx
-import jwt
 import structlog
 from fastapi import HTTPException, status
 from pydantic import BaseModel, ConfigDict
@@ -48,22 +47,23 @@ class SupabaseAuthError(HTTPException):
 
 class SupabaseAuth:
     """
-    Supabase JWT authentication handler
+    Modern Supabase authentication handler using Auth API
     """
 
     def __init__(self):
-        self.jwt_secret = (
-            settings.supabase_jwt_secret or "test-jwt-secret-for-development"
-        )
         self.supabase_url = settings.supabase_url or "https://test.supabase.co"
         self.logger = structlog.get_logger().bind(component="supabase_auth")
 
-        # JWT algorithm - enforce HS256 only for security
-        self.algorithms = ["HS256"]
+        # Validate required configuration
+        if not settings.supabase_url:
+            raise ValueError("SUPABASE_URL is required for authentication")
+
+        if not settings.supabase_anon_key and not settings.supabase_service_role_key:
+            raise ValueError("Either SUPABASE_ANON_KEY or SUPABASE_SERVICE_ROLE_KEY is required")
 
     async def verify_token(self, token: str) -> SupabaseUser:
         """
-        Verify and decode Supabase JWT token using Auth server verification
+        Verify and decode Supabase JWT token using Auth server verification only
 
         Args:
             token: JWT token from Authorization header
@@ -79,70 +79,23 @@ class SupabaseAuth:
             if token.startswith("Bearer "):
                 token = token[7:]
 
-            # Use Auth server verification (recommended approach)
+            # Use Auth server verification (modern approach only)
             user_info = await self._verify_with_auth_server(token)
             if user_info:
                 return user_info
 
-            # Fallback to legacy JWT secret verification
-            payload = jwt.decode(
-                token,
-                self.jwt_secret,
-                algorithms=self.algorithms,
-                audience="authenticated",
-                options={
-                    "verify_signature": True,
-                    "verify_exp": True,
-                    "verify_aud": True,
-                    "require": ["exp", "iat", "sub"],
-                },
-            )
+            # If Auth server verification fails, authentication failed
+            raise SupabaseAuthError("Invalid or expired token")
 
-            # Extract user information
-            user_id = payload.get("sub")
-            if not user_id:
-                raise SupabaseAuthError("Token missing user ID")
-
-            email = payload.get("email")
-            if not email:
-                raise SupabaseAuthError("Token missing email")
-
-            # Create user object
-            user = SupabaseUser(
-                user_id=user_id,
-                email=email,
-                role=payload.get("role", "authenticated"),
-                app_metadata=payload.get("app_metadata", {}),
-                user_metadata=payload.get("user_metadata", {}),
-                aud=payload.get("aud", "authenticated"),
-                exp=payload.get("exp", 0),
-                iat=payload.get("iat", 0),
-                iss=payload.get("iss", ""),
-                sub=user_id,
-            )
-
-            self.logger.info(
-                "Token verified successfully", user_id=user_id, email=email
-            )
-
-            return user
-
-        except jwt.ExpiredSignatureError as e:
-            self.logger.warning("Token expired")
-            raise SupabaseAuthError("Token has expired") from e
-
-        except jwt.InvalidTokenError as e:
-            self.logger.warning("Invalid token", error=str(e))
-            raise SupabaseAuthError(f"Invalid token: {e!s}") from e
-
-        except jwt.InvalidAudienceError as e:
-            self.logger.warning("Invalid token audience")
-            raise SupabaseAuthError("Invalid token audience") from e
+        except SupabaseAuthError:
+            # Re-raise SupabaseAuthError as-is
+            raise
 
         except Exception as e:
             self.logger.error(
                 "Token verification failed",
                 error=str(e),
+                error_type=type(e).__name__,
                 # Never log token data for security
             )
             # Don't expose internal error details to client
@@ -244,7 +197,7 @@ class SupabaseAuth:
 
     def verify_service_role_token(self, token: str) -> bool:
         """
-        Verify service role token for internal API calls
+        Verify service role token for internal API calls using API key only
 
         Args:
             token: Service role token
@@ -260,58 +213,33 @@ class SupabaseAuth:
                 self.logger.info("Service role token verified")
                 return True
 
-            # Also try JWT verification for service role tokens
-            payload = jwt.decode(
-                token,
-                self.jwt_secret,
-                algorithms=self.algorithms,
-                options={
-                    "verify_signature": True,  # Always verify signature
-                    "verify_exp": True,  # Always verify expiration
-                    "verify_aud": False,  # Service role tokens may have different audience
-                },
-            )
-
-            # Check if this is a service role token
-            role = payload.get("role")
-            if role == "service_role":
-                self.logger.info("Service role JWT verified")
-                return True
-
             return False
 
         except Exception as e:
             self.logger.warning("Service role token verification failed", error=str(e))
             return False
 
-    def extract_user_claims(self, token: str) -> dict[str, Any]:
+    async def extract_user_claims(self, token: str) -> dict[str, Any]:
         """
-        Extract custom claims from VERIFIED token only
-        SECURITY: Only call this after token has been verified with verify_token()
+        Extract custom claims from VERIFIED token using Auth server
+        SECURITY: This method verifies the token again to ensure security
 
         Args:
-            token: JWT token (must be already verified)
+            token: JWT token
 
         Returns:
             Dict: Custom claims from token
         """
         try:
-            # SECURITY: Always verify token completely
-            payload = jwt.decode(
-                token,
-                self.jwt_secret,
-                algorithms=self.algorithms,
-                options={
-                    "verify_signature": True,
-                    "verify_exp": True,
-                    "verify_aud": True,
-                },
-            )
+            # Always verify token through Auth server first
+            user_info = await self._verify_with_auth_server(token)
+            if not user_info:
+                return {}
 
             return {
-                "user_metadata": payload.get("user_metadata", {}),
-                "app_metadata": payload.get("app_metadata", {}),
-                "custom_claims": payload.get("custom_claims", {}),
+                "user_metadata": user_info.user_metadata or {},
+                "app_metadata": user_info.app_metadata or {},
+                "custom_claims": {},  # Custom claims would be in app_metadata
             }
 
         except Exception as e:

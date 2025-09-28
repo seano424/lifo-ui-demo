@@ -9,6 +9,7 @@ from typing import Any
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
+from app.auth.monitoring import get_auth_health, get_auth_monitor
 from app.auth.secure_dependencies import get_current_user
 from app.core.config import settings
 from app.security.input_validation import sanitize_for_logging
@@ -79,6 +80,117 @@ async def get_security_statistics(
         )
         raise HTTPException(
             status_code=500, detail="Failed to retrieve security statistics"
+        ) from e
+
+
+@router.get("/auth/health")
+async def get_authentication_health(
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """
+    Get authentication system health status
+    """
+    try:
+        health_status = get_auth_health()
+
+        logger.info(
+            "Authentication health requested",
+            user_id=current_user.get("sub"),
+            status=health_status.get("status"),
+            health_score=health_status.get("health_score")
+        )
+
+        return health_status
+
+    except Exception as e:
+        logger.error(
+            "Failed to get authentication health",
+            error=str(e),
+            user_id=current_user.get("sub"),
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve authentication health"
+        ) from e
+
+
+@router.get("/auth/metrics")
+async def get_authentication_metrics(
+    hours: int = Query(1, ge=1, le=168, description="Hours of metrics to retrieve"),
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """
+    Get authentication metrics and statistics
+    """
+    try:
+        auth_monitor = get_auth_monitor()
+        metrics = auth_monitor.get_metrics_summary(hours=hours)
+
+        logger.info(
+            "Authentication metrics requested",
+            user_id=current_user.get("sub"),
+            hours=hours,
+            total_requests=metrics.total_requests
+        )
+
+        return {
+            "time_period_hours": hours,
+            "metrics": {
+                "total_requests": metrics.total_requests,
+                "successful_auths": metrics.successful_auths,
+                "failed_auths": metrics.failed_auths,
+                "success_rate_percent": (
+                    (metrics.successful_auths / metrics.total_requests * 100)
+                    if metrics.total_requests > 0 else 0
+                ),
+                "avg_response_time_ms": metrics.avg_response_time_ms,
+                "rate_limit_hits": metrics.rate_limit_hits,
+                "unique_users": metrics.unique_users,
+                "security_incidents": metrics.security_incidents,
+                "uptime_percentage": metrics.uptime_percentage
+            },
+            "timestamp": datetime.utcnow()
+        }
+
+    except Exception as e:
+        logger.error(
+            "Failed to get authentication metrics",
+            error=str(e),
+            user_id=current_user.get("sub"),
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve authentication metrics"
+        ) from e
+
+
+@router.get("/auth/security-report")
+async def get_auth_security_report(
+    hours: int = Query(24, ge=1, le=168, description="Hours of security data to analyze"),
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """
+    Get comprehensive authentication security report
+    """
+    try:
+        auth_monitor = get_auth_monitor()
+        security_report = auth_monitor.get_security_report(hours=hours)
+
+        logger.info(
+            "Authentication security report requested",
+            user_id=current_user.get("sub"),
+            hours=hours,
+            total_incidents=security_report.get("total_incidents", 0)
+        )
+
+        return security_report
+
+    except Exception as e:
+        logger.error(
+            "Failed to get authentication security report",
+            error=str(e),
+            user_id=current_user.get("sub"),
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve authentication security report"
         ) from e
 
 

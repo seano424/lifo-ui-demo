@@ -47,11 +47,30 @@ class Settings(BaseSettings):
     db_max_overflow: int = 30
     db_pool_recycle: int = 3600
 
-    # Authentication
-    supabase_url: str = ""
-    supabase_jwt_secret: str = ""
-    supabase_anon_key: str = ""
-    supabase_service_role_key: str = ""
+    # Supabase Authentication
+    supabase_url: str = Field(
+        default="",
+        description="Supabase project URL for authentication and database"
+    )
+    supabase_jwt_secret: str = ""  # Keep for compatibility
+    supabase_anon_key: str = Field(
+        default="",
+        description="Supabase anonymous key for public operations (legacy JWT)"
+    )
+    supabase_service_role_key: str = Field(
+        default="",
+        description="Supabase service role key for admin operations (legacy JWT)"
+    )
+
+    # New Supabase API Keys (recommended over legacy JWT keys)
+    supabase_publishable_key: str = Field(
+        default="",
+        description="Supabase publishable key (new API key system) for client-side auth"
+    )
+    supabase_secret_key: str = Field(
+        default="",
+        description="Supabase secret key (new API key system) for server-side admin operations"
+    )
 
     # JWT Configuration
     jwt_secret_key: str = Field(
@@ -125,6 +144,32 @@ class Settings(BaseSettings):
     )
     performance_monitoring_retention_hours: int = Field(
         default=72, description="Hours to retain performance metrics"
+    )
+
+    # Automated Scoring Configuration
+    enable_automated_scoring: bool = Field(
+        default=True, description="Enable automated scoring scheduler"
+    )
+    default_scoring_cron: str = Field(
+        default="0 */4 * * *", description="Default cron expression for automated scoring (every 4 hours)"
+    )
+    default_scoring_timezone: str = Field(
+        default="UTC", description="Default timezone for automated scoring schedules"
+    )
+    scoring_max_retries: int = Field(
+        default=3, description="Maximum retry attempts for failed scoring jobs"
+    )
+    scoring_retry_delay_minutes: int = Field(
+        default=5, description="Minutes to wait between scoring retry attempts"
+    )
+    scoring_timeout_minutes: int = Field(
+        default=15, description="Timeout in minutes for scoring operations"
+    )
+    scoring_batch_size: int = Field(
+        default=500, description="Default batch size for automated scoring"
+    )
+    max_concurrent_scoring_jobs: int = Field(
+        default=5, description="Maximum concurrent scoring jobs allowed"
     )
 
     # Mobile performance thresholds
@@ -257,14 +302,22 @@ class Settings(BaseSettings):
                 if host and not host.startswith("*"):  # No wildcards in production
                     hosts.append(host)
 
-            # Add specific production domains only (no wildcards)
-            # Production domains must be explicitly configured via FRONTEND_URL and API_URL
+            # Add DigitalOcean App Platform hosts for health checks
+            hosts.extend([
+                "*.ondigitalocean.app",  # DigitalOcean App Platform domains
+            ])
 
-            return hosts if hosts else ["127.0.0.1"]  # Fallback to localhost only
+            return hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]  # Fallback includes DO domains
 
         elif self.environment == "staging":
             # Staging - limited hosts
             hosts = ["localhost", "127.0.0.1"]
+
+            # Add DigitalOcean staging domains
+            hosts.extend([
+                "*.ondigitalocean.app",
+            ])
+
             if self.frontend_url:
                 host = self.frontend_url.replace("https://", "").replace("http://", "")
                 if host:
@@ -275,11 +328,12 @@ class Settings(BaseSettings):
         return self.allowed_hosts_list
 
     model_config = SettingsConfigDict(
-        env_file=".env.local",
+        env_file=[".env.local", "../.env.local", "../../.env.local"],  # Try multiple paths for .env file
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",  # Ignore extra environment variables not defined in the model
         env_nested_delimiter=None,  # Disable nested parsing
+        env_ignore_empty=True,  # Ignore empty .env files
     )
 
 
@@ -308,8 +362,16 @@ def get_supabase_config() -> dict[str, Any]:
     """
     return {
         "url": settings.supabase_url,
+        # Legacy JWT keys (for backward compatibility)
         "jwt_secret": settings.supabase_jwt_secret,
+        "anon_key": settings.supabase_anon_key,
         "service_role_key": settings.supabase_service_role_key,
+        # New API keys (recommended)
+        "publishable_key": settings.supabase_publishable_key,
+        "secret_key": settings.supabase_secret_key,
+        # Default timeout and retry settings for auth operations
+        "timeout_seconds": 30,
+        "retry_attempts": 3,
     }
 
 

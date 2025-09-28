@@ -11,12 +11,17 @@ from typing import Any
 import structlog
 from fastapi import HTTPException, Request
 
+from app.auth.error_responses import StandardAuthErrors, map_supabase_error
+from app.auth.monitoring import (
+    record_login_failure,
+    record_login_success,
+)
 from app.auth.supabase_api_key_auth import (
     SupabaseAPIKeyError,
     get_api_key_auth,
 )
 from app.core.config import settings
-from app.utils.mvp_exceptions import AuthenticationException, AuthorizationException
+from app.utils.mvp_exceptions import AuthorizationException
 
 logger = structlog.get_logger()
 
@@ -39,14 +44,31 @@ async def get_current_user(
     Raises:
         AuthenticationException: If authentication fails
     """
+    import time
+    start_time = time.time()
+    client_ip = getattr(request.client, 'host', None) if hasattr(request, 'client') else None
+
     try:
         # Use the new API key authentication system
         auth = get_api_key_auth()
         user = await auth.validate_api_request(request)
 
+        # Calculate response time
+        response_time_ms = (time.time() - start_time) * 1000
+
+        # Record successful authentication
+        record_login_success(
+            user_id=user.user_id,
+            ip_address=client_ip,
+            response_time_ms=response_time_ms
+        )
+
         # Log successful authentication (without sensitive data)
         logger.info(
-            "User authenticated successfully", user_id=user.user_id, role=user.role
+            "User authenticated successfully",
+            user_id=user.user_id,
+            role=user.role,
+            response_time_ms=response_time_ms
         )
 
         return {
@@ -60,10 +82,25 @@ async def get_current_user(
 
     except SupabaseAPIKeyError as e:
         logger.warning("Supabase API key authentication failed", error=str(e))
-        raise AuthenticationException("Invalid authentication token") from e
+
+        # Record authentication failure
+        record_login_failure(
+            ip_address=client_ip,
+            error_code=str(getattr(e, 'status_code', 401))
+        )
+
+        # Map to standardized error response
+        raise map_supabase_error(e) from e
     except Exception as e:
         logger.error("Authentication error", error=str(e))
-        raise AuthenticationException("Authentication failed") from e
+
+        # Record authentication failure
+        record_login_failure(
+            ip_address=client_ip,
+            error_code="AUTH_009"
+        )
+
+        raise StandardAuthErrors.auth_configuration_error() from e
 
 
 async def get_optional_user(
@@ -74,8 +111,8 @@ async def get_optional_user(
     Used for endpoints that work with or without authentication
     """
     try:
-        # Check if Authorization header exists
-        authorization = request.headers.get("Authorization")
+        # Check if Authorization header exists (case-insensitive)
+        authorization = request.headers.get("Authorization") or request.headers.get("authorization")
         if not authorization:
             return None
 
@@ -111,17 +148,17 @@ async def require_service_role(
             logger.warning(
                 "Service role required but user has different role", role=user.role
             )
-            raise AuthorizationException("Service role required")
+            raise StandardAuthErrors.insufficient_permissions("service_role")
 
         logger.info("Service role authenticated")
         return {"role": "service_role", "authenticated": True, "user_id": user.user_id}
 
     except SupabaseAPIKeyError as e:
         logger.error("Service role authentication error", error=str(e))
-        raise AuthorizationException("Service role authentication failed") from e
+        raise StandardAuthErrors.invalid_service_key() from e
     except Exception as e:
         logger.error("Service role authentication error", error=str(e))
-        raise AuthorizationException("Service role authentication failed") from e
+        raise StandardAuthErrors.auth_configuration_error() from e
 
 
 # Input Validation Functions
@@ -344,30 +381,146 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
     Raises:
         AuthorizationException: If user doesn't have access
     """
-    # For now, implement basic validation
-    # In production, this would check database for user-store relationships
+    from app.auth.monitoring import record_suspicious_activity
+    from app.database.supabase_service import SupabaseService
+    
+    # Validate store ID format first (prevent injection)
+    try:
+        validated_store_id = validate_store_id_format(store_id)
+    except HTTPException as e:
+        logger.warning("Invalid store ID format in access check", store_id=store_id)
+        raise AuthorizationException("Invalid store ID format") from e
 
-    # Service role has access to all stores
+    # Service role has access to all stores (admin access)
     if current_user.get("role") == "service_role":
+        logger.info(
+            "Service role accessing store",
+            store_id=validated_store_id,
+            user_role="service_role"
+        )
         return True
 
-    # For regular users, we would check store_users table
-    # This is a placeholder that should be implemented with actual database checks
-
+    # Extract and validate user ID from token
     user_id = current_user.get("sub")
     if not user_id:
-        logger.warning("User ID not found in token")
-        raise AuthorizationException("Invalid user token")
+        logger.error("User ID not found in authentication token")
+        raise AuthorizationException("Invalid authentication token")
 
-    # TODO: Implement actual store access validation with database
-    # For now, allow access (this should be fixed in production)
-    logger.warning(
-        "Store access validation not fully implemented",
-        store_id=store_id,
-        user_id=user_id,
-    )
-
-    return True
+    # Initialize Supabase service for database queries
+    supabase_service = SupabaseService()
+    
+    try:
+        # Use service role client for authorization checks (bypass RLS)
+        admin_client = supabase_service.get_admin_client()
+        
+        # Check 1: Is user the owner of the store?
+        store_response = (
+            admin_client.schema("business")
+            .table("stores")
+            .select("owner_id, is_active, store_name")
+            .eq("store_id", validated_store_id)
+            .single()
+            .execute()
+        )
+        
+        if not store_response.data:
+            # Store doesn't exist - deny access without revealing this
+            logger.warning(
+                "Access attempt to non-existent store",
+                store_id=validated_store_id,
+                user_id=user_id
+            )
+            record_suspicious_activity(
+                activity_type="non_existent_store_access",
+                details={"store_id": validated_store_id},
+                user_id=user_id
+            )
+            raise AuthorizationException("Access denied")
+        
+        store_data = store_response.data
+        
+        # Check if store is active
+        if not store_data.get("is_active", False):
+            logger.warning(
+                "Access attempt to inactive store",
+                store_id=validated_store_id,
+                user_id=user_id,
+                store_name=store_data.get("store_name")
+            )
+            raise AuthorizationException("Store is not active")
+        
+        # Check if user is the owner
+        if str(store_data.get("owner_id")) == str(user_id):
+            logger.info(
+                "Store owner accessing their store",
+                store_id=validated_store_id,
+                user_id=user_id,
+                store_name=store_data.get("store_name")
+            )
+            return True
+        
+        # Check 2: Is user a member of the store with active access?
+        member_response = (
+            admin_client.schema("business")
+            .table("store_users")
+            .select("user_id, role_in_store, is_active, permissions")
+            .eq("store_id", validated_store_id)
+            .eq("user_id", user_id)
+            .eq("is_active", True)
+            .single()
+            .execute()
+        )
+        
+        if member_response.data:
+            member_data = member_response.data
+            logger.info(
+                "Store member accessing store",
+                store_id=validated_store_id,
+                user_id=user_id,
+                role_in_store=member_data.get("role_in_store"),
+                store_name=store_data.get("store_name")
+            )
+            return True
+        
+        # User has no access to this store
+        logger.warning(
+            "Unauthorized store access attempt",
+            store_id=validated_store_id,
+            user_id=user_id,
+            store_name=store_data.get("store_name")
+        )
+        
+        # Record this as a security event
+        record_suspicious_activity(
+            activity_type="unauthorized_store_access",
+            details={
+                "store_id": validated_store_id,
+                "store_name": store_data.get("store_name")
+            },
+            user_id=user_id
+        )
+        
+        raise AuthorizationException(
+            "You do not have permission to access this store"
+        )
+        
+    except AuthorizationException:
+        # Re-raise authorization exceptions
+        raise
+    except Exception as e:
+        # Log database errors but don't expose details
+        logger.error(
+            "Database error during store access validation",
+            store_id=validated_store_id,
+            user_id=user_id,
+            error=str(e)
+        )
+        
+        # Fail safe - deny access on any error
+        # This follows the principle of least privilege
+        raise AuthorizationException(
+            "Unable to verify store access permissions"
+        ) from e
 
 
 def validate_api_key(api_key: str) -> bool:
@@ -395,8 +548,13 @@ def rate_limit_key_func(request: Request) -> str:
     Generate rate limiting key based on user or IP
     """
     try:
-        # Try to get user ID from JWT token
-        auth_header = request.headers.get("authorization", "")
+        # Try to get user ID from JWT token (case-insensitive)
+        auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
+
+        # Ensure header is a string (handle potential bytes issues)
+        if isinstance(auth_header, bytes):
+            auth_header = auth_header.decode('utf-8')
+
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
             # For rate limiting, we'll decode without verification for speed

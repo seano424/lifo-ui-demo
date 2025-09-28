@@ -241,6 +241,17 @@ class StoreSettings(Base):
     scoring_weights = Column(
         get_json_type(), default={"expiry": 0.5, "velocity": 0.3, "margin": 0.2}
     )
+    donation_preference_config = Column(
+        get_json_type(),
+        default={
+            "strategy": "balanced",
+            "donation_first_threshold": 0.6,
+            "force_donation_categories": [],
+            "min_margin_for_discount": 5.0,
+            "donation_weight_multiplier": 1.0,
+            "social_impact_weight": 0.15
+        }
+    )
     critical_threshold: Column[NUMERIC] = Column(NUMERIC(3, 2), default=0.80)
     warning_threshold: Column[NUMERIC] = Column(NUMERIC(3, 2), default=0.60)
     opening_hours = Column(

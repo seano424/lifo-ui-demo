@@ -9,7 +9,7 @@ from typing import Any
 
 import structlog
 from pydantic import BaseModel, Field
-from sqlalchemy import and_, desc, select
+from sqlalchemy import and_, desc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.connection import async_session
@@ -31,10 +31,16 @@ class BatchFromScanRequest(BaseModel):
     )
     brand: str | None = Field(None, max_length=100, description="Product brand")
     category: str | None = Field(None, max_length=100, description="Product category")
+    
+    # CSV imports provide SKU - add this field for proper handling
+    sku: str | None = Field(None, max_length=100, description="Product SKU from CSV import")
 
     # Batch details
     quantity: float = Field(..., gt=0, description="Initial quantity")
     expiry_date: date = Field(..., description="Product expiry date")
+    batch_number: str | None = Field(
+        None, max_length=100, description="Optional batch number from CSV or user input"
+    )
 
     # Pricing (optional)
     cost_price: float | None = Field(None, ge=0, description="Cost price per unit")
@@ -101,8 +107,12 @@ class BatchCreationService:
                     session, store_id, user_id, batch_data
                 )
 
-                # 2. Generate unique batch number
-                batch_number = await self._generate_batch_number(session, store_id)
+                # 2. Use provided batch number or generate unique one
+                batch_number = (
+                    batch_data.batch_number
+                    if batch_data.batch_number
+                    else await self._generate_batch_number(session, store_id)
+                )
 
                 # 3. Create batch using existing schema
                 batch_id = await self._create_batch_record(
@@ -180,9 +190,17 @@ class BatchCreationService:
 
             return existing_product.product_id, False, was_updated  # type: ignore[return-value]
 
-        # Create new product
+        # Find or create category if provided
+        if batch_data.category:
+            await self._find_or_create_category(
+                session, batch_data.category, user_id
+            )
+
+        # Create new product - use provided SKU or generate one
+        product_sku = batch_data.sku if batch_data.sku else f"SCAN-{batch_data.barcode}"
+        
         new_product = Product(
-            sku=f"SCAN-{batch_data.barcode}",
+            sku=product_sku,
             name=batch_data.product_name,
             category_id=await self._resolve_category_to_uuid(
                 session, batch_data.category, "dry_goods"
@@ -214,8 +232,57 @@ class BatchCreationService:
             added_by=uuid.UUID(user_id),
         )
         session.add(store_product)
+        await session.flush()  # Ensure store_product exists before batch creation
 
         return new_product.product_id, True, False  # type: ignore[return-value]
+
+    async def _find_or_create_category(
+        self, session: AsyncSession, category_name: str, user_id: str
+    ) -> uuid.UUID:
+        """Find existing category by name or create a new one"""
+        from app.database.inventory_models import Category
+
+        # First, try to find existing category by display name
+        result = await session.execute(
+            select(Category).where(Category.display_name_en == category_name)
+        )
+        existing_category = result.scalar_one_or_none()
+
+        if existing_category:
+            return existing_category.category_id  # type: ignore[return-value]
+
+        # Create new category
+        category_code = (
+            category_name.lower()
+            .replace(" ", "_")
+            .replace("-", "_")
+            .replace("&", "and")
+            [:50]  # Limit to 50 characters
+        )
+
+        # Ensure category code is unique
+        counter = 1
+        original_code = category_code
+        while True:
+            result = await session.execute(
+                select(Category).where(Category.category_code == category_code)
+            )
+            if not result.scalar_one_or_none():
+                break
+            category_code = f"{original_code}_{counter}"
+            counter += 1
+
+        new_category = Category(
+            category_code=category_code,
+            display_name_en=category_name,
+            display_name_fr=category_name,  # Use same name for French
+            typical_shelf_life_days=30,  # Default shelf life
+            is_active=True,
+        )
+        session.add(new_category)
+        await session.flush()
+
+        return new_category.category_id  # type: ignore[return-value]
 
     async def _generate_batch_number(self, session: AsyncSession, store_id: str) -> str:
         """Generate unique batch number for the store"""
@@ -274,6 +341,326 @@ class BatchCreationService:
         await session.flush()
 
         return batch.batch_id  # type: ignore[return-value]
+
+    # PERFORMANCE OPTIMIZATION: Bulk database operations
+    async def _bulk_lookup_products(
+        self, session: AsyncSession, store_id: str, barcodes: list[str]
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
+        """
+        Bulk lookup products by barcodes for a specific store
+        Returns dict mapping barcode -> (product_id, exists_in_store)
+        """
+        from app.database.inventory_models import Product, StoreProduct
+
+        # Remove duplicates and empty barcodes
+        unique_barcodes = list({b for b in barcodes if b and b.strip()})
+
+        if not unique_barcodes:
+            return {}
+
+        # Bulk query for existing products
+        result = await session.execute(
+            select(Product.barcode, Product.product_id, StoreProduct.store_id)
+            .join(StoreProduct, Product.product_id == StoreProduct.product_id, isouter=True)
+            .where(
+                and_(
+                    Product.barcode.in_(unique_barcodes),
+                    or_(
+                        StoreProduct.store_id.is_(None),  # Product exists but not in this store
+                        and_(
+                            StoreProduct.store_id == store_id,
+                            StoreProduct.is_active
+                        )
+                    )
+                )
+            )
+        )
+
+        existing_products = {}
+        for row in result:
+            barcode, product_id, store_id_result = row
+            exists_in_store = store_id_result == store_id
+            existing_products[barcode] = (product_id, exists_in_store)
+
+        logger.info(
+            "Bulk product lookup completed",
+            requested_barcodes=len(unique_barcodes),
+            found_products=len(existing_products),
+            store_id=store_id,
+        )
+
+        return existing_products
+
+    async def _bulk_create_missing_products(
+        self,
+        session: AsyncSession,
+        batch_requests: list[BatchFromScanRequest],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+        store_id: str,
+        user_id: str,
+    ) -> dict[str, uuid.UUID]:
+        """
+        Bulk create products that don't exist yet
+        Returns dict mapping barcode -> product_id for newly created products
+        """
+
+        from app.database.inventory_models import Product, StoreProduct
+
+        new_products = {}
+        products_to_create = []
+        store_products_to_create = []
+
+        for request in batch_requests:
+            barcode = request.barcode
+
+            # Skip if product already exists
+            if barcode in existing_products:
+                product_id, exists_in_store = existing_products[barcode]
+
+                # If product exists but not in store, add to store
+                if not exists_in_store:
+                    store_product = StoreProduct(
+                        store_id=uuid.UUID(store_id),
+                        product_id=product_id,
+                        cost_price=request.cost_price or 0,
+                        selling_price=request.selling_price or 0,
+                        is_active=True,
+                        added_by=uuid.UUID(user_id),
+                        updated_by=uuid.UUID(user_id),
+                    )
+                    store_products_to_create.append(store_product)
+                continue
+
+            # Create new product
+            product_id = uuid.uuid4()
+            new_products[barcode] = product_id
+
+            # Estimate shelf life from category
+            category_shelf_life = {
+                "fresh_produce": 7,
+                "fresh_meat_fish": 3,
+                "bakery_fresh": 2,
+                "dairy_eggs": 14,
+                "frozen_foods": 365,
+                "beverages": 180,
+            }
+            shelf_life = category_shelf_life.get(request.category or "other", 30)
+
+            # Use provided SKU from CSV or generate unique one
+            if hasattr(request, 'sku') and request.sku:
+                product_sku = request.sku
+            else:
+                # Generate unique SKU for products without SKU
+                import uuid as uuid_lib
+                product_sku = f"CSV_{barcode[:10]}_{uuid_lib.uuid4().hex[:8].upper()}"
+            
+            product = Product(
+                product_id=product_id,
+                sku=product_sku,  # Use provided SKU or generated unique one
+                name=request.product_name,
+                brand=request.brand,
+                barcode=barcode,
+                barcode_type="CSV_IMPORT",
+                typical_shelf_life_days=shelf_life,
+                base_cost_price=request.cost_price or 0,
+                base_selling_price=request.selling_price or 0,
+                created_by=uuid.UUID(user_id),
+                is_verified=True,  # CSV imports are considered verified
+            )
+            products_to_create.append(product)
+
+            # Create corresponding store product
+            store_product = StoreProduct(
+                store_id=uuid.UUID(store_id),
+                product_id=product_id,
+                cost_price=request.cost_price or 0,
+                selling_price=request.selling_price or 0,
+                is_active=True,
+                added_by=uuid.UUID(user_id),
+                updated_by=uuid.UUID(user_id),
+            )
+            store_products_to_create.append(store_product)
+
+        # Bulk insert new products
+        if products_to_create:
+            session.add_all(products_to_create)
+            logger.info("Bulk created products", count=len(products_to_create))
+
+        # Bulk insert store products
+        if store_products_to_create:
+            session.add_all(store_products_to_create)
+            logger.info("Bulk created store products", count=len(store_products_to_create))
+
+        await session.flush()
+        return new_products
+
+    async def _bulk_create_batches(
+        self,
+        session: AsyncSession,
+        batch_requests: list[BatchFromScanRequest],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+        new_products: dict[str, uuid.UUID],
+        store_id: str,
+        user_id: str,
+        chunk_start: int,
+    ) -> list[dict[str, Any]]:
+        """
+        Bulk create batch records for all requests
+        Returns list of successful batch records
+        """
+        from app.database.inventory_models import Batch
+
+        batches_to_create = []
+        successful_batches = []
+
+        for i, request in enumerate(batch_requests):
+            try:
+                # Get product ID
+                if request.barcode in existing_products:
+                    product_id, _ = existing_products[request.barcode]
+                elif request.barcode in new_products:
+                    product_id = new_products[request.barcode]
+                else:
+                    logger.error(
+                        "Product ID not found for barcode",
+                        barcode=request.barcode,
+                        chunk_start=chunk_start,
+                        index=i,
+                    )
+                    continue
+
+                # Use provided batch number or generate one
+                if request.batch_number:
+                    batch_number = request.batch_number
+                else:
+                    batch_number = await self._generate_csv_batch_number(
+                        session, store_id, chunk_start, i
+                    )
+
+                # Calculate manufacture date
+                manufacture_date = request.expiry_date - timedelta(days=30)
+
+                batch = Batch(
+                    product_id=product_id,
+                    batch_number=batch_number,
+                    initial_quantity=request.quantity,
+                    current_quantity=request.quantity,
+                    manufacture_date=manufacture_date,
+                    expiry_date=request.expiry_date,
+                    cost_price=request.cost_price or 0,
+                    selling_price=request.selling_price or 0,
+                    batch_source="csv_import",
+                    scanned_barcode=request.barcode,
+                    scan_confidence=1.0,
+                    verification_status="verified",
+                    store_id=uuid.UUID(store_id),
+                    created_by=uuid.UUID(user_id),
+                    status="active",
+                )
+
+                batches_to_create.append(batch)
+
+                # Prepare success record
+                successful_batches.append({
+                    "batch_id": str(batch.batch_id),
+                    "product_id": str(product_id),
+                    "batch_number": batch_number,
+                    "barcode": request.barcode,
+                    "product_name": request.product_name,
+                    "quantity": request.quantity,
+                    "expiry_date": request.expiry_date.isoformat(),
+                })
+
+            except Exception as e:
+                logger.error(
+                    "Failed to prepare batch for bulk creation",
+                    barcode=request.barcode,
+                    error=str(e),
+                    chunk_start=chunk_start,
+                    index=i,
+                )
+                continue
+
+        # Bulk insert all batches
+        if batches_to_create:
+            session.add_all(batches_to_create)
+            logger.info("Bulk created batches", count=len(batches_to_create))
+
+        await session.flush()
+        return successful_batches
+
+    async def _process_batch_chunk_optimized(
+        self,
+        store_id: str,
+        user_id: str,
+        chunk_requests: list[BatchFromScanRequest],
+        chunk_start: int,
+    ) -> dict[str, list]:
+        """
+        OPTIMIZED: Process a chunk of batch requests using bulk operations
+        Replaces individual database calls with bulk operations for better performance
+        """
+        async with self.async_session() as session:
+            try:
+                # Validate all requests first
+                for i, request in enumerate(chunk_requests):
+                    self._validate_batch_request(request, chunk_start + i)
+
+                # Step 1: Bulk lookup existing products
+                barcodes = [req.barcode for req in chunk_requests]
+                existing_products = await self._bulk_lookup_products(session, store_id, barcodes)
+
+                # Step 2: Bulk create missing products
+                new_products = await self._bulk_create_missing_products(
+                    session, chunk_requests, existing_products, store_id, user_id
+                )
+
+                # Step 3: Bulk create all batches
+                successful_batches = await self._bulk_create_batches(
+                    session, chunk_requests, existing_products, new_products, store_id, user_id, chunk_start
+                )
+
+                # Commit all changes
+                await session.commit()
+
+                logger.info(
+                    "Optimized chunk processing completed",
+                    chunk_start=chunk_start,
+                    total_requests=len(chunk_requests),
+                    successful_batches=len(successful_batches),
+                    created_products=len(new_products),
+                )
+
+                return {
+                    "successful": successful_batches,
+                    "failed": [],
+                    "created_products": list(new_products.values()),
+                    "updated_products": [],
+                }
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(
+                    "Optimized chunk processing failed",
+                    chunk_start=chunk_start,
+                    error=str(e),
+                )
+                # Return all as failed
+                failed_batches = []
+                for i, request in enumerate(chunk_requests):
+                    failed_batches.append({
+                        "index": chunk_start + i,
+                        "barcode": request.barcode,
+                        "product_name": request.product_name,
+                        "error": f"Bulk processing failed: {str(e)}",
+                    })
+
+                return {
+                    "successful": [],
+                    "failed": failed_batches,
+                    "created_products": [],
+                    "updated_products": [],
+                }
 
     async def get_recent_batches_from_scans(
         self, store_id: str, user_id: str, limit: int = 20
@@ -361,7 +748,7 @@ class BatchCreationService:
             chunk_requests = batch_requests[chunk_start:chunk_end]
 
             try:
-                chunk_results = await self._process_batch_chunk(
+                chunk_results = await self._process_batch_chunk_optimized(
                     store_id, user_id, chunk_requests, chunk_start
                 )
 
@@ -472,10 +859,23 @@ class BatchCreationService:
                         elif was_updated:
                             updated_products.append(str(product_id))
 
-                        # Generate batch number
-                        batch_number = await self._generate_csv_batch_number(
-                            session, store_id, chunk_start, i
-                        )
+                        # Use provided batch number or generate one
+                        if batch_request.batch_number:
+                            batch_number = batch_request.batch_number
+                            logger.info(
+                                "Using provided batch number from CSV",
+                                barcode=batch_request.barcode,
+                                provided_batch_number=batch_number,
+                            )
+                        else:
+                            batch_number = await self._generate_csv_batch_number(
+                                session, store_id, chunk_start, i
+                            )
+                            logger.info(
+                                "Generated CSV batch number",
+                                barcode=batch_request.barcode,
+                                generated_batch_number=batch_number,
+                            )
 
                         # Create batch record
                         batch_id = await self._create_csv_batch_record(
@@ -601,6 +1001,326 @@ class BatchCreationService:
         await session.flush()
 
         return batch.batch_id  # type: ignore[return-value]
+
+    # PERFORMANCE OPTIMIZATION: Bulk database operations
+    async def _bulk_lookup_products(
+        self, session: AsyncSession, store_id: str, barcodes: list[str]
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
+        """
+        Bulk lookup products by barcodes for a specific store
+        Returns dict mapping barcode -> (product_id, exists_in_store)
+        """
+        from app.database.inventory_models import Product, StoreProduct
+
+        # Remove duplicates and empty barcodes
+        unique_barcodes = list({b for b in barcodes if b and b.strip()})
+
+        if not unique_barcodes:
+            return {}
+
+        # Bulk query for existing products
+        result = await session.execute(
+            select(Product.barcode, Product.product_id, StoreProduct.store_id)
+            .join(StoreProduct, Product.product_id == StoreProduct.product_id, isouter=True)
+            .where(
+                and_(
+                    Product.barcode.in_(unique_barcodes),
+                    or_(
+                        StoreProduct.store_id.is_(None),  # Product exists but not in this store
+                        and_(
+                            StoreProduct.store_id == store_id,
+                            StoreProduct.is_active
+                        )
+                    )
+                )
+            )
+        )
+
+        existing_products = {}
+        for row in result:
+            barcode, product_id, store_id_result = row
+            exists_in_store = store_id_result == store_id
+            existing_products[barcode] = (product_id, exists_in_store)
+
+        logger.info(
+            "Bulk product lookup completed",
+            requested_barcodes=len(unique_barcodes),
+            found_products=len(existing_products),
+            store_id=store_id,
+        )
+
+        return existing_products
+
+    async def _bulk_create_missing_products(
+        self,
+        session: AsyncSession,
+        batch_requests: list[BatchFromScanRequest],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+        store_id: str,
+        user_id: str,
+    ) -> dict[str, uuid.UUID]:
+        """
+        Bulk create products that don't exist yet
+        Returns dict mapping barcode -> product_id for newly created products
+        """
+
+        from app.database.inventory_models import Product, StoreProduct
+
+        new_products = {}
+        products_to_create = []
+        store_products_to_create = []
+
+        for request in batch_requests:
+            barcode = request.barcode
+
+            # Skip if product already exists
+            if barcode in existing_products:
+                product_id, exists_in_store = existing_products[barcode]
+
+                # If product exists but not in store, add to store
+                if not exists_in_store:
+                    store_product = StoreProduct(
+                        store_id=uuid.UUID(store_id),
+                        product_id=product_id,
+                        cost_price=request.cost_price or 0,
+                        selling_price=request.selling_price or 0,
+                        is_active=True,
+                        added_by=uuid.UUID(user_id),
+                        updated_by=uuid.UUID(user_id),
+                    )
+                    store_products_to_create.append(store_product)
+                continue
+
+            # Create new product
+            product_id = uuid.uuid4()
+            new_products[barcode] = product_id
+
+            # Estimate shelf life from category
+            category_shelf_life = {
+                "fresh_produce": 7,
+                "fresh_meat_fish": 3,
+                "bakery_fresh": 2,
+                "dairy_eggs": 14,
+                "frozen_foods": 365,
+                "beverages": 180,
+            }
+            shelf_life = category_shelf_life.get(request.category or "other", 30)
+
+            # Use provided SKU from CSV or generate unique one
+            if hasattr(request, 'sku') and request.sku:
+                product_sku = request.sku
+            else:
+                # Generate unique SKU for products without SKU
+                import uuid as uuid_lib
+                product_sku = f"CSV_{barcode[:10]}_{uuid_lib.uuid4().hex[:8].upper()}"
+            
+            product = Product(
+                product_id=product_id,
+                sku=product_sku,  # Use provided SKU or generated unique one
+                name=request.product_name,
+                brand=request.brand,
+                barcode=barcode,
+                barcode_type="CSV_IMPORT",
+                typical_shelf_life_days=shelf_life,
+                base_cost_price=request.cost_price or 0,
+                base_selling_price=request.selling_price or 0,
+                created_by=uuid.UUID(user_id),
+                is_verified=True,  # CSV imports are considered verified
+            )
+            products_to_create.append(product)
+
+            # Create corresponding store product
+            store_product = StoreProduct(
+                store_id=uuid.UUID(store_id),
+                product_id=product_id,
+                cost_price=request.cost_price or 0,
+                selling_price=request.selling_price or 0,
+                is_active=True,
+                added_by=uuid.UUID(user_id),
+                updated_by=uuid.UUID(user_id),
+            )
+            store_products_to_create.append(store_product)
+
+        # Bulk insert new products
+        if products_to_create:
+            session.add_all(products_to_create)
+            logger.info("Bulk created products", count=len(products_to_create))
+
+        # Bulk insert store products
+        if store_products_to_create:
+            session.add_all(store_products_to_create)
+            logger.info("Bulk created store products", count=len(store_products_to_create))
+
+        await session.flush()
+        return new_products
+
+    async def _bulk_create_batches(
+        self,
+        session: AsyncSession,
+        batch_requests: list[BatchFromScanRequest],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+        new_products: dict[str, uuid.UUID],
+        store_id: str,
+        user_id: str,
+        chunk_start: int,
+    ) -> list[dict[str, Any]]:
+        """
+        Bulk create batch records for all requests
+        Returns list of successful batch records
+        """
+        from app.database.inventory_models import Batch
+
+        batches_to_create = []
+        successful_batches = []
+
+        for i, request in enumerate(batch_requests):
+            try:
+                # Get product ID
+                if request.barcode in existing_products:
+                    product_id, _ = existing_products[request.barcode]
+                elif request.barcode in new_products:
+                    product_id = new_products[request.barcode]
+                else:
+                    logger.error(
+                        "Product ID not found for barcode",
+                        barcode=request.barcode,
+                        chunk_start=chunk_start,
+                        index=i,
+                    )
+                    continue
+
+                # Use provided batch number or generate one
+                if request.batch_number:
+                    batch_number = request.batch_number
+                else:
+                    batch_number = await self._generate_csv_batch_number(
+                        session, store_id, chunk_start, i
+                    )
+
+                # Calculate manufacture date
+                manufacture_date = request.expiry_date - timedelta(days=30)
+
+                batch = Batch(
+                    product_id=product_id,
+                    batch_number=batch_number,
+                    initial_quantity=request.quantity,
+                    current_quantity=request.quantity,
+                    manufacture_date=manufacture_date,
+                    expiry_date=request.expiry_date,
+                    cost_price=request.cost_price or 0,
+                    selling_price=request.selling_price or 0,
+                    batch_source="csv_import",
+                    scanned_barcode=request.barcode,
+                    scan_confidence=1.0,
+                    verification_status="verified",
+                    store_id=uuid.UUID(store_id),
+                    created_by=uuid.UUID(user_id),
+                    status="active",
+                )
+
+                batches_to_create.append(batch)
+
+                # Prepare success record
+                successful_batches.append({
+                    "batch_id": str(batch.batch_id),
+                    "product_id": str(product_id),
+                    "batch_number": batch_number,
+                    "barcode": request.barcode,
+                    "product_name": request.product_name,
+                    "quantity": request.quantity,
+                    "expiry_date": request.expiry_date.isoformat(),
+                })
+
+            except Exception as e:
+                logger.error(
+                    "Failed to prepare batch for bulk creation",
+                    barcode=request.barcode,
+                    error=str(e),
+                    chunk_start=chunk_start,
+                    index=i,
+                )
+                continue
+
+        # Bulk insert all batches
+        if batches_to_create:
+            session.add_all(batches_to_create)
+            logger.info("Bulk created batches", count=len(batches_to_create))
+
+        await session.flush()
+        return successful_batches
+
+    async def _process_batch_chunk_optimized(
+        self,
+        store_id: str,
+        user_id: str,
+        chunk_requests: list[BatchFromScanRequest],
+        chunk_start: int,
+    ) -> dict[str, list]:
+        """
+        OPTIMIZED: Process a chunk of batch requests using bulk operations
+        Replaces individual database calls with bulk operations for better performance
+        """
+        async with self.async_session() as session:
+            try:
+                # Validate all requests first
+                for i, request in enumerate(chunk_requests):
+                    self._validate_batch_request(request, chunk_start + i)
+
+                # Step 1: Bulk lookup existing products
+                barcodes = [req.barcode for req in chunk_requests]
+                existing_products = await self._bulk_lookup_products(session, store_id, barcodes)
+
+                # Step 2: Bulk create missing products
+                new_products = await self._bulk_create_missing_products(
+                    session, chunk_requests, existing_products, store_id, user_id
+                )
+
+                # Step 3: Bulk create all batches
+                successful_batches = await self._bulk_create_batches(
+                    session, chunk_requests, existing_products, new_products, store_id, user_id, chunk_start
+                )
+
+                # Commit all changes
+                await session.commit()
+
+                logger.info(
+                    "Optimized chunk processing completed",
+                    chunk_start=chunk_start,
+                    total_requests=len(chunk_requests),
+                    successful_batches=len(successful_batches),
+                    created_products=len(new_products),
+                )
+
+                return {
+                    "successful": successful_batches,
+                    "failed": [],
+                    "created_products": list(new_products.values()),
+                    "updated_products": [],
+                }
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(
+                    "Optimized chunk processing failed",
+                    chunk_start=chunk_start,
+                    error=str(e),
+                )
+                # Return all as failed
+                failed_batches = []
+                for i, request in enumerate(chunk_requests):
+                    failed_batches.append({
+                        "index": chunk_start + i,
+                        "barcode": request.barcode,
+                        "product_name": request.product_name,
+                        "error": f"Bulk processing failed: {str(e)}",
+                    })
+
+                return {
+                    "successful": [],
+                    "failed": failed_batches,
+                    "created_products": [],
+                    "updated_products": [],
+                }
 
     async def _resolve_category_to_uuid(
         self,

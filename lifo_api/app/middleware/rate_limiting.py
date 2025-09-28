@@ -92,9 +92,14 @@ def analytics_rate_limit(rate: str = "40/minute"):
 # Advanced rate limiting for different user types
 def get_user_rate_limit_key(request: Request) -> str:
     """Get rate limit key based on user authentication"""
-    # Try to get user ID from JWT token
+    # Try to get user ID from JWT token (case-insensitive)
     try:
-        auth_header = request.headers.get("authorization", "")
+        auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
+
+        # Ensure header is a string (handle potential bytes issues)
+        if isinstance(auth_header, bytes):
+            auth_header = auth_header.decode('utf-8')
+
         if auth_header.startswith("Bearer "):
             # In production, would decode JWT to get user ID
             # For now, use IP + user agent combination

@@ -1,4 +1,0 @@
-Sku,name,Category,qty,expiry,Brand,costprice,price,Location,unit_type
-MIX-001,Red Peppers,fresh_produce,60,2025-08-24,VeggieFarm,1.20,2.40,PRODUCE,kg
-MIX-002,Cheddar Cheese,dairy,35,2025-09-05,CheeseMasters,2.50,4.99,FRIDGE,pcs
-MIX-003,Croissants,bakery_fresh,24,2025-08-16,ParisianBakery,0.75,1.50,BAKERY,pcs

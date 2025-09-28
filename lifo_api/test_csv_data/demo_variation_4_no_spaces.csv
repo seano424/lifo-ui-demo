@@ -1,4 +1,0 @@
-sku,productname,category,quantity,expirydate,brand,costprice,sellingprice,locationcode,unittype
-NOSPACE-001,BlueberryMuffins,bakery_fresh,12,2025-08-19,MuffinHouse,1.30,2.75,BAKERY,pcs
-NOSPACE-002,LowFatMilk,dairy,45,2025-08-21,HealthyDairy,0.95,1.85,FRIDGE,liter
-NOSPACE-003,ChocolateChipCookies,bakery_fresh,36,2025-08-30,SweetTreats,0.60,1.25,BAKERY,pcs

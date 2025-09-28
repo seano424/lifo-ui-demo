@@ -1,0 +1,98 @@
+# BACKUP: Alternative app.yaml configuration from lifo_api/.do/app.yaml
+# This was the configuration found in the duplicate directory before consolidation
+# Digital Ocean App Platform Configuration for LIFO API
+# Multi-store deployment specification
+
+name: lifo-api
+services:
+- name: api
+  source_dir: /
+  github:
+    repo: lifo-ai/lifo-app  # Correct repository
+    branch: main
+    deploy_on_push: true
+
+  # Docker configuration
+  dockerfile_path: Dockerfile
+
+  # Instance configuration for 5-10 stores
+  instance_count: 1
+  instance_size_slug: professional-s  # 1 vCPU, 2GB RAM
+
+  # Environment variables
+  envs:
+  - key: ENVIRONMENT
+    value: production
+  - key: DATABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: SUPABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: SUPABASE_ANON_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: SUPABASE_SERVICE_ROLE_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: JWT_SECRET_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: GOOGLE_CLOUD_VISION_CREDENTIALS
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: OPENAI_API_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: MCP_SERVER_URL
+    value: "http://localhost:3000"
+  - key: ENABLE_PERFORMANCE_MONITORING
+    value: "true"
+  - key: RATE_LIMIT_ENABLED
+    value: "true"
+  - key: RATE_LIMIT_REQUESTS_PER_MINUTE
+    value: "60"
+
+  # Health check
+  health_check:
+    http_path: /api/v1/health
+    initial_delay_seconds: 10
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+
+  # HTTP configuration
+  http_port: 8000
+  routes:
+  - path: /
+
+  # Auto-scaling for multi-store load
+  autoscaling:
+    min_instance_count: 1
+    max_instance_count: 3
+    metrics:
+    - type: cpu
+      target: 70
+    - type: memory
+      target: 80
+
+# Database (if not using external Supabase)
+databases:
+- name: lifo-db
+  engine: PG
+  version: "14"
+  size_slug: db-s-1vcpu-1gb  # Start small, can scale up
+  num_nodes: 1
+
+# Domain configuration
+domains:
+- domain: lifo-app.com  # Update with your actual production domain
+  type: PRIMARY
+
+# Static assets (if needed)
+static_sites:
+- name: docs
+  source_dir: /docs
+  routes:
+  - path: /docs

@@ -1,6 +1,7 @@
 """
 CSV to Batch Adapter Utility
 Converts CSV processed data to BatchFromScanRequest format for batch creation
+UPDATED: Now uses unified CSV services to eliminate duplicate code
 """
 
 from datetime import date, datetime, timedelta
@@ -16,7 +17,7 @@ logger = structlog.get_logger()
 class CSVToBatchAdapter:
     """
     Utility class to convert CSV processed data to batch creation requests
-    Bridges the gap between CSV upload processing and batch creation service
+    Updated to use unified CSV services for consistency
     """
 
     @staticmethod
@@ -86,6 +87,8 @@ class CSVToBatchAdapter:
             quantity = float(row.get("quantity", 0))
             expiry_date_str = row.get("expiry_date", "")
 
+            from app.services.batch_creation_service import BatchFromScanRequest
+
             # Validate required fields
             if not sku:
                 raise ValueError(f"Row {row_index}: SKU is required")
@@ -107,6 +110,17 @@ class CSVToBatchAdapter:
                 or row.get("category", "").strip()
                 or None
             )
+            batch_number = row.get("batch_number", "").strip() or None
+
+            # Debug logging for batch number extraction
+            logger.info(
+                "CSV row processing",
+                row_index=row_index,
+                sku=sku,
+                product_name=product_name,
+                raw_batch_number=row.get("batch_number"),
+                processed_batch_number=batch_number,
+            )
 
             # Parse prices
             cost_price = CSVToBatchAdapter._parse_float(
@@ -120,21 +134,26 @@ class CSVToBatchAdapter:
             # Generate a proper barcode if SKU is not barcode-like
             barcode = CSVToBatchAdapter._generate_barcode_from_sku(sku)
 
-            # Create batch request
-            batch_request = BatchFromScanRequest(
-                barcode=barcode,
-                product_name=product_name,
-                brand=brand,
-                category=category,
-                quantity=quantity,
-                expiry_date=expiry_date,
-                cost_price=cost_price,
-                selling_price=selling_price,
-                scan_confidence=1.0,  # CSV data is considered 100% confident
-                ocr_extracted_date=None,  # No OCR for CSV data
-                ocr_confidence=None,
-                openfoodfacts_data=None,  # Could be enhanced later
-            )
+            # Create batch request using the Pydantic model
+            batch_data = {
+                "barcode": barcode,
+                "product_name": product_name,
+                "brand": brand,
+                "category": category,
+                "quantity": quantity,
+                "expiry_date": expiry_date,
+                "batch_number": batch_number,  # Use provided batch number from CSV
+                "cost_price": cost_price if cost_price is not None else None,
+                "selling_price": selling_price if selling_price is not None else None,
+                "scan_confidence": 1.0,  # CSV data is considered 100% confident
+                "ocr_extracted_date": None,  # No OCR for CSV data
+                "ocr_confidence": None,
+                "openfoodfacts_data": None,  # Could be enhanced later
+                "sku": sku,  # Pass the original SKU from CSV
+            }
+            # Create BatchFromScanRequest for validation, then convert back to dict
+            # Create BatchFromScanRequest instance
+            batch_request = BatchFromScanRequest(**batch_data)
 
             return batch_request
 
@@ -184,20 +203,14 @@ class CSVToBatchAdapter:
     @staticmethod
     def _generate_barcode_from_sku(sku: str) -> str:
         """
-        Generate a barcode from SKU for CSV imports
-        If SKU looks like a barcode (8+ digits), use it directly
-        Otherwise, generate a unique barcode
+        Generate a unique barcode from SKU for CSV imports
+        Always generate a hash-based barcode to ensure uniqueness
         """
         # Clean SKU
         clean_sku = sku.strip().upper()
 
-        # If SKU is already barcode-like (8+ characters, mostly numeric)
-        if (
-            len(clean_sku) >= 8
-            and clean_sku.replace("-", "").replace("_", "").isalnum()
-        ):
-            # Use first 13 characters to fit EAN-13 format
-            return clean_sku[:13]
+        # Always generate hash-based barcode to prevent collisions
+        # Even if SKU looks barcode-like, truncation can cause duplicates
 
         # Generate a barcode from SKU hash
         # Use a predictable hash so same SKU always gets same barcode

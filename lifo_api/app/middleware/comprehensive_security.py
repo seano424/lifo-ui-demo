@@ -40,6 +40,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             "/openapi.json",
             "/favicon.ico",
             "/robots.txt",
+            "/api/v1/test"
         }
 
         # High-security endpoints requiring extra validation
@@ -238,7 +239,11 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
         # Check for required headers on certain endpoints
         if request.method in ["POST", "PUT", "PATCH"]:
             content_type = request.headers.get("content-type", "")
-            if not content_type and request.url.path.startswith("/api/"):
+            # Only require Content-Type for endpoints that actually need a request body
+            # Scoring endpoints use query parameters, not request body
+            if (not content_type and
+                request.url.path.startswith("/api/") and
+                not request.url.path.startswith("/api/v1/scoring/")):
                 validation_result["valid"] = False
                 validation_result["details"]["missing_content_type"] = True
 
@@ -313,8 +318,13 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
 
             # Additional authentication checks for admin endpoints
             if "/admin" in request.url.path:
-                # Require additional authentication headers
-                auth_header = request.headers.get("authorization", "")
+                # Require additional authentication headers (case-insensitive)
+                auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
+
+                # Ensure header is a string (handle potential bytes issues)
+                if isinstance(auth_header, bytes):
+                    auth_header = auth_header.decode('utf-8')
+
                 if not auth_header.startswith("Bearer "):
                     return False
 
@@ -427,6 +437,9 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                     "category",
                     "store_id",
                     "days",
+                    "force_recalculate",
+                    "save_to_database",
+                    "include_donation_rationale",
                 ],
                 "analytics": ["store_id", "days", "metric", "timeframe"],
                 "general": ["page", "limit", "offset", "sort", "order", "filter"],
@@ -495,6 +508,10 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                     return True
                 except ValueError:
                     return False
+
+            elif param_name in ["force_recalculate", "save_to_database", "include_donation_rationale"]:
+                # Boolean parameters
+                return value.lower() in ["true", "false", "1", "0"]
 
             elif param_name in [
                 "urgency",

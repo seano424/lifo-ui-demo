@@ -1,4 +1,0 @@
-sku,name,category,quantity,expiry,brand,costprice,price,location,unit_type
-ALIAS-001,Premium Steaks,fresh_meat_fish,8,2025-08-17,PrimeMeats,12.50,24.99,MEAT,pcs
-ALIAS-002,Fresh Salmon,fresh_meat_fish,12,2025-08-16,OceanFresh,8.75,16.50,FISH,kg
-ALIAS-003,Energy Drinks,beverages,48,2025-12-31,PowerBoost,1.10,2.50,DRINKS,pcs

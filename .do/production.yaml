@@ -1,0 +1,142 @@
+# Digital Ocean App Platform Configuration for LIFO AI FastAPI Backend - PRODUCTION
+# Deploy: doctl apps create --spec .do/production.yaml
+# Update: doctl apps update <production_app_id> --spec .do/production.yaml
+
+name: lifo-ai-api
+region: ams3
+
+services:
+- name: fastapi-backend
+  source_dir: lifo_api
+  github:
+    repo: lifo-ai/lifo-app 
+    branch: main  # Deploy from main branch
+    deploy_on_push: true
+  
+  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
+  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
+
+  
+  # Run command for production (optimized)
+  run_command: gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 1000 --preload app.main:app
+  
+  # Resource allocation (production optimized)
+  instance_count: 1
+  instance_size_slug: professional-xs  # Better resources for production
+  
+  # Health check
+  health_check:
+    http_path: /api/v1/health
+    initial_delay_seconds: 30
+    period_seconds: 10
+    timeout_seconds: 5
+    failure_threshold: 3
+    success_threshold: 1
+  
+  # Environment variables for production
+  envs:
+  # Application settings
+  - key: ENVIRONMENT
+    value: production
+    type: SECRET
+  
+  # Database configuration (production database)
+  - key: DATABASE_URL
+    value: ""  # Set to production database URL in DO console
+    type: SECRET
+  
+  - key: SUPABASE_URL
+    value: ""  # Production Supabase project
+    type: SECRET
+    
+  - key: SUPABASE_ANON_KEY
+    value: ""  # Production keys
+    type: SECRET
+  
+  - key: SUPABASE_SERVICE_ROLE_KEY
+    value: ""  # Production keys
+    type: SECRET
+  
+  # Security (strong production secret)
+  - key: SECRET_KEY
+    value: ""  # Strong secret key for production
+    type: SECRET
+  
+  - key: ALGORITHM
+    value: HS256
+    
+  - key: ACCESS_TOKEN_EXPIRE_MINUTES
+    value: "1440"  # 24 hours for production
+  
+  # API Configuration
+  - key: API_V1_STR
+    value: /api/v1
+    
+  - key: PROJECT_NAME
+    value: "LIFO AI API"
+  
+  # CORS settings for production (restrictive)
+  - key: BACKEND_CORS_ORIGINS
+    value: "https://lifo-app.com,https://www.lifo-app.com"  # Only production domains
+  
+  # Production settings
+  - key: DEBUG
+    value: "false"
+    
+  - key: LOG_LEVEL
+    value: INFO
+  
+  # Performance settings (optimized for production)
+  - key: WORKERS
+    value: "2"  # Production workers
+    
+  - key: MAX_WORKERS
+    value: "4"
+
+  # Performance monitoring
+  - key: ENABLE_PERFORMANCE_MONITORING
+    value: "true"
+    
+  - key: RATE_LIMIT_ENABLED
+    value: "true"
+
+  # HTTP settings
+  http_port: 8080
+  
+  # Routes - production API endpoints
+  # Let FastAPI handle all routing internally (no path stripping)
+  routes:
+  - path: /            # Forward all paths to FastAPI without modification
+
+# Production database (optional - if not using Supabase)
+databases:
+- name: lifo-postgres-production
+  engine: PG
+  version: "15"
+  size: db-s-1vcpu-2gb  # Larger than staging for production load
+  num_nodes: 1
+
+# Production jobs
+# jobs: # Database migrations handled by Supabase, not Alembic
+# - name: db-migrate-production
+  source_dir: lifo_api
+  github:
+    repo: lifo-ai/lifo-app
+    branch: main
+    deploy_on_push: true
+  # run_command: alembic upgrade head # Not needed for Supabase
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  kind: PRE_DEPLOY  # Runs before deployment
+
+# Production monitoring and alerts
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DEPLOYMENT_LIVE  
+- rule: DOMAIN_FAILED
+- rule: CPU_UTILIZATION
+  value: 80
+- rule: MEM_UTILIZATION  
+  value: 80
+- rule: RESTART_COUNT
+  value: 5

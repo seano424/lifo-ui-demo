@@ -7,6 +7,7 @@ import os
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DECIMAL,
@@ -27,6 +28,10 @@ from sqlalchemy.orm import relationship
 
 from app.database.connection import Base
 
+# Import Store model to resolve the relationship
+if TYPE_CHECKING:
+    pass
+
 
 def get_auth_users_fk() -> str:
     """Get the correct foreign key reference for auth.users table based on environment"""
@@ -36,7 +41,6 @@ def get_auth_users_fk() -> str:
 def get_uuid_type():
     """Get the correct UUID type based on environment (String for SQLite, UUID for PostgreSQL)"""
     from sqlalchemy.dialects.postgresql import UUID
-
     return (
         SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else UUID(as_uuid=True)
     )
@@ -69,9 +73,9 @@ class Category(Base):
     )
     typical_shelf_life_days = Column(Integer)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
     )
 
     # Self-referential relationship for parent categories
@@ -138,9 +142,9 @@ class Product(Base):
     last_scanned_at = Column(DateTime)
 
     # Audit fields
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
     )
     created_by = Column(
         get_uuid_type(),
@@ -204,15 +208,15 @@ class StoreProduct(Base):
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),
     )
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
     )
 
     # Relationships
     product = relationship("Product", back_populates="store_products")
-    # Store relationship - using module path to avoid circular imports
-    # store = relationship("Store", back_populates="store_products")
+    # Use string reference to avoid circular import - Store is in app.database.models
+    store = relationship("app.database.models.Store", back_populates="store_products")
 
 
 class BatchSource(Enum):
@@ -299,22 +303,28 @@ class Batch(Base):
         String(20), default="verified"
     )  # VerificationStatus enum values
 
+    # OCR fields for expiry date extraction
+    ocr_extracted_date = Column(String(255))  # Raw OCR text for expiry date
+    ocr_confidence: Column[DECIMAL] = Column(
+        DECIMAL(3, 2)
+    )  # OCR confidence score (0.00-1.00)
+
     # Audit fields
     created_by = Column(
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),
     )
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
     )
 
     # Relationships
     product = relationship("Product", back_populates="batches")
     actions = relationship("BatchAction", back_populates="batch")
-    # Store relationship - using module path to avoid circular imports
-    # store = relationship("Store", back_populates="batches")
-    # scores = relationship("ProductScore", back_populates="batch")  # ProductScore is in models.py
+    # Use string reference to avoid circular import - Store is in app.database.models
+    store = relationship("app.database.models.Store", back_populates="batches")
+    scores = relationship("ProductScore", back_populates="batch")
 
 
 class ActionType(Enum):

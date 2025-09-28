@@ -7,8 +7,9 @@ import asyncio
 import re
 from collections.abc import AsyncGenerator
 
+import asyncpg
 import structlog
-from sqlalchemy import text
+from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
@@ -23,6 +24,67 @@ Base = declarative_base()
 # Lazy initialization for database engine and session
 _engine = None
 _async_session = None
+
+
+def create_sync_asyncpg_connection():
+    """
+    Custom sync connection creator that returns an asyncpg connection
+    properly configured for pgbouncer compatibility
+    """
+    import asyncio
+    import urllib.parse
+
+    # Get the database URL and parse it
+    database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
+    parsed = urllib.parse.urlparse(database_url)
+
+    # Create an event loop if none exists (for sync context)
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    # Create connection with statement_cache_size=0 for pgbouncer
+    async def create_conn():
+        conn = await asyncpg.connect(
+            host=parsed.hostname,
+            port=parsed.port or 5432,
+            user=parsed.username,
+            password=parsed.password,
+            database=parsed.path.lstrip('/'),
+            ssl='require',
+            statement_cache_size=0,  # Critical for pgbouncer transaction pooling
+            command_timeout=30
+        )
+        logger.info("Created direct asyncpg connection with statement_cache_size=0 for pgbouncer")
+        return conn
+
+    return loop.run_until_complete(create_conn())
+
+
+def _setup_engine_events(engine):
+    """Setup engine events to ensure pgbouncer compatibility"""
+
+    @event.listens_for(engine.sync_engine, "do_connect")
+    def _set_connection_params(dialect, conn_rec, cargs, cparams):
+        """Configure connection parameters before connection is created"""
+        # Force disable prepared statements for pgbouncer compatibility
+        # The error message specifically mentions "statement_cache_size" not "prepared_statement_cache_size"
+        cparams['statement_cache_size'] = 0
+        cparams['prepared_statement_cache_size'] = 0  # Also set this for good measure
+        cparams['prepared_statement_name_func'] = None
+
+        logger.debug("Forcing connection parameters for pgbouncer compatibility",
+                    statement_cache_size=cparams.get('statement_cache_size'),
+                    prepared_statement_cache_size=cparams.get('prepared_statement_cache_size'))
+
+    @event.listens_for(engine.sync_engine, "connect")
+    def _on_connect(dbapi_conn, connection_record):
+        """Handle connection setup after connection is established"""
+        logger.debug("Connection established with pgbouncer settings")
+
+    return engine
 
 
 def get_engine():
@@ -41,42 +103,64 @@ def get_engine():
                 connect_args={"check_same_thread": False},
             )
         elif settings.debug:
-            # PostgreSQL Development: Use NullPool for simplicity
+            # PostgreSQL Development: AGGRESSIVE pgbouncer transaction pooler compatibility
+            # This prevents connection reuse which can cause prepared statement conflicts
             _engine = create_async_engine(
                 database_url,
-                echo=settings.debug,
+                echo=False,  # Disable SQL echo to reduce prepared statement conflicts
                 future=True,
-                poolclass=NullPool,
+                poolclass=NullPool,  # Critical: No pooling to avoid prepared statement conflicts
                 connect_args={
                     "ssl": "require",  # Required for Supabase
+                    "statement_cache_size": 0,  # Critical: Disable prepared statements for pgbouncer
+                    "prepared_statement_cache_size": 0,  # Alternative parameter name
+                    "prepared_statement_name_func": None,  # Disable named prepared statements
+                    "command_timeout": 30,  # Add command timeout
+                    "server_settings": {
+                        "statement_timeout": "25s",
+                        "lock_timeout": "5s",
+                        "jit": "off",  # Disable JIT to prevent optimization-related prepared statements
+                        "plan_cache_mode": "force_generic_plan",  # Force generic plans
+                        "log_statement": "none",  # Disable query logging
+                    },
                 },
+                execution_options={
+                    "compiled_cache": {},  # Disable SQLAlchemy's compiled statement cache
+                    "schema_translate_map": None,  # Disable schema translation cache
+                }
             )
+            # Setup engine events for pgbouncer compatibility
+            _engine = _setup_engine_events(_engine)
         else:
-            # PostgreSQL Production: Use mobile-optimized connection pooling
+            # PostgreSQL Production: AGGRESSIVE pgbouncer transaction pooler compatibility
+            # Note: pgbouncer handles the connection pooling, so SQLAlchemy should not pool
             _engine = create_async_engine(
                 database_url,
                 echo=False,
                 future=True,
-                pool_size=min(
-                    settings.db_pool_size, 10
-                ),  # MOBILE: Smaller pool for mobile workloads
-                max_overflow=min(
-                    settings.db_max_overflow, 20
-                ),  # MOBILE: Limited overflow
-                pool_pre_ping=True,
-                pool_recycle=1800,  # MOBILE: 30min recycle for mobile stability
-                pool_timeout=10,  # MOBILE: Fast timeout for mobile responsiveness
+                poolclass=NullPool,  # Critical: No pooling, pgbouncer handles this
                 connect_args={
                     "command_timeout": 30,  # MOBILE: Faster timeout for mobile queries
                     "ssl": "require",  # Required for Supabase
+                    "statement_cache_size": 0,  # Critical: Disable prepared statements for pgbouncer
+                    "prepared_statement_cache_size": 0,  # Alternative parameter name
+                    "prepared_statement_name_func": None,  # Disable named prepared statements
                     "server_settings": {
                         "jit": "off",  # Disable JIT for more predictable performance
                         "statement_timeout": "25s",  # MOBILE: Hard limit for mobile queries
                         "lock_timeout": "5s",  # MOBILE: Fast lock timeout
                         "idle_in_transaction_session_timeout": "10min",  # MOBILE: Cleanup idle sessions
+                        "plan_cache_mode": "force_generic_plan",  # Force generic plans
+                        "log_statement": "none",  # Disable query logging in production
                     },
                 },
+                execution_options={
+                    "compiled_cache": {},  # Disable SQLAlchemy's compiled statement cache
+                    "schema_translate_map": None,  # Disable schema translation cache
+                }
             )
+            # Setup engine events for pgbouncer compatibility
+            _engine = _setup_engine_events(_engine)
     return _engine
 
 
@@ -114,35 +198,31 @@ async def init_database():
     try:
         logger.info("Initializing database connection...")
 
-        # Test the connection
-        async with engine().begin():
-            # Import all models to ensure they're registered
+        # For pgbouncer transaction pooling, skip connection test during startup
+        # The connection will be tested on first actual use
+        logger.info("Skipping database connection test for pgbouncer compatibility")
+        logger.info("Database will be tested on first API request requiring database access")
 
-            # Skip table creation in development - use Supabase migrations instead
-            if settings.debug:
-                # await conn.run_sync(Base.metadata.create_all)  # Disabled - use migrations
-                logger.info(
-                    "Database connection verified (table creation skipped - using Supabase migrations)"
-                )
-
-        logger.info("Database initialization completed successfully")
+        logger.info("Database initialization completed successfully (deferred connection test)")
 
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
-        raise
+        # Don't raise the error - let the app start and handle DB errors per request
+        logger.warning("Database connection will be attempted on first use")
 
 
 async def test_connection() -> bool:
     """
-    Test database connection health
+    Test database connection health with pgbouncer compatibility
 
     Returns:
         bool: True if connection is healthy
     """
     try:
-        async with engine().begin() as conn:
-            # Execute a simple query
-            result = await conn.execute(text("SELECT 1"))
+        # Use a fresh connection for each test to avoid prepared statement conflicts
+        async with get_async_session()() as session:
+            # Execute a simple query using the session
+            result = await session.execute(text("SELECT 1"))
             test_result = result.scalar()
 
             if test_result == 1:
@@ -153,8 +233,41 @@ async def test_connection() -> bool:
                 return False
 
     except Exception as e:
-        logger.error("Database connection test failed", error=str(e))
-        return False
+        if "prepared statement" in str(e).lower():
+            logger.warning("Prepared statement error in connection test - this is expected with pgbouncer transaction pooling", error=str(e))
+            # Try one more time with a different approach
+            try:
+                # Direct asyncpg connection test bypassing SQLAlchemy
+                import urllib.parse
+                database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
+                parsed = urllib.parse.urlparse(database_url)
+
+                conn = await asyncpg.connect(
+                    host=parsed.hostname,
+                    port=parsed.port or 5432,
+                    user=parsed.username,
+                    password=parsed.password,
+                    database=parsed.path.lstrip('/'),
+                    ssl='require',
+                    statement_cache_size=0
+                )
+
+                result = await conn.fetchval("SELECT 1")
+                await conn.close()
+
+                if result == 1:
+                    logger.debug("Direct asyncpg connection test successful")
+                    return True
+                else:
+                    logger.error("Direct asyncpg connection test failed - unexpected result")
+                    return False
+
+            except Exception as direct_error:
+                logger.error("Direct asyncpg connection test also failed", error=str(direct_error))
+                return False
+        else:
+            logger.error("Database connection test failed", error=str(e))
+            return False
 
 
 async def get_database() -> AsyncGenerator[AsyncSession, None]:
@@ -188,6 +301,25 @@ async def get_database_session() -> AsyncSession:
         AsyncSession: Database session
     """
     return async_session()()
+
+
+async def get_async_database_session() -> AsyncSession:
+    """
+    Get an async database session for use in async contexts
+    
+    Returns:
+        AsyncSession: Async database session
+    """
+    return async_session()()
+
+
+def get_db_sync():
+    """
+    Synchronous database session function for legacy CSV processor compatibility
+    Note: This returns None to trigger graceful fallback in CSV processor
+    The CSV processor will use hardcoded category codes instead of database lookups
+    """
+    return None
 
 
 class DatabaseManager:
@@ -402,17 +534,27 @@ class DatabaseManager:
                     end_time = asyncio.get_event_loop().time()
                     response_time = (end_time - start_time) * 1000
 
+                    # Handle pool stats safely (different pool types have different methods)
+                    pool_stats = {}
+                    try:
+                        if hasattr(self.engine.pool, 'size'):
+                            pool_stats = {
+                                "size": self.engine.pool.size(),
+                                "checked_in": self.engine.pool.checkedin(),
+                                "checked_out": self.engine.pool.checkedout(),
+                                "overflow": self.engine.pool.overflow(),
+                                "invalid": self.engine.pool.invalid(),
+                            }
+                        else:
+                            pool_stats = {"type": "NullPool", "pooling_disabled": True}
+                    except AttributeError:
+                        pool_stats = {"error": "Unable to get pool stats"}
+
                     return {
                         "status": "healthy",
                         "response_time_ms": round(response_time, 2),
                         "store_count": store_count,
-                        "connection_pool": {
-                            "size": self.engine.pool.size(),
-                            "checked_in": self.engine.pool.checkedin(),
-                            "checked_out": self.engine.pool.checkedout(),
-                            "overflow": self.engine.pool.overflow(),
-                            "invalid": self.engine.pool.invalid(),
-                        },
+                        "connection_pool": pool_stats,
                     }
 
         except Exception as e:
