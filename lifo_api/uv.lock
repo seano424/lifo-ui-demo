@@ -451,17 +451,6 @@ wheels = [
 ]
 
 [[package]]
-name = "dotenv"
-version = "0.9.9"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "python-dotenv" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b2/b7/545d2c10c1fc15e48653c91efde329a790f2eecfbbf2bd16003b5db2bab0/dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9", size = 1892, upload-time = "2025-02-19T22:15:01.647Z" },
-]
-
-[[package]]
 name = "ecdsa"
 version = "0.19.1"
 source = { registry = "https://pypi.org/simple" }
@@ -880,7 +869,6 @@ dependencies = [
     { name = "apscheduler" },
     { name = "asyncpg" },
     { name = "chardet" },
-    { name = "dotenv" },
     { name = "factory-boy" },
     { name = "fastapi" },
     { name = "google-cloud-storage" },
@@ -944,7 +932,6 @@ requires-dist = [
     { name = "apscheduler", specifier = ">=3.10.4" },
     { name = "asyncpg", specifier = ">=0.29.0" },
     { name = "chardet", specifier = ">=5.0.0" },
-    { name = "dotenv", specifier = ">=0.9.9" },
     { name = "factory-boy", specifier = ">=3.3.0" },
     { name = "fastapi", specifier = ">=0.104.0" },
     { name = "google-cloud-storage", specifier = ">=2.10.0" },

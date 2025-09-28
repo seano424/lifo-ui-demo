@@ -11,7 +11,6 @@ dependencies = [
     "apscheduler>=3.10.4",
     "asyncpg>=0.29.0",
     "chardet>=5.0.0",
-    "dotenv>=0.9.9",
     "factory-boy>=3.3.0",
     "fastapi>=0.104.0",
     "google-cloud-storage>=2.10.0",
