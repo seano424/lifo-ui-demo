@@ -1,6 +1,6 @@
 # Digital Ocean App Platform Configuration for LIFO AI FastAPI Backend - STAGING (SECURE)
-# Deploy: doctl apps create --spec .do/staging-secure.yaml
-# Update: doctl apps update <staging_app_id> --spec .do/staging-secure.yaml
+# Deploy: doctl apps create --spec .do/staging.yaml
+# Update: doctl apps update <staging_app_id> --spec .do/staging.yaml
 
 name: lifo-ai-api-staging
 region: ams3
@@ -12,19 +12,9 @@ services:
     repo: lifo-ai/lifo-app
     branch: staging  # Deploy from staging branch
     deploy_on_push: true
-<<<<<<< Updated upstream
-  
+
   # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
   # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
-
-=======
-
-  # Build configuration
-  build_command: |
-    pip install uv
-    uv pip install --system --require-locked
->>>>>>> Stashed changes
-
 
   # Run command for staging (with debug logging)
   run_command: gunicorn -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 500 --log-level debug --preload app.main:app
@@ -32,19 +22,8 @@ services:
   # Resource allocation (smaller for staging)
   instance_count: 1
   instance_size_slug: basic-xxs  # Minimal resources for testing
-<<<<<<< Updated upstream
-  
-  # health_check:
-  #   http_path: /api/v1/health
-  #   initial_delay_seconds: 30
-  #   period_seconds: 10
-  #   timeout_seconds: 5
-  #   failure_threshold: 3
-  #   success_threshold: 1
-  
-=======
 
-  # Health check
+  # Health check enabled for staging
   health_check:
     http_path: /api/v1/health
     initial_delay_seconds: 30
@@ -52,8 +31,6 @@ services:
     timeout_seconds: 5
     failure_threshold: 3
     success_threshold: 1
-
->>>>>>> Stashed changes
   # Environment variables for staging
   # SECURITY NOTE: Secrets should be set manually in DigitalOcean console
   # Only non-sensitive configuration values are included here
@@ -100,12 +77,6 @@ services:
   - key: MOCK_EXTERNAL_SERVICES
     value: "false"  # Set to true if you want to mock external APIs in staging
 
-  # SECRETS MUST BE SET MANUALLY IN DIGITALOCEAN CONSOLE AS COMPONENT-LEVEL ENVIRONMENT VARIABLES:
-  # 1. DATABASE_URL (type: SECRET) - Your database connection string
-  # 2. SUPABASE_URL (type: SECRET) - https://your-project.supabase.co
-  # 3. SUPABASE_ANON_KEY (type: SECRET) - Your Supabase anonymous key
-  # 4. SUPABASE_SERVICE_ROLE_KEY (type: SECRET) - Your Supabase service role key
-  # 5. SECRET_KEY (type: SECRET) - Generate with: openssl rand -hex 32
 
   # HTTP settings
   http_port: 8080
@@ -113,18 +84,7 @@ services:
   # Routes - this exposes the API publicly
   # Let FastAPI handle all routing internally (no path stripping)
   routes:
-<<<<<<< Updated upstream
-  - path: /
-  - path: /api
-  - path: /docs  # FastAPI auto-docs
-  - path: /redoc  # Alternative docs
-  - path: /openapi.json
-  - path: /test  # Additional test routes
-  - path: /api/v1/{rest_of_path:*}  # All API v1 paths
-  - path: /api
-=======
   - path: /            # Forward all paths to FastAPI without modification
->>>>>>> Stashed changes
 
 # Optional: Separate staging database (recommended)
 databases:

@@ -22,7 +22,7 @@ jobs:
       run: |
         cd lifo_api
         python -m pip install uv
-        uv pip install --system --require-locked
+        uv sync --locked
     
     - name: Run basic health check
       run: |
