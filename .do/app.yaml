@@ -120,13 +120,13 @@ services:
     value: 5
     window: FIVE_MINUTES
 
-# Optional: Database (if you want managed PostgreSQL)
-databases:
-- name: lifo-postgres
-  engine: PG
-  version: "15"
-  size: db-s-1vcpu-1gb  # Can scale up
-  num_nodes: 1
+# Optional: Database (using Supabase instead of DO managed PostgreSQL)
+# databases:
+# - name: lifo-postgres
+#   engine: PG
+#   version: "15"
+#   size: db-s-1vcpu-1gb  # Can scale up
+#   num_nodes: 1
 
 
 # Jobs for maintenance tasks (optional)
