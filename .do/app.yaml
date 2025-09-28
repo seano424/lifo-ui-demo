@@ -39,27 +39,17 @@ services:
     value: production
     type: SECRET
   
-  # Database configuration (will be set in DO console)
-  - key: DATABASE_URL
-    value: ""  # Set this in DO App Platform console as encrypted
-    type: SECRET
-  
-  - key: SUPABASE_URL
-    value: ""  # Set in console
-    type: SECRET
-    
-  - key: SUPABASE_ANON_KEY
-    value: ""  # Set in console
-    type: SECRET
-  
-  - key: SUPABASE_SERVICE_ROLE_KEY
-    value: ""  # Set in console
-    type: SECRET
-  
-  # Security
-  - key: SECRET_KEY
-    value: ""  # Set in console - generate with: openssl rand -hex 32
-    type: SECRET
+  # Database configuration (set in DO App Platform console)
+  # - key: DATABASE_URL
+  #   type: SECRET
+  # - key: SUPABASE_URL
+  #   type: SECRET
+  # - key: SUPABASE_ANON_KEY
+  #   type: SECRET
+  # - key: SUPABASE_SERVICE_ROLE_KEY
+  #   type: SECRET
+  # - key: SECRET_KEY
+  #   type: SECRET
   
   - key: ALGORITHM
     value: HS256
@@ -78,10 +68,9 @@ services:
   - key: BACKEND_CORS_ORIGINS
     value: "https://lifo-app.com,https://www.lifo-app.com"
   
-  # Google Cloud
-  - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
-    value: ""  # Set in console as base64 encoded service account JSON
-    type: SECRET
+  # Google Cloud (set in DO App Platform console)
+  # - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+  #   type: SECRET
   
   # # Redis (if using caching)
   # - key: REDIS_URL
@@ -92,9 +81,8 @@ services:
   - key: LOG_LEVEL
     value: INFO
   
-  - key: SENTRY_DSN
-    value: ""  # Optional: Set for error tracking
-    type: SECRET
+  # - key: SENTRY_DSN  # Optional: Set for error tracking in DO console
+  #   type: SECRET
   
   # Performance settings
   - key: WORKERS
@@ -129,13 +117,14 @@ static_sites:
   - path: /static
 
 # Jobs for maintenance tasks (optional)
-# jobs: # Database migrations handled by Supabase, not Alembic
+# Database migrations handled by Supabase, not Alembic
+# jobs:
 # - name: db-migrate
-  source_dir: lifo_api
-  # run_command: alembic upgrade head # Not needed for Supabase
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  kind: PRE_DEPLOY  # Runs before deployment
+#   source_dir: lifo_api
+#   run_command: alembic upgrade head # Not needed for Supabase
+#   instance_count: 1
+#   instance_size_slug: basic-xxs
+#   kind: PRE_DEPLOY  # Runs before deployment
 
 alerts:
 - rule: CPU_UTILIZATION
