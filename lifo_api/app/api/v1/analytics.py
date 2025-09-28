@@ -15,7 +15,6 @@ from app.auth.secure_dependencies import (
     require_service_role,
     validate_store_access,
 )
-from app.auth.dependencies import get_user_stores
 from app.database.connection import get_db
 from app.database.read_only_operations import get_read_only_operations
 

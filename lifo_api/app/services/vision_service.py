@@ -1,6 +1,6 @@
 """
 Google Cloud Vision API service for OCR, barcode detection, and image analysis
-Provides real Google Vision integration for complex image processing tasks
+Provides real Google Vision integration with performance optimizations
 """
 
 import asyncio
@@ -9,6 +9,7 @@ import io
 import json
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 
 import structlog
@@ -17,7 +18,10 @@ from google.cloud import vision
 from google.oauth2 import service_account
 from PIL import Image
 
+from app.core.config import settings
 from app.models.base import ConfigurableModel
+from app.utils.circuit_breaker import CircuitBreakerError, get_vision_api_breaker
+from app.utils.local_cache import cache_ocr_result, get_cached_ocr_result
 
 logger = structlog.get_logger()
 
@@ -68,13 +72,15 @@ class VisionScanResult(ConfigurableModel):
 class GoogleVisionService:
     """
     Google Cloud Vision API service for image processing
-    Handles OCR, barcode detection, and text analysis
+    Enhanced with caching, circuit breaker, and async optimization
     """
 
     def __init__(self, project_id: str | None = None):
-        """Initialize Google Vision client"""
+        """Initialize Google Vision client with resilience features"""
         self.project_id = project_id
         self.client = None
+        self.circuit_breaker = get_vision_api_breaker()
+        self.thread_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="vision")
         self._initialize_client()
 
     def _initialize_client(self):
@@ -125,6 +131,7 @@ class GoogleVisionService:
             # For development, we'll create a None client and handle gracefully
             self.client = None
 
+<<<<<<< Updated upstream
     def _load_google_credentials(self) -> service_account.Credentials | None:
         """
         Load Google Cloud credentials using Google's official recommended method for containers.
@@ -287,10 +294,17 @@ class GoogleVisionService:
                 error_type=type(e).__name__
             )
             return None
+=======
+    def __del__(self):
+        """Clean up thread pool on service destruction"""
+        if hasattr(self, 'thread_pool') and self.thread_pool:
+            self.thread_pool.shutdown(wait=False)
+>>>>>>> Stashed changes
 
     async def process_image(self, image_data: bytes) -> VisionScanResult:
         """
         Process image with Google Vision API for comprehensive analysis
+        Enhanced with caching, circuit breaker, and error handling
 
         Args:
             image_data: Raw image bytes
@@ -300,50 +314,33 @@ class GoogleVisionService:
         """
         start_time = datetime.now()
 
+        # Check cache first
+        cached_result = get_cached_ocr_result(image_data)
+        if cached_result:
+            logger.info("OCR result served from cache")
+            return VisionScanResult(**cached_result)
+
         if not self.client:
-            logger.warning("Google Vision client not available, returning empty result")
-            return VisionScanResult()
+            logger.error("Google Vision client not available")
+            return VisionScanResult(
+                processing_time_ms=(datetime.now() - start_time).total_seconds() * 1000
+            )
 
         try:
-            # Preprocess image for optimal European food label OCR
-            preprocessed_data = await self._preprocess_image_for_eu_food_labels(
-                image_data
+            # Use circuit breaker for resilience
+            result = await self.circuit_breaker.call(
+                self._process_image_with_vision_api, image_data, start_time
             )
-            image_dimensions = await self._get_image_dimensions(preprocessed_data)
 
-            # Create Vision API image object
-            image = vision.Image(content=preprocessed_data)
+            # Cache successful results
+            cache_ocr_result(image_data, result.dict())
 
-            # Single optimized API call for both text and barcode detection
-            barcodes, raw_text = await self._detect_text_and_barcodes_combined(image)
+            return result
 
-            # Parse expiry dates from OCR text
-            expiry_dates = self._parse_expiry_dates(raw_text)
-
-            # Calculate processing time
+        except CircuitBreakerError as e:
+            logger.warning("Vision API circuit breaker is open", error=str(e))
             processing_time = (datetime.now() - start_time).total_seconds() * 1000
-
-            # Calculate average confidence scores
-            text_confidence_avg = (
-                sum(ocr.confidence for ocr in raw_text) / len(raw_text)
-                if raw_text
-                else 0.0
-            )
-            barcode_confidence_avg = (
-                sum(barcode.confidence for barcode in barcodes) / len(barcodes)
-                if barcodes
-                else 0.0
-            )
-
-            return VisionScanResult(
-                barcodes=barcodes,
-                raw_text=raw_text,
-                expiry_dates=expiry_dates,
-                image_dimensions=image_dimensions,
-                processing_time_ms=processing_time,
-                text_confidence_avg=text_confidence_avg,
-                barcode_confidence_avg=barcode_confidence_avg,
-            )
+            return VisionScanResult(processing_time_ms=processing_time)
 
         except Exception as e:
             logger.error(
@@ -356,11 +353,68 @@ class GoogleVisionService:
             processing_time = (datetime.now() - start_time).total_seconds() * 1000
             return VisionScanResult(processing_time_ms=processing_time)
 
+    async def _process_image_with_vision_api(
+        self, image_data: bytes, start_time: datetime
+    ) -> VisionScanResult:
+        """Internal method for actual Vision API processing"""
+        # Preprocess image with configurable settings
+        preprocessed_data = await self._preprocess_image_for_eu_food_labels(image_data)
+        image_dimensions = await self._get_image_dimensions(preprocessed_data)
+
+        # Create Vision API image object
+        image = vision.Image(content=preprocessed_data)
+
+        # Single optimized API call with timeout
+        barcodes, raw_text = await asyncio.wait_for(
+            self._detect_text_and_barcodes_combined(image),
+            timeout=settings.ocr_timeout_seconds
+        )
+
+        # Parse expiry dates from OCR text
+        expiry_dates = self._parse_expiry_dates(raw_text)
+
+        # Calculate processing time
+        processing_time = (datetime.now() - start_time).total_seconds() * 1000
+
+        # Calculate average confidence scores
+        text_confidence_avg = (
+            sum(ocr.confidence for ocr in raw_text) / len(raw_text)
+            if raw_text
+            else 0.0
+        )
+        barcode_confidence_avg = (
+            sum(barcode.confidence for barcode in barcodes) / len(barcodes)
+            if barcodes
+            else 0.0
+        )
+
+        return VisionScanResult(
+            barcodes=barcodes,
+            raw_text=raw_text,
+            expiry_dates=expiry_dates,
+            image_dimensions=image_dimensions,
+            processing_time_ms=processing_time,
+            text_confidence_avg=text_confidence_avg,
+            barcode_confidence_avg=barcode_confidence_avg,
+        )
+
     async def _preprocess_image_for_eu_food_labels(self, image_data: bytes) -> bytes:
         """
         Preprocess image for optimal European food label OCR
-        Optimized for French/German/Dutch packaging standards
+        Enhanced with configurable settings and async processing
         """
+        try:
+            # Run CPU-intensive preprocessing in thread pool
+            return await asyncio.get_event_loop().run_in_executor(
+                self.thread_pool, self._preprocess_image_sync, image_data
+            )
+        except Exception as e:
+            logger.error(f"Image preprocessing failed: {e}")
+            # Return original data if preprocessing fails
+            return image_data
+
+    def _preprocess_image_sync(self, image_data: bytes) -> bytes:
+        """Synchronous image preprocessing to run in thread pool"""
         try:
             # Load image with PIL for preprocessing
             image: Image.Image = Image.open(io.BytesIO(image_data))
@@ -369,21 +423,26 @@ class GoogleVisionService:
             if image.mode != "RGB":
                 image = image.convert("RGB")
 
-            # Optimize image size for Google Vision (640x480 recommended)
-            max_size = (640, 480)
+            # Use configurable image size limits (increased from 640x480)
+            max_size = (settings.ocr_max_image_width, settings.ocr_max_image_height)
             if image.size[0] > max_size[0] or image.size[1] > max_size[1]:
                 image.thumbnail(max_size, Image.Resampling.LANCZOS)
                 logger.debug(f"Resized image from original to {image.size}")
 
-            # Enhance contrast for European packaging (often darker backgrounds)
+            # Enhance contrast using configurable setting
             from PIL import ImageEnhance
 
             enhancer = ImageEnhance.Contrast(image)
-            image = enhancer.enhance(1.2)  # Slightly increase contrast
+            image = enhancer.enhance(settings.ocr_contrast_enhancement)
 
-            # Save optimized image as JPEG (best for Vision API)
+            # Save optimized image as JPEG with configurable quality
             output = io.BytesIO()
-            image.save(output, format="JPEG", quality=85, optimize=True)
+            image.save(
+                output,
+                format="JPEG",
+                quality=settings.ocr_jpeg_quality,
+                optimize=True
+            )
             optimized_data = output.getvalue()
 
             # Validate file size (10MB limit for text detection)
@@ -400,8 +459,7 @@ class GoogleVisionService:
             return optimized_data
 
         except Exception as e:
-            logger.error(f"Image preprocessing failed: {e}")
-            # Return original data if preprocessing fails
+            logger.error(f"Synchronous image preprocessing failed: {e}")
             return image_data
 
     async def _detect_text_and_barcodes_combined(
@@ -433,12 +491,12 @@ class GoogleVisionService:
                 image=image, features=features, image_context=image_context
             )
 
-            # Execute request in thread pool to avoid blocking
+            # Execute request in dedicated thread pool to avoid blocking
             if not self.client:
                 raise RuntimeError("Google Vision client not initialized")
 
             response = await asyncio.get_event_loop().run_in_executor(
-                None, lambda: self.client.annotate_image(request)
+                self.thread_pool, lambda: self.client.annotate_image(request)
             )
 
             # Extract text from response
@@ -537,7 +595,7 @@ class GoogleVisionService:
                 raise RuntimeError("Google Vision client not initialized")
 
             response = await asyncio.get_event_loop().run_in_executor(
-                None, lambda: self.client.annotate_image(barcode_request)
+                self.thread_pool, lambda: self.client.annotate_image(barcode_request)
             )
 
             if response.text_annotations:
@@ -579,12 +637,12 @@ class GoogleVisionService:
 
             # Run in thread pool to avoid blocking
             response = await asyncio.get_event_loop().run_in_executor(
-                None, lambda: self.client.text_detection(image=image)
+                self.thread_pool, lambda: self.client.text_detection(image=image)
             )
 
             # Also try barcode detection specifically
             await asyncio.get_event_loop().run_in_executor(
-                None,
+                self.thread_pool,
                 lambda: self.client.annotate_image(
                     {
                         "image": image,
@@ -630,7 +688,7 @@ class GoogleVisionService:
 
             # Run OCR in thread pool
             response = await asyncio.get_event_loop().run_in_executor(
-                None, lambda: self.client.text_detection(image=image)
+                self.thread_pool, lambda: self.client.text_detection(image=image)
             )
 
             ocr_results = []

@@ -35,7 +35,7 @@ yarn-error.log*
 .env
 
 credentials/
-*.json
+# *.json
 !package.json
 !package-lock.json
 !tsconfig.json
@@ -104,7 +104,7 @@ htmlcov/
 report_*
 
 # Test data and debug files
-test_data/
+# test_data/
 test_archive/
 test_*.py
 debug/
