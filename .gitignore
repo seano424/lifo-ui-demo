@@ -106,7 +106,6 @@ report_*
 # Test data and debug files
 test_data/
 test_archive/
-test_*.py
 *debug*
 debug/
 
