@@ -4,10 +4,40 @@ Image processing and validation utilities.
 import io
 from pathlib import Path
 from typing import Tuple, Optional, Dict, Any
-import cv2
 import numpy as np
 from PIL import Image, ExifTags
 import logging
+
+# Import OpenCV with fallback handling
+try:
+    from app.core.opencv_fallback import (
+        safe_cv2_import,
+        safe_laplacian_variance,
+        safe_rgb_to_grayscale
+    )
+except ImportError:
+    # Fallback for when running outside main app context
+    def safe_cv2_import():
+        try:
+            import cv2
+            return cv2
+        except ImportError:
+            return None
+
+    def safe_laplacian_variance(gray_image):
+        cv2 = safe_cv2_import()
+        if cv2:
+            return float(cv2.Laplacian(gray_image, cv2.CV_64F).var())
+        # Basic fallback
+        kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float64)
+        from scipy import ndimage
+        laplacian = ndimage.convolve(gray_image.astype(np.float64), kernel)
+        return float(np.var(laplacian))
+
+    def safe_rgb_to_grayscale(rgb_image):
+        if len(rgb_image.shape) == 2:
+            return rgb_image
+        return np.dot(rgb_image[...,:3], [0.299, 0.587, 0.114]).astype(np.uint8)
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +170,11 @@ def detect_text_regions(image_path: Path, confidence_threshold: float = 0.5) -> 
         List of detected text region bounding boxes
     """
     try:
+        cv2 = safe_cv2_import()
+        if cv2 is None:
+            logger.warning("OpenCV not available for text detection")
+            return []
+
         # Read image
         image = cv2.imread(str(image_path))
         if image is None:
@@ -187,15 +222,26 @@ def calculate_image_quality_score(image_path: Path) -> float:
         Quality score between 0.0 and 1.0
     """
     try:
-        image = cv2.imread(str(image_path))
-        if image is None:
-            return 0.0
+        cv2 = safe_cv2_import()
+        if cv2 is not None:
+            image = cv2.imread(str(image_path))
+            if image is None:
+                return 0.0
 
-        # Convert to grayscale for analysis
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # Convert to grayscale for analysis
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            # Fallback using PIL
+            with Image.open(image_path) as pil_image:
+                if pil_image.mode != 'L':
+                    pil_image = pil_image.convert('RGB')
+                    image_array = np.array(pil_image)
+                    gray = safe_rgb_to_grayscale(image_array)
+                else:
+                    gray = np.array(pil_image)
 
-        # Calculate Laplacian variance (sharpness)
-        laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+        # Calculate Laplacian variance (sharpness) with fallback
+        laplacian_var = safe_laplacian_variance(gray)
 
         # Normalize sharpness score (typical range: 0-2000)
         sharpness_score = min(laplacian_var / 1000.0, 1.0)

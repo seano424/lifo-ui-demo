@@ -4,7 +4,6 @@ Provides comprehensive image quality analysis to improve OCR accuracy
 """
 
 import logging
-import cv2  # type: ignore
 import numpy as np
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
@@ -13,6 +12,15 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import io
 from PIL import Image, ImageStat
+
+# Import OpenCV with fallback handling
+from app.core.opencv_fallback import (
+    safe_cv2_import,
+    safe_laplacian_variance,
+    safe_rgb_to_grayscale,
+    pil_to_cv2_fallback,
+    is_opencv_available
+)
 
 logger = logging.getLogger(__name__)
 
@@ -138,8 +146,21 @@ class ImageQualityService:
 
         # Load image for analysis
         image_pil = Image.open(io.BytesIO(image_data))
-        image_cv = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
-        gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
+
+        # Try OpenCV, fallback to PIL if needed
+        cv2 = safe_cv2_import()
+        if cv2 is not None:
+            try:
+                image_cv = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
+                gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
+            except Exception as e:
+                logger.warning(f"OpenCV image processing failed: {e}, using PIL fallback")
+                image_cv = pil_to_cv2_fallback(image_pil)
+                gray = safe_rgb_to_grayscale(image_cv)
+        else:
+            logger.info("OpenCV not available, using PIL-based processing")
+            image_cv = pil_to_cv2_fallback(image_pil)
+            gray = safe_rgb_to_grayscale(image_cv)
 
         # Calculate comprehensive metrics
         metrics = self._calculate_quality_metrics(image_pil, image_cv, gray, focus_areas)
@@ -172,8 +193,8 @@ class ImageQualityService:
     ) -> ImageQualityMetrics:
         """Calculate comprehensive quality metrics"""
 
-        # Blur detection using Laplacian variance
-        blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
+        # Blur detection using Laplacian variance (with fallback)
+        blur_score = safe_laplacian_variance(gray)
 
         # Resolution assessment
         height, width = gray.shape
@@ -212,8 +233,28 @@ class ImageQualityService:
     def _estimate_noise(self, gray: np.ndarray) -> float:
         """Estimate image noise using high-frequency analysis"""
         # Apply high-pass filter to isolate noise
-        kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
-        high_freq = cv2.filter2D(gray, -1, kernel)
+        kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]], dtype=np.float64)
+
+        cv2 = safe_cv2_import()
+        if cv2 is not None:
+            try:
+                high_freq = cv2.filter2D(gray, -1, kernel)
+            except Exception as e:
+                logger.warning(f"OpenCV filter failed: {e}, using fallback")
+                # Fallback using scipy or manual convolution
+                try:
+                    from scipy import ndimage
+                    high_freq = ndimage.convolve(gray.astype(np.float64), kernel)
+                except ImportError:
+                    # Manual convolution fallback
+                    high_freq = self._manual_convolution(gray.astype(np.float64), kernel)
+        else:
+            # Use fallback convolution
+            try:
+                from scipy import ndimage
+                high_freq = ndimage.convolve(gray.astype(np.float64), kernel)
+            except ImportError:
+                high_freq = self._manual_convolution(gray.astype(np.float64), kernel)
 
         # Calculate signal-to-noise ratio approximation
         signal_power = np.mean(gray.astype(float) ** 2)
@@ -224,14 +265,37 @@ class ImageQualityService:
             return max(0, min(50, snr_db))  # Clamp to reasonable range
         return 50.0  # Perfect case
 
+    def _manual_convolution(self, image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+        """Manual convolution implementation as fallback"""
+        kernel_h, kernel_w = kernel.shape
+        pad_h, pad_w = kernel_h // 2, kernel_w // 2
+
+        # Pad image
+        padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode='edge')
+
+        # Initialize output
+        output = np.zeros_like(image)
+
+        # Apply convolution
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                region = padded[i:i+kernel_h, j:j+kernel_w]
+                output[i, j] = np.sum(region * kernel)
+
+        return output
+
     def _detect_rotation(self, gray: np.ndarray) -> float:
         """Detect image rotation using Hough line transform"""
         try:
-            # Edge detection
-            edges = cv2.Canny(gray, 50, 150, apertureSize=3)
-
-            # Hough line detection
-            lines = cv2.HoughLines(edges, 1, np.pi/180, threshold=100)
+            cv2 = safe_cv2_import()
+            if cv2 is not None:
+                # Edge detection
+                edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+                # Hough line detection
+                lines = cv2.HoughLines(edges, 1, np.pi/180, threshold=100)
+            else:
+                logger.info("OpenCV not available for rotation detection, using gradient-based fallback")
+                return self._detect_rotation_fallback(gray)
 
             if lines is not None and len(lines) > 5:
                 angles = []
@@ -252,12 +316,46 @@ class ImageQualityService:
         except Exception:
             return 0.0
 
+    def _detect_rotation_fallback(self, gray: np.ndarray) -> float:
+        """Fallback rotation detection using gradients"""
+        try:
+            # Calculate horizontal and vertical gradients
+            grad_x = np.gradient(gray.astype(np.float64), axis=1)
+            grad_y = np.gradient(gray.astype(np.float64), axis=0)
+
+            # Calculate gradient angles
+            angles = np.arctan2(grad_y, grad_x) * 180 / np.pi
+
+            # Find dominant angle (simplified approach)
+            # In a properly aligned image, most gradients should be horizontal/vertical
+            angle_hist, bins = np.histogram(angles, bins=180, range=(-90, 90))
+
+            # Find the most common angle
+            dominant_angle_idx = np.argmax(angle_hist)
+            dominant_angle = bins[dominant_angle_idx]
+
+            # Normalize to [-45, 45] range
+            if dominant_angle > 45:
+                dominant_angle -= 90
+            elif dominant_angle < -45:
+                dominant_angle += 90
+
+            return float(dominant_angle)
+
+        except Exception:
+            return 0.0
+
     def _assess_perspective_distortion(self, gray: np.ndarray) -> float:
         """Assess perspective distortion by analyzing rectangular structures"""
         try:
-            # Find contours
-            edges = cv2.Canny(gray, 50, 150)
-            contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2 = safe_cv2_import()
+            if cv2 is not None:
+                # Find contours
+                edges = cv2.Canny(gray, 50, 150)
+                contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            else:
+                logger.info("OpenCV not available for perspective analysis, using simplified fallback")
+                return self._assess_perspective_fallback(gray)
 
             if not contours:
                 return 1.0  # Perfect score if no contours found
@@ -290,12 +388,48 @@ class ImageQualityService:
         except Exception:
             return 1.0
 
+    def _assess_perspective_fallback(self, gray: np.ndarray) -> float:
+        """Simplified perspective assessment using variance analysis"""
+        try:
+            # Analyze variance in horizontal and vertical strips
+            h, w = gray.shape
+
+            # Calculate variance in horizontal strips (should be consistent if not distorted)
+            strip_height = h // 10
+            h_variances = []
+            for i in range(0, h - strip_height, strip_height):
+                strip = gray[i:i+strip_height, :]
+                h_variances.append(np.var(strip))
+
+            # Calculate variance in vertical strips
+            strip_width = w // 10
+            v_variances = []
+            for i in range(0, w - strip_width, strip_width):
+                strip = gray[:, i:i+strip_width]
+                v_variances.append(np.var(strip))
+
+            # Perspective distortion causes uneven variance distribution
+            if len(h_variances) > 1 and len(v_variances) > 1:
+                h_consistency = 1.0 - (np.std(h_variances) / (np.mean(h_variances) + 1e-6))
+                v_consistency = 1.0 - (np.std(v_variances) / (np.mean(v_variances) + 1e-6))
+                return float(max(0.0, min(1.0, (h_consistency + v_consistency) / 2)))
+
+            return 1.0
+
+        except Exception:
+            return 1.0
+
     def _estimate_text_area(self, gray: np.ndarray, focus_areas: Optional[List[Dict]] = None) -> float:
         """Estimate the ratio of image containing text"""
         try:
-            # Use MSER (Maximally Stable Extremal Regions) for text detection
-            mser = cv2.MSER_create()
-            regions, _ = mser.detectRegions(gray)
+            cv2 = safe_cv2_import()
+            if cv2 is not None:
+                # Use MSER (Maximally Stable Extremal Regions) for text detection
+                mser = cv2.MSER_create()
+                regions, _ = mser.detectRegions(gray)
+            else:
+                logger.info("OpenCV not available for text area estimation, using edge-based fallback")
+                return self._estimate_text_area_fallback(gray, focus_areas)
 
             if not regions:
                 return 0.0
@@ -304,11 +438,12 @@ class ImageQualityService:
             height, width = gray.shape
             text_mask = np.zeros((height, width), dtype=np.uint8)
 
-            for region in regions:
-                # Filter regions by size and aspect ratio (typical for text)
-                if len(region) > 10:
-                    hull = cv2.convexHull(region.reshape(-1, 1, 2))
-                    cv2.fillPoly(text_mask, [hull], 255)
+            if cv2 is not None:
+                for region in regions:
+                    # Filter regions by size and aspect ratio (typical for text)
+                    if len(region) > 10:
+                        hull = cv2.convexHull(region.reshape(-1, 1, 2))
+                        cv2.fillPoly(text_mask, [hull], 255)
 
             # Calculate text area ratio
             text_pixels = np.sum(text_mask > 0)
@@ -318,6 +453,35 @@ class ImageQualityService:
 
         except Exception:
             return 0.1  # Conservative estimate
+
+    def _estimate_text_area_fallback(self, gray: np.ndarray, focus_areas: Optional[List[Dict]] = None) -> float:
+        """Fallback text area estimation using edge density analysis"""
+        try:
+            # Calculate edge density as proxy for text content
+            # Text areas typically have high edge density
+
+            # Simple edge detection using gradients
+            grad_x = np.abs(np.gradient(gray.astype(np.float64), axis=1))
+            grad_y = np.abs(np.gradient(gray.astype(np.float64), axis=0))
+
+            # Combine gradients
+            edge_magnitude = np.sqrt(grad_x**2 + grad_y**2)
+
+            # Threshold to identify edge regions
+            edge_threshold = np.percentile(edge_magnitude, 80)  # Top 20% of edges
+            edge_mask = edge_magnitude > edge_threshold
+
+            # Calculate ratio of high-edge pixels
+            edge_ratio = np.sum(edge_mask) / edge_mask.size
+
+            # Text typically has moderate to high edge density
+            # Scale the ratio to be more conservative
+            text_area_estimate = min(edge_ratio * 1.5, 0.8)  # Cap at 80%
+
+            return float(max(0.0, text_area_estimate))
+
+        except Exception:
+            return 0.1  # Conservative fallback
 
     def _identify_quality_issues(self, metrics: ImageQualityMetrics) -> List[QualityIssue]:
         """Identify specific quality issues based on metrics"""
