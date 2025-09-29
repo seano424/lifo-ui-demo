@@ -106,7 +106,11 @@ report_*
 # Test data and debug files
 # test_data/
 test_archive/
+
+*debug*
+
 test_*.py
+
 debug/
 
 # Environment backups

@@ -1,0 +1,173 @@
+{
+  "edge_case_info": {
+    "name": "OCR Edge Case and Stress Test Dataset",
+    "version": "1.0.0",
+    "description": "Challenging scenarios for OCR robustness testing",
+    "categories": ["corrupted_text", "ambiguous_dates", "invalid_barcodes", "multilingual_confusion", "performance_stress"]
+  },
+  "edge_cases": [
+    {
+      "id": "CORRUPTED_TEXT_001",
+      "description": "Poor OCR quality with character recognition errors",
+      "category": "corrupted_text",
+      "text_blocks": [
+        "0rganic M1lk",
+        "8est 8y: 1S/09/2025",
+        "U5e By: 22/09/2025",
+        "MF6: 15/08/2025",
+        "B4rc0de: 123456789O12"
+      ],
+      "expected_behavior": "Should handle OCR errors gracefully and attempt reconstruction"
+    },
+    {
+      "id": "AMBIGUOUS_DATES_001",
+      "description": "Date that could be DD/MM or MM/DD",
+      "category": "ambiguous_dates",
+      "text_blocks": [
+        "Premium Crackers",
+        "Best Before: 06/08/2025",
+        "Made in: 02/08/2025",
+        "Weight: 200g"
+      ],
+      "expected_behavior": "Should use regional preference to resolve ambiguity"
+    },
+    {
+      "id": "INVALID_BARCODE_001",
+      "description": "Barcode with invalid checksum",
+      "category": "invalid_barcodes",
+      "text_blocks": [
+        "Test Product",
+        "Invalid Code: 1234567890123",
+        "Valid Code: 8901030827195"
+      ],
+      "expected_behavior": "Should detect invalid checksum and flag appropriately"
+    },
+    {
+      "id": "MULTILINGUAL_CONFUSION_001",
+      "description": "Mixed languages that could confuse classification",
+      "category": "multilingual_confusion",
+      "text_blocks": [
+        "Café au Lait Coffee",
+        "Made in Deutschland",
+        "Prodotto in Italia",
+        "Best Before: 15/12/2025",
+        "Mejor Antes: 15/12/2025"
+      ],
+      "expected_behavior": "Should handle mixed language contexts correctly"
+    },
+    {
+      "id": "NO_DATES_001",
+      "description": "Product with no recognizable dates",
+      "category": "missing_data",
+      "text_blocks": [
+        "Salt",
+        "Pure Sea Salt",
+        "Weight: 1kg",
+        "Harvested from Atlantic Ocean"
+      ],
+      "expected_behavior": "Should return empty results gracefully"
+    },
+    {
+      "id": "MULTIPLE_SIMILAR_DATES_001",
+      "description": "Many similar dates that could cause confusion",
+      "category": "date_overload",
+      "text_blocks": [
+        "Product Info",
+        "Batch Date: 01/09/2025",
+        "Pack Date: 02/09/2025",
+        "Ship Date: 03/09/2025",
+        "Sell By: 04/09/2025",
+        "Best By: 05/09/2025",
+        "Use By: 06/09/2025",
+        "Expiry: 07/09/2025"
+      ],
+      "expected_behavior": "Should prioritize consumer-facing dates over internal dates"
+    },
+    {
+      "id": "SHORT_TEXT_001",
+      "description": "Minimal text content",
+      "category": "minimal_content",
+      "text_blocks": [
+        "Milk",
+        "15/09/25",
+        "123456789012"
+      ],
+      "expected_behavior": "Should extract available information efficiently"
+    },
+    {
+      "id": "VERY_LONG_TEXT_001",
+      "description": "Extremely verbose label with lots of text",
+      "category": "verbose_content",
+      "text_blocks": [
+        "Premium Artisanal Organic Free-Range Grass-Fed Sustainably Sourced Lactose-Free Vitamin D Enriched Whole Milk",
+        "This product is made from the finest milk sourced from happy cows that graze on organic pastures in the beautiful countryside of Northern France",
+        "Ingredients: Organic milk, Vitamin D3, Natural flavoring, Organic vanilla extract, Filtered water, Sea salt from Guérande",
+        "Allergen Information: Contains milk. May contain traces of nuts, soy, and gluten due to shared processing facilities",
+        "Storage Instructions: Keep refrigerated at 2-4°C. Do not freeze. Shake well before use. Once opened, consume within 5 days",
+        "Nutritional Information per 100ml: Energy 65kcal, Protein 3.2g, Carbohydrates 4.8g, Fat 3.6g, Calcium 120mg",
+        "Production Date: 15/09/2025",
+        "Best Before: 22/09/2025",
+        "Batch Number: FR2025091501A",
+        "Producer: Ferme Bio du Soleil, 12345 Normandie, France",
+        "Distributor: Premium Dairy Co., London, UK",
+        "Customer Service: Call 0800-123-456 for any questions",
+        "Barcode: 3760020507980",
+        "Weight: 1L (1000ml)",
+        "Certified Organic by Ecocert France",
+        "Carbon Neutral Packaging"
+      ],
+      "expected_behavior": "Should extract key information despite noise"
+    },
+    {
+      "id": "SPECIAL_CHARACTERS_001",
+      "description": "Text with special characters and symbols",
+      "category": "special_characters",
+      "text_blocks": [
+        "Café® Espresso™",
+        "Meilleur Avant: 15/09/2025",
+        "Poids: 250g ± 5g",
+        "Code-barres: 3760020507980",
+        "Prix: €4.99",
+        "Température: -18°C → +5°C"
+      ],
+      "expected_behavior": "Should handle special characters without errors"
+    },
+    {
+      "id": "PERFORMANCE_STRESS_001",
+      "description": "Large batch of text blocks for performance testing",
+      "category": "performance_stress",
+      "text_blocks": [
+        "Product 1", "Date 1: 01/01/2025", "Barcode 1: 1111111111111",
+        "Product 2", "Date 2: 02/01/2025", "Barcode 2: 2222222222222",
+        "Product 3", "Date 3: 03/01/2025", "Barcode 3: 3333333333333",
+        "Product 4", "Date 4: 04/01/2025", "Barcode 4: 4444444444444",
+        "Product 5", "Date 5: 05/01/2025", "Barcode 5: 5555555555555",
+        "Product 6", "Date 6: 06/01/2025", "Barcode 6: 6666666666666",
+        "Product 7", "Date 7: 07/01/2025", "Barcode 7: 7777777777777",
+        "Product 8", "Date 8: 08/01/2025", "Barcode 8: 8888888888888",
+        "Product 9", "Date 9: 09/01/2025", "Barcode 9: 9999999999999",
+        "Product 10", "Date 10: 10/01/2025", "Barcode 10: 1010101010101"
+      ],
+      "expected_behavior": "Should maintain performance with large input"
+    }
+  ],
+  "stress_test_scenarios": [
+    {
+      "name": "Concurrent Processing",
+      "description": "Test concurrent processing of multiple images",
+      "test_count": 50,
+      "concurrent_requests": 10
+    },
+    {
+      "name": "Memory Leak Detection",
+      "description": "Test for memory leaks over extended processing",
+      "test_count": 1000,
+      "iterations": 10
+    },
+    {
+      "name": "Error Recovery",
+      "description": "Test system recovery from various error conditions",
+      "error_types": ["malformed_input", "network_timeout", "memory_pressure"]
+    }
+  ]
+}

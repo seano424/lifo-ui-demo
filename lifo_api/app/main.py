@@ -5,6 +5,10 @@ Intelligent inventory scoring and waste reduction microservice
 
 import os
 import time
+import warnings
+
+# Suppress Google Cloud libraries' pkg_resources deprecation warnings
+warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
 
 from dotenv import load_dotenv
 
@@ -231,6 +235,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 # Don't fail startup for automated scoring issues
         else:
             logger.info("Automated scoring system disabled in configuration")
+
 
         # Log debug health endpoints availability for production troubleshooting
         debug_endpoints = [

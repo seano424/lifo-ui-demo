@@ -172,6 +172,42 @@ class Settings(BaseSettings):
         default=5, description="Maximum concurrent scoring jobs allowed"
     )
 
+
+    # OCR Configuration
+    ocr_max_image_width: int = Field(
+        default=1024, description="Maximum image width for OCR processing"
+    )
+    ocr_max_image_height: int = Field(
+        default=768, description="Maximum image height for OCR processing"
+    )
+    ocr_jpeg_quality: int = Field(
+        default=85, description="JPEG quality for OCR image preprocessing"
+    )
+    ocr_contrast_enhancement: float = Field(
+        default=1.2, description="Contrast enhancement factor for OCR"
+    )
+    ocr_timeout_seconds: int = Field(
+        default=10, description="Timeout for OCR API calls in seconds"
+    )
+    ocr_text_confidence_threshold: float = Field(
+        default=0.7, description="Minimum confidence threshold for OCR text"
+    )
+    ocr_barcode_confidence_threshold: float = Field(
+        default=0.8, description="Minimum confidence threshold for barcode detection"
+    )
+    ocr_date_confidence_threshold: float = Field(
+        default=0.65, description="Minimum confidence threshold for date parsing"
+    )
+    ocr_cache_ttl_seconds: int = Field(
+        default=3600, description="OCR result cache TTL in seconds (1 hour)"
+    )
+    ocr_enable_caching: bool = Field(
+        default=True, description="Enable OCR result caching"
+    )
+    ocr_enable_fallback_mock: bool = Field(
+        default=False, description="Enable dangerous mock fallback (NEVER in production)"
+    )
+
     # Mobile performance thresholds
     mobile_response_time_critical_ms: int = Field(
         default=200, description="Critical mobile response time threshold (ms)"
