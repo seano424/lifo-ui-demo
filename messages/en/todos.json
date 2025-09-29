@@ -32,19 +32,19 @@
   "emptyStateWithFilters": "Try adjusting your filters to see more items.",
   "card": {
     "suggestion": "Suggestion",
-    "daysLeft": "{days} days left",
+    "daysLeft": "{days, plural, =1 {1 day left} other {# days left}}",
     "daysLeftOne": "1 day left",
-    "expiresIn": "Expires in {days} days",
+    "expiresIn": "{days, plural, =1 {Expires in 1 day} other {Expires in # days}}",
     "expiresToday": "Expires today",
-    "expired": "Expiring {days} days ago",
-    "expiredYesterday": "Expiring yesterday",
+    "expired": "{days, plural, =1 {Expired 1 day ago} other {Expired # days ago}}",
+    "expiredYesterday": "Expired yesterday",
     "currentlyDiscounted": "Currently discounted: {percent}%",
     "suggestedDiscount": "Suggested discount: {percent}%",
     "healthyMaintain": "Suggestion: Healthy & Maintain",
     "expiringSoon": "Expiring soon",
     "activeHealthy": "Active & healthy",
     "editTodo": "Edit todo",
-    "unitsLeft": "{quantity} left",
+    "unitsLeft": "{quantity, plural, =0 {0 left} =1 {1 left} other {# left}}",
     "allSold": "All sold!",
     "donated": "Donated!",
     "disposed": "All disposed!",
@@ -61,7 +61,7 @@
     "details": "Details"
   },
   "bottomSheet": {
-    "units": "{count} units"
+    "units": "{count, plural, =0 {0 units} =1 {1 unit} other {# units}}"
   },
   "discount": {
     "success": "Successfully applied {percent}% discount to {product}",
@@ -169,8 +169,9 @@
       "priorityScore": "Priority Score",
       "urgency": "Urgency"
     },
-    "daysAgo": "{days} days ago",
-    "daysLeft": "{days} days",
+    "daysAgo": "{days, plural, =1 {1 day ago} other {# days ago}}",
+    "daysLeft": "{days, plural, =1 {1 day} other {# days}}",
+    "daysRemaining": "{days, plural, =1 {1 day remaining} other {# days remaining}}",
     "inventoryPricing": "Inventory & Pricing",
     "percentOff": "% off",
     "actionHistory": "Action History",
