@@ -55,7 +55,19 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
 
     def should_bypass_security(self, path: str) -> bool:
         """Check if path should bypass security checks"""
-        return any(bypass_path in path for bypass_path in self.bypass_paths)
+        should_bypass = any(bypass_path in path for bypass_path in self.bypass_paths)
+
+        # Debug logging for health check path specifically
+        if "/health" in path:
+            logger.info(
+                "Health check bypass decision",
+                path=path,
+                bypass_paths=list(self.bypass_paths),
+                should_bypass=should_bypass,
+                exact_match=path in self.bypass_paths
+            )
+
+        return should_bypass
 
     def is_high_security_endpoint(self, path: str) -> bool:
         """Check if endpoint requires high security"""
