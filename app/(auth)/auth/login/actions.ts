@@ -28,11 +28,11 @@ export async function loginWithCredentials(_prevState: unknown, formData: FormDa
         return { error: 'Authentication service error' }
       }
 
-      if (!userResult || userResult.length === 0 || !userResult[0].email) {
+      if (!userResult || !userResult.success || !userResult.user?.email) {
         return { error: 'Invalid credentials' }
       }
 
-      email = userResult[0].email
+      email = userResult.user.email
     }
 
     // Authenticate with Supabase
