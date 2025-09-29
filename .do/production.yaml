@@ -10,7 +10,7 @@ services:
   source_dir: lifo_api
   github:
     repo: lifo-ai/lifo-app 
-    branch: staging  # Deploy from main branch
+    branch: main  # Deploy from main branch
     deploy_on_push: true
   
   # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
