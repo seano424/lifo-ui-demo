@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        error: 'This email may already be registered. Try logging in instead.',
+        error: 'This email address is already registered. Try logging in instead.',
         details: errorMessage,
       },
       { status: 500 },
