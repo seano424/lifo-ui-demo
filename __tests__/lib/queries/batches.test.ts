@@ -17,8 +17,11 @@ jest.mock('@/lib/supabase/client', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }))
 
+// Type helper for mock Supabase client
+type MockSupabaseClient = Partial<SupabaseClient<Database>>
+
 // Create a mock Supabase client
-let mockSupabaseClient: Partial<SupabaseClient<Database>>
+let mockSupabaseClient: MockSupabaseClient
 
 describe('batches queries', () => {
   beforeEach(() => {
@@ -93,7 +96,11 @@ describe('batches queries', () => {
         status: 'active',
       }
 
-      const result = await fetchBatchesPage({ page: 0, pageSize: 10 }, filters, mockSupabaseClient as any)
+      const result = await fetchBatchesPage(
+        { page: 0, pageSize: 10 },
+        filters,
+        mockSupabaseClient as any,
+      )
 
       expect(result.data.length).toBe(1)
       expect(result.count).toBe(1)
@@ -185,7 +192,11 @@ describe('batches queries', () => {
         }),
       } as any
 
-      const result = await fetchBatchesPage({ page: 0, pageSize: 10 }, { storeId: 'store-1' }, mockSupabaseClient as any)
+      const result = await fetchBatchesPage(
+        { page: 0, pageSize: 10 },
+        { storeId: 'store-1' },
+        mockSupabaseClient as any,
+      )
 
       expect(result.nextPage).toBe(1) // There are more pages
     })
@@ -207,7 +218,11 @@ describe('batches queries', () => {
       } as any
 
       await expect(
-        fetchBatchesPage({ page: 0, pageSize: 10 }, { storeId: 'store-1' }, mockSupabaseClient as any),
+        fetchBatchesPage(
+          { page: 0, pageSize: 10 },
+          { storeId: 'store-1' },
+          mockSupabaseClient as any,
+        ),
       ).rejects.toThrow('Failed to fetch batches page: Database connection failed')
     })
   })

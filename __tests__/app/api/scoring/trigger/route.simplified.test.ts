@@ -19,8 +19,14 @@ import { createClient } from '@supabase/supabase-js'
 // Mock Supabase
 jest.mock('@supabase/supabase-js')
 
+type MockSupabaseClient = {
+  schema: jest.Mock
+  from: jest.Mock
+  upsert: jest.Mock
+}
+
 describe('Scoring Trigger Route Logic', () => {
-  let mockSupabaseClient: any
+  let mockSupabaseClient: MockSupabaseClient
   let mockFetch: jest.Mock
 
   beforeEach(() => {
@@ -45,7 +51,21 @@ describe('Scoring Trigger Route Logic', () => {
      * This tests the data transformation logic that happens in the route
      * We extract and test it separately to avoid Next.js API complexity
      */
-    function transformScoringResult(result: any) {
+    function transformScoringResult(result: {
+      batch_id: string
+      store_id: string
+      expiry_score: string
+      velocity_score: string
+      margin_score: string
+      composite_score: string
+      recommendation: string
+      urgency_level: string
+      discount_percent: string
+      reason: string
+      ml_enhanced: string
+      confidence_level: string
+      calculated_at?: string
+    }) {
       return {
         batch_id: result.batch_id,
         store_id: result.store_id,
@@ -255,7 +275,7 @@ describe('Scoring Trigger Route Logic', () => {
 
   describe('Validation Logic', () => {
     it('validates storeId is required', () => {
-      function validateInput(body: any) {
+      function validateInput(body: { storeId?: string; triggeredBy?: string }) {
         if (!body.storeId) {
           return { valid: false, error: 'Store ID required' }
         }
@@ -304,8 +324,9 @@ describe('Scoring Trigger Route Logic', () => {
 
   describe('Supabase Integration', () => {
     it('configures Supabase client correctly', () => {
-      const SUPABASE_URL = 'http://localhost:54321'
-      const SERVICE_ROLE_KEY = 'test-service-role-key'
+      // These would be used to create the Supabase client in the actual route
+      const _SUPABASE_URL = 'http://localhost:54321'
+      const _SERVICE_ROLE_KEY = 'test-service-role-key'
 
       const config = {
         auth: {

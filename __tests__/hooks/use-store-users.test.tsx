@@ -425,9 +425,7 @@ describe('useStoreUsers hooks', () => {
 
         await waitFor(() => expect(result.current.isAdding).toBe(false))
 
-        expect(toast.error).toHaveBeenCalledWith(
-          'Failed to add user to store: User already exists',
-        )
+        expect(toast.error).toHaveBeenCalledWith('Failed to add user to store: User already exists')
       })
     })
 
@@ -473,9 +471,7 @@ describe('useStoreUsers hooks', () => {
 
       await waitFor(() => expect(result.current.isAdding).toBe(false))
 
-      expect(toast.error).toHaveBeenCalledWith(
-        expect.stringContaining('Store ID is required'),
-      )
+      expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('Store ID is required'))
     })
 
     it('returns current storeId', () => {
