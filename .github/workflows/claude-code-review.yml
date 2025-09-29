@@ -12,9 +12,6 @@ on:
 
 jobs:
   claude-review:
-    # Skip if still a draft
-    if: github.event.pull_request.draft == false
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
