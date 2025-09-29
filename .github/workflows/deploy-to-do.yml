@@ -51,23 +51,100 @@ jobs:
     - name: Update DO App Platform deployment
       run: |
         echo "Updating Digital Ocean App Platform deployment..."
-        doctl apps update ${{ secrets.DO_APP_ID }} --spec .do/app.yaml
+        # Use staging config for staging app, production config for production app
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          echo "Deploying to production from main branch..."
+          doctl apps update ${{ secrets.DO_PRODUCTION_APP_ID }} --spec .do/production.yaml
+        else
+          echo "Deploying to staging from staging branch..."
+          doctl apps update ${{ secrets.DO_STAGING_APP_ID }} --spec .do/staging.yaml
+        fi
         echo "Deployment triggered successfully"
     
     - name: Wait for deployment completion
       run: |
         echo "Monitoring deployment status..."
         sleep 60  # Wait for deployment to start
-        
-        # Check deployment status (simplified)
-        for i in {1..10}; do
-          echo "Checking deployment status (attempt $i/10)..."
+
+        # Get deployment status and wait for completion
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          APP_ID="${{ secrets.DO_PRODUCTION_APP_ID }}"
+        else
+          APP_ID="${{ secrets.DO_STAGING_APP_ID }}"
+        fi
+        MAX_WAIT=600  # 10 minutes max wait
+        ELAPSED=0
+
+        while [ $ELAPSED -lt $MAX_WAIT ]; do
+          echo "Checking deployment status (elapsed: ${ELAPSED}s)..."
+
+          # Get latest deployment
+          DEPLOYMENT_STATUS=$(doctl apps list-deployments $APP_ID --format ID,Status --no-header | head -n1 | awk '{print $2}')
+          echo "Current deployment status: $DEPLOYMENT_STATUS"
+
+          case $DEPLOYMENT_STATUS in
+            "ACTIVE")
+              echo "✅ Deployment completed successfully!"
+              break
+              ;;
+            "ERROR"|"CANCELED")
+              echo "❌ Deployment failed with status: $DEPLOYMENT_STATUS"
+              doctl apps list-deployments $APP_ID --format ID,Status,Created --no-header | head -n3
+              exit 1
+              ;;
+            "BUILDING"|"DEPLOYING"|"PENDING")
+              echo "🔄 Deployment in progress: $DEPLOYMENT_STATUS"
+              ;;
+            *)
+              echo "⚠️  Unknown deployment status: $DEPLOYMENT_STATUS"
+              ;;
+          esac
+
           sleep 30
+          ELAPSED=$((ELAPSED + 30))
         done
-        
-        echo "Deployment monitoring completed"
+
+        if [ $ELAPSED -ge $MAX_WAIT ]; then
+          echo "⏰ Deployment timeout after ${MAX_WAIT}s"
+          exit 1
+        fi
     
+    - name: Verify deployment health
+      run: |
+        echo "🔍 Verifying deployment health..."
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          APP_ID="${{ secrets.DO_PRODUCTION_APP_ID }}"
+        else
+          APP_ID="${{ secrets.DO_STAGING_APP_ID }}"
+        fi
+
+        # Get app URL
+        APP_URL=$(doctl apps get $APP_ID --format LiveURL --no-header)
+        echo "App URL: $APP_URL"
+
+        # Test health endpoint
+        echo "Testing health endpoint..."
+        curl -f -s "${APP_URL}/api/v1/health" | jq '.'
+
+        if [ $? -eq 0 ]; then
+          echo "✅ Health check passed!"
+        else
+          echo "❌ Health check failed"
+          echo "Checking app logs..."
+          doctl apps logs $APP_ID --type=run --follow=false | tail -20
+          exit 1
+        fi
+
     - name: Notify deployment completion
       run: |
         echo "🚀 Deployment to Digital Ocean App Platform completed"
         echo "Your multi-store LIFO API is now live!"
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          APP_ID="${{ secrets.DO_PRODUCTION_APP_ID }}"
+        else
+          APP_ID="${{ secrets.DO_STAGING_APP_ID }}"
+        fi
+        APP_URL=$(doctl apps get $APP_ID --format LiveURL --no-header)
+        echo "API URL: $APP_URL"
+        echo "Health Check: ${APP_URL}/api/v1/health"
+        echo "API Docs: ${APP_URL}/docs"

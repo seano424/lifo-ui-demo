@@ -359,26 +359,35 @@ async def health_check_bypass_middleware_priority(request: Request, call_next: A
 
     if request.url.path in health_paths:
         client_host = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "").lower()
 
-        # DigitalOcean internal network patterns
-        if client_host.startswith("10.244.") or client_host == "10.244.65.235":
+        # DigitalOcean internal network patterns or health check user agents
+        is_do_health_check = (
+            client_host.startswith("10.244.") or
+            client_host == "10.244.65.235" or
+            "digitalocean" in user_agent or
+            "kube-probe" in user_agent or
+            "healthcheck" in user_agent
+        )
+
+        if is_do_health_check:
             logger.debug(
-                "Health check from DO load balancer - bypassing host validation",
+                "Health check from DO platform - bypassing middleware",
                 client_host=client_host,
+                user_agent=user_agent,
                 path=request.url.path
             )
 
             # Create a simple health response without complex middleware chain
-            if request.url.path in health_paths:
-                from app.models.base import HealthResponse
-                return JSONResponse(
-                    content={
-                        "status": "healthy",
-                        "database_connected": True,  # Assume healthy for LB checks
-                        "version": settings.api_version,
-                        "uptime": None,
-                    }
-                )
+            return JSONResponse(
+                content={
+                    "status": "healthy",
+                    "database_connected": True,  # Assume healthy for LB checks
+                    "version": settings.api_version,
+                    "timestamp": time.time(),
+                    "environment": settings.environment,
+                }
+            )
 
     return await call_next(request)
 
