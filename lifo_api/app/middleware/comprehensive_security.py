@@ -239,10 +239,12 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
         if request.method in ["POST", "PUT", "PATCH"]:
             content_type = request.headers.get("content-type", "")
             # Only require Content-Type for endpoints that actually need a request body
-            # Scoring endpoints use query parameters, not request body
+            # Scoring and trigger endpoints may use query parameters, not request body
+            trigger_endpoint = "/trigger/" in request.url.path
             if (not content_type and
                 request.url.path.startswith("/api/") and
-                not request.url.path.startswith("/api/v1/scoring/")):
+                not request.url.path.startswith("/api/v1/scoring/") and
+                not trigger_endpoint):
                 validation_result["valid"] = False
                 validation_result["details"]["missing_content_type"] = True
 
@@ -439,6 +441,14 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                     "force_recalculate",
                     "save_to_database",
                     "include_donation_rationale",
+                    # Automated scoring parameters
+                    "schedule_type",
+                    "cron_expression",
+                    "interval_hours",
+                    "timezone",
+                    "enabled",
+                    "scoring_config",
+                    "priority",
                 ],
                 "analytics": ["store_id", "days", "metric", "timeframe"],
                 "general": ["page", "limit", "offset", "sort", "order", "filter"],
@@ -446,7 +456,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
 
             # Get endpoint type
             endpoint_type = "general"
-            if "/scoring/" in request.url.path:
+            if "/scoring/" in request.url.path or "/automated-scoring/" in request.url.path:
                 endpoint_type = "scoring"
             elif "/analytics/" in request.url.path:
                 endpoint_type = "analytics"
@@ -508,9 +518,35 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                 except ValueError:
                     return False
 
-            elif param_name in ["force_recalculate", "save_to_database", "include_donation_rationale"]:
+            elif param_name in ["force_recalculate", "save_to_database", "include_donation_rationale", "enabled"]:
                 # Boolean parameters
                 return value.lower() in ["true", "false", "1", "0"]
+
+            elif param_name in ["schedule_type"]:
+                # Should be either 'cron' or 'interval'
+                return value in ["cron", "interval"]
+
+            elif param_name in ["cron_expression"]:
+                # Basic cron expression validation (allow spaces and standard cron chars)
+                import re
+
+                cron_pattern = r"^[0-9\s\*\/\-\,]+$"
+                return bool(re.match(cron_pattern, value)) and len(value) <= 50
+
+            elif param_name in ["interval_hours"]:
+                # Should be positive integer representing hours
+                try:
+                    int_val = int(value)
+                    return 1 <= int_val <= 168  # Max 1 week
+                except ValueError:
+                    return False
+
+            elif param_name in ["timezone"]:
+                # Should be valid timezone string
+                import re
+
+                timezone_pattern = r"^[A-Za-z\/\_\-]+$"
+                return bool(re.match(timezone_pattern, value)) and len(value) <= 50
 
             elif param_name in [
                 "urgency",
@@ -520,6 +556,8 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                 "sort",
                 "order",
                 "filter",
+                "priority",
+                "scoring_config",
             ]:
                 # Should be alphanumeric with limited special characters
                 import re
