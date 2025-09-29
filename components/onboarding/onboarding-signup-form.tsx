@@ -187,7 +187,14 @@ export function OnboardingSignUpForm({
 
       // Check if it's a Supabase auth error that we might have missed
       if (error && typeof error === 'object') {
-        const errorObj = error as any
+        const errorObj = error as {
+          message?: string
+          details?: string
+          hint?: string
+          status?: number
+          statusCode?: number
+          error?: { message?: string; status?: number }
+        }
         const errorMessage = errorObj.message?.toLowerCase() || ''
         const errorDetails = errorObj.details?.toLowerCase() || ''
         const errorHint = errorObj.hint?.toLowerCase() || ''

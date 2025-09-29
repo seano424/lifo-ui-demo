@@ -56,11 +56,27 @@ export function TodoActionBottomSheet({
 
   // Tab configuration
   const tabs = [
-    { id: 'details' as TabType, label: t('actions.details'), icon: SparklesIcon },
-    { id: 'discount' as TabType, label: t('actions.discount'), icon: PercentIcon },
-    { id: 'donate' as TabType, label: t('actions.donate'), icon: PackageOpenIcon },
+    {
+      id: 'details' as TabType,
+      label: t('actions.details'),
+      icon: SparklesIcon,
+    },
+    {
+      id: 'discount' as TabType,
+      label: t('actions.discount'),
+      icon: PercentIcon,
+    },
+    {
+      id: 'donate' as TabType,
+      label: t('actions.donate'),
+      icon: PackageOpenIcon,
+    },
     { id: 'sold' as TabType, label: t('actions.sell'), icon: TagIcon },
-    { id: 'dispose' as TabType, label: t('actions.dispose'), icon: PackageXIcon },
+    {
+      id: 'dispose' as TabType,
+      label: t('actions.dispose'),
+      icon: PackageXIcon,
+    },
   ]
 
   return (
@@ -69,10 +85,14 @@ export function TodoActionBottomSheet({
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
-        <div className="flex flex-col gap-2 max-w-[280px] sm:max-w-max">
-          <Typography className="leading-normal truncate" variant="h4">
-            {currentBatch.product_name || ''}
-          </Typography>
+        <div className="flex flex-col gap-2">
+          <div className="w-80 overflow-hidden">
+            <div className="truncate">
+              <Typography className="leading-normal" variant="h4">
+                {currentBatch.product_name || ''}
+              </Typography>
+            </div>
+          </div>
           <div className="flex flex-row sm:items-center divide-x">
             <div className="divide-x flex">
               <Typography className="pr-2 text-xs sm:text-base">
@@ -82,7 +102,9 @@ export function TodoActionBottomSheet({
             </div>
             <div className="divide-x flex">
               <Typography className="px-2 text-xs sm:text-base">
-                {t('bottomSheet.units', { count: currentBatch.current_quantity || 0 })}
+                {t('bottomSheet.units', {
+                  count: currentBatch.current_quantity || 0,
+                })}
               </Typography>
               <Typography className="px-2 text-xs sm:text-base">
                 €{(currentBatch.unit_price || 0).toFixed(2)}
