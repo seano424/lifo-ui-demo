@@ -12,18 +12,11 @@ services:
     repo: lifo-ai/lifo-app
     branch: staging  # Deploy from staging branch
     deploy_on_push: true
-<<<<<<< Updated upstream
-  
-  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
-  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
-
-=======
 
   # Build configuration
   build_command: |
     pip install uv
     uv pip install --system --require-locked
->>>>>>> Stashed changes
 
 
   # Run command for staging (with debug logging)
@@ -32,8 +25,8 @@ services:
   # Resource allocation (smaller for staging)
   instance_count: 1
   instance_size_slug: basic-xxs  # Minimal resources for testing
-<<<<<<< Updated upstream
-  
+
+  # # Health check
   # health_check:
   #   http_path: /api/v1/health
   #   initial_delay_seconds: 30
@@ -41,19 +34,7 @@ services:
   #   timeout_seconds: 5
   #   failure_threshold: 3
   #   success_threshold: 1
-  
-=======
 
-  # Health check
-  health_check:
-    http_path: /api/v1/health
-    initial_delay_seconds: 30
-    period_seconds: 10
-    timeout_seconds: 5
-    failure_threshold: 3
-    success_threshold: 1
-
->>>>>>> Stashed changes
   # Environment variables for staging
   # SECURITY NOTE: Secrets should be set manually in DigitalOcean console
   # Only non-sensitive configuration values are included here
@@ -113,18 +94,7 @@ services:
   # Routes - this exposes the API publicly
   # Let FastAPI handle all routing internally (no path stripping)
   routes:
-<<<<<<< Updated upstream
-  - path: /
-  - path: /api
-  - path: /docs  # FastAPI auto-docs
-  - path: /redoc  # Alternative docs
-  - path: /openapi.json
-  - path: /test  # Additional test routes
-  - path: /api/v1/{rest_of_path:*}  # All API v1 paths
-  - path: /api
-=======
   - path: /            # Forward all paths to FastAPI without modification
->>>>>>> Stashed changes
 
 # Optional: Separate staging database (recommended)
 databases:
