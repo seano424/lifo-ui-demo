@@ -2,11 +2,11 @@
 # Deploy: doctl apps create --spec .do/production.yaml
 # Update: doctl apps update <production_app_id> --spec .do/production.yaml
 
-name: lifo-ai-api
+name: lifo-ai-api-production
 region: ams3
 
 services:
-- name: fastapi-backend
+- name: fastapi-backend-production
   source_dir: lifo_api
   github:
     repo: lifo-ai/lifo-app 
@@ -117,17 +117,7 @@ databases:
   num_nodes: 1
 
 # Production jobs
-# jobs: # Database migrations handled by Supabase, not Alembic
-# - name: db-migrate-production
-  source_dir: lifo_api
-  github:
-    repo: lifo-ai/lifo-app
-    branch: main
-    deploy_on_push: true
-  # run_command: alembic upgrade head # Not needed for Supabase
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  kind: PRE_DEPLOY  # Runs before deployment
+# Database migrations are handled by Supabase, not needed here
 
 # Production monitoring and alerts
 alerts:

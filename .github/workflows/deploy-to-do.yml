@@ -16,24 +16,30 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.12'
     
     - name: Install dependencies
       run: |
         cd lifo_api
         python -m pip install uv
-        uv pip install --system --require-locked
+        uv sync --locked --all-extras
     
     - name: Run basic health check
+      env:
+        SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
       run: |
         cd lifo_api
-        python -c "
+        .venv/bin/python -c "
         import sys
         try:
             from app.main import app
             print('✅ Application imports successfully')
         except Exception as e:
             print(f'❌ Import failed: {e}')
+            print(f'Python path: {sys.path}')
+            print(f'Python executable: {sys.executable}')
             sys.exit(1)
         "
     

@@ -7,7 +7,6 @@ Optimized architecture with clear frontend-backend separation:
 
 from fastapi import APIRouter
 
-
 from app.api.v1 import (
     analytics,
     automated_scoring,
@@ -55,13 +54,14 @@ router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-# TODO: Commented out - module on different branch
-# router.include_router(
-#     automated_scoring.router,
-#     prefix="/automated-scoring",
-#     tags=["Automated Scoring Management"],
-#     responses={404: {"description": "Not found"}},
-# )
+
+router.include_router(
+    automated_scoring.router,
+    prefix="/automated-scoring",
+    tags=["Automated Scoring Management"],
+    responses={404: {"description": "Not found"}},
+)
+
 
 router.include_router(
     analytics_router,

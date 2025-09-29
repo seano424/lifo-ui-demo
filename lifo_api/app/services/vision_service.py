@@ -131,7 +131,6 @@ class GoogleVisionService:
             # For development, we'll create a None client and handle gracefully
             self.client = None
 
-<<<<<<< Updated upstream
     def _load_google_credentials(self) -> service_account.Credentials | None:
         """
         Load Google Cloud credentials using Google's official recommended method for containers.
@@ -294,12 +293,11 @@ class GoogleVisionService:
                 error_type=type(e).__name__
             )
             return None
-=======
+
     def __del__(self):
         """Clean up thread pool on service destruction"""
         if hasattr(self, 'thread_pool') and self.thread_pool:
             self.thread_pool.shutdown(wait=False)
->>>>>>> Stashed changes
 
     async def process_image(self, image_data: bytes) -> VisionScanResult:
         """

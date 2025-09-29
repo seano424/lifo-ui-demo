@@ -117,6 +117,7 @@ debug/
 *.env.backup
 *.env.legacy
 
+
 # Development logs and temporary files (expanded)
 *.log
 logs/
@@ -177,3 +178,6 @@ dmypy.json
 # Deployment app IDs (keep these local)
 .do/*_app_id.txt
 .do/ENVIRONMENT_VARIABLES_CHECKLIST.md
+
+!dataset_tools/
+!test_data/
