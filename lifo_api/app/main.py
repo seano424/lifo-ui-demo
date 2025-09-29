@@ -375,8 +375,17 @@ async def health_check_bypass_middleware_priority(request: Request, call_next: A
             client_host == "::1"                 # IPv6 localhost
         )
 
+        # Always log health check attempts for debugging
+        logger.info(
+            "Health check bypass middleware executed",
+            client_host=client_host,
+            user_agent=user_agent,
+            path=request.url.path,
+            is_do_health_check=is_do_health_check
+        )
+
         if is_do_health_check:
-            logger.debug(
+            logger.info(
                 "Health check from DO platform - bypassing middleware",
                 client_host=client_host,
                 user_agent=user_agent,
