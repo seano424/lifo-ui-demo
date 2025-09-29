@@ -2,143 +2,46 @@
 
 import { Building2, Key, User } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { toast } from 'sonner'
+import { loginWithCredentials } from '@/app/(auth)/auth/login/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
-import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
-import { logger } from '@/lib/utils/logger'
 
 // Types for the authentication modes
 type AuthMode = 'admin' | 'employee'
 
+// Submit button component that uses form status
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? 'Signing in...' : 'Sign In'}
+    </Button>
+  )
+}
+
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [authMode, setAuthMode] = useState<AuthMode>('employee')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
-
-  // Email/Password form state
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-
-  // PIN form state
-  const [username, setUsername] = useState('')
-  const [pin, setPin] = useState('')
+  const [state, formAction] = useActionState(loginWithCredentials, null)
 
   // Reset form when switching modes
   const handleModeChange = (mode: AuthMode) => {
     setAuthMode(mode)
-    setError(null)
-    setEmail('')
-    setPassword('')
-    setUsername('')
-    setPin('')
   }
 
-  // Email/Password login with username support
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      let loginEmail = email
-
-      // If the input doesn't contain @, treat it as a username and look up the email
-      if (!email.includes('@')) {
-        // Look up user by username using optimized function
-        const { data: userResult, error: userError } = await supabase.rpc('get_user_by_username', {
-          p_username: email,
-        })
-
-        if (userError) {
-          logger.error('LoginForm', 'Failed to lookup user by username:', userError)
-          throw new Error('Authentication service error')
-        }
-
-        if (!userResult || userResult.length === 0 || !userResult[0].email) {
-          throw new Error('Invalid username or password')
-        }
-
-        loginEmail = userResult[0].email
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password,
-      })
-
-      if (error) throw error
-
-      toast.success('Welcome back!')
-      router.push('/dashboard')
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsLoading(false)
+  // Show error toast when state changes
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error)
     }
-  }
-
-  // PIN login form handler - with proper Supabase session
-  const handlePINLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      // Call the PIN session API to validate and create session
-      const response = await fetch('/api/auth/pin-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, pin }),
-      })
-
-      const result = await response.json()
-
-      if (!result.success) {
-        throw new Error(result.error || 'Invalid credentials')
-      }
-
-      if (result.session) {
-        // Set the session in Supabase client if we have session tokens
-        const supabase = createClient()
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: result.session.access_token,
-          refresh_token: result.session.refresh_token,
-        })
-
-        if (sessionError) {
-          logger.error('LoginForm', 'Failed to set session:', sessionError)
-          throw new Error('Failed to create session')
-        }
-      } else {
-        throw new Error('No session returned from authentication')
-      }
-
-      toast.success(`Welcome back, ${result.user.full_name}!`)
-
-      router.push('/dashboard') // Same redirect for all users
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  }, [state])
 
   return (
     <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
@@ -174,24 +77,22 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             {/* Employee PIN Login */}
             <TabsContent value="employee" className="space-y-4">
-              <form onSubmit={handlePINLogin} className="space-y-4 font-mono uppercase">
+              <form action={formAction} className="space-y-4 font-mono uppercase">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username or Email</Label>
+                  <Label htmlFor="employee-identifier">Username or Email</Label>
                   <Input
-                    id="username"
+                    id="employee-identifier"
+                    name="identifier"
                     type="text"
                     placeholder="johnd"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
                     required
                     autoComplete="username"
-                    disabled={isLoading}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">PIN</Label>
+                    <Label htmlFor="employee-password">PIN</Label>
                     <Link
                       href="/auth/forgot-password"
                       className="text-sm text-primary hover:underline"
@@ -200,52 +101,46 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                     </Link>
                   </div>
                   <Input
-                    id="pin"
+                    id="employee-password"
+                    name="password"
                     type="password"
                     showPasswordToggle
                     placeholder="••••••"
-                    value={pin}
-                    onChange={e => setPin(e.target.value)}
                     required
                     autoComplete="current-password"
-                    disabled={isLoading}
                   />
                 </div>
 
-                {error && authMode === 'employee' && (
+                {state?.error && authMode === 'employee' && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
                     <Typography variant="p" color="destructive" className="text-sm">
-                      {error}
+                      {state.error}
                     </Typography>
                   </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                </Button>
+                <SubmitButton />
               </form>
             </TabsContent>
 
             {/* Admin Email/Password Login */}
             <TabsContent value="admin" className="space-y-4">
-              <form onSubmit={handleEmailLogin} className="space-y-4 font-mono uppercase">
+              <form action={formAction} className="space-y-4 font-mono uppercase">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Username or Email</Label>
+                  <Label htmlFor="admin-identifier">Username or Email</Label>
                   <Input
-                    id="email"
+                    id="admin-identifier"
+                    name="identifier"
                     type="text"
                     placeholder="manager@store.com or admin.user"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
                     required
                     autoComplete="username"
-                    disabled={isLoading}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="admin-password">Password</Label>
                     <Link
                       href="/auth/forgot-password"
                       className="text-sm text-primary hover:underline"
@@ -254,29 +149,25 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                     </Link>
                   </div>
                   <Input
-                    id="password"
+                    id="admin-password"
+                    name="password"
                     type="password"
                     showPasswordToggle
                     placeholder="••••••••"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    disabled={isLoading}
                   />
                 </div>
 
-                {error && authMode === 'admin' && (
+                {state?.error && authMode === 'admin' && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
                     <Typography variant="p" color="destructive" className="text-sm">
-                      {error}
+                      {state.error}
                     </Typography>
                   </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                </Button>
+                <SubmitButton />
               </form>
             </TabsContent>
           </Tabs>
