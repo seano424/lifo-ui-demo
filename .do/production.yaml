@@ -10,7 +10,7 @@ services:
   source_dir: lifo_api
   github:
     repo: lifo-ai/lifo-app 
-    branch: main  # Deploy from main branch
+    branch: staging  # Deploy from main branch
     deploy_on_push: true
   
   # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
@@ -57,6 +57,9 @@ services:
   # CORS settings for production (restrictive)
   - key: BACKEND_CORS_ORIGINS
     value: "https://lifo-app.com,https://www.lifo-app.com"  # Only production domains
+
+  - key: FRONTEND_URL
+    value: "https://lifo-app.com"  # Primary production frontend URL
   
   # Production settings
   - key: DEBUG

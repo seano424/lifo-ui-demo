@@ -302,11 +302,11 @@ class Settings(BaseSettings):
                     # In production, only HTTPS is allowed
                     pass
 
-            # For DigitalOcean App Platform health checks - allow all origins for health endpoints only
-            # This is handled by health_check_bypass_middleware which bypasses CORS for health paths
-            # If no frontend URL is configured, allow wildcard (for health checks only)
+            # For DigitalOcean App Platform health checks - add null origin for internal requests
+            # Health checks come from internal networks without proper origins
             if not origins:
-                origins.append("*")
+                # Allow requests with no origin (internal health checks) and localhost for testing
+                origins.extend(["null", "http://localhost:3000"])  # More specific than wildcard
 
             return origins
 
