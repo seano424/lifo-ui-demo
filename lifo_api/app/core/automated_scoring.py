@@ -5,7 +5,9 @@ Provides background task scheduling for automatic inventory scoring updates
 
 import asyncio
 import uuid
-from datetime import datetime
+
+from datetime import datetime, timedelta
+
 from typing import Any, Dict, List, Optional
 
 import structlog
@@ -14,9 +16,15 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from pydantic import BaseModel, Field
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
 from app.core.config import settings
 from app.core.scoring import create_scoring_service
 from app.database.connection import get_async_session
+
+from app.database.read_only_operations import get_read_only_operations
+
 
 logger = structlog.get_logger()
 

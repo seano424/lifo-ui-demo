@@ -54,13 +54,14 @@ router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-# Automated scoring system management
+
 router.include_router(
     automated_scoring.router,
     prefix="/automated-scoring",
     tags=["Automated Scoring Management"],
     responses={404: {"description": "Not found"}},
 )
+
 
 router.include_router(
     analytics_router,

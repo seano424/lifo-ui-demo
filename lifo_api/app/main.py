@@ -5,6 +5,10 @@ Intelligent inventory scoring and waste reduction microservice
 
 import os
 import time
+import warnings
+
+# Suppress Google Cloud libraries' pkg_resources deprecation warnings
+warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
 
 from dotenv import load_dotenv
 
