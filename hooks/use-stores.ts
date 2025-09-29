@@ -28,7 +28,8 @@ function useCurrentAuthUser() {
       } = await supabase.auth.getUser()
 
       if (error || !user) {
-        throw new Error('Not authenticated')
+        // Return null instead of throwing to avoid error during logout
+        return null
       }
 
       return user
