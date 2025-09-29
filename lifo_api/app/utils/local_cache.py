@@ -34,7 +34,7 @@ class LocalMemoryCache:
         default_ttl_seconds: int = 3600,
         cleanup_interval_seconds: int = 300
     ):
-        self._cache = {}
+        self._cache: dict[str, dict[str, Any]] = {}
         self._max_size = max_size
         self._default_ttl = default_ttl_seconds
         self._lock = Lock()

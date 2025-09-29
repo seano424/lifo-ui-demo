@@ -685,16 +685,17 @@ class ProductNameExtractionService:
     def _determine_hierarchy_level(self, block: TextBlock, name_type: str) -> int:
         """Determine hierarchy level (1=primary, 2=secondary, 3=tertiary)"""
         # Font size is primary indicator
+        hierarchy_level: int
         if block.font_size_score >= 0.8:
-            return 1  # Primary
+            hierarchy_level = 1  # Primary
         elif block.font_size_score >= 0.6:
-            return 2  # Secondary
+            hierarchy_level = 2  # Secondary
         else:
-            return 3  # Tertiary
+            hierarchy_level = 3  # Tertiary
 
         # Name type can influence hierarchy
         if name_type == 'brand' and block.font_size_score >= 0.5:
-            return min(hierarchy_level - 1, 1)  # Promote brands
+            hierarchy_level = min(hierarchy_level - 1, 1)  # Promote brands
 
         return hierarchy_level
 
@@ -747,7 +748,7 @@ class ProductNameExtractionService:
             return []
 
         # Group by normalized product name
-        name_groups = {}
+        name_groups: dict[str, list[ProductNameResult]] = {}
         for candidate in candidates:
             normalized_name = candidate.product_name.lower().strip()
             if normalized_name not in name_groups:
@@ -783,9 +784,12 @@ class ProductNameExtractionService:
         return True
 
 
+# Global service instance
+_product_name_extraction_service: Optional[ProductNameExtractionService] = None
+
 def get_product_name_extraction_service() -> ProductNameExtractionService:
     """Get singleton instance of product name extraction service"""
     global _product_name_extraction_service
-    if '_product_name_extraction_service' not in globals():
+    if _product_name_extraction_service is None:
         _product_name_extraction_service = ProductNameExtractionService()
     return _product_name_extraction_service

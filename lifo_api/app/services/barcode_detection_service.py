@@ -58,6 +58,7 @@ class BarcodeDetectionService:
             'medium': 0.70,
             'low': 0.50
         }
+        self.date_exclusion_patterns = self._initialize_date_exclusion_patterns()
 
         logger.info(
             "BarcodeDetectionService initialized",
@@ -126,6 +127,24 @@ class BarcodeDetectionService:
             'nummer': 0.4,  # German: number
             'numero': 0.4,  # Spanish/Italian: number
         }
+
+    def _initialize_date_exclusion_patterns(self) -> list[str]:
+        """Initialize patterns that indicate date content (to exclude from barcode detection)"""
+        return [
+            # Date keywords that indicate this is NOT a barcode
+            r'\b(?:exp|expiry|expires?|expiration)\b',
+            r'\b(?:best\s*before|best\s*by|bb)\b',
+            r'\b(?:use\s*by|use\s*before)\b',
+            r'\b(?:sell\s*by|sell\s*before)\b',
+            r'\b(?:display\s*until|display\s*by)\b',
+            r'\b(?:mfg|manufactured|production|prod|made)\b',
+            # Non-English date indicators
+            r'\b(?:à\s*consommer|mindestens\s*haltbar|consumir\s*preferentemente)\b',
+            r'\b(?:da\s*consumarsi|vendre\s*avant|verkaufen\s*bis|scade\s*il)\b',
+            # Date format patterns with context
+            r'\b\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}\b',  # Traditional date formats
+            r'\b\d{4}[/\-.]\d{1,2}[/\-.]\d{1,2}\b',    # ISO-style dates
+        ]
 
     async def detect_barcodes_from_text_blocks(
         self,
@@ -216,6 +235,14 @@ class BarcodeDetectionService:
         """Extract potential barcode candidates from a text block"""
         candidates = []
 
+        # Skip if this text block likely contains dates
+        if self._is_likely_date_context(text_block):
+            logger.debug(
+                "Skipping potential date context for barcode detection",
+                text_block=text_block[:50]
+            )
+            return candidates
+
         # Find all numeric sequences
         numeric_patterns = [
             r'\d{6,}',  # 6 or more consecutive digits
@@ -228,6 +255,15 @@ class BarcodeDetectionService:
             for match in matches:
                 clean_digits = re.sub(r'[^\d]', '', match.group())
                 if len(clean_digits) >= 6:  # Minimum barcode length
+
+                    # Additional date exclusion check for the specific match
+                    if self._is_likely_date_sequence(match.group(), text_block):
+                        logger.debug(
+                            "Excluding likely date sequence from barcode candidates",
+                            sequence=match.group()
+                        )
+                        continue
+
                     context_score = self._calculate_context_score(text_block)
 
                     candidate = BarcodeCandidate(
@@ -251,8 +287,71 @@ class BarcodeDetectionService:
             if indicator in text_lower:
                 score += weight
 
+        # Penalize if date-like content is detected
+        if self._is_likely_date_context(text):
+            score *= 0.3  # Significantly reduce score for date contexts
+
         # Normalize score
         return min(score, 1.0)
+
+    def _is_likely_date_context(self, text: str) -> bool:
+        """Check if text block contains date-related content"""
+        text_lower = text.lower()
+
+        # Check for date exclusion patterns
+        for pattern in self.date_exclusion_patterns:
+            if re.search(pattern, text_lower, re.IGNORECASE):
+                return True
+
+        # Use date extraction service for additional validation if available
+        try:
+            # Lazy import to avoid circular dependency
+            from .date_extraction_service import get_date_extraction_service
+            date_service = get_date_extraction_service()
+            is_date, confidence = date_service.is_likely_date(text)
+            return is_date and confidence > 0.6
+        except Exception:
+            # Fallback to pattern-based detection if service fails
+            return False
+
+    def _is_likely_date_sequence(self, sequence: str, context: str) -> bool:
+        """Check if a specific numeric sequence is likely a date"""
+        # Check for date-like patterns in the sequence itself
+        sequence_clean = re.sub(r'[^\d]', '', sequence)
+
+        # Common date formats that shouldn't be barcodes
+        if len(sequence_clean) == 8:  # DDMMYYYY or YYYYMMDD
+            # Check if it could be a valid date
+            try:
+                # Try YYYYMMDD format
+                if sequence_clean[:4] in ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026']:
+                    month = int(sequence_clean[4:6])
+                    day = int(sequence_clean[6:8])
+                    if 1 <= month <= 12 and 1 <= day <= 31:
+                        return True
+
+                # Try DDMMYYYY format
+                day = int(sequence_clean[:2])
+                month = int(sequence_clean[2:4])
+                year = int(sequence_clean[4:])
+                if 1 <= day <= 31 and 1 <= month <= 12 and 1900 <= year <= 2050:
+                    return True
+
+            except (ValueError, IndexError):
+                pass
+
+        elif len(sequence_clean) == 6:  # DDMMYY or YYMMDD
+            try:
+                # Multiple potential date interpretations
+                # If context contains date keywords, more likely to be a date
+                context_lower = context.lower()
+                date_indicators = ['exp', 'expiry', 'best', 'use', 'sell', 'mfg', 'prod']
+                if any(indicator in context_lower for indicator in date_indicators):
+                    return True
+            except (ValueError, IndexError):
+                pass
+
+        return False
 
     async def _detect_single_block_barcodes(
         self,
@@ -623,7 +722,7 @@ class BarcodeDetectionService:
             return []
 
         # Group by barcode value
-        barcode_groups = {}
+        barcode_groups: dict[str, list[BarcodeDetectionResult]] = {}
         for result in results:
             if result.value not in barcode_groups:
                 barcode_groups[result.value] = []
@@ -658,10 +757,49 @@ class BarcodeDetectionService:
 
         return True
 
+    def is_barcode_likely(self, text: str) -> tuple[bool, float]:
+        """Check if text is likely a barcode (complementary to date detection)"""
+        text_clean = re.sub(r'[^\d]', '', text)
+
+        # Must have sufficient digits
+        if len(text_clean) < 6:
+            return False, 0.0
+
+        # Check for date exclusions first
+        if self._is_likely_date_context(text) or self._is_likely_date_sequence(text, text):
+            return False, 0.0
+
+        confidence = 0.0
+
+        # Length-based scoring (typical barcode lengths)
+        if len(text_clean) in [8, 12, 13]:  # Common barcode lengths
+            confidence += 0.4
+        elif len(text_clean) in [6, 14]:  # Less common but valid
+            confidence += 0.3
+        elif 8 <= len(text_clean) <= 14:  # Within reasonable range
+            confidence += 0.2
+
+        # Context scoring
+        context_score = self._calculate_context_score(text)
+        confidence += context_score * 0.3
+
+        # Pattern consistency
+        if self._has_consistent_digit_pattern(text_clean):
+            confidence += 0.2
+
+        # Not date-like
+        if not self._is_likely_date_sequence(text, text):
+            confidence += 0.1
+
+        return confidence > 0.5, min(confidence, 1.0)
+
+
+# Global service instance
+_barcode_detection_service: Optional[BarcodeDetectionService] = None
 
 def get_barcode_detection_service() -> BarcodeDetectionService:
     """Get singleton instance of barcode detection service"""
     global _barcode_detection_service
-    if '_barcode_detection_service' not in globals():
+    if _barcode_detection_service is None:
         _barcode_detection_service = BarcodeDetectionService()
     return _barcode_detection_service

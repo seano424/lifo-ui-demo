@@ -316,6 +316,9 @@ class EnhancedVisionService:
 
     async def _call_vision_api_in_thread(self, image: vision.Image) -> Any:
         """Call Vision API in thread pool to avoid blocking"""
+        if self.client is None:
+            raise RuntimeError("Google Vision client not initialized")
+
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
             self.thread_pool,
@@ -339,9 +342,9 @@ class EnhancedVisionService:
         self,
         ocr_result: 'OCRExtractionResult',
         extraction_types: list[str]
-    ) -> dict[str, list]:
+    ) -> dict[str, list[Any]]:
         """Perform specialized extractions using modular services"""
-        results = {}
+        results: dict[str, list[Any]] = {}
 
         # Extract text and bounding boxes for service calls
         text_blocks = [block.text for block in ocr_result.raw_text_blocks]
@@ -372,17 +375,32 @@ class EnhancedVisionService:
         extraction_results = await asyncio.gather(*extraction_tasks, return_exceptions=True)
 
         # Process results
-        for i, result in enumerate(extraction_results):
-            if isinstance(result, Exception):
-                logger.error(f"Extraction {i} failed: {result}")
-                continue
+        extraction_index = 0
+        if 'dates' in extraction_types:
+            if (extraction_index < len(extraction_results) and
+                not isinstance(extraction_results[extraction_index], Exception)):
+                result = extraction_results[extraction_index]
+                results['dates'] = result if isinstance(result, list) else []
+            else:
+                results['dates'] = []
+            extraction_index += 1
 
-            if i == 0 and 'dates' in extraction_types:
-                results['dates'] = result
-            elif (i == 1 and 'barcodes' in extraction_types) or (i == 0 and 'dates' not in extraction_types and 'barcodes' in extraction_types):
-                results['barcodes'] = result
-            elif 'product_names' in extraction_types:
-                results['product_names'] = result
+        if 'barcodes' in extraction_types:
+            if (extraction_index < len(extraction_results) and
+                not isinstance(extraction_results[extraction_index], Exception)):
+                result = extraction_results[extraction_index]
+                results['barcodes'] = result if isinstance(result, list) else []
+            else:
+                results['barcodes'] = []
+            extraction_index += 1
+
+        if 'product_names' in extraction_types:
+            if (extraction_index < len(extraction_results) and
+                not isinstance(extraction_results[extraction_index], Exception)):
+                result = extraction_results[extraction_index]
+                results['product_names'] = result if isinstance(result, list) else []
+            else:
+                results['product_names'] = []
 
         return results
 
@@ -489,7 +507,7 @@ class EnhancedVisionService:
                 language_scores[language] = score
 
         if language_scores:
-            return max(language_scores, key=language_scores.get)
+            return max(language_scores.keys(), key=lambda k: language_scores[k])
 
         return 'english'  # Default
 
@@ -560,9 +578,12 @@ class OCRExtractionResult:
     combined_text: str
 
 
+# Global service instance
+_enhanced_vision_service: Optional[EnhancedVisionService] = None
+
 def get_enhanced_vision_service() -> EnhancedVisionService:
     """Get singleton instance of enhanced vision service"""
     global _enhanced_vision_service
-    if '_enhanced_vision_service' not in globals():
+    if _enhanced_vision_service is None:
         _enhanced_vision_service = EnhancedVisionService()
     return _enhanced_vision_service

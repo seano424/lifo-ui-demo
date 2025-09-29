@@ -4,7 +4,7 @@ Provides comprehensive image quality analysis to improve OCR accuracy
 """
 
 import logging
-import cv2
+import cv2  # type: ignore
 import numpy as np
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass

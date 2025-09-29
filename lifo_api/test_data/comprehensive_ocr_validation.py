@@ -11,6 +11,7 @@ from typing import Dict, List, Any
 from pathlib import Path
 from dataclasses import asdict
 
+
 from app.services.enhanced_vision_service import get_enhanced_vision_service
 from app.services.date_extraction_service import get_date_extraction_service
 from app.services.barcode_detection_service import get_barcode_detection_service
@@ -241,9 +242,9 @@ class ComprehensiveOCRValidator:
             extracted_products = []
             for result in results:
                 extracted_products.append({
-                    'name': result.name,
-                    'classification': result.classification,
-                    'brand_detected': result.brand_detected,
+                    'name': result.product_name,
+                    'classification': result.name_type,
+                    'brand_detected': result.brand_name,
                     'confidence': result.confidence
                 })
 

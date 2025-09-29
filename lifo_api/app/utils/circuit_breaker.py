@@ -39,7 +39,7 @@ class CircuitBreaker:
         self,
         failure_threshold: int = 5,
         recovery_timeout_seconds: int = 60,
-        expected_exception: type = Exception,
+        expected_exception: type[BaseException] = Exception,
         success_threshold: int = 2
     ):
         self.failure_threshold = failure_threshold
@@ -138,7 +138,7 @@ class CircuitBreaker:
 
         except self.expected_exception as e:
             self._record_failure()
-            raise e
+            raise
         except Exception as e:
             # Unexpected exceptions don't count as failures
             logger.warning(

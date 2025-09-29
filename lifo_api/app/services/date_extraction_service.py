@@ -136,10 +136,45 @@ class DateExtractionService:
                 'type': 'use_by'
             },
             'context_expiry': {
-                'pattern': r'(?:EXP|Exp|Expiry|Expires?|Expiration)[\s:]*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})',
-                'format': 'MM/DD/YYYY',
+                'pattern': r'(?:EXP|Exp|Expiry|Expires?|Expiration)[\s:]*(\d{1,4})[/\-.,\s](\d{1,2})[/\-.,\s](\d{1,4})',
+                'format': 'SMART',
                 'priority': 'very_high',
                 'region': 'US',
+                'type': 'expiry'
+            },
+            'context_expiry_eu': {
+                'pattern': r'(?:EXP|Exp|Expiry|Expires?|Expiration)[\s:]*(\d{1,4})[/\-.,\s](\d{1,2})[/\-.,\s](\d{1,4})',
+                'format': 'SMART',
+                'priority': 'very_high',
+                'region': 'EU',
+                'type': 'expiry'
+            },
+            'context_sell_by': {
+                'pattern': r'(?:Sell\s*By|Sell\s*Before|Best\s*Sold\s*By|Vendre\s*avant\s*le|Verkaufen\s*bis|Vender\s*antes\s*del|Vendere\s*entro\s*il)[\s:]*(\d{1,4})[/\-.,\s](\d{1,2})[/\-.,\s](\d{1,4})',
+                'format': 'SMART',
+                'priority': 'very_high',
+                'region': 'EU',
+                'type': 'sell_by'
+            },
+            'context_sell_by_us': {
+                'pattern': r'(?:Sell\s*By|Sell\s*Before|Best\s*Sold\s*By)[\s:]*(\d{1,4})[/\-.,\s](\d{1,2})[/\-.,\s](\d{1,4})',
+                'format': 'SMART',
+                'priority': 'very_high',
+                'region': 'US',
+                'type': 'sell_by'
+            },
+            'context_display_until': {
+                'pattern': r'(?:Display\s*Until|Display\s*By|Afficher\s*jusqu|Anzeigen\s*bis|Mostrar\s*hasta|Mostrare\s*fino)[\s:]*(\d{1,4})[/\-.,\s](\d{1,2})[/\-.,\s](\d{1,4})',
+                'format': 'SMART',
+                'priority': 'high',
+                'region': 'EU',
+                'type': 'sell_by'
+            },
+            'context_expiry_yyyy': {
+                'pattern': r'(?:EXP|Exp|Expiry|Expires?|Expiration)[\s:]*(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})',
+                'format': 'YYYY/MM/DD',
+                'priority': 'very_high',
+                'region': 'ISO',
                 'type': 'expiry'
             },
             'context_manufactured': {
@@ -147,6 +182,20 @@ class DateExtractionService:
                 'format': 'DD/MM/YYYY',
                 'priority': 'high',
                 'region': 'EU',
+                'type': 'manufactured'
+            },
+            'context_manufactured_compact': {
+                'pattern': r'(?:MFG|Mfg|Manufactured|Production|Prod|Made|Best\s*Before)[\s:]*(\d{8})',
+                'format': 'YYYYMMDD',
+                'priority': 'high',
+                'region': 'ISO',
+                'type': 'manufactured'
+            },
+            'context_manufactured_yyyy': {
+                'pattern': r'(?:PRO|Pro|MFG|Mfg|Manufactured|Production|Prod|Made)[\s:]*(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})',
+                'format': 'YYYY/MM/DD',
+                'priority': 'high',
+                'region': 'ISO',
                 'type': 'manufactured'
             },
             'mfg_compact': {
@@ -223,6 +272,14 @@ class DateExtractionService:
                 'confidence_boost': 0.25,
                 'shelf_life_days': (1, 90)  # 1 day to 3 months
             },
+            'sell_by': {
+                'keywords': ['sell by', 'sell before', 'best sold by', 'display until',
+                           'display by', 'vendre avant le', 'verkaufen bis',
+                           'vender antes del', 'vendere entro il', 'afficher jusqu',
+                           'anzeigen bis', 'mostrar hasta', 'mostrare fino'],
+                'confidence_boost': 0.25,
+                'shelf_life_days': (1, 90)  # 1 day to 3 months
+            },
             'expiry': {
                 'keywords': ['exp', 'expiry', 'expires', 'expiration'],
                 'confidence_boost': 0.2,
@@ -280,8 +337,11 @@ class DateExtractionService:
             results.extend(block_results)
 
         # Remove duplicates and sort by confidence
+        logger.debug(f"Before deduplication: {len(results)} results")
         unique_results = self._remove_duplicate_dates(results)
+        logger.debug(f"After deduplication: {len(unique_results)} results")
         validated_results = [r for r in unique_results if self._validate_date_result(r)]
+        logger.debug(f"After validation: {len(validated_results)} results")
 
         # Sort by confidence (descending) and date type priority
         validated_results.sort(key=lambda x: (
@@ -298,7 +358,52 @@ class DateExtractionService:
             detected_language=detected_language
         )
 
-        return validated_results[:5]  # Return top 5 results
+        final_results = validated_results[:5]  # Return top 5 results
+        logger.debug(f"Final results to return: {len(final_results)} results")
+        for i, result in enumerate(final_results):
+            logger.debug(f"  Result {i+1}: {result.date} ({result.date_type}) confidence={result.confidence}")
+        return final_results
+
+    def is_likely_date(self, text: str) -> tuple[bool, float]:
+        """Check if text is likely a date (for barcode exclusion)"""
+        text_lower = text.lower()
+
+        # Strong date indicators
+        date_keywords = [
+            'exp', 'expiry', 'expires', 'expiration', 'best before', 'best by',
+            'use by', 'use before', 'sell by', 'sell before', 'display until',
+            'mfg', 'manufactured', 'production', 'prod', 'made', 'bb',
+            'à consommer', 'mindestens haltbar', 'consumir preferentemente',
+            'da consumarsi', 'vendre avant', 'verkaufen bis', 'scade il'
+        ]
+
+        # Check for date keywords nearby
+        has_date_keyword = any(keyword in text_lower for keyword in date_keywords)
+
+        # Check for date patterns
+        date_patterns = [
+            r'\b\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}\b',  # DD/MM/YYYY or MM/DD/YYYY
+            r'\b\d{4}[/\-.]\d{1,2}[/\-.]\d{1,2}\b',    # YYYY/MM/DD
+            r'\b\d{6,8}\b'  # Compact dates like DDMMYYYY
+        ]
+
+        has_date_pattern = any(re.search(pattern, text) for pattern in date_patterns)
+
+        # Calculate confidence
+        confidence = 0.0
+        if has_date_keyword:
+            confidence += 0.7
+        if has_date_pattern:
+            confidence += 0.5
+
+        # Additional heuristics
+        if len(text.strip()) <= 20:  # Short text more likely to be date
+            confidence += 0.2
+
+        if re.search(r'\b(20|19)\d{2}\b', text):  # Contains year
+            confidence += 0.3
+
+        return confidence > 0.5, min(confidence, 1.0)
 
     async def _extract_dates_from_block(
         self,
@@ -330,7 +435,13 @@ class DateExtractionService:
                 )
 
                 if result and result.confidence >= self.confidence_thresholds['low']:
+                    logger.debug(f"Pattern {pattern_name} result accepted: {result.date} (confidence: {result.confidence})")
                     results.append(result)
+                else:
+                    if result:
+                        logger.debug(f"Pattern {pattern_name} result rejected: confidence {result.confidence} < {self.confidence_thresholds['low']}")
+                    else:
+                        logger.debug(f"Pattern {pattern_name} result is None")
 
         return results
 
@@ -349,10 +460,15 @@ class DateExtractionService:
             groups = match.groups()
             raw_text = match.group(0)
 
-            # Parse date based on format
-            parsed_date = self._parse_date_groups(groups, pattern_info, detected_language)
+            # Parse date based on format (add context for smart parsing)
+            pattern_info_with_context = pattern_info.copy()
+            pattern_info_with_context['context_text'] = context_text
+            parsed_date = self._parse_date_groups(groups, pattern_info_with_context, detected_language, context_text, pattern_name)
             if not parsed_date:
+                logger.debug(f"Pattern {pattern_name} parsing returned None")
                 return None
+            else:
+                logger.debug(f"Pattern {pattern_name} successfully parsed date: {parsed_date}")
 
             # Determine date type from context
             date_type = self._classify_date_type(context_text, pattern_info.get('type', 'unknown'))
@@ -361,6 +477,7 @@ class DateExtractionService:
             confidence = self._calculate_confidence(
                 parsed_date, raw_text, pattern_info, date_type, context_text
             )
+            logger.debug(f"Pattern {pattern_name} confidence calculated: {confidence}")
 
             return DateExtractionResult(
                 date=parsed_date,
@@ -381,42 +498,140 @@ class DateExtractionService:
         self,
         groups: tuple,
         pattern_info: dict,
-        detected_language: Optional[str]
+        detected_language: Optional[str],
+        context_text: str = "",
+        pattern_name: str = "unknown"
     ) -> Optional[datetime]:
         """Parse date from regex groups based on format"""
         try:
             format_type = pattern_info['format']
+            logger.debug(f"Attempting to parse with format: {format_type}, groups: {groups}")
 
-            if format_type in ['DD/MM/YYYY', 'DD-MM-YYYY', 'DD.MM.YYYY']:
-                day, month, year = int(groups[0]), int(groups[1]), self._normalize_year(int(groups[2]))
+            # Handle mixed group patterns (YYYY/MM/DD or DD/MM/YYYY in same regex)
+            filtered_groups = [g for g in groups if g is not None]
+            if len(filtered_groups) < 1:
+                return None
+
+            # For compact formats, we need only 1 group; for separated formats, we need 3
+            if format_type in ['YYYYMMDD', 'DDMMYYYY', 'DDMMYY'] and len(filtered_groups) < 1:
+                return None
+            elif format_type not in ['YYYYMMDD', 'DDMMYYYY', 'DDMMYY'] and len(filtered_groups) < 3:
+                return None
+
+            # Smart format detection for context-aware patterns
+            if format_type == 'SMART':
+                return self._parse_smart_date(filtered_groups, pattern_info, detected_language)
+
+            elif format_type in ['DD/MM/YYYY', 'DD-MM-YYYY', 'DD.MM.YYYY']:
+                # Check if first group is a 4-digit year (YYYY format detected)
+                if len(filtered_groups[0]) == 4:
+                    year, month, day = int(filtered_groups[0]), int(filtered_groups[1]), int(filtered_groups[2])
+                else:
+                    day, month, year = int(filtered_groups[0]), int(filtered_groups[1]), self._normalize_year(int(filtered_groups[2]))
                 return datetime(year, month, day)
 
             elif format_type in ['MM/DD/YYYY', 'MM-DD-YYYY']:
-                month, day, year = int(groups[0]), int(groups[1]), self._normalize_year(int(groups[2]))
+                # Check if first group is a 4-digit year (YYYY format detected)
+                if len(filtered_groups[0]) == 4:
+                    year, month, day = int(filtered_groups[0]), int(filtered_groups[1]), int(filtered_groups[2])
+                else:
+                    month, day, year = int(filtered_groups[0]), int(filtered_groups[1]), self._normalize_year(int(filtered_groups[2]))
                 return datetime(year, month, day)
 
-            elif format_type == 'YYYY-MM-DD':
-                year, month, day = int(groups[0]), int(groups[1]), int(groups[2])
+            elif format_type in ['YYYY-MM-DD', 'YYYY/MM/DD']:
+                year, month, day = int(filtered_groups[0]), int(filtered_groups[1]), int(filtered_groups[2])
                 return datetime(year, month, day)
 
             elif format_type in ['DD Mon YYYY', 'Mon DD YYYY']:
-                return self._parse_month_name_date(groups, format_type, detected_language)
+                return self._parse_month_name_date(filtered_groups, format_type, detected_language)
 
             elif format_type in ['DDMMYYYY', 'DDMMYY']:
-                return self._parse_compact_date(groups[0])
+                return self._parse_compact_date(filtered_groups[0])
+
+            elif format_type == 'YYYYMMDD':
+                return self._parse_compact_date_yyyy(filtered_groups[0])
 
             elif format_type in ['DD Mon YY']:
-                day, month_str, year = groups[0], groups[1], groups[2]
-                month = self._get_month_number(month_str.lower(), detected_language)
-                if month:
+                day, month_str, year = filtered_groups[0], filtered_groups[1], filtered_groups[2]
+                month_num: Optional[int] = self._get_month_number(month_str.lower(), detected_language)
+                if month_num is not None:
                     year_normalized = self._normalize_year(int(year))
-                    return datetime(year_normalized, month, int(day))
+                    return datetime(year_normalized, month_num, int(day))
 
         except (ValueError, TypeError) as e:
-            logger.debug(f"Date parsing failed: {e}", groups=groups, format=pattern_info['format'])
+            logger.debug(f"Date parsing failed: {e}", groups=groups, format=pattern_info['format'], pattern=pattern_name)
+        except Exception as e:
+            logger.debug(f"Unexpected parsing error: {e}", groups=groups, format=pattern_info['format'], pattern=pattern_name)
             return None
 
         return None
+
+    def _parse_smart_date(
+        self,
+        groups: list[str],
+        pattern_info: dict,
+        detected_language: Optional[str] = None
+    ) -> Optional[datetime]:
+        """Smart date parsing that detects format based on content"""
+        try:
+            first, second, third = int(groups[0]), int(groups[1]), int(groups[2])
+
+            # Determine the most likely format based on the values
+            # If first value is 4 digits, it's likely YYYY/MM/DD
+            if len(groups[0]) == 4 and 1900 <= first <= 2100:
+                year, month, day = first, second, third
+            # If third value is 4 digits, it's likely DD/MM/YYYY or MM/DD/YYYY
+            elif len(groups[2]) == 4 and 1900 <= third <= 2100:
+                year = third
+                # Enhanced logic to determine DD/MM vs MM/DD
+                # First check if values clearly indicate format
+                if first <= 12 and second > 12:
+                    # Clearly MM/DD format (month 1-12, day >12)
+                    month, day = first, second
+                elif first > 12 and second <= 12:
+                    # Clearly DD/MM format (day >12, month 1-12)
+                    day, month = first, second
+                elif first <= 12 and second <= 12:
+                    # Ambiguous case - use context clues
+                    # Check for US-style keywords in the text
+                    context_text = pattern_info.get('context_text', '')
+                    us_indicators = ['sell by', 'best by', 'use by', 'expires']
+                    eu_indicators = ['best before', 'mindestens haltbar', 'à consommer']
+
+                    has_us_indicator = any(indicator in context_text.lower() for indicator in us_indicators)
+                    has_eu_indicator = any(indicator in context_text.lower() for indicator in eu_indicators)
+
+                    if has_us_indicator and not has_eu_indicator:
+                        month, day = first, second  # US format
+                    elif pattern_info.get('region') == 'US' and first <= 12:
+                        month, day = first, second  # US preference
+                    else:
+                        day, month = first, second  # EU default
+                else:
+                    # Default to region preference
+                    if pattern_info.get('region') == 'US':
+                        month, day = first, second
+                    else:
+                        day, month = first, second
+            else:
+                # Try 2-digit year normalization
+                if len(groups[2]) == 2:
+                    year = self._normalize_year(third)
+                    if pattern_info.get('region') == 'US' and first <= 12:
+                        month, day = first, second
+                    else:
+                        day, month = first, second
+                else:
+                    return None
+
+            # Validate date components
+            if not (1 <= month <= 12 and 1 <= day <= 31):
+                return None
+
+            return datetime(year, month, day)
+
+        except (ValueError, TypeError):
+            return None
 
     def _parse_month_name_date(
         self,
@@ -431,10 +646,10 @@ class DateExtractionService:
             else:  # Mon DD YYYY
                 month_str, day, year = groups[0], groups[1], groups[2]
 
-            month = self._get_month_number(month_str.lower(), detected_language)
-            if month:
+            month_num: Optional[int] = self._get_month_number(month_str.lower(), detected_language)
+            if month_num is not None:
                 year_normalized = self._normalize_year(int(year))
-                return datetime(year_normalized, month, int(day))
+                return datetime(year_normalized, month_num, int(day))
 
         except (ValueError, TypeError):
             pass
@@ -458,6 +673,24 @@ class DateExtractionService:
             return datetime(year, month, day)
 
         except ValueError:
+            return None
+
+    def _parse_compact_date_yyyy(self, date_str: str) -> Optional[datetime]:
+        """Parse YYYY first compact date formats like YYYYMMDD"""
+        try:
+            logger.debug(f"Parsing YYYY compact date: '{date_str}' (length: {len(date_str)})")
+            if len(date_str) == 8:  # YYYYMMDD
+                year = int(date_str[:4])
+                month = int(date_str[4:6])
+                day = int(date_str[6:])
+                parsed_date = datetime(year, month, day)
+                logger.debug(f"Parsed YYYY date components: year={year}, month={month}, day={day} -> {parsed_date}")
+                return parsed_date
+            else:
+                logger.debug(f"Invalid length for YYYY compact date: {len(date_str)}")
+                return None
+        except ValueError as e:
+            logger.debug(f"ValueError parsing YYYY compact date: {e}")
             return None
 
     def _get_month_number(self, month_str: str, detected_language: Optional[str]) -> Optional[int]:
@@ -506,7 +739,7 @@ class DateExtractionService:
                 language_scores[language] = score
 
         if language_scores:
-            return max(language_scores, key=language_scores.get)
+            return max(language_scores.keys(), key=lambda k: language_scores[k])
 
         return 'english'  # Default to English
 
@@ -590,31 +823,38 @@ class DateExtractionService:
         """Get pattern processing priority based on region preference"""
         if preferred_region == 'EU':
             return [
-                'context_best_before', 'context_use_by', 'eu_month_name',
-                'eu_standard', 'compact_alpha', 'context_manufactured',
-                'mfg_compact', 'production_date', 'made_on',
-                'context_expiry', 'us_month_name', 'us_standard', 'iso_standard'
+                'context_best_before', 'context_use_by', 'context_sell_by_us',
+                'context_sell_by', 'context_display_until', 'context_expiry_eu',
+                'context_expiry_yyyy', 'context_expiry', 'context_manufactured_yyyy',
+                'context_manufactured_compact', 'eu_month_name', 'eu_standard',
+                'compact_alpha', 'context_manufactured', 'mfg_compact', 'production_date',
+                'made_on', 'us_month_name', 'us_standard', 'iso_standard'
             ]
         elif preferred_region == 'US':
             return [
-                'context_expiry', 'us_month_name', 'us_standard',
-                'context_best_before', 'context_use_by', 'compact_alpha',
-                'context_manufactured', 'mfg_compact', 'production_date', 'made_on',
-                'eu_month_name', 'eu_standard', 'iso_standard'
+                'context_expiry', 'context_expiry_yyyy', 'context_sell_by_us',
+                'us_month_name', 'us_standard', 'context_best_before',
+                'context_use_by', 'context_sell_by', 'context_display_until',
+                'context_expiry_eu', 'context_manufactured_yyyy', 'context_manufactured_compact',
+                'compact_alpha', 'context_manufactured', 'mfg_compact', 'production_date',
+                'made_on', 'eu_month_name', 'eu_standard', 'iso_standard'
             ]
         else:  # AUTO or unknown
             return [
-                'context_best_before', 'context_use_by', 'context_expiry',
-                'eu_month_name', 'us_month_name', 'compact_alpha',
-                'eu_standard', 'us_standard', 'context_manufactured',
+                'context_best_before', 'context_use_by', 'context_sell_by',
+                'context_sell_by_us', 'context_display_until', 'context_expiry',
+                'context_expiry_eu', 'context_expiry_yyyy', 'context_manufactured_yyyy',
+                'context_manufactured_compact', 'eu_month_name', 'us_month_name',
+                'compact_alpha', 'eu_standard', 'us_standard', 'context_manufactured',
                 'mfg_compact', 'production_date', 'made_on', 'iso_standard'
             ]
 
     def _get_date_type_priority(self, date_type: str) -> int:
         """Get priority score for date type (higher is better)"""
         priorities = {
-            'use_by': 5,
-            'expiry': 4,
+            'use_by': 6,
+            'expiry': 5,
+            'sell_by': 4,
             'best_before': 3,
             'manufactured': 2,
             'unknown': 1
@@ -627,7 +867,7 @@ class DateExtractionService:
             return []
 
         # Group by date
-        date_groups = {}
+        date_groups: dict[str, list[DateExtractionResult]] = {}
         for result in results:
             if result.date:
                 date_key = result.date.strftime('%Y-%m-%d')
@@ -663,9 +903,12 @@ class DateExtractionService:
         return True
 
 
+# Global service instance
+_date_extraction_service: Optional[DateExtractionService] = None
+
 def get_date_extraction_service() -> DateExtractionService:
     """Get singleton instance of date extraction service"""
     global _date_extraction_service
-    if '_date_extraction_service' not in globals():
+    if _date_extraction_service is None:
         _date_extraction_service = DateExtractionService()
     return _date_extraction_service
