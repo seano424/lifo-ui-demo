@@ -403,7 +403,6 @@ class BatchCreationService:
         Bulk create products that don't exist yet
         Returns dict mapping barcode -> product_id for newly created products
         """
-        import time
 
         from app.database.inventory_models import Product, StoreProduct
 
@@ -1064,7 +1063,6 @@ class BatchCreationService:
         Bulk create products that don't exist yet
         Returns dict mapping barcode -> product_id for newly created products
         """
-        import time
 
         from app.database.inventory_models import Product, StoreProduct
 

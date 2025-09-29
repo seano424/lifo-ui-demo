@@ -3,7 +3,6 @@ Structured logging system for LIFO AI Engine
 Centralized log aggregation with correlation IDs and business event tracking
 """
 
-import json
 import logging
 import sys
 import uuid
@@ -12,8 +11,7 @@ from typing import Any, Dict, Optional
 from contextvars import ContextVar
 
 import structlog
-from structlog.contextvars import bind_contextvars, clear_contextvars
-from opentelemetry import trace
+from structlog.contextvars import clear_contextvars
 
 from app.core.config import settings
 from app.monitoring.tracing import get_current_trace_id, get_current_span_id

@@ -245,6 +245,7 @@
     }
   },
   "pricingpage": {
+    "contactUs": "Neem contact op voor vragen",
     "title": "Kies uw plan",
     "subtitle": "Begin met onze gratis proefperiode en schaal mee met uw groei. Geen vastlegging, volledige ondersteuning inbegrepen.",
     "badges": {
@@ -263,10 +264,10 @@
         "title": "Gratis proefperiode",
         "subtitle": "Pilot winkels",
         "price": "Gratis",
-        "period": "3 maanden",
-        "description": "Alle functies, zonder beperkingen, voor een gratis proefperiode van 3 maanden.",
+        "period": "2 maanden",
+        "description": "Alle functies, zonder beperkingen, voor een gratis proefperiode van 2 maanden.",
         "features": {
-          "0": "3 dagen onboarding en training",
+          "0": "1 dag onboarding en training",
           "1": "Volledige ondersteuning inbegrepen",
           "2": "Geen vastlegging - stop wanneer u wilt",
           "3": "Alle functies ontgrendeld"

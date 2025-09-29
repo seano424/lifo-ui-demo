@@ -3,7 +3,6 @@ Load Testing Configuration for Phase 2 API Consolidations
 Uses Locust for performance testing of consolidated endpoints
 """
 
-import json
 import random
 from datetime import datetime, timedelta
 

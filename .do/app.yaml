@@ -3,7 +3,7 @@
 # Update: doctl apps update <app_id> --spec .do/app.yaml
 
 name: lifo-ai-api
-region: nyc1
+region: ams3
 
 services:
 - name: fastapi-backend
@@ -12,20 +12,21 @@ services:
     repo: lifo-ai/lifo-app
     branch: main  # Production deploys from main branch
     deploy_on_push: true
-  
-  # Build configuration
-  build_command: |
-    pip install --upgrade pip
-    pip install -r requirements.txt
-  
+
+  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
+  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
+
+  # Explicitly specify Python version from pyproject.toml
+  environment_slug: python
+
   # Run command for production
   run_command: gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 1000 --preload app.main:app
-  
+
   # Resource allocation
   instance_count: 1
   instance_size_slug: basic-xxs  # Can scale up to professional-xs, professional-s, etc.
-  
-  # Health check
+
+  # Health check enabled for production
   health_check:
     http_path: /api/v1/health
     initial_delay_seconds: 30
@@ -39,29 +40,18 @@ services:
   # Application settings
   - key: ENVIRONMENT
     value: production
-    type: SECRET
   
-  # Database configuration (will be set in DO console)
-  - key: DATABASE_URL
-    value: ""  # Set this in DO App Platform console as encrypted
-    type: SECRET
-  
-  - key: SUPABASE_URL
-    value: ""  # Set in console
-    type: SECRET
-    
-  - key: SUPABASE_ANON_KEY
-    value: ""  # Set in console
-    type: SECRET
-  
-  - key: SUPABASE_SERVICE_ROLE_KEY
-    value: ""  # Set in console
-    type: SECRET
-  
-  # Security
-  - key: SECRET_KEY
-    value: ""  # Set in console - generate with: openssl rand -hex 32
-    type: SECRET
+  # Database configuration (set in DO App Platform console)
+  # - key: DATABASE_URL
+  #   type: SECRET
+  # - key: SUPABASE_URL
+  #   type: SECRET
+  # - key: SUPABASE_ANON_KEY
+  #   type: SECRET
+  # - key: SUPABASE_SERVICE_ROLE_KEY
+  #   type: SECRET
+  # - key: SECRET_KEY
+  #   type: SECRET
   
   - key: ALGORITHM
     value: HS256
@@ -80,10 +70,9 @@ services:
   - key: BACKEND_CORS_ORIGINS
     value: "https://lifo-app.com,https://www.lifo-app.com"
   
-  # Google Cloud (if using Vision API)
-  - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
-    value: ""  # Set in console as base64 encoded service account JSON
-    type: SECRET
+  # Google Cloud (set in DO App Platform console)
+  # - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+  #   type: SECRET
   
   # # Redis (if using caching)
   # - key: REDIS_URL
@@ -94,9 +83,8 @@ services:
   - key: LOG_LEVEL
     value: INFO
   
-  - key: SENTRY_DSN
-    value: ""  # Optional: Set for error tracking
-    type: SECRET
+  # - key: SENTRY_DSN  # Optional: Set for error tracking in DO console
+  #   type: SECRET
   
   # Performance settings
   - key: WORKERS
@@ -109,43 +97,45 @@ services:
   http_port: 8080
   
   # Routes - this exposes the API publicly
+  # Let FastAPI handle all routing internally (no path stripping)
   routes:
-  - path: /
-  - path: /api
-  - path: /docs  # FastAPI auto-docs
-  - path: /redoc  # Alternative docs
-  - path: /openapi.json
+  - path: /            # Forward all paths to FastAPI without modification
+    preserve_path_prefix: true
 
-# Optional: Database (if you want managed PostgreSQL)
-databases:
-- name: lifo-postgres
-  engine: PG
-  version: "15"
-  size: db-s-1vcpu-1gb  # Can scale up
-  num_nodes: 1
+  # Service-level alerts
+  alerts:
+  - rule: CPU_UTILIZATION
+    disabled: false
+    operator: GREATER_THAN
+    value: 80
+    window: FIVE_MINUTES
+  - rule: MEM_UTILIZATION
+    disabled: false
+    operator: GREATER_THAN
+    value: 80
+    window: FIVE_MINUTES
+  - rule: RESTART_COUNT
+    disabled: false
+    operator: GREATER_THAN
+    value: 5
+    window: FIVE_MINUTES
 
-# Optional: Static assets (if serving any)
-static_sites:
-- name: api-docs
-  source_dir: docs
-  index_document: index.html
-  error_document: index.html
-  routes:
-  - path: /static
+# Optional: Database (using Supabase instead of DO managed PostgreSQL)
+# databases:
+# - name: lifo-postgres
+#   engine: PG
+#   version: "15"
+#   size: db-s-1vcpu-1gb  # Can scale up
+#   num_nodes: 1
+
 
 # Jobs for maintenance tasks (optional)
-jobs:
-- name: db-migrate
-  source_dir: lifo_api
-  run_command: alembic upgrade head
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  kind: PRE_DEPLOY  # Runs before deployment
+# Database migrations handled by Supabase, not Alembic
+# jobs:
+# - name: db-migrate
+#   source_dir: lifo_api
+#   run_command: alembic upgrade head # Not needed for Supabase
+#   instance_count: 1
+#   instance_size_slug: basic-xxs
+#   kind: PRE_DEPLOY  # Runs before deployment
 
-alerts:
-- rule: CPU_UTILIZATION
-  value: 80
-- rule: MEM_UTILIZATION  
-  value: 80
-- rule: RESTART_COUNT
-  value: 5

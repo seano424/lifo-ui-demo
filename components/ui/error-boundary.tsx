@@ -1,112 +1,139 @@
 'use client'
 
-import { AlertTriangle, RefreshCw } from 'lucide-react'
-import React from 'react'
+import { AlertCircle, RefreshCw } from 'lucide-react'
+import React, { type ErrorInfo, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Typography } from '@/components/ui/typography'
 
-interface ErrorBoundaryProps {
-  children: React.ReactNode
-  fallback?: React.ComponentType<ErrorBoundaryFallbackProps>
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
+interface Props {
+  children: ReactNode
+  fallback?: ReactNode
+  onError?: (error: Error, errorInfo: ErrorInfo) => void
 }
 
-interface ErrorBoundaryFallbackProps {
-  error: Error
-  retry: () => void
-}
-
-interface ErrorBoundaryState {
+interface State {
   hasError: boolean
-  error: Error | null
+  error?: Error
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+export class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo)
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo)
     this.props.onError?.(error, errorInfo)
   }
 
-  retry = () => {
-    this.setState({ hasError: false, error: null })
+  handleRetry = () => {
+    this.setState({ hasError: false, error: undefined })
   }
 
   render() {
     if (this.state.hasError) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback
-      return <FallbackComponent error={this.state.error!} retry={this.retry} />
+      if (this.props.fallback) {
+        return this.props.fallback
+      }
+
+      return (
+        <Card className="m-4 border-destructive">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Something went wrong
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              An error occurred while loading this component. Please try refreshing the page or
+              contact support if the problem persists.
+            </p>
+
+            {process.env.NODE_ENV === 'development' && this.state.error && (
+              <details className="text-sm">
+                <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                  Error details (development only)
+                </summary>
+                <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
+                  {this.state.error.stack}
+                </pre>
+              </details>
+            )}
+
+            <Button onClick={this.handleRetry} variant="outline" className="w-full">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )
     }
 
     return this.props.children
   }
 }
 
-function DefaultErrorFallback({ error, retry }: ErrorBoundaryFallbackProps) {
+// Hook version for functional components
+export function useErrorBoundary() {
+  const [error, setError] = React.useState<Error | null>(null)
+
+  const resetError = React.useCallback(() => {
+    setError(null)
+  }, [])
+
+  const captureError = React.useCallback((error: Error) => {
+    setError(error)
+  }, [])
+
+  if (error) {
+    throw error
+  }
+
+  return { captureError, resetError }
+}
+
+// Simple error fallback component
+export function SimpleErrorFallback({
+  error: _error,
+  resetError,
+}: {
+  error: Error
+  resetError: () => void
+}) {
   return (
-    <div className="flex items-center justify-center min-h-[400px]">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <AlertTriangle className="h-12 w-12 text-destructive" />
-          </div>
-          <CardTitle>Something went wrong</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Typography variant="p" color="muted" className="text-center">
-            An error occurred while loading this step. Please try again or contact support if the
-            problem persists.
-          </Typography>
-
-          {process.env.NODE_ENV === 'development' && (
-            <div className="bg-muted p-3 rounded-2xl text-sm">
-              <Typography variant="p" className="font-mono text-xs">
-                {error.message}
-              </Typography>
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <Button onClick={retry} className="w-full">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Try Again
-            </Button>
-            <Button variant="outline" onClick={() => window.location.reload()} className="w-full">
-              Reload Page
-            </Button>
-          </div>
-
-          <Typography variant="p" className="text-center text-xs text-muted-foreground">
-            Need help?{' '}
-            <a
-              href="mailto:support@lifo.ai?subject=Onboarding Error"
-              className="text-primary hover:underline"
-            >
-              Contact Support
-            </a>
-          </Typography>
-        </CardContent>
-      </Card>
+    <div className="text-center py-8">
+      <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+      <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
+      <p className="text-muted-foreground mb-4">Unable to load this content. Please try again.</p>
+      <Button onClick={resetError} variant="outline">
+        <RefreshCw className="h-4 w-4 mr-2" />
+        Retry
+      </Button>
     </div>
   )
 }
 
-// Hook for handling async errors in functional components
-export function useErrorHandler() {
-  const [, setError] = React.useState()
-
-  return React.useCallback((error: Error) => {
-    setError(() => {
-      throw error
-    })
-  }, [])
+// Specific error boundary for infinite scroll components
+export function InfiniteScrollErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <div className="text-center py-8 text-muted-foreground">
+          <p>Unable to load more items. Please refresh the page to try again.</p>
+        </div>
+      }
+      onError={(error, errorInfo) => {
+        // Log infinite scroll specific errors
+        console.error('Infinite scroll error:', error, errorInfo)
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  )
 }

@@ -4,7 +4,6 @@ This is a placeholder implementation for the MCP CSV processor
 Currently experimental - not used in production
 """
 
-import asyncio
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List
 from uuid import uuid4

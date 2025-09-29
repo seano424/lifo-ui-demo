@@ -2,6 +2,7 @@
 
 import bcrypt from 'bcryptjs'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 export interface PINLoginResult {
   success: boolean
@@ -23,88 +24,31 @@ export interface PINValidationData {
 }
 
 // PIN configuration constants
+export const MIN_PIN_LENGTH = 6
+
 export const PIN_CONFIG = {
-  length: 6,
+  minLength: MIN_PIN_LENGTH,
   maxAttempts: 3,
   lockoutDurationMinutes: 15,
   expiryDays: 90,
   historyCount: 5, // Can't reuse last 5 PINs
 } as const
 
-// Blocked PIN patterns (weak PINs)
-export const BLOCKED_PINS = [
-  '000000',
-  '111111',
-  '222222',
-  '333333',
-  '444444',
-  '555555',
-  '666666',
-  '777777',
-  '888888',
-  '999999',
-  '123456',
-  '654321',
-  '246810',
-  '135790',
-  '012345',
-  '543210',
-  '567890',
-  '098765',
-  '000001',
-  '111122',
-  '123123',
-  '456456',
-  '789789',
-] as const
-
 /**
- * Generate a secure 6-digit PIN
+ * Generate a secure PIN (defaults to 6 digits, but can be customized)
  */
-export function generateSecurePIN(): string {
-  let pin: string
-  let attempts = 0
-  const maxAttempts = 100
+export function generateSecurePIN(length: number = MIN_PIN_LENGTH): string {
+  if (length < MIN_PIN_LENGTH) {
+    throw new Error(`PIN length must be at least ${MIN_PIN_LENGTH} digits`)
+  }
 
-  do {
-    pin = Math.floor(100000 + Math.random() * 900000).toString()
-    attempts++
+  const min = 10 ** (length - 1)
+  const max = 10 ** length - 1
 
-    if (attempts > maxAttempts) {
-      throw new Error('Unable to generate secure PIN after maximum attempts')
-    }
-  } while (BLOCKED_PINS.includes(pin as (typeof BLOCKED_PINS)[number]) || isSequentialPIN(pin))
+  // Generate random PIN of specified length
+  const pin = Math.floor(min + Math.random() * (max - min + 1)).toString()
 
   return pin
-}
-
-/**
- * Check if PIN contains sequential numbers
- */
-function isSequentialPIN(pin: string): boolean {
-  if (pin.length !== 6) return false
-
-  const digits = pin.split('').map(Number)
-
-  // Check ascending sequence (1234, 2345, etc.)
-  let isAscending = true
-  for (let i = 1; i < digits.length; i++) {
-    if (digits[i] !== digits[i - 1] + 1) {
-      isAscending = false
-      break
-    }
-  }
-
-  // Check descending sequence (4321, 5432, etc.)
-  let isDescending = true
-  for (let i = 1; i < digits.length; i++) {
-    if (digits[i] !== digits[i - 1] - 1) {
-      isDescending = false
-      break
-    }
-  }
-
-  return isAscending || isDescending
 }
 
 /**
@@ -136,7 +80,7 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
     })
 
     if (error) {
-      console.error('[validatePINLogin] RPC error:', error)
+      logger.error('PIN Auth', 'validatePINLogin RPC error:', error)
       return {
         success: false,
         error: 'Authentication service error',
@@ -184,7 +128,7 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
     })
 
     if (authError) {
-      console.error('[validatePINLogin] Auth error:', authError)
+      logger.error('PIN Auth', 'validatePINLogin auth error:', authError)
       // Fallback: try to refresh the session if user is already logged in
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
       if (sessionError || !sessionData.session) {
@@ -206,7 +150,7 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
       },
     }
   } catch (error) {
-    console.error('[validatePINLogin] Unexpected error:', error)
+    logger.error('PIN Auth', 'validatePINLogin unexpected error:', error)
     return {
       success: false,
       error: 'Login failed. Please try again.',
@@ -226,13 +170,13 @@ export async function resetUserPINAttempts(userId: string): Promise<boolean> {
     })
 
     if (error) {
-      console.error('[resetUserPINAttempts] Error:', error)
+      logger.error('PIN Auth', 'resetUserPINAttempts error:', error)
       return false
     }
 
     return true
   } catch (error) {
-    console.error('[resetUserPINAttempts] Unexpected error:', error)
+    logger.error('PIN Auth', 'resetUserPINAttempts unexpected error:', error)
     return false
   }
 }
@@ -249,10 +193,10 @@ export async function updateUserPIN(
 
   try {
     // Validate new PIN strength
-    if (BLOCKED_PINS.includes(newPin as (typeof BLOCKED_PINS)[number]) || isSequentialPIN(newPin)) {
+    if (newPin.length < MIN_PIN_LENGTH) {
       return {
         success: false,
-        error: 'PIN is too weak. Please choose a different PIN.',
+        error: `PIN must be at least ${MIN_PIN_LENGTH} digits long.`,
       }
     }
 
@@ -271,7 +215,7 @@ export async function updateUserPIN(
 
     return { success: true }
   } catch (error) {
-    console.error('[updateUserPIN] Unexpected error:', error)
+    logger.error('PIN Auth', 'updateUserPIN unexpected error:', error)
     return {
       success: false,
       error: 'Failed to update PIN',
@@ -319,13 +263,13 @@ export async function isUserPINLocked(userId: string): Promise<boolean> {
     })
 
     if (error) {
-      console.error('[isUserPINLocked] Error:', error)
+      logger.error('PIN Auth', 'isUserPINLocked error:', error)
       return false
     }
 
     return data?.is_locked || false
   } catch (error) {
-    console.error('[isUserPINLocked] Unexpected error:', error)
+    logger.error('PIN Auth', 'isUserPINLocked unexpected error:', error)
     return false
   }
 }

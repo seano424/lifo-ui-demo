@@ -20,7 +20,7 @@ try:
 except ImportError:
     USE_OPTIMIZED_SERVICE = False
 from app.utils.csv_to_batch_adapter import CSVToBatchAdapter
-from app.utils.timing_metrics import CSVProcessingTimer, TimingMetrics, get_memory_usage_mb
+from app.utils.timing_metrics import CSVProcessingTimer, get_memory_usage_mb
 
 logger = structlog.get_logger()
 

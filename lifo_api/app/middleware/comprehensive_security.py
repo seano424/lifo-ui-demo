@@ -40,6 +40,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             "/openapi.json",
             "/favicon.ico",
             "/robots.txt",
+            "/api/v1/test"
         }
 
         # High-security endpoints requiring extra validation

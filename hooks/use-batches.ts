@@ -25,6 +25,7 @@ import {
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { Database } from '@/types/supabase'
+import type { TodoFilters } from '@/lib/queries/todos-rpc'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -336,12 +337,51 @@ export function useBatchActions() {
     },
 
     onSettled: (data, _error, { batchId }) => {
+      // Invalidate batch-related queries
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.detail(batchId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.batches.todo(batchId),
       })
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
+        })
+
+        // Invalidate todo-related queries that depend on batch data
+        queryClient.invalidateQueries({
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            // Match the exact structure: ["todos", "filtered", { storeId, filters, pageSize }]
+            if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+              const params = queryKey?.[2] as
+                | { storeId?: string; filters?: TodoFilters; pageSize?: number }
+                | undefined
+              return params?.storeId === activeStoreId
+            }
+            return false
+          },
+        })
+
+        // Also force refetch to ensure immediate data updates
+        queryClient.refetchQueries({
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            // Match the exact structure: ["todos", "filtered", { storeId, filters, pageSize }]
+            if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+              const params = queryKey?.[2] as
+                | { storeId?: string; filters?: TodoFilters; pageSize?: number }
+                | undefined
+              return params?.storeId === activeStoreId
+            }
+            return false
+          },
+        })
+
+        // Invalidate dashboard summaries since batch updates affect metrics
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.dashboardSummary(activeStoreId),
         })
       }
 
@@ -352,7 +392,15 @@ export function useBatchActions() {
       }
     },
 
-    onSuccess: () => {
+    onSuccess: (_data, { batchId }) => {
+      // Immediately invalidate the batch todo query after successful update
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.batches.todo(batchId),
+      })
+      // Also force refetch
+      queryClient.refetchQueries({
+        queryKey: queryKeys.batches.todo(batchId),
+      })
       toast.success('Batch updated successfully')
     },
   })

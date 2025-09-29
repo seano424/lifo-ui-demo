@@ -4,7 +4,6 @@ Supports multiple notification channels with intelligent throttling
 """
 
 import asyncio
-import json
 import time
 from collections import defaultdict, deque
 from datetime import datetime, timedelta, UTC

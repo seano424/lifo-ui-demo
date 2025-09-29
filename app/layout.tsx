@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import { getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
-import { Toaster } from 'sonner'
+import { Toaster } from '@/components/ui/toaster'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
@@ -42,8 +42,6 @@ const robotoMono = Roboto_Mono({
   weight: ['400', '500', '600', '700'],
 })
 
-const devMode = process.env.NODE_ENV === 'development'
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -57,7 +55,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} scroll-smooth`}
     >
-      <body className={`font-sans antialiased ${devMode && 'debug-screens'}`}>
+      <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light" // Use light theme as default until we add dark themes across
@@ -74,6 +72,8 @@ export default async function RootLayout({
             richColors
             theme="light"
             className="toaster"
+            closeButton
+            closeOnClickOutside
             toastOptions={{
               className: 'toast',
               duration: 4000,
