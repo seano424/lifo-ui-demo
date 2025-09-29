@@ -1,27 +1,8 @@
 'use client'
 
 import type { ColumnDef, Header } from '@tanstack/react-table'
-import {
-  AlertTriangle,
-  Calendar,
-  DollarSign,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Package,
-  Trash2,
-} from 'lucide-react'
+import { Calendar, DollarSign, Package } from 'lucide-react'
 import { SortableHeader } from '@/components/batches/sortable-header'
-import { Button } from '@/components/ui/button'
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { getExpiryBadge, getStatusBadge } from '@/lib/utils/batch-utils'
 
@@ -69,9 +50,6 @@ export function createBatchTableColumns({
   t,
   tStatus,
   tExpiry,
-  markBatchAsExpired,
-  markBatchAsDamaged,
-  isUpdating,
   DEFAULT_COLUMN_WIDTHS,
 }: {
   data: BatchWithProduct[]
@@ -80,9 +58,6 @@ export function createBatchTableColumns({
   t: (key: string) => string
   tStatus: (key: string) => string
   tExpiry: (key: string, params?: { days: number }) => string
-  markBatchAsExpired: (id: string) => void
-  markBatchAsDamaged: (id: string) => void
-  isUpdating: boolean
   DEFAULT_COLUMN_WIDTHS: Record<string, number>
 }): ColumnDef<BatchWithProduct>[] {
   return [
@@ -270,54 +245,6 @@ export function createBatchTableColumns({
         calculateMaxWidth(data, item => item.status || 'active'),
       ),
       enableResizing: true,
-    },
-    {
-      id: 'actions',
-      header: '',
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" disabled={isUpdating}>
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" />
-              {t('actions.viewDetails')}
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Edit className="mr-2 h-4 w-4" />
-              {t('actions.editBatch')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => markBatchAsExpired(row.original.batch_id)}
-              disabled={row.original.status === 'expired'}
-            >
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              {t('actions.markAsExpired')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => markBatchAsDamaged(row.original.batch_id)}
-              disabled={row.original.status === 'damaged'}
-            >
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              {t('actions.markAsDamaged')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t('actions.deleteBatch')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-      enableResizing: false,
-      size: DEFAULT_COLUMN_WIDTHS.actions,
-      minSize: 50,
     },
   ]
 }

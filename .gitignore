@@ -35,7 +35,7 @@ yarn-error.log*
 .env
 
 credentials/
-*.json
+# *.json
 !package.json
 !package-lock.json
 !tsconfig.json
@@ -104,23 +104,18 @@ htmlcov/
 report_*
 
 # Test data and debug files
-test_data/
+# test_data/
 test_archive/
+
 *debug*
+
+test_*.py
+
 debug/
 
 # Environment backups
 *.env.backup
 *.env.legacy
-
-# Documentation artifacts (keep essential docs only)
-PERFORMANCE_OPTIMIZATION_REPORT.md
-PRODUCT_SCORING_RULES_DOCUMENTATION.md
-DONATION_FIRST_REFERENCE.md
-ARCHITECTURE_MIGRATION_GUIDE.md
-SECURITY_AUDIT_REPORT.md
-DOCUMENTATION.md
-docs/archive/
 
 # Development logs and temporary files (expanded)
 *.log

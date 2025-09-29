@@ -21,6 +21,7 @@ logger = structlog.get_logger()
 
 
 @router.get("/")
+@router.get("")
 async def health_check() -> dict[str, Any]:
     """
     Comprehensive health check for all services

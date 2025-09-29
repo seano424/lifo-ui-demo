@@ -10,7 +10,6 @@ import json
 import random
 import string
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
 import httpx
 import psutil
 import base64
@@ -94,13 +93,13 @@ class APIPerformanceTestSuite:
                 self.results["health_p95"] = sorted(health_times)[int(len(health_times) * 0.95)]
                 self.results["health_p99"] = sorted(health_times)[int(len(health_times) * 0.99)]
                 
-                print(f"\n  Results:")
+                print("\n  Results:")
                 print(f"    Average: {self.results['health_avg']:.2f}ms")
                 print(f"    P50: {self.results['health_p50']:.2f}ms")
                 print(f"    P95: {self.results['health_p95']:.2f}ms")
                 print(f"    P99: {self.results['health_p99']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['health_check']}ms")
-                print(f"    ✓ PASS" if self.results['health_avg'] < PERFORMANCE_TARGETS['health_check'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['health_avg'] < PERFORMANCE_TARGETS['health_check'] else "    ✗ FAIL")
     
     async def test_mobile_endpoints(self):
         """Test mobile endpoint performance"""
@@ -131,11 +130,11 @@ class APIPerformanceTestSuite:
                 self.results["mobile_summary_avg"] = statistics.mean(mobile_times)
                 self.results["mobile_summary_p95"] = sorted(mobile_times)[int(len(mobile_times) * 0.95)]
                 
-                print(f"\n  Mobile Summary Results:")
+                print("\n  Mobile Summary Results:")
                 print(f"    Average: {self.results['mobile_summary_avg']:.2f}ms")
                 print(f"    P95: {self.results['mobile_summary_p95']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['mobile_summary']}ms")
-                print(f"    ✓ PASS" if self.results['mobile_summary_avg'] < PERFORMANCE_TARGETS['mobile_summary'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['mobile_summary_avg'] < PERFORMANCE_TARGETS['mobile_summary'] else "    ✗ FAIL")
             
             # Test batch-quick-score endpoint
             print("\nTesting batch-quick-score endpoint...")
@@ -167,11 +166,11 @@ class APIPerformanceTestSuite:
                 self.results["batch_quick_score_avg"] = statistics.mean(quick_score_times)
                 self.results["batch_quick_score_p95"] = sorted(quick_score_times)[int(len(quick_score_times) * 0.95)]
                 
-                print(f"\n  Batch Quick Score Results:")
+                print("\n  Batch Quick Score Results:")
                 print(f"    Average: {self.results['batch_quick_score_avg']:.2f}ms")
                 print(f"    P95: {self.results['batch_quick_score_p95']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['batch_quick_score']}ms")
-                print(f"    ✓ PASS" if self.results['batch_quick_score_avg'] < PERFORMANCE_TARGETS['batch_quick_score'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['batch_quick_score_avg'] < PERFORMANCE_TARGETS['batch_quick_score'] else "    ✗ FAIL")
     
     async def test_bulk_scoring(self):
         """Test bulk scoring performance"""
@@ -212,11 +211,11 @@ class APIPerformanceTestSuite:
                 self.results["bulk_scoring_avg"] = statistics.mean(bulk_times)
                 self.results["bulk_scoring_p95"] = sorted(bulk_times)[int(len(bulk_times) * 0.95)] if len(bulk_times) > 1 else bulk_times[0]
                 
-                print(f"\n  Bulk Scoring Results (71 batches):")
+                print("\n  Bulk Scoring Results (71 batches):")
                 print(f"    Average: {self.results['bulk_scoring_avg']:.2f}ms")
                 print(f"    P95: {self.results['bulk_scoring_p95']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['bulk_scoring']}ms")
-                print(f"    ✓ PASS" if self.results['bulk_scoring_avg'] < PERFORMANCE_TARGETS['bulk_scoring'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['bulk_scoring_avg'] < PERFORMANCE_TARGETS['bulk_scoring'] else "    ✗ FAIL")
                 
                 # Calculate improvement from baseline (5000ms pre-optimization)
                 baseline = 5000
@@ -255,11 +254,11 @@ class APIPerformanceTestSuite:
                 self.results["analytics_dashboard_avg"] = statistics.mean(analytics_times)
                 self.results["analytics_dashboard_p95"] = sorted(analytics_times)[int(len(analytics_times) * 0.95)] if len(analytics_times) > 1 else analytics_times[0]
                 
-                print(f"\n  Analytics Dashboard Results:")
+                print("\n  Analytics Dashboard Results:")
                 print(f"    Average: {self.results['analytics_dashboard_avg']:.2f}ms")
                 print(f"    P95: {self.results['analytics_dashboard_p95']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['analytics_dashboard']}ms")
-                print(f"    ✓ PASS" if self.results['analytics_dashboard_avg'] < PERFORMANCE_TARGETS['analytics_dashboard'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['analytics_dashboard_avg'] < PERFORMANCE_TARGETS['analytics_dashboard'] else "    ✗ FAIL")
     
     async def test_csv_processing(self):
         """Test CSV processing performance"""
@@ -294,10 +293,10 @@ class APIPerformanceTestSuite:
             if validation_times:
                 self.results["csv_validation_avg"] = statistics.mean(validation_times)
                 
-                print(f"\n  CSV Validation Results (100 rows):")
+                print("\n  CSV Validation Results (100 rows):")
                 print(f"    Average: {self.results['csv_validation_avg']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['csv_validation']}ms")
-                print(f"    ✓ PASS" if self.results['csv_validation_avg'] < PERFORMANCE_TARGETS['csv_validation'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['csv_validation_avg'] < PERFORMANCE_TARGETS['csv_validation'] else "    ✗ FAIL")
             
             # Test CSV upload
             print("\nTesting CSV upload...")
@@ -321,10 +320,10 @@ class APIPerformanceTestSuite:
             if upload_times:
                 self.results["csv_upload_avg"] = statistics.mean(upload_times)
                 
-                print(f"\n  CSV Upload Results (100 rows):")
+                print("\n  CSV Upload Results (100 rows):")
                 print(f"    Average: {self.results['csv_upload_avg']:.2f}ms")
                 print(f"    Target: <{PERFORMANCE_TARGETS['csv_upload']}ms")
-                print(f"    ✓ PASS" if self.results['csv_upload_avg'] < PERFORMANCE_TARGETS['csv_upload'] else "    ✗ FAIL")
+                print("    ✓ PASS" if self.results['csv_upload_avg'] < PERFORMANCE_TARGETS['csv_upload'] else "    ✗ FAIL")
     
     async def test_multiport_servers(self):
         """Test performance across multiple server ports"""
@@ -463,7 +462,7 @@ class APIPerformanceTestSuite:
                 print(f"{metric_name:30} {actual:>10.2f}ms  Target: <{target}ms  {status}")
         
         # Performance improvements
-        print(f"\n📈 KEY PERFORMANCE IMPROVEMENTS:")
+        print("\n📈 KEY PERFORMANCE IMPROVEMENTS:")
         print("-" * 40)
         
         if self.results.get("bulk_scoring_avg"):
@@ -475,7 +474,7 @@ class APIPerformanceTestSuite:
             print(f"  Baseline: ~{baseline}ms → Current: {current:.0f}ms")
         
         # Concurrent performance
-        print(f"\n🔄 CONCURRENT LOAD PERFORMANCE:")
+        print("\n🔄 CONCURRENT LOAD PERFORMANCE:")
         print("-" * 40)
         
         for level in [1, 5, 10, 20, 50]:
@@ -486,7 +485,7 @@ class APIPerformanceTestSuite:
                 print(f"{level:2d} concurrent: Avg {avg:>7.2f}ms, P95 {p95:>7.2f}ms, Success {success:>3.0f}%")
         
         # Multi-port status
-        print(f"\n🖥️  MULTI-PORT SERVER STATUS:")
+        print("\n🖥️  MULTI-PORT SERVER STATUS:")
         print("-" * 40)
         
         if "multiport_results" in self.results:
@@ -500,7 +499,7 @@ class APIPerformanceTestSuite:
             print(f"\nTotal Active: {active_count}/6 servers")
         
         # Memory usage
-        print(f"\n💾 SYSTEM RESOURCES:")
+        print("\n💾 SYSTEM RESOURCES:")
         print("-" * 40)
         
         process = psutil.Process()
@@ -512,7 +511,7 @@ class APIPerformanceTestSuite:
         print(f"CPU Usage: {cpu_percent:.1f}%")
         
         # Overall summary
-        print(f"\n🎯 OVERALL RESULTS:")
+        print("\n🎯 OVERALL RESULTS:")
         print("-" * 40)
         print(f"Tests Passed: {passed}")
         print(f"Tests Failed: {failed}")
@@ -520,10 +519,10 @@ class APIPerformanceTestSuite:
             print(f"Success Rate: {(passed/(passed+failed)*100):.1f}%")
         
         if passed > failed:
-            print(f"\n✅ PHASE 2 OPTIMIZATIONS VALIDATED SUCCESSFULLY!")
+            print("\n✅ PHASE 2 OPTIMIZATIONS VALIDATED SUCCESSFULLY!")
             print("   All major performance targets have been met or exceeded.")
         else:
-            print(f"\n⚠️  Some performance targets need attention.")
+            print("\n⚠️  Some performance targets need attention.")
             print("   Review failed metrics for optimization opportunities.")
         
         # Save results

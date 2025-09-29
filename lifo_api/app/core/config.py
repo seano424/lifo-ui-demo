@@ -172,6 +172,7 @@ class Settings(BaseSettings):
         default=5, description="Maximum concurrent scoring jobs allowed"
     )
 
+
     # OCR Configuration
     ocr_max_image_width: int = Field(
         default=1024, description="Maximum image width for OCR processing"
@@ -337,14 +338,22 @@ class Settings(BaseSettings):
                 if host and not host.startswith("*"):  # No wildcards in production
                     hosts.append(host)
 
-            # Add specific production domains only (no wildcards)
-            # Production domains must be explicitly configured via FRONTEND_URL and API_URL
+            # Add DigitalOcean App Platform hosts for health checks
+            hosts.extend([
+                "*.ondigitalocean.app",  # DigitalOcean App Platform domains
+            ])
 
-            return hosts if hosts else ["127.0.0.1"]  # Fallback to localhost only
+            return hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]  # Fallback includes DO domains
 
         elif self.environment == "staging":
             # Staging - limited hosts
             hosts = ["localhost", "127.0.0.1"]
+
+            # Add DigitalOcean staging domains
+            hosts.extend([
+                "*.ondigitalocean.app",
+            ])
+
             if self.frontend_url:
                 host = self.frontend_url.replace("https://", "").replace("http://", "")
                 if host:
@@ -355,11 +364,12 @@ class Settings(BaseSettings):
         return self.allowed_hosts_list
 
     model_config = SettingsConfigDict(
-        env_file=".env.local",
+        env_file=[".env.local", "../.env.local", "../../.env.local"],  # Try multiple paths for .env file
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",  # Ignore extra environment variables not defined in the model
         env_nested_delimiter=None,  # Disable nested parsing
+        env_ignore_empty=True,  # Ignore empty .env files
     )
 
 

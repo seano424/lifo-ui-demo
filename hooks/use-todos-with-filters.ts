@@ -35,7 +35,7 @@ export function useTodosWithFilters(filters: TodoFilters = {}, pageSize: number 
     },
     initialPageParam: 0,
     enabled: !!activeStoreId,
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 30 * 1000, // 30 seconds - shorter for better responsiveness
     gcTime: 3 * 60 * 1000, // 3 minutes
   })
 

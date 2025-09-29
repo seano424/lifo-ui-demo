@@ -40,18 +40,18 @@ export function createTodoSorter(sort: SortConfig) {
 
     switch (sort.field) {
       case 'urgency': {
-        aVal = URGENCY_ORDER[a.urgency_level] || 0
-        bVal = URGENCY_ORDER[b.urgency_level] || 0
+        aVal = URGENCY_ORDER[a.urgency_level as keyof typeof URGENCY_ORDER] || 0
+        bVal = URGENCY_ORDER[b.urgency_level as keyof typeof URGENCY_ORDER] || 0
         break
       }
       case 'expiry_date': {
-        aVal = new Date(a.expiry_date).getTime()
-        bVal = new Date(b.expiry_date).getTime()
+        aVal = new Date(a.expiry_date || '').getTime()
+        bVal = new Date(b.expiry_date || '').getTime()
         break
       }
       case 'current_quantity': {
-        aVal = a.current_quantity
-        bVal = b.current_quantity
+        aVal = a.current_quantity || 0
+        bVal = b.current_quantity || 0
         break
       }
       case 'potential_loss': {
@@ -60,8 +60,8 @@ export function createTodoSorter(sort: SortConfig) {
         break
       }
       case 'alphabetical': {
-        aVal = a.product_name.toLowerCase()
-        bVal = b.product_name.toLowerCase()
+        aVal = (a.product_name || '').toLowerCase()
+        bVal = (b.product_name || '').toLowerCase()
         break
       }
       default: {

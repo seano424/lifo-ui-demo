@@ -12,17 +12,15 @@ import io
 import random
 import string
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List
 import httpx
 import psutil
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from app.core.config import settings
 from app.database.supabase_service import SupabaseService
 from app.services.batch_creation_service import BatchCreationService
 from app.services.unified_write_service import UnifiedWriteService
@@ -35,7 +33,6 @@ from app.core.scoring_optimizations import (
 )
 from app.services.csv.unified_csv_service import UnifiedCSVService
 from app.api.v1.analytics import get_analytics_data
-from app.api.v1.mvp_analytics import get_mobile_summary
 
 # Performance targets from requirements
 PERFORMANCE_TARGETS = {
@@ -143,7 +140,7 @@ class PerformanceTestSuite:
         print(f"  Average: {self.results['bulk_scoring_avg']:.2f}ms")
         print(f"  P95: {self.results['bulk_scoring_p95']:.2f}ms")
         print(f"  Target: <{PERFORMANCE_TARGETS['bulk_scoring_71_batches']}ms")
-        print(f"  ✓ PASS" if self.results['bulk_scoring_avg'] < PERFORMANCE_TARGETS['bulk_scoring_71_batches'] else "  ✗ FAIL")
+        print("  ✓ PASS" if self.results['bulk_scoring_avg'] < PERFORMANCE_TARGETS['bulk_scoring_71_batches'] else "  ✗ FAIL")
         
     async def test_database_write_optimizations(self):
         """Test database write optimization performance"""
@@ -171,7 +168,7 @@ class PerformanceTestSuite:
             print(f"  Average: {self.results['write_25_items_avg']:.2f}ms")
             print(f"  P95: {self.results['write_25_items_p95']:.2f}ms")
             print(f"  Target: <{PERFORMANCE_TARGETS['database_write_25_items']}ms")
-            print(f"  ✓ PASS" if self.results['write_25_items_avg'] < PERFORMANCE_TARGETS['database_write_25_items'] else "  ✗ FAIL")
+            print("  ✓ PASS" if self.results['write_25_items_avg'] < PERFORMANCE_TARGETS['database_write_25_items'] else "  ✗ FAIL")
         
         # Test mobile write service
         print("\nTesting mobile write service performance...")
@@ -193,8 +190,8 @@ class PerformanceTestSuite:
             self.results["mobile_write_p95"] = sorted(mobile_write_times)[int(len(mobile_write_times) * 0.95)]
             print(f"  Average: {self.results['mobile_write_avg']:.2f}ms")
             print(f"  P95: {self.results['mobile_write_p95']:.2f}ms")
-            print(f"  Target: <200ms sync")
-            print(f"  ✓ PASS" if self.results['mobile_write_avg'] < 200 else "  ✗ FAIL")
+            print("  Target: <200ms sync")
+            print("  ✓ PASS" if self.results['mobile_write_avg'] < 200 else "  ✗ FAIL")
         
         # Test database operations per second
         print("\nTesting database operations per second...")
@@ -214,7 +211,7 @@ class PerformanceTestSuite:
             print(f"  Duration: {test_duration}s")
             print(f"  Operations/second: {ops_per_second:.0f}")
             print(f"  Target: >{PERFORMANCE_TARGETS['database_ops_per_second']} ops/s")
-            print(f"  ✓ PASS" if ops_per_second > PERFORMANCE_TARGETS['database_ops_per_second'] else "  ✗ FAIL")
+            print("  ✓ PASS" if ops_per_second > PERFORMANCE_TARGETS['database_ops_per_second'] else "  ✗ FAIL")
         except Exception as e:
             print(f"  Error during ops/s test: {e}")
             
@@ -307,7 +304,7 @@ class PerformanceTestSuite:
             self.results["csv_validation_avg"] = statistics.mean(validation_times)
             print(f"  Average: {self.results['csv_validation_avg']:.2f}ms")
             print(f"  Target: <{PERFORMANCE_TARGETS['csv_validation']}ms")
-            print(f"  ✓ PASS" if self.results['csv_validation_avg'] < PERFORMANCE_TARGETS['csv_validation'] else "  ✗ FAIL")
+            print("  ✓ PASS" if self.results['csv_validation_avg'] < PERFORMANCE_TARGETS['csv_validation'] else "  ✗ FAIL")
         
         # Test CSV processing speed
         print("\nTesting CSV processing performance (25 items)...")
@@ -329,7 +326,7 @@ class PerformanceTestSuite:
             self.results["csv_processing_25_avg"] = statistics.mean(processing_times)
             print(f"  Average: {self.results['csv_processing_25_avg']:.2f}ms")
             print(f"  Target: <{PERFORMANCE_TARGETS['csv_processing_25_items']}ms")
-            print(f"  ✓ PASS" if self.results['csv_processing_25_avg'] < PERFORMANCE_TARGETS['csv_processing_25_items'] else "  ✗ FAIL")
+            print("  ✓ PASS" if self.results['csv_processing_25_avg'] < PERFORMANCE_TARGETS['csv_processing_25_items'] else "  ✗ FAIL")
         
         # Test template generation
         print("\nTesting template generation speed...")
@@ -356,7 +353,7 @@ class PerformanceTestSuite:
         self.results["memory_rss_mb"] = memory_info.rss / 1024 / 1024
         self.results["memory_vms_mb"] = memory_info.vms / 1024 / 1024
         
-        print(f"Current Memory Usage:")
+        print("Current Memory Usage:")
         print(f"  RSS: {self.results['memory_rss_mb']:.2f} MB")
         print(f"  VMS: {self.results['memory_vms_mb']:.2f} MB")
         
@@ -390,16 +387,12 @@ class PerformanceTestSuite:
         
         start = time.perf_counter()
         # Import main application modules
-        import app.main
-        import app.api.v1.analytics
-        import app.api.v1.mvp_analytics
-        import app.api.v1.scoring
         elapsed = (time.perf_counter() - start) * 1000
         
         self.results["startup_time"] = elapsed
         print(f"  Startup time: {elapsed:.2f}ms")
         print(f"  Target: <{PERFORMANCE_TARGETS['startup_time']}ms")
-        print(f"  ✓ PASS" if elapsed < PERFORMANCE_TARGETS['startup_time'] else "  ✗ FAIL")
+        print("  ✓ PASS" if elapsed < PERFORMANCE_TARGETS['startup_time'] else "  ✗ FAIL")
         
     async def test_multiport_servers(self):
         """Test performance across multiple server ports"""
@@ -434,7 +427,7 @@ class PerformanceTestSuite:
                         "min": min(health_times),
                         "max": max(health_times)
                     }
-                    print(f"  Health endpoint:")
+                    print("  Health endpoint:")
                     print(f"    Avg: {port_results[port]['avg']:.2f}ms")
                     print(f"    P95: {port_results[port]['p95']:.2f}ms")
                     print(f"    Min: {port_results[port]['min']:.2f}ms")
@@ -461,11 +454,11 @@ class PerformanceTestSuite:
                             "avg": statistics.mean(mobile_times),
                             "p95": sorted(mobile_times)[int(len(mobile_times) * 0.95)]
                         }
-                        print(f"  Mobile summary endpoint:")
+                        print("  Mobile summary endpoint:")
                         print(f"    Avg: {port_results[f'{port}_mobile']['avg']:.2f}ms")
                         print(f"    P95: {port_results[f'{port}_mobile']['p95']:.2f}ms")
                         print(f"    Target: <{PERFORMANCE_TARGETS['mobile_summary']}ms")
-                        print(f"    ✓ PASS" if port_results[f'{port}_mobile']['avg'] < PERFORMANCE_TARGETS['mobile_summary'] else "    ✗ FAIL")
+                        print("    ✓ PASS" if port_results[f'{port}_mobile']['avg'] < PERFORMANCE_TARGETS['mobile_summary'] else "    ✗ FAIL")
         
         self.results["multiport_results"] = port_results
         
@@ -513,7 +506,7 @@ class PerformanceTestSuite:
                 print(f"{metric_name:30} {actual:>10.2f}ms  Target: <{target}ms  {status}")
         
         # Performance improvements
-        print(f"\n📈 PERFORMANCE IMPROVEMENTS:")
+        print("\n📈 PERFORMANCE IMPROVEMENTS:")
         print("-" * 40)
         
         if self.results.get("bulk_scoring_avg"):
@@ -528,7 +521,7 @@ class PerformanceTestSuite:
             print(f"Caching Effectiveness: {cache_improvement:.1f}% faster with cache hits")
         
         # Memory and startup
-        print(f"\n💾 MEMORY & STARTUP:")
+        print("\n💾 MEMORY & STARTUP:")
         print("-" * 40)
         print(f"Memory RSS: {self.results.get('memory_rss_mb', 0):.2f} MB")
         print(f"Memory VMS: {self.results.get('memory_vms_mb', 0):.2f} MB")
@@ -536,7 +529,7 @@ class PerformanceTestSuite:
         print(f"Total Import Time: {self.results.get('total_import_time', 0):.2f}ms")
         
         # Multi-port server status
-        print(f"\n🖥️  MULTI-PORT SERVER STATUS:")
+        print("\n🖥️  MULTI-PORT SERVER STATUS:")
         print("-" * 40)
         
         if "multiport_results" in self.results:
@@ -549,16 +542,16 @@ class PerformanceTestSuite:
                     print(f"Port {port}: ❌ NOT RESPONDING")
         
         # Overall summary
-        print(f"\n🎯 OVERALL RESULTS:")
+        print("\n🎯 OVERALL RESULTS:")
         print("-" * 40)
         print(f"Tests Passed: {passed}")
         print(f"Tests Failed: {failed}")
         print(f"Success Rate: {(passed/(passed+failed)*100):.1f}%" if (passed+failed) > 0 else "N/A")
         
         if passed > failed:
-            print(f"\n✅ Phase 2 optimizations are delivering expected performance improvements!")
+            print("\n✅ Phase 2 optimizations are delivering expected performance improvements!")
         else:
-            print(f"\n⚠️  Some optimizations need further tuning to meet targets.")
+            print("\n⚠️  Some optimizations need further tuning to meet targets.")
         
         # Save results to file
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

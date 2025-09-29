@@ -326,6 +326,7 @@
     }
   },
   "pricingpage": {
+    "contactUs": "Contact us for questions",
     "title": "Choose Your Plan",
     "subtitle": "Start with our free trial and scale as you grow. No lock-in, full support included.",
     "badges": {
@@ -344,10 +345,10 @@
         "title": "Free Trial",
         "subtitle": "Pilot shops",
         "price": "Free",
-        "period": "3 months",
-        "description": "All features, with no limitation, for a 3-month free trial.",
+        "period": "2 months",
+        "description": "All features, with no limitation, for a 2-month free trial.",
         "features": {
-          "0": "3 days of Onboarding and Training",
+          "0": "1 day of Onboarding and Training",
           "1": "Full support included",
           "2": "No lock-in - exit anytime",
           "3": "All features unlocked"

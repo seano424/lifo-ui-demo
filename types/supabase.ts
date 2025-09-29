@@ -1110,7 +1110,10 @@ export type Database = {
           batch_status: string | null
           completion_status: string | null
           composite_score: number | null
+          cost_price: number | null
           current_quantity: number | null
+          current_selling_price: number | null
+          current_total_value: number | null
           days_to_expiry: number | null
           expiry_date: string | null
           hours_since_last_action: number | null
@@ -1118,9 +1121,14 @@ export type Database = {
           last_action_time: string | null
           last_action_type: Database["public"]["Enums"]["action_type"] | null
           last_discount_percent: number | null
+          potential_loss_value: number | null
+          potential_revenue_value: number | null
           priority_order: number | null
           product_brand: string | null
           product_name: string | null
+          profit_margin: number | null
+          profit_margin_percent: number | null
+          selling_price: number | null
           store_id: string | null
           todo_state: string | null
           total_actions_ever: number | null
@@ -1129,6 +1137,7 @@ export type Database = {
           total_donated_quantity: number | null
           total_ignored_quantity: number | null
           total_sold_quantity: number | null
+          unit_price: number | null
           urgency_level: string | null
           view_refreshed_at: string | null
         }
@@ -2243,28 +2252,7 @@ export type Database = {
           p_section_filter: string
           p_store_id: string
         }
-        Returns: {
-          ai_recommendation: string
-          batch_id: string
-          batch_number: string
-          completion_status: string
-          composite_score: number
-          current_quantity: number
-          days_to_expiry: number
-          expiry_date: string
-          hours_since_last_action: number
-          last_action_time: string
-          last_action_type: Database["public"]["Enums"]["action_type"]
-          last_discount_percent: number
-          priority_order: number
-          product_brand: string
-          product_name: string
-          store_id: string
-          todo_state: string
-          total_actions_ever: number
-          urgency_level: string
-          view_refreshed_at: string
-        }[]
+        Returns: unknown[]
       }
       get_todos_dashboard: {
         Args: { p_store_id: string }
@@ -2317,34 +2305,15 @@ export type Database = {
           p_offset?: number
           p_store_id: string
         }
-        Returns: {
-          ai_recommendation: string
-          batch_id: string
-          batch_number: string
-          completion_status: string
-          composite_score: number
-          current_quantity: number
-          days_to_expiry: number
-          expiry_date: string
-          hours_since_last_action: number
-          last_action_time: string
-          last_action_type: Database["public"]["Enums"]["action_type"]
-          last_discount_percent: number
-          priority_order: number
-          product_brand: string
-          product_name: string
-          store_id: string
-          todo_state: string
-          total_actions_ever: number
-          urgency_level: string
-          view_refreshed_at: string
-        }[]
+        Returns: unknown[]
       }
       get_user_by_username: {
         Args: { p_username: string }
         Returns: {
           email: string
-          user_id: string
+          full_name: string
+          id: string
+          username: string
         }[]
       }
       get_user_complete_profile: {

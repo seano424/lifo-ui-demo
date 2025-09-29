@@ -100,12 +100,19 @@ export function useStoreSettings(storeId?: string) {
 
       return fetchStoreSettings(effectiveStoreId)
     },
-    enabled: !!effectiveStoreId, // Only run query when we have a storeId
+    enabled: !!effectiveStoreId, // Only run query when we have a storeId - let auth errors be handled by the query
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnMount: false, // 🚀 CRITICAL: Prevent refetch if we have cached data
     refetchOnWindowFocus: false,
     retry: (failureCount, error: Error) => {
-      if (error?.message?.includes('permission denied') || error?.message?.includes('403')) {
+      // Don't retry auth errors or permission errors - they need user intervention
+      if (
+        error?.message?.includes('User not authenticated') ||
+        error?.message?.includes('JWT') ||
+        error?.message?.includes('Permission denied') ||
+        error?.message?.includes('access') ||
+        error?.message?.includes('403')
+      ) {
         return false
       }
       return failureCount < 2

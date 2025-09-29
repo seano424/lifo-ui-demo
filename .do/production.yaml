@@ -3,7 +3,7 @@
 # Update: doctl apps update <production_app_id> --spec .do/production.yaml
 
 name: lifo-ai-api
-region: nyc1
+region: ams3
 
 services:
 - name: fastapi-backend
@@ -13,10 +13,9 @@ services:
     branch: main  # Deploy from main branch
     deploy_on_push: true
   
-  # Build configuration
-  build_command: |
-    pip install uv
-    uv pip install --system --require-locked
+  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
+  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
+
   
   # Run command for production (optimized)
   run_command: gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 1000 --preload app.main:app
@@ -105,12 +104,9 @@ services:
   http_port: 8080
   
   # Routes - production API endpoints
+  # Let FastAPI handle all routing internally (no path stripping)
   routes:
-  - path: /
-  - path: /api
-  - path: /docs  # Keep docs available in production
-  - path: /redoc
-  - path: /openapi.json
+  - path: /            # Forward all paths to FastAPI without modification
 
 # Production database (optional - if not using Supabase)
 databases:
@@ -121,14 +117,14 @@ databases:
   num_nodes: 1
 
 # Production jobs
-jobs:
-- name: db-migrate-production
+# jobs: # Database migrations handled by Supabase, not Alembic
+# - name: db-migrate-production
   source_dir: lifo_api
   github:
     repo: lifo-ai/lifo-app
     branch: main
     deploy_on_push: true
-  run_command: alembic upgrade head
+  # run_command: alembic upgrade head # Not needed for Supabase
   instance_count: 1
   instance_size_slug: basic-xxs
   kind: PRE_DEPLOY  # Runs before deployment

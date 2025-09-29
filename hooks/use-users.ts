@@ -122,7 +122,8 @@ export function useCurrentUser() {
 
       return transformedUser as User
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1000, // Check for fresh data every second - balance between performance and freshness
+    gcTime: 5 * 60 * 1000, // Keep cache for 5 minutes
     retry: false,
   })
 }

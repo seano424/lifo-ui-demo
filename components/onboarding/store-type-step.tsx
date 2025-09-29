@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
-import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -25,7 +24,6 @@ import {
 import { StepHeader } from '@/components/ui/step-header'
 import { STORE_TYPES, type StoreFormData, storeFormSchema } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 
 // Type guard for store_type
 function isStoreType(value: string | null | undefined): value is StoreFormData['store_type'] {
@@ -37,11 +35,14 @@ export function StoreTypeStep() {
   const t = useTranslations('onboarding.storeType')
   const tStoreTypes = useTranslations('settings.storeInformation.storeTypes')
 
-  const { selectedStoreForm, isManualEntry, setSelectedStoreForm, goToNextStep, goToPreviousStep } =
-    useOnboardingStore()
-
-  // Memoize Google Places status to avoid recalculation
-  const googlePlacesEnabled = useMemo(() => isGooglePlacesEnabled(), [])
+  const {
+    selectedStoreForm,
+    isManualEntry,
+    setSelectedStoreForm,
+    goToNextStep,
+    goToPreviousStep,
+    canGoBack,
+  } = useOnboardingStore()
 
   const form = useForm<StoreFormData>({
     resolver: zodResolver(storeFormSchema),
@@ -75,15 +76,13 @@ export function StoreTypeStep() {
     }
 
     setSelectedStoreForm(storeFormData)
-    // Navigate to the next step using the centralized navigation
-    goToNextStep(googlePlacesEnabled)
+    // Navigate to the next step - super clean, no conditionals!
+    goToNextStep()
   }
 
   const handleBack = () => {
-    goToPreviousStep(googlePlacesEnabled)
+    goToPreviousStep()
   }
-
-  const canGoBack = googlePlacesEnabled
 
   return (
     <div className="mx-auto space-y-4">
@@ -186,11 +185,11 @@ export function StoreTypeStep() {
               </div>
 
               <FormNavigation
-                onBack={canGoBack ? handleBack : undefined}
+                onBack={canGoBack() ? handleBack : undefined}
                 onNext={() => {}} // Form submission is handled by onSubmit
                 nextLabel={t('continueButton')}
                 isSubmitting={form.formState.isSubmitting}
-                showBack={canGoBack}
+                showBack={canGoBack()}
                 nextType="submit"
               />
             </form>

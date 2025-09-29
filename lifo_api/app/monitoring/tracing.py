@@ -3,7 +3,6 @@ OpenTelemetry distributed tracing configuration for LIFO AI Engine
 Provides end-to-end request visibility and performance monitoring
 """
 
-import logging
 import uuid
 from contextvars import ContextVar
 from typing import Any, Dict, Optional

@@ -5,17 +5,14 @@ Implements advanced database optimization techniques for 3x+ performance improve
 
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import time
 
 import structlog
-from pydantic import BaseModel
-from sqlalchemy import and_, insert, select, text, values
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from app.database.connection import async_session
-from app.database.inventory_models import Product, StoreProduct, Batch, Category
 from app.services.batch_creation_service import BatchFromScanRequest
 
 logger = structlog.get_logger()
