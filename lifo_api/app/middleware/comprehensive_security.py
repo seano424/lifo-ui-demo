@@ -34,6 +34,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
         # Security bypass paths (for health checks, metrics, etc.)
         self.bypass_paths = {
             "/health",
+            "/api/v1/health",  # DigitalOcean health check endpoint
             "/metrics",
             "/docs",
             "/redoc",
