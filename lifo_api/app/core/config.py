@@ -346,6 +346,7 @@ class Settings(BaseSettings):
             # Add DigitalOcean App Platform hosts for health checks
             hosts.extend([
                 "*.ondigitalocean.app",  # DigitalOcean App Platform domains
+                "*",  # Allow all hosts for health check compatibility (production override)
             ])
 
             return hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]  # Fallback includes DO domains
