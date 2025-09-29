@@ -83,7 +83,9 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       return t('details.validation.batchNumberRequired')
     }
     if (editedValues.batch_number.length > MAX_BATCH_NUMBER_LENGTH) {
-      return t('details.validation.batchNumberTooLong', { max: MAX_BATCH_NUMBER_LENGTH })
+      return t('details.validation.batchNumberTooLong', {
+        max: MAX_BATCH_NUMBER_LENGTH,
+      })
     }
     // Basic alphanumeric validation (adjust based on business requirements)
     const batchNumberRegex = /^[a-zA-Z0-9\-_\s]+$/
@@ -102,10 +104,14 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     futureLimit.setFullYear(futureLimit.getFullYear() + MAX_YEARS_IN_FUTURE)
 
     if (expiryDate < pastLimit) {
-      return t('details.validation.expiryDateTooFarPast', { years: MAX_YEARS_IN_PAST })
+      return t('details.validation.expiryDateTooFarPast', {
+        years: MAX_YEARS_IN_PAST,
+      })
     }
     if (expiryDate > futureLimit) {
-      return t('details.validation.expiryDateTooFarFuture', { years: MAX_YEARS_IN_FUTURE })
+      return t('details.validation.expiryDateTooFarFuture', {
+        years: MAX_YEARS_IN_FUTURE,
+      })
     }
 
     // Quantity validation
@@ -126,7 +132,9 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     // Validate reasonable price limits (adjust based on business requirements)
     const MAX_PRICE = 999999.99
     if (editedValues.cost_price > MAX_PRICE || editedValues.selling_price > MAX_PRICE) {
-      return t('details.validation.priceExceedsMax', { max: MAX_PRICE.toLocaleString() })
+      return t('details.validation.priceExceedsMax', {
+        max: MAX_PRICE.toLocaleString(),
+      })
     }
 
     return null
@@ -199,14 +207,20 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'expired':
-        return { label: t('details.status.expired'), className: 'text-red-600 bg-red-50' }
+        return {
+          label: t('details.status.expired'),
+          className: 'text-red-600 bg-red-50',
+        }
       case 'expiring_soon':
         return {
           label: t('details.status.expiringSoon'),
           className: 'text-orange-600 bg-orange-50',
         }
       case 'fresh':
-        return { label: t('details.status.fresh'), className: 'text-green-600 bg-green-50' }
+        return {
+          label: t('details.status.fresh'),
+          className: 'text-green-600 bg-green-50',
+        }
       default:
         return { label: status, className: 'text-gray-600 bg-gray-50' }
     }
@@ -266,40 +280,49 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               </Typography>
             </div>
 
-            <div className="flex justify-between items-center">
-              <Label htmlFor="batch-number">{t('details.fields.batchNumber')}</Label>
+            <div className="flex justify-between items-center gap-2 w-full">
+              <Label className="flex-shrink-0" htmlFor="batch-number">
+                {t('details.fields.batchNumber')}
+              </Label>
               {isEditing ? (
-                <Input
-                  id="batch-number"
-                  value={editedValues.batch_number}
-                  onChange={e =>
-                    setEditedValues(prev => ({ ...prev, batch_number: e.target.value }))
-                  }
-                  className="w-32"
-                />
+                <div className="w-40">
+                  <Input
+                    id="batch-number"
+                    value={editedValues.batch_number}
+                    onChange={e =>
+                      setEditedValues(prev => ({
+                        ...prev,
+                        batch_number: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
               ) : (
                 <Typography variant="p">{selectedBatch.batch_number || ''}</Typography>
               )}
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-2 w-full">
               <Label htmlFor="status">{t('details.fields.status')}</Label>
               {isEditing ? (
                 <Select
                   value={editedValues.batch_status}
                   onValueChange={value =>
-                    setEditedValues(prev => ({ ...prev, batch_status: value }))
+                    setEditedValues(prev => ({
+                      ...prev,
+                      batch_status: value,
+                    }))
                   }
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">{t('details.statusOptions.active')}</SelectItem>
-                    <SelectItem value="expired">{t('details.statusOptions.expired')}</SelectItem>
-                    <SelectItem value="damaged">{t('details.statusOptions.damaged')}</SelectItem>
-                    <SelectItem value="sold_out">{t('details.statusOptions.soldOut')}</SelectItem>
-                    <SelectItem value="reserved">{t('details.statusOptions.reserved')}</SelectItem>
+                    <SelectItem value="active">{t('details.status.active')}</SelectItem>
+                    <SelectItem value="expired">{t('details.status.expired')}</SelectItem>
+                    <SelectItem value="damaged">{t('details.status.damaged')}</SelectItem>
+                    <SelectItem value="sold_out">{t('details.status.soldOut')}</SelectItem>
+                    <SelectItem value="reserved">{t('details.status.reserved')}</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
@@ -309,18 +332,25 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               )}
             </div>
 
-            <div className="flex justify-between items-center">
-              <Label htmlFor="expiry-date">{t('details.fields.expiryDate')}</Label>
+            <div className="flex justify-between items-center gap-2 w-full">
+              <Label className="flex-shrink-0" htmlFor="expiry-date">
+                {t('details.fields.expiryDate')}
+              </Label>
               {isEditing ? (
-                <Input
-                  id="expiry-date"
-                  type="date"
-                  value={editedValues.expiry_date}
-                  onChange={e =>
-                    setEditedValues(prev => ({ ...prev, expiry_date: e.target.value }))
-                  }
-                  className="w-40"
-                />
+                <div className="w-40">
+                  <Input
+                    id="expiry-date"
+                    type="date"
+                    value={editedValues.expiry_date}
+                    onChange={e =>
+                      setEditedValues(prev => ({
+                        ...prev,
+                        expiry_date: e.target.value,
+                      }))
+                    }
+                    className="w-full"
+                  />
+                </div>
               ) : (
                 <span className="flex items-center gap-2">
                   {formatDate(selectedBatch.expiry_date || '')}
@@ -350,10 +380,13 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.inventoryPricing')}</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-4">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="quantity">{t('details.fields.currentQuantity')}</Label>
+            <div className="flex justify-between items-center gap-2 w-full">
+              <Label className="flex-shrink-0" htmlFor="quantity">
+                {t('details.fields.currentQuantity')}
+              </Label>
               {isEditing ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-40">
+                  <span className="text-sm">#</span>
                   <Input
                     id="quantity"
                     type="number"
@@ -366,19 +399,20 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                         current_quantity: Math.max(0, Number(e.target.value) || 0),
                       }))
                     }
-                    className={cn('w-20', editedValues.current_quantity < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.current_quantity < 0 && 'border-red-500')}
                   />
-                  <span className="text-sm text-muted-foreground">units</span>
                 </div>
               ) : (
                 <Typography variant="p">{selectedBatch.current_quantity || 0} units</Typography>
               )}
             </div>
 
-            <div className="flex justify-between items-center">
-              <Label htmlFor="cost-price">{t('details.fields.costPrice')}</Label>
+            <div className="flex justify-between items-center gap-2 w-full">
+              <Label className="flex-shrink-0" htmlFor="cost-price">
+                {t('details.fields.costPrice')}
+              </Label>
               {isEditing ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-40">
                   <span className="text-sm">€</span>
                   <Input
                     id="cost-price"
@@ -392,7 +426,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                         cost_price: formatCurrencyValue(Math.max(0, Number(e.target.value) || 0)),
                       }))
                     }
-                    className={cn('w-24', editedValues.cost_price < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.cost_price < 0 && 'border-red-500')}
                   />
                 </div>
               ) : (
@@ -400,10 +434,12 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               )}
             </div>
 
-            <div className="flex justify-between items-center">
-              <Label htmlFor="selling-price">{t('details.fields.sellingPrice')}</Label>
+            <div className="flex justify-between items-center gap-2 w-full">
+              <Label className="flex-shrink-0" htmlFor="selling-price">
+                {t('details.fields.sellingPrice')}
+              </Label>
               {isEditing ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-40">
                   <span className="text-sm">€</span>
                   <Input
                     id="selling-price"
@@ -419,7 +455,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                         ),
                       }))
                     }
-                    className={cn('w-24', editedValues.selling_price < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.selling_price < 0 && 'border-red-500')}
                   />
                 </div>
               ) : (

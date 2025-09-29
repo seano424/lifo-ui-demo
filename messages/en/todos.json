@@ -175,7 +175,10 @@
     "inventoryPricing": "Inventory & Pricing",
     "percentOff": "% off",
     "actionHistory": "Action History",
-    "noActions": "No actions taken yet",
+    "lastAction": "Last Action",
+    "lastActionTime": "Last Action Time",
+    "lastActionQuantity": "Last Action Quantity",
+    "noActionsYet": "No actions taken yet",
     "totalActions": "Total Actions",
     "actions": {
       "sold": "Sold:",
@@ -183,7 +186,10 @@
       "donated": "Donated:",
       "disposed": "Disposed:"
     },
-    "aiInsights": "AI Insights"
+    "aiInsights": "AI Insights",
+    "recommendation": "Recommendation",
+    "priorityScore": "Priority Score",
+    "urgency": "Urgency"
   },
   "filters": {
     "searchPlaceholder": "Search products...",

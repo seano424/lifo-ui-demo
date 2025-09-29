@@ -169,12 +169,16 @@
       "priorityScore": "Prioriteitsscore",
       "urgency": "Urgentie"
     },
-    "daysAgo": "{days} dagen geleden",
-    "daysLeft": "{days} dagen",
+    "daysAgo": "{days, plural, =1 {1 dag geleden} other {# dagen geleden}}",
+    "daysLeft": "{days, plural, =1 {1 dag} other {# dagen}}",
+    "daysRemaining": "{days, plural, =1 {1 dag resterend} other {# dagen resterend}}",
     "inventoryPricing": "Voorraad en prijzen",
     "percentOff": "% korting",
     "actionHistory": "Actiegeschiedenis",
-    "noActions": "Nog geen acties ondernomen",
+    "lastAction": "Laatste actie",
+    "lastActionTime": "Tijd laatste actie",
+    "lastActionQuantity": "Hoeveelheid laatste actie",
+    "noActionsYet": "Nog geen acties ondernomen",
     "totalActions": "Totaal acties",
     "actions": {
       "sold": "Verkocht:",
@@ -182,7 +186,10 @@
       "donated": "Gedoneerd:",
       "disposed": "Weggegooid:"
     },
-    "aiInsights": "AI-inzichten"
+    "aiInsights": "AI-inzichten",
+    "recommendation": "Aanbeveling",
+    "priorityScore": "Prioriteitsscore",
+    "urgency": "Urgentie"
   },
   "filters": {
     "searchPlaceholder": "Zoek producten...",
