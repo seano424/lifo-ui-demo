@@ -1,9 +1,9 @@
 // app/api/onboarding/route.ts
 
-import { createClient } from '@supabase/supabase-js'
-import { type NextRequest, NextResponse } from 'next/server'
 import { convertFormDataToStoreInsert } from '@/lib/schemas/store-schemas'
 import type { StoreFormData } from '@/lib/stores/onboarding-store'
+import { createClient } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
 
 interface OnboardingRequest {
   userId: string
@@ -64,10 +64,29 @@ export async function POST(request: NextRequest) {
     console.error('Error details:', error)
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+    // Check for email already exists error
+    if (
+      errorMessage.includes('already registered') ||
+      errorMessage.includes('duplicate key') ||
+      errorMessage.includes('unique constraint') ||
+      errorMessage.includes('already exists') ||
+      errorMessage.includes('EMAIL_ALREADY_EXISTS:')
+    ) {
+      return NextResponse.json(
+        {
+          error: 'EMAIL_ALREADY_EXISTS',
+          message: 'This email address is already registered. Please log in instead.',
+        },
+        { status: 409 }, // Conflict status
+      )
+    }
+
     return NextResponse.json(
       {
-        error: 'Failed to complete onboarding',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: 'This email may already be registered. Try logging in instead.',
+        details: errorMessage,
       },
       { status: 500 },
     )
@@ -110,6 +129,7 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
     )
 
     // Create store record
+    console.log('🏪 Creating store with data:', JSON.stringify(storeInsert, null, 2))
     const { data: storeData, error: storeError } = await supabase
       .schema('business')
       .from('stores')
@@ -120,6 +140,20 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
     if (storeError) {
       console.error('❌ Store creation error:', storeError)
       console.error('❌ Full error details:', JSON.stringify(storeError, null, 2))
+
+      // Check for specific error types
+      if (storeError.code === '23505' || storeError.message?.includes('duplicate key')) {
+        console.error('🔍 DETECTED: Duplicate key constraint violation')
+        throw new Error(
+          `Store with this information already exists. Please check your store details.`,
+        )
+      }
+
+      if (storeError.message?.includes('foreign key')) {
+        console.error('🔍 DETECTED: Foreign key constraint violation')
+        throw new Error(`Invalid user reference. Please try signing up again.`)
+      }
+
       throw new Error(`Failed to create store: ${storeError.message}`)
     }
 
@@ -140,6 +174,10 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
       assigned_by: userId,
     }
 
+    console.log(
+      '👤 Creating store-user relationship with data:',
+      JSON.stringify(storeUserData, null, 2),
+    )
     const { error: storeUserError } = await supabase
       .schema('business')
       .from('store_users')
@@ -148,6 +186,18 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
     if (storeUserError) {
       console.error('❌ Store-user relationship error:', storeUserError)
       console.error('❌ Full error details:', JSON.stringify(storeUserError, null, 2))
+
+      // Check for specific error types
+      if (storeUserError.code === '23505' || storeUserError.message?.includes('duplicate key')) {
+        console.error('🔍 DETECTED: User already has access to this store')
+        throw new Error(`You already have access to this store. Please log in instead.`)
+      }
+
+      if (storeUserError.message?.includes('foreign key')) {
+        console.error('🔍 DETECTED: Invalid store or user reference')
+        throw new Error(`Invalid store or user reference. Please try again.`)
+      }
+
       throw new Error(`Failed to create store-user relationship: ${storeUserError.message}`)
     }
 
@@ -180,6 +230,25 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
     })
   } catch (error) {
     console.error('💥 Onboarding error:', error)
+
+    // Check for specific error types in the handleOnboarding function
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('💥 HandleOnboarding error message:', errorMessage)
+
+    // Check for email already exists error
+    if (
+      errorMessage.includes('already registered') ||
+      errorMessage.includes('duplicate key') ||
+      errorMessage.includes('unique constraint') ||
+      errorMessage.includes('already exists') ||
+      errorMessage.includes('You already have access to this store')
+    ) {
+      console.error('🔍 DETECTED: Email conflict in handleOnboarding')
+      throw new Error(
+        'EMAIL_ALREADY_EXISTS: This email address is already registered. Please log in instead.',
+      )
+    }
+
     throw error
   }
 }
