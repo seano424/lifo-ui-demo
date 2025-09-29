@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface DonateTabProps {
   selectedBatch: TodoItem
@@ -89,6 +90,10 @@ function useDonationRecipients(batchId: string) {
 }
 
 export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
+  const t = useTranslations('todos')
+  const tCommon = useTranslations()
+  const tErrors = useTranslations('errors.common')
+
   const activeStoreId = useActiveStoreId()
 
   // Log to verify we have the store ID
@@ -143,7 +148,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // Handle donation execution
   const handleDonateAction = async () => {
     if (!selectedRecipient) {
-      toast.error('Please select a donation recipient')
+      toast.error(t('donate.selectRecipient'))
       return
     }
 
@@ -161,7 +166,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       await executeDonate(params)
 
       // Success - show success toast and close the modal
-      toast.success(`Successfully donated ${donateQuantity} units to ${recipientName}`)
+      toast.success(t('donate.success', { quantity: donateQuantity, recipient: recipientName }))
       onClose()
     } catch (error) {
       console.error('[DonateTab] Donation failed:', {
@@ -174,8 +179,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       })
 
       // Show user-facing error message
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
-      toast.error(`Failed to process donation: ${errorMessage}`)
+      const errorMessage = error instanceof Error ? error.message : tErrors('common.unexpected')
+      toast.error(t('donate.error', { error: errorMessage }))
     }
   }
 
@@ -186,7 +191,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         <div className="flex-1 overflow-y-auto flex items-center justify-center">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
-            <span className="ml-2 text-gray-600">Loading donation recipients...</span>
+            <span className="ml-2 text-gray-600">{t('donate.loadingRecipients')}</span>
           </div>
         </div>
       </div>
@@ -199,10 +204,8 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       <div className="flex flex-col h-full bg-muted">
         <div className="flex-1 overflow-y-auto flex items-center justify-center px-8">
           <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">No donation recipients available for this store.</p>
-            <p className="text-sm text-gray-500">
-              Contact your admin to set up donation recipients.
-            </p>
+            <p className="text-gray-600 mb-4">{t('donate.noRecipients')}</p>
+            <p className="text-sm text-gray-500">{t('donate.contactAdmin')}</p>
           </div>
         </div>
       </div>
@@ -216,7 +219,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         {/* Recipient Selection */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="p" className="xs:text-lg">
-            Select donation recipient
+            {t('donate.selectRecipient')}
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <div className="grid grid-cols-1 gap-2">
@@ -245,7 +248,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         {/* Quantity Selection */}
         <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
           <Typography variant="p" className="xs:text-lg">
-            How many units to donate?
+            {t('donate.howMany')}
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <InputSlider
@@ -255,7 +258,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
               max={selectedBatch.current_quantity || 0}
               step={1}
               suffix={`/${selectedBatch.current_quantity}`}
-              label={`Mark for donation: ${donateQuantity} units`}
+              label={t('donate.markForDonation', { quantity: donateQuantity })}
             />
           </div>
         </div>
@@ -269,7 +272,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
           onClick={onClose}
           className="rounded-full flex-1"
         >
-          Cancel
+          {tCommon('cancel')}
         </Button>
         <Button
           size={isMobile ? 'default' : 'lg'}
@@ -281,12 +284,12 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
           {isDonating ? (
             <span className="flex items-center justify-center gap-2">
               <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-              Processing Donation...
+              {t('donate.processing')}
             </span>
           ) : donateQuantity === (selectedBatch.current_quantity || 0) ? (
-            'Donate all'
+            t('donate.donateAll')
           ) : (
-            `Donate ${donateQuantity}`
+            t('donate.donate', { quantity: donateQuantity })
           )}
         </Button>
       </div>

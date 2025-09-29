@@ -9,26 +9,31 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface DisposeTabProps {
   selectedBatch: TodoItem
   onClose: () => void
 }
 
-// Disposal reason options
-const DISPOSAL_REASONS = [
-  { id: 'expired', label: 'Expired/Past due date', icon: '📅' },
-  { id: 'damaged', label: 'Damaged packaging', icon: '📦' },
-  { id: 'spoiled', label: 'Spoiled/Quality issues', icon: '🦠' },
-  { id: 'recalled', label: 'Product recall', icon: '⚠️' },
-  { id: 'contaminated', label: 'Contaminated', icon: '☣️' },
-  { id: 'other', label: 'Other reason', icon: '❓' },
-]
-
 export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
+  const t = useTranslations('todos')
+  const tCommon = useTranslations()
+  const tErrors = useTranslations('errors.common')
+
   const activeStoreId = useActiveStoreId()
   const { executeDispose, isDisposing } = useBatchActionRPC(activeStoreId || undefined)
   const { isMobile } = useMediaQuery()
+
+  // Disposal reason options
+  const DISPOSAL_REASONS = [
+    { id: 'expired', label: t('dispose.reasons.expired'), icon: '📅' },
+    { id: 'damaged', label: t('dispose.reasons.damaged'), icon: '📦' },
+    { id: 'spoiled', label: t('dispose.reasons.spoiled'), icon: '🦠' },
+    { id: 'recalled', label: t('dispose.reasons.recalled'), icon: '⚠️' },
+    { id: 'contaminated', label: t('dispose.reasons.contaminated'), icon: '☣️' },
+    { id: 'other', label: t('dispose.reasons.other'), icon: '❓' },
+  ]
 
   // Dispose tab state
   const [disposeQuantity, setDisposeQuantity] = useState(selectedBatch.current_quantity || 0)
@@ -70,7 +75,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
 
     // Validate custom disposal reason if 'other' is selected
     if (selectedDisposalReason === 'other' && !customDisposalReason.trim()) {
-      toast.error('Please provide a disposal reason')
+      toast.error(t('dispose.provideReason'))
       return
     }
 
@@ -85,7 +90,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       await executeDispose(params)
 
       // Success - show success toast and close the modal
-      toast.success(`Successfully disposed ${disposeQuantity} units`)
+      toast.success(t('dispose.success', { quantity: disposeQuantity }))
       onClose()
     } catch (error) {
       console.error('[DisposeTab] Disposal failed:', {
@@ -98,8 +103,8 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       })
 
       // Show user-facing error message
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
-      toast.error(`Failed to dispose items: ${errorMessage}`)
+      const errorMessage = error instanceof Error ? error.message : tErrors('common.unexpected')
+      toast.error(t('dispose.error', { error: errorMessage }))
     }
   }
 
@@ -110,7 +115,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         {/* Disposal Reason Selection */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="p" className="xs:text-lg">
-            Why are you disposing this?
+            {t('dispose.whyDisposing')}
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
@@ -135,7 +140,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
                   type="text"
                   value={customDisposalReason}
                   onChange={e => handleCustomReasonChange(e.target.value)}
-                  placeholder="Enter custom disposal reason"
+                  placeholder={t('dispose.customReasonPlaceholder')}
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -146,7 +151,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         {/* Quantity Selection */}
         <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
           <Typography variant="p" className="xs:text-lg">
-            How many units to dispose?
+            {t('dispose.howMany')}
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <InputSlider
@@ -156,7 +161,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
               max={selectedBatch.current_quantity || 0}
               step={1}
               suffix={`/${selectedBatch.current_quantity}`}
-              label={`Mark as disposed: ${disposeQuantity} units`}
+              label={t('dispose.markAsDisposed', { quantity: disposeQuantity })}
             />
           </div>
         </div>
@@ -170,7 +175,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
           onClick={onClose}
           className="rounded-full flex-1"
         >
-          Cancel
+          {tCommon('cancel')}
         </Button>
         <Button
           size={isMobile ? 'default' : 'lg'}
@@ -186,12 +191,12 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
           {isDisposing ? (
             <span className="flex items-center justify-center gap-2">
               <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-              Processing Disposal...
+              {t('dispose.processing')}
             </span>
           ) : disposeQuantity === (selectedBatch.current_quantity || 0) ? (
-            'Dispose all'
+            t('dispose.disposeAll')
           ) : (
-            `Dispose ${disposeQuantity}`
+            t('dispose.dispose', { quantity: disposeQuantity })
           )}
         </Button>
       </div>

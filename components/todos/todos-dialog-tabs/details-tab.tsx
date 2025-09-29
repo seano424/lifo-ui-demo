@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { Edit3, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface DetailsTabProps {
   selectedBatch: TodoItem
@@ -26,6 +27,10 @@ interface DetailsTabProps {
 }
 
 export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
+  const t = useTranslations('todos')
+  const tCommon = useTranslations()
+  const tErrors = useTranslations('errors.common')
+
   const { updateBatch, isUpdating } = useBatchActions()
 
   // Type-safe batch status
@@ -75,20 +80,20 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   const validateForm = (): string | null => {
     // Batch number validation
     if (!editedValues.batch_number?.trim()) {
-      return 'Batch number is required'
+      return t('details.validation.batchNumberRequired')
     }
     if (editedValues.batch_number.length > MAX_BATCH_NUMBER_LENGTH) {
-      return `Batch number must be less than ${MAX_BATCH_NUMBER_LENGTH} characters`
+      return t('details.validation.batchNumberTooLong', { max: MAX_BATCH_NUMBER_LENGTH })
     }
     // Basic alphanumeric validation (adjust based on business requirements)
     const batchNumberRegex = /^[a-zA-Z0-9\-_\s]+$/
     if (!batchNumberRegex.test(editedValues.batch_number)) {
-      return 'Batch number can only contain letters, numbers, hyphens, underscores, and spaces'
+      return t('details.validation.batchNumberInvalid')
     }
 
     // Expiry date validation
     if (!editedValues.expiry_date) {
-      return 'Expiry date is required'
+      return t('details.validation.expiryDateRequired')
     }
     const expiryDate = new Date(editedValues.expiry_date)
     const pastLimit = new Date()
@@ -97,31 +102,31 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     futureLimit.setFullYear(futureLimit.getFullYear() + MAX_YEARS_IN_FUTURE)
 
     if (expiryDate < pastLimit) {
-      return `Expiry date cannot be more than ${MAX_YEARS_IN_PAST} years in the past`
+      return t('details.validation.expiryDateTooFarPast', { years: MAX_YEARS_IN_PAST })
     }
     if (expiryDate > futureLimit) {
-      return `Expiry date cannot be more than ${MAX_YEARS_IN_FUTURE} years in the future`
+      return t('details.validation.expiryDateTooFarFuture', { years: MAX_YEARS_IN_FUTURE })
     }
 
     // Quantity validation
     if (editedValues.current_quantity < 0) {
-      return 'Quantity must be 0 or greater'
+      return t('details.validation.quantityNegative')
     }
     if (!Number.isInteger(editedValues.current_quantity)) {
-      return 'Quantity must be a whole number'
+      return t('details.validation.quantityInteger')
     }
 
     // Price validation
     if (editedValues.cost_price < 0) {
-      return 'Cost price must be 0 or greater'
+      return t('details.validation.costPriceNegative')
     }
     if (editedValues.selling_price < 0) {
-      return 'Selling price must be 0 or greater'
+      return t('details.validation.sellingPriceNegative')
     }
     // Validate reasonable price limits (adjust based on business requirements)
     const MAX_PRICE = 999999.99
     if (editedValues.cost_price > MAX_PRICE || editedValues.selling_price > MAX_PRICE) {
-      return `Prices cannot exceed €${MAX_PRICE.toLocaleString()}`
+      return t('details.validation.priceExceedsMax', { max: MAX_PRICE.toLocaleString() })
     }
 
     return null
@@ -154,16 +159,16 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
 
       if (error instanceof Error) {
         if (error.message.includes('constraint') || error.message.includes('duplicate')) {
-          toast.error('Invalid data: Batch number may already exist or contain invalid characters')
+          toast.error(t('details.error.invalidData'))
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
-          toast.error('Network error: Please check your connection and try again')
+          toast.error(tErrors('common.networkError'))
         } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
-          toast.error('Permission denied: You may not have access to update this batch')
+          toast.error(tErrors('common.permissionDenied'))
         } else {
-          toast.error(`Update failed: ${error.message}`)
+          toast.error(t('details.error.updateFailed', { error: error.message }))
         }
       } else {
-        toast.error('An unexpected error occurred while updating the batch')
+        toast.error(tErrors('common.unexpected'))
       }
     }
   }
@@ -194,14 +199,14 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'expired':
-        return { label: 'Expired', className: 'text-red-600 bg-red-50' }
+        return { label: t('details.status.expired'), className: 'text-red-600 bg-red-50' }
       case 'expiring_soon':
         return {
-          label: 'Expiring Soon',
+          label: t('details.status.expiringSoon'),
           className: 'text-orange-600 bg-orange-50',
         }
       case 'fresh':
-        return { label: 'Fresh', className: 'text-green-600 bg-green-50' }
+        return { label: t('details.status.fresh'), className: 'text-green-600 bg-green-50' }
       default:
         return { label: status, className: 'text-gray-600 bg-gray-50' }
     }
@@ -216,7 +221,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         {/* Product Information */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <div className="flex items-center justify-between">
-            <Typography variant="h4">Product Information</Typography>
+            <Typography variant="h4">{t('details.productInformation')}</Typography>
             {!isEditing ? (
               <Button
                 variant="ghost"
@@ -225,7 +230,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                 className="gap-2"
               >
                 <Edit3 className="h-4 w-4" />
-                Edit
+                {tCommon('edit')}
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -237,7 +242,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                   className="gap-2"
                 >
                   <X className="h-4 w-4" />
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
                 <Button
                   variant="default"
@@ -247,14 +252,14 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                   className="gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  {isUpdating ? 'Saving...' : 'Save'}
+                  {isUpdating ? tCommon('saving') : tCommon('save')}
                 </Button>
               </div>
             )}
           </div>
           <div className="bg-white rounded-2xl p-4 space-y-4">
             <div className="flex justify-between items-start">
-              <Typography variant="p">Product</Typography>
+              <Typography variant="p">{t('details.fields.product')}</Typography>
               <Typography variant="p">
                 <span>{selectedBatch.product_name || ''}</span>
                 {selectedBatch.product_brand && <span> - {selectedBatch.product_brand}</span>}
@@ -262,7 +267,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             </div>
 
             <div className="flex justify-between items-center">
-              <Label htmlFor="batch-number">Batch Number</Label>
+              <Label htmlFor="batch-number">{t('details.fields.batchNumber')}</Label>
               {isEditing ? (
                 <Input
                   id="batch-number"
@@ -278,7 +283,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             </div>
 
             <div className="flex justify-between items-center">
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">{t('details.fields.status')}</Label>
               {isEditing ? (
                 <Select
                   value={editedValues.batch_status}
@@ -290,11 +295,11 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="damaged">Damaged</SelectItem>
-                    <SelectItem value="sold_out">Sold Out</SelectItem>
-                    <SelectItem value="reserved">Reserved</SelectItem>
+                    <SelectItem value="active">{t('details.statusOptions.active')}</SelectItem>
+                    <SelectItem value="expired">{t('details.statusOptions.expired')}</SelectItem>
+                    <SelectItem value="damaged">{t('details.statusOptions.damaged')}</SelectItem>
+                    <SelectItem value="sold_out">{t('details.statusOptions.soldOut')}</SelectItem>
+                    <SelectItem value="reserved">{t('details.statusOptions.reserved')}</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
@@ -305,7 +310,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             </div>
 
             <div className="flex justify-between items-center">
-              <Label htmlFor="expiry-date">Expiry Date</Label>
+              <Label htmlFor="expiry-date">{t('details.fields.expiryDate')}</Label>
               {isEditing ? (
                 <Input
                   id="expiry-date"
@@ -331,8 +336,8 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                   >
                     (
                     {daysToExpiry < 0
-                      ? `${Math.abs(daysToExpiry)} days ago`
-                      : `${daysToExpiry} days`}
+                      ? t('details.daysAgo', { days: Math.abs(daysToExpiry) })
+                      : t('details.daysRemaining', { days: daysToExpiry })}
                     )
                   </span>
                 </span>
@@ -343,10 +348,10 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
 
         {/* Inventory & Pricing */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="h4">Inventory & Pricing</Typography>
+          <Typography variant="h4">{t('details.inventoryPricing')}</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-4">
             <div className="flex justify-between items-center">
-              <Label htmlFor="quantity">Current Quantity</Label>
+              <Label htmlFor="quantity">{t('details.fields.currentQuantity')}</Label>
               {isEditing ? (
                 <div className="flex items-center gap-2">
                   <Input
@@ -371,7 +376,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             </div>
 
             <div className="flex justify-between items-center">
-              <Label htmlFor="cost-price">Cost Price</Label>
+              <Label htmlFor="cost-price">{t('details.fields.costPrice')}</Label>
               {isEditing ? (
                 <div className="flex items-center gap-2">
                   <span className="text-sm">€</span>
@@ -396,7 +401,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             </div>
 
             <div className="flex justify-between items-center">
-              <Label htmlFor="selling-price">Selling Price</Label>
+              <Label htmlFor="selling-price">{t('details.fields.sellingPrice')}</Label>
               {isEditing ? (
                 <div className="flex items-center gap-2">
                   <span className="text-sm">€</span>
@@ -427,7 +432,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             {!isEditing &&
               (selectedBatch.current_selling_price || 0) !== (selectedBatch.selling_price || 0) && (
                 <Typography variant="p" className="flex justify-between capitalize">
-                  <span>Current Price</span>
+                  <span>{t('details.fields.currentPrice')}</span>
                   <span>
                     {formatCurrency(selectedBatch.current_selling_price || 0)}
                     <span className="ml-1 text-xs">
@@ -446,7 +451,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
 
             {!isEditing && (
               <Typography variant="p" className="flex justify-between capitalize">
-                <span>Potential Loss</span>
+                <span>{t('details.fields.potentialLoss')}</span>
                 <span>{formatCurrency(selectedBatch.potential_loss_value || 0)}</span>
               </Typography>
             )}
@@ -455,57 +460,57 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
 
         {/* Action History */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="h4">Action History</Typography>
+          <Typography variant="h4">{t('details.actionHistory')}</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-3">
             {selectedBatch.last_action_type ? (
               <>
                 <Typography variant="p" className="flex justify-between capitalize">
-                  <span>Last Action</span>
+                  <span>{t('details.lastAction')}</span>
                   <span>{selectedBatch.last_action_type.replace('_', ' ')}</span>
                 </Typography>
                 <Typography variant="p" className="flex justify-between capitalize">
-                  <span>Last Action Time</span>
+                  <span>{t('details.lastActionTime')}</span>
                   <span>{formatDateTime(selectedBatch.last_action_time || '')}</span>
                 </Typography>
                 {selectedBatch.last_action_quantity && (
                   <Typography variant="p" className="flex justify-between capitalize">
-                    <span>Last Action Quantity</span>
+                    <span>{t('details.lastActionQuantity')}</span>
                     <span>{selectedBatch.last_action_quantity || 0} units</span>
                   </Typography>
                 )}
               </>
             ) : (
               <Typography variant="p" className="text-center py-2">
-                No actions taken yet
+                {t('details.noActionsYet')}
               </Typography>
             )}
 
             <div className="border-t pt-3 space-y-2">
               <Typography variant="p" className="uppercase">
-                Total Actions
+                {t('details.totalActions')}
               </Typography>
               <div>
                 {(selectedBatch.total_sold_quantity || 0) > 0 && (
                   <Typography variant="p" className="flex justify-between capitalize">
-                    <span>Sold:</span>
+                    <span>{t('details.actions.sold')}:</span>
                     <span>{selectedBatch.total_sold_quantity || 0}</span>
                   </Typography>
                 )}
                 {(selectedBatch.total_discounted_quantity || 0) > 0 && (
                   <Typography variant="p" className="flex justify-between capitalize">
-                    <span>Discounted:</span>
+                    <span>{t('details.actions.discounted')}:</span>
                     <span>{selectedBatch.total_discounted_quantity || 0}</span>
                   </Typography>
                 )}
                 {(selectedBatch.total_donated_quantity || 0) > 0 && (
                   <Typography variant="p" className="flex justify-between capitalize">
-                    <span>Donated:</span>
+                    <span>{t('details.actions.donated')}:</span>
                     <span>{selectedBatch.total_donated_quantity || 0}</span>
                   </Typography>
                 )}
                 {(selectedBatch.total_disposed_quantity || 0) > 0 && (
                   <Typography variant="p" className="flex justify-between capitalize">
-                    <span>Disposed:</span>
+                    <span>{t('details.actions.disposed')}:</span>
                     <span>{selectedBatch.total_disposed_quantity || 0}</span>
                   </Typography>
                 )}
@@ -517,21 +522,21 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         {/* AI Insights */}
         {selectedBatch.ai_recommendation && (
           <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-            <Typography variant="h4">AI Insights</Typography>
+            <Typography variant="h4">{t('details.aiInsights')}</Typography>
             <div className="bg-white rounded-2xl p-4 space-y-3">
               <div className="flex justify-between capitalize">
-                <span>Recommendation</span>
+                <span>{t('details.recommendation')}</span>
                 <span>{(selectedBatch.ai_recommendation || '').replace('_', ' ')}</span>
               </div>
               {selectedBatch.composite_score && (
                 <div className="flex justify-between capitalize">
-                  <span>Priority Score</span>
+                  <span>{t('details.priorityScore')}</span>
                   <span>{Math.round((selectedBatch.composite_score || 0) * 100)}%</span>
                 </div>
               )}
               {selectedBatch.urgency_level && (
                 <div className="flex justify-between capitalize">
-                  <span>Urgency</span>
+                  <span>{t('details.urgency')}</span>
                   <Badge
                     variant={
                       selectedBatch.urgency_level === 'critical'
@@ -560,10 +565,10 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
           onClick={onClose}
           className="rounded-full px-40 hidden sm:block"
         >
-          Close
+          {tCommon('close')}
         </Button>
         <Button variant="subtleGray" onClick={onClose} className="rounded-full px-40 sm:hidden">
-          Close
+          {tCommon('close')}
         </Button>
       </div>
     </div>

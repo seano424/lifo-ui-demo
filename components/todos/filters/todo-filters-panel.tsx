@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { useTranslations } from 'next-intl'
 import { useCallback } from 'react'
 import { TodoFiltersBar, type TodoFilterValues } from './todo-filters-bar'
 import { TodoSearchBar } from './todo-search-bar'
@@ -34,6 +35,8 @@ export function TodoFiltersPanel({
   isLoading = false,
   className,
 }: TodoFiltersPanelProps) {
+  const t = useTranslations('todos')
+
   const handleFilterChange = useCallback(
     (newFilters: TodoFilterValues) => {
       onFiltersChange((prevFilters: TodoFiltersState) => ({
@@ -84,17 +87,17 @@ export function TodoFiltersPanel({
           searchTerm={filters.product_name}
           onSearchChange={handleSearchChange}
           isLoading={isLoading}
-          placeholder="Search products..."
+          placeholder={t('filters.searchPlaceholder')}
         />
 
         <div className="flex items-center gap-2">
           {hasActiveFilters && (
             <>
               <span className="hidden sm:inline text-sm text-muted-foreground">
-                Active filters applied
+                {t('filters.activeFilters')}
               </span>
               <Button size="sm" variant="secondary" onClick={clearAllFilters} className="h-8">
-                Clear all
+                {t('filters.clearAll')}
               </Button>
             </>
           )}

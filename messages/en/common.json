@@ -83,7 +83,10 @@
       "notFound": "The requested resource was not found.",
       "validationFailed": "Please check your input and try again.",
       "timeoutError": "Request timed out. Please try again.",
-      "unknownError": "An unknown error occurred"
+      "unknownError": "An unknown error occurred",
+      "unexpected": "An unexpected error occurred",
+      "somethingWrong": "Something went wrong",
+      "permissionDenied": "Permission denied"
     },
     "forms": {
       "required": "This field is required",
@@ -126,5 +129,9 @@
       "updating": "Updating..."
     }
   },
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "close": "Close",
+  "save": "Save",
+  "edit": "Edit",
+  "saving": "Saving..."
 }

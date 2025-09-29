@@ -1,0 +1,270 @@
+{
+  "page": {
+    "title": "Todos",
+    "description": "Manage actionable inventory items and track your progress"
+  },
+  "tabs": {
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed"
+  },
+  "pending": {
+    "errorLoading": "Error loading pending todos",
+    "loading": "Loading pending todos...",
+    "noPendingHeading": "No pending todos!",
+    "allCaughtUp": "All caught up! No items need immediate attention.",
+    "noMatch": "No pending todos match your filters"
+  },
+  "inProgress": {
+    "errorLoading": "Error loading in-progress todos",
+    "loading": "Loading in-progress todos...",
+    "noTodosHeading": "No todos in progress",
+    "noItems": "No items are currently being worked on.",
+    "noMatch": "No in-progress todos match your filters"
+  },
+  "completed": {
+    "errorLoading": "Error loading completed todos",
+    "loading": "Loading completed todos...",
+    "noCompletedHeading": "No completed todos",
+    "notFound": "No completed todos found.",
+    "noMatch": "No completed todos match your filters"
+  },
+  "emptyStateWithFilters": "Try adjusting your filters to see more items.",
+  "card": {
+    "suggestion": "Suggestion",
+    "daysLeft": "{days} days left",
+    "daysLeftOne": "1 day left",
+    "expiresIn": "Expires in {days} days",
+    "expiresToday": "Expires today",
+    "expired": "Expiring {days} days ago",
+    "expiredYesterday": "Expiring yesterday",
+    "currentlyDiscounted": "Currently discounted: {percent}%",
+    "suggestedDiscount": "Suggested discount: {percent}%",
+    "healthyMaintain": "Suggestion: Healthy & Maintain",
+    "expiringSoon": "Expiring soon",
+    "activeHealthy": "Active & healthy",
+    "editTodo": "Edit todo",
+    "unitsLeft": "{quantity} left",
+    "allSold": "All sold!",
+    "donated": "Donated!",
+    "disposed": "All disposed!",
+    "completedOn": "Completed on {date}",
+    "donatedOn": "Donated on {date}",
+    "disposedOn": "Disposed on {date}",
+    "noRecommendation": "No recommendation"
+  },
+  "actions": {
+    "discount": "Discount",
+    "donate": "Donate",
+    "sell": "Sell",
+    "dispose": "Dispose",
+    "details": "Details"
+  },
+  "bottomSheet": {
+    "units": "{count} units"
+  },
+  "discount": {
+    "success": "Successfully applied {percent}% discount to {product}",
+    "error": "Failed to apply discount: {error}",
+    "selectPercentage": "Select discount percentage",
+    "customDiscount": "Or set a custom discount",
+    "newPrice": "New price: €{price}",
+    "processing": "Processing Discount...",
+    "setPrice": "Set Price €{price}",
+    "apply": "Apply {percent}% Discount",
+    "action": "Discount"
+  },
+  "donate": {
+    "selectRecipient": "Please select a donation recipient",
+    "success": "Successfully donated {quantity} units to {recipient}",
+    "error": "Failed to process donation: {error}",
+    "loadingRecipients": "Loading donation recipients...",
+    "noRecipients": "No donation recipients available for this store.",
+    "contactAdmin": "Contact your admin to set up donation recipients.",
+    "howMany": "How many units to donate?",
+    "markForDonation": "Mark for donation: {quantity} units",
+    "processing": "Processing Donation...",
+    "donateAll": "Donate all",
+    "donate": "Donate {quantity}"
+  },
+  "dispose": {
+    "reasons": {
+      "expired": "Expired/Past due date",
+      "damaged": "Damaged packaging",
+      "spoiled": "Spoiled/Quality issues",
+      "recalled": "Product recall",
+      "contaminated": "Contaminated",
+      "other": "Other reason"
+    },
+    "provideReason": "Please provide a disposal reason",
+    "success": "Successfully disposed {quantity} units",
+    "error": "Failed to dispose items: {error}",
+    "whyDisposing": "Why are you disposing this?",
+    "customReasonPlaceholder": "Enter custom disposal reason",
+    "howMany": "How many units to dispose?",
+    "markAsDisposed": "Mark as disposed: {quantity} units",
+    "processing": "Processing Disposal...",
+    "disposeAll": "Dispose all",
+    "dispose": "Dispose {quantity}"
+  },
+  "sold": {
+    "timing": {
+      "justNow": "Just now",
+      "today": "Earlier today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week"
+    },
+    "success": "Successfully marked {quantity} units as sold",
+    "error": "Failed to mark items as sold: {error}",
+    "whenSell": "When did this sell?",
+    "howMany": "How many units did you sell?",
+    "markAsSold": "Mark as sold: {quantity} units",
+    "processing": "Processing Sale...",
+    "sellAll": "Sell all",
+    "sell": "Sell {quantity}"
+  },
+  "details": {
+    "validation": {
+      "batchNumberRequired": "Batch number is required",
+      "batchNumberTooLong": "Batch number must be less than {max} characters",
+      "batchNumberInvalid": "Batch number can only contain letters, numbers, hyphens, underscores, and spaces",
+      "expiryRequired": "Expiry date is required",
+      "expiryTooOld": "Expiry date cannot be more than {years} years in the past",
+      "expiryTooFuture": "Expiry date cannot be more than {years} years in the future",
+      "quantityPositive": "Quantity must be 0 or greater",
+      "quantityWhole": "Quantity must be a whole number",
+      "costPricePositive": "Cost price must be 0 or greater",
+      "sellingPricePositive": "Selling price must be 0 or greater",
+      "priceMax": "Prices cannot exceed €{max}"
+    },
+    "error": {
+      "invalidData": "Invalid data: Batch number may already exist or contain invalid characters",
+      "updateFailed": "Update failed: {error}",
+      "unexpected": "An unexpected error occurred while updating the batch"
+    },
+    "status": {
+      "expired": "Expired",
+      "expiringSoon": "Expiring Soon",
+      "fresh": "Fresh",
+      "active": "Active",
+      "damaged": "Damaged",
+      "soldOut": "Sold Out",
+      "reserved": "Reserved"
+    },
+    "productInformation": "Product Information",
+    "fields": {
+      "product": "Product",
+      "batchNumber": "Batch Number",
+      "status": "Status",
+      "expiryDate": "Expiry Date",
+      "currentQuantity": "Current Quantity",
+      "costPrice": "Cost Price",
+      "sellingPrice": "Selling Price",
+      "currentPrice": "Current Price",
+      "potentialLoss": "Potential Loss",
+      "lastAction": "Last Action",
+      "lastActionTime": "Last Action Time",
+      "lastActionQuantity": "Last Action Quantity",
+      "recommendation": "Recommendation",
+      "priorityScore": "Priority Score",
+      "urgency": "Urgency"
+    },
+    "daysAgo": "{days} days ago",
+    "daysLeft": "{days} days",
+    "inventoryPricing": "Inventory & Pricing",
+    "percentOff": "% off",
+    "actionHistory": "Action History",
+    "noActions": "No actions taken yet",
+    "totalActions": "Total Actions",
+    "actions": {
+      "sold": "Sold:",
+      "discounted": "Discounted:",
+      "donated": "Donated:",
+      "disposed": "Disposed:"
+    },
+    "aiInsights": "AI Insights"
+  },
+  "filters": {
+    "searchPlaceholder": "Search products...",
+    "activeFilters": "Active filters applied",
+    "clearAll": "Clear all",
+    "urgency": {
+      "all": "All Urgency Levels",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "none": "None"
+    },
+    "action": {
+      "all": "All Actions",
+      "discount": "Discount",
+      "donate": "Donate",
+      "donatePrepared": "Donate Prepared",
+      "dispose": "Dispose",
+      "maintain": "Maintain",
+      "ignored": "Ignored",
+      "sold": "Sold"
+    },
+    "status": {
+      "all": "All Status",
+      "active": "Active",
+      "expired": "Expired"
+    },
+    "urgencyCount": "Urgency ({count})",
+    "filterByUrgency": "Filter by urgency",
+    "actionsCount": "Actions ({count})",
+    "filterByAction": "Filter by action",
+    "statusCount": "Status ({count})",
+    "filterByStatus": "Filter by status",
+    "activeUrgency": "Urgency: {urgency}",
+    "activeAction": "Action: {action}",
+    "activeStatus": "Status: {status}"
+  },
+  "search": {
+    "placeholder": "Search products...",
+    "searching": "Searching..."
+  },
+  "sort": {
+    "sortBy": "Sort by",
+    "sortDirection": "Sort {direction}",
+    "asc": "Asc",
+    "desc": "Desc",
+    "urgency": {
+      "label": "Urgency",
+      "description": "Sort by priority level (critical → low)"
+    },
+    "expiryDate": {
+      "label": "Expiry Date",
+      "description": "Sort by when items expire"
+    },
+    "quantity": {
+      "label": "Quantity",
+      "description": "Sort by current stock quantity"
+    },
+    "potentialLoss": {
+      "label": "Potential Loss",
+      "description": "Sort by estimated financial impact"
+    },
+    "productName": {
+      "label": "Product Name",
+      "description": "Sort alphabetically by product name"
+    },
+    "lastAction": {
+      "label": "Last Action",
+      "description": "Sort by when action was last taken"
+    },
+    "effectiveness": {
+      "label": "Effectiveness",
+      "description": "Sort by action effectiveness score"
+    }
+  },
+  "list": {
+    "noTodosFound": "No todos found",
+    "emptyState": "{emptyStateMessage}",
+    "adjustFilters": "Try adjusting your filters to see more items.",
+    "loadingMore": "Loading more todos...",
+    "scrollToLoad": "Scroll to load more ({count} loaded)",
+    "updating": "Updating..."
+  }
+}
