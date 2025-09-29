@@ -2,6 +2,7 @@
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useTranslations } from 'next-intl'
 import { Search, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -16,9 +17,10 @@ interface TodoSearchBarProps {
 export function TodoSearchBar({
   searchTerm = '',
   onSearchChange,
-  placeholder = 'Search products...',
+  placeholder,
   isLoading = false,
 }: TodoSearchBarProps) {
+  const t = useTranslations('todos')
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm)
 
   // Debounce the search term to avoid too many API calls
@@ -49,7 +51,7 @@ export function TodoSearchBar({
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder || t('filters.searchPlaceholder')}
           value={localSearchTerm}
           onChange={e => setLocalSearchTerm(e.target.value)}
           disabled={isLoading}
@@ -69,7 +71,9 @@ export function TodoSearchBar({
 
       {/* Search Stats */}
       {isLoading && hasSearch && (
-        <div className="text-xs text-muted-foreground whitespace-nowrap">Searching...</div>
+        <div className="text-xs text-muted-foreground whitespace-nowrap">
+          {t('filters.searching')}
+        </div>
       )}
     </div>
   )

@@ -9,6 +9,7 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface DiscountTabProps {
   selectedBatch: TodoItem
@@ -16,6 +17,10 @@ interface DiscountTabProps {
 }
 
 export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
+  const t = useTranslations('todos')
+  const tCommon = useTranslations()
+  const tErrors = useTranslations('errors.common')
+
   const activeStoreId = useActiveStoreId()
   const { executeDiscount, isDiscounting } = useBatchActionRPC(activeStoreId || undefined)
 
@@ -93,7 +98,10 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
 
       // Success - show success toast and close the modal
       toast.success(
-        `Successfully applied ${priceMetrics.actualDiscountPercentage}% discount to ${selectedBatch.product_name}`,
+        t('discount.success', {
+          percent: priceMetrics.actualDiscountPercentage,
+          product: selectedBatch.product_name ?? '',
+        }),
       )
       onClose()
     } catch (error) {
@@ -106,8 +114,8 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
       })
 
       // Show user-facing error message
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
-      toast.error(`Failed to apply discount: ${errorMessage}`)
+      const errorMessage = error instanceof Error ? error.message : tErrors('common.unexpected')
+      toast.error(t('discount.error', { error: errorMessage }))
     }
   }
 
@@ -118,7 +126,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         {/* Discount Preset Options */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="p" className="xs:text-lg">
-            Select discount percentage
+            {t('discount.selectPercentage')}
           </Typography>
           <div className="grid grid-cols-2 gap-2 bg-white rounded-2xl p-4">
             {[10, 20, 25, 50].map(preset => (
@@ -138,7 +146,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         {/* Discount Slider */}
         <div className="px-8 py-4 flex-1 flex flex-col justify-center gap-4">
           <Typography variant="p" className="xs:text-lg">
-            Or set a custom discount
+            {t('discount.customDiscount')}
           </Typography>
           <div className="bg-white rounded-2xl p-4">
             <InputSlider
@@ -147,7 +155,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
               min={5}
               max={100}
               step={1}
-              label={`New price: €${priceMetrics.newPrice.toFixed(2)}`}
+              label={t('discount.newPrice', { price: priceMetrics.newPrice.toFixed(2) })}
               suffix="%"
               isPercentage
             />
@@ -163,7 +171,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           onClick={onClose}
           className="rounded-full flex-1"
         >
-          Cancel
+          {tCommon('cancel')}
         </Button>
         <Button
           size={isMobile ? 'default' : 'lg'}
@@ -175,12 +183,12 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           {isDiscounting ? (
             <span className="flex items-center justify-center gap-2">
               <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-              Processing Discount...
+              {t('discount.processing')}
             </span>
           ) : useCustomPrice && customPrice ? (
-            `Set Price €${priceMetrics.newPrice.toFixed(2)}`
+            t('discount.setPrice', { price: priceMetrics.newPrice.toFixed(2) })
           ) : (
-            `Apply ${priceMetrics.actualDiscountPercentage}% Discount`
+            t('discount.apply', { percent: priceMetrics.actualDiscountPercentage })
           )}
         </Button>
         <Button
@@ -190,7 +198,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
           onClick={handleDiscountAction}
           disabled={isDiscounting}
         >
-          Discount
+          {t('discount.label')}
         </Button>
       </div>
     </div>

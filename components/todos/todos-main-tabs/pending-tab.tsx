@@ -1,8 +1,10 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { usePendingTodos } from '@/hooks/use-todos-with-filters'
 import type { TodoFiltersState } from '../filters/todo-filters-panel'
 import { TodoCardList } from '../todo-card-list'
+import { Typography } from '@/components/ui/typography'
 
 interface PendingTabProps {
   filters: TodoFiltersState
@@ -10,6 +12,9 @@ interface PendingTabProps {
 }
 
 export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
+  const t = useTranslations('todos')
+  const tErrors = useTranslations('errors.common')
+
   const {
     data: todos,
     isLoading,
@@ -32,9 +37,9 @@ export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
   if (isError) {
     return (
       <div className="text-center py-8">
-        <p className="text-destructive">Error loading pending todos</p>
+        <p className="text-destructive">{t('pending.errorLoading')}</p>
         <p className="text-sm text-muted-foreground mt-2">
-          {error?.message || 'Something went wrong'}
+          {error?.message || tErrors('common.somethingWrong')}
         </p>
       </div>
     )
@@ -44,23 +49,25 @@ export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground mt-2">Loading pending todos...</p>
+        <p className="text-muted-foreground mt-2">{t('pending.loading')}</p>
       </div>
     )
   }
 
   if (!todos?.length) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
         <div className="text-6xl mb-4">🎉</div>
-        <h3 className="text-lg font-semibold mb-2">No pending todos!</h3>
-        <p className="text-muted-foreground">
+        <Typography variant="h3" color="primary">
+          {t('pending.noPendingHeading')}
+        </Typography>
+        <Typography variant="p" color="muted">
           {Object.values(filters).some(
             f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true),
           )
-            ? 'Try adjusting your filters to see more items.'
-            : 'All caught up! No items need immediate attention.'}
-        </p>
+            ? t('emptyStateWithFilters')
+            : t('pending.allCaughtUp')}
+        </Typography>
       </div>
     )
   }
@@ -74,7 +81,7 @@ export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
       fetchNextPage={fetchNextPage}
       isFetchingNextPage={isFetchingNextPage}
       sortConfig={filters.sortConfig}
-      emptyStateMessage="No pending todos match your filters"
+      emptyStateMessage={t('pending.noMatch')}
       emptyStateIcon="📋"
     />
   )

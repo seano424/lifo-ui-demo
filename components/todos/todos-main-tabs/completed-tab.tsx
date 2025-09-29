@@ -1,8 +1,10 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useCompletedTodos } from '@/hooks/use-todos-with-filters'
 import type { TodoFiltersState } from '../filters/todo-filters-panel'
 import { TodoCardList } from '../todo-card-list'
+import { Typography } from '@/components/ui/typography'
 
 interface CompletedTabProps {
   filters: TodoFiltersState
@@ -10,6 +12,9 @@ interface CompletedTabProps {
 }
 
 export function CompletedTab({ filters, pageSize = 20 }: CompletedTabProps) {
+  const t = useTranslations('todos')
+  const tErrors = useTranslations('errors.common')
+
   const {
     data: todos,
     isLoading,
@@ -31,36 +36,42 @@ export function CompletedTab({ filters, pageSize = 20 }: CompletedTabProps) {
 
   if (isError) {
     return (
-      <div className="text-center py-8">
-        <p className="text-destructive">Error loading completed todos</p>
-        <p className="text-sm text-muted-foreground mt-2">
-          {error?.message || 'Something went wrong'}
-        </p>
+      <div className="text-center py-8 flex flex-col items-center justify-center gap-4">
+        <Typography variant="p" color="destructive">
+          {t('completed.errorLoading')}
+        </Typography>
+        <Typography variant="p" color="muted">
+          {error?.message || tErrors('common.somethingWrong')}
+        </Typography>
       </div>
     )
   }
 
   if (isLoading) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-8 flex flex-col items-center justify-center gap-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground mt-2">Loading completed todos...</p>
+        <Typography variant="p" color="muted">
+          {t('completed.loading')}
+        </Typography>
       </div>
     )
   }
 
   if (!todos?.length) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
         <div className="text-6xl mb-4">✅</div>
-        <h3 className="text-lg font-semibold mb-2">No completed todos</h3>
-        <p className="text-muted-foreground">
+        <Typography variant="h3" color="primary">
+          {t('completed.noCompletedHeading')}
+        </Typography>
+        <Typography variant="p" color="muted">
           {Object.values(filters).some(
             f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true),
           )
-            ? 'Try adjusting your filters to see more items.'
-            : 'No completed todos found.'}
-        </p>
+            ? t('emptyStateWithFilters')
+            : t('completed.notFound')}
+        </Typography>
       </div>
     )
   }
@@ -74,7 +85,7 @@ export function CompletedTab({ filters, pageSize = 20 }: CompletedTabProps) {
       fetchNextPage={fetchNextPage}
       isFetchingNextPage={isFetchingNextPage}
       sortConfig={filters.sortConfig}
-      emptyStateMessage="No completed todos match your filters"
+      emptyStateMessage={t('completed.noMatch')}
       emptyStateIcon="✅"
     />
   )

@@ -1,0 +1,270 @@
+{
+  "page": {
+    "title": "À faire",
+    "description": "Gérez les articles d'inventaire nécessitant une action et suivez vos progrès"
+  },
+  "tabs": {
+    "pending": "En attente",
+    "inProgress": "En cours",
+    "completed": "Terminé"
+  },
+  "pending": {
+    "errorLoading": "Erreur lors du chargement des tâches en attente",
+    "loading": "Chargement des tâches en attente...",
+    "noPendingHeading": "Aucune tâche en attente !",
+    "allCaughtUp": "Tout est à jour ! Aucun article ne nécessite d'attention immédiate.",
+    "noMatch": "Aucune tâche en attente ne correspond à vos filtres"
+  },
+  "inProgress": {
+    "errorLoading": "Erreur lors du chargement des tâches en cours",
+    "loading": "Chargement des tâches en cours...",
+    "noTodosHeading": "Aucune tâche en cours",
+    "noItems": "Aucun article n'est actuellement en traitement.",
+    "noMatch": "Aucune tâche en cours ne correspond à vos filtres"
+  },
+  "completed": {
+    "errorLoading": "Erreur lors du chargement des tâches terminées",
+    "loading": "Chargement des tâches terminées...",
+    "noCompletedHeading": "Aucune tâche terminée",
+    "notFound": "Aucune tâche terminée trouvée.",
+    "noMatch": "Aucune tâche terminée ne correspond à vos filtres"
+  },
+  "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
+  "card": {
+    "suggestion": "Suggestion",
+    "daysLeft": "{days} jours restants",
+    "daysLeftOne": "1 jour restant",
+    "expiresIn": "Expire dans {days} jours",
+    "expiresToday": "Expire aujourd'hui",
+    "expired": "Expiré il y a {days} jours",
+    "expiredYesterday": "Expiré hier",
+    "currentlyDiscounted": "Actuellement remisé : {percent}%",
+    "suggestedDiscount": "Remise suggérée : {percent}%",
+    "healthyMaintain": "Suggestion : Sain et à maintenir",
+    "expiringSoon": "Expire bientôt",
+    "activeHealthy": "Actif et sain",
+    "editTodo": "Modifier la tâche",
+    "unitsLeft": "{quantity} restant(s)",
+    "allSold": "Tout vendu !",
+    "donated": "Donné !",
+    "disposed": "Tout éliminé !",
+    "completedOn": "Terminé le {date}",
+    "donatedOn": "Donné le {date}",
+    "disposedOn": "Éliminé le {date}",
+    "noRecommendation": "Aucune recommandation"
+  },
+  "actions": {
+    "discount": "Remise",
+    "donate": "Faire un don",
+    "sell": "Vendre",
+    "dispose": "Éliminer",
+    "details": "Détails"
+  },
+  "bottomSheet": {
+    "units": "{count} unités"
+  },
+  "discount": {
+    "success": "Remise de {percent}% appliquée avec succès à {product}",
+    "error": "Échec de l'application de la remise : {error}",
+    "selectPercentage": "Sélectionnez le pourcentage de remise",
+    "customDiscount": "Ou définissez une remise personnalisée",
+    "newPrice": "Nouveau prix : €{price}",
+    "processing": "Traitement de la remise...",
+    "setPrice": "Définir le prix €{price}",
+    "apply": "Appliquer {percent}% de remise",
+    "action": "Remise"
+  },
+  "donate": {
+    "selectRecipient": "Veuillez sélectionner un destinataire de don",
+    "success": "{quantity} unités données avec succès à {recipient}",
+    "error": "Échec du traitement du don : {error}",
+    "loadingRecipients": "Chargement des destinataires de dons...",
+    "noRecipients": "Aucun destinataire de don disponible pour ce magasin.",
+    "contactAdmin": "Contactez votre administrateur pour configurer les destinataires de dons.",
+    "howMany": "Combien d'unités donner ?",
+    "markForDonation": "Marquer pour don : {quantity} unités",
+    "processing": "Traitement du don...",
+    "donateAll": "Tout donner",
+    "donate": "Donner {quantity}"
+  },
+  "dispose": {
+    "reasons": {
+      "expired": "Expiré/Date de péremption dépassée",
+      "damaged": "Emballage endommagé",
+      "spoiled": "Gâté/Problèmes de qualité",
+      "recalled": "Rappel de produit",
+      "contaminated": "Contaminé",
+      "other": "Autre raison"
+    },
+    "provideReason": "Veuillez fournir une raison d'élimination",
+    "success": "{quantity} unités éliminées avec succès",
+    "error": "Échec de l'élimination des articles : {error}",
+    "whyDisposing": "Pourquoi éliminez-vous ceci ?",
+    "customReasonPlaceholder": "Entrez une raison d'élimination personnalisée",
+    "howMany": "Combien d'unités éliminer ?",
+    "markAsDisposed": "Marquer comme éliminé : {quantity} unités",
+    "processing": "Traitement de l'élimination...",
+    "disposeAll": "Tout éliminer",
+    "dispose": "Éliminer {quantity}"
+  },
+  "sold": {
+    "timing": {
+      "justNow": "À l'instant",
+      "today": "Plus tôt aujourd'hui",
+      "yesterday": "Hier",
+      "thisWeek": "Cette semaine"
+    },
+    "success": "{quantity} unités marquées comme vendues avec succès",
+    "error": "Échec du marquage des articles comme vendus : {error}",
+    "whenSell": "Quand cela a-t-il été vendu ?",
+    "howMany": "Combien d'unités avez-vous vendu ?",
+    "markAsSold": "Marquer comme vendu : {quantity} unités",
+    "processing": "Traitement de la vente...",
+    "sellAll": "Tout vendre",
+    "sell": "Vendre {quantity}"
+  },
+  "details": {
+    "validation": {
+      "batchNumberRequired": "Le numéro de lot est requis",
+      "batchNumberTooLong": "Le numéro de lot doit contenir moins de {max} caractères",
+      "batchNumberInvalid": "Le numéro de lot ne peut contenir que des lettres, chiffres, traits d'union, underscores et espaces",
+      "expiryRequired": "La date d'expiration est requise",
+      "expiryTooOld": "La date d'expiration ne peut pas être plus de {years} ans dans le passé",
+      "expiryTooFuture": "La date d'expiration ne peut pas être plus de {years} ans dans le futur",
+      "quantityPositive": "La quantité doit être 0 ou plus",
+      "quantityWhole": "La quantité doit être un nombre entier",
+      "costPricePositive": "Le prix de revient doit être 0 ou plus",
+      "sellingPricePositive": "Le prix de vente doit être 0 ou plus",
+      "priceMax": "Les prix ne peuvent pas dépasser €{max}"
+    },
+    "error": {
+      "invalidData": "Données invalides : Le numéro de lot existe peut-être déjà ou contient des caractères invalides",
+      "updateFailed": "Échec de la mise à jour : {error}",
+      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot"
+    },
+    "status": {
+      "expired": "Expiré",
+      "expiringSoon": "Expire bientôt",
+      "fresh": "Frais",
+      "active": "Actif",
+      "damaged": "Endommagé",
+      "soldOut": "Épuisé",
+      "reserved": "Réservé"
+    },
+    "productInformation": "Informations sur le produit",
+    "fields": {
+      "product": "Produit",
+      "batchNumber": "Numéro de lot",
+      "status": "Statut",
+      "expiryDate": "Date d'expiration",
+      "currentQuantity": "Quantité actuelle",
+      "costPrice": "Prix de revient",
+      "sellingPrice": "Prix de vente",
+      "currentPrice": "Prix actuel",
+      "potentialLoss": "Perte potentielle",
+      "lastAction": "Dernière action",
+      "lastActionTime": "Heure de la dernière action",
+      "lastActionQuantity": "Quantité de la dernière action",
+      "recommendation": "Recommandation",
+      "priorityScore": "Score de priorité",
+      "urgency": "Urgence"
+    },
+    "daysAgo": "il y a {days} jours",
+    "daysLeft": "{days} jours",
+    "inventoryPricing": "Inventaire et tarification",
+    "percentOff": "% de réduction",
+    "actionHistory": "Historique des actions",
+    "noActions": "Aucune action effectuée pour l'instant",
+    "totalActions": "Actions totales",
+    "actions": {
+      "sold": "Vendu :",
+      "discounted": "Remisé :",
+      "donated": "Donné :",
+      "disposed": "Éliminé :"
+    },
+    "aiInsights": "Analyses IA"
+  },
+  "filters": {
+    "searchPlaceholder": "Rechercher des produits...",
+    "activeFilters": "Filtres actifs appliqués",
+    "clearAll": "Tout effacer",
+    "urgency": {
+      "all": "Tous les niveaux d'urgence",
+      "critical": "Critique",
+      "high": "Élevé",
+      "medium": "Moyen",
+      "low": "Faible",
+      "none": "Aucun"
+    },
+    "action": {
+      "all": "Toutes les actions",
+      "discount": "Remise",
+      "donate": "Don",
+      "donatePrepared": "Don préparé",
+      "dispose": "Éliminer",
+      "maintain": "Maintenir",
+      "ignored": "Ignoré",
+      "sold": "Vendu"
+    },
+    "status": {
+      "all": "Tous les statuts",
+      "active": "Actif",
+      "expired": "Expiré"
+    },
+    "urgencyCount": "Urgence ({count})",
+    "filterByUrgency": "Filtrer par urgence",
+    "actionsCount": "Actions ({count})",
+    "filterByAction": "Filtrer par action",
+    "statusCount": "Statut ({count})",
+    "filterByStatus": "Filtrer par statut",
+    "activeUrgency": "Urgence : {urgency}",
+    "activeAction": "Action : {action}",
+    "activeStatus": "Statut : {status}"
+  },
+  "search": {
+    "placeholder": "Rechercher des produits...",
+    "searching": "Recherche..."
+  },
+  "sort": {
+    "sortBy": "Trier par",
+    "sortDirection": "Trier {direction}",
+    "asc": "Asc",
+    "desc": "Desc",
+    "urgency": {
+      "label": "Urgence",
+      "description": "Trier par niveau de priorité (critique → faible)"
+    },
+    "expiryDate": {
+      "label": "Date d'expiration",
+      "description": "Trier par date d'expiration des articles"
+    },
+    "quantity": {
+      "label": "Quantité",
+      "description": "Trier par quantité en stock actuelle"
+    },
+    "potentialLoss": {
+      "label": "Perte potentielle",
+      "description": "Trier par impact financier estimé"
+    },
+    "productName": {
+      "label": "Nom du produit",
+      "description": "Trier alphabétiquement par nom de produit"
+    },
+    "lastAction": {
+      "label": "Dernière action",
+      "description": "Trier par date de la dernière action effectuée"
+    },
+    "effectiveness": {
+      "label": "Efficacité",
+      "description": "Trier par score d'efficacité de l'action"
+    }
+  },
+  "list": {
+    "noTodosFound": "Aucune tâche trouvée",
+    "emptyState": "{emptyStateMessage}",
+    "adjustFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
+    "loadingMore": "Chargement de plus de tâches...",
+    "scrollToLoad": "Faites défiler pour charger plus ({count} chargés)",
+    "updating": "Mise à jour..."
+  }
+}

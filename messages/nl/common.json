@@ -83,7 +83,10 @@
       "notFound": "De gevraagde resource is niet gevonden.",
       "validationFailed": "Controleer uw invoer en probeer opnieuw.",
       "timeoutError": "Verzoek verlopen. Probeer opnieuw.",
-      "unknownError": "Er is een onbekende fout opgetreden"
+      "unknownError": "Er is een onbekende fout opgetreden",
+      "unexpected": "Er is een onverwachte fout opgetreden",
+      "somethingWrong": "Er is iets misgegaan",
+      "permissionDenied": "Toegang geweigerd"
     },
     "forms": {
       "required": "Dit veld is verplicht",
@@ -126,5 +129,9 @@
       "updating": "Bijwerken..."
     }
   },
-  "cancel": "Annuleren"
+  "cancel": "Annuleren",
+  "close": "Sluiten",
+  "save": "Opslaan",
+  "edit": "Bewerken",
+  "saving": "Opslaan..."
 }

@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useTranslations } from 'next-intl'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useMemo } from 'react'
 
@@ -35,43 +36,43 @@ interface TodoSortControlsProps {
 
 const SORT_OPTIONS: {
   value: SortField
-  label: string
-  description?: string
+  labelKey: string
+  descriptionKey: string
 }[] = [
   {
     value: 'urgency',
-    label: 'Urgency',
-    description: 'Sort by priority level (critical → low)',
+    labelKey: 'sort.urgency.label',
+    descriptionKey: 'sort.urgency.description',
   },
   {
     value: 'expiry_date',
-    label: 'Expiry Date',
-    description: 'Sort by when items expire',
+    labelKey: 'sort.expiryDate.label',
+    descriptionKey: 'sort.expiryDate.description',
   },
   {
     value: 'current_quantity',
-    label: 'Quantity',
-    description: 'Sort by current stock quantity',
+    labelKey: 'sort.quantity.label',
+    descriptionKey: 'sort.quantity.description',
   },
   {
     value: 'potential_loss',
-    label: 'Potential Loss',
-    description: 'Sort by estimated financial impact',
+    labelKey: 'sort.potentialLoss.label',
+    descriptionKey: 'sort.potentialLoss.description',
   },
   {
     value: 'alphabetical',
-    label: 'Product Name',
-    description: 'Sort alphabetically by product name',
+    labelKey: 'sort.productName.label',
+    descriptionKey: 'sort.productName.description',
   },
   {
     value: 'action_date',
-    label: 'Last Action',
-    description: 'Sort by when action was last taken',
+    labelKey: 'sort.lastAction.label',
+    descriptionKey: 'sort.lastAction.description',
   },
   {
     value: 'effectiveness',
-    label: 'Effectiveness',
-    description: 'Sort by action effectiveness score',
+    labelKey: 'sort.effectiveness.label',
+    descriptionKey: 'sort.effectiveness.description',
   },
 ]
 
@@ -85,6 +86,7 @@ export function TodoSortControls({
   onSortChange,
   isLoading = false,
 }: TodoSortControlsProps) {
+  const t = useTranslations('todos')
   const currentSortConfig = sortConfig || DEFAULT_SORT_CONFIG
 
   const handleSortFieldChange = (field: SortField) => {
@@ -115,16 +117,14 @@ export function TodoSortControls({
         disabled={isLoading}
       >
         <SelectTrigger className="sm:w-[160px] md:w-[180px]" id="todos-sort-field-trigger">
-          <SelectValue>{currentOption?.label || 'Sort by'}</SelectValue>
+          <SelectValue>{currentOption ? t(currentOption.labelKey) : t('sort.sortBy')}</SelectValue>
         </SelectTrigger>
         <SelectContent id="todos-sort-field-content">
           {SORT_OPTIONS.map(option => (
             <SelectItem key={option.value} value={option.value}>
               <div className="flex flex-col">
-                <span className="font-medium">{option.label}</span>
-                {option.description && (
-                  <span className="text-xs text-muted-foreground">{option.description}</span>
-                )}
+                <span className="font-medium">{t(option.labelKey)}</span>
+                <span className="text-xs text-muted-foreground">{t(option.descriptionKey)}</span>
               </div>
             </SelectItem>
           ))}
@@ -137,14 +137,18 @@ export function TodoSortControls({
         onClick={handleDirectionToggle}
         disabled={isLoading}
         className="w-32 select-none px-3"
-        title={`Sort ${currentSortConfig.direction === 'asc' ? 'ascending' : 'descending'}`}
+        title={t('sort.sortDirection', {
+          direction: currentSortConfig.direction === 'asc' ? t('sort.asc') : t('sort.desc'),
+        })}
       >
         {currentSortConfig.direction === 'asc' ? (
           <ArrowUp className="h-4 w-4" />
         ) : (
           <ArrowDown className="h-4 w-4" />
         )}
-        <span className="ml-1 flex">{currentSortConfig.direction === 'asc' ? 'Asc' : 'Desc'}</span>
+        <span className="ml-1 flex">
+          {currentSortConfig.direction === 'asc' ? t('sort.asc') : t('sort.desc')}
+        </span>
       </Button>
     </div>
   )
