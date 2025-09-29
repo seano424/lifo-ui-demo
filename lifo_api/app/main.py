@@ -355,7 +355,7 @@ async def health_check_bypass_middleware_priority(request: Request, call_next: A
     Priority health check bypass - runs BEFORE TrustedHostMiddleware
     Solves DigitalOcean App Platform health check 400 error issue
     """
-    health_paths = ["/health", "/api/v1/health", "/api/v1/health/"]
+    health_paths = ["/health", "/api/v1/health", "/api/v1/health/", "/v1/health"]
 
     if request.url.path in health_paths:
         client_host = request.client.host if request.client else "unknown"
@@ -363,11 +363,16 @@ async def health_check_bypass_middleware_priority(request: Request, call_next: A
 
         # DigitalOcean internal network patterns or health check user agents
         is_do_health_check = (
-            client_host.startswith("10.244.") or
+            client_host.startswith("10.244.") or  # DO internal network
+            client_host.startswith("10.") or      # Broader internal network range
             client_host == "10.244.65.235" or
             "digitalocean" in user_agent or
             "kube-probe" in user_agent or
-            "healthcheck" in user_agent
+            "healthcheck" in user_agent or
+            "kube-" in user_agent or             # Kubernetes probes
+            user_agent == "" or                  # Empty user agent (internal calls)
+            client_host == "127.0.0.1" or       # Localhost health checks
+            client_host == "::1"                 # IPv6 localhost
         )
 
         if is_do_health_check:
@@ -439,7 +444,7 @@ async def health_check_debugging_middleware(request: Request, call_next: Any) ->
     """
     Debug health check requests to troubleshoot deployment issues
     """
-    health_paths = ["/health", "/api/v1/health", "/api/v1/health/"]
+    health_paths = ["/health", "/api/v1/health", "/api/v1/health/", "/v1/health"]
 
     if request.url.path in health_paths:
         client_host = request.client.host if request.client else "unknown"

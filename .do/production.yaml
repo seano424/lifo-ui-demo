@@ -54,9 +54,9 @@ services:
   - key: PROJECT_NAME
     value: "LIFO AI API"
   
-  # CORS settings for production (restrictive)
+  # CORS settings for production (restrictive but allow health checks)
   - key: BACKEND_CORS_ORIGINS
-    value: "https://lifo-app.com,https://www.lifo-app.com"  # Only production domains
+    value: "https://lifo-app.com,https://www.lifo-app.com,null"  # Production domains + internal health checks
 
   - key: FRONTEND_URL
     value: "https://lifo-app.com"  # Primary production frontend URL
