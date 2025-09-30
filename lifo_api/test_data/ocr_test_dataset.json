@@ -467,13 +467,7 @@
       "region": "EU",
       "language": "english",
       "category": "packaged_goods",
-      "text_blocks": [
-        "Crackers",
-        "Original Taste",
-        "12/11/25",
-        "BB 15/11/25",
-        "789123456789"
-      ],
+      "text_blocks": ["Crackers", "Original Taste", "12/11/25", "BB 15/11/25", "789123456789"],
       "expected_results": {
         "dates": [
           {

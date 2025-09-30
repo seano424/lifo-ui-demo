@@ -786,24 +786,9 @@
     "created": "2025-01-15",
     "description": "Comprehensive test data for date extraction, barcode detection, and product name extraction",
     "total_test_cases": 25,
-    "languages": [
-      "english",
-      "french",
-      "german",
-      "spanish",
-      "italian"
-    ],
-    "regions": [
-      "EU",
-      "US"
-    ],
-    "categories": [
-      "dairy",
-      "bakery",
-      "organic",
-      "packaged_goods",
-      "beverages"
-    ]
+    "languages": ["english", "french", "german", "spanish", "italian"],
+    "regions": ["EU", "US"],
+    "categories": ["dairy", "bakery", "organic", "packaged_goods", "beverages"]
   },
   "timestamp": "2025-09-29 03:19:00"
 }

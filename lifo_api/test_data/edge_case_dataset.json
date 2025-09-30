@@ -3,7 +3,13 @@
     "name": "OCR Edge Case and Stress Test Dataset",
     "version": "1.0.0",
     "description": "Challenging scenarios for OCR robustness testing",
-    "categories": ["corrupted_text", "ambiguous_dates", "invalid_barcodes", "multilingual_confusion", "performance_stress"]
+    "categories": [
+      "corrupted_text",
+      "ambiguous_dates",
+      "invalid_barcodes",
+      "multilingual_confusion",
+      "performance_stress"
+    ]
   },
   "edge_cases": [
     {
@@ -35,11 +41,7 @@
       "id": "INVALID_BARCODE_001",
       "description": "Barcode with invalid checksum",
       "category": "invalid_barcodes",
-      "text_blocks": [
-        "Test Product",
-        "Invalid Code: 1234567890123",
-        "Valid Code: 8901030827195"
-      ],
+      "text_blocks": ["Test Product", "Invalid Code: 1234567890123", "Valid Code: 8901030827195"],
       "expected_behavior": "Should detect invalid checksum and flag appropriately"
     },
     {
@@ -59,12 +61,7 @@
       "id": "NO_DATES_001",
       "description": "Product with no recognizable dates",
       "category": "missing_data",
-      "text_blocks": [
-        "Salt",
-        "Pure Sea Salt",
-        "Weight: 1kg",
-        "Harvested from Atlantic Ocean"
-      ],
+      "text_blocks": ["Salt", "Pure Sea Salt", "Weight: 1kg", "Harvested from Atlantic Ocean"],
       "expected_behavior": "Should return empty results gracefully"
     },
     {
@@ -87,11 +84,7 @@
       "id": "SHORT_TEXT_001",
       "description": "Minimal text content",
       "category": "minimal_content",
-      "text_blocks": [
-        "Milk",
-        "15/09/25",
-        "123456789012"
-      ],
+      "text_blocks": ["Milk", "15/09/25", "123456789012"],
       "expected_behavior": "Should extract available information efficiently"
     },
     {
@@ -137,16 +130,36 @@
       "description": "Large batch of text blocks for performance testing",
       "category": "performance_stress",
       "text_blocks": [
-        "Product 1", "Date 1: 01/01/2025", "Barcode 1: 1111111111111",
-        "Product 2", "Date 2: 02/01/2025", "Barcode 2: 2222222222222",
-        "Product 3", "Date 3: 03/01/2025", "Barcode 3: 3333333333333",
-        "Product 4", "Date 4: 04/01/2025", "Barcode 4: 4444444444444",
-        "Product 5", "Date 5: 05/01/2025", "Barcode 5: 5555555555555",
-        "Product 6", "Date 6: 06/01/2025", "Barcode 6: 6666666666666",
-        "Product 7", "Date 7: 07/01/2025", "Barcode 7: 7777777777777",
-        "Product 8", "Date 8: 08/01/2025", "Barcode 8: 8888888888888",
-        "Product 9", "Date 9: 09/01/2025", "Barcode 9: 9999999999999",
-        "Product 10", "Date 10: 10/01/2025", "Barcode 10: 1010101010101"
+        "Product 1",
+        "Date 1: 01/01/2025",
+        "Barcode 1: 1111111111111",
+        "Product 2",
+        "Date 2: 02/01/2025",
+        "Barcode 2: 2222222222222",
+        "Product 3",
+        "Date 3: 03/01/2025",
+        "Barcode 3: 3333333333333",
+        "Product 4",
+        "Date 4: 04/01/2025",
+        "Barcode 4: 4444444444444",
+        "Product 5",
+        "Date 5: 05/01/2025",
+        "Barcode 5: 5555555555555",
+        "Product 6",
+        "Date 6: 06/01/2025",
+        "Barcode 6: 6666666666666",
+        "Product 7",
+        "Date 7: 07/01/2025",
+        "Barcode 7: 7777777777777",
+        "Product 8",
+        "Date 8: 08/01/2025",
+        "Barcode 8: 8888888888888",
+        "Product 9",
+        "Date 9: 09/01/2025",
+        "Barcode 9: 9999999999999",
+        "Product 10",
+        "Date 10: 10/01/2025",
+        "Barcode 10: 1010101010101"
       ],
       "expected_behavior": "Should maintain performance with large input"
     }
