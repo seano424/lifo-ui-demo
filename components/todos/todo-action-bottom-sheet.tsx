@@ -138,8 +138,9 @@ export function TodoActionBottomSheet({
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 flex-shrink-0 p-2 rounded-xl',
-                activeTab === tab.id && 'text-primary bg-primary-50',
+                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 flex-shrink-0 py-2 rounded-2xl',
+                activeTab === tab.id &&
+                  'text-primary bg-primary-50 dark:bg-brand-dark dark:text-secondary-600',
               )}
             >
               <tab.icon className="size-4" />

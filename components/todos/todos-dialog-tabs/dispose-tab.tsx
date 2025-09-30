@@ -31,7 +31,11 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
     { id: 'damaged', label: t('dispose.reasons.damaged'), icon: '📦' },
     { id: 'spoiled', label: t('dispose.reasons.spoiled'), icon: '🦠' },
     { id: 'recalled', label: t('dispose.reasons.recalled'), icon: '⚠️' },
-    { id: 'contaminated', label: t('dispose.reasons.contaminated'), icon: '☣️' },
+    {
+      id: 'contaminated',
+      label: t('dispose.reasons.contaminated'),
+      icon: '☣️',
+    },
     { id: 'other', label: t('dispose.reasons.other'), icon: '❓' },
   ]
 
@@ -109,15 +113,15 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-muted">
+    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
       {/* content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Disposal Reason Selection */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="p" className="xs:text-lg">
             {t('dispose.whyDisposing')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4">
+          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
               {DISPOSAL_REASONS.map(reason => (
                 <Button
@@ -153,7 +157,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
           <Typography variant="p" className="xs:text-lg">
             {t('dispose.howMany')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4">
+          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
             <InputSlider
               value={disposeQuantity}
               onChange={handleQuantityChange}
@@ -168,19 +172,19 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="subtleGray"
           onClick={onClose}
-          className="rounded-full flex-1"
+          className="rounded-full flex-1 dark:bg-secondary/10 dark:text-white"
         >
           {tCommon('cancel')}
         </Button>
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="black"
-          className="rounded-full flex-1"
+          className="rounded-full flex-1 dark:bg-primary dark:text-white"
           onClick={handleDisposeAction}
           disabled={
             isDisposing ||
@@ -190,7 +194,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         >
           {isDisposing ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              <span className="animate-spin h-4 w-4 border-2 border-white dark:border-brand-dark border-t-transparent rounded-full" />
               {t('dispose.processing')}
             </span>
           ) : disposeQuantity === (selectedBatch.current_quantity || 0) ? (
