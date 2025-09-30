@@ -166,7 +166,12 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       await executeDonate(params)
 
       // Success - show success toast and close the modal
-      toast.success(t('donate.success', { quantity: donateQuantity, recipient: recipientName }))
+      toast.success(
+        t('donate.success', {
+          quantity: donateQuantity,
+          recipient: recipientName,
+        }),
+      )
       onClose()
     } catch (error) {
       console.error('[DonateTab] Donation failed:', {
@@ -187,7 +192,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // Loading state
   if (loadingRecipients) {
     return (
-      <div className="flex flex-col h-full bg-muted">
+      <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
         <div className="flex-1 overflow-y-auto flex items-center justify-center">
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full"></div>
@@ -201,7 +206,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   // No recipients available
   if (recipients.length === 0) {
     return (
-      <div className="flex flex-col h-full bg-muted">
+      <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
         <div className="flex-1 overflow-y-auto flex items-center justify-center px-8">
           <div className="text-center py-8">
             <p className="text-gray-600 mb-4">{t('donate.noRecipients')}</p>
@@ -213,15 +218,15 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-muted">
+    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
       {/* content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Recipient Selection */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="p" className="xs:text-lg">
             {t('donate.selectRecipient')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4">
+          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
             <div className="grid grid-cols-1 gap-2">
               {recipients.map(recipient => (
                 <Button
@@ -250,7 +255,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
           <Typography variant="p" className="xs:text-lg">
             {t('donate.howMany')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4">
+          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
             <InputSlider
               value={donateQuantity}
               onChange={handleQuantityChange}
@@ -265,25 +270,25 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="subtleGray"
           onClick={onClose}
-          className="rounded-full flex-1"
+          className="rounded-full flex-1 dark:bg-secondary/10 dark:text-white"
         >
           {tCommon('cancel')}
         </Button>
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="black"
-          className="rounded-full flex-1"
+          className="rounded-full flex-1 dark:bg-primary dark:text-white"
           onClick={handleDonateAction}
           disabled={isDonating || donateQuantity === 0 || !selectedRecipient}
         >
           {isDonating ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              <span className="animate-spin h-4 w-4 border-2 border-white dark:border-brand-dark border-t-transparent rounded-full" />
               {t('donate.processing')}
             </span>
           ) : donateQuantity === (selectedBatch.current_quantity || 0) ? (

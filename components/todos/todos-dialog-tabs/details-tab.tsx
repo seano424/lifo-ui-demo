@@ -20,6 +20,7 @@ import { Edit3, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { useTheme } from 'next-themes'
 
 interface DetailsTabProps {
   selectedBatch: TodoItem
@@ -30,6 +31,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   const t = useTranslations('todos')
   const tCommon = useTranslations()
   const tErrors = useTranslations('errors.common')
+  const { resolvedTheme } = useTheme()
 
   const { updateBatch, isUpdating } = useBatchActions()
 
@@ -219,7 +221,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       case 'fresh':
         return {
           label: t('details.status.fresh'),
-          className: 'text-green-600 bg-green-50',
+          className: 'text-primary-600 bg-primary-50',
         }
       default:
         return { label: status, className: 'text-gray-600 bg-gray-50' }
@@ -229,9 +231,9 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
   const statusDisplay = getStatusDisplay(selectedBatch.todo_state || '')
 
   return (
-    <div className="flex flex-col h-full bg-muted">
+    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
       {/* content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Product Information */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <div className="flex items-center justify-between">
@@ -271,7 +273,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               </div>
             )}
           </div>
-          <div className="bg-white rounded-2xl p-4 space-y-4">
+          <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
             <div className="flex justify-between items-start">
               <Typography variant="p">{t('details.fields.product')}</Typography>
               <Typography variant="p">
@@ -326,7 +328,12 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                   </SelectContent>
                 </Select>
               ) : (
-                <span className={cn('px-2 py-1 rounded text-sm', statusDisplay.className)}>
+                <span
+                  className={cn(
+                    'px-2 py-1 rounded text-sm dark:text-white dark:bg-secondary-900',
+                    statusDisplay.className,
+                  )}
+                >
                   {statusDisplay.label}
                 </span>
               )}
@@ -361,7 +368,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                         ? 'text-red-600'
                         : daysToExpiry <= 7
                           ? 'text-orange-600'
-                          : 'text-green-600',
+                          : 'text-primary-600',
                     )}
                   >
                     (
@@ -379,7 +386,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         {/* Inventory & Pricing */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.inventoryPricing')}</Typography>
-          <div className="bg-white rounded-2xl p-4 space-y-4">
+          <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
             <div className="flex justify-between items-center gap-2 w-full">
               <Label className="flex-shrink-0" htmlFor="quantity">
                 {t('details.fields.currentQuantity')}
@@ -403,7 +410,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                   />
                 </div>
               ) : (
-                <Typography variant="p">{selectedBatch.current_quantity || 0} units</Typography>
+                <Typography variant="p">{selectedBatch.current_quantity || 0}</Typography>
               )}
             </div>
 
@@ -497,7 +504,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         {/* Action History */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.actionHistory')}</Typography>
-          <div className="bg-white rounded-2xl p-4 space-y-3">
+          <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
             {selectedBatch.last_action_type ? (
               <>
                 <Typography variant="p" className="flex justify-between capitalize">
@@ -511,7 +518,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
                 {selectedBatch.last_action_quantity && (
                   <Typography variant="p" className="flex justify-between capitalize">
                     <span>{t('details.lastActionQuantity')}</span>
-                    <span>{selectedBatch.last_action_quantity || 0} units</span>
+                    <span>{selectedBatch.last_action_quantity || 0} #</span>
                   </Typography>
                 )}
               </>
@@ -559,7 +566,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         {selectedBatch.ai_recommendation && (
           <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
             <Typography variant="h4">{t('details.aiInsights')}</Typography>
-            <div className="bg-white rounded-2xl p-4 space-y-3">
+            <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
               <div className="flex justify-between capitalize">
                 <span>{t('details.recommendation')}</span>
                 <span>{(selectedBatch.ai_recommendation || '').replace('_', ' ')}</span>
@@ -594,16 +601,20 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-center border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-center border-t border-muted gap-4">
         <Button
           size="lg"
-          variant="subtleGray"
+          variant={resolvedTheme === 'dark' ? 'default' : 'subtleGray'}
           onClick={onClose}
           className="rounded-full px-40 hidden sm:block"
         >
           {tCommon('close')}
         </Button>
-        <Button variant="subtleGray" onClick={onClose} className="rounded-full px-40 sm:hidden">
+        <Button
+          variant={resolvedTheme === 'dark' ? 'default' : 'subtleGray'}
+          onClick={onClose}
+          className="rounded-full px-40 sm:hidden"
+        >
           {tCommon('close')}
         </Button>
       </div>

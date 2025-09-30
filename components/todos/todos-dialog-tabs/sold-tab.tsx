@@ -86,15 +86,15 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-muted">
+    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
       {/* content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Sale Timing Options */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="p" className="xs:text-lg">
             {t('sold.whenSell')}
           </Typography>
-          <div className="grid grid-cols-2 gap-2 bg-white rounded-2xl p-4">
+          <div className="grid grid-cols-2 gap-2 bg-white rounded-2xl p-4 dark:bg-brand-dark">
             {SALE_TIMING_OPTIONS.map(option => (
               <Button
                 key={option.id}
@@ -114,7 +114,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
           <Typography variant="p" className="xs:text-lg">
             {t('sold.howMany')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4">
+          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
             <InputSlider
               value={soldQuantity}
               onChange={handleQuantityChange}
@@ -129,25 +129,25 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white px-8 py-4 flex justify-between border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="subtleGray"
           onClick={onClose}
-          className="rounded-full flex-1"
+          className="rounded-full flex-1 dark:bg-secondary/10 dark:text-white"
         >
           {tCommon('cancel')}
         </Button>
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="black"
-          className="rounded-full flex-1"
+          className="rounded-full flex-1 dark:bg-primary dark:text-white"
           onClick={handleSoldAction}
           disabled={isMarkingSold || soldQuantity === 0}
         >
           {isMarkingSold ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              <span className="animate-spin h-4 w-4 border-2 border-white dark:border-brand-dark border-t-transparent rounded-full" />
               {t('sold.processing')}
             </span>
           ) : soldQuantity === (selectedBatch.current_quantity || 0) ? (
