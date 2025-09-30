@@ -456,7 +456,8 @@ class AutomatedScoringScheduler:
 
         try:
             # Create database session for this job
-            async with get_async_session() as db:
+            async_session_maker = get_async_session()
+            async with async_session_maker() as db:
                 scoring_service = create_scoring_service(db)
 
                 # Execute scoring with timeout
