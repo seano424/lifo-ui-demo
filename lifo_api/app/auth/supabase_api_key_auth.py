@@ -393,7 +393,7 @@ async def get_current_user(request: Request) -> APIKeyUser:
     return await auth.validate_api_request(request)
 
 
-async def require_permission(permission: str):
+def require_permission(permission: str):
     """
     FastAPI dependency factory for permission-based access control
 

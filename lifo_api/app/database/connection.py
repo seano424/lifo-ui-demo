@@ -25,6 +25,10 @@ Base = declarative_base()
 _engine = None
 _async_session = None
 
+# Direct database connection (bypasses pgBouncer) for bulk operations
+_direct_engine = None
+_direct_async_session = None
+
 
 def create_sync_asyncpg_connection():
     """
@@ -110,6 +114,7 @@ def get_engine():
                 echo=False,  # Disable SQL echo to reduce prepared statement conflicts
                 future=True,
                 poolclass=NullPool,  # Critical: No pooling to avoid prepared statement conflicts
+                query_cache_size=0,  # CRITICAL: Disable query compilation cache for pgBouncer
                 connect_args={
                     "ssl": "require",  # Required for Supabase
                     "statement_cache_size": 0,  # Critical: Disable prepared statements for pgbouncer
@@ -139,6 +144,7 @@ def get_engine():
                 echo=False,
                 future=True,
                 poolclass=NullPool,  # Critical: No pooling, pgbouncer handles this
+                query_cache_size=0,  # CRITICAL: Disable query compilation cache for pgBouncer
                 connect_args={
                     "command_timeout": 30,  # MOBILE: Faster timeout for mobile queries
                     "ssl": "require",  # Required for Supabase
@@ -189,6 +195,49 @@ def engine():
 def async_session():
     """Get the async session factory (lazy-initialized)"""
     return get_async_session()
+
+
+def get_direct_engine():
+    """
+    Get or create a direct database engine that bypasses pgBouncer.
+    This is used for bulk operations that need prepared statements.
+    """
+    global _direct_engine
+    if _direct_engine is None:
+        import os
+        direct_url = os.getenv("DATABASE_DIRECT_URL")
+        if not direct_url:
+            logger.warning("DATABASE_DIRECT_URL not set, falling back to regular engine")
+            return get_engine()
+
+        logger.info("Creating direct database engine (bypassing pgBouncer)", url=direct_url[:50])
+        _direct_engine = create_async_engine(
+            direct_url,
+            echo=False,
+            future=True,
+            poolclass=NullPool,  # No pooling for direct connections
+        )
+    return _direct_engine
+
+
+def get_direct_async_session():
+    """Get or create the direct database async session factory"""
+    global _direct_async_session
+    if _direct_async_session is None:
+        engine = get_direct_engine()
+        _direct_async_session = async_sessionmaker(
+            engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
+            autocommit=False,
+            autoflush=True,
+        )
+    return _direct_async_session
+
+
+def direct_async_session():
+    """Get the direct async session factory (lazy-initialized, bypasses pgBouncer)"""
+    return get_direct_async_session()
 
 
 async def init_database():

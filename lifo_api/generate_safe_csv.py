@@ -47,7 +47,7 @@ def generate_safe_csv_data(num_rows: int, run_id: str) -> list:
 
         # Generate unique timestamps to avoid duplicates
         now = datetime.now()
-        now + timedelta(microseconds=i)
+        now += timedelta(microseconds=i)
 
         expiry_days = {
             "fresh_produce": random.randint(3, 14),
@@ -95,6 +95,7 @@ def create_safe_csv_file(filename: str, num_rows: int):
     headers = ["sku", "product_name", "category", "quantity", "expiry_date", "cost_price", "selling_price", "batch_number"]
 
     filepath = Path("test_data/csv") / filename
+    print (f"Writing to {filepath}...")
 
     with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)

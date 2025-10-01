@@ -195,7 +195,7 @@ async def upload_csv(
             "skipped": skipped_count,  # Now populated from metadata
             "errors": result.get("errors", []),
             "total_items": total_items,
-            "processing_time_ms": processing_time_ms,
+            "processing_time_ms": round(timing_details.get("total_processing_ms", 0), 2),
             "duplicates_skipped": duplicates[:10] if duplicates else [],  # Limit to first 10
             "performance_metrics": {
                 # ⏱️ Comprehensive Timing Metrics
