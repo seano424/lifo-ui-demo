@@ -169,12 +169,16 @@
       "priorityScore": "Score de priorité",
       "urgency": "Urgence"
     },
-    "daysAgo": "il y a {days} jours",
-    "daysLeft": "{days} jours",
+    "daysAgo": "{days, plural, =1 {il y a 1 jour} other {il y a # jours}}",
+    "daysLeft": "{days, plural, =1 {1 jour} other {# jours}}",
+    "daysRemaining": "{days, plural, =1 {1 jour restant} other {# jours restants}}",
     "inventoryPricing": "Inventaire et tarification",
     "percentOff": "% de réduction",
     "actionHistory": "Historique des actions",
-    "noActions": "Aucune action effectuée pour l'instant",
+    "lastAction": "Dernière action",
+    "lastActionTime": "Heure de la dernière action",
+    "lastActionQuantity": "Quantité de la dernière action",
+    "noActionsYet": "Aucune action effectuée pour l'instant",
     "totalActions": "Actions totales",
     "actions": {
       "sold": "Vendu :",
@@ -182,7 +186,10 @@
       "donated": "Donné :",
       "disposed": "Éliminé :"
     },
-    "aiInsights": "Analyses IA"
+    "aiInsights": "Analyses IA",
+    "recommendation": "Recommandation",
+    "priorityScore": "Score de priorité",
+    "urgency": "Urgence"
   },
   "filters": {
     "searchPlaceholder": "Rechercher des produits...",
