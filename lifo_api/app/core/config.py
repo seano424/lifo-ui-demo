@@ -153,6 +153,9 @@ class Settings(BaseSettings):
     default_scoring_cron: str = Field(
         default="0 */4 * * *", description="Default cron expression for automated scoring (every 4 hours)"
     )
+    default_full_rescore_cron: str = Field(
+        default="0 2 * * *", description="Default cron expression for nightly full rescore (2 AM daily)"
+    )
     default_scoring_timezone: str = Field(
         default="UTC", description="Default timezone for automated scoring schedules"
     )

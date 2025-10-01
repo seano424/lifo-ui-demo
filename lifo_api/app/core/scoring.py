@@ -1686,7 +1686,8 @@ class ScoringService:
             read_ops = get_read_only_operations(self.db)
 
             # Get inventory data for scoring using secure read-only view
-            inventory_data = await read_ops.get_store_inventory_for_scoring(store_id)
+            # fetch_all=True ensures we score ALL batches, not just 1000
+            inventory_data = await read_ops.get_store_inventory_for_scoring(store_id, fetch_all=True)
 
             if not inventory_data:
                 self.logger.warning(

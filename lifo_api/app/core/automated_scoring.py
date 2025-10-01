@@ -53,6 +53,10 @@ class ScoringScheduleConfig(BaseModel):
         default=False,
         description="Force recalculation of all scores"
     )
+    full_rescore: bool = Field(
+        default=False,
+        description="Score ALL batches (not limited to 1000). Use for nightly comprehensive rescoring."
+    )
     enabled: bool = Field(default=True, description="Whether schedule is active")
 
     # Advanced options
@@ -460,14 +464,35 @@ class AutomatedScoringScheduler:
             async with async_session_maker() as db:
                 scoring_service = create_scoring_service(db)
 
-                # Execute scoring with timeout
-                scoring_result = await asyncio.wait_for(
-                    scoring_service.score_store_inventory_bulk(
-                        config.store_id,
-                        recalculate_all=config.force_recalculate
-                    ),
-                    timeout=config.timeout_minutes * 60
-                )
+                # Choose scoring method based on full_rescore flag
+                if config.full_rescore:
+                    # Full rescore: Score ALL batches (not limited to 1000)
+                    self.logger.info(
+                        "Executing FULL rescore (all batches)",
+                        job_id=job_id,
+                        store_id=config.store_id
+                    )
+                    scoring_result = await asyncio.wait_for(
+                        scoring_service.score_store_inventory(
+                            config.store_id,
+                            recalculate_all=config.force_recalculate
+                        ),
+                        timeout=config.timeout_minutes * 60
+                    )
+                else:
+                    # Standard bulk: Score top 1000 most urgent batches
+                    self.logger.info(
+                        "Executing standard bulk rescore (1000 most urgent batches)",
+                        job_id=job_id,
+                        store_id=config.store_id
+                    )
+                    scoring_result = await asyncio.wait_for(
+                        scoring_service.score_store_inventory_bulk(
+                            config.store_id,
+                            recalculate_all=config.force_recalculate
+                        ),
+                        timeout=config.timeout_minutes * 60
+                    )
 
                 # Update result with success data
                 result.completed_at = datetime.utcnow()
@@ -606,16 +631,20 @@ class AutomatedScoringScheduler:
 
             # Get default schedule configuration
             default_cron = settings.default_scoring_cron
+            default_full_rescore_cron = settings.default_full_rescore_cron
             default_timezone = settings.default_scoring_timezone
 
             self.logger.info(
                 "Default schedules loaded (implement store discovery as needed)",
                 default_cron=default_cron,
+                default_full_rescore_cron=default_full_rescore_cron,
                 default_timezone=default_timezone
             )
 
-            # TODO: Implement automatic discovery of active stores
-            # and creation of default schedules if needed
+            # TODO: Implement automatic discovery of active stores and creation of default schedules
+            # Two-tier approach:
+            # 1. Quick scoring (every 4 hours): top 1000 urgent batches (full_rescore=False)
+            # 2. Nightly full rescore (2 AM): ALL batches for comprehensive coverage (full_rescore=True)
 
         except Exception as e:
             self.logger.error("Failed to load default schedules", error=str(e))

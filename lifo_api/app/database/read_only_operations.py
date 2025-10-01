@@ -733,11 +733,15 @@ class SecureReadOnlyOperations:
         self.logger = structlog.get_logger().bind(component="read_only_ops")
 
     async def get_store_inventory_for_scoring(
-        self, store_id: str
+        self, store_id: str, fetch_all: bool = False
     ) -> list[dict[str, Any]]:
         """
         Get inventory data for scoring calculations only
         Now uses Supabase client for compatibility with Next.js approach
+
+        Args:
+            store_id: Store ID to fetch inventory for
+            fetch_all: If True, fetch ALL batches (no limit). If False, uses Supabase default of 1000.
         """
         try:
             # Import Supabase service (fallback to direct client usage)
@@ -747,40 +751,82 @@ class SecureReadOnlyOperations:
             admin_client = supabase_service.get_admin_client()
 
             # Enhanced query with product JOIN for proper product names and categories
-            result = (
-                admin_client.schema("inventory")
-                .table("batches")
-                .select("""
-                    batch_id,
-                    product_id,
-                    batch_number,
-                    current_quantity,
-                    selling_price,
-                    cost_price,
-                    expiry_date,
-                    location_code,
-                    supplier,
-                    status,
-                    store_products!inner (
-                        products (
-                            product_id,
-                            sku,
-                            name,
-                            brand,
-                            category_id,
-                            category:categories(
-                                category_code,
-                                display_name_en
-                            )
+            base_query = """
+                batch_id,
+                product_id,
+                batch_number,
+                current_quantity,
+                selling_price,
+                cost_price,
+                expiry_date,
+                location_code,
+                supplier,
+                status,
+                store_products!inner (
+                    products (
+                        product_id,
+                        sku,
+                        name,
+                        brand,
+                        category_id,
+                        category:categories(
+                            category_code,
+                            display_name_en
                         )
                     )
-                """)
-                .eq("store_id", store_id)
-                .in_("status", ["active", "expired"])
-                .gt("current_quantity", 0)
-                .order("expiry_date", desc=False)
-                .execute()
-            )
+                )
+            """
+
+            if fetch_all:
+                # Fetch ALL batches using pagination to avoid arbitrary limits
+                self.logger.info("Fetching ALL batches using pagination", store_id=store_id)
+                all_data = []
+                page_size = 1000
+                offset = 0
+
+                while True:
+                    page_result = (
+                        admin_client.schema("inventory")
+                        .table("batches")
+                        .select(base_query)
+                        .eq("store_id", store_id)
+                        .in_("status", ["active", "expired"])
+                        .gt("current_quantity", 0)
+                        .order("expiry_date", desc=False)
+                        .range(offset, offset + page_size - 1)
+                        .execute()
+                    )
+
+                    if not page_result.data:
+                        break
+
+                    all_data.extend(page_result.data)
+
+                    # If we got fewer records than page_size, we've reached the end
+                    if len(page_result.data) < page_size:
+                        break
+
+                    offset += page_size
+
+                self.logger.info(
+                    "Fetched all batches via pagination",
+                    store_id=store_id,
+                    total_batches=len(all_data)
+                )
+                result = type('obj', (object,), {'data': all_data})()  # Create result-like object
+            else:
+                # Use Supabase default limit of 1000 for quick scoring
+                self.logger.info("Fetching top 1000 urgent batches for scoring", store_id=store_id)
+                result = (
+                    admin_client.schema("inventory")
+                    .table("batches")
+                    .select(base_query)
+                    .eq("store_id", store_id)
+                    .in_("status", ["active", "expired"])
+                    .gt("current_quantity", 0)
+                    .order("expiry_date", desc=False)
+                    .execute()
+                )
 
             if not result.data:
                 self.logger.info("No active batches found", store_id=store_id)
