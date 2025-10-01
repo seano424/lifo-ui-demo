@@ -1,12 +1,12 @@
 'use client'
 
-import { AlertCircle, Bell, CreditCard, Lock, Store, User, Users } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import UserAccountInformation from '@/components/account/user-account-information'
 import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { AlertCircle, Bell, CreditCard, Lock, Store, User, Users } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 // Import existing components - preserve all functionality
 import StoreInformation from '@/components/settings/store-information'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
@@ -115,45 +115,50 @@ export default function UnifiedSettingsPage() {
           </div>
         ) : (
           <TabsList
-            className="grid w-full"
+            className="grid w-full overflow-x-auto"
             style={{
-              gridTemplateColumns: `repeat(${visibleTabs()?.length}, 1fr)`,
+              gridTemplateColumns: `repeat(${visibleTabs()?.length}, minmax(min-content, 1fr))`,
             }}
           >
             {visibleTabs()?.includes('store') && (
-              <TabsTrigger value="store" className="flex items-center gap-2">
-                <Store className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('tabs.store')}</span>
+              <TabsTrigger value="store" className="flex items-center justify-center gap-2 px-1">
+                <Store className="h-4 w-4 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('tabs.store')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('account') && (
-              <TabsTrigger value="account" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('tabs.account')}</span>
+              <TabsTrigger value="account" className="flex items-center justify-center gap-2 px-1">
+                <User className="h-4 w-4 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('tabs.account')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('team') && (
-              <TabsTrigger value="team" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('tabs.team')}</span>
+              <TabsTrigger value="team" className="flex items-center justify-center gap-2 px-1">
+                <Users className="h-4 w-4 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('tabs.team')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('notifications') && (
-              <TabsTrigger value="notifications" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('tabs.notifications')}</span>
+              <TabsTrigger
+                value="notifications"
+                className="flex items-center justify-center gap-2 px-1"
+              >
+                <Bell className="h-4 w-4 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">
+                  {t('tabs.notifications')}
+                </span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('billing') && (
-              <TabsTrigger value="billing" className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('tabs.billing')}</span>
+              <TabsTrigger value="billing" className="flex items-center justify-center gap-2 px-1">
+                <CreditCard className="h-4 w-4 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('tabs.billing')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('security') && (
-              <TabsTrigger value="security" className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('tabs.security')}</span>
+              <TabsTrigger value="security" className="flex items-center justify-center gap-2 px-1">
+                <Lock className="h-4 w-4 flex-shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('tabs.security')}</span>
               </TabsTrigger>
             )}
           </TabsList>

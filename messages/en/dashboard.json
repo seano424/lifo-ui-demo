@@ -1,5 +1,30 @@
 {
   "dashboard": {
+    "welcome": {
+      "title": "Welcome to Your Dashboard",
+      "description": "Get started with your inventory management by adding your first products. Here are some quick actions to help you get started.",
+      "badge": "Let's get started with your inventory",
+      "actions": {
+        "getStarted": "Get Started",
+        "inbound": {
+          "title": "Add Your First Products",
+          "description": "Start by adding products to your inventory through scanning or manual entry."
+        },
+        "settings": {
+          "title": "Configure Your Store",
+          "description": "Customize your store settings, manage team members, and set up notifications."
+        },
+        "products": {
+          "title": "Manage Products",
+          "description": "View and manage your product catalog and inventory settings."
+        }
+      },
+      "help": {
+        "title": "Need Help Getting Started?",
+        "description": "Learn how to use the dashboard effectively with our quick tutorial and guides.",
+        "learnMore": "Learn more about inventory management"
+      }
+    },
     "quickActions": {
       "title": "Quick Actions",
       "description": "Quickly add, remove, or view products and tasks.",
