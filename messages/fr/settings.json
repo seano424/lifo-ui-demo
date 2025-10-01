@@ -129,7 +129,9 @@
         "invalidWebsite": "URL de site web invalide",
         "descriptionTooLong": "La description est trop longue"
       },
-      "addStore": "Ajouter un magasin"
+      "addStore": "Ajouter un magasin",
+      "manageMultipleStores": "Gérer plusieurs magasins",
+      "addStoreDescription": "Créez des magasins supplémentaires pour gérer différents emplacements à partir d'un seul compte"
     },
     "addStoreSearch": {
       "title": "Ajouter votre magasin",

@@ -1,5 +1,30 @@
 {
   "dashboard": {
+    "welcome": {
+      "title": "Welkom op Uw Dashboard",
+      "description": "Begin met het beheren van uw voorraad door uw eerste producten toe te voegen. Hier zijn enkele snelle acties om u op weg te helpen.",
+      "badge": "Laten we beginnen met uw voorraad",
+      "actions": {
+        "getStarted": "Aan de slag",
+        "inbound": {
+          "title": "Voeg Uw Eerste Producten Toe",
+          "description": "Begin met het toevoegen van producten aan uw voorraad via scannen of handmatige invoer."
+        },
+        "settings": {
+          "title": "Configureer Uw Winkel",
+          "description": "Pas uw winkelinstellingen aan, beheer teamleden en stel meldingen in."
+        },
+        "products": {
+          "title": "Beheer Producten",
+          "description": "Bekijk en beheer uw productcatalogus en voorraad instellingen."
+        }
+      },
+      "help": {
+        "title": "Hulp Nodig bij het Starten?",
+        "description": "Leer hoe u het dashboard effectief kunt gebruiken met onze snelle handleiding en gidsen.",
+        "learnMore": "Meer informatie over voorraadbeheer"
+      }
+    },
     "quickActions": {
       "title": "Snelle Acties",
       "description": "Voeg snel producten toe, verwijder of bekijk producten en taken.",

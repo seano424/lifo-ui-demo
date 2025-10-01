@@ -128,7 +128,9 @@
         "invalidWebsite": "Invalid website URL",
         "descriptionTooLong": "Description too long"
       },
-      "addStore": "Add Store"
+      "addStore": "Add Store",
+      "manageMultipleStores": "Manage Multiple Stores",
+      "addStoreDescription": "Create additional stores to manage different locations from a single account"
     },
     "addStoreSearch": {
       "title": "Add Your Store",

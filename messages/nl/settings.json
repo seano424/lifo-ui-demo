@@ -129,7 +129,9 @@
         "invalidWebsite": "Ongeldige website URL",
         "descriptionTooLong": "Beschrijving is te lang"
       },
-      "addStore": "Winkel toevoegen"
+      "addStore": "Winkel toevoegen",
+      "manageMultipleStores": "Meerdere winkels beheren",
+      "addStoreDescription": "Maak extra winkels aan om verschillende locaties vanaf één account te beheren"
     }
   },
   "onboarding": {
