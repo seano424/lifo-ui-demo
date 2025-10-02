@@ -239,6 +239,7 @@ export function useCSVUpload() {
       setCsvPreview([])
       setIsPreviewReady(false)
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
+      mutation.reset() // Reset mutation state to clear uploadResult
     },
     columnMapping,
     updateCsvItemExpiry: (index: number, newExpiryDate: string) => {
