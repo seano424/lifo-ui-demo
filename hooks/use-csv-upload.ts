@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { CSV_PROCESSING, TOAST_DURATIONS } from '@/lib/constants/file-upload'
-import { createClient } from '@/lib/supabase/client'
 
 interface CSVUploadResponse {
   success: boolean
@@ -121,17 +120,6 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      // Get the Supabase session token for authentication
-      const supabase = createClient()
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
-      if (sessionError || !session?.access_token) {
-        throw new Error('Authentication required. Please sign in again.')
-      }
-
       const formData = new FormData()
 
       // Python API expects 'store_id' parameter and doesn't handle csvData JSON
@@ -139,15 +127,9 @@ export function useCSVUpload() {
       formData.append('file', file)
       formData.append('store_id', storeId)
 
-      // Use the Python FastAPI upload route for data processing and database writes
-      const fastapiUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
-      const uploadUrl = `${fastapiUrl}/api/v1/csv-upload/upload`
-
-      const response = await fetch(uploadUrl, {
+      // Use Next.js API route proxy (securely forwards to FastAPI with service role key)
+      const response = await fetch('/api/csv-upload', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: formData,
       })
 
