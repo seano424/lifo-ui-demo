@@ -294,8 +294,8 @@ async function createProductBatch(
   const supabase = createClient()
 
   try {
-    // Generate unique batch number
-    const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+    // Generate unique batch number using UUID for guaranteed uniqueness
+    const batchNumber = `BATCH-${crypto.randomUUID().substring(0, 13).toUpperCase()}`
 
     const newBatchData: Database['inventory']['Tables']['batches']['Insert'] = {
       batch_number: batchNumber,
@@ -329,10 +329,10 @@ async function createProductBatch(
       console.error('[createProductBatch] Failed to create batch:', error)
 
       if (error.code === '23505' && error.message.includes('batch_number')) {
-        // Batch number collision, retry with different number
+        // Batch number collision (extremely rare with UUID), retry with new UUID
         const retryBatchData = {
           ...newBatchData,
-          batch_number: `BATCH-${Date.now()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+          batch_number: `BATCH-${crypto.randomUUID().substring(0, 13).toUpperCase()}`,
         }
 
         const { data: retryBatch, error: retryError } = await supabase
@@ -619,10 +619,10 @@ async function bulkInsertBatches(
   // Prepare batch data
   const batchData: Database['inventory']['Tables']['batches']['Insert'][] = []
 
-  productsData.forEach((productData, index) => {
+  productsData.forEach(productData => {
     const product = productLookup.get(productData.barcode)
     if (product) {
-      const batchNumber = `BATCH-${Date.now()}-${index.toString().padStart(3, '0')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+      const batchNumber = `BATCH-${crypto.randomUUID().substring(0, 13).toUpperCase()}`
 
       batchData.push({
         batch_number: batchNumber,
