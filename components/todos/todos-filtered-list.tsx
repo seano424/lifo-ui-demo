@@ -10,6 +10,7 @@ import {
 } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
@@ -34,6 +35,7 @@ interface TodosFilteredListProps {
 }
 
 export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
+  const t = useTranslations('todos')
   const router = useRouter()
   const { isMobile } = useMediaQuery()
   const [showFilters, setShowFilters] = useState(false)
@@ -83,24 +85,24 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     () => [
       {
         id: 'pending' as TodoTabType,
-        label: 'Pending',
+        label: t('tabs.pending'),
         count: pendingTodos?.length || 0,
         component: PendingTab,
       },
       {
         id: 'in_progress' as TodoTabType,
-        label: 'In Progress',
+        label: t('tabs.inProgress'),
         count: inProgressTodos?.length || 0,
         component: InProgressTab,
       },
       {
         id: 'completed' as TodoTabType,
-        label: 'Completed',
+        label: t('tabs.completed'),
         count: completedTodos?.length || 0,
         component: CompletedTab,
       },
     ],
-    [pendingTodos?.length, inProgressTodos?.length, completedTodos?.length],
+    [pendingTodos?.length, inProgressTodos?.length, completedTodos?.length, t],
   )
 
   // Update tab indicator position
@@ -182,7 +184,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       {/* Filter Panel */}
       <div className="flex sm:hidden justify-center py-4 border-y border-muted">
         <Button variant="subtleTertiary" onClick={() => setShowFilters(!showFilters)}>
-          Filters
+          {t('filters.clearAll').replace(' all', 's')}
         </Button>
       </div>
 

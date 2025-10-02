@@ -1,44 +1,35 @@
-'use client'
+import { getTranslations } from 'next-intl/server'
 
-import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
-import { BatchStatusSummary } from '@/components/dashboard/batch-status-summary'
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
-import { ExpiredItemsSummary } from '@/components/dashboard/expired-items-summary'
-import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
-import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
+import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
+import { DashboardContent } from '@/components/dashboard/dashboard-content'
+import { createClient } from '@/lib/supabase/server'
+import { fetchBatchesPage } from '@/lib/queries/batches'
+import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 
-import { useBatches } from '@/hooks/use-batches'
-import { useTranslations } from 'next-intl'
+export default async function DashboardPage() {
+  const activeStoreId = await getActiveStoreCookie()
 
-export default function Page() {
-  const t = useTranslations('dashboardNav.pages')
-  const { data: batches } = useBatches()
-  const hasBatches = batches && batches.length > 0
+  // Show welcome screen if no active store selected
+  if (!activeStoreId) {
+    return <DashboardWelcome />
+  }
 
-  return (
-    <div className="flex flex-col gap-8">
-      <DashboardInsetHeader title={t('dashboard')} />
+  const supabase = await createClient()
+  const t = await getTranslations('dashboardNav.pages')
 
-      {hasBatches && <BatchStatusSummary />}
-      {hasBatches && <ExpiredItemsSummary />}
-
-      {hasBatches && (
-        <div className="border p-5 rounded-2xl">
-          <DashboardKPICards />
-        </div>
-      )}
-      {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
-          <StoreInsightsDashboard />
-        </div>
-      )}
-      {hasBatches && (
-        <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
-          <QuickActionCards />
-        </div>
-      )}
-      {hasBatches && <AlertSensitivityControls />}
-    </div>
+  // Check if user has any batches (lightweight query)
+  const { count } = await fetchBatchesPage(
+    { page: 0, pageSize: 1 },
+    { storeId: activeStoreId },
+    supabase,
   )
+
+  const hasBatches = count > 0
+
+  // Show welcome screen if no batches exist
+  if (!hasBatches) {
+    return <DashboardWelcome />
+  }
+
+  return <DashboardContent title={t('dashboard')} />
 }

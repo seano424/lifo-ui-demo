@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { CSV_PROCESSING, TOAST_DURATIONS } from '@/lib/constants/file-upload'
-import { createClient } from '@/lib/supabase/client'
 
 interface CSVUploadResponse {
   success: boolean
@@ -121,17 +120,6 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      // Get the Supabase session token for authentication
-      const supabase = createClient()
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
-      if (sessionError || !session?.access_token) {
-        throw new Error('Authentication required. Please sign in again.')
-      }
-
       const formData = new FormData()
 
       // Python API expects 'store_id' parameter and doesn't handle csvData JSON
@@ -139,12 +127,9 @@ export function useCSVUpload() {
       formData.append('file', file)
       formData.append('store_id', storeId)
 
-      // Use the Python FastAPI upload route for data processing (read-only)
-      const response = await fetch('http://localhost:8000/api/v1/csv-upload/upload', {
+      // Use Next.js API route proxy (securely forwards to FastAPI with service role key)
+      const response = await fetch('/api/csv-upload', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: formData,
       })
 
@@ -155,41 +140,10 @@ export function useCSVUpload() {
 
       const result = await response.json()
 
-      // Phase 2: Save processed data to database
-
-      if (result.success && result._internal?.data) {
-        try {
-          // Use Next.js API route to save batches (handles Supabase operations)
-
-          const saveResponse = await fetch('/api/inventory/save-csv-batches', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              processedData: result._internal.data, // The processed data from Python API
-              storeId: storeId,
-              metadata: result._internal.metadata || {},
-            }),
-          })
-
-          if (saveResponse.ok) {
-            const saveResult = await saveResponse.json()
-
-            // Update result with actual database metrics
-            result.processed = saveResult.saved_count || result.processed
-            result.message = `Successfully imported ${saveResult.saved_count || result.processed} items to inventory`
-          } else {
-            // Don't throw error - CSV processing succeeded, just database save failed
-          }
-        } catch (_saveError) {
-          // Don't throw error - CSV processing succeeded
-        }
-      }
-
+      // FastAPI now handles all database writes - no separate save phase needed
       return result
     },
-    onSuccess: (data, { storeId }) => {
+    onSuccess: async (data, { storeId }) => {
       // Invalidate inventory queries to refresh dashboard
       queryClient.invalidateQueries({ queryKey: ['store-batches', storeId] })
       queryClient.invalidateQueries({ queryKey: ['store-inventory', storeId] })
@@ -198,6 +152,29 @@ export function useCSVUpload() {
 
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
+
+      // 🎯 AUTOMATIC SCORING: Trigger scoring calculations after successful import
+      if (data.processed > 0) {
+        try {
+          await fetch('/api/scoring/trigger', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              storeId,
+              metadata: {
+                triggeredBy: 'csv-import',
+                itemsImported: data.processed,
+                timestamp: new Date().toISOString(),
+              },
+            }),
+          })
+        } catch (error) {
+          // Don't fail the upload if scoring fails
+          console.error('Scoring trigger failed:', error)
+        }
+      }
 
       // Enhanced success notification with detailed performance metrics
       const metrics = data.performance_metrics || {}
@@ -244,6 +221,7 @@ export function useCSVUpload() {
       setCsvPreview([])
       setIsPreviewReady(false)
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
+      mutation.reset() // Reset mutation state to clear uploadResult
     },
     columnMapping,
     updateCsvItemExpiry: (index: number, newExpiryDate: string) => {

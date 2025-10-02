@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { formatRecommendation } from '@/lib/utils/todo-transformers'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
+import { useTranslations } from 'next-intl'
 
 interface TodoCardProps {
   todo: TodoItem
@@ -61,6 +62,8 @@ const URGENCY_CONFIG = {
 } as const
 
 export function TodoCard({ todo, onClick }: TodoCardProps) {
+  const t = useTranslations('todos')
+
   const handleCardClick = () => {
     onClick?.()
   }
@@ -84,8 +87,8 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
     const diffDays = differenceInDays(todayStartOfDay, expiryStartOfDay)
 
-    if (diffDays === 1) return 'Expiring yesterday'
-    return `Expiring ${diffDays} days ago`
+    if (diffDays === 1) return t('card.expiredYesterday')
+    return t('card.expired', { days: diffDays })
   }
 
   // Simple lookup for urgency configuration - no memoization needed since config is static
@@ -100,15 +103,16 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   const completionDate = todo.last_action_time ? new Date(todo.last_action_time) : null
 
   const getCompletionDateText = () => {
+    const date = completionDate?.toLocaleDateString() ?? ''
     switch (lastActionType) {
       case 'donate':
-        return `Donated on ${completionDate?.toLocaleDateString()}`
+        return t('card.donatedOn', { date })
       case 'dispose':
-        return `Disposed on ${completionDate?.toLocaleDateString()}`
+        return t('card.disposedOn', { date })
       case 'sold':
-        return `Completed on ${completionDate?.toLocaleDateString()}`
+        return t('card.completedOn', { date })
       default:
-        return `Completed on ${completionDate?.toLocaleDateString()}`
+        return t('card.completedOn', { date })
     }
   }
 
@@ -140,9 +144,9 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
             <div className="flex-1 w-full">
               <Typography className="flex gap-1 sm:w-8/12">
-                <span className="flex-shrink-0">Suggestion</span>
+                <span className="flex-shrink-0">{t('card.suggestion')}</span>
                 <span className="truncate lowercase">
-                  {formatRecommendation(todo.ai_recommendation || 'No recommendation')}
+                  {formatRecommendation(todo.ai_recommendation || t('card.noRecommendation'))}
                 </span>
               </Typography>
             </div>
@@ -159,13 +163,13 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               {!isCompleted && (
                 <Typography variant="muted" className="flex items-center gap-1 px-2">
                   <Package className="h-3 w-3" />
-                  {todo.current_quantity} left
+                  {t('card.unitsLeft', { quantity: todo.current_quantity ?? 0 })}
                 </Typography>
               )}
 
               {isCompleted && lastActionType === 'sold' && (
                 <Typography variant="small" className="flex items-center gap-1 px-2">
-                  🎉 All sold!
+                  🎉 {t('card.allSold')}
                 </Typography>
               )}
               {/* {isCompleted && lastActionType === 'sold' && (
@@ -173,54 +177,56 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
               {isCompleted && wasDonated && (
                 <Typography variant="small" className="flex items-center gap-1">
-                  🎁 Donated!
+                  🎁 {t('card.donated')}
                 </Typography>
               )}
 
               {isCompleted && wasDisposed && (
                 <Typography variant="small" className="flex items-center gap-1">
-                  🗑️ All disposed!
+                  🗑️ {t('card.disposed')}
                 </Typography>
               )}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {isCompleted && wasDisposed && <Badge variant={'default'}>Disposed</Badge>}
+              {isCompleted && wasDisposed && (
+                <Badge variant={'default'}>{t('card.disposed')}</Badge>
+              )}
 
               {todo.last_discount_percent != null &&
                 todo.last_discount_percent > 0 &&
                 !wasDiscounted &&
                 !isCompleted && (
                   <Badge variant={urgencyConfig.badgeVariant}>
-                    Suggested discount: {todo.last_discount_percent}%
+                    {t('card.suggestedDiscount', { percent: todo.last_discount_percent })}
                   </Badge>
                 )}
 
               {wasDiscounted && (
                 <Badge variant={urgencyConfig.badgeVariant}>
-                  Currently discounted: {todo.last_discount_percent}%
+                  {t('card.currentlyDiscounted', { percent: todo.last_discount_percent ?? 0 })}
                 </Badge>
               )}
 
               {(todo.last_discount_percent == null || todo.last_discount_percent === 0) &&
                 !isCompleted && (
-                  <Badge variant={urgencyConfig.badgeVariant}>Suggestion: Healthy & Maintain</Badge>
+                  <Badge variant={urgencyConfig.badgeVariant}>{t('card.healthyMaintain')}</Badge>
                 )}
 
               {isCompleted ? (
                 <Badge variant="primary">{getCompletionDateText()}</Badge>
               ) : isExpiringToday ? (
-                <Badge variant="default">Expires today</Badge>
+                <Badge variant="default">{t('card.expiresToday')}</Badge>
               ) : isExpiring ? (
                 <Badge variant="default">{getExpiringText()}</Badge>
               ) : isExpiringSoon ? (
-                <Badge variant="primary">Expiring soon</Badge>
+                <Badge variant="primary">{t('card.expiringSoon')}</Badge>
               ) : wasDonated ? (
                 <Badge className="hidden" variant="primary">
-                  Donated
+                  {t('card.donated')}
                 </Badge>
               ) : (
-                <Badge variant="primary">Active & healthy</Badge>
+                <Badge variant="primary">{t('card.activeHealthy')}</Badge>
               )}
             </div>
           </div>
@@ -229,7 +235,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
         <div className="absolute right-4 top-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded p-1.5 group/edit">
           <PenLine className="h-4 w-4" />
           <div className="absolute right-2 text-xs w-min text-nowrap bg-brand-dark font-medium text-white rounded-lg py-1 px-2.5 -top-full opacity-0 group-hover/edit:opacity-100 transition-all duration-1000 delay-300">
-            Edit todo
+            {t('card.editTodo')}
           </div>
         </div>
       </div>

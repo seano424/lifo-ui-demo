@@ -105,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   if (isLoading) return <div>Loading...</div>
   if (isError) return <div>Error</div>
-  if (!user) return <div>Not logged in</div>
+  if (!user) return
 
   return (
     <Sidebar
