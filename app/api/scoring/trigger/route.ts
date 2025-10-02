@@ -17,16 +17,13 @@ export async function POST(request: NextRequest) {
     // No need to write the data, the new endpoint does it for us
     // Just trigger the bulk scoring process
 
-    const result = await fetch(
-      `${process.env.FASTAPI_URL}/api/v1/scoring/batch/${storeId}/bulk`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        },
-        signal: AbortSignal.timeout(30000), // Allow 30 seconds for background scoring
-      }
-    )
+    const result = await fetch(`${process.env.FASTAPI_URL}/api/v1/scoring/batch/${storeId}/bulk`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+      signal: AbortSignal.timeout(30000), // Allow 30 seconds for background scoring
+    })
 
     if (!result.ok) {
       const errorText = await result.text()
@@ -52,7 +49,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to trigger scoring',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
