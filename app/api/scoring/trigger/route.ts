@@ -1,6 +1,5 @@
 // app/api/scoring/trigger/route.ts
 
-import { createClient } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -26,7 +25,7 @@ export async function POST(request: NextRequest) {
           Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
         },
         signal: AbortSignal.timeout(30000), // Allow 30 seconds for background scoring
-      },
+      }
     )
 
     if (!result.ok) {
@@ -36,7 +35,6 @@ export async function POST(request: NextRequest) {
 
     const scoringResult = await result.json()
     const processingTime = Date.now() - startTime
-
 
     return NextResponse.json({
       success: true,
@@ -54,7 +52,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to trigger scoring',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
