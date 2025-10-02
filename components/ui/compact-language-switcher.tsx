@@ -1,6 +1,5 @@
 'use client'
 
-import { Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -9,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { type Language, useLanguageStore } from '@/lib/stores/language-store'
+import { Globe } from 'lucide-react'
 
 const LIFO_LANGUAGES = {
   fr: { name: 'Français' },
@@ -26,8 +26,8 @@ export function CompactLanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" disabled={isLoading}>
-          <Globe className="!h-5 !w-5 text-muted-foreground" />
+        <Button variant="outline" size="icon" disabled={isLoading} className="rounded-full border">
+          <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

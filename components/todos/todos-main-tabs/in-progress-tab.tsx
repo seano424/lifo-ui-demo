@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 import { useInProgressTodos } from '@/hooks/use-todos-with-filters'
 import type { TodoFiltersState } from '../filters/todo-filters-panel'
@@ -11,6 +12,9 @@ interface InProgressTabProps {
 }
 
 export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
+  const t = useTranslations('todos')
+  const tErrors = useTranslations('errors.common')
+
   const {
     data: todos,
     isLoading,
@@ -33,9 +37,9 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
   if (isError) {
     return (
       <div className="text-center py-8">
-        <p className="text-destructive">Error loading in-progress todos</p>
+        <p className="text-destructive">{t('inProgress.errorLoading')}</p>
         <p className="text-sm text-muted-foreground mt-2">
-          {error?.message || 'Something went wrong'}
+          {error?.message || tErrors('common.somethingWrong')}
         </p>
       </div>
     )
@@ -45,24 +49,24 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground mt-2">Loading in-progress todos...</p>
+        <p className="text-muted-foreground mt-2">{t('inProgress.loading')}</p>
       </div>
     )
   }
 
   if (!todos?.length) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
         <div className="text-6xl mb-4">⚡</div>
         <Typography variant="h3" color="primary">
-          No todos in progress
+          {t('inProgress.noTodosHeading')}
         </Typography>
         <Typography variant="p" color="muted">
           {Object.values(filters).some(
             f => f !== undefined && (Array.isArray(f) ? f.length > 0 : true),
           )
-            ? 'Try adjusting your filters to see more items.'
-            : 'No items are currently being worked on.'}
+            ? t('emptyStateWithFilters')
+            : t('inProgress.noItems')}
         </Typography>
       </div>
     )
@@ -77,7 +81,7 @@ export function InProgressTab({ filters, pageSize = 20 }: InProgressTabProps) {
       fetchNextPage={fetchNextPage}
       isFetchingNextPage={isFetchingNextPage}
       sortConfig={filters.sortConfig}
-      emptyStateMessage="No in-progress todos match your filters"
+      emptyStateMessage={t('inProgress.noMatch')}
       emptyStateIcon="⚡"
     />
   )

@@ -1,9 +1,5 @@
 'use client'
 
-import { AlertTriangle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,6 +10,10 @@ import { useCurrentUser } from '@/hooks/use-users'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { AlertTriangle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export function OnboardingSignUpForm({
   className,
@@ -104,7 +104,31 @@ export function OnboardingSignUpForm({
           },
         })
 
-        if (authError) throw authError
+        if (authError) {
+          console.error('🚨 Supabase Auth Error:', authError)
+          console.error('🚨 Auth Error Message:', authError.message)
+          console.error('🚨 Auth Error Code:', authError.status)
+
+          // Check for email already exists error from Supabase
+          const errorMessage = authError.message?.toLowerCase() || ''
+          if (
+            errorMessage.includes('already registered') ||
+            errorMessage.includes('already exists') ||
+            errorMessage.includes('duplicate') ||
+            errorMessage.includes('user already registered') ||
+            errorMessage.includes('email already confirmed') ||
+            authError.status === 422
+          ) {
+            setError(
+              'This email address is already registered. Please log in or try a different email.',
+            )
+            setIsLoading(false)
+            return
+          }
+
+          throw authError
+        }
+
         if (!authData.user) throw new Error('No user data returned from Supabase')
 
         userId = authData.user.id
@@ -134,7 +158,20 @@ export function OnboardingSignUpForm({
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create store and user records')
+
+        // Handle specific error types from API
+        if (errorData.error === 'EMAIL_ALREADY_EXISTS') {
+          setError(
+            errorData.message ||
+              'This email address is already registered. Please log in or try a different email.',
+          )
+          setIsLoading(false)
+          return
+        }
+
+        throw new Error(
+          errorData.message || errorData.error || 'Failed to create store and user records',
+        )
       }
 
       // Update onboarding state
@@ -145,6 +182,65 @@ export function OnboardingSignUpForm({
       router.push('/onboarding/success')
     } catch (error: unknown) {
       console.error('💥 Signup error:', error)
+      console.error('💥 Error type:', typeof error)
+      console.error('💥 Error constructor:', error?.constructor?.name)
+
+      // Check if it's a Supabase auth error that we might have missed
+      if (error && typeof error === 'object') {
+        // Define a type for the error object with optional properties
+        interface SupabaseErrorObject {
+          message?: string
+          details?: string
+          hint?: string
+          status?: number
+          statusCode?: number
+          error?: {
+            message?: string
+            status?: number
+          }
+        }
+
+        const errorObj = error as SupabaseErrorObject
+        const errorMessage = errorObj.message?.toLowerCase() || ''
+        const errorDetails = errorObj.details?.toLowerCase() || ''
+        const errorHint = errorObj.hint?.toLowerCase() || ''
+
+        console.error('💥 Error message:', errorMessage)
+        console.error('💥 Error details:', errorDetails)
+        console.error('💥 Error hint:', errorHint)
+        console.error('💥 Full error object:', JSON.stringify(error, null, 2))
+
+        // Check all possible error message fields
+        const allErrorText = `${errorMessage} ${errorDetails} ${errorHint}`.toLowerCase()
+
+        // Also check if the error has a nested error object
+        const nestedError = errorObj.error?.message?.toLowerCase() || ''
+        const allText = `${allErrorText} ${nestedError}`.toLowerCase()
+
+        console.error('💥 All error text combined:', allText)
+
+        if (
+          allText.includes('already registered') ||
+          allText.includes('already exists') ||
+          allText.includes('duplicate') ||
+          allText.includes('user already registered') ||
+          allText.includes('email already confirmed') ||
+          allText.includes('a user with this email address has already been registered') ||
+          allText.includes('user with this email already exists') ||
+          allText.includes('email address has already been registered') ||
+          errorObj.status === 422 ||
+          errorObj.statusCode === 422 ||
+          errorObj.error?.status === 422
+        ) {
+          console.log('✅ Detected email conflict in catch block')
+          setError(
+            'This email address is already registered. Please log in or try a different email.',
+          )
+          setIsLoading(false)
+          return
+        }
+      }
+
       setError(error instanceof Error ? error.message : t('errors.signupError'))
     } finally {
       setIsLoading(false)
@@ -274,20 +370,58 @@ export function OnboardingSignUpForm({
 
               {error && (
                 <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription className="flex justify-center">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        <p>{error}</p>
+                      </div>
+                      <div className="flex flex-col items-center gap-2 mt-3">
+                        <div className="flex justify-center gap-2 w-full">
+                          <Button
+                            type="button"
+                            variant="default"
+                            onClick={() => router.push('/auth/login')}
+                          >
+                            Login Instead
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="text-primary"
+                            onClick={() => {
+                              setError(null)
+                              setEmail('')
+                            }}
+                          >
+                            Try Again
+                          </Button>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-sm"
+                          onClick={() => router.push('/auth/forgot-password')}
+                        >
+                          Forgot your password?
+                        </Button>
+                      </div>
+                    </div>
+                  </AlertDescription>
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading
-                  ? isLoggedIn
-                    ? 'Creating store...'
-                    : 'Creating account...'
-                  : isLoggedIn
-                    ? 'Create Store'
-                    : t('createAccountButton')}
-              </Button>
+              {!error && (
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading
+                    ? isLoggedIn
+                      ? 'Creating store...'
+                      : 'Creating account...'
+                    : isLoggedIn
+                      ? 'Create Store'
+                      : t('createAccountButton')}
+                </Button>
+              )}
 
               {!isLoggedIn && (
                 <Typography variant="p" color="muted" className="text-center text-sm">

@@ -1,5 +1,30 @@
 {
   "dashboard": {
+    "welcome": {
+      "title": "Bienvenue sur Votre Dashboard",
+      "description": "Commencez à gérer votre inventaire en ajoutant vos premiers produits. Voici quelques actions rapides pour vous aider à démarrer.",
+      "badge": "Commençons avec votre inventaire",
+      "actions": {
+        "getStarted": "Commencer",
+        "inbound": {
+          "title": "Ajouter Vos Premiers Produits",
+          "description": "Commencez par ajouter des produits à votre inventaire par numérisation ou saisie manuelle."
+        },
+        "settings": {
+          "title": "Configurer Votre Magasin",
+          "description": "Personnalisez les paramètres de votre magasin, gérez les membres de l'équipe et configurez les notifications."
+        },
+        "products": {
+          "title": "Gérer les Produits",
+          "description": "Consultez et gérez votre catalogue de produits et les paramètres d'inventaire."
+        }
+      },
+      "help": {
+        "title": "Besoin d'Aide pour Démarrer?",
+        "description": "Apprenez à utiliser le tableau de bord efficacement avec notre tutoriel et nos guides rapides.",
+        "learnMore": "En savoir plus sur la gestion d'inventaire"
+      }
+    },
     "quickActions": {
       "title": "Actions Rapides",
       "description": "Ajoutez rapidement des produits, supprimez ou consultez des produits et des tâches.",

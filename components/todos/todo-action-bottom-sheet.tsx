@@ -3,6 +3,7 @@
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useBatchTodo } from '@/hooks/use-batch-todo'
 import { DiscountTab } from './todos-dialog-tabs/discount-tab'
@@ -27,6 +28,7 @@ export function TodoActionBottomSheet({
   onClose,
   selectedBatch,
 }: TodoActionBottomSheetProps) {
+  const t = useTranslations('todos')
   const [activeTab, setActiveTab] = useState<TabType>('details')
 
   // Fetch fresh batch data to ensure UI stays in sync
@@ -46,19 +48,35 @@ export function TodoActionBottomSheet({
     const diffTime = expiryDate.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-    if (diffDays === 0) return 'Expires today'
-    if (diffDays === 1) return '1 day left'
-    if (diffDays < 0) return `${Math.abs(diffDays)} days ago`
-    return `${diffDays} days left`
+    if (diffDays === 0) return t('card.expiresToday')
+    if (diffDays === 1) return t('card.daysLeftOne')
+    if (diffDays < 0) return t('card.expired', { days: Math.abs(diffDays) })
+    return t('card.daysLeft', { days: diffDays })
   }
 
   // Tab configuration
   const tabs = [
-    { id: 'details' as TabType, label: 'Details', icon: SparklesIcon },
-    { id: 'discount' as TabType, label: 'Discount', icon: PercentIcon },
-    { id: 'donate' as TabType, label: 'Donate', icon: PackageOpenIcon },
-    { id: 'sold' as TabType, label: 'Sell', icon: TagIcon },
-    { id: 'dispose' as TabType, label: 'Dispose', icon: PackageXIcon },
+    {
+      id: 'details' as TabType,
+      label: t('actions.details'),
+      icon: SparklesIcon,
+    },
+    {
+      id: 'discount' as TabType,
+      label: t('actions.discount'),
+      icon: PercentIcon,
+    },
+    {
+      id: 'donate' as TabType,
+      label: t('actions.donate'),
+      icon: PackageOpenIcon,
+    },
+    { id: 'sold' as TabType, label: t('actions.sell'), icon: TagIcon },
+    {
+      id: 'dispose' as TabType,
+      label: t('actions.dispose'),
+      icon: PackageXIcon,
+    },
   ]
 
   return (
@@ -67,10 +85,14 @@ export function TodoActionBottomSheet({
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
-        <div className="flex flex-col gap-2 max-w-[280px] sm:max-w-max">
-          <Typography className="leading-normal truncate" variant="h4">
-            {currentBatch.product_name || ''}
-          </Typography>
+        <div className="flex flex-col gap-2">
+          <div className="w-80 overflow-hidden">
+            <div className="truncate">
+              <Typography className="leading-normal" variant="h4">
+                {currentBatch.product_name || ''}
+              </Typography>
+            </div>
+          </div>
           <div className="flex flex-row sm:items-center divide-x">
             <div className="divide-x flex">
               <Typography className="pr-2 text-xs sm:text-base">
@@ -80,7 +102,9 @@ export function TodoActionBottomSheet({
             </div>
             <div className="divide-x flex">
               <Typography className="px-2 text-xs sm:text-base">
-                {currentBatch.current_quantity || 0} units
+                {t('bottomSheet.units', {
+                  count: currentBatch.current_quantity || 0,
+                })}
               </Typography>
               <Typography className="px-2 text-xs sm:text-base">
                 €{(currentBatch.unit_price || 0).toFixed(2)}
@@ -114,8 +138,9 @@ export function TodoActionBottomSheet({
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 flex-shrink-0 p-2 rounded-xl',
-                activeTab === tab.id && 'text-primary bg-primary-50',
+                'transition-all flex flex-col items-center gap-1 font-medium font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 flex-shrink-0 py-2 rounded-2xl',
+                activeTab === tab.id &&
+                  'text-primary bg-primary-50 dark:bg-brand-dark dark:text-secondary-600',
               )}
             >
               <tab.icon className="size-4" />

@@ -1,14 +1,15 @@
-import { HydrationBoundary } from '@tanstack/react-query'
-import { BellIcon } from 'lucide-react'
 import { AppSidebar } from '@/components/app-sidebar'
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
 import { SettingsError } from '@/components/settings/settings-error-boundary'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { Button } from '@/components/ui/button'
+import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import UserButton from '@/components/users/user-button'
 import { prefetchDashboardData } from '@/lib/react-query/prefetch'
+import { HydrationBoundary } from '@tanstack/react-query'
+import { BellIcon } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const dashboardData = await prefetchDashboardData()
@@ -44,6 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
 
             <div className="flex items-center gap-2">
+              <CompactLanguageSwitcher />
               <Button size="icon" className="border rounded-full">
                 <BellIcon className="w-4 h-4" />
               </Button>

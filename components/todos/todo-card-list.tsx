@@ -7,8 +7,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import type { SortConfig } from './filters/todo-sort-controls'
+import { Typography } from '../ui/typography'
 
 interface TodoCardListProps {
   todos: TodoItem[]
@@ -33,6 +35,8 @@ export function TodoCardList({
   emptyStateMessage = 'No todos found',
   emptyStateIcon = '📋',
 }: TodoCardListProps) {
+  const t = useTranslations('todos')
+
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<TodoItem | null>(null)
@@ -142,10 +146,14 @@ export function TodoCardList({
 
   if (!sortedTodos.length) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
         <div className="text-6xl mb-4">{emptyStateIcon}</div>
-        <h3 className="text-lg font-semibold mb-2">{emptyStateMessage}</h3>
-        <p className="text-muted-foreground">Try adjusting your filters to see more items.</p>
+        <Typography variant="h3" color="primary">
+          {emptyStateMessage}
+        </Typography>
+        <Typography variant="p" color="muted">
+          {t('list.adjustFilters')}
+        </Typography>
       </div>
     )
   }
@@ -169,11 +177,11 @@ export function TodoCardList({
             {isFetchingNextPage ? (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm">Loading more todos...</span>
+                <span className="text-sm">{t('list.loadingMore')}</span>
               </div>
             ) : (
               <div className="text-sm text-muted-foreground opacity-60">
-                Scroll to load more ({sortedTodos.length} loaded)
+                {t('list.scrollToLoad', { count: sortedTodos.length })}
               </div>
             )}
           </div>
@@ -182,7 +190,7 @@ export function TodoCardList({
         {/* Loading indicator when fetching */}
         {isFetching && !isFetchingNextPage && (
           <div className="flex justify-center py-2">
-            <div className="text-sm text-muted-foreground">Updating...</div>
+            <div className="text-sm text-muted-foreground">{t('list.updating')}</div>
           </div>
         )}
       </div>

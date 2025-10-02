@@ -83,7 +83,10 @@
       "notFound": "La ressource demandée n'a pas été trouvée.",
       "validationFailed": "Veuillez vérifier votre saisie et réessayer.",
       "timeoutError": "Délai d'attente dépassé. Veuillez réessayer.",
-      "unknownError": "Une erreur inconnue s'est produite"
+      "unknownError": "Une erreur inconnue s'est produite",
+      "unexpected": "Une erreur inattendue s'est produite",
+      "somethingWrong": "Quelque chose s'est mal passé",
+      "permissionDenied": "Permission refusée"
     },
     "forms": {
       "required": "Ce champ est obligatoire",
@@ -126,5 +129,9 @@
       "updating": "Mise à jour..."
     }
   },
-  "cancel": "Annuler"
+  "cancel": "Annuler",
+  "close": "Fermer",
+  "save": "Sauvegarder",
+  "edit": "Modifier",
+  "saving": "Enregistrement..."
 }

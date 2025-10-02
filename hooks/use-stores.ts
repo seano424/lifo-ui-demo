@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { setActiveStoreCookie } from '@/lib/actions/store-actions'
@@ -28,7 +29,8 @@ function useCurrentAuthUser() {
       } = await supabase.auth.getUser()
 
       if (error || !user) {
-        throw new Error('Not authenticated')
+        // Return null instead of throwing to avoid error during logout
+        return null
       }
 
       return user
@@ -120,6 +122,7 @@ export function useUserStores() {
 
 // Hook to switch stores with cache invalidation
 export function useStoreActions() {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { data: currentUser } = useCurrentAuthUser()
   const { setActiveStore, setChangingStore, activeStore } = useStoreState()
@@ -154,6 +157,9 @@ export function useStoreActions() {
 
       // Also set cookie for server-side persistence
       await setActiveStoreCookie(newStore.store_id)
+
+      // Refresh server components to re-render with new store data
+      router.refresh()
 
       // Invalidate all store-specific queries to refetch for new store
       queryClient.invalidateQueries({

@@ -1,0 +1,56 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [ready_for_review]  # ✅ Only when marked ready, not every commit
+    # Optional: Only run on specific file changes
+    # paths:
+    #   - "src/**/*.ts"
+    #   - "src/**/*.tsx"
+    #   - "src/**/*.js"
+    #   - "src/**/*.jsx"
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # Changed to 'write' so Claude can comment
+      issues: write         # Changed to 'write'
+      id-token: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            You are reviewing PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
+
+            This is a LIFO.AI food waste management system built with:
+            - Next.js 15 + TypeScript + React 19
+            - Supabase (PostgreSQL with RLS)
+            - React Query for data fetching
+            - FastAPI backend for AI/ML processing
+
+            Please review this PR for:
+            1. **TypeScript best practices** - Proper types, no 'any' usage
+            2. **Supabase patterns** - Use RPC functions for complex queries, proper RLS policies
+            3. **React Query usage** - Correct query keys, proper invalidation
+            4. **Security** - Input validation, RLS checks, auth verification
+            5. **Performance** - Inefficient queries, unnecessary re-renders, mobile optimization (<300ms targets)
+            6. **Code consistency** - Matches existing LIFO architecture patterns in CLAUDE.md
+
+            Use `gh pr comment` to post your review with specific line references where possible.
+            Be constructive and provide code examples for suggested improvements.
+          
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+
