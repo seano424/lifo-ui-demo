@@ -619,7 +619,7 @@ async function bulkInsertBatches(
   // Prepare batch data
   const batchData: Database['inventory']['Tables']['batches']['Insert'][] = []
 
-  productsData.forEach((productData, index) => {
+  productsData.forEach(productData => {
     const product = productLookup.get(productData.barcode)
     if (product) {
       const batchNumber = `BATCH-${crypto.randomUUID().substring(0, 13).toUpperCase()}`
