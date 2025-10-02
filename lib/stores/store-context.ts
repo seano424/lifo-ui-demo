@@ -33,6 +33,7 @@ export const useStoreState = create<StoreState>()(
 
     setActiveStore: store => {
       // Persist to localStorage when setting active store
+      // Cookie persistence is handled by setActiveStoreCookie server action in useStoreActions
       if (typeof window !== 'undefined') {
         if (store) {
           localStorage.setItem(ACTIVE_STORE_KEY, store.store_id)
