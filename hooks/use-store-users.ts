@@ -19,6 +19,9 @@ import {
 } from '@/lib/queries/store-users'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
+// Page size for client-side filtered queries (fetches all users for filtering)
+const FILTERED_USERS_PAGE_SIZE = 100
+
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
 
@@ -98,14 +101,31 @@ export function usePinEnabledUsers() {
 
 /**
  * Client-side filtered store users hook
- * Fetches all users once and filters on the client side for instant performance
- * Use this instead of useStoreUsers when you need filtered results
+ *
+ * Fetches all users once and filters on the client side for instant performance.
+ *
+ * ✅ **Use when:**
+ * - Store has <50 users
+ * - Multiple filters needed
+ * - Want instant filter updates without network requests
+ *
+ * ❌ **Avoid when:**
+ * - Store has >50 users (use `useStoreUsers` with server-side filters instead)
+ * - Only need a single filter (use `useStoreUsers` directly)
+ *
+ * **Performance:** Fetches all users once (up to 100) and filters client-side.
  */
 export function useFilteredStoreUsers(filters: StoreUserFilters = {}) {
   const activeStoreId = useActiveStoreId()
 
   // Fetch all users once (with caching)
-  const { data: allUsers, isLoading, isFetching, isError, error } = useStoreUsers({}, 100)
+  const {
+    data: allUsers,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = useStoreUsers({}, FILTERED_USERS_PAGE_SIZE)
 
   // Filter on the client side using useMemo for performance
   const filteredUsers = useMemo(() => {

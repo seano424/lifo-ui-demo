@@ -72,6 +72,8 @@ export function useAuthStateMonitor() {
   const { setActiveStore, setUserStores } = useStoreState()
 
   useEffect(() => {
+    let isMounted = true // ✅ Track mount state to prevent updates on unmounted component
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -92,6 +94,8 @@ export function useAuthStateMonitor() {
         }
 
         invalidateTimeoutRef.current = setTimeout(() => {
+          if (!isMounted) return // ✅ Guard against unmounted component
+
           // Invalidate user queries
           queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
@@ -172,6 +176,7 @@ export function useAuthStateMonitor() {
 
     // Cleanup subscription on unmount
     return () => {
+      isMounted = false // ✅ Mark as unmounted to prevent state updates
       // ✅ Clear timeout on unmount
       if (invalidateTimeoutRef.current) {
         clearTimeout(invalidateTimeoutRef.current)

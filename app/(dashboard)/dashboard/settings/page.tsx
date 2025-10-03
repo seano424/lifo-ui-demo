@@ -3,13 +3,14 @@
 import UserAccountInformation from '@/components/account/user-account-information'
 import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { Bell, CreditCard, Lock, Store, User, Users } from 'lucide-react'
+import { AlertCircle, Bell, CreditCard, Lock, Store, User, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 // Import existing components - preserve all functionality
 import StoreInformation from '@/components/settings/store-information'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import ComingSoon from '@/components/ui/coming-soon'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -26,7 +27,7 @@ export default function UnifiedSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabValue>('store')
 
   // Load all data once
-  const { isLoading } = useUnifiedSettings()
+  const { isLoading, error } = useUnifiedSettings()
   const { isOwner, isManager, isLoading: isLoadingPermissions, storeId } = usePermissionsNew()
 
   // Handle URL state for tab persistence
@@ -73,7 +74,20 @@ export default function UnifiedSettingsPage() {
     return baseTabs
   }
 
-  // Note: Error handling is now managed by individual hooks (useStoreSettings, useStoreUsers)
+  // ✅ Add error handling back to the page
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6">
+        <DashboardInsetHeader title={t('title')} description={t('description')} />
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error instanceof Error ? error.message : t('errors.loadingFailed')}
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   // Show loading state while permissions load (now much faster with single query!)
   if (isLoadingPermissions) {
