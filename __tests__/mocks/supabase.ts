@@ -5,8 +5,8 @@ import type { Database } from '@/types/supabase'
  * Mock Supabase client for testing
  * This creates a minimal mock that you can extend in your tests
  */
-export function createMockSupabaseClient(): Partial<SupabaseClient<Database>> {
-  return {
+export function createMockSupabaseClient() {
+  const mockClient = {
     from: jest.fn().mockReturnThis(),
     select: jest.fn().mockReturnThis(),
     insert: jest.fn().mockReturnThis(),
@@ -23,7 +23,14 @@ export function createMockSupabaseClient(): Partial<SupabaseClient<Database>> {
     range: jest.fn().mockReturnThis(),
     single: jest.fn().mockResolvedValue({ data: null, error: null }),
     schema: jest.fn().mockReturnThis(),
-  } as unknown as Partial<SupabaseClient<Database>>
+    rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
+    auth: {
+      getUser: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      getSession: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    },
+  }
+
+  return mockClient as typeof mockClient & Partial<SupabaseClient<Database>>
 }
 
 /**
