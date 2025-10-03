@@ -2,12 +2,16 @@
 -- Created: 2025-01-03
 -- Purpose: Bypasses RLS to allow managers/owners to permanently remove other users from stores
 --
+-- Dependencies:
+-- - Requires business.user_can_manage_store_users() function (created in earlier migration)
+--   This function enforces role hierarchy: owners can manage anyone, managers can manage employees/staff only
+--
 -- This function addresses the RLS permission issue where direct table updates
 -- were blocked because the policy only allows users to update their own records.
 --
 -- Key Features:
 -- - Uses SECURITY DEFINER to bypass RLS restrictions
--- - Enforces permission checks via user_can_manage_store_users()
+-- - Enforces permission checks via business.user_can_manage_store_users()
 -- - Prevents self-removal
 -- - Provides detailed audit trail in response
 -- - Permanently removes user from store (DELETE vs UPDATE is_active = false)
@@ -103,9 +107,9 @@ EXCEPTION
 END;
 $$;
 
--- Grant execute permissions to authenticated users
+-- Grant execute permissions to authenticated users only
+-- NOTE: anon users explicitly NOT granted permission as they should not perform destructive operations
 GRANT EXECUTE ON FUNCTION public.remove_user_from_store(UUID, UUID) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.remove_user_from_store(UUID, UUID) TO anon;
 
 -- Add function comment for documentation
 COMMENT ON FUNCTION public.remove_user_from_store IS
