@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
+import { logger } from '@/lib/utils/logger'
+import { withPerformanceTracking } from '@/lib/utils/performance'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -108,35 +110,42 @@ export async function fetchTodosBySection(
   nextPage: number | undefined
   hasMore: boolean
 }> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/todos-rpc',
+    'fetchTodosBySection',
+    { storeId, section, page, pageSize },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  try {
-    const { data, error, count } = await supabase.rpc('get_todos_by_section', {
-      p_store_id: storeId,
-      p_section_filter: section,
-      p_limit: pageSize,
-      p_offset: page * pageSize,
-    })
+      const { data, error, count } = await supabase.rpc('get_todos_by_section', {
+        p_store_id: storeId,
+        p_section_filter: section,
+        p_limit: pageSize,
+        p_offset: page * pageSize,
+      })
 
-    if (error) {
-      console.error(`[fetchTodosBySection] Error for section ${section}:`, error)
-      throw new Error(`Failed to fetch todos for section ${section}: ${error.message}`)
-    }
+      if (error) {
+        logger.error('lib/queries/todos-rpc', 'Error in fetchTodosBySection', {
+          error: error.message,
+          code: error.code,
+          storeId,
+          section,
+        })
+        throw new Error(`Failed to fetch todos for section ${section}: ${error.message}`)
+      }
 
-    const todos = (data || []) as TodoItem[]
-    const hasMore = todos.length === pageSize
-    const nextPage = hasMore ? page + 1 : undefined
+      const todos = (data || []) as TodoItem[]
+      const hasMore = todos.length === pageSize
+      const nextPage = hasMore ? page + 1 : undefined
 
-    return {
-      data: todos,
-      count: count || null,
-      nextPage,
-      hasMore,
-    }
-  } catch (err) {
-    console.error(`[fetchTodosBySection] Unexpected error for section ${section}:`, err)
-    throw err
-  }
+      return {
+        data: todos,
+        count: count || null,
+        nextPage,
+        hasMore,
+      }
+    },
+  )
 }
 
 /**
@@ -146,36 +155,42 @@ export async function fetchDashboardSummary(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<DashboardSummary> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/todos-rpc',
+    'fetchDashboardSummary',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  try {
-    const { data, error } = await supabase.rpc('get_dashboard_summary', {
-      p_store_id: storeId,
-    })
+      const { data, error } = await supabase.rpc('get_dashboard_summary', {
+        p_store_id: storeId,
+      })
 
-    if (error) {
-      console.error('[fetchDashboardSummary] Error:', error)
-      throw new Error(`Failed to fetch dashboard summary: ${error.message}`)
-    }
-
-    return (
-      data?.[0] || {
-        total_active_batches: 0,
-        needs_attention_count: 0,
-        critical_count: 0,
-        high_count: 0,
-        medium_count: 0,
-        low_count: 0,
-        ok_count: 0,
-        needs_attention_percentage: 0,
-        expired_items_count: 0,
-        expired_items_value: 0,
+      if (error) {
+        logger.error('lib/queries/todos-rpc', 'Error in fetchDashboardSummary', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to fetch dashboard summary: ${error.message}`)
       }
-    )
-  } catch (err) {
-    console.error('[fetchDashboardSummary] Unexpected error:', err)
-    throw err
-  }
+
+      return (
+        data?.[0] || {
+          total_active_batches: 0,
+          needs_attention_count: 0,
+          critical_count: 0,
+          high_count: 0,
+          medium_count: 0,
+          low_count: 0,
+          ok_count: 0,
+          needs_attention_percentage: 0,
+          expired_items_count: 0,
+          expired_items_value: 0,
+        }
+      )
+    },
+  )
 }
 
 /**
@@ -185,23 +200,29 @@ export async function fetchTodosDashboardOverview(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<TodosDashboardOverview[]> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/todos-rpc',
+    'fetchTodosDashboardOverview',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  try {
-    const { data, error } = await supabase.rpc('get_todos_dashboard_overview', {
-      p_store_id: storeId,
-    })
+      const { data, error } = await supabase.rpc('get_todos_dashboard_overview', {
+        p_store_id: storeId,
+      })
 
-    if (error) {
-      console.error('[fetchTodosDashboardOverview] Error:', error)
-      throw new Error(`Failed to fetch dashboard overview: ${error.message}`)
-    }
+      if (error) {
+        logger.error('lib/queries/todos-rpc', 'Error in fetchTodosDashboardOverview', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to fetch dashboard overview: ${error.message}`)
+      }
 
-    return data || []
-  } catch (err) {
-    console.error('[fetchTodosDashboardOverview] Unexpected error:', err)
-    throw err
-  }
+      return data || []
+    },
+  )
 }
 
 /**

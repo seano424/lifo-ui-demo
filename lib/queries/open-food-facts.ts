@@ -1,5 +1,7 @@
 // lib/queries/open-food-facts.ts
 
+import { logger } from '@/lib/utils/logger'
+
 // Type for search results from Open Food Facts
 export interface OpenFoodFactsSearchResult {
   code: string
@@ -83,7 +85,10 @@ class OpenFoodFactsClient {
       const data = await response.json()
       return data
     } catch (error) {
-      console.error(`[OpenFoodFacts] Failed to lookup ${barcode}:`, error)
+      logger.error('lib/queries/open-food-facts', 'Failed to lookup barcode', {
+        error: error instanceof Error ? error.message : String(error),
+        barcode,
+      })
       throw error
     }
   }
@@ -102,7 +107,10 @@ class OpenFoodFactsClient {
       const data = await response.json()
       return data.products || []
     } catch (error) {
-      console.error(`[OpenFoodFacts] Failed to search for "${query}":`, error)
+      logger.error('lib/queries/open-food-facts', 'Failed to search products', {
+        error: error instanceof Error ? error.message : String(error),
+        query,
+      })
       throw error
     }
   }
