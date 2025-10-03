@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
+import { withPerformanceTracking } from '@/lib/utils/performance'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -61,18 +63,30 @@ export async function fetchStoreInsights(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<StoreInsights> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/store-insights',
+    'fetchStoreInsights',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  const { data, error } = await supabase.rpc('get_store_insights', {
-    target_store_id: storeId,
-  })
+      const { data, error } = await supabase.rpc('get_store_insights', {
+        target_store_id: storeId,
+      })
 
-  if (error) {
-    console.error('Error fetching store insights:', error)
-    throw new Error(`Failed to fetch store insights: ${error.message}`)
-  }
+      if (error) {
+        logger.error('lib/queries/store-insights', 'Error fetching store insights', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to fetch store insights: ${error.message}`)
+      }
 
-  return data as StoreInsights
+      logger.log('lib/queries/store-insights', 'Successfully fetched store insights', { storeId })
+      return data as StoreInsights
+    },
+  )
 }
 
 // Get detailed actionable batches
@@ -80,18 +94,32 @@ export async function fetchActionableBatches(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<ActionableBatchesResponse> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/store-insights',
+    'fetchActionableBatches',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  const { data, error } = await supabase.rpc('get_actionable_batches', {
-    input_store_id: storeId,
-  })
+      const { data, error } = await supabase.rpc('get_actionable_batches', {
+        input_store_id: storeId,
+      })
 
-  if (error) {
-    console.error('Error fetching actionable batches:', error)
-    throw new Error(`Failed to fetch actionable batches: ${error.message}`)
-  }
+      if (error) {
+        logger.error('lib/queries/store-insights', 'Error fetching actionable batches', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to fetch actionable batches: ${error.message}`)
+      }
 
-  return data as ActionableBatchesResponse
+      logger.log('lib/queries/store-insights', 'Successfully fetched actionable batches', {
+        storeId,
+      })
+      return data as ActionableBatchesResponse
+    },
+  )
 }
 
 // Get insights for all stores (admin view)

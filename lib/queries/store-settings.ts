@@ -1,6 +1,8 @@
 // lib/queries/store-settings.ts - RPC VERSION (FINAL FIX)
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
+import { withPerformanceTracking } from '@/lib/utils/performance'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -76,47 +78,65 @@ export async function fetchStoreSettings(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<StoreSettingsData> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'fetchStoreSettings',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  // Use the RPC function to get store data
-  const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
-    store_id_param: storeId,
-  })
+      // Use the RPC function to get store data
+      const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
+        store_id_param: storeId,
+      })
 
-  if (storeError) {
-    // Only suppress auth errors during logout - let other errors through normally
-    if (
-      storeError.message?.includes('JWT') ||
-      storeError.message?.includes('invalid') ||
-      storeError.code === 'PGRST301' ||
-      storeError.message?.includes('Auth session missing')
-    ) {
-      console.log('🔐 Store fetch skipped - user not authenticated')
-      throw new Error('User not authenticated')
-    }
+      if (storeError) {
+        // Only suppress auth errors during logout - let other errors through normally
+        if (
+          storeError.message?.includes('JWT') ||
+          storeError.message?.includes('invalid') ||
+          storeError.code === 'PGRST301' ||
+          storeError.message?.includes('Auth session missing')
+        ) {
+          logger.log('lib/queries/store-settings', 'Store fetch skipped - user not authenticated', {
+            storeId,
+          })
+          throw new Error('User not authenticated')
+        }
 
-    // Log all other errors normally and let React Query handle them
-    console.error('❌ Store fetch error:', storeError)
-    throw new Error(`Failed to fetch store: ${storeError.message}`)
-  }
+        // Log all other errors normally and let React Query handle them
+        logger.error('lib/queries/store-settings', 'Store fetch error', {
+          error: storeError.message,
+          code: storeError.code,
+          storeId,
+        })
+        throw new Error(`Failed to fetch store: ${storeError.message}`)
+      }
 
-  // Still fetch store settings from business.store_settings if needed
-  const { data: settingsData, error: settingsError } = await supabase
-    .schema('business')
-    .from('store_settings')
-    .select('*')
-    .eq('store_id', storeId)
-    .single()
+      // Still fetch store settings from business.store_settings if needed
+      const { data: settingsData, error: settingsError } = await supabase
+        .schema('business')
+        .from('store_settings')
+        .select('*')
+        .eq('store_id', storeId)
+        .single()
 
-  // Settings might not exist yet, that's OK
-  if (settingsError && settingsError.code !== 'PGRST116') {
-    console.warn('⚠️ Failed to fetch store settings:', settingsError.message)
-  }
+      // Settings might not exist yet, that's OK
+      if (settingsError && settingsError.code !== 'PGRST116') {
+        logger.warn('lib/queries/store-settings', 'Failed to fetch store settings', {
+          error: settingsError.message,
+          storeId,
+        })
+      }
 
-  return {
-    ...storeData,
-    settings: settingsData || undefined,
-  }
+      logger.log('lib/queries/store-settings', 'Successfully fetched store settings', { storeId })
+
+      return {
+        ...storeData,
+        settings: settingsData || undefined,
+      }
+    },
+  )
 }
 
 // Update store basic information using RPC function
@@ -125,34 +145,46 @@ export async function updateStoreBasicInfo(
   updates: Partial<StoreBasicInfo>,
   serverClient?: ServerClient,
 ): Promise<StoreBasicInfo> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'updateStoreBasicInfo',
+    { storeId, updateFields: Object.keys(updates) },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  // Use the RPC function to update store data
-  const { data, error } = await supabase.rpc('update_store_settings', {
-    store_id_param: storeId,
-    store_name_param: updates.store_name || null,
-    business_name_param: updates.business_name || null,
-    store_code_param: updates.store_code || null,
-    store_type_param: updates.store_type || null,
-    size_category_param: updates.size_category || null,
-    address_param: updates.address || null,
-    city_param: updates.city || null,
-    postal_code_param: updates.postal_code || null,
-    country_param: updates.country || null,
-    phone_param: updates.phone || null,
-    email_param: updates.email || null,
-    website_url_param: updates.website_url || null,
-    description_param: updates.description || null,
-    default_markup_percent_param: updates.default_markup_percent || null,
-    waste_reduction_target_percent_param: updates.waste_reduction_target_percent || null,
-  })
+      // Use the RPC function to update store data
+      const { data, error } = await supabase.rpc('update_store_settings', {
+        store_id_param: storeId,
+        store_name_param: updates.store_name || null,
+        business_name_param: updates.business_name || null,
+        store_code_param: updates.store_code || null,
+        store_type_param: updates.store_type || null,
+        size_category_param: updates.size_category || null,
+        address_param: updates.address || null,
+        city_param: updates.city || null,
+        postal_code_param: updates.postal_code || null,
+        country_param: updates.country || null,
+        phone_param: updates.phone || null,
+        email_param: updates.email || null,
+        website_url_param: updates.website_url || null,
+        description_param: updates.description || null,
+        default_markup_percent_param: updates.default_markup_percent || null,
+        waste_reduction_target_percent_param: updates.waste_reduction_target_percent || null,
+      })
 
-  if (error) {
-    console.error('❌ Store update error via RPC:', error)
-    throw new Error(`Failed to update store: ${error.message}`)
-  }
+      if (error) {
+        logger.error('lib/queries/store-settings', 'Store update error via RPC', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to update store: ${error.message}`)
+      }
 
-  return data
+      logger.log('lib/queries/store-settings', 'Successfully updated store basic info', { storeId })
+      return data
+    },
+  )
 }
 
 // Use RPC function for advanced settings updates with proper security
@@ -161,34 +193,51 @@ export async function updateStoreAdvancedSettings(
   updates: Partial<StoreAdvancedSettings>,
   serverClient?: ServerClient,
 ): Promise<StoreAdvancedSettings> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'updateStoreAdvancedSettings',
+    { storeId, updateFields: Object.keys(updates) },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  // Use the new RPC function for updating advanced settings (public schema)
-  const { data, error } = await supabase.rpc('update_store_advanced_settings', {
-    p_store_id: storeId,
-    p_critical_threshold: updates.critical_threshold || null,
-    p_warning_threshold: updates.warning_threshold || null,
-    p_scoring_weights: updates.scoring_weights || null,
-    p_notification_preferences: updates.notification_preferences || null,
-    p_display_preferences: updates.display_preferences || null,
-    p_backup_preferences: updates.backup_preferences || null,
-    p_opening_hours: updates.opening_hours || null,
-    p_peak_hours: updates.peak_hours || null,
-    p_weather_location_lat: updates.weather_location_lat || null,
-    p_weather_location_lon: updates.weather_location_lon || null,
-    p_currency: updates.currency || null,
-  })
+      // Use the new RPC function for updating advanced settings (public schema)
+      const { data, error } = await supabase.rpc('update_store_advanced_settings', {
+        p_store_id: storeId,
+        p_critical_threshold: updates.critical_threshold || null,
+        p_warning_threshold: updates.warning_threshold || null,
+        p_scoring_weights: updates.scoring_weights || null,
+        p_notification_preferences: updates.notification_preferences || null,
+        p_display_preferences: updates.display_preferences || null,
+        p_backup_preferences: updates.backup_preferences || null,
+        p_opening_hours: updates.opening_hours || null,
+        p_peak_hours: updates.peak_hours || null,
+        p_weather_location_lat: updates.weather_location_lat || null,
+        p_weather_location_lon: updates.weather_location_lon || null,
+        p_currency: updates.currency || null,
+      })
 
-  if (error) {
-    console.error('Failed to update store advanced settings:', error)
-    throw new Error(`Failed to update settings: ${error.message}`)
-  }
+      if (error) {
+        logger.error('lib/queries/store-settings', 'Failed to update store advanced settings', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to update settings: ${error.message}`)
+      }
 
-  if (!data || data.length === 0) {
-    throw new Error('No data returned from update operation')
-  }
+      if (!data || data.length === 0) {
+        logger.error('lib/queries/store-settings', 'No data returned from update operation', {
+          storeId,
+        })
+        throw new Error('No data returned from update operation')
+      }
 
-  return data[0] // RPC returns an array, get the first result
+      logger.log('lib/queries/store-settings', 'Successfully updated store advanced settings', {
+        storeId,
+      })
+      return data[0] // RPC returns an array, get the first result
+    },
+  )
 }
 
 // Specialized function for threshold updates only
@@ -200,24 +249,39 @@ export async function updateStoreThresholds(
   },
   serverClient?: ServerClient,
 ): Promise<StoreAdvancedSettings> {
-  const supabase = serverClient || createClient()
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'updateStoreThresholds',
+    { storeId, thresholds },
+    async () => {
+      const supabase = serverClient || createClient()
 
-  const { data, error } = await supabase.rpc('update_store_thresholds', {
-    p_store_id: storeId,
-    p_critical_threshold: thresholds.critical_threshold,
-    p_warning_threshold: thresholds.warning_threshold,
-  })
+      const { data, error } = await supabase.rpc('update_store_thresholds', {
+        p_store_id: storeId,
+        p_critical_threshold: thresholds.critical_threshold,
+        p_warning_threshold: thresholds.warning_threshold,
+      })
 
-  if (error) {
-    console.error('Failed to update store thresholds:', error)
-    throw new Error(`Failed to update thresholds: ${error.message}`)
-  }
+      if (error) {
+        logger.error('lib/queries/store-settings', 'Failed to update store thresholds', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to update thresholds: ${error.message}`)
+      }
 
-  if (!data || data.length === 0) {
-    throw new Error('No data returned from threshold update operation')
-  }
+      if (!data || data.length === 0) {
+        logger.error('lib/queries/store-settings', 'No data returned from threshold update', {
+          storeId,
+        })
+        throw new Error('No data returned from threshold update operation')
+      }
 
-  return data[0] // RPC returns an array, get the first result
+      logger.log('lib/queries/store-settings', 'Successfully updated store thresholds', { storeId })
+      return data[0] // RPC returns an array, get the first result
+    },
+  )
 }
 
 // Debug function to test store access
@@ -295,7 +359,10 @@ export async function validateStoreCode(
 
     return data.length === 0 // Returns true if code is available
   } catch (error) {
-    console.error('validateStoreCode error:', error)
+    logger.error('lib/queries/store-settings', 'validateStoreCode error', {
+      error: error instanceof Error ? error.message : String(error),
+      storeCode,
+    })
     throw error
   }
 }
@@ -323,7 +390,10 @@ export async function validateStoreEmail(
 
     return data.length === 0 // Returns true if email is available
   } catch (error) {
-    console.error('validateStoreEmail error:', error)
+    logger.error('lib/queries/store-settings', 'validateStoreEmail error', {
+      error: error instanceof Error ? error.message : String(error),
+      email,
+    })
     throw error
   }
 }
@@ -345,7 +415,10 @@ export async function testTableAccess(
       return { success: true, method: 'RPC function' }
     }
   } catch (error) {
-    console.error('testTableAccess error:', error)
+    logger.error('lib/queries/store-settings', 'testTableAccess error', {
+      error: error instanceof Error ? error.message : String(error),
+      storeId,
+    })
   }
 
   // Method 2: Try business schema access
@@ -361,7 +434,10 @@ export async function testTableAccess(
       return { success: true, method: 'business schema' }
     }
   } catch (error) {
-    console.error('❌ Method 2 (business schema) exception:', error)
+    logger.error('lib/queries/store-settings', 'Method 2 (business schema) exception', {
+      error: error instanceof Error ? error.message : String(error),
+      storeId,
+    })
   }
 
   return {
