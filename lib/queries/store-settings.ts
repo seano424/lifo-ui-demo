@@ -129,8 +129,6 @@ export async function fetchStoreSettings(
         })
       }
 
-      logger.log('lib/queries/store-settings', 'Successfully fetched store settings', { storeId })
-
       return {
         ...storeData,
         settings: settingsData || undefined,
@@ -181,7 +179,6 @@ export async function updateStoreBasicInfo(
         throw new Error(`Failed to update store: ${error.message}`)
       }
 
-      logger.log('lib/queries/store-settings', 'Successfully updated store basic info', { storeId })
       return data
     },
   )
@@ -232,9 +229,6 @@ export async function updateStoreAdvancedSettings(
         throw new Error('No data returned from update operation')
       }
 
-      logger.log('lib/queries/store-settings', 'Successfully updated store advanced settings', {
-        storeId,
-      })
       return data[0] // RPC returns an array, get the first result
     },
   )
@@ -278,7 +272,6 @@ export async function updateStoreThresholds(
         throw new Error('No data returned from threshold update operation')
       }
 
-      logger.log('lib/queries/store-settings', 'Successfully updated store thresholds', { storeId })
       return data[0] // RPC returns an array, get the first result
     },
   )

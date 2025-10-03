@@ -83,7 +83,6 @@ export async function fetchStoreInsights(
         throw new Error(`Failed to fetch store insights: ${error.message}`)
       }
 
-      logger.log('lib/queries/store-insights', 'Successfully fetched store insights', { storeId })
       return data as StoreInsights
     },
   )
@@ -114,9 +113,6 @@ export async function fetchActionableBatches(
         throw new Error(`Failed to fetch actionable batches: ${error.message}`)
       }
 
-      logger.log('lib/queries/store-insights', 'Successfully fetched actionable batches', {
-        storeId,
-      })
       return data as ActionableBatchesResponse
     },
   )

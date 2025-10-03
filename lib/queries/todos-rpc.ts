@@ -138,12 +138,6 @@ export async function fetchTodosBySection(
       const hasMore = todos.length === pageSize
       const nextPage = hasMore ? page + 1 : undefined
 
-      logger.log('lib/queries/todos-rpc', 'Successfully fetched todos by section', {
-        storeId,
-        section,
-        count: todos.length,
-      })
-
       return {
         data: todos,
         count: count || null,
@@ -180,8 +174,6 @@ export async function fetchDashboardSummary(
         })
         throw new Error(`Failed to fetch dashboard summary: ${error.message}`)
       }
-
-      logger.log('lib/queries/todos-rpc', 'Successfully fetched dashboard summary', { storeId })
 
       return (
         data?.[0] || {
@@ -227,11 +219,6 @@ export async function fetchTodosDashboardOverview(
         })
         throw new Error(`Failed to fetch dashboard overview: ${error.message}`)
       }
-
-      logger.log('lib/queries/todos-rpc', 'Successfully fetched dashboard overview', {
-        storeId,
-        count: data?.length || 0,
-      })
 
       return data || []
     },

@@ -83,13 +83,6 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
       const criticalItems = typedData.filter(item => item.urgency_level === 'Critical')
       const urgentItems = typedData.filter(item => item.urgency_level === 'Urgent')
 
-      logger.log('lib/queries/urgent-alerts', 'Successfully fetched urgent alerts', {
-        storeId,
-        criticalCount: criticalItems.length,
-        urgentCount: urgentItems.length,
-        totalCount: typedData.length,
-      })
-
       return {
         criticalCount: criticalItems.length,
         urgentCount: urgentItems.length,

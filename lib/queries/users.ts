@@ -134,7 +134,6 @@ export async function fetchUsers(serverClient?: ServerClient): Promise<User[]> {
     }
 
     const users = (data || []).map(transformAuthUserToUser)
-    logger.log('lib/queries/users', 'Successfully fetched users', { count: users.length })
     return users
   })
 }
@@ -230,13 +229,6 @@ export async function fetchUsersPage(
       const endIndex = startIndex + pageSize
       const pageUsers = users.slice(startIndex, endIndex)
 
-      logger.log('lib/queries/users', 'Successfully fetched users page', {
-        page,
-        pageSize,
-        totalCount,
-        returnedCount: pageUsers.length,
-      })
-
       return {
         data: pageUsers,
         count: totalCount,
@@ -278,7 +270,6 @@ export async function updateUserPhone(
         throw new Error(`Failed to update phone: ${error.message}`)
       }
 
-      logger.log('lib/queries/users', 'Successfully updated user phone', { userId })
       return data as UpdatePhoneResponse
     },
   )
@@ -321,10 +312,6 @@ export async function updateUserLanguagePreference(
         throw new Error(`Failed to update language preference: ${error.message}`)
       }
 
-      logger.log('lib/queries/users', 'Successfully updated user language preference', {
-        userId,
-        languagePreference,
-      })
       return data as UpdateLanguageResponse
     },
   )
@@ -360,7 +347,6 @@ export async function getUserByUsername(
         return null
       }
 
-      logger.log('lib/queries/users', 'Successfully found user by username', { username })
       return data[0]
     },
   )
@@ -446,7 +432,6 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
       }
 
       const transformedUser = transformAuthUserToUser(updatedUser)
-      logger.log('lib/queries/users', 'Successfully updated user', { userId })
       return transformedUser
     },
   )
@@ -486,7 +471,6 @@ export async function updateUserMetadata(
         return false
       }
 
-      logger.log('lib/queries/users', 'Successfully updated user metadata', { userId })
       return true
     },
   )
@@ -511,7 +495,6 @@ export async function updateUserEmail(userId: string, email: string): Promise<bo
       return false
     }
 
-    logger.log('lib/queries/users', 'Successfully updated user email', { userId })
     return true
   })
 }
@@ -553,8 +536,6 @@ export async function deleteUser(userId: string): Promise<void> {
       })
       throw new Error(`Failed to delete user: ${error.message}`)
     }
-
-    logger.log('lib/queries/users', 'Successfully deleted user', { userId })
   })
 }
 
@@ -582,7 +563,6 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
       throw new Error(`User with ID "${userId}" not found`)
     }
 
-    logger.log('lib/queries/users', 'Successfully fetched user by ID', { userId })
     return transformAuthUserToUser(userData)
   })
 }
@@ -616,10 +596,6 @@ export async function fetchUserRoles(userId: string): Promise<string[]> {
           Array.isArray(item.roles) ? item.roles.map(r => r.role_name) : [],
         )
       : []
-    logger.log('lib/queries/users', 'Successfully fetched user roles', {
-      userId,
-      roleCount: roles.length,
-    })
     return roles
   })
 }
@@ -651,11 +627,6 @@ export async function checkUserHasRole(userId: string, roleName: string): Promis
       }
 
       const hasRole = (data?.length || 0) > 0
-      logger.log('lib/queries/users', 'Successfully checked user role', {
-        userId,
-        roleName,
-        hasRole,
-      })
       return hasRole
     },
   )
@@ -675,11 +646,6 @@ export async function fetchUserWithRoles(
         fetchUserById(userId, serverClient),
         fetchUserRoles(userId),
       ])
-
-      logger.log('lib/queries/users', 'Successfully fetched user with roles', {
-        userId,
-        roleCount: roles.length,
-      })
 
       return {
         ...userResult,
@@ -706,7 +672,6 @@ export async function fetchCurrentUser(
     // Transform the auth user to our User type
     const transformedUser = transformAuthUserToUser(user)
 
-    logger.log('lib/queries/users', 'Successfully fetched current user', { userId: user.id })
     return transformedUser
   })
 }
