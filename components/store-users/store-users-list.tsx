@@ -62,8 +62,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Typography } from '@/components/ui/typography'
+import { usePermissionsNew } from '@/hooks/use-complete-user-profile'
 import { useStoreUserActions, useStoreUsers } from '@/hooks/use-store-users'
-import { usePermissions, useUserRole } from '@/hooks/use-users'
 import type { StoreUser } from '@/lib/queries/store-users'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
@@ -99,11 +99,10 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
   const { changeUserRole, toggleUserActiveStatus, removeUser, refetch } = useStoreUserActions()
 
   // 🚀 Use server permissions if available, fallback to client permissions
-  const clientPermissions = usePermissions()
-  const { isOwner, isManager } = useUserRole()
+  const { isOwner, isManager, canManageUsers: clientCanManageUsers } = usePermissionsNew()
   const { activeStore } = useStoreState()
 
-  const canManageUsers = serverPermissions?.canManageTeam ?? clientPermissions.canManageUsers
+  const canManageUsers = serverPermissions?.canManageTeam ?? clientCanManageUsers
   const isMoreThanOneOwner = data.filter(user => user.role_in_store === 'owner').length > 1
 
   // Helper function to safely get translated role

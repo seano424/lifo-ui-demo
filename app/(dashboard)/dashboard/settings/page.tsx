@@ -74,14 +74,16 @@ export default function UnifiedSettingsPage() {
     return baseTabs
   }
 
-  // Show error state
+  // ✅ Add error handling back to the page
   if (error) {
     return (
       <div className="flex flex-col gap-6">
         <DashboardInsetHeader title={t('title')} description={t('description')} />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{t('errors.loadingFailed')}</AlertDescription>
+          <AlertDescription>
+            {error instanceof Error ? error.message : t('errors.loadingFailed')}
+          </AlertDescription>
         </Alert>
       </div>
     )

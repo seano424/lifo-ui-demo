@@ -57,12 +57,7 @@ export async function prefetchDashboardData() {
       staleTime: 5 * 60 * 1000,
     })
 
-    // Prefetch auth user data
-    await queryClient.prefetchQuery({
-      queryKey: ['currentAuthUser'],
-      queryFn: async () => user,
-      staleTime: 5 * 60 * 1000,
-    })
+    // Prefetch auth user data (removed - duplicate of currentUser query above)
 
     // Fetch and prefetch user stores
     const userStores = await fetchUserStores(user.id, supabase)

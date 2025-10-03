@@ -68,9 +68,12 @@ export function useAuthStateMonitor() {
   const queryClient = useQueryClient()
   const supabase = createClient()
   const hasShownLogoutToast = useRef(false)
+  const invalidateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { setActiveStore, setUserStores } = useStoreState()
 
   useEffect(() => {
+    let isMounted = true // ✅ Track mount state to prevent updates on unmounted component
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -85,14 +88,28 @@ export function useAuthStateMonitor() {
         logoutStateManager.reset()
         hasShownLogoutToast.current = false
 
-        // Invalidate user queries to refresh user data
-        queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
+        // ✅ SOLUTION: Debounce invalidations to avoid cascading refetches
+        if (invalidateTimeoutRef.current) {
+          clearTimeout(invalidateTimeoutRef.current)
+        }
 
-        // Force refresh of store-related queries to prevent showing old user's stores
-        queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
-        queryClient.invalidateQueries({ queryKey: queryKeys.userPreferences.all })
+        invalidateTimeoutRef.current = setTimeout(() => {
+          if (!isMounted) return // ✅ Guard against unmounted component
 
-        logger.log('AuthStateMonitor', 'User signed in, refreshing user data and stores')
+          // Invalidate user queries
+          queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
+
+          // ✅ More targeted invalidation - only user's stores, not ALL stores
+          if (session?.user?.id) {
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.stores.userStores(session.user.id),
+            })
+          }
+
+          queryClient.invalidateQueries({ queryKey: queryKeys.userPreferences.all })
+
+          logger.log('AuthStateMonitor', 'User signed in, refreshing user data and stores')
+        }, 300) // Wait 300ms for multiple events to settle
       }
 
       if (event === 'SIGNED_OUT') {
@@ -159,6 +176,11 @@ export function useAuthStateMonitor() {
 
     // Cleanup subscription on unmount
     return () => {
+      isMounted = false // ✅ Mark as unmounted to prevent state updates
+      // ✅ Clear timeout on unmount
+      if (invalidateTimeoutRef.current) {
+        clearTimeout(invalidateTimeoutRef.current)
+      }
       logger.log('AuthStateMonitor', 'Cleaning up auth state subscription')
       subscription.unsubscribe()
     }
