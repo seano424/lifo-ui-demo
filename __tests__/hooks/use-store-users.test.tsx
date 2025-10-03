@@ -458,6 +458,38 @@ describe('useStoreUsers hooks', () => {
 
         expect(toast.error).toHaveBeenCalledWith('Failed to remove user: Cannot remove owner')
       })
+
+      it('handles RPC permission errors', async () => {
+        mockRemoveUserFromStore.mockRejectedValue(
+          new Error('Insufficient permissions to manage this user'),
+        )
+
+        const { result } = renderHook(() => useStoreUserActions(), {
+          wrapper: createWrapper(),
+        })
+
+        result.current.removeUser('user-1')
+
+        await waitFor(() => expect(result.current.isRemoving).toBe(false))
+
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to remove user: Insufficient permissions to manage this user',
+        )
+      })
+
+      it('handles RPC user not found errors', async () => {
+        mockRemoveUserFromStore.mockRejectedValue(new Error('User not found in store'))
+
+        const { result } = renderHook(() => useStoreUserActions(), {
+          wrapper: createWrapper(),
+        })
+
+        result.current.removeUser('user-1')
+
+        await waitFor(() => expect(result.current.isRemoving).toBe(false))
+
+        expect(toast.error).toHaveBeenCalledWith('Failed to remove user: User not found in store')
+      })
     })
 
     it('throws error when no active store for mutations', async () => {
