@@ -73,27 +73,27 @@ export function useStoreUser(userId: string) {
 }
 
 export function useStoreOwners() {
-  return useStoreUsers({ role_in_store: 'owner' })
+  return useFilteredStoreUsers({ role_in_store: 'owner' })
 }
 
 export function useStoreManagers() {
-  return useStoreUsers({ role_in_store: 'manager' })
+  return useFilteredStoreUsers({ role_in_store: 'manager' })
 }
 
 export function useStoreEmployees() {
-  return useStoreUsers({ role_in_store: 'employee' })
+  return useFilteredStoreUsers({ role_in_store: 'employee' })
 }
 
 export function useActiveStoreUsers() {
-  return useStoreUsers({ is_active: true })
+  return useFilteredStoreUsers({ is_active: true })
 }
 
 export function useInactiveStoreUsers() {
-  return useStoreUsers({ is_active: false })
+  return useFilteredStoreUsers({ is_active: false })
 }
 
 export function usePinEnabledUsers() {
-  return useStoreUsers({ can_use_pin_auth: true })
+  return useFilteredStoreUsers({ can_use_pin_auth: true })
 }
 
 /**
@@ -153,7 +153,15 @@ export function useFilteredStoreUsers(filters: StoreUserFilters = {}) {
 
       return true
     })
-  }, [allUsers, filters])
+  }, [
+    allUsers,
+    filters.role_in_store,
+    filters.is_active,
+    filters.can_use_pin_auth,
+    filters.pin_access_level,
+    filters.email,
+    filters.full_name,
+  ])
 
   return {
     data: filteredUsers,

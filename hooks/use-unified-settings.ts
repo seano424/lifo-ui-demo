@@ -10,10 +10,15 @@ export function useUnifiedSettings() {
   const { data: currentUser } = useCurrentUser()
 
   // ✅ SOLUTION: Use React Query hooks to leverage caching
-  const { data: storeSettings, isLoading: loadingSettings } = useStoreSettings(storeId || undefined)
-  const { data: storeUsers, isLoading: loadingUsers } = useStoreUsers({}, 100)
+  const {
+    data: storeSettings,
+    isLoading: loadingSettings,
+    error: settingsError,
+  } = useStoreSettings(storeId || undefined)
+  const { data: storeUsers, isLoading: loadingUsers, error: usersError } = useStoreUsers({}, 20)
 
   const isLoading = loadingSettings || loadingUsers || !currentUser
+  const error = settingsError || usersError
 
   return {
     data: {
@@ -22,6 +27,7 @@ export function useUnifiedSettings() {
       user: currentUser,
     },
     isLoading,
+    error,
     store: storeSettings,
     team: storeUsers,
     user: currentUser,

@@ -68,12 +68,10 @@ export function useAuthStateMonitor() {
   const queryClient = useQueryClient()
   const supabase = createClient()
   const hasShownLogoutToast = useRef(false)
+  const invalidateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { setActiveStore, setUserStores } = useStoreState()
 
   useEffect(() => {
-    // ✅ Add debounce timeout ref
-    const invalidateTimeout = { current: null as NodeJS.Timeout | null }
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -89,11 +87,11 @@ export function useAuthStateMonitor() {
         hasShownLogoutToast.current = false
 
         // ✅ SOLUTION: Debounce invalidations to avoid cascading refetches
-        if (invalidateTimeout.current) {
-          clearTimeout(invalidateTimeout.current)
+        if (invalidateTimeoutRef.current) {
+          clearTimeout(invalidateTimeoutRef.current)
         }
 
-        invalidateTimeout.current = setTimeout(() => {
+        invalidateTimeoutRef.current = setTimeout(() => {
           // Invalidate user queries
           queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
@@ -175,8 +173,8 @@ export function useAuthStateMonitor() {
     // Cleanup subscription on unmount
     return () => {
       // ✅ Clear timeout on unmount
-      if (invalidateTimeout.current) {
-        clearTimeout(invalidateTimeout.current)
+      if (invalidateTimeoutRef.current) {
+        clearTimeout(invalidateTimeoutRef.current)
       }
       logger.log('AuthStateMonitor', 'Cleaning up auth state subscription')
       subscription.unsubscribe()
