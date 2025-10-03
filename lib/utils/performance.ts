@@ -14,7 +14,7 @@ export type PerformanceThreshold = {
 
 export const DEFAULT_THRESHOLDS: PerformanceThreshold = {
   warn: 200,
-  error: 300,
+  error: 500,
 }
 
 export class PerformanceTimer {

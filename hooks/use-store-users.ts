@@ -222,7 +222,7 @@ export function useStoreUserActions() {
       queryClient.setQueriesData(
         { queryKey: queryKeys.storeUsers.byStore(activeStoreId) },
         (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
-          if (!oldData) return oldData
+          if (!oldData?.pages) return oldData
 
           return {
             ...oldData,
@@ -251,19 +251,31 @@ export function useStoreUserActions() {
       toast.error(`Failed to update user: ${err.message}`)
     },
 
-    onSettled: (_data, _error, { userId }) => {
+    onSuccess: (updatedUser, { userId }) => {
       if (!activeStoreId) return
 
-      // Always refetch after mutation
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.storeUsers.detail(activeStoreId, userId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.storeUsers.byStore(activeStoreId),
-      })
-    },
+      // 🚀 OPTIMIZATION: Update cache with returned data instead of refetching
+      // The RPC already returns the complete updated user data
+      queryClient.setQueryData(queryKeys.storeUsers.detail(activeStoreId, userId), updatedUser)
 
-    onSuccess: () => {
+      // Update the infinite query cache with the updated user
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.storeUsers.byStore(activeStoreId) },
+        (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
+          if (!oldData?.pages) return oldData
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map(page => ({
+              ...page,
+              data: page.data.map((user: StoreUser) =>
+                user.user_id === userId ? updatedUser : user,
+              ),
+            })),
+          }
+        },
+      )
+
       toast.success('User updated successfully')
     },
   })
