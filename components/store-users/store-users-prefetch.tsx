@@ -19,14 +19,15 @@ export function StoreUsersPrefetch() {
 
     const storeId = activeStore.store_id
 
-    // Prefetch the main store users data when store changes
+    // Prefetch only the main store users data when store changes
     const prefetchStoreUsers = async () => {
       try {
-        // Only prefetch if we don't already have recent data
+        // Check if we already have recent data
         const existingData = queryClient.getQueryData(queryKeys.storeUsers.infinite(storeId, {}))
 
         if (!existingData) {
-          // Prefetch first page of all users
+          // Only prefetch the main unfiltered query
+          // Client-side filtering will handle role/status filters without additional queries
           await queryClient.prefetchInfiniteQuery({
             queryKey: queryKeys.storeUsers.infinite(storeId, {}),
             queryFn: ({ pageParam = 0 }) =>
@@ -34,33 +35,6 @@ export function StoreUsersPrefetch() {
             initialPageParam: 0,
             staleTime: 5 * 60 * 1000, // 5 minutes
           })
-
-          // Prefetch active users for stats
-          await queryClient.prefetchInfiniteQuery({
-            queryKey: queryKeys.storeUsers.infinite(storeId, { is_active: true }),
-            queryFn: ({ pageParam = 0 }) =>
-              fetchStoreUsersPage(storeId, { page: pageParam, pageSize: 20 }, { is_active: true }),
-            initialPageParam: 0,
-            staleTime: 5 * 60 * 1000,
-          })
-
-          // Prefetch users by role for quick stats
-          const roles = ['owner', 'manager', 'employee'] as const
-          await Promise.all(
-            roles.map(role =>
-              queryClient.prefetchInfiniteQuery({
-                queryKey: queryKeys.storeUsers.infinite(storeId, { role_in_store: role }),
-                queryFn: ({ pageParam = 0 }) =>
-                  fetchStoreUsersPage(
-                    storeId,
-                    { page: pageParam, pageSize: 20 },
-                    { role_in_store: role },
-                  ),
-                initialPageParam: 0,
-                staleTime: 5 * 60 * 1000,
-              }),
-            ),
-          )
         }
       } catch (error) {
         console.error('[StoreUsersPrefetch] Error prefetching store users:', error)

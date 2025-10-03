@@ -5,6 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
@@ -32,6 +33,11 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId,
+    // Cache configuration optimized for user data that changes infrequently
+    staleTime: 5 * 60 * 1000, // 5 minutes - user data doesn't change frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+    refetchOnWindowFocus: false, // Don't refetch on tab switch
+    refetchOnMount: false, // Don't refetch if data exists in cache
   })
 
   // Flatten pages into single array
@@ -88,6 +94,76 @@ export function useInactiveStoreUsers() {
 
 export function usePinEnabledUsers() {
   return useStoreUsers({ can_use_pin_auth: true })
+}
+
+/**
+ * Client-side filtered store users hook
+ * Fetches all users once and filters on the client side for instant performance
+ * Use this instead of useStoreUsers when you need filtered results
+ */
+export function useFilteredStoreUsers(filters: StoreUserFilters = {}) {
+  const activeStoreId = useActiveStoreId()
+
+  // Fetch all users once (with caching)
+  const { data: allUsers, isLoading, isFetching, isError, error } = useStoreUsers({}, 100)
+
+  // Filter on the client side using useMemo for performance
+  const filteredUsers = useMemo(() => {
+    if (!allUsers) return []
+
+    return allUsers.filter(user => {
+      // Filter by role
+      if (filters.role_in_store && user.role_in_store !== filters.role_in_store) {
+        return false
+      }
+
+      // Filter by active status
+      if (filters.is_active !== undefined && user.is_active !== filters.is_active) {
+        return false
+      }
+
+      // Filter by PIN auth capability
+      if (
+        filters.can_use_pin_auth !== undefined &&
+        user.can_use_pin_auth !== filters.can_use_pin_auth
+      ) {
+        return false
+      }
+
+      // Filter by PIN access level
+      if (filters.pin_access_level && user.pin_access_level !== filters.pin_access_level) {
+        return false
+      }
+
+      // Filter by email (case-insensitive partial match)
+      if (filters.email) {
+        const emailLower = filters.email.toLowerCase()
+        if (!user.email.toLowerCase().includes(emailLower)) {
+          return false
+        }
+      }
+
+      // Filter by full name (case-insensitive partial match)
+      if (filters.full_name) {
+        const nameLower = filters.full_name.toLowerCase()
+        if (!user.full_name?.toLowerCase().includes(nameLower)) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [allUsers, filters])
+
+  return {
+    data: filteredUsers,
+    count: filteredUsers.length,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    storeId: activeStoreId,
+  }
 }
 
 export function useStoreUserActions() {

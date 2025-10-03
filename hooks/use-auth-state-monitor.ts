@@ -71,6 +71,9 @@ export function useAuthStateMonitor() {
   const { setActiveStore, setUserStores } = useStoreState()
 
   useEffect(() => {
+    // ✅ Add debounce timeout ref
+    const invalidateTimeout = { current: null as NodeJS.Timeout | null }
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -85,14 +88,26 @@ export function useAuthStateMonitor() {
         logoutStateManager.reset()
         hasShownLogoutToast.current = false
 
-        // Invalidate user queries to refresh user data
-        queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
+        // ✅ SOLUTION: Debounce invalidations to avoid cascading refetches
+        if (invalidateTimeout.current) {
+          clearTimeout(invalidateTimeout.current)
+        }
 
-        // Force refresh of store-related queries to prevent showing old user's stores
-        queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
-        queryClient.invalidateQueries({ queryKey: queryKeys.userPreferences.all })
+        invalidateTimeout.current = setTimeout(() => {
+          // Invalidate user queries
+          queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
 
-        logger.log('AuthStateMonitor', 'User signed in, refreshing user data and stores')
+          // ✅ More targeted invalidation - only user's stores, not ALL stores
+          if (session?.user?.id) {
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.stores.userStores(session.user.id),
+            })
+          }
+
+          queryClient.invalidateQueries({ queryKey: queryKeys.userPreferences.all })
+
+          logger.log('AuthStateMonitor', 'User signed in, refreshing user data and stores')
+        }, 300) // Wait 300ms for multiple events to settle
       }
 
       if (event === 'SIGNED_OUT') {
@@ -159,6 +174,10 @@ export function useAuthStateMonitor() {
 
     // Cleanup subscription on unmount
     return () => {
+      // ✅ Clear timeout on unmount
+      if (invalidateTimeout.current) {
+        clearTimeout(invalidateTimeout.current)
+      }
       logger.log('AuthStateMonitor', 'Cleaning up auth state subscription')
       subscription.unsubscribe()
     }

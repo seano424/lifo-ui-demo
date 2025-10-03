@@ -436,7 +436,7 @@ export function useUpdatePhone() {
       updateUserPhone(userId, phone),
     onSuccess: (_data: UpdatePhoneResponse, { phone }) => {
       // Invalidate user queries to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
       queryClient.invalidateQueries({ queryKey: ['users'] })
 
       if (phone) {
@@ -461,7 +461,7 @@ export function useUpdateLanguagePreference() {
       updateUserLanguagePreference(userId, language),
     onSuccess: (_data: UpdateLanguageResponse, { language }) => {
       // Invalidate user queries to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['currentAuthUser'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() })
       queryClient.invalidateQueries({ queryKey: ['users'] })
 
       toast.success(`Language preference updated to ${language.toUpperCase()}`)
