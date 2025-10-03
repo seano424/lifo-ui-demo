@@ -1,6 +1,8 @@
 // lib/queries/store-users.ts - Final version with RPC fallback
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
+import { PerformanceTimer } from '@/lib/utils/performance'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -99,6 +101,8 @@ export async function fetchStoreUsers(
   serverClient?: ServerClient,
 ): Promise<StoreUser[]> {
   const supabase = serverClient || createClient()
+  const context = 'fetchStoreUsers'
+  const timer = new PerformanceTimer(context, 'RPC: get_store_users', { storeId })
 
   try {
     const { data, error } = await supabase.rpc('get_store_users', {
@@ -106,15 +110,27 @@ export async function fetchStoreUsers(
     })
 
     if (error) {
-      console.error('[fetchStoreUsers] RPC error:', error)
+      timer.end({ success: false, errorCode: error.code })
+      logger.error(context, 'RPC error', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        storeId,
+      })
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
     const storeUsers = (data || []).map(transformStoreUserRow)
 
+    timer.end({ success: true, userCount: storeUsers.length })
+
     return storeUsers
   } catch (err) {
-    console.error('[fetchStoreUsers] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+    })
     throw err
   }
 }
@@ -131,6 +147,9 @@ export async function fetchStoreUsersPage(
   nextPage: number | undefined
 }> {
   const supabase = serverClient || createClient()
+  const context = 'fetchStoreUsersPage'
+
+  logger.log(context, 'Fetching paginated store users', { storeId, page, pageSize, filters })
 
   try {
     const { data, error } = await supabase.rpc('get_store_users_paginated', {
@@ -142,7 +161,14 @@ export async function fetchStoreUsersPage(
     })
 
     if (error) {
-      console.error('[fetchStoreUsersPage] RPC error:', error)
+      logger.error(context, 'RPC error', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        storeId,
+        page,
+        pageSize,
+      })
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
@@ -166,13 +192,27 @@ export async function fetchStoreUsersPage(
     const totalCount =
       data && data.length > 0 ? Number((data[0] as Record<string, unknown>)?.total_count || 0) : 0
 
+    logger.log(context, 'Successfully fetched paginated users', {
+      storeId,
+      page,
+      userCount: storeUsers.length,
+      totalCount,
+      hasNextPage: totalCount > (page + 1) * pageSize,
+    })
+
     return {
       data: storeUsers,
       count: totalCount,
       nextPage: totalCount > (page + 1) * pageSize ? page + 1 : undefined,
     }
   } catch (err) {
-    console.error('[fetchStoreUsersPage] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+      page,
+      pageSize,
+    })
     throw err
   }
 }
@@ -184,6 +224,9 @@ export async function fetchStoreUserById(
   serverClient?: ServerClient,
 ): Promise<StoreUser | null> {
   const supabase = serverClient || createClient()
+  const context = 'fetchStoreUserById'
+
+  logger.log(context, 'Fetching store user by ID', { storeId, userId })
 
   try {
     const { data, error } = await supabase.rpc('get_store_users', {
@@ -191,21 +234,39 @@ export async function fetchStoreUserById(
     })
 
     if (error) {
-      console.error('[fetchStoreUserById] RPC error:', error)
+      logger.error(context, 'RPC error', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        storeId,
+        userId,
+      })
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
     const userRow = data?.find((row: StoreUserRow) => row.user_id === userId)
 
     if (!userRow) {
+      logger.log(context, 'User not found', { storeId, userId })
       return null
     }
 
     const storeUser = transformStoreUserRow(userRow)
 
+    logger.log(context, 'Successfully fetched user', {
+      storeId,
+      userId,
+      role: storeUser.role_in_store,
+    })
+
     return storeUser
   } catch (err) {
-    console.error('[fetchStoreUserById] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+      userId,
+    })
     throw err
   }
 }
@@ -223,6 +284,10 @@ export async function updateStoreUser(
   },
 ): Promise<StoreUser> {
   const supabase = createClient()
+  const context = 'updateStoreUser'
+  const timer = new PerformanceTimer(context, 'Update store user', { storeId, userId })
+
+  logger.log(context, 'Starting user update', { storeId, userId, updates })
 
   try {
     // 🔍 Check authentication state
@@ -231,11 +296,17 @@ export async function updateStoreUser(
     } = await supabase.auth.getSession()
 
     if (!session?.user) {
+      timer.end({ success: false, reason: 'No session' })
+      logger.error(context, 'No authenticated session', { storeId, userId })
       throw new Error('No authenticated session found')
     }
 
+    logger.log(context, 'Session verified', { sessionUserId: session.user.id })
+
     // 🎯 METHOD 1: Try direct table update first
     try {
+      logger.log(context, 'Attempting direct table update', { storeId, userId })
+
       const { error } = await supabase
         .schema('business')
         .from('store_users')
@@ -246,10 +317,12 @@ export async function updateStoreUser(
         .single()
 
       if (error) {
-        console.warn('[updateStoreUser] Direct update failed:', {
+        logger.warn(context, 'Direct update failed, trying RPC fallback', {
           error: error.message,
           code: error.code,
           details: error.details,
+          storeId,
+          userId,
         })
         throw error // Will be caught by outer try-catch
       }
@@ -257,12 +330,18 @@ export async function updateStoreUser(
       // Fetch complete user data after successful direct update
       const updatedUser = await fetchStoreUserById(storeId, userId)
       if (!updatedUser) {
+        timer.end({ success: false, method: 'direct', reason: 'User not found after update' })
+        logger.error(context, 'User not found after direct update', { storeId, userId })
         throw new Error('Updated user not found after direct update')
       }
 
+      timer.end({ success: true, method: 'direct' })
+      logger.log(context, 'Direct update successful', { storeId, userId })
       return updatedUser
     } catch {
       // 🎯 METHOD 2: Fallback to RPC function (now with SECURITY DEFINER)
+      logger.log(context, 'Executing RPC fallback', { storeId, userId })
+
       const { data: rpcData, error: rpcError } = await supabase.rpc('update_store_user_safe', {
         input_store_id: storeId,
         input_user_id: userId,
@@ -275,23 +354,31 @@ export async function updateStoreUser(
       })
 
       if (rpcError) {
-        console.error('[updateStoreUser] ❌ RPC fallback also failed:', {
+        timer.end({ success: false, method: 'rpc', errorCode: rpcError.code })
+        logger.error(context, 'RPC fallback failed', {
           error: rpcError.message,
           code: rpcError.code,
           details: rpcError.details,
           hint: rpcError.hint,
+          storeId,
+          userId,
+          updates,
         })
         throw new Error(`Failed to update store user: ${rpcError.message}`)
       }
 
       if (!rpcData || rpcData.length === 0) {
+        timer.end({ success: false, method: 'rpc', reason: 'No data returned' })
+        logger.error(context, 'No data returned from RPC', { storeId, userId })
         throw new Error('No data returned from RPC update')
       }
 
+      timer.end({ success: true, method: 'rpc' })
+      logger.log(context, 'RPC update successful', { storeId, userId })
       return transformStoreUserRow(rpcData[0])
     }
   } catch (err: unknown) {
-    console.error('[updateStoreUser] ❌ All methods failed:', {
+    logger.error(context, 'All update methods failed', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -304,38 +391,79 @@ export async function updateStoreUser(
 
 // Helper function to test the update functionality
 export async function testStoreUserUpdate(storeId: string, userId: string) {
+  const context = 'testStoreUserUpdate'
+
   try {
+    logger.log(context, 'Testing store user update', { storeId, userId })
+
     // Test a simple update that should work
     const result = await updateStoreUser(storeId, userId, {
       can_use_pin_auth: true,
     })
 
+    logger.log(context, 'Test successful', { storeId, userId })
     return { success: true, result }
   } catch (error: unknown) {
-    console.error('❌ Test failed:', error instanceof Error ? error.message : String(error))
+    logger.error(context, 'Test failed', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      storeId,
+      userId,
+    })
     return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
 
-// Direct table operations for removing users
+// Remove user from store using SECURITY DEFINER RPC function
 export async function removeUserFromStore(storeId: string, userId: string): Promise<void> {
   const supabase = createClient()
+  const context = 'removeUserFromStore'
+  const timer = new PerformanceTimer(context, 'RPC: remove_user_from_store', { storeId, userId })
 
   try {
-    // Try direct update first
-    const { error } = await supabase
-      .schema('business')
-      .from('store_users')
-      .update({ is_active: false })
-      .eq('store_id', storeId)
-      .eq('user_id', userId)
+    // Call the SECURITY DEFINER RPC function
+    const { data, error } = await supabase.rpc('remove_user_from_store', {
+      p_store_id: storeId,
+      p_target_user_id: userId,
+    })
 
     if (error) {
-      console.error('[removeUserFromStore] Supabase error:', error)
+      timer.end({ success: false, errorCode: error.code })
+      logger.error(context, 'RPC error', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        storeId,
+        userId,
+      })
       throw new Error(`Failed to remove user from store: ${error.message}`)
     }
+
+    // The RPC function returns JSON with success/error fields
+    if (!data?.success) {
+      timer.end({ success: false, rpcError: data?.error })
+      logger.error(context, 'RPC returned failure', {
+        rpcError: data?.error,
+        rpcData: data,
+        storeId,
+        userId,
+      })
+      throw new Error(data?.error || 'Failed to remove user from store')
+    }
+
+    timer.end({
+      success: true,
+      removedRole: data?.removed_user_role,
+      removedBy: data?.removed_by,
+    })
   } catch (err) {
-    console.error('[removeUserFromStore] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+      userId,
+    })
     throw err
   }
 }
@@ -351,12 +479,23 @@ export async function addUserToStore(
   pinPermissions: Record<string, unknown> = {},
 ): Promise<StoreUser> {
   const supabase = createClient()
+  const context = 'addUserToStore'
+
+  logger.log(context, 'Starting user addition', {
+    storeId,
+    userId,
+    roleInStore,
+    canUsePinAuth,
+    pinAccessLevel,
+  })
 
   try {
     const {
       data: { user },
     } = await supabase.auth.getUser()
     const assignedBy = user?.id
+
+    logger.log(context, 'Authenticated user', { assignedBy })
 
     const { error } = await supabase
       .schema('business')
@@ -376,18 +515,40 @@ export async function addUserToStore(
       .single()
 
     if (error) {
-      console.error('[addUserToStore] Supabase error:', error)
+      logger.error(context, 'Supabase upsert error', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        storeId,
+        userId,
+        roleInStore,
+      })
       throw new Error(`Failed to add user to store: ${error.message}`)
     }
 
     const newStoreUser = await fetchStoreUserById(storeId, userId)
     if (!newStoreUser) {
+      logger.error(context, 'User not found after addition', { storeId, userId })
       throw new Error('Added user not found')
     }
 
+    logger.log(context, 'User added successfully', {
+      storeId,
+      userId,
+      roleInStore,
+      assignedBy,
+    })
+
     return newStoreUser
   } catch (err) {
-    console.error('[addUserToStore] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+      userId,
+      roleInStore,
+    })
     throw err
   }
 }
@@ -395,6 +556,9 @@ export async function addUserToStore(
 // Helper functions for permissions checking
 export async function canManageStoreUser(storeId: string, targetUserId?: string): Promise<boolean> {
   const supabase = createClient()
+  const context = 'canManageStoreUser'
+
+  logger.log(context, 'Checking user management permissions', { storeId, targetUserId })
 
   try {
     const { data, error } = await supabase.rpc('user_can_manage_store_users', {
@@ -403,13 +567,27 @@ export async function canManageStoreUser(storeId: string, targetUserId?: string)
     })
 
     if (error) {
-      console.error('[canManageStoreUser] Error:', error)
+      logger.error(context, 'RPC error', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        storeId,
+        targetUserId,
+      })
       return false
     }
 
-    return Boolean(data)
+    const canManage = Boolean(data)
+    logger.log(context, 'Permission check complete', { storeId, targetUserId, canManage })
+
+    return canManage
   } catch (err) {
-    console.error('[canManageStoreUser] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+      targetUserId,
+    })
     return false
   }
 }
@@ -417,12 +595,18 @@ export async function canManageStoreUser(storeId: string, targetUserId?: string)
 // Get current user's role in a store
 export async function getCurrentUserRoleInStore(storeId: string): Promise<string | null> {
   const supabase = createClient()
+  const context = 'getCurrentUserRoleInStore'
+
+  logger.log(context, 'Getting current user role', { storeId })
 
   try {
     const {
       data: { user },
     } = await supabase.auth.getUser()
-    if (!user) return null
+    if (!user) {
+      logger.log(context, 'No authenticated user')
+      return null
+    }
 
     const { data, error } = await supabase
       .schema('business')
@@ -434,6 +618,11 @@ export async function getCurrentUserRoleInStore(storeId: string): Promise<string
       .single()
 
     if (error) {
+      logger.log(context, 'User not in store_users, checking if owner', {
+        storeId,
+        userId: user.id,
+      })
+
       // Check if user is store owner
       const { data: storeData } = await supabase
         .schema('business')
@@ -443,12 +632,22 @@ export async function getCurrentUserRoleInStore(storeId: string): Promise<string
         .eq('owner_id', user.id)
         .single()
 
-      return storeData ? 'owner' : null
+      const role = storeData ? 'owner' : null
+      logger.log(context, 'Role determined', { storeId, userId: user.id, role })
+
+      return role
     }
 
-    return data?.role_in_store || null
+    const role = data?.role_in_store || null
+    logger.log(context, 'Role found in store_users', { storeId, userId: user.id, role })
+
+    return role
   } catch (err) {
-    console.error('[getCurrentUserRoleInStore] Unexpected error:', err)
+    logger.error(context, 'Unexpected error', {
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      storeId,
+    })
     return null
   }
 }
