@@ -3,7 +3,12 @@ import { redirect } from 'next/navigation'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
 import ProductsHeader from '@/components/products/products-header'
-import { fetchProductsPage, type ProductFilters, type SortField } from '@/lib/queries/products'
+import {
+  fetchCategories,
+  fetchProductsPage,
+  type ProductFilters,
+  type SortField,
+} from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
@@ -34,6 +39,14 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
   }
 
   try {
+    // Prefetch categories first (shared across all stores)
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.categories.list,
+      queryFn: () => fetchCategories(serverClient),
+      staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
+      gcTime: 30 * 60 * 1000, // 30 minutes
+    })
+
     // Prefetch user stores and preferences
     await Promise.all([
       queryClient.prefetchQuery({
@@ -69,12 +82,15 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
       filters.category = params.category
     }
 
-    // Handle sorting
+    // Handle sorting - match client default
     if (params.sort) {
       filters.sort = {
         field: params.sort as SortField,
         direction: (params.direction || 'asc') as 'asc' | 'desc',
       }
+    } else {
+      // Default sort matches client-side default in ProductsFilteredList
+      filters.sort = { field: 'created_at', direction: 'desc' }
     }
 
     // Prefetch the first page of products with filters
