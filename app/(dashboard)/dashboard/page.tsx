@@ -4,7 +4,7 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
 import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { createClient } from '@/lib/supabase/server'
-import { fetchBatchesPage } from '@/lib/queries/batches'
+import { hasBatchesRPC } from '@/lib/queries/batches-rpc'
 import { fetchDashboardSummary } from '@/lib/queries/todos-rpc'
 import { fetchStoreSettings } from '@/lib/queries/store-settings'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
@@ -22,14 +22,8 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const t = await getTranslations('dashboardNav.pages')
 
-  // Check if user has any batches (lightweight query)
-  const { count } = await fetchBatchesPage(
-    { page: 0, pageSize: 1 },
-    { storeId: activeStoreId },
-    supabase,
-  )
-
-  const hasBatches = count > 0
+  // Check if user has any batches (optimized RPC: 555ms → ~20ms)
+  const hasBatches = await hasBatchesRPC(activeStoreId, supabase)
 
   // Show welcome screen if no batches exist
   if (!hasBatches) {

@@ -17,11 +17,13 @@ import {
   deleteBatch,
   fetchBatchById,
   fetchBatchesForProduct,
-  fetchBatchesPage,
-  fetchExpiringBatches,
-  fetchLowStockBatches,
   updateBatch,
 } from '@/lib/queries/batches'
+import {
+  fetchBatchesPageRPC,
+  fetchExpiringBatchesRPC,
+  fetchLowStockBatchesRPC,
+} from '@/lib/queries/batches-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { Database } from '@/types/supabase'
@@ -35,7 +37,7 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   const result = useInfiniteQuery({
     queryKey: queryKeys.batches.infinite(activeStoreId || '', filters),
     queryFn: ({ pageParam = 0 }) =>
-      fetchBatchesPage(
+      fetchBatchesPageRPC(
         { page: pageParam, pageSize },
         { ...filters, storeId: activeStoreId || undefined },
         undefined,
@@ -170,7 +172,7 @@ export function useExpiringBatches(daysAhead: number = 7) {
 
   return useQuery({
     queryKey: [...queryKeys.batches.byStore(activeStoreId || ''), 'expiring', { daysAhead }],
-    queryFn: () => fetchExpiringBatches(activeStoreId!, daysAhead),
+    queryFn: () => fetchExpiringBatchesRPC(activeStoreId!, daysAhead),
     enabled: !!activeStoreId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
@@ -195,7 +197,7 @@ export function useLowStockBatches(thresholdQuantity: number = 10) {
       'lowStock',
       { threshold: thresholdQuantity },
     ],
-    queryFn: () => fetchLowStockBatches(activeStoreId!, thresholdQuantity),
+    queryFn: () => fetchLowStockBatchesRPC(activeStoreId!, thresholdQuantity),
     enabled: !!activeStoreId,
     staleTime: 5 * 60 * 1000,
     retry: (failureCount, error: SupabaseError) => {
