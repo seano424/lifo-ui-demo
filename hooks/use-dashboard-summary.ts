@@ -10,7 +10,9 @@ export function useDashboardSummary() {
     queryKey: queryKeys.todos.dashboardSummary(activeStoreId || ''),
     queryFn: () => fetchDashboardSummary(activeStoreId!),
     enabled: !!activeStoreId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch when user returns to tab
+    refetchOnMount: false, // Use cached data if available
   })
 }

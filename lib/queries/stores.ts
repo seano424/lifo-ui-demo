@@ -216,12 +216,13 @@ export async function fetchUserPreferences(
 
   return withPerformanceTracking(context, 'Fetch user preferences', {}, async () => {
     try {
-      // Don't filter by user_id - let RLS handle it automatically
+      // Direct query - RLS will filter to current user
+      // Note: RPC optimization pending database migration
       const { data, error } = await supabase
         .schema('user_mgmt')
         .from('user_preferences')
         .select('*')
-        .maybeSingle() // Use maybeSingle() instead of single()
+        .maybeSingle()
 
       if (error) {
         logger.error(context, 'Supabase error', {
