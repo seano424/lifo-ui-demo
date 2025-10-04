@@ -345,8 +345,8 @@
         "title": "Free Trial",
         "subtitle": "Pilot shops",
         "price": "Free",
-        "period": "2 months",
-        "description": "All features, with no limitation, for a 2-month free trial.",
+        "period": "1 month",
+        "description": "All features, with no limitation, for a 1-month free trial.",
         "features": {
           "0": "1 day of Onboarding and Training",
           "1": "Full support included",

@@ -264,8 +264,8 @@
         "title": "Essai gratuit",
         "subtitle": "Magasins pilotes",
         "price": "Gratuit",
-        "period": "2 mois",
-        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 2 mois.",
+        "period": "1 mois",
+        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 1 mois.",
         "features": {
           "0": "1 jour d'intégration et de formation",
           "1": "Support complet inclus",
