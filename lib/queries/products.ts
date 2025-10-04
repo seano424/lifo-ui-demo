@@ -59,6 +59,10 @@ export type Product = BaseProduct & {
   category_code?: string
   category_display_name?: string
   category_display_name_fr?: string
+  // Aggregated batch data (from RPC or client-side calculation)
+  total_stock?: number
+  active_batches_count?: number
+  avg_days_to_expiry?: number | null
 }
 
 export type SortField =

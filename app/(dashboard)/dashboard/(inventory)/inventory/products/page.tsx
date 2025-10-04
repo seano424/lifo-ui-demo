@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
 import ProductsHeader from '@/components/products/products-header'
-import { fetchProductsPage, type ProductFilters, type SortField } from '@/lib/queries/products'
+import type { ProductFilters, SortField } from '@/lib/queries/products'
+import { fetchProductsPageRPC } from '@/lib/queries/products-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
@@ -68,11 +69,11 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
       filters.sort = { field: 'created_at', direction: 'desc' }
     }
 
-    // Prefetch the first page of products with filters
+    // Prefetch the first page of products with filters (using optimized RPC)
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.products.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchProductsPage({ page: pageParam, pageSize: 20 }, filters, serverClient),
+        fetchProductsPageRPC({ page: pageParam, pageSize: 20 }, filters, serverClient),
       initialPageParam: 0,
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page
