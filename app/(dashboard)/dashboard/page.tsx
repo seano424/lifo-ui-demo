@@ -6,6 +6,7 @@ import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { createClient } from '@/lib/supabase/server'
 import { fetchBatchesPage } from '@/lib/queries/batches'
 import { fetchDashboardSummary } from '@/lib/queries/todos-rpc'
+import { fetchStoreSettings } from '@/lib/queries/store-settings'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { queryKeys } from '@/lib/queries/query-keys'
@@ -35,11 +36,21 @@ export default async function DashboardPage() {
     return <DashboardWelcome />
   }
 
-  // Prefetch dashboard summary data on the server
+  // Prefetch dashboard data on the server
   const { queryClient } = await createPrefetchedQuery()
+
+  // Prefetch dashboard summary
   await queryClient.prefetchQuery({
     queryKey: queryKeys.todos.dashboardSummary(activeStoreId),
     queryFn: () => fetchDashboardSummary(activeStoreId, supabase),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  })
+
+  // Prefetch store settings (needed by AlertSensitivityControls)
+  await queryClient.prefetchQuery({
+    queryKey: queryKeys.stores.detail(activeStoreId),
+    queryFn: () => fetchStoreSettings(activeStoreId, supabase),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   })
