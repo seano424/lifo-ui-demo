@@ -1,7 +1,8 @@
 import { dehydrate } from '@tanstack/react-query'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchUserPreferences, fetchUserStores, selectDefaultStore } from '@/lib/queries/stores'
+import { fetchUserStores, selectDefaultStore } from '@/lib/queries/stores'
+import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { fetchCurrentUser } from '@/lib/queries/users'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createQueryClient } from './client'
@@ -68,13 +69,13 @@ export async function prefetchDashboardData() {
       staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
     })
 
-    // Fetch user preferences
-    const userPreferences = await fetchUserPreferences(supabase)
+    // Fetch user preferences using optimized RPC
+    const userPreferences = await fetchUserPreferencesRPC(supabase)
 
     await queryClient.prefetchQuery({
       queryKey: queryKeys.userPreferences.detail(user.id),
       queryFn: () => userPreferences,
-      staleTime: 5 * 60 * 1000,
+      staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
     })
 
     // Get active store from cookies and use smart selection
