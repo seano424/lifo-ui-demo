@@ -1,12 +1,12 @@
 'use client'
 
-import { Check, Euro } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
+import { Check, Euro } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export interface InventoryFormData {
   expiryDate: string
@@ -112,10 +112,10 @@ export default function InventoryForm({
               <div>
                 <Label className="text-xs">{finalQuantityLabel}</Label>
                 <Input
-                  type="number"
-                  value={data.quantity}
-                  onChange={e => handleChange('quantity')(parseInt(e.target.value, 10) || 1)}
                   min="0"
+                  type="number"
+                  value={data.quantity || ''}
+                  onChange={e => handleChange('quantity')(parseInt(e.target.value, 10) || 0)}
                   className="text-sm"
                   disabled={disabled}
                 />
@@ -173,8 +173,8 @@ export default function InventoryForm({
               <Input
                 id="quantity"
                 type="number"
-                value={data.quantity}
-                onChange={e => handleChange('quantity')(parseInt(e.target.value, 10) || 1)}
+                value={data.quantity || ''}
+                onChange={e => handleChange('quantity')(parseInt(e.target.value, 10) || 0)}
                 min="0"
                 disabled={disabled}
               />
