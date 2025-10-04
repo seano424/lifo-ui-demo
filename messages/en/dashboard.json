@@ -565,9 +565,19 @@
       "users": "Team Management",
       "account": "Account settings"
     },
+    "titles": {
+      "dashboard": "Dashboard Overview",
+      "notifications": "Notifications",
+      "todos": "Task Management",
+      "products": "Product Inventory",
+      "batches": "Inventory Batches",
+      "users": "Team Management",
+      "account": "Account Settings"
+    },
     "descriptions": {
       "batches": "View and manage your store's inventory batches",
-      "products": "View and manage your store's product inventory"
+      "products": "View and manage your store's product inventory",
+      "dashboard": "Monitor your store's performance, track inventory, and optimize operations with real-time insights and AI-powered recommendations."
     }
   },
   "users": {

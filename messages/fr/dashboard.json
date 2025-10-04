@@ -564,9 +564,19 @@
       "users": "Gestion d'équipe",
       "account": "Paramètres du compte"
     },
+    "titles": {
+      "dashboard": "Vue d'ensemble du tableau de bord",
+      "notifications": "Notifications",
+      "todos": "Gestion des tâches",
+      "products": "Inventaire des produits",
+      "batches": "Lots d'inventaire",
+      "users": "Gestion d'équipe",
+      "account": "Paramètres du compte"
+    },
     "descriptions": {
       "batches": "Visualisez et gérez les lots d'inventaire de votre magasin",
-      "products": "Visualisez et gérez l'inventaire des produits de votre magasin"
+      "products": "Visualisez et gérez l'inventaire des produits de votre magasin",
+      "dashboard": "Surveillez les performances de votre magasin, suivez l'inventaire et optimisez les opérations avec des insights en temps réel et des recommandations alimentées par l'IA."
     }
   },
   "users": {

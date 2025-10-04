@@ -1,10 +1,8 @@
-import { getTranslations } from 'next-intl/server'
-
-import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
 import { DashboardContent } from '@/components/dashboard/dashboard-content'
-import { createClient } from '@/lib/supabase/server'
-import { fetchBatchesPage } from '@/lib/queries/batches'
+import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
+import { fetchBatchesPage } from '@/lib/queries/batches'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function DashboardPage() {
   const activeStoreId = await getActiveStoreCookie()
@@ -15,7 +13,6 @@ export default async function DashboardPage() {
   }
 
   const supabase = await createClient()
-  const t = await getTranslations('dashboardNav.pages')
 
   // Check if user has any batches (lightweight query)
   const { count } = await fetchBatchesPage(
@@ -31,5 +28,5 @@ export default async function DashboardPage() {
     return <DashboardWelcome />
   }
 
-  return <DashboardContent title={t('dashboard')} />
+  return <DashboardContent />
 }

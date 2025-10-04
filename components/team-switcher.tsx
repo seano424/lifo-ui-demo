@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,32 +8,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { useStoreActions, useUserStores } from "@/hooks/use-stores";
-import type { Store } from "@/lib/queries/stores";
-import { useStoreState } from "@/lib/stores/store-context";
-import { cn } from "@/lib/utils";
-import { MapPin, Settings, Store as StoreIcon } from "lucide-react";
-import { Button } from "./ui/button";
-import { Skeleton } from "./ui/skeleton";
+} from '@/components/ui/sidebar'
+import { useStoreActions, useUserStores } from '@/hooks/use-stores'
+import type { Store } from '@/lib/queries/stores'
+import { useStoreState } from '@/lib/stores/store-context'
+import { cn } from '@/lib/utils'
+import { MapPin, Settings, Store as StoreIcon } from 'lucide-react'
+import { Button } from './ui/button'
+import { Skeleton } from './ui/skeleton'
 
 export function TeamSwitcher() {
-  const { isMobile } = useSidebar();
-  const { userStores, isLoading } = useUserStores();
-  const { switchStore, isChangingStore } = useStoreActions();
-  const { activeStore } = useStoreState();
+  const { isMobile } = useSidebar()
+  const { userStores, isLoading } = useUserStores()
+  const { switchStore, isChangingStore } = useStoreActions()
+  const { activeStore } = useStoreState()
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {
-      switchStore(store, makePrimary);
+      switchStore(store, makePrimary)
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -52,7 +52,7 @@ export function TeamSwitcher() {
           </SidebarMenuItem>
         </SidebarMenu>
       </div>
-    );
+    )
   }
 
   if (!activeStore || userStores.length === 0) {
@@ -68,15 +68,13 @@ export function TeamSwitcher() {
                 <StoreIcon className="w-4 h-4 text-muted-foreground" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="text-muted-foreground">
-                  No stores available
-                </span>
+                <span className="text-muted-foreground">No stores available</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </div>
-    );
+    )
   }
 
   return (
@@ -97,7 +95,7 @@ export function TeamSwitcher() {
             <DropdownMenuContent
               className="w-[--radix-dropdown-menu-npm run devtrigger-width] min-w-56 rounded-2xl"
               align="start"
-              side={isMobile ? "bottom" : "right"}
+              side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
@@ -105,17 +103,17 @@ export function TeamSwitcher() {
               </DropdownMenuLabel>
 
               {userStores.map((userStore, index) => {
-                const store = userStore.store;
-                const isActive = store.store_id === activeStore.store_id;
+                const store = userStore.store
+                const isActive = store.store_id === activeStore.store_id
 
                 return (
                   <DropdownMenuItem
                     key={store.store_id}
                     onClick={() => handleStoreSwitch(store)}
                     className={cn(
-                      "gap-2 p-2 border-b border-b-border rounded-none",
-                      index === userStores.length - 1 && "border-b-0",
-                      index === 0 && "border-t border-t-border/50"
+                      'gap-2 p-2 border-b border-b-border rounded-none',
+                      index === userStores.length - 1 && 'border-b-0',
+                      index === 0 && 'border-t border-t-border/50',
                     )}
                     disabled={isChangingStore}
                   >
@@ -142,7 +140,7 @@ export function TeamSwitcher() {
 
                     {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
                   </DropdownMenuItem>
-                );
+                )
               })}
 
               <DropdownMenuSeparator />
@@ -157,9 +155,7 @@ export function TeamSwitcher() {
                   <div className="flex size-6 items-center justify-center rounded-2xl border bg-transparent">
                     <Settings className="size-4" />
                   </div>
-                  <div className="font-medium text-muted-foreground">
-                    Set as Primary Store
-                  </div>
+                  <div className="font-medium text-muted-foreground">Set as Primary Store</div>
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -167,5 +163,5 @@ export function TeamSwitcher() {
         </SidebarMenuItem>
       </SidebarMenu>
     </div>
-  );
+  )
 }
