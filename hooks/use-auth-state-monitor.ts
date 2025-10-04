@@ -69,6 +69,7 @@ export function useAuthStateMonitor() {
   const supabase = createClient()
   const hasShownLogoutToast = useRef(false)
   const invalidateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSessionIdRef = useRef<string | null>(null) // Track session changes
   const { setActiveStore, setUserStores } = useStoreState()
 
   useEffect(() => {
@@ -84,6 +85,20 @@ export function useAuthStateMonitor() {
       })
 
       if (event === 'SIGNED_IN') {
+        // Only invalidate if this is a NEW session (prevent duplicate invalidations)
+        const currentSessionId = session?.access_token
+        const isNewSession = lastSessionIdRef.current !== currentSessionId
+
+        if (!isNewSession) {
+          logger.log(
+            'AuthStateMonitor',
+            'SIGNED_IN event for existing session, skipping invalidation',
+          )
+          return
+        }
+
+        lastSessionIdRef.current = currentSessionId || null
+
         // Reset flags on successful sign in
         logoutStateManager.reset()
         hasShownLogoutToast.current = false
@@ -114,6 +129,9 @@ export function useAuthStateMonitor() {
 
       if (event === 'SIGNED_OUT') {
         logger.log('AuthStateMonitor', 'SIGNED_OUT event - redirecting then clearing cache')
+
+        // Reset session tracking
+        lastSessionIdRef.current = null
 
         // Redirect FIRST to avoid "Not authenticated" errors on dashboard pages
         const currentPath = window.location.pathname

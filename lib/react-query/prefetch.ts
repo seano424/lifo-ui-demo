@@ -1,6 +1,7 @@
 import { dehydrate } from '@tanstack/react-query'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { fetchCategories } from '@/lib/queries/products'
 import { fetchUserStores, selectDefaultStore } from '@/lib/queries/stores'
 import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { fetchCurrentUser } from '@/lib/queries/users'
@@ -51,14 +52,22 @@ export async function prefetchDashboardData() {
       throw new Error('Authentication required')
     }
 
-    // Prefetch current user data
-    await queryClient.prefetchQuery({
-      queryKey: ['currentUser'],
-      queryFn: () => fetchCurrentUser(supabase),
-      staleTime: 5 * 60 * 1000,
-    })
-
-    // Prefetch auth user data (removed - duplicate of currentUser query above)
+    // Prefetch shared data that rarely changes
+    await Promise.all([
+      // Current user data
+      queryClient.prefetchQuery({
+        queryKey: ['currentUser'],
+        queryFn: () => fetchCurrentUser(supabase),
+        staleTime: 5 * 60 * 1000,
+      }),
+      // Categories (shared across all stores and pages)
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.categories.list,
+        queryFn: () => fetchCategories(supabase),
+        staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
+        gcTime: 30 * 60 * 1000, // 30 minutes
+      }),
+    ])
 
     // Fetch and prefetch user stores
     const userStores = await fetchUserStores(user.id, supabase)

@@ -3,12 +3,7 @@ import { redirect } from 'next/navigation'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
 import ProductsHeader from '@/components/products/products-header'
-import {
-  fetchCategories,
-  fetchProductsPage,
-  type ProductFilters,
-  type SortField,
-} from '@/lib/queries/products'
+import { fetchProductsPage, type ProductFilters, type SortField } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
@@ -39,31 +34,11 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
   }
 
   try {
-    // Prefetch categories first (shared across all stores)
-    await queryClient.prefetchQuery({
-      queryKey: queryKeys.categories.list,
-      queryFn: () => fetchCategories(serverClient),
-      staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
-      gcTime: 30 * 60 * 1000, // 30 minutes
-    })
-
-    // Prefetch user stores and preferences
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.stores.userStores(user.id),
-        queryFn: () => fetchUserStores(user.id, serverClient),
-        staleTime: 5 * 60 * 1000,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.userPreferences.detail(user.id),
-        queryFn: () => fetchUserPreferences(serverClient),
-        staleTime: 5 * 60 * 1000,
-      }),
+    // Fetch stores and preferences (layout has them cached in client but we need them server-side)
+    const [stores, preferences] = await Promise.all([
+      fetchUserStores(user.id, serverClient),
+      fetchUserPreferences(serverClient),
     ])
-
-    // Get user's stores to determine which store to prefetch products for
-    const stores = await fetchUserStores(user.id, serverClient)
-    const preferences = await fetchUserPreferences(serverClient)
 
     if (stores.length === 0) {
       // User has no stores - show error instead of redirecting
