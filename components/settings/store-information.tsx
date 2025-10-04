@@ -354,7 +354,7 @@ export default function StoreInformation({
       {/* Manage Multiple Stores Section */}
       <Card className="mb-4">
         <CardHeader className="py-4">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <div className="flex flex-col gap-2">
               <Typography variant="h3" className="flex font-black items-center gap-2">
                 {t('storeInformation.manageMultipleStores')}
@@ -378,9 +378,9 @@ export default function StoreInformation({
       {/* Store Information Section */}
       <Card className="shadow-primary-300 border-t-0">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <Typography variant="h3" className="flex font-black items-center gap-2">
+          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
+            <div className="flex flex-col gap-2 pb-2">
+              <Typography variant="h3" className="flex font-black items-center">
                 {t('storeInformation.title')}
               </Typography>
               <Typography variant="p" color="muted">
