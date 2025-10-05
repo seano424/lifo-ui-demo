@@ -1,4 +1,3 @@
-import { getTranslations } from 'next-intl/server'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 
 import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
@@ -50,7 +49,7 @@ export default async function DashboardPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <DashboardContent title={t('dashboard')} />
+      <DashboardContent />
     </HydrationBoundary>
   )
 }
