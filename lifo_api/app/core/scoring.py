@@ -1711,10 +1711,17 @@ class ScoringService:
                         "calculated_at": result.calculated_at
                     })
                 
-                # Use simplified persistence service
-                from app.core.simplified_scoring_persistence import get_simplified_scoring_persistence
-                # Use the db session from SecureReadOnlyOperations
-                persistence_service = get_simplified_scoring_persistence(self.bulk_data_retriever.read_ops.db)
+                # Choose persistence strategy based on dataset size and known issues
+                # For now, use ultra-safe persistence to avoid Supabase statement timeouts
+                from app.core.supabase_safe_persistence import get_supabase_safe_persistence
+                persistence_service = get_supabase_safe_persistence(self.bulk_data_retriever.read_ops.db)
+                
+                self.logger.info(
+                    "Using SUPABASE-SAFE persistence to avoid statement timeouts",
+                    item_count=len(results_data),
+                    chunk_size=25,
+                    strategy="ultra_conservative"
+                )
                 
                 persistence_result = await persistence_service.persist_scoring_results(
                     results_data, store_id

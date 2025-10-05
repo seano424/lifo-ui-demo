@@ -1,15 +1,14 @@
 """
-Simplified Scoring Persistence Service
+Supabase-Safe Persistence Service
 
-This replaces the complex multi-tier persistence strategy with a unified approach
-that focuses on reliability over micro-optimizations.
+This version is specifically designed to work around Supabase's statement timeout issues.
+Uses very small chunks with high concurrency to maintain throughput while avoiding timeouts.
 
-Key improvements:
-1. Single connection strategy (Supabase REST API only)
-2. Proper chunking with error isolation
-3. Transactional integrity
-4. Comprehensive error handling and recovery
-5. Performance monitoring without complexity
+Strategy:
+- Ultra-small chunks (25 items max)
+- High concurrency (8 concurrent chunks)  
+- Fast failure detection (5s timeout)
+- Aggressive retry logic
 """
 
 import asyncio
@@ -23,26 +22,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 logger = structlog.get_logger()
 
 
-class SimplifiedScoringPersistence:
+class SupabaseSafePersistence:
     """
-    Unified scoring persistence service focused on reliability.
+    Ultra-conservative persistence service designed specifically for Supabase timeouts.
     
-    Strategy:
-    - Use only Supabase REST API (most reliable)
-    - Process in smaller chunks (50 items) for better error isolation
-    - Implement exponential backoff for retries
-    - Clear error reporting and recovery
+    This version prioritizes reliability over raw speed, using small chunks
+    with high concurrency to work around Supabase's statement timeout limitations.
     """
     
     def __init__(self, session: AsyncSession):
         self.session = session
-        self.logger = structlog.get_logger().bind(component="simplified_scoring_persistence")
+        self.logger = structlog.get_logger().bind(component="supabase_safe_persistence")
         
-        # Optimized chunking configuration to avoid Supabase timeouts
-        self.CHUNK_SIZE = 50   # Smaller chunks to avoid statement timeout
+        # Ultra-conservative settings to avoid Supabase timeouts
+        self.CHUNK_SIZE = 25  # Very small chunks to avoid statement timeout
         self.MAX_RETRIES = 3
-        self.RETRY_DELAY_BASE = 0.3  # Faster retry delay
-        self.MAX_CONCURRENT_CHUNKS = 5  # More concurrent chunks to maintain throughput
+        self.RETRY_DELAY_BASE = 0.2  # Fast retry
+        self.MAX_CONCURRENT_CHUNKS = 8  # High concurrency to maintain throughput
+        self.CHUNK_TIMEOUT = 5.0  # Very fast timeout detection
     
     async def persist_scoring_results(
         self, 
@@ -50,14 +47,7 @@ class SimplifiedScoringPersistence:
         store_id: str
     ) -> dict[str, Any]:
         """
-        Persist scoring results with reliable chunked approach.
-        
-        Args:
-            results: List of scoring result dictionaries
-            store_id: Store identifier
-            
-        Returns:
-            Dictionary with persistence results and metrics
+        Persist scoring results using ultra-safe approach for Supabase.
         """
         start_time = time.perf_counter()
         
@@ -72,111 +62,121 @@ class SimplifiedScoringPersistence:
             }
         
         self.logger.info(
-            "Starting simplified scoring persistence",
+            "🛡️  SUPABASE-SAFE: Starting ultra-conservative scoring persistence",
             total_items=len(results),
             store_id=store_id,
-            chunk_size=self.CHUNK_SIZE
+            chunk_size=self.CHUNK_SIZE,
+            max_concurrent=self.MAX_CONCURRENT_CHUNKS,
+            estimated_chunks=(len(results) + self.CHUNK_SIZE - 1) // self.CHUNK_SIZE
         )
         
-        # Import Supabase service
-        from app.database.supabase_service import get_supabase_service
-        
         try:
+            from app.database.supabase_service import get_supabase_service
+            
             supabase_service = get_supabase_service()
             admin_client = supabase_service.get_admin_client()
             
-            # Process chunks concurrently for massive performance improvement
-            successful = 0
-            failed = 0
-            errors = []
-            
-            total_chunks = (len(results) + self.CHUNK_SIZE - 1) // self.CHUNK_SIZE
-            
-            self.logger.info(
-                "Starting concurrent chunk processing",
-                total_chunks=total_chunks,
-                chunk_size=self.CHUNK_SIZE,
-                max_concurrent=self.MAX_CONCURRENT_CHUNKS
-            )
-            
-            # Create all chunks first
+            # Create all chunks (very small)
             chunks = []
             for chunk_index in range(0, len(results), self.CHUNK_SIZE):
                 chunk = results[chunk_index:chunk_index + self.CHUNK_SIZE]
                 chunk_num = (chunk_index // self.CHUNK_SIZE) + 1
                 chunks.append((chunk, chunk_num))
             
-            # Process chunks in concurrent batches
+            total_chunks = len(chunks)
+            
+            self.logger.info(
+                "📦 Ultra-safe chunk preparation complete",
+                total_chunks=total_chunks,
+                chunk_size=self.CHUNK_SIZE,
+                strategy="avoid_statement_timeout"
+            )
+            
+            # Process chunks in batches with high concurrency
+            successful = 0
+            failed = 0
+            errors = []
+            
             for batch_start in range(0, len(chunks), self.MAX_CONCURRENT_CHUNKS):
                 batch_end = min(batch_start + self.MAX_CONCURRENT_CHUNKS, len(chunks))
                 chunk_batch = chunks[batch_start:batch_end]
                 
-                # Create concurrent tasks for this batch
+                batch_start_time = time.perf_counter()
+                
+                # Create concurrent tasks
                 tasks = []
                 for chunk, chunk_num in chunk_batch:
-                    task = self._process_chunk_with_retry(
+                    task = self._process_chunk_ultra_safe(
                         admin_client, chunk, chunk_num, total_chunks, store_id
                     )
                     tasks.append(task)
                 
-                # Wait for all tasks in this batch to complete
+                # Execute all tasks concurrently
                 batch_results = await asyncio.gather(*tasks, return_exceptions=True)
                 
+                batch_time = (time.perf_counter() - batch_start_time) * 1000
+                
                 # Process results
+                batch_successful = 0
+                batch_failed = 0
                 for i, result in enumerate(batch_results):
                     chunk, chunk_num = chunk_batch[i]
                     
                     if isinstance(result, Exception):
+                        batch_failed += len(chunk)
                         failed += len(chunk)
                         errors.append(f"Chunk {chunk_num}: {str(result)}")
-                        self.logger.error(
-                            f"Chunk {chunk_num}/{total_chunks} exception",
-                            error=str(result)
-                        )
-                    elif result["success"]:
+                    elif result and result.get("success"):
+                        batch_successful += result["processed"]
                         successful += result["processed"]
-                        self.logger.debug(
-                            f"Chunk {chunk_num}/{total_chunks} succeeded",
-                            processed=result["processed"]
-                        )
                     else:
+                        batch_failed += len(chunk)
                         failed += len(chunk)
-                        errors.extend(result["errors"])
-                        self.logger.warning(
-                            f"Chunk {chunk_num}/{total_chunks} failed",
-                            errors=result["errors"]
-                        )
+                        if result and result.get("errors"):
+                            errors.extend(result["errors"])
                 
-                # Log progress for large operations
-                if total_chunks > 10:
-                    progress = min(batch_end, len(chunks)) / len(chunks) * 100
-                    self.logger.info(
-                        f"Concurrent processing progress: {progress:.1f}%",
-                        completed_chunks=min(batch_end, len(chunks)),
-                        total_chunks=len(chunks)
-                    )
+                # Log progress
+                progress = min(batch_end, len(chunks)) / len(chunks) * 100
+                throughput = batch_successful / (batch_time / 1000) if batch_time > 0 else 0
+                
+                self.logger.info(
+                    f"🛡️  Safe batch {batch_start//self.MAX_CONCURRENT_CHUNKS + 1} complete: {progress:.0f}%",
+                    batch_successful=batch_successful,
+                    batch_failed=batch_failed,
+                    throughput_items_per_sec=round(throughput, 0),
+                    batch_time_ms=round(batch_time, 0)
+                )
             
             processing_time_ms = (time.perf_counter() - start_time) * 1000
             
             result = {
-                "success": failed == 0,  # Success only if all chunks succeeded
+                "success": failed == 0,
                 "total_items": len(results),
                 "successful": successful,
                 "failed": failed,
                 "processing_time_ms": round(processing_time_ms, 2),
-                "errors": errors,
+                "errors": errors[:5],  # Limit errors
                 "performance": {
+                    "mode": "supabase_safe",
                     "chunk_size": self.CHUNK_SIZE,
                     "total_chunks": total_chunks,
-                    "items_per_second": round(len(results) / (processing_time_ms / 1000), 2),
-                    "avg_chunk_time_ms": round(processing_time_ms / total_chunks, 2)
+                    "max_concurrent": self.MAX_CONCURRENT_CHUNKS,
+                    "items_per_second": round(len(results) / (processing_time_ms / 1000), 1),
+                    "success_rate_percent": round(successful / len(results) * 100, 1) if len(results) > 0 else 100
                 }
             }
             
-            self.logger.info(
-                "Simplified scoring persistence completed",
-                **result
-            )
+            if failed == 0:
+                self.logger.info(
+                    "🎉 SUPABASE-SAFE: Perfect success with ultra-conservative approach",
+                    **result["performance"]
+                )
+            else:
+                self.logger.warning(
+                    "⚠️  SUPABASE-SAFE: Some failures despite conservative approach",
+                    **result["performance"],
+                    failed_items=failed
+                )
             
             return result
             
@@ -184,11 +184,9 @@ class SimplifiedScoringPersistence:
             processing_time_ms = (time.perf_counter() - start_time) * 1000
             
             self.logger.error(
-                "Critical error in simplified scoring persistence",
+                "💥 CRITICAL: Even ultra-safe persistence failed",
                 error=str(e),
-                error_type=type(e).__name__,
-                processing_time_ms=processing_time_ms,
-                total_items=len(results)
+                processing_time_ms=processing_time_ms
             )
             
             return {
@@ -197,10 +195,10 @@ class SimplifiedScoringPersistence:
                 "successful": 0,
                 "failed": len(results),
                 "processing_time_ms": round(processing_time_ms, 2),
-                "errors": [f"Critical persistence failure: {str(e)}"]
+                "errors": [f"Critical failure: {str(e)}"]
             }
     
-    async def _process_chunk_with_retry(
+    async def _process_chunk_ultra_safe(
         self, 
         admin_client, 
         chunk: list[dict], 
@@ -209,14 +207,14 @@ class SimplifiedScoringPersistence:
         store_id: str
     ) -> dict[str, Any]:
         """
-        Process a single chunk with retry logic.
+        Process chunk with ultra-conservative approach.
         """
         for attempt in range(self.MAX_RETRIES):
             try:
-                # Prepare data for Supabase
+                # Prepare data with minimal processing time
                 upsert_data = []
                 for item in chunk:
-                    score_data = {
+                    upsert_data.append({
                         "batch_id": item["batch_id"],
                         "store_id": store_id,
                         "expiry_score": float(item.get("expiry_score", 0.0)),
@@ -226,7 +224,7 @@ class SimplifiedScoringPersistence:
                         "recommendation": str(item.get("recommendation", "monitor")),
                         "urgency_level": str(item.get("urgency_level", "low")),
                         "discount_percent": int(item.get("discount_percent", 0)),
-                        "reason": str(item.get("reason", "Automated scoring")),
+                        "reason": str(item.get("reason", "Automated"))[:200],  # Limit length
                         "ml_enhanced": bool(item.get("ml_enhanced", True)),
                         "confidence_level": float(item.get("confidence_level", 0.85)),
                         "calculated_at": (
@@ -234,13 +232,12 @@ class SimplifiedScoringPersistence:
                             if hasattr(item.get("calculated_at"), "isoformat")
                             else datetime.utcnow().isoformat()
                         )
-                    }
-                    upsert_data.append(score_data)
+                    })
                 
-                # Execute upsert with fast timeout to avoid Supabase statement timeout
+                # Execute with ultra-fast timeout
                 result = await asyncio.wait_for(
-                    self._execute_supabase_upsert(admin_client, upsert_data),
-                    timeout=10.0  # Very fast timeout to detect issues quickly
+                    self._execute_supabase_upsert_safe(admin_client, upsert_data),
+                    timeout=self.CHUNK_TIMEOUT
                 )
                 
                 if result:
@@ -250,14 +247,11 @@ class SimplifiedScoringPersistence:
                         "errors": []
                     }
                 else:
-                    raise Exception("Supabase upsert returned False")
+                    raise Exception("Upsert returned False")
                     
             except asyncio.TimeoutError:
-                self.logger.warning(
-                    f"Timeout on chunk {chunk_num}/{total_chunks}, attempt {attempt + 1}/{self.MAX_RETRIES}"
-                )
                 if attempt < self.MAX_RETRIES - 1:
-                    delay = self.RETRY_DELAY_BASE * (2 ** attempt)  # Exponential backoff
+                    delay = self.RETRY_DELAY_BASE * (2 ** attempt)
                     await asyncio.sleep(delay)
                     continue
                 else:
@@ -268,10 +262,13 @@ class SimplifiedScoringPersistence:
                     }
                     
             except Exception as e:
-                self.logger.warning(
-                    f"Error on chunk {chunk_num}/{total_chunks}, attempt {attempt + 1}/{self.MAX_RETRIES}",
-                    error=str(e)
-                )
+                error_msg = str(e)
+                if "statement timeout" in error_msg.lower():
+                    self.logger.warning(
+                        f"Statement timeout on chunk {chunk_num}, attempt {attempt + 1}",
+                        chunk_size=len(chunk)
+                    )
+                
                 if attempt < self.MAX_RETRIES - 1:
                     delay = self.RETRY_DELAY_BASE * (2 ** attempt)
                     await asyncio.sleep(delay)
@@ -280,18 +277,18 @@ class SimplifiedScoringPersistence:
                     return {
                         "success": False,
                         "processed": 0,
-                        "errors": [f"Failed after {self.MAX_RETRIES} attempts: {str(e)}"]
+                        "errors": [f"Failed: {error_msg[:100]}"]
                     }
         
         return {
             "success": False,
             "processed": 0,
-            "errors": ["Unexpected error in retry logic"]
+            "errors": ["Unexpected retry logic failure"]
         }
     
-    async def _execute_supabase_upsert(self, admin_client, upsert_data: list[dict]) -> bool:
+    async def _execute_supabase_upsert_safe(self, admin_client, upsert_data: list[dict]) -> bool:
         """
-        Execute the actual Supabase upsert operation.
+        Execute Supabase upsert with minimal overhead.
         """
         try:
             result = (
@@ -301,17 +298,19 @@ class SimplifiedScoringPersistence:
                 .execute()
             )
             
-            return len(result.data) > 0 if result.data else False
+            # Quick success check
+            return result and hasattr(result, 'data') and result.data is not None
             
         except Exception as e:
-            self.logger.error(
-                "Supabase upsert execution failed",
-                error=str(e),
-                data_count=len(upsert_data)
-            )
+            error_msg = str(e)
+            if "statement timeout" in error_msg.lower():
+                self.logger.debug(
+                    "Supabase statement timeout detected",
+                    chunk_size=len(upsert_data)
+                )
             return False
 
 
-def get_simplified_scoring_persistence(session: AsyncSession) -> SimplifiedScoringPersistence:
-    """Factory function for dependency injection."""
-    return SimplifiedScoringPersistence(session)
+def get_supabase_safe_persistence(session: AsyncSession) -> SupabaseSafePersistence:
+    """Factory function for Supabase-safe persistence."""
+    return SupabaseSafePersistence(session)
