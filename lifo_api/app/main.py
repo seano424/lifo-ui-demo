@@ -311,6 +311,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         except Exception as e:
             logger.error("Error shutting down automated scoring system", error=str(e))
 
+    # Shutdown bulk operations optimizer connection pool
+    try:
+        from app.database.bulk_operations_optimized import close_bulk_optimizer
+        await close_bulk_optimizer()
+        logger.info("Bulk operations optimizer shutdown completed")
+    except Exception as e:
+        logger.error("Error shutting down bulk optimizer", error=str(e))
+
     await engine().dispose()
 
 
