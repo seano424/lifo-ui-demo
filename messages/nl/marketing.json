@@ -160,14 +160,15 @@
   },
   "landingpage": {
     "hero": {
-      "title": "De toekomst van voorraadbeheer is hier.",
-      "subtitle": "De slimme oplossing om verspilling te verminderen en uw winst te verhogen",
+      "title": "Slimmere voorraad beslissingen - Batch per batch",
+      "subtitle": "Verminder verspilling, optimaliseer bestellingen en verhoog uw marges met AI-gestuurde inzichten ontwikkeld voor winkelmanagers",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
-        "explore": "Verken het platform"
+        "explore": "Verken het platform",
+        "dashboard": "Naar mijn dashboard"
       },
       "badge": {
-        "text": "Geniet van een gratis proefperiode van 14 dagen"
+        "text": "Geniet van een gratis proefperiode van 1 maand"
       }
     },
     "features": {

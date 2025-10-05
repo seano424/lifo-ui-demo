@@ -1,8 +1,8 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { LayoutDashboard, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
 
 export function HeroButtons() {
   const t = useTranslations('landingpage.hero.buttons')
@@ -16,7 +16,7 @@ export function HeroButtons() {
         className="px-6 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity flex items-center gap-2"
       >
         <LayoutDashboard size={18} />
-        Go to my Dashboard
+        {t('dashboard')}
       </Button>
       <Button
         asLink

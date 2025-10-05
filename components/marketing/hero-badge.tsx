@@ -13,7 +13,7 @@ export function HeroBadge({
   className = 'mt-10',
 }: Partial<AnimatedBadgeProps>) {
   const t = useTranslations('landingpage.hero.badge')
-  const text = t('text', { fallback: 'Enjoy a 14-day free trial' })
+  const text = t('text', { fallback: 'Enjoy a 1 month free trial' })
 
   return (
     <>
