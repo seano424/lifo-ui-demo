@@ -123,12 +123,20 @@ class BulkOperationsOptimizer:
             - Prod: ~500-1000ms for 100 items (vs 27,000-30,000ms PostgREST)
         """
         if not scores:
+            self.logger.debug("Empty scores list - returning 0")
             return 0
 
         start_time = datetime.utcnow()
 
+        self.logger.info(
+            "🚀 Starting direct PostgreSQL bulk upsert",
+            scores_count=len(scores),
+            method="bulk_operations_optimized"
+        )
+
         try:
             pool = await self._get_pool()
+            self.logger.debug("Connection pool acquired successfully")
 
             # Prepare data tuples for bulk insert
             data = []
@@ -179,8 +187,7 @@ class BulkOperationsOptimizer:
                         reason = EXCLUDED.reason,
                         ml_enhanced = EXCLUDED.ml_enhanced,
                         confidence_level = EXCLUDED.confidence_level,
-                        calculated_at = EXCLUDED.calculated_at,
-                        updated_at = NOW()
+                        calculated_at = EXCLUDED.calculated_at
                 """, data)
 
             duration_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
