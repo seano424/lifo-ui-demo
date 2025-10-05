@@ -385,6 +385,11 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.dashboardSummary(activeStoreId),
         })
+
+        // Invalidate urgent todos count (sidebar badge)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.urgentCount(activeStoreId),
+        })
       }
 
       if (data) {

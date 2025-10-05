@@ -95,6 +95,11 @@ export function useInventorySubmission() {
           queryKey: [...queryKeys.batches.byStore(activeStoreId), 'lowStock'],
         })
 
+        // Invalidate urgent todos count (sidebar badge)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.urgentCount(activeStoreId),
+        })
+
         toast.success(result.message)
       } else if (!result.success) {
         toast.error(result.message)
@@ -181,6 +186,11 @@ export function useBatchInventorySubmission() {
         })
         queryClient.invalidateQueries({
           queryKey: [...queryKeys.batches.byStore(activeStoreId), 'lowStock'],
+        })
+
+        // Invalidate urgent todos count (sidebar badge)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.urgentCount(activeStoreId),
         })
 
         // Trigger background scoring after successful batch submission
