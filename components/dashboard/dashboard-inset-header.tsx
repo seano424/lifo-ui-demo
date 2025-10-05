@@ -4,22 +4,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import {
-  Activity,
-  BarChart3,
-  Bell,
   ChartNoAxesCombined,
-  CreditCard,
-  FileText,
   Layers,
   ListTodo,
   Package,
   ScanBarcode,
   ScanSearch,
   SettingsIcon,
-  Trophy,
-  Upload,
-  User,
-  Users,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
@@ -36,17 +27,6 @@ function getPageIcon(pathname: string) {
   if (cleanPath.startsWith('/dashboard/inventory/products')) return Package
   if (cleanPath.startsWith('/dashboard/inventory/batches')) return Layers
   if (cleanPath.startsWith('/dashboard/settings')) return SettingsIcon
-
-  // Additional pages
-  if (cleanPath.startsWith('/dashboard/notifications')) return Bell
-  if (cleanPath.startsWith('/dashboard/billing')) return CreditCard
-  if (cleanPath.startsWith('/dashboard/account')) return User
-  if (cleanPath.startsWith('/dashboard/performance')) return BarChart3
-  if (cleanPath.startsWith('/dashboard/action-log')) return FileText
-  if (cleanPath.startsWith('/dashboard/milestones')) return Trophy
-  if (cleanPath.startsWith('/dashboard/playground')) return Activity
-  if (cleanPath.startsWith('/dashboard/upgrade')) return Upload
-  if (cleanPath.startsWith('/dashboard/users')) return Users
 
   // Default fallback
   return ChartNoAxesCombined

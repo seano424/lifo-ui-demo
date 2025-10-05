@@ -2,8 +2,10 @@
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { ArrowRight, Building2, Check, Sparkles, Users } from 'lucide-react'
+import { ArrowRight, Check, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+
+// import {Building2, Users} from 'lucide-react' --- IGNORE (It's when we're putting back the others pricing cards) ---
 
 interface PricingCardProps {
   title: string

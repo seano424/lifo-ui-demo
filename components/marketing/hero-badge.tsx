@@ -17,28 +17,38 @@ export function HeroBadge({
   const { data: currentUser } = useCurrentUser()
   const text = t('text', { fallback: 'Enjoy a 1 month free trial' })
 
-  if (currentUser) return null
-
   return (
-    <>
-      <style>
-        {`
-          @keyframes move-bg {
-            to {
-              background-position: 400% 0;
+    <div className={`h-[42px] sm:h-[48px] ${className}`}>
+      {!currentUser && (
+        <style>
+          {`
+            @keyframes move-bg {
+              to {
+                background-position: 400% 0;
+              }
             }
-          }
-        `}
-      </style>
+          `}
+        </style>
+      )}
       <div
-        className={`inline-flex rounded-full p-[1px] bg-gradient-to-r from-transparent ${borderColor} to-transparent [background-size:400%_100%] ${className} max-w-full`}
-        style={{ animation: 'move-bg 10s linear infinite' }}
+        className={`inline-flex rounded-full p-[1px] max-w-full transition-opacity duration-300 ${
+          currentUser ? 'opacity-0' : 'opacity-100'
+        }`}
+        style={
+          !currentUser
+            ? {
+                animation: 'move-bg 10s linear infinite',
+                backgroundImage: `linear-gradient(to right, transparent, ${borderColor}, transparent)`,
+                backgroundSize: '400% 100%',
+              }
+            : undefined
+        }
       >
         <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/5 to-secondary/10 border border-primary/10 px-3 sm:px-4 py-1 text-xs sm:text-sm">
           {icon}
           <span className="font-medium text-primary truncate">{text}</span>
         </div>
       </div>
-    </>
+    </div>
   )
 }
