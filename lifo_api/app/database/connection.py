@@ -39,7 +39,7 @@ def create_sync_asyncpg_connection():
     import urllib.parse
 
     # Get the database URL and parse it
-    database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
+    database_url = get_database_url()
     parsed = urllib.parse.urlparse(database_url)
 
     # Create an event loop if none exists (for sync context)
