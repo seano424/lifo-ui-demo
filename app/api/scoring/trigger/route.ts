@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     // Call FastAPI scoring endpoint - it handles scoring AND database writes
     const fastapiUrl = process.env.FASTAPI_URL
-    const fullUrl = `${fastapiUrl}/api/v1/analytics/scoring/trigger/${storeId}`
+    const fullUrl = `${fastapiUrl}/api/v1/scoring/batch/${storeId}/bulk`
 
     logger.log('scoring-trigger', 'Calling FastAPI endpoint', {
       url: fullUrl,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
       },
-      signal: AbortSignal.timeout(30000), // Allow 30 seconds for background scoring
+      signal: AbortSignal.timeout(200000), // Allow 200 seconds for background scoring for now
     })
 
     logger.log('scoring-trigger', 'FastAPI response received', {
@@ -55,13 +55,13 @@ export async function POST(request: NextRequest) {
 
     logger.log('scoring-trigger', 'Scoring completed successfully', {
       processingTime,
-      batchesProcessed: scoringResult.batches_processed || 0,
+      batchesProcessed: scoringResult.processed || 0,
       highPriorityCount: scoringResult.high_priority_count || 0,
     })
 
     return NextResponse.json({
       success: true,
-      message: 'Background scoring triggered successfully',
+      message: 'Scoring triggered successfully',
       result: scoringResult,
       metadata: {
         triggeredBy: triggeredBy || 'unknown',

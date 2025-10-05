@@ -44,6 +44,26 @@
         "action": "Remove products"
       }
     },
+    "inbound": {
+      "title": "Inventory Reception",
+      "description": "Scan or enter new items to add them to your inventory. You can scan barcodes, upload a CSV file, or enter items manually.",
+      "desktop": {
+        "barcodeScanning": "Barcode Scanning",
+        "csvBulkImport": "CSV Bulk Import",
+        "manualEntry": "Manual Entry"
+      },
+      "mobile": {
+        "barcodeScanning": "Scan Items",
+        "csvBulkImport": "CSV Import",
+        "manualEntry": "Manual Entry"
+      }
+    },
+    "scanOut": {
+      "title": "Product Removal",
+      "description": "Scan items to remove them from your inventory. Each scan will automatically remove the oldest batch of the scanned product, following the LIFO principle.",
+      "recentlyRemoved": "{count, plural, =0 {No items removed} =1 {1 item removed} other {# items removed}}",
+      "success": "Product successfully removed"
+    },
     "errors": {
       "noStores": {
         "title": "No Stores Found",
@@ -565,9 +585,19 @@
       "users": "Team Management",
       "account": "Account settings"
     },
+    "titles": {
+      "dashboard": "Dashboard Overview",
+      "notifications": "Notifications",
+      "todos": "Task Management",
+      "products": "Product Inventory",
+      "batches": "Inventory Batches",
+      "users": "Team Management",
+      "account": "Account Settings"
+    },
     "descriptions": {
       "batches": "View and manage your store's inventory batches",
-      "products": "View and manage your store's product inventory"
+      "products": "View and manage your store's product inventory",
+      "dashboard": "Monitor your store's performance, track inventory, and optimize operations with real-time insights and AI-powered recommendations."
     }
   },
   "users": {

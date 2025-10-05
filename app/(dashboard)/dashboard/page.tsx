@@ -20,7 +20,6 @@ export default async function DashboardPage() {
   }
 
   const supabase = await createClient()
-  const t = await getTranslations('dashboardNav.pages')
 
   // Check if user has any batches (optimized RPC: 555ms → ~20ms)
   const hasBatches = await hasBatchesRPC(activeStoreId, supabase)
