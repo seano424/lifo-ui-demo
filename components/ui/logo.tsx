@@ -78,8 +78,9 @@ export function Logo({ variant = 'vertical', size = 'md', className, darkMode, h
     }
   }
 
-  // Get proper dimensions for each variant
-  const getDimensions = () => {
+  // Get proper aspect ratio dimensions for each variant
+  // These match the intrinsic SVG viewBox dimensions
+  const getDimensions = (): { width: number; height: number } => {
     switch (variant) {
       case 'icon':
       case 'icon-dark':

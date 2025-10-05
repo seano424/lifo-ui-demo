@@ -2,6 +2,7 @@
 
 import { Laptop, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +16,7 @@ import {
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
+  const t = useTranslations('common.aria')
 
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
@@ -30,7 +32,7 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={'sm'} aria-label="Toggle theme">
+        <Button variant="ghost" size={'sm'} aria-label={t('toggleTheme')}>
           {theme === 'light' ? (
             <Sun key="light" size={ICON_SIZE} className={'text-muted-foreground'} />
           ) : theme === 'dark' ? (
