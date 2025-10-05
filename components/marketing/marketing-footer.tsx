@@ -19,16 +19,14 @@ export function MarketingFooter() {
           {/* Logo and Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="relative w-8 h-8">
-                <Image
-                  src="/logos/lifo-logo-icon.svg"
-                  alt="LIFO.AI Logo"
-                  fill
-                  className="object-contain"
-                  priority
-                  sizes="32px"
-                />
-              </div>
+              <Image
+                src="/logos/lifo-logo-icon.svg"
+                alt="LIFO.AI Logo"
+                width={600}
+                height={280}
+                className="h-8 w-auto"
+                priority
+              />
               <Typography
                 variant="h4"
                 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"

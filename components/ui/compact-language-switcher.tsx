@@ -26,7 +26,13 @@ export function CompactLanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" disabled={isLoading} className="rounded-full border" aria-label="Select language">
+        <Button
+          variant="outline"
+          size="icon"
+          disabled={isLoading}
+          className="rounded-full border"
+          aria-label="Select language"
+        >
           <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

@@ -43,9 +43,10 @@ export function Logo({ variant = 'vertical', size = 'md', className, darkMode, h
         <Image
           src="/logos/lifo-logo-icon.svg"
           alt="LIFO Icon"
-          className="h-16 w-16"
-          width={32}
-          height={32}
+          className="w-16 h-auto"
+          width={600}
+          height={280}
+          priority
         />
         <Typography className="font-black font-heading text-3xl lg:text-4xl" variant="h2">
           Lifo
@@ -77,6 +78,23 @@ export function Logo({ variant = 'vertical', size = 'md', className, darkMode, h
     }
   }
 
+  // Get proper dimensions for each variant
+  const getDimensions = () => {
+    switch (variant) {
+      case 'icon':
+      case 'icon-dark':
+        return { width: 600, height: 280 }
+      case 'vertical':
+        return { width: 600, height: 464 }
+      case 'horizontal':
+        return { width: 902, height: 180 }
+      default:
+        return { width: 600, height: 464 }
+    }
+  }
+
+  const dimensions = getDimensions()
+
   const logoElement = (
     <Image
       src={getLogoPath()}
@@ -87,8 +105,8 @@ export function Logo({ variant = 'vertical', size = 'md', className, darkMode, h
         className,
       )}
       priority
-      width={100}
-      height={100}
+      width={dimensions.width}
+      height={dimensions.height}
     />
   )
 
