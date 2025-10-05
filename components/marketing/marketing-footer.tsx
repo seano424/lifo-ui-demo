@@ -24,7 +24,7 @@ export function MarketingFooter() {
                 alt="LIFO.AI Logo"
                 width={600}
                 height={280}
-                className="h-8 w-auto"
+                className="w-10 h-auto"
                 priority
               />
               <Typography
