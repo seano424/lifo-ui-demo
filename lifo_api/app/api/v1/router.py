@@ -12,6 +12,7 @@ from app.api.v1 import (
     automated_scoring,
     batch_creation,
     csv,
+    csv_duplicate_check,
     csv_upload,
     donation_queries,
     donations,
@@ -82,6 +83,14 @@ router.include_router(
 router.include_router(
     csv_upload.router,
     prefix="/csv-upload",
+    tags=["CSV Upload"],
+    responses={404: {"description": "Not found"}},
+)
+
+# CSV Duplicate Check (pre-flight validation)
+router.include_router(
+    csv_duplicate_check.router,
+    prefix="/csv",
     tags=["CSV Upload"],
     responses={404: {"description": "Not found"}},
 )
