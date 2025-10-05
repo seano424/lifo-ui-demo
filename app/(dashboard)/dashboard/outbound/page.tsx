@@ -1,12 +1,13 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { type ScannedItem, ScanOutInterface } from '@/components/scanning'
 import { Typography } from '@/components/ui/typography'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 export default function OutboundPage() {
-  const t = useTranslations('scanOut')
+  const t = useTranslations('dashboard.scanOut')
   const [removedItems, setRemovedItems] = useState<ScannedItem[]>([])
 
   const handleItemRemoved = (item: ScannedItem) => {
@@ -14,8 +15,9 @@ export default function OutboundPage() {
   }
 
   return (
-    <div className="lg:max-w-screen-sm lg:mx-auto pb-40">
-      <div className="space-y-6 px-4">
+    <div className="Space-y-6 px-4 ">
+      <DashboardInsetHeader title={t('title')} description={t('description')} />
+      <div className=" lg:max-w-screen-sm lg:mx-auto pb-40 mt-8">
         <ScanOutInterface onItemRemoved={handleItemRemoved} />
 
         {removedItems.length > 0 && (
