@@ -94,7 +94,7 @@ export default function DashboardInsetHeader({
                 </div>
                 <Typography
                   variant="h1"
-                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize"
+                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-2"
                 >
                   {title}
                 </Typography>

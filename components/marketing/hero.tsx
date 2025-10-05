@@ -7,14 +7,16 @@ export function Hero() {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="flex flex-col gap-4 items-center p-2 sm:py-6 px-4"
+      className="flex flex-col gap-4 items-center py-4 px-3 sm:py-12 sm:px-6 overflow-hidden w-full"
     >
       {/* Main content */}
-      <div className="text-center max-w-4xl mx-auto">
+      <div className="text-center w-full max-w-4xl mx-auto space-y-6 sm:space-y-8">
         <HeroHeading />
         <HeroDescription />
         <HeroButtons />
-        <HeroBadge />
+        <div className="px-2">
+          <HeroBadge />
+        </div>
       </div>
     </section>
   )
