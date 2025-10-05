@@ -181,3 +181,4 @@ dmypy.json
 
 !dataset_tools/
 !test_data/
+CLAUDE.md
