@@ -160,7 +160,7 @@
   },
   "landingpage": {
     "hero": {
-      "title": "Smarter Inventory Decisions - Batch by Batch",
+      "title": "Smarter Inventory Decisions Batch by Batch",
       "subtitle": "Reduce waste, optimize ordering, and boost your margins with AI-driven insights designed for store managers",
       "buttons": {
         "freeTrial": "Start my free trial",
@@ -168,7 +168,8 @@
         "dashboard": "Go to my Dashboard"
       },
       "badge": {
-        "text": "Enjoy a one month free trial"
+        "text": "Enjoy a one month free trial",
+        "welcomeBack": "Your dashboard is ready"
       }
     },
     "features": {

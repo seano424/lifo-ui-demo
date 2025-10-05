@@ -15,7 +15,10 @@ export function HeroBadge({
 }: Partial<AnimatedBadgeProps>) {
   const t = useTranslations('landingpage.hero.badge')
   const { data: currentUser } = useCurrentUser()
-  const text = t('text', { fallback: 'Enjoy a 1 month free trial' })
+  const text = currentUser
+    ? t('welcomeBack')
+    : t('text', { fallback: 'Enjoy a 1 month free trial' })
+  const iconToShow = currentUser ? <span className="mr-2 text-green-600 text-lg">👋</span> : icon
 
   return (
     <div className={`h-[42px] sm:h-[48px] ${className}`}>
@@ -31,9 +34,7 @@ export function HeroBadge({
         </style>
       )}
       <div
-        className={`inline-flex rounded-full p-[1px] max-w-full transition-opacity duration-300 ${
-          currentUser ? 'opacity-0' : 'opacity-100'
-        }`}
+        className={`inline-flex rounded-full p-[1px] max-w-full transition-all duration-300 opacity-100`}
         style={
           !currentUser
             ? {
@@ -41,11 +42,14 @@ export function HeroBadge({
                 backgroundImage: `linear-gradient(to right, transparent, ${borderColor}, transparent)`,
                 backgroundSize: '400% 100%',
               }
-            : undefined
+            : {
+                backgroundImage: `linear-gradient(to right, transparent, ${borderColor}, transparent)`,
+                backgroundSize: '400% 100%',
+              }
         }
       >
         <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/5 to-secondary/10 border border-primary/10 px-3 sm:px-4 py-1 text-xs sm:text-sm">
-          {icon}
+          {iconToShow}
           <span className="font-medium text-primary truncate">{text}</span>
         </div>
       </div>

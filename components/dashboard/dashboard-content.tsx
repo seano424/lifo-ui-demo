@@ -21,13 +21,11 @@ export function DashboardContent() {
       />
 
       {/* Status Overview Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-150">
-        <div className="space-y-6">
-          <BatchStatusSummary />
-        </div>
-        <div className="space-y-6">
-          <ExpiredItemsSummary />
-        </div>
+
+      <div className="space-y-6">
+        <BatchStatusSummary />
+
+        <ExpiredItemsSummary />
       </div>
 
       {/* KPI Cards Section */}

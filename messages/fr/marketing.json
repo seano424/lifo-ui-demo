@@ -160,7 +160,7 @@
   },
   "landingpage": {
     "hero": {
-      "title": "La gestion de stocks plus intelligente - Lot par lot",
+      "title": "La gestion de stocks plus intelligente Lot par lot",
       "subtitle": "Réduisez le gaspillage, optimisez vos commandes et augmentez vos marges grâce aux aperçus IA pour la gestion de stocks",
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
@@ -168,7 +168,8 @@
         "dashboard": "Accéder à mon tableau de bord"
       },
       "badge": {
-        "text": "Profitez d'un mois d'essai gratuit"
+        "text": "Profitez d'un mois d'essai gratuit",
+        "welcomeBack": "Votre tableau de bord est prêt"
       }
     },
     "features": {

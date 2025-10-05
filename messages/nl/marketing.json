@@ -160,7 +160,7 @@
   },
   "landingpage": {
     "hero": {
-      "title": "Slimmere voorraad beslissingen - Batch per batch",
+      "title": "Slimmere voorraad beslissingen Batch per batch",
       "subtitle": "Verminder verspilling, optimaliseer bestellingen en verhoog uw marges met AI-gestuurde inzichten ontwikkeld voor winkelmanagers",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
@@ -168,7 +168,8 @@
         "dashboard": "Naar mijn dashboard"
       },
       "badge": {
-        "text": "Geniet van een gratis proefperiode van een maand"
+        "text": "Geniet van een gratis proefperiode van een maand",
+        "welcomeBack": "Uw dashboard is klaar"
       }
     },
     "features": {
