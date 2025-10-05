@@ -93,7 +93,7 @@ export function TeamSwitcher() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-npm run devtrigger-width] min-w-56 rounded-2xl"
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl"
               align="start"
               side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}
