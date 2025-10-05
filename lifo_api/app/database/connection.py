@@ -201,6 +201,10 @@ def get_direct_engine():
     """
     Get or create a direct database engine that bypasses pgBouncer.
     This is used for bulk operations that need prepared statements.
+
+    NOTE: Even for direct connections, we disable prepared statements
+    because SQLAlchemy's statement cache can cause issues with
+    connection pooling and concurrent operations.
     """
     global _direct_engine
     if _direct_engine is None:
@@ -216,7 +220,27 @@ def get_direct_engine():
             echo=False,
             future=True,
             poolclass=NullPool,  # No pooling for direct connections
+            query_cache_size=0,  # Disable query compilation cache
+            connect_args={
+                "ssl": "require",  # Required for Supabase
+                "statement_cache_size": 0,  # Disable prepared statements
+                "prepared_statement_cache_size": 0,  # Alternative parameter
+                "prepared_statement_name_func": None,  # Disable named prepared statements
+                "command_timeout": 60,  # Longer timeout for bulk operations
+                "server_settings": {
+                    "statement_timeout": "55s",  # Bulk operations may take longer
+                    "lock_timeout": "10s",
+                    "jit": "off",
+                    "plan_cache_mode": "force_generic_plan",
+                },
+            },
+            execution_options={
+                "compiled_cache": {},  # Disable SQLAlchemy's compiled statement cache
+                "schema_translate_map": None,
+            }
         )
+        # Setup engine events for consistency
+        _direct_engine = _setup_engine_events(_direct_engine)
     return _direct_engine
 
 
