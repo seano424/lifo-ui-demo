@@ -39,12 +39,12 @@ class OptimizedBatchCreationService:
     _cache_loaded = False
 
     def __init__(self):
-        # Use direct database connection to bypass pgBouncer for bulk operations
-        self.async_session = direct_async_session()
+        # Use pooler connection for WSL/IPv4 compatibility (direct connection uses IPv6 which fails in WSL)
+        self.async_session = async_session()
         self.performance_metrics = {}
         # System UUID for service_role and system operations
         self.SYSTEM_USER_UUID = uuid.UUID("00000000-0000-0000-0000-000000000000")
-        logger.info("OptimizedBatchCreationService initialized with direct database connection (bypasses pgBouncer)")
+        logger.info("OptimizedBatchCreationService initialized with pooler connection (IPv4-compatible for WSL)")
 
     def _parse_user_id_to_uuid(self, user_id: str) -> uuid.UUID:
         """
@@ -474,7 +474,7 @@ class OptimizedBatchCreationService:
                         created_by, created_at, updated_at, barcode, barcode_type, is_verified
                     ) VALUES
                     {values_clause}
-                    ON CONFLICT (barcode) DO NOTHING
+                    ON CONFLICT (sku) DO NOTHING
                 """
 
                 # Use raw asyncpg to avoid prepared statements
