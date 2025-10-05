@@ -1,23 +1,23 @@
-"use client";
+'use client'
 
-import { AlertSensitivityControls } from "@/components/dashboard/alert-sensitivity-controls";
-import { BatchStatusSummary } from "@/components/dashboard/batch-status-summary";
-import DashboardInsetHeader from "@/components/dashboard/dashboard-inset-header";
-import { DashboardKPICards } from "@/components/dashboard/dashboard-kpi-cards";
-import { ExpiredItemsSummary } from "@/components/dashboard/expired-items-summary";
-import { QuickActionCards } from "@/components/dashboard/quick-action-cards";
-import { StoreInsightsDashboard } from "@/components/dashboard/store-insights-dashboard";
-import { useTranslations } from "next-intl";
+import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
+import { BatchStatusSummary } from '@/components/dashboard/batch-status-summary'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
+import { ExpiredItemsSummary } from '@/components/dashboard/expired-items-summary'
+import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
+import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
+import { useTranslations } from 'next-intl'
 
 export function DashboardContent() {
-  const t = useTranslations("dashboardNav");
+  const t = useTranslations('dashboardNav')
 
   return (
     <div className="flex flex-col gap-10 pb-8 animate-in fade-in-0 duration-1000">
       {/* Enhanced Header */}
       <DashboardInsetHeader
-        title={t("titles.dashboard")}
-        description={t("descriptions.dashboard")}
+        title={t('titles.dashboard')}
+        description={t('descriptions.dashboard')}
       />
 
       {/* Status Overview Section */}
@@ -54,5 +54,5 @@ export function DashboardContent() {
         </div>
       </div>
     </div>
-  );
+  )
 }

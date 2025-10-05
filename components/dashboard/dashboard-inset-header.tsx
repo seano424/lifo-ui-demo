@@ -13,6 +13,7 @@ import {
   SettingsIcon,
 } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { useMemo } from 'react'
 
 // Function to get the appropriate icon based on the current path
 function getPageIcon(pathname: string) {
@@ -46,7 +47,7 @@ export default function DashboardInsetHeader({
   className?: string
 }) {
   const pathname = usePathname()
-  const PageIcon = getPageIcon(pathname)
+  const PageIcon = useMemo(() => getPageIcon(pathname), [pathname])
 
   return (
     <div className="relative animate-in fade-in-0 slide-in-from-top-4 duration-700">
