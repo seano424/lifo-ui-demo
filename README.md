@@ -1,3 +1,4 @@
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/26avg.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 # LIFO.AI - Intelligent Food Waste Management Platform
 
 **Transform inventory management from reactive to predictive, reducing food waste through AI-driven insights.**
