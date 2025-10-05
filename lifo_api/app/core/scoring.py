@@ -806,47 +806,91 @@ class BulkResultPersister:
     async def _persist_via_supabase_rest(
         self, results: list[ScoringResult], store_id: str
     ) -> tuple[int, int]:
-        """Persist small batches using Supabase REST API (existing method)"""
-        scores_data = self._prepare_scores_data(results, store_id)
+        """
+        Persist using Supabase REST API with chunking to avoid statement timeout.
 
-        # Try bulk operation first for optimal performance
+        IMPORTANT: Chunks large batches into smaller pieces to avoid statement timeout.
+        Supabase statement_timeout can cause failures when inserting 1000+ items at once.
+        Chunking into 100-item batches ensures each request completes within timeout limits.
+        """
+        scores_data = self._prepare_scores_data(results, store_id)
         bulk_db_start = datetime.utcnow()
+
+        # Chunk size for Supabase REST API to avoid statement timeout
+        CHUNK_SIZE = 100
+        total_items = len(scores_data)
+        successful_count = 0
+        failed_count = 0
 
         try:
             self.logger.info(
-                "Executing Supabase REST bulk operation",
-                total_results=len(results),
-                operation_type="supabase_rest_api"
+                "Executing chunked Supabase REST bulk operation",
+                total_results=total_items,
+                chunk_size=CHUNK_SIZE,
+                total_chunks=(total_items + CHUNK_SIZE - 1) // CHUNK_SIZE,
+                operation_type="supabase_rest_api_chunked"
             )
 
-            bulk_success = await self.read_ops.bulk_store_score_results(scores_data)
+            # Process in chunks to avoid statement timeout
+            for i in range(0, total_items, CHUNK_SIZE):
+                chunk = scores_data[i:i + CHUNK_SIZE]
+                chunk_num = (i // CHUNK_SIZE) + 1
+                total_chunks = (total_items + CHUNK_SIZE - 1) // CHUNK_SIZE
 
-            if bulk_success:
-                bulk_db_time = int((datetime.utcnow() - bulk_db_start).total_seconds() * 1000)
+                try:
+                    chunk_success = await self.read_ops.bulk_store_score_results(chunk)
 
-                # Track performance metrics
-                from app.monitoring.metrics import metrics_collector
-                metrics_collector.record_api_request(
-                    endpoint="bulk_scoring_database",
-                    method="POST",
-                    status_code=200,
-                    response_time_ms=bulk_db_time
-                )
+                    if chunk_success:
+                        successful_count += len(chunk)
+                        self.logger.debug(
+                            f"Chunk {chunk_num}/{total_chunks} succeeded",
+                            chunk_size=len(chunk),
+                            successful_so_far=successful_count
+                        )
+                    else:
+                        failed_count += len(chunk)
+                        self.logger.warning(
+                            f"Chunk {chunk_num}/{total_chunks} returned False",
+                            chunk_size=len(chunk)
+                        )
 
-                self.logger.info(
-                    "Supabase REST operation completed successfully",
-                    successful=len(results),
-                    database_time_ms=bulk_db_time
-                )
+                except Exception as chunk_error:
+                    failed_count += len(chunk)
+                    self.logger.error(
+                        f"Chunk {chunk_num}/{total_chunks} failed",
+                        error=str(chunk_error),
+                        chunk_size=len(chunk)
+                    )
 
-                return len(results), 0
-            else:
-                raise Exception("Bulk operation returned False")
+            bulk_db_time = int((datetime.utcnow() - bulk_db_start).total_seconds() * 1000)
+
+            # Track performance metrics
+            from app.monitoring.metrics import metrics_collector
+            metrics_collector.record_api_request(
+                endpoint="bulk_scoring_database",
+                method="POST",
+                status_code=200 if failed_count == 0 else 207,  # 207 = Multi-Status
+                response_time_ms=bulk_db_time
+            )
+
+            self.logger.info(
+                "Chunked Supabase REST operation completed",
+                successful=successful_count,
+                failed=failed_count,
+                total=total_items,
+                database_time_ms=bulk_db_time
+            )
+
+            # If all chunks failed, fallback to individual transactions
+            if successful_count == 0:
+                raise Exception(f"All {total_chunks} chunks failed")
+
+            return successful_count, failed_count
 
         except Exception as bulk_error:
-            # Fallback to individual transactions if bulk operation fails
+            # Fallback to individual transactions if bulk operation fails completely
             self.logger.warning(
-                "Supabase REST operation failed, falling back to individual transactions",
+                "Supabase REST operation failed completely, falling back to individual transactions",
                 error=str(bulk_error),
                 fallback_method="isolated_transactions"
             )
