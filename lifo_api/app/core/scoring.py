@@ -1689,17 +1689,45 @@ class ScoringService:
                 errors_count=len(errors)
             )
 
-            # STEP 6: Bulk result persistence
+            # STEP 6: Simplified bulk result persistence
             database_successful, database_failed = 0, 0
             if results:
-                database_successful, database_failed = await self.result_persister.persist_results(
-                    results, store_id
+                # Convert ScoringResult objects to dictionaries
+                results_data = []
+                for result in results:
+                    results_data.append({
+                        "batch_id": result.batch_id,
+                        "store_id": result.store_id,
+                        "expiry_score": result.expiry_score,
+                        "velocity_score": result.velocity_score,
+                        "margin_score": result.margin_score,
+                        "composite_score": result.composite_score,
+                        "recommendation": result.recommendation,
+                        "urgency_level": result.urgency_level,
+                        "discount_percent": result.discount_percent,
+                        "reason": result.reason,
+                        "ml_enhanced": result.ml_enhanced,
+                        "confidence_level": result.confidence_level,
+                        "calculated_at": result.calculated_at
+                    })
+                
+                # Use simplified persistence service
+                from app.core.simplified_scoring_persistence import get_simplified_scoring_persistence
+                # Use the db session from SecureReadOnlyOperations
+                persistence_service = get_simplified_scoring_persistence(self.bulk_data_retriever.read_ops.db)
+                
+                persistence_result = await persistence_service.persist_scoring_results(
+                    results_data, store_id
                 )
+                
+                database_successful = persistence_result["successful"]
+                database_failed = persistence_result["failed"]
 
                 self.performance_monitor.log_milestone(
                     "persistence_complete",
                     database_successful=database_successful,
-                    database_failed=database_failed
+                    database_failed=database_failed,
+                    persistence_errors=persistence_result.get("errors", [])
                 )
 
             # STEP 7: Complete monitoring and prepare response
