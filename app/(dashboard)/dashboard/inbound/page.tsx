@@ -1,22 +1,24 @@
 'use client'
 
-import { Keyboard, Scan, Upload } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import ManualInboundEntry from '@/components/inbound/manual-inbound-entry'
 import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { useStoreState } from '@/lib/stores/store-context'
+import { Keyboard, Scan, Upload } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
   const { isTablet, isMobile } = useMediaQuery()
-  const t = useTranslations('inbound')
+  const t = useTranslations('dashboard.inbound')
 
   return (
     <div className="space-y-6">
+      <DashboardInsetHeader title={t('title')} description={t('description')} />
       {/* Mobile Tabs */}
       <Tabs defaultValue="scan" className="w-full lg:hidden">
         <TabsList className="grid w-full grid-cols-2">

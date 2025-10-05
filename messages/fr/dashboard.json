@@ -44,6 +44,26 @@
         "action": "Supprimer des produits"
       }
     },
+    "inbound": {
+      "title": "Réception des stocks",
+      "description": "Scannez ou saisissez de nouveaux articles pour les ajouter à votre inventaire. Vous pouvez scanner des codes-barres, importer un fichier CSV ou saisir manuellement les articles.",
+      "desktop": {
+        "barcodeScanning": "Scanner le code-barres",
+        "csvBulkImport": "Importation CSV",
+        "manualEntry": "Saisie manuelle"
+      },
+      "mobile": {
+        "barcodeScanning": "Scanner",
+        "csvBulkImport": "Import CSV",
+        "manualEntry": "Saisie manuelle"
+      }
+    },
+    "scanOut": {
+      "title": "Sortie des produits",
+      "description": "Scannez les articles à retirer de votre inventaire. Chaque scan retire automatiquement le lot le plus récent du produit scanné, selon le principe LIFO.",
+      "recentlyRemoved": "{count, plural, =0 {Aucun article retiré} =1 {1 article retiré} other {# articles retirés}}",
+      "success": "Produit retiré avec succès"
+    },
     "errors": {
       "noStores": {
         "title": "Aucun Magasin Trouvé",
@@ -564,9 +584,19 @@
       "users": "Gestion d'équipe",
       "account": "Paramètres du compte"
     },
+    "titles": {
+      "dashboard": "Vue d'ensemble du tableau de bord",
+      "notifications": "Notifications",
+      "todos": "Gestion des tâches",
+      "products": "Inventaire des produits",
+      "batches": "Lots d'inventaire",
+      "users": "Gestion d'équipe",
+      "account": "Paramètres du compte"
+    },
     "descriptions": {
       "batches": "Visualisez et gérez les lots d'inventaire de votre magasin",
-      "products": "Visualisez et gérez l'inventaire des produits de votre magasin"
+      "products": "Visualisez et gérez l'inventaire des produits de votre magasin",
+      "dashboard": "Surveillez les performances de votre magasin, suivez l'inventaire et optimisez les opérations avec des insights en temps réel et des recommandations alimentées par l'IA."
     }
   },
   "users": {

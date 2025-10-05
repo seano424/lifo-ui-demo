@@ -44,6 +44,26 @@
         "action": "Verwijder producten"
       }
     },
+    "inbound": {
+      "title": "Voorraad Ontvangst",
+      "description": "Scan of voer nieuwe artikelen in om ze aan uw voorraad toe te voegen. U kunt barcodes scannen, een CSV-bestand uploaden of handmatig artikelen invoeren.",
+      "desktop": {
+        "barcodeScanning": "Barcode Scannen",
+        "csvBulkImport": "CSV Bulk Import",
+        "manualEntry": "Handmatige Invoer"
+      },
+      "mobile": {
+        "barcodeScanning": "Scannen",
+        "csvBulkImport": "CSV Import",
+        "manualEntry": "Handmatige Invoer"
+      }
+    },
+    "scanOut": {
+      "title": "Producten Uitslag",
+      "description": "Scan artikelen om ze uit uw voorraad te verwijderen. Elke scan verwijdert automatisch de meest recente batch van het gescande product, volgens het LIFO-principe.",
+      "recentlyRemoved": "{count, plural, =0 {Geen artikelen verwijderd} =1 {1 artikel verwijderd} other {# artikelen verwijderd}}",
+      "success": "Product succesvol verwijderd"
+    },
     "errors": {
       "noStores": {
         "title": "Geen Winkels Gevonden",
@@ -564,9 +584,19 @@
       "users": "Teambeheer",
       "account": "Accountinstellingen"
     },
+    "titles": {
+      "dashboard": "Dashboard overzicht",
+      "notifications": "Notificaties",
+      "todos": "Taakbeheer",
+      "products": "Product voorraad",
+      "batches": "Voorraad batches",
+      "users": "Teambeheer",
+      "account": "Accountinstellingen"
+    },
     "descriptions": {
       "batches": "Bekijk en beheer de voorraad batches van uw winkel",
-      "products": "Bekijk en beheer uw product voorraad"
+      "products": "Bekijk en beheer uw product voorraad",
+      "dashboard": "Monitor de prestaties van uw winkel, volg voorraad en optimaliseer operaties met real-time inzichten en AI-aangedreven aanbevelingen."
     }
   },
   "users": {

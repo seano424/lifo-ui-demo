@@ -46,7 +46,7 @@ export function QuickActionCards() {
           description="todoSuggestions.description"
           primaryIcon={<CheckSquare className="h-3.5 w-3.5" />}
           secondaryIcon={<ListTodo className="h-4 w-4" />}
-          link="/dashboard/todo"
+          link="/dashboard/todos"
           translationKey="dashboard.quickActions"
         />
       </div>

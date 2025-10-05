@@ -96,7 +96,7 @@ export function MarketingFooter() {
               </a>
               <div className="flex items-center gap-2 mt-8">
                 <a
-                  href="https://linkedin.com/company/lifo-ai"
+                  href="https://www.linkedin.com/company/lifo-app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
