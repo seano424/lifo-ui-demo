@@ -1,6 +1,7 @@
 {
   "marketing": {
     "nav": {
+      "menuButton": "Open menu",
       "about": "About",
       "features": "Features",
       "resources": "Resources",

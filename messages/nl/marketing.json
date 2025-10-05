@@ -1,6 +1,7 @@
 {
   "marketing": {
     "nav": {
+      "menuButton": "Menu openen",
       "about": "Over",
       "features": "Services",
       "resources": "Bronnen",

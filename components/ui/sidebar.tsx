@@ -259,6 +259,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
         onClick?.(event)
         toggleSidebar()
       }}
+      aria-label="Toggle sidebar"
       {...props}
     >
       <PanelLeftIcon />

@@ -32,7 +32,11 @@
     "dateMustBeFuture": "Date must be in the future"
   },
   "common": {
-    "more": "More"
+    "more": "More",
+    "aria": {
+      "toggleTheme": "Toggle theme",
+      "selectLanguage": "Select language"
+    }
   },
   "breadcrumbs": {
     "batches": "Batches",
