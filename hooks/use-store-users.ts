@@ -5,6 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
@@ -17,6 +18,9 @@ import {
   updateStoreUser,
 } from '@/lib/queries/store-users'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+
+// Page size for client-side filtered queries (fetches all users for filtering)
+const FILTERED_USERS_PAGE_SIZE = 100
 
 export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number = 20) {
   const activeStoreId = useActiveStoreId()
@@ -32,6 +36,11 @@ export function useStoreUsers(filters: StoreUserFilters = {}, pageSize: number =
     getNextPageParam: lastPage => lastPage.nextPage,
     initialPageParam: 0,
     enabled: !!activeStoreId,
+    // Cache configuration optimized for user data that changes infrequently
+    staleTime: 5 * 60 * 1000, // 5 minutes - user data doesn't change frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+    refetchOnWindowFocus: false, // Don't refetch on tab switch
+    refetchOnMount: false, // Don't refetch if data exists in cache
   })
 
   // Flatten pages into single array
@@ -67,27 +76,122 @@ export function useStoreUser(userId: string) {
 }
 
 export function useStoreOwners() {
-  return useStoreUsers({ role_in_store: 'owner' })
+  return useFilteredStoreUsers({ role_in_store: 'owner' })
 }
 
 export function useStoreManagers() {
-  return useStoreUsers({ role_in_store: 'manager' })
+  return useFilteredStoreUsers({ role_in_store: 'manager' })
 }
 
 export function useStoreEmployees() {
-  return useStoreUsers({ role_in_store: 'employee' })
+  return useFilteredStoreUsers({ role_in_store: 'employee' })
 }
 
 export function useActiveStoreUsers() {
-  return useStoreUsers({ is_active: true })
+  return useFilteredStoreUsers({ is_active: true })
 }
 
 export function useInactiveStoreUsers() {
-  return useStoreUsers({ is_active: false })
+  return useFilteredStoreUsers({ is_active: false })
 }
 
 export function usePinEnabledUsers() {
-  return useStoreUsers({ can_use_pin_auth: true })
+  return useFilteredStoreUsers({ can_use_pin_auth: true })
+}
+
+/**
+ * Client-side filtered store users hook
+ *
+ * Fetches all users once and filters on the client side for instant performance.
+ *
+ * ✅ **Use when:**
+ * - Store has <50 users
+ * - Multiple filters needed
+ * - Want instant filter updates without network requests
+ *
+ * ❌ **Avoid when:**
+ * - Store has >50 users (use `useStoreUsers` with server-side filters instead)
+ * - Only need a single filter (use `useStoreUsers` directly)
+ *
+ * **Performance:** Fetches all users once (up to 100) and filters client-side.
+ */
+export function useFilteredStoreUsers(filters: StoreUserFilters = {}) {
+  const activeStoreId = useActiveStoreId()
+
+  // Fetch all users once (with caching)
+  const {
+    data: allUsers,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = useStoreUsers({}, FILTERED_USERS_PAGE_SIZE)
+
+  // Filter on the client side using useMemo for performance
+  const filteredUsers = useMemo(() => {
+    if (!allUsers) return []
+
+    return allUsers.filter(user => {
+      // Filter by role
+      if (filters.role_in_store && user.role_in_store !== filters.role_in_store) {
+        return false
+      }
+
+      // Filter by active status
+      if (filters.is_active !== undefined && user.is_active !== filters.is_active) {
+        return false
+      }
+
+      // Filter by PIN auth capability
+      if (
+        filters.can_use_pin_auth !== undefined &&
+        user.can_use_pin_auth !== filters.can_use_pin_auth
+      ) {
+        return false
+      }
+
+      // Filter by PIN access level
+      if (filters.pin_access_level && user.pin_access_level !== filters.pin_access_level) {
+        return false
+      }
+
+      // Filter by email (case-insensitive partial match)
+      if (filters.email) {
+        const emailLower = filters.email.toLowerCase()
+        if (!user.email.toLowerCase().includes(emailLower)) {
+          return false
+        }
+      }
+
+      // Filter by full name (case-insensitive partial match)
+      if (filters.full_name) {
+        const nameLower = filters.full_name.toLowerCase()
+        if (!user.full_name?.toLowerCase().includes(nameLower)) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [
+    allUsers,
+    filters.role_in_store,
+    filters.is_active,
+    filters.can_use_pin_auth,
+    filters.pin_access_level,
+    filters.email,
+    filters.full_name,
+  ])
+
+  return {
+    data: filteredUsers,
+    count: filteredUsers.length,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    storeId: activeStoreId,
+  }
 }
 
 export function useStoreUserActions() {
@@ -138,7 +242,7 @@ export function useStoreUserActions() {
       queryClient.setQueriesData(
         { queryKey: queryKeys.storeUsers.byStore(activeStoreId) },
         (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
-          if (!oldData) return oldData
+          if (!oldData?.pages) return oldData
 
           return {
             ...oldData,
@@ -167,19 +271,31 @@ export function useStoreUserActions() {
       toast.error(`Failed to update user: ${err.message}`)
     },
 
-    onSettled: (_data, _error, { userId }) => {
+    onSuccess: (updatedUser, { userId }) => {
       if (!activeStoreId) return
 
-      // Always refetch after mutation
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.storeUsers.detail(activeStoreId, userId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.storeUsers.byStore(activeStoreId),
-      })
-    },
+      // 🚀 OPTIMIZATION: Update cache with returned data instead of refetching
+      // The RPC already returns the complete updated user data
+      queryClient.setQueryData(queryKeys.storeUsers.detail(activeStoreId, userId), updatedUser)
 
-    onSuccess: () => {
+      // Update the infinite query cache with the updated user
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.storeUsers.byStore(activeStoreId) },
+        (oldData: InfiniteData<{ data: StoreUser[]; nextPage?: number }, number> | undefined) => {
+          if (!oldData?.pages) return oldData
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map(page => ({
+              ...page,
+              data: page.data.map((user: StoreUser) =>
+                user.user_id === userId ? updatedUser : user,
+              ),
+            })),
+          }
+        },
+      )
+
       toast.success('User updated successfully')
     },
   })

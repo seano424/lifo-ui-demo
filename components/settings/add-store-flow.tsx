@@ -93,7 +93,7 @@ export function AddStoreFlow() {
           return (
             queryKey.includes('stores') ||
             queryKey.includes('userPreferences') ||
-            queryKey.includes('currentAuthUser')
+            queryKey.includes('currentUser')
           )
         },
       })

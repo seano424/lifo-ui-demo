@@ -2,6 +2,8 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
+import { logger } from '@/lib/utils/logger'
+import { withPerformanceTracking } from '@/lib/utils/performance'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -27,13 +29,15 @@ export async function fetchUserStores(
   serverClient?: ServerClient,
 ): Promise<UserStore[]> {
   const supabase = serverClient || createClient()
+  const context = 'fetchUserStores'
 
-  try {
-    const { data, error } = await supabase
-      .schema('business')
-      .from('store_users')
-      .select(
-        `
+  return withPerformanceTracking(context, 'Fetch user stores', { userId }, async () => {
+    try {
+      const { data, error } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select(
+          `
         role_in_store,
         permissions,
         stores:store_id (
@@ -57,28 +61,38 @@ export async function fetchUserStores(
           updated_at
         )
       `,
-      )
-      .eq('user_id', userId)
-      .eq('stores.is_active', true)
+        )
+        .eq('user_id', userId)
+        .eq('stores.is_active', true)
 
-    if (error) {
-      console.error('[fetchUserStores] Supabase error:', error)
-      throw new Error(`Failed to fetch user stores: ${error.message}`)
-    }
-
-    const userStores = data.map(item => {
-      return {
-        store: item.stores as unknown as Store,
-        role: item.role_in_store as string,
-        permissions: item.permissions,
+      if (error) {
+        logger.error(context, 'Supabase error', {
+          userId,
+          error: error.message,
+          code: error.code,
+        })
+        throw new Error(`Failed to fetch user stores: ${error.message}`)
       }
-    })
 
-    return userStores
-  } catch (err) {
-    console.error('[fetchUserStores] Unexpected error:', err)
-    throw err
-  }
+      const userStores = data.map(item => {
+        return {
+          store: item.stores as unknown as Store,
+          role: item.role_in_store as string,
+          permissions: item.permissions,
+        }
+      })
+
+      logger.log(context, 'User stores fetched successfully', {
+        userId,
+        storeCount: userStores.length,
+      })
+
+      return userStores
+    } catch (err) {
+      logger.error(context, 'Unexpected error', { userId, error: err })
+      throw err
+    }
+  })
 }
 
 // Alternative query method - direct join to test
@@ -87,14 +101,20 @@ export async function fetchUserStoresAlternative(
   serverClient?: ServerClient,
 ): Promise<UserStore[]> {
   const supabase = serverClient || createClient()
+  const context = 'fetchUserStoresAlternative'
 
-  try {
-    // Direct query with manual join
-    const { data, error } = await supabase
-      .schema('business')
-      .from('stores')
-      .select(
-        `
+  return withPerformanceTracking(
+    context,
+    'Fetch user stores (alternative)',
+    { userId },
+    async () => {
+      try {
+        // Direct query with manual join
+        const { data, error } = await supabase
+          .schema('business')
+          .from('stores')
+          .select(
+            `
         *,
         store_users!inner(
           role_in_store,
@@ -102,69 +122,89 @@ export async function fetchUserStoresAlternative(
           user_id
         )
       `,
-      )
-      .eq('store_users.user_id', userId)
-      .eq('stores.is_active', true)
+          )
+          .eq('store_users.user_id', userId)
+          .eq('stores.is_active', true)
 
-    if (error) {
-      console.error('[fetchUserStoresAlternative] Supabase error:', error)
-      throw new Error(`Failed to fetch user stores: ${error.message}`)
-    }
+        if (error) {
+          logger.error(context, 'Supabase error', {
+            userId,
+            error: error.message,
+            code: error.code,
+          })
+          throw new Error(`Failed to fetch user stores: ${error.message}`)
+        }
 
-    const userStores = data.map(storeData => ({
-      store: {
-        store_id: storeData.store_id,
-        store_name: storeData.store_name,
-        store_code: storeData.store_code,
-        business_name: storeData.business_name,
-        address: storeData.address,
-        city: storeData.city,
-        postal_code: storeData.postal_code,
-        country: storeData.country,
-        timezone: storeData.timezone,
-        store_type: storeData.store_type,
-        size_category: storeData.size_category,
-        default_markup_percent: storeData.default_markup_percent,
-        waste_reduction_target_percent: storeData.waste_reduction_target_percent,
-        owner_id: storeData.owner_id,
-        is_active: storeData.is_active,
-        onboarding_completed: storeData.onboarding_completed,
-        created_at: storeData.created_at,
-        updated_at: storeData.updated_at,
-      } as Store,
-      role: storeData.store_users[0]?.role_in_store as string,
-      permissions: storeData.store_users[0]?.permissions,
-    }))
+        const userStores = data.map(storeData => ({
+          store: {
+            store_id: storeData.store_id,
+            store_name: storeData.store_name,
+            store_code: storeData.store_code,
+            business_name: storeData.business_name,
+            address: storeData.address,
+            city: storeData.city,
+            postal_code: storeData.postal_code,
+            country: storeData.country,
+            timezone: storeData.timezone,
+            store_type: storeData.store_type,
+            size_category: storeData.size_category,
+            default_markup_percent: storeData.default_markup_percent,
+            waste_reduction_target_percent: storeData.waste_reduction_target_percent,
+            owner_id: storeData.owner_id,
+            is_active: storeData.is_active,
+            onboarding_completed: storeData.onboarding_completed,
+            created_at: storeData.created_at,
+            updated_at: storeData.updated_at,
+          } as Store,
+          role: storeData.store_users[0]?.role_in_store as string,
+          permissions: storeData.store_users[0]?.permissions,
+        }))
 
-    return userStores
-  } catch (err) {
-    console.error('[fetchUserStoresAlternative] Unexpected error:', err)
-    throw err
-  }
+        logger.log(context, 'User stores fetched successfully', {
+          userId,
+          storeCount: userStores.length,
+        })
+
+        return userStores
+      } catch (err) {
+        logger.error(context, 'Unexpected error', { userId, error: err })
+        throw err
+      }
+    },
+  )
 }
 
 // Fetch store by ID
 export async function fetchStoreById(storeId: string, serverClient?: ServerClient): Promise<Store> {
   const supabase = serverClient || createClient()
+  const context = 'fetchStoreById'
 
-  try {
-    const { data, error } = await supabase
-      .schema('business')
-      .from('stores')
-      .select('*')
-      .eq('store_id', storeId)
-      .single()
+  return withPerformanceTracking(context, 'Fetch store by ID', { storeId }, async () => {
+    try {
+      const { data, error } = await supabase
+        .schema('business')
+        .from('stores')
+        .select('*')
+        .eq('store_id', storeId)
+        .single()
 
-    if (error) {
-      console.error('[fetchStoreById] Supabase error:', error)
-      throw new Error(`Failed to fetch store: ${error.message}`)
+      if (error) {
+        logger.error(context, 'Supabase error', {
+          storeId,
+          error: error.message,
+          code: error.code,
+        })
+        throw new Error(`Failed to fetch store: ${error.message}`)
+      }
+
+      logger.log(context, 'Store fetched successfully', { storeId })
+
+      return data as Store
+    } catch (err) {
+      logger.error(context, 'Unexpected error', { storeId, error: err })
+      throw err
     }
-
-    return data as Store
-  } catch (err) {
-    console.error('[fetchStoreById] Unexpected error:', err)
-    throw err
-  }
+  })
 }
 
 // Fetch user preferences including primary store
@@ -172,55 +212,81 @@ export async function fetchUserPreferences(
   serverClient?: ServerClient,
 ): Promise<UserPreferences | null> {
   const supabase = serverClient || createClient()
+  const context = 'fetchUserPreferences'
 
-  try {
-    // Don't filter by user_id - let RLS handle it automatically
-    const { data, error } = await supabase
-      .schema('user_mgmt')
-      .from('user_preferences')
-      .select('*')
-      .maybeSingle() // Use maybeSingle() instead of single()
+  return withPerformanceTracking(context, 'Fetch user preferences', {}, async () => {
+    try {
+      // Don't filter by user_id - let RLS handle it automatically
+      const { data, error } = await supabase
+        .schema('user_mgmt')
+        .from('user_preferences')
+        .select('*')
+        .maybeSingle() // Use maybeSingle() instead of single()
 
-    if (error) {
-      console.error('[fetchUserPreferences] Supabase error:', error)
-      // Handle specific error types
-      if (error.code === 'PGRST116') {
-        return null // No row found - this is OK
+      if (error) {
+        logger.error(context, 'Supabase error', {
+          error: error.message,
+          code: error.code,
+        })
+        // Handle specific error types
+        if (error.code === 'PGRST116') {
+          logger.log(context, 'No user preferences found')
+          return null // No row found - this is OK
+        }
+        throw error
       }
-      throw error
-    }
 
-    return data
-  } catch (err) {
-    console.error('[fetchUserPreferences] Unexpected error:', err)
-    // Return null instead of throwing for 406 errors
-    if (err instanceof Error && err.message.includes('406')) {
-      console.warn('Authentication issue, returning null preferences')
-      return null
+      logger.log(context, 'User preferences fetched successfully', {
+        hasPreferences: !!data,
+      })
+
+      return data
+    } catch (err) {
+      logger.error(context, 'Unexpected error', { error: err })
+      // Return null instead of throwing for 406 errors
+      if (err instanceof Error && err.message.includes('406')) {
+        logger.warn(context, 'Authentication issue, returning null preferences')
+        return null
+      }
+      throw err
     }
-    throw err
-  }
+  })
 }
 
 // Update user's primary store
 export async function updateUserPrimaryStore(userId: string, storeId: string): Promise<void> {
   const supabase = createClient()
+  const context = 'updateUserPrimaryStore'
 
-  try {
-    const { error } = await supabase.schema('user_mgmt').from('user_preferences').upsert({
-      user_id: userId,
-      primary_store_id: storeId,
-      updated_at: new Date().toISOString(),
-    })
+  return withPerformanceTracking(
+    context,
+    'Update user primary store',
+    { userId, storeId },
+    async () => {
+      try {
+        const { error } = await supabase.schema('user_mgmt').from('user_preferences').upsert({
+          user_id: userId,
+          primary_store_id: storeId,
+          updated_at: new Date().toISOString(),
+        })
 
-    if (error) {
-      console.error('[updateUserPrimaryStore] Supabase error:', error)
-      throw new Error(`Failed to update primary store: ${error.message}`)
-    }
-  } catch (err) {
-    console.error('[updateUserPrimaryStore] Unexpected error:', err)
-    throw err
-  }
+        if (error) {
+          logger.error(context, 'Supabase error', {
+            userId,
+            storeId,
+            error: error.message,
+            code: error.code,
+          })
+          throw new Error(`Failed to update primary store: ${error.message}`)
+        }
+
+        logger.log(context, 'Primary store updated successfully', { userId, storeId })
+      } catch (err) {
+        logger.error(context, 'Unexpected error', { userId, storeId, error: err })
+        throw err
+      }
+    },
+  )
 }
 
 // Smart store selection logic

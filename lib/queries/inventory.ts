@@ -7,6 +7,8 @@
 import { createClient } from '@/lib/supabase/client'
 import { BATCH_SOURCES } from '@/types/inventory'
 import type { Database, Json } from '@/types/supabase'
+import { logger } from '@/lib/utils/logger'
+import { withPerformanceTracking } from '@/lib/utils/performance'
 
 export interface ScannedProductData {
   barcode: string
@@ -43,37 +45,57 @@ export interface InventorySubmissionResult {
 export async function submitScannedProductToInventory(
   productData: ScannedProductData,
 ): Promise<InventorySubmissionResult> {
-  try {
-    // Step 1: UPSERT to inventory.products table
-    const product = await upsertGlobalProduct(productData)
+  const context = 'submitScannedProductToInventory'
 
-    // Step 2: UPSERT to inventory.store_products table
-    const { created: storeProductCreated } = await upsertStoreProduct(
-      product.product_id,
-      productData,
-    )
+  return withPerformanceTracking(
+    context,
+    'Submit scanned product to inventory',
+    { barcode: productData.barcode, storeId: productData.storeId },
+    async () => {
+      try {
+        // Step 1: UPSERT to inventory.products table
+        const product = await upsertGlobalProduct(productData)
 
-    // Step 3: CREATE new batch in inventory.batches table
-    const batch = await createProductBatch(product.product_id, productData)
+        // Step 2: UPSERT to inventory.store_products table
+        const { created: storeProductCreated } = await upsertStoreProduct(
+          product.product_id,
+          productData,
+        )
 
-    return {
-      success: true,
-      productId: product.product_id,
-      storeProductCreated,
-      batchId: batch.batch_id,
-      message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
-    }
-  } catch (error) {
-    console.error('[submitScannedProductToInventory] Submission failed:', error)
+        // Step 3: CREATE new batch in inventory.batches table
+        const batch = await createProductBatch(product.product_id, productData)
 
-    return {
-      success: false,
-      productId: '',
-      storeProductCreated: false,
-      batchId: '',
-      message: error instanceof Error ? error.message : 'Failed to submit product to inventory',
-    }
-  }
+        logger.log(context, 'Product submitted successfully', {
+          productId: product.product_id,
+          batchId: batch.batch_id,
+          storeId: productData.storeId,
+          quantity: productData.quantity,
+        })
+
+        return {
+          success: true,
+          productId: product.product_id,
+          storeProductCreated,
+          batchId: batch.batch_id,
+          message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
+        }
+      } catch (error) {
+        logger.error(context, 'Submission failed', {
+          error: error instanceof Error ? error.message : String(error),
+          barcode: productData.barcode,
+          storeId: productData.storeId,
+        })
+
+        return {
+          success: false,
+          productId: '',
+          storeProductCreated: false,
+          batchId: '',
+          message: error instanceof Error ? error.message : 'Failed to submit product to inventory',
+        }
+      }
+    },
+  )
 }
 
 /**
@@ -84,6 +106,7 @@ async function upsertGlobalProduct(
   productData: ScannedProductData,
 ): Promise<Database['inventory']['Tables']['products']['Row']> {
   const supabase = createClient()
+  const context = 'upsertGlobalProduct'
 
   try {
     // First, try to find existing product by barcode
@@ -134,14 +157,26 @@ async function upsertGlobalProduct(
             .single()
 
           if (error) {
-            console.error('[upsertGlobalProduct] Failed to update existing product:', error)
+            logger.warn(context, 'Failed to update existing product', {
+              barcode: productData.barcode,
+              productId: existingProduct.product_id,
+              error: error.message,
+            })
             // Continue with existing product data if update fails
             return existingProduct
           }
 
+          logger.log(context, 'Updated existing product', {
+            productId: updatedProduct.product_id,
+            barcode: productData.barcode,
+          })
           return updatedProduct
         }
 
+        logger.log(context, 'Using existing product', {
+          productId: existingProduct.product_id,
+          barcode: productData.barcode,
+        })
         return existingProduct
       }
     }
@@ -177,13 +212,25 @@ async function upsertGlobalProduct(
       .single()
 
     if (error) {
-      console.error('[upsertGlobalProduct] Failed to create product:', error)
+      logger.error(context, 'Failed to create product', {
+        barcode: productData.barcode,
+        error: error.message,
+        code: error.code,
+      })
       throw new Error(`Failed to create product: ${error.message}`)
     }
 
+    logger.log(context, 'Created new product', {
+      productId: newProduct.product_id,
+      barcode: productData.barcode,
+    })
+
     return newProduct
   } catch (error) {
-    console.error('[upsertGlobalProduct] Unexpected error:', error)
+    logger.error(context, 'Unexpected error', {
+      error: error instanceof Error ? error.message : String(error),
+      barcode: productData.barcode,
+    })
     throw error
   }
 }
@@ -197,6 +244,7 @@ async function upsertStoreProduct(
   productData: ScannedProductData,
 ): Promise<{ created: boolean }> {
   const supabase = createClient()
+  const context = 'upsertStoreProduct'
 
   try {
     // Check if store-product association already exists
@@ -245,11 +293,19 @@ async function upsertStoreProduct(
           .eq('product_id', productId)
 
         if (error) {
-          console.error('[upsertStoreProduct] Failed to update store product:', error)
+          logger.warn(context, 'Failed to update store product', {
+            storeId: productData.storeId,
+            productId,
+            error: error.message,
+          })
           // Continue anyway - the association exists
         }
       }
 
+      logger.log(context, 'Using existing store product', {
+        storeId: productData.storeId,
+        productId,
+      })
       return { created: false }
     }
 
@@ -272,13 +328,26 @@ async function upsertStoreProduct(
       .insert(newStoreProductData)
 
     if (error) {
-      console.error('[upsertStoreProduct] Failed to create store product:', error)
+      logger.error(context, 'Failed to create store product', {
+        storeId: productData.storeId,
+        productId,
+        error: error.message,
+        code: error.code,
+      })
       throw new Error(`Failed to link product to store: ${error.message}`)
     }
 
+    logger.log(context, 'Created new store product', {
+      storeId: productData.storeId,
+      productId,
+    })
     return { created: true }
   } catch (error) {
-    console.error('[upsertStoreProduct] Unexpected error:', error)
+    logger.error(context, 'Unexpected error', {
+      error: error instanceof Error ? error.message : String(error),
+      storeId: productData.storeId,
+      productId,
+    })
     throw error
   }
 }
@@ -292,6 +361,7 @@ async function createProductBatch(
   productData: ScannedProductData,
 ): Promise<Database['inventory']['Tables']['batches']['Row']> {
   const supabase = createClient()
+  const context = 'createProductBatch'
 
   try {
     // Generate unique batch number using UUID for guaranteed uniqueness
@@ -326,9 +396,12 @@ async function createProductBatch(
       .single()
 
     if (error) {
-      console.error('[createProductBatch] Failed to create batch:', error)
-
       if (error.code === '23505' && error.message.includes('batch_number')) {
+        logger.warn(context, 'Batch number collision, retrying', {
+          batchNumber,
+          productId,
+          storeId: productData.storeId,
+        })
         // Batch number collision (extremely rare with UUID), retry with new UUID
         const retryBatchData = {
           ...newBatchData,
@@ -343,18 +416,43 @@ async function createProductBatch(
           .single()
 
         if (retryError) {
+          logger.error(context, 'Failed to create batch after retry', {
+            productId,
+            storeId: productData.storeId,
+            error: retryError.message,
+          })
           throw new Error(`Failed to create batch after retry: ${retryError.message}`)
         }
 
+        logger.log(context, 'Batch created successfully (after retry)', {
+          batchId: retryBatch.batch_id,
+          productId,
+          storeId: productData.storeId,
+        })
         return retryBatch
       }
 
+      logger.error(context, 'Failed to create batch', {
+        productId,
+        storeId: productData.storeId,
+        error: error.message,
+        code: error.code,
+      })
       throw new Error(`Failed to create batch: ${error.message}`)
     }
 
+    logger.log(context, 'Batch created successfully', {
+      batchId: newBatch.batch_id,
+      productId,
+      storeId: productData.storeId,
+    })
     return newBatch
   } catch (error) {
-    console.error('[createProductBatch] Unexpected error:', error)
+    logger.error(context, 'Unexpected error', {
+      error: error instanceof Error ? error.message : String(error),
+      productId,
+      storeId: productData.storeId,
+    })
     throw error
   }
 }
@@ -374,6 +472,8 @@ async function mapCategoryToId(
   categoryName: string,
   supabase: ReturnType<typeof createClient>,
 ): Promise<string | null> {
+  const context = 'mapCategoryToId'
+
   try {
     const now = Date.now()
 
@@ -400,6 +500,8 @@ async function mapCategoryToId(
           categoryCache!.set(cat.category_code.toLowerCase(), cat.category_id)
         }
       })
+
+      logger.log(context, 'Category cache refreshed', { categoryCount: categories?.length || 0 })
     }
 
     // Try exact match first, then fuzzy match
@@ -417,9 +519,13 @@ async function mapCategoryToId(
       }
     }
 
+    logger.warn(context, 'Category not found', { categoryName })
     return null
   } catch (error) {
-    console.warn('[mapCategoryToId] Category mapping failed:', error)
+    logger.warn(context, 'Category mapping failed', {
+      error: error instanceof Error ? error.message : String(error),
+      categoryName,
+    })
     return null
   }
 }
@@ -456,6 +562,7 @@ async function bulkUpsertProducts(
   productsData: ScannedProductData[],
 ): Promise<Database['inventory']['Tables']['products']['Row'][]> {
   const supabase = createClient()
+  const context = 'bulkUpsertProducts'
   const userId = (await supabase.auth.getUser()).data.user?.id
 
   // Group products by barcode to handle duplicates
@@ -467,6 +574,11 @@ async function bulkUpsertProducts(
   })
 
   const uniqueProducts = Array.from(productMap.values())
+
+  logger.log(context, 'Processing products', {
+    total: productsData.length,
+    unique: uniqueProducts.length,
+  })
 
   // Prepare bulk insert data
   const bulkProductData: Database['inventory']['Tables']['products']['Insert'][] =
@@ -506,6 +618,11 @@ async function bulkUpsertProducts(
   // Split into new products (to insert) and existing products (to return)
   const newProducts = bulkProductData.filter(p => !existingBarcodesSet.has(p.barcode))
 
+  logger.log(context, 'Products analyzed', {
+    existing: existingProducts?.length || 0,
+    new: newProducts.length,
+  })
+
   let allProducts = [...(existingProducts || [])]
 
   // Bulk insert only new products (no conflicts)
@@ -517,11 +634,16 @@ async function bulkUpsertProducts(
       .select()
 
     if (error) {
-      console.error('[bulkUpsertProducts] Bulk insert failed:', error)
+      logger.error(context, 'Bulk insert failed', {
+        error: error.message,
+        code: error.code,
+        newProductCount: newProducts.length,
+      })
       throw new Error(`Bulk product insert failed: ${error.message}`)
     }
 
     allProducts = [...allProducts, ...(insertedProducts || [])]
+    logger.log(context, 'New products inserted', { count: insertedProducts?.length || 0 })
   }
 
   return allProducts
@@ -535,6 +657,7 @@ async function bulkUpsertStoreProducts(
   productsData: ScannedProductData[],
 ): Promise<void> {
   const supabase = createClient()
+  const context = 'bulkUpsertStoreProducts'
   const userId = (await supabase.auth.getUser()).data.user?.id
 
   // Create product lookup map by barcode
@@ -565,7 +688,10 @@ async function bulkUpsertStoreProducts(
     }
   })
 
-  if (storeProductData.length === 0) return
+  if (storeProductData.length === 0) {
+    logger.warn(context, 'No store products to upsert')
+    return
+  }
 
   // Get existing store products
   const { data: existingStoreProducts } = await supabase
@@ -590,6 +716,12 @@ async function bulkUpsertStoreProducts(
     sp => !existingPairs.has(`${sp.store_id}-${sp.product_id}`),
   )
 
+  logger.log(context, 'Store products analyzed', {
+    total: storeProductData.length,
+    existing: existingPairs.size,
+    new: newStoreProducts.length,
+  })
+
   if (newStoreProducts.length > 0) {
     const { error } = await supabase
       .schema('inventory')
@@ -597,9 +729,15 @@ async function bulkUpsertStoreProducts(
       .insert(newStoreProducts)
 
     if (error) {
-      console.error('[bulkUpsertStoreProducts] Bulk insert failed:', error)
+      logger.error(context, 'Bulk insert failed', {
+        error: error.message,
+        code: error.code,
+        newProductCount: newStoreProducts.length,
+      })
       throw new Error(`Bulk store product insert failed: ${error.message}`)
     }
+
+    logger.log(context, 'New store products inserted', { count: newStoreProducts.length })
   }
 }
 
@@ -611,6 +749,7 @@ async function bulkInsertBatches(
   productsData: ScannedProductData[],
 ): Promise<Database['inventory']['Tables']['batches']['Row'][]> {
   const supabase = createClient()
+  const context = 'bulkInsertBatches'
   const userId = (await supabase.auth.getUser()).data.user?.id
 
   // Create product lookup map by barcode
@@ -648,8 +787,11 @@ async function bulkInsertBatches(
   })
 
   if (batchData.length === 0) {
+    logger.error(context, 'No valid products found for batch creation')
     throw new Error('No valid products found for batch creation')
   }
+
+  logger.log(context, 'Preparing batches for insert', { batchCount: batchData.length })
 
   // Bulk insert batches
   const { data: insertedBatches, error } = await supabase
@@ -659,9 +801,17 @@ async function bulkInsertBatches(
     .select()
 
   if (error) {
-    console.error('[bulkInsertBatches] Bulk insert failed:', error)
+    logger.error(context, 'Bulk insert failed', {
+      error: error.message,
+      code: error.code,
+      batchCount: batchData.length,
+    })
     throw new Error(`Bulk batch insert failed: ${error.message}`)
   }
+
+  logger.log(context, 'Batches inserted successfully', {
+    count: insertedBatches?.length || 0,
+  })
 
   return insertedBatches || []
 }
@@ -676,86 +826,95 @@ export async function submitMultipleScannedProducts(products: ScannedProductData
   successCount: number
   failureCount: number
 }> {
+  const context = 'submitMultipleScannedProducts'
+
   if (products.length === 0) {
+    logger.warn(context, 'No products to submit')
     return { success: false, results: [], successCount: 0, failureCount: 0 }
   }
 
-  try {
-    console.log(
-      `[submitMultipleScannedProducts] Starting bulk submission for ${products.length} products`,
-    )
+  return withPerformanceTracking(
+    context,
+    'Bulk submit scanned products',
+    { productCount: products.length },
+    async () => {
+      try {
+        logger.log(context, 'Starting bulk submission', { productCount: products.length })
 
-    // Step 1: Bulk upsert all products (1 DB call)
-    const upsertedProducts = await bulkUpsertProducts(products)
-    console.log(`[submitMultipleScannedProducts] Upserted ${upsertedProducts.length} products`)
+        // Step 1: Bulk upsert all products (1 DB call)
+        const upsertedProducts = await bulkUpsertProducts(products)
+        logger.log(context, 'Products upserted', { count: upsertedProducts.length })
 
-    // Step 2: Bulk upsert all store-product associations (1 DB call)
-    await bulkUpsertStoreProducts(upsertedProducts, products)
-    console.log(`[submitMultipleScannedProducts] Upserted store-product associations`)
+        // Step 2: Bulk upsert all store-product associations (1 DB call)
+        await bulkUpsertStoreProducts(upsertedProducts, products)
+        logger.log(context, 'Store-product associations created')
 
-    // Step 3: Bulk insert all batches (1 DB call)
-    const insertedBatches = await bulkInsertBatches(upsertedProducts, products)
-    console.log(`[submitMultipleScannedProducts] Inserted ${insertedBatches.length} batches`)
+        // Step 3: Bulk insert all batches (1 DB call)
+        const insertedBatches = await bulkInsertBatches(upsertedProducts, products)
+        logger.log(context, 'Batches inserted', { count: insertedBatches.length })
 
-    // Create product lookup for result mapping
-    const productLookup = new Map(upsertedProducts.map(product => [product.barcode, product]))
+        // Create product lookup for result mapping
+        const productLookup = new Map(upsertedProducts.map(product => [product.barcode, product]))
 
-    const batchLookup = new Map(insertedBatches.map(batch => [batch.product_id, batch]))
+        const batchLookup = new Map(insertedBatches.map(batch => [batch.product_id, batch]))
 
-    // Build results array maintaining original order
-    const results: InventorySubmissionResult[] = products.map(productData => {
-      const product = productLookup.get(productData.barcode)
-      const batch = product ? batchLookup.get(product.product_id) : null
+        // Build results array maintaining original order
+        const results: InventorySubmissionResult[] = products.map(productData => {
+          const product = productLookup.get(productData.barcode)
+          const batch = product ? batchLookup.get(product.product_id) : null
 
-      if (product && batch) {
+          if (product && batch) {
+            return {
+              success: true,
+              productId: product.product_id,
+              storeProductCreated: true, // We always create/update store products in bulk
+              batchId: batch.batch_id,
+              message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
+            }
+          } else {
+            return {
+              success: false,
+              productId: '',
+              storeProductCreated: false,
+              batchId: '',
+              message: `Failed to process ${productData.productName}`,
+            }
+          }
+        })
+
+        const successCount = results.filter(r => r.success).length
+        const failureCount = results.length - successCount
+
+        logger.log(context, 'Bulk submission complete', { successCount, failureCount })
+
         return {
-          success: true,
-          productId: product.product_id,
-          storeProductCreated: true, // We always create/update store products in bulk
-          batchId: batch.batch_id,
-          message: `Successfully added ${productData.quantity} units of ${productData.productName} to inventory`,
+          success: successCount > 0,
+          results,
+          successCount,
+          failureCount,
         }
-      } else {
-        return {
+      } catch (error) {
+        logger.error(context, 'Bulk submission failed', {
+          error: error instanceof Error ? error.message : String(error),
+          productCount: products.length,
+        })
+
+        // Return failure results for all products
+        const results: InventorySubmissionResult[] = products.map(_productData => ({
           success: false,
           productId: '',
           storeProductCreated: false,
           batchId: '',
-          message: `Failed to process ${productData.productName}`,
+          message: error instanceof Error ? error.message : 'Bulk submission failed',
+        }))
+
+        return {
+          success: false,
+          results,
+          successCount: 0,
+          failureCount: products.length,
         }
       }
-    })
-
-    const successCount = results.filter(r => r.success).length
-    const failureCount = results.length - successCount
-
-    console.log(
-      `[submitMultipleScannedProducts] Bulk submission complete: ${successCount} success, ${failureCount} failures`,
-    )
-
-    return {
-      success: successCount > 0,
-      results,
-      successCount,
-      failureCount,
-    }
-  } catch (error) {
-    console.error('[submitMultipleScannedProducts] Bulk submission failed:', error)
-
-    // Return failure results for all products
-    const results: InventorySubmissionResult[] = products.map(_productData => ({
-      success: false,
-      productId: '',
-      storeProductCreated: false,
-      batchId: '',
-      message: error instanceof Error ? error.message : 'Bulk submission failed',
-    }))
-
-    return {
-      success: false,
-      results,
-      successCount: 0,
-      failureCount: products.length,
-    }
-  }
+    },
+  )
 }

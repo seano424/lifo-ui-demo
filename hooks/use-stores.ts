@@ -13,39 +13,13 @@ import {
   updateUserPrimaryStore,
 } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
-import { createClient } from '@/lib/supabase/client'
+import { useCurrentUser } from './use-users'
 
 const ACTIVE_STORE_KEY = 'activeStoreId'
 
-// Hook to get current auth user
-function useCurrentAuthUser() {
-  return useQuery({
-    queryKey: ['currentAuthUser'],
-    queryFn: async () => {
-      const supabase = createClient()
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser()
-
-      if (error || !user) {
-        // Return null instead of throwing to avoid error during logout
-        return null
-      }
-
-      return user
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-    refetchOnMount: false, // Don't refetch if we have cached data
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    retry: false,
-  })
-}
-
 // Hook to get user's stores and automatically set active store
 export function useUserStores() {
-  const { data: currentUser } = useCurrentAuthUser()
+  const { data: currentUser } = useCurrentUser()
   const { setActiveStore, setUserStores, setLoadingStores, activeStore, userStores } =
     useStoreState()
 
@@ -124,7 +98,7 @@ export function useUserStores() {
 export function useStoreActions() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { data: currentUser } = useCurrentAuthUser()
+  const { data: currentUser } = useCurrentUser()
   const { setActiveStore, setChangingStore, activeStore } = useStoreState()
 
   const updatePrimaryStoreMutation = useMutation({

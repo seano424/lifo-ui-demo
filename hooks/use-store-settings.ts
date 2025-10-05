@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useCurrentUser, usePermissions } from '@/hooks/use-users'
+import { usePermissionsNew } from '@/hooks/use-complete-user-profile'
+import { useCurrentUser } from '@/hooks/use-users'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   debugStoreAccess,
@@ -33,7 +34,7 @@ export function useStorePermissions({
     isManager,
     isEmployee,
     isLoading: permissionsLoading,
-  } = usePermissions()
+  } = usePermissionsNew()
 
   if (serverPermissions && effectiveStoreId) {
     return {

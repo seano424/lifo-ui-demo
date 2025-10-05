@@ -41,7 +41,8 @@ export default async function UsersPage() {
     )
   }
 
-  // Prefetch store users for the primary store
+  // Prefetch only the main store users query once
+  // Client-side filtering will handle role/status filters without additional queries
   await queryClient.prefetchInfiniteQuery({
     queryKey: queryKeys.storeUsers.infinite(primaryStore.store_id, {}),
     queryFn: ({ pageParam = 0 }) =>
@@ -55,64 +56,6 @@ export default async function UsersPage() {
     getNextPageParam: lastPage => lastPage.nextPage,
     pages: 1,
   })
-
-  // Also prefetch active store users for stats
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: queryKeys.storeUsers.infinite(primaryStore.store_id, { is_active: true }),
-    queryFn: ({ pageParam = 0 }) =>
-      fetchStoreUsersPage(
-        primaryStore.store_id,
-        { page: pageParam, pageSize: 20 },
-        { is_active: true },
-        serverClient,
-      ),
-    initialPageParam: 0,
-    getNextPageParam: lastPage => lastPage.nextPage,
-    pages: 1,
-  })
-
-  // Prefetch users by role for stats
-  await Promise.all([
-    queryClient.prefetchInfiniteQuery({
-      queryKey: queryKeys.storeUsers.infinite(primaryStore.store_id, { role_in_store: 'owner' }),
-      queryFn: ({ pageParam = 0 }) =>
-        fetchStoreUsersPage(
-          primaryStore.store_id,
-          { page: pageParam, pageSize: 20 },
-          { role_in_store: 'owner' },
-          serverClient,
-        ),
-      initialPageParam: 0,
-      getNextPageParam: lastPage => lastPage.nextPage,
-      pages: 1,
-    }),
-    queryClient.prefetchInfiniteQuery({
-      queryKey: queryKeys.storeUsers.infinite(primaryStore.store_id, { role_in_store: 'manager' }),
-      queryFn: ({ pageParam = 0 }) =>
-        fetchStoreUsersPage(
-          primaryStore.store_id,
-          { page: pageParam, pageSize: 20 },
-          { role_in_store: 'manager' },
-          serverClient,
-        ),
-      initialPageParam: 0,
-      getNextPageParam: lastPage => lastPage.nextPage,
-      pages: 1,
-    }),
-    queryClient.prefetchInfiniteQuery({
-      queryKey: queryKeys.storeUsers.infinite(primaryStore.store_id, { role_in_store: 'employee' }),
-      queryFn: ({ pageParam = 0 }) =>
-        fetchStoreUsersPage(
-          primaryStore.store_id,
-          { page: pageParam, pageSize: 20 },
-          { role_in_store: 'employee' },
-          serverClient,
-        ),
-      initialPageParam: 0,
-      getNextPageParam: lastPage => lastPage.nextPage,
-      pages: 1,
-    }),
-  ])
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

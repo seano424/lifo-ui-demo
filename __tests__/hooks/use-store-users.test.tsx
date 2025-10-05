@@ -228,67 +228,100 @@ describe('useStoreUsers hooks', () => {
 
   describe('useStoreOwners', () => {
     it('fetches only owners', async () => {
+      // useStoreOwners uses client-side filtering, so it fetches all users
       mockFetchStoreUsersPage.mockResolvedValue({
-        data: [{ user_id: 'owner-1', role_in_store: 'owner' }],
-        count: 1,
+        data: [
+          { user_id: 'owner-1', role_in_store: 'owner' },
+          { user_id: 'manager-1', role_in_store: 'manager' },
+        ],
+        count: 2,
         nextPage: undefined,
       })
 
-      renderHook(() => useStoreOwners(), {
+      const { result } = renderHook(() => useStoreOwners(), {
         wrapper: createWrapper(),
       })
 
       await waitFor(() => {
         expect(mockFetchStoreUsersPage).toHaveBeenCalledWith(
           'store-123',
-          { page: 0, pageSize: 20 },
-          { role_in_store: 'owner' },
+          { page: 0, pageSize: 100 },
+          {},
         )
       })
+
+      // Wait for data to load
+      await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+      // Client-side filtering should only return owners
+      expect(result.current.data).toHaveLength(1)
+      expect(result.current.data[0].role_in_store).toBe('owner')
     })
   })
 
   describe('useStoreManagers', () => {
     it('fetches only managers', async () => {
+      // useStoreManagers uses client-side filtering, so it fetches all users
       mockFetchStoreUsersPage.mockResolvedValue({
-        data: [{ user_id: 'manager-1', role_in_store: 'manager' }],
-        count: 1,
+        data: [
+          { user_id: 'manager-1', role_in_store: 'manager' },
+          { user_id: 'employee-1', role_in_store: 'employee' },
+        ],
+        count: 2,
         nextPage: undefined,
       })
 
-      renderHook(() => useStoreManagers(), {
+      const { result } = renderHook(() => useStoreManagers(), {
         wrapper: createWrapper(),
       })
 
       await waitFor(() => {
         expect(mockFetchStoreUsersPage).toHaveBeenCalledWith(
           'store-123',
-          { page: 0, pageSize: 20 },
-          { role_in_store: 'manager' },
+          { page: 0, pageSize: 100 },
+          {},
         )
       })
+
+      // Wait for data to load
+      await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+      // Client-side filtering should only return managers
+      expect(result.current.data).toHaveLength(1)
+      expect(result.current.data[0].role_in_store).toBe('manager')
     })
   })
 
   describe('useStoreEmployees', () => {
     it('fetches only employees', async () => {
+      // useStoreEmployees uses client-side filtering, so it fetches all users
       mockFetchStoreUsersPage.mockResolvedValue({
-        data: [{ user_id: 'employee-1', role_in_store: 'employee' }],
-        count: 1,
+        data: [
+          { user_id: 'employee-1', role_in_store: 'employee' },
+          { user_id: 'owner-1', role_in_store: 'owner' },
+        ],
+        count: 2,
         nextPage: undefined,
       })
 
-      renderHook(() => useStoreEmployees(), {
+      const { result } = renderHook(() => useStoreEmployees(), {
         wrapper: createWrapper(),
       })
 
       await waitFor(() => {
         expect(mockFetchStoreUsersPage).toHaveBeenCalledWith(
           'store-123',
-          { page: 0, pageSize: 20 },
-          { role_in_store: 'employee' },
+          { page: 0, pageSize: 100 },
+          {},
         )
       })
+
+      // Wait for data to load
+      await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+      // Client-side filtering should only return employees
+      expect(result.current.data).toHaveLength(1)
+      expect(result.current.data[0].role_in_store).toBe('employee')
     })
   })
 
@@ -457,6 +490,38 @@ describe('useStoreUsers hooks', () => {
         await waitFor(() => expect(result.current.isRemoving).toBe(false))
 
         expect(toast.error).toHaveBeenCalledWith('Failed to remove user: Cannot remove owner')
+      })
+
+      it('handles RPC permission errors', async () => {
+        mockRemoveUserFromStore.mockRejectedValue(
+          new Error('Insufficient permissions to manage this user'),
+        )
+
+        const { result } = renderHook(() => useStoreUserActions(), {
+          wrapper: createWrapper(),
+        })
+
+        result.current.removeUser('user-1')
+
+        await waitFor(() => expect(result.current.isRemoving).toBe(false))
+
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to remove user: Insufficient permissions to manage this user',
+        )
+      })
+
+      it('handles RPC user not found errors', async () => {
+        mockRemoveUserFromStore.mockRejectedValue(new Error('User not found in store'))
+
+        const { result } = renderHook(() => useStoreUserActions(), {
+          wrapper: createWrapper(),
+        })
+
+        result.current.removeUser('user-1')
+
+        await waitFor(() => expect(result.current.isRemoving).toBe(false))
+
+        expect(toast.error).toHaveBeenCalledWith('Failed to remove user: User not found in store')
       })
     })
 
