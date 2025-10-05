@@ -100,6 +100,7 @@ export function MarketingFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
+                  aria-label="Visit LIFO.AI on LinkedIn"
                 >
                   <Linkedin size={16} />
                 </a>
