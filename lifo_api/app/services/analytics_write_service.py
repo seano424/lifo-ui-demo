@@ -456,17 +456,30 @@ class AnalyticsWriteService:
                     )
                     
                     if not existing_check.scalar_one_or_none():
-                        recommendation = BatchAction(
-                            batch_id=result["batch_id"],
-                            store_id=store_id,
-                            recommended_action=result.get("recommendation", "discount"),
-                            action_type="maintain",
-                            ai_score=Decimal(str(urgency_score)),
-                            performed_at=datetime.now(UTC)
+                        # Fetch batch to get initial quantity
+                        from app.database.inventory_models import Batch
+                        batch_result = await session.execute(
+                            select(Batch).where(Batch.batch_id == result["batch_id"])
                         )
-                        session.add(recommendation)
-                        recommendations_created += 1
-                        tx.increment_operation()
+                        batch = batch_result.scalar_one_or_none()
+
+                        if batch:
+                            recommendation = BatchAction(
+                                batch_id=result["batch_id"],
+                                store_id=store_id,
+                                recommended_action=result.get("recommendation", "discount"),
+                                action_type="maintain",
+                                ai_score=Decimal(str(urgency_score)),
+                                performed_at=datetime.now(UTC),
+                                # Required NOT NULL fields
+                                quantity_affected=Decimal("0"),
+                                total_original_value=Decimal("0"),
+                                total_recovered_value=Decimal("0"),
+                                batch_initial_quantity=batch.initial_quantity,
+                            )
+                            session.add(recommendation)
+                            recommendations_created += 1
+                            tx.increment_operation()
                         
             except Exception as e:
                 logger.warning(

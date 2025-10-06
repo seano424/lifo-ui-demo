@@ -622,7 +622,19 @@ class UnifiedWriteService:
         tx: TransactionManager
     ) -> dict[str, Any]:
         """Setup action tracking for AI recommendations"""
-        
+
+        # Fetch batch to get initial quantity
+        from app.database.inventory_models import Batch
+        from sqlalchemy import select
+
+        batch_result = await session.execute(
+            select(Batch).where(Batch.batch_id == uuid.UUID(batch_id))
+        )
+        batch = batch_result.scalar_one_or_none()
+
+        if not batch:
+            raise ValueError(f"Batch not found: {batch_id}")
+
         action_record = BatchAction(
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
@@ -630,13 +642,18 @@ class UnifiedWriteService:
             action_type="maintain",  # Default until user acts
             ai_score=Decimal(str(score_result["urgency_score"])),
             performed_at=datetime.now(UTC),
-            performed_by=uuid.UUID(user_id)
+            performed_by=uuid.UUID(user_id),
+            # Required NOT NULL fields
+            quantity_affected=Decimal("0"),
+            total_original_value=Decimal("0"),
+            total_recovered_value=Decimal("0"),
+            batch_initial_quantity=batch.initial_quantity,
         )
-        
+
         session.add(action_record)
         await session.flush()
         tx.increment_operation()
-        
+
         return {
             "action_id": action_record.entry_id,
             "recommended_action": score_result["recommendation"]
@@ -831,17 +848,30 @@ class UnifiedWriteService:
                     )
                     
                     if not existing_check.scalar_one_or_none():
-                        recommendation = BatchAction(
-                            batch_id=uuid.UUID(result["batch_id"]),
-                            store_id=uuid.UUID(store_id),
-                            recommended_action=result["recommendation"],
-                            actual_action="maintain",
-                            ai_score=Decimal(str(result["urgency_score"])),
-                            action_date=datetime.utcnow()
+                        # Fetch batch to get initial quantity
+                        from app.database.inventory_models import Batch
+                        batch_result = await session.execute(
+                            select(Batch).where(Batch.batch_id == uuid.UUID(result["batch_id"]))
                         )
-                        session.add(recommendation)
-                        recommendations_created += 1
-                        tx.increment_operation()
+                        batch = batch_result.scalar_one_or_none()
+
+                        if batch:
+                            recommendation = BatchAction(
+                                batch_id=uuid.UUID(result["batch_id"]),
+                                store_id=uuid.UUID(store_id),
+                                recommended_action=result["recommendation"],
+                                action_type="maintain",
+                                ai_score=Decimal(str(result["urgency_score"])),
+                                performed_at=datetime.now(UTC),
+                                # Required NOT NULL fields
+                                quantity_affected=Decimal("0"),
+                                total_original_value=Decimal("0"),
+                                total_recovered_value=Decimal("0"),
+                                batch_initial_quantity=batch.initial_quantity,
+                            )
+                            session.add(recommendation)
+                            recommendations_created += 1
+                            tx.increment_operation()
                         
             except Exception as e:
                 logger.warning(
@@ -867,6 +897,17 @@ class UnifiedWriteService:
         
         for action_data in mobile_actions:
             try:
+                # Fetch batch to get initial quantity
+                from app.database.inventory_models import Batch
+                batch_result = await session.execute(
+                    select(Batch).where(Batch.batch_id == uuid.UUID(action_data["batch_id"]))
+                )
+                batch = batch_result.scalar_one_or_none()
+
+                if not batch:
+                    logger.warning("Batch not found for mobile action", batch_id=action_data["batch_id"])
+                    continue
+
                 # Create or update action record
                 action = BatchAction(
                     batch_id=uuid.UUID(action_data["batch_id"]),
@@ -877,9 +918,12 @@ class UnifiedWriteService:
                     performed_at=datetime.fromisoformat(action_data.get("action_date", action_data.get("performed_at", datetime.now(UTC).isoformat()))),
                     performed_by=uuid.UUID(user_id),
                     quantity_affected=Decimal(str(action_data.get("quantity_affected", 0))),
+                    total_original_value=Decimal(str(action_data.get("original_value", action_data.get("total_original_value", 0)))),
+                    total_recovered_value=Decimal(str(action_data.get("recovered_value", action_data.get("total_recovered_value", 0)))),
+                    batch_initial_quantity=batch.initial_quantity,
                     notes=action_data.get("notes")
                 )
-                
+
                 session.add(action)
                 synced_count += 1
                 tx.increment_operation()
