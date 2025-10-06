@@ -3,6 +3,7 @@ Optimized Batch Creation Service for High-Performance CSV Import
 Implements advanced database optimization techniques for 3x+ performance improvement
 """
 
+import asyncio
 import uuid
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
@@ -31,9 +32,10 @@ class OptimizedBatchCreationService:
     """
 
     # Optimal chunk sizes based on testing
-    OPTIMAL_CHUNK_SIZE = 100  # Increased from 50 for better throughput
+    OPTIMAL_CHUNK_SIZE = 50   # Smaller chunks for better concurrency
     MAX_CHUNK_SIZE = 500      # Maximum safe chunk size for memory
-    
+    MAX_CONCURRENT_CHUNKS = 5 # Concurrent chunk processing
+
     # Cache for category lookups
     _category_cache: dict[str, uuid.UUID] = {}
     _cache_loaded = False
@@ -138,51 +140,69 @@ class OptimizedBatchCreationService:
         async with self.async_session() as session:
             await self._preload_category_cache(session)
 
-        # Process in optimized chunks
+        # Prepare chunks for concurrent processing
+        chunks = []
         for chunk_start in range(0, total_requests, chunk_size):
             chunk_end = min(chunk_start + chunk_size, total_requests)
             chunk_requests = batch_requests[chunk_start:chunk_end]
-            
-            chunk_db_start = time.perf_counter()
-            
-            try:
-                chunk_results = await self._process_chunk_ultra_optimized(
-                    store_id, user_id, chunk_requests, chunk_start
-                )
-                
-                successful_batches.extend(chunk_results["successful"])
-                failed_batches.extend(chunk_results["failed"])
-                created_products.update(chunk_results["created_products"])
-                updated_products.update(chunk_results["updated_products"])
-                
-                chunk_db_time = time.perf_counter() - chunk_db_start
-                db_time_total += chunk_db_time
-                
-                logger.info(
-                    "Chunk processed successfully",
-                    chunk_start=chunk_start,
-                    chunk_end=chunk_end,
-                    successful=len(chunk_results["successful"]),
-                    failed=len(chunk_results["failed"]),
-                    chunk_time_ms=chunk_db_time * 1000,
-                )
-                
-            except Exception as e:
-                logger.error(
-                    "Chunk processing failed",
-                    chunk_start=chunk_start,
-                    chunk_end=chunk_end,
-                    error=str(e),
-                )
-                
-                # Mark entire chunk as failed
-                for i, request in enumerate(chunk_requests):
-                    failed_batches.append({
-                        "index": chunk_start + i,
-                        "barcode": request.barcode,
-                        "product_name": request.product_name,
-                        "error": f"Chunk processing failed: {str(e)}",
-                    })
+            chunks.append((chunk_requests, chunk_start, chunk_end))
+
+        # Process chunks concurrently with semaphore limiting
+        semaphore = asyncio.Semaphore(self.MAX_CONCURRENT_CHUNKS)
+
+        async def process_chunk_with_semaphore(chunk_data):
+            chunk_requests, chunk_start, chunk_end = chunk_data
+            async with semaphore:
+                chunk_db_start = time.perf_counter()
+                try:
+                    chunk_results = await self._process_chunk_ultra_optimized(
+                        store_id, user_id, chunk_requests, chunk_start
+                    )
+                    chunk_db_time = time.perf_counter() - chunk_db_start
+
+                    logger.info(
+                        "Chunk processed successfully",
+                        chunk_start=chunk_start,
+                        chunk_end=chunk_end,
+                        successful=len(chunk_results["successful"]),
+                        failed=len(chunk_results["failed"]),
+                        chunk_time_ms=chunk_db_time * 1000,
+                    )
+                    return chunk_results, chunk_db_time
+
+                except Exception as e:
+                    logger.error(
+                        "Chunk processing failed",
+                        chunk_start=chunk_start,
+                        chunk_end=chunk_end,
+                        error=str(e),
+                    )
+                    # Return failed results for entire chunk
+                    failed_results = []
+                    for i, request in enumerate(chunk_requests):
+                        failed_results.append({
+                            "index": chunk_start + i,
+                            "barcode": request.barcode,
+                            "product_name": request.product_name,
+                            "error": f"Chunk processing failed: {str(e)}",
+                        })
+                    return {"successful": [], "failed": failed_results, "created_products": set(), "updated_products": set()}, 0
+
+        # Execute all chunks concurrently
+        results_list = await asyncio.gather(*[process_chunk_with_semaphore(chunk) for chunk in chunks], return_exceptions=True)
+
+        # Aggregate results
+        for result in results_list:
+            if isinstance(result, Exception):
+                logger.error("Chunk processing exception", error=str(result))
+                continue
+
+            chunk_results, chunk_db_time = result
+            successful_batches.extend(chunk_results["successful"])
+            failed_batches.extend(chunk_results["failed"])
+            created_products.update(chunk_results["created_products"])
+            updated_products.update(chunk_results["updated_products"])
+            db_time_total += chunk_db_time
 
         # Calculate performance metrics
         total_time = time.perf_counter() - start_time

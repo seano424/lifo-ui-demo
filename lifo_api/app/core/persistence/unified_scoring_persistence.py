@@ -27,6 +27,8 @@ import asyncpg
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from monitoring_config import log_performance_alert
+
 logger = structlog.get_logger()
 
 
@@ -41,10 +43,10 @@ class UnifiedScoringPersistence:
 
     # Performance-tuned configuration
     COPY_THRESHOLD = 50  # Use COPY for batches >= 50 items
-    CHUNK_SIZE = 50  # Optimal chunk size for REST API fallback
+    CHUNK_SIZE = 25  # Smaller chunks for better concurrency
     MAX_RETRIES = 3
     RETRY_DELAY_BASE = 0.3
-    MAX_CONCURRENT_CHUNKS = 5
+    MAX_CONCURRENT_CHUNKS = 10  # Increased concurrency for WSL2 REST fallback
     CHUNK_TIMEOUT = 10.0
 
     def __init__(self, session: AsyncSession):
@@ -79,7 +81,27 @@ class UnifiedScoringPersistence:
                 "errors": []
             }
 
+        # CRITICAL FIX: Deduplicate results by batch_id to prevent upsert conflicts
+        # PostgreSQL error 21000: "ON CONFLICT DO UPDATE command cannot affect row a second time"
+        # occurs when multiple rows with the same unique key are in a single upsert batch
+        original_count = len(results)
+        deduplicated_results = {}
+        for result in results:
+            batch_id = str(result.get("batch_id"))
+            # Keep the last occurrence (most recent score)
+            deduplicated_results[batch_id] = result
+
+        results = list(deduplicated_results.values())
         total_items = len(results)
+
+        if total_items < original_count:
+            self.logger.warning(
+                "Deduplicated scoring results before persistence",
+                original_count=original_count,
+                deduplicated_count=total_items,
+                duplicates_removed=original_count - total_items,
+                store_id=store_id
+            )
 
         self.logger.info(
             "Starting unified scoring persistence",
@@ -123,6 +145,10 @@ class UnifiedScoringPersistence:
                 "success_rate": f"{round(result.get('successful', 0) / total_items * 100, 1)}%"
             }
         )
+
+        # Check performance thresholds and alert
+        metric_name = f"scoring_{result.get('method', 'unknown')}"
+        log_performance_alert(metric_name, result["processing_time_ms"], self.logger)
 
         return result
 
