@@ -34,12 +34,12 @@ class SupabaseSafePersistence:
         self.session = session
         self.logger = structlog.get_logger().bind(component="supabase_safe_persistence")
         
-        # Ultra-conservative settings to avoid Supabase timeouts
-        self.CHUNK_SIZE = 25  # Very small chunks to avoid statement timeout
-        self.MAX_RETRIES = 3
-        self.RETRY_DELAY_BASE = 0.2  # Fast retry
-        self.MAX_CONCURRENT_CHUNKS = 8  # High concurrency to maintain throughput
-        self.CHUNK_TIMEOUT = 5.0  # Very fast timeout detection
+        # ULTRA-HIGH CONCURRENCY to overcome WSL→Supabase network latency
+        self.CHUNK_SIZE = 25   # Keep small chunks for reliability
+        self.MAX_RETRIES = 2   # Fewer retries for speed
+        self.RETRY_DELAY_BASE = 0.1  # Ultra-fast retry
+        self.MAX_CONCURRENT_CHUNKS = 20  # MASSIVE concurrency for network latency
+        self.CHUNK_TIMEOUT = 8.0  # Slightly longer for network overhead
     
     async def persist_scoring_results(
         self, 
