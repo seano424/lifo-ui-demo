@@ -196,11 +196,11 @@ class StructuredLogger:
     
     def set_correlation_context(
         self,
-        correlation_id: Optional[str] = None,
-        session_id: Optional[str] = None,
-        tenant_id: Optional[str] = None,
-        user_id: Optional[str] = None,
-        request_id: Optional[str] = None
+        correlation_id: str | None = None,
+        session_id: str | None = None,
+        tenant_id: str | None = None,
+        user_id: str | None = None,
+        request_id: str | None = None
     ):
         """Set correlation context for current request"""
         
@@ -224,11 +224,11 @@ class StructuredLogger:
         operation: str,
         category: str,
         message: str,
-        store_id: Optional[str] = None,
-        batch_id: Optional[str] = None,
-        item_count: Optional[int] = None,
-        processing_time_ms: Optional[float] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        store_id: str | None = None,
+        batch_id: str | None = None,
+        item_count: int | None = None,
+        processing_time_ms: float | None = None,
+        metadata: dict[str, Any] | None = None,
         level: str = "info"
     ):
         """Log business event with standardized structure"""
@@ -258,9 +258,9 @@ class StructuredLogger:
         operation: str,
         execution_time_ms: float,
         success: bool,
-        result_count: Optional[int] = None,
-        error: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        result_count: int | None = None,
+        error: str | None = None,
+        metadata: dict[str, Any] | None = None
     ):
         """Log performance event"""
         
@@ -284,12 +284,12 @@ class StructuredLogger:
     def log_security_event(
         self,
         event_type: str,
-        user_id: Optional[str] = None,
-        client_ip: Optional[str] = None,
-        user_agent: Optional[str] = None,
+        user_id: str | None = None,
+        client_ip: str | None = None,
+        user_agent: str | None = None,
         success: bool = True,
-        reason: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        reason: str | None = None,
+        metadata: dict[str, Any] | None = None
     ):
         """Log security event"""
         
@@ -319,11 +319,11 @@ class StructuredLogger:
         endpoint: str,
         status_code: int,
         response_time_ms: float,
-        user_id: Optional[str] = None,
-        client_ip: Optional[str] = None,
-        user_agent: Optional[str] = None,
-        request_size: Optional[int] = None,
-        response_size: Optional[int] = None
+        user_id: str | None = None,
+        client_ip: str | None = None,
+        user_agent: str | None = None,
+        request_size: int | None = None,
+        response_size: int | None = None
     ):
         """Log API request"""
         
@@ -359,13 +359,13 @@ class StructuredLogger:
     def log_scoring_event(
         self,
         operation: str,
-        category: Optional[str] = None,
-        item_count: Optional[int] = None,
-        processing_time_ms: Optional[float] = None,
-        algorithm_version: Optional[str] = None,
-        confidence_score: Optional[float] = None,
-        store_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        category: str | None = None,
+        item_count: int | None = None,
+        processing_time_ms: float | None = None,
+        algorithm_version: str | None = None,
+        confidence_score: float | None = None,
+        store_id: str | None = None,
+        metadata: dict[str, Any] | None = None
     ):
         """Log scoring algorithm event"""
         
@@ -395,12 +395,12 @@ class StructuredLogger:
         self,
         operation: str,
         item_count: int,
-        store_id: Optional[str] = None,
-        batch_id: Optional[str] = None,
-        processing_time_ms: Optional[float] = None,
-        waste_reduction_estimate: Optional[float] = None,
-        cost_impact: Optional[float] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        store_id: str | None = None,
+        batch_id: str | None = None,
+        processing_time_ms: float | None = None,
+        waste_reduction_estimate: float | None = None,
+        cost_impact: float | None = None,
+        metadata: dict[str, Any] | None = None
     ):
         """Log inventory management event"""
         

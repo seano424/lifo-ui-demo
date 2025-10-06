@@ -22,7 +22,7 @@ class BarcodeDetectionResult:
     checksum_valid: bool
     source: str  # 'single_block', 'fragmented', 'zero_padded', 'context_enhanced'
     raw_text: str
-    bounding_box: Optional[dict] = None
+    bounding_box: dict | None = None
     position_score: float = 0.0  # Positioning heuristic score
 
 
@@ -32,7 +32,7 @@ class BarcodeCandidate:
     text: str
     clean_digits: str
     original_text: str
-    bounding_box: Optional[dict]
+    bounding_box: dict | None
     index: int
     context_score: float = 0.0
 
@@ -149,7 +149,7 @@ class BarcodeDetectionService:
     async def detect_barcodes_from_text_blocks(
         self,
         text_blocks: list[str],
-        bounding_boxes: Optional[list[dict]] = None,
+        bounding_boxes: list[dict] | None = None,
         region_preference: str = 'EU'
     ) -> list[BarcodeDetectionResult]:
         """
@@ -229,7 +229,7 @@ class BarcodeDetectionService:
     def _extract_candidates_from_block(
         self,
         text_block: str,
-        bounding_box: Optional[dict],
+        bounding_box: dict | None,
         index: int
     ) -> list[BarcodeCandidate]:
         """Extract potential barcode candidates from a text block"""
@@ -472,7 +472,7 @@ class BarcodeDetectionService:
         format_name: str,
         format_info: dict,
         source: str
-    ) -> Optional[BarcodeDetectionResult]:
+    ) -> BarcodeDetectionResult | None:
         """Create a BarcodeDetectionResult from a candidate"""
         try:
             # Validate checksum
@@ -548,7 +548,7 @@ class BarcodeDetectionService:
 
         return min(max(base_confidence, 0.0), 1.0)
 
-    def _calculate_position_score(self, bounding_box: Optional[dict]) -> float:
+    def _calculate_position_score(self, bounding_box: dict | None) -> float:
         """Calculate position-based heuristic score"""
         if not bounding_box:
             return 0.5  # Neutral score
@@ -795,7 +795,7 @@ class BarcodeDetectionService:
 
 
 # Global service instance
-_barcode_detection_service: Optional[BarcodeDetectionService] = None
+_barcode_detection_service: BarcodeDetectionService | None = None
 
 def get_barcode_detection_service() -> BarcodeDetectionService:
     """Get singleton instance of barcode detection service"""

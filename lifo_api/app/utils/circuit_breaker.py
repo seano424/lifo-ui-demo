@@ -6,7 +6,8 @@ Prevents cascading failures when external services (like Google Vision API) are 
 import asyncio
 import time
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any, Optional
+from collections.abc import Callable
 
 import structlog
 
@@ -163,7 +164,7 @@ class CircuitBreaker:
 
 
 # Global circuit breakers for different services
-_vision_api_breaker: Optional[CircuitBreaker] = None
+_vision_api_breaker: CircuitBreaker | None = None
 
 
 def get_vision_api_breaker() -> CircuitBreaker:

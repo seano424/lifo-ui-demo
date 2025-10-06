@@ -36,7 +36,7 @@ class HealthStatus(str, Enum):
 async def comprehensive_health_check(
     include_performance: bool = Query(True, description="Include performance metrics"),
     include_detailed: bool = Query(False, description="Include detailed service info")
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Comprehensive health check combining:
     - Database connectivity (Supabase + SQLAlchemy)
@@ -48,7 +48,7 @@ async def comprehensive_health_check(
     """
     start_time = asyncio.get_event_loop().time()
     
-    health_status: Dict[str, Any] = {
+    health_status: dict[str, Any] = {
         "status": HealthStatus.HEALTHY,
         "timestamp": datetime.utcnow().isoformat(),
         "services": {},
@@ -126,7 +126,7 @@ async def comprehensive_health_check(
 @router.get("/k8s")
 async def kubernetes_probes(
     probe_type: str = Query("both", description="ready, live, or both")
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Kubernetes probes endpoint - combines readiness and liveness
     Lightweight checks for container orchestration
@@ -173,8 +173,8 @@ async def kubernetes_probes(
 async def performance_metrics(
     include_mobile: bool = Query(True, description="Include mobile performance"),
     include_detailed: bool = Query(False, description="Include detailed metrics"),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-) -> Dict[str, Any]:
+    current_user: dict[str, Any] = Depends(get_current_user)
+) -> dict[str, Any]:
     """
     Performance metrics and mobile optimization status
     Consolidates performance monitoring into single endpoint
@@ -225,7 +225,7 @@ async def _quick_supabase_check() -> bool:
         return False
 
 
-async def _get_performance_summary(metrics_collector) -> Dict[str, Any]:
+async def _get_performance_summary(metrics_collector) -> dict[str, Any]:
     """Get consolidated performance summary"""
     try:
         metrics_summary = metrics_collector.get_metrics_summary()
@@ -240,7 +240,7 @@ async def _get_performance_summary(metrics_collector) -> Dict[str, Any]:
         return {"error": "Performance data unavailable"}
 
 
-async def _get_mobile_performance_analysis(metrics_collector) -> Dict[str, Any]:
+async def _get_mobile_performance_analysis(metrics_collector) -> dict[str, Any]:
     """Detailed mobile performance analysis"""
     mobile_endpoints = {
         "mobile_summary": {"target_ms": 300, "critical": True},

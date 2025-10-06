@@ -35,7 +35,7 @@ class OptimizedBatchCreationService:
     MAX_CHUNK_SIZE = 500      # Maximum safe chunk size for memory
     
     # Cache for category lookups
-    _category_cache: Dict[str, uuid.UUID] = {}
+    _category_cache: dict[str, uuid.UUID] = {}
     _cache_loaded = False
 
     def __init__(self):
@@ -95,9 +95,9 @@ class OptimizedBatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
-        chunk_size: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        batch_requests: list[BatchFromScanRequest],
+        chunk_size: int | None = None,
+    ) -> dict[str, Any]:
         """
         Ultra-optimized bulk batch creation with 3x+ performance improvement
         
@@ -229,9 +229,9 @@ class OptimizedBatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        chunk_requests: List[BatchFromScanRequest],
+        chunk_requests: list[BatchFromScanRequest],
         chunk_start: int,
-    ) -> Dict[str, List]:
+    ) -> dict[str, list]:
         """
         Ultra-optimized chunk processing with minimal database operations
         
@@ -319,8 +319,8 @@ class OptimizedBatchCreationService:
         self,
         session: AsyncSession,
         store_id: str,
-        barcodes: List[str],
-    ) -> Dict[str, Tuple[uuid.UUID, bool]]:
+        barcodes: list[str],
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
         """
         Optimized bulk product lookup with single efficient query
         """
@@ -364,9 +364,9 @@ class OptimizedBatchCreationService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        barcode_to_requests: Dict[str, List[BatchFromScanRequest]],
-        existing_products: Dict[str, Tuple[uuid.UUID, bool]],
-    ) -> Dict[str, Tuple[uuid.UUID, bool]]:
+        barcode_to_requests: dict[str, list[BatchFromScanRequest]],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
         """
         Bulk UPSERT products using PostgreSQL ON CONFLICT for maximum efficiency
         Returns mapping of barcode -> (product_id, was_created)
@@ -608,10 +608,10 @@ class OptimizedBatchCreationService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
-        product_mapping: Dict[str, Tuple[uuid.UUID, bool]],
+        batch_requests: list[BatchFromScanRequest],
+        product_mapping: dict[str, tuple[uuid.UUID, bool]],
         chunk_start: int,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Bulk insert all batches using single INSERT statement
         """
@@ -724,7 +724,7 @@ class OptimizedBatchCreationService:
         logger.info("Category pre-loading disabled for pgbouncer compatibility")
         self._cache_loaded = True
 
-    async def _get_category_id_cached(self, category_str: Optional[str]) -> Optional[uuid.UUID]:
+    async def _get_category_id_cached(self, category_str: str | None) -> uuid.UUID | None:
         """Get category ID from cache"""
         if not category_str:
             # Return default category

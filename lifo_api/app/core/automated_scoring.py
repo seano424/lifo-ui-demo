@@ -37,13 +37,13 @@ class ScoringScheduleConfig(BaseModel):
     schedule_type: str = Field(default="cron", description="'cron' or 'interval'")
 
     # Cron configuration (for cron schedule_type)
-    cron_expression: Optional[str] = Field(
+    cron_expression: str | None = Field(
         default="0 */4 * * *",  # Every 4 hours by default
         description="Cron expression (minute hour day month day_of_week)"
     )
 
     # Interval configuration (for interval schedule_type)
-    interval_hours: Optional[int] = Field(
+    interval_hours: int | None = Field(
         default=4,
         description="Hours between scoring runs (for interval type)"
     )
@@ -76,7 +76,7 @@ class ScoringJobResult(BaseModel):
     schedule_id: str
     store_id: str
     started_at: datetime
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
     status: str = "running"  # running, completed, failed, timeout
 
     # Results
@@ -86,12 +86,12 @@ class ScoringJobResult(BaseModel):
     processing_time_ms: int = 0
 
     # Error handling
-    error_message: Optional[str] = None
+    error_message: str | None = None
     retry_count: int = 0
 
     # Performance metrics
-    items_per_second: Optional[float] = None
-    database_operations: Optional[Dict[str, int]] = None
+    items_per_second: float | None = None
+    database_operations: dict[str, int] | None = None
 
 
 class AutomatedScoringScheduler:
@@ -102,8 +102,8 @@ class AutomatedScoringScheduler:
 
     def __init__(self):
         self.scheduler = AsyncIOScheduler()
-        self.active_schedules: Dict[str, ScoringScheduleConfig] = {}
-        self.job_results: Dict[str, ScoringJobResult] = {}
+        self.active_schedules: dict[str, ScoringScheduleConfig] = {}
+        self.job_results: dict[str, ScoringJobResult] = {}
         self.logger = structlog.get_logger().bind(component="automated_scoring_scheduler")
         self._is_running = False
 
@@ -278,7 +278,7 @@ class AutomatedScoringScheduler:
             )
             return False
 
-    async def get_schedule_status(self, schedule_id: str) -> Optional[Dict[str, Any]]:
+    async def get_schedule_status(self, schedule_id: str) -> dict[str, Any] | None:
         """
         Get status of a scoring schedule
 
@@ -338,7 +338,7 @@ class AutomatedScoringScheduler:
             )
             return None
 
-    async def list_active_schedules(self) -> List[Dict[str, Any]]:
+    async def list_active_schedules(self) -> list[dict[str, Any]]:
         """
         List all active scoring schedules
 
@@ -396,7 +396,7 @@ class AutomatedScoringScheduler:
             )
             raise
 
-    async def get_job_result(self, job_id: str) -> Optional[ScoringJobResult]:
+    async def get_job_result(self, job_id: str) -> ScoringJobResult | None:
         """
         Get result of a scoring job
 
@@ -518,7 +518,7 @@ class AutomatedScoringScheduler:
                     high_priority_count=result.high_priority_count
                 )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             result.completed_at = datetime.utcnow()
             result.status = "timeout"
             result.error_message = f"Scoring timed out after {config.timeout_minutes} minutes"
@@ -651,7 +651,7 @@ class AutomatedScoringScheduler:
 
 
 # Global scheduler instance
-_scheduler_instance: Optional[AutomatedScoringScheduler] = None
+_scheduler_instance: AutomatedScoringScheduler | None = None
 
 
 def get_automated_scoring_scheduler() -> AutomatedScoringScheduler:

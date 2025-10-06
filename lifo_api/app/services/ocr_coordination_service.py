@@ -23,8 +23,8 @@ class OCRClassificationResult:
     content_type: str  # 'date', 'barcode', 'text', 'mixed', 'uncertain'
     confidence: float
     reasoning: str
-    date_results: List[DateExtractionResult]
-    barcode_results: List[BarcodeDetectionResult]
+    date_results: list[DateExtractionResult]
+    barcode_results: list[BarcodeDetectionResult]
     raw_text: str
 
 
@@ -63,10 +63,10 @@ class OCRCoordinationService:
 
     async def classify_text_content(
         self,
-        text_blocks: List[str],
-        bounding_boxes: Optional[List[dict]] = None,
+        text_blocks: list[str],
+        bounding_boxes: list[dict] | None = None,
         preferred_region: str = 'EU'
-    ) -> List[OCRClassificationResult]:
+    ) -> list[OCRClassificationResult]:
         """
         Classify text content as dates, barcodes, or other text
 
@@ -101,7 +101,7 @@ class OCRCoordinationService:
     async def _classify_single_block(
         self,
         text_block: str,
-        bounding_box: Optional[dict],
+        bounding_box: dict | None,
         preferred_region: str
     ) -> OCRClassificationResult:
         """Classify a single text block"""
@@ -125,8 +125,8 @@ class OCRCoordinationService:
     def _resolve_classification_conflicts(
         self,
         text_block: str,
-        date_results: List[DateExtractionResult],
-        barcode_results: List[BarcodeDetectionResult],
+        date_results: list[DateExtractionResult],
+        barcode_results: list[BarcodeDetectionResult],
         preferred_region: str
     ) -> OCRClassificationResult:
         """Resolve conflicts between date and barcode detections"""
@@ -175,7 +175,7 @@ class OCRCoordinationService:
     def _calculate_date_score(
         self,
         text_block: str,
-        date_results: List[DateExtractionResult]
+        date_results: list[DateExtractionResult]
     ) -> float:
         """Calculate overall score for date classification"""
         if not date_results:
@@ -214,7 +214,7 @@ class OCRCoordinationService:
     def _calculate_barcode_score(
         self,
         text_block: str,
-        barcode_results: List[BarcodeDetectionResult]
+        barcode_results: list[BarcodeDetectionResult]
     ) -> float:
         """Calculate overall score for barcode classification"""
         if not barcode_results:
@@ -252,8 +252,8 @@ class OCRCoordinationService:
 
     def get_classification_summary(
         self,
-        classifications: List[OCRClassificationResult]
-    ) -> Dict[str, any]:
+        classifications: list[OCRClassificationResult]
+    ) -> dict[str, any]:
         """Get summary statistics for classification results"""
         if not classifications:
             return {'error': 'No classifications provided'}
@@ -292,7 +292,7 @@ class OCRCoordinationService:
         self,
         text_block: str,
         classification: OCRClassificationResult
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """Debug information for classification conflicts"""
         return {
             'text_block': text_block,
@@ -323,7 +323,7 @@ class OCRCoordinationService:
 
 
 # Global service instance
-_ocr_coordination_service: Optional[OCRCoordinationService] = None
+_ocr_coordination_service: OCRCoordinationService | None = None
 
 def get_ocr_coordination_service() -> OCRCoordinationService:
     """Get singleton instance of OCR coordination service"""

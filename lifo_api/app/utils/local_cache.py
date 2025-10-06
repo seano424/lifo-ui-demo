@@ -111,7 +111,7 @@ class LocalMemoryCache:
             max_size=self._max_size
         )
 
-    def get(self, key_data: Any) -> Optional[Any]:
+    def get(self, key_data: Any) -> Any | None:
         """Get value from cache"""
         cache_key = self._generate_key(key_data)
 
@@ -139,7 +139,7 @@ class LocalMemoryCache:
         self,
         key_data: Any,
         value: Any,
-        ttl_seconds: Optional[int] = None
+        ttl_seconds: int | None = None
     ) -> None:
         """Set value in cache with TTL"""
         cache_key = self._generate_key(key_data)
@@ -202,7 +202,7 @@ class LocalMemoryCache:
 
 
 # Global cache instance for OCR results
-_ocr_cache: Optional[LocalMemoryCache] = None
+_ocr_cache: LocalMemoryCache | None = None
 
 
 def get_ocr_cache() -> LocalMemoryCache:
@@ -228,7 +228,7 @@ def cache_ocr_result(image_data: bytes, result: Any) -> None:
     cache.set(image_data, result, settings.ocr_cache_ttl_seconds)
 
 
-def get_cached_ocr_result(image_data: bytes) -> Optional[Any]:
+def get_cached_ocr_result(image_data: bytes) -> Any | None:
     """Get cached OCR result for image data"""
     from app.core.config import settings
     if not settings.ocr_enable_caching:

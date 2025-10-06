@@ -42,10 +42,10 @@ class AnalyticsWriteService:
     async def bulk_write_scoring_results(
         self,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         include_recommendations: bool = True,
         update_actions: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Bulk write scoring results with consolidated operations
         
@@ -148,9 +148,9 @@ class AnalyticsWriteService:
     
     async def batch_analytics_events(
         self,
-        events: List[Dict[str, Any]],
+        events: list[dict[str, Any]],
         flush_interval_seconds: int = 5
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Batch analytics events for efficient writes
         
@@ -211,9 +211,9 @@ class AnalyticsWriteService:
     async def write_performance_metrics(
         self,
         store_id: str,
-        metrics_data: Dict[str, Any],
+        metrics_data: dict[str, Any],
         time_window: timedelta = timedelta(minutes=5)
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Write performance metrics with aggregation
         
@@ -262,8 +262,8 @@ class AnalyticsWriteService:
         self,
         user_id: str,
         store_id: str,
-        actions: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        actions: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Bulk track user actions with analytics
         
@@ -337,7 +337,7 @@ class AnalyticsWriteService:
     async def _bulk_upsert_product_scores(
         self,
         session: AsyncSession,
-        scores_data: List[Dict[str, Any]],
+        scores_data: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Bulk upsert product scores with conflict resolution"""
@@ -389,7 +389,7 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Bulk update batch actions based on scoring results"""
@@ -431,7 +431,7 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Create recommendation records for high urgency items"""
@@ -480,8 +480,8 @@ class AnalyticsWriteService:
     
     def _group_events_for_processing(
         self, 
-        events: List[Dict[str, Any]]
-    ) -> Dict[str, List[Dict[str, Any]]]:
+        events: list[dict[str, Any]]
+    ) -> dict[str, list[dict[str, Any]]]:
         """Group events by type and store for optimal processing"""
         
         grouped = {}
@@ -499,7 +499,7 @@ class AnalyticsWriteService:
     async def _process_event_group(
         self,
         event_group: str,
-        events: List[Dict[str, Any]]
+        events: list[dict[str, Any]]
     ):
         """Process a group of similar events"""
         
@@ -517,10 +517,10 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        metrics_data: Dict[str, Any],
+        metrics_data: dict[str, Any],
         time_window: timedelta,
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Aggregate performance metrics for the time window"""
         
         # Simple aggregation for now
@@ -542,7 +542,7 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        aggregated_metrics: Dict[str, Any],
+        aggregated_metrics: dict[str, Any],
         tx: TransactionManager
     ) -> int:
         """Write aggregated metrics to storage"""
@@ -561,8 +561,8 @@ class AnalyticsWriteService:
     
     def _group_actions_by_type(
         self, 
-        actions: List[Dict[str, Any]]
-    ) -> Dict[str, List[Dict[str, Any]]]:
+        actions: list[dict[str, Any]]
+    ) -> dict[str, list[dict[str, Any]]]:
         """Group actions by type for optimized processing"""
         
         grouped = {}
@@ -581,9 +581,9 @@ class AnalyticsWriteService:
         user_id: str,
         store_id: str,
         action_type: str,
-        actions: List[Dict[str, Any]],
+        actions: list[dict[str, Any]],
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process a group of user actions of the same type"""
         
         tracked = 0

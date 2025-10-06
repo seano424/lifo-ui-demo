@@ -553,7 +553,7 @@ class OCRConfigurationManager:
 
 
 # Global configuration manager instance
-_ocr_config_manager: Optional[OCRConfigurationManager] = None
+_ocr_config_manager: OCRConfigurationManager | None = None
 
 
 def get_ocr_config_manager() -> OCRConfigurationManager:

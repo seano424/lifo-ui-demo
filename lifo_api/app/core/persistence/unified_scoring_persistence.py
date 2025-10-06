@@ -469,7 +469,7 @@ class UnifiedScoringPersistence:
                 else:
                     raise Exception("Upsert returned no result")
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 if attempt < self.MAX_RETRIES - 1:
                     await asyncio.sleep(self.RETRY_DELAY_BASE * (attempt + 1))
                     continue

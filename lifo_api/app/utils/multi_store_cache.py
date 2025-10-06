@@ -18,7 +18,7 @@ class MultiStoreCache:
     __slots__ = ('_cache', '_default_ttl', '_stats')
     
     def __init__(self, default_ttl_minutes: int = 5):
-        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._cache: dict[str, dict[str, Any]] = {}
         self._default_ttl = timedelta(minutes=default_ttl_minutes)
         self._stats = {
             "hits": 0,
@@ -27,14 +27,14 @@ class MultiStoreCache:
             "evictions": 0
         }
     
-    def _generate_key(self, user_id: str, operation: str, params: Optional[Dict[str, Any]] = None) -> str:
+    def _generate_key(self, user_id: str, operation: str, params: dict[str, Any] | None = None) -> str:
         """Generate cache key for multi-store operations"""
         if params:
             param_str = "_".join(f"{k}:{v}" for k, v in sorted(params.items()))
             return f"multi_store:{user_id}:{operation}:{param_str}"
         return f"multi_store:{user_id}:{operation}"
     
-    def _is_expired(self, cache_entry: Dict[str, Any]) -> bool:
+    def _is_expired(self, cache_entry: dict[str, Any]) -> bool:
         """Check if cache entry has expired"""
         return datetime.utcnow() > cache_entry["expires_at"]
     
@@ -50,7 +50,7 @@ class MultiStoreCache:
             del self._cache[key]
             self._stats["evictions"] += 1
     
-    async def get(self, user_id: str, operation: str, params: Optional[Dict[str, Any]] = None) -> Optional[Any]:
+    async def get(self, user_id: str, operation: str, params: dict[str, Any] | None = None) -> Any | None:
         """Get cached data for multi-store operation"""
         try:
             # Periodic cleanup (every 10th operation)
@@ -87,7 +87,7 @@ class MultiStoreCache:
             logger.warning("Multi-store cache get failed", error=str(e))
             return None
     
-    async def set(self, user_id: str, operation: str, data: Any, params: Optional[Dict[str, Any]] = None, ttl_minutes: Optional[int] = None) -> None:
+    async def set(self, user_id: str, operation: str, data: Any, params: dict[str, Any] | None = None, ttl_minutes: int | None = None) -> None:
         """Cache data for multi-store operation"""
         try:
             cache_key = self._generate_key(user_id, operation, params)
@@ -165,7 +165,7 @@ class MultiStoreCache:
         except Exception as e:
             logger.warning("Multi-store cache operation invalidation failed", error=str(e))
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache performance statistics"""
         total_requests = self._stats["hits"] + self._stats["misses"]
         hit_rate = (self._stats["hits"] / total_requests * 100) if total_requests > 0 else 0
@@ -188,7 +188,7 @@ class MultiStoreCache:
 
 
 # Global cache instance for the application
-_multi_store_cache: Optional[MultiStoreCache] = None
+_multi_store_cache: MultiStoreCache | None = None
 
 
 def get_multi_store_cache() -> MultiStoreCache:
@@ -206,7 +206,7 @@ async def cache_multi_store_operation(
     user_id: str,
     operation: str,
     data_fetcher,
-    params: Optional[Dict[str, Any]] = None,
+    params: dict[str, Any] | None = None,
     ttl_minutes: int = 5
 ) -> Any:
     """

@@ -31,7 +31,7 @@ class OCRTextBlock:
     text: str
     confidence: float
     bounding_box: dict
-    language: Optional[str] = None
+    language: str | None = None
 
 
 @dataclass
@@ -52,11 +52,11 @@ class EnhancedVisionResult:
     processing_time_ms: float
 
     # Enhanced quality assessment
-    quality_assessment: Optional[ImageQualityAssessment] = None
+    quality_assessment: ImageQualityAssessment | None = None
 
     # Metadata
-    language_detected: Optional[str] = None
-    region_detected: Optional[str] = None
+    language_detected: str | None = None
+    region_detected: str | None = None
     quality_profile_used: str = ""
     cache_hit: bool = False
 
@@ -73,7 +73,7 @@ class EnhancedVisionService:
     - Performance optimization for mobile and batch processing
     """
 
-    def __init__(self, project_id: Optional[str] = None):
+    def __init__(self, project_id: str | None = None):
         """Initialize enhanced vision service"""
         self.project_id = project_id
         self.client = None
@@ -135,9 +135,9 @@ class EnhancedVisionService:
     async def process_image_comprehensive(
         self,
         image_data: bytes,
-        extraction_types: Optional[list[str]] = None,
-        quality_override: Optional[str] = None,
-        region_override: Optional[str] = None
+        extraction_types: list[str] | None = None,
+        quality_override: str | None = None,
+        region_override: str | None = None
     ) -> EnhancedVisionResult:
         """
         Process image with comprehensive extraction capabilities
@@ -426,7 +426,7 @@ class EnhancedVisionService:
         self,
         ocr_result: 'OCRExtractionResult',
         extraction_results: dict,
-        quality_assessment: Optional[ImageQualityAssessment] = None
+        quality_assessment: ImageQualityAssessment | None = None
     ) -> dict[str, Any]:
         """Calculate quality metrics for the overall extraction"""
 
@@ -487,7 +487,7 @@ class EnhancedVisionService:
 
         return min(max(base_score, 0.0), 1.0)
 
-    def _detect_primary_language(self, text: str) -> Optional[str]:
+    def _detect_primary_language(self, text: str) -> str | None:
         """Detect primary language from text content"""
         # Simple keyword-based detection
         text_lower = text.lower()
@@ -511,7 +511,7 @@ class EnhancedVisionService:
 
         return 'english'  # Default
 
-    def _detect_region_from_extractions(self, extraction_results: dict) -> Optional[str]:
+    def _detect_region_from_extractions(self, extraction_results: dict) -> str | None:
         """Detect region preference from extraction patterns"""
         # Check date formats
         dates = extraction_results.get('dates', [])
@@ -579,7 +579,7 @@ class OCRExtractionResult:
 
 
 # Global service instance
-_enhanced_vision_service: Optional[EnhancedVisionService] = None
+_enhanced_vision_service: EnhancedVisionService | None = None
 
 def get_enhanced_vision_service() -> EnhancedVisionService:
     """Get singleton instance of enhanced vision service"""

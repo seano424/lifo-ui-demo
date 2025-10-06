@@ -33,11 +33,11 @@ class CreateScheduleRequest(BaseModel):
         pattern="^(cron|interval)$",
         description="Schedule type: 'cron' or 'interval'"
     )
-    cron_expression: Optional[str] = Field(
+    cron_expression: str | None = Field(
         default="0 */4 * * *",
         description="Cron expression (minute hour day month day_of_week)"
     )
-    interval_hours: Optional[int] = Field(
+    interval_hours: int | None = Field(
         default=4,
         ge=1,
         le=168,  # Max 1 week
@@ -54,27 +54,27 @@ class CreateScheduleRequest(BaseModel):
 class UpdateScheduleRequest(BaseModel):
     """Request model for updating an existing scoring schedule"""
 
-    schedule_type: Optional[str] = Field(
+    schedule_type: str | None = Field(
         default=None,
         pattern="^(cron|interval)$",
         description="Schedule type: 'cron' or 'interval'"
     )
-    cron_expression: Optional[str] = Field(
+    cron_expression: str | None = Field(
         default=None,
         description="Cron expression (minute hour day month day_of_week)"
     )
-    interval_hours: Optional[int] = Field(
+    interval_hours: int | None = Field(
         default=None,
         ge=1,
         le=168,  # Max 1 week
         description="Hours between scoring runs (for interval type)"
     )
-    force_recalculate: Optional[bool] = Field(
+    force_recalculate: bool | None = Field(
         default=None,
         description="Force recalculation of all scores"
     )
-    timezone: Optional[str] = Field(default=None, description="Timezone for scheduling")
-    enabled: Optional[bool] = Field(default=None, description="Whether schedule is active")
+    timezone: str | None = Field(default=None, description="Timezone for scheduling")
+    enabled: bool | None = Field(default=None, description="Whether schedule is active")
 
 
 class ScheduleResponse(BaseModel):
@@ -84,12 +84,12 @@ class ScheduleResponse(BaseModel):
     store_id: str
     enabled: bool
     schedule_type: str
-    cron_expression: Optional[str]
-    interval_hours: Optional[int]
+    cron_expression: str | None
+    interval_hours: int | None
     timezone: str
-    next_run_time: Optional[str]
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
+    next_run_time: str | None
+    created_at: str | None = None
+    updated_at: str | None = None
 
 
 class JobStatusResponse(BaseModel):
@@ -100,20 +100,20 @@ class JobStatusResponse(BaseModel):
     store_id: str
     status: str
     started_at: str
-    completed_at: Optional[str]
+    completed_at: str | None
     processed_items: int
     processing_time_ms: int
-    items_per_second: Optional[float]
-    error_message: Optional[str]
+    items_per_second: float | None
+    error_message: str | None
 
 
 # API Endpoints
-@router.post("/schedules", response_model=Dict[str, Any])
+@router.post("/schedules", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("10/minute")
 async def create_scoring_schedule(
     request_data: CreateScheduleRequest,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -190,12 +190,12 @@ async def create_scoring_schedule(
         ) from e
 
 
-@router.get("/schedules", response_model=Dict[str, Any])
+@router.get("/schedules", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("30/minute")
 async def list_scoring_schedules(
     request: Request,
-    store_id: Optional[str] = Query(None, description="Filter by store ID"),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    store_id: str | None = Query(None, description="Filter by store ID"),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -253,12 +253,12 @@ async def list_scoring_schedules(
         ) from e
 
 
-@router.get("/schedules/{schedule_id}", response_model=Dict[str, Any])
+@router.get("/schedules/{schedule_id}", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("50/minute")
 async def get_scoring_schedule(
     schedule_id: str,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -318,13 +318,13 @@ async def get_scoring_schedule(
         ) from e
 
 
-@router.put("/schedules/{schedule_id}", response_model=Dict[str, Any])
+@router.put("/schedules/{schedule_id}", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("20/minute")
 async def update_scoring_schedule(
     schedule_id: str,
     request_data: UpdateScheduleRequest,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -418,12 +418,12 @@ async def update_scoring_schedule(
         ) from e
 
 
-@router.delete("/schedules/{schedule_id}", response_model=Dict[str, Any])
+@router.delete("/schedules/{schedule_id}", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("10/minute")
 async def delete_scoring_schedule(
     schedule_id: str,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -491,7 +491,7 @@ async def delete_scoring_schedule(
         ) from e
 
 
-@router.post("/trigger/{store_id}", response_model=Dict[str, Any])
+@router.post("/trigger/{store_id}", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("5/minute")
 async def trigger_immediate_scoring(
     store_id: str,
@@ -499,7 +499,7 @@ async def trigger_immediate_scoring(
     force_recalculate: bool = Query(
         False, description="Force recalculation of all scores"
     ),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -558,12 +558,12 @@ async def trigger_immediate_scoring(
         ) from e
 
 
-@router.get("/jobs/{job_id}", response_model=Dict[str, Any])
+@router.get("/jobs/{job_id}", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("100/minute")
 async def get_job_status(
     job_id: str,
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -641,11 +641,11 @@ async def get_job_status(
         ) from e
 
 
-@router.get("/system/status", response_model=Dict[str, Any])
+@router.get("/system/status", response_model=dict[str, Any])
 @ai_endpoint_rate_limit("10/minute")
 async def get_system_status(
     request: Request,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """

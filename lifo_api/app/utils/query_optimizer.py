@@ -22,7 +22,7 @@ class QueryOptimizer:
 
     async def get_inventory_with_scores_bulk(
         self, store_id: str, limit: int = 1000
-    ) -> List[dict]:
+    ) -> list[dict]:
         """
         Optimized query to get inventory with scores in a single query
         Avoids N+1 problem using JOIN and window functions
@@ -171,7 +171,7 @@ class QueryOptimizer:
         data = [dict(row._mapping) for row in result]
         return self._aggregate_analytics(data)
 
-    def _aggregate_analytics(self, daily_data: List[dict]) -> dict:
+    def _aggregate_analytics(self, daily_data: list[dict]) -> dict:
         """Aggregate daily analytics into summary"""
         if not daily_data:
             return {}
@@ -208,7 +208,7 @@ class QueryOptimizer:
     async def bulk_insert_optimized(
         self, 
         table_name: str, 
-        records: List[dict], 
+        records: list[dict], 
         chunk_size: int = 100
     ) -> int:
         """
@@ -295,7 +295,7 @@ class QueryOptimizer:
             except Exception as e:
                 logger.warning(f"Index creation skipped (may already exist): {e}")
 
-    async def vacuum_analyze_tables(self, tables: List[str]):
+    async def vacuum_analyze_tables(self, tables: list[str]):
         """Run VACUUM ANALYZE on specified tables for query optimization"""
         for table in tables:
             try:

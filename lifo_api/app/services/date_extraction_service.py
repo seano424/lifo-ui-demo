@@ -17,14 +17,14 @@ logger = structlog.get_logger()
 @dataclass
 class DateExtractionResult:
     """Result of date extraction with confidence scoring"""
-    date: Optional[datetime]
+    date: datetime | None
     raw_text: str
     format_detected: str
     confidence: float
     date_type: str  # 'expiry', 'best_before', 'use_by', 'manufactured'
     regulatory_format: str  # 'EU', 'US', 'ISO', 'COMPACT'
-    language_detected: Optional[str] = None
-    bounding_box: Optional[dict] = None
+    language_detected: str | None = None
+    bounding_box: dict | None = None
 
 
 @dataclass
@@ -297,7 +297,7 @@ class DateExtractionService:
     async def extract_dates_from_text_blocks(
         self,
         text_blocks: list[str],
-        bounding_boxes: Optional[list[dict]] = None,
+        bounding_boxes: list[dict] | None = None,
         preferred_region: str = 'EU'
     ) -> list[DateExtractionResult]:
         """
@@ -408,9 +408,9 @@ class DateExtractionService:
     async def _extract_dates_from_block(
         self,
         text_block: str,
-        bounding_box: Optional[dict],
+        bounding_box: dict | None,
         preferred_region: str,
-        detected_language: Optional[str],
+        detected_language: str | None,
         context_text: str
     ) -> list[DateExtractionResult]:
         """Extract dates from a single text block with context awareness"""
@@ -451,10 +451,10 @@ class DateExtractionService:
         pattern_info: dict,
         pattern_name: str,
         text_block: str,
-        bounding_box: Optional[dict],
-        detected_language: Optional[str],
+        bounding_box: dict | None,
+        detected_language: str | None,
         context_text: str
-    ) -> Optional[DateExtractionResult]:
+    ) -> DateExtractionResult | None:
         """Create a DateExtractionResult from a regex match"""
         try:
             groups = match.groups()
@@ -498,10 +498,10 @@ class DateExtractionService:
         self,
         groups: tuple,
         pattern_info: dict,
-        detected_language: Optional[str],
+        detected_language: str | None,
         context_text: str = "",
         pattern_name: str = "unknown"
-    ) -> Optional[datetime]:
+    ) -> datetime | None:
         """Parse date from regex groups based on format"""
         try:
             format_type = pattern_info['format']
@@ -553,7 +553,7 @@ class DateExtractionService:
 
             elif format_type in ['DD Mon YY']:
                 day, month_str, year = filtered_groups[0], filtered_groups[1], filtered_groups[2]
-                month_num: Optional[int] = self._get_month_number(month_str.lower(), detected_language)
+                month_num: int | None = self._get_month_number(month_str.lower(), detected_language)
                 if month_num is not None:
                     year_normalized = self._normalize_year(int(year))
                     return datetime(year_normalized, month_num, int(day))
@@ -570,8 +570,8 @@ class DateExtractionService:
         self,
         groups: list[str],
         pattern_info: dict,
-        detected_language: Optional[str] = None
-    ) -> Optional[datetime]:
+        detected_language: str | None = None
+    ) -> datetime | None:
         """Smart date parsing that detects format based on content"""
         try:
             first, second, third = int(groups[0]), int(groups[1]), int(groups[2])
@@ -637,8 +637,8 @@ class DateExtractionService:
         self,
         groups: tuple,
         format_type: str,
-        detected_language: Optional[str]
-    ) -> Optional[datetime]:
+        detected_language: str | None
+    ) -> datetime | None:
         """Parse dates with month names"""
         try:
             if format_type == 'DD Mon YYYY':
@@ -646,7 +646,7 @@ class DateExtractionService:
             else:  # Mon DD YYYY
                 month_str, day, year = groups[0], groups[1], groups[2]
 
-            month_num: Optional[int] = self._get_month_number(month_str.lower(), detected_language)
+            month_num: int | None = self._get_month_number(month_str.lower(), detected_language)
             if month_num is not None:
                 year_normalized = self._normalize_year(int(year))
                 return datetime(year_normalized, month_num, int(day))
@@ -656,7 +656,7 @@ class DateExtractionService:
 
         return None
 
-    def _parse_compact_date(self, date_str: str) -> Optional[datetime]:
+    def _parse_compact_date(self, date_str: str) -> datetime | None:
         """Parse compact date formats like DDMMYYYY or DDMMYY"""
         try:
             if len(date_str) == 8:  # DDMMYYYY
@@ -675,7 +675,7 @@ class DateExtractionService:
         except ValueError:
             return None
 
-    def _parse_compact_date_yyyy(self, date_str: str) -> Optional[datetime]:
+    def _parse_compact_date_yyyy(self, date_str: str) -> datetime | None:
         """Parse YYYY first compact date formats like YYYYMMDD"""
         try:
             logger.debug(f"Parsing YYYY compact date: '{date_str}' (length: {len(date_str)})")
@@ -693,7 +693,7 @@ class DateExtractionService:
             logger.debug(f"ValueError parsing YYYY compact date: {e}")
             return None
 
-    def _get_month_number(self, month_str: str, detected_language: Optional[str]) -> Optional[int]:
+    def _get_month_number(self, month_str: str, detected_language: str | None) -> int | None:
         """Get month number from month name with language detection"""
         month_lower = month_str.lower()
 
@@ -719,7 +719,7 @@ class DateExtractionService:
                 return 1900 + year
         return year
 
-    def _detect_language(self, text: str) -> Optional[str]:
+    def _detect_language(self, text: str) -> str | None:
         """Detect language from text content"""
         text_lower = text.lower()
 
@@ -904,7 +904,7 @@ class DateExtractionService:
 
 
 # Global service instance
-_date_extraction_service: Optional[DateExtractionService] = None
+_date_extraction_service: DateExtractionService | None = None
 
 def get_date_extraction_service() -> DateExtractionService:
     """Get singleton instance of date extraction service"""

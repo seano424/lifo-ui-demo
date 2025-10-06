@@ -64,8 +64,8 @@ class ImageQualityAssessment:
     overall_quality: QualityLevel
     confidence: float  # 0.0 to 1.0
     metrics: ImageQualityMetrics
-    issues: List[QualityIssue]
-    recommendations: List[str]
+    issues: list[QualityIssue]
+    recommendations: list[str]
     ocr_readiness_score: float  # 0.0 to 1.0, specific to OCR tasks
 
 class ImageQualityService:
@@ -93,7 +93,7 @@ class ImageQualityService:
     async def assess_image_quality(
         self,
         image_data: bytes,
-        focus_areas: Optional[List[Dict]] = None
+        focus_areas: list[dict] | None = None
     ) -> ImageQualityAssessment:
         """
         Comprehensive image quality assessment for OCR optimization
@@ -140,7 +140,7 @@ class ImageQualityService:
     def _analyze_image_quality(
         self,
         image_data: bytes,
-        focus_areas: Optional[List[Dict]] = None
+        focus_areas: list[dict] | None = None
     ) -> ImageQualityAssessment:
         """Internal method for comprehensive quality analysis"""
 
@@ -189,7 +189,7 @@ class ImageQualityService:
         image_pil: Image.Image,
         image_cv: np.ndarray,
         gray: np.ndarray,
-        focus_areas: Optional[List[Dict]] = None
+        focus_areas: list[dict] | None = None
     ) -> ImageQualityMetrics:
         """Calculate comprehensive quality metrics"""
 
@@ -419,7 +419,7 @@ class ImageQualityService:
         except Exception:
             return 1.0
 
-    def _estimate_text_area(self, gray: np.ndarray, focus_areas: Optional[List[Dict]] = None) -> float:
+    def _estimate_text_area(self, gray: np.ndarray, focus_areas: list[dict] | None = None) -> float:
         """Estimate the ratio of image containing text"""
         try:
             cv2 = safe_cv2_import()
@@ -454,7 +454,7 @@ class ImageQualityService:
         except Exception:
             return 0.1  # Conservative estimate
 
-    def _estimate_text_area_fallback(self, gray: np.ndarray, focus_areas: Optional[List[Dict]] = None) -> float:
+    def _estimate_text_area_fallback(self, gray: np.ndarray, focus_areas: list[dict] | None = None) -> float:
         """Fallback text area estimation using edge density analysis"""
         try:
             # Calculate edge density as proxy for text content
@@ -483,7 +483,7 @@ class ImageQualityService:
         except Exception:
             return 0.1  # Conservative fallback
 
-    def _identify_quality_issues(self, metrics: ImageQualityMetrics) -> List[QualityIssue]:
+    def _identify_quality_issues(self, metrics: ImageQualityMetrics) -> list[QualityIssue]:
         """Identify specific quality issues based on metrics"""
         issues = []
 
@@ -570,8 +570,8 @@ class ImageQualityService:
     def _generate_recommendations(
         self,
         metrics: ImageQualityMetrics,
-        issues: List[QualityIssue]
-    ) -> List[str]:
+        issues: list[QualityIssue]
+    ) -> list[str]:
         """Generate actionable recommendations for image improvement"""
         recommendations = []
 
@@ -610,8 +610,8 @@ class ImageQualityService:
     def _calculate_overall_quality(
         self,
         metrics: ImageQualityMetrics,
-        issues: List[QualityIssue]
-    ) -> Tuple[QualityLevel, float]:
+        issues: list[QualityIssue]
+    ) -> tuple[QualityLevel, float]:
         """Calculate overall quality level and confidence"""
 
         # Calculate quality score based on multiple factors
@@ -679,7 +679,7 @@ class ImageQualityService:
     def _calculate_ocr_readiness(
         self,
         metrics: ImageQualityMetrics,
-        issues: List[QualityIssue]
+        issues: list[QualityIssue]
     ) -> float:
         """Calculate OCR-specific readiness score"""
 
@@ -733,7 +733,7 @@ class ImageQualityService:
         )
 
 # Global service instance
-_image_quality_service: Optional[ImageQualityService] = None
+_image_quality_service: ImageQualityService | None = None
 
 def get_image_quality_service() -> ImageQualityService:
     """Get global image quality service instance"""
