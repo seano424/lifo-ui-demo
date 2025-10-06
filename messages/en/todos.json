@@ -234,6 +234,30 @@
       "active": "Active",
       "expired": "Expired"
     },
+    "expiry": {
+      "expiringWithin": "Expiring within",
+      "expiredInLast": "Expired in last",
+      "expiryRange": "Expiry range",
+      "expiring": {
+        "all": "All expiring",
+        "3days": "3 days",
+        "1week": "1 week",
+        "2weeks": "2 weeks",
+        "1month": "1 month"
+      },
+      "expired": {
+        "all": "All expired",
+        "3days": "Last 3 days",
+        "1week": "Last week",
+        "2weeks": "Last 2 weeks",
+        "1month": "Last month"
+      },
+      "general": {
+        "all": "All dates",
+        "expiringSoon": "Expiring soon (7 days)",
+        "recentlyExpired": "Recently expired (7 days)"
+      }
+    },
     "urgencyCount": "Urgency ({count})",
     "filterByUrgency": "Filter by urgency",
     "actionsCount": "Actions ({count})",

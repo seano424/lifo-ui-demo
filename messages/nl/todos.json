@@ -220,6 +220,30 @@
       "active": "Actief",
       "expired": "Verlopen"
     },
+    "expiry": {
+      "expiringWithin": "Verloopt in",
+      "expiredInLast": "Verlopen in de laatste",
+      "expiryRange": "Vervalperiode",
+      "expiring": {
+        "all": "Alle verlopen",
+        "3days": "3 dagen",
+        "1week": "1 week",
+        "2weeks": "2 weken",
+        "1month": "1 maand"
+      },
+      "expired": {
+        "all": "Alle verlopen",
+        "3days": "Laatste 3 dagen",
+        "1week": "Laatste week",
+        "2weeks": "Laatste 2 weken",
+        "1month": "Laatste maand"
+      },
+      "general": {
+        "all": "Alle datums",
+        "expiringSoon": "Verloopt binnenkort (7 dagen)",
+        "recentlyExpired": "Verlopen laatst (7 dagen)"
+      }
+    },
     "urgencyCount": "Urgentie ({count})",
     "filterByUrgency": "Filteren op urgentie",
     "actionsCount": "Acties ({count})",

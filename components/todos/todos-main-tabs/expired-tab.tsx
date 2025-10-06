@@ -29,6 +29,8 @@ export function ExpiredTab({ filters, pageSize = 20 }: ExpiredTabProps) {
       urgency_level: filters.urgency_level,
       action_type: filters.action_type,
       product_name: filters.product_name,
+      days_to_expiry_min: filters.days_to_expiry_min,
+      days_to_expiry_max: filters.days_to_expiry_max,
     },
     pageSize,
   )

@@ -83,7 +83,16 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const { data: pendingTodos } = usePendingTodos(filters, pageSize)
   const { data: inProgressTodos } = useInProgressTodos(filters, pageSize)
   const { data: completedTodos } = useCompletedTodos(filters, pageSize)
-  const { data: expiringTodos } = useExpiringTodos(3, pageSize)
+  const { data: expiringTodos } = useExpiringTodos(
+    {
+      urgency_level: filters.urgency_level,
+      action_type: filters.action_type,
+      product_name: filters.product_name,
+      days_to_expiry_min: filters.days_to_expiry_min,
+      days_to_expiry_max: filters.days_to_expiry_max,
+    },
+    pageSize,
+  )
   const { data: expiredTodos } = useExpiredTodos(filters, pageSize)
 
   // Tab configuration
@@ -219,6 +228,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             filters={filters}
             onFiltersChange={handleFiltersChange}
             isLoading={false}
+            activeTab={activeTab}
           />
         </div>
       )}
@@ -228,6 +238,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           filters={filters}
           onFiltersChange={handleFiltersChange}
           isLoading={false}
+          activeTab={activeTab}
         />
       </div>
 
