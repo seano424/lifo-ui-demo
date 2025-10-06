@@ -365,7 +365,7 @@ class BatchAction(Base):
         else {"extend_existing": True}
     )
 
-    action_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
+    entry_id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4)
     batch_id = Column(
         get_uuid_type(),
         ForeignKey(

@@ -64,7 +64,7 @@ class ActionTrackingService:
         This completes the AI recommendation vs actual action tracking
         """
         result = await self.db.execute(
-            select(BatchAction).where(BatchAction.action_id == uuid.UUID(action_id))
+            select(BatchAction).where(BatchAction.entry_id == uuid.UUID(action_id))
         )
         action_record = result.scalar_one_or_none()
 

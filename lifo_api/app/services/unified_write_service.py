@@ -638,7 +638,7 @@ class UnifiedWriteService:
         tx.increment_operation()
         
         return {
-            "action_id": action_record.action_id,
+            "action_id": action_record.entry_id,
             "recommended_action": score_result["recommendation"]
         }
     

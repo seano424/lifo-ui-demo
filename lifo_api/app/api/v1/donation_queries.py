@@ -115,7 +115,7 @@ async def get_batch_actions(
         return {
             "actions": [
                 {
-                    "action_id": str(action.action_id),
+                    "action_id": str(action.entry_id),
                     "batch_id": str(action.batch_id),
                     "store_id": str(action.store_id),
                     "recommended_action": action.recommended_action.value,
